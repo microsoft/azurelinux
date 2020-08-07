@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "MICROSOFT-RPM-GPG-KEY": "2cfd20a306b2fa5e25522d78f2ef50a1f429d35fd30bd983e2ebffc2b80944fa",
+  "mariner-official-base.repo": "e551fdc398d9b4c098b403fe0e176b758a6a5450d22d178b0bbc0beb29398771",
+  "mariner-official-update.repo": "b2002481315f5f10e6222dd219e76251501611423bc1559288a9a25ed2b8cc4e"
+ }
+}

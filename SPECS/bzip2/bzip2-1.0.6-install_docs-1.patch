@@ -1,0 +1,42 @@
+Submitted By:            Matthew Burgess <matthew@linuxfromscratch.org>
+Date:                    2007-01-31
+Initial Package Version: 1.0.4
+Upstream Status:         Not submitted
+Origin:                  Randy McMurchy & Steve Crosby
+Description:             Installs pre-formatted documentation
+
+diff -Naur bzip2-1.0.4.orig/Makefile bzip2-1.0.4/Makefile
+--- bzip2-1.0.4.orig/Makefile	2007-01-03 03:49:21.000000000 +0000
++++ bzip2-1.0.4/Makefile	2007-01-26 20:00:01.000000000 +0000
+@@ -25,7 +25,7 @@
+ 
+ # Where you want it installed when you do 'make install'
+ PREFIX=/usr/local
+-
++DOCDIR=share/doc/$(DISTNAME)
+ 
+ OBJS= blocksort.o  \
+       huffman.o    \
+@@ -74,6 +74,7 @@
+ 	if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
+ 	if ( test ! -d $(PREFIX)/man ) ; then mkdir -p $(PREFIX)/man ; fi
+ 	if ( test ! -d $(PREFIX)/man/man1 ) ; then mkdir -p $(PREFIX)/man/man1 ; fi
++	if ( test ! -d $(PREFIX)/$(DOCDIR) ) ; then mkdir -p $(PREFIX)/$(DOCDIR); fi
+ 	if ( test ! -d $(PREFIX)/include ) ; then mkdir -p $(PREFIX)/include ; fi
+ 	cp -f bzip2 $(PREFIX)/bin/bzip2
+ 	cp -f bzip2 $(PREFIX)/bin/bunzip2
+@@ -107,6 +108,14 @@
+ 	echo ".so man1/bzgrep.1" > $(PREFIX)/man/man1/bzfgrep.1
+ 	echo ".so man1/bzmore.1" > $(PREFIX)/man/man1/bzless.1
+ 	echo ".so man1/bzdiff.1" > $(PREFIX)/man/man1/bzcmp.1
++	cp -f manual.html $(PREFIX)/$(DOCDIR)
++	cp -f manual.pdf $(PREFIX)/$(DOCDIR)
++	cp -f manual.ps $(PREFIX)/$(DOCDIR)
++	cp -f bzip2.txt $(PREFIX)/$(DOCDIR)
++	chmod a+r $(PREFIX)/$(DOCDIR)/manual.html
++	chmod a+r $(PREFIX)/$(DOCDIR)/manual.pdf
++	chmod a+r $(PREFIX)/$(DOCDIR)/manual.ps
++	chmod a+r $(PREFIX)/$(DOCDIR)/bzip2.txt
+ 
+ clean: 
+ 	rm -f *.o libbz2.a bzip2 bzip2recover \

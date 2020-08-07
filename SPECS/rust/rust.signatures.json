@@ -1,0 +1,12 @@
+{
+ "Signatures": {
+  "cargo-0.39.0-aarch64-unknown-linux-gnu.tar.gz": "496d008dc715ccd7d509c531cec04d9d432c84d779e7b2b1b3cf5abf3d68d172",
+  "cargo-0.39.0-x86_64-unknown-linux-gnu.tar.gz": "406ea5822851cf853a14b250386d47df0a60000410ce8ae92b47dedf8162ba9c",
+  "rust-1.39.0-cargo.tar.gz": "5ff0bc29d904fa053c184f588414160d085ffc542512735409535007a5a35804",
+  "rust-std-1.38.0-aarch64-unknown-linux-gnu.tar.gz": "0725ae9f55639c648fdaba06129de395ed839a7d1aab6aebfd21f26cbe1ce7ca",
+  "rust-std-1.38.0-x86_64-unknown-linux-gnu.tar.gz": "cd50ec3384d79aae89ffdacf09715b68b1b5562657e993f26f67b9458e92dfdd",
+  "rustc-1.38.0-aarch64-unknown-linux-gnu.tar.gz": "0c787eaf01b5779b5a0c12bd0573901cf1b58e5e484ad44c3530b7ed51754d15",
+  "rustc-1.38.0-x86_64-unknown-linux-gnu.tar.gz": "790a611695fabd12c3a141efa58b3dc5913d749947c1a95d3f5b6eb5476ee612",
+  "rustc-1.39.0-src.tar.xz": "4b0dbb356070687a606034f71dc032b783bbf8b5d3f9fff39f2c1fbc4f171c29"
+ }
+}

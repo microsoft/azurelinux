@@ -1,0 +1,135 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Thu, 13 Oct 2016 13:55:26 -0700
+Subject: [PATCH] Make TPM errors less fatal
+
+Handle TPM errors, and stop trying to use the TPM once we hit one.
+---
+ grub-core/kern/dl.c                   |  1 +
+ grub-core/lib/cmdline.c               |  1 +
+ grub-core/loader/i386/efi/linux.c     |  2 ++
+ grub-core/loader/i386/linux.c         |  1 +
+ grub-core/loader/i386/multiboot_mbi.c |  1 +
+ grub-core/loader/linux.c              |  2 ++
+ grub-core/loader/multiboot.c          |  1 +
+ grub-core/loader/multiboot_mbi2.c     |  1 +
+ grub-core/script/execute.c            |  1 +
+ 9 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index d0989573866..91105bc4677 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -831,6 +831,7 @@ grub_dl_load_file (const char *filename)
+   grub_file_close (file);
+ 
+   grub_tpm_measure(core, size, GRUB_BINARY_PCR, "grub_module", filename);
++  grub_print_error();
+ 
+   mod = grub_dl_load_core (core, size);
+   grub_free (core);
+diff --git a/grub-core/lib/cmdline.c b/grub-core/lib/cmdline.c
+index 178f7382f07..d5c12957cad 100644
+--- a/grub-core/lib/cmdline.c
++++ b/grub-core/lib/cmdline.c
+@@ -128,6 +128,7 @@ int grub_create_loader_cmdline (int argc, char *argv[], char *buf,
+ 
+   grub_tpm_measure ((void *)orig, grub_strlen (orig), GRUB_ASCII_PCR,
+ 		    "grub_kernel_cmdline", orig);
++  grub_print_error();
+ 
+   return i;
+ }
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 074dbd6513e..ea9f5134e67 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -133,6 +133,7 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+           goto fail;
+         }
+       grub_tpm_measure (ptr, cursize, GRUB_BINARY_PCR, "grub_linuxefi", "Initrd");
++      grub_print_error();
+       ptr += cursize;
+       grub_memset (ptr, 0, ALIGN_UP_OVERHEAD (cursize, 4));
+       ptr += ALIGN_UP_OVERHEAD (cursize, 4);
+@@ -198,6 +199,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+ 
+   grub_tpm_measure (kernel, filelen, GRUB_BINARY_PCR, "grub_linuxefi", "Kernel");
++  grub_print_error();
+ 
+   rc = grub_linuxefi_secure_validate (kernel, filelen);
+   if (rc < 0)
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index 273f48a6c88..76304f05700 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -726,6 +726,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+ 
+   grub_tpm_measure (kernel, len, GRUB_BINARY_PCR, "grub_linux", "Kernel");
++  grub_print_error();
+ 
+   grub_memcpy (&lh, kernel, sizeof (lh));
+ 
+diff --git a/grub-core/loader/i386/multiboot_mbi.c b/grub-core/loader/i386/multiboot_mbi.c
+index 2ce424a997b..ca85358f771 100644
+--- a/grub-core/loader/i386/multiboot_mbi.c
++++ b/grub-core/loader/i386/multiboot_mbi.c
+@@ -175,6 +175,7 @@ grub_multiboot_load (grub_file_t file, const char *filename)
+     }
+ 
+   grub_tpm_measure((unsigned char*)buffer, len, GRUB_BINARY_PCR, "grub_multiboot", filename);
++  grub_print_error();
+ 
+   header = find_header (buffer, len);
+ 
+diff --git a/grub-core/loader/linux.c b/grub-core/loader/linux.c
+index 78c41e33416..c2c7cfcd0fd 100644
+--- a/grub-core/loader/linux.c
++++ b/grub-core/loader/linux.c
+@@ -290,6 +290,8 @@ grub_initrd_load (struct grub_linux_initrd_context *initrd_ctx,
+ 	  return grub_errno;
+ 	}
+       grub_tpm_measure (ptr, cursize, GRUB_BINARY_PCR, "grub_initrd", "Initrd");
++      grub_print_error();
++
+       ptr += cursize;
+     }
+   if (newc)
+diff --git a/grub-core/loader/multiboot.c b/grub-core/loader/multiboot.c
+index 3b87dc4fab3..9a8dae5565b 100644
+--- a/grub-core/loader/multiboot.c
++++ b/grub-core/loader/multiboot.c
+@@ -442,6 +442,7 @@ grub_cmd_module (grub_command_t cmd __attribute__ ((unused)),
+ 
+   grub_file_close (file);
+   grub_tpm_measure (module, size, GRUB_BINARY_PCR, "grub_multiboot", argv[0]);
++  grub_print_error();
+   return GRUB_ERR_NONE;
+ }
+ 
+diff --git a/grub-core/loader/multiboot_mbi2.c b/grub-core/loader/multiboot_mbi2.c
+index 60ae4606fda..54078455e2f 100644
+--- a/grub-core/loader/multiboot_mbi2.c
++++ b/grub-core/loader/multiboot_mbi2.c
+@@ -133,6 +133,7 @@ grub_multiboot2_load (grub_file_t file, const char *filename)
+   COMPILE_TIME_ASSERT (MULTIBOOT_HEADER_ALIGN % 4 == 0);
+ 
+   grub_tpm_measure ((unsigned char *)mld.buffer, len, GRUB_BINARY_PCR, "grub_multiboot", filename);
++  grub_print_error();
+ 
+   header = find_header (mld.buffer, len);
+   if (header == 0)
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index 976643c47b0..93965777138 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -997,6 +997,7 @@ grub_script_execute_cmdline (struct grub_script_cmd *cmd)
+   cmdstring[cmdlen-1]= '\0';
+   grub_tpm_measure ((unsigned char *)cmdstring, cmdlen, GRUB_ASCII_PCR,
+ 		    "grub_cmd", cmdstring);
++  grub_print_error();
+   grub_free(cmdstring);
+   invert = 0;
+   argc = argv.argc - 1;

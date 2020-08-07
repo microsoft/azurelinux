@@ -1,0 +1,121 @@
+#
+#   System settings
+#
+%_topdir            /usr/src/mariner
+#
+#   Some standard locations
+#
+%_sysconfdir        /etc
+%_lib               /usr/lib
+%_lib64             /usr/lib64
+%_prefix            /usr
+%_exec_prefix       /usr
+%_bindir            /usr/bin
+%_sbindir           /usr/sbin
+%_libdir            /usr/lib
+%_lib64dir          /usr/lib64
+%_libexecdir        /usr/libexec
+%_datadir           /usr/share
+%_docdir            /usr/share/doc
+%_includedir        /usr/include
+%_infodir           /usr/share/info
+%_mandir            /usr/share/man
+%_oldincludedir     /usr/include
+%_sharedstatedir    /var/lib
+%_var               /var
+%_localstatedir     /var
+
+%__tar              /bin/tar --no-same-owner
+
+# This section overrides the default behavior of the build macro to export
+# all of the flags handled by set_build_flags. Once the configure macros
+# are consistently applied this override should be removed.
+%__spec_build_template	#!%{__spec_build_shell}\
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
+%_enable_debug_packages 1
+%_include_minidebuginfo 1
+%_use_internal_dependency_generator 1
+%_build_id_links alldebug
+
+%__os_install_post    \
+    %{_rpmconfigdir}/brp-compress \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
+%{nil}
+
+%install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
+%%install\
+%{nil}
+
+# Compilation and linking flag macros
+%build_cflags %{optflags}
+%build_cxxflags %{optflags}
+%build_fflags %{optflags} -I%{_fmoddir}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}
+
+%set_build_flags \
+  CFLAGS="${CFLAGS:-%{build_cflags}}" ; export CFLAGS ; \
+  CXXFLAGS="${CXXFLAGS:-%{build_cxxflags}}" ; export CXXFLAGS ; \
+  FFLAGS="${FFLAGS:-%{build_fflags}}" ; export FFLAGS ; \
+  FCFLAGS="${FCFLAGS:-%{build_fflags}}" ; export FCFLAGS ; \
+  LDFLAGS="${LDFLAGS:-%{build_ldflags}}" ; export LDFLAGS ; \
+  LT_SYS_LIBRARY_PATH="${LT_SYS_LIBRARY_PATH:-%_libdir:}" ; export LT_SYS_LIBRARY_PATH
+
+%configure \
+  %{set_build_flags}; \
+  %{_configure} --host=%{_host} --build=%{_build} \\\
+        --program-prefix=%{?_program_prefix} \\\
+        --disable-dependency-tracking \\\
+        --prefix=%{_prefix} \\\
+        --exec-prefix=%{_exec_prefix} \\\
+        --bindir=%{_bindir} \\\
+        --sbindir=%{_sbindir} \\\
+        --sysconfdir=%{_sysconfdir} \\\
+        --datadir=%{_datadir} \\\
+        --includedir=%{_includedir} \\\
+        --libdir=%{_libdir} \\\
+        --libexecdir=%{_libexecdir} \\\
+        --localstatedir=%{_localstatedir} \\\
+        --sharedstatedir=%{_sharedstatedir} \\\
+        --mandir=%{_mandir} \\\
+        --infodir=%{_infodir}
+
+# Use SHA256 for FILEDIGESTS
+%_source_filedigest_algorithm 8
+%_binary_filedigest_algorithm 8
+
+%_hardening_cflags      -specs=/usr/lib/rpm/mariner/default-hardened-cc1
+%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld
+
+# Harden packages by default
+# https://fedorahosted.org/fesco/ticket/1384 (accepted on 2014-02-11)
+# Use "%undefine _hardened_build" to disable.
+%_hardened_build        1
+%_hardened_cflags       %{?_hardened_build:%{_hardening_cflags}}
+%_hardened_ldflags      %{?_hardened_build:%{_hardening_ldflags}}
+
+# Add extra information to binary objects created by gcc
+# https://pagure.io/fesco/issue/1780 (accepted on 2017-10-30)
+# Use "%undefine _annotated_build" to disable.
+#%_annotated_build       1
+%_annobin_cflags        -specs=/usr/lib/rpm/mariner/default-annobin-cc1
+%_annotated_cflags      %{?_annotated_build:%{_annobin_cflags}}
+
+# Fail linking if there are undefined symbols.  Required for proper
+# ELF symbol versioning support.  Disabled by default.
+# Use "%define _ld_strict_symbol_defs 1" to enable.
+#%_ld_strict_symbol_defs                1
+%_ld_symbols_flags              %{?_ld_strict_symbol_defs:-Wl,-z,defs}
+
+# https://fedoraproject.org/wiki/Changes/RemoveExcessiveLinking
+# use "%undefine _ld_as_needed" to disable.
+%_ld_as_needed          1
+%_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
+
+%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}

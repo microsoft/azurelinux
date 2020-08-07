@@ -1,0 +1,99 @@
+diff -up libcgroup-0.41/src/api.c.coverity libcgroup-0.41/src/api.c
+--- libcgroup-0.41/src/api.c.coverity	2014-01-13 20:52:49.853838149 +0100
++++ libcgroup-0.41/src/api.c	2014-01-13 20:52:49.854838142 +0100
+@@ -2791,7 +2791,6 @@ static int cgroup_create_template_group(
+ 	if (group_name == NULL) {
+ 		ret = ECGOTHER;
+ 		last_errno = errno;
+-		free(template_name);
+ 		goto end;
+ 	}
+ 
+diff -up libcgroup-0.41/src/config.c.coverity libcgroup-0.41/src/config.c
+--- libcgroup-0.41/src/config.c.coverity	2014-01-13 15:05:56.000000000 +0100
++++ libcgroup-0.41/src/config.c	2014-01-13 20:52:49.854838142 +0100
+@@ -323,7 +323,7 @@ int config_group_task_perm(char *perm_ty
+ 	long val = atoi(value);
+ 	char buffer[CGROUP_BUFFER_LEN];
+ 	struct cgroup *config_cgroup;
+-	int table_index;
++	int table_index, ret;
+ 
+ 	switch (flag) {
+ 	case CGROUP:
+@@ -367,10 +367,10 @@ int config_group_task_perm(char *perm_ty
+ 			if (!group)
+ 				goto group_task_error;
+ 
+-			getgrnam_r(value, group, buffer,
++			ret = getgrnam_r(value, group, buffer,
+ 					CGROUP_BUFFER_LEN, &group_buffer);
+ 
+-			if (group_buffer == NULL) {
++			if (ret != 0 || group_buffer == NULL) {
+ 				free(group);
+ 				goto group_task_error;
+ 			}
+@@ -436,7 +436,7 @@ int config_group_admin_perm(char *perm_t
+ 	struct cgroup *config_cgroup;
+ 	long val = atoi(value);
+ 	char buffer[CGROUP_BUFFER_LEN];
+-	int table_index;
++	int table_index, ret;
+ 
+ 	switch (flag) {
+ 	case CGROUP:
+@@ -479,10 +479,10 @@ int config_group_admin_perm(char *perm_t
+ 			if (!group)
+ 				goto admin_error;
+ 
+-			getgrnam_r(value, group, buffer,
++			ret = getgrnam_r(value, group, buffer,
+ 					CGROUP_BUFFER_LEN, &group_buffer);
+ 
+-			if (group_buffer == NULL) {
++			if (ret != 0 || group_buffer == NULL) {
+ 				free(group);
+ 				goto admin_error;
+ 			}
+diff -up libcgroup-0.41/src/daemon/cgrulesengd.c.coverity libcgroup-0.41/src/daemon/cgrulesengd.c
+--- libcgroup-0.41/src/daemon/cgrulesengd.c.coverity	2014-01-13 15:05:56.000000000 +0100
++++ libcgroup-0.41/src/daemon/cgrulesengd.c	2014-01-13 20:52:49.854838142 +0100
+@@ -646,7 +646,7 @@ close:
+ 
+ static int cgre_create_netlink_socket_process_msg(void)
+ {
+-	int sk_nl = 0, sk_unix = 0, sk_max;
++	int sk_nl = -1, sk_unix = -1, sk_max;
+ 	struct sockaddr_nl my_nla;
+ 	char buff[BUFF_SIZE];
+ 	int rc = -1;
+@@ -784,9 +784,9 @@ static int cgre_create_netlink_socket_pr
+ 	}
+ 
+ close_and_exit:
+-	if (sk_nl > 0)
++	if (sk_nl > -1)
+ 		close(sk_nl);
+-	if (sk_unix > 0)
++	if (sk_unix > -1)
+ 		close(sk_unix);
+ 	return rc;
+ }
+diff -upr libcgroup-0.40.rc1.orig/src/tools/lscgroup.c libcgroup-0.40.rc1/src/tools/lscgroup.c
+--- libcgroup-0.40.rc1.orig/src/tools/lscgroup.c	2013-05-21 15:36:04.000000000 +0200
++++ libcgroup-0.40.rc1/src/tools/lscgroup.c	2013-11-04 14:26:53.400473523 +0100
+@@ -97,11 +97,11 @@ static int display_controller_data(char
+ 	if (ret != 0)
+ 		return ret;
+ 
+-	strncpy(cgroup_dir_path, info.full_path, FILENAME_MAX);
++	strncpy(cgroup_dir_path, info.full_path, FILENAME_MAX - 1);
+ 	/* remove problematic  '/' characters from cgroup directory path*/
+ 	trim_filepath(cgroup_dir_path);
+ 
+-	strncpy(input_dir_path, input_path, FILENAME_MAX);
++	strncpy(input_dir_path, input_path, FILENAME_MAX - 1);
+ 
+ 	/* remove problematic  '/' characters from input directory path*/
+ 	trim_filepath(input_dir_path);

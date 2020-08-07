@@ -1,0 +1,86 @@
+diff -u net-tools-1.60/lib/interface.c net-tools-1.60/lib/interface.c
+--- net-tools-1.60/lib/interface.c
++++ net-tools-1.60/lib/interface.c
+@@ -858,37 +858,37 @@
+ 	tx = ptr->stats.tx_bytes;
+ 	short_rx = rx * 10;  
+ 	short_tx = tx * 10;
+-	if (rx > 1125899906842624ull) {
+-	    short_rx /= 1125899906842624ull;
+-	    Rext = "PiB";
+-	} else if (rx > 1099511627776ull) {
+-	    short_rx /= 1099511627776ull;
+-	    Rext = "TiB";
+-	} else if (rx > 1073741824ull) {
+-	    short_rx /= 1073741824ull;
+-	    Rext = "GiB";
+-	} else if (rx > 1048576) {
+-	    short_rx /= 1048576;
+-	    Rext = "MiB";
+-	} else if (rx > 1024) {
+-	    short_rx /= 1024;
+-	    Rext = "KiB";
++	if (rx > 1000000000000000ull) {
++	    short_rx /= 1000000000000000ull;
++	    Rext = "PB";
++	} else if (rx > 1000000000000ull) {
++	    short_rx /= 1000000000000ull;
++	    Rext = "TB";
++	} else if (rx > 1000000000ull) {
++	    short_rx /= 1000000000ull;
++	    Rext = "GB";
++	} else if (rx > 1000000) {
++	    short_rx /= 1000000;
++	    Rext = "MB";
++	} else if (rx > 1000) {
++	    short_rx /= 1000;
++	    Rext = "KB";
+ 	}
+-	if (tx > 1125899906842624ull) {
+-	    short_tx /= 1125899906842624ull;
+-	    Text = "PiB";
+-	} else 	if (tx > 1099511627776ull) {
+-	    short_tx /= 1099511627776ull;
+-	    Text = "TiB";
+-	} else if (tx > 1073741824ull) {
+-	    short_tx /= 1073741824ull;
+-	    Text = "GiB";
+-	} else if (tx > 1048576) {
+-	    short_tx /= 1048576;
+-	    Text = "MiB";
+-	} else if (tx > 1024) {
+-	    short_tx /= 1024;
+-	    Text = "KiB";
++	if (tx > 1000000000000000ull) {
++	    short_tx /= 1000000000000000ull;
++	    Text = "PB";
++	} else 	if (tx > 1000000000000ull) {
++	    short_tx /= 1000000000000ull;
++	    Text = "TB";
++	} else if (tx > 1000000000ull) {
++	    short_tx /= 1000000000ull;
++	    Text = "GB";
++	} else if (tx > 1000000) {
++	    short_tx /= 1000000;
++	    Text = "MB";
++	} else if (tx > 1000) {
++	    short_tx /= 1000;
++	    Text = "KB";
+ 	}
+ 
+ 	printf("          ");
+diff -u net-tools-1.60/man/en_US/ifconfig.8 net-tools-1.60/man/en_US/ifconfig.8
+--- net-tools-1.60/man/en_US/ifconfig.8
++++ net-tools-1.60/man/en_US/ifconfig.8
+@@ -194,11 +194,6 @@
+ .BR iptables (8)
+ command.
+ .LP
+-Since net\-tools 1.60\-4 ifconfig is printing byte counters and human readable
+-counters with IEC 60027-2 units. So 1 KiB are 2^10 byte. Note, the numbers 
+-are truncated to one decimal (which can by quite a large error if you 
+-consider 0.1 PiB is 112.589.990.684.262 bytes :)
+-.LP
+ Interrupt problems with Ethernet device drivers fail with EAGAIN
+ .I (SIOCSIIFLAGS: Resource temporarily unavailable)
+ it is most likely a interrupt conflict. See

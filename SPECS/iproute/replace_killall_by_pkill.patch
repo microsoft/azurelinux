@@ -1,0 +1,14 @@
+--- a/ip/ifcfg	2015-08-31 16:31:15.000000000 -0700
++++ b/ip/ifcfg	2016-06-16 00:14:36.670926572 -0700
+@@ -15,7 +15,10 @@
+ }
+ 
+ RestartRDISC () {
+-  killall -HUP rdisc || rdisc -fs
++  #killall is shipped with psmisc package which is not installed by default
++  # on minimal mariner installation, use pkill command instead.
++  #killall -HUP rdisc || rdisc -fs
++  pkill -HUP '^rdisc*' || rdisc -fs
+ }
+ 
+ ABCMaskLen () {

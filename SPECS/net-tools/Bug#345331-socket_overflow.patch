@@ -1,0 +1,28 @@
+Patch by Antonio Galea <ant9000@netwise.it> to solve the socket number overflow
+from #345331
+
+diff -urNad net-tools-1.60/netstat.c /tmp/dpep.15Gej9/net-tools-1.60/netstat.c
+--- net-tools-1.60/netstat.c	2005-12-30 16:52:15.000000000 +0100
++++ /tmp/dpep.15Gej9/net-tools-1.60/netstat.c	2005-12-30 16:56:00.000000000 +0100
+@@ -313,8 +313,8 @@
+ 
+         strncpy(inode_str, lname+PRG_SOCKET_PFXl, inode_str_len);
+         inode_str[inode_str_len] = '\0';
+-        *inode_p = strtol(inode_str,&serr,0);
+-        if (!serr || *serr || *inode_p < 0 || *inode_p >= INT_MAX) 
++        *inode_p = strtoul(inode_str,&serr,0);
++        if (!serr || *serr)
+             return(-1);
+     }
+     return(0);
+@@ -334,8 +334,8 @@
+     {
+         char *serr;
+ 
+-        *inode_p=strtol(lname + PRG_SOCKET_PFX2l,&serr,0);
+-        if (!serr || *serr || *inode_p < 0 || *inode_p >= INT_MAX) 
++        *inode_p=strtoul(lname + PRG_SOCKET_PFX2l,&serr,0);
++        if (!serr || *serr)
+             return(-1);
+     }
+     return(0);

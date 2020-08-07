@@ -1,0 +1,25 @@
+From a8c2e967e74d280cd3b8554af0c95d823647d1c0 Mon Sep 17 00:00:00 2001
+From: Jan Chaloupka <jchaloup@redhat.com>
+Date: Thu, 6 Feb 2014 11:43:18 +0100
+Subject: [PATCH] lex updated, additional '\' char for ID token
+
+---
+ libcgroup-0.41/src/lex.l | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcgroup-0.41/src/lex.l b/libcgroup-0.41/src/lex.l
+index 1b357db..d7bf575 100644
+--- a/libcgroup-0.41/src/lex.l
++++ b/libcgroup-0.41/src/lex.l
+@@ -43,7 +43,7 @@ jmp_buf parser_error_env;
+ "namespace"	{return NAMESPACE;}
+ "template"	{return TEMPLATE;}
+ "default"	{return DEFAULT;}
+-[a-zA-Z0-9_\-\/\.\,\%\@]+ {yylval.name = strdup(yytext); return ID;}
++[a-zA-Z0-9_\-\/\.\,\%\@\\]+ {yylval.name = strdup(yytext); return ID;}
+ \"[^"]*\" {yylval.name = strdup(yytext+1); yylval.name[strlen(yylval.name)-1] = '\0'; return ID; }
+ .	{return yytext[0];}
+ %%
+-- 
+1.8.5.3
+

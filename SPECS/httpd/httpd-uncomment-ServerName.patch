@@ -1,0 +1,12 @@
+diff -rupr a/docs/conf/httpd.conf.in b/docs/conf/httpd.conf.in
+--- a/docs/conf/httpd.conf.in	2017-04-03 14:00:39.329698057 -0700
++++ b/docs/conf/httpd.conf.in	2017-04-03 14:02:13.207020360 -0700
+@@ -105,7 +105,7 @@ ServerAdmin admin@localhost
+ #
+ # If your host doesn't have a registered DNS name, enter its IP address here.
+ #
+-#ServerName localhost:@@Port@@
++ServerName localhost:@@Port@@
+ 
+ #
+ # Deny access to the entirety of your server's filesystem. You must

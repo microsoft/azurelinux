@@ -1,0 +1,33 @@
+From ad27a46d8c0e180f71b4606d7b2a3bd3bebd7bbf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Thu, 13 Oct 2016 13:42:30 +0200
+Subject: [PATCH] api.c: preserve dirty flag when copying controller values
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When setting cgroup parameters with cgset fails, no error is reported.
+This is caused by the fact that cgroup_copy_controller_values is not
+preserving dirty flags of the values, so it's making all errors
+considered non-fatal.
+
+Signed-off-by: Nikola Forró <nforro@redhat.com>
+---
+ src/api.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/api.c b/src/api.c
+index 0bf0615..daf4ef0 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -1687,6 +1687,7 @@ static int cgroup_copy_controller_values(struct cgroup_controller *dst,
+ 		dst_val = dst->values[i];
+ 		strncpy(dst_val->value, src_val->value, CG_VALUE_MAX);
+ 		strncpy(dst_val->name, src_val->name, FILENAME_MAX);
++		dst_val->dirty = src_val->dirty;
+ 	}
+ err:
+ 	return ret;
+-- 
+2.7.4
+

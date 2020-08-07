@@ -1,0 +1,150 @@
+From 691430206f1104b752b0e52386f317e639137788 Mon Sep 17 00:00:00 2001
+From: Jan Chaloupka <jchaloup@redhat.com>
+Date: Mon, 15 Sep 2014 13:29:39 +0200
+Subject: [PATCH] api.c: support for setting multiline values in control files
+
+As of now, libcgroup does not support multiline values setting from configuration files. i.e. values in a form:
+
+net_prio.ifpriomap="lo 7
+eth0 66
+eth1 5
+eth2 4
+eth3 3";
+
+Thus, setting of more network interfaces can not be done from configuration file. Or
+
+devices.allow="a *:* w
+c 8:* r";
+
+thus setting list of allow devices can not be set as well. The only way is to set it from userspace, e.g.:
+# echo "lo 7" > /sys/fs/cgroup/net_prio/testGroup/net_prio.ifpriomap
+# echo "eth 0" > /sys/fs/cgroup/net_prio/testGroup/net_prio.ifpriomap
+# echo "eth 1" > /sys/fs/cgroup/net_prio/testGroup/net_prio.ifpriomap
+# echo "eth 2" > /sys/fs/cgroup/net_prio/testGroup/net_prio.ifpriomap
+# echo "eth 3" > /sys/fs/cgroup/net_prio/testGroup/net_prio.ifpriomap
+
+This patch allows setting of multiline variables.
+
+How this support works:
+Multiline value is broken in lines and each line is set by write (man 2 write) syscall (without bufferring).
+This implies change of fopen with open, fclose with close.
+There is no control on multiline value, thus "eth0\n  \t\n" can be set. However, setting
+of "  \t" will fail as write command returns -1. Thus administrator has to set correct
+multiline values.
+
+Tested on virtual machine with fedora and rhel with network interface lo, eth0-eth3. Configuration file:
+
+# cat /etc/cgconfig.conf
+group testGroup {
+        net_prio {
+                net_prio.ifpriomap="lo 7
+eth0    66
+eth1 5
+eth2 4
+eth3 3";
+        }
+}
+
+net_prio has to be created before:
+# modprobe netprio_cgroup
+# mkdir /sys/fs/cgroup/net_prio
+# mount -t cgroup -onet_prio none /sys/fs/cgroup/net_prio
+
+Changelog:
+	test of success of strdup call
+	free str_val before return (str_val is changing in while cycle,
+		thus str_start_val points to the start of str_val before while)
+
+Signed-off-by: Jan Chaloupka <jchaloup@redhat.com>
+---
+ src/api.c | 50 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/src/api.c b/src/api.c
+index 5751b8f..d6c9d3a 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -1495,13 +1495,18 @@ static int cg_create_control_group(const char *path)
+  */
+ static int cg_set_control_value(char *path, const char *val)
+ {
+-	FILE *control_file = NULL;
++	int ctl_file;
++	char *str_val;
++	char *str_val_start;
++	char *pos;
++	size_t len;
++
+ 	if (!cg_test_mounted_fs())
+ 		return ECGROUPNOTMOUNTED;
+ 
+-	control_file = fopen(path, "r+e");
++	ctl_file = open(path, O_RDWR | O_CLOEXEC);
+ 
+-	if (!control_file) {
++	if (ctl_file == -1) {
+ 		if (errno == EPERM) {
+ 			/*
+ 			 * We need to set the correct error value, does the
+@@ -1512,6 +1517,7 @@ static int cg_set_control_value(char *path, const char *val)
+ 			 */
+ 			char *path_dir_end;
+ 			char *tasks_path;
++			FILE *control_file;
+ 
+ 			path_dir_end = strrchr(path, '/');
+ 			if (path_dir_end == NULL)
+@@ -1543,15 +1549,47 @@ static int cg_set_control_value(char *path, const char *val)
+ 		return ECGROUPVALUENOTEXIST;
+ 	}
+ 
+-	if (fprintf(control_file, "%s", val) < 0) {
++	/* Split the multiline value into lines. */
++	/* One line is a special case of multiline value. */
++	str_val = strdup(val);
++	if (str_val == NULL) {
+ 		last_errno = errno;
+-		fclose(control_file);
++		close(ctl_file);
+ 		return ECGOTHER;
+ 	}
+-	if (fclose(control_file) < 0) {
++
++	str_val_start = str_val;
++	pos = str_val;
++
++	do {
++		str_val = pos;
++		pos = strchr(str_val, '\n');
++
++		if (pos) {
++			*pos = '\0';
++			++pos;
++		}
++
++		len = strlen(str_val);
++		if (len > 0) {
++			if (write(ctl_file, str_val, len) == -1) {
++				last_errno = errno;
++				free(str_val_start);
++				close(ctl_file);
++				return ECGOTHER;
++			}
++		} else
++			cgroup_warn("Warning: skipping empty line for %s\n",
++				path);
++	} while(pos);
++
++	if (close(ctl_file)) {
+ 		last_errno = errno;
++		free(str_val_start);
+ 		return ECGOTHER;
+ 	}
++
++	free(str_val_start);
+ 	return 0;
+ }
+ 
+-- 
+1.9.3
+

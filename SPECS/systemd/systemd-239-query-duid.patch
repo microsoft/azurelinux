@@ -1,0 +1,457 @@
+diff -rup systemd-239/src/libsystemd/sd-network/sd-network.c systemd-239-new/src/libsystemd/sd-network/sd-network.c
+--- systemd-239/src/libsystemd/sd-network/sd-network.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/libsystemd/sd-network/sd-network.c	2018-08-28 18:29:32.652924414 -0700
+@@ -257,6 +257,51 @@ _public_ int sd_network_link_get_carrier
+         return network_link_get_ifindexes(ifindex, "CARRIER_BOUND_BY", ret);
+ }
+ 
++static int network_get_file_str(const char *key, const char *fpath, int ifindex, char **ret) {
++        _cleanup_free_ char *p = NULL, *s = NULL;
++        int r;
++
++        assert_return(ifindex > 0, -EINVAL);
++        assert_return(fpath, -EINVAL);
++        assert_return(ret, -EINVAL);
++
++        if (asprintf(&p, "%s/%d", fpath, ifindex) < 0)
++                return -ENOMEM;
++
++        r = parse_env_file(NULL, p, NEWLINE, key, &s, NULL);
++        if (r == -ENOENT)
++                return -ENODATA;
++        if (r < 0)
++                return r;
++        if (isempty(s))
++                return -ENODATA;
++
++        *ret = s;
++        s = NULL;
++        return 0;
++}
++
++_public_ int sd_network_link_get_clientid(int ifindex, char **clientid) {
++        return network_get_file_str("CLIENTID",
++                                    "/run/systemd/netif/leases",
++                                    ifindex,
++                                    clientid);
++}
++
++_public_ int sd_network_link_get_iaid(int ifindex, char **iaid) {
++        return network_get_file_str("IAID",
++                                    "/run/systemd/netif/leases6",
++                                    ifindex,
++                                    iaid);
++}
++
++_public_ int sd_network_link_get_duid(int ifindex, char **duid) {
++        return network_get_file_str("DUID",
++                                    "/run/systemd/netif/leases6",
++                                    ifindex,
++                                    duid);
++}
++
+ static inline int MONITOR_TO_FD(sd_network_monitor *m) {
+         return (int) (unsigned long) m - 1;
+ }
+diff -rup systemd-239/src/libsystemd-network/dhcp6-lease-internal.h systemd-239-new/src/libsystemd-network/dhcp6-lease-internal.h
+--- systemd-239/src/libsystemd-network/dhcp6-lease-internal.h	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/libsystemd-network/dhcp6-lease-internal.h	2018-08-28 17:45:45.115101216 -0700
+@@ -9,6 +9,7 @@
+ 
+ #include "sd-dhcp6-lease.h"
+ 
++#include "dhcp-identifier.h"
+ #include "dhcp6-internal.h"
+ 
+ struct sd_dhcp6_lease {
+@@ -21,6 +22,8 @@ struct sd_dhcp6_lease {
+ 
+         DHCP6IA ia;
+         DHCP6IA pd;
++        struct duid *duid;
++        size_t duid_len;
+ 
+         DHCP6Address *addr_iter;
+         DHCP6Address *prefix_iter;
+@@ -50,6 +53,7 @@ int dhcp6_lease_set_rapid_commit(sd_dhcp
+ int dhcp6_lease_get_rapid_commit(sd_dhcp6_lease *lease, bool *rapid_commit);
+ 
+ int dhcp6_lease_get_iaid(sd_dhcp6_lease *lease, be32_t *iaid);
++int dhcp6_lease_set_duid(sd_dhcp6_lease *lease, struct duid *duid, size_t duid_len);
+ 
+ int dhcp6_lease_set_dns(sd_dhcp6_lease *lease, uint8_t *optval, size_t optlen);
+ int dhcp6_lease_set_domains(sd_dhcp6_lease *lease, uint8_t *optval,
+@@ -59,3 +63,4 @@ int dhcp6_lease_set_sntp(sd_dhcp6_lease
+                          size_t optlen) ;
+ 
+ int dhcp6_lease_new(sd_dhcp6_lease **ret);
++int dhcp6_lease_save(sd_dhcp6_lease *lease, const char *lease_file);
+diff -rup systemd-239/src/libsystemd-network/sd-dhcp6-client.c systemd-239-new/src/libsystemd-network/sd-dhcp6-client.c
+--- systemd-239/src/libsystemd-network/sd-dhcp6-client.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/libsystemd-network/sd-dhcp6-client.c	2018-08-28 18:44:58.854783546 -0700
+@@ -213,6 +213,23 @@ int sd_dhcp6_client_set_duid(
+         return 0;
+ }
+ 
++int sd_dhcp6_client_get_duid(sd_dhcp6_client *client, uint16_t *duid_type,
++                             const uint8_t **duid, size_t *duid_len) {
++        assert_return(client, -EINVAL);
++        assert_return(IN_SET(client->state, DHCP6_STATE_STOPPED), -EBUSY);
++
++        *duid_type = 0;
++        *duid_len = 0;
++        *duid = NULL;
++        if (client->duid_len > 0) {
++                *duid_type = be16toh(client->duid.type);
++                *duid_len = client->duid_len - sizeof(client->duid.type);
++                *duid = client->duid.raw.data;
++        }
++
++        return 0;
++}
++
+ int sd_dhcp6_client_set_iaid(sd_dhcp6_client *client, uint32_t iaid) {
+         assert_return(client, -EINVAL);
+         assert_return(IN_SET(client->state, DHCP6_STATE_STOPPED), -EBUSY);
+@@ -223,6 +240,14 @@ int sd_dhcp6_client_set_iaid(sd_dhcp6_cl
+         return 0;
+ }
+ 
++int sd_dhcp6_client_get_iaid(sd_dhcp6_client *client, uint32_t *iaid) {
++        assert_return(client, -EINVAL);
++
++        *iaid = be32toh(client->ia_na.ia_na.id);
++
++        return 0;
++}
++
+ int sd_dhcp6_client_set_fqdn(
+                 sd_dhcp6_client *client,
+                 const char *fqdn) {
+@@ -848,6 +873,10 @@ static int client_parse_message(
+                         if (r < 0 && r != -ENOMSG)
+                                 return r;
+ 
++                        r = dhcp6_lease_set_duid(lease, &client->duid, client->duid_len);
++                        if (r < 0)
++                                return r;
++
+                         r = dhcp6_lease_get_iaid(lease, &iaid_lease);
+                         if (r < 0)
+                                 return r;
+diff -rup systemd-239/src/libsystemd-network/sd-dhcp6-lease.c systemd-239-new/src/libsystemd-network/sd-dhcp6-lease.c
+--- systemd-239/src/libsystemd-network/sd-dhcp6-lease.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/libsystemd-network/sd-dhcp6-lease.c	2018-08-28 17:55:36.941847082 -0700
+@@ -3,11 +3,15 @@
+   Copyright © 2014-2015 Intel Corporation. All rights reserved.
+ ***/
+ 
++#include <arpa/inet.h>
+ #include <errno.h>
+ 
+ #include "alloc-util.h"
+ #include "dhcp6-lease-internal.h"
+ #include "dhcp6-protocol.h"
++#include "fd-util.h"
++#include "fileio.h"
++#include "hexdecoct.h"
+ #include "strv.h"
+ #include "util.h"
+ 
+@@ -136,6 +140,15 @@ int dhcp6_lease_get_iaid(sd_dhcp6_lease
+         return 0;
+ }
+ 
++int dhcp6_lease_set_duid(sd_dhcp6_lease *lease, struct duid *duid, size_t duid_len) {
++        assert_return(lease, -EINVAL);
++        assert_return(duid, -EINVAL);
++
++        lease->duid = duid;
++        lease->duid_len = duid_len;
++        return 0;
++}
++
+ int sd_dhcp6_lease_get_address(sd_dhcp6_lease *lease, struct in6_addr *addr,
+                                uint32_t *lifetime_preferred,
+                                uint32_t *lifetime_valid) {
+@@ -424,3 +437,74 @@ int dhcp6_lease_new(sd_dhcp6_lease **ret
+         *ret = lease;
+         return 0;
+ }
++
++int dhcp6_lease_save(sd_dhcp6_lease *lease, const char *lease_file) {
++        _cleanup_free_ char *temp_path = NULL;
++        _cleanup_fclose_ FILE *f = NULL;
++        char addr6[INET6_ADDRSTRLEN];
++        const char *paddr6;
++        struct in6_addr ip6_addr;
++        uint32_t lifetime_preferred, lifetime_valid;
++        be32_t iaid_lease;
++        const struct in6_addr *addresses;
++        int r;
++
++        assert(lease);
++        assert(lease_file);
++
++        r = fopen_temporary(lease_file, &f, &temp_path);
++        if (r < 0)
++                goto fail;
++
++        fchmod(fileno(f), 0644);
++
++        fprintf(f, "# This is private data. Do not parse.\n");
++
++        sd_dhcp6_lease_reset_address_iter(lease);
++        do {
++                r = sd_dhcp6_lease_get_address(lease, &ip6_addr,
++                                               &lifetime_preferred,
++                                               &lifetime_valid);
++                if (r >= 0) {
++                        paddr6 = inet_ntop(AF_INET6, &ip6_addr, addr6,
++                                           INET6_ADDRSTRLEN);
++                        if (paddr6 != NULL) {
++                                fprintf(f, "ADDRESS=%s\n", paddr6);
++                                fprintf(f, "LIFETIME_PREFERRED=%u\n", lifetime_preferred);
++                                fprintf(f, "LIFETIME_VALID=%u\n", lifetime_valid);
++                        }
++                }
++        } while (r >=0);
++
++        r = dhcp6_lease_get_iaid(lease, &iaid_lease);
++        if (r == 0)
++                fprintf(f, "IAID=%u\n", be32toh(iaid_lease));
++
++        if (lease->duid_len > 0) {
++                _cleanup_free_ char *duid_hex;
++
++                duid_hex = hexmem(lease->duid, lease->duid_len);
++                if (duid_hex == NULL) {
++                        r = -ENOMEM;
++                        goto fail;
++                }
++                fprintf(f, "DUID=%s\n", duid_hex);
++        }
++
++        r = fflush_and_check(f);
++        if (r < 0)
++                goto fail;
++
++        if (rename(temp_path, lease_file) < 0) {
++                r = -errno;
++                goto fail;
++        }
++
++        return 0;
++
++fail:
++        if (temp_path)
++                (void) unlink(temp_path);
++
++        return log_error_errno(r, "Failed to save lease data %s: %m", lease_file);
++}
+diff -rup systemd-239/src/network/networkctl.c systemd-239-new/src/network/networkctl.c
+--- systemd-239/src/network/networkctl.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/network/networkctl.c	2018-08-28 17:59:09.994342281 -0700
+@@ -736,6 +736,7 @@ static int link_status_one(
+ 
+         _cleanup_strv_free_ char **dns = NULL, **ntp = NULL, **search_domains = NULL, **route_domains = NULL;
+         _cleanup_free_ char *setup_state = NULL, *operational_state = NULL, *tz = NULL;
++        _cleanup_free_ char *clientid = NULL, *duid = NULL, *iaid = NULL;
+         _cleanup_(sd_device_unrefp) sd_device *d = NULL;
+         char devid[2 + DECIMAL_STR_MAX(int)];
+         _cleanup_free_ char *t = NULL, *network = NULL;
+@@ -838,6 +839,18 @@ static int link_status_one(
+         if (tz)
+                 printf("       Time Zone: %s\n", tz);
+ 
++        (void) sd_network_link_get_clientid(info->ifindex, &clientid);
++        if (clientid)
++                printf("        CLIENTID: %s\n", clientid);
++
++        (void) sd_network_link_get_iaid(info->ifindex, &iaid);
++        if (iaid)
++                printf("            IAID: %s\n", iaid);
++
++        (void) sd_network_link_get_duid(info->ifindex, &duid);
++        if (duid)
++                printf("            DUID: %s\n", duid);
++
+         (void) dump_lldp_neighbors("    Connected To: ", info->ifindex);
+ 
+         return 0;
+diff -rup systemd-239/src/network/networkd.c systemd-239-new/src/network/networkd.c
+--- systemd-239/src/network/networkd.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/network/networkd.c	2018-08-28 18:01:52.275174625 -0700
+@@ -65,6 +65,10 @@ int main(int argc, char *argv[]) {
+         if (r < 0)
+                 log_warning_errno(r, "Could not create runtime directory 'leases': %m");
+ 
++        r = mkdir_safe_label("/run/systemd/netif/leases6", 0755, uid, gid, MKDIR_WARN_MODE);
++        if (r < 0)
++                log_warning_errno(r, "Could not create runtime directory 'leases6': %m");
++
+         r = mkdir_safe_label("/run/systemd/netif/lldp", 0755, uid, gid, MKDIR_WARN_MODE);
+         if (r < 0)
+                 log_warning_errno(r, "Could not create runtime directory 'lldp': %m");
+diff -rup systemd-239/src/network/networkd-dhcp6.c systemd-239-new/src/network/networkd-dhcp6.c
+--- systemd-239/src/network/networkd-dhcp6.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/network/networkd-dhcp6.c	2018-08-28 18:05:22.981585877 -0700
+@@ -333,6 +333,7 @@ static int dhcp6_lease_address_acquired(
+                 if (r < 0)
+                         return r;
+         }
++        link->dhcp6_lease = sd_dhcp6_lease_ref(lease);
+ 
+         return 0;
+ }
+@@ -356,7 +357,9 @@ static void dhcp6_handler(sd_dhcp6_clien
+ 
+                 (void) manager_dhcp6_prefix_remove_all(link->manager, link);
+ 
++                link->dhcp6_lease = sd_dhcp6_lease_unref(link->dhcp6_lease);
+                 link->dhcp6_configured = false;
++                link_dirty(link);
+                 break;
+ 
+         case SD_DHCP6_CLIENT_EVENT_IP_ACQUIRE:
+@@ -379,6 +382,7 @@ static void dhcp6_handler(sd_dhcp6_clien
+                 }
+ 
+                 link->dhcp6_configured = true;
++                link_dirty(link);
+                 break;
+ 
+         default:
+diff -rup systemd-239/src/network/networkd-link.c systemd-239-new/src/network/networkd-link.c
+--- systemd-239/src/network/networkd-link.c	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/network/networkd-link.c	2018-08-28 18:11:12.507990001 -0700
+@@ -9,6 +9,7 @@
+ #include "alloc-util.h"
+ #include "bus-util.h"
+ #include "dhcp-lease-internal.h"
++#include "dhcp6-lease-internal.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+ #include "netlink-util.h"
+@@ -469,6 +470,9 @@ static int link_new(Manager *manager, sd
+         if (asprintf(&link->lease_file, "/run/systemd/netif/leases/%d", link->ifindex) < 0)
+                 return -ENOMEM;
+ 
++        if (asprintf(&link->lease6_file, "/run/systemd/netif/leases6/%d", link->ifindex) < 0)
++                return -ENOMEM;
++
+         if (asprintf(&link->lldp_file, "/run/systemd/netif/lldp/%d", link->ifindex) < 0)
+                 return -ENOMEM;
+ 
+@@ -515,10 +519,12 @@ static void link_free(Link *link) {
+         sd_dhcp_server_unref(link->dhcp_server);
+         sd_dhcp_client_unref(link->dhcp_client);
+         sd_dhcp_lease_unref(link->dhcp_lease);
++        sd_dhcp6_lease_unref(link->dhcp6_lease);
+ 
+         link_lldp_emit_stop(link);
+ 
+         free(link->lease_file);
++        free(link->lease6_file);
+ 
+         sd_lldp_unref(link->lldp);
+         free(link->lldp_file);
+@@ -3562,6 +3568,7 @@ int link_save(Link *link) {
+         assert(link);
+         assert(link->state_file);
+         assert(link->lease_file);
++        assert(link->lease6_file);
+         assert(link->manager);
+ 
+         if (link->state == LINK_STATE_LINGER) {
+@@ -3841,6 +3848,31 @@ int link_save(Link *link) {
+         } else
+                 unlink(link->lease_file);
+ 
++        if (link->dhcp6_lease) {
++                struct in6_addr addr6;
++                uint32_t lp, lv;
++                assert(link->network);
++
++                fputs("DHCP6_ADDRESS=", f);
++
++                sd_dhcp6_lease_reset_address_iter(link->dhcp6_lease);
++                while (sd_dhcp6_lease_get_address(link->dhcp6_lease,
++                                                  &addr6, &lp, &lv) >= 0) {
++                        serialize_in6_addrs(f, &addr6, 1);
++                        fputc(' ', f);
++                }
++                fputc('\n', f);
++
++                r = dhcp6_lease_save(link->dhcp6_lease, link->lease6_file);
++                if (r < 0)
++                        goto fail;
++
++                fprintf(f,
++                        "DHCP6_LEASE=%s\n",
++                        link->lease6_file);
++        } else
++                unlink(link->lease6_file);
++
+         if (link->ipv4ll) {
+                 struct in_addr address;
+ 
+diff -rup systemd-239/src/network/networkd-link.h systemd-239-new/src/network/networkd-link.h
+--- systemd-239/src/network/networkd-link.h	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/network/networkd-link.h	2018-08-28 18:12:19.545834891 -0700
+@@ -83,6 +83,7 @@ typedef struct Link {
+         sd_dhcp_client *dhcp_client;
+         sd_dhcp_lease *dhcp_lease;
+         char *lease_file;
++        char *lease6_file;
+         uint32_t original_mtu;
+         unsigned dhcp4_messages;
+         bool dhcp4_configured;
+@@ -110,6 +111,7 @@ typedef struct Link {
+         sd_radv *radv;
+ 
+         sd_dhcp6_client *dhcp6_client;
++        sd_dhcp6_lease *dhcp6_lease;
+         bool rtnl_extended_attrs;
+ 
+         /* This is about LLDP reception */
+diff -rup systemd-239/src/systemd/sd-dhcp6-client.h systemd-239-new/src/systemd/sd-dhcp6-client.h
+--- systemd-239/src/systemd/sd-dhcp6-client.h	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/systemd/sd-dhcp6-client.h	2018-08-28 18:14:29.274251168 -0700
+@@ -102,9 +102,17 @@ int sd_dhcp6_client_set_duid(
+                 uint16_t duid_type,
+                 const void *duid,
+                 size_t duid_len);
++int sd_dhcp6_client_get_duid(
++                sd_dhcp6_client *client,
++                uint16_t *duid_type,
++                const uint8_t **duid,
++                size_t *duid_len);
+ int sd_dhcp6_client_set_iaid(
+                 sd_dhcp6_client *client,
+                 uint32_t iaid);
++int sd_dhcp6_client_get_iaid(
++                sd_dhcp6_client *client,
++                uint32_t *iaid);
+ int sd_dhcp6_client_set_fqdn(
+                 sd_dhcp6_client *client,
+                 const char *fqdn);
+diff -rup systemd-239/src/systemd/sd-network.h systemd-239-new/src/systemd/sd-network.h
+--- systemd-239/src/systemd/sd-network.h	2018-06-22 04:11:49.000000000 -0700
++++ systemd-239-new/src/systemd/sd-network.h	2018-08-28 18:15:43.931855886 -0700
+@@ -157,6 +157,15 @@ int sd_network_link_get_carrier_bound_to
+ /* Get the CARRIERS that are bound to current link. */
+ int sd_network_link_get_carrier_bound_by(int ifindex, int **ifindexes);
+ 
++/* Get the CLIENTID if the link has a IPv4 DHCP address. */
++int sd_network_link_get_clientid(int ifindex, char **clientid);
++
++/* Get the IAID if the link has a IPv6 DHCP address. */
++int sd_network_link_get_iaid(int ifindex, char **iaid);
++
++/* Get the DUID if the link has a IPv6 DHCP address. */
++int sd_network_link_get_duid(int ifindex, char **duid);
++
+ /* Get the timezone that was learnt on a specific link. */
+ int sd_network_link_get_timezone(int ifindex, char **timezone);
+ 

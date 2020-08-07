@@ -1,0 +1,26 @@
+# exchange-bmc-os-info
+#
+# Config file to control Exchange of information between
+# the OS and Service Processor/Baseboard Management Controller (BMC)
+#
+# See here for details
+#    https://fedoraproject.org/wiki/Features/AgentFreeManagement
+
+### Set OS Info in BMC/Service Processor ###
+# Name: SET_OS_INFO
+# Description: Set OS Name, Version and Hostname in the Service Processor (BMC)
+# Default: yes
+SET_OS_INFO="yes"
+
+### Reset OS Info in BMC/Service Processor ###
+# Name: RESET_OS_INFO
+# Description: Reset OS Name, Version and Hostname in the Service Processor (BMC).
+# 		Useful when the OS Name/Hostname should be empty on reboot
+# Default: no
+RESET_OS_INFO="no"
+
+### Set BMC/Service Processor Info in OS ###
+# Name; SET_BMC_INFO
+# Description: Set IP Address and URL of Service Processor/BMC in /run/bmc-info
+# Default: yes
+SET_BMC_INFO="yes"

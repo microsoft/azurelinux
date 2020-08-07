@@ -1,0 +1,10 @@
+# instance-id: cloud-host-0
+local-hostname: mariner-vm
+# ----------------------------------------------------------
+# eth0 is the default network interface enabled in the image
+# ----------------------------------------------------------
+# The following section is for a dynamic IP using DHCP
+#
+# ----------------------------------------------------------
+# network-interfaces: |
+#  auto eth0

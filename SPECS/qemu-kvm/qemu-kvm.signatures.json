@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "65-kvm.rules": "c16a8dc7855880b2651f1a3ff488ecc54d4ac1036c71fffd5007021d8d18a7c5",
+  "qemu-4.2.0.tar.xz": "d3481d4108ce211a053ef15be69af1bdd9dde1510fda80d92be0f6c3e98768f0"
+ }
+}

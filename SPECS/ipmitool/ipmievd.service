@@ -1,0 +1,13 @@
+[Unit]
+Description=Ipmievd Daemon 
+After=syslog.target
+After=ipmi.service
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/ipmievd
+ExecStart=/usr/sbin/ipmievd $IPMIEVD_OPTIONS
+Type=forking
+PIDFile=/var/run/ipmievd.pid
+
+[Install]
+WantedBy=multi-user.target

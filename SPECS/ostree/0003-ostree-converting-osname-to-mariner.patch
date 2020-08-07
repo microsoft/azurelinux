@@ -1,0 +1,32 @@
+diff --git a/src/libostree/ostree-sysroot-deploy.c b/src/libostree/ostree-sysroot-deploy.c
+index 0744d7e..634101e 100755
+--- a/src/libostree/ostree-sysroot-deploy.c
++++ b/src/libostree/ostree-sysroot-deploy.c
+@@ -1040,15 +1040,15 @@ get_kernel_from_tree_usrlib_modules (int                  deployment_dfd,
+ 
+   g_clear_object (&in);
+   glnx_close_fd (&fd);
+-/* Setting the param for Copying Photon Specific config files to sutiable location */
++/* Setting the param for Copying Mariner Specific config files to sutiable location */
+   if (!glnx_opendirat (deployment_dfd, "usr/lib/ostree-boot", FALSE, &ret_layout->ostree_boot_dfd, error))
+ 	return FALSE;
+-  if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "photon.cfg", &fd, error))
++  if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "mariner.cfg", &fd, error))
+     return FALSE;
+   if (fd != -1)
+     {
+       ret_layout->kernelcfg_srcpath = g_strdup_printf ("linux-%s.cfg",kver);
+-      ret_layout->kernelcfg_namever = g_strdup ("photon.cfg");
++      ret_layout->kernelcfg_namever = g_strdup ("mariner.cfg");
+     }
+   glnx_close_fd (&fd);
+   if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "systemd.cfg", &fd, error))
+@@ -1714,7 +1714,7 @@ install_deployment_kernel (OstreeSysroot   *sysroot,
+         }
+     }
+ 
+-/* Copying Photon Specific config files to sutiable location */
++/* Copying Mariner Specific config files to sutiable location */
+   if (kernel_layout->kernelcfg_srcpath)
+     {
+       if (!glnx_fstatat_allow_noent (bootcsum_dfd, kernel_layout->kernelcfg_namever, &stbuf, 0, error))

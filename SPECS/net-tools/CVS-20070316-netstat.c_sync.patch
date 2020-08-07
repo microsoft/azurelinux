@@ -1,0 +1,484 @@
+Sync with upstream's CVS until rev 1.53
+
+Revision 1.53 - Thu Mar 16 08:59:42 2006 UTC by ecki
+
+Debian Bug #260587 fixed, make sure the Columns state and user in netstat -t -e
+are separated by blanks. This may cause scripts to fail parsing by column width.
+Better wait for the script compatible output. Problems exists for ESTABLIHED
+state only.
+
+Revision 1.52 - Tue Aug 2 22:28:10 2005 UTC by ecki
+make ipx in 2.6 work (perhaps).
+Fixes http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=318503
+
+Revision 1.51 - Thu Jun 3 22:27:37 2004 UTC by ecki
+avoid namespace conflicts
+
+Revision 1.50 - Tue Dec 10 00:56:41 2002 UTC by ecki
+ - change columns of netstat -i/ifconfig -s to avoid run-into (Stefan Illner)
+ - prevent segfault on protocol families without host error member
+ - use /128 as default prefix if not specified instead of /0
+
+Revision 1.49 - Tue Jul 23 21:08:16 2002 UTC by ecki
+allow support for -6 and -4 options to netstat, also allow both, and
+print out tcp6, udp6 or raw6 if it is a v6 socket
+
+Revision 1.48 - Thu Jun 27 18:04:02 2002 UTC by ecki
+fixing debian bug #151130 reported by Dan Jacobson where netstat
+was printing 81 chars in a line for tcp, udp and raw.
+
+Revision 1.47 - Tue Feb 19 01:12:49 2002 UTC by ecki
+inodes in unix domain sockets are now padded to 8chars (netstat -x)
+
+Revision 1.46 - Tue Feb 19 00:55:35 2002 UTC by ecki
+fixes debian bug#134600 (sigsegv in netstat on negative inoded in
+/proc/net/udp) on "netstat -lpu". Thanks to Arnaud Giersch for the report.
+
+Revision 1.45 - Sun Nov 25 06:48:50 2001 UTC by ecki
+this fixes Debian Bug #109164 (netstat -ci does only print stats once). It
+also renames add_interface and free_interface list to if_cache_add/free.
+I am not sure if removing the "proc_read" flag will harm performance, looks
+likt this check is never triggereed. Anyway, we need more efficient b-search
+sooner or later.
+
+Revision 1.44 - Sun Aug 26 05:25:21 2001 UTC by ak
+Fix netstat -- don't print all v4 addresses as v4-mapped-in-v6.
+
+Index: net-tools/netstat.c
+===================================================================
+--- net-tools.orig/netstat.c
++++ net-tools/netstat.c
+@@ -6,7 +6,7 @@
+  *              NET-3 Networking Distribution for the LINUX operating
+  *              system.
+  *
+- * Version:     $Id: netstat.c,v 1.43 2001/04/15 14:41:17 pb Exp $
++ * Version:     $Id: netstat.c,v 1.54 2007/12/01 18:12:34 ecki Exp $
+  *
+  * Authors:     Fred Baumgarten, <dc6iq@insu1.etec.uni-karlsruhe.de>
+  *              Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+@@ -216,7 +216,7 @@ FILE *procinfo;
+ 
+ static struct prg_node {
+     struct prg_node *next;
+-    int inode;
++    unsigned long inode;
+     char name[PROGNAME_WIDTH];
+ } *prg_hash[PRG_HASH_SIZE];
+ 
+@@ -249,7 +249,7 @@ static char prg_cache_loaded = 0;
+ /* NOT working as of glibc-2.0.7: */
+ #undef  DIRENT_HAVE_D_TYPE_WORKS
+ 
+-static void prg_cache_add(int inode, char *name)
++static void prg_cache_add(unsigned long inode, char *name)
+ {
+     unsigned hi = PRG_HASHIT(inode);
+     struct prg_node **pnp,*pn;
+@@ -272,7 +272,7 @@ static void prg_cache_add(int inode, cha
+     strcpy(pn->name,name);
+ }
+ 
+-static const char *prg_cache_get(int inode)
++static const char *prg_cache_get(unsigned long inode)
+ {
+     unsigned hi=PRG_HASHIT(inode);
+     struct prg_node *pn;
+@@ -295,16 +295,18 @@ static void prg_cache_clear(void)
+     prg_cache_loaded=0;
+ }
+ 
+-static void extract_type_1_socket_inode(const char lname[], long * inode_p) {
++static int extract_type_1_socket_inode(const char lname[], unsigned long * inode_p) {
+ 
+     /* If lname is of the form "socket:[12345]", extract the "12345"
+        as *inode_p.  Otherwise, return -1 as *inode_p.
+        */
+ 
+-    if (strlen(lname) < PRG_SOCKET_PFXl+3) *inode_p = -1;
+-    else if (memcmp(lname, PRG_SOCKET_PFX, PRG_SOCKET_PFXl)) *inode_p = -1;
+-    else if (lname[strlen(lname)-1] != ']') *inode_p = -1;
+-    else {
++    if (strlen(lname) < PRG_SOCKET_PFXl+3) return(-1);
++    
++    if (memcmp(lname, PRG_SOCKET_PFX, PRG_SOCKET_PFXl)) return(-1);
++    if (lname[strlen(lname)-1] != ']') return(-1);
++
++    {
+         char inode_str[strlen(lname + 1)];  /* e.g. "12345" */
+         const int inode_str_len = strlen(lname) - PRG_SOCKET_PFXl - 1;
+         char *serr;
+@@ -313,37 +315,41 @@ static void extract_type_1_socket_inode(
+         inode_str[inode_str_len] = '\0';
+         *inode_p = strtol(inode_str,&serr,0);
+         if (!serr || *serr || *inode_p < 0 || *inode_p >= INT_MAX) 
+-            *inode_p = -1;
++            return(-1);
+     }
++    return(0);
+ }
+ 
+ 
+ 
+-static void extract_type_2_socket_inode(const char lname[], long * inode_p) {
++static int extract_type_2_socket_inode(const char lname[], unsigned long * inode_p) {
+ 
+     /* If lname is of the form "[0000]:12345", extract the "12345"
+        as *inode_p.  Otherwise, return -1 as *inode_p.
+        */
+ 
+-    if (strlen(lname) < PRG_SOCKET_PFX2l+1) *inode_p = -1;
+-    else if (memcmp(lname, PRG_SOCKET_PFX2, PRG_SOCKET_PFX2l)) *inode_p = -1;
+-    else {
++    if (strlen(lname) < PRG_SOCKET_PFX2l+1) return(-1);
++    if (memcmp(lname, PRG_SOCKET_PFX2, PRG_SOCKET_PFX2l)) return(-1);
++
++    {
+         char *serr;
+ 
+         *inode_p=strtol(lname + PRG_SOCKET_PFX2l,&serr,0);
+         if (!serr || *serr || *inode_p < 0 || *inode_p >= INT_MAX) 
+-            *inode_p = -1;
++            return(-1);
+     }
++    return(0);
+ }
+ 
+ 
+ 
++
+ static void prg_cache_load(void)
+ {
+     char line[LINE_MAX],eacces=0;
+     int procfdlen,fd,cmdllen,lnamelen;
+     char lname[30],cmdlbuf[512],finbuf[PROGNAME_WIDTH];
+-    long inode;
++    unsigned long inode;
+     const char *cs,*cmdlp;
+     DIR *dirproc=NULL,*dirfd=NULL;
+     struct dirent *direproc,*direfd;
+@@ -386,11 +392,9 @@ static void prg_cache_load(void)
+ 	    lnamelen=readlink(line,lname,sizeof(lname)-1);
+             lname[lnamelen] = '\0';  /*make it a null-terminated string*/
+ 
+-            extract_type_1_socket_inode(lname, &inode);
+-
+-            if (inode < 0) extract_type_2_socket_inode(lname, &inode);
+-
+-            if (inode < 0) continue;
++            if (extract_type_1_socket_inode(lname, &inode) < 0)
++              if (extract_type_2_socket_inode(lname, &inode) < 0)
++                continue;
+ 
+ 	    if (!cmdlp) {
+ 		if (procfdlen - PATH_FD_SUFFl + PATH_CMDLINEl >= 
+@@ -527,10 +531,10 @@ static void finish_this_one(int uid, uns
+ 
+     if (flag_exp > 1) {
+ 	if (!(flag_not & FLAG_NUM_USER) && ((pw = getpwuid(uid)) != NULL))
+-	    printf("%-10s ", pw->pw_name);
++	    printf(" %-10s ", pw->pw_name);
+ 	else
+-	    printf("%-10d ", uid);
+-	printf("%-10ld ",inode);
++	    printf(" %-10d ", uid);
++	printf("%-10lu ",inode);
+     }
+     if (flag_prg)
+ 	printf("%-" PROGNAME_WIDTHs "s",prg_cache_get(inode));
+@@ -705,6 +709,7 @@ static void tcp_do_one(int lnr, const ch
+     unsigned long rxq, txq, time_len, retr, inode;
+     int num, local_port, rem_port, d, state, uid, timer_run, timeout;
+     char rem_addr[128], local_addr[128], timers[64], buffer[1024], more[512];
++    char *protname;
+     struct aftype *ap;
+ #if HAVE_AFINET6
+     struct sockaddr_in6 localaddr, remaddr;
+@@ -719,12 +724,13 @@ static void tcp_do_one(int lnr, const ch
+ 	return;
+ 
+     num = sscanf(line,
+-    "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %ld %512s\n",
++    "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %lu %512s\n",
+ 		 &d, local_addr, &local_port, rem_addr, &rem_port, &state,
+ 		 &txq, &rxq, &timer_run, &time_len, &retr, &uid, &timeout, &inode, more);
+ 
+     if (strlen(local_addr) > 8) {
+ #if HAVE_AFINET6
++	protname = "tcp6";
+ 	/* Demangle what the kernel gives us */
+ 	sscanf(local_addr, "%08X%08X%08X%08X",
+ 	       &in6.s6_addr32[0], &in6.s6_addr32[1],
+@@ -740,6 +746,7 @@ static void tcp_do_one(int lnr, const ch
+ 	remaddr.sin6_family = AF_INET6;
+ #endif
+     } else {
++	protname = "tcp";
+ 	sscanf(local_addr, "%X",
+ 	       &((struct sockaddr_in *) &localaddr)->sin_addr.s_addr);
+ 	sscanf(rem_addr, "%X",
+@@ -813,8 +820,8 @@ static void tcp_do_one(int lnr, const ch
+ 			 timer_run, (double) time_len / HZ, retr, timeout);
+ 		break;
+ 	    }
+-	printf("tcp   %6ld %6ld %-23s %-23s %-12s",
+-	       rxq, txq, local_addr, rem_addr, _(tcp_state[state]));
++	printf("%-4s  %6ld %6ld %-*s %-*s %-11s",
++	       protname, rxq, txq, netmax(23,strlen(local_addr)), local_addr, netmax(23,strlen(rem_addr)), rem_addr, _(tcp_state[state]));
+ 
+ 	finish_this_one(uid,inode,timers);
+     }
+@@ -831,6 +838,7 @@ static void udp_do_one(int lnr, const ch
+     char buffer[8192], local_addr[64], rem_addr[64];
+     char *udp_state, timers[64], more[512];
+     int num, local_port, rem_port, d, state, timer_run, uid, timeout;
++    char *protname;
+ #if HAVE_AFINET6
+     struct sockaddr_in6 localaddr, remaddr;
+     char addr6[INET6_ADDRSTRLEN];
+@@ -847,13 +855,14 @@ static void udp_do_one(int lnr, const ch
+ 
+     more[0] = '\0';
+     num = sscanf(line,
+-		 "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %ld %512s\n",
++		 "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %lu %512s\n",
+ 		 &d, local_addr, &local_port,
+ 		 rem_addr, &rem_port, &state,
+ 	  &txq, &rxq, &timer_run, &time_len, &retr, &uid, &timeout, &inode, more);
+ 
+     if (strlen(local_addr) > 8) {
+ #if HAVE_AFINET6
++	protname="udp6";
+ 	sscanf(local_addr, "%08X%08X%08X%08X",
+ 	       &in6.s6_addr32[0], &in6.s6_addr32[1],
+ 	       &in6.s6_addr32[2], &in6.s6_addr32[3]);
+@@ -868,6 +877,7 @@ static void udp_do_one(int lnr, const ch
+ 	remaddr.sin6_family = AF_INET6;
+ #endif
+     } else {
++        protname="udp";
+ 	sscanf(local_addr, "%X",
+ 	       &((struct sockaddr_in *) &localaddr)->sin_addr.s_addr);
+ 	sscanf(rem_addr, "%X",
+@@ -953,8 +963,8 @@ static void udp_do_one(int lnr, const ch
+ 			 retr, timeout);
+ 		break;
+ 	    }
+-	printf("udp   %6ld %6ld %-23s %-23s %-12s",
+-	       rxq, txq, local_addr, rem_addr, udp_state);
++	printf("%-4s  %6ld %6ld %-23s %-23s %-11s",
++	       protname, rxq, txq, local_addr, rem_addr, udp_state);
+ 
+ 	finish_this_one(uid,inode,timers);
+     }
+@@ -971,6 +981,7 @@ static void raw_do_one(int lnr, const ch
+     char buffer[8192], local_addr[64], rem_addr[64];
+     char timers[64], more[512];
+     int num, local_port, rem_port, d, state, timer_run, uid, timeout;
++    char *protname;
+ #if HAVE_AFINET6
+     struct sockaddr_in6 localaddr, remaddr;
+     char addr6[INET6_ADDRSTRLEN];
+@@ -987,12 +998,13 @@ static void raw_do_one(int lnr, const ch
+ 
+     more[0] = '\0';
+     num = sscanf(line,
+-		 "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %ld %512s\n",
++		 "%d: %64[0-9A-Fa-f]:%X %64[0-9A-Fa-f]:%X %X %lX:%lX %X:%lX %lX %d %d %lu %512s\n",
+ 		 &d, local_addr, &local_port, rem_addr, &rem_port, &state,
+ 	  &txq, &rxq, &timer_run, &time_len, &retr, &uid, &timeout, &inode, more);
+ 
+     if (strlen(local_addr) > 8) {
+ #if HAVE_AFINET6
++	protname = "raw6";
+ 	sscanf(local_addr, "%08X%08X%08X%08X",
+ 	       &in6.s6_addr32[0], &in6.s6_addr32[1],
+            &in6.s6_addr32[2], &in6.s6_addr32[3]);
+@@ -1007,6 +1019,7 @@ static void raw_do_one(int lnr, const ch
+ 	remaddr.sin6_family = AF_INET6;
+ #endif
+     } else {
++        protname = "raw";
+ 	sscanf(local_addr, "%X",
+ 	       &((struct sockaddr_in *) &localaddr)->sin_addr.s_addr);
+ 	sscanf(rem_addr, "%X",
+@@ -1074,8 +1087,8 @@ static void raw_do_one(int lnr, const ch
+ 			 retr, timeout);
+ 		break;
+ 	    }
+-	printf("raw   %6ld %6ld %-23s %-23s %-12d",
+-	       rxq, txq, local_addr, rem_addr, state);
++	printf("%-4s  %6ld %6ld %-23s %-23s %-11d",
++	       protname, rxq, txq, local_addr, rem_addr, state);
+ 
+ 	finish_this_one(uid,inode,timers);
+     }
+@@ -1099,9 +1112,9 @@ static void unix_do_one(int nr, const ch
+     static int has = 0;
+     char path[MAXPATHLEN], ss_flags[32];
+     char *ss_proto, *ss_state, *ss_type;
+-    int num, state, type, inode;
++    int num, state, type;
+     void *d;
+-    unsigned long refcnt, proto, flags;
++    unsigned long refcnt, proto, flags, inode;
+ 
+     if (nr == 0) {
+ 	if (strstr(line, "Inode"))
+@@ -1109,14 +1122,14 @@ static void unix_do_one(int nr, const ch
+ 	return;
+     }
+     path[0] = '\0';
+-    num = sscanf(line, "%p: %lX %lX %lX %X %X %d %s",
++    num = sscanf(line, "%p: %lX %lX %lX %X %X %lu %s",
+ 		 &d, &refcnt, &proto, &flags, &type, &state, &inode, path);
+     if (num < 6) {
+ 	fprintf(stderr, _("warning, got bogus unix line.\n"));
+ 	return;
+     }
+     if (!(has & HAS_INODE))
+-	snprintf(path,sizeof(path),"%d",inode);
++	snprintf(path,sizeof(path),"%lu",inode);
+ 
+     if (!flag_all) {
+     	if ((state == SS_UNCONNECTED) && (flags & SO_ACCEPTCON)) {
+@@ -1208,9 +1221,9 @@ static void unix_do_one(int nr, const ch
+     printf("%-5s %-6ld %-11s %-10s %-13s ",
+ 	   ss_proto, refcnt, ss_flags, ss_type, ss_state);
+     if (has & HAS_INODE)
+-	printf("%-6d ",inode);
++	printf("%-8lu ",inode);
+     else
+-	printf("-      ");
++	printf("-        ");
+     if (flag_prg)
+ 	printf("%-" PROGNAME_WIDTHs "s",(has & HAS_INODE?prg_cache_get(inode):"-"));
+     puts(path);
+@@ -1350,18 +1363,37 @@ static int ipx_info(void)
+     char sad[50], dad[50];
+     struct sockaddr sa;
+     unsigned sport = 0, dport = 0;
+-
+-    if (!(f = fopen(_PATH_PROCNET_IPX, "r"))) {
+-	if (errno != ENOENT) {
+-	    perror(_PATH_PROCNET_IPX);
+-	    return (-1);
+-	}
+-	if (flag_arg || flag_ver)
+-	    ESYSNOT("netstat", "AF IPX");
+-	if (flag_arg)
+-	    return (1);
+-	else
+-	    return (0);
++    struct stat s;
++    
++    f = fopen(_PATH_PROCNET_IPX_SOCKET1, "r");
++    if (!f) {
++        if (errno != ENOENT) {
++            perror(_PATH_PROCNET_IPX_SOCKET1);
++            return (-1);
++        }
++        f = fopen(_PATH_PROCNET_IPX_SOCKET2, "r");
++
++        /* We need to check for directory */
++        if (f) {
++            fstat(fileno(f), &s);
++            if (!S_ISREG(s.st_mode)) {
++                fclose(f);
++                f=NULL;
++            }
++        }
++
++        if (!f) {
++            if (errno != ENOENT) {
++	        perror(_PATH_PROCNET_IPX_SOCKET2);
++	        return (-1);
++	    }
++	    if (flag_arg || flag_ver)
++	        ESYSNOT("netstat", "AF IPX");
++	    if (flag_arg)
++	        return (1);
++ 	    else
++	        return (0);
++        }
+     }
+     printf(_("Active IPX sockets\nProto Recv-Q Send-Q Local Address              Foreign Address            State"));	/* xxx */
+     if (flag_exp > 1)
+@@ -1381,7 +1413,7 @@ static int ipx_info(void)
+ 	    sscanf(st, "%X", &sport);	/* net byt order */
+ 	    sport = ntohs(sport);
+ 	} else {
+-	    EINTERN("netstat.c", _PATH_PROCNET_IPX " sport format error");
++	    EINTERN("netstat.c", "ipx socket format error in source port");
+ 	    return (-1);
+ 	}
+ 	nc = 0;
+@@ -1391,7 +1423,7 @@ static int ipx_info(void)
+ 		sscanf(st, "%X", &dport);	/* net byt order */
+ 		dport = ntohs(dport);
+ 	    } else {
+-		EINTERN("netstat.c", _PATH_PROCNET_IPX " dport format error");
++		EINTERN("netstat.c", "ipx soket format error in destination port");
+ 		return (-1);
+ 	    }
+ 	} else
+@@ -1449,7 +1481,7 @@ static int iface_info(void)
+     }
+     if (flag_exp < 2) {
+ 	ife_short = 1;
+-	printf(_("Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR   TX-OK TX-ERR TX-DRP TX-OVR Flg\n"));
++	printf(_("Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg\n"));
+     }
+ 
+     if (for_all_interfaces(do_if_print, &flag_all) < 0) {
+@@ -1457,7 +1489,7 @@ static int iface_info(void)
+ 	exit(1);
+     }
+     if (flag_cnt)
+-	free_interface_list();
++	if_cache_free();
+     else {
+ 	close(skfd);
+ 	skfd = -1;
+@@ -1503,7 +1535,7 @@ static void usage(void)
+     fprintf(stderr, _("        -C, --cache              display routing cache instead of FIB\n\n"));
+ 
+     fprintf(stderr, _("  <Socket>={-t|--tcp} {-u|--udp} {-w|--raw} {-x|--unix} --ax25 --ipx --netrom\n"));
+-    fprintf(stderr, _("  <AF>=Use '-A <af>' or '--<af>'; default: %s\n"), DFLT_AF);
++    fprintf(stderr, _("  <AF>=Use '-6|-4' or '-A <af>' or '--<af>'; default: %s\n"), DFLT_AF);
+     fprintf(stderr, _("  List of possible address families (which support routing):\n"));
+     print_aflist(1); /* 1 = routeable */
+     exit(E_USAGE);
+@@ -1514,7 +1546,7 @@ int main
+  (int argc, char *argv[]) {
+     int i;
+     int lop;
+-    struct option longopts[] =
++    static struct option longopts[] =
+     {
+ 	AFTRANS_OPTS,
+ 	{"version", 0, 0, 'V'},
+@@ -1556,7 +1588,7 @@ int main
+     getroute_init();		/* Set up AF routing support */
+ 
+     afname[0] = '\0';
+-    while ((i = getopt_long(argc, argv, "MCFA:acdegphinNorstuVv?wxl", longopts, &lop)) != EOF)
++    while ((i = getopt_long(argc, argv, "MCFA:acdegphinNorstuVv?wxl64", longopts, &lop)) != EOF)
+ 	switch (i) {
+ 	case -1:
+ 	    break;
+@@ -1624,6 +1656,14 @@ int main
+ 	case 'o':
+ 	    flag_opt++;
+ 	    break;
++	case '6':
++	    if (aftrans_opt("inet6"))
++		exit(1);
++	    break;
++	case '4':
++	    if (aftrans_opt("inet"))
++		exit(1);
++	    break;
+ 	case 'V':
+ 	    version();
+ 	    /*NOTREACHED */

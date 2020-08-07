@@ -1,0 +1,102 @@
+From 385a7dd63fad61a28e38444da797d947f1c79623 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 15 May 2018 11:20:15 -0400
+Subject: [PATCH 01/12] generate_hash() / generate_pw_hash(): don't use
+ strlen() for strncpy bounds
+
+New gcc rightly comlplains when we do the following:
+
+strncpy (dest, src, strlen(src));
+
+For two reasons:
+a) it doesn't copy the NUL byte
+b) it's otherwise the same thing strcpy() would have done
+
+This patch replaces that with stpncpy (just because it's slightly easier
+to use) and the real bounds for the destination.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/mokutil.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index 6e9a342..6e31e2d 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -766,9 +766,10 @@ generate_hash (pw_crypt_t *pw_crypt, char *password, unsigned int pw_len)
+ {
+ 	pw_crypt_t new_crypt;
+ 	char settings[SETTINGS_LEN];
++	char *next;
+ 	char *crypt_string;
+ 	const char *prefix;
+-	int hash_len, prefix_len;
++	int hash_len, settings_len = sizeof (settings) - 2;
+ 
+ 	if (!password || !pw_crypt || password[pw_len] != '\0')
+ 		return -1;
+@@ -776,15 +777,19 @@ generate_hash (pw_crypt_t *pw_crypt, char *password, unsigned int pw_len)
+ 	prefix = get_crypt_prefix (pw_crypt->method);
+ 	if (!prefix)
+ 		return -1;
+-	prefix_len = strlen(prefix);
+ 
+ 	pw_crypt->salt_size = get_salt_size (pw_crypt->method);
+ 	generate_salt ((char *)pw_crypt->salt, pw_crypt->salt_size);
+ 
+-	strncpy (settings, prefix, prefix_len);
+-	strncpy (settings + prefix_len, (const char *)pw_crypt->salt,
+-		 pw_crypt->salt_size);
+-	settings[pw_crypt->salt_size + prefix_len] = '\0';
++	memset (settings, 0, sizeof (settings));
++	next = stpncpy (settings, prefix, settings_len);
++	if (pw_crypt->salt_size > settings_len - (next - settings)) {
++		errno = EOVERFLOW;
++		return -1;
++	}
++	next = stpncpy (next, (const char *)pw_crypt->salt,
++			pw_crypt->salt_size);
++	*next = '\0';
+ 
+ 	crypt_string = crypt (password, settings);
+ 	if (!crypt_string)
+@@ -1931,10 +1936,11 @@ static int
+ generate_pw_hash (const char *input_pw)
+ {
+ 	char settings[SETTINGS_LEN];
++	char *next;
+ 	char *password = NULL;
+ 	char *crypt_string;
+ 	const char *prefix;
+-	int prefix_len;
++	int settings_len = sizeof (settings) - 2;
+ 	unsigned int pw_len, salt_size;
+ 
+ 	if (input_pw) {
+@@ -1960,12 +1966,18 @@ generate_pw_hash (const char *input_pw)
+ 	prefix = get_crypt_prefix (DEFAULT_CRYPT_METHOD);
+ 	if (!prefix)
+ 		return -1;
+-	prefix_len = strlen(prefix);
+ 
+-	strncpy (settings, prefix, prefix_len);
++	memset (settings, 0, sizeof (settings));
++	next = stpncpy (settings, prefix, settings_len);
+ 	salt_size = get_salt_size (DEFAULT_CRYPT_METHOD);
+-	generate_salt ((settings + prefix_len), salt_size);
+-	settings[DEFAULT_SALT_SIZE + prefix_len] = '\0';
++	if (salt_size > settings_len - (next - settings)) {
++		free(password);
++		errno = EOVERFLOW;
++		return -1;
++	}
++	generate_salt (next, salt_size);
++	next += salt_size;
++	*next = '\0';
+ 
+ 	crypt_string = crypt (password, settings);
+ 	free (password);
+-- 
+2.21.0
+

@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "pgbouncer-1.11.0.tar.gz": "84802fa48a2806c53675764ce10a8b6e4733f196eb23e1aa4b954dcbe7287e70",
+  "pgbouncer.service": "9c158af014827b4b96577caacce1d5fbf1e186ebb481c96f4f071a0f05425fe1"
+ }
+}

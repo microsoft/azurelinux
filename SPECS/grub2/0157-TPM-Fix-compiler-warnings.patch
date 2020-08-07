@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Fri, 15 Jun 2018 09:58:50 +0200
+Subject: [PATCH] TPM: Fix compiler warnings
+
+Stop defining our own Event type in tpm.c instead use the one from
+the header, so that it matches the function prototype.
+Note this requires some further code changes to go from all lowercaps
+of the private Event type to the CamelCaps from the header.
+
+Also cast buf, which gets passed as a efi_physicall_address_t to an
+integer, to avoid the compiler complaining about passing a pointer as
+an integer.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ grub-core/kern/efi/tpm.c | 24 ++++++++----------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/grub-core/kern/efi/tpm.c b/grub-core/kern/efi/tpm.c
+index 36e1f69df16..0d3ebe22e57 100644
+--- a/grub-core/kern/efi/tpm.c
++++ b/grub-core/kern/efi/tpm.c
+@@ -161,21 +161,12 @@ grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,
+   }
+ }
+ 
+-typedef struct {
+-	grub_uint32_t pcrindex;
+-	grub_uint32_t eventtype;
+-	grub_uint8_t digest[20];
+-	grub_uint32_t eventsize;
+-	grub_uint8_t event[1];
+-} Event;
+-
+-
+ static grub_err_t
+ grub_tpm1_log_event(grub_efi_handle_t tpm_handle, unsigned char *buf,
+ 		    grub_size_t size, grub_uint8_t pcr,
+ 		    const char *description)
+ {
+-  Event *event;
++  TCG_PCR_EVENT *event;
+   grub_efi_status_t status;
+   grub_efi_tpm_protocol_t *tpm;
+   grub_efi_physical_address_t lastevent;
+@@ -188,18 +179,19 @@ grub_tpm1_log_event(grub_efi_handle_t tpm_handle, unsigned char *buf,
+   if (!grub_tpm_present(tpm))
+     return 0;
+ 
+-  event = grub_zalloc(sizeof (Event) + grub_strlen(description) + 1);
++  event = grub_zalloc(sizeof (TCG_PCR_EVENT) + grub_strlen(description) + 1);
+   if (!event)
+     return grub_error (GRUB_ERR_OUT_OF_MEMORY,
+ 		       N_("cannot allocate TPM event buffer"));
+ 
+-  event->pcrindex = pcr;
+-  event->eventtype = EV_IPL;
+-  event->eventsize = grub_strlen(description) + 1;
+-  grub_memcpy(event->event, description, event->eventsize);
++  event->PCRIndex = pcr;
++  event->EventType = EV_IPL;
++  event->EventSize = grub_strlen(description) + 1;
++  grub_memcpy(event->Event, description, event->EventSize);
+ 
+   algorithm = TCG_ALG_SHA;
+-  status = efi_call_7 (tpm->log_extend_event, tpm, buf, (grub_uint64_t) size,
++  status = efi_call_7 (tpm->log_extend_event, tpm,
++                       (unsigned long) buf, (grub_uint64_t) size,
+ 		       algorithm, event, &eventnum, &lastevent);
+ 
+   switch (status) {

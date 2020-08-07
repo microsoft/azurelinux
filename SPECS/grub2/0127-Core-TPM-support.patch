@@ -1,0 +1,786 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Tue, 14 Jul 2015 17:06:35 -0700
+Subject: [PATCH] Core TPM support
+
+Add support for performing basic TPM measurements. Right now this only
+supports extending PCRs statically and only on UEFI and BIOS systems, but
+will measure all modules as they're loaded.
+---
+ grub-core/Makefile.core.def  |   3 +
+ grub-core/kern/dl.c          |   3 +
+ grub-core/kern/efi/tpm.c     | 282 +++++++++++++++++++++++++++++++++++++++++++
+ grub-core/kern/i386/pc/tpm.c | 132 ++++++++++++++++++++
+ grub-core/kern/tpm.c         |  13 ++
+ include/grub/efi/tpm.h       | 153 +++++++++++++++++++++++
+ include/grub/tpm.h           |  91 ++++++++++++++
+ grub-core/Makefile.am        |   1 +
+ 8 files changed, 678 insertions(+)
+ create mode 100644 grub-core/kern/efi/tpm.c
+ create mode 100644 grub-core/kern/i386/pc/tpm.c
+ create mode 100644 grub-core/kern/tpm.c
+ create mode 100644 include/grub/efi/tpm.h
+ create mode 100644 include/grub/tpm.h
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index cb24f92a431..420831bc89e 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -131,6 +131,7 @@ kernel = {
+   common = kern/rescue_parser.c;
+   common = kern/rescue_reader.c;
+   common = kern/term.c;
++  common = kern/tpm.c;
+ 
+   noemu = kern/compiler-rt.c;
+   noemu = kern/mm.c;
+@@ -199,6 +200,7 @@ kernel = {
+   efi = term/efi/console.c;
+   efi = kern/acpi.c;
+   efi = kern/efi/acpi.c;
++  efi = kern/efi/tpm.c;
+   i386_coreboot = kern/i386/pc/acpi.c;
+   i386_multiboot = kern/i386/pc/acpi.c;
+   i386_coreboot = kern/acpi.c;
+@@ -245,6 +247,7 @@ kernel = {
+ 
+   i386_pc = kern/i386/pc/init.c;
+   i386_pc = kern/i386/pc/mmap.c;
++  i386_pc = kern/i386/pc/tpm.c;
+   i386_pc = term/i386/pc/console.c;
+ 
+   i386_qemu = bus/pci.c;
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index eb8b969cded..387d1e6446d 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -33,6 +33,7 @@
+ #include <grub/cache.h>
+ #include <grub/i18n.h>
+ #include <grub/efi/sb.h>
++#include <grub/tpm.h>
+ 
+ /* Platforms where modules are in a readonly area of memory.  */
+ #if defined(GRUB_MACHINE_QEMU)
+@@ -829,6 +830,8 @@ grub_dl_load_file (const char *filename)
+      opens of the same device.  */
+   grub_file_close (file);
+ 
++  grub_tpm_measure(core, size, GRUB_TPM_PCR, filename);
++
+   mod = grub_dl_load_core (core, size);
+   grub_free (core);
+   if (! mod)
+diff --git a/grub-core/kern/efi/tpm.c b/grub-core/kern/efi/tpm.c
+new file mode 100644
+index 00000000000..c9fb3c133f3
+--- /dev/null
++++ b/grub-core/kern/efi/tpm.c
+@@ -0,0 +1,282 @@
++#include <grub/err.h>
++#include <grub/i18n.h>
++#include <grub/efi/api.h>
++#include <grub/efi/efi.h>
++#include <grub/efi/tpm.h>
++#include <grub/mm.h>
++#include <grub/tpm.h>
++#include <grub/term.h>
++
++static grub_efi_guid_t tpm_guid = EFI_TPM_GUID;
++static grub_efi_guid_t tpm2_guid = EFI_TPM2_GUID;
++
++static grub_efi_boolean_t grub_tpm_present(grub_efi_tpm_protocol_t *tpm)
++{
++  grub_efi_status_t status;
++  TCG_EFI_BOOT_SERVICE_CAPABILITY caps;
++  grub_uint32_t flags;
++  grub_efi_physical_address_t eventlog, lastevent;
++
++  caps.Size = (grub_uint8_t)sizeof(caps);
++
++  status = efi_call_5(tpm->status_check, tpm, &caps, &flags, &eventlog,
++		      &lastevent);
++
++  if (status != GRUB_EFI_SUCCESS || caps.TPMDeactivatedFlag
++      || !caps.TPMPresentFlag)
++    return 0;
++
++  return 1;
++}
++
++static grub_efi_boolean_t grub_tpm2_present(grub_efi_tpm2_protocol_t *tpm)
++{
++  grub_efi_status_t status;
++  EFI_TCG2_BOOT_SERVICE_CAPABILITY caps;
++
++  caps.Size = (grub_uint8_t)sizeof(caps);
++
++  status = efi_call_2(tpm->get_capability, tpm, &caps);
++
++  if (status != GRUB_EFI_SUCCESS || !caps.TPMPresentFlag)
++    return 0;
++
++  return 1;
++}
++
++static grub_efi_boolean_t grub_tpm_handle_find(grub_efi_handle_t *tpm_handle,
++					       grub_efi_uint8_t *protocol_version)
++{
++  grub_efi_handle_t *handles;
++  grub_efi_uintn_t num_handles;
++
++  handles = grub_efi_locate_handle (GRUB_EFI_BY_PROTOCOL, &tpm_guid, NULL,
++				    &num_handles);
++  if (handles && num_handles > 0) {
++    *tpm_handle = handles[0];
++    *protocol_version = 1;
++    return 1;
++  }
++
++  handles = grub_efi_locate_handle (GRUB_EFI_BY_PROTOCOL, &tpm2_guid, NULL,
++				    &num_handles);
++  if (handles && num_handles > 0) {
++    *tpm_handle = handles[0];
++    *protocol_version = 2;
++    return 1;
++  }
++
++  return 0;
++}
++
++static grub_err_t
++grub_tpm1_execute(grub_efi_handle_t tpm_handle,
++		  PassThroughToTPM_InputParamBlock *inbuf,
++		  PassThroughToTPM_OutputParamBlock *outbuf)
++{
++  grub_efi_status_t status;
++  grub_efi_tpm_protocol_t *tpm;
++  grub_uint32_t inhdrsize = sizeof(*inbuf) - sizeof(inbuf->TPMOperandIn);
++  grub_uint32_t outhdrsize = sizeof(*outbuf) - sizeof(outbuf->TPMOperandOut);
++
++  tpm = grub_efi_open_protocol (tpm_handle, &tpm_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!grub_tpm_present(tpm))
++    return 0;
++
++  /* UEFI TPM protocol takes the raw operand block, no param block header */
++  status = efi_call_5 (tpm->pass_through_to_tpm, tpm,
++		       inbuf->IPBLength - inhdrsize, inbuf->TPMOperandIn,
++		       outbuf->OPBLength - outhdrsize, outbuf->TPMOperandOut);
++
++  switch (status) {
++  case GRUB_EFI_SUCCESS:
++    return 0;
++  case GRUB_EFI_DEVICE_ERROR:
++    return grub_error (GRUB_ERR_IO, N_("Command failed"));
++  case GRUB_EFI_INVALID_PARAMETER:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Invalid parameter"));
++  case GRUB_EFI_BUFFER_TOO_SMALL:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Output buffer too small"));
++  case GRUB_EFI_NOT_FOUND:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("TPM unavailable"));
++  default:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("Unknown TPM error"));
++  }
++}
++
++static grub_err_t
++grub_tpm2_execute(grub_efi_handle_t tpm_handle,
++		  PassThroughToTPM_InputParamBlock *inbuf,
++		  PassThroughToTPM_OutputParamBlock *outbuf)
++{
++  grub_efi_status_t status;
++  grub_efi_tpm2_protocol_t *tpm;
++  grub_uint32_t inhdrsize = sizeof(*inbuf) - sizeof(inbuf->TPMOperandIn);
++  grub_uint32_t outhdrsize = sizeof(*outbuf) - sizeof(outbuf->TPMOperandOut);
++
++  tpm = grub_efi_open_protocol (tpm_handle, &tpm2_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!grub_tpm2_present(tpm))
++    return 0;
++
++  /* UEFI TPM protocol takes the raw operand block, no param block header */
++  status = efi_call_5 (tpm->submit_command, tpm,
++		       inbuf->IPBLength - inhdrsize, inbuf->TPMOperandIn,
++		       outbuf->OPBLength - outhdrsize, outbuf->TPMOperandOut);
++
++  switch (status) {
++  case GRUB_EFI_SUCCESS:
++    return 0;
++  case GRUB_EFI_DEVICE_ERROR:
++    return grub_error (GRUB_ERR_IO, N_("Command failed"));
++  case GRUB_EFI_INVALID_PARAMETER:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Invalid parameter"));
++  case GRUB_EFI_BUFFER_TOO_SMALL:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Output buffer too small"));
++  case GRUB_EFI_NOT_FOUND:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("TPM unavailable"));
++  default:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("Unknown TPM error"));
++  }
++}
++
++grub_err_t
++grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,
++		 PassThroughToTPM_OutputParamBlock *outbuf)
++{
++  grub_efi_handle_t tpm_handle;
++   grub_uint8_t protocol_version;
++
++  /* It's not a hard failure for there to be no TPM */
++  if (!grub_tpm_handle_find(&tpm_handle, &protocol_version))
++    return 0;
++
++  if (protocol_version == 1) {
++    return grub_tpm1_execute(tpm_handle, inbuf, outbuf);
++  } else {
++    return grub_tpm2_execute(tpm_handle, inbuf, outbuf);
++  }
++}
++
++typedef struct {
++	grub_uint32_t pcrindex;
++	grub_uint32_t eventtype;
++	grub_uint8_t digest[20];
++	grub_uint32_t eventsize;
++	grub_uint8_t event[1];
++} Event;
++
++
++static grub_err_t
++grub_tpm1_log_event(grub_efi_handle_t tpm_handle, unsigned char *buf,
++		    grub_size_t size, grub_uint8_t pcr,
++		    const char *description)
++{
++  Event *event;
++  grub_efi_status_t status;
++  grub_efi_tpm_protocol_t *tpm;
++  grub_efi_physical_address_t lastevent;
++  grub_uint32_t algorithm;
++  grub_uint32_t eventnum = 0;
++
++  tpm = grub_efi_open_protocol (tpm_handle, &tpm_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!grub_tpm_present(tpm))
++    return 0;
++
++  event = grub_zalloc(sizeof (Event) + grub_strlen(description) + 1);
++  if (!event)
++    return grub_error (GRUB_ERR_OUT_OF_MEMORY,
++		       N_("cannot allocate TPM event buffer"));
++
++  event->pcrindex = pcr;
++  event->eventtype = EV_IPL;
++  event->eventsize = grub_strlen(description) + 1;
++  grub_memcpy(event->event, description, event->eventsize);
++
++  algorithm = TCG_ALG_SHA;
++  status = efi_call_7 (tpm->log_extend_event, tpm, buf, (grub_uint64_t) size,
++		       algorithm, event, &eventnum, &lastevent);
++
++  switch (status) {
++  case GRUB_EFI_SUCCESS:
++    return 0;
++  case GRUB_EFI_DEVICE_ERROR:
++    return grub_error (GRUB_ERR_IO, N_("Command failed"));
++  case GRUB_EFI_INVALID_PARAMETER:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Invalid parameter"));
++  case GRUB_EFI_BUFFER_TOO_SMALL:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Output buffer too small"));
++  case GRUB_EFI_NOT_FOUND:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("TPM unavailable"));
++  default:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("Unknown TPM error"));
++  }
++}
++
++static grub_err_t
++grub_tpm2_log_event(grub_efi_handle_t tpm_handle, unsigned char *buf,
++		   grub_size_t size, grub_uint8_t pcr,
++		   const char *description)
++{
++  EFI_TCG2_EVENT *event;
++  grub_efi_status_t status;
++  grub_efi_tpm2_protocol_t *tpm;
++
++  tpm = grub_efi_open_protocol (tpm_handle, &tpm2_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!grub_tpm2_present(tpm))
++    return 0;
++
++  event = grub_zalloc(sizeof (EFI_TCG2_EVENT) + grub_strlen(description) + 1);
++  if (!event)
++    return grub_error (GRUB_ERR_OUT_OF_MEMORY,
++		       N_("cannot allocate TPM event buffer"));
++
++  event->Header.HeaderSize = sizeof(EFI_TCG2_EVENT_HEADER);
++  event->Header.HeaderVersion = 1;
++  event->Header.PCRIndex = pcr;
++  event->Header.EventType = EV_IPL;
++  event->Size = sizeof(*event) - sizeof(event->Event) + grub_strlen(description) + 1;
++  grub_memcpy(event->Event, description, grub_strlen(description) + 1);
++
++  status = efi_call_5 (tpm->hash_log_extend_event, tpm, 0, buf,
++		       (grub_uint64_t) size, event);
++
++  switch (status) {
++  case GRUB_EFI_SUCCESS:
++    return 0;
++  case GRUB_EFI_DEVICE_ERROR:
++    return grub_error (GRUB_ERR_IO, N_("Command failed"));
++  case GRUB_EFI_INVALID_PARAMETER:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Invalid parameter"));
++  case GRUB_EFI_BUFFER_TOO_SMALL:
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("Output buffer too small"));
++  case GRUB_EFI_NOT_FOUND:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("TPM unavailable"));
++  default:
++    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("Unknown TPM error"));
++  }
++}
++
++grub_err_t
++grub_tpm_log_event(unsigned char *buf, grub_size_t size, grub_uint8_t pcr,
++		   const char *description)
++{
++  grub_efi_handle_t tpm_handle;
++  grub_efi_uint8_t protocol_version;
++
++  if (!grub_tpm_handle_find(&tpm_handle, &protocol_version))
++    return 0;
++
++  if (protocol_version == 1) {
++    return grub_tpm1_log_event(tpm_handle, buf, size, pcr, description);
++  } else {
++    return grub_tpm2_log_event(tpm_handle, buf, size, pcr, description);
++  }
++}
+diff --git a/grub-core/kern/i386/pc/tpm.c b/grub-core/kern/i386/pc/tpm.c
+new file mode 100644
+index 00000000000..8c6c1e6ece2
+--- /dev/null
++++ b/grub-core/kern/i386/pc/tpm.c
+@@ -0,0 +1,132 @@
++#include <grub/err.h>
++#include <grub/i18n.h>
++#include <grub/mm.h>
++#include <grub/tpm.h>
++#include <grub/misc.h>
++#include <grub/i386/pc/int.h>
++
++#define TCPA_MAGIC 0x41504354
++
++int tpm_present(void);
++
++int tpm_present(void)
++{
++  struct grub_bios_int_registers regs;
++
++  regs.flags = GRUB_CPU_INT_FLAGS_DEFAULT;
++  regs.eax = 0xbb00;
++  regs.ebx = TCPA_MAGIC;
++  grub_bios_interrupt (0x1a, &regs);
++
++  if (regs.eax == 0)
++    return 1;
++
++  return 0;
++}
++
++grub_err_t
++grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,
++		 PassThroughToTPM_OutputParamBlock *outbuf)
++{
++  struct grub_bios_int_registers regs;
++  grub_addr_t inaddr, outaddr;
++
++  if (!tpm_present())
++    return 0;
++
++  inaddr = (grub_addr_t) inbuf;
++  outaddr = (grub_addr_t) outbuf;
++  regs.flags = GRUB_CPU_INT_FLAGS_DEFAULT;
++  regs.eax = 0xbb02;
++  regs.ebx = TCPA_MAGIC;
++  regs.ecx = 0;
++  regs.edx = 0;
++  regs.es = (inaddr & 0xffff0000) >> 4;
++  regs.edi = inaddr & 0xffff;
++  regs.ds = outaddr >> 4;
++  regs.esi = outaddr & 0xf;
++
++  grub_bios_interrupt (0x1a, &regs);
++
++  if (regs.eax)
++    return grub_error (GRUB_ERR_IO, N_("TPM error %x\n"), regs.eax);
++
++  return 0;
++}
++
++typedef struct {
++	grub_uint32_t pcrindex;
++	grub_uint32_t eventtype;
++	grub_uint8_t digest[20];
++	grub_uint32_t eventdatasize;
++	grub_uint8_t event[0];
++} GRUB_PACKED Event;
++
++typedef struct {
++	grub_uint16_t ipblength;
++	grub_uint16_t reserved;
++	grub_uint32_t hashdataptr;
++	grub_uint32_t hashdatalen;
++	grub_uint32_t pcr;
++	grub_uint32_t reserved2;
++	grub_uint32_t logdataptr;
++	grub_uint32_t logdatalen;
++} GRUB_PACKED EventIncoming;
++
++typedef struct {
++	grub_uint16_t opblength;
++	grub_uint16_t reserved;
++	grub_uint32_t eventnum;
++	grub_uint8_t  hashvalue[20];
++} GRUB_PACKED EventOutgoing;
++
++grub_err_t
++grub_tpm_log_event(unsigned char *buf, grub_size_t size, grub_uint8_t pcr,
++		   const char *description)
++{
++	struct grub_bios_int_registers regs;
++	EventIncoming incoming;
++	EventOutgoing outgoing;
++	Event *event;
++	grub_uint32_t datalength;
++
++	if (!tpm_present())
++		return 0;
++
++	datalength = grub_strlen(description);
++	event = grub_zalloc(datalength + sizeof(Event));
++	if (!event)
++		return grub_error (GRUB_ERR_OUT_OF_MEMORY,
++				   N_("cannot allocate TPM event buffer"));
++
++	event->pcrindex = pcr;
++	event->eventtype = 0x0d;
++	event->eventdatasize = grub_strlen(description);
++	grub_memcpy(event->event, description, datalength);
++
++	incoming.ipblength = sizeof(incoming);
++	incoming.hashdataptr = (grub_uint32_t)buf;
++	incoming.hashdatalen = size;
++	incoming.pcr = pcr;
++	incoming.logdataptr = (grub_uint32_t)event;
++	incoming.logdatalen = datalength + sizeof(Event);
++
++	regs.flags = GRUB_CPU_INT_FLAGS_DEFAULT;
++	regs.eax = 0xbb01;
++	regs.ebx = TCPA_MAGIC;
++	regs.ecx = 0;
++	regs.edx = 0;
++	regs.es = (((grub_addr_t) &incoming) & 0xffff0000) >> 4;
++	regs.edi = ((grub_addr_t) &incoming) & 0xffff;
++	regs.ds = (((grub_addr_t) &outgoing) & 0xffff0000) >> 4;
++	regs.esi = ((grub_addr_t) &outgoing) & 0xffff;
++
++	grub_bios_interrupt (0x1a, &regs);
++
++	grub_free(event);
++
++	if (regs.eax)
++		return grub_error (GRUB_ERR_IO, N_("TPM error %x\n"), regs.eax);
++
++	return 0;
++}
+diff --git a/grub-core/kern/tpm.c b/grub-core/kern/tpm.c
+new file mode 100644
+index 00000000000..1a991876c83
+--- /dev/null
++++ b/grub-core/kern/tpm.c
+@@ -0,0 +1,13 @@
++#include <grub/err.h>
++#include <grub/i18n.h>
++#include <grub/misc.h>
++#include <grub/mm.h>
++#include <grub/tpm.h>
++#include <grub/term.h>
++
++grub_err_t
++grub_tpm_measure (unsigned char *buf, grub_size_t size, grub_uint8_t pcr,
++		  const char *description)
++{
++  return grub_tpm_log_event(buf, size, pcr, description);
++}
+diff --git a/include/grub/efi/tpm.h b/include/grub/efi/tpm.h
+new file mode 100644
+index 00000000000..e2aff4a3c22
+--- /dev/null
++++ b/include/grub/efi/tpm.h
+@@ -0,0 +1,153 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2015  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_EFI_TPM_HEADER
++#define GRUB_EFI_TPM_HEADER 1
++
++#define EFI_TPM_GUID {0xf541796d, 0xa62e, 0x4954, {0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd }};
++#define EFI_TPM2_GUID {0x607f766c, 0x7455, 0x42be, {0x93, 0x0b, 0xe4, 0xd7, 0x6d, 0xb2, 0x72, 0x0f }};
++
++typedef struct {
++  grub_efi_uint8_t Major;
++  grub_efi_uint8_t Minor;
++  grub_efi_uint8_t RevMajor;
++  grub_efi_uint8_t RevMinor;
++} TCG_VERSION;
++
++typedef struct _TCG_EFI_BOOT_SERVICE_CAPABILITY {
++  grub_efi_uint8_t          Size;                /// Size of this structure.
++  TCG_VERSION    StructureVersion;
++  TCG_VERSION    ProtocolSpecVersion;
++  grub_efi_uint8_t          HashAlgorithmBitmap; /// Hash algorithms .
++  char        TPMPresentFlag;      /// 00h = TPM not present.
++  char        TPMDeactivatedFlag;  /// 01h = TPM currently deactivated.
++} TCG_EFI_BOOT_SERVICE_CAPABILITY;
++
++typedef struct {
++  grub_efi_uint32_t PCRIndex;
++  grub_efi_uint32_t EventType;
++  grub_efi_uint8_t digest[20];
++  grub_efi_uint32_t EventSize;
++  grub_efi_uint8_t  Event[1];
++} TCG_PCR_EVENT;
++
++struct grub_efi_tpm_protocol
++{
++  grub_efi_status_t (*status_check) (struct grub_efi_tpm_protocol *this,
++				     TCG_EFI_BOOT_SERVICE_CAPABILITY *ProtocolCapability,
++				     grub_efi_uint32_t *TCGFeatureFlags,
++				     grub_efi_physical_address_t *EventLogLocation,
++				     grub_efi_physical_address_t *EventLogLastEntry);
++  grub_efi_status_t (*hash_all) (struct grub_efi_tpm_protocol *this,
++				 grub_efi_uint8_t *HashData,
++				 grub_efi_uint64_t HashLen,
++				 grub_efi_uint32_t AlgorithmId,
++				 grub_efi_uint64_t *HashedDataLen,
++				 grub_efi_uint8_t **HashedDataResult);
++  grub_efi_status_t (*log_event) (struct grub_efi_tpm_protocol *this,
++				  TCG_PCR_EVENT *TCGLogData,
++				  grub_efi_uint32_t *EventNumber,
++				  grub_efi_uint32_t Flags);
++  grub_efi_status_t (*pass_through_to_tpm) (struct grub_efi_tpm_protocol *this,
++					    grub_efi_uint32_t TpmInputParameterBlockSize,
++					    grub_efi_uint8_t *TpmInputParameterBlock,
++					    grub_efi_uint32_t TpmOutputParameterBlockSize,
++					    grub_efi_uint8_t *TpmOutputParameterBlock);
++  grub_efi_status_t (*log_extend_event) (struct grub_efi_tpm_protocol *this,
++					 grub_efi_physical_address_t HashData,
++					 grub_efi_uint64_t HashDataLen,
++					 grub_efi_uint32_t AlgorithmId,
++					 TCG_PCR_EVENT *TCGLogData,
++					 grub_efi_uint32_t *EventNumber,
++					 grub_efi_physical_address_t *EventLogLastEntry);
++};
++
++typedef struct grub_efi_tpm_protocol grub_efi_tpm_protocol_t;
++
++typedef grub_efi_uint32_t EFI_TCG2_EVENT_LOG_BITMAP;
++typedef grub_efi_uint32_t EFI_TCG2_EVENT_LOG_FORMAT;
++typedef grub_efi_uint32_t EFI_TCG2_EVENT_ALGORITHM_BITMAP;
++
++typedef struct tdEFI_TCG2_VERSION {
++  grub_efi_uint8_t Major;
++  grub_efi_uint8_t Minor;
++} GRUB_PACKED EFI_TCG2_VERSION;
++
++typedef struct tdEFI_TCG2_BOOT_SERVICE_CAPABILITY {
++  grub_efi_uint8_t Size;
++  EFI_TCG2_VERSION StructureVersion;
++  EFI_TCG2_VERSION ProtocolVersion;
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP HashAlgorithmBitmap;
++  EFI_TCG2_EVENT_LOG_BITMAP SupportedEventLogs;
++  grub_efi_boolean_t TPMPresentFlag;
++  grub_efi_uint16_t MaxCommandSize;
++  grub_efi_uint16_t MaxResponseSize;
++  grub_efi_uint32_t ManufacturerID;
++  grub_efi_uint32_t NumberOfPcrBanks;
++  EFI_TCG2_EVENT_ALGORITHM_BITMAP ActivePcrBanks;
++} EFI_TCG2_BOOT_SERVICE_CAPABILITY;
++
++typedef grub_efi_uint32_t TCG_PCRINDEX;
++typedef grub_efi_uint32_t TCG_EVENTTYPE;
++
++typedef struct tdEFI_TCG2_EVENT_HEADER {
++  grub_efi_uint32_t HeaderSize;
++  grub_efi_uint16_t HeaderVersion;
++  TCG_PCRINDEX PCRIndex;
++  TCG_EVENTTYPE EventType;
++} GRUB_PACKED EFI_TCG2_EVENT_HEADER;
++
++typedef struct tdEFI_TCG2_EVENT {
++  grub_efi_uint32_t Size;
++  EFI_TCG2_EVENT_HEADER Header;
++  grub_efi_uint8_t Event[1];
++} GRUB_PACKED EFI_TCG2_EVENT;
++
++struct grub_efi_tpm2_protocol
++{
++  grub_efi_status_t (*get_capability) (struct grub_efi_tpm2_protocol *this,
++				       EFI_TCG2_BOOT_SERVICE_CAPABILITY *ProtocolCapability);
++  grub_efi_status_t (*get_event_log) (struct grub_efi_tpm2_protocol *this,
++				      EFI_TCG2_EVENT_LOG_FORMAT EventLogFormat,
++				      grub_efi_physical_address_t *EventLogLocation,
++				      grub_efi_physical_address_t *EventLogLastEntry,
++				      grub_efi_boolean_t *EventLogTruncated);
++  grub_efi_status_t (*hash_log_extend_event) (struct grub_efi_tpm2_protocol *this,
++					      grub_efi_uint64_t Flags,
++					      grub_efi_physical_address_t *DataToHash,
++					      grub_efi_uint64_t DataToHashLen,
++					      EFI_TCG2_EVENT *EfiTcgEvent);
++  grub_efi_status_t (*submit_command) (struct grub_efi_tpm2_protocol *this,
++				       grub_efi_uint32_t InputParameterBlockSize,
++				       grub_efi_uint8_t *InputParameterBlock,
++				       grub_efi_uint32_t OutputParameterBlockSize,
++				       grub_efi_uint8_t *OutputParameterBlock);
++  grub_efi_status_t (*get_active_pcr_blanks) (struct grub_efi_tpm2_protocol *this,
++					      grub_efi_uint32_t *ActivePcrBanks);
++  grub_efi_status_t (*set_active_pcr_banks) (struct grub_efi_tpm2_protocol *this,
++					     grub_efi_uint32_t ActivePcrBanks);
++  grub_efi_status_t (*get_result_of_set_active_pcr_banks) (struct grub_efi_tpm2_protocol *this,
++							   grub_efi_uint32_t *OperationPresent,
++							   grub_efi_uint32_t *Response);
++};
++
++typedef struct grub_efi_tpm2_protocol grub_efi_tpm2_protocol_t;
++
++#define TCG_ALG_SHA 0x00000004
++
++#endif
+diff --git a/include/grub/tpm.h b/include/grub/tpm.h
+new file mode 100644
+index 00000000000..40d3cf65ba6
+--- /dev/null
++++ b/include/grub/tpm.h
+@@ -0,0 +1,91 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2015  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_TPM_HEADER
++#define GRUB_TPM_HEADER 1
++
++#define SHA1_DIGEST_SIZE 20
++
++#define TPM_BASE 0x0
++#define TPM_SUCCESS TPM_BASE
++#define TPM_AUTHFAIL (TPM_BASE + 0x1)
++#define TPM_BADINDEX (TPM_BASE + 0x2)
++
++#define GRUB_TPM_PCR 9
++#define GRUB_KERNEL_PCR 10
++#define GRUB_INITRD_PCR 11
++#define GRUB_CMDLINE_PCR 12
++
++#define TPM_TAG_RQU_COMMAND 0x00C1
++#define TPM_ORD_Extend 0x14
++
++#define EV_IPL 0x0d
++
++/* TCG_PassThroughToTPM Input Parameter Block */
++typedef struct {
++        grub_uint16_t IPBLength;
++        grub_uint16_t Reserved1;
++        grub_uint16_t OPBLength;
++        grub_uint16_t Reserved2;
++        grub_uint8_t TPMOperandIn[1];
++} GRUB_PACKED PassThroughToTPM_InputParamBlock;
++
++/* TCG_PassThroughToTPM Output Parameter Block */
++typedef struct {
++        grub_uint16_t OPBLength;
++        grub_uint16_t Reserved;
++        grub_uint8_t TPMOperandOut[1];
++} GRUB_PACKED PassThroughToTPM_OutputParamBlock;
++
++typedef struct {
++        grub_uint16_t tag;
++        grub_uint32_t paramSize;
++        grub_uint32_t ordinal;
++        grub_uint32_t pcrNum;
++        grub_uint8_t inDigest[SHA1_DIGEST_SIZE];                /* The 160 bit value representing the event to be recorded. */
++} GRUB_PACKED ExtendIncoming;
++
++/* TPM_Extend Outgoing Operand */
++typedef struct {
++        grub_uint16_t tag;
++        grub_uint32_t paramSize;
++        grub_uint32_t returnCode;
++        grub_uint8_t outDigest[SHA1_DIGEST_SIZE];               /* The PCR value after execution of the command. */
++} GRUB_PACKED ExtendOutgoing;
++
++grub_err_t EXPORT_FUNC(grub_tpm_measure) (unsigned char *buf, grub_size_t size,
++					  grub_uint8_t pcr,
++					  const char *description);
++#if defined (GRUB_MACHINE_EFI) || defined (GRUB_MACHINE_PCBIOS)
++grub_err_t grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,
++			    PassThroughToTPM_OutputParamBlock *outbuf);
++grub_err_t grub_tpm_log_event(unsigned char *buf, grub_size_t size,
++			      grub_uint8_t pcr, const char *description);
++#else
++static inline grub_err_t grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,
++					  PassThroughToTPM_OutputParamBlock *outbuf) { return 0; };
++static inline grub_err_t grub_tpm_log_event(unsigned char *buf,
++					    grub_size_t size,
++					    grub_uint8_t pcr,
++					    const char *description)
++{
++	return 0;
++};
++#endif
++
++#endif
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index f36200bd688..3781bb9cbb9 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -94,6 +94,7 @@ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/term.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/time.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/mm_private.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/net.h
++KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/tpm.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/memory.h
+ 
+ if COND_i386_pc

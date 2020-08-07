@@ -1,0 +1,13 @@
+Set "RefuseManualStop=no" in "auditd.service"
+See this discussion on "RefuseManualStop": https://systemd-devel.freedesktop.narkive.com/9RzEJTWh/auditd-service-and-refusemanualstop
+--- a/init.d/auditd.service
++++ b/init.d/auditd.service
+@@ -11,7 +11,7 @@
+ Before=sysinit.target shutdown.target
+ ##Before=shutdown.target
+ Conflicts=shutdown.target
+-RefuseManualStop=yes
++RefuseManualStop=no
+ ConditionKernelCommandLine=!audit=0
+ Documentation=man:auditd(8) https://github.com/linux-audit/audit-documentation
+ 

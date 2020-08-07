@@ -1,0 +1,80 @@
+--- crash-gcore-command-1.4.0/libgcore/gcore_defs.h.orig	2017-09-30 16:05:19.520000000 -0400
++++ crash-gcore-command-1.4.0/libgcore/gcore_defs.h	2017-09-30 16:09:46.848000000 -0400
+@@ -584,16 +584,8 @@
+ /* Type for a general-purpose register.  */
+ typedef unsigned long elf_greg_t;
+ 
+-/* And the whole bunch of them.  We could have used `struct
+-   pt_regs' directly in the typedef, but tradition says that
+-   the register set is an array, which does have some peculiar
+-   semantics, so leave it that way.  */
+-#define ELF_NGREG (sizeof (struct user_pt_regs) / sizeof(elf_greg_t))
+ typedef elf_greg_t elf_gregset_t[ELF_NGREG];
+ 
+-/* Register set for the floating-point registers.  */
+-typedef struct user_fpsimd_state elf_fpregset_t;
+-
+ #ifdef GCORE_ARCH_COMPAT
+ /* AArch32 registers. */
+ struct user_regs_struct32{
+@@ -699,13 +691,6 @@
+         PIDTYPE_MAX
+ };
+ 
+-struct elf_siginfo
+-{
+-        int     si_signo;                       /* signal number */
+-	int     si_code;                        /* extra code */
+-        int     si_errno;                       /* errno */
+-};
+-
+ /* Parameters used to convert the timespec values: */
+ #define NSEC_PER_USEC   1000L
+ #define NSEC_PER_SEC    1000000000L
+@@ -796,24 +781,6 @@
+ }
+ #endif
+ 
+-struct elf_prstatus
+-{
+-	struct elf_siginfo pr_info;	/* Info associated with signal */
+-	short	pr_cursig;		/* Current signal */
+-	unsigned long pr_sigpend;	/* Set of pending signals */
+-	unsigned long pr_sighold;	/* Set of held signals */
+-	int	pr_pid;
+-	int	pr_ppid;
+-	int	pr_pgrp;
+-	int	pr_sid;
+-	struct timeval pr_utime;	/* User time */
+-	struct timeval pr_stime;	/* System time */
+-	struct timeval pr_cutime;	/* Cumulative user time */
+-	struct timeval pr_cstime;	/* Cumulative system time */
+-	elf_gregset_t pr_reg;	/* GP registers */
+-	int pr_fpvalid;		/* True if math co-processor being used.  */
+-};
+-
+ #if defined(X86) || defined(X86_64) || defined(ARM) || defined(MIPS)
+ typedef unsigned short __kernel_old_uid_t;
+ typedef unsigned short __kernel_old_gid_t;
+@@ -892,21 +859,6 @@
+ 
+ #define ELF_PRARGSZ     (80)    /* Number of chars for args */
+ 
+-struct elf_prpsinfo
+-{
+-        char    pr_state;       /* numeric process state */
+-        char    pr_sname;       /* char for pr_state */
+-        char    pr_zomb;        /* zombie */
+-        char    pr_nice;        /* nice val */
+-        unsigned long pr_flag;  /* flags */
+-        __kernel_uid_t  pr_uid;
+-        __kernel_gid_t  pr_gid;
+-        pid_t   pr_pid, pr_ppid, pr_pgrp, pr_sid;
+-        /* Lots missing */
+-        char    pr_fname[16];   /* filename of executable */
+-        char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
+-};
+-
+ #ifdef GCORE_ARCH_COMPAT
+ 
+ struct compat_elf_siginfo

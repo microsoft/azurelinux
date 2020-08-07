@@ -1,0 +1,5 @@
+#%PAM-1.0
+auth       substack     password-auth
+auth       include      postlogin
+account    required     pam_nologin.so
+account    include      password-auth

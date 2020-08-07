@@ -1,0 +1,1945 @@
+Author: Petr Machata <pmachata@apm-mustang-ev2-02.ml3.eng.bos.redhat.com>
+Description: Set child stack alignment in trace-clone.c
+ This is important on aarch64, which requires 16-byte aligned
+ stack pointer.  This might be relevant on other arches as well,
+ I suspect we just happened to get the 16-byte boundary in some
+ cases.
+Applied-Upstream: http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commit;h=912a0f75b3521803fa724a55f0e883c134c7b4e9
+Last-Update: 2014-03-13
+
+Index: ltrace/configure.ac
+===================================================================
+--- ltrace.orig/configure.ac	2014-03-12 16:20:44.020676662 -0600
++++ ltrace/configure.ac	2014-03-12 16:20:44.012676553 -0600
+@@ -1,6 +1,6 @@
+ # -*- Autoconf -*-
+ # This file is part of ltrace.
+-# Copyright (C) 2010,2013 Petr Machata, Red Hat Inc.
++# Copyright (C) 2010,2013,2014 Petr Machata, Red Hat Inc.
+ # Copyright (C) 2010,2011 Joe Damato
+ # Copyright (C) 2010 Marc Kleine-Budde
+ # Copyright (C) 2010 Zachary T Welch
+@@ -319,6 +319,7 @@
+ 	Makefile
+ 	sysdeps/Makefile
+ 	sysdeps/linux-gnu/Makefile
++	sysdeps/linux-gnu/aarch64/Makefile
+ 	sysdeps/linux-gnu/alpha/Makefile
+ 	sysdeps/linux-gnu/arm/Makefile
+ 	sysdeps/linux-gnu/cris/Makefile
+Index: ltrace/sysdeps/linux-gnu/Makefile.am
+===================================================================
+--- ltrace.orig/sysdeps/linux-gnu/Makefile.am	2014-03-12 16:20:44.020676662 -0600
++++ ltrace/sysdeps/linux-gnu/Makefile.am	2014-03-12 16:20:44.016676607 -0600
+@@ -1,4 +1,5 @@
+ # This file is part of ltrace.
++# Copyright (C) 2014 Petr Machata, Red Hat, Inc.
+ # Copyright (C) 2010,2012 Marc Kleine-Budde, Pengutronix
+ #
+ # This program is free software; you can redistribute it and/or
+@@ -16,7 +17,7 @@
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ # 02110-1301 USA
+ 
+-DIST_SUBDIRS = alpha arm cris ia64 m68k mips ppc s390 sparc x86
++DIST_SUBDIRS = aarch64 alpha arm cris ia64 m68k mips ppc s390 sparc x86
+ 
+ SUBDIRS = \
+ 	$(HOST_CPU)
+Index: ltrace/sysdeps/linux-gnu/aarch64/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/Makefile.am	2014-03-12 16:20:44.016676607 -0600
+@@ -0,0 +1,25 @@
++# This file is part of ltrace.
++# Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation; either version 2 of the
++# License, or (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++# 02110-1301 USA
++
++noinst_LTLIBRARIES = ../libcpu.la
++
++___libcpu_la_SOURCES = fetch.c plt.c regs.c trace.c
++
++noinst_HEADERS = arch.h ptrace.h signalent.h syscallent.h
++
++MAINTAINERCLEANFILES = Makefile.in
+Index: ltrace/sysdeps/linux-gnu/aarch64/arch.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/arch.h	2014-03-12 16:20:44.016676607 -0600
+@@ -0,0 +1,37 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++#ifndef LTRACE_AARCH64_ARCH_H
++#define LTRACE_AARCH64_ARCH_H
++
++/* | 31                 21 | 20       5 | 4       0 | *
++ * | 1 1 0 1 0 1 0 0 0 0 1 |    imm16   | 0 0 0 0 0 | */
++#define BREAKPOINT_VALUE { 0xd4, 0x20, 0, 0 }
++#define BREAKPOINT_LENGTH 4
++#define DECR_PC_AFTER_BREAK 0
++
++#define LT_ELFCLASS	ELFCLASS64
++#define LT_ELF_MACHINE	EM_AARCH64
++
++#define ARCH_HAVE_FETCH_ARG
++#define ARCH_ENDIAN_BIG
++#define ARCH_HAVE_SIZEOF
++#define ARCH_HAVE_ALIGNOF
++
++#endif /* LTRACE_AARCH64_ARCH_H */
+Index: ltrace/sysdeps/linux-gnu/aarch64/fetch.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/fetch.c	2014-03-12 16:23:25.382866486 -0600
+@@ -0,0 +1,365 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <sys/ptrace.h>
++#include <asm/ptrace.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "fetch.h"
++#include "proc.h"
++#include "type.h"
++#include "value.h"
++
++int aarch64_read_gregs(struct Process *proc, struct user_pt_regs *regs);
++int aarch64_read_fregs(struct Process *proc, struct user_fpsimd_state *regs);
++
++
++struct fetch_context
++{
++	struct user_pt_regs gregs;
++	struct user_fpsimd_state fpregs;
++	arch_addr_t nsaa;
++	unsigned ngrn;
++	unsigned nsrn;
++	arch_addr_t x8;
++};
++
++static int
++context_init(struct fetch_context *context, struct Process *proc)
++{
++	if (aarch64_read_gregs(proc, &context->gregs) < 0
++	    || aarch64_read_fregs(proc, &context->fpregs) < 0)
++		return -1;
++
++	context->ngrn = 0;
++	context->nsrn = 0;
++	/* XXX double cast */
++	context->nsaa = (arch_addr_t) (uintptr_t) context->gregs.sp;
++	context->x8 = 0;
++
++	return 0;
++}
++
++struct fetch_context *
++arch_fetch_arg_clone(struct Process *proc, struct fetch_context *context)
++{
++	struct fetch_context *ret = malloc(sizeof(*ret));
++	if (ret == NULL)
++		return NULL;
++	return memcpy(ret, context, sizeof(*ret));
++}
++
++static void
++fetch_next_gpr(struct fetch_context *context, unsigned char *buf)
++{
++	uint64_t u = context->gregs.regs[context->ngrn++];
++	memcpy(buf, &u, 8);
++}
++
++static int
++fetch_gpr(struct fetch_context *context, struct value *value, size_t sz)
++{
++	if (sz < 8)
++		sz = 8;
++
++	unsigned char *buf = value_reserve(value, sz);
++	if (buf == NULL)
++		return -1;
++
++	size_t i;
++	for (i = 0; i < sz; i += 8)
++		fetch_next_gpr(context, buf + i);
++
++	return 0;
++}
++
++static void
++fetch_next_sse(struct fetch_context *context, unsigned char *buf, size_t sz)
++{
++	__int128 u = context->fpregs.vregs[context->nsrn++];
++	memcpy(buf, &u, sz);
++}
++
++static int
++fetch_sse(struct fetch_context *context, struct value *value, size_t sz)
++{
++	unsigned char *buf = value_reserve(value, sz);
++	if (buf == NULL)
++		return -1;
++
++	fetch_next_sse(context, buf, sz);
++	return 0;
++}
++
++static int
++fetch_hfa(struct fetch_context *context,
++	  struct value *value, struct arg_type_info *hfa_t, size_t count)
++{
++	size_t sz = type_sizeof(value->inferior, hfa_t);
++	unsigned char *buf = value_reserve(value, sz * count);
++	if (buf == NULL)
++		return -1;
++
++	size_t i;
++	for (i = 0; i < count; ++i) {
++		fetch_next_sse(context, buf, sz);
++		buf += sz;
++	}
++	return 0;
++}
++
++static int
++fetch_stack(struct fetch_context *context, struct value *value,
++	    size_t align, size_t sz)
++{
++	if (align < 8)
++		align = 8;
++	size_t amount = ((sz + align - 1) / align) * align;
++
++	/* XXX double casts */
++	uintptr_t sp = (uintptr_t) context->nsaa;
++	sp = ((sp + align - 1) / align) * align;
++
++	value_in_inferior(value, (arch_addr_t) sp);
++
++	sp += amount;
++	context->nsaa = (arch_addr_t) sp;
++
++	return 0;
++}
++
++enum convert_method {
++	CVT_ERR = -1,
++	CVT_NOP = 0,
++	CVT_BYREF,
++};
++
++enum fetch_method {
++	FETCH_NOP,
++	FETCH_STACK,
++	FETCH_GPR,
++	FETCH_SSE,
++	FETCH_HFA,
++};
++
++struct fetch_script {
++	enum convert_method c;
++	enum fetch_method f;
++	size_t sz;
++	struct arg_type_info *hfa_t;
++	size_t count;
++};
++
++static struct fetch_script
++pass_arg(struct fetch_context const *context,
++	 struct Process *proc, struct arg_type_info *info)
++{
++	enum fetch_method cvt = CVT_NOP;
++
++	size_t sz = type_sizeof(proc, info);
++	if (sz == (size_t) -1)
++		return (struct fetch_script) { CVT_ERR, FETCH_NOP, sz };
++
++	switch (info->type) {
++	case ARGTYPE_VOID:
++		return (struct fetch_script) { cvt, FETCH_NOP, sz };
++
++	case ARGTYPE_STRUCT:
++	case ARGTYPE_ARRAY:;
++		size_t count;
++		struct arg_type_info *hfa_t = type_get_hfa_type(info, &count);
++		if (hfa_t != NULL && count <= 4) {
++			if (context->nsrn + count <= 8)
++				return (struct fetch_script)
++					{ cvt, FETCH_HFA, sz, hfa_t, count };
++			return (struct fetch_script)
++				{ cvt, FETCH_STACK, sz, hfa_t, count };
++		}
++
++		if (sz <= 16) {
++			size_t count = sz / 8;
++			if (context->ngrn + count <= 8)
++				return (struct fetch_script)
++					{ cvt, FETCH_GPR, sz };
++		}
++
++		cvt = CVT_BYREF;
++		sz = 8;
++		/* Fall through.  */
++
++	case ARGTYPE_POINTER:
++	case ARGTYPE_INT:
++	case ARGTYPE_UINT:
++	case ARGTYPE_LONG:
++	case ARGTYPE_ULONG:
++	case ARGTYPE_CHAR:
++	case ARGTYPE_SHORT:
++	case ARGTYPE_USHORT:
++		if (context->ngrn < 8 && sz <= 8)
++			return (struct fetch_script) { cvt, FETCH_GPR, sz };
++		/* We don't support types wider than 8 bytes as of
++		 * now.  */
++		assert(sz <= 8);
++
++		return (struct fetch_script) { cvt, FETCH_STACK, sz };
++
++	case ARGTYPE_FLOAT:
++	case ARGTYPE_DOUBLE:
++		if (context->nsrn < 8) {
++			/* ltrace doesn't support float128.  */
++			assert(sz <= 8);
++			return (struct fetch_script) { cvt, FETCH_SSE, sz };
++		}
++
++		return (struct fetch_script) { cvt, FETCH_STACK, sz };
++	}
++
++	assert(! "Failed to allocate argument.");
++	abort();
++}
++
++static int
++convert_arg(struct value *value, struct fetch_script how)
++{
++	switch (how.c) {
++	case CVT_NOP:
++		return 0;
++	case CVT_BYREF:
++		return value_pass_by_reference(value);
++	case CVT_ERR:
++		return -1;
++	}
++
++	assert(! "Don't know how to convert argument.");
++	abort();
++}
++
++static int
++fetch_arg(struct fetch_context *context,
++	  struct Process *proc, struct arg_type_info *info,
++	  struct value *value, struct fetch_script how)
++{
++	if (convert_arg(value, how) < 0)
++		return -1;
++
++	switch (how.f) {
++	case FETCH_NOP:
++		return 0;
++
++	case FETCH_STACK:
++		if (how.hfa_t != NULL && how.count != 0 && how.count <= 8)
++			context->nsrn = 8;
++		return fetch_stack(context, value,
++				   type_alignof(proc, info), how.sz);
++
++	case FETCH_GPR:
++		return fetch_gpr(context, value, how.sz);
++
++	case FETCH_SSE:
++		return fetch_sse(context, value, how.sz);
++
++	case FETCH_HFA:
++		return fetch_hfa(context, value, how.hfa_t, how.count);
++	}
++
++	assert(! "Don't know how to fetch argument.");
++	abort();
++}
++
++struct fetch_context *
++arch_fetch_arg_init(enum tof type, struct Process *proc,
++		    struct arg_type_info *ret_info)
++{
++	struct fetch_context *context = malloc(sizeof *context);
++	if (context == NULL || context_init(context, proc) < 0) {
++	fail:
++		free(context);
++		return NULL;
++	}
++
++	/* There's a provision in ARMv8 parameter passing convention
++	 * for returning types that, if passed as first argument to a
++	 * function, would be passed on stack.  For those types, x8
++	 * contains an address where the return argument should be
++	 * placed.  The callee doesn't need to preserve the value of
++	 * x8, so we need to fetch it now.
++	 *
++	 * To my knowledge, there are currently no types where this
++	 * holds, but the code is here, utterly untested.  */
++
++	struct fetch_script how = pass_arg(context, proc, ret_info);
++	if (how.c == CVT_ERR)
++		goto fail;
++	if (how.c == CVT_NOP && how.f == FETCH_STACK) {
++		/* XXX double cast.  */
++		context->x8 = (arch_addr_t) (uintptr_t) context->gregs.regs[8];
++		/* See the comment above about the assert.  */
++		assert(! "Unexpected: first argument passed on stack.");
++		abort();
++	}
++
++	return context;
++}
++
++int
++arch_fetch_arg_next(struct fetch_context *context, enum tof type,
++		    struct Process *proc, struct arg_type_info *info,
++		    struct value *value)
++{
++	return fetch_arg(context, proc, info, value,
++			 pass_arg(context, proc, info));
++}
++
++int
++arch_fetch_retval(struct fetch_context *context, enum tof type,
++		  struct Process *proc, struct arg_type_info *info,
++		  struct value *value)
++{
++	if (context->x8 != 0) {
++		value_in_inferior(value, context->x8);
++		return 0;
++	}
++
++	if (context_init(context, proc) < 0)
++		return -1;
++
++	return fetch_arg(context, proc, info, value,
++			 pass_arg(context, proc, info));
++}
++
++void
++arch_fetch_arg_done(struct fetch_context *context)
++{
++	if (context != NULL)
++		free(context);
++}
++
++size_t
++arch_type_sizeof(struct Process *proc, struct arg_type_info *arg)
++{
++	return (size_t) -2;
++}
++
++size_t
++arch_type_alignof(struct Process *proc, struct arg_type_info *arg)
++{
++	return (size_t) -2;
++}
+Index: ltrace/sysdeps/linux-gnu/aarch64/plt.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/plt.c	2014-03-12 16:23:25.382866486 -0600
+@@ -0,0 +1,38 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <gelf.h>
++
++#include "backend.h"
++#include "proc.h"
++#include "library.h"
++#include "ltrace-elf.h"
++
++arch_addr_t
++sym2addr(struct Process *proc, struct library_symbol *sym)
++{
++	return sym->enter_addr;
++}
++
++GElf_Addr
++arch_plt_sym_val(struct ltelf *lte, size_t ndx, GElf_Rela *rela)
++{
++	return lte->plt_addr + 32 + ndx * 16;
++}
+Index: ltrace/sysdeps/linux-gnu/aarch64/ptrace.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/ptrace.h	2014-03-12 16:20:44.016676607 -0600
+@@ -0,0 +1,22 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <sys/ptrace.h>
++#include <asm/ptrace.h>
+Index: ltrace/sysdeps/linux-gnu/aarch64/regs.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/regs.c	2014-03-12 16:23:25.382866486 -0600
+@@ -0,0 +1,130 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <sys/ptrace.h>
++#include <asm/ptrace.h>
++#include <linux/uio.h>
++#include <assert.h>
++#include <stdlib.h>
++
++#include "backend.h"
++#include "proc.h"
++
++#define PC_OFF (32 * 4)
++
++int
++aarch64_read_gregs(struct Process *proc, struct user_pt_regs *regs)
++{
++	*regs = (struct user_pt_regs) {};
++	struct iovec iovec;
++	iovec.iov_base = regs;
++	iovec.iov_len = sizeof *regs;
++	return ptrace(PTRACE_GETREGSET, proc->pid, NT_PRSTATUS, &iovec) < 0
++		? -1 : 0;
++}
++
++int
++aarch64_write_gregs(struct Process *proc, struct user_pt_regs *regs)
++{
++	struct iovec iovec;
++	iovec.iov_base = regs;
++	iovec.iov_len = sizeof *regs;
++	return ptrace(PTRACE_SETREGSET, proc->pid, NT_PRSTATUS, &iovec) < 0
++		? -1 : 0;
++}
++
++int
++aarch64_read_fregs(struct Process *proc, struct user_fpsimd_state *regs)
++{
++	*regs = (struct user_fpsimd_state) {};
++	struct iovec iovec;
++	iovec.iov_base = regs;
++	iovec.iov_len = sizeof *regs;
++	return ptrace(PTRACE_GETREGSET, proc->pid, NT_FPREGSET, &iovec) < 0
++		? -1 : 0;
++}
++
++arch_addr_t
++get_instruction_pointer(struct Process *proc)
++{
++	struct user_pt_regs regs;
++	if (aarch64_read_gregs(proc, &regs) < 0) {
++		fprintf(stderr, "get_instruction_pointer: "
++			"Couldn't read registers of %d.\n", proc->pid);
++		return 0;
++	}
++
++	/* 
++	char buf[128];
++	sprintf(buf, "cat /proc/%d/maps", proc->pid);
++	system(buf);
++	*/
++
++	/* XXX double cast */
++	return (arch_addr_t) (uintptr_t) regs.pc;
++}
++
++void
++set_instruction_pointer(struct Process *proc, arch_addr_t addr)
++{
++	struct user_pt_regs regs;
++	if (aarch64_read_gregs(proc, &regs) < 0) {
++		fprintf(stderr, "get_instruction_pointer: "
++			"Couldn't read registers of %d.\n", proc->pid);
++		return;
++	}
++
++	/* XXX double cast */
++	regs.pc = (uint64_t) (uintptr_t) addr;
++
++	if (aarch64_write_gregs(proc, &regs) < 0) {
++		fprintf(stderr, "get_instruction_pointer: "
++			"Couldn't write registers of %d.\n", proc->pid);
++		return;
++	}
++}
++
++arch_addr_t
++get_stack_pointer(struct Process *proc)
++{
++	struct user_pt_regs regs;
++	if (aarch64_read_gregs(proc, &regs) < 0) {
++		fprintf(stderr, "get_stack_pointer: "
++			"Couldn't read registers of %d.\n", proc->pid);
++		return 0;
++	}
++
++	/* XXX double cast */
++	return (arch_addr_t) (uintptr_t) regs.sp;
++}
++
++arch_addr_t
++get_return_addr(struct Process *proc, arch_addr_t stack_pointer)
++{
++	struct user_pt_regs regs;
++	if (aarch64_read_gregs(proc, &regs) < 0) {
++		fprintf(stderr, "get_return_addr: "
++			"Couldn't read registers of %d.\n", proc->pid);
++		return 0;
++	}
++
++	/* XXX double cast */
++	return (arch_addr_t) (uintptr_t) regs.regs[30];
++}
+Index: ltrace/sysdeps/linux-gnu/aarch64/signalent.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/signalent.h	2014-03-12 16:20:44.016676607 -0600
+@@ -0,0 +1,52 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2006 Ian Wienand
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++	"SIG_0",			/* 0 */
++	"SIGHUP",			/* 1 */
++	"SIGINT",			/* 2 */
++	"SIGQUIT",			/* 3 */
++	"SIGILL",			/* 4 */
++	"SIGTRAP",			/* 5 */
++	"SIGABRT",			/* 6 */
++	"SIGBUS",			/* 7 */
++	"SIGFPE",			/* 8 */
++	"SIGKILL",			/* 9 */
++	"SIGUSR1",			/* 10 */
++	"SIGSEGV",			/* 11 */
++	"SIGUSR2",			/* 12 */
++	"SIGPIPE",			/* 13 */
++	"SIGALRM",			/* 14 */
++	"SIGTERM",			/* 15 */
++	"SIGSTKFLT",			/* 16 */
++	"SIGCHLD",			/* 17 */
++	"SIGCONT",			/* 18 */
++	"SIGSTOP",			/* 19 */
++	"SIGTSTP",			/* 20 */
++	"SIGTTIN",			/* 21 */
++	"SIGTTOU",			/* 22 */
++	"SIGURG",			/* 23 */
++	"SIGXCPU",			/* 24 */
++	"SIGXFSZ",			/* 25 */
++	"SIGVTALRM",			/* 26 */
++	"SIGPROF",			/* 27 */
++	"SIGWINCH",			/* 28 */
++	"SIGIO",			/* 29 */
++	"SIGPWR",			/* 30 */
++	"SIGSYS",			/* 31 */
+Index: ltrace/sysdeps/linux-gnu/aarch64/syscallent.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/syscallent.h	2014-03-12 16:20:44.016676607 -0600
+@@ -0,0 +1,1100 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++	"io_setup",                        /* 0 */
++	"io_destroy",                      /* 1 */
++	"io_submit",                       /* 2 */
++	"io_cancel",                       /* 3 */
++	"io_getevents",                    /* 4 */
++	"setxattr",                        /* 5 */
++	"lsetxattr",                       /* 6 */
++	"fsetxattr",                       /* 7 */
++	"getxattr",                        /* 8 */
++	"lgetxattr",                       /* 9 */
++	"fgetxattr",                       /* 10 */
++	"listxattr",                       /* 11 */
++	"llistxattr",                      /* 12 */
++	"flistxattr",                      /* 13 */
++	"removexattr",                     /* 14 */
++	"lremovexattr",                    /* 15 */
++	"fremovexattr",                    /* 16 */
++	"getcwd",                          /* 17 */
++	"lookup_dcookie",                  /* 18 */
++	"eventfd2",                        /* 19 */
++	"epoll_create1",                   /* 20 */
++	"epoll_ctl",                       /* 21 */
++	"epoll_pwait",                     /* 22 */
++	"dup",                             /* 23 */
++	"dup3",                            /* 24 */
++	"fcntl",                           /* 25 */
++	"inotify_init1",                   /* 26 */
++	"inotify_add_watch",               /* 27 */
++	"inotify_rm_watch",                /* 28 */
++	"ioctl",                           /* 29 */
++	"ioprio_set",                      /* 30 */
++	"ioprio_get",                      /* 31 */
++	"flock",                           /* 32 */
++	"mknodat",                         /* 33 */
++	"mkdirat",                         /* 34 */
++	"unlinkat",                        /* 35 */
++	"symlinkat",                       /* 36 */
++	"linkat",                          /* 37 */
++	"renameat",                        /* 38 */
++	"umount2",                         /* 39 */
++	"mount",                           /* 40 */
++	"pivot_root",                      /* 41 */
++	"nfsservctl",                      /* 42 */
++	"statfs",                          /* 43 */
++	"fstatfs",                         /* 44 */
++	"truncate",                        /* 45 */
++	"ftruncate",                       /* 46 */
++	"fallocate",                       /* 47 */
++	"faccessat",                       /* 48 */
++	"chdir",                           /* 49 */
++	"fchdir",                          /* 50 */
++	"chroot",                          /* 51 */
++	"fchmod",                          /* 52 */
++	"fchmodat",                        /* 53 */
++	"fchownat",                        /* 54 */
++	"fchown",                          /* 55 */
++	"openat",                          /* 56 */
++	"close",                           /* 57 */
++	"vhangup",                         /* 58 */
++	"pipe2",                           /* 59 */
++	"quotactl",                        /* 60 */
++	"getdents64",                      /* 61 */
++	"lseek",                           /* 62 */
++	"read",                            /* 63 */
++	"write",                           /* 64 */
++	"readv",                           /* 65 */
++	"writev",                          /* 66 */
++	"pread64",                         /* 67 */
++	"pwrite64",                        /* 68 */
++	"preadv",                          /* 69 */
++	"pwritev",                         /* 70 */
++	"sendfile",                        /* 71 */
++	"pselect6",                        /* 72 */
++	"ppoll",                           /* 73 */
++	"signalfd4",                       /* 74 */
++	"vmsplice",                        /* 75 */
++	"splice",                          /* 76 */
++	"tee",                             /* 77 */
++	"readlinkat",                      /* 78 */
++	"fstatat",                         /* 79 */
++	"fstat",                           /* 80 */
++	"sync",                            /* 81 */
++	"fsync",                           /* 82 */
++	"fdatasync",                       /* 83 */
++	"sync_file_range",                 /* 84 */
++	"timerfd_create",                  /* 85 */
++	"timerfd_settime",                 /* 86 */
++	"timerfd_gettime",                 /* 87 */
++	"utimensat",                       /* 88 */
++	"acct",                            /* 89 */
++	"capget",                          /* 90 */
++	"capset",                          /* 91 */
++	"personality",                     /* 92 */
++	"exit",                            /* 93 */
++	"exit_group",                      /* 94 */
++	"waitid",                          /* 95 */
++	"set_tid_address",                 /* 96 */
++	"unshare",                         /* 97 */
++	"futex",                           /* 98 */
++	"set_robust_list",                 /* 99 */
++	"get_robust_list",                 /* 100 */
++	"nanosleep",                       /* 101 */
++	"getitimer",                       /* 102 */
++	"setitimer",                       /* 103 */
++	"kexec_load",                      /* 104 */
++	"init_module",                     /* 105 */
++	"delete_module",                   /* 106 */
++	"timer_create",                    /* 107 */
++	"timer_gettime",                   /* 108 */
++	"timer_getoverrun",                /* 109 */
++	"timer_settime",                   /* 110 */
++	"timer_delete",                    /* 111 */
++	"clock_settime",                   /* 112 */
++	"clock_gettime",                   /* 113 */
++	"clock_getres",                    /* 114 */
++	"clock_nanosleep",                 /* 115 */
++	"syslog",                          /* 116 */
++	"ptrace",                          /* 117 */
++	"sched_setparam",                  /* 118 */
++	"sched_setscheduler",              /* 119 */
++	"sched_getscheduler",              /* 120 */
++	"sched_getparam",                  /* 121 */
++	"sched_setaffinity",               /* 122 */
++	"sched_getaffinity",               /* 123 */
++	"sched_yield",                     /* 124 */
++	"sched_get_priority_max",          /* 125 */
++	"sched_get_priority_min",          /* 126 */
++	"sched_rr_get_interval",           /* 127 */
++	"restart_syscall",                 /* 128 */
++	"kill",                            /* 129 */
++	"tkill",                           /* 130 */
++	"tgkill",                          /* 131 */
++	"sigaltstack",                     /* 132 */
++	"rt_sigsuspend",                   /* 133 */
++	"rt_sigaction",                    /* 134 */
++	"rt_sigprocmask",                  /* 135 */
++	"rt_sigpending",                   /* 136 */
++	"rt_sigtimedwait",                 /* 137 */
++	"rt_sigqueueinfo",                 /* 138 */
++	"rt_sigreturn",                    /* 139 */
++	"setpriority",                     /* 140 */
++	"getpriority",                     /* 141 */
++	"reboot",                          /* 142 */
++	"setregid",                        /* 143 */
++	"setgid",                          /* 144 */
++	"setreuid",                        /* 145 */
++	"setuid",                          /* 146 */
++	"setresuid",                       /* 147 */
++	"getresuid",                       /* 148 */
++	"setresgid",                       /* 149 */
++	"getresgid",                       /* 150 */
++	"setfsuid",                        /* 151 */
++	"setfsgid",                        /* 152 */
++	"times",                           /* 153 */
++	"setpgid",                         /* 154 */
++	"getpgid",                         /* 155 */
++	"getsid",                          /* 156 */
++	"setsid",                          /* 157 */
++	"getgroups",                       /* 158 */
++	"setgroups",                       /* 159 */
++	"uname",                           /* 160 */
++	"sethostname",                     /* 161 */
++	"setdomainname",                   /* 162 */
++	"getrlimit",                       /* 163 */
++	"setrlimit",                       /* 164 */
++	"getrusage",                       /* 165 */
++	"umask",                           /* 166 */
++	"prctl",                           /* 167 */
++	"getcpu",                          /* 168 */
++	"gettimeofday",                    /* 169 */
++	"settimeofday",                    /* 170 */
++	"adjtimex",                        /* 171 */
++	"getpid",                          /* 172 */
++	"getppid",                         /* 173 */
++	"getuid",                          /* 174 */
++	"geteuid",                         /* 175 */
++	"getgid",                          /* 176 */
++	"getegid",                         /* 177 */
++	"gettid",                          /* 178 */
++	"sysinfo",                         /* 179 */
++	"mq_open",                         /* 180 */
++	"mq_unlink",                       /* 181 */
++	"mq_timedsend",                    /* 182 */
++	"mq_timedreceive",                 /* 183 */
++	"mq_notify",                       /* 184 */
++	"mq_getsetattr",                   /* 185 */
++	"msgget",                          /* 186 */
++	"msgctl",                          /* 187 */
++	"msgrcv",                          /* 188 */
++	"msgsnd",                          /* 189 */
++	"semget",                          /* 190 */
++	"semctl",                          /* 191 */
++	"semtimedop",                      /* 192 */
++	"semop",                           /* 193 */
++	"shmget",                          /* 194 */
++	"shmctl",                          /* 195 */
++	"shmat",                           /* 196 */
++	"shmdt",                           /* 197 */
++	"socket",                          /* 198 */
++	"socketpair",                      /* 199 */
++	"bind",                            /* 200 */
++	"listen",                          /* 201 */
++	"accept",                          /* 202 */
++	"connect",                         /* 203 */
++	"getsockname",                     /* 204 */
++	"getpeername",                     /* 205 */
++	"sendto",                          /* 206 */
++	"recvfrom",                        /* 207 */
++	"setsockopt",                      /* 208 */
++	"getsockopt",                      /* 209 */
++	"shutdown",                        /* 210 */
++	"sendmsg",                         /* 211 */
++	"recvmsg",                         /* 212 */
++	"readahead",                       /* 213 */
++	"brk",                             /* 214 */
++	"munmap",                          /* 215 */
++	"mremap",                          /* 216 */
++	"add_key",                         /* 217 */
++	"request_key",                     /* 218 */
++	"keyctl",                          /* 219 */
++	"clone",                           /* 220 */
++	"execve",                          /* 221 */
++	"mmap",                            /* 222 */
++	"fadvise64",                       /* 223 */
++	"swapon",                          /* 224 */
++	"swapoff",                         /* 225 */
++	"mprotect",                        /* 226 */
++	"msync",                           /* 227 */
++	"mlock",                           /* 228 */
++	"munlock",                         /* 229 */
++	"mlockall",                        /* 230 */
++	"munlockall",                      /* 231 */
++	"mincore",                         /* 232 */
++	"madvise",                         /* 233 */
++	"remap_file_pages",                /* 234 */
++	"mbind",                           /* 235 */
++	"get_mempolicy",                   /* 236 */
++	"set_mempolicy",                   /* 237 */
++	"migrate_pages",                   /* 238 */
++	"move_pages",                      /* 239 */
++	"rt_tgsigqueueinfo",               /* 240 */
++	"perf_event_open",                 /* 241 */
++	"accept4",                         /* 242 */
++	"recvmmsg",                        /* 243 */
++	"arch_specific_syscall",           /* 244 */
++	"245",                             /* 245 */
++	"246",                             /* 246 */
++	"247",                             /* 247 */
++	"248",                             /* 248 */
++	"249",                             /* 249 */
++	"250",                             /* 250 */
++	"251",                             /* 251 */
++	"252",                             /* 252 */
++	"253",                             /* 253 */
++	"254",                             /* 254 */
++	"255",                             /* 255 */
++	"256",                             /* 256 */
++	"257",                             /* 257 */
++	"258",                             /* 258 */
++	"259",                             /* 259 */
++	"wait4",                           /* 260 */
++	"prlimit64",                       /* 261 */
++	"fanotify_init",                   /* 262 */
++	"fanotify_mark",                   /* 263 */
++	"name_to_handle_at",               /* 264 */
++	"open_by_handle_at",               /* 265 */
++	"clock_adjtime",                   /* 266 */
++	"syncfs",                          /* 267 */
++	"setns",                           /* 268 */
++	"sendmmsg",                        /* 269 */
++	"process_vm_readv",                /* 270 */
++	"process_vm_writev",               /* 271 */
++	"kcmp",                            /* 272 */
++	"finit_module",                    /* 273 */
++	"syscalls",                        /* 274 */
++	"275",                             /* 275 */
++	"276",                             /* 276 */
++	"277",                             /* 277 */
++	"278",                             /* 278 */
++	"279",                             /* 279 */
++	"280",                             /* 280 */
++	"281",                             /* 281 */
++	"282",                             /* 282 */
++	"283",                             /* 283 */
++	"284",                             /* 284 */
++	"285",                             /* 285 */
++	"286",                             /* 286 */
++	"287",                             /* 287 */
++	"288",                             /* 288 */
++	"289",                             /* 289 */
++	"290",                             /* 290 */
++	"291",                             /* 291 */
++	"292",                             /* 292 */
++	"293",                             /* 293 */
++	"294",                             /* 294 */
++	"295",                             /* 295 */
++	"296",                             /* 296 */
++	"297",                             /* 297 */
++	"298",                             /* 298 */
++	"299",                             /* 299 */
++	"300",                             /* 300 */
++	"301",                             /* 301 */
++	"302",                             /* 302 */
++	"303",                             /* 303 */
++	"304",                             /* 304 */
++	"305",                             /* 305 */
++	"306",                             /* 306 */
++	"307",                             /* 307 */
++	"308",                             /* 308 */
++	"309",                             /* 309 */
++	"310",                             /* 310 */
++	"311",                             /* 311 */
++	"312",                             /* 312 */
++	"313",                             /* 313 */
++	"314",                             /* 314 */
++	"315",                             /* 315 */
++	"316",                             /* 316 */
++	"317",                             /* 317 */
++	"318",                             /* 318 */
++	"319",                             /* 319 */
++	"320",                             /* 320 */
++	"321",                             /* 321 */
++	"322",                             /* 322 */
++	"323",                             /* 323 */
++	"324",                             /* 324 */
++	"325",                             /* 325 */
++	"326",                             /* 326 */
++	"327",                             /* 327 */
++	"328",                             /* 328 */
++	"329",                             /* 329 */
++	"330",                             /* 330 */
++	"331",                             /* 331 */
++	"332",                             /* 332 */
++	"333",                             /* 333 */
++	"334",                             /* 334 */
++	"335",                             /* 335 */
++	"336",                             /* 336 */
++	"337",                             /* 337 */
++	"338",                             /* 338 */
++	"339",                             /* 339 */
++	"340",                             /* 340 */
++	"341",                             /* 341 */
++	"342",                             /* 342 */
++	"343",                             /* 343 */
++	"344",                             /* 344 */
++	"345",                             /* 345 */
++	"346",                             /* 346 */
++	"347",                             /* 347 */
++	"348",                             /* 348 */
++	"349",                             /* 349 */
++	"350",                             /* 350 */
++	"351",                             /* 351 */
++	"352",                             /* 352 */
++	"353",                             /* 353 */
++	"354",                             /* 354 */
++	"355",                             /* 355 */
++	"356",                             /* 356 */
++	"357",                             /* 357 */
++	"358",                             /* 358 */
++	"359",                             /* 359 */
++	"360",                             /* 360 */
++	"361",                             /* 361 */
++	"362",                             /* 362 */
++	"363",                             /* 363 */
++	"364",                             /* 364 */
++	"365",                             /* 365 */
++	"366",                             /* 366 */
++	"367",                             /* 367 */
++	"368",                             /* 368 */
++	"369",                             /* 369 */
++	"370",                             /* 370 */
++	"371",                             /* 371 */
++	"372",                             /* 372 */
++	"373",                             /* 373 */
++	"374",                             /* 374 */
++	"375",                             /* 375 */
++	"376",                             /* 376 */
++	"377",                             /* 377 */
++	"378",                             /* 378 */
++	"379",                             /* 379 */
++	"380",                             /* 380 */
++	"381",                             /* 381 */
++	"382",                             /* 382 */
++	"383",                             /* 383 */
++	"384",                             /* 384 */
++	"385",                             /* 385 */
++	"386",                             /* 386 */
++	"387",                             /* 387 */
++	"388",                             /* 388 */
++	"389",                             /* 389 */
++	"390",                             /* 390 */
++	"391",                             /* 391 */
++	"392",                             /* 392 */
++	"393",                             /* 393 */
++	"394",                             /* 394 */
++	"395",                             /* 395 */
++	"396",                             /* 396 */
++	"397",                             /* 397 */
++	"398",                             /* 398 */
++	"399",                             /* 399 */
++	"400",                             /* 400 */
++	"401",                             /* 401 */
++	"402",                             /* 402 */
++	"403",                             /* 403 */
++	"404",                             /* 404 */
++	"405",                             /* 405 */
++	"406",                             /* 406 */
++	"407",                             /* 407 */
++	"408",                             /* 408 */
++	"409",                             /* 409 */
++	"410",                             /* 410 */
++	"411",                             /* 411 */
++	"412",                             /* 412 */
++	"413",                             /* 413 */
++	"414",                             /* 414 */
++	"415",                             /* 415 */
++	"416",                             /* 416 */
++	"417",                             /* 417 */
++	"418",                             /* 418 */
++	"419",                             /* 419 */
++	"420",                             /* 420 */
++	"421",                             /* 421 */
++	"422",                             /* 422 */
++	"423",                             /* 423 */
++	"424",                             /* 424 */
++	"425",                             /* 425 */
++	"426",                             /* 426 */
++	"427",                             /* 427 */
++	"428",                             /* 428 */
++	"429",                             /* 429 */
++	"430",                             /* 430 */
++	"431",                             /* 431 */
++	"432",                             /* 432 */
++	"433",                             /* 433 */
++	"434",                             /* 434 */
++	"435",                             /* 435 */
++	"436",                             /* 436 */
++	"437",                             /* 437 */
++	"438",                             /* 438 */
++	"439",                             /* 439 */
++	"440",                             /* 440 */
++	"441",                             /* 441 */
++	"442",                             /* 442 */
++	"443",                             /* 443 */
++	"444",                             /* 444 */
++	"445",                             /* 445 */
++	"446",                             /* 446 */
++	"447",                             /* 447 */
++	"448",                             /* 448 */
++	"449",                             /* 449 */
++	"450",                             /* 450 */
++	"451",                             /* 451 */
++	"452",                             /* 452 */
++	"453",                             /* 453 */
++	"454",                             /* 454 */
++	"455",                             /* 455 */
++	"456",                             /* 456 */
++	"457",                             /* 457 */
++	"458",                             /* 458 */
++	"459",                             /* 459 */
++	"460",                             /* 460 */
++	"461",                             /* 461 */
++	"462",                             /* 462 */
++	"463",                             /* 463 */
++	"464",                             /* 464 */
++	"465",                             /* 465 */
++	"466",                             /* 466 */
++	"467",                             /* 467 */
++	"468",                             /* 468 */
++	"469",                             /* 469 */
++	"470",                             /* 470 */
++	"471",                             /* 471 */
++	"472",                             /* 472 */
++	"473",                             /* 473 */
++	"474",                             /* 474 */
++	"475",                             /* 475 */
++	"476",                             /* 476 */
++	"477",                             /* 477 */
++	"478",                             /* 478 */
++	"479",                             /* 479 */
++	"480",                             /* 480 */
++	"481",                             /* 481 */
++	"482",                             /* 482 */
++	"483",                             /* 483 */
++	"484",                             /* 484 */
++	"485",                             /* 485 */
++	"486",                             /* 486 */
++	"487",                             /* 487 */
++	"488",                             /* 488 */
++	"489",                             /* 489 */
++	"490",                             /* 490 */
++	"491",                             /* 491 */
++	"492",                             /* 492 */
++	"493",                             /* 493 */
++	"494",                             /* 494 */
++	"495",                             /* 495 */
++	"496",                             /* 496 */
++	"497",                             /* 497 */
++	"498",                             /* 498 */
++	"499",                             /* 499 */
++	"500",                             /* 500 */
++	"501",                             /* 501 */
++	"502",                             /* 502 */
++	"503",                             /* 503 */
++	"504",                             /* 504 */
++	"505",                             /* 505 */
++	"506",                             /* 506 */
++	"507",                             /* 507 */
++	"508",                             /* 508 */
++	"509",                             /* 509 */
++	"510",                             /* 510 */
++	"511",                             /* 511 */
++	"512",                             /* 512 */
++	"513",                             /* 513 */
++	"514",                             /* 514 */
++	"515",                             /* 515 */
++	"516",                             /* 516 */
++	"517",                             /* 517 */
++	"518",                             /* 518 */
++	"519",                             /* 519 */
++	"520",                             /* 520 */
++	"521",                             /* 521 */
++	"522",                             /* 522 */
++	"523",                             /* 523 */
++	"524",                             /* 524 */
++	"525",                             /* 525 */
++	"526",                             /* 526 */
++	"527",                             /* 527 */
++	"528",                             /* 528 */
++	"529",                             /* 529 */
++	"530",                             /* 530 */
++	"531",                             /* 531 */
++	"532",                             /* 532 */
++	"533",                             /* 533 */
++	"534",                             /* 534 */
++	"535",                             /* 535 */
++	"536",                             /* 536 */
++	"537",                             /* 537 */
++	"538",                             /* 538 */
++	"539",                             /* 539 */
++	"540",                             /* 540 */
++	"541",                             /* 541 */
++	"542",                             /* 542 */
++	"543",                             /* 543 */
++	"544",                             /* 544 */
++	"545",                             /* 545 */
++	"546",                             /* 546 */
++	"547",                             /* 547 */
++	"548",                             /* 548 */
++	"549",                             /* 549 */
++	"550",                             /* 550 */
++	"551",                             /* 551 */
++	"552",                             /* 552 */
++	"553",                             /* 553 */
++	"554",                             /* 554 */
++	"555",                             /* 555 */
++	"556",                             /* 556 */
++	"557",                             /* 557 */
++	"558",                             /* 558 */
++	"559",                             /* 559 */
++	"560",                             /* 560 */
++	"561",                             /* 561 */
++	"562",                             /* 562 */
++	"563",                             /* 563 */
++	"564",                             /* 564 */
++	"565",                             /* 565 */
++	"566",                             /* 566 */
++	"567",                             /* 567 */
++	"568",                             /* 568 */
++	"569",                             /* 569 */
++	"570",                             /* 570 */
++	"571",                             /* 571 */
++	"572",                             /* 572 */
++	"573",                             /* 573 */
++	"574",                             /* 574 */
++	"575",                             /* 575 */
++	"576",                             /* 576 */
++	"577",                             /* 577 */
++	"578",                             /* 578 */
++	"579",                             /* 579 */
++	"580",                             /* 580 */
++	"581",                             /* 581 */
++	"582",                             /* 582 */
++	"583",                             /* 583 */
++	"584",                             /* 584 */
++	"585",                             /* 585 */
++	"586",                             /* 586 */
++	"587",                             /* 587 */
++	"588",                             /* 588 */
++	"589",                             /* 589 */
++	"590",                             /* 590 */
++	"591",                             /* 591 */
++	"592",                             /* 592 */
++	"593",                             /* 593 */
++	"594",                             /* 594 */
++	"595",                             /* 595 */
++	"596",                             /* 596 */
++	"597",                             /* 597 */
++	"598",                             /* 598 */
++	"599",                             /* 599 */
++	"600",                             /* 600 */
++	"601",                             /* 601 */
++	"602",                             /* 602 */
++	"603",                             /* 603 */
++	"604",                             /* 604 */
++	"605",                             /* 605 */
++	"606",                             /* 606 */
++	"607",                             /* 607 */
++	"608",                             /* 608 */
++	"609",                             /* 609 */
++	"610",                             /* 610 */
++	"611",                             /* 611 */
++	"612",                             /* 612 */
++	"613",                             /* 613 */
++	"614",                             /* 614 */
++	"615",                             /* 615 */
++	"616",                             /* 616 */
++	"617",                             /* 617 */
++	"618",                             /* 618 */
++	"619",                             /* 619 */
++	"620",                             /* 620 */
++	"621",                             /* 621 */
++	"622",                             /* 622 */
++	"623",                             /* 623 */
++	"624",                             /* 624 */
++	"625",                             /* 625 */
++	"626",                             /* 626 */
++	"627",                             /* 627 */
++	"628",                             /* 628 */
++	"629",                             /* 629 */
++	"630",                             /* 630 */
++	"631",                             /* 631 */
++	"632",                             /* 632 */
++	"633",                             /* 633 */
++	"634",                             /* 634 */
++	"635",                             /* 635 */
++	"636",                             /* 636 */
++	"637",                             /* 637 */
++	"638",                             /* 638 */
++	"639",                             /* 639 */
++	"640",                             /* 640 */
++	"641",                             /* 641 */
++	"642",                             /* 642 */
++	"643",                             /* 643 */
++	"644",                             /* 644 */
++	"645",                             /* 645 */
++	"646",                             /* 646 */
++	"647",                             /* 647 */
++	"648",                             /* 648 */
++	"649",                             /* 649 */
++	"650",                             /* 650 */
++	"651",                             /* 651 */
++	"652",                             /* 652 */
++	"653",                             /* 653 */
++	"654",                             /* 654 */
++	"655",                             /* 655 */
++	"656",                             /* 656 */
++	"657",                             /* 657 */
++	"658",                             /* 658 */
++	"659",                             /* 659 */
++	"660",                             /* 660 */
++	"661",                             /* 661 */
++	"662",                             /* 662 */
++	"663",                             /* 663 */
++	"664",                             /* 664 */
++	"665",                             /* 665 */
++	"666",                             /* 666 */
++	"667",                             /* 667 */
++	"668",                             /* 668 */
++	"669",                             /* 669 */
++	"670",                             /* 670 */
++	"671",                             /* 671 */
++	"672",                             /* 672 */
++	"673",                             /* 673 */
++	"674",                             /* 674 */
++	"675",                             /* 675 */
++	"676",                             /* 676 */
++	"677",                             /* 677 */
++	"678",                             /* 678 */
++	"679",                             /* 679 */
++	"680",                             /* 680 */
++	"681",                             /* 681 */
++	"682",                             /* 682 */
++	"683",                             /* 683 */
++	"684",                             /* 684 */
++	"685",                             /* 685 */
++	"686",                             /* 686 */
++	"687",                             /* 687 */
++	"688",                             /* 688 */
++	"689",                             /* 689 */
++	"690",                             /* 690 */
++	"691",                             /* 691 */
++	"692",                             /* 692 */
++	"693",                             /* 693 */
++	"694",                             /* 694 */
++	"695",                             /* 695 */
++	"696",                             /* 696 */
++	"697",                             /* 697 */
++	"698",                             /* 698 */
++	"699",                             /* 699 */
++	"700",                             /* 700 */
++	"701",                             /* 701 */
++	"702",                             /* 702 */
++	"703",                             /* 703 */
++	"704",                             /* 704 */
++	"705",                             /* 705 */
++	"706",                             /* 706 */
++	"707",                             /* 707 */
++	"708",                             /* 708 */
++	"709",                             /* 709 */
++	"710",                             /* 710 */
++	"711",                             /* 711 */
++	"712",                             /* 712 */
++	"713",                             /* 713 */
++	"714",                             /* 714 */
++	"715",                             /* 715 */
++	"716",                             /* 716 */
++	"717",                             /* 717 */
++	"718",                             /* 718 */
++	"719",                             /* 719 */
++	"720",                             /* 720 */
++	"721",                             /* 721 */
++	"722",                             /* 722 */
++	"723",                             /* 723 */
++	"724",                             /* 724 */
++	"725",                             /* 725 */
++	"726",                             /* 726 */
++	"727",                             /* 727 */
++	"728",                             /* 728 */
++	"729",                             /* 729 */
++	"730",                             /* 730 */
++	"731",                             /* 731 */
++	"732",                             /* 732 */
++	"733",                             /* 733 */
++	"734",                             /* 734 */
++	"735",                             /* 735 */
++	"736",                             /* 736 */
++	"737",                             /* 737 */
++	"738",                             /* 738 */
++	"739",                             /* 739 */
++	"740",                             /* 740 */
++	"741",                             /* 741 */
++	"742",                             /* 742 */
++	"743",                             /* 743 */
++	"744",                             /* 744 */
++	"745",                             /* 745 */
++	"746",                             /* 746 */
++	"747",                             /* 747 */
++	"748",                             /* 748 */
++	"749",                             /* 749 */
++	"750",                             /* 750 */
++	"751",                             /* 751 */
++	"752",                             /* 752 */
++	"753",                             /* 753 */
++	"754",                             /* 754 */
++	"755",                             /* 755 */
++	"756",                             /* 756 */
++	"757",                             /* 757 */
++	"758",                             /* 758 */
++	"759",                             /* 759 */
++	"760",                             /* 760 */
++	"761",                             /* 761 */
++	"762",                             /* 762 */
++	"763",                             /* 763 */
++	"764",                             /* 764 */
++	"765",                             /* 765 */
++	"766",                             /* 766 */
++	"767",                             /* 767 */
++	"768",                             /* 768 */
++	"769",                             /* 769 */
++	"770",                             /* 770 */
++	"771",                             /* 771 */
++	"772",                             /* 772 */
++	"773",                             /* 773 */
++	"774",                             /* 774 */
++	"775",                             /* 775 */
++	"776",                             /* 776 */
++	"777",                             /* 777 */
++	"778",                             /* 778 */
++	"779",                             /* 779 */
++	"780",                             /* 780 */
++	"781",                             /* 781 */
++	"782",                             /* 782 */
++	"783",                             /* 783 */
++	"784",                             /* 784 */
++	"785",                             /* 785 */
++	"786",                             /* 786 */
++	"787",                             /* 787 */
++	"788",                             /* 788 */
++	"789",                             /* 789 */
++	"790",                             /* 790 */
++	"791",                             /* 791 */
++	"792",                             /* 792 */
++	"793",                             /* 793 */
++	"794",                             /* 794 */
++	"795",                             /* 795 */
++	"796",                             /* 796 */
++	"797",                             /* 797 */
++	"798",                             /* 798 */
++	"799",                             /* 799 */
++	"800",                             /* 800 */
++	"801",                             /* 801 */
++	"802",                             /* 802 */
++	"803",                             /* 803 */
++	"804",                             /* 804 */
++	"805",                             /* 805 */
++	"806",                             /* 806 */
++	"807",                             /* 807 */
++	"808",                             /* 808 */
++	"809",                             /* 809 */
++	"810",                             /* 810 */
++	"811",                             /* 811 */
++	"812",                             /* 812 */
++	"813",                             /* 813 */
++	"814",                             /* 814 */
++	"815",                             /* 815 */
++	"816",                             /* 816 */
++	"817",                             /* 817 */
++	"818",                             /* 818 */
++	"819",                             /* 819 */
++	"820",                             /* 820 */
++	"821",                             /* 821 */
++	"822",                             /* 822 */
++	"823",                             /* 823 */
++	"824",                             /* 824 */
++	"825",                             /* 825 */
++	"826",                             /* 826 */
++	"827",                             /* 827 */
++	"828",                             /* 828 */
++	"829",                             /* 829 */
++	"830",                             /* 830 */
++	"831",                             /* 831 */
++	"832",                             /* 832 */
++	"833",                             /* 833 */
++	"834",                             /* 834 */
++	"835",                             /* 835 */
++	"836",                             /* 836 */
++	"837",                             /* 837 */
++	"838",                             /* 838 */
++	"839",                             /* 839 */
++	"840",                             /* 840 */
++	"841",                             /* 841 */
++	"842",                             /* 842 */
++	"843",                             /* 843 */
++	"844",                             /* 844 */
++	"845",                             /* 845 */
++	"846",                             /* 846 */
++	"847",                             /* 847 */
++	"848",                             /* 848 */
++	"849",                             /* 849 */
++	"850",                             /* 850 */
++	"851",                             /* 851 */
++	"852",                             /* 852 */
++	"853",                             /* 853 */
++	"854",                             /* 854 */
++	"855",                             /* 855 */
++	"856",                             /* 856 */
++	"857",                             /* 857 */
++	"858",                             /* 858 */
++	"859",                             /* 859 */
++	"860",                             /* 860 */
++	"861",                             /* 861 */
++	"862",                             /* 862 */
++	"863",                             /* 863 */
++	"864",                             /* 864 */
++	"865",                             /* 865 */
++	"866",                             /* 866 */
++	"867",                             /* 867 */
++	"868",                             /* 868 */
++	"869",                             /* 869 */
++	"870",                             /* 870 */
++	"871",                             /* 871 */
++	"872",                             /* 872 */
++	"873",                             /* 873 */
++	"874",                             /* 874 */
++	"875",                             /* 875 */
++	"876",                             /* 876 */
++	"877",                             /* 877 */
++	"878",                             /* 878 */
++	"879",                             /* 879 */
++	"880",                             /* 880 */
++	"881",                             /* 881 */
++	"882",                             /* 882 */
++	"883",                             /* 883 */
++	"884",                             /* 884 */
++	"885",                             /* 885 */
++	"886",                             /* 886 */
++	"887",                             /* 887 */
++	"888",                             /* 888 */
++	"889",                             /* 889 */
++	"890",                             /* 890 */
++	"891",                             /* 891 */
++	"892",                             /* 892 */
++	"893",                             /* 893 */
++	"894",                             /* 894 */
++	"895",                             /* 895 */
++	"896",                             /* 896 */
++	"897",                             /* 897 */
++	"898",                             /* 898 */
++	"899",                             /* 899 */
++	"900",                             /* 900 */
++	"901",                             /* 901 */
++	"902",                             /* 902 */
++	"903",                             /* 903 */
++	"904",                             /* 904 */
++	"905",                             /* 905 */
++	"906",                             /* 906 */
++	"907",                             /* 907 */
++	"908",                             /* 908 */
++	"909",                             /* 909 */
++	"910",                             /* 910 */
++	"911",                             /* 911 */
++	"912",                             /* 912 */
++	"913",                             /* 913 */
++	"914",                             /* 914 */
++	"915",                             /* 915 */
++	"916",                             /* 916 */
++	"917",                             /* 917 */
++	"918",                             /* 918 */
++	"919",                             /* 919 */
++	"920",                             /* 920 */
++	"921",                             /* 921 */
++	"922",                             /* 922 */
++	"923",                             /* 923 */
++	"924",                             /* 924 */
++	"925",                             /* 925 */
++	"926",                             /* 926 */
++	"927",                             /* 927 */
++	"928",                             /* 928 */
++	"929",                             /* 929 */
++	"930",                             /* 930 */
++	"931",                             /* 931 */
++	"932",                             /* 932 */
++	"933",                             /* 933 */
++	"934",                             /* 934 */
++	"935",                             /* 935 */
++	"936",                             /* 936 */
++	"937",                             /* 937 */
++	"938",                             /* 938 */
++	"939",                             /* 939 */
++	"940",                             /* 940 */
++	"941",                             /* 941 */
++	"942",                             /* 942 */
++	"943",                             /* 943 */
++	"944",                             /* 944 */
++	"945",                             /* 945 */
++	"946",                             /* 946 */
++	"947",                             /* 947 */
++	"948",                             /* 948 */
++	"949",                             /* 949 */
++	"950",                             /* 950 */
++	"951",                             /* 951 */
++	"952",                             /* 952 */
++	"953",                             /* 953 */
++	"954",                             /* 954 */
++	"955",                             /* 955 */
++	"956",                             /* 956 */
++	"957",                             /* 957 */
++	"958",                             /* 958 */
++	"959",                             /* 959 */
++	"960",                             /* 960 */
++	"961",                             /* 961 */
++	"962",                             /* 962 */
++	"963",                             /* 963 */
++	"964",                             /* 964 */
++	"965",                             /* 965 */
++	"966",                             /* 966 */
++	"967",                             /* 967 */
++	"968",                             /* 968 */
++	"969",                             /* 969 */
++	"970",                             /* 970 */
++	"971",                             /* 971 */
++	"972",                             /* 972 */
++	"973",                             /* 973 */
++	"974",                             /* 974 */
++	"975",                             /* 975 */
++	"976",                             /* 976 */
++	"977",                             /* 977 */
++	"978",                             /* 978 */
++	"979",                             /* 979 */
++	"980",                             /* 980 */
++	"981",                             /* 981 */
++	"982",                             /* 982 */
++	"983",                             /* 983 */
++	"984",                             /* 984 */
++	"985",                             /* 985 */
++	"986",                             /* 986 */
++	"987",                             /* 987 */
++	"988",                             /* 988 */
++	"989",                             /* 989 */
++	"990",                             /* 990 */
++	"991",                             /* 991 */
++	"992",                             /* 992 */
++	"993",                             /* 993 */
++	"994",                             /* 994 */
++	"995",                             /* 995 */
++	"996",                             /* 996 */
++	"997",                             /* 997 */
++	"998",                             /* 998 */
++	"999",                             /* 999 */
++	"1000",                            /* 1000 */
++	"1001",                            /* 1001 */
++	"1002",                            /* 1002 */
++	"1003",                            /* 1003 */
++	"1004",                            /* 1004 */
++	"1005",                            /* 1005 */
++	"1006",                            /* 1006 */
++	"1007",                            /* 1007 */
++	"1008",                            /* 1008 */
++	"1009",                            /* 1009 */
++	"1010",                            /* 1010 */
++	"1011",                            /* 1011 */
++	"1012",                            /* 1012 */
++	"1013",                            /* 1013 */
++	"1014",                            /* 1014 */
++	"1015",                            /* 1015 */
++	"1016",                            /* 1016 */
++	"1017",                            /* 1017 */
++	"1018",                            /* 1018 */
++	"1019",                            /* 1019 */
++	"1020",                            /* 1020 */
++	"1021",                            /* 1021 */
++	"1022",                            /* 1022 */
++	"1023",                            /* 1023 */
++	"open",                            /* 1024 */
++	"link",                            /* 1025 */
++	"unlink",                          /* 1026 */
++	"mknod",                           /* 1027 */
++	"chmod",                           /* 1028 */
++	"chown",                           /* 1029 */
++	"mkdir",                           /* 1030 */
++	"rmdir",                           /* 1031 */
++	"lchown",                          /* 1032 */
++	"access",                          /* 1033 */
++	"rename",                          /* 1034 */
++	"readlink",                        /* 1035 */
++	"symlink",                         /* 1036 */
++	"utimes",                          /* 1037 */
++	"stat",                            /* 1038 */
++	"lstat",                           /* 1039 */
++	"pipe",                            /* 1040 */
++	"dup2",                            /* 1041 */
++	"epoll_create",                    /* 1042 */
++	"inotify_init",                    /* 1043 */
++	"eventfd",                         /* 1044 */
++	"signalfd",                        /* 1045 */
++	"sendfile",                        /* 1046 */
++	"ftruncate",                       /* 1047 */
++	"truncate",                        /* 1048 */
++	"stat",                            /* 1049 */
++	"lstat",                           /* 1050 */
++	"fstat",                           /* 1051 */
++	"fcntl",                           /* 1052 */
++	"fadvise64",                       /* 1053 */
++	"newfstatat",                      /* 1054 */
++	"fstatfs",                         /* 1055 */
++	"statfs",                          /* 1056 */
++	"lseek",                           /* 1057 */
++	"mmap",                            /* 1058 */
++	"alarm",                           /* 1059 */
++	"getpgrp",                         /* 1060 */
++	"pause",                           /* 1061 */
++	"time",                            /* 1062 */
++	"utime",                           /* 1063 */
++	"creat",                           /* 1064 */
++	"getdents",                        /* 1065 */
++	"futimesat",                       /* 1066 */
++	"select",                          /* 1067 */
++	"poll",                            /* 1068 */
++	"epoll_wait",                      /* 1069 */
++	"ustat",                           /* 1070 */
++	"vfork",                           /* 1071 */
++	"oldwait4",                        /* 1072 */
++	"recv",                            /* 1073 */
++	"send",                            /* 1074 */
++	"bdflush",                         /* 1075 */
++	"umount",                          /* 1076 */
++	"uselib",                          /* 1077 */
++	"_sysctl",                         /* 1078 */
++	"fork",                            /* 1079 */
+Index: ltrace/sysdeps/linux-gnu/aarch64/trace.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ltrace/sysdeps/linux-gnu/aarch64/trace.c	2014-03-12 16:23:25.382866486 -0600
+@@ -0,0 +1,83 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2014 Petr Machata, Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <sys/ptrace.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <asm/ptrace.h>
++#include <string.h>
++#include <errno.h>
++
++#include "backend.h"
++#include "proc.h"
++
++void
++get_arch_dep(struct Process *proc)
++{
++}
++
++int aarch64_read_gregs(struct Process *proc, struct user_pt_regs *regs);
++
++/* The syscall instruction is:
++ * | 31                   21 | 20    5 | 4       0 |
++ * | 1 1 0 1 0 1 0 0 | 0 0 0 |  imm16  | 0 0 0 0 1 | */
++#define SVC_MASK  0xffe0001f
++#define SVC_VALUE 0xd4000001
++
++int
++syscall_p(struct Process *proc, int status, int *sysnum)
++{
++	if (WIFSTOPPED(status)
++	    && WSTOPSIG(status) == (SIGTRAP | proc->tracesysgood)) {
++
++		struct user_pt_regs regs;
++		if (aarch64_read_gregs(proc, &regs) < 0) {
++			fprintf(stderr, "syscall_p: "
++				"Couldn't read registers of %d.\n", proc->pid);
++			return -1;
++		}
++
++		errno = 0;
++		unsigned long insn = (unsigned long) ptrace(PTRACE_PEEKTEXT,
++							    proc->pid,
++							    regs.pc - 4, 0);
++		if (insn == -1UL && errno != 0) {
++			fprintf(stderr, "syscall_p: "
++				"Couldn't peek into %d: %s\n", proc->pid,
++				strerror(errno));
++			return -1;
++		}
++
++		insn &= 0xffffffffUL;
++		if ((insn & SVC_MASK) == SVC_VALUE) {
++			*sysnum = regs.regs[8];
++
++			size_t d1 = proc->callstack_depth - 1;
++			if (proc->callstack_depth > 0
++			    && proc->callstack[d1].is_syscall
++			    && proc->callstack[d1].c_un.syscall == *sysnum)
++				return 2;
++
++			return 1;
++		}
++	}
++
++	return 0;
++}

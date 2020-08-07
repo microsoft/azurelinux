@@ -1,0 +1,35 @@
+Description: Properly initialise sin6 fields. Copied from upstream CVS: http://cvs.berlios.de/cgi-bin/viewvc.cgi/net-tools/net-tools/lib/inet6.c?r1=1.12&r2=1.13
+Author: Bernd Eckenfels <net-tools@lina.inka.de>
+Bug-Debian: http://bugs.debian.org/508110
+
+Index: net-tools/lib/inet6.c
+===================================================================
+--- net-tools.orig/lib/inet6.c
++++ net-tools/lib/inet6.c
+@@ -3,7 +3,7 @@
+  *              support functions for the net-tools.
+  *              (most of it copied from lib/inet.c 1.26).
+  *
+- * Version:     $Id: inet6.c,v 1.12 2002/12/10 01:03:09 ecki Exp $
++ * Version:     $Id: inet6.c,v 1.13 2010/07/05 22:52:00 ecki Exp $
+  *
+  * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+  *              Copyright 1993 MicroWalt Corporation
+@@ -157,12 +157,14 @@ static int INET6_getsock(char *bufp, str
+     sin6 = (struct sockaddr_in6 *) sap;
+     sin6->sin6_family = AF_INET6;
+     sin6->sin6_port = 0;
++    sin6->sin6_scope_id = 0;
++    sin6->sin6_flowinfo = 0;
+ 
+     if (inet_pton(AF_INET6, bufp, sin6->sin6_addr.s6_addr) <= 0)
+ 	return (-1);
+-	p = fix_v4_address(bufp, &sin6->sin6_addr);
+-	if (p != bufp) 
+-		memcpy(bufp, p, strlen(p)+1); 
++    p = fix_v4_address(bufp, &sin6->sin6_addr);
++    if (p != bufp)
++        memcpy(bufp, p, strlen(p)+1);
+     return 16;			/* ?;) */
+ }
+ 

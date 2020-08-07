@@ -1,0 +1,68 @@
+From 00e9935c10ca32c9fcb4beafcd1f6ecd77a23916 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ingy=20d=C3=B6t=20Net?= <ingy@ingy.net>
+Date: Tue, 19 Mar 2019 10:34:39 -0700
+Subject: [PATCH] Add custom constructors to multiple loaders
+
+When someone writes a subclass of the YAMLObject class, the constructors
+will now be added to all 3 (non-safe) loaders.
+
+Furthermore, we support the class variable `yaml_loader` being a list,
+offering more control of which loaders are affected.
+
+To support safe_load in your custom class you could add this:
+
+    yaml_loader = yaml.SafeLoader
+
+    yaml_loader = yaml.YAMLObject.yaml_loader
+    yaml_loader.append(yaml.SafeLoader)
+
+--- a/lib/yaml/__init__.py_org	2019-04-13 00:40:21.924330209 +0000
++++ b/lib/yaml/__init__.py	2019-04-13 00:43:18.976335205 +0000
+@@ -371,7 +371,12 @@ class YAMLObjectMetaclass(type):
+     def __init__(cls, name, bases, kwds):
+         super(YAMLObjectMetaclass, cls).__init__(name, bases, kwds)
+         if 'yaml_tag' in kwds and kwds['yaml_tag'] is not None:
+-            cls.yaml_loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++            if isinstance(cls.yaml_loader, list):
++                for loader in cls.yaml_loader:
++                    loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++            else:
++                cls.yaml_loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++
+             cls.yaml_dumper.add_representer(cls, cls.to_yaml)
+ 
+ class YAMLObject(object):
+@@ -383,7 +388,7 @@ class YAMLObject(object):
+     __metaclass__ = YAMLObjectMetaclass
+     __slots__ = ()  # no direct instantiation, so allow immutable subclasses
+ 
+-    yaml_loader = Loader
++    yaml_loader = [Loader, FullLoader, UnsafeLoader]
+     yaml_dumper = Dumper
+ 
+     yaml_tag = None
+--- a/lib3/yaml/__init__.py_org	2019-04-13 00:43:29.432335500 +0000
++++ b/lib3/yaml/__init__.py	2019-04-13 00:44:38.876337459 +0000
+@@ -278,7 +278,12 @@ class YAMLObjectMetaclass(type):
+     def __init__(cls, name, bases, kwds):
+         super(YAMLObjectMetaclass, cls).__init__(name, bases, kwds)
+         if 'yaml_tag' in kwds and kwds['yaml_tag'] is not None:
+-            cls.yaml_loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++            if isinstance(cls.yaml_loader, list):
++                for loader in cls.yaml_loader:
++                    loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++            else:
++                cls.yaml_loader.add_constructor(cls.yaml_tag, cls.from_yaml)
++
+             cls.yaml_dumper.add_representer(cls, cls.to_yaml)
+ 
+ class YAMLObject(metaclass=YAMLObjectMetaclass):
+@@ -289,7 +294,7 @@ class YAMLObject(metaclass=YAMLObjectMet
+ 
+     __slots__ = ()  # no direct instantiation, so allow immutable subclasses
+ 
+-    yaml_loader = Loader
++    yaml_loader = [Loader, FullLoader, UnsafeLoader]
+     yaml_dumper = Dumper
+ 
+     yaml_tag = None

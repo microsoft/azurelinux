@@ -1,0 +1,44 @@
+From 99d94682de590719f9333fcf091910a9581b44c0 Mon Sep 17 00:00:00 2001
+From: Nigel Croxon <ncroxon@redhat.com>
+Date: Thu, 13 Jul 2017 08:43:16 -0400
+Subject: [PATCH 1/2] [PATCH] Disable AVX instruction set on IA32 and x86_64
+ platforms
+
+If gnu-efi is compiled with "-march=native" on a host that supports AVX, both
+gcc and clang will use AVX instructions freely which is currently not supported
+and will result in a non-functional gnu-efi build (e.g. black screen, hangs).
+
+For now, disable AVX on IA32 and x86_64 by checking first if the compiler does
+actually support the appropriate flag (-mno-avx) and use it if possible.
+
+Credit for the compiler command line to check if a flag is supported goes to
+Gentoo's awesome flag-o-matic eclass, where it is taken from. Thanks.
+
+Signed-off-by: Matthias Dahl <matthias.dahl@binary-island.eu>
+Signed-off-by: Nigel Croxon <ncroxon@redhat.com>
+---
+ Make.defaults | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Make.defaults b/Make.defaults
+index 16f1fd21848..446e676dc14 100755
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -120,6 +120,14 @@ ifeq ($(ARCH),x86_64)
+   endif
+ endif
+ 
++ifneq (,$(filter $(ARCH),ia32 x86_64))
++  # Disable AVX, if the compiler supports that.
++  CC_CAN_DISABLE_AVX=$(shell $(CC) -Werror -c -o /dev/null -xc -mno-avx - </dev/null >/dev/null 2>&1 && echo 1)
++  ifeq ($(CC_CAN_DISABLE_AVX), 1)
++    CFLAGS += -mno-avx
++  endif
++endif
++
+ ifeq ($(ARCH),mips64el)
+   CFLAGS += -march=mips64r2
+   ARCH3264 = -mabi=64
+-- 
+2.15.0
+

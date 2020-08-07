@@ -1,0 +1,1873 @@
+Sync with upstream CVS, for most files in lib/
+
+Index: net-tools/lib/Makefile
+===================================================================
+--- net-tools.orig/lib/Makefile
++++ net-tools/lib/Makefile
+@@ -16,7 +16,7 @@
+ #
+ 
+ 
+-HWOBJS	 = hw.o loopback.o slip.o ether.o ax25.o ppp.o arcnet.o tr.o tunnel.o frame.o sit.o rose.o ash.o fddi.o hippi.o hdlclapb.o strip.o irda.o ec_hw.o x25.o
++HWOBJS	 = hw.o loopback.o slip.o ether.o ax25.o ppp.o arcnet.o tr.o tunnel.o frame.o sit.o rose.o ash.o fddi.o hippi.o hdlclapb.o strip.o irda.o ec_hw.o x25.o eui64.o ib.o
+ AFOBJS	 = unix.o inet.o inet6.o ax25.o ipx.o ddp.o ipx.o netrom.o af.o rose.o econet.o x25.o
+ AFGROBJS = inet_gr.o inet6_gr.o ipx_gr.o ddp_gr.o netrom_gr.o ax25_gr.o rose_gr.o getroute.o x25_gr.o
+ AFSROBJS = inet_sr.o inet6_sr.o netrom_sr.o ipx_sr.o setroute.o x25_sr.o
+Index: net-tools/lib/ddp_gr.c
+===================================================================
+--- net-tools.orig/lib/ddp_gr.c
++++ net-tools/lib/ddp_gr.c
+@@ -1,3 +1,20 @@
++/*
++ * lib/ddp_gr.c         Prinbting of DDP (AppleTalk) routing table
++ *                      used by the NET-LIB.
++ *
++ * NET-LIB      
++ *
++ * Version:     $Id: ddp_gr.c,v 1.4 2002/06/02 05:25:15 ecki Exp $
++ *
++ * Author:      Ajax <ajax@firest0rm.org>
++ *
++ * Modification:
++ *  2002-06-02 integrated into main source by Bernd Eckenfels
++ *
++ */
++
++/* TODO: name lookups (/etc/atalk.names?  NBP?) */
++
+ #include "config.h"
+ 
+ #if HAVE_AFATALK
+@@ -16,9 +33,61 @@
+ #include "pathnames.h"
+ #include "intl.h"
+ 
++/* stolen from inet_gr.c */
++#define flags_decode(i,o) do {                  \
++        o[0] = '\0';                            \
++        if (i & RTF_UP) strcat(o, "U");         \
++        if (i & RTF_GATEWAY) strcat(o, "G");    \
++        if (i & RTF_REJECT) strcat(o, "!");     \
++        if (i & RTF_HOST) strcat(o, "H");       \
++        if (i & RTF_REINSTATE) strcat(o, "R");  \
++        if (i & RTF_DYNAMIC) strcat(o, "D");    \
++        if (i & RTF_MODIFIED) strcat(o, "M");   \
++        if (i & RTF_DEFAULT) strcat(o, "d");    \
++        if (i & RTF_ALLONLINK) strcat(o, "a");  \
++        if (i & RTF_ADDRCONF) strcat(o, "c");   \
++        if (i & RTF_NONEXTHOP) strcat(o, "o");  \
++        if (i & RTF_EXPIRES) strcat(o, "e");    \
++        if (i & RTF_CACHE) strcat(o, "c");      \
++        if (i & RTF_FLOW) strcat(o, "f");       \
++        if (i & RTF_POLICY) strcat(o, "p");     \
++        if (i & RTF_LOCAL) strcat(o, "l");      \
++        if (i & RTF_MTU) strcat(o, "u");        \
++        if (i & RTF_WINDOW) strcat(o, "w");     \
++        if (i & RTF_IRTT) strcat(o, "i");       \
++        if (i & RTF_NOTCACHED) strcat(o, "n");  \
++    } while (0)
++
+ int DDP_rprint(int options)
+ {
+-    fprintf(stderr, _("Routing table for `ddp' not yet supported.\n"));
+-    return (1);
++    FILE *fp;
++    char *dest, *gw, *dev, *flags;
++    char oflags[32];
++    char *hdr = "Destination     Gateway         Device          Flags";
++
++    fp = fopen(_PATH_PROCNET_ATALK_ROUTE, "r");
++
++    if (!fp) {
++        perror("Error opening " _PATH_PROCNET_ATALK_ROUTE);
++        fprintf(stderr, "DDP (AppleTalk) not configured on this system.\n");
++        return 1;
++    }
++
++    fscanf(fp, "%as %as %as %as\n", &dest, &gw, &flags, &dev);
++    free(dest); free(gw); free(dev); free(flags);
++
++    printf("%s\n", hdr);
++
++    while (fscanf(fp, "%as %as %as %as\n", &dest, &gw, &flags, &dev) == 4) {
++        int iflags = atoi(flags);
++        flags_decode(iflags, oflags);
++        printf("%-16s%-16s%-16s%-s\n", dest, gw, dev, oflags);
++        free(dest); free(gw); free(dev); free(flags);
++    }
++
++    fclose(fp);
++    
++    return 0;
++
+ }
+ #endif
+Index: net-tools/lib/ether.c
+===================================================================
+--- net-tools.orig/lib/ether.c
++++ net-tools/lib/ether.c
+@@ -2,7 +2,7 @@
+  * lib/ether.c        This file contains an implementation of the "Ethernet"
+  *              support functions.
+  *
+- * Version:     $Id: ether.c,v 1.7 1999/09/27 11:00:47 philip Exp $
++ * Version:     $Id: ether.c,v 1.8 2002/07/30 05:17:29 ecki Exp $
+  *
+  * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+  *              Copyright 1993 MicroWalt Corporation
+@@ -39,7 +39,7 @@ static char *pr_ether(unsigned char *ptr
+ {
+     static char buff[64];
+ 
+-    snprintf(buff, sizeof(buff), "%02X:%02X:%02X:%02X:%02X:%02X",
++    snprintf(buff, sizeof(buff), "%02x:%02x:%02x:%02x:%02x:%02x",
+ 	     (ptr[0] & 0377), (ptr[1] & 0377), (ptr[2] & 0377),
+ 	     (ptr[3] & 0377), (ptr[4] & 0377), (ptr[5] & 0377)
+ 	);
+Index: net-tools/lib/hw.c
+===================================================================
+--- net-tools.orig/lib/hw.c
++++ net-tools/lib/hw.c
+@@ -2,7 +2,7 @@
+  * lib/hw.c   This file contains the top-level part of the hardware
+  *              support functions module.
+  *
+- * Version:     $Id: hw.c,v 1.17 2000/05/20 13:38:10 pb Exp $
++ * Version:     $Id: hw.c,v 1.19 2008/10/03 01:52:04 ecki Exp $
+  *
+  * Maintainer:  Bernd 'eckes' Eckenfels, <net-tools@lina.inka.de>
+  *
+@@ -73,6 +73,10 @@ extern struct hwtype irda_hwtype;
+ 
+ extern struct hwtype ec_hwtype;
+ 
++extern struct hwtype ib_hwtype;
++
++extern struct hwtype eui64_hwtype;
++
+ static struct hwtype *hwtypes[] =
+ {
+ 
+@@ -144,6 +148,12 @@ static struct hwtype *hwtypes[] =
+ #if HAVE_HWX25
+     &x25_hwtype,
+ #endif
++#if HAVE_HWIB
++    &ib_hwtype,
++#endif
++#if HAVE_HWEUI64
++    &eui64_hwtype,
++#endif
+     &unspec_hwtype,
+     NULL
+ };
+@@ -217,6 +227,12 @@ void hwinit()
+ #if HAVE_HWEC
+     ec_hwtype.title = _("Econet");
+ #endif
++#if HAVE_HWIB
++    ib_hwtype.title = _("InfiniBand");
++#endif
++#if HAVE_HWEUI64
++    eui64_hwtype.title = _("Generic EUI-64");
++#endif
+     sVhwinit = 1;
+ }
+ 
+Index: net-tools/lib/inet.c
+===================================================================
+--- net-tools.orig/lib/inet.c
++++ net-tools/lib/inet.c
+@@ -3,7 +3,7 @@
+  *              support functions for the net-tools.
+  *              (NET-3 base distribution).
+  *
+- * Version:    $Id: inet.c,v 1.13 1999/12/11 13:35:56 freitag Exp $
++ * Version:    $Id: inet.c,v 1.14 2003/10/19 11:57:37 pb Exp $
+  *
+  * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+  *              Copyright 1993 MicroWalt Corporation
+@@ -144,7 +144,7 @@ static int INET_rresolve(char *name, siz
+     struct hostent *ent;
+     struct netent *np;
+     struct addr *pn;
+-    unsigned long ad, host_ad;
++    u_int32_t ad, host_ad;
+     int host = 0;
+ 
+     /* Grmpf. -FvK */
+@@ -155,7 +155,7 @@ static int INET_rresolve(char *name, siz
+ 	errno = EAFNOSUPPORT;
+ 	return (-1);
+     }
+-    ad = (unsigned long) sin->sin_addr.s_addr;
++    ad = sin->sin_addr.s_addr;
+ #ifdef DEBUG
+     fprintf (stderr, "rresolve: %08lx, mask %08x, num %08x \n", ad, netmask, numeric);
+ #endif
+Index: net-tools/lib/inet6.c
+===================================================================
+--- net-tools.orig/lib/inet6.c
++++ net-tools/lib/inet6.c
+@@ -3,7 +3,7 @@
+  *              support functions for the net-tools.
+  *              (most of it copied from lib/inet.c 1.26).
+  *
+- * Version:     $Id: inet6.c,v 1.10 2000/10/28 11:04:00 pb Exp $
++ * Version:     $Id: inet6.c,v 1.12 2002/12/10 01:03:09 ecki Exp $
+  *
+  * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+  *              Copyright 1993 MicroWalt Corporation
+@@ -44,6 +44,21 @@
+ 
+ extern int h_errno;		/* some netdb.h versions don't export this */
+ 
++char * fix_v4_address(char *buf, struct in6_addr *in6) 
++{ 
++	if (IN6_IS_ADDR_V4MAPPED(in6->s6_addr)) { 
++			char *s =strchr(buf, '.'); 
++			if (s) { 
++				while (s > buf && *s != ':')
++					--s;
++				if (*s == ':') ++s; 	
++				else s = NULL; 
++			} 	
++			if (s) return s;
++	} 
++	return buf; 
++} 
++
+ static int INET6_resolve(char *name, struct sockaddr_in6 *sin6)
+ {
+     struct addrinfo req, *ai;
+@@ -83,14 +98,14 @@ static int INET6_rresolve(char *name, st
+ 	return (-1);
+     }
+     if (numeric & 0x7FFF) {
+-	inet_ntop(AF_INET6, &sin6->sin6_addr, name, 80);
++	inet_ntop( AF_INET6, &sin6->sin6_addr, name, 80);
+ 	return (0);
+     }
+     if (IN6_IS_ADDR_UNSPECIFIED(&sin6->sin6_addr)) {
+         if (numeric & 0x8000)
+ 	    strcpy(name, "default");
+ 	else
+-	    strcpy(name, "*");
++	    strcpy(name, "[::]");
+ 	return (0);
+     }
+ 
+@@ -109,13 +124,14 @@ static void INET6_reserror(char *text)
+ }
+ 
+ 
++
+ /* Display an Internet socket address. */
+ static char *INET6_print(unsigned char *ptr)
+ {
+     static char name[80];
+ 
+     inet_ntop(AF_INET6, (struct in6_addr *) ptr, name, 80);
+-    return name;
++	return fix_v4_address(name, (struct in6_addr *)ptr);
+ }
+ 
+ 
+@@ -129,13 +145,14 @@ static char *INET6_sprint(struct sockadd
+ 	return safe_strncpy(buff, _("[NONE SET]"), sizeof(buff));
+     if (INET6_rresolve(buff, (struct sockaddr_in6 *) sap, numeric) != 0)
+ 	return safe_strncpy(buff, _("[UNKNOWN]"), sizeof(buff));
+-    return (buff);
++    return (fix_v4_address(buff, &((struct sockaddr_in6 *)sap)->sin6_addr));
+ }
+ 
+ 
+ static int INET6_getsock(char *bufp, struct sockaddr *sap)
+ {
+     struct sockaddr_in6 *sin6;
++	char *p;
+ 
+     sin6 = (struct sockaddr_in6 *) sap;
+     sin6->sin6_family = AF_INET6;
+@@ -143,7 +160,9 @@ static int INET6_getsock(char *bufp, str
+ 
+     if (inet_pton(AF_INET6, bufp, sin6->sin6_addr.s6_addr) <= 0)
+ 	return (-1);
+-
++	p = fix_v4_address(bufp, &sin6->sin6_addr);
++	if (p != bufp) 
++		memcpy(bufp, p, strlen(p)+1); 
+     return 16;			/* ?;) */
+ }
+ 
+Index: net-tools/lib/inet6_gr.c
+===================================================================
+--- net-tools.orig/lib/inet6_gr.c
++++ net-tools/lib/inet6_gr.c
+@@ -1,4 +1,4 @@
+-/*
++ /*
+    Modifications:
+    1998-07-01 - Arnaldo Carvalho de Melo - GNU gettext instead of catgets,
+    snprintf instead of sprintf
+@@ -71,11 +71,15 @@ int rprint_fib6(int ext, int numeric)
+         printf(_("INET6 (IPv6) not configured in this system.\n"));
+ 	return 1;
+     }
+-    printf(_("Kernel IPv6 routing table\n"));
+ 
+-    printf(_("Destination                                 "
+-	     "Next Hop                                "
+-	     "Flags Metric Ref    Use Iface\n"));
++    if (numeric & RTF_CACHE)
++    	printf(_("Kernel IPv6 routing cache\n"));
++    else
++    	printf(_("Kernel IPv6 routing table\n"));
++
++    printf(_("Destination                    "
++	     "Next Hop                   "
++	     "Flag Met Ref Use If\n"));
+ 
+     while (fgets(buff, 1023, fp)) {
+ 	num = sscanf(buff, "%4s%4s%4s%4s%4s%4s%4s%4s %02x %4s%4s%4s%4s%4s%4s%4s%4s %02x %4s%4s%4s%4s%4s%4s%4s%4s %08x %08x %08x %08x %s\n",
+@@ -87,13 +91,19 @@ int rprint_fib6(int ext, int numeric)
+ 		     &slen,
+ 		     naddr6p[0], naddr6p[1], naddr6p[2], naddr6p[3],
+ 		     naddr6p[4], naddr6p[5], naddr6p[6], naddr6p[7],
+-		     &metric, &use, &refcnt, &iflags, iface);
++		     &metric, &refcnt, &use, &iflags, iface);
+ #if 0
+ 	if (num < 23)
+ 	    continue;
+ #endif
+-	if (!(iflags & RTF_UP))
+-	    continue;
++	if (iflags & RTF_CACHE) {
++		if (!(numeric & RTF_CACHE))
++			continue;
++	} else {
++		if (numeric & RTF_CACHE)
++			continue;
++	}
++			
+ 	/* Fetch and resolve the target address. */
+ 	snprintf(addr6, sizeof(addr6), "%s:%s:%s:%s:%s:%s:%s:%s",
+ 		 addr6p[0], addr6p[1], addr6p[2], addr6p[3],
+@@ -112,7 +122,12 @@ int rprint_fib6(int ext, int numeric)
+ 		 inet6_aftype.sprint((struct sockaddr *) &snaddr6, 1));
+ 
+ 	/* Decode the flags. */
+-	strcpy(flags, "U");
++
++	flags[0]=0;
++	if (iflags & RTF_UP)
++	    strcat(flags, "U");
++	if (iflags & RTF_REJECT)
++	    strcat(flags, "!");
+ 	if (iflags & RTF_GATEWAY)
+ 	    strcat(flags, "G");
+ 	if (iflags & RTF_HOST)
+@@ -123,9 +138,19 @@ int rprint_fib6(int ext, int numeric)
+ 	    strcat(flags, "A");
+ 	if (iflags & RTF_CACHE)
+ 	    strcat(flags, "C");
++	if (iflags & RTF_ALLONLINK)
++	    strcat(flags, "a");
++	if (iflags & RTF_EXPIRES)
++	    strcat(flags, "e");
++	if (iflags & RTF_MODIFIED)
++	    strcat(flags, "m");
++	if (iflags & RTF_NONEXTHOP)
++	    strcat(flags, "n");
++	if (iflags & RTF_FLOW)
++	    strcat(flags, "f");
+ 
+ 	/* Print the info. */
+-	printf("%-43s %-39s %-5s %-6d %-2d %7d %-8s\n",
++	printf("%-30s %-26s %-4s %-3d %-1d%6d %s\n",
+ 	       addr6, naddr6, flags, metric, refcnt, use, iface);
+     }
+ 
+@@ -144,8 +169,7 @@ int rprint_cache6(int ext, int numeric)
+     char addr6p[8][5], haddrp[6][3];
+ 
+     if (!fp) {
+-	ESYSNOT("nd_print", "ND Table");
+-	return 1;
++	return rprint_fib6(ext, numeric | RTF_CACHE);
+     }
+     printf(_("Kernel IPv6 Neighbour Cache\n"));
+ 
+Index: net-tools/lib/inet_sr.c
+===================================================================
+--- net-tools.orig/lib/inet_sr.c
++++ net-tools/lib/inet_sr.c
+@@ -3,6 +3,7 @@
+    1998-07-01 - Arnaldo Carvalho de Melo - GNU gettext instead of catgets
+    1999-10-07 - Kurt Garloff		 - for -host and gws: prefer host names
+ 						over networks (or even reject)
++   2003-10-11 - Maik Broemme		 - gcc 3.x warnign fixes (default: break;)
+  */
+ 
+ #include "config.h"
+@@ -104,7 +105,6 @@ static int INET_setroute(int action, int
+        isnet = 1; break;
+     case 2:
+        isnet = 0; break;
+-    default:
+     }
+ 
+     /* Fill in the other fields. */
+Index: net-tools/lib/interface.c
+===================================================================
+--- net-tools.orig/lib/interface.c
++++ net-tools/lib/interface.c
+@@ -7,7 +7,7 @@
+    8/2000  Andi Kleen make the list operations a bit more efficient.
+    People are crazy enough to use thousands of aliases now.
+ 
+-   $Id: interface.c,v 1.14 2001/02/10 19:31:15 pb Exp $
++   $Id: interface.c,v 1.30 2005/08/23 22:46:51 ecki Exp $
+  */
+ 
+ #include "config.h"
+@@ -23,6 +23,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <ctype.h>
++#include <string.h>
+ 
+ #if HAVE_AFIPX
+ #if (__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1)
+@@ -87,14 +88,20 @@ int procnetdev_vsn = 1;
+ 
+ int ife_short;
+ 
++int if_list_all = 0;	/* do we have requested the complete proc list, yet? */
++
+ static struct interface *int_list, *int_last;
+ 
+ static int if_readlist_proc(char *);
+ 
+-static struct interface *add_interface(char *name)
++static struct interface *if_cache_add(char *name)
+ {
+     struct interface *ife, **nextp, *new;
+ 
++    if (!int_list)
++    	int_last = NULL;
++
++    /* the cache is sorted, so if we hit a smaller if, exit */
+     for (ife = int_last; ife; ife = ife->prev) {
+ 	    int n = nstrcmp(ife->name, name); 
+ 	    if (n == 0) 
+@@ -104,7 +111,7 @@ static struct interface *add_interface(c
+     }
+     new(new); 
+     safe_strncpy(new->name, name, IFNAMSIZ); 
+-    nextp = ife ? &ife->next : &int_list;
++    nextp = ife ? &ife->next : &int_list; // keep sorting
+     new->prev = ife;
+     new->next = *nextp; 
+     if (new->next) 
+@@ -117,19 +124,22 @@ static struct interface *add_interface(c
+ 
+ struct interface *lookup_interface(char *name)
+ {
+-    struct interface *ife = NULL;
+-
+-    if (if_readlist_proc(name) < 0) 
+-	    return NULL; 
+-    ife = add_interface(name); 
+-    return ife;
++   /* if we have read all, use it */
++   if (if_list_all)
++   	return if_cache_add(name);
++
++   /* otherwise we read a limited list */
++   if (if_readlist_proc(name) < 0)
++   	return NULL;
++ 
++   return if_cache_add(name);
+ }
+ 
+ int for_all_interfaces(int (*doit) (struct interface *, void *), void *cookie)
+ {
+     struct interface *ife;
+ 
+-    if (!int_list && (if_readlist() < 0))
++    if (!if_list_all && (if_readlist() < 0))
+ 	return -1;
+     for (ife = int_list; ife; ife = ife->next) {
+ 	int err = doit(ife, cookie);
+@@ -139,13 +149,15 @@ int for_all_interfaces(int (*doit) (stru
+     return 0;
+ }
+ 
+-int free_interface_list(void)
++int if_cache_free(void)
+ {
+     struct interface *ife;
+     while ((ife = int_list) != NULL) {
+ 	int_list = ife->next;
+ 	free(ife);
+     }
++    int_last = NULL;
++    if_list_all = 0;
+     return 0;
+ }
+ 
+@@ -180,7 +192,7 @@ static int if_readconf(void)
+ 	}
+ 	if (ifc.ifc_len == sizeof(struct ifreq) * numreqs) {
+ 	    /* assume it overflowed and try again */
+-	    numreqs += 10;
++	    numreqs *= 2;
+ 	    continue;
+ 	}
+ 	break;
+@@ -188,7 +200,7 @@ static int if_readconf(void)
+ 
+     ifr = ifc.ifc_req;
+     for (n = 0; n < ifc.ifc_len; n += sizeof(struct ifreq)) {
+-	add_interface(ifr->ifr_name);
++	if_cache_add(ifr->ifr_name);
+ 	ifr++;
+     }
+     err = 0;
+@@ -198,7 +210,7 @@ out:
+     return err;
+ }
+ 
+-static char *get_name(char *name, char *p)
++char *get_name(char *name, char *p)
+ {
+     while (isspace(*p))
+ 	p++;
+@@ -206,16 +218,19 @@ static char *get_name(char *name, char *
+ 	if (isspace(*p))
+ 	    break;
+ 	if (*p == ':') {	/* could be an alias */
+-	    char *dot = p, *dotname = name;
+-	    *name++ = *p++;
+-	    while (isdigit(*p))
+-		*name++ = *p++;
+-	    if (*p != ':') {	/* it wasn't, backup */
+-		p = dot;
+-		name = dotname;
++		char *dot = p++;
++ 		while (*p && isdigit(*p)) p++;
++		if (*p == ':') {
++			/* Yes it is, backup and copy it. */
++			p = dot;
++			*name++ = *p++;
++			while (*p && isdigit(*p)) {
++				*name++ = *p++;
++			}
++		} else {
++			/* No, it isn't */
++			p = dot;
+ 	    }
+-	    if (*p == '\0')
+-		return NULL;
+ 	    p++;
+ 	    break;
+ 	}
+@@ -225,7 +240,7 @@ static char *get_name(char *name, char *
+     return p;
+ }
+ 
+-static int procnetdev_version(char *buf)
++int procnetdev_version(char *buf)
+ {
+     if (strstr(buf, "compressed"))
+ 	return 3;
+@@ -234,12 +249,12 @@ static int procnetdev_version(char *buf)
+     return 1;
+ }
+ 
+-static int get_dev_fields(char *bp, struct interface *ife)
++int get_dev_fields(char *bp, struct interface *ife)
+ {
+     switch (procnetdev_vsn) {
+     case 3:
+ 	sscanf(bp,
+-	"%llu %llu %lu %lu %lu %lu %lu %lu %llu %llu %lu %lu %lu %lu %lu %lu",
++	"%Lu %Lu %lu %lu %lu %lu %lu %lu %Lu %Lu %lu %lu %lu %lu %lu %lu",
+ 	       &ife->stats.rx_bytes,
+ 	       &ife->stats.rx_packets,
+ 	       &ife->stats.rx_errors,
+@@ -259,7 +274,7 @@ static int get_dev_fields(char *bp, stru
+ 	       &ife->stats.tx_compressed);
+ 	break;
+     case 2:
+-	sscanf(bp, "%llu %llu %lu %lu %lu %lu %llu %llu %lu %lu %lu %lu %lu",
++	sscanf(bp, "%Lu %Lu %lu %lu %lu %lu %Lu %Lu %lu %lu %lu %lu %lu",
+ 	       &ife->stats.rx_bytes,
+ 	       &ife->stats.rx_packets,
+ 	       &ife->stats.rx_errors,
+@@ -277,7 +292,7 @@ static int get_dev_fields(char *bp, stru
+ 	ife->stats.rx_multicast = 0;
+ 	break;
+     case 1:
+-	sscanf(bp, "%llu %lu %lu %lu %lu %llu %lu %lu %lu %lu %lu",
++	sscanf(bp, "%Lu %lu %lu %lu %lu %Lu %lu %lu %lu %lu %lu",
+ 	       &ife->stats.rx_packets,
+ 	       &ife->stats.rx_errors,
+ 	       &ife->stats.rx_dropped,
+@@ -300,22 +315,16 @@ static int get_dev_fields(char *bp, stru
+ 
+ static int if_readlist_proc(char *target)
+ {
+-    static int proc_read; 
+     FILE *fh;
+     char buf[512];
+     struct interface *ife;
+     int err;
+ 
+-    if (proc_read) 
+-	    return 0; 
+-    if (!target) 
+-	    proc_read = 1;
+-
+     fh = fopen(_PATH_PROCNET_DEV, "r");
+     if (!fh) {
+ 		fprintf(stderr, _("Warning: cannot open %s (%s). Limited output.\n"),
+ 			_PATH_PROCNET_DEV, strerror(errno)); 
+-		return if_readconf();
++		return -2;
+ 	}	
+     fgets(buf, sizeof buf, fh);	/* eat line */
+     fgets(buf, sizeof buf, fh);
+@@ -350,7 +359,7 @@ static int if_readlist_proc(char *target
+     while (fgets(buf, sizeof buf, fh)) {
+ 	char *s, name[IFNAMSIZ];
+ 	s = get_name(name, buf);    
+-	ife = add_interface(name);
++	ife = if_cache_add(name);
+ 	get_dev_fields(s, ife);
+ 	ife->statistics_valid = 1;
+ 	if (target && !strcmp(target,name))
+@@ -359,7 +368,6 @@ static int if_readlist_proc(char *target
+     if (ferror(fh)) {
+ 	perror(_PATH_PROCNET_DEV);
+ 	err = -1;
+-	proc_read = 0; 
+     }
+ 
+ #if 0
+@@ -371,9 +379,16 @@ static int if_readlist_proc(char *target
+ 
+ int if_readlist(void) 
+ { 
+-    int err = if_readlist_proc(NULL); 
+-    if (!err)
+-	    err = if_readconf();
++    /* caller will/should check not to call this too often 
++     *   (i.e. only if if_list_all == 0 
++     */
++    int err = 0;
++
++    err |= if_readlist_proc(NULL); 
++    err |= if_readconf();
++
++    if_list_all = 1;
++
+     return err;
+ } 
+ 
+@@ -580,10 +595,10 @@ int do_if_print(struct interface *ife, v
+ void ife_print_short(struct interface *ptr)
+ {
+     printf("%-5.5s ", ptr->name);
+-    printf("%5d %3d", ptr->mtu, ptr->metric);
++    printf("%5d %-2d ", ptr->mtu, ptr->metric);
+     /* If needed, display the interface statistics. */
+     if (ptr->statistics_valid) {
+-	printf("%8llu %6lu %6lu %6lu",
++	printf("%8llu %6lu %6lu %-6lu ",
+ 	       ptr->stats.rx_packets, ptr->stats.rx_errors,
+ 	       ptr->stats.rx_dropped, ptr->stats.rx_fifo_errors);
+ 	printf("%8llu %6lu %6lu %6lu ",
+@@ -636,9 +651,10 @@ void ife_print_long(struct interface *pt
+     int hf;
+     int can_compress = 0;
+     unsigned long long rx, tx, short_rx, short_tx;
+-    char Rext[5]="b";
+-    char Text[5]="b";
+-
++    const char *Rext = "B";
++    const char *Text = "B";
++    static char flags[200];
++    
+ #if HAVE_AFIPX
+     static struct aftype *ipxtype = NULL;
+ #endif
+@@ -670,32 +686,70 @@ void ife_print_long(struct interface *pt
+     if (hw == NULL)
+ 	hw = get_hwntype(-1);
+ 
+-    printf(_("%-9.9s Link encap:%s  "), ptr->name, hw->title);
+-    /* For some hardware types (eg Ash, ATM) we don't print the 
+-       hardware address if it's null.  */
+-    if (hw->print != NULL && (! (hw_null_address(hw, ptr->hwaddr) &&
+-				  hw->suppress_null_addr)))
+-	printf(_("HWaddr %s  "), hw->print(ptr->hwaddr));
+-#ifdef IFF_PORTSEL
+-    if (ptr->flags & IFF_PORTSEL) {
+-	printf(_("Media:%s"), if_port_text[ptr->map.port][0]);
+-	if (ptr->flags & IFF_AUTOMEDIA)
+-	    printf(_("(auto)"));
+-    }
++    sprintf(flags, "flags=%d<", ptr->flags);
++    /* DONT FORGET TO ADD THE FLAGS IN ife_print_short, too */
++    if (ptr->flags == 0)
++	strcat(flags,">");
++    if (ptr->flags & IFF_UP)
++	strcat(flags,_("UP,"));
++    if (ptr->flags & IFF_BROADCAST)
++	strcat(flags,_("BROADCAST,"));
++    if (ptr->flags & IFF_DEBUG)
++	strcat(flags,_("DEBUG,"));
++    if (ptr->flags & IFF_LOOPBACK)
++	strcat(flags,_("LOOPBACK,"));
++    if (ptr->flags & IFF_POINTOPOINT)
++	strcat(flags,_("POINTOPOINT,"));
++    if (ptr->flags & IFF_NOTRAILERS)
++	strcat(flags,_("NOTRAILERS,"));
++    if (ptr->flags & IFF_RUNNING)
++	strcat(flags,_("RUNNING,"));
++    if (ptr->flags & IFF_NOARP)
++	strcat(flags,_("NOARP,"));
++    if (ptr->flags & IFF_PROMISC)
++	strcat(flags,_("PROMISC,"));
++    if (ptr->flags & IFF_ALLMULTI)
++	strcat(flags,_("ALLMULTI,"));
++    if (ptr->flags & IFF_SLAVE)
++	strcat(flags,_("SLAVE,"));
++    if (ptr->flags & IFF_MASTER)
++	strcat(flags,_("MASTER,"));
++    if (ptr->flags & IFF_MULTICAST)
++	strcat(flags,_("MULTICAST,"));
++#ifdef HAVE_DYNAMIC
++    if (ptr->flags & IFF_DYNAMIC)
++	strcat(flags,_("DYNAMIC,"));
++#endif
++    /* DONT FORGET TO ADD THE FLAGS IN ife_print_short */
++    if (flags[strlen(flags)-1] == ',')
++      flags[strlen(flags)-1] = '>';
++    else
++      flags[strlen(flags)-1] = 0;
++      
++
++    printf(_("%s: %s  mtu %d  metric %d"),
++	   ptr->name, flags, ptr->mtu, ptr->metric ? ptr->metric : 1);
++#ifdef SIOCSKEEPALIVE
++    if (ptr->outfill || ptr->keepalive)
++	printf(_("  outfill %d  keepalive %d"),
++	       ptr->outfill, ptr->keepalive);
+ #endif
+     printf("\n");
+ 
++
++
+ #if HAVE_AFINET
+     if (ptr->has_ip) {
+-	printf(_("          %s addr:%s "), ap->name,
++	printf(_("        %s %s"), ap->name,
+ 	       ap->sprint(&ptr->addr, 1));
+-	if (ptr->flags & IFF_POINTOPOINT) {
+-	    printf(_(" P-t-P:%s "), ap->sprint(&ptr->dstaddr, 1));
+-	}
++	printf(_("  netmask %s"), ap->sprint(&ptr->netmask, 1));
+ 	if (ptr->flags & IFF_BROADCAST) {
+-	    printf(_(" Bcast:%s "), ap->sprint(&ptr->broadaddr, 1));
++	    printf(_("  broadcast %s"), ap->sprint(&ptr->broadaddr, 1));
++	}
++	if (ptr->flags & IFF_POINTOPOINT) {
++	    printf(_("  destination %s"), ap->sprint(&ptr->dstaddr, 1));
+ 	}
+-	printf(_(" Mask:%s\n"), ap->sprint(&ptr->netmask, 1));
++	printf("\n");
+     }
+ #endif
+ 
+@@ -712,29 +766,30 @@ void ife_print_long(struct interface *pt
+ 			addr6p[0], addr6p[1], addr6p[2], addr6p[3],
+ 			addr6p[4], addr6p[5], addr6p[6], addr6p[7]);
+ 		inet6_aftype.input(1, addr6, (struct sockaddr *) &sap);
+-		printf(_("          inet6 addr: %s/%d"),
+-		 inet6_aftype.sprint((struct sockaddr *) &sap, 1), plen);
+-		printf(_(" Scope:"));
+-		switch (scope) {
+-		case 0:
+-		    printf(_("Global"));
+-		    break;
+-		case IPV6_ADDR_LINKLOCAL:
+-		    printf(_("Link"));
+-		    break;
+-		case IPV6_ADDR_SITELOCAL:
+-		    printf(_("Site"));
+-		    break;
+-		case IPV6_ADDR_COMPATv4:
+-		    printf(_("Compat"));
+-		    break;
+-		case IPV6_ADDR_LOOPBACK:
+-		    printf(_("Host"));
+-		    break;
+-		default:
+-		    printf(_("Unknown"));
++		printf(_("        %s %s  prefixlen %d"),
++			inet6_aftype.name, 
++			inet6_aftype.sprint((struct sockaddr *) &sap, 1), 
++			plen);
++		printf(_("  scopeid 0x%x"), scope);
++
++		flags[0] = '<'; flags[1] = 0;
++		if (scope & IPV6_ADDR_COMPATv4) {
++		    	strcat(flags, _("compat,"));
++		    	scope -= IPV6_ADDR_COMPATv4;
+ 		}
+-		printf("\n");
++		if (scope == 0)
++			strcat(flags, _("global,"));
++		if (scope & IPV6_ADDR_LINKLOCAL)
++			strcat(flags, _("link,"));
++		if (scope & IPV6_ADDR_SITELOCAL)
++			strcat(flags, _("site,"));
++		if (scope & IPV6_ADDR_LOOPBACK)
++			strcat(flags, _("host,"));
++		if (flags[strlen(flags)-1] == ',')
++			flags[strlen(flags)-1] = '>';
++		else
++			flags[strlen(flags)-1] = 0;
++		printf("%s\n", flags);
+ 	    }
+ 	}
+ 	fclose(f);
+@@ -747,17 +802,17 @@ void ife_print_long(struct interface *pt
+ 
+     if (ipxtype != NULL) {
+ 	if (ptr->has_ipx_bb)
+-	    printf(_("          IPX/Ethernet II addr:%s\n"),
+-		   ipxtype->sprint(&ptr->ipxaddr_bb, 1));
++	    printf(_("        %s Ethernet-II   %s\n"),
++		   ipxtype->name, ipxtype->sprint(&ptr->ipxaddr_bb, 1));
+ 	if (ptr->has_ipx_sn)
+-	    printf(_("          IPX/Ethernet SNAP addr:%s\n"),
+-		   ipxtype->sprint(&ptr->ipxaddr_sn, 1));
++	    printf(_("        %s Ethernet-SNAP %s\n"),
++		   ipxtype->name, ipxtype->sprint(&ptr->ipxaddr_sn, 1));
+ 	if (ptr->has_ipx_e2)
+-	    printf(_("          IPX/Ethernet 802.2 addr:%s\n"),
+-		   ipxtype->sprint(&ptr->ipxaddr_e2, 1));
++	    printf(_("        %s Ethernet802.2 %s\n"),
++		   ipxtype->name, ipxtype->sprint(&ptr->ipxaddr_e2, 1));
+ 	if (ptr->has_ipx_e3)
+-	    printf(_("          IPX/Ethernet 802.3 addr:%s\n"),
+-		   ipxtype->sprint(&ptr->ipxaddr_e3, 1));
++	    printf(_("        %s Ethernet802.3 %s\n"),
++		   ipxtype->name, ipxtype->sprint(&ptr->ipxaddr_e3, 1));
+     }
+ #endif
+ 
+@@ -766,7 +821,7 @@ void ife_print_long(struct interface *pt
+ 	ddptype = get_afntype(AF_APPLETALK);
+     if (ddptype != NULL) {
+ 	if (ptr->has_ddp)
+-	    printf(_("          EtherTalk Phase 2 addr:%s\n"), ddptype->sprint(&ptr->ddpaddr, 1));
++	    printf(_("        %s %s\n"), ddptype->name, ddptype->sprint(&ptr->ddpaddr, 1));
+     }
+ #endif
+ 
+@@ -775,53 +830,30 @@ void ife_print_long(struct interface *pt
+ 	ectype = get_afntype(AF_ECONET);
+     if (ectype != NULL) {
+ 	if (ptr->has_econet)
+-	    printf(_("          econet addr:%s\n"), ectype->sprint(&ptr->ecaddr, 1));
++	    printf(_("        %s %s\n"), ectype->name, ectype->sprint(&ptr->ecaddr, 1));
+     }
+ #endif
+ 
+-    printf("          ");
+-    /* DONT FORGET TO ADD THE FLAGS IN ife_print_short, too */
+-    if (ptr->flags == 0)
+-	printf(_("[NO FLAGS] "));
+-    if (ptr->flags & IFF_UP)
+-	printf(_("UP "));
+-    if (ptr->flags & IFF_BROADCAST)
+-	printf(_("BROADCAST "));
+-    if (ptr->flags & IFF_DEBUG)
+-	printf(_("DEBUG "));
+-    if (ptr->flags & IFF_LOOPBACK)
+-	printf(_("LOOPBACK "));
+-    if (ptr->flags & IFF_POINTOPOINT)
+-	printf(_("POINTOPOINT "));
+-    if (ptr->flags & IFF_NOTRAILERS)
+-	printf(_("NOTRAILERS "));
+-    if (ptr->flags & IFF_RUNNING)
+-	printf(_("RUNNING "));
+-    if (ptr->flags & IFF_NOARP)
+-	printf(_("NOARP "));
+-    if (ptr->flags & IFF_PROMISC)
+-	printf(_("PROMISC "));
+-    if (ptr->flags & IFF_ALLMULTI)
+-	printf(_("ALLMULTI "));
+-    if (ptr->flags & IFF_SLAVE)
+-	printf(_("SLAVE "));
+-    if (ptr->flags & IFF_MASTER)
+-	printf(_("MASTER "));
+-    if (ptr->flags & IFF_MULTICAST)
+-	printf(_("MULTICAST "));
+-#ifdef HAVE_DYNAMIC
+-    if (ptr->flags & IFF_DYNAMIC)
+-	printf(_("DYNAMIC "));
+-#endif
+-    /* DONT FORGET TO ADD THE FLAGS IN ife_print_short */
+-    printf(_(" MTU:%d  Metric:%d"),
+-	   ptr->mtu, ptr->metric ? ptr->metric : 1);
+-#ifdef SIOCSKEEPALIVE
+-    if (ptr->outfill || ptr->keepalive)
+-	printf(_("  Outfill:%d  Keepalive:%d"),
+-	       ptr->outfill, ptr->keepalive);
++    /* For some hardware types (eg Ash, ATM) we don't print the 
++       hardware address if it's null.  */
++    if (hw->print != NULL && (! (hw_null_address(hw, ptr->hwaddr) &&
++				  hw->suppress_null_addr)))
++	printf(_("        %s %s"), hw->name, hw->print(ptr->hwaddr));
++    else
++	printf(_("        %s"), hw->name);
++    if (ptr->tx_queue_len != -1)
++    	printf(_("  txqueuelen %d"), ptr->tx_queue_len);
++    printf("  (%s)\n", hw->title);
++
++#ifdef IFF_PORTSEL
++    if (ptr->flags & IFF_PORTSEL) {
++	printf(_("        media %s"), if_port_text[ptr->map.port][0]);
++	if (ptr->flags & IFF_AUTOMEDIA)
++	    printf(_("autoselect"));
++    	printf("\n");
++    }
+ #endif
+-    printf("\n");
++
+ 
+     /* If needed, display the interface statistics. */
+ 
+@@ -830,55 +862,87 @@ void ife_print_long(struct interface *pt
+ 	 *      not for the aliases, although strictly speaking they're shared
+ 	 *      by all addresses.
+ 	 */
+-	printf("          ");
+-
+-	printf(_("RX packets:%llu errors:%lu dropped:%lu overruns:%lu frame:%lu\n"),
+-	       ptr->stats.rx_packets, ptr->stats.rx_errors,
+-	       ptr->stats.rx_dropped, ptr->stats.rx_fifo_errors,
+-	       ptr->stats.rx_frame_errors);
+-	if (can_compress)
+-	    printf(_("             compressed:%lu\n"), ptr->stats.rx_compressed);
+-
+ 	rx = ptr->stats.rx_bytes;  
+-	tx = ptr->stats.tx_bytes;
+ 	short_rx = rx * 10;  
++	if (rx > 1125899906842624ull) {
++	    short_rx /= 1125899906842624ull;
++	    Rext = "PiB";
++	} else if (rx > 1099511627776ull) {
++	    short_rx /= 1099511627776ull;
++	    Rext = "TiB";
++	} else if (rx > 1073741824ull) {
++	    short_rx /= 1073741824ull;
++	    Rext = "GiB";
++	} else if (rx > 1048576) {
++	    short_rx /= 1048576;
++	    Rext = "MiB";
++	} else if (rx > 1024) {
++	    short_rx /= 1024;
++	    Rext = "KiB";
++	}
++	tx = ptr->stats.tx_bytes;
+ 	short_tx = tx * 10;
+-	if (rx > 1048576) { short_rx /= 1048576;  strcpy(Rext, "Mb"); }
+-	else if (rx > 1024) { short_rx /= 1024;  strcpy(Rext, "Kb"); }
+-	if (tx > 1048576) { short_tx /= 1048576;  strcpy(Text, "Mb"); }
+-	else if (tx > 1024) { short_tx /= 1024;  strcpy(Text, "Kb"); }
+-
+-	printf("          ");
+-	printf(_("TX packets:%llu errors:%lu dropped:%lu overruns:%lu carrier:%lu\n"),
+-	       ptr->stats.tx_packets, ptr->stats.tx_errors,
+-	       ptr->stats.tx_dropped, ptr->stats.tx_fifo_errors,
+-	       ptr->stats.tx_carrier_errors);
+-	printf(_("          collisions:%lu "), ptr->stats.collisions);
+-	if (can_compress)
+-	    printf(_("compressed:%lu "), ptr->stats.tx_compressed);
+-	if (ptr->tx_queue_len != -1)
+-	    printf(_("txqueuelen:%d "), ptr->tx_queue_len);
+-	printf("\n          ");
+-	printf(_("RX bytes:%llu (%lu.%lu %s)  TX bytes:%llu (%lu.%lu %s)\n"),
++	if (tx > 1125899906842624ull) {
++	    short_tx /= 1125899906842624ull;
++	    Text = "PiB";
++	} else 	if (tx > 1099511627776ull) {
++	    short_tx /= 1099511627776ull;
++	    Text = "TiB";
++	} else if (tx > 1073741824ull) {
++	    short_tx /= 1073741824ull;
++	    Text = "GiB";
++	} else if (tx > 1048576) {
++	    short_tx /= 1048576;
++	    Text = "MiB";
++	} else if (tx > 1024) {
++	    short_tx /= 1024;
++	    Text = "KiB";
++	}
++
++	printf("        ");
++	printf(_("RX packets %llu  bytes %llu (%lu.%lu %s)\n"), 
++		ptr->stats.rx_packets, 
+ 	       rx, (unsigned long)(short_rx / 10), 
+-	       (unsigned long)(short_rx % 10), Rext, 
+-	       tx, (unsigned long)(short_tx / 10), 
+-	       (unsigned long)(short_tx % 10), Text);
++	       (unsigned long)(short_rx % 10), Rext);
++	if (can_compress) {
++  	    printf("        ");
++	    printf(_("RX compressed:%lu\n"), ptr->stats.rx_compressed);
++	}
++	printf("        ");
++	printf(_("RX errors %lu  dropped %lu  overruns %lu  frame %lu\n"),
++	       ptr->stats.rx_errors, ptr->stats.rx_dropped, 
++	       ptr->stats.rx_fifo_errors, ptr->stats.rx_frame_errors);
++
++
++	printf("        ");
++	printf(_("TX packets %llu  bytes %llu (%lu.%lu %s)\n"),
++		ptr->stats.tx_packets, 
++	        tx, (unsigned long)(short_tx / 10), 
++	        (unsigned long)(short_tx % 10), Text);
++	if (can_compress) {
++  	    printf("        ");
++	    printf(_("TX compressed %lu\n"), ptr->stats.tx_compressed);
++	}
++	printf("        ");
++	printf(_("TX errors %lu  dropped %lu overruns %lu  carrier %lu  collisions %lu\n"),
++	       ptr->stats.tx_errors,
++	       ptr->stats.tx_dropped, ptr->stats.tx_fifo_errors,
++	       ptr->stats.tx_carrier_errors, ptr->stats.collisions);
+     }
+ 
+     if ((ptr->map.irq || ptr->map.mem_start || ptr->map.dma ||
+-	 ptr->map.base_addr)) {
+-	printf("          ");
++	 ptr->map.base_addr >= 0x100)) {
++	printf("        device ");
+ 	if (ptr->map.irq)
+-	    printf(_("Interrupt:%d "), ptr->map.irq);
++	    printf(_("interrupt %d  "), ptr->map.irq);
+ 	if (ptr->map.base_addr >= 0x100)	/* Only print devices using it for 
+ 						   I/O maps */
+-	    printf(_("Base address:0x%x "), ptr->map.base_addr);
++	    printf(_("base 0x%x  "), ptr->map.base_addr);
+ 	if (ptr->map.mem_start) {
+-	    printf(_("Memory:%lx-%lx "), ptr->map.mem_start, ptr->map.mem_end);
++	    printf(_("memory 0x%lx-%lx  "), ptr->map.mem_start, ptr->map.mem_end);
+ 	}
+ 	if (ptr->map.dma)
+-	    printf(_("DMA chan:%x "), ptr->map.dma);
++	    printf(_("  dma 0x%x"), ptr->map.dma);
+ 	printf("\n");
+     }
+     printf("\n");
+Index: net-tools/lib/ipx.c
+===================================================================
+--- net-tools.orig/lib/ipx.c
++++ net-tools/lib/ipx.c
+@@ -133,6 +133,9 @@ static int IPX_input(int type, char *buf
+     char *ep;
+     int nbo;
+ 
++    if (!sai)
++    	return (-1);
++    	
+     sai->sipx_family = AF_IPX;
+     sai->sipx_network = htonl(0);
+     sai->sipx_node[0] = sai->sipx_node[1] = sai->sipx_node[2] =
+Index: net-tools/lib/ipx_gr.c
+===================================================================
+--- net-tools.orig/lib/ipx_gr.c
++++ net-tools/lib/ipx_gr.c
+@@ -38,21 +38,27 @@ int IPX_rprint(int options)
+     char net[128], router_net[128];
+     char router_node[128];
+     int num;
+-    FILE *fp = fopen(_PATH_PROCNET_IPX_ROUTE, "r");
++    FILE *fp;
+     struct aftype *ap;
+     struct sockaddr sa;
+ 
+-    if ((ap = get_afntype(AF_IPX)) == NULL) {
+-	EINTERN("lib/ipx_rt.c", "AF_IPX missing");
+-	return (-1);
+-    }
++    fp = fopen(_PATH_PROCNET_IPX_ROUTE1, "r");
+ 
+     if (!fp) {
+-        perror(_PATH_PROCNET_IPX_ROUTE);
+-        printf(_("IPX not configured in this system.\n"));
++        fp = fopen(_PATH_PROCNET_IPX_ROUTE2, "r");
++    }
++    
++    if (!fp) {
++        perror(NULL);
++        printf(_("IPX routing not in file %s or %s found.\n"), _PATH_PROCNET_IPX_ROUTE1, _PATH_PROCNET_IPX_ROUTE2);
+ 	return 1;
+     }
+ 
++    if ((ap = get_afntype(AF_IPX)) == NULL) {
++	EINTERN("lib/ipx_rt.c", "AF_IPX missing");
++	return (-1);
++    }
++
+     printf(_("Kernel IPX routing table\n"));	/* xxx */
+     printf(_("Destination               Router Net                Router Node\n"));
+ 
+Index: net-tools/lib/irda.c
+===================================================================
+--- net-tools.orig/lib/irda.c
++++ net-tools/lib/irda.c
+@@ -1,13 +1,15 @@
+ /*********************************************************************
+  *                
+  * Filename:      irda.c
+- * Version:       0.1
+- * Description:   A first attempt to make ifconfig understand IrDA
++ * Version:       0.2
++ * Description:   A second attempt to make ifconfig understand IrDA
+  * Status:        Experimental.
+  * Author:        Dag Brattli <dagb@cs.uit.no>
+  * Created at:    Wed Apr 21 09:03:09 1999
+  * Modified at:   Wed Apr 21 09:17:05 1999
+  * Modified by:   Dag Brattli <dagb@cs.uit.no>
++ * Modified at:   Wed May  1 11:51:44 CEST 2002
++ * Modified by:   Christoph Bartelmus <christoph@bartelmus.de>
+  * 
+  *     This program is free software; you can redistribute it and/or 
+  *     modify it under the terms of the GNU General Public License as 
+@@ -59,9 +61,9 @@
+  */
+ static char *irda_print(unsigned char *ptr)
+ {
+-    static char buff[8];
++    static char buff[12];
+ 
+-    sprintf(&buff[strlen(buff)], "%02x:%02x:%02x:%02x", ptr[3], ptr[2], 
++    snprintf(buff, 12, "%02x:%02x:%02x:%02x", ptr[3], ptr[2], 
+ 	    ptr[1], ptr[0]);
+ 
+     return (buff);
+Index: net-tools/lib/net-features.h
+===================================================================
+--- net-tools.orig/lib/net-features.h
++++ net-tools/lib/net-features.h
+@@ -295,6 +295,13 @@ static char *Features =
+ "-"
+ #endif
+ "HDLC/LAPB "
++
++#if HAVE_HWEUI64
++"+"
++#else
++"-"
++#endif
++"EUI64 "
+ ;
+ 
+ 
+Index: net-tools/lib/nstrcmp.c
+===================================================================
+--- net-tools.orig/lib/nstrcmp.c
++++ net-tools/lib/nstrcmp.c
+@@ -1,34 +1,157 @@
+ /* Copyright 1998 by Andi Kleen. Subject to the GPL. */
+-/* $Id: nstrcmp.c,v 1.2 1998/11/15 20:11:38 freitag Exp $ */ 
++/* rewritten by bernd eckenfels because of complicated alias semantic */
++/* $Id: nstrcmp.c,v 1.4 2004/06/03 22:49:17 ecki Exp $ */ 
+ #include <ctype.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include "util.h"
+ 
+-/* like strcmp(), but knows about numbers */
+-int nstrcmp(const char *astr, const char *b)
++
++/* return numerical :999 suffix or null. sideeffect: replace ':' with \0 */
++char* cutalias(char* name)
+ {
+-    const char *a = astr;
++	int digit = 0;
++	int pos;
++	
++	for(pos=strlen(name); pos>0; pos--)
++	{
++		if (name[pos-1]==':' && digit)
++		{
++			name[pos-1]='\0';
++			return name+pos;
++		}
++		if (!isdigit(name[pos-1]))
++			break;
++		digit = 1;
++	}
++	return NULL;
++}
+ 
+-    while (*a == *b) {
+-	if (*a == '\0')
+-	    return 0;
+-	a++;
+-	b++;
+-    }
+-    if (isdigit(*a)) {
+-	if (!isdigit(*b))
+-	    return -1;
+-	while (a > astr) {
+-	    a--;
+-	    if (!isdigit(*a)) {
+-		a++;
+-		break;
+-	    }
+-	    if (!isdigit(*b))
+-		return -1;
+-	    b--;
++
++/* return index of last non digit or -1 if it does not end with digits */
++int rindex_nondigit(char *name)
++{
++	int pos = strlen(name);
++
++	for(pos=strlen(name); pos>0; pos--)
++	{
++		if (!isdigit(name[pos-1]))
++			return pos;
+ 	}
+-	return atoi(a) > atoi(b) ? 1 : -1;
+-    }
+-    return *a - *b;
++	return 0;
++}
++
++
++/* like strcmp(), but knows about numbers and ':' alias suffix */
++int nstrcmp(const char *ap, const char *bp)
++{
++	char *a = (char*)strdup(ap);
++	char *b = (char*)strdup(bp);
++	char *an, *bn;
++	int av = 0, bv = 0;
++	char *aalias=cutalias(a);
++	char *balias=cutalias(b);
++	int aindex=rindex_nondigit(a);
++	int bindex=rindex_nondigit(b);
++	int complen=(aindex<bindex)?aindex:bindex;
++	int res = strncmp(a, b, complen);
++
++	if (res != 0)
++		{ free(a); free(b); return res; }
++		
++	if (aindex > bindex)
++		{ free(a); free(b); return 1; }
++		
++	if (aindex < bindex)
++		{ free(a); free(b); return -1; }
++		
++	an = a+aindex;
++	bn = b+bindex;
++	
++	av = atoi(an);
++	bv = atoi(bn);
++	
++	if (av < bv)
++		{ free(a); free(b); return -1; }
++		
++	if (av > bv)
++		{ free(a); free(b); return 1; }
++		
++	av = -1;
++	if (aalias != NULL)
++		av = atoi(aalias);
++	
++	bv = -1;
++	if (balias != NULL)
++		bv = atoi(balias);
++	
++	free(a); free(b);
++	
++	if (av < bv)
++		return -1;
++		
++	if (av > bv)
++		return 1;
++		
++	return 0;
++}
++
++
++#ifdef NSTRCMP_TEST
++
++int cs(int s)
++{
++	if (s < 0) return -1;
++	if (s > 0) return 1;
++	return 0;
++}
++
++
++int dotest(char* a, char* b, int exp)
++{
++	int res = nstrcmp(a, b);
++	int err = (cs(res) != cs(exp));
++	printf("nstrcmp(\"%s\", \"%s\")=%d %d %s\n", a, b, res, exp, err?"WRONG":"OK");
++	return err;
+ }
++
++int main()
++{
++	int err = 0;
++	
++	err |= dotest("eth1", "eth1", 0);
++	err |= dotest("eth0:1", "eth0:1", 0);
++	err |= dotest("lan", "lan", 0);
++	err |= dotest("100", "100", 0);
++	err |= dotest("", "", 0);
++	err |= dotest(":", ":", 0);
++	err |= dotest("a:b:c", "a:b:c", 0);
++	err |= dotest("a:", "a:", 0);
++	err |= dotest(":a", ":a", 0);
++
++	err |= dotest("a", "aa", -1);	
++	err |= dotest("eth0", "eth1", -1);
++	err |= dotest("eth1", "eth20", -1);
++	err |= dotest("eth20", "eth100", -1);
++	err |= dotest("eth1", "eth13", -1);
++	err |= dotest("eth", "eth2", -1);
++	err |= dotest("eth0:1", "eth0:2", -1);
++	err |= dotest("eth1:10", "eth13:10", -1);
++	err |= dotest("eth1:1", "eth1:13", -1);
++	err |= dotest("a", "a:", -1);
++	
++	err |= dotest("aa", "a", 1);
++	err |= dotest("eth2", "eth1", 1);
++	err |= dotest("eth13", "eth1", 1);	
++	err |= dotest("eth2", "eth", 1);
++	err |= dotest("eth2:10", "eth2:1", 1);
++	err |= dotest("eth2:5", "eth2:4", 1);
++	err |= dotest("eth3:2", "eth2:3", 1);
++	err |= dotest("eth13:1", "eth1:0", 1);
++	err |= dotest("a:", "a", 1);
++	err |= dotest("a1b12", "a1b2", 1);
++
++	return err;
++}
++
++#endif
+Index: net-tools/lib/pathnames.h
+===================================================================
+--- net-tools.orig/lib/pathnames.h
++++ net-tools/lib/pathnames.h
+@@ -1,4 +1,3 @@
+-
+ /*
+  * lib/pathnames.h    This file contains the definitions of the path 
+  *                      names used by the NET-LIB.
+@@ -29,8 +28,10 @@
+ #define _PATH_PROCNET_NR_NODES		"/proc/net/nr_nodes"
+ #define _PATH_PROCNET_ARP		"/proc/net/arp"
+ #define _PATH_PROCNET_AX25		"/proc/net/ax25"
+-#define _PATH_PROCNET_IPX		"/proc/net/ipx"
+-#define _PATH_PROCNET_IPX_ROUTE		"/proc/net/ipx_route"
++#define _PATH_PROCNET_IPX_SOCKET1	"/proc/net/ipx/socket"
++#define _PATH_PROCNET_IPX_SOCKET2	"/proc/net/ipx"
++#define _PATH_PROCNET_IPX_ROUTE1	"/proc/net/ipx/route"
++#define _PATH_PROCNET_IPX_ROUTE2	"/proc/net/ipx_route"
+ #define _PATH_PROCNET_ATALK		"/proc/net/appletalk"
+ #define _PATH_PROCNET_IP_BLK		"/proc/net/ip_block"
+ #define _PATH_PROCNET_IP_FWD		"/proc/net/ip_forward"
+@@ -45,6 +46,7 @@
+ #define _PATH_PROCNET_X25              "/proc/net/x25"
+ #define _PATH_PROCNET_X25_ROUTE                "/proc/net/x25_routes"
+ #define _PATH_PROCNET_DEV_MCAST		"/proc/net/dev_mcast"
++#define _PATH_PROCNET_ATALK_ROUTE	"/proc/net/atalk_route"
+ 
+ /* pathname for the netlink device */
+ #define _PATH_DEV_ROUTE	"/dev/route"
+Index: net-tools/lib/proc.c
+===================================================================
+--- net-tools.orig/lib/proc.c
++++ net-tools/lib/proc.c
+@@ -1,11 +1,12 @@
+ /* Tolerant /proc file parser. Copyright 1998 Andi Kleen */
+-/* $Id: proc.c,v 1.4 1999/01/05 20:54:00 philip Exp $ */ 
++/* $Id: proc.c,v 1.5 2007/12/01 18:44:57 ecki Exp $ */ 
+ /* Fixme: cannot currently cope with removed fields */ 
+ 
+ #include <string.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <ctype.h>
++#include <unistd.h>
+ 
+ /* Caller must free return string. */
+ 
+@@ -72,3 +73,22 @@ int proc_guess_fmt(char *name, FILE *fh,
+     va_end(ap);
+     return flag;
+ }
++
++
++FILE *proc_fopen(const char *name)
++{
++    static char *buffer;
++    static size_t pagesz;
++    FILE *fd = fopen(name, "r");
++
++    if (fd == NULL)
++      return NULL;
++      
++    if (!buffer) {
++      pagesz = getpagesize();
++      buffer = malloc(pagesz);
++    }
++    
++    setvbuf(fd, buffer, _IOFBF, pagesz);
++    return fd;
++}
+Index: net-tools/lib/proc.h
+===================================================================
+--- net-tools.orig/lib/proc.h
++++ net-tools/lib/proc.h
+@@ -1,5 +1,7 @@
+-
+-
+-/* Generate a suitable scanf format for a column title line */
++/* 
++ * prototypes for proc.c
++ */
+ char *proc_gen_fmt(char *name, int more, FILE * fh,...);
+ int   proc_guess_fmt(char *name, FILE* fh,...);
++FILE *proc_fopen(const char *name);
++
+Index: net-tools/lib/tr.c
+===================================================================
+--- net-tools.orig/lib/tr.c
++++ net-tools/lib/tr.c
+@@ -2,7 +2,7 @@
+  * lib/tr.c   This file contains an implementation of the "Tokenring"
+  *              support functions.
+  *
+- * Version:     $Id: tr.c,v 1.8 2000/02/02 08:56:30 freitag Exp $
++ * Version:     $Id: tr.c,v 1.9 2005/05/16 03:15:12 ecki Exp $
+  *
+  * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+  *              Copyright 1993 MicroWalt Corporation
+@@ -30,8 +30,14 @@
+ #include "net-support.h"
+ #include "pathnames.h"
+ #include "intl.h"
++#include "util.h"
+ 
++
++/* actual definition at the end of file */
+ extern struct hwtype tr_hwtype;
++#ifdef ARPHRD_IEEE802_TR
++extern struct hwtype tr_hwtype1;
++#endif
+ 
+ static char *pr_tr(unsigned char *ptr)
+ {
+@@ -42,7 +48,7 @@ static char *pr_tr(unsigned char *ptr)
+ 	     (ptr[3] & 0377), (ptr[4] & 0377), (ptr[5] & 0377)
+ 	);
+     return (buff);
+-}
++      }
+ 
+ 
+ static int in_tr(char *bufp, struct sockaddr *sap)
+@@ -51,7 +57,17 @@ static int in_tr(char *bufp, struct sock
+     char c, *orig;
+     int i, val;
+ 
++#ifdef ARPHRD_IEEE802_TR
++    if (kernel_version() < KRELEASE(2,3,30)) { 
++        sap->sa_family = tr_hwtype.type;
++    } else { 
++        sap->sa_family = tr_hwtype1.type;
++    } 	
++#else
+     sap->sa_family = tr_hwtype.type;
++    #warning "Limited functionality, no support for ARPHRD_IEEE802_TR (old kernel headers?)"
++#endif
++
+     ptr = sap->sa_data;
+ 
+     i = 0;
+Index: net-tools/lib/util-ank.c
+===================================================================
+--- net-tools.orig/lib/util-ank.c
++++ net-tools/lib/util-ank.c
+@@ -293,7 +293,7 @@ int inet_addr_match(inet_prefix *a, inet
+ 	return 0;
+ }
+ 
+-const char *format_host(int af, void *addr, __u8 *abuf, int alen)
++const char *format_host(int af, void *addr, char *abuf, int alen)
+ {
+ #ifdef RESOLVE_HOSTNAMES
+ 	if (resolve_hosts) {
+Index: net-tools/lib/util.h
+===================================================================
+--- net-tools.orig/lib/util.h
++++ net-tools/lib/util.h
+@@ -14,3 +14,6 @@ int nstrcmp(const char *, const char *);
+ 
+ char *safe_strncpy(char *dst, const char *src, size_t size); 
+ 
++
++#define netmin(a,b) ((a)<(b) ? (a) : (b))
++#define netmax(a,b) ((a)>(b) ? (a) : (b))
+Index: net-tools/lib/x25_sr.c
+===================================================================
+--- net-tools.orig/lib/x25_sr.c
++++ net-tools/lib/x25_sr.c
+@@ -67,7 +67,7 @@ static int X25_setroute(int action, int 
+   strcpy(target, *args++);
+ 
+   /* Clean out the x25_route_struct structure. */
+-  memset((char *) &rt, 0, sizeof(struct x25_route_struct));
++  memset((char *) &rt, 0, sizeof(rt));
+ 
+ 
+   if ((sigdigits = x25_aftype.input(0, target, (struct sockaddr *)&sx25)) < 0) {
+@@ -76,8 +76,8 @@ static int X25_setroute(int action, int 
+   }
+   rt.sigdigits=sigdigits;
+ 
+-  /* x25_route_struct.address isn't type struct sockaddr_x25, Why? */
+-  memcpy(&rt.address, &sx25.sx25_addr, sizeof(x25_address));
++  /* this works with 2.4 and 2.6 headers struct x25_address vs. typedef */
++  memcpy(&rt.address, &sx25.sx25_addr, sizeof(sx25.sx25_addr));
+ 
+   while (*args) {
+ 	if (!strcmp(*args,"device") || !strcmp(*args,"dev")) {
+Index: net-tools/lib/eui64.c
+===================================================================
+--- /dev/null
++++ net-tools/lib/eui64.c
+@@ -0,0 +1,155 @@
++/*
++ * lib/eui64.c  This file contains support for generic EUI-64 hw addressing
++ *
++ * Version:     $Id: eui64.c,v 1.1 2001/11/12 02:12:05 ecki Exp $
++ *
++ * Author:      Daniel Stodden <stodden@in.tum.de>
++ *              Copyright 2001 Daniel Stodden
++ *
++ *              blueprinted from ether.c 
++ *              Copyright 1993 MicroWalt Corporation
++ *
++ *              This program is free software; you can redistribute it
++ *              and/or  modify it under  the terms of  the GNU General
++ *              Public  License as  published  by  the  Free  Software
++ *              Foundation;  either  version 2 of the License, or  (at
++ *              your option) any later version.
++ */
++#include "config.h"
++
++#if HAVE_HWEUI64
++
++#include <sys/types.h>
++#include <sys/ioctl.h>
++#include <sys/socket.h>
++#include <net/if_arp.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <ctype.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <string.h>
++#include <termios.h>
++#include <unistd.h>
++#include "net-support.h"
++#include "pathnames.h"
++#include "intl.h"
++
++/*
++ * EUI-64 constants
++ */
++
++#define EUI64_ALEN	8
++
++#ifndef ARPHRD_EUI64
++#define ARPHRD_EUI64	27
++#warning "ARPHRD_EUI64 not defined in <net/if_arp.h>. Using private value 27"
++#endif
++
++struct hwtype eui64_hwtype;
++
++/* Display an EUI-64 address in readable format. */
++static char *pr_eui64( unsigned char *ptr )
++{
++	static char buff[64];
++
++	snprintf(buff, sizeof(buff), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
++		 (ptr[0] & 0377), (ptr[1] & 0377), (ptr[2] & 0377), (ptr[3] & 0377), 
++		 (ptr[4] & 0377), (ptr[5] & 0377), (ptr[6] & 0377), (ptr[7] & 0377)
++		);
++	return (buff);
++}
++
++/* Start the PPP encapsulation on the file descriptor. */
++static int in_eui64( char *bufp, struct sockaddr *sap )
++{
++	unsigned char *ptr;
++	char c, *orig;
++	int i;
++	unsigned val;
++
++	sap->sa_family = eui64_hwtype.type;
++	ptr = sap->sa_data;
++
++	i = 0;
++	orig = bufp;
++	
++	while ((*bufp != '\0') && (i < EUI64_ALEN)) {
++		val = 0;
++		c = *bufp++;
++		if (isdigit(c))
++			val = c - '0';
++		else if (c >= 'a' && c <= 'f')
++			val = c - 'a' + 10;
++		else if (c >= 'A' && c <= 'F')
++			val = c - 'A' + 10;
++		else {
++#ifdef DEBUG
++			fprintf( stderr, _("in_eui64(%s): invalid eui64 address!\n"), 
++				 orig );
++#endif
++			errno = EINVAL;
++			return (-1);
++		}
++
++		val <<= 4;
++		c = *bufp;
++		if (isdigit(c))
++			val |= c - '0';
++		else if (c >= 'a' && c <= 'f')
++			val |= c - 'a' + 10;
++		else if (c >= 'A' && c <= 'F')
++			val |= c - 'A' + 10;
++		else if (c == ':' || c == 0)
++			val >>= 4;
++		else {
++#ifdef DEBUG
++			fprintf( stderr, _("in_eui64(%s): invalid eui64 address!\n"), 
++				 orig );
++#endif
++			errno = EINVAL;
++			return (-1);
++		}
++
++		if (c != 0)
++			bufp++;
++
++		*ptr++ = (unsigned char) (val & 0377);
++		i++;
++		
++		/* We might get a semicolon here - not required. */
++		if (*bufp == ':') {
++			if (i == EUI64_ALEN) {
++#ifdef DEBUG
++				fprintf(stderr, _("in_eui64(%s): trailing : ignored!\n"),
++					orig)
++#endif
++					; /* nothing */
++			}
++			bufp++;
++		}
++	}
++
++	/* That's it.  Any trailing junk? */
++	if ((i == EUI64_ALEN) && (*bufp != '\0')) {
++#ifdef DEBUG
++		fprintf(stderr, _("in_eui64(%s): trailing junk!\n"), orig);
++		errno = EINVAL;
++		return (-1);
++#endif
++	}
++#ifdef DEBUG
++	fprintf(stderr, "in_eui64(%s): %s\n", orig, pr_eui64(sap->sa_data));
++#endif
++
++    return (0);
++}
++
++struct hwtype eui64_hwtype =
++{
++	"eui64", NULL, /*"EUI-64 addressing", */ ARPHRD_EUI64, EUI64_ALEN,
++	pr_eui64, in_eui64, NULL, 0
++};
++
++
++#endif				/* HAVE_EUI64 */
+Index: net-tools/lib/ib.c
+===================================================================
+--- /dev/null
++++ net-tools/lib/ib.c
+@@ -0,0 +1,147 @@
++/*
++ * lib/ib.c        This file contains an implementation of the "Infiniband"
++ *              support functions.
++ *
++ * Version:     $Id: ib.c,v 1.1 2005/02/06 11:00:47 tduffy Exp $
++ *
++ * Author:      Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
++ *              Copyright 1993 MicroWalt Corporation
++ *		Tom Duffy <tduffy@sun.com>
++ *
++ *              This program is free software; you can redistribute it
++ *              and/or  modify it under  the terms of  the GNU General
++ *              Public  License as  published  by  the  Free  Software
++ *              Foundation;  either  version 2 of the License, or  (at
++ *              your option) any later version.
++ */
++#include "config.h"
++
++#if HAVE_HWIB
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <net/if_arp.h>
++#include <linux/if_infiniband.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <errno.h>
++#include <ctype.h>
++#include <string.h>
++#include <unistd.h>
++#include "net-support.h"
++#include "pathnames.h"
++#include "intl.h"
++#include "util.h"
++
++extern struct hwtype ib_hwtype;
++
++
++/* Display an InfiniBand address in readable format. */
++static char *pr_ib(unsigned char *ptr)
++{
++    static char buff[128];
++    char *pos;
++    unsigned int i;
++
++    pos = buff;
++    for (i = 0; i < INFINIBAND_ALEN; i++) {
++	pos += sprintf(pos, "%02X:", (*ptr++ & 0377));
++    }
++    buff[strlen(buff) - 1] = '\0';
++
++    /* snprintf(buff, sizeof(buff), "%02X:%02X:%02X:%02X:%02X:%02X",
++	     (ptr[0] & 0377), (ptr[1] & 0377), (ptr[2] & 0377),
++	     (ptr[3] & 0377), (ptr[4] & 0377), (ptr[5] & 0377)
++	);
++    */
++    return (buff);
++}
++
++
++/* Input an Infiniband address and convert to binary. */
++static int in_ib(char *bufp, struct sockaddr *sap)
++{
++    unsigned char *ptr;
++    char c, *orig;
++    int i;
++    unsigned val;
++
++    sap->sa_family = ib_hwtype.type;
++    ptr = sap->sa_data;
++
++    i = 0;
++    orig = bufp;
++    while ((*bufp != '\0') && (i < INFINIBAND_ALEN)) {
++	val = 0;
++	c = *bufp++;
++	if (isdigit(c))
++	    val = c - '0';
++	else if (c >= 'a' && c <= 'f')
++	    val = c - 'a' + 10;
++	else if (c >= 'A' && c <= 'F')
++	    val = c - 'A' + 10;
++	else {
++#ifdef DEBUG
++	    fprintf(stderr, _("in_ib(%s): invalid infiniband address!\n"), orig);
++#endif
++	    errno = EINVAL;
++	    return (-1);
++	}
++	val <<= 4;
++	c = *bufp;
++	if (isdigit(c))
++	    val |= c - '0';
++	else if (c >= 'a' && c <= 'f')
++	    val |= c - 'a' + 10;
++	else if (c >= 'A' && c <= 'F')
++	    val |= c - 'A' + 10;
++	else if (c == ':' || c == 0)
++	    val >>= 4;
++	else {
++#ifdef DEBUG
++	    fprintf(stderr, _("in_ib(%s): invalid infiniband address!\n"), orig);
++#endif
++	    errno = EINVAL;
++	    return (-1);
++	}
++	if (c != 0)
++	    bufp++;
++	*ptr++ = (unsigned char) (val & 0377);
++	i++;
++
++	/* We might get a semicolon here - not required. */
++	if (*bufp == ':') {
++	    if (i == INFINIBAND_ALEN) {
++#ifdef DEBUG
++		fprintf(stderr, _("in_ib(%s): trailing : ignored!\n"),
++			orig)
++#endif
++		    ;		/* nothing */
++	    }
++	    bufp++;
++	}
++    }
++
++    /* That's it.  Any trailing junk? */
++    if ((i == INFINIBAND_ALEN) && (*bufp != '\0')) {
++#ifdef DEBUG
++	fprintf(stderr, _("in_ib(%s): trailing junk!\n"), orig);
++	errno = EINVAL;
++	return (-1);
++#endif
++    }
++#ifdef DEBUG
++    fprintf(stderr, "in_ib(%s): %s\n", orig, pr_ib(sap->sa_data));
++#endif
++
++    return (0);
++}
++
++
++struct hwtype ib_hwtype =
++{
++    "infiniband", NULL, ARPHRD_INFINIBAND, INFINIBAND_ALEN,
++    pr_ib, in_ib, NULL
++};
++
++
++#endif				/* HAVE_HWIB */

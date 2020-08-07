@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "golang-crypto-eb71ad9bd329b5ac0fd0148dd99bd62e8be8e035.zip": "831c3f55bb9e043a07a50b183c8bbdefed361c540f4d51fbc003522cdc46c1e0",
+  "golang-sys-07c182904dbd53199946ba614a412c61d3c548f5.zip": "3be56632d092bec2ae24fea024fbf24c5bc02cc25fc1c6104678f7e4ee5cc84c",
+  "logrus-1.0.3.tar.gz": "c1a29d4e1cd0af9ca75e6258eaac720b18c366c7e32502900494f9a77dfd9cb0",
+  "runc-v1.0.0-rc8.tar.gz": "efe4ff9bbe49b19074346d65c914d809c0a3e90d062ea9619fe240f931f0b700",
+  "runtime-spec-1.0.0.tar.gz": "857c0f6128deec6453994abb776d4e937b34b174954718f989375d3fc08db6c5",
+  "urfave-cli-1.19.1.tar.gz": "2b026d3d9e4caad3dd403139c5daada848494f36e5d46ddfb3e3a7f8466d0c96"
+ }
+}

@@ -1,0 +1,11 @@
+--- a/src/twisted/python/test/test_setup.py	2018-09-13 19:23:17.219592749 +0530
++++ b/src/twisted/python/test/test_setup.py	2018-09-13 19:25:02.451597309 +0530
+@@ -92,7 +92,7 @@ class OptionalDependenciesTests(TestCase
+         The extras need to be parsed with pkg_resources.parse_requirements(),
+         which returns a generator.
+         """
+-        extras = dict(im_an_extra_dependency="thing")
++        extras = dict(im_an_extra_dependency=["thing"])
+         attrs = dict(extras_require=extras)
+         distribution = Distribution(attrs)
+ 

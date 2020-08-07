@@ -1,0 +1,37 @@
+From 650995585fc01b732e1cb61686cce11b53b9104c Mon Sep 17 00:00:00 2001
+From: Alexey Makhalov <amakhalov@vmware.com>
+Date: Fri, 25 Jan 2019 23:41:12 +0000
+Subject: [PATCH] efinet: do not start EFI networking at module init time
+
+Do it at NIC configuration time instead.
+
+It will allow us to have networking disabled at Linux boot time
+to workaround NXP ls1012a frwy PFE reset issue.
+---
+ grub-core/net/drivers/efi/efinet.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 5388f95..5849f23 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -331,6 +331,8 @@ grub_efi_net_config_real (grub_efi_handle_t hnd, char **device,
+   struct grub_net_card *card;
+   grub_efi_device_path_t *dp;
+ 
++  grub_efinet_findcards ();
++
+   dp = grub_efi_get_device_path (hnd);
+   if (! dp)
+     return;
+@@ -389,7 +391,6 @@ grub_efi_net_config_real (grub_efi_handle_t hnd, char **device,
+ 
+ GRUB_MOD_INIT(efinet)
+ {
+-  grub_efinet_findcards ();
+   grub_efi_net_config = grub_efi_net_config_real;
+ }
+ 
+-- 
+2.19.0
+

@@ -1,0 +1,34 @@
+# This file is for rpm macro overrides that modify the behavior of the build.
+# It gets copied into /usr/lib/rpm/macros.d in toolchain and main package builds.
+# It can be used to configure the scriptlets in macros.check in mariner-rpm-macros.
+
+# IMPORTANT: Hyphens (-) must be replaced with underscores (_) in spec names for these
+# macro definitions as hyphens are illegal characters for macro names.
+
+# This list of skip_check_%{name} entries will cause %check to return immediately
+# on the specified spec.
+
+%skip_check_libsoup 1
+%skip_check_ant 1
+%skip_check_python_lxml 1
+%skip_check_socat 1
+
+# Check hangs
+%skip_check_glibc 1
+%skip_check_python2 1
+%skip_check_bash 1
+%skip_check_gtk_doc 1
+
+# Chmods /dev/null to 600 breaking many non-root applications.
+%skip_check_zstd 1
+
+# Still fails package build when it fails
+%skip_check_gcc 1
+
+# Uncommenting "%select_check 1" will force %check to only run in specs
+#  that have  select_check_%{name} defined below.
+#%select_check 1
+
+# Example macros to select specs to run check
+%select_check_bc 1
+%select_check_zsh 1

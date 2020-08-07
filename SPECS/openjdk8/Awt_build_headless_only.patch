@@ -1,0 +1,12 @@
+--- a/jdk/make/lib/Awt2dLibraries.gmk	2017-07-06 14:04:55.841781250 -0700
++++ b/jdk/make/lib/Awt2dLibraries.gmk	2017-07-06 14:11:37.242683732 -0700
+@@ -1092,8 +1092,6 @@
+ 
+ endif # OPENJDK_TARGET_OS
+ 
+-BUILD_LIBRARIES += $(BUILD_LIBJAWT)
+-
+ ##########################################################################################
+ 
+ ifndef OPENJDK
+

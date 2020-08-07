@@ -1,0 +1,15 @@
+diff -up qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_WORDSIZE qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp
+--- qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_WORDSIZE	2016-12-01 02:17:04.000000000 -0600
++++ qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp	2016-12-08 12:37:28.931589338 -0600
+@@ -179,6 +179,11 @@ int runMoc(int argc, char **argv)
+     Moc moc;
+     pp.macros["Q_MOC_RUN"];
+     pp.macros["__cplusplus"];
++    pp.macros["_SYS_SYSMACROS_H_OUTER"];
++    Macro macro;
++    macro.symbols = Preprocessor::tokenize(QByteArray::number(Q_PROCESSOR_WORDSIZE*8), 1, Preprocessor::TokenizeDefine);
++    macro.symbols.removeLast(); // remove the EOF symbol
++    pp.macros.insert("__WORDSIZE", macro);
+ 
+     // Don't stumble over GCC extensions
+     Macro dummyVariadicFunctionMacro;

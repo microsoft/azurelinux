@@ -1,0 +1,87 @@
+From eba569a8e6c33f07042758cbfa1706d7339464e1 Mon Sep 17 00:00:00 2001
+From: Gary Lin <glin@suse.com>
+Date: Wed, 13 Jan 2016 16:05:21 +0800
+Subject: [PATCH 5/7] Make all efi_guid_t const
+
+All UEFI GUIDs defined in efivar are const. Declare all of them const
+to make gcc happy.
+
+Signed-off-by: Gary Lin <glin@suse.com>
+---
+ src/mokutil.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index 1fb34f9..d2c52b4 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -200,7 +200,7 @@ efichar_from_char (efi_char16_t *dest, const char *src, size_t dest_len)
+ }
+ 
+ static uint32_t
+-efi_hash_size (efi_guid_t *hash_type)
++efi_hash_size (const efi_guid_t *hash_type)
+ {
+ 	if (efi_guid_cmp (hash_type, &efi_guid_sha1) == 0) {
+ 		return SHA_DIGEST_LENGTH;
+@@ -218,7 +218,7 @@ efi_hash_size (efi_guid_t *hash_type)
+ }
+ 
+ static uint32_t
+-signature_size (efi_guid_t *hash_type)
++signature_size (const efi_guid_t *hash_type)
+ {
+ 	uint32_t hash_size;
+ 
+@@ -439,7 +439,7 @@ list_keys (uint8_t *data, size_t data_size)
+ 
+ /* match the hash in the hash array and return the index if matched */
+ static int
+-match_hash_array (efi_guid_t *hash_type, const void *hash,
++match_hash_array (const efi_guid_t *hash_type, const void *hash,
+ 		  const void *hash_array, const uint32_t array_size)
+ {
+ 	uint32_t hash_size, hash_count;
+@@ -469,8 +469,8 @@ match_hash_array (efi_guid_t *hash_type, const void *hash,
+ }
+ 
+ static int
+-delete_data_from_list (efi_guid_t *var_guid, const char *var_name,
+-		       efi_guid_t *type, void *data, uint32_t data_size)
++delete_data_from_list (const efi_guid_t *var_guid, const char *var_name,
++		       const efi_guid_t *type, void *data, uint32_t data_size)
+ {
+ 	uint8_t *var_data = NULL;
+ 	size_t var_data_size = 0;
+@@ -1006,8 +1006,8 @@ is_valid_cert (void *cert, uint32_t cert_size)
+ }
+ 
+ static int
+-is_duplicate (efi_guid_t *type, const void *data, const uint32_t data_size,
+-	      efi_guid_t *vendor, const char *db_name)
++is_duplicate (const efi_guid_t *type, const void *data, const uint32_t data_size,
++	      const efi_guid_t *vendor, const char *db_name)
+ {
+ 	uint8_t *var_data;
+ 	size_t var_data_size;
+@@ -1059,7 +1059,7 @@ done:
+ }
+ 
+ static int
+-is_valid_request (efi_guid_t *type, void *mok, uint32_t mok_size,
++is_valid_request (const efi_guid_t *type, void *mok, uint32_t mok_size,
+ 		  MokRequest req)
+ {
+ 	switch (req) {
+@@ -1096,7 +1096,7 @@ is_valid_request (efi_guid_t *type, void *mok, uint32_t mok_size,
+ }
+ 
+ static int
+-in_pending_request (efi_guid_t *type, void *data, uint32_t data_size,
++in_pending_request (const efi_guid_t *type, void *data, uint32_t data_size,
+ 		    MokRequest req)
+ {
+ 	uint8_t *authvar_data;
+-- 
+2.7.4
+

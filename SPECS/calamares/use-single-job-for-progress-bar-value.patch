@@ -1,0 +1,16 @@
+diff --git a/src/libcalamares/JobQueue.cpp b/src/libcalamares/JobQueue.cpp
+index 3a76aa099..896befa4c 100644
+--- a/src/libcalamares/JobQueue.cpp
++++ b/src/libcalamares/JobQueue.cpp
+@@ -101,10 +101,8 @@ private:
+             ? m_jobs.at( m_jobIndex )->prettyStatusMessage()
+             : tr( "Done" );
+ 
+-        qreal percent = ( m_jobIndex + jobPercent ) / qreal( jobCount );
+-
+         QMetaObject::invokeMethod( m_queue, "progress", Qt::QueuedConnection,
+-            Q_ARG( qreal, percent ),
++            Q_ARG( qreal, jobPercent ),
+             Q_ARG( QString, message )
+         );
+     }

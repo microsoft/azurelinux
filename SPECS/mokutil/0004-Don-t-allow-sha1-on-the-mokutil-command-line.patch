@@ -1,0 +1,32 @@
+From ecc8fb0d92f0f453414a98172df22e23fb5893f5 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Jun 2015 17:06:30 -0400
+Subject: [PATCH 4/7] Don't allow sha1 on the mokutil command line.
+
+Related: rhbz#1115843
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/mokutil.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index a7e83f7..1fb34f9 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -1351,10 +1351,12 @@ identify_hash_type (const char *hash_str, efi_guid_t *type)
+ 	}
+ 
+ 	switch (len) {
++#if 0
+ 	case SHA_DIGEST_LENGTH*2:
+ 		*type = efi_guid_sha1;
+ 		hash_size = SHA_DIGEST_LENGTH;
+ 		break;
++#endif
+ 	case SHA224_DIGEST_LENGTH*2:
+ 		*type = efi_guid_sha224;
+ 		hash_size = SHA224_DIGEST_LENGTH;
+-- 
+2.7.4
+

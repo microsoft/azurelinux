@@ -1,0 +1,23 @@
+diff -up dialog-1.1-20110707/dialog-config.in.incdir dialog-1.1-20110707/dialog-config.in
+--- dialog-1.1-20110707/dialog-config.in.incdir	2011-01-06 10:38:03.000000000 +0100
++++ dialog-1.1-20110707/dialog-config.in	2011-07-26 13:00:02.692038027 +0200
+@@ -35,6 +35,7 @@ bindir="@bindir@"
+ libdir="@libdir@"
+ datadir="@datadir@"
+ mandir="@mandir@"
++includedir="@includedir@"
+ 
+ THIS="@PACKAGE@"
+ 
+@@ -67,10 +68,7 @@ while test $# -gt 0; do
+ 		;;
+ 	# compile/link
+ 	--cflags)
+-		INCS=
+-		if test "${prefix}/include" != /usr/include ; then
+-			INCS="-I${prefix}/include"
+-		fi
++		INCS="-I$includedir"
+ 		sed -e 's,^[ ]*,,' -e 's, [ ]*, ,g' -e 's,[ ]*$,,' <<-ENDECHO
+ 			$INCS
+ ENDECHO

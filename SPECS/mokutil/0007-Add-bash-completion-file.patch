@@ -1,0 +1,98 @@
+From d16c76d139f9a9a56b49c0dd51cd9056f626031e Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 14 Jun 2016 10:20:14 -0400
+Subject: [PATCH 7/7] Add bash completion file.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ Makefile.am  |  5 +++++
+ configure.ac | 17 +++++++++++++++++
+ data/mokutil | 37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
+ create mode 100755 data/mokutil
+
+diff --git a/Makefile.am b/Makefile.am
+index 9f0d419..c17cc4a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1 +1,6 @@
+ SUBDIRS = src man
++
++if ENABLE_BASH_COMPLETION
++  bashcompletiondir = $(BASH_COMPLETION_DIR)
++  dist_bashcompletion_DATA = data/mokutil
++endif
+diff --git a/configure.ac b/configure.ac
+index 69d412a..7b52a06 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -86,6 +86,23 @@ AC_CHECK_FUNCS([memset])
+ PKG_CHECK_MODULES(OPENSSL, [openssl >= 0.9.8])
+ PKG_CHECK_MODULES(EFIVAR, [efivar >= 0.12])
+ 
++AC_ARG_WITH([bash-completion-dir],
++    AS_HELP_STRING([--with-bash-completion-dir[=PATH]],
++        [Install the bash auto-completion script in this directory. @<:@default=yes@:>@]),
++    [],
++    [with_bash_completion_dir=yes])
++
++if test "x$with_bash_completion_dir" = "xyes"; then
++    PKG_CHECK_MODULES([BASH_COMPLETION], [bash-completion >= 2.0],
++        [BASH_COMPLETION_DIR="`pkg-config --variable=completionsdir bash-completion`"],
++        [BASH_COMPLETION_DIR="$datadir/bash-completion/completions"])
++else
++    BASH_COMPLETION_DIR="$with_bash_completion_dir"
++fi
++
++AC_SUBST([BASH_COMPLETION_DIR])
++AM_CONDITIONAL([ENABLE_BASH_COMPLETION],[test "x$with_bash_completion_dir" != "xno"])
++
+ AC_CONFIG_FILES([Makefile
+                  src/Makefile
+ 		 man/Makefile])
+diff --git a/data/mokutil b/data/mokutil
+new file mode 100755
+index 0000000..800b039
+--- /dev/null
++++ b/data/mokutil
+@@ -0,0 +1,37 @@
++#!/bin/bash
++
++_mokutil()
++{
++	local cur=${COMP_WORDS[COMP_CWORD]}
++
++	if [[ "$cur" == -* ]]; then
++		#COMPREPLY=( $( compgen -W "--help --list-enrolled --list-new --list-delete --import --delete --revoke-import --revoke-delete --export --password --clear-password --disable-validation --enable-validation --sb-state --test-key --reset --generate-hash --hash-file --root-pw --simple-hash" -- $cur ) )
++		COMPREPLY=( $( compgen -W '$( _parse_help "$1" --long-help ) -h -l -N -D -i -d -x -p -c -t -f -g -P -s -X' -- "$cur" ) )
++		[[ $COMPREPLY == *= ]] && compopt -o nospace
++		return 0
++	fi
++
++	case "${COMP_WORDS[COMP_CWORD-1]}" in
++	--import|-i|--delete|-d|--test-key|-t|--hash-file|-f)
++		_filedir
++		return 0
++		;;
++	--import-hash|--delete-hash)
++		COMPREPLY=( $( compgen -W "" ) )
++		return 0
++		;;
++	--set-verbosity)
++		COMPREPLY=( $( compgen -W "true false") )
++		return 0
++		;;
++	--generate-hash|-g)
++		COMPREPLY=( $( compgen -o nospace -P= -W "") )
++		return 0
++		;;
++	*)
++		return 0
++		;;
++	esac
++}
++
++complete -F _mokutil mokutil
+-- 
+2.7.4
+

@@ -1,0 +1,40 @@
+From 62bab9d121d4fb416205f5ac53ad342184ae42b6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Tue, 8 Dec 2015 16:53:41 +0100
+Subject: [PATCH 2/6] api.c: fix infinite loop
+
+If getgrnam or getpwuid functions failed, the program entered
+an infinite loop, because the rule pointer was never advanced.
+This is now fixed by updating the pointer before continuing
+to the next iteration.
+---
+ src/api.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/api.c b/src/api.c
+index df90a6f..217d6c9 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -2664,13 +2664,17 @@ static struct cgroup_rule *cgroup_find_matching_rule_uid_gid(uid_t uid,
+ 			/* Get the group data. */
+ 			sp = &(rule->username[1]);
+ 			grp = getgrnam(sp);
+-			if (!grp)
++			if (!grp) {
++				rule = rule->next;
+ 				continue;
++			}
+ 
+ 			/* Get the data for UID. */
+ 			usr = getpwuid(uid);
+-			if (!usr)
++			if (!usr) {
++				rule = rule->next;
+ 				continue;
++			}
+ 
+ 			/* If UID is a member of group, we matched. */
+ 			for (i = 0; grp->gr_mem[i]; i++) {
+-- 
+2.17.0
+

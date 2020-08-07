@@ -1,0 +1,4 @@
+#
+# Optional arguments passed to rpcbind. See rpcbind(8)
+RPCBIND_OPTIONS=""
+

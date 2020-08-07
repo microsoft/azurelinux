@@ -1,0 +1,963 @@
+From 6057bd5bd318905300c6f8b577144287c328faa8 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 21 Feb 2020 16:39:33 -0500
+Subject: [PATCH] misc: Make grub_strtol() "end" pointers have safer const
+ qualifiers
+
+Currently the string functions grub_strtol(), grub_strtoul(), and
+grub_strtoull() don't declare the "end" pointer in such a way as to
+require the pointer itself or the character array to be immutable to the
+implementation, nor does the C standard do so in its similar functions,
+though it does require us not to change any of it.
+
+The typical declarations of these functions follow this pattern:
+
+long
+strtol(const char * restrict nptr, char ** restrict endptr, int base);
+
+Much of the reason for this is historic, and a discussion of that
+follows below, after the explanation of this change.  (GRUB currently
+does not include the "restrict" qualifiers, and we name the arguments a
+bit differently.)
+
+The implementation is semantically required to treat the character array
+as immutable, but such accidental modifications aren't stopped by the
+compiler, and the semantics for both the callers and the implementation
+of these functions are sometimes also helped by adding that requirement.
+
+This patch changes these declarations to follow this pattern instead:
+
+long
+strtol(const char * restrict nptr,
+       const char ** const restrict endptr,
+       int base);
+
+This means that if any modification to these functions accidentally
+introduces either an errant modification to the underlying character
+array, or an accidental assignment to endptr rather than *endptr, the
+compiler should generate an error.  (The two uses of "restrict" in this
+case basically mean strtol() isn't allowed to modify the character array
+by going through *endptr, and endptr isn't allowed to point inside the
+array.)
+
+It also means the typical use case changes to:
+
+  char *s = ...;
+  const char *end;
+  long l;
+
+  l = strtol(s, &end, 10);
+
+Or even:
+
+  const char *p = str;
+  while (p && *p) {
+	  long l = strtol(p, &p, 10);
+	  ...
+  }
+
+This fixes 26 places where we discard our attempts at treating the data
+safely by doing:
+
+  const char *p = str;
+  long l;
+
+  l = strtol(p, (char **)&ptr, 10);
+
+It also adds 5 places where we do:
+
+  char *p = str;
+  while (p && *p) {
+	  long l = strtol(p, (const char ** const)&p, 10);
+	  ...
+	  /* more calls that need p not to be pointer-to-const */
+  }
+
+While moderately distasteful, this is a better problem to have.
+
+With one minor exception, I have tested that all of this compiles
+without relevant warnings or errors, and that /much/ of it behaves
+correctly, with gcc 9 using 'gcc -W -Wall -Wextra'.  The one exception
+is the changes in grub-core/osdep/aros/hostdisk.c , which I have no idea
+how to build.
+
+Because the C standard defined type-qualifiers in a way that can be
+confusing, in the past there's been a slow but fairly regular stream of
+churn within our patches, which add and remove the const qualifier in many
+of the users of these functions.  This change should help avoid that in
+the future, and in order to help ensure this, I've added an explanation
+in misc.h so that when someone does get a compiler warning about a type
+error, they have the fix at hand.
+
+The reason we don't have "const" in these calls in the standard is
+purely anachronistic: C78 (de facto) did not have type qualifiers in the
+syntax, and the "const" type qualifier was added for C89 (I think; it
+may have been later).  strtol() appears to date from 4.3BSD in 1986,
+which means it could not be added to those functions in the standard
+without breaking compatibility, which is usually avoided.
+
+The syntax chosen for type qualifiers is what has led to the churn
+regarding usage of const, and is especially confusing on string
+functions due to the lack of a string type.  Quoting from C99, the
+syntax is:
+
+ declarator:
+  pointer[opt] direct-declarator
+ direct-declarator:
+  identifier
+  ( declarator )
+  direct-declarator [ type-qualifier-list[opt] assignment-expression[opt] ]
+  ...
+  direct-declarator [ type-qualifier-list[opt] * ]
+  ...
+ pointer:
+  * type-qualifier-list[opt]
+  * type-qualifier-list[opt] pointer
+ type-qualifier-list:
+  type-qualifier
+  type-qualifier-list type-qualifier
+ ...
+ type-qualifier:
+  const
+  restrict
+  volatile
+
+So the examples go like:
+
+const char foo;			// immutable object
+const char *foo;		// mutable pointer to object
+char * const foo;		// immutable pointer to mutable object
+const char * const foo;		// immutable pointer to immutable object
+const char const * const foo; 	// XXX extra const keyword in the middle
+const char * const * const foo; // immutable pointer to immutable
+				//   pointer to immutable object
+const char ** const foo;	// immutable pointer to mutable pointer
+				//   to immutable object
+
+Making const left-associative for * and right-associative for everything
+else may not have been the best choice ever, but here we are, and the
+inevitable result is people using trying to use const (as they should!),
+putting it at the wrong place, fighting with the compiler for a bit, and
+then either removing it or typecasting something in a bad way.  I won't
+go into describing restrict, but its syntax has exactly the same issue
+as with const.
+
+Anyway, the last example above actually represents the *behavior* that's
+required of strtol()-like functions, so that's our choice for the "end"
+pointer.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/date.c                 |  3 ++-
+ grub-core/commands/i386/cmostest.c        |  2 +-
+ grub-core/commands/i386/pc/play.c         |  2 +-
+ grub-core/commands/password_pbkdf2.c      |  2 +-
+ grub-core/commands/pcidump.c              | 13 ++++++------
+ grub-core/commands/regexp.c               |  2 +-
+ grub-core/commands/setpci.c               | 21 ++++++++++----------
+ grub-core/commands/test.c                 |  2 +-
+ grub-core/commands/videoinfo.c            |  2 +-
+ grub-core/disk/diskfilter.c               |  3 ++-
+ grub-core/disk/lvm.c                      |  9 +++++----
+ grub-core/efiemu/pnvram.c                 |  5 +++--
+ grub-core/gfxmenu/gui_circular_progress.c |  2 +-
+ grub-core/gfxmenu/theme_loader.c          |  2 +-
+ grub-core/kern/fs.c                       |  2 +-
+ grub-core/kern/misc.c                     | 10 ++++++----
+ grub-core/kern/partition.c                |  2 +-
+ grub-core/lib/arg.c                       |  2 +-
+ grub-core/lib/legacy_parse.c              |  2 +-
+ grub-core/lib/syslinux_parse.c            |  6 +++---
+ grub-core/loader/i386/bsd.c               |  6 +++---
+ grub-core/loader/i386/linux.c             |  2 +-
+ grub-core/loader/i386/pc/linux.c          |  2 +-
+ grub-core/loader/i386/xen_fileXX.c        |  2 +-
+ grub-core/mmap/mmap.c                     |  4 ++--
+ grub-core/net/http.c                      |  4 ++--
+ grub-core/net/net.c                       |  8 ++++----
+ grub-core/normal/menu.c                   |  3 +--
+ grub-core/osdep/aros/hostdisk.c           |  2 +-
+ grub-core/osdep/devmapper/hostdisk.c      |  2 +-
+ grub-core/script/execute.c                |  6 +++---
+ grub-core/term/serial.c                   |  2 +-
+ grub-core/term/terminfo.c                 |  2 +-
+ grub-core/tests/strtoull_test.c           |  2 +-
+ include/grub/misc.h                       | 24 ++++++++++++++++++++---
+ util/grub-fstest.c                        |  2 +-
+ 36 files changed, 94 insertions(+), 73 deletions(-)
+
+diff --git a/grub-core/commands/date.c b/grub-core/commands/date.c
+index 8e1f41f..5cb4faf 100644
+--- a/grub-core/commands/date.c
++++ b/grub-core/commands/date.c
+@@ -59,7 +59,8 @@ grub_cmd_date (grub_command_t cmd __attribute__ ((unused)),
+ 
+   for (; argc; argc--, args++)
+     {
+-      char *p, c;
++      const char *p;
++      char c;
+       int m1, ofs, n, cur_mask;
+ 
+       p = args[0];
+diff --git a/grub-core/commands/i386/cmostest.c b/grub-core/commands/i386/cmostest.c
+index c839b70..9f6b56a 100644
+--- a/grub-core/commands/i386/cmostest.c
++++ b/grub-core/commands/i386/cmostest.c
+@@ -27,7 +27,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ static grub_err_t
+ parse_args (int argc, char *argv[], int *byte, int *bit)
+ {
+-  char *rest;
++  const char *rest;
+ 
+   if (argc != 1)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, "address required");
+diff --git a/grub-core/commands/i386/pc/play.c b/grub-core/commands/i386/pc/play.c
+index 7712e2a..a2d8380 100644
+--- a/grub-core/commands/i386/pc/play.c
++++ b/grub-core/commands/i386/pc/play.c
+@@ -132,7 +132,7 @@ grub_cmd_play (grub_command_t cmd __attribute__ ((unused)),
+     }
+   else
+     {
+-      char *end;
++      const char *end;
+       unsigned tempo;
+       struct note note;
+       int i;
+diff --git a/grub-core/commands/password_pbkdf2.c b/grub-core/commands/password_pbkdf2.c
+index da636e6..ab845d2 100644
+--- a/grub-core/commands/password_pbkdf2.c
++++ b/grub-core/commands/password_pbkdf2.c
+@@ -86,7 +86,7 @@ grub_cmd_password (grub_command_t cmd __attribute__ ((unused)),
+ 		   int argc, char **args)
+ {
+   grub_err_t err;
+-  char *ptr, *ptr2;
++  const char *ptr, *ptr2;
+   grub_uint8_t *ptro;
+   struct pbkdf2_password *pass;
+ 
+diff --git a/grub-core/commands/pcidump.c b/grub-core/commands/pcidump.c
+index f99ad4a..f72628f 100644
+--- a/grub-core/commands/pcidump.c
++++ b/grub-core/commands/pcidump.c
+@@ -95,7 +95,7 @@ grub_cmd_pcidump (grub_extcmd_context_t ctxt,
+   if (ctxt->state[0].set)
+     {
+       ptr = ctxt->state[0].arg;
+-      ctx.pciid_check_value |= (grub_strtoul (ptr, (char **) &ptr, 16) & 0xffff);
++      ctx.pciid_check_value |= (grub_strtoul (ptr, &ptr, 16) & 0xffff);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -108,8 +108,7 @@ grub_cmd_pcidump (grub_extcmd_context_t ctxt,
+       if (*ptr != ':')
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("missing `%c' symbol"), ':');
+       ptr++;
+-      ctx.pciid_check_value |= (grub_strtoul (ptr, (char **) &ptr, 16) & 0xffff)
+-	<< 16;
++      ctx.pciid_check_value |= (grub_strtoul (ptr, &ptr, 16) & 0xffff) << 16;
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	grub_errno = GRUB_ERR_NONE;
+       else
+@@ -121,10 +120,10 @@ grub_cmd_pcidump (grub_extcmd_context_t ctxt,
+   if (ctxt->state[1].set)
+     {
+       const char *optr;
+-      
++
+       ptr = ctxt->state[1].arg;
+       optr = ptr;
+-      ctx.bus = grub_strtoul (ptr, (char **) &ptr, 16);
++      ctx.bus = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -138,7 +137,7 @@ grub_cmd_pcidump (grub_extcmd_context_t ctxt,
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("missing `%c' symbol"), ':');
+       ptr++;
+       optr = ptr;
+-      ctx.device = grub_strtoul (ptr, (char **) &ptr, 16);
++      ctx.device = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -149,7 +148,7 @@ grub_cmd_pcidump (grub_extcmd_context_t ctxt,
+       if (*ptr == '.')
+ 	{
+ 	  ptr++;
+-	  ctx.function = grub_strtoul (ptr, (char **) &ptr, 16);
++	  ctx.function = grub_strtoul (ptr, &ptr, 16);
+ 	  if (grub_errno)
+ 	    return grub_errno;
+ 	  ctx.check_function = 1;
+diff --git a/grub-core/commands/regexp.c b/grub-core/commands/regexp.c
+index 4019164..612003f 100644
+--- a/grub-core/commands/regexp.c
++++ b/grub-core/commands/regexp.c
+@@ -64,7 +64,7 @@ set_matches (char **varnames, char *str, grub_size_t nmatches,
+ {
+   int i;
+   char *p;
+-  char *q;
++  const char * q;
+   grub_err_t err;
+   unsigned long j;
+ 
+diff --git a/grub-core/commands/setpci.c b/grub-core/commands/setpci.c
+index d5bc97d..e966af0 100644
+--- a/grub-core/commands/setpci.c
++++ b/grub-core/commands/setpci.c
+@@ -169,7 +169,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+   if (ctxt->state[0].set)
+     {
+       ptr = ctxt->state[0].arg;
+-      pciid_check_value |= (grub_strtoul (ptr, (char **) &ptr, 16) & 0xffff);
++      pciid_check_value |= (grub_strtoul (ptr, &ptr, 16) & 0xffff);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -182,8 +182,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+       if (*ptr != ':')
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("missing `%c' symbol"), ':');
+       ptr++;
+-      pciid_check_value |= (grub_strtoul (ptr, (char **) &ptr, 16) & 0xffff)
+-	<< 16;
++      pciid_check_value |= (grub_strtoul (ptr, &ptr, 16) & 0xffff) << 16;
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	grub_errno = GRUB_ERR_NONE;
+       else
+@@ -197,10 +196,10 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+   if (ctxt->state[1].set)
+     {
+       const char *optr;
+-      
++
+       ptr = ctxt->state[1].arg;
+       optr = ptr;
+-      bus = grub_strtoul (ptr, (char **) &ptr, 16);
++      bus = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -214,7 +213,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("missing `%c' symbol"), ':');
+       ptr++;
+       optr = ptr;
+-      device = grub_strtoul (ptr, (char **) &ptr, 16);
++      device = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno == GRUB_ERR_BAD_NUMBER)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -225,7 +224,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+       if (*ptr == '.')
+ 	{
+ 	  ptr++;
+-	  function = grub_strtoul (ptr, (char **) &ptr, 16);
++	  function = grub_strtoul (ptr, &ptr, 16);
+ 	  if (grub_errno)
+ 	    return grub_errno;
+ 	  check_function = 1;
+@@ -253,7 +252,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+   if (i == ARRAY_SIZE (pci_registers))
+     {
+       regsize = 0;
+-      regaddr = grub_strtoul (ptr, (char **) &ptr, 16);
++      regaddr = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT, "unknown register");
+     }
+@@ -270,7 +269,7 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+   if (*ptr == '+')
+     {
+       ptr++;
+-      regaddr += grub_strtoul (ptr, (char **) &ptr, 16);
++      regaddr += grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	return grub_errno;
+     }
+@@ -302,14 +301,14 @@ grub_cmd_setpci (grub_extcmd_context_t ctxt, int argc, char **argv)
+   if (*ptr == '=')
+     {
+       ptr++;
+-      regwrite = grub_strtoul (ptr, (char **) &ptr, 16);
++      regwrite = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	return grub_errno;
+       write_mask = 0xffffffff;
+       if (*ptr == ':')
+ 	{
+ 	  ptr++;
+-	  write_mask = grub_strtoul (ptr, (char **) &ptr, 16);
++	  write_mask = grub_strtoul (ptr, &ptr, 16);
+ 	  if (grub_errno)
+ 	    return grub_errno;
+ 	  write_mask = 0xffffffff;
+diff --git a/grub-core/commands/test.c b/grub-core/commands/test.c
+index 5f06642..08bf9bf 100644
+--- a/grub-core/commands/test.c
++++ b/grub-core/commands/test.c
+@@ -31,7 +31,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ /* A simple implementation for signed numbers. */
+ static int
+-grub_strtosl (char *arg, char **end, int base)
++grub_strtosl (char *arg, const char ** const end, int base)
+ {
+   if (arg[0] == '-')
+     return -grub_strtoul (arg + 1, end, base);
+diff --git a/grub-core/commands/videoinfo.c b/grub-core/commands/videoinfo.c
+index 4be8107..016a4d8 100644
+--- a/grub-core/commands/videoinfo.c
++++ b/grub-core/commands/videoinfo.c
+@@ -136,7 +136,7 @@ grub_cmd_videoinfo (grub_command_t cmd __attribute__ ((unused)),
+   ctx.height = ctx.width = ctx.depth = 0;
+   if (argc)
+     {
+-      char *ptr;
++      const char *ptr;
+       ptr = args[0];
+       ctx.width = grub_strtoul (ptr, &ptr, 0);
+       if (grub_errno)
+diff --git a/grub-core/disk/diskfilter.c b/grub-core/disk/diskfilter.c
+index 2be0192..72449fa 100644
+--- a/grub-core/disk/diskfilter.c
++++ b/grub-core/disk/diskfilter.c
+@@ -969,7 +969,8 @@ grub_diskfilter_vg_register (struct grub_diskfilter_vg *vg)
+ 	    for (p = vgp->lvs; p; p = p->next)
+ 	      {
+ 		int cur_num;
+-		char *num, *end;
++		char *num;
++		const char *end;
+ 		if (!p->fullname)
+ 		  continue;
+ 		if (grub_strncmp (p->fullname, lv->fullname, len) != 0)
+diff --git a/grub-core/disk/lvm.c b/grub-core/disk/lvm.c
+index d1df640..8e76d1a 100644
+--- a/grub-core/disk/lvm.c
++++ b/grub-core/disk/lvm.c
+@@ -38,7 +38,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+    at the number.  In case STR is not found, *P will be NULL and the
+    return value will be 0.  */
+ static grub_uint64_t
+-grub_lvm_getvalue (char **p, const char *str)
++grub_lvm_getvalue (const char ** const p, const char *str)
+ {
+   *p = grub_strstr (*p, str);
+   if (! *p)
+@@ -63,12 +63,12 @@ grub_lvm_checkvalue (char **p, char *str, char *tmpl)
+ #endif
+ 
+ static int
+-grub_lvm_check_flag (char *p, const char *str, const char *flag)
++grub_lvm_check_flag (const char *p, const char *str, const char *flag)
+ {
+   grub_size_t len_str = grub_strlen (str), len_flag = grub_strlen (flag);
+   while (1)
+     {
+-      char *q;
++      const char *q;
+       p = grub_strstr (p, str);
+       if (! p)
+ 	return 0;
+@@ -105,7 +105,8 @@ grub_lvm_detect (grub_disk_t disk,
+   char buf[GRUB_LVM_LABEL_SIZE];
+   char vg_id[GRUB_LVM_ID_STRLEN+1];
+   char pv_id[GRUB_LVM_ID_STRLEN+1];
+-  char *metadatabuf, *p, *q, *vgname;
++  char *metadatabuf, *vgname;
++  const char *p, *q;
+   struct grub_lvm_label_header *lh = (struct grub_lvm_label_header *) buf;
+   struct grub_lvm_pv_header *pvh;
+   struct grub_lvm_disk_locn *dlocn;
+diff --git a/grub-core/efiemu/pnvram.c b/grub-core/efiemu/pnvram.c
+index c5c3d4b..dd42bc6 100644
+--- a/grub-core/efiemu/pnvram.c
++++ b/grub-core/efiemu/pnvram.c
+@@ -39,7 +39,7 @@ static grub_size_t nvramsize;
+ 
+ /* Parse signed value */
+ static int
+-grub_strtosl (const char *arg, char **end, int base)
++grub_strtosl (const char *arg, const char ** const end, int base)
+ {
+   if (arg[0] == '-')
+     return -grub_strtoul (arg + 1, end, base);
+@@ -120,7 +120,8 @@ nvram_set (void * data __attribute__ ((unused)))
+   grub_memset (nvram, 0, nvramsize);
+   FOR_SORTED_ENV (var)
+   {
+-    char *guid, *attr, *name, *varname;
++    const char *guid;
++    char *attr, *name, *varname;
+     struct efi_variable *efivar;
+     int len = 0;
+     int i;
+diff --git a/grub-core/gfxmenu/gui_circular_progress.c b/grub-core/gfxmenu/gui_circular_progress.c
+index 354dd7b..7578bfb 100644
+--- a/grub-core/gfxmenu/gui_circular_progress.c
++++ b/grub-core/gfxmenu/gui_circular_progress.c
+@@ -230,7 +230,7 @@ circprog_set_state (void *vself, int visible, int start,
+ static int
+ parse_angle (const char *value)
+ {
+-  char *ptr;
++  const char *ptr;
+   int angle;
+ 
+   angle = grub_strtol (value, &ptr, 10);
+diff --git a/grub-core/gfxmenu/theme_loader.c b/grub-core/gfxmenu/theme_loader.c
+index 0297839..4c7461f 100644
+--- a/grub-core/gfxmenu/theme_loader.c
++++ b/grub-core/gfxmenu/theme_loader.c
+@@ -484,7 +484,7 @@ parse_proportional_spec (const char *value, signed *abs, grub_fixed_signed_t *pr
+ 	  ptr++;
+ 	}
+ 
+-      num = grub_strtoul (ptr, (char **) &ptr, 0);
++      num = grub_strtoul (ptr, &ptr, 0);
+       if (grub_errno)
+ 	return grub_errno;
+       if (sig)
+diff --git a/grub-core/kern/fs.c b/grub-core/kern/fs.c
+index 23f4301..730d217 100644
+--- a/grub-core/kern/fs.c
++++ b/grub-core/kern/fs.c
+@@ -134,7 +134,7 @@ struct grub_fs_block
+ static grub_err_t
+ grub_fs_blocklist_open (grub_file_t file, const char *name)
+ {
+-  char *p = (char *) name;
++  const char *p = name;
+   unsigned num = 0;
+   unsigned i;
+   grub_disk_t disk = file->device->disk;
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index a7abd36..a9ce013 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -340,7 +340,8 @@ grub_isspace (int c)
+ }
+ 
+ unsigned long
+-grub_strtoul (const char *str, char **end, int base)
++grub_strtoul (const char * restrict str, const char ** const restrict end,
++	      int base)
+ {
+   unsigned long long num;
+ 
+@@ -357,7 +358,8 @@ grub_strtoul (const char *str, char **end, int base)
+ }
+ 
+ unsigned long long
+-grub_strtoull (const char *str, char **end, int base)
++grub_strtoull (const char * restrict str, const char ** const restrict end,
++	       int base)
+ {
+   unsigned long long num = 0;
+   int found = 0;
+@@ -853,14 +855,14 @@ grub_vsnprintf_real (char *str, grub_size_t max_len, const char *fmt0,
+ 	{
+ 	  if (fmt[0] == '0')
+ 	    zerofill = '0';
+-	  format1 = grub_strtoul (fmt, (char **) &fmt, 10);
++	  format1 = grub_strtoul (fmt, &fmt, 10);
+ 	}
+ 
+       if (*fmt == '.')
+ 	fmt++;
+ 
+       if (grub_isdigit (*fmt))
+-	format2 = grub_strtoul (fmt, (char **) &fmt, 10);
++	format2 = grub_strtoul (fmt, &fmt, 10);
+ 
+       if (*fmt == '$')
+ 	{
+diff --git a/grub-core/kern/partition.c b/grub-core/kern/partition.c
+index e499147..2c401b8 100644
+--- a/grub-core/kern/partition.c
++++ b/grub-core/kern/partition.c
+@@ -126,7 +126,7 @@ grub_partition_probe (struct grub_disk *disk, const char *str)
+       while (*ptr && grub_isalpha (*ptr))
+ 	ptr++;
+       partname_end = ptr; 
+-      num = grub_strtoul (ptr, (char **) &ptr, 0) - 1;
++      num = grub_strtoul (ptr, &ptr, 0) - 1;
+ 
+       curpart = 0;
+       /* Use the first partition map type found.  */
+diff --git a/grub-core/lib/arg.c b/grub-core/lib/arg.c
+index 3288609..8439a00 100644
+--- a/grub-core/lib/arg.c
++++ b/grub-core/lib/arg.c
+@@ -382,7 +382,7 @@ grub_arg_parse (grub_extcmd_t cmd, int argc, char **argv,
+ 
+ 	    case ARG_TYPE_INT:
+ 	      {
+-		char *tail;
++		const char * tail;
+ 
+ 		grub_strtoull (option, &tail, 0);
+ 		if (tail == 0 || tail == option || *tail != '\0' || grub_errno)
+diff --git a/grub-core/lib/legacy_parse.c b/grub-core/lib/legacy_parse.c
+index ef56150..05719ab 100644
+--- a/grub-core/lib/legacy_parse.c
++++ b/grub-core/lib/legacy_parse.c
+@@ -418,7 +418,7 @@ adjust_file (const char *in, grub_size_t len)
+     }
+   if (*comma != ',')
+     return grub_legacy_escape (in, len);
+-  part = grub_strtoull (comma + 1, (char **) &rest, 0);
++  part = grub_strtoull (comma + 1, &rest, 0);
+   if (rest[0] == ',' && rest[1] >= 'a' && rest[1] <= 'z')
+     {
+       subpart = rest[1] - 'a';
+diff --git a/grub-core/lib/syslinux_parse.c b/grub-core/lib/syslinux_parse.c
+index 28ba3ae..21ca040 100644
+--- a/grub-core/lib/syslinux_parse.c
++++ b/grub-core/lib/syslinux_parse.c
+@@ -1058,7 +1058,7 @@ write_entry (struct output_buffer *outbuf,
+ 		if (ptr[0] == 'h' && ptr[1] == 'd')
+ 		  {
+ 		    is_fd = 0;
+-		    devn = grub_strtoul (ptr + 2, &ptr, 0);
++		    devn = grub_strtoul (ptr + 2, (const char **)&ptr, 0);
+ 		    continue;
+ 		  }
+ 		if (grub_strncasecmp (ptr, "file=", 5) == 0)
+@@ -1082,12 +1082,12 @@ write_entry (struct output_buffer *outbuf,
+ 		if (ptr[0] == 'f' && ptr[1] == 'd')
+ 		  {
+ 		    is_fd = 1;
+-		    devn = grub_strtoul (ptr + 2, &ptr, 0);
++		    devn = grub_strtoul (ptr + 2, (const char **)&ptr, 0);
+ 		    continue;
+ 		  }
+ 		if (grub_isdigit (ptr[0]))
+ 		  {
+-		    part = grub_strtoul (ptr, &ptr, 0);
++		    part = grub_strtoul (ptr, (const char **)&ptr, 0);
+ 		    continue;
+ 		  }
+ 		/* FIXME: isolinux, ntldr, cmldr, *dos, seg, hide
+diff --git a/grub-core/loader/i386/bsd.c b/grub-core/loader/i386/bsd.c
+index a21ed3f..1944ef6 100644
+--- a/grub-core/loader/i386/bsd.c
++++ b/grub-core/loader/i386/bsd.c
+@@ -1616,7 +1616,7 @@ grub_cmd_openbsd (grub_extcmd_context_t ctxt, int argc, char *argv[])
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT,
+ 			   "unknown disk type name");
+ 
+-      unit = grub_strtoul (arg, (char **) &arg, 10);
++      unit = grub_strtoul (arg, &arg, 10);
+       if (! (arg && *arg >= 'a' && *arg <= 'z'))
+ 	return grub_error (GRUB_ERR_BAD_ARGUMENT,
+ 			   "only device specifications of form "
+@@ -1634,7 +1634,7 @@ grub_cmd_openbsd (grub_extcmd_context_t ctxt, int argc, char *argv[])
+   if (ctxt->state[OPENBSD_SERIAL_ARG].set)
+     {
+       struct grub_openbsd_bootarg_console serial;
+-      char *ptr;
++      const char *ptr;
+       unsigned port = 0;
+       unsigned speed = 9600;
+ 
+@@ -1736,7 +1736,7 @@ grub_cmd_netbsd (grub_extcmd_context_t ctxt, int argc, char *argv[])
+       if (ctxt->state[NETBSD_SERIAL_ARG].set)
+ 	{
+ 	  struct grub_netbsd_btinfo_serial serial;
+-	  char *ptr;
++	  const char *ptr;
+ 
+ 	  grub_memset (&serial, 0, sizeof (serial));
+ 	  grub_strcpy (serial.devname, "com");
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index 94439d1..e55859d 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -994,7 +994,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ #endif /* GRUB_MACHINE_PCBIOS */
+     if (grub_memcmp (argv[i], "mem=", 4) == 0)
+       {
+-	char *val = argv[i] + 4;
++	const char *val = argv[i] + 4;
+ 
+ 	linux_mem_size = grub_strtoul (val, &val, 0);
+ 
+diff --git a/grub-core/loader/i386/pc/linux.c b/grub-core/loader/i386/pc/linux.c
+index 35c73ca..4176eb1 100644
+--- a/grub-core/loader/i386/pc/linux.c
++++ b/grub-core/loader/i386/pc/linux.c
+@@ -281,7 +281,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       }
+     else if (grub_memcmp (argv[i], "mem=", 4) == 0)
+       {
+-	char *val = argv[i] + 4;
++	const char *val = argv[i] + 4;
+ 
+ 	linux_mem_size = grub_strtoul (val, &val, 0);
+ 
+diff --git a/grub-core/loader/i386/xen_fileXX.c b/grub-core/loader/i386/xen_fileXX.c
+index fb66e66..293f1ad 100644
+--- a/grub-core/loader/i386/xen_fileXX.c
++++ b/grub-core/loader/i386/xen_fileXX.c
+@@ -25,7 +25,7 @@ parse_xen_guest (grub_elf_t elf, struct grub_xen_file_info *xi,
+ 		 grub_off_t off, grub_size_t sz)
+ {
+   char *buf;
+-  char *ptr;
++  const char *ptr;
+   int has_paddr = 0;
+ 
+   grub_errno = GRUB_ERR_NONE;
+diff --git a/grub-core/mmap/mmap.c b/grub-core/mmap/mmap.c
+index 57b4e9a..64684c2 100644
+--- a/grub-core/mmap/mmap.c
++++ b/grub-core/mmap/mmap.c
+@@ -423,7 +423,7 @@ static grub_err_t
+ grub_cmd_badram (grub_command_t cmd __attribute__ ((unused)),
+ 		 int argc, char **args)
+ {
+-  char * str;
++  const char *str;
+   struct badram_entry entry;
+ 
+   if (argc != 1)
+@@ -465,7 +465,7 @@ static grub_uint64_t
+ parsemem (const char *str)
+ {
+   grub_uint64_t ret;
+-  char *ptr;
++  const char *ptr;
+ 
+   ret = grub_strtoul (str, &ptr, 0);
+ 
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index 5aa4ad3..e575b92 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -107,7 +107,7 @@ parse_line (grub_file_t file, http_data_t data, char *ptr, grub_size_t len)
+ 	  return GRUB_ERR_NONE;
+ 	}
+       ptr += sizeof ("HTTP/1.1 ") - 1;
+-      code = grub_strtoul (ptr, &ptr, 10);
++      code = grub_strtoul (ptr, (const char **)&ptr, 10);
+       if (grub_errno)
+ 	return grub_errno;
+       switch (code)
+@@ -134,7 +134,7 @@ parse_line (grub_file_t file, http_data_t data, char *ptr, grub_size_t len)
+       == 0 && !data->size_recv)
+     {
+       ptr += sizeof ("Content-Length: ") - 1;
+-      file->size = grub_strtoull (ptr, &ptr, 10);
++      file->size = grub_strtoull (ptr, (const char **)&ptr, 10);
+       data->size_recv = 1;
+       return GRUB_ERR_NONE;
+     }
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 3b2f227..8a78cd7 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -406,7 +406,7 @@ parse_ip (const char *val, grub_uint32_t *ip, const char **rest)
+   for (i = 0; i < 4; i++)
+     {
+       unsigned long t;
+-      t = grub_strtoul (ptr, (char **) &ptr, 0);
++      t = grub_strtoul (ptr, &ptr, 0);
+       if (grub_errno)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -453,7 +453,7 @@ parse_ip6 (const char *val, grub_uint64_t *ip, const char **rest)
+ 	  ptr++;
+ 	  continue;
+ 	}
+-      t = grub_strtoul (ptr, (char **) &ptr, 16);
++      t = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -563,7 +563,7 @@ grub_net_resolve_net_address (const char *name,
+       addr->type = GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV4;
+       if (*rest == '/')
+ 	{
+-	  addr->ipv4.masksize = grub_strtoul (rest + 1, (char **) &rest, 0);
++	  addr->ipv4.masksize = grub_strtoul (rest + 1, &rest, 0);
+ 	  if (!grub_errno && *rest == 0)
+ 	    return GRUB_ERR_NONE;
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -579,7 +579,7 @@ grub_net_resolve_net_address (const char *name,
+       addr->type = GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV6;
+       if (*rest == '/')
+ 	{
+-	  addr->ipv6.masksize = grub_strtoul (rest + 1, (char **) &rest, 0);
++	  addr->ipv6.masksize = grub_strtoul (rest + 1, &rest, 0);
+ 	  if (!grub_errno && *rest == 0)
+ 	    return GRUB_ERR_NONE;
+ 	  grub_errno = GRUB_ERR_NONE;
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index e7a83c2..3a6f002 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -170,8 +170,7 @@ grub_menu_set_timeout (int timeout)
+ static int
+ get_and_remove_first_entry_number (const char *name)
+ {
+-  const char *val;
+-  char *tail;
++  const char *val, *tail;
+   int entry;
+ 
+   val = grub_env_get (name);
+diff --git a/grub-core/osdep/aros/hostdisk.c b/grub-core/osdep/aros/hostdisk.c
+index 7d99b54..9032f6f 100644
+--- a/grub-core/osdep/aros/hostdisk.c
++++ b/grub-core/osdep/aros/hostdisk.c
+@@ -194,7 +194,7 @@ grub_util_fd_open (const char *dev, int flg)
+     p1 = dev + strlen (dev);
+   else
+     {
+-      unit = grub_strtoul (p1 + 1, (char **) &p2, 16);
++      unit = grub_strtoul (p1 + 1, &p2, 16);
+       if (p2 && *p2 == '/')
+ 	flags = grub_strtoul (p2 + 1, 0, 16);
+     }
+diff --git a/grub-core/osdep/devmapper/hostdisk.c b/grub-core/osdep/devmapper/hostdisk.c
+index a697bcb..a8afc0c 100644
+--- a/grub-core/osdep/devmapper/hostdisk.c
++++ b/grub-core/osdep/devmapper/hostdisk.c
+@@ -113,7 +113,7 @@ grub_util_get_dm_node_linear_info (dev_t dev,
+   void *next = NULL;
+   uint64_t length, start;
+   char *target, *params;
+-  char *ptr;
++  const char *ptr;
+   int major = 0, minor = 0;
+   int first = 1;
+   grub_disk_addr_t partstart = 0;
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index 1d47e52..4aa0779 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -122,7 +122,7 @@ replace_scope (struct grub_script_scope *new_scope)
+ grub_err_t
+ grub_script_break (grub_command_t cmd, int argc, char *argv[])
+ {
+-  char *p = 0;
++  const char *p = NULL;
+   unsigned long count;
+ 
+   if (argc == 0)
+@@ -154,7 +154,7 @@ grub_err_t
+ grub_script_shift (grub_command_t cmd __attribute__((unused)),
+ 		   int argc, char *argv[])
+ {
+-  char *p = 0;
++  const char *p = NULL;
+   unsigned long n = 0;
+ 
+   if (! scope)
+@@ -215,7 +215,7 @@ grub_err_t
+ grub_script_return (grub_command_t cmd __attribute__((unused)),
+ 		    int argc, char *argv[])
+ {
+-  char *p;
++  const char *p = NULL;
+   unsigned long n;
+ 
+   if (! scope || argc > 1)
+diff --git a/grub-core/term/serial.c b/grub-core/term/serial.c
+index db80b3b..f9271b0 100644
+--- a/grub-core/term/serial.c
++++ b/grub-core/term/serial.c
+@@ -269,7 +269,7 @@ grub_cmd_serial (grub_extcmd_context_t ctxt, int argc, char **args)
+ 
+   if (state[OPTION_BASE_CLOCK].set)
+     {
+-      char *ptr;
++      const char *ptr;
+       config.base_clock = grub_strtoull (state[OPTION_BASE_CLOCK].arg, &ptr, 0);
+       if (grub_errno)
+ 	return grub_errno;
+diff --git a/grub-core/term/terminfo.c b/grub-core/term/terminfo.c
+index 5fa94c0..cd72008 100644
+--- a/grub-core/term/terminfo.c
++++ b/grub-core/term/terminfo.c
+@@ -740,7 +740,7 @@ grub_cmd_terminfo (grub_extcmd_context_t ctxt, int argc, char **args)
+ 
+   if (state[OPTION_GEOMETRY].set)
+     {
+-      char *ptr = state[OPTION_GEOMETRY].arg;
++      const char *ptr = state[OPTION_GEOMETRY].arg;
+       w = grub_strtoul (ptr, &ptr, 0);
+       if (grub_errno)
+ 	return grub_errno;
+diff --git a/grub-core/tests/strtoull_test.c b/grub-core/tests/strtoull_test.c
+index 7da615f..5488ab2 100644
+--- a/grub-core/tests/strtoull_test.c
++++ b/grub-core/tests/strtoull_test.c
+@@ -25,7 +25,7 @@ static void
+ strtoull_testcase (const char *input, int base, unsigned long long expected,
+ 		   int num_digits, grub_err_t error)
+ {
+-  char *output;
++  const char *output;
+   unsigned long long value;
+   grub_errno = 0;
+   value = grub_strtoull(input, &output, base);
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 372f009..290ad21 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -243,11 +243,29 @@ grub_strncasecmp (const char *s1, const char *s2, grub_size_t n)
+     - (int) grub_tolower ((grub_uint8_t) *s2);
+ }
+ 
+-unsigned long EXPORT_FUNC(grub_strtoul) (const char *str, char **end, int base);
+-unsigned long long EXPORT_FUNC(grub_strtoull) (const char *str, char **end, int base);
++/*
++ * Note that these differ from the C standard's definitions of strtol,
++ * strtoul(), and strtoull() by the addition of two const qualifiers on the end
++ * pointer, which make the declaration match the *semantic* requirements of
++ * their behavior.  This means that instead of:
++ *
++ *  char *s = "1234 abcd";
++ *  char *end;
++ *  unsigned long l;
++ *
++ *  l = grub_strtoul(s, &end, 10);
++ *
++ * We must one of:
++ *
++ *  const char *end;
++ *  ... or ...
++ *  l = grub_strtoul(s, (const char ** const)&end, 10);
++ */
++unsigned long EXPORT_FUNC(grub_strtoul) (const char * restrict str, const char ** const restrict end, int base);
++unsigned long long EXPORT_FUNC(grub_strtoull) (const char * restrict str, const char ** const restrict end, int base);
+ 
+ static inline long
+-grub_strtol (const char *str, char **end, int base)
++grub_strtol (const char * restrict str, const char ** const restrict end, int base)
+ {
+   int negative = 0;
+   unsigned long long magnitude;
+diff --git a/util/grub-fstest.c b/util/grub-fstest.c
+index 793aefa..3632065 100644
+--- a/util/grub-fstest.c
++++ b/util/grub-fstest.c
+@@ -538,7 +538,7 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ static error_t 
+ argp_parser (int key, char *arg, struct argp_state *state)
+ {
+-  char *p;
++  const char *p;
+ 
+   switch (key)
+     {
+-- 
+2.17.1
+

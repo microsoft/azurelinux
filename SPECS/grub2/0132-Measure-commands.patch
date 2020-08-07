@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+Date: Mon, 10 Aug 2015 15:27:12 -0700
+Subject: [PATCH] Measure commands
+
+Measure each command executed by grub, which includes script execution.
+---
+ grub-core/script/execute.c | 25 +++++++++++++++++++++++--
+ include/grub/tpm.h         |  1 +
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index cf6cd6601d6..9ae04a05160 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -30,6 +30,7 @@
+ #include <grub/normal.h>
+ #include <grub/extcmd.h>
+ #include <grub/i18n.h>
++#include <grub/tpm.h>
+ 
+ /* Max digits for a char is 3 (0xFF is 255), similarly for an int it
+    is sizeof (int) * 3, and one extra for a possible -ve sign.  */
+@@ -967,8 +968,9 @@ grub_script_execute_cmdline (struct grub_script_cmd *cmd)
+   grub_err_t ret = 0;
+   grub_script_function_t func = 0;
+   char errnobuf[18];
+-  char *cmdname;
+-  int argc;
++  char *cmdname, *cmdstring;
++  int argc, offset = 0, cmdlen = 0;
++  unsigned int i;
+   char **args;
+   int invert;
+   struct grub_script_argv argv = { 0, 0, 0 };
+@@ -977,6 +979,25 @@ grub_script_execute_cmdline (struct grub_script_cmd *cmd)
+   if (grub_script_arglist_to_argv (cmdline->arglist, &argv) || ! argv.args[0])
+     return grub_errno;
+ 
++  for (i = 0; i < argv.argc; i++) {
++	  cmdlen += grub_strlen (argv.args[i]) + 1;
++  }
++
++  cmdstring = grub_malloc (cmdlen);
++  if (!cmdstring)
++  {
++	  return grub_error (GRUB_ERR_OUT_OF_MEMORY,
++			     N_("cannot allocate command buffer"));
++  }
++
++  for (i = 0; i < argv.argc; i++) {
++	  offset += grub_snprintf (cmdstring + offset, cmdlen - offset, "%s ",
++				   argv.args[i]);
++  }
++  cmdstring[cmdlen-1]= '\0';
++  grub_tpm_measure ((unsigned char *)cmdstring, cmdlen, GRUB_COMMAND_PCR,
++		    cmdstring);
++  grub_free(cmdstring);
+   invert = 0;
+   argc = argv.argc - 1;
+   args = argv.args + 1;
+diff --git a/include/grub/tpm.h b/include/grub/tpm.h
+index 40d3cf65ba6..7fc9d77d277 100644
+--- a/include/grub/tpm.h
++++ b/include/grub/tpm.h
+@@ -30,6 +30,7 @@
+ #define GRUB_KERNEL_PCR 10
+ #define GRUB_INITRD_PCR 11
+ #define GRUB_CMDLINE_PCR 12
++#define GRUB_COMMAND_PCR 13
+ 
+ #define TPM_TAG_RQU_COMMAND 0x00C1
+ #define TPM_ORD_Extend 0x14

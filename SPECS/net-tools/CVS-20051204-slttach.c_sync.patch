@@ -1,0 +1,43 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.11 - Sun Dec 4 05:15:36 2005 UTC by ecki
+use file version
+
+Revision 1.10 - Sun Dec 4 05:14:08 2005 UTC by ecki
+make slattach 3-wire -L mode work (no RTSCTS) (Debian Bug #175743)
+
+Index: net-tools/slattach.c
+===================================================================
+--- net-tools.orig/slattach.c
++++ net-tools/slattach.c
+@@ -73,7 +73,7 @@
+ 
+ 
+ const char *Release = RELEASE,
+-	   *Version = "@(#) slattach 1.21 (1999-11-21)",
++	   *Version = "$Id: slattach.c,v 1.11 2005/12/04 05:15:36 ecki Exp $",
+ 	   *Signature = "net-tools, Fred N. van Kempen et al.";
+ 
+ 
+@@ -115,7 +115,7 @@ int		opt_h = 0;		/* "hangup" on carrier 
+ int		opt_k = 0;		/* "keepalive" value		*/
+ #endif
+ int		opt_l = 0;		/* "lock it" flag		*/
+-int		opt_L = 0;		/* clocal flag			*/
++int		opt_L = 0;		/* 3-wire mode flag		*/
+ int		opt_m = 0;		/* "set RAW mode" flag		*/
+ int		opt_n = 0;		/* "set No Mesg" flag		*/
+ #ifdef SIOCSOUTFILL
+@@ -342,9 +342,11 @@ tty_set_raw(struct termios *tty)
+   tty->c_oflag = (0);				/* output flags		*/
+   tty->c_lflag = (0);				/* local flags		*/
+   speed = (tty->c_cflag & CBAUD);		/* save current speed	*/
+-  tty->c_cflag = (CRTSCTS | HUPCL | CREAD);	/* UART flags		*/
++  tty->c_cflag = (HUPCL | CREAD);		/* UART flags		*/
+   if (opt_L) 
+ 	tty->c_cflag |= CLOCAL;
++  else
++	tty->c_cflag |= CRTSCTS;
+   tty->c_cflag |= speed;			/* restore speed	*/
+   return(0);
+ }

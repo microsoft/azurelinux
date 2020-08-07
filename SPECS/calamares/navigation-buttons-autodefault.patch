@@ -1,0 +1,10 @@
+--- calamares-3.2.11/src/libcalamaresui/ViewManager.cpp	2020-05-27 16:32:36.688679534 -0700
++++ calamares-3.2.11-enter-for-button/src/libcalamaresui/ViewManager.cpp	2020-05-27 16:30:45.803365289 -0700
+@@ -86,6 +86,7 @@
+ {
+     QPushButton* button = new QPushButton( parent );
+     setButtonIcon( button, name );
++    button->setAutoDefault(true);
+     return button;
+ }
+ 

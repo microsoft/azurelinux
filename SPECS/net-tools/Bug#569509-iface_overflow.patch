@@ -1,0 +1,19 @@
+Description: do not crash if an inappropriately long argument is used for -D.
+Author: Kees Cook <kees@ubuntu.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/net-tools/+bug/515010
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=569509
+
+Index: net-tools-1.60/arp.c
+===================================================================
+--- net-tools-1.60.orig/arp.c	2010-02-11 15:19:16.702985736 -0800
++++ net-tools-1.60/arp.c	2010-02-11 15:22:29.729592589 -0800
+@@ -243,7 +243,8 @@
+     struct ifreq ifr;
+     struct hwtype *xhw;
+ 
+-    strcpy(ifr.ifr_name, ifname);
++    strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
++    ifr.ifr_name[IFNAMSIZ-1]='\0';
+     if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0) {
+ 	fprintf(stderr, _("arp: cant get HW-Address for `%s': %s.\n"), ifname, strerror(errno));
+ 	return (-1);

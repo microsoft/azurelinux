@@ -1,0 +1,27 @@
+#! /bin/sh
+
+# Begin /etc/systemd/scripts/iptables.stop
+
+iptables -Z
+iptables -F
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -X
+iptables -P INPUT       ACCEPT
+iptables -P FORWARD     ACCEPT
+iptables -P OUTPUT      ACCEPT
+
+ip6tables -Z
+ip6tables -F
+ip6tables -t nat -F
+ip6tables -t nat -X
+ip6tables -t mangle -F
+ip6tables -t mangle -X
+ip6tables -X
+ip6tables -P INPUT       ACCEPT
+ip6tables -P FORWARD     ACCEPT
+ip6tables -P OUTPUT      ACCEPT
+
+# End /etc/systemd/scripts/iptables.stop

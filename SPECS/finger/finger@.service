@@ -1,0 +1,7 @@
+[Unit]
+Description=Finger Per-Connection Daemon
+
+[Service]
+ExecStart=-/usr/bin/in.fingerd
+StandardInput=socket
+StandardError=syslog

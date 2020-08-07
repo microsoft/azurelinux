@@ -1,0 +1,41 @@
+From 911762e077c8b2f9795171c1e628942a0a979801 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Fri, 15 Dec 2017 11:56:12 +0100
+Subject: foo
+
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index 536c709..c6eb1b1 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -111,6 +111,8 @@ Q_LOGGING_CATEGORY(lcQpaXInputEvents, "qt.qpa.input.events")
+ Q_LOGGING_CATEGORY(lcQpaScreen, "qt.qpa.screen")
+ Q_LOGGING_CATEGORY(lcQpaEvents, "qt.qpa.events")
+ Q_LOGGING_CATEGORY(lcQpaXcb, "qt.qpa.xcb") // for general (uncategorized) XCB logging
++Q_LOGGING_CATEGORY(lcQpaXcbError, "qt.qpa.xcb.xcberror")
++// TODO: How to categorize by xcberror type? (e.g. only BadWindow)
+ Q_LOGGING_CATEGORY(lcQpaPeeker, "qt.qpa.peeker")
+
+ // this event type was added in libxcb 1.10,
+@@ -964,7 +966,8 @@ void QXcbConnection::handleXcbError(xcb_generic_error_t *error)
+     uint clamped_error_code = qMin<uint>(error->error_code, (sizeof(xcb_errors) / sizeof(xcb_errors[0])) - 1);
+     uint clamped_major_code = qMin<uint>(error->major_code, (sizeof(xcb_protocol_request_codes) / sizeof(xcb_protocol_request_codes[0])) - 1);
+
+-    qWarning("QXcbConnection: XCB error: %d (%s), sequence: %d, resource id: %d, major code: %d (%s), minor code: %d",
++    qCWarning(lcQpaXcbError,
++           "QXcbConnection: XCB error: %d (%s), sequence: %d, resource id: %d, major code: %d (%s), minor code: %d",
+            int(error->error_code), xcb_errors[clamped_error_code],
+            int(error->sequence), int(error->resource_id),
+            int(error->major_code), xcb_protocol_request_codes[clamped_major_code],
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.h b/src/plugins/platforms/xcb/qxcbconnection.h
+index 999dc06..554611c 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.h
++++ b/src/plugins/platforms/xcb/qxcbconnection.h
+@@ -91,6 +91,7 @@ Q_DECLARE_LOGGING_CATEGORY(lcQpaXInputEvents)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaScreen)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaEvents)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaXcb)
++Q_DECLARE_LOGGING_CATEGORY(lcQpaXcbError)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaPeeker)
+
+ class QXcbVirtualDesktop;

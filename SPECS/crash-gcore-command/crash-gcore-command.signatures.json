@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "crash-gcore-command-1.5.1.tar.gz": "0ebaa95598deea0ce39d294410ef4978efc4151857e20547bba5d347891cbabd",
+  "gcore_defs.patch": "80a3e55ba2ba92269e7ff6561cbbf027a7fdb4abf1e69ac7cca1c155eb478684"
+ }
+}

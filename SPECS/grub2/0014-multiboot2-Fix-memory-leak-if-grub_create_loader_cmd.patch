@@ -1,0 +1,34 @@
+From f8ad7a3dd8213f691b0f32d0e9eb656a70cefc13 Mon Sep 17 00:00:00 2001
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date: Fri, 26 Jun 2020 10:51:43 -0400
+Subject: [PATCH 14/28] multiboot2: Fix memory leak if
+ grub_create_loader_cmdline() fails
+
+Fixes: CID 292468
+
+Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/multiboot_mbi2.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/multiboot_mbi2.c b/grub-core/loader/multiboot_mbi2.c
+index 18e766c7b..e88c9f488 100644
+--- a/grub-core/loader/multiboot_mbi2.c
++++ b/grub-core/loader/multiboot_mbi2.c
+@@ -1076,7 +1076,11 @@ grub_multiboot2_add_module (grub_addr_t start, grub_size_t size,
+   err = grub_create_loader_cmdline (argc, argv, newmod->cmdline,
+ 				    newmod->cmdline_size, GRUB_VERIFY_MODULE_CMDLINE);
+   if (err)
+-    return err;
++    {
++      grub_free (newmod->cmdline);
++      grub_free (newmod);
++      return err;
++    }
+ 
+   if (modules_last)
+     modules_last->next = newmod;
+-- 
+2.17.1
+

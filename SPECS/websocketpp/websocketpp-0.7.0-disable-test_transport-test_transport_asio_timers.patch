@@ -1,0 +1,46 @@
+--- a/test/transport/CMakeLists.txt
++++ b/test/transport/CMakeLists.txt
+@@ -1,24 +1,24 @@
+ if (OPENSSL_FOUND)
+ 
+-# Test transport integration
+-file (GLOB SOURCE integration.cpp)
+-
+-init_target (test_transport)
+-build_test (${TARGET_NAME} ${SOURCE})
+-link_boost ()
+-link_openssl()
+-final_target ()
+-set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "test")
+-
+-# Test transport asio timers
+-file (GLOB SOURCE asio/timers.cpp)
+-
+-init_target (test_transport_asio_timers)
+-build_test (${TARGET_NAME} ${SOURCE})
+-link_boost ()
+-link_openssl()
+-final_target ()
+-set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "test")
++## Test transport integration
++#file (GLOB SOURCE integration.cpp)
++#
++#init_target (test_transport)
++#build_test (${TARGET_NAME} ${SOURCE})
++#link_boost ()
++#link_openssl()
++#final_target ()
++#set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "test")
++#
++## Test transport asio timers
++#file (GLOB SOURCE asio/timers.cpp)
++#
++#init_target (test_transport_asio_timers)
++#build_test (${TARGET_NAME} ${SOURCE})
++#link_boost ()
++#link_openssl()
++#final_target ()
++#set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "test")
+ 
+ # Test transport asio security
+ file (GLOB SOURCE asio/security.cpp)

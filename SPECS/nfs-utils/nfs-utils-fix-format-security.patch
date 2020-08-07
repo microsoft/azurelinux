@@ -1,0 +1,57 @@
+diff -Naur nfs-utils-2.3.3/tools/rpcgen/rpc_hout.c nfs-utils-2.3.3.mod/tools/rpcgen/rpc_hout.c
+--- nfs-utils-2.3.3/tools/rpcgen/rpc_hout.c	2018-09-06 11:09:08.000000000 -0700
++++ nfs-utils-2.3.3.mod/tools/rpcgen/rpc_hout.c	2020-06-01 18:56:25.287175150 -0700
+@@ -467,7 +467,7 @@
+ 			break;
+ 		}
+ 	}
+-	f_print(fout, separator );
++	f_print(fout, "%s", separator );
+ }
+ 
+ static int
+diff -Naur nfs-utils-2.3.3/tools/rpcgen/rpc_main.c nfs-utils-2.3.3.mod/tools/rpcgen/rpc_main.c
+--- nfs-utils-2.3.3/tools/rpcgen/rpc_main.c	2018-09-06 11:09:08.000000000 -0700
++++ nfs-utils-2.3.3.mod/tools/rpcgen/rpc_main.c	2020-06-01 19:00:23.773098928 -0700
+@@ -502,7 +502,7 @@
+ 	if (extend && tell == ftell(fout)) {
+ 		(void) unlink(outfilename);
+ 	} else if (tblflag) {
+-		f_print(fout, rpcgen_table_dcl);
++		f_print(fout, "%s", rpcgen_table_dcl);
+ 	}
+ 	f_print(fout, "\n#endif /* !_%s */\n", guard);
+ }
+diff -Naur nfs-utils-2.3.3/tools/rpcgen/rpc_svcout.c nfs-utils-2.3.3.mod/tools/rpcgen/rpc_svcout.c
+--- nfs-utils-2.3.3/tools/rpcgen/rpc_svcout.c	2018-09-06 11:09:08.000000000 -0700
++++ nfs-utils-2.3.3.mod/tools/rpcgen/rpc_svcout.c	2020-06-01 19:03:26.163698229 -0700
+@@ -293,7 +293,7 @@
+ 			  f_print(fout, "(" );
+ 			  /* arg name */
+ 			  if (proc->arg_num > 1)
+-			    f_print(fout, proc->args.argname);
++			    f_print(fout, "%s", proc->args.argname);
+ 			  else
+ 			    ptype(proc->args.decls->decl.prefix, 
+ 				  proc->args.decls->decl.type, 0);
+diff -Naur nfs-utils-2.3.3/tools/rpcgen/rpc_tblout.c nfs-utils-2.3.3.mod/tools/rpcgen/rpc_tblout.c
+--- nfs-utils-2.3.3/tools/rpcgen/rpc_tblout.c	2018-09-06 11:09:08.000000000 -0700
++++ nfs-utils-2.3.3.mod/tools/rpcgen/rpc_tblout.c	2020-06-01 19:05:12.406934960 -0700
+@@ -94,7 +94,7 @@
+ 			expected = 0;
+ 		} else {
+ 			expected = 1;
+-			f_print(fout, null_entry);
++			f_print(fout, "%s", null_entry);
+ 		}
+ 		for (proc = vp->procs; proc != NULL; proc = proc->next) {
+ 			current = atoi(proc->proc_num);
+@@ -134,7 +134,7 @@
+ 		}
+ 
+ 		/* print the table trailer */
+-		f_print(fout, tbl_end);
++		f_print(fout, "%s", tbl_end);
+ 		f_print(fout, tbl_nproc, progvers, progvers, progvers);
+ 	}
+ }

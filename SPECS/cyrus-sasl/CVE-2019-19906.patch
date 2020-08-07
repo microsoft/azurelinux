@@ -1,0 +1,12 @@
+diff --git a/lib/common.c b/lib/common.c
+index bc3bf1df..9969d6aa 100644
+--- a/lib/common.c
++++ b/lib/common.c
+@@ -190,7 +190,7 @@ int _sasl_add_string(char **out, size_t *alloclen,
+
+   if (add==NULL) add = "(null)";
+
+-  addlen=strlen(add); /* only compute once */
++  addlen=strlen(add)+1; /* only compute once */
+   if (_buf_alloc(out, alloclen, (*outlen)+addlen)!=SASL_OK)
+     return SASL_NOMEM;

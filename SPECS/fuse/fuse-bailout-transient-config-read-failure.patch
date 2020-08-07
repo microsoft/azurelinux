@@ -1,0 +1,45 @@
+From 0d2b6c2e60fe044c9fb9b9314cc9ede3ead106e7 Mon Sep 17 00:00:00 2001
+From: Jann Horn <jannh@google.com>
+Date: Fri, 13 Jul 2018 15:50:50 -0700
+Subject: [PATCH] fusermount: bail out on transient config read failure
+
+If an attacker wishes to use the default configuration instead of the
+system's actual configuration, they can attempt to trigger a failure in
+read_conf(). This only permits increasing mount_max if it is lower than the
+default, so it's not particularly interesting. Still, this should probably
+be prevented robustly; bail out if funny stuff happens when we're trying to
+read the config.
+
+Note that the classic attack trick of opening so many files that the
+system-wide limit is reached won't work here - because fusermount only
+drops the fsuid, not the euid, the process is running with euid=0 and
+CAP_SYS_ADMIN, so it bypasses the number-of-globally-open-files check in
+get_empty_filp() (unless you're inside a user namespace).
+---
+ util/fusermount.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/util/fusermount.c b/util/fusermount.c
+index 143bd4ac..4e0f51a3 100644
+--- a/util/fusermount.c
++++ b/util/fusermount.c
+@@ -565,10 +565,19 @@ static void read_conf(void)
+ 			fprintf(stderr, "%s: reading %s: missing newline at end of file\n", progname, FUSE_CONF);
+ 
+ 		}
++		if (ferror(fp)) {
++			fprintf(stderr, "%s: reading %s: read failed\n", progname, FUSE_CONF);
++			exit(1);
++		}
+ 		fclose(fp);
+ 	} else if (errno != ENOENT) {
++		bool fatal = (errno != EACCES && errno != ELOOP &&
++			      errno != ENAMETOOLONG && errno != ENOTDIR &&
++			      errno != EOVERFLOW);
+ 		fprintf(stderr, "%s: failed to open %s: %s\n",
+ 			progname, FUSE_CONF, strerror(errno));
++		if (fatal)
++			exit(1);
+ 	}
+ }
+ 

@@ -1,0 +1,20 @@
+Author: dann frazier <dannf@debian.org>
+Description: add missing <stdint.h> include
+ aarch64's fetch.c uses the uintptr_t typedef defined by stdint.h without
+ including it. This doesn't currently cause a build failure because stdint.h
+ is indirectly included via proc.h.
+Applied-Upstream: http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commitdiff;h=e9919d980a5b6fc2417d7c05d46329b442467940
+Last-Update: 2014-03-17
+
+Index: ltrace/sysdeps/linux-gnu/aarch64/fetch.c
+===================================================================
+--- ltrace.orig/sysdeps/linux-gnu/aarch64/fetch.c	2014-03-12 16:23:25.382866486 -0600
++++ ltrace/sysdeps/linux-gnu/aarch64/fetch.c	2014-03-12 16:25:38.492638417 -0600
+@@ -22,6 +22,7 @@
+ #include <asm/ptrace.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <stdint.h>
+ 
+ #include "fetch.h"
+ #include "proc.h"

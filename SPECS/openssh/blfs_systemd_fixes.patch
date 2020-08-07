@@ -1,0 +1,20 @@
+--- blfs-systemd-units-20191026/Makefile	2020-04-24 14:50:26.991707631 -0700
++++ blfs-systemd-units-20191026/Makefile	2020-04-24 14:51:39.204579251 -0700
+@@ -70,7 +70,7 @@
+ 
+ install-iptables: create-dirs
+ 	install -m ${CONFMODE} blfs/units/iptables.service ${UNITSDIR}/
+-	test -n "${DESTDIR}" || systemctl enable iptables.service
++	test -n "${DESTDIR}" || true # systemctl enable iptables.service
+ 
+ install-krb5: create-dirs
+ 	install -m ${CONFMODE} blfs/units/krb5-kdc.service ${UNITSDIR}/
+@@ -188,7 +188,7 @@
+ 	install -m ${CONFMODE} blfs/units/sshd.service ${UNITSDIR}/
+ 	install -m ${CONFMODE} blfs/units/sshdat.service ${UNITSDIR}/sshd@.service
+ 	install -m ${CONFMODE} blfs/units/sshd.socket ${UNITSDIR}/
+-	test -n "${DESTDIR}" || systemctl enable sshd.service
++	test -n "${DESTDIR}" || true # systemctl enable sshd.service
+ 
+ install-svnserve: create-dirs
+ 	install -m ${CONFMODE} blfs/default/svnserve ${DEFAULTSDIR}/

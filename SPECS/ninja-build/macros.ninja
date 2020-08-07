@@ -1,0 +1,8 @@
+%__ninja %{_bindir}/ninja
+%__ninja_common_opts -v %{?_smp_mflags}
+%ninja_build \
+    %{__ninja} %{__ninja_common_opts}
+%ninja_install \
+    DESTDIR=%{buildroot} %{__ninja} install %{__ninja_common_opts}
+%ninja_test \
+    %{__ninja} test %{__ninja_common_opts}

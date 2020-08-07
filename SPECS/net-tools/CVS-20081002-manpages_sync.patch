@@ -1,0 +1,1398 @@
+Sync from upstream's CVS for all manpages. Full log:
+
+2008-10-02 20:16  ecki
+
+	* en_US/: arp.8, ethers.5, hostname.1, ifconfig.8, mii-tool.8,
+	  nameif.8, netstat.8, plipconfig.8, rarp.8, route.8, slattach.8:
+	  Fix hypen in man pages (Debian Bug#288343 from Andrew Moise) Move
+	  man pages to sysadmin books update samples for route(8) (Debian
+	  Bug#400844, #368697 Danny Rathjens) update see also for
+	  ifconfig(8) (Debian Bug#365916 Dan Jacobs)
+
+2008-10-02 19:42  ecki
+
+	* en_US/arp.8: fix some more hypens, changed book name and updated
+	  date to 2008-10-03
+
+2008-10-02 19:30  ecki
+
+	* en_US/netstat.8: document the additional info in Send-Q/Recv-Q
+	  with recent kernels for listening sockets.
+
+2008-06-16 21:18  ecki
+
+	* en_US/arp.8: Spelling error (Debian Bug #486448 reported by
+	  Volker Stolz)
+
+2007-12-02 01:42  ecki
+
+	* de_DE/netstat.8, en_US/netstat.8, fr_FR/netstat.8,
+	  pt_BR/netstat.8: fixed interfaceS spelling (Debian Bug #435690).
+	  Thanks Alan and Liu Xing.
+
+2007-12-01 15:19  ecki
+
+	* en_US/arp.8: cleanup man page (arp.8 2007-12-01)
+
+2007-11-07 20:01  ecki
+
+	* en_US/ifconfig.8: Fix Formatting Bug for ifconfig.8 (Debian
+	  Bug#450432 reported by Ivan Shmakov)
+
+2006-10-10 02:58  ecki
+
+	* en_US/slattach.8: formatting fixes from Justin Pryzby in Debian
+	  Bug #391495
+
+2005-09-04 00:51  ecki
+
+	* en_US/slattach.8 (tags: net-tools-1_65): Spelling fix for Debian
+	  Bug#326124 reported by A. Costa.
+
+2005-06-30 16:26  ecki
+
+	* en_US/ifconfig.8: minor formatting
+
+2005-06-30 15:42  ecki
+
+	* en_US/ifconfig.8: added pointer to iptables(8) not only
+	  ipchains(8) (Toralf Förster)
+
+2005-05-16 01:30  ecki
+
+	* en_US/arp.8: desupport dontpub in arp.8 and arp -? (Debian Bug
+	  #203396)
+
+2005-05-13 19:34  ecki
+
+	* en_US/ethers.5: line break fix debian bug #305637
+
+2005-05-13 19:31  ecki
+
+	* en_US/mii-tool.8: spellig fix debian bug #305638
+
+2005-05-13 19:28  ecki
+
+	* en_US/route.8: spelling fix debian bug #305640
+
+2004-06-29 17:28  ecki
+
+	* en_US/netstat.8 (tags: net-tools-1_65): little formatting fix
+
+2004-03-28 18:35  ecki
+
+	* en_US/mii-tool.8 (tags: net-tools-1_65): added diagnostics
+	  (closes debian bug #239229: EINVAL for downed interface)
+
+2003-10-02 17:06  ecki
+
+	* en_US/: netstat.8, route.8 (tags: net-tools-1_65): fixes for man
+	  page bugs reported by Hugh Redelmeier.
+
+2003-05-28 17:59  ecki
+
+	* en_US/: ifconfig.8 (tags: net-tools-1_65), netstat.8: fixed
+	  wording of binary units counters and interpunctuation in
+	  netstat(8)
+
+2003-02-25 18:03  ecki
+
+	* en_US/ifconfig.8: Marc Lehmann pointed out that binary prefixes
+	  are made up by the IEEE and are not official SI yet. (Debian Bug
+	  #182478)
+
+2003-02-08 19:49  ecki
+
+	* en_US/ifconfig.8: add a comment about alias interfaces and
+	  primary interface of scopes (intended to fix Debian wishlist bug
+	  #179780 and normal bug #64458)
+
+2002-07-03 20:40  ecki
+
+	* en_US/ifconfig.8: there is no such thing as -i option for
+	  ifconfig removed variable, fixed usage, added options to english
+	  man page
+
+2002-02-20 11:31  ecki
+
+	* de_DE/netstat.8 (tags: net-tools-1_65): fixed typo in german man
+	  page and added a comment that man page is currently not
+	  completely up-to-date.
+
+2001-11-24 02:56  ecki
+
+	* de_DE/netstat.8, en_US/netstat.8: fixed minor errors in netstat.8
+	  man page (--numeric-users was missing, some font problems and
+	  --interfaces has no <interface> argument (Debian Bug #120475)
+	  thanks for the report to Uwe Hermann.
+
+2001-11-11 22:46  ecki
+
+	* en_US/ifconfig.8: added documentation about SI prefixes for
+	  decimal numbers
+
+2001-11-05 10:12  ecki
+
+	* en_US/rarp.8, fr_FR/arp.8, fr_FR/hostname.1, fr_FR/ifconfig.8,
+	  fr_FR/netstat.8, fr_FR/rarp.8, pt_BR/rarp.8 (utags:
+	  net-tools-1_65): changed troff syntax according to ESR's report
+
+2001-11-05 10:07  ecki
+
+	* en_US/arp.8 (tags: net-tools-1_65): fixed troff syntax, as
+	  reported by ESR. Did not changed the date of the man page.
+
+2001-06-29 04:47  ecki
+
+	* en_US/ifconfig.8: made man page more useful and added right link
+	  for irq conflicts in ifconfig.8
+
+2001-06-29 00:50  ecki
+
+	* fr_FR/netstat.8: man page fix CLOSED -> CLOSE
+
+2001-06-29 00:15  ecki
+
+	* en_US/netstat.8: fixed CLOSED -> CLOSE in french and english
+	  manpage as of bug report from Matthew Tippett
+
+Index: net-tools/man/de_DE/netstat.8
+===================================================================
+--- net-tools.orig/man/de_DE/netstat.8
++++ net-tools/man/de_DE/netstat.8
+@@ -9,7 +9,7 @@
+ .\" Modified: Tuan Hoang tuan@optimus.mitre.org 
+ .\"
+ .\"
+-.TH NETSTAT 8 "6. M\(:arz 1999" "net-tools" "Handbuch f\(:ur Linuxprogrammierer"
++.TH NETSTAT 8 "2007-12-02" "net-tools" "Handbuch f\(:ur Linuxprogrammierer"
+ 
+ .SH NAME
+ netstat \- Anzeige von Netzwerksverbindungen, Routentabellen, Schnittstellenstatistiken, maskierten Verbindungen, Netlink-Nachrichten und Mitgliedschaft in Multicastgruppen
+@@ -44,7 +44,6 @@ netstat \- Anzeige von Netzwerksverbindu
+ .B netstat
+ .RB [ \-veenpac ]
+ .RB { \-\-interfaces | \-i }
+-.RI [ Schnittstelle ]
+ 
+ .PP
+ 
+@@ -68,6 +67,8 @@ netstat \- Anzeige von Netzwerksverbindu
+ .SH BESCHREIBUNG
+ .B Netstat
+ zeigt Informationen des Linux Netzwerkssystems an.
++.PP
++.B Bitte beachten Sie, dass der Inhalt der deutschen man-page nicht vollst\(:andig ist, im Moment.
+ 
+ .SS "(no option)"
+ Ohne Optionen zeigt
+@@ -103,18 +104,17 @@ benutzt das Ausgabeformat von
+ Wegen Details siehe
+ .BR route (8).
+ 
+-.SS "\-i, \-\-interface \fISchnittstelle\fI"
++.SS "\-i, \-\-interfaces"
+ Wird die
+ .BR -i ", " --interfaces
+-Option verwendet,  so wird eine Tabelle aller (oder der angegebenen
+-.IR Schnittstellen ) 
++Option verwendet,  so wird eine Tabelle aller Schnittstellen
+ ausgedruckt.  Die Ausgabe ist im Format von
+ .B "ifconfig -e"
+ und wird in
+ .BR ifconfig (8)
+ beschrieben.
+ .B "netstat -ei" 
+-druckt eine Tabelle oder einen Eintrag f\(:ur einen einzelnes Interface wie
++druckt eine Tabelle f\(:ur Interfaces wie
+ .BR ifconfig .
+ Die
+ .B -a
+@@ -182,7 +182,7 @@ Dies hat den gleichen Effekt wie die Lan
+ und
+ .BR \-\-ddp.
+ 
+-.SS "\-c, \-\-continous"
++.SS "\-c, \-\-continuous"
+ Mit dieser Option wiederholt
+ .B netstat
+ im Sekundenabstand die Ausgabe, bis es abgebrochen wird.
+Index: net-tools/man/en_US/arp.8
+===================================================================
+--- net-tools.orig/man/en_US/arp.8
++++ net-tools/man/en_US/arp.8
+@@ -1,56 +1,111 @@
+-.TH ARP 8 "5 Jan 1999" "net-tools" "Linux Programmer's Manual"
++.TH ARP 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ arp \- manipulate the system ARP cache
+ .SH SYNOPSIS
+ .B arp 
+ .RB [ \-vn ] 
+-.RB [ "\-H type" ] 
+-.RB [ "-i if" ] 
+-.B -a 
+-.RB [ hostname ]
++.RB [ \-H 
++.IR type ] 
++.RB [ \-i
++.IR if ] 
++.RB [ \-a ] 
++.RI [ hostname ]
+ .PP
+ .B arp 
+ .RB [ \-v ]
+-.RB [ "\-i if" ] 
+-.B "\-d hostname"
++.RB [ \-i
++.IR if ] 
++.B \-d 
++.I hostname
+ .RB [ pub ]
+ .PP
+ .B arp 
+ .RB [ \-v ] 
+-.RB [ "\-H type" ] 
+-.RB [ "\-i if" ] 
+-.B -s hostname hw_addr
++.RB [ \-H
++.IR type ] 
++.RB [ \-i
++.IR if ] 
++.B \-s
++.I hostname hw_addr
+ .RB [ temp ] 
+ .PP
+ .B arp 
+ .RB [ \-v ] 
+-.RB [ "\-H type" ] 
+-.RB [ "\-i if" ] 
+-.B -s hostname hw_addr
+-.RB [ "netmask nm" ] 
++.RB [ \-H
++.IR type ] 
++.RB [ \-i
++.IR if ] 
++.B \-s
++.I hostname hw_addr
++.RB [ netmask
++.IR nm ] 
+ .B pub
+ .PP
+ .B arp 
+ .RB [ \-v ] 
+-.RB [ "\-H type" ] 
+-.RB [ "\-i if" ] 
+-.B -Ds hostname ifa
+-.RB [ "netmask nm" ] 
++.RB [ \-H
++.IR type ] 
++.RB [ \-i
++.IR if ] 
++.B \-Ds 
++.I hostname
++.I ifname
++.RB [ netmask
++.IR nm ] 
+ .B pub
+ .PP
+ .B arp 
+ .RB [ \-vnD ]
+-.RB [ "\-H type" ] 
+-.RB [ "-i if" ]
+-.B -f [filename]
++.RB [ \-H 
++.IR type ] 
++.RB [ \-i
++.IR if ]
++.B \-f 
++.RI [ filename ]
+ 
+ .SH DESCRIPTION
+ .B Arp
+-manipulates the kernel's ARP cache in various ways.  The primary options
+-are clearing an address mapping entry and manually setting up one.  For
+-debugging purposes, the
++manipulates or displays the kernel's IPv4 network neighbour cache. It can add
++entries to the table, delete one or display the current content.
++
++.B ARP
++stands for Address Resolution Protocol, which is used to find the media
++access control address of a network neighbour for a given IPv4 Address.
++.SH MODES
+ .B arp
+-program also allows a complete dump of the ARP cache.
++with no mode specifier will print the current content of the table. It is
++possible to limit the number of entries printed, by specifying an hardware
++address type, interface name or host address.
++
++.B arp -d
++.I address
++will delete a ARP table entry. Root or netadmin priveledge is required to do
++this. The entry is found by IP address. If a hostname is given, it will be
++resolved before looking up the entry in the ARP table.
++
++.B arp -s
++.I address hw_addr
++is used to set up a new table entry. The format of the 
++.I hw_addr
++parameter is dependent on the hardware class, but for most classes one can
++assume that the usual presentation can be used.  For the Ethernet class,
++this is 6 bytes in hexadecimal, separated by colons. When adding proxy arp
++entries (that is those with the
++.BR pub lish 
++flag set a 
++.B netmask 
++may be specified to proxy arp for entire subnets. This is not good
++practice, but is supported by older kernels because it can be
++useful. If the
++.B temp
++flag is not supplied entries will be permanent stored into the ARP
++cache. To simplyfy setting up entries for one of your own network interfaces, you can use the
++.B "arp \-Ds"
++.I address ifname
++form. In that case the hardware address is taken from the interface with the
++specified name.
++
++.br
+ .SH OPTIONS
+ .TP
+ .B "\-v, \-\-verbose"
+@@ -60,7 +115,7 @@ Tell the user what is going on by being 
+ shows numerical addresses instead of trying to determine symbolic host, port
+ or user names.
+ .TP
+-.B "\-H type, \-\-hw-type type"
++.B "\-H type, \-\-hw\-type type"
+ When setting or reading the ARP cache, this optional parameter tells
+ .B arp
+ which class of entries it should check for.  The default value of
+@@ -76,21 +131,13 @@ Other values might include network techn
+ and
+ .RB "NET/ROM (" netrom ")."
+ .TP
+-.B "\-a [hostname], \-\-display [hostname]"
+-Shows the entries of the specified hosts.  If the
+-.B hostname
+-parameter is not used,
+-.B all
+-entries will be displayed.
+-.TP
+-.B "\-d hostname, \-\-delete hostname"
+-Remove any entry for the specified host.  This can be used if the
+-indicated host is brought down, for example.
++.B \-a
++Use alternate BSD style output format (with no fixed columns).
+ .TP
+ .B "\-D, \-\-use-device"
+-Use the interface
+-.BR ifa "'s"
+-hardware address.
++Instead of a hw_addr, the given argument is the name of an interface. 
++.B arp
++will use the MAC address of that interface for the table entry. This is usually the best option to set up a proxy ARP entry to yourself.
+ .TP
+ .B "\-i If, \-\-device If"
+ Select an interface. When dumping the ARP cache only entries matching
+@@ -106,33 +153,15 @@ be answered. 
+ .B NOTE:
+ This has to be different from the interface to which the IP
+ datagrams will be routed.
+-.TP
+-.B "\-s hostname hw_addr, \-\-set hostname"
+-Manually create an ARP address mapping entry for host
+-.B hostname
+-with hardware address set to
+-.B hw_addr
+-.  The format of the hardware address is dependent on the hardware
+-class, but for most classes one can assume that the usual presentation
+-can be used.  For the Ethernet class, this is 6 bytes in hexadecimal,
+-separated by colons. When adding proxy arp entries (that is those with
+-the 
+-.BR pub lish 
+-flag set a 
+-.B netmask 
+-may be specified to proxy arp for entire subnets. This is not good
+-practice, but is supported by older kernels because it can be
+-useful. If the
+-.B temp
+-flag is not supplied entries will be permanent stored into the ARP
+-cache.
+-.br
+ .B NOTE:
+ As of kernel 2.2.0 it is no longer possible to set an ARP entry for an 
+ entire subnet. Linux instead does automagic proxy arp when a route
+ exists and it is forwarding. See 
+ .BR arp (7)
+-for details.
++for details. Also the
++.B dontpub
++option which is available for delete and set operations cannot be 
++used with 2.4 and newer kernels.
+ .TP
+ .B "\-f filename, \-\-file filename"
+ Similar to the
+@@ -167,8 +196,18 @@ flag. Permanent entries are marked with
+ and published entries have the
+ .B P
+ flag.
++.SH EXAMPLES
++.B /usr/sbin/arp -i eth0 -Ds 10.0.0.2 eth1 pub
++
++This will answer ARP requests for 10.0.0.2 on eth0 with the MAC address for
++eth1.
++
++.B /usr/sbin/arp -i eth1 -d 10.0.0.1
++
++Delete the ARP table entry for 10.0.0.1 on interface eth1. This will match
++published proxy ARP entries and permanent entries.
+ .SH FILES
+-.I /proc/net/arp,
++.I /proc/net/arp
+ .br
+ .I /etc/networks
+ .br
+@@ -178,5 +217,4 @@ flag.
+ .SH SEE ALSO
+ rarp(8), route(8), ifconfig(8), netstat(8)
+ .SH AUTHORS
+-Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org> with a lot of improvements
+-from net-tools Maintainer Bernd Eckenfels <net-tools@lina.inka.de>.
++Fred N. van Kempen <waltje@uwalt.nl.mugnet.org>, Bernd Eckenfels <net\-tools@lina.inka.de>.
+Index: net-tools/man/en_US/ethers.5
+===================================================================
+--- net-tools.orig/man/en_US/ethers.5
++++ net-tools/man/en_US/ethers.5
+@@ -1,4 +1,4 @@
+-.TH ETHERS 5 "April 26th, 1996" "" "File formats"
++.TH ETHERS 5 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME \"{{{roff}}}\"{{{
+ ethers \- Ethernet address to IP number database
+ .\"}}}
+@@ -7,17 +7,17 @@ ethers \- Ethernet address to IP number 
+ IP numbers, one line for each IP number:
+ .sp
+ .RS
+-\fIEthernet-address\fP  \fIIP-number\fP
++\fIEthernet\-address\fP  \fIIP\-number\fP
+ .RE
+ .sp
+-The two items are separated by any number of SPACE and/or TAB char
+-acters.   A \fB#\fP at the beginning of a line starts a comment
+-which extends to the end of the line.  The \fIEthernet-address\fP is
++The two items are separated by any number of SPACE and/or TAB characters.
++A \fB#\fP at the beginning of a line starts a comment
++which extends to the end of the line.  The \fIEthernet\-address\fP is
+ written as
+ .IR x : x : x : x : x : x ,
+ where \fIx\fP is a hexadecimal number between \fB0\fP and \fBff\fP
+ which represents one byte of the address, which is in network byte
+-order (big-endian).  The \fIIP-number\fP may be a hostname which
++order (big-endian).  The \fIIP\-number\fP may be a hostname which
+ can be resolved by DNS or a dot separated number.
+ .\"}}}
+ .SH EXAMPLES \"{{{
+Index: net-tools/man/en_US/hostname.1
+===================================================================
+--- net-tools.orig/man/en_US/hostname.1
++++ net-tools/man/en_US/hostname.1
+@@ -1,4 +1,4 @@
+-.TH HOSTNAME 1 "28 Jan 1996" "net-tools" "Linux Programmer's Manual"
++.TH HOSTNAME 1 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ 
+ .SH NAME
+ hostname \- show or set the system's host name
+@@ -23,7 +23,7 @@ nodename \- show or set the system's DEC
+ .RB [ \-f ]
+ .RB [ \-\-fqdn ]
+ .RB [ \-i ]
+-.RB [ \-\-ip-address ]
++.RB [ \-\-ip\-address ]
+ .RB [ \-\-long ]
+ .RB [ \-s ]
+ .RB [ \-\-short ]
+@@ -181,7 +181,7 @@ part of the FQDN) in the \fI/etc/hosts\f
+ .I "\-h, \-\-help"
+ Print a usage message and exit.
+ .TP
+-.I "\-i, \-\-ip-address"
++.I "\-i, \-\-ip\-address"
+ Display the IP address(es) of the host.
+ .TP
+ .I "\-n, \-\-node"
+@@ -205,9 +205,9 @@ Display the NIS domain name. If a parame
+ .SH FILES
+ .B /etc/hosts
+ .SH AUTHOR
+-Peter Tobias, <tobias@et-inf.fho-emden.de>
++Peter Tobias, <tobias@et\-inf.fho\-emden.de>
+ .br
+-Bernd Eckenfels, <net-tools@lina.inka.de> (NIS and manpage).
++Bernd Eckenfels, <net\-tools@lina.inka.de> (NIS and manpage).
+ .br
+ Steve Whitehouse, <SteveW@ACM.org> (DECnet support and manpage).
+ 
+Index: net-tools/man/en_US/ifconfig.8
+===================================================================
+--- net-tools.orig/man/en_US/ifconfig.8
++++ net-tools/man/en_US/ifconfig.8
+@@ -1,10 +1,10 @@
+-.TH IFCONFIG 8 "14 August 2000" "net-tools" "Linux Programmer's Manual"
++.TH IFCONFIG 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ ifconfig \- configure a network interface
+ .SH SYNOPSIS
+-.B "ifconfig [interface]"
++.B "ifconfig [-v] [-a] [-s] [interface]"
+ .br
+-.B "ifconfig interface [aftype] options | address ..."
++.B "ifconfig [-v] interface [aftype] options | address ..."
+ .SH DESCRIPTION
+ .B Ifconfig
+ is used to configure the kernel-resident network interfaces.  It is
+@@ -18,7 +18,7 @@ a single
+ .B interface
+ argument is given, it displays the status of the given interface
+ only; if a single
+-.B -a
++.B \-a
+ argument is given, it displays the status of all interfaces, even
+ those that are down.  Otherwise, it configures an interface.
+ 
+@@ -41,11 +41,27 @@ supported address families include
+ (AMPR Packet radio).
+ .SH OPTIONS
+ .TP
++.B -a
++display all interfaces which are currently available, even if down
++.TP
++.B -s
++display a short list (like netstat -i)
++.TP
++.B -v
++be more verbose for some error conditions
++.TP
+ .B interface
+ The name of the interface.  This is usually a driver name followed by
+ a unit number, for example
+ .B eth0
+-for the first Ethernet interface.
++for the first Ethernet interface. If your kernel supports alias interfaces,
++you can specify them with 
++.B eth0:0
++for the first alias of eth0. You can use them to assign a second address. To
++delete an alias interface use
++.BR "ifconfig eth0:0 down" .
++Note: for every scope (i.e. same net with address/netmask combination) all
++aliases are deleted, if you delete the first (primary).
+ .TP
+ .B up
+ This flag causes the interface to be activated.  It is implicitly
+@@ -122,13 +138,13 @@ are 
+ can be used to tell the driver to auto-sense the media.  Again, not
+ all drivers can do this.
+ .TP
+-.B "[-]broadcast [addr]"
++.B "[\-]broadcast [addr]"
+ If the address argument is given, set the protocol broadcast
+ address for this interface.  Otherwise, set (or clear) the
+ .B IFF_BROADCAST
+ flag for the interface.
+ .TP
+-.B "[-]pointopoint [addr]"
++.B "[\-]pointopoint [addr]"
+ This keyword enables the
+ .B point-to-point
+ mode of an interface, meaning that it is a direct link between two
+@@ -173,11 +189,20 @@ alias interfaces anymore. The statistics
+ are shared with all alias addresses on the same device. If you want per-address
+ statistics you should add explicit accounting
+ rules for the address using the 
+-.BR ipchains(8)
++.BR ipchains (8)
++or
++.BR iptables (8)
+ command.
+ .LP
+-Interrupt problems with Ethernet device drivers fail with EAGAIN. See
+-.I http://cesdis.gsfc.nasa.gov/linux/misc/irq-conflict.html
++Since net\-tools 1.60\-4 ifconfig is printing byte counters and human readable
++counters with IEC 60027-2 units. So 1 KiB are 2^10 byte. Note, the numbers 
++are truncated to one decimal (which can by quite a large error if you 
++consider 0.1 PiB is 112.589.990.684.262 bytes :)
++.LP
++Interrupt problems with Ethernet device drivers fail with EAGAIN
++.I (SIOCSIIFLAGS: Resource temporarily unavailable)
++it is most likely a interrupt conflict. See
++.I http://www.scyld.com/expert/irq\-conflict.html
+ for more information.
+ .SH FILES
+ .I /proc/net/socket 
+@@ -189,7 +214,9 @@ for more information.
+ While appletalk DDP and IPX addresses will be displayed they cannot be
+ altered by this command.
+ .SH SEE ALSO
+-route(8), netstat(8), arp(8), rarp(8), ipchains(8)
++route(8), netstat(8), arp(8), rarp(8), ipchains(8), iptables(8), ifup(8), interfaces(5).
++.br
++http://physics.nist.gov/cuu/Units/binary.html - Prefixes for binary multiples
+ .SH AUTHORS
+ Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+ .br
+@@ -198,3 +225,5 @@ Alan Cox, <Alan.Cox@linux.org>
+ Phil Blundell, <Philip.Blundell@pobox.com>
+ .br
+ Andi Kleen
++.br
++Bernd Eckenfels, <net\-tools@lina.inka.de>
+Index: net-tools/man/en_US/mii-tool.8
+===================================================================
+--- net-tools.orig/man/en_US/mii-tool.8
++++ net-tools/man/en_US/mii-tool.8
+@@ -1,13 +1,13 @@
+ .\" Copyright (C) 2000 David A. Hinds -- dhinds@pcmcia.sourceforge.org
+ .\" mii-tool.8 1.5 2000/04/25 22:58:19
+ .\"
+-.TH MII-TOOL 8 "2000/04/25 22:58:19" "net-tools"
++.TH MII\-TOOL 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ 
+ .SH NAME
+-mii-tool \- view, manipulate media-independent interface status
++mii\-tool \- view, manipulate media-independent interface status
+ 
+ .SH SYNOPSIS
+-.B mii-tool
++.B mii\-tool
+ [\fB\-v\fR, \fB\-\-verbose\fR]
+ [\fB\-V\fR, \fB\-\-version\fR]
+ [\fB\-R\fR, \fB\-\-reset\fR]
+@@ -32,12 +32,12 @@ single-speed hubs, are unable to autoneg
+ devices, the MII protocol also allows for establishing a link by
+ simply detecting either a 10baseT or 100baseT link beat.  The \fB\-F\fR
+ or \fB\-\-force\fR options can be used to force the MII to operate in
+-one mode, instead of autonegotiating.  The \fB\-A\fR and \fB-F\fR
++one mode, instead of autonegotiating.  The \fB\-A\fR and \fB\-F\fR
+ options are mutually exclusive.
+ .PP
+ The default short output reports the negotiated link speed and link
+ status for each interface.  If an interface or interfaces are not
+-specified on the command line, then \fBmii-tool\fR will check any
++specified on the command line, then \fBmii\-tool\fR will check any
+ available interfaces from \fBeth0\fR through \fBeth7\fR.
+ .SH OPTIONS
+ .TP
+@@ -59,7 +59,7 @@ Watch interface(s) and report changes in
+ interfaces are polled at one second intervals.
+ .TP
+ \fB\-l\fR, \fB\-\-log\fR
+-Used with \fB-w\fR, records link status changes in the system log
++Used with \fB\-w\fR, records link status changes in the system log
+ instead of printing on standard output.
+ .TP
+ \fB\-F\fI media\fR, \fB\-\-force=\fImedia\fR
+@@ -72,7 +72,24 @@ media technologies.  Multiple technologi
+ commas.  Valid media are \fB100baseT4\fR, \fB100baseTx-FD\fR,
+ \fB100baseTx-HD\fR, \fB10baseT-FD\fR, and \fB10baseT-HD\fR.
+ 
++.SH DIAGNOSTICS
++.TP
++SIOCGMIIPHY on 'eth?' failed: Invalid argument
++If the interface is not running (up), kernel will refuse to report its link state.
++.TP
++SIOCGMIIPHY on 'eth?' failed: Operation not permitted
++Most kernels restrict access to root.
++.TP
++SIOCGMIIPHY on 'eth?' failed: No such device
++This error is shown, if the kernel does not know about the named device.
++.TP
++SIOCGMIIPHY on 'eth?' failed: Operation not supported 
++The interface in question does not support MII queries. Most likely, it does not have 
++MII transceivers, at all.
++
+ .SH AUTHORS
+ David Hinds \- dhinds@pcmcia.sourceforge.org
+ .br
+ Donald Becker \- becker@scyld.com
++.br
++Bernd Eckenfels \- ecki@debian.org
+Index: net-tools/man/en_US/nameif.8
+===================================================================
+--- net-tools.orig/man/en_US/nameif.8
++++ net-tools/man/en_US/nameif.8
+@@ -1,10 +1,10 @@
+-.TH NAMEIF 8 "18 Oct 2000" "net-tools" "Linux's Administrator's Manual"
++.TH NAMEIF 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ nameif \- name network interfaces based on MAC addresses
+ .SH SYNOPSIS
+-.B "nameif [-c configfile] [-s]"
++.B "nameif [\-c configfile] [\-s]"
+ .br
+-.B "nameif [-c configfile] [-s] {interface macaddress}"
++.B "nameif [\-c configfile] [\-s] {interface macaddress}"
+ .SH DESCRIPTION
+ .B nameif 
+ renames network interfaces based on mac addresses. When no arguments are
+@@ -18,11 +18,11 @@ looks for the interface with the given M
+ name given.
+ 
+ When the 
+-.I -s
++.I \-s
+ argument is given all error messages go to the syslog.
+ 
+ When the 
+-.I -c 
++.I \-c 
+ argument is given with a file name that file is read instead of /etc/mactab.
+ 
+ .SH NOTES
+Index: net-tools/man/en_US/netstat.8
+===================================================================
+--- net-tools.orig/man/en_US/netstat.8
++++ net-tools/man/en_US/netstat.8
+@@ -8,7 +8,7 @@
+ .\" Modified: Tuan Hoang tqhoang@bigfoot.com 
+ .\"
+ .\"
+-.TH NETSTAT 8 "19 December 2000" "net-tools" "Linux Programmer's Manual"
++.TH NETSTAT 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ 
+ .SH NAME
+ netstat \- Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships
+@@ -23,7 +23,7 @@ netstat \- Print network connections, ro
+ .RB [ \-\-listening | \-l ]
+ .RB [ \-\-all | \-a ]
+ .RB [ \-\-numeric | \-n ]
+-.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
++.RB [ \-\-numeric\-hosts "] [" \-\-numeric\-ports "] [" \-\-numeric\-users ]
+ .RB [ \-\-symbolic | \-N ]
+ .RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+ .RB [ \-\-timers | \-o ]
+@@ -37,31 +37,30 @@ netstat \- Print network connections, ro
+ .RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+ .RB [ \-\-verbose | \-v ]
+ .RB [ \-\-numeric | \-n ]
+-.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
++.RB [ \-\-numeric\-hosts "] [" \-\-numeric\-ports "] [" \-\-numeric\-users ]
+ .RB [ \-\-continuous | \-c]
+ .P
+ .B netstat
+ .RB { \-\-interfaces | \-i }
+-.RI [ iface ]
+ .RB [ \-\-all | \-a ]
+ .RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+ .RB [ \-\-verbose | \-v ]
+ .RB [ \-\-program | \-p ]
+ .RB [ \-\-numeric | \-n ]
+-.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
++.RB [ \-\-numeric-hosts "] [" \-\-numeric-ports "] [" \-\-numeric-users ]
+ .RB [ \-\-continuous | \-c]
+ .P
+ .B netstat
+ .RB { \-\-groups | \-g }
+ .RB [ \-\-numeric | \-n ]
+-.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
++.RB [ \-\-numeric\-hosts "] [" \-\-numeric\-ports "] [" \-\-numeric\-users ]
+ .RB [ \-\-continuous | \-c]
+ .P
+ .B netstat
+ .RB { \-\-masquerade | \-M }
+ .RB [ \-\-extend | \-e ]
+ .RB [ \-\-numeric | \-n ]
+-.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
++.RB [ \-\-numeric\-hosts "] [" \-\-numeric\-ports "] [" \-\-numeric\-users ]
+ .RB [ \-\-continuous | \-c]
+ .P
+ .B netstat
+@@ -78,6 +77,8 @@ netstat \- Print network connections, ro
+ .P
+ .IR address_family_options :
+ .PP
++.RB [ -4 ]
++.RB [ -6 ]
+ .RB [ \-\-protocol= { inet , unix , ipx , ax25 , netrom , ddp }[, ...] ]
+ .RB [ \-\-unix | \-x ] 
+ .RB [ \-\-inet | \-\-ip ]
+@@ -98,12 +99,17 @@ displays a list of open sockets.  If you
+ address families, then the active sockets of all configured address
+ families will be printed.
+ .SS "\-\-route , \-r"
+-Display the kernel routing tables.
++Display the kernel routing tables. See the description in 
++.BR route (8) 
++for details. 
++.B netstat -r 
++and 
++.B route -e 
++produce the same output.
+ .SS "\-\-groups , \-g"
+ Display multicast group membership information for IPv4 and IPv6.
+-.SS "\-\-interface=\fIiface \fR, \fB\-i"
+-Display a table of all network interfaces, or the specified
+-.IR iface ) .
++.SS "\-\-interfaces, \-i"
++Display a table of all network interfaces.
+ .SS "\-\-masquerade , \-M"
+ Display a list of masqueraded connections.
+ .SS "\-\-statistics , \-s"
+@@ -115,13 +121,13 @@ useful information about unconfigured ad
+ .SS "\-\-numeric , \-n"
+ Show numerical addresses instead of trying to determine symbolic host, port
+ or user names.
+-.SS "\-\-numeric-hosts"
++.SS "\-\-numeric\-hosts"
+ shows numerical host addresses but does not affect the resolution of
+ port or user names.
+-.SS "\-\-numeric-ports"
++.SS "\-\-numeric\-ports"
+ shows numerical port numbers but does not affect the resolution of
+ host or user names.
+-.SS "\-\-numeric-users"
++.SS "\-\-numeric\-users"
+ shows numerical user IDs but does not affect the resolution of host or
+ port names.
+ 
+@@ -164,23 +170,24 @@ Show the PID and name of the program to 
+ Show only listening sockets.  (These are omitted by default.)
+ .SS "\-a, \-\-all"
+ Show both listening and non-listening sockets.  With the
+-.B --interfaces
+-option, show interfaces that are not marked 
++.B \-\-interfaces
++option, show interfaces that are not up
+ .SS "\-F"
+ Print routing information from the FIB.  (This is the default.)
+ .SS "\-C"
+ Print routing information from the route cache.
+-.IR UP .
+ .P
+ .SH OUTPUT
+ .P
+ .SS Active Internet connections \fR(TCP, UDP, raw)\fR
+ .SS "Proto" 
+ The protocol (tcp, udp, raw) used by the socket. 
+-.SS "Recv-Q"
+-The count of bytes not copied by the user program connected to this socket.
+-.SS "Send-Q"
+-The count of bytes not acknowledged by the remote host.
++.SS "Recv\-Q"
++Established: The count of bytes not copied by the user program connected to this socket.
++Listening: Since Kernel 2.6.18 this column contains the current syn backlog.
++.SS "Send\-Q"
++Established: The count of bytes not acknowledged by the remote host.
++Listening: Since Kernel 2.6.18 this column contains the maximum size of the syn backlog.
+ .SS "Local Address" 
+ Address and port number of the local end of the socket.  Unless the
+ .BR \-\-numeric " (" \-n )
+@@ -221,7 +228,7 @@ TIME_WAIT
+ The socket is waiting after close to handle packets still in the network.
+ .TP
+ .I
+-CLOSED
++CLOSE
+ The socket is not being used.
+ .TP
+ .I
+@@ -255,7 +262,7 @@ The username or the user id (UID) of the
+ .SS "PID/Program name"
+ Slash-separated pair of the process id (PID) and process name of the 
+ process that owns the socket.
+-.B --program
++.B \-\-program
+ causes this column to be included.  You will also need
+ .I superuser
+ privileges to see this information on sockets you don't own.  This
+@@ -358,7 +365,7 @@ to the socket.
+ .PP
+ .SH NOTES
+ Starting with Linux release 2.2 
+-.B netstat -i 
++.B netstat \-i 
+ does not show interface statistics for alias interfaces. To get per
+ alias interface counters you need to setup explicit rules using the
+ .BR ipchains(8) 
+@@ -438,12 +445,12 @@ as it is viewed. This is unlikely to occ
+ .P
+ .SH AUTHORS
+ The netstat user interface was written by Fred Baumgarten
+-<dc6iq@insu1.etec.uni-karlsruhe.de> the man page basically
++<dc6iq@insu1.etec.uni\-karlsruhe.de>, the man page basically
+ by Matt Welsh <mdw@tc.cornell.edu>. It was updated by
+ Alan Cox <Alan.Cox@linux.org> but could do with a bit more
+ work.  It was updated again by Tuan Hoang
+ <tqhoang@bigfoot.com>.
+ .br
+-The man page and the command included in the net-tools
++The man page and the command included in the net\-tools
+ package is totally rewritten by Bernd Eckenfels 
+ <ecki@linux.de>.
+Index: net-tools/man/en_US/plipconfig.8
+===================================================================
+--- net-tools.orig/man/en_US/plipconfig.8
++++ net-tools/man/en_US/plipconfig.8
+@@ -1,4 +1,4 @@
+-.TH PLIPCONFIG 8 "17 February 1995" "" ""
++.TH PLIPCONFIG 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ plipconfig \- fine tune PLIP device parameters 
+ .SH SYNOPSIS
+Index: net-tools/man/en_US/rarp.8
+===================================================================
+--- net-tools.orig/man/en_US/rarp.8
++++ net-tools/man/en_US/rarp.8
+@@ -1,20 +1,20 @@
+-.TH RARP 8 "4 August 1997" "net-tools" "Linux Programmer's Manual"
++.TH RARP 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ rarp \- manipulate the system RARP table
+ .SH SYNOPSIS
+-.B "rarp [-V] [--version] [-h] [--help]"
++.B "rarp [\-V] [\-\-version] [\-h] [\-\-help]"
+ .br
+-.B "rarp -a"
++.B "rarp \-a"
+ .br
+-.B "rarp [-v] -d hostname ..."
++.B "rarp [\-v] \-d hostname ..."
+ .br
+-.B "rarp [-v] [-t type] -s hostname hw_addr"
++.B "rarp [\-v] [\-t type] \-s hostname hw_addr"
+ .SH NOTE
+ .P
+ This program is obsolete.  From version 2.3, the Linux kernel 
+ no longer contains RARP support.  For a replacement RARP daemon, see
+ .I
+-ftp://ftp.dementia.org/pub/net-tools
++ftp://ftp.dementia.org/pub/net\-tools
+ .SH DESCRIPTION
+ .B Rarp
+ manipulates the kernel's RARP table in various ways.  The primary options
+@@ -61,8 +61,8 @@ Remove all RARP entries for the specifie
+ Create a RARP address mapping entry for host
+ .B hostname
+ with hardware address set to
+-.B hw_addr
+-.  The format of the hardware address is dependent on the hardware
++.BR hw_addr .
++The format of the hardware address is dependent on the hardware
+ class, but for most classes one can assume that the usual presentation
+ can be used.  For the Ethernet class, this is 6 bytes in hexadecimal,
+ separated by colons.
+Index: net-tools/man/en_US/route.8
+===================================================================
+--- net-tools.orig/man/en_US/route.8
++++ net-tools/man/en_US/route.8
+@@ -1,4 +1,4 @@
+-.TH ROUTE 8 "2 January 2000" "net-tools" "Linux Programmer's Manual"
++.TH ROUTE 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ route \- show / manipulate the IP routing table
+ .SH SYNOPSIS
+@@ -51,7 +51,7 @@ If]
+ .RB [ \-V ] 
+ .RB [ \-\-version ]
+ .RB [ \-h ]
+-.RB [ \--help ]
++.RB [ \-\-help ]
+ .SH DESCRIPTION
+ .B Route
+ manipulates the kernel's IP routing tables.  Its primary use is to set
+@@ -73,16 +73,16 @@ displays the current contents of the rou
+ .SH OPTIONS
+ .TP
+ .B \-A family
+-use the specified address family (eg `inet'; use `route --help' for a full 
++use the specified address family (eg `inet'; use `route \-\-help' for a full 
+ list).
+ 
+ .TP 
+-.B -F
++.B \-F
+ operate on the kernel's FIB (Forwarding Information Base) routing
+ table. 
+ This is the default.
+ .TP 
+-.B -C
++.B \-C
+ operate on the kernel's routing cache.
+ 
+ .TP
+@@ -96,7 +96,7 @@ nameserver has vanished.
+ .TP
+ .B \-e
+ use
+-.BR netstat (8)-format
++.BR netstat (8)\-format
+ for displaying the routing table.
+ .B \-ee 
+ will generate a very long line with all parameters from the routing table.
+@@ -117,7 +117,7 @@ the
+ .B target
+ is a network.
+ .TP
+-.B -host
++.B \-host
+ the
+ .B target 
+ is a host.
+@@ -141,7 +141,7 @@ set the metric field in the routing tabl
+ set the TCP Maximum Segment Size (MSS) for connections over this route
+ to M bytes. 
+ The default is the device MTU minus headers, or a lower MTU when path mtu 
+-discovery occured. This setting can be used to force smaller TCP packets on the
++discovery occurred. This setting can be used to force smaller TCP packets on the
+ other end when path mtu discovery does not work (usually because of
+ misconfigured firewalls that block ICMP Fragmentation Needed)
+ .TP 
+@@ -179,24 +179,27 @@ modifiers (metric - netmask - gw - dev) 
+ 
+ .SH EXAMPLES
+ .TP
+-.B route add -net 127.0.0.0
+-adds the normal loopback entry, using netmask 255.0.0.0 (class A net,
+-determined from the destination address) and associated with the 
+-"lo" device (assuming this device was prviously set up correctly with
++.B route add \-net 127.0.0.0 netmask 255.0.0.0 dev lo
++adds the normal loopback entry, using netmask 255.0.0.0 and associated with the 
++"lo" device (assuming this device was previously set up correctly with
+ .BR ifconfig (8)). 
+ 
+ .TP 
+-.B route add -net 192.56.76.0 netmask 255.255.255.0 dev eth0
+-adds a route to the network 192.56.76.x via 
+-"eth0". The Class C netmask modifier is not really necessary here because
+-192.* is a Class C IP address. The word "dev" can be omitted here. 
++.B route add \-net 192.56.76.0 netmask 255.255.255.0 dev eth0
++adds a route to the local network 192.56.76.x via 
++"eth0".  The word "dev" can be omitted here. 
+ 
+ .TP
+-.B route add default gw mango-gw
++.B route del default
++deletes the current default route, which is labeled "default" or 0.0.0.0
++in the destination field of the current routing table.
++
++.TP
++.B route add default gw mango\-gw
+ adds a default route (which will be used if no other route matches).
+-All packets using this route will be gatewayed through "mango-gw". The
++All packets using this route will be gatewayed through "mango\-gw". The
+ device which will actually be used for that route depends on how we
+-can reach "mango-gw" - the static route to "mango-gw" will have to be
++can reach "mango\-gw" - the static route to "mango\-gw" will have to be
+ set up before. 
+ 
+ .TP
+@@ -205,18 +208,18 @@ Adds the route to the "ipx4" host via th
+ "ipx4" is the SLIP host).
+ 
+ .TP
+-.B route add -net 192.57.66.0 netmask 255.255.255.0 gw ipx4
++.B route add \-net 192.57.66.0 netmask 255.255.255.0 gw ipx4
+ This command adds the net "192.57.66.x" to be gatewayed through the former
+ route to the SLIP interface.
+ 
+ .TP
+-.B route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0
++.B route add \-net 224.0.0.0 netmask 240.0.0.0 dev eth0
+ This is an obscure one documented so people know how to do it. This sets
+ all of the class D (multicast) IP routes to go via "eth0". This is the
+ correct normal configuration line with a multicasting kernel. 
+ 
+ .TP
+-.B route add -net 10.0.0.0 netmask 255.0.0.0 reject
++.B route add \-net 10.0.0.0 netmask 255.0.0.0 reject
+ This installs a rejecting route for the private network "10.x.x.x."
+ 
+ .LP
+@@ -282,14 +285,14 @@ recent kernels, but may be needed by rou
+ Number of references to this route. (Not used in the Linux kernel.)
+ .TP
+ .B Use
+-Count of lookups for the route.  Depending on the use of -F and -C this will
+-be either route cache misses (-F) or hits (-C).
++Count of lookups for the route.  Depending on the use of \-F and \-C this will
++be either route cache misses (\-F) or hits (\-C).
+ .TP
+ .B Iface
+ Interface to which packets for this route will be sent.
+ .TP
+ .B MSS 
+-Default maximum segement size for TCP connections over this route.
++Default maximum segment size for TCP connections over this route.
+ .TP
+ .B Window  
+ Default window size for TCP connections over this route.
+@@ -323,4 +326,4 @@ for Linux was originally written by Fred
+ Linus Torvalds for pl15. Alan Cox added the mss and window options for
+ Linux 1.1.22. irtt support and merged with netstat from Bernd Eckenfels.
+ .SH AUTHOR
+-Currently maintained by Phil Blundell <Philip.Blundell@pobox.com>.
++Currently maintained by Phil Blundell <Philip.Blundell@pobox.com> and Bernd Eckenfels <net-tools@lina.inka.de>.
+Index: net-tools/man/en_US/slattach.8
+===================================================================
+--- net-tools.orig/man/en_US/slattach.8
++++ net-tools/man/en_US/slattach.8
+@@ -1,8 +1,8 @@
+-.TH SLATTACH 8 "12 Feb 1994" "" ""
++.TH SLATTACH 8 "2008\-10\-03" "net\-tools" "Linux System Administrator's Manual"
+ .SH NAME
+ slattach \- attach a network interface to a serial line
+ .SH SYNOPSIS
+-.B "slattach [-dehlLmnqv] [-c command] [-p proto] [-s speed] [tty]"
++.B "slattach [\-dehlLmnqv] [\-c command] [\-p proto] [\-s speed] [tty]"
+ .br
+ .SH DESCRIPTION
+ .B Slattach
+@@ -11,47 +11,48 @@ is a tiny little program that can be use
+ you to use it for point-to-point links to other computers.
+ .SH OPTIONS
+ .TP
+-.B "[-c command]"
++.B "[\-c command]"
+ Execute
+ .B command
+ when the line is hung up. This can be used to run scripts or re-establish
+ connections when a link goes down.
+ .TP
+-.B "[-d]"
++.B "[\-d]"
+ Enable debugging output.  Useful when determining why a given
+ setup doesn't work.
+ .TP
+-.B "[-h]"
++.B "[\-h]"
+ Exit when the carrier is lost. This works on both /dev/tty and /dev/cua
+ devices by directly monitoring the carrier status every 15 seconds.
+-.B "[-v]"
++.TP
++.B "[\-v]"
+ Enable verbose output.  Useful in shell scripts.
+ .TP
+-.B "[-q]"
++.B "[\-q]"
+ Operate in quiet mode - no messages at all.
+ .TP
+-.B "[-l]"
++.B "[\-l]"
+ Create an UUCP-style lockfile for the device in /var/lock.
+ .TP
+-.B "[-n]"
++.B "[\-n]"
+ Equivalent to the "mesg n" command.
+ .TP
+-.B "[-m]"
++.B "[\-m]"
+ Do \fBnot\fP initialize the line into 8 bits raw mode.
+ .TP
+-.B "[-e]"
++.B "[\-e]"
+ Exit right after initializing device, instead of waiting for the
+-line to hangup.
++line to hang up.
+ .TP
+-.B "[-L]"
++.B "[\-L]"
+ Enable 3 wire operation. The terminal is moved into CLOCAL mode, 
+ carrier watching is disabled.
+ .TP
+-.B "[-p proto]"
++.B "[\-p proto]"
+ Set a specific kind of protocol to use on the line.  The default
+ is set to
+-.B "cslip"
+-, i.e. compressed SLIP.  Other possible values are
++.BR "cslip" ,
++i.e. compressed SLIP.  Other possible values are
+ .B "slip"
+ (normal SLIP), 
+ .B "adaptive"
+@@ -70,7 +71,7 @@ to be active on the line. For kiss conne
+ .B axattach
+ program should be used.
+ .TP
+-.B "[-s speed]"
++.B "[\-s speed]"
+ Set a specific line speed, other than the default.
+ .PP
+ If no arguments are given, the current terminal line (usually: the
+Index: net-tools/man/fr_FR/arp.8
+===================================================================
+--- net-tools.orig/man/fr_FR/arp.8
++++ net-tools/man/fr_FR/arp.8
+@@ -140,8 +140,8 @@ pour un sous réseau entier.
+ Similaire à l'option 
+ .B \-s
+ , mais cette fois les informations d'adresses sont prises dans le fichier
+-.B nom_de_fichier
+-. Ceci peut être utilisé si les entrées ARP à configurer sont
++.BR nom_de_fichier .
++Ceci peut être utilisé si les entrées ARP à configurer sont
+ nombreuses.  Le nom du fichier de données est très souvent nommé
+ .B /etc/ethers
+ , mais ce n'est pas officiel.
+@@ -160,8 +160,8 @@ en notation décimale pointée.
+ .LP
+ Chaque entrée complète se trouvant dans le cache ARP est marquée de
+ l'indicateur
+-.B C
+-. Les entrées permanentes sont marquées de l'indicateur
++.BR C .
++Les entrées permanentes sont marquées de l'indicateur
+ .B M
+ et les entrées 'pub' ont l'indicateur
+ .B P
+Index: net-tools/man/fr_FR/hostname.1
+===================================================================
+--- net-tools.orig/man/fr_FR/hostname.1
++++ net-tools/man/fr_FR/hostname.1
+@@ -84,8 +84,8 @@ Appelé sans argument, le programme affic
+ .LP
+ .B hostname
+ fournit le nom du système tel qu'il est retourné par la fonction
+-.BR getdomainname (2)
+-. Ceci est connu comme nom de domaine YP/NIS du système.
++.BR getdomainname (2).
++Ceci est connu comme nom de domaine YP/NIS du système.
+ 
+ 
+ .LP
+@@ -145,8 +145,8 @@ Le nom de domaine DNS est la partie suiv
+ .LP
+ La façon dont vous pouvez le changer dépend de la configuration
+ (habituellement dans 
+-.IR /etc/host.conf )
+-. Si le fichier 'hosts' est analysé avant d'interroger le DNS ou 
++.IR /etc/host.conf ).
++Si le fichier 'hosts' est analysé avant d'interroger le DNS ou 
+ NIS) vous pouvez le changer dans le fichier 
+ .IR /etc/hosts .
+ 
+Index: net-tools/man/fr_FR/ifconfig.8
+===================================================================
+--- net-tools.orig/man/fr_FR/ifconfig.8
++++ net-tools/man/fr_FR/ifconfig.8
+@@ -60,14 +60,14 @@ le signe moins (\-) est présent, l'optio
+ .TP
+ .B "[\-]promisc"
+ Valide ou invalide le mode
+-.B promiscuous
+-.  S'il est validé, tous les paquets circulant sur le réseau
++.BR promiscuous .
++S'il est validé, tous les paquets circulant sur le réseau
+ seront reçus sur cette interface.
+ .TP
+ .B "[\-]allmulti"
+ Valide ou invalide le fonctionnement de l'interface en mode
+-.B all-multicast
+-.  S'il est validé, tous les paquets multicast circulant sur le réseau
++.BR all-multicast .
++S'il est validé, tous les paquets multicast circulant sur le réseau
+ seront reçus sur cette interface.
+ .TP
+ .B "metric N"
+Index: net-tools/man/fr_FR/netstat.8
+===================================================================
+--- net-tools.orig/man/fr_FR/netstat.8
++++ net-tools/man/fr_FR/netstat.8
+@@ -8,7 +8,7 @@
+ .\" Modified: Tuan Hoang tuan@optimus.mitre.org 
+ .\"
+ .\"
+-.TH NETSTAT 8 "25 Fév 1999" "net-tools" "Linux Programmer's Manual"
++.TH NETSTAT 8 "2007-12-02" "net-tools" "Linux Programmer's Manual"
+ 
+ .SH NAME
+ netstat \- Affiche les connexions réseau, les tables de routage, les
+@@ -106,7 +106,7 @@ Veuillez consulter
+ .BR route (8)
+ pour plus de détails.
+ 
+-.SS "\-i, \-\-interface \fIiface\fI"
++.SS "\-i, \-\-interfaces \fIiface\fI"
+ Si vous utilisez l'option
+ .BR -i ", " --interfaces
+ , une table de toutes (ou de l'interface
+@@ -118,8 +118,8 @@ même que celui de la commande
+ .BR ifconfig (8).
+ .B "netstat -ei"
+ affiche une table ou une seule entrée d'interface comme la commande 
+-.B ifconfig
+-. Avec le paramètre
++.BR ifconfig .
++Avec le paramètre
+ .B -a
+ , vous pouvez inclure les interfaces qui ne sont pas configurées (c.a.d qui
+ n'ont pas l'indicateur
+@@ -249,7 +249,7 @@ La socket attend le traitement de tous l
+ avant d'entreprendre la fermeture.
+ .TP
+ .I
+-CLOSED
++CLOSE
+ La socket n'est pas utilisée.
+ .TP
+ .I
+@@ -409,8 +409,7 @@ Affiche le chemin correspondant à l'atta
+ Depuis la version 2.2 du noyau, netstat -i n'affiche plus les statistiques
+ des interfaces alias. Pour obtenir les compteurs par interface alias, vous
+ devez définir des règles spécifiques à l'aide de la commande
+-.BR ipchains(8) 
+-.  
++.BR ipchains (8).
+ 
+ .SH FICHIERS
+ .ta
+Index: net-tools/man/fr_FR/rarp.8
+===================================================================
+--- net-tools.orig/man/fr_FR/rarp.8
++++ net-tools/man/fr_FR/rarp.8
+@@ -55,8 +55,8 @@ Supprime toutes les entrées RARP relativ
+ Crée manuellement une correspondance d'adresses RARP pour l'hôte
+ .B nom_d_hôte
+ avec l'adresse matérielle
+-.B adr_materielle
+-. Le format de l'adresse matérielle est dépendant du matériel,
++.BR adr_materielle .
++Le format de l'adresse matérielle est dépendant du matériel,
+ mais pour la plupart on peut considérer que la présentation classique
+ peut être utilisée.  Pour la classe Ethernet, c'est 6 octets en hexadécimal,
+ séparés par des double-points.
+Index: net-tools/man/pt_BR/netstat.8
+===================================================================
+--- net-tools.orig/man/pt_BR/netstat.8
++++ net-tools/man/pt_BR/netstat.8
+@@ -8,7 +8,7 @@
+ .\" Traduzido para português por Arnaldo Carvalho de Melo <acme@conectiva.com.br>
+ .\" Revisado por Jorge Luiz Godoy Filho <jorge@bestway.com.br>
+ .\"
+-.TH NETSTAT 8 "19 de maio de 1997" "net-tools" "Manual do Programador Linux"
++.TH NETSTAT 8 "2007-12-02" "net-tools" "Manual do Programador Linux"
+ 
+ .SH NOME
+ netstat \- Mostra conexões de rede, tabelas de roteamento, estatísticas de interface e conexões
+@@ -97,7 +97,7 @@ Por favor veja
+ .BR route (8)
+ para maiores detalhes.
+ 
+-.SS "\-i, \-\-interface \fIiface\fI"
++.SS "\-i, \-\-interfaces \fIiface\fI"
+ Se você usar a opção
+ .BR -i ", " --interfaces
+ , uma tabela de todas (ou da
+Index: net-tools/man/pt_BR/rarp.8
+===================================================================
+--- net-tools.orig/man/pt_BR/rarp.8
++++ net-tools/man/pt_BR/rarp.8
+@@ -50,8 +50,8 @@ máquina indicada for desligada, por exem
+ Cria um mapeamento de endereços RARP para a máquina
+ .B máquina
+ com endereço de hardware configurado para
+-.B endereço_hardware
+-.  O formato do endereço de hardware depende da classe do hardware, mas
++.B endereço_hardware.
++O formato do endereço de hardware depende da classe do hardware, mas
+ para a maioria das classes você pode assumir que a apresentação usual pode
+ ser usada.  Para a classe Ethernet, são 6 bytes em hexadecimal, separados
+ por dois pontos (:).

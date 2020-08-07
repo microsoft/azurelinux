@@ -1,0 +1,61 @@
+Undocumented patches found in diff.gz.
+
+Index: net-tools/netstat.c
+===================================================================
+--- net-tools.orig/netstat.c
++++ net-tools/netstat.c
+@@ -387,6 +387,10 @@ static void prg_cache_load(void)
+ #ifdef DIRENT_HAVE_D_TYPE_WORKS
+ 	    if (direfd->d_type!=DT_LNK) 
+ 		continue;
++#else
++	    /* Skip . and .. */
++	    if (!isdigit(direfd->d_name[0]))
++		continue;
+ #endif
+ 	    if (procfdlen+1+strlen(direfd->d_name)+1>sizeof(line)) 
+ 		continue;
+@@ -541,9 +545,9 @@ static void finish_this_one(int uid, uns
+ 	printf("%-10lu ",inode);
+     }
+     if (flag_prg)
+-	printf("%-" PROGNAME_WIDTHs "s",prg_cache_get(inode));
++	printf(" %-16s",prg_cache_get(inode));
+     if (flag_opt)
+-	printf("%s", timers);
++	printf(" %s", timers);
+     putchar('\n');
+ }
+ 
+@@ -1250,7 +1254,7 @@ static int unix_info(void)
+ 	printf(_("(w/o servers)"));
+     }
+ 
+-    printf(_("\nProto RefCnt Flags       Type       State         I-Node"));
++    printf(_("\nProto RefCnt Flags       Type       State         I-Node  "));
+     print_progname_banner();
+     printf(_(" Path\n"));	/* xxx */
+ 
+@@ -1813,10 +1817,11 @@ int main
+ 	    }
+ 	    printf(_("\nProto Recv-Q Send-Q Local Address           Foreign Address         State      "));	/* xxx */
+ 	    if (flag_exp > 1)
+-		printf(_(" User       Inode     "));
+-	    print_progname_banner();
++		printf(_(" User       Inode      "));
++            if (flag_prg)
++                printf(_(" PID/Program name"));
+ 	    if (flag_opt)
+-		printf(_(" Timer"));	/* xxx */
++		printf(_(" Timer"));
+ 	    printf("\n");
+ #else
+ 	    if (flag_arg) {
+@@ -1917,6 +1922,7 @@ int main
+ 	    }
+ #endif
+ 	}
++	            
+ 	if (!flag_cnt || i)
+ 	    break;
+ 	sleep(1);

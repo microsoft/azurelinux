@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "qemu-kvm",
+        "qemu-img"
+    ]
+}

@@ -1,0 +1,385 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.21 - Fri Oct 3 00:05:20 2008 UTC by ecki
+Enable netstat -s for IPv6 (Debian Bug #453859 from Varun Chandramohan)
+
+Revision 1.20 - Sat Dec 1 18:44:56 2007 UTC by ecki
+Faster pagesize aligned fopen for netstat -s (Eric Dumazet)
+
+Revision 1.19 - Sat Dec 1 18:29:05 2007 UTC by ecki
+Better netstat -s error handling and larger buffers
+
+Revision 1.18 - Wed Feb 12 03:30:57 2003 UTC by ak
+Add text for two new TCP statistics and fix some existing descriptions
+
+Revision 1.17 - Sun Apr 28 15:41:01 2002 UTC by ak
+Fix some counter descriptions.  Noted by Jamal Hadi.
+
+Revision 1.16 - Wed Oct 24 11:57:05 2001 UTC by ak
+(Finally) update netstat -s for 2.4 statistics.
+
+Revision 1.15 - Fri Oct 19 09:28:01 2001 UTC by ak
+Only print unknown statistics when their counter is > 0.
+
+Index: net-tools/statistics.c
+===================================================================
+--- net-tools.orig/statistics.c
++++ net-tools/statistics.c
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright 1997,1999,2000 Andi Kleen. Subject to the GPL. 
+- * $Id: statistics.c,v 1.14 2001/02/02 18:01:23 pb Exp $
++ * $Id: statistics.c,v 1.21 2008/10/03 00:05:20 ecki Exp $
+  * 19980630 - i18n - Arnaldo Carvalho de Melo <acme@conectiva.com.br> 
+  * 19981113 - i18n fixes - Arnaldo Carvalho de Melo <acme@conectiva.com.br> 
+  * 19990101 - added net/netstat, -t, -u, -w supprt - Bernd Eckenfels 
+@@ -11,6 +11,7 @@
+ #include <string.h>
+ #include "config.h"
+ #include "intl.h"
++#include "proc.h"
+ 
+ /* #define WARN 1 */
+ 
+@@ -83,6 +84,32 @@ struct entry Iptab[] =
+     {"FragCreates", N_("%u fragments created"), opt_number}
+ };
+ 
++struct entry Ip6tab[] =
++{
++    {"Ip6InReceives", N_("%u total packets received"), number},
++    {"Ip6InHdrErrors", N_("%u with invalid headers"), opt_number},
++    {"Ip6InTooBigErrors", N_("%u with packets too big"), opt_number},
++    {"Ip6InNoRoutes", N_("%u incoming packets with no route"), opt_number},
++    {"Ip6InAddrErrors", N_("%u with invalid addresses"), opt_number},
++    {"Ip6InUnknownProtos", N_("%u with unknown protocol"), opt_number},
++    {"Ip6InTruncatedPkts", N_("%u with truncated packets"), opt_number},
++    {"Ip6InDiscards", N_("%u incoming packets discarded"), number},
++    {"Ip6InDelivers", N_("%u incoming packets delivered"), number},
++    {"Ip6OutForwDatagrams", N_("%u forwarded"), number},
++    {"Ip6OutRequests", N_("%u requests sent out"), number},     /*? */
++    {"Ip6OutDiscards", N_("%u outgoing packets dropped"), opt_number},
++    {"Ip6OutNoRoutes", N_("%u dropped because of missing route"), opt_number},
++    {"Ip6ReasmTimeout", N_("%u fragments dropped after timeout"), opt_number},
++    {"Ip6ReasmReqds", N_("%u reassemblies required"), opt_number}, /* ? */
++    {"Ip6ReasmOKs", N_("%u packets reassembled ok"), opt_number},
++    {"Ip6ReasmFails", N_("%u packet reassembles failed"), opt_number},
++    {"Ip6FragOKs", N_("%u fragments received ok"), opt_number},
++    {"Ip6FragFails", N_("%u fragments failed"), opt_number},
++    {"Ip6FragCreates", N_("%u fragments created"), opt_number},
++    {"Ip6InMcastPkts", N_("%u incoming multicast packets"), opt_number},
++    {"Ip6OutMcastPkts", N_("%u outgoing multicast packets"), opt_number}
++};
++
+ struct entry Icmptab[] =
+ {
+     {"InMsgs", N_("%u ICMP messages received"), number},
+@@ -113,6 +140,41 @@ struct entry Icmptab[] =
+     {"OutAddrMaskReps", N_("address mask replies: %u"), i_outp_icmp | I_TITLE},
+ };
+ 
++struct entry Icmp6tab[] =
++{
++    {"Icmp6InMsgs", N_("%u ICMP messages received"), number},
++    {"Icmp6InErrors", N_("%u input ICMP message failed."), number},
++    {"Icmp6InDestUnreachs", N_("destination unreachable: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InPktTooBigs", N_("packets too big: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InTimeExcds", N_("received ICMPv6 time exceeded: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InParmProblems", N_("parameter problem: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InEchos", N_("echo requests: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InEchoReplies", N_("echo replies: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InGroupMembQueries", N_("group member queries: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InGroupMembResponses", N_("group member responses: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InGroupMembReductions", N_("group member reductions: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InRouterSolicits", N_("router solicits: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InRouterAdvertisements", N_("router advertisement: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InNeighborSolicits", N_("neighbour solicits: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InNeighborAdvertisements", N_("neighbour advertisement: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6InRedirects", N_("redirects: %u"), i_inp_icmp | I_TITLE},
++    {"Icmp6OutMsgs", N_("%u ICMP messages sent"), number},
++    {"Icmp6OutDestUnreachs", N_("destination unreachable: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutPktTooBigs", N_("packets too big: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutTimeExcds", N_("sent ICMPv6 time exceeded: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutParmProblems", N_("parameter problem: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutEchos", N_("echo requests: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutEchoReplies", N_("echo replies: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutGroupMembQueries", N_("group member queries: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutGroupMembResponses", N_("group member responses: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutGroupMembReductions", N_("group member reductions: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutRouterSolicits", N_("router solicits: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutRouterAdvertisements ", N_("router advertisement: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutNeighborSolicits", N_("neighbor solicits: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutNeighborAdvertisements", N_("neighbor advertisements: %u"), i_outp_icmp | I_TITLE},
++    {"Icmp6OutRedirects", N_("redirects: %u"), i_outp_icmp | I_TITLE},
++};
++
+ struct entry Tcptab[] =
+ {
+     {"RtoAlgorithm", N_("RTO algorithm is %s"), i_rto_alg | I_STATIC},
+@@ -139,6 +201,14 @@ struct entry Udptab[] =
+     {"OutDatagrams", N_("%u packets sent"), number},
+ };
+ 
++struct entry Udp6tab[] =
++{
++    {"Udp6InDatagrams", N_("%u packets received"), number},
++    {"Udp6NoPorts", N_("%u packets to unknown port received."), number},
++    {"Udp6InErrors", N_("%u packet receive errors"), number},
++    {"Udp6OutDatagrams", N_("%u packets sent"), number},
++};
++
+ struct entry Tcpexttab[] =
+ {
+     {"SyncookiesSent", N_("%u SYN cookies sent"), opt_number},
+@@ -172,19 +242,59 @@ struct entry Tcpexttab[] =
+     { "DelayedACKLost", N_("Quick ack mode was activated %u times"), opt_number },
+     { "ListenOverflows", N_("%u times the listen queue of a socket overflowed"),
+       opt_number },
+-    { "ListenDrops", N_("%u SYNs to LISTEN sockets ignored"), opt_number },
++    { "ListenDrops", N_("%u SYNs to LISTEN sockets dropped"), opt_number },
+     { "TCPPrequeued", N_("%u packets directly queued to recvmsg prequeue."), 
+       opt_number },
+-    { "TCPDirectCopyFromBacklog", N_("%u packets directly received"
+-				     " from backlog"), opt_number },
+-    { "TCPDirectCopyFromPrequeue", N_("%u packets directly received"
+-				      " from prequeue"), opt_number },
++    { "TCPDirectCopyFromBacklog", N_("%u bytes directly in process context from backlog"), opt_number },
++    { "TCPDirectCopyFromPrequeue", N_("%u bytes directly received in process context from prequeue"),
++				      opt_number },
+     { "TCPPrequeueDropped", N_("%u packets dropped from prequeue"), opt_number },
+-    { "TCPHPHits", N_("%u packets header predicted"), number },
++    { "TCPHPHits", N_("%u packet headers predicted"), number },
+     { "TCPHPHitsToUser", N_("%u packets header predicted and "
+ 			    "directly queued to user"), opt_number },
+     { "SockMallocOOM", N_("Ran %u times out of system memory during " 
+ 			  "packet sending"), opt_number }, 
++    { "TCPPureAcks", N_("%u acknowledgments not containing data payload received"), opt_number },
++    { "TCPHPAcks", N_("%u predicted acknowledgments"), opt_number },
++    { "TCPRenoRecovery", N_("%u times recovered from packet loss due to fast retransmit"), opt_number },
++    { "TCPSackRecovery", N_("%u times recovered from packet loss by selective acknowledgements"), opt_number },
++    { "TCPSACKReneging", N_("%u bad SACK blocks received"), opt_number },
++    { "TCPFACKReorder", N_("Detected reordering %u times using FACK"), opt_number },
++    { "TCPSACKReorder", N_("Detected reordering %u times using SACK"), opt_number },
++    { "TCPTSReorder", N_("Detected reordering %u times using time stamp"), opt_number },
++    { "TCPRenoReorder", N_("Detected reordering %u times using reno fast retransmit"), opt_number },
++    { "TCPFullUndo", N_("%u congestion windows fully recovered without slow start"), opt_number }, 
++    { "TCPPartialUndo", N_("%u congestion windows partially recovered using Hoe heuristic"), opt_number },
++    { "TCPDSackUndo", N_("%u congestion window recovered without slow start using DSACK"), opt_number },
++    { "TCPLossUndo", N_("%u congestion windows recovered without slow start after partial ack"), opt_number },
++    { "TCPLostRetransmits", N_("%u retransmits lost"), opt_number },
++    { "TCPRenoFailures",  N_("%u timeouts after reno fast retransmit"), opt_number },
++    { "TCPSackFailures",  N_("%u timeouts after SACK recovery"), opt_number },
++    { "TCPLossFailures",  N_("%u timeouts in loss state"), opt_number },
++    { "TCPFastRetrans", N_("%u fast retransmits"), opt_number },
++    { "TCPForwardRetrans", N_("%u forward retransmits"), opt_number }, 
++    { "TCPSlowStartRetrans", N_("%u retransmits in slow start"), opt_number },
++    { "TCPTimeouts", N_("%u other TCP timeouts"), opt_number },
++    { "TCPRenoRecoveryFailed", N_("%u reno fast retransmits failed"), opt_number },
++    { "TCPSackRecoveryFail", N_("%u SACK retransmits failed"), opt_number },
++    { "TCPSchedulerFailed", N_("%u times receiver scheduled too late for direct processing"), opt_number },
++    { "TCPRcvCollapsed", N_("%u packets collapsed in receive queue due to low socket buffer"), opt_number },
++    { "TCPDSACKOldSent", N_("%u DSACKs sent for old packets"), opt_number },
++    { "TCPDSACKOfoSent", N_("%u DSACKs sent for out of order packets"), opt_number },
++    { "TCPDSACKRecv", N_("%u DSACKs received"), opt_number },
++    { "TCPDSACKOfoRecv", N_("%u DSACKs for out of order packets received"), opt_number },
++    { "TCPAbortOnSyn", N_("%u connections reset due to unexpected SYN"), opt_number },
++    { "TCPAbortOnData", N_("%u connections reset due to unexpected data"), opt_number },
++    { "TCPAbortOnClose", N_("%u connections reset due to early user close"), opt_number },
++    { "TCPAbortOnMemory", N_("%u connections aborted due to memory pressure"), opt_number },
++    { "TCPAbortOnTimeout", N_("%u connections aborted due to timeout"), opt_number },
++    { "TCPAbortOnLinger", N_("%u connections aborted after user close in linger timeout"), opt_number },
++    { "TCPAbortFailed", N_("%u times unabled to send RST due to no memory"), opt_number }, 
++    { "TCPMemoryPressures", N_("TCP ran low on memory %u times"), opt_number }, 
++    { "TCPLoss", N_("%u TCP data loss events"), opt_number },
++    { "TCPDSACKUndo", N_("%u congestion windows recovered without slow start by DSACK"), 
++	opt_number },
++    { "TCPRenoRecoveryFail", N_("%u classic Reno fast retransmits failed"), opt_number },
+ };
+ 
+ struct tabtab {
+@@ -204,6 +314,15 @@ struct tabtab snmptabs[] =
+     {NULL}
+ };
+ 
++struct tabtab snmp6tabs[] =
++{
++    {"Ip6", Ip6tab, sizeof(Ip6tab), &f_raw},
++    {"Icmp6", Icmp6tab, sizeof(Icmp6tab), &f_raw},
++    {"Udp6", Udp6tab, sizeof(Udp6tab), &f_udp},
++    {"Tcp6", Tcptab, sizeof(Tcptab), &f_tcp},
++    {NULL}
++};
++
+ /* XXX IGMP */
+ 
+ int cmpentries(const void *a, const void *b)
+@@ -222,7 +341,8 @@ void printval(struct tabtab *tab, char *
+ 	    ent = bsearch(&key, tab->tab, tab->size / sizeof(struct entry),
+ 			  sizeof(struct entry), cmpentries);
+     if (!ent) {			/* try our best */
+-	printf("%*s%s: %d\n", states[state].indent, "", title, val);
++	if (val) 
++		printf("%*s%s: %d\n", states[state].indent, "", title, val);
+ 	return;
+     }
+     type = ent->type;
+@@ -289,14 +409,17 @@ struct tabtab *newtable(struct tabtab *t
+ 	return &dummytab;
+ }
+ 
+-void process_fd(FILE *f)
++int process_fd(FILE *f, int all, char *filter)
+ {
+-    char buf1[1024], buf2[1024];
++    char buf1[2048], buf2[2048];
+     char *sp, *np, *p;
+     while (fgets(buf1, sizeof buf1, f)) {
+ 	int endflag;
+ 	struct tabtab *tab;
+ 
++        if (buf1[0] == '\n') // skip empty first line in 2.6 kernels
++            continue;
++            
+ 	if (!fgets(buf2, sizeof buf2, f))
+ 	    break;
+ 	sp = strchr(buf1, ':');
+@@ -305,6 +428,10 @@ void process_fd(FILE *f)
+ 	    goto formaterr;
+ 	*sp = '\0';
+ 
++        if (!all)
++           if (strncmp(buf1, filter, strlen(filter)))
++               continue;
++
+ 	tab = newtable(snmptabs, buf1);
+ 	if (tab == NULL) {
+ 		printf("unknown %s\n", buf1);
+@@ -330,13 +457,47 @@ void process_fd(FILE *f)
+ 	    sp = p + 1;
+ 	}
+     }
+-  return;
++  return 0;
+   
+ formaterr:
+-  perror(_("error parsing /proc/net/snmp"));
+-  return;
++  return -1;
++}
++
++void cpytitle(char *original, char *new)
++{
++     char *ptr = original;
++     while(*ptr != '6' && *ptr != '\0') {
++           *new = *ptr;
++            new++;
++            ptr++;
++     }
++    *new = *ptr;
++    new++;
++    *new = '\0';
+ }
+ 
++void process6_fd(FILE *f)
++{
++   char buf1[1024],buf2[50],buf3[1024];
++   unsigned long val;
++   struct tabtab *tab = NULL;
++   int cpflg = 0;
++
++   while (fgets(buf1, sizeof buf1, f)) {
++          sscanf(buf1, "%s %lu", buf2, &val);
++          if(!cpflg) {
++             cpytitle(buf2, buf3);
++             tab = newtable(snmp6tabs, buf3);
++             cpflg = 1;
++          }
++          if(!strstr(buf2, buf3)) {
++             cpytitle(buf2, buf3);
++             tab = newtable(snmp6tabs, buf3);
++          }
++          printval(tab, buf2, val);
++   }
++
++}
+ 
+ void parsesnmp(int flag_raw, int flag_tcp, int flag_udp)
+ {
+@@ -344,22 +505,25 @@ void parsesnmp(int flag_raw, int flag_tc
+ 
+     f_raw = flag_raw; f_tcp = flag_tcp; f_udp = flag_udp;
+     
+-    f = fopen("/proc/net/snmp", "r");
++    f = proc_fopen("/proc/net/snmp");
+     if (!f) {
+ 	perror(_("cannot open /proc/net/snmp"));
+ 	return;
+     }
+-    process_fd(f);
++
++    if (process_fd(f, 1, NULL) < 0)
++      fprintf(stderr, _("Problem while parsing /proc/net/snmp\n"));
+ 
+     if (ferror(f))
+ 	perror("/proc/net/snmp");
+ 
+     fclose(f);
+ 
+-    f = fopen("/proc/net/netstat", "r");
++    f = proc_fopen("/proc/net/netstat");
+ 
+     if (f) {
+-    	process_fd(f);
++    	if (process_fd(f, 1, NULL) <0)
++          fprintf(stderr, _("Problem while parsing /proc/net/netstat\n"));
+ 
+         if (ferror(f))
+ 	    perror("/proc/net/netstat");
+@@ -369,6 +533,33 @@ void parsesnmp(int flag_raw, int flag_tc
+     return;
+ }
+     
++void parsesnmp6(int flag_raw, int flag_tcp, int flag_udp)
++{
++    FILE *f;
++
++    f_raw = flag_raw; f_tcp = flag_tcp; f_udp = flag_udp;
++
++    f = fopen("/proc/net/snmp6", "r");
++    if (!f) {
++        perror(_("cannot open /proc/net/snmp6"));
++        return;
++    }
++    process6_fd(f);
++    if (ferror(f))
++        perror("/proc/net/snmp6");
++
++    fclose(f);
++    f = fopen("/proc/net/snmp", "r");
++    if (!f) {
++        perror(_("cannot open /proc/net/snmp"));
++        return;
++    }
++    process_fd(f, 0, "Tcp");
++    if (ferror(f))
++        perror("/proc/net/snmp");
++
++    fclose(f);
++}
+ 
+ void inittab(void)
+ {
+@@ -379,3 +570,13 @@ void inittab(void)
+ 	qsort(t->tab, t->size / sizeof(struct entry),
+ 	      sizeof(struct entry), cmpentries);
+ }
++
++void inittab6(void)
++{
++    struct tabtab *t;
++
++    for (t = snmp6tabs; t->title; t++)
++        qsort(t->tab, t->size / sizeof(struct entry),
++              sizeof(struct entry), cmpentries);
++}
++

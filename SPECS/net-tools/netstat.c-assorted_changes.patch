@@ -1,0 +1,141 @@
+Unsyncable patches that are nevertheless already in upstream's CVS in the
+following revisions:
+
+* 1.57: Enable netstat -s for IPv6 (Debian Bug #453859 from Varun Chandramohan)
+* 1.55: use new page aliged proc_fopen for address families
+
+Updated on 2014/05/11 to fix #541172
+ (patch by Hannes von Haugwitz <hannes@vonhaugwitz.com>).
+
+--- a/netstat.c
++++ b/netstat.c
+@@ -6,7 +6,7 @@
+  *              NET-3 Networking Distribution for the LINUX operating
+  *              system.
+  *
+- * Version:     $Id: netstat.c,v 1.54 2007/12/01 18:12:34 ecki Exp $
++ * Version:     $Id: netstat.c,v 1.55 2007/12/01 19:00:40 ecki Exp $
+  *
+  * Authors:     Fred Baumgarten, <dc6iq@insu1.etec.uni-karlsruhe.de>
+  *              Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+@@ -94,6 +94,7 @@
+ #include "sockets.h"
+ #include "interface.h"
+ #include "util.h"
++#include "proc.h"
+ 
+ #define PROGNAME_WIDTH 20
+ 
+@@ -104,6 +105,8 @@
+ /* prototypes for statistics.c */
+ void parsesnmp(int, int, int);
+ void inittab(void);
++void parsesnmp6(int, int, int);
++void inittab6(void);
+ 
+ typedef enum {
+     SS_FREE = 0,		/* not allocated                */
+@@ -153,7 +156,7 @@
+ FILE *procinfo;
+ 
+ #define INFO_GUTS1(file,name,proc)			\
+-  procinfo = fopen((file), "r");			\
++  procinfo = proc_fopen((file));			\
+   if (procinfo == NULL) {				\
+     if (errno != ENOENT) {				\
+       perror((file));					\
+@@ -174,7 +177,7 @@
+ #if HAVE_AFINET6
+ #define INFO_GUTS2(file,proc)				\
+   lnr = 0;						\
+-  procinfo = fopen((file), "r");		       	\
++  procinfo = proc_fopen((file));		       	\
+   if (procinfo != NULL) {				\
+     do {						\
+       if (fgets(buffer, sizeof(buffer), procinfo))	\
+@@ -454,7 +457,7 @@
+     char buffer[256], dev[16];
+     int st, vs, vr, sendq, recvq, ret;
+ 
+-    f = fopen(_PATH_PROCNET_NR, "r");
++    f = proc_fopen(_PATH_PROCNET_NR);
+     if (f == NULL) {
+ 	if (errno != ENOENT) {
+ 	    perror(_PATH_PROCNET_NR);
+@@ -650,7 +653,7 @@
+ #if HAVE_AFX25
+ static int x25_info(void)
+ {
+-       FILE *f=fopen(_PATH_PROCNET_X25, "r");
++       FILE *f=proc_fopen(_PATH_PROCNET_X25);
+        char buffer[256],dev[16];
+        int st,vs,vr,sendq,recvq,lci;
+        static char *x25_state[5]=
+@@ -661,7 +664,7 @@
+                "ESTABLISHED",
+                "RECOVERY"
+        };
+-       if(!(f=fopen(_PATH_PROCNET_X25, "r")))
++       if(!(f=proc_fopen(_PATH_PROCNET_X25)))
+        {
+                if (errno != ENOENT) {
+                        perror(_PATH_PROCNET_X25);
+@@ -1269,7 +1272,7 @@
+ 	N_("ESTABLISHED"),
+ 	N_("RECOVERY")
+     };
+-    if (!(f = fopen(_PATH_PROCNET_AX25, "r"))) {
++    if (!(f = proc_fopen(_PATH_PROCNET_AX25))) {
+ 	if (errno != ENOENT) {
+ 	    perror(_PATH_PROCNET_AX25);
+ 	    return (-1);
+@@ -1365,13 +1368,13 @@
+     unsigned sport = 0, dport = 0;
+     struct stat s;
+     
+-    f = fopen(_PATH_PROCNET_IPX_SOCKET1, "r");
++    f = proc_fopen(_PATH_PROCNET_IPX_SOCKET1);
+     if (!f) {
+         if (errno != ENOENT) {
+             perror(_PATH_PROCNET_IPX_SOCKET1);
+             return (-1);
+         }
+-        f = fopen(_PATH_PROCNET_IPX_SOCKET2, "r");
++        f = proc_fopen(_PATH_PROCNET_IPX_SOCKET2);
+ 
+         /* We need to check for directory */
+         if (f) {
+@@ -1728,9 +1731,30 @@
+     }
+ 
+     if (flag_sta) {
+-        inittab();
+-	parsesnmp(flag_raw, flag_tcp, flag_udp);
+-	exit(0);
++        char *tmp1, *tmp2;
++        char buf[256];
++        if (!afname[0]) {
++            inittab();
++            parsesnmp(flag_raw, flag_tcp, flag_udp);
++        } else {
++            safe_strncpy(buf, afname, sizeof(buf));
++            tmp1 = buf;
++            if ((tmp2 = index(tmp1, ',')))
++                 printf("Multiple interface\n");
++            else if(!strncmp(buf,"inet6",5)) {
++#if HAVE_AFINET6
++                 inittab6();
++                 parsesnmp6(flag_raw, flag_tcp, flag_udp);
++#else
++                 printf("Address type not supported for stats\n");
++                 exit(1);
++#endif
++            } else {
++                 printf("Address type not supported for stats\n");
++                 exit(1);
++            }
++        }
++        exit(0);
+     }
+     
+     if (flag_rou) {

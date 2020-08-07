@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "ipmi.service": "7f55866340569bfbb4bcce32a6218667d0e8dbba99d9aac4ef8e192d3952fa71",
+  "openipmi-2.0.25.tar.gz": "f0f1a0ec732409930b7a31a6daa6cf39b585f52059b62a5f092b7ece21aa75a5",
+  "openipmi-helper": "e646bf49b3962dd0cd6261d5a7c44240261c856e0bc47d70bdc2720a2ea7d530"
+ }
+}

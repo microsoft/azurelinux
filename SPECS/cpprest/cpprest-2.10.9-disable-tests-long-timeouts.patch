@@ -1,0 +1,70 @@
+diff --git a/Release/tests/functional/http/client/connections_and_errors.cpp b/Release/tests/functional/http/client/connections_and_errors.cpp
+index 22e0fc82..115597fc 100644
+--- a/Release/tests/functional/http/client/connections_and_errors.cpp
++++ b/Release/tests/functional/http/client/connections_and_errors.cpp
+@@ -130,6 +130,7 @@ SUITE(connections_and_errors)
+         VERIFY_THROWS(client.request(methods::GET).wait(), web::http::http_exception);
+     }
+ 
++/*
+     TEST_FIXTURE(uri_address, request_timeout)
+     {
+         test_http_server::scoped_server scoped(m_uri);
+@@ -148,7 +149,9 @@ SUITE(connections_and_errors)
+ #endif
+         t.get();
+     }
++*/
+ 
++/*
+     TEST_FIXTURE(uri_address, request_timeout_microsecond)
+     {
+         pplx::task<test_request*> t;
+@@ -175,6 +178,7 @@ SUITE(connections_and_errors)
+         {
+         }
+     }
++*/
+ 
+     TEST_FIXTURE(uri_address, invalid_method)
+     {
+diff --git a/Release/tests/functional/http/listener/requests_tests.cpp b/Release/tests/functional/http/listener/requests_tests.cpp
+index db293598..7e1dbbc4 100644
+--- a/Release/tests/functional/http/listener/requests_tests.cpp
++++ b/Release/tests/functional/http/listener/requests_tests.cpp
+@@ -167,6 +167,7 @@ SUITE(requests_tests)
+         listener.close().wait();
+     }
+ 
++/*
+     TEST_FIXTURE(uri_address, response_order)
+     {
+         http_listener listener(m_uri);
+@@ -208,6 +209,7 @@ SUITE(requests_tests)
+ 
+         listener.close().wait();
+     }
++*/
+ 
+     TEST_FIXTURE(uri_address, uri_encoding, "Ignore", "Codeplex 201")
+     {
+diff --git a/Release/tests/functional/websockets/client/client_construction.cpp b/Release/tests/functional/websockets/client/client_construction.cpp
+index cffe647b..03a93b01 100644
+--- a/Release/tests/functional/websockets/client/client_construction.cpp
++++ b/Release/tests/functional/websockets/client/client_construction.cpp
+@@ -87,6 +87,7 @@ SUITE(client_construction)
+         VERIFY_ARE_EQUAL(config2.credentials().username(), cred.username());
+     }
+ 
++/*
+     // Verify that we can get the baseuri from websocket_client connect.
+     TEST_FIXTURE(uri_address, uri_test)
+     {
+@@ -106,6 +107,7 @@ SUITE(client_construction)
+         VERIFY_ARE_EQUAL(client2.uri(), m_uri);
+         client2.close().wait();
+     }
++*/
+ 
+     TEST_FIXTURE(uri_address, move_operations)
+     {

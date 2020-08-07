@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Tue, 1 Sep 2015 16:02:55 -0700
+Subject: [PATCH] Measure multiboot images and modules
+
+---
+ grub-core/loader/i386/multiboot_mbi.c | 3 +++
+ grub-core/loader/multiboot.c          | 2 ++
+ grub-core/loader/multiboot_mbi2.c     | 4 +++-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/i386/multiboot_mbi.c b/grub-core/loader/i386/multiboot_mbi.c
+index dc98dbcae25..1c5b0ac25ce 100644
+--- a/grub-core/loader/i386/multiboot_mbi.c
++++ b/grub-core/loader/i386/multiboot_mbi.c
+@@ -36,6 +36,7 @@
+ #include <grub/net.h>
+ #include <grub/i18n.h>
+ #include <grub/lib/cmdline.h>
++#include <grub/tpm.h>
+ 
+ #ifdef GRUB_MACHINE_EFI
+ #include <grub/efi/efi.h>
+@@ -173,6 +174,8 @@ grub_multiboot_load (grub_file_t file, const char *filename)
+       return grub_errno;
+     }
+ 
++  grub_tpm_measure((unsigned char*)buffer, len, GRUB_KERNEL_PCR, filename);
++
+   header = find_header (buffer, len);
+ 
+   if (header == 0)
+diff --git a/grub-core/loader/multiboot.c b/grub-core/loader/multiboot.c
+index 26df46a4161..93e026c53db 100644
+--- a/grub-core/loader/multiboot.c
++++ b/grub-core/loader/multiboot.c
+@@ -51,6 +51,7 @@
+ #include <grub/memory.h>
+ #include <grub/i18n.h>
+ #include <grub/efi/sb.h>
++#include <grub/tpm.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -440,6 +441,7 @@ grub_cmd_module (grub_command_t cmd __attribute__ ((unused)),
+     }
+ 
+   grub_file_close (file);
++  grub_tpm_measure (module, size, GRUB_KERNEL_PCR, argv[0]);
+   return GRUB_ERR_NONE;
+ }
+ 
+diff --git a/grub-core/loader/multiboot_mbi2.c b/grub-core/loader/multiboot_mbi2.c
+index 4df6595954d..d5ad02a33a1 100644
+--- a/grub-core/loader/multiboot_mbi2.c
++++ b/grub-core/loader/multiboot_mbi2.c
+@@ -36,6 +36,7 @@
+ #include <grub/i18n.h>
+ #include <grub/net.h>
+ #include <grub/lib/cmdline.h>
++#include <grub/tpm.h>
+ 
+ #if defined (GRUB_MACHINE_EFI)
+ #include <grub/efi/efi.h>
+@@ -131,8 +132,9 @@ grub_multiboot2_load (grub_file_t file, const char *filename)
+ 
+   COMPILE_TIME_ASSERT (MULTIBOOT_HEADER_ALIGN % 4 == 0);
+ 
++  grub_tpm_measure ((unsigned char *)buffer, len, GRUB_KERNEL_PCR, filename);
++
+   header = find_header (mld.buffer, len);
+-
+   if (header == 0)
+     {
+       grub_free (mld.buffer);

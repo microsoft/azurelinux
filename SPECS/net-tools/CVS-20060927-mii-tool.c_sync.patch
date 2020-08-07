@@ -1,0 +1,341 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.9 - Wed Sep 27 20:59:18 2006 UTC by ecki
+
+GigE Support by Stephen Hemminger from
+http://developer.osdl.org/shemminger/prototypes/mii-tool.tar.bz2
+with verbose register patch from Dean Gaudet
+
+Revision 1.8 - Thu Jun 3 22:18:26 2004 UTC by ecki
+
+added linebreak to  version signature
+
+Revision 1.7 - Mon Oct 20 22:22:22 2003 UTC by ecki
+make sure version string is helpful
+
+Revision 1.6 - Mon Oct 20 22:01:13 2003 UTC by ecki
+patch to recognize more hardware without MII support (from Redhat Bug#77882,
+notified by Tilmann Bubeck).
+
+Revision 1.5 - Sat Jun 28 03:19:04 2003 UTC by ecki
+Use new style MII ioctls only. This will give you a warning, if compiled
+with old kernel source tree. It will also not work if compiled with
+new source on old kernels. The new ioctls also require root for reading, the
+old didnt. This fixes Debian bug #133648. No fallback compatibility
+is included for reasons of cleaner source.
+
+Revision 1.4 - Wed May 28 19:41:16 2003 UTC by ecki
+make it compile on stricter gcc3.3
+
+Revision 1.3 - Sun Sep 15 00:25:14 2002 UTC by ecki
+Implemented the Sean Reifenschneider suggested fflush() to the --watch
+function of mii-tool.
+
+Revision 1.2 - Fri Jun 14 01:08:20 2002 UTC by ecki
+this fixes segfault on -A "" and -F "" in mii-tool reported in debian
+bug #139027
+
+Index: net-tools/mii-tool.c
+===================================================================
+--- net-tools.orig/mii-tool.c
++++ net-tools/mii-tool.c
+@@ -29,8 +29,7 @@
+ 	http://www.national.com/pf/DP/DP83840.html
+ */
+ 
+-static char version[] =
+-"mii-tool.c 1.9 2000/04/28 00:56:08 (David Hinds)\n";
++static char Version[] = "$Id: mii-tool.c,v 1.9 2006/09/27 20:59:18 ecki Exp $\n(Author: David Hinds based on Donald Becker's mii-diag)";
+ 
+ #include <unistd.h>
+ #include <stdlib.h>
+@@ -46,16 +45,19 @@ static char version[] =
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+ #include <net/if.h>
++#include <linux/sockios.h>
++
+ #ifndef __GLIBC__
+ #include <linux/if_arp.h>
+ #include <linux/if_ether.h>
+ #endif
+ #include "mii.h"
++#include "version.h"
+ 
+ #define MAX_ETH		8		/* Maximum # of interfaces */
+ 
+ /* Table of known MII's */
+-static struct {
++static const struct {
+     u_short	id1, id2;
+     char	*name;
+ } mii_id[] = {
+@@ -74,6 +76,9 @@ static struct {
+     { 0x0181, 0x4410, "Quality QS6612" },
+     { 0x0282, 0x1c50, "SMSC 83C180" },
+     { 0x0300, 0xe540, "TDK 78Q2120" },
++    { 0x0141, 0x0c20, "Yukon 88E1011" },
++    { 0x0141, 0x0cc0, "Yukon-EC 88E1111" },
++    { 0x0141, 0x0c90, "Yukon-2 88E1112" },
+ };
+ #define NMII (sizeof(mii_id)/sizeof(mii_id[0]))
+ 
+@@ -137,40 +142,48 @@ static void mdio_write(int skfd, int loc
+ 
+ const struct {
+     char	*name;
+-    u_short	value;
++    u_short	value[2];
+ } media[] = {
+     /* The order through 100baseT4 matches bits in the BMSR */
+-    { "10baseT-HD",	MII_AN_10BASET_HD },
+-    { "10baseT-FD",	MII_AN_10BASET_FD },
+-    { "100baseTx-HD",	MII_AN_100BASETX_HD },
+-    { "100baseTx-FD",	MII_AN_100BASETX_FD },
+-    { "100baseT4",	MII_AN_100BASET4 },
+-    { "100baseTx",	MII_AN_100BASETX_FD | MII_AN_100BASETX_HD },
+-    { "10baseT",	MII_AN_10BASET_FD | MII_AN_10BASET_HD },
++    { "10baseT-HD",	{MII_AN_10BASET_HD} },
++    { "10baseT-FD",	{MII_AN_10BASET_FD} },
++    { "100baseTx-HD",	{MII_AN_100BASETX_HD} },
++    { "100baseTx-FD",	{MII_AN_100BASETX_FD} },
++    { "100baseT4",	{MII_AN_100BASET4} },
++    { "100baseTx",	{MII_AN_100BASETX_FD | MII_AN_100BASETX_HD} },
++    { "10baseT",	{MII_AN_10BASET_FD | MII_AN_10BASET_HD} },
++
++    { "1000baseT-HD",	{0, MII_BMCR2_1000HALF} },
++    { "1000baseT-FD",	{0, MII_BMCR2_1000FULL} },
++    { "1000baseT",	{0, MII_BMCR2_1000HALF|MII_BMCR2_1000FULL} },
+ };
+ #define NMEDIA (sizeof(media)/sizeof(media[0]))
+ 	
+ /* Parse an argument list of media types */
+-static int parse_media(char *arg)
++static int parse_media(char *arg, unsigned *bmcr2)
+ {
+     int mask, i;
+     char *s;
+     mask = strtoul(arg, &s, 16);
+     if ((*arg != '\0') && (*s == '\0')) {
+ 	if ((mask & MII_AN_ABILITY_MASK) &&
+-	    !(mask & ~MII_AN_ABILITY_MASK))
+-	    return mask;
++	    !(mask & ~MII_AN_ABILITY_MASK)) {
++		*bmcr2 = 0;
++		return mask;
++	}
+ 	goto failed;
+-    } else {
+-	mask = 0;
+-	s = strtok(arg, ", ");
+-	do {
++    }
++    mask = 0;
++    *bmcr2 = 0;
++    s = strtok(arg, ", ");
++    do {
+ 	    for (i = 0; i < NMEDIA; i++)
+-		if (strcasecmp(media[i].name, s) == 0) break;
++		if (s && strcasecmp(media[i].name, s) == 0) break;
+ 	    if (i == NMEDIA) goto failed;
+-	    mask |= media[i].value;
+-	} while ((s = strtok(NULL, ", ")) != NULL);
+-    }
++	    mask |= media[i].value[0];
++	    *bmcr2 |= media[i].value[1];
++    } while ((s = strtok(NULL, ", ")) != NULL);
++
+     return mask;
+ failed:
+     fprintf(stderr, "Invalid media specification '%s'.\n", arg);
+@@ -179,11 +192,24 @@ failed:
+ 
+ /*--------------------------------------------------------------------*/
+ 
+-static char *media_list(int mask, int best)
++static const char *media_list(unsigned mask, unsigned mask2, int best)
+ {
+     static char buf[100];
+     int i;
+     *buf = '\0';
++
++    if (mask & MII_BMCR_SPEED1000) {
++	if (mask2 & MII_BMCR2_1000HALF) {
++	    strcat(buf, " ");
++	    strcat(buf, "1000baseT-HD");
++	    if (best) goto out;
++	}
++	if (mask2 & MII_BMCR2_1000FULL) {
++	    strcat(buf, " ");
++	    strcat(buf, "1000baseT-FD");
++	    if (best) goto out;
++	}
++    }
+     mask >>= 5;
+     for (i = 4; i >= 0; i--) {
+ 	if (mask & (1<<i)) {
+@@ -192,6 +218,7 @@ static char *media_list(int mask, int be
+ 	    if (best) break;
+ 	}
+     }
++ out:
+     if (mask & (1<<5))
+ 	strcat(buf, " flow-control");
+     return buf;
+@@ -201,15 +228,15 @@ int show_basic_mii(int sock, int phy_id)
+ {
+     char buf[100];
+     int i, mii_val[32];
+-    int bmcr, bmsr, advert, lkpar;
++    unsigned bmcr, bmsr, advert, lkpar, bmcr2, lpa2;
+ 
+     /* Some bits in the BMSR are latched, but we can't rely on being
+        the only reader, so only the current values are meaningful */
+     mdio_read(sock, MII_BMSR);
+-    for (i = 0; i < ((verbose > 1) ? 32 : 8); i++)
++    for (i = 0; i < ((verbose > 1) ? 32 : MII_BASIC_MAX); i++)
+ 	mii_val[i] = mdio_read(sock, i);
+ 
+-    if (mii_val[MII_BMCR] == 0xffff) {
++    if (mii_val[MII_BMCR] == 0xffff  || mii_val[MII_BMSR] == 0x0000) {
+ 	fprintf(stderr, "  No MII transceiver present!.\n");
+ 	return -1;
+     }
+@@ -217,6 +244,7 @@ int show_basic_mii(int sock, int phy_id)
+     /* Descriptive rename. */
+     bmcr = mii_val[MII_BMCR]; bmsr = mii_val[MII_BMSR];
+     advert = mii_val[MII_ANAR]; lkpar = mii_val[MII_ANLPAR];
++    bmcr2 = mii_val[MII_CTRL1000]; lpa2 = mii_val[MII_STAT1000];
+ 
+     sprintf(buf, "%s: ", ifr.ifr_name);
+     if (bmcr & MII_BMCR_AN_ENA) {
+@@ -224,7 +252,7 @@ int show_basic_mii(int sock, int phy_id)
+ 	    if (advert & lkpar) {
+ 		strcat(buf, (lkpar & MII_AN_ACK) ?
+ 		       "negotiated" : "no autonegotiation,");
+-		strcat(buf, media_list(advert & lkpar, 1));
++		strcat(buf, media_list(advert & lkpar, bmcr2 & lpa2>>2, 1));
+ 		strcat(buf, ", ");
+ 	    } else {
+ 		strcat(buf, "autonegotiation failed, ");
+@@ -234,8 +262,10 @@ int show_basic_mii(int sock, int phy_id)
+ 	}
+     } else {
+ 	sprintf(buf+strlen(buf), "%s Mbit, %s duplex, ",
+-	       (bmcr & MII_BMCR_100MBIT) ? "100" : "10",
+-	       (bmcr & MII_BMCR_DUPLEX) ? "full" : "half");
++		((bmcr2 & (MII_BMCR2_1000HALF | MII_BMCR2_1000FULL)) & lpa2 >> 2)
++		? "1000"
++		: (bmcr & MII_BMCR_100MBIT) ? "100" : "10",
++		(bmcr & MII_BMCR_DUPLEX) ? "full" : "half");
+     }
+     strcat(buf, (bmsr & MII_BMSR_LINK_VALID) ? "link ok" : "no link");
+ 
+@@ -296,12 +326,13 @@ int show_basic_mii(int sock, int phy_id)
+ 	if (bmsr & MII_BMSR_REMOTE_FAULT)
+ 	    printf("remote fault, ");
+ 	printf((bmsr & MII_BMSR_LINK_VALID) ? "link ok" : "no link");
+-	printf("\n  capabilities:%s", media_list(bmsr >> 6, 0));
+-	printf("\n  advertising: %s", media_list(advert, 0));
++	printf("\n  capabilities:%s", media_list(bmsr >> 6, bmcr2, 0));
++	printf("\n  advertising: %s", media_list(advert, lpa2 >> 2, 0));
+ 	if (lkpar & MII_AN_ABILITY_MASK)
+-	    printf("\n  link partner:%s", media_list(lkpar, 0));
++	    printf("\n  link partner:%s", media_list(lkpar, bmcr2, 0));
+ 	printf("\n");
+     }
++    fflush(stdout);
+     return 0;
+ }
+ 
+@@ -329,7 +360,7 @@ static int do_one_xcvr(int skfd, char *i
+ 	printf("resetting the transceiver...\n");
+ 	mdio_write(skfd, MII_BMCR, MII_BMCR_RESET);
+     }
+-    if (nway_advertise) {
++    if (nway_advertise > 0) {
+ 	mdio_write(skfd, MII_ANAR, nway_advertise | 1);
+ 	opt_restart = 1;
+     }
+@@ -379,27 +410,38 @@ static void watch_one_xcvr(int skfd, cha
+ /*--------------------------------------------------------------------*/
+ 
+ const char *usage =
+-"usage: %s [-VvRrwl] [-A media,... | -F media] [interface ...]
+-       -V, --version               display version information
+-       -v, --verbose               more verbose output
+-       -R, --reset                 reset MII to poweron state
+-       -r, --restart               restart autonegotiation
+-       -w, --watch                 monitor for link status changes
+-       -l, --log                   with -w, write events to syslog
+-       -A, --advertise=media,...   advertise only specified media
+-       -F, --force=media           force specified media technology
+-media: 100baseT4, 100baseTx-FD, 100baseTx-HD, 10baseT-FD, 10baseT-HD,
+-       (to advertise both HD and FD) 100baseTx, 10baseT\n";
++"usage: %s [-VvRrwl] [-A media,... | -F media] [interface ...]\n"
++"       -V, --version               display version information\n"
++"       -v, --verbose               more verbose output\n"
++"       -R, --reset                 reset MII to poweron state\n"
++"       -r, --restart               restart autonegotiation\n"
++"       -w, --watch                 monitor for link status changes\n"
++"       -l, --log                   with -w, write events to syslog\n"
++"       -A, --advertise=media,...   advertise only specified media\n"
++"       -F, --force=media           force specified media technology\n"
++"media: 1000baseTx-HD, 1000baseTx-FD,\n"
++"       100baseT4, 100baseTx-FD, 100baseTx-HD,\n"
++"       10baseT-FD, 10baseT-HD,\n"
++"       (to advertise both HD and FD) 1000baseTx, 100baseTx, 10baseT\n";
++
++
++static void version(void)
++{
++    fprintf(stderr, "%s\n%s\n", Version, RELEASE);
++    exit(5); /* E_VERSION */
++}
++
+ 
+ int main(int argc, char **argv)
+ {
+     int i, c, ret, errflag = 0;
+     char s[6];
++    unsigned ctrl1000 = 0;
+     
+     while ((c = getopt_long(argc, argv, "A:F:p:lrRvVw?", longopts, 0)) != EOF)
+ 	switch (c) {
+-	case 'A': nway_advertise = parse_media(optarg); break;
+-	case 'F': fixed_speed = parse_media(optarg); break;
++	case 'A': nway_advertise = parse_media(optarg, &ctrl1000); break;
++	case 'F': fixed_speed = parse_media(optarg, &ctrl1000); break;
+ 	case 'p': override_phy = atoi(optarg); break;
+ 	case 'r': opt_restart++;	break;
+ 	case 'R': opt_reset++;		break;
+@@ -411,6 +453,10 @@ int main(int argc, char **argv)
+ 	}
+     /* Check for a few inappropriate option combinations */
+     if (opt_watch) verbose = 0;
++
++    if ((nway_advertise < 0) || (fixed_speed < 0))
++    	return 2;
++
+     if (errflag || (fixed_speed & (fixed_speed-1)) ||
+ 	(fixed_speed && (opt_restart || nway_advertise))) {
+ 	fprintf(stderr, usage, argv[0]);
+@@ -418,7 +464,7 @@ int main(int argc, char **argv)
+     }
+ 
+     if (opt_version)
+-	printf(version);
++	version();
+ 
+     /* Open a basic socket. */
+     if ((skfd = socket(AF_INET, SOCK_DGRAM,0)) < 0) {
+@@ -426,6 +472,9 @@ int main(int argc, char **argv)
+ 	exit(-1);
+     }
+ 
++    if (verbose > 1)
++    	printf("Using SIOCGMIIPHY=0x%x\n", SIOCGMIIPHY);	
++
+     /* No remaining args means show all interfaces. */
+     if (optind == argc) {
+ 	ret = 1;

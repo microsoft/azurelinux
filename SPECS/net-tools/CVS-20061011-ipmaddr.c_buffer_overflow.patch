@@ -1,0 +1,36 @@
+Patch by Jochen Voss, already applied in upstream CVS. (Bug #392263)
+Index: net-tools/ipmaddr.c
+===================================================================
+--- net-tools.orig/ipmaddr.c
++++ net-tools/ipmaddr.c
+@@ -291,13 +291,15 @@ static void print_mlist(FILE *fp, struct
+ static int multiaddr_list(int argc, char **argv)
+ {
+ 	struct ma_info *list = NULL;
++	size_t l;
+ 
+ 	while (argc > 0) {
+ 		if (strcmp(*argv, "dev") == 0) {
+ 			NEXT_ARG();
+-			if (filter_dev[0])
++			l = strlen(*argv);
++			if (l <= 0 || l >= sizeof(filter_dev))
+ 				usage();
+-			strcpy(filter_dev, *argv);
++			strncpy(filter_dev, *argv, sizeof (filter_dev));
+ 		} else if (strcmp(*argv, "all") == 0) {
+ 			filter_family = AF_UNSPEC;
+ 		} else if (strcmp(*argv, "ipv4") == 0) {
+@@ -307,9 +309,10 @@ static int multiaddr_list(int argc, char
+ 		} else if (strcmp(*argv, "link") == 0) {
+ 			filter_family = AF_PACKET;
+ 		} else {
+-			if (filter_dev[0])
++			l = strlen(*argv);
++			if (l <= 0 || l >= sizeof(filter_dev))
+ 				usage();
+-			strcpy(filter_dev, *argv);
++			strncpy(filter_dev, *argv, sizeof (filter_dev));
+ 		}
+ 		argv++; argc--;
+ 	}

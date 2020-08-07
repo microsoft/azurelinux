@@ -1,0 +1,8 @@
+[mariner-official-update]
+name=CBL-Mariner Official Update $releasever $basearch
+baseurl=https://packages.microsoft.com/yumrepos/cbl-mariner-$releasever-prod-update-$basearch-rpms
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+gpgcheck=0
+enabled=1
+skip_if_unavailable=True
+sslverify=1

@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "cmake-3.17.3.tar.gz": "0bd60d512275dc9f6ef2a2865426a184642ceb3761794e6b65bff233b91d8c40",
+  "macros.cmake": "dd2ad8398fb802f921dc6fed38bdaa4c9bc630ddecee37d10c335af2931628ff"
+ }
+}

@@ -1,0 +1,29 @@
+From 46baedf88fe22abafa3f2341b2c1bcb4764ce389 Mon Sep 17 00:00:00 2001
+From: Troy Dawson <tdawson@redhat.com>
+Date: Fri, 21 Jul 2017 14:05:47 -0700
+Subject: [PATCH] attr: escape left brace in a regex in test/run
+
+... to fix test-suite failure with perl-5.26.0
+
+Bug: https://bugzilla.redhat.com/1473853
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ test/run | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/run b/test/run
+index 4b1f8d0..07e916c 100755
+--- a/test/run
++++ b/test/run
+@@ -106,7 +106,7 @@ for (;;) {
+   if (defined $line) {
+     # Substitute %VAR and %{VAR} with environment variables.
+     $line =~ s[%(\w+)][$ENV{$1}]eg;
+-    $line =~ s[%{(\w+)}][$ENV{$1}]eg;
++    $line =~ s[%\{(\w+)}][$ENV{$1}]eg;
+   }
+   if (defined $line) {
+     if ($line =~ s/^\s*< ?//) {
+-- 
+2.13.0
+

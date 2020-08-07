@@ -1,0 +1,16 @@
+diff -up libcgroup-0.41/src/api.c.templates-fix libcgroup-0.41/src/api.c
+--- libcgroup-0.41/src/api.c.templates-fix	2014-01-13 21:04:36.933747000 +0100
++++ libcgroup-0.41/src/api.c	2014-01-13 21:16:44.478580105 +0100
+@@ -2974,10 +2974,10 @@ int cgroup_change_cgroup_flags(uid_t uid
+ 						available, "%d", pid);
+ 					break;
+ 				case 'p':
+-					if(procname) {
++					if(procname && strlen(basename(procname))) {
+ 						written = snprintf(newdest + j,
+ 							available, "%s",
+-							procname);
++							basename(procname));
+ 					} else {
+ 						written = snprintf(newdest + j,
+ 							available, "%d", pid);

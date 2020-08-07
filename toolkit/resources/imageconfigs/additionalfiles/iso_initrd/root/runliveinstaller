@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Use a custom termcap for the Mariner installer in an ISO environment
+# for a high contrast cursor.
+export TERMINFO=/usr/lib/mariner/terminfo
+export TERM=mariner-installer
+
+# Mounting the ISO root for the installer.
+ISO_ROOT=/mnt/cdrom
+mkdir -p $ISO_ROOT
+LABEL=CDROM
+
+if grep -qs $ISO_ROOT /proc/mounts; then
+    echo ISO root already mounted
+else
+    echo Attempt to mount the ISO root
+    # It is possible that the partition isn't ready to be mounted when this script
+    # is first run. So use a retry loop.
+    RETRY=0
+    LIMIT=5
+    SLEEPSECONDS=2
+    while [ $RETRY -lt $LIMIT ]
+    do
+        mount -L $LABEL -o ro $ISO_ROOT && break
+        echo Mount failed. Retrying...
+        ((RETRY++))
+        sleep $SLEEPSECONDS
+    done
+fi
+
+CONFIG_ROOT=$ISO_ROOT/config
+
+cd /installer
+
+# Turn off echoing while the installer runs to stop sensitive data from rendering in the TTY session.
+stty -echo
+
+./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $CONFIG_ROOT/unattended_config.json --template-config $CONFIG_ROOT/attended_config.json \
+                --build-dir $PWD --log-file=/installer/log.txt
+installerExitCode=$?
+
+# Consume any buffered stdin to prevent it from being passed to any future programs,
+# as it may contain sensitive data
+while read -t 1 -n 10000
+do
+    echo ""
+done
+
+# Turn back on echoing input so the TTY session is usable for the user.
+stty echo
+
+if [ $installerExitCode -eq 0 ]; then
+    reboot
+else
+    /bin/bash
+fi

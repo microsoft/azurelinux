@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "contrib-0.7.0.tar.gz": "1d4e651ea59ea0d2b440e290fda5e166a21847891abca2907b8a1683c2252b8d",
+  "kubernetes-1.16.10.tar.gz": "f49f59d4df6212f61bf3a2a1e8ab7c7357071aa290fb7a1ce087dcdceb668911"
+ }
+}

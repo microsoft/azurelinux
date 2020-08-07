@@ -1,0 +1,18 @@
+Subject: Linux version now can be two-component.
+
+--- a/lib/util.c
++++ b/lib/util.c
+@@ -33,11 +33,11 @@
+ int kernel_version(void)
+ {
+     struct utsname uts;
+-    int major, minor, patch;
++    int major = 0, minor = 0, patch = 0;
+ 
+     if (uname(&uts) < 0)
+ 	return -1;
+-    if (sscanf(uts.release, "%d.%d.%d", &major, &minor, &patch) != 3)
++    if (sscanf(uts.release, "%d.%d.%d", &major, &minor, &patch) < 2)
+ 	return -1;
+     return KRELEASE(major, minor, patch);
+ }

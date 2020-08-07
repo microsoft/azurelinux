@@ -1,0 +1,13 @@
+[Unit]
+Description=Entropy Daemon based on the HAVEGE algorithm
+Documentation=man:haveged(8) http://www.issihosts.com/haveged/
+DefaultDependencies=no
+Before=cloud-init-local.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/haveged -w 1024 -v 1 --Foreground
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

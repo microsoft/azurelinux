@@ -1,0 +1,36 @@
+From 1313fa02a5b2bfe61ee6702696600fc148ec2d6e Mon Sep 17 00:00:00 2001
+From: Gary Ching-Pang Lin <glin@suse.com>
+Date: Tue, 4 Nov 2014 15:50:03 +0800
+Subject: [PATCH 1/7] Fix the potential buffer overflow
+
+Signed-off-by: Gary Ching-Pang Lin <glin@suse.com>
+---
+ src/mokutil.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index 5b34f22..93fb6fa 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -1743,7 +1743,7 @@ set_toggle (const char * VarName, uint32_t state)
+ 	MokToggleVar tvar;
+ 	char *password = NULL;
+ 	unsigned int pw_len;
+-	efi_char16_t efichar_pass[SB_PASSWORD_MAX];
++	efi_char16_t efichar_pass[SB_PASSWORD_MAX+1];
+ 	int ret = -1;
+ 
+ 	printf ("password length: %d~%d\n", SB_PASSWORD_MIN, SB_PASSWORD_MAX);
+@@ -1757,8 +1757,7 @@ set_toggle (const char * VarName, uint32_t state)
+ 	efichar_from_char (efichar_pass, password,
+ 			   SB_PASSWORD_MAX * sizeof(efi_char16_t));
+ 
+-	memcpy(tvar.password, efichar_pass,
+-	       SB_PASSWORD_MAX * sizeof(efi_char16_t));
++	memcpy(tvar.password, efichar_pass, sizeof(tvar.password));
+ 
+ 	tvar.mok_toggle_state = state;
+ 
+-- 
+2.7.4
+

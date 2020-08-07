@@ -1,0 +1,11 @@
+[Unit]
+Description=Simple Network Management Protocol (SNMP) Trap Daemon.
+After=syslog.target network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/snmptrapd -Lsd -f
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

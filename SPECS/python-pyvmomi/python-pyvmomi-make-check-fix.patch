@@ -1,0 +1,14 @@
+--- a/tests/test_connect.py	2020-03-18 18:39:57.286422617 -0700
++++ b/tests/test_connect.py	2020-03-18 18:42:06.909208607 -0700
+@@ -92,9 +92,11 @@
+     @tests.VCRTestBase.my_vcr.use_cassette('ssl_tunnel.yaml',
+                       cassette_library_dir=tests.fixtures_path,
+                       record_mode='none')
++    @unittest.skip("Disable the test")
+     def test_ssl_tunnel(self):
+         connect.SoapStubAdapter('sdkTunnel', 8089, httpProxyHost='vcsa').GetConnection()
+
++    @unittest.skip("Disable the test")
+     def test_ssl_tunnel_http_failure(self):
+         import socket
+         def should_fail():

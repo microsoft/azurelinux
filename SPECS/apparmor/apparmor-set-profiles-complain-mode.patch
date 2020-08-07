@@ -1,0 +1,1743 @@
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/bin.netstat apparmor-2.13-mod/profiles/apparmor/profiles/extras/bin.netstat
+--- apparmor-2.13/profiles/apparmor/profiles/extras/bin.netstat	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/bin.netstat	2018-08-04 21:50:34.414133541 +0530
+@@ -15,7 +15,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile netstat /{usr/,}bin/netstat {
++profile netstat /{usr/,}bin/netstat flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.logrotate apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.logrotate
+--- apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.logrotate	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.logrotate	2018-08-04 21:50:34.422133541 +0530
+@@ -13,7 +13,7 @@
+ 
+ #include <tunables/global>
+ 
+-/etc/cron.daily/logrotate {
++/etc/cron.daily/logrotate flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.slocate.cron apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.slocate.cron
+--- apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.slocate.cron	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.slocate.cron	2018-08-04 21:50:34.422133541 +0530
+@@ -14,7 +14,7 @@
+ 
+ #include <tunables/global>
+ 
+-/etc/cron.daily/slocate.cron {
++/etc/cron.daily/slocate.cron flags=(complain) {
+   #include <abstractions/base>
+   /{usr/,}bin/bash                 mixr,
+   /dev/tty                         wr  ,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.tmpwatch apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.tmpwatch
+--- apparmor-2.13/profiles/apparmor/profiles/extras/etc.cron.daily.tmpwatch	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/etc.cron.daily.tmpwatch	2018-08-04 21:50:34.430133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/etc/cron.daily/tmpwatch {
++/etc/cron.daily/tmpwatch flags=(complain) {
+   #include <abstractions/base>
+   /etc/cron.daily/tmpwatch  r,
+   /tmp                      r,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhclient apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhclient
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhclient	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhclient	2018-08-04 21:50:34.418133541 +0530
+@@ -21,7 +21,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile dhclient /{usr/,}sbin/dhclient {
++profile dhclient /{usr/,}sbin/dhclient flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhclient-script apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhclient-script
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhclient-script	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhclient-script	2018-08-04 21:50:34.414133541 +0530
+@@ -4,7 +4,7 @@
+ # dhclient-script will call plugins from /etc/netconfig.d, so this
+ # will need to be extended on a per-site basis.
+ 
+-profile dhclient-script /{usr/,}sbin/dhclient-script {
++profile dhclient-script /{usr/,}sbin/dhclient-script flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhcpcd apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhcpcd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.dhcpcd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.dhcpcd	2018-08-04 21:50:34.418133541 +0530
+@@ -18,7 +18,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile dhcpcd /{usr/,}sbin/dhcpcd {
++profile dhcpcd /{usr/,}sbin/dhcpcd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.portmap apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.portmap
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.portmap	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.portmap	2018-08-04 21:50:34.430133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile portmap /{usr/,}sbin/portmap {
++profile portmap /{usr/,}sbin/portmap flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.resmgrd apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.resmgrd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.resmgrd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.resmgrd	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile resmgrd /{usr/,}sbin/resmgrd {
++profile resmgrd /{usr/,}sbin/resmgrd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.rpc.lockd apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.rpc.lockd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.rpc.lockd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.rpc.lockd	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile rpc.lockd /{usr/,}sbin/rpc.lockd {
++profile rpc.lockd /{usr/,}sbin/rpc.lockd flags=(complain) {
+   #include <abstractions/base>
+   /{usr/,}sbin/rpc.lockd	rmix,
+ }
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/sbin.rpc.statd apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.rpc.statd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/sbin.rpc.statd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/sbin.rpc.statd	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile rpc.statd /{usr/,}sbin/rpc.statd {
++profile rpc.statd /{usr/,}sbin/rpc.statd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   /etc/rpc                         r,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.acroread apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.acroread
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.acroread	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.acroread	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/X11R6/bin/acroread {
++/usr/X11R6/bin/acroread flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.apropos apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.apropos
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.apropos	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.apropos	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/apropos {
++/usr/bin/apropos flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.evolution-2.10 apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.evolution-2.10
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.evolution-2.10	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.evolution-2.10	2018-08-04 21:50:34.414133541 +0530
+@@ -40,7 +40,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/evolution-2.10 {
++/usr/bin/evolution-2.10 flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.fam apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.fam
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.fam	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.fam	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/fam {
++/usr/bin/fam flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   /tmp/.fam*		wl,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.freshclam apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.freshclam
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.freshclam	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.freshclam	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/freshclam {
++/usr/bin/freshclam flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.gaim apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.gaim
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.gaim	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.gaim	2018-08-04 21:50:34.414133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/gaim {
++/usr/bin/gaim flags=(complain) {
+   #include <abstractions/audio>
+   #include <abstractions/base>
+   #include <abstractions/bash>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.man apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.man
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.man	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.man	2018-08-04 21:50:34.422133541 +0530
+@@ -14,7 +14,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/man {
++/usr/bin/man flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-bounce apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-bounce
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-bounce	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-bounce	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-bounce {
++/usr/bin/mlmmj-bounce flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/bin/mlmmj-bounce mr,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-maintd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-maintd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-maintd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-maintd	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-maintd {
++/usr/bin/mlmmj-maintd flags=(complain) {
+   #include <abstractions/base>
+ 
+   capability setuid,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-make-ml.sh apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-make-ml.sh
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-make-ml.sh	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-make-ml.sh	2018-08-04 21:50:34.426133540 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-make-ml.sh {
++/usr/bin/mlmmj-make-ml.sh flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-process apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-process
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-process	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-process	2018-08-04 21:50:34.414133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-process {
++/usr/bin/mlmmj-process flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/bin/mlmmj-process mr,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-receive apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-receive
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-receive	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-receive	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-receive {
++/usr/bin/mlmmj-receive flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/bin/mlmmj-process Px,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-recieve apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-recieve
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-recieve	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-recieve	2018-08-04 21:50:34.422133541 +0530
+@@ -16,7 +16,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-recieve {
++/usr/bin/mlmmj-recieve flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/bin/mlmmj-process Px,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-send apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-send
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-send	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-send	2018-08-04 21:50:34.422133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-send {
++/usr/bin/mlmmj-send flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-sub apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-sub
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-sub	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-sub	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-sub {
++/usr/bin/mlmmj-sub flags=(complain) {
+   #include <abstractions/base>
+ 
+   capability setuid,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-unsub apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-unsub
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.mlmmj-unsub	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.mlmmj-unsub	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/mlmmj-unsub {
++/usr/bin/mlmmj-unsub flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/bin/mlmmj-unsub mr,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.opera apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.opera
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.opera	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.opera	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ # vim:syntax=apparmor
+ 
+ #include <tunables/global>
+-/usr/bin/opera {
++/usr/bin/opera flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.passwd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.passwd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.passwd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.passwd	2018-08-04 21:50:34.414133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/passwd {
++/usr/bin/passwd flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.procmail apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.procmail
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.procmail	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.procmail	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/procmail {
++/usr/bin/procmail flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.spamc apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.spamc
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.spamc	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.spamc	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/spamc {
++/usr/bin/spamc flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.svnserve apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.svnserve
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.svnserve	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.svnserve	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/svnserve {
++/usr/bin/svnserve flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.wireshark apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.wireshark
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.wireshark	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.wireshark	2018-08-04 21:50:34.422133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/wireshark {
++/usr/bin/wireshark flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.xfs apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.xfs
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.bin.xfs	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.bin.xfs	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/bin/xfs {
++/usr/bin/xfs flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib64.GConf.2.gconfd-2 apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib64.GConf.2.gconfd-2
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib64.GConf.2.gconfd-2	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib64.GConf.2.gconfd-2	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib64/GConf/2/gconfd-2 {
++/usr/lib64/GConf/2/gconfd-2 flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/user-tmp>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.bonobo.bonobo-activation-server apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.bonobo.bonobo-activation-server
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.bonobo.bonobo-activation-server	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.bonobo.bonobo-activation-server	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/bonobo/bonobo-activation-server {
++/usr/lib/bonobo/bonobo-activation-server flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/user-tmp>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.evolution-data-server.evolution-data-server-1.10 apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.evolution-data-server.evolution-data-server-1.10
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.evolution-data-server.evolution-data-server-1.10	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.evolution-data-server.evolution-data-server-1.10	2018-08-04 21:50:34.422133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/evolution-data-server/evolution-data-server-1.10 {
++/usr/lib/evolution-data-server/evolution-data-server-1.10 flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/user-tmp>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox	2018-08-04 21:50:34.414133541 +0530
+@@ -16,7 +16,7 @@
+ #  /usr/lib/firefox-4.0b8/firefox
+ # but not:
+ #  /usr/lib/firefox-4.0b8/firefox.sh
+-/usr/lib/firefox{,-[0-9]*}/firefox{,*[^s][^h]} {
++/usr/lib/firefox{,-[0-9]*}/firefox{,*[^s][^h]} flags=(complain) {
+   #include <abstractions/audio>
+   #include <abstractions/cups-client>
+   #include <abstractions/dbus-session>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox.sh apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox.sh
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox.sh	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.firefox.sh	2018-08-04 21:50:34.426133540 +0530
+@@ -1,7 +1,7 @@
+ # Last Modified: Wed Nov  5 03:32:59 2008
+ #include <tunables/global>
+ 
+-/usr/lib/firefox/firefox.sh {
++/usr/lib/firefox/firefox.sh flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.mozilla-xremote-client apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.mozilla-xremote-client
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.firefox.mozilla-xremote-client	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.firefox.mozilla-xremote-client	2018-08-04 21:50:34.426133540 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/firefox/mozilla-xremote-client {
++/usr/lib/firefox/mozilla-xremote-client flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/X>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.GConf.2.gconfd-2 apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.GConf.2.gconfd-2
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.GConf.2.gconfd-2	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.GConf.2.gconfd-2	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/GConf/2/gconfd-2 {
++/usr/lib/GConf/2/gconfd-2 flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/user-tmp>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.man-db.man apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.man-db.man
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.man-db.man	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.man-db.man	2018-08-04 21:50:34.422133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/man-db/man {
++/usr/lib/man-db/man flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.anvil apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.anvil
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.anvil	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.anvil	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/anvil {
++/usr/lib/postfix/anvil flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.bounce apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.bounce
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.bounce	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.bounce	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/bounce {
++/usr/lib/postfix/bounce flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.cleanup apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.cleanup
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.cleanup	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.cleanup	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/cleanup {
++/usr/lib/postfix/cleanup flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.discard apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.discard
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.discard	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.discard	2018-08-04 21:50:34.422133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/discard {
++/usr/lib/postfix/discard flags=(complain) {
+   #include <abstractions/base>
+ 
+   /usr/lib/postfix/discard rmix,
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.error apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.error
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.error	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.error	2018-08-04 21:50:34.418133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/error {
++/usr/lib/postfix/error flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.flush apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.flush
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.flush	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.flush	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/flush {
++/usr/lib/postfix/flush flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.lmtp apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.lmtp
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.lmtp	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.lmtp	2018-08-04 21:50:34.414133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/lmtp {
++/usr/lib/postfix/lmtp flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.local apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.local
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.local	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.local	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/local {
++/usr/lib/postfix/local flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.master apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.master
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.master	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.master	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/master {
++/usr/lib/postfix/master flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.nqmgr apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.nqmgr
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.nqmgr	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.nqmgr	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/nqmgr {
++/usr/lib/postfix/nqmgr flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.oqmgr apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.oqmgr
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.oqmgr	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.oqmgr	2018-08-04 21:50:34.426133540 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/oqmgr {
++/usr/lib/postfix/oqmgr flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.pickup apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.pickup
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.pickup	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.pickup	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/pickup {
++/usr/lib/postfix/pickup flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.pipe apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.pipe
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.pipe	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.pipe	2018-08-04 21:50:34.410133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/pipe {
++/usr/lib/postfix/pipe flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.proxymap apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.proxymap
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.proxymap	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.proxymap	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/proxymap {
++/usr/lib/postfix/proxymap flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.qmgr apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.qmgr
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.qmgr	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.qmgr	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/qmgr {
++/usr/lib/postfix/qmgr flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.qmqpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.qmqpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.qmqpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.qmqpd	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/qmqpd {
++/usr/lib/postfix/qmqpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.scache apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.scache
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.scache	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.scache	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/scache {
++/usr/lib/postfix/scache flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.showq apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.showq
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.showq	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.showq	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/showq {
++/usr/lib/postfix/showq flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.smtp apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.smtp
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.smtp	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.smtp	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/smtp {
++/usr/lib/postfix/smtp flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.smtpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.smtpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.smtpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.smtpd	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/smtpd {
++/usr/lib/postfix/smtpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.spawn apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.spawn
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.spawn	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.spawn	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/spawn {
++/usr/lib/postfix/spawn flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.tlsmgr apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.tlsmgr
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.tlsmgr	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.tlsmgr	2018-08-04 21:50:34.422133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/tlsmgr {
++/usr/lib/postfix/tlsmgr flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.trivial-rewrite apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.trivial-rewrite
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.trivial-rewrite	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.trivial-rewrite	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/trivial-rewrite {
++/usr/lib/postfix/trivial-rewrite flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.verify apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.verify
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.verify	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.verify	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/verify {
++/usr/lib/postfix/verify flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.virtual apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.virtual
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.postfix.virtual	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.postfix.virtual	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/postfix/virtual {
++/usr/lib/postfix/virtual flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/postfix-common>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.RealPlayer10.realplay apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.RealPlayer10.realplay
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.lib.RealPlayer10.realplay	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.lib.RealPlayer10.realplay	2018-08-04 21:50:34.422133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/RealPlayer10/realplay {
++/usr/lib/RealPlayer10/realplay flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.NX.bin.nxclient apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.NX.bin.nxclient
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.NX.bin.nxclient	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.NX.bin.nxclient	2018-08-04 21:50:34.418133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/NX/bin/nxclient {
++/usr/NX/bin/nxclient flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.cupsd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.cupsd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.cupsd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.cupsd	2018-08-04 21:50:34.422133541 +0530
+@@ -1,6 +1,6 @@
+ # Last Modified: Sun Sep 16 18:11:15 2007
+ #include <tunables/global>
+-/usr/sbin/cupsd {
++/usr/sbin/cupsd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/dbus>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.dhcpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.dhcpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.dhcpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.dhcpd	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/dhcpd {
++/usr/sbin/dhcpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.httpd2-prefork apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.httpd2-prefork
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.httpd2-prefork	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.httpd2-prefork	2018-08-04 21:50:34.426133540 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/httpd2-prefork {
++/usr/sbin/httpd2-prefork flags=(complain) {
+   #include <abstractions/apache2-common>
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+@@ -129,12 +129,12 @@
+   /var/lib/php/sess_*                rwl,
+ 
+ 
+-  ^HANDLING_UNTRUSTED_INPUT {
++  ^HANDLING_UNTRUSTED_INPUT flags=(complain) {
+     #include <abstractions/apache2-common>
+     /var/log/apache2/*     w,
+   }
+ 
+-  ^DEFAULT_URI {
++  ^DEFAULT_URI flags=(complain) {
+     #include <abstractions/apache2-common>
+     #include <abstractions/base>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.imapd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.imapd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.imapd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.imapd	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/imapd {
++/usr/sbin/imapd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/authentication>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.fingerd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.fingerd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.fingerd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.fingerd	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/in.fingerd {
++/usr/sbin/in.fingerd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.ftpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.ftpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.ftpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.ftpd	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/in.ftpd {
++/usr/sbin/in.ftpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/authentication>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.ntalkd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.ntalkd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.in.ntalkd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.in.ntalkd	2018-08-04 21:50:34.426133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/in.ntalkd {
++/usr/sbin/in.ntalkd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.ipop2d apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.ipop2d
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.ipop2d	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.ipop2d	2018-08-04 21:50:34.414133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/ipop2d {
++/usr/sbin/ipop2d flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/authentication>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.ipop3d apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.ipop3d
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.ipop3d	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.ipop3d	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/ipop3d {
++/usr/sbin/ipop3d flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/authentication>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.lighttpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.lighttpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.lighttpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.lighttpd	2018-08-04 21:50:34.426133540 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/lighttpd {
++/usr/sbin/lighttpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/web-data>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.mysqld apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.mysqld
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.mysqld	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.mysqld	2018-08-04 21:50:34.418133541 +0530
+@@ -14,7 +14,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/mysqld {
++/usr/sbin/mysqld flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/mysql>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.nmbd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.nmbd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.nmbd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.nmbd	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/nmbd {
++/usr/sbin/nmbd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.oidentd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.oidentd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.oidentd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.oidentd	2018-08-04 21:50:34.418133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/oidentd {
++/usr/sbin/oidentd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.popper apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.popper
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.popper	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.popper	2018-08-04 21:50:34.414133541 +0530
+@@ -11,7 +11,7 @@
+ # Last Modified: Wed Aug 31 11:14:09 2005
+ #include <tunables/global>
+ 
+-/usr/sbin/popper {
++/usr/sbin/popper flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postalias apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postalias
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postalias	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postalias	2018-08-04 21:50:34.430133540 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/postalias {
++/usr/sbin/postalias flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/kerberosclient>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postdrop apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postdrop
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postdrop	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postdrop	2018-08-04 21:50:34.430133540 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/postdrop {
++/usr/sbin/postdrop flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/kerberosclient>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postmap apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postmap
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postmap	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postmap	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/postmap {
++/usr/sbin/postmap flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/kerberosclient>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postqueue apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postqueue
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.postqueue	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.postqueue	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/postqueue {
++/usr/sbin/postqueue flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail	2018-08-04 21:50:34.426133540 +0530
+@@ -13,7 +13,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/sendmail {
++/usr/sbin/sendmail flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/kerberosclient>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail.postfix apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail.postfix
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail.postfix	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail.postfix	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/sendmail.postfix {
++/usr/sbin/sendmail.postfix flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail.sendmail apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail.sendmail
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sendmail.sendmail	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sendmail.sendmail	2018-08-04 21:50:34.422133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/sendmail.sendmail {
++/usr/sbin/sendmail.sendmail flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.smbd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.smbd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.smbd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.smbd	2018-08-04 21:50:34.418133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/smbd {
++/usr/sbin/smbd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.spamd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.spamd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.spamd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.spamd	2018-08-04 21:50:34.414133541 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/spamd {
++/usr/sbin/spamd flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.squid apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.squid
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.squid	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.squid	2018-08-04 21:50:34.422133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/squid {
++/usr/sbin/squid flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/kerberosclient>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sshd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sshd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.sshd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.sshd	2018-08-04 21:50:34.414133541 +0530
+@@ -16,7 +16,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/sshd {
++/usr/sbin/sshd flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+@@ -98,7 +98,7 @@
+ 
+   # to set memory protection for passwd
+   @{PROC}/@{pid}/task/@{pid}/attr/exec w,
+-  profile passwd {
++  profile passwd flags=(complain) {
+     #include <abstractions/authentication>
+     #include <abstractions/base>
+     #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.useradd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.useradd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.useradd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.useradd	2018-08-04 21:50:34.418133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/useradd {
++/usr/sbin/useradd flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/bash>
+@@ -59,7 +59,7 @@
+   /{,var/}run/nscd.pid rw,
+   /var/spool/mail/* rw,
+ 
+-  profile pam_tally2 {
++  profile pam_tally2 flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/consoles>
+     #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.userdel apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.userdel
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.userdel	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.userdel	2018-08-04 21:50:34.414133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/userdel {
++/usr/sbin/userdel flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/bash>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.vsftpd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.vsftpd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.vsftpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.vsftpd	2018-08-04 21:50:34.418133541 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/vsftpd {
++/usr/sbin/vsftpd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/authentication>
+diff -Naur apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.xinetd apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.xinetd
+--- apparmor-2.13/profiles/apparmor/profiles/extras/usr.sbin.xinetd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor/profiles/extras/usr.sbin.xinetd	2018-08-04 21:50:34.418133541 +0530
+@@ -10,7 +10,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/xinetd {
++/usr/sbin/xinetd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/abstractions/launchpad-integration apparmor-2.13-mod/profiles/apparmor.d/abstractions/launchpad-integration
+--- apparmor-2.13/profiles/apparmor.d/abstractions/launchpad-integration	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/abstractions/launchpad-integration	2018-08-04 21:52:13.374128584 +0530
+@@ -3,7 +3,7 @@
+ 
+   # Launchpad integration should run in a sanitizing profile
+   /usr/bin/launchpad-integration Cxr -> launchpad_integration,
+-  profile launchpad_integration {
++  profile launchpad_integration flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/nameservice>
+     #include <abstractions/ubuntu-browsers>
+diff -Naur apparmor-2.13/profiles/apparmor.d/abstractions/ubuntu-browsers.d/java apparmor-2.13-mod/profiles/apparmor.d/abstractions/ubuntu-browsers.d/java
+--- apparmor-2.13/profiles/apparmor.d/abstractions/ubuntu-browsers.d/java	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/abstractions/ubuntu-browsers.d/java	2018-08-04 21:52:13.366128584 +0530
+@@ -17,7 +17,7 @@
+   # Profile for the supported OpenJDK in Ubuntu. This doesn't require the
+   # unfortunate workarounds of the proprietary Javas, so have a separate
+   # profile.
+-  profile browser_openjdk {
++  profile browser_openjdk flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/fonts>
+     #include <abstractions/gnome>
+@@ -62,7 +62,7 @@
+ 
+   # Profile for commercial Javas. These need workarounds to work right (eg
+   # Sun's forcing of an executable stack (LP: #535247)).
+-  profile browser_java {
++  profile browser_java flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/fonts>
+     #include <abstractions/gnome>
+diff -Naur apparmor-2.13/profiles/apparmor.d/abstractions/ubuntu-helpers apparmor-2.13-mod/profiles/apparmor.d/abstractions/ubuntu-helpers
+--- apparmor-2.13/profiles/apparmor.d/abstractions/ubuntu-helpers	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/abstractions/ubuntu-helpers	2018-08-04 21:52:13.374128584 +0530
+@@ -31,7 +31,7 @@
+ # Use at your own risk. This profile was developed as an interim workaround for
+ # LP: #851986 until AppArmor utilizes proper environment filtering.
+ 
+-profile sanitized_helper {
++profile sanitized_helper flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/X>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/apache2.d/phpsysinfo apparmor-2.13-mod/profiles/apparmor.d/apache2.d/phpsysinfo
+--- apparmor-2.13/profiles/apparmor.d/apache2.d/phpsysinfo	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/apache2.d/phpsysinfo	2018-08-04 21:52:13.378128584 +0530
+@@ -1,7 +1,7 @@
+ # Last Modified: Fri Sep 11 13:27:22 2009
+ # Author: Marc Deslauriers <marc.deslauriers@ubuntu.com>
+ 
+-  ^phpsysinfo {
++  ^phpsysinfo flags=(complain) {
+     #include <abstractions/apache2-common>
+     #include <abstractions/base>
+     #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/bin.ping apparmor-2.13-mod/profiles/apparmor.d/bin.ping
+--- apparmor-2.13/profiles/apparmor.d/bin.ping	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/bin.ping	2018-08-04 21:52:13.378128584 +0530
+@@ -10,7 +10,7 @@
+ # ------------------------------------------------------------------
+ 
+ #include <tunables/global>
+-profile ping /{usr/,}bin/ping {
++profile ping /{usr/,}bin/ping flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/sbin.klogd apparmor-2.13-mod/profiles/apparmor.d/sbin.klogd
+--- apparmor-2.13/profiles/apparmor.d/sbin.klogd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/sbin.klogd	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile klogd /{usr/,}sbin/klogd {
++profile klogd /{usr/,}sbin/klogd flags=(complain) {
+   #include <abstractions/base>
+ 
+   capability sys_admin, # for backward compatibility with kernel <= 2.6.37
+diff -Naur apparmor-2.13/profiles/apparmor.d/sbin.syslogd apparmor-2.13-mod/profiles/apparmor.d/sbin.syslogd
+--- apparmor-2.13/profiles/apparmor.d/sbin.syslogd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/sbin.syslogd	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-profile syslogd /{usr/,}sbin/syslogd {
++profile syslogd /{usr/,}sbin/syslogd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor.d/sbin.syslog-ng apparmor-2.13-mod/profiles/apparmor.d/sbin.syslog-ng
+--- apparmor-2.13/profiles/apparmor.d/sbin.syslog-ng	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/sbin.syslog-ng	2018-08-04 21:52:13.378128584 +0530
+@@ -15,7 +15,7 @@
+ #define this to be where syslog-ng is chrooted
+ @{CHROOT_BASE}=""
+ 
+-profile syslog-ng /{usr/,}sbin/syslog-ng {
++profile syslog-ng /{usr/,}sbin/syslog-ng flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.apache2.mpm-prefork.apache2 apparmor-2.13-mod/profiles/apparmor.d/usr.lib.apache2.mpm-prefork.apache2
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.apache2.mpm-prefork.apache2	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.apache2.mpm-prefork.apache2	2018-08-04 21:52:13.362128584 +0530
+@@ -1,7 +1,7 @@
+ # Author: Marc Deslauriers <marc.deslauriers@ubuntu.com>
+ 
+ #include <tunables/global>
+-/usr/lib/apache2/mpm-prefork/apache2 {
++/usr/lib/apache2/mpm-prefork/apache2 flags=(complain) {
+ 
+   # This profile is completely permissive.
+   # It is designed to target specific applications using mod_apparmor,
+@@ -53,7 +53,7 @@
+   /** mrwlkix,
+ 
+ 
+-  ^DEFAULT_URI {
++  ^DEFAULT_URI flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/nameservice>
+ 
+@@ -62,7 +62,7 @@
+ 
+   }
+ 
+-  ^HANDLING_UNTRUSTED_INPUT {
++  ^HANDLING_UNTRUSTED_INPUT flags=(complain) {
+     #include <abstractions/nameservice>
+ 
+     / rw,
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.anvil apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.anvil
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.anvil	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.anvil	2018-08-04 21:52:13.378128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/anvil {
++/usr/lib/dovecot/anvil flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.auth apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.auth
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.auth	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.auth	2018-08-04 21:52:13.362128584 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/auth {
++/usr/lib/dovecot/auth flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/mysql>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.config apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.config
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.config	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.config	2018-08-04 21:52:13.358128585 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/config {
++/usr/lib/dovecot/config flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.deliver apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.deliver
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.deliver	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.deliver	2018-08-04 21:52:13.362128584 +0530
+@@ -14,7 +14,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/deliver {
++/usr/lib/dovecot/deliver flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dict apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dict
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dict	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dict	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/dict {
++/usr/lib/dovecot/dict flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/mysql>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dovecot-auth apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dovecot-auth
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dovecot-auth	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dovecot-auth	2018-08-04 21:52:13.378128584 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/dovecot-auth {
++/usr/lib/dovecot/dovecot-auth flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dovecot-lda apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dovecot-lda
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.dovecot-lda	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.dovecot-lda	2018-08-04 21:55:57.894117337 +0530
+@@ -12,7 +12,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/dovecot-lda flags=(attach_disconnected) {
++/usr/lib/dovecot/dovecot-lda flags=(attach_disconnected,complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+@@ -37,7 +37,7 @@
+   #include <local/usr.lib.dovecot.dovecot-lda>
+ 
+ 
+-  profile /usr/sbin/sendmail flags=(attach_disconnected) {
++  profile /usr/sbin/sendmail flags=(attach_disconnected,complain) {
+     # this profile is based on the usr.sbin.sendmail profile in extras
+     # and should support both postfix' and sendmail's sendmail binary
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.imap apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.imap
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.imap	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.imap	2018-08-04 21:52:13.362128584 +0530
+@@ -13,7 +13,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/imap {
++/usr/lib/dovecot/imap flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.imap-login apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.imap-login
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.imap-login	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.imap-login	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ # vim: ft=apparmor
+ 
+ #include <tunables/global>
+-/usr/lib/dovecot/imap-login {
++/usr/lib/dovecot/imap-login flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/ssl_certs>
+   #include <abstractions/ssl_keys>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.lmtp apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.lmtp
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.lmtp	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.lmtp	2018-08-04 21:52:13.358128585 +0530
+@@ -12,7 +12,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/lmtp {
++/usr/lib/dovecot/lmtp flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.log apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.log
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.log	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.log	2018-08-04 21:55:47.938117836 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/log flags=(attach_disconnected) {
++/usr/lib/dovecot/log flags=(attach_disconnected,complain) {
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.managesieve apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.managesieve
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.managesieve	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.managesieve	2018-08-04 21:52:13.362128584 +0530
+@@ -13,7 +13,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/managesieve {
++/usr/lib/dovecot/managesieve flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.managesieve-login apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.managesieve-login
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.managesieve-login	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.managesieve-login	2018-08-04 21:52:13.362128584 +0530
+@@ -14,7 +14,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/managesieve-login {
++/usr/lib/dovecot/managesieve-login flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/ssl_certs>
+   #include <abstractions/ssl_keys>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.pop3 apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.pop3
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.pop3	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.pop3	2018-08-04 21:52:13.378128584 +0530
+@@ -13,7 +13,7 @@
+ #include <tunables/global>
+ #include <tunables/dovecot>
+ 
+-/usr/lib/dovecot/pop3 {
++/usr/lib/dovecot/pop3 flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.pop3-login apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.pop3-login
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.pop3-login	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.pop3-login	2018-08-04 21:52:13.358128585 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/pop3-login {
++/usr/lib/dovecot/pop3-login flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/ssl_certs>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.ssl-params apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.ssl-params
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.ssl-params	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.ssl-params	2018-08-04 21:52:13.378128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/ssl-params {
++/usr/lib/dovecot/ssl-params flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.stats apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.stats
+--- apparmor-2.13/profiles/apparmor.d/usr.lib.dovecot.stats	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.lib.dovecot.stats	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/lib/dovecot/stats {
++/usr/lib/dovecot/stats flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.apache2 apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.apache2
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.apache2	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.apache2	2018-08-04 21:59:21.910107117 +0530
+@@ -1,7 +1,7 @@
+ # Author: Marc Deslauriers <marc.deslauriers@ubuntu.com>
+ 
+ #include <tunables/global>
+-/usr/sbin/apache2 flags=(attach_disconnected) {
++/usr/sbin/apache2 flags=(attach_disconnected,complain) {
+ 
+   # This profile is completely permissive.
+   # It is designed to target specific applications using mod_apparmor,
+@@ -84,7 +84,7 @@
+   /** mrwlkix,
+ 
+ 
+-  ^DEFAULT_URI flags=(attach_disconnected) {
++  ^DEFAULT_URI flags=(attach_disconnected,complain) {
+     #include <abstractions/base>
+     #include <abstractions/apache2-common>
+ 
+@@ -92,7 +92,7 @@
+     /** mrwlkix,
+   }
+ 
+-  ^HANDLING_UNTRUSTED_INPUT flags=(attach_disconnected) {
++  ^HANDLING_UNTRUSTED_INPUT flags=(attach_disconnected,complain) {
+     #include <abstractions/apache2-common>
+ 
+     / rw,
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.avahi-daemon apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.avahi-daemon
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.avahi-daemon	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.avahi-daemon	2018-08-04 21:52:13.378128584 +0530
+@@ -1,5 +1,5 @@
+ #include <tunables/global>
+-/usr/sbin/avahi-daemon {
++/usr/sbin/avahi-daemon flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/dbus>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.dnsmasq apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.dnsmasq
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.dnsmasq	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.dnsmasq	2018-08-04 21:55:26.974118886 +0530
+@@ -12,7 +12,7 @@
+ @{TFTP_DIR}=/var/tftp /srv/tftpboot
+ 
+ #include <tunables/global>
+-/usr/sbin/dnsmasq flags=(attach_disconnected) {
++/usr/sbin/dnsmasq flags=(attach_disconnected,complain) {
+   #include <abstractions/base>
+   #include <abstractions/dbus>
+   #include <abstractions/nameservice>
+@@ -88,7 +88,7 @@
+   /{,var/}run/NetworkManager/dnsmasq.conf r,
+   /{,var/}run/NetworkManager/dnsmasq.pid w,
+ 
+-  profile libvirt_leaseshelper {
++  profile libvirt_leaseshelper flags=(complain) {
+     #include <abstractions/base>
+ 
+     /etc/libnl-3/classid r,
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.dovecot apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.dovecot
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.dovecot	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.dovecot	2018-08-04 21:56:30.926115682 +0530
+@@ -12,7 +12,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/dovecot flags=(attach_disconnected) {
++/usr/sbin/dovecot flags=(attach_disconnected,complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/dovecot-common>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.identd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.identd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.identd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.identd	2018-08-04 21:52:13.362128584 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/identd {
++/usr/sbin/identd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   capability net_bind_service,
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.mdnsd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.mdnsd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.mdnsd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.mdnsd	2018-08-04 21:52:13.358128585 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ 
+-/usr/sbin/mdnsd {
++/usr/sbin/mdnsd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.nmbd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.nmbd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.nmbd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.nmbd	2018-08-04 21:52:13.358128585 +0530
+@@ -1,6 +1,6 @@
+ #include <tunables/global>
+ 
+-/usr/sbin/nmbd {
++/usr/sbin/nmbd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/samba>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.nscd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.nscd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.nscd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.nscd	2018-08-04 21:52:13.378128584 +0530
+@@ -10,7 +10,7 @@
+ # ------------------------------------------------------------------
+ 
+ #include <tunables/global>
+-/usr/sbin/nscd {
++/usr/sbin/nscd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.ntpd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.ntpd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.ntpd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.ntpd	2018-08-04 21:55:10.414119715 +0530
+@@ -11,7 +11,7 @@
+ 
+ #include <tunables/global>
+ #include <tunables/ntpd>
+-/usr/sbin/ntpd flags=(attach_disconnected) {
++/usr/sbin/ntpd flags=(attach_disconnected,complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/openssl>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.smbd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.smbd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.smbd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.smbd	2018-08-04 21:52:13.358128585 +0530
+@@ -1,6 +1,6 @@
+ #include <tunables/global>
+ 
+-/usr/sbin/smbd {
++/usr/sbin/smbd flags=(complain) {
+   #include <abstractions/authentication>
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.smbldap-useradd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.smbldap-useradd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.smbldap-useradd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.smbldap-useradd	2018-08-04 21:52:13.362128584 +0530
+@@ -1,7 +1,7 @@
+ # Last Modified: Tue Jan  3 00:17:40 2012
+ #include <tunables/global>
+ 
+-/usr/sbin/smbldap-useradd {
++/usr/sbin/smbldap-useradd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/bash>
+   #include <abstractions/nameservice>
+@@ -20,7 +20,7 @@
+   # Site-specific additions and overrides. See local/README for details.
+   #include <local/usr.sbin.smbldap-useradd>
+ 
+-  profile /etc/init.d/nscd {
++  profile /etc/init.d/nscd flags=(complain) {
+     #include <abstractions/base>
+     #include <abstractions/nameservice>
+ 
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.traceroute apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.traceroute
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.traceroute	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.traceroute	2018-08-04 21:52:13.378128584 +0530
+@@ -10,7 +10,7 @@
+ # ------------------------------------------------------------------
+ 
+ #include <tunables/global>
+-/usr/{sbin/traceroute,bin/traceroute.db} {
++/usr/{sbin/traceroute,bin/traceroute.db} flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/consoles>
+   #include <abstractions/nameservice>
+diff -Naur apparmor-2.13/profiles/apparmor.d/usr.sbin.winbindd apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.winbindd
+--- apparmor-2.13/profiles/apparmor.d/usr.sbin.winbindd	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/profiles/apparmor.d/usr.sbin.winbindd	2018-08-04 21:52:13.378128584 +0530
+@@ -1,6 +1,6 @@
+ #include <tunables/global>
+ 
+-/usr/sbin/winbindd {
++/usr/sbin/winbindd flags=(complain) {
+   #include <abstractions/base>
+   #include <abstractions/nameservice>
+   #include <abstractions/samba>

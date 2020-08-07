@@ -1,0 +1,2 @@
+*self_spec:
++ %{!static:%{!shared:%{!r:-pie}}}

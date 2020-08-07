@@ -1,0 +1,54 @@
+diff -Naur alsa-utils-1.0.29/alsactl/init/00main alsa-utils-1.0.29_/alsactl/init/00main
+--- alsa-utils-1.0.29/alsactl/init/00main	2015-02-26 06:49:40.000000000 -0800
++++ alsa-utils-1.0.29_/alsactl/init/00main	2015-06-02 09:57:23.342226526 -0700
+@@ -32,6 +32,7 @@
+ # real ALSA configuration database
+ CARDINFO{driver}=="HDA-Intel", INCLUDE="hda", GOTO="init_end"
+ CARDINFO{driver}=="CA0106", INCLUDE="ca0106", GOTO="init_end"
++CARDINFO{driver}=="ENS1371", INCLUDE="ens1371", GOTO="init_end"
+ CARDINFO{driver}=="Test", INCLUDE="test", GOTO="init_end"
+ 
+ LABEL="init_end"
+diff -Naur alsa-utils-1.0.29/alsactl/init/ens1371 alsa-utils-1.0.29_/alsactl/init/ens1371
+--- alsa-utils-1.0.29/alsactl/init/ens1371	1969-12-31 16:00:00.000000000 -0800
++++ alsa-utils-1.0.29_/alsactl/init/ens1371	2014-01-16 20:20:09.000000000 -0800
+@@ -0,0 +1,15 @@
++# Configuration for ensoniq based cards
++
++CARDINFO{mixername}=="Cirrus Logic CS4297A rev 3", \
++  ATTR{subsystem_vendor}=="0x1274", ATTR{subsystem_device}=="0x1371", \
++  GOTO="vmware-ac97"
++RESULT="false", EXIT="return"
++
++LABEL="vmware-ac97"
++# playback
++CTL{reset}="mixer"
++CTL{name}="Master Playback Volume", CTL{value}="0dB,0dB"
++CTL{name}="Master Playback Switch", CTL{value}="on"
++CTL{name}="PCM Playback Volume", CTL{value}="51dB,51dB"
++CTL{name}="PCM Playback Switch", CTL{value}="on"
++RESULT="true", EXIT="return"
+diff -Naur alsa-utils-1.0.29/alsactl/init/Makefile.am alsa-utils-1.0.29_/alsactl/init/Makefile.am
+--- alsa-utils-1.0.29/alsactl/init/Makefile.am	2015-02-26 06:49:40.000000000 -0800
++++ alsa-utils-1.0.29_/alsactl/init/Makefile.am	2015-06-02 10:50:52.732086372 -0700
+@@ -1,7 +1,7 @@
+ 
+ init_files = \
+ 	00main default help info test \
+-	hda ca0106
++	hda ca0106 ens1371
+ EXTRA_DIST = $(init_files)
+ alsainitdir = $(datadir)/alsa/init
+ alsainit_DATA = $(init_files)
+diff -Naur alsa-utils-1.0.29/alsactl/init/Makefile.in alsa-utils-1.0.29_/alsactl/init/Makefile.in
+--- alsa-utils-1.0.29/alsactl/init/Makefile.in	2015-02-26 06:50:21.000000000 -0800
++++ alsa-utils-1.0.29_/alsactl/init/Makefile.in	2015-06-02 10:50:45.164213531 -0700
+@@ -246,7 +246,7 @@
+ xmlto_available = @xmlto_available@
+ init_files = \
+ 	00main default help info test \
+-	hda ca0106
++	hda ca0106 ens1371
+ 
+ EXTRA_DIST = $(init_files)
+ alsainitdir = $(datadir)/alsa/init

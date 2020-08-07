@@ -1,0 +1,12 @@
+[Unit]
+Description=NFS Mount Daemon
+DefaultDependencies=no
+Requires=proc-fs-nfsd.mount
+After=proc-fs-nfsd.mount
+After=network.target local-fs.target
+BindsTo=nfs-server.service
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/default/nfs-utils
+ExecStart=/usr/sbin/rpc.mountd $MOUNTD_OPTS

@@ -1,0 +1,30 @@
+---
+componentName:  mariner
+
+welcomeStyleCalamares:   false
+
+strings:
+    productName:         "@{NAME}"
+    shortProductName:    "@{NAME}"
+    version:             "@{VERSION}"
+    shortVersion:        "@{VERSION_ID}"
+    versionedName:       "@{NAME} @{VERSION_ID}"
+    shortVersionedName:  "@{NAME} @{VERSION_ID}"
+    bootloaderEntryName: "@{NAME}"
+
+welcomeExpandingLogo:   true
+
+images:
+    productLogo:         "mariner-logo.png"
+    productIcon:         "mariner-logo.png"
+    productWelcome:      "mariner-welcome.png"
+
+# The slideshow is displayed during execution steps (e.g. when the
+# installer is actually writing to disk and doing other slow things).
+slideshow:               "show.qml"
+
+style:
+   sidebarBackground:    "#292F34"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#292F34"
+   sidebarTextHighlight: "#00A4EF"

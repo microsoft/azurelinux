@@ -1,0 +1,293 @@
+Submitted By:            Armin K. <krejzi at email dot com>
+Date:                    2013-04-17
+Initial Package Version: 2.4.4
+Comment:                 rediffed for version 2.4.10 (Fernando de Oliveira
+                         <famobr at yahoo dot com dot br>)
+                         rediffed for version 2.4.34 (thomas)
+Upstream Status:         Not applicable
+Origin:                  Self
+Description:             Patches the build system to install stuff into BLFS
+                         specific paths, and adjusts proper permissions
+                         on installed files and directories.
+
+diff -Naur httpd-2.4.34.orig/config.layout httpd-2.4.34/config.layout
+--- httpd-2.4.34.orig/config.layout	2018-02-09 11:30:35.000000000 +0100
++++ httpd-2.4.34/config.layout	2018-07-15 07:31:23.216202917 +0200
+@@ -9,6 +9,30 @@
+ ##    (This may become a configurable parameter at some point.)
+ ##
+ 
++<Layout BLFS>
++    prefix:
++    exec_prefix:     ${prefix}/usr
++    bindir:          ${exec_prefix}/bin
++    sbindir:         ${exec_prefix}/sbin
++    libdir:          ${exec_prefix}/lib
++    libexecdir:      ${exec_prefix}/lib/httpd/modules
++    mandir:          ${exec_prefix}/share/man
++    sysconfdir:      ${prefix}/etc/httpd
++    datadir:         ${exec_prefix}/share/httpd
++    iconsdir:        ${datadir}/icons
++    htdocsdir:       ${prefix}/srv/www
++    manualdir:       ${datadir}/manual
++    cgidir:          ${exec_prefix}/lib/httpd/cgi-bin
++    includedir:      ${exec_prefix}/include/httpd
++    localstatedir:   ${prefix}/var/lock/httpd
++    runtimedir:      ${prefix}/var/run/httpd
++    logfiledir:      ${prefix}/var/log/httpd
++    proxycachedir:   ${prefix}/var/cache/httpd/proxy
++    infodir:         ${exec_prefix}/share/info
++    installbuilddir: ${datadir}/build
++    errordir:        ${datadir}/error
++</Layout>
++
+ #   Classical Apache path layout.
+ <Layout Apache>
+     prefix:        /usr/local/apache2
+diff -Naur httpd-2.4.34.orig/configure httpd-2.4.34/configure
+--- httpd-2.4.34.orig/configure	2018-07-10 15:55:14.000000000 +0200
++++ httpd-2.4.34/configure	2018-07-15 07:31:23.232202853 +0200
+@@ -39653,17 +39653,17 @@
+ 
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define HTTPD_ROOT "${ap_prefix}"
++#define HTTPD_ROOT "/etc/httpd"
+ _ACEOF
+ 
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define SERVER_CONFIG_FILE "${rel_sysconfdir}/${progname}.conf"
++#define SERVER_CONFIG_FILE "${progname}.conf"
+ _ACEOF
+ 
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define AP_TYPES_CONFIG_FILE "${rel_sysconfdir}/mime.types"
++#define AP_TYPES_CONFIG_FILE "mime.types"
+ _ACEOF
+ 
+ 
+diff -Naur httpd-2.4.34.orig/configure.in httpd-2.4.34/configure.in
+--- httpd-2.4.34.orig/configure.in	2018-05-30 21:09:00.000000000 +0200
++++ httpd-2.4.34/configure.in	2018-07-15 07:31:23.235202841 +0200
+@@ -871,11 +871,11 @@
+ echo $MODLIST | $AWK -f $srcdir/build/build-modules-c.awk > modules.c
+ 
+ APR_EXPAND_VAR(ap_prefix, $prefix)
+-AC_DEFINE_UNQUOTED(HTTPD_ROOT, "${ap_prefix}",
++AC_DEFINE_UNQUOTED(HTTPD_ROOT, "/etc/httpd",
+ 	[Root directory of the Apache install area])
+-AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${rel_sysconfdir}/${progname}.conf",
++AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${progname}.conf",
+ 	[Location of the config file, relative to the Apache root directory])
+-AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
++AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "mime.types",
+ 	[Location of the MIME types config file, relative to the Apache root directory])
+ 
+ perlbin=`$ac_aux_dir/PrintPath perl`
+diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/httpd.conf.in
+--- httpd-2.4.34.orig/docs/conf/httpd.conf.in	2016-08-17 01:12:07.000000000 +0200
++++ httpd-2.4.34/docs/conf/httpd.conf.in	2018-07-15 07:31:23.236202837 +0200
+@@ -28,7 +28,7 @@
+ # same ServerRoot for multiple httpd daemons, you will need to change at
+ # least PidFile.
+ #
+-ServerRoot "@@ServerRoot@@"
++#ServerRoot "@@ServerRoot@@"
+ 
+ #
+ # Mutex: Allows you to set the mutex mechanism and mutex file directory
+@@ -74,8 +74,8 @@
+ # It is usually good practice to create a dedicated user and group for
+ # running httpd, as with most system services.
+ #
+-User daemon
+-Group daemon
++User apache
++Group apache
+ 
+ </IfModule>
+ 
+@@ -96,7 +96,7 @@
+ # e-mailed.  This address appears on some server-generated pages, such
+ # as error documents.  e.g. admin@your-domain.com
+ #
+-ServerAdmin you@example.com
++ServerAdmin admin@localhost
+ 
+ #
+ # ServerName gives the name and port that the server uses to identify itself.
+@@ -105,7 +105,7 @@
+ #
+ # If your host doesn't have a registered DNS name, enter its IP address here.
+ #
+-#ServerName www.example.com:@@Port@@
++#ServerName localhost:@@Port@@
+ 
+ #
+ # Deny access to the entirety of your server's filesystem. You must
+@@ -181,7 +181,7 @@
+ # logged here.  If you *do* define an error logfile for a <VirtualHost>
+ # container, that host's errors will be logged there and not here.
+ #
+-ErrorLog "@rel_logfiledir@/error_log"
++ErrorLog "@rel_logfiledir@/error.log"
+ 
+ #
+ # LogLevel: Control the number of messages logged to the error_log.
+@@ -210,13 +210,13 @@
+     # define per-<VirtualHost> access logfiles, transactions will be
+     # logged therein and *not* in this file.
+     #
+-    CustomLog "@rel_logfiledir@/access_log" common
++    CustomLog "@rel_logfiledir@/access.log" common
+ 
+     #
+     # If you prefer a logfile with access, agent, and referer information
+     # (Combined Logfile Format) you can use the following directive.
+     #
+-    #CustomLog "@rel_logfiledir@/access_log" combined
++    #CustomLog "@rel_logfiledir@/access.log" combined
+ </IfModule>
+ 
+ <IfModule alias_module>
+diff -Naur httpd-2.4.34.orig/include/ap_config_layout.h.in httpd-2.4.34/include/ap_config_layout.h.in
+--- httpd-2.4.34.orig/include/ap_config_layout.h.in	2006-07-11 22:55:32.000000000 +0200
++++ httpd-2.4.34/include/ap_config_layout.h.in	2018-07-15 07:31:23.237202833 +0200
+@@ -60,5 +60,6 @@
+ #define DEFAULT_REL_LOGFILEDIR "@rel_logfiledir@"
+ #define DEFAULT_EXP_PROXYCACHEDIR "@exp_proxycachedir@"
+ #define DEFAULT_REL_PROXYCACHEDIR "@rel_proxycachedir@"
++#define DEFAULT_PIDLOG "/var/run/httpd/httpd.pid"
+ 
+ #endif /* AP_CONFIG_LAYOUT_H */
+diff -Naur httpd-2.4.34.orig/include/httpd.h httpd-2.4.34/include/httpd.h
+--- httpd-2.4.34.orig/include/httpd.h	2018-05-31 15:19:12.000000000 +0200
++++ httpd-2.4.34/include/httpd.h	2018-07-15 07:31:23.238202829 +0200
+@@ -109,7 +109,7 @@
+ #define DOCUMENT_LOCATION  HTTPD_ROOT "/docs"
+ #else
+ /* Set default for non OS/2 file system */
+-#define DOCUMENT_LOCATION  HTTPD_ROOT "/htdocs"
++#define DOCUMENT_LOCATION  "/srv/www"
+ #endif
+ #endif /* DOCUMENT_LOCATION */
+ 
+diff -Naur httpd-2.4.34.orig/Makefile.in httpd-2.4.34/Makefile.in
+--- httpd-2.4.34.orig/Makefile.in	2018-05-30 21:09:00.000000000 +0200
++++ httpd-2.4.34/Makefile.in	2018-07-15 07:31:23.244202804 +0200
+@@ -121,9 +121,9 @@
+ 	    done ; \
+ 	done ; \
+ 	if test -f "$(builddir)/envvars-std"; then \
+-	    cp -p envvars-std $(DESTDIR)$(sbindir); \
+-	    if test ! -f $(DESTDIR)$(sbindir)/envvars; then \
+-	        cp -p envvars-std $(DESTDIR)$(sbindir)/envvars ; \
++	    install -o root -g root -m644 envvars-std $(DESTDIR)$(installbuilddir); \
++	    if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
++	        install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars ; \
+ 	    fi ; \
+ 	fi
+ 
+@@ -175,7 +175,7 @@
+ 	    if test -d $(htdocs-srcdir) && test "x$(RSYNC)" != "x" && test -x $(RSYNC) ; then \
+ 		$(RSYNC) --exclude .svn -rlpt --numeric-ids $(htdocs-srcdir)/ $(DESTDIR)$(htdocsdir)/; \
+ 	    else \
+-		test -d $(htdocs-srcdir) && (cd $(htdocs-srcdir) && cp -rp * $(DESTDIR)$(htdocsdir)) ; \
++		test -d $(htdocs-srcdir) && (cd $(htdocs-srcdir) && cp -rp * $(DESTDIR)$(htdocsdir) && chown -R root:root $(DESTDIR)$(htdocsdir)) ; \
+ 		cd $(DESTDIR)$(htdocsdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	    fi; \
+ 	fi
+@@ -186,7 +186,7 @@
+         else \
+ 	    echo Installing error documents ; \
+ 	    $(MKINSTALLDIRS) $(DESTDIR)$(errordir) ; \
+-	    cd $(top_srcdir)/docs/error && cp -rp * $(DESTDIR)$(errordir) ; \
++	    cd $(top_srcdir)/docs/error && cp -rp * $(DESTDIR)$(errordir) && chown -R root:root $(DESTDIR)$(errordir); \
+ 	    test "x$(errordir)" != "x" && cd $(DESTDIR)$(errordir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	fi
+ 
+@@ -196,7 +196,7 @@
+         else \
+ 	    echo Installing icons ; \
+ 	    $(MKINSTALLDIRS) $(DESTDIR)$(iconsdir) ; \
+-	    cd $(top_srcdir)/docs/icons && cp -rp * $(DESTDIR)$(iconsdir) ; \
++	    cd $(top_srcdir)/docs/icons && cp -rp * $(DESTDIR)$(iconsdir) && chown -R root:root $(DESTDIR)$(iconsdir); \
+ 	    test "x$(iconsdir)" != "x" && cd $(DESTDIR)$(iconsdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	fi
+ 
+@@ -206,7 +206,7 @@
+ 	else \
+ 	   echo Installing CGIs ; \
+ 	   $(MKINSTALLDIRS) $(DESTDIR)$(cgidir) ; \
+-	   cd $(top_srcdir)/docs/cgi-examples && cp -rp * $(DESTDIR)$(cgidir) ; \
++	   cd $(top_srcdir)/docs/cgi-examples && cp -rp * $(DESTDIR)$(cgidir) && chown -R root:root $(DESTDIR)$(cgidir); \
+ 	   test "x$(cgidir)" != "x" && cd $(DESTDIR)$(cgidir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	fi
+ 
+@@ -260,12 +260,12 @@
+ 	@test -d $(DESTDIR)$(mandir)/man1 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man1
+ 	@test -d $(DESTDIR)$(mandir)/man8 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man8
+ 	@test -d $(DESTDIR)$(manualdir)   || $(MKINSTALLDIRS) $(DESTDIR)$(manualdir)
+-	@cp -p $(top_srcdir)/docs/man/*.1 $(DESTDIR)$(mandir)/man1
+-	@cp -p $(top_srcdir)/docs/man/*.8 $(DESTDIR)$(mandir)/man8
++	@install -o root -g root -m644 $(top_srcdir)/docs/man/*.1 $(DESTDIR)$(mandir)/man1
++	@install -o root -g root -m644 $(top_srcdir)/docs/man/*.8 $(DESTDIR)$(mandir)/man8
+ 	@if test "x$(RSYNC)" != "x" && test -x $(RSYNC) ; then \
+ 	  $(RSYNC) --exclude .svn -rlpt --numeric-ids $(top_srcdir)/docs/manual/ $(DESTDIR)$(manualdir)/; \
+ 	else \
+-	  cd $(top_srcdir)/docs/manual && cp -rp * $(DESTDIR)$(manualdir); \
++	  cd $(top_srcdir)/docs/manual && cp -rp * $(DESTDIR)$(manualdir) && chown -R root:root $(DESTDIR)$(manualdir); \
+ 	  cd $(DESTDIR)$(manualdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	fi
+ 
+diff -Naur httpd-2.4.34.orig/support/apachectl.in httpd-2.4.34/support/apachectl.in
+--- httpd-2.4.34.orig/support/apachectl.in	2012-02-01 04:47:28.000000000 +0100
++++ httpd-2.4.34/support/apachectl.in	2018-07-15 07:31:23.244202804 +0200
+@@ -45,8 +45,8 @@
+ HTTPD='@exp_sbindir@/@progname@'
+ #
+ # pick up any necessary environment variables
+-if test -f @exp_sbindir@/envvars; then
+-  . @exp_sbindir@/envvars
++if test -f @exp_sysconfdir@/envvars; then
++  . @exp_sysconfdir@/envvars
+ fi
+ #
+ # a command that outputs a formatted text version of the HTML at the
+diff -Naur httpd-2.4.34.orig/support/Makefile.in httpd-2.4.34/support/Makefile.in
+--- httpd-2.4.34.orig/support/Makefile.in	2018-02-09 11:17:30.000000000 +0100
++++ httpd-2.4.34/support/Makefile.in	2018-07-15 07:31:23.245202800 +0200
+@@ -16,23 +16,23 @@
+ 	@test -d $(DESTDIR)$(bindir) || $(MKINSTALLDIRS) $(DESTDIR)$(bindir)
+ 	@test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
+ 	@test -d $(DESTDIR)$(libexecdir) || $(MKINSTALLDIRS) $(DESTDIR)$(libexecdir)
+-	@cp -p $(top_builddir)/server/httpd.exp $(DESTDIR)$(libexecdir)
++	@test -d $(DESTDIR)$(sysconfdir) || $(MKINSTALLDIRS) $(DESTDIR)$(sysconfdir)
++	@test -d $(DESTDIR)$(installbuilddir) || $(MKINSTALLDIRS) $(DESTDIR)$(installbuilddir)
++	@install -o root -g root -m644 $(top_builddir)/server/httpd.exp $(DESTDIR)$(libexecdir)
+ 	@for i in apxs dbmmanage; do \
+ 	    if test -f "$(builddir)/$$i"; then \
+-	        cp -p $$i $(DESTDIR)$(bindir); \
+-	        chmod 755 $(DESTDIR)$(bindir)/$$i; \
++	        install -o root -g root -m755 $$i $(DESTDIR)$(bindir); \
+ 	    fi ; \
+ 	done
+ 	@for i in apachectl; do \
+ 	    if test -f "$(builddir)/$$i"; then \
+-	        cp -p $$i $(DESTDIR)$(sbindir); \
+-	        chmod 755 $(DESTDIR)$(sbindir)/$$i; \
++	        install -o root -g root -m755 $$i $(DESTDIR)$(sbindir); \
+ 	    fi ; \
+ 	done
+ 	@if test -f "$(builddir)/envvars-std"; then \
+-	    cp -p envvars-std $(DESTDIR)$(sbindir); \
+-	    if test ! -f $(DESTDIR)$(sbindir)/envvars; then \
+-	        cp -p envvars-std $(DESTDIR)$(sbindir)/envvars ; \
++	    install -o root -g root -m644 envvars-std $(DESTDIR)$(installbuilddir); \
++	    if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
++	        install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars ; \
+ 	    fi ; \
+ 	fi
+ 

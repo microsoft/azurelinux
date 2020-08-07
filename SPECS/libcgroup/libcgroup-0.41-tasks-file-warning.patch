@@ -1,0 +1,49 @@
+From 437b68f34c459d136c806e61dafb5825d2f97170 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Tue, 17 Apr 2018 13:32:28 +0200
+Subject: [PATCH 4/6] api.c: Show warning when tasks file can not be opened
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Nikola Forró <nforro@redhat.com>
+---
+ src/api.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/api.c b/src/api.c
+index 4d98081..51081b4 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -1190,12 +1190,15 @@ static int __cgroup_attach_task_pid(char *path, pid_t tid)
+ 	if (!tasks) {
+ 		switch (errno) {
+ 		case EPERM:
+-			return ECGROUPNOTOWNER;
++			ret = ECGROUPNOTOWNER;
++			break;
+ 		case ENOENT:
+-			return ECGROUPNOTEXIST;
++			ret = ECGROUPNOTEXIST;
++			break;
+ 		default:
+-			return ECGROUPNOTALLOWED;
++			ret = ECGROUPNOTALLOWED;
+ 		}
++		goto err;
+ 	}
+ 	ret = fprintf(tasks, "%d", tid);
+ 	if (ret < 0) {
+@@ -1214,7 +1217,8 @@ static int __cgroup_attach_task_pid(char *path, pid_t tid)
+ err:
+ 	cgroup_warn("Warning: cannot write tid %d to %s:%s\n",
+ 			tid, path, strerror(errno));
+-	fclose(tasks);
++	if (tasks)
++		fclose(tasks);
+ 	return ret;
+ }
+ 
+-- 
+2.17.0
+

@@ -1,0 +1,46 @@
+From 9c80e2cb4bca26993a12027c46a274bb43645630 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Wed, 22 Jun 2016 14:12:46 +0200
+Subject: [PATCH 3/6] api.c: fix potential buffer overflow
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It is assumed that arguments read from /proc/<pid>/cmdline don't exceed
+buf_pname buffer size, which is FILENAME_MAX - 1 characters, but that's
+not always the case.
+
+Add check to prevent buffer overflow and discard the excessive part of
+an argument.
+
+Signed-off-by: Nikola Forró <nforro@redhat.com>
+---
+ src/api.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/api.c b/src/api.c
+index 217d6c9..4d98081 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -4065,13 +4065,17 @@ static int cg_get_procname_from_proc_cmdline(pid_t pid,
+ 
+ 	while (c != EOF) {
+ 		c = fgetc(f);
+-		if ((c != EOF) && (c != '\0')) {
++		if ((c != EOF) && (c != '\0') && (len < FILENAME_MAX - 1)) {
+ 			buf_pname[len] = c;
+ 			len++;
+ 			continue;
+ 		}
+ 		buf_pname[len] = '\0';
+ 
++		if (len == FILENAME_MAX - 1)
++			while ((c != EOF) && (c != '\0'))
++				c = fgetc(f);
++
+ 		/*
+ 		 * The taken process name from /proc/<pid>/status is
+ 		 * shortened to 15 characters if it is over. So the
+-- 
+2.17.0
+

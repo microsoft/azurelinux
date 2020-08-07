@@ -1,0 +1,41 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.9 - Sun Dec 2 02:19:52 2007 UTC by ecki
+more backoff
+
+Revision 1.8 - Sat Dec 1 19:36:55 2007 UTC by ecki
+backoff proc_fopen usage from etherfile.
+
+Revision 1.7 - Sat Dec 1 18:51:09 2007 UTC by ecki
+Page aligned fopen buffer
+
+Index: net-tools/rarp.c
+===================================================================
+--- net-tools.orig/rarp.c
++++ net-tools/rarp.c
+@@ -3,7 +3,7 @@
+  *              that maintains the kernel's RARP cache.  It is derived
+  *              from Fred N. van Kempen's arp command.
+  *
+- * Version:	$Id: rarp.c,v 1.6 2001/04/08 17:05:05 pb Exp $
++ * Version:	$Id: rarp.c,v 1.9 2007/12/02 02:19:52 ecki Exp $
+  *
+  * Usage:       rarp -d hostname                      Delete entry
+  *              rarp -s hostname ethernet_address     Add entry
+@@ -40,6 +40,7 @@
+ #include "net-support.h"
+ #include "version.h"
+ #include "pathnames.h"
++#include "proc.h"
+ 
+ static char no_rarp_message[] = N_("This kernel does not support RARP.\n");
+ 
+@@ -154,7 +155,7 @@ static int rarp_file(int fd, const char 
+ 
+ static int display_cache(void)
+ {
+-    FILE *fd = fopen(_PATH_PROCNET_RARP, "r");
++    FILE *fd = proc_fopen(_PATH_PROCNET_RARP);
+     char buffer[256];
+     if (fd == NULL) {
+ 	if (errno == ENOENT)

@@ -1,0 +1,38 @@
+From 7c99c167f41d3f8810808436d2ac58afc3a7d6c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Tue, 17 Apr 2018 13:33:03 +0200
+Subject: [PATCH 5/6] api.c: Fix level of failed user/group lookup warnings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Nikola Forró <nforro@redhat.com>
+---
+ src/api.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/api.c b/src/api.c
+index 51081b4..efde2d1 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -639,7 +639,7 @@ static int cgroup_parse_rules(bool cache, uid_t muid,
+ 				uid = CGRULE_INVALID;
+ 				gid = grp->gr_gid;
+ 			} else {
+-				cgroup_dbg("Warning: Entry for %s not"
++				cgroup_warn("Warning: Entry for %s not"
+ 						"found.  Skipping rule on line"
+ 						" %d.\n", itr, linenum);
+ 				skipped = true;
+@@ -656,7 +656,7 @@ static int cgroup_parse_rules(bool cache, uid_t muid,
+ 				uid = pwd->pw_uid;
+ 				gid = CGRULE_INVALID;
+ 			} else {
+-				cgroup_dbg("Warning: Entry for %s not"
++				cgroup_warn("Warning: Entry for %s not"
+ 						"found.  Skipping rule on line"
+ 						" %d.\n", user, linenum);
+ 				skipped = true;
+-- 
+2.17.0
+

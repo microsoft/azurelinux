@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "brp-strip-debug-symbols": "6cd7e01cd3ab55de6a04bd61a2a4f787bbddbfe575d85ec282f8d76563fa1cd4",
+  "brp-strip-unneeded": "b7d2323c52322b5f0144fd9de3ca86e4ea8ec24a262c0382490a9ea434dda3bf",
+  "rpm-4.14.2-release.tar.gz": "f0b2d95258eaa6a6e72baf66443355614db9cd854d2b9598f9be3feada7dfd40"
+ }
+}

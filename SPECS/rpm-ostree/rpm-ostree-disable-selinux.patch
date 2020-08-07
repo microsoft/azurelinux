@@ -1,0 +1,295 @@
+diff --git a/src/app/rpmostree-compose-builtin-rojig.c b/src/app/rpmostree-compose-builtin-rojig.c
+index 02f0e03..10b0059 100644
+--- src/app/rpmostree-compose-builtin-rojig.c
++++ src/app/rpmostree-compose-builtin-rojig.c
+@@ -206,6 +206,7 @@ install_packages (RpmOstreeRojigCompose  *self,
+   if (!rpmostree_context_assemble (self->corectx, cancellable, error))
+     return FALSE;
+ 
++#ifdef ENABLE_SELINUX
+   /* Now reload the policy from the tmproot, and relabel the pkgcache - this
+    * is the same thing done in rpmostree_context_commit(). But here we want
+    * to ensure our pkgcache labels are accurate, since that will
+@@ -217,7 +218,7 @@ install_packages (RpmOstreeRojigCompose  *self,
+     if (!rpmostree_context_force_relabel (self->corectx, cancellable, error))
+       return FALSE;
+   }
+-
++#endif
+   if (out_unmodified)
+     *out_unmodified = FALSE;
+   *out_new_inputhash = g_steal_pointer (&ret_new_inputhash);
+diff --git a/src/app/rpmostree-compose-builtin-tree.c b/src/app/rpmostree-compose-builtin-tree.c
+index a2b6131..96530c1 100644
+--- src/app/rpmostree-compose-builtin-tree.c
++++ src/app/rpmostree-compose-builtin-tree.c
+@@ -287,9 +287,10 @@ install_packages (RpmOstreeTreeComposeContext  *self,
+       return FALSE;
+   }
+ 
++#ifdef ENABLE_SELINUX
+   if (!try_load_previous_sepolicy (self, cancellable, error))
+     return FALSE;
+-
++#endif
+   /* For unified core, we have a pkgcache repo. This is auto-created under the cachedir. */
+   if (opt_unified_core)
+     {
+@@ -397,6 +398,7 @@ install_packages (RpmOstreeTreeComposeContext  *self,
+       if (!rpmostree_context_assemble (self->corectx, cancellable, error))
+         return FALSE;
+ 
++#ifdef ENABLE_SELINUX
+       /* Now reload the policy from the tmproot, and relabel the pkgcache - this
+        * is the same thing done in rpmostree_context_commit(). But here we want
+        * to ensure our pkgcache labels are accurate, since that will
+@@ -410,6 +412,7 @@ install_packages (RpmOstreeTreeComposeContext  *self,
+ 
+       if (!rpmostree_context_force_relabel (self->corectx, cancellable, error))
+         return FALSE;
++#endif
+     }
+   else
+     {
+diff --git a/src/daemon/rpmostree-sysroot-upgrader.c b/src/daemon/rpmostree-sysroot-upgrader.c
+index 27551a1..95a416f 100644
+--- src/daemon/rpmostree-sysroot-upgrader.c
++++ src/daemon/rpmostree-sysroot-upgrader.c
+@@ -906,13 +906,14 @@ prepare_context_for_assembly (RpmOstreeSysrootUpgrader *self,
+                                                self->cfg_merge_deployment);
+ 
+   /* load the sepolicy to use during import */
++#ifdef ENABLE_SELINUX
+   glnx_unref_object OstreeSePolicy *sepolicy = NULL;
+   if (!rpmostree_prepare_rootfs_get_sepolicy (self->tmprootfs_dfd, &sepolicy,
+                                               cancellable, error))
+     return FALSE;
+ 
+   rpmostree_context_set_sepolicy (self->ctx, sepolicy);
+-
++#endif
+   if (self->flags & RPMOSTREE_SYSROOT_UPGRADER_FLAGS_PKGCACHE_ONLY)
+     rpmostree_context_set_pkgcache_only (self->ctx, TRUE);
+ 
+diff --git a/src/daemon/rpmostreed-transaction-livefs.c b/src/daemon/rpmostreed-transaction-livefs.c
+index b8e2a1b..0c881f2 100644
+--- src/daemon/rpmostreed-transaction-livefs.c
++++ src/daemon/rpmostreed-transaction-livefs.c
+@@ -189,10 +189,11 @@ copy_new_config_files (OstreeRepo          *repo,
+    */
+   OstreeRepoCheckoutAtOptions etc_co_opts = { .force_copy = TRUE,
+                                               .overwrite_mode = OSTREE_REPO_CHECKOUT_OVERWRITE_ADD_FILES };
++#ifdef ENABLE_SELINUX
+   /* Use SELinux policy if it's initialized */
+   if (ostree_sepolicy_get_name (sepolicy) != NULL)
+     etc_co_opts.sepolicy = sepolicy;
+-
++#endif
+   glnx_autofd int deployment_etc_dfd = -1;
+   if (!glnx_opendirat (new_deployment_dfd, "etc", TRUE, &deployment_etc_dfd, error))
+     return FALSE;
+@@ -209,8 +210,10 @@ copy_new_config_files (OstreeRepo          *repo,
+       const char *etc_path = path + strlen ("/usr");
+ 
+       etc_co_opts.subpath = path;
++#ifdef ENABLE_SELINUX
+       /* Strip off /usr for selinux labeling */
+       etc_co_opts.sepolicy_prefix = etc_path;
++#endif
+ 
+       const char *sub_etc_relpath = etc_path + strlen ("/etc/");
+       /* We keep track of added subdirectories and skip children of it, since
+diff --git a/src/libpriv/rpmostree-core.c b/src/libpriv/rpmostree-core.c
+index 1d1b87c..75551f9 100644
+--- src/libpriv/rpmostree-core.c
++++ src/libpriv/rpmostree-core.c
+@@ -804,6 +804,7 @@ rpmostree_context_setup (RpmOstreeContext    *self,
+ 
+   gboolean selinux;
+   g_assert (g_variant_dict_lookup (self->spec->dict, "selinux", "b", &selinux));
++#ifdef ENABLE_SELINUX
+   /* Load policy from / if SELinux is enabled, and we haven't already loaded
+    * a policy.  This is mostly for the "compose tree" case.
+    */
+@@ -828,6 +829,7 @@ rpmostree_context_setup (RpmOstreeContext    *self,
+         return glnx_throw (error, "Unable to load SELinux policy from /");
+       rpmostree_context_set_sepolicy (self, sepolicy);
+     }
++#endif
+ 
+   return TRUE;
+ }
+@@ -2021,10 +2023,12 @@ rpmostree_context_prepare_rojig (RpmOstreeContext *self,
+                                  GError          **error)
+ {
+   self->rojig_pure = TRUE;
++#ifdef ENABLE_SELINUX
+   /* Override the default policy load; rojig handles xattrs
+    * internally.
+    */
+   rpmostree_context_set_sepolicy (self, NULL);
++#endif
+   self->rojig_allow_not_found = allow_not_found;
+   return rpmostree_context_prepare (self, cancellable, error);
+ }
+@@ -2992,7 +2996,9 @@ relabel_in_thread_impl (RpmOstreeContext *self,
+     ostree_repo_commit_modifier_new (OSTREE_REPO_COMMIT_MODIFIER_FLAGS_CONSUME,
+                                        NULL, NULL, NULL);
+   ostree_repo_commit_modifier_set_devino_cache (modifier, cache);
++#ifdef ENABLE_SELINUX
+   ostree_repo_commit_modifier_set_sepolicy (modifier, self->sepolicy);
++#endif
+ 
+   g_autoptr(OstreeMutableTree) mtree = ostree_mutable_tree_new ();
+   if (!ostree_repo_write_dfd_to_mtree (repo, tmpdir_dfd, pkg_dirname, mtree,
+@@ -3010,6 +3016,7 @@ relabel_in_thread_impl (RpmOstreeContext *self,
+   if (!ostree_repo_load_commit (repo, commit_csum, &commit_var, NULL, error))
+     return FALSE;
+ 
++#ifdef ENABLE_SELINUX
+   /* let's just copy the metadata from the previous commit and only change the
+    * rpmostree.sepolicy value */
+   g_autoptr(GVariant) meta = g_variant_get_child_value (commit_var, 0);
+@@ -3017,14 +3024,14 @@ relabel_in_thread_impl (RpmOstreeContext *self,
+ 
+   g_variant_dict_insert (meta_dict, "rpmostree.sepolicy", "s",
+                          ostree_sepolicy_get_csum (self->sepolicy));
+-
++#endif
++  
+   g_autofree char *new_commit_csum = NULL;
+   if (!ostree_repo_write_commit (repo, NULL, "", "",
+                                  g_variant_dict_end (meta_dict),
+                                  OSTREE_REPO_FILE (root), &new_commit_csum,
+                                  cancellable, error))
+     return FALSE;
+-
+   /* Compute new content checksum */
+   g_autoptr(GVariant) new_commit = NULL;
+   if (!ostree_repo_load_commit (repo, new_commit_csum, &new_commit, NULL, error))
+@@ -3580,6 +3587,7 @@ add_install (RpmOstreeContext *self,
+     return FALSE;
+ 
+   gboolean sepolicy_matches;
++#ifdef ENABLE_SELINUX
+   if (self->sepolicy)
+     {
+       if (!commit_has_matching_sepolicy (commit, self->sepolicy, &sepolicy_matches,
+@@ -3589,7 +3597,7 @@ add_install (RpmOstreeContext *self,
+       /* We already did any relabeling/reimporting above */
+       g_assert (sepolicy_matches);
+     }
+-
++#endif
+   if (!checkout_pkg_metadata_by_dnfpkg (self, pkg, cancellable, error))
+     return FALSE;
+ 
+@@ -4425,6 +4433,7 @@ rpmostree_context_commit (RpmOstreeContext      *self,
+     /* if we're SELinux aware, then reload the final policy from the tmprootfs in case it
+      * was changed by a scriptlet; this covers the foobar/foobar-selinux path */
+     g_autoptr(OstreeSePolicy) final_sepolicy = NULL;
++#ifdef ENABLE_SELINUX
+     if (self->sepolicy)
+       {
+         if (!rpmostree_prepare_rootfs_get_sepolicy (self->tmprootfs_dfd, &final_sepolicy,
+@@ -4440,6 +4449,7 @@ rpmostree_context_commit (RpmOstreeContext      *self,
+                        ostree_sepolicy_get_csum (final_sepolicy)) == 0)
+           modflags |= OSTREE_REPO_COMMIT_MODIFIER_FLAGS_DEVINO_CANONICAL;
+       }
++#endif
+ 
+     commit_modifier = ostree_repo_commit_modifier_new (modflags, NULL, NULL, NULL);
+     if (final_sepolicy)
+diff --git a/src/libpriv/rpmostree-importer.c b/src/libpriv/rpmostree-importer.c
+index adcc7e9..4dd80d4 100644
+--- src/libpriv/rpmostree-importer.c
++++ src/libpriv/rpmostree-importer.c
+@@ -450,6 +450,7 @@ build_metadata_variant (RpmOstreeImporter *self,
+                                         headerGetString (self->hdr, RPMTAG_RELEASE),
+                                         headerGetString (self->hdr, RPMTAG_ARCH)));
+ 
++#ifdef ENABLE_SELINUX
+   /* The current sepolicy that was used to label the unpacked files is important
+    * to record. It will help us during future overlays to determine whether the
+    * files should be relabeled. */
+@@ -457,7 +458,7 @@ build_metadata_variant (RpmOstreeImporter *self,
+     g_variant_builder_add (&metadata_builder, "{sv}", "rpmostree.sepolicy",
+                            g_variant_new_string
+                              (ostree_sepolicy_get_csum (self->sepolicy)));
+-
++#endif
+   /* let's be nice to our future selves just in case */
+   g_variant_builder_add (&metadata_builder, "{sv}", "rpmostree.unpack_version",
+                          g_variant_new_uint32 (1));
+@@ -872,7 +873,9 @@ import_rpm_to_repo (RpmOstreeImporter *self,
+   else
+     {
+       ostree_repo_commit_modifier_set_xattr_callback (modifier, xattr_cb, NULL, self);
++#ifdef ENABLE_SELINUX
+       ostree_repo_commit_modifier_set_sepolicy (modifier, self->sepolicy);
++#endif
+     }
+ 
+   OstreeRepoImportArchiveOptions opts = { 0 };
+diff --git a/src/libpriv/rpmostree-postprocess.c b/src/libpriv/rpmostree-postprocess.c
+index d6c7328..72ae916 100644
+--- src/libpriv/rpmostree-postprocess.c
++++ src/libpriv/rpmostree-postprocess.c
+@@ -978,6 +978,7 @@ rpmostree_postprocess_final (int            rootfs_dfd,
+   if (!ror_compose_postprocess_final (rootfs_dfd, error))
+     return FALSE;
+ 
++#ifdef ENABLE_SELINUX
+   if (selinux)
+     {
+       g_print ("Recompiling policy\n");
+@@ -989,6 +990,7 @@ rpmostree_postprocess_final (int            rootfs_dfd,
+                               cancellable, error))
+         return FALSE;
+     }
++#endif
+ 
+   gboolean container = FALSE;
+   if (!_rpmostree_jsonutil_object_get_optional_boolean_member (treefile,
+@@ -1019,11 +1021,13 @@ rpmostree_postprocess_final (int            rootfs_dfd,
+   if (!replace_nsswitch (rootfs_dfd, cancellable, error))
+     return glnx_prefix_error (error, "nsswitch replacement");
+ 
++#ifdef ENABLE_SELINUX
+   if (selinux)
+     {
+       if (!postprocess_selinux_policy_store_location (rootfs_dfd, cancellable, error))
+         return glnx_prefix_error (error, "SELinux postprocess");
+     }
++#endif
+ 
+   if (!convert_var_to_tmpfiles_d (rootfs_dfd, cancellable, error))
+     return FALSE;
+@@ -2042,12 +2046,14 @@ rpmostree_compose_commit (int            rootfs_fd,
+                           GError       **error)
+ {
+   g_autoptr(OstreeSePolicy) sepolicy = NULL;
++#ifdef ENABLE_SELINUX
+   if (enable_selinux)
+     {
+       sepolicy = ostree_sepolicy_new_at (rootfs_fd, cancellable, error);
+       if (!sepolicy)
+         return FALSE;
+     }
++#endif
+ 
+   g_autoptr(OstreeMutableTree) mtree = ostree_mutable_tree_new ();
+   /* We may make this configurable if someone complains about including some
+@@ -2067,10 +2073,12 @@ rpmostree_compose_commit (int            rootfs_fd,
+                                                   filter_xattrs_cb, NULL,
+                                                   &tdata);
+ 
++#ifdef ENABLE_SELINUX
+   if (sepolicy && ostree_sepolicy_get_name (sepolicy) != NULL)
+     ostree_repo_commit_modifier_set_sepolicy (commit_modifier, sepolicy);
+   else if (enable_selinux)
+     return glnx_throw (error, "SELinux enabled, but no policy found");
++#endif
+ 
+   if (devino_cache)
+     ostree_repo_commit_modifier_set_devino_cache (commit_modifier, devino_cache);

@@ -1,0 +1,27 @@
+Submitted By:            Bruce Dubbs <bdubbs_at_linuxfromscratch_dot_org>
+Date:                    2015-10-19
+Initial Package Version: 1.0.1
+Upstream Status:         None.  BLFS specific.
+Origin:                  BLFS
+Description:             Updates Makefile enabling parameter passing.
+                         Rediffed for version 1.0.1
+Updates:                 Rediffed for version 1.0.3 (P. Labastie)
+                         Patch version 2 for version 1.0.3: Removed ICU
+                         and POPT switches, keeping only the
+                         install target (P. Labastie)
+
+diff -Naur gptfdisk-1.0.3.old/Makefile gptfdisk-1.0.3.new/Makefile
+--- gptfdisk-1.0.3.old/Makefile	2017-07-28 03:41:20.000000000 +0200
++++ gptfdisk-1.0.3.new/Makefile	2018-04-20 10:04:18.896802047 +0200
+@@ -37,6 +37,11 @@
+ clean:	#no pre-reqs
+ 	rm -f core *.o *~ gdisk sgdisk cgdisk fixparts
+ 
++install: gdisk cgdisk sgdisk fixparts
++	install -dm 755 $(DESTDIR)/sbin $(DESTDIR)/usr/share/man/man8
++	install -m755 gdisk cgdisk sgdisk fixparts $(DESTDIR)/sbin
++	install -m644 *.8 $(DESTDIR)/usr/share/man/man8
++
+ # what are the source dependencies
+ depend: $(SRCS)
+ 	$(DEPEND) $(SRCS)

@@ -1,0 +1,12 @@
+diff -rupN cloud-init-18.3/tools/ds-identify cloud-init-18.3_ds-identity-fixed/tools/ds-identify
+--- cloud-init-18.3/tools/ds-identify	2018-06-20 00:19:26.000000000 +0000
++++ cloud-init-18.3_ds-identity-fixed/tools/ds-identify	2018-12-04 12:50:04.673777694 +0000
+@@ -85,7 +85,7 @@ _DI_LOGGED=""
+ DI_MAIN=${DI_MAIN:-main}
+ 
+ DI_BLKID_OUTPUT=""
+-DI_DEFAULT_POLICY="search,found=all,maybe=all,notfound=${DI_DISABLED}"
++DI_DEFAULT_POLICY="search,found=all,maybe=all,notfound=${DI_ENABLED}"
+ DI_DEFAULT_POLICY_NO_DMI="search,found=all,maybe=all,notfound=${DI_ENABLED}"
+ DI_DMI_CHASSIS_ASSET_TAG=""
+ DI_DMI_PRODUCT_NAME=""

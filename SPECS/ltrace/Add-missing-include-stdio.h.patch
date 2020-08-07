@@ -1,0 +1,30 @@
+Author: dann frazier <dannf@debian.org>
+Description: Add missing #include stdio.h
+ Include stdio.h in files that use fprintf()
+Applied-Upstream: http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commitdiff;h=3c4a0de0be06377caf43a5f9e1682b05ef7299f9
+Last-Update: 2014-03-17
+
+Index: ltrace/sysdeps/linux-gnu/aarch64/regs.c
+===================================================================
+--- ltrace.orig/sysdeps/linux-gnu/aarch64/regs.c	2014-03-12 16:23:25.382866486 -0600
++++ ltrace/sysdeps/linux-gnu/aarch64/regs.c	2014-03-12 16:26:20.989198876 -0600
+@@ -23,6 +23,7 @@
+ #include <linux/uio.h>
+ #include <assert.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ 
+ #include "backend.h"
+ #include "proc.h"
+Index: ltrace/sysdeps/linux-gnu/aarch64/trace.c
+===================================================================
+--- ltrace.orig/sysdeps/linux-gnu/aarch64/trace.c	2014-03-12 16:23:25.382866486 -0600
++++ ltrace/sysdeps/linux-gnu/aarch64/trace.c	2014-03-12 16:26:20.989198876 -0600
+@@ -23,6 +23,7 @@
+ #include <sys/wait.h>
+ #include <asm/ptrace.h>
+ #include <string.h>
++#include <stdio.h>
+ #include <errno.h>
+ 
+ #include "backend.h"

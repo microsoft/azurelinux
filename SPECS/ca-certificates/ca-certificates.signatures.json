@@ -1,0 +1,24 @@
+{
+ "Signatures": {
+  "LICENSE": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+  "README.edk2": "757c28eddb0634b74e6482d16324193be27eee41864c1f96c447020dae14b44f",
+  "README.etc": "6c7b9287c41c171c64b358fc7331b8a9ae969fc2d00d997d88bcbf4da0de598a",
+  "README.extr": "146ff96c60a8ee32bbcf2da59d624d6ecfbab7ef7442529d46d8d63064d8ca58",
+  "README.java": "7bb8781320fb3ff84e76c7e7e4a9c3813879c4f1943710a3b0140b31efacfd32",
+  "README.openssl": "6c812d1ec8ce5bde2216cc42be33021d6345fbea05c14f50c52191a38c175ea9",
+  "README.pem": "27362e773c8b6bb065a455a66badb05e2652720bab8ade9ab91f0404cf827dab",
+  "README.src": "86184318d451bec55d70c84e618cbfe10c8adb7dc893964ce4aaecff99d83433",
+  "README.usr": "0d2e90b6cf575678cd9d4f409d92258ef0d676995d4d733acdb2425309a38ff8",
+  "ca-legacy": "de73a03a0cde4aff31ce3d5e27eecd03284a637c102e46b9e47d4369b5152ae0",
+  "ca-legacy.8.txt": "4fef2b8fed41d21ae559803b06074ca61a3f46648f174832542e3223d16dabf4",
+  "ca-legacy.conf": "400b96da374503fa6b6350a867347082d0c90e05ba4d02cc6b51b11229199c4d",
+  "certdata.base.txt": "379ffa21b2ee3500c447bba886ef09544ddcf9235a1d5a5155b3c3d9a804f50c",
+  "certdata.txt": "cc6408bd4be7fbfb8699bdb40ccb7f6de5780d681d87785ea362646e4dad5e8e",
+  "certdata2pem.py": "0be02cecc27a6e55e1cad1783033b147f502b26f9fb1bb5a53e7a43bbcb68fa0",
+  "nssckbi.h": "4019b4b68df6b89b22d350ffea652707864ee995b399de2f876c6d52d41f11ac",
+  "pem2bundle.sh": "79012e7fabf560c3b950349e500770a314006e5b330621a50147eeda11c633ea",
+  "trust-fixes": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+  "update-ca-trust": "0c0c0600587db7f59ba5e399666152ea6de6059f37408f3946c43438d607efdd",
+  "update-ca-trust.8.txt": "2470551bd11cc393ddf4cf43cf101c29d9f308c15469ee5e78908cfcf2437579"
+ }
+}

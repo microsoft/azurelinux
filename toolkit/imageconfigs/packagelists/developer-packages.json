@@ -1,0 +1,20 @@
+{
+    "packages": [
+        "build-essential",
+        "createrepo_c",
+        "device-mapper",
+        "fuse-devel",
+        "git",
+        "golang",
+        "less",
+        "parted",
+        "python3-pip",
+        "tar",
+        "texinfo",
+        "wget",
+        "curl-devel",
+        "cmake",
+        "flex",
+        "ninja-build"
+    ]
+}

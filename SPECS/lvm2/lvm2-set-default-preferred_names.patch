@@ -1,0 +1,13 @@
+diff --git a/conf/example.conf.in b/new/conf/example.conf.in
+index 60f8023..19dce47 100644
+--- a/conf/example.conf.in
++++ b/new/conf/example.conf.in
+@@ -104,7 +104,7 @@ devices {
+ 	# Prefer the path with least value in lexicographical order.
+ 	# 
+ 	# Example
+-	# preferred_names = [ "^/dev/mpath/", "^/dev/mapper/mpath", "^/dev/[hs]d" ]
++	preferred_names = [ "^/dev/mpath/", "^/dev/mapper/mpath", "^/dev/[hs]d" ]
+ 	# 
+ 	# This configuration option does not have a default value defined.
+ 

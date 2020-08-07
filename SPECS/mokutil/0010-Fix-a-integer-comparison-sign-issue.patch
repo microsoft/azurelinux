@@ -1,0 +1,33 @@
+From 9292352eb29a4fca41909448799efc524ee3c255 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 25 Jul 2018 10:27:34 -0400
+Subject: [PATCH] Fix a integer comparison sign issue.
+
+I introduced this, and it's stupid:
+
+mokutil.c: In function 'generate_pw_hash':
+mokutil.c:1971:16: error: comparison of integer expressions of different signedness: 'unsigned int' and 'int' [-Werror=sign-compare]
+  if (salt_size > settings_len - (next - settings)) {
+                ^
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/mokutil.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index d03127abf54..068df0d109c 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -1938,7 +1938,7 @@ generate_pw_hash (const char *input_pw)
+ 	char *password = NULL;
+ 	char *crypt_string;
+ 	const char *prefix;
+-	int settings_len = sizeof (settings) - 2;
++	unsigned int settings_len = sizeof (settings) - 2;
+ 	unsigned int pw_len, salt_size;
+ 
+ 	if (input_pw) {
+-- 
+2.23.0
+

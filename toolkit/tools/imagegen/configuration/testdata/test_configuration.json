@@ -1,0 +1,235 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 1024,
+            "TargetDisk": {
+                "Type": "path",
+                "Value": "/dev/sda"
+            },
+            "Artifacts": [
+                {
+                    "Name": "CompressedVHD",
+                    "Type": "vhd",
+                    "Compression": "gz"
+                },
+                {
+                    "Name": "UncompressedVHD",
+                    "Type": "vhd"
+                }
+            ],
+            "RawBinaries": [
+                {
+                    "BinPath": "binaries/1.bin",
+                    "BlockSize": 1024,
+                    "Seek": 1
+                },
+                {
+                    "BinPath": "binaries/2.bin",
+                    "BlockSize": 1024,
+                    "Seek": 2
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "MyBoot",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 3,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "MyRootfs",
+                    "Start": 9,
+                    "End": 1024,
+                    "FsType": "ext4"
+                }
+            ]
+        },
+        {
+            "PartitionTableType": "mbr",
+            "MaxSize": 4096,
+            "TargetDisk": {
+                "Type": "path",
+                "Value": "/dev/sdb"
+            },
+            "Partitions": [
+                {
+                    "ID": "MyBootA",
+                    "Flags": [
+                        "boot"
+                    ],
+                    "Start": 3,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "MyRootfsA",
+                    "Start": 9,
+                    "End": 1024,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "MyBootB",
+                    "Flags": [
+                        "boot"
+                    ],
+                    "Start": 1024,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "MyRootfsB",
+                    "Start": 1033,
+                    "End": 2048,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "SharedData",
+                    "Start": 2048,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "SmallerDisk",
+            "IsDefault": true,
+            "PartitionSettings": [
+                {
+                    "ID": "MyBoot",
+                    "MountPoint": "/boot",
+                    "MountOptions": "ro,exec"
+                },
+                {
+                    "ID": "MyRootfs",
+                    "MountPoint": "/",
+                    "RemoveDocs": true
+                }
+            ],
+            "PackageLists": [
+                "path/to/packages.json",
+                "path/to/extraPackages.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv":  "kernel-hyperv"
+            },
+            "AdditionalFiles": {
+                "local/path/file1": "/final/system/path",
+                "local/path/file2": "/final/system/path/renamedfile2"
+            },
+            "Hostname": "Mariner-Test",
+            "BootType": "efi",
+            "Groups": [
+                {
+                    "Name": "groupa"
+                },
+                {
+                    "Name": "groupb"
+                },
+                {
+                    "Name": "testgroup",
+                    "GID": "109"
+                }
+            ],
+            "Users": [
+                {
+                    "Name": "basicuser",
+                    "Password": "abc"
+                },
+                {
+                    "Name": "advancedSecureCoolUser",
+                    "Password": "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
+                    "PasswordHashed": true,
+                    "PasswordExpiresDays": 99999,
+                    "UID": "105",
+                    "PrimaryGroup": "testgroup",
+                    "SecondaryGroups": [
+                        "groupa",
+                        "groupb"
+                    ],
+                    "SSHPubkeyPaths": [
+                        "firstSSHKey.pub",
+                        "secondSSHKey.pub"
+                    ],
+                    "StartupCommand": "/usr/bin/somescript"
+                }
+            ],
+            "PostInstallScripts":[
+                {
+                    "Path": "arglessScript.sh"
+                },
+                {
+                    "Path": "thisOneNeedsArguments.sh",
+                    "Args": "--input abc --output cba"
+                }
+            ],
+            "Encryption" : {
+                "Enable":   true,
+                "Password": "EncryptPassphrase123"
+            }
+        },
+        {
+            "Name": "BiggerDiskA",
+            "PartitionSettings": [
+                {
+                    "ID": "MyBootA",
+                    "MountPoint": "/boot"
+                },
+                {
+                    "ID": "MyRootfsA",
+                    "MountPoint": "/",
+                    "RemoveDocs": true
+                },
+                {
+                    "ID": "SharedData",
+                    "MountPoint": "/some/path/to/data",
+                    "MountOptions": "ro,noexec"
+                }
+            ],
+            "PackageLists": [
+                "path/to/packages.json"
+            ],
+            "Hostname": "Mariner-TestA",
+            "Users": [
+                {
+                    "Name": "basicuser",
+                    "Password": "abc"
+                }
+            ]
+        },
+        {
+            "Name": "BiggerDiskB",
+            "PartitionSettings": [
+                {
+                    "ID": "MyBootB",
+                    "MountPoint": "/boot"
+                },
+                {
+                    "ID": "MyRootfsB",
+                    "MountPoint": "/",
+                    "RemoveDocs": true
+                },
+                {
+                    "ID": "SharedData",
+                    "MountPoint": "/some/path/to/data",
+                    "MountOptions": "ro,noexec"
+                }
+            ],
+            "PackageLists": [
+                "path/to/packages.json"
+            ],
+            "Hostname": "Mariner-TestB",
+            "Users": [
+                {
+                    "Name": "basicuser",
+                    "Password": "abc"
+                }
+            ]
+        }
+    ]
+}

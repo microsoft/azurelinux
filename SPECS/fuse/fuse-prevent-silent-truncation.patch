@@ -1,0 +1,97 @@
+From 9d89f28b3d1ecd056d4b536b94a1149fecb547a5 Mon Sep 17 00:00:00 2001
+From: Jann Horn <jannh@google.com>
+Date: Fri, 13 Jul 2018 14:51:17 -0700
+Subject: [PATCH] fusermount: prevent silent truncation of mount options
+
+Currently, in the kernel, copy_mount_options() copies in one page of
+userspace memory (or less if some of that memory area is not mapped).
+do_mount() then writes a null byte to the last byte of the copied page.
+This means that mount option strings longer than PAGE_SIZE-1 bytes get
+truncated silently.
+
+Therefore, this can happen:
+
+user@d9-ut:~$ _FUSE_COMMFD=10000 fusermount -o "$(perl -e 'print ","x4000')" mount
+sending file descriptor: Bad file descriptor
+user@d9-ut:~$ grep /mount /proc/mounts
+/dev/fuse /home/user/mount fuse rw,nosuid,nodev,relatime,user_id=1000,group_id=1000 0 0
+user@d9-ut:~$ fusermount -u mount
+user@d9-ut:~$ _FUSE_COMMFD=10000 fusermount -o "$(perl -e 'print ","x4050')" mount
+sending file descriptor: Bad file descriptor
+user@d9-ut:~$ grep /mount /proc/mounts
+/dev/fuse /home/user/mount fuse rw,nosuid,nodev,relatime,user_id=1000,group_id=100 0 0
+user@d9-ut:~$ fusermount -u mount
+user@d9-ut:~$ _FUSE_COMMFD=10000 fusermount -o "$(perl -e 'print ","x4051')" mount
+sending file descriptor: Bad file descriptor
+user@d9-ut:~$ grep /mount /proc/mounts
+/dev/fuse /home/user/mount fuse rw,nosuid,nodev,relatime,user_id=1000,group_id=10 0 0
+user@d9-ut:~$ fusermount -u mount
+user@d9-ut:~$ _FUSE_COMMFD=10000 fusermount -o "$(perl -e 'print ","x4052')" mount
+sending file descriptor: Bad file descriptor
+user@d9-ut:~$ grep /mount /proc/mounts
+/dev/fuse /home/user/mount fuse rw,nosuid,nodev,relatime,user_id=1000,group_id=1 0 0
+user@d9-ut:~$ fusermount -u mount
+
+I'm not aware of any context in which this is actually exploitable - you'd
+still need the UIDs to fit, and you can't do it if the three GIDs of the
+process don't match (in the case of a typical setgid binary), but it does
+look like something that should be fixed.
+
+I also plan to try to get this fixed on the kernel side.
+---
+ util/fusermount.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/util/fusermount.c b/util/fusermount.c
+index 26a0b75..0f1d1ec 100644
+--- a/util/fusermount.c
++++ b/util/fusermount.c
+@@ -712,6 +712,23 @@ static int get_string_opt(const char *s, unsigned len, const char *opt,
+ 	return 1;
+ }
+ 
++/* The kernel silently truncates the "data" argument to PAGE_SIZE-1 characters.
++ * This can be dangerous if it e.g. truncates the option "group_id=1000" to
++ * "group_id=1".
++ * This wrapper detects this case and bails out with an error.
++ */
++static int mount_notrunc(const char *source, const char *target,
++			 const char *filesystemtype, unsigned long mountflags,
++			 const char *data) {
++	if (strlen(data) > sysconf(_SC_PAGESIZE) - 1) {
++		fprintf(stderr, "%s: mount options too long\n", progname);
++		errno = EINVAL;
++		return -1;
++	}
++	return mount(source, target, filesystemtype, mountflags, data);
++}
++
++
+ static int do_mount(const char *mnt, char **typep, mode_t rootmode,
+ 		    int fd, const char *opts, const char *dev, char **sourcep,
+ 		    char **mnt_optsp, off_t rootsize)
+@@ -836,7 +853,7 @@ static int do_mount(const char *mnt, char **typep, mode_t rootmode,
+ 	else
+ 		strcpy(source, subtype ? subtype : dev);
+ 
+-	res = mount(source, mnt, type, flags, optbuf);
++	res = mount_notrunc(source, mnt, type, flags, optbuf);
+ 	if (res == -1 && errno == ENODEV && subtype) {
+ 		/* Probably missing subtype support */
+ 		strcpy(type, blkdev ? "fuseblk" : "fuse");
+@@ -847,13 +864,13 @@ static int do_mount(const char *mnt, char **typep, mode_t rootmode,
+ 			strcpy(source, type);
+ 		}
+ 
+-		res = mount(source, mnt, type, flags, optbuf);
++		res = mount_notrunc(source, mnt, type, flags, optbuf);
+ 	}
+ 	if (res == -1 && errno == EINVAL) {
+ 		/* It could be an old version not supporting group_id */
+ 		sprintf(d, "fd=%i,rootmode=%o,user_id=%u",
+ 			fd, rootmode, getuid());
+-		res = mount(source, mnt, type, flags, optbuf);
++		res = mount_notrunc(source, mnt, type, flags, optbuf);
+ 	}
+ 	if (res == -1) {
+ 		int errno_save = errno;

@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "99-disable-networking-config.cfg": "6a74be0419b8fca21c609a264ce8b0a62de2f0c10555418b358b7fe0fb6f02cd",
+  "cloud-init-19.1.tar.gz": "75be8cbff1431883227c05356cb69400f20bbb2666fd05e085f846ecf1d153cb",
+  "cloud-mariner.cfg": "c7afb54b38930ebf6a3f729c92e0759f18bf04d2a190954a2e60c6e09e7e11ce"
+ }
+}

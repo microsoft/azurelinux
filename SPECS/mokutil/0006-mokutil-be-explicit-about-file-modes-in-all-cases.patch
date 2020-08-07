@@ -1,0 +1,37 @@
+From b68dca2d4de779387c4b5306bb9cfc9a3bab2572 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 14 Jun 2016 10:19:43 -0400
+Subject: [PATCH 6/7] mokutil: be explicit about file modes in all cases.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/mokutil.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index d2c52b4..d554f6c 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -574,7 +574,8 @@ delete_data_from_list (const efi_guid_t *var_guid, const char *var_name,
+ 		     | EFI_VARIABLE_BOOTSERVICE_ACCESS
+ 		     | EFI_VARIABLE_RUNTIME_ACCESS;
+ 	ret = efi_set_variable (*var_guid, var_name,
+-				var_data, total, attributes);
++				var_data, total, attributes,
++				S_IRUSR | S_IWUSR);
+ 	if (ret < 0) {
+ 		fprintf (stderr, "Failed to write variable \"%s\": %m\n",
+ 			 var_name);
+@@ -938,7 +939,8 @@ update_request (void *new_list, int list_len, MokRequest req,
+ 		data_size = list_len;
+ 
+ 		if (efi_set_variable (efi_guid_shim, req_name,
+-				      data, data_size, attributes) < 0) {
++				      data, data_size, attributes,
++				      S_IRUSR | S_IWUSR) < 0) {
+ 			switch (req) {
+ 			case ENROLL_MOK:
+ 				fprintf (stderr, "Failed to enroll new keys\n");
+-- 
+2.7.4
+

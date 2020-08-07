@@ -1,0 +1,19 @@
+This patch changes the default socket location in the iotedge management
+application to be in /var/lib/, the canonical location for non-debian Linux.
+
+This saves the user from having to specify --host unix:\\<path-to>.socket every
+time they use the iotedge management app.
+
+diff --git a/iotedge/src/main.rs b/iotedge/src/main.rs
+index b82f57d6..1f2f72a9 100644
+--- a/iotedge/src/main.rs
++++ b/iotedge/src/main.rs
+@@ -67,7 +67,7 @@ fn run() -> Result<(), Error> {
+             )
+         } else {
+             (
+-                Cow::Borrowed("unix:///var/run/iotedge/mgmt.sock"),
++                Cow::Borrowed("unix:///var/lib/iotedge/mgmt.sock"),
+                 Cow::Borrowed(Path::new("/etc/iotedge/config.yaml")),
+                 Cow::Borrowed(Path::new("/etc/docker/daemon.json")),
+             )

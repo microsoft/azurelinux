@@ -1,0 +1,113 @@
+Sync with upstream CVS, complete log:
+
+2006-10-10 22:14  ecki
+
+	* util-ank.h: fixed signedness compiler warning
+
+2006-09-27 17:59  ecki
+
+	* mii.h: GigE Support by Stephen Hemminger from
+	  http://developer.osdl.org/shemminger/prototypes/mii-tool.tar.bz2
+	  with verbose register patch from Dean Gaudet
+
+2003-06-28 00:19  ecki
+
+	* mii.h: Use new style MII ioctls only. This will give you a
+	  warning, if compiled with old kernel source tree. It will also
+	  not work if compiled with new source on old kernels. The new
+	  ioctls also require root for reading, the old didnt. This fixes
+	  Debian bug #133648. No fallback compatibility is included for
+	  reasons of cleaner source.
+
+2002-03-04 21:47  ecki
+
+	* interface.h: export procnetdev_version, get_dev_fields, get_name
+	  from lib/interface.c for general usage (e.g. in my next patch to
+	  iptunnel)
+
+2001-11-25 03:48  ecki
+
+	* interface.h: this fixes Debian Bug #109164 (netstat -ci does only
+	  print stats once). It also renames add_interface and
+	  free_interface list to if_cache_add/free.  I am not sure if
+	  removing the "proc_read" flag will harm performance, looks likt
+	  this check is never triggereed. Anyway, we need more efficient
+	  b-search sooner or later.
+
+--- net-tools-1.60.orig/include/util-ank.h
++++ net-tools-1.60/include/util-ank.h
+@@ -75,6 +75,6 @@
+ extern int do_class(int argc, char **argv);
+ extern int do_filter(int argc, char **argv);
+ 
+-extern const char *format_host(int af, void *addr, __u8 *abuf, int alen);
++extern const char *format_host(int af, void *addr, char *abuf, int alen);
+ 
+ #endif /* __UTILS_H__ */
+--- net-tools-1.60.orig/include/mii.h
++++ net-tools-1.60/include/mii.h
+@@ -6,11 +6,14 @@
+  * Copyright (C) 2000 David A. Hinds -- dhinds@pcmcia.sourceforge.org
+  */
+ 
+-#ifndef _LINUX_MII_H
+-#define _LINUX_MII_H
++#ifndef _NETTOOL_MII_H
++#define _NETTOOLS_MII_H
++
++#include <linux/sockios.h>
+ 
+ /* network interface ioctl's for MII commands */
+ #ifndef SIOCGMIIPHY
++#warning "SIOCGMIIPHY is not defined by your kernel source"
+ #define SIOCGMIIPHY (SIOCDEVPRIVATE)	/* Read from current PHY */
+ #define SIOCGMIIREG (SIOCDEVPRIVATE+1) 	/* Read any PHY register */
+ #define SIOCSMIIREG (SIOCDEVPRIVATE+2) 	/* Write any PHY register */
+@@ -38,6 +41,7 @@
+ #define  MII_BMCR_RESTART	0x0200
+ #define  MII_BMCR_DUPLEX	0x0100
+ #define  MII_BMCR_COLTEST	0x0080
++#define  MII_BMCR_SPEED1000	0x0040
+ 
+ /* Basic Mode Status Register */
+ #define MII_BMSR		0x01
+@@ -83,4 +87,17 @@
+ #define  MII_ANER_PAGE_RX	0x0002
+ #define  MII_ANER_LP_AN_ABLE	0x0001
+ 
+-#endif /* _LINUX_MII_H */
++#define MII_CTRL1000		0x09
++#define   MII_BMCR2_1000FULL	0x0200
++#define   MII_BMCR2_1000HALF	0x0100
++
++#define MII_STAT1000		0x0a
++#define   MII_LPA2_1000LOCALOK  0x2000
++#define   MII_LPA2_1000REMRXOK	0x1000
++#define   MII_LPA2_1000FULL	0x0800
++#define   MII_LPA2_1000HALF	0x0400
++
++/* Last register we need for show_basic_mii() */
++#define MII_BASIC_MAX          (MII_STAT1000+1)
++
++#endif /* _NETTOOLS_MII_H */
+--- net-tools-1.60.orig/include/interface.h
++++ net-tools-1.60/include/interface.h
+@@ -64,13 +64,17 @@
+ extern int if_fetch(struct interface *ife);
+ 
+ extern int for_all_interfaces(int (*)(struct interface *, void *), void *);
+-extern int free_interface_list(void);
++extern int if_cache_free(void);
+ extern struct interface *lookup_interface(char *name);
+ extern int if_readlist(void);
+ 
+ extern int do_if_fetch(struct interface *ife);
+ extern int do_if_print(struct interface *ife, void *cookie);
+ 
++extern int    procnetdev_version(char *buf);
++extern int    get_dev_fields(char *bp, struct interface *ife);
++extern char * get_name(char *name, char *p);
++
+ extern void ife_print(struct interface *ptr);
+ 
+ extern int ife_short;

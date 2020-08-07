@@ -1,0 +1,45 @@
+There was a buffer overflow detected in list.c file where cfactorstr[] had an insufficient size (10). It was fixed in unzip beta versions and expanded to size 12 but I think it's still insufficient. The right size should be 13 (sgn (1), int (10), % (1), nul (1)).
+
+Also, replacing sprintf() by snprintf() might make the code more robust.
+Kudos to Josef Möllers (josef.moellers@suse.com).
+
+Refs: https://sourceforge.net/p/infozip/bugs/53/
+      CVE-2018-18384
+
+diff --git a/list.c b/list.c
+index 15e0011..a770ae7 100644
+--- a/list.c
++++ b/list.c
+@@ -97,7 +97,7 @@ int list_files(__G)    /* return PK-type error code */
+ {
+     int do_this_file=FALSE, cfactor, error, error_in_archive=PK_COOL;
+ #ifndef WINDLL
+-    char sgn, cfactorstr[10];
++    char sgn, cfactorstr[1+10+1+1];	/* <sgn><int>%NUL */
+     int longhdr=(uO.vflag>1);
+ #endif
+     int date_format;
+@@ -378,9 +378,9 @@ int list_files(__G)    /* return PK-type error code */
+             }
+ #else /* !WINDLL */
+             if (cfactor == 100)
+-                sprintf(cfactorstr, LoadFarString(CompFactor100));
++                snprintf(cfactorstr, sizeof(cfactorstr), LoadFarString(CompFactor100));
+             else
+-                sprintf(cfactorstr, LoadFarString(CompFactorStr), sgn, cfactor);
++                snprintf(cfactorstr, sizeof(cfactorstr), LoadFarString(CompFactorStr), sgn, cfactor);
+             if (longhdr)
+                 Info(slide, 0, ((char *)slide, LoadFarString(LongHdrStats),
+                   FmZofft(G.crec.ucsize, "8", "u"), methbuf,
+@@ -460,9 +460,9 @@ int list_files(__G)    /* return PK-type error code */
+ 
+ #else /* !WINDLL */
+         if (cfactor == 100)
+-            sprintf(cfactorstr, LoadFarString(CompFactor100));
++            snprintf(cfactorstr, sizeof(cfactorstr), LoadFarString(CompFactor100));
+         else
+-            sprintf(cfactorstr, LoadFarString(CompFactorStr), sgn, cfactor);
++            snprintf(cfactorstr, sizeof(cfactorstr), LoadFarString(CompFactorStr), sgn, cfactor);
+         if (longhdr) {
+             Info(slide, 0, ((char *)slide, LoadFarString(LongFileTrailer),
+               FmZofft(tot_ucsize, "8", "u"), FmZofft(tot_csize, "8", "u"),

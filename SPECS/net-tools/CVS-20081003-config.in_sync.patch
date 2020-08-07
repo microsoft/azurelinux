@@ -1,0 +1,74 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.24 - Fri Oct 3 02:09:57 2008 UTC by ecki
+moved H suport for Infiniband to the right section
+
+Revision 1.23 - Fri Oct 3 01:55:07 2008 UTC by ecki
+Add hardware support for InfiniBand (Debian Bug #294252 Tom Duffy from Sun).
+
+Revision 1.22 - Fri Jun 4 00:06:50 2004 UTC by ecki
+default all options which work with recent systems  to on
+
+Revision 1.21 - Mon Nov 12 02:12:05 2001 UTC by ecki
+added EUI64 Hardware Address Family
+Daniel Stodden <stodden@in.tum.de>
+
+Index: net-tools/config.in
+===================================================================
+--- net-tools.orig/config.in
++++ net-tools/config.in
+@@ -49,16 +49,16 @@ bool 'Does your system support GNU gette
+ * 
+ bool 'UNIX protocol family' HAVE_AFUNIX y
+ bool 'INET (TCP/IP) protocol family' HAVE_AFINET y
+-bool 'INET6 (IPv6) protocol family' HAVE_AFINET6 n
++bool 'INET6 (IPv6) protocol family' HAVE_AFINET6 y
+ bool 'Novell IPX/SPX protocol family' HAVE_AFIPX y
+ bool 'Appletalk DDP protocol family' HAVE_AFATALK y
+ bool 'AX25 (packet radio) protocol family' HAVE_AFAX25 y
+ bool 'NET/ROM (packet radio) protocol family' HAVE_AFNETROM y
+-bool 'Rose (packet radio) protocol family' HAVE_AFROSE n
++bool 'Rose (packet radio) protocol family' HAVE_AFROSE y
+ bool 'X.25 (CCITT) protocol family' HAVE_AFX25 y
+-bool 'Econet protocol family' HAVE_AFECONET n
++bool 'Econet protocol family' HAVE_AFECONET y
+ bool 'DECnet protocol family' HAVE_AFDECnet n
+-bool 'Ash protocol family' HAVE_AFASH n
++bool 'Ash protocol family' HAVE_AFASH y
+ *
+ *
+ *            Device Hardware types.
+@@ -71,21 +71,23 @@ bool 'IPIP Tunnel support' HAVE_HWTUNNEL
+ bool 'STRIP (Metricom radio) support' HAVE_HWSTRIP y
+ bool 'Token ring (generic) support' HAVE_HWTR y
+ bool 'AX25 (packet radio) support' HAVE_HWAX25 y
+-bool 'Rose (packet radio) support' HAVE_HWROSE n
++bool 'Rose (packet radio) support' HAVE_HWROSE y
+ bool 'NET/ROM (packet radio) support' HAVE_HWNETROM y
+ bool 'X.25 (generic) support' HAVE_HWX25 y
+ bool 'DLCI/FRAD (frame relay) support' HAVE_HWFR y
+-bool 'SIT (IPv6-in-IPv4) support' HAVE_HWSIT n
+-bool 'FDDI (generic) support' HAVE_HWFDDI n
+-bool 'HIPPI (generic) support' HAVE_HWHIPPI n
+-bool 'Ash hardware support' HAVE_HWASH n
+-bool '(Cisco)-HDLC/LAPB support' HAVE_HWHDLCLAPB n
++bool 'SIT (IPv6-in-IPv4) support' HAVE_HWSIT y
++bool 'FDDI (generic) support' HAVE_HWFDDI y
++bool 'HIPPI (generic) support' HAVE_HWHIPPI y
++bool 'Ash hardware support' HAVE_HWASH y
++bool '(Cisco)-HDLC/LAPB support' HAVE_HWHDLCLAPB y
+ bool 'IrDA support' HAVE_HWIRDA y
+-bool 'Econet hardware support' HAVE_HWEC n
++bool 'Econet hardware support' HAVE_HWEC y
++bool 'Generic EUI-64 hardware support' HAVE_HWEUI64 y
++bool 'InfiniBand hardware support' HAVE_HWIB y
+ *
+ *
+ *           Other Features.
+ *
+-bool 'IP Masquerading support' HAVE_FW_MASQUERADE n
+-bool 'Build iptunnel and ipmaddr' HAVE_IP_TOOLS n
+-bool 'Build mii-tool' HAVE_MII n
++bool 'IP Masquerading support' HAVE_FW_MASQUERADE y
++bool 'Build iptunnel and ipmaddr' HAVE_IP_TOOLS y
++bool 'Build mii-tool' HAVE_MII y

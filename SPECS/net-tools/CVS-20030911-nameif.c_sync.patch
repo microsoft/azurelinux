@@ -1,0 +1,90 @@
+Sync with upstream CVS, complete log:
+
+Revision 1.4 - Thu Sep 11 03:46:49 2003 UTC by ak
+Fix off by one in name length checking
+
+Revision 1.3 - Thu Mar 6 23:26:52 2003 UTC by ecki
+Fix Debian Bug#178209, Fix RedHat Bug#85748: nameif segfaults
+
+Revision 1.2 - Sun Nov 25 06:55:06 2001 UTC by ecki
+fixed debian bug#111642 reported by Jonathan Amery <jdamery@pick.ucam.org>
+(newline missing in nameif usage)
+
+Index: net-tools/nameif.c
+===================================================================
+--- net-tools.orig/nameif.c
++++ net-tools/nameif.c
+@@ -3,7 +3,7 @@
+  * Writen 2000 by Andi Kleen.
+  * Subject to the Gnu Public License, version 2.  
+  * TODO: make it support token ring etc.
+- * $Id: nameif.c,v 1.1 2000/10/18 17:26:29 ak Exp $
++ * $Id: nameif.c,v 1.4 2003/09/11 03:46:49 ak Exp $
+  */ 
+ #ifndef _GNU_SOURCE 
+ #define _GNU_SOURCE
+@@ -117,7 +117,8 @@ int getmac(char *name, unsigned char *ma
+ }
+ 
+ struct change { 
+-	struct change *next,**pprev;
++	struct change *next;
++	int found;
+ 	char ifname[IFNAMSIZ+1];
+ 	unsigned char mac[6];
+ }; 
+@@ -139,10 +140,7 @@ int addchange(char *p, struct change *ch
+ 			ch->ifname, pos); 
+ 	if (parsemac(p,ch->mac) < 0) 
+ 		complain(_("cannot parse MAC `%s' at %s"), p, pos); 
+-	if (clist) 
+-		clist->pprev = &ch->next;
+ 	ch->next = clist;
+-	ch->pprev = &clist;
+ 	clist = ch;
+ 	return 0; 
+ }
+@@ -177,7 +175,7 @@ void readconf(void)
+ 		if (*p == '\0')
+ 			continue; 
+ 		n = strcspn(p, " \t"); 
+-		if (n > IFNAMSIZ) 
++		if (n > IFNAMSIZ-1) 
+ 			complain(_("interface name too long at line %d"), line);  
+ 		memcpy(ch->ifname, p, n); 
+ 		ch->ifname[n] = 0; 
+@@ -200,7 +198,7 @@ struct option lopt[] = { 
+ 
+ void usage(void)
+ {
+-	fprintf(stderr, _("usage: nameif [-c configurationfile] [-s] {ifname macaddress}")); 
++	fprintf(stderr, _("usage: nameif [-c configurationfile] [-s] {ifname macaddress}\n")); 
+ 	exit(1); 
+ }
+ 
+@@ -277,21 +275,21 @@ int main(int ac, char **av) 
+ 		ch = lookupmac(mac); 
+ 		if (!ch) 
+ 			continue;
+-			
+-		*ch->pprev = ch->next;
++		
++		ch->found = 1;	
+ 		if (strcmp(p, ch->ifname)) { 
+ 			if (setname(p, ch->ifname) < 0)  
+ 				complain(_("cannot change name of %s to %s: %s"),
+ 						p, ch->ifname, strerror(errno)); 
+ 		} 
+-		free(ch);
+ 	} 
+ 	fclose(ifh); 
+ 	
+ 	while (clist) { 
+ 		struct change *ch = clist;
+ 		clist = clist->next;
+-		warning(_("interface '%s' not found"), ch->ifname); 
++		if (!ch->found)
++			warning(_("interface '%s' not found"), ch->ifname); 
+ 		free(ch); 
+ 	}
+ 

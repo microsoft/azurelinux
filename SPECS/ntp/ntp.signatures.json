@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "ntp-4.2.8p13.tar.gz": "288772cecfcd9a53694ffab108d1825a31ba77f3a8466b0401baeca3bc232a38",
+  "ntp.sysconfig": "f2a0ab20767f2c1975cd56cc2b013070fc5b0fbc6a619a3fad05c16d5d0bd6ba",
+  "ntpstat-master.zip": "383871e655c38fa853a4d5935d4be4aba08842e73e51ed3daf824e6a333dadc6"
+ }
+}

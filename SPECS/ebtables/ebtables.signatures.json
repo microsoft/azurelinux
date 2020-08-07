@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "ebtables-2.0.11.tar.gz": "b71f654784a726329f88b412ef7b96b4e5d786ed2bd28193ed7b4c0d677dfd2a",
+  "ebtables-config": "9ed565e6e58aeb3e537ba088c59eb8fff43812203b6c04dd94c4214c639b9ab9",
+  "ebtables-helper": "a2fbefc72e953235a40ba90e2094156e1fc21ef27992c7a5f507e3354bf5132b",
+  "ebtables-legacy-save": "d78ae83beea288f7e53472aa87c55e9ab3d7463467f1737d7b2994e90437471d",
+  "ebtables.service": "1caf0e67245d6e6fef29de28e525ca51fe375738e8b93cabbafaf6a8fcf608d8"
+ }
+}

@@ -1,0 +1,8 @@
+[Unit]
+Description=NFS client services
+Before=remote-fs-pre.target
+Wants=remote-fs-pre.target rpc-statd-notify.service
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=remote-fs.target

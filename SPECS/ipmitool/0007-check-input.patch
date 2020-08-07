@@ -1,0 +1,41 @@
+diff -urNp old/doc/ipmitool.1 new/doc/ipmitool.1
+--- old/doc/ipmitool.1	2017-10-03 16:10:50.446539988 +0200
++++ new/doc/ipmitool.1	2017-10-03 16:16:37.039673239 +0200
+@@ -3170,13 +3170,14 @@ SOL configuration data for the currently
+ 
+ Enable, disable or show status of SOL payload for the user on the specified channel. 
+ .TP 
+-\fIset\fP <\fBparameter\fR> <\fBvalue\fR> [<\fBchannel\fR>]
++\fIset\fP <\fBparameter\fR> <\fBvalue\fR> [<\fBchannel\fR>] [\fBnoguard\fR]
+ .br 
+ 
+ Configure parameters for Serial Over Lan.  If no channel is given,
+ it will display SOL configuration data for the currently used
+ channel.  Configuration parameter updates are automatically guarded
+-with the updates to the set\-in\-progress parameter.
++with the updates to the set\-in\-progress parameter, unless \fInoguard\fR
++parameter is present.
+ .RS
+ .TP 
+ Valid parameters and values are:
+diff -urNp old/lib/ipmi_sol.c new/lib/ipmi_sol.c
+--- old/lib/ipmi_sol.c	2017-10-03 16:10:50.447539996 +0200
++++ new/lib/ipmi_sol.c	2017-10-03 16:18:37.079006949 +0200
+@@ -1875,7 +1875,7 @@ static void
+ print_sol_usage(void)
+ {
+ 	lprintf(LOG_NOTICE, "SOL Commands: info [<channel number>]");
+-	lprintf(LOG_NOTICE, "              set <parameter> <value> [channel]");
++	lprintf(LOG_NOTICE, "              set <parameter> <value> [channel] [noguard]");
+ 	lprintf(LOG_NOTICE, "              payload <enable|disable|status> [channel] [userid]");
+ 	lprintf(LOG_NOTICE, "              activate [<usesolkeepalive|nokeepalive>] [instance=<number>]");
+ 	lprintf(LOG_NOTICE, "              deactivate [instance=<number>]");
+@@ -1890,6 +1890,8 @@ print_sol_usage(void)
+ static void
+ print_sol_set_usage(void)
+ {
++	lprintf(LOG_NOTICE, "\nSOL set usage: \n");
++	lprintf(LOG_NOTICE, "  sol set <parameter> <value> [channel] [noguard]\n");
+ 	lprintf(LOG_NOTICE, "\nSOL set parameters and values: \n");
+   	lprintf(LOG_NOTICE, "  set-in-progress             set-complete | "
+ 		"set-in-progress | commit-write");

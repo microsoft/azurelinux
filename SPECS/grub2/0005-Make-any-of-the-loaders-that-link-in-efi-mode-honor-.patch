@@ -1,0 +1,516 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 6 Oct 2015 16:09:25 -0400
+Subject: [PATCH] Make any of the loaders that link in efi mode honor secure
+ boot.
+
+And in this case "honor" means "even if somebody does link this in, they
+won't register commands if SB is enabled."
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/Makefile.core.def        |  1 +
+ grub-core/commands/iorw.c          |  7 +++++
+ grub-core/commands/memrw.c         |  7 +++++
+ grub-core/kern/dl.c                |  1 +
+ grub-core/kern/efi/efi.c           | 34 --------------------
+ grub-core/kern/efi/sb.c            | 64 ++++++++++++++++++++++++++++++++++++++
+ grub-core/loader/efi/appleloader.c |  7 +++++
+ grub-core/loader/efi/chainloader.c |  1 +
+ grub-core/loader/i386/bsd.c        |  7 +++++
+ grub-core/loader/i386/linux.c      |  7 +++++
+ grub-core/loader/i386/pc/linux.c   |  7 +++++
+ grub-core/loader/multiboot.c       |  7 +++++
+ grub-core/loader/xnu.c             |  7 +++++
+ include/grub/efi/efi.h             |  1 -
+ include/grub/efi/sb.h              | 29 +++++++++++++++++
+ include/grub/ia64/linux.h          |  0
+ include/grub/mips/linux.h          |  0
+ include/grub/powerpc/linux.h       |  0
+ include/grub/sparc64/linux.h       |  0
+ grub-core/Makefile.am              |  1 +
+ 20 files changed, 153 insertions(+), 35 deletions(-)
+ create mode 100644 grub-core/kern/efi/sb.c
+ create mode 100644 include/grub/efi/sb.h
+ create mode 100644 include/grub/ia64/linux.h
+ create mode 100644 include/grub/mips/linux.h
+ create mode 100644 include/grub/powerpc/linux.h
+ create mode 100644 include/grub/sparc64/linux.h
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 0b4b0c2122d..e92a7ef322f 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -195,6 +195,7 @@ kernel = {
+   i386_multiboot = kern/i386/pc/acpi.c;
+   i386_coreboot = kern/acpi.c;
+   i386_multiboot = kern/acpi.c;
++  common = kern/efi/sb.c;
+ 
+   x86 = kern/i386/tsc.c;
+   x86 = kern/i386/tsc_pit.c;
+diff --git a/grub-core/commands/iorw.c b/grub-core/commands/iorw.c
+index a0c164e54f0..41a7f3f0466 100644
+--- a/grub-core/commands/iorw.c
++++ b/grub-core/commands/iorw.c
+@@ -23,6 +23,7 @@
+ #include <grub/env.h>
+ #include <grub/cpu/io.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -118,6 +119,9 @@ grub_cmd_write (grub_command_t cmd, int argc, char **argv)
+ 
+ GRUB_MOD_INIT(memrw)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_read_byte =
+     grub_register_extcmd ("inb", grub_cmd_read, 0,
+ 			  N_("PORT"), N_("Read 8-bit value from PORT."),
+@@ -146,6 +150,9 @@ GRUB_MOD_INIT(memrw)
+ 
+ GRUB_MOD_FINI(memrw)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_extcmd (cmd_read_byte);
+   grub_unregister_extcmd (cmd_read_word);
+   grub_unregister_extcmd (cmd_read_dword);
+diff --git a/grub-core/commands/memrw.c b/grub-core/commands/memrw.c
+index 98769eadb34..088cbe9e2bc 100644
+--- a/grub-core/commands/memrw.c
++++ b/grub-core/commands/memrw.c
+@@ -22,6 +22,7 @@
+ #include <grub/extcmd.h>
+ #include <grub/env.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -120,6 +121,9 @@ grub_cmd_write (grub_command_t cmd, int argc, char **argv)
+ 
+ GRUB_MOD_INIT(memrw)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_read_byte =
+     grub_register_extcmd ("read_byte", grub_cmd_read, 0,
+ 			  N_("ADDR"), N_("Read 8-bit value from ADDR."),
+@@ -148,6 +152,9 @@ GRUB_MOD_INIT(memrw)
+ 
+ GRUB_MOD_FINI(memrw)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_extcmd (cmd_read_byte);
+   grub_unregister_extcmd (cmd_read_word);
+   grub_unregister_extcmd (cmd_read_dword);
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 04e804d1668..621070918d4 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -32,6 +32,7 @@
+ #include <grub/env.h>
+ #include <grub/cache.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ /* Platforms where modules are in a readonly area of memory.  */
+ #if defined(GRUB_MACHINE_QEMU)
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index 91129e33566..708581fcbde 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -273,40 +273,6 @@ grub_efi_get_variable (const char *var, const grub_efi_guid_t *guid,
+   return NULL;
+ }
+ 
+-grub_efi_boolean_t
+-grub_efi_secure_boot (void)
+-{
+-  grub_efi_guid_t efi_var_guid = GRUB_EFI_GLOBAL_VARIABLE_GUID;
+-  grub_size_t datasize;
+-  char *secure_boot = NULL;
+-  char *setup_mode = NULL;
+-  grub_efi_boolean_t ret = 0;
+-
+-  secure_boot = grub_efi_get_variable("SecureBoot", &efi_var_guid, &datasize);
+-  if (datasize != 1 || !secure_boot)
+-    {
+-      grub_dprintf ("secureboot", "No SecureBoot variable\n");
+-      goto out;
+-    }
+-  grub_dprintf ("secureboot", "SecureBoot: %d\n", *secure_boot);
+-
+-  setup_mode = grub_efi_get_variable("SetupMode", &efi_var_guid, &datasize);
+-  if (datasize != 1 || !setup_mode)
+-    {
+-      grub_dprintf ("secureboot", "No SetupMode variable\n");
+-      goto out;
+-    }
+-  grub_dprintf ("secureboot", "SetupMode: %d\n", *setup_mode);
+-
+-  if (*secure_boot && !*setup_mode)
+-    ret = 1;
+-
+- out:
+-  grub_free (secure_boot);
+-  grub_free (setup_mode);
+-  return ret;
+-}
+-
+ #pragma GCC diagnostic ignored "-Wcast-align"
+ 
+ /* Search the mods section from the PE32/PE32+ image. This code uses
+diff --git a/grub-core/kern/efi/sb.c b/grub-core/kern/efi/sb.c
+new file mode 100644
+index 00000000000..d74778b0cac
+--- /dev/null
++++ b/grub-core/kern/efi/sb.c
+@@ -0,0 +1,64 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2014 Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/err.h>
++#include <grub/mm.h>
++#include <grub/types.h>
++#include <grub/cpu/linux.h>
++#include <grub/efi/efi.h>
++#include <grub/efi/pe32.h>
++#include <grub/efi/linux.h>
++#include <grub/efi/sb.h>
++
++int
++grub_efi_secure_boot (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  grub_efi_guid_t efi_var_guid = GRUB_EFI_GLOBAL_VARIABLE_GUID;
++  grub_size_t datasize;
++  char *secure_boot = NULL;
++  char *setup_mode = NULL;
++  grub_efi_boolean_t ret = 0;
++
++  secure_boot = grub_efi_get_variable("SecureBoot", &efi_var_guid, &datasize);
++  if (datasize != 1 || !secure_boot)
++    {
++      grub_dprintf ("secureboot", "No SecureBoot variable\n");
++      goto out;
++    }
++  grub_dprintf ("secureboot", "SecureBoot: %d\n", *secure_boot);
++
++  setup_mode = grub_efi_get_variable("SetupMode", &efi_var_guid, &datasize);
++  if (datasize != 1 || !setup_mode)
++    {
++      grub_dprintf ("secureboot", "No SetupMode variable\n");
++      goto out;
++    }
++  grub_dprintf ("secureboot", "SetupMode: %d\n", *setup_mode);
++
++  if (*secure_boot && !*setup_mode)
++    ret = 1;
++
++ out:
++  grub_free (secure_boot);
++  grub_free (setup_mode);
++  return ret;
++#else
++  return 0;
++#endif
++}
+diff --git a/grub-core/loader/efi/appleloader.c b/grub-core/loader/efi/appleloader.c
+index 74888c463ba..69c2a10d351 100644
+--- a/grub-core/loader/efi/appleloader.c
++++ b/grub-core/loader/efi/appleloader.c
+@@ -24,6 +24,7 @@
+ #include <grub/misc.h>
+ #include <grub/efi/api.h>
+ #include <grub/efi/efi.h>
++#include <grub/efi/sb.h>
+ #include <grub/command.h>
+ #include <grub/i18n.h>
+ 
+@@ -227,6 +228,9 @@ static grub_command_t cmd;
+ 
+ GRUB_MOD_INIT(appleloader)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd = grub_register_command ("appleloader", grub_cmd_appleloader,
+ 			       N_("[OPTS]"),
+ 			       /* TRANSLATORS: This command is used on EFI to
+@@ -238,5 +242,8 @@ GRUB_MOD_INIT(appleloader)
+ 
+ GRUB_MOD_FINI(appleloader)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_command (cmd);
+ }
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index af2189619a3..5cd9b6e08a8 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -34,6 +34,7 @@
+ #include <grub/efi/disk.h>
+ #include <grub/efi/pe32.h>
+ #include <grub/efi/linux.h>
++#include <grub/efi/sb.h>
+ #include <grub/command.h>
+ #include <grub/i18n.h>
+ #include <grub/net.h>
+diff --git a/grub-core/loader/i386/bsd.c b/grub-core/loader/i386/bsd.c
+index 7f96515da65..87709aa23e8 100644
+--- a/grub-core/loader/i386/bsd.c
++++ b/grub-core/loader/i386/bsd.c
+@@ -38,6 +38,7 @@
+ #ifdef GRUB_MACHINE_PCBIOS
+ #include <grub/machine/int.h>
+ #endif
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -2124,6 +2125,9 @@ static grub_command_t cmd_netbsd_module_elf, cmd_openbsd_ramdisk;
+ 
+ GRUB_MOD_INIT (bsd)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   /* Net and OpenBSD kernels are often compressed.  */
+   grub_dl_load ("gzio");
+ 
+@@ -2163,6 +2167,9 @@ GRUB_MOD_INIT (bsd)
+ 
+ GRUB_MOD_FINI (bsd)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_extcmd (cmd_freebsd);
+   grub_unregister_extcmd (cmd_openbsd);
+   grub_unregister_extcmd (cmd_netbsd);
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index f7186be4002..c84747ea857 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -35,6 +35,7 @@
+ #include <grub/i18n.h>
+ #include <grub/lib/cmdline.h>
+ #include <grub/linux.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1156,6 +1157,9 @@ static grub_command_t cmd_linux, cmd_initrd;
+ 
+ GRUB_MOD_INIT(linux)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_linux = grub_register_command ("linux", grub_cmd_linux,
+ 				     0, N_("Load Linux."));
+   cmd_initrd = grub_register_command ("initrd", grub_cmd_initrd,
+@@ -1165,6 +1169,9 @@ GRUB_MOD_INIT(linux)
+ 
+ GRUB_MOD_FINI(linux)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_command (cmd_linux);
+   grub_unregister_command (cmd_initrd);
+ }
+diff --git a/grub-core/loader/i386/pc/linux.c b/grub-core/loader/i386/pc/linux.c
+index caa76bee8af..783a3cd93bc 100644
+--- a/grub-core/loader/i386/pc/linux.c
++++ b/grub-core/loader/i386/pc/linux.c
+@@ -35,6 +35,7 @@
+ #include <grub/i386/floppy.h>
+ #include <grub/lib/cmdline.h>
+ #include <grub/linux.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -480,6 +481,9 @@ static grub_command_t cmd_linux, cmd_linux16, cmd_initrd, cmd_initrd16;
+ 
+ GRUB_MOD_INIT(linux16)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_linux =
+     grub_register_command ("linux", grub_cmd_linux,
+ 			   0, N_("Load Linux."));
+@@ -497,6 +501,9 @@ GRUB_MOD_INIT(linux16)
+ 
+ GRUB_MOD_FINI(linux16)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_command (cmd_linux);
+   grub_unregister_command (cmd_linux16);
+   grub_unregister_command (cmd_initrd);
+diff --git a/grub-core/loader/multiboot.c b/grub-core/loader/multiboot.c
+index 40c67e82489..26df46a4161 100644
+--- a/grub-core/loader/multiboot.c
++++ b/grub-core/loader/multiboot.c
+@@ -50,6 +50,7 @@
+ #include <grub/video.h>
+ #include <grub/memory.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -446,6 +447,9 @@ static grub_command_t cmd_multiboot, cmd_module;
+ 
+ GRUB_MOD_INIT(multiboot)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_multiboot =
+ #ifdef GRUB_USE_MULTIBOOT2
+     grub_register_command ("multiboot2", grub_cmd_multiboot,
+@@ -466,6 +470,9 @@ GRUB_MOD_INIT(multiboot)
+ 
+ GRUB_MOD_FINI(multiboot)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   grub_unregister_command (cmd_multiboot);
+   grub_unregister_command (cmd_module);
+ }
+diff --git a/grub-core/loader/xnu.c b/grub-core/loader/xnu.c
+index c9885b1bcd7..df8dfdb4ba0 100644
+--- a/grub-core/loader/xnu.c
++++ b/grub-core/loader/xnu.c
+@@ -33,6 +33,7 @@
+ #include <grub/extcmd.h>
+ #include <grub/env.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1469,6 +1470,9 @@ static grub_extcmd_t cmd_splash;
+ 
+ GRUB_MOD_INIT(xnu)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+   cmd_kernel = grub_register_command ("xnu_kernel", grub_cmd_xnu_kernel, 0,
+ 				      N_("Load XNU image."));
+   cmd_kernel64 = grub_register_command ("xnu_kernel64", grub_cmd_xnu_kernel64,
+@@ -1509,6 +1513,9 @@ GRUB_MOD_INIT(xnu)
+ 
+ GRUB_MOD_FINI(xnu)
+ {
++  if (grub_efi_secure_boot())
++    return;
++
+ #ifndef GRUB_MACHINE_EMU
+   grub_unregister_command (cmd_resume);
+ #endif
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 1061aee9726..39480b38674 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -85,7 +85,6 @@ EXPORT_FUNC (grub_efi_set_variable) (const char *var,
+ 				     const grub_efi_guid_t *guid,
+ 				     void *data,
+ 				     grub_size_t datasize);
+-grub_efi_boolean_t EXPORT_FUNC (grub_efi_secure_boot) (void);
+ int
+ EXPORT_FUNC (grub_efi_compare_device_paths) (const grub_efi_device_path_t *dp1,
+ 					     const grub_efi_device_path_t *dp2);
+diff --git a/include/grub/efi/sb.h b/include/grub/efi/sb.h
+new file mode 100644
+index 00000000000..9629fbb0f9e
+--- /dev/null
++++ b/include/grub/efi/sb.h
+@@ -0,0 +1,29 @@
++/* sb.h - declare functions for EFI Secure Boot support */
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2006,2007,2008,2009  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_EFI_SB_HEADER
++#define GRUB_EFI_SB_HEADER	1
++
++#include <grub/types.h>
++#include <grub/dl.h>
++
++/* Functions.  */
++int EXPORT_FUNC (grub_efi_secure_boot) (void);
++
++#endif /* ! GRUB_EFI_SB_HEADER */
+diff --git a/include/grub/ia64/linux.h b/include/grub/ia64/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/mips/linux.h b/include/grub/mips/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/powerpc/linux.h b/include/grub/powerpc/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/sparc64/linux.h b/include/grub/sparc64/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index f4ff62b769a..9c69aa88626 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -71,6 +71,7 @@ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/command.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/device.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/disk.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/dl.h
++KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/efi/sb.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/env.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/env_private.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/err.h

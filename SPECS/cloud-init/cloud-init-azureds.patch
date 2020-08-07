@@ -1,0 +1,80 @@
+diff -rup cloud-init-18.3/cloudinit/sources/DataSourceAzure.py cloud-init-18.3-new/cloudinit/sources/DataSourceAzure.py
+--- cloud-init-18.3/cloudinit/sources/DataSourceAzure.py	2018-06-20 05:49:26.000000000 +0530
++++ cloud-init-18.3-new/cloudinit/sources/DataSourceAzure.py	2018-09-20 21:06:26.700264085 +0530
+@@ -27,7 +27,7 @@ LOG = logging.getLogger(__name__)
+ 
+ DS_NAME = 'Azure'
+ DEFAULT_METADATA = {"instance-id": "iid-AZURE-NODE"}
+-AGENT_START = ['service', 'walinuxagent', 'start']
++AGENT_START = ['systemctl', 'start', 'waagent']
+ AGENT_START_BUILTIN = "__builtin__"
+ BOUNCE_COMMAND_IFUP = [
+     'sh', '-xc',
+diff -rup cloud-init-18.3/cloudinit/sources/helpers/azure.py cloud-init-18.3-new/cloudinit/sources/helpers/azure.py
+--- cloud-init-18.3/cloudinit/sources/helpers/azure.py	2018-06-20 05:49:26.000000000 +0530
++++ cloud-init-18.3-new/cloudinit/sources/helpers/azure.py	2018-09-20 22:29:32.376130787 +0530
+@@ -7,6 +7,7 @@ import re
+ import socket
+ import struct
+ import time
++import configobj
+ 
+ from cloudinit.net import dhcp
+ from cloudinit import stages
+@@ -18,9 +18,10 @@
+ from cloudinit import url_helper
+ from cloudinit import util
+ from cloudinit.reporting import events
++from io import StringIO
+ 
+ LOG = logging.getLogger(__name__)
+-
++NETWORKD_LEASES_DIR = '/run/systemd/netif/leases'
+ 
+ azure_ds_reporter = events.ReportEventStack(
+     name="azure-ds",
+@@ -332,6 +333,32 @@
+         return dhcp_options
+ 
+     @staticmethod
++    def networkd_parse_lease(content):
++        """Parse a systemd lease file content as in /run/systemd/netif/leases/
++        Parse this (almost) ini style file even though it says:
++          # This is private data. Do not parse.
++        Simply return a dictionary of key/values."""
++
++        return dict(configobj.ConfigObj(StringIO(content), list_values=False))
++
++    @staticmethod
++    def networkd_load_leases(leases_d=None):
++        """Return a dictionary of dictionaries representing each lease
++        found in lease_d.i
++        The top level key will be the filename, which is typically the ifindex."""
++
++        if leases_d is None:
++            leases_d = NETWORKD_LEASES_DIR
++
++        ret = {}
++        if not os.path.isdir(leases_d):
++            return ret
++        for lfile in os.listdir(leases_d):
++            ret[lfile] = WALinuxAgentShim.networkd_parse_lease(
++                util.load_file(os.path.join(leases_d, lfile)))
++        return ret
++
++    @staticmethod
+     @azure_ds_telemetry_reporter
+     def _get_value_from_dhcpoptions(dhcp_options):
+         if dhcp_options is None:
+@@ -306,8 +334,9 @@ class WALinuxAgentShim(object):
+             # Option-245 stored in /run/cloud-init/dhclient.hooks/<ifc>.json
+             # a dhclient exit hook that calls cloud-init-dhclient-hook
+             LOG.debug('Finding Azure endpoint from hook json...')
+-            dhcp_options = WALinuxAgentShim._load_dhclient_json()
+-            value = WALinuxAgentShim._get_value_from_dhcpoptions(dhcp_options)
++            value = WALinuxAgentShim._networkd_get_value_from_leases()
++            LOG.debug('networkd value from lease %s', value)
++
+         if value is None:
+             # Fallback and check the leases file if unsuccessful
+             LOG.debug("Unable to find endpoint in dhclient logs. "

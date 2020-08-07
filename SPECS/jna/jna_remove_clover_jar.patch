@@ -1,0 +1,75 @@
+diff --git a/build.xml b/build.xml
+index f763f02..f4eea18 100644
+--- a/build.xml
++++ b/build.xml
+@@ -363,7 +363,6 @@
+       <pathelement path="${build}/${jar}"/>
+       <pathelement path="${test.classes}"/>
+       <pathelement path="${build}/${testjar}"/>
+-      <pathelement path="lib/clover.jar"/>
+       <path refid="test.libs"/>
+     </path>
+   </target>
+@@ -1041,7 +1040,6 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
+     <copy todir="${build}/jws" file="${build}/${jar}"/>
+     <copy todir="${build}/jws" file="${build}/${testjar}"/>
+     <copy todir="${build}/jws" file="lib/junit.jar"/>
+-    <copy todir="${build}/jws" file="lib/clover.jar"/>
+     <jar jarfile="${build}/jws/jnidispatch.jar">
+       <fileset dir="${build.native}" includes="*jnidispatch.*"/>
+     </jar>
+@@ -1050,7 +1048,7 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
+     <!-- javaws -viewer (security tab, import CSR as CA-->
+     <!--
+     <signjar alias="jna" keystore="jna.keystore" storepass="jnadev" lazy="true">
+-      <fileset dir="${build}/jws" includes="${jar},${testjar},junit.jar,jnidispatch.jar,clover.jar"/>
++      <fileset dir="${build}/jws" includes="${jar},${testjar},junit.jar,jnidispatch.jar"/>
+     </signjar>
+     -->
+   </target>
+@@ -1167,27 +1165,6 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
+     </subant>
+   </target>
+ 
+-  <target name="with.clover" description="Enable code coverage for tests">
+-    <taskdef resource="cloverlib.xml" classpath="lib/clover.jar"/>
+-    <property name="clover" value="true"/>
+-    <property name="build" value="build.clover"/>
+-    <clover-setup/>
+-  </target>
+-
+-  <target name="clover" depends="with.clover,test"
+-          description="Generate test code coverage reports">
+-    <property name="reports.clover" value="${reports}/clover"/>
+-    <mkdir dir="${reports.clover}"/>
+-    <clover-report>
+-      <current outfile="${reports.clover}" title="clover">
+-        <fileset dir="." includes="**/*.java" />
+-        <testresults dir="${results.junit}" includes="TEST-*.xml"/>
+-        <format type="html"/>
+-      </current>
+-    </clover-report>
+-    <echo>Reports generated in ${reports.clover}</echo>
+-  </target>
+-
+   <target name="javadoc" depends="-setup">
+     <path id="javadoc.src.path">
+       <path refid="src.path"/>
+@@ -1278,7 +1255,7 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
+     <!-- Full sources required to build and test everything -->
+     <zip zipfile="${dist}/src-full.zip">
+       <zipfileset src="${dist}/src.zip"/>
+-      <zipfileset dir="lib" includes="junit.jar,clover.jar" prefix="lib"/>
++      <zipfileset dir="lib" includes="junit.jar" prefix="lib"/>
+       <zipfileset dir="." includes=".classpath,.project"/>
+       <zipfileset dir="${native}" includes="libffi,libffi/**/*" prefix="native"/>
+     </zip>
+@@ -1293,8 +1270,6 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
+       <fileset dir="${build}"/>
+     </delete>
+     <delete quiet="true" includeEmptyDirs="true">
+-      <fileset dir=".clover"/>
+-      <fileset dir="build.clover" />
+       <fileset dir="${javadoc}"/>
+       <fileset dir="." includes="*~,**/*~,build.number,native/libffi/configure"/>
+     </delete>

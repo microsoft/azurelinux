@@ -1,0 +1,16 @@
+[Unit]
+Description=Connection poller for PostgreSQL.
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/pgbouncer --quiet --user pgbouncer /etc/pgbouncer.ini
+ExecReload=/bin/kill -USR2 $MAINPID
+User=pgbouncer
+Group=pgbouncer
+RuntimeDirectory=pgbouncer
+RuntimeDirectoryMode=0755
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

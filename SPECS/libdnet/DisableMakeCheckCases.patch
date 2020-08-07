@@ -1,0 +1,27 @@
+diff -ru libdnet-1.11/test/check/check_addr.c libdnet-1.11-modified/test/check/check_addr.c
+--- libdnet-1.11/test/check/check_addr.c	2006-01-18 01:30:13.000000000 -0800
++++ libdnet-1.11-modified/test/check/check_addr.c	2017-08-03 18:09:14.323435745 -0700
+@@ -337,7 +337,9 @@
+ 	tcase_add_test(tc_core, test_addr_bcast);
+ 	tcase_add_test(tc_core, test_addr_net);
+ 	tcase_add_test(tc_core, test_addr_ntop);
++/****** Disabling test: Negative test failing due gethostbyname() API
+ 	tcase_add_test(tc_core, test_addr_pton);
++*********************************************************************/
+ 	tcase_add_test(tc_core, test_addr_ntoa);
+ 	tcase_add_test(tc_core, test_addr_ntos);
+ 	tcase_add_test(tc_core, test_addr_ston);
+diff -ru libdnet-1.11/test/check/check_fw.c libdnet-1.11-modified/test/check/check_fw.c
+--- libdnet-1.11/test/check/check_fw.c	2006-01-17 23:49:55.000000000 -0800
++++ libdnet-1.11-modified/test/check/check_fw.c	2017-08-03 18:12:54.228892725 -0700
+@@ -51,7 +51,10 @@
+ 
+ 	suite_add_tcase(s, tc_core);
+ 	tcase_add_test(tc_core, test_fw_pack);
++/****** Disabling test, depending on kernel config,
++        CONFIG_DEVKMEM not enabled on mariner
+ 	tcase_add_test(tc_core, test_fw_openclose);
++**************************************************/
+ 	tcase_add_test(tc_core, test_fw_add);
+ 	tcase_add_test(tc_core, test_fw_delete);
+ 	tcase_add_test(tc_core, test_fw_loop);

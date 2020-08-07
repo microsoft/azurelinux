@@ -1,0 +1,2 @@
+mount -t proc proc /proc
+/lib/systemd/systemd

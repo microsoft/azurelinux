@@ -1,0 +1,22 @@
+{
+ "Signatures": {
+  "branding.desc": "cb7c163612c7f7945b5dc00656d608a24081d1eae6188a6f404f3214c122cc4e",
+  "calamares-3.2.11.tar.gz": "9cda2941c60edee9a31ea658e878173cc22b05d80649cffcd788d2692e6259b6",
+  "calamares-auto_de.ts": "4a24d817979a83c3f08c163b05f5a4f34a992c1f798a12f3a6b50cde75a852d8",
+  "calamares-auto_fr.ts": "a65dd534637607533cd725aee3151f10f56b7f606b41fbd3ceeae13d61d8a98f",
+  "calamares-auto_it.ts": "16c666c68dfd16ecbf45e07312f435859a66f689faa6e751c08f15ef9cfd7a7e",
+  "calamares-finished-1.1.0.tar.gz": "d2b0f03989c33521e3e3e1b24e2d2ad99e98b9f058097bf8c278520feac4f428",
+  "calamares-license-1.1.0.tar.gz": "01f497ce6f6eeda2d9e9dc9c9ddd8c85e239d53bc6290904562045c9d3a79dcb",
+  "calamares-partition-1.1.0.tar.gz": "6a278339c7d57c3735dcc391843e036cfb939c62663842dc812288caf746e4aa",
+  "calamares-users-1.1.0.tar.gz": "ae6cabb21bce0e62ad895f27c8cc5a1ee91375ff3ac4c2c01e250ac934c68cd6",
+  "calamares-welcome-1.1.0.tar.gz": "4c504047d4bec3fc899e12cecccf134b66ff22a73d7eec718c8128db01a3113e",
+  "license.conf": "7d167acd0c8d80d9cad0421c1e99023184a384b7a82f11a85f093bda6e78a213",
+  "mariner-eula": "ac06b0663da25548c3cc7050c7af1ed475f3cdc3474cd3e4aa81728aaee335a6",
+  "mariner-logo.png": "58261b49c68f5a767178031d369f6385b808cce58719fa19d15096b1993dc05e",
+  "mariner-welcome.png": "f59ff0674afef871b135ebe0307e68446b521ae3acb44770fdd041632fc0f3ab",
+  "settings.conf": "eb07144f595f9036b008eba83430b33a9f9b611bd841ff5ecb9d7a249cf3b975",
+  "show.qml": "e9afb9897c3419b2205a583ac23a6820e52f6cbb335eb38590afdd03e8d21c63",
+  "stylesheet.qss": "9707878d63c9591fd83096d1650ada773bf5e85797fd3fbfc19555ef39ffa30a",
+  "users.conf": "f80e6214ce6876220eb2cd4971948f95b11a07b23166cf47972769f61efac9eb"
+ }
+}

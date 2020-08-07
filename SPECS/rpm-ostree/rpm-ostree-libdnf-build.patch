@@ -1,0 +1,9 @@
+--- libdnf/CMakeLists.txt
++++ libdnf/CMakeLists.txt
+@@ -45,7 +45,8 @@ endif()
+
+ # build dependencies
+ find_package(Gpgme REQUIRED)
++set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH};/usr/share/cmake/Modules/)
+ find_package(LibSolv 0.6.30 REQUIRED COMPONENTS ext)
+ find_package(OpenSSL REQUIRED)

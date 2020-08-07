@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "LICENSE.PTR": "157a28c411baa3bd54b99986290f6af3a60ed0676459c5c2279de5820512b5d6",
+  "rng-tools-5.tar.gz": "60a102b6603bbcce2da341470cad42eeaa9564a16b4490e7867026ca11a3078e",
+  "rngd.service": "f00fe60ff19fe22347103ff0ae60ab6c9f5e5713b598ec9921c7c185c548cf95"
+ }
+}

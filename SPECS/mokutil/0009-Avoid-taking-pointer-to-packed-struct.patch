@@ -1,0 +1,117 @@
+From 19e8c9071b3d9306ca7b7329b313b31f86c2936d Mon Sep 17 00:00:00 2001
+From: Harry Youd <harry@harryyoud.co.uk>
+Date: Wed, 31 Jul 2019 19:44:53 +0100
+Subject: [PATCH 12/12] Avoid taking pointer to packed struct
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+error: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Werror=address-of-packed-member]
+---
+ src/mokutil.c | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index e2d567d..8892613 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -270,20 +270,22 @@ build_mok_list (void *data, unsigned long data_size, uint32_t *mok_num)
+ 			return NULL;
+ 		}
+ 
+-		if ((efi_guid_cmp (&CertList->SignatureType, &efi_guid_x509_cert) != 0) &&
+-		    (efi_guid_cmp (&CertList->SignatureType, &efi_guid_sha1) != 0) &&
+-		    (efi_guid_cmp (&CertList->SignatureType, &efi_guid_sha224) != 0) &&
+-		    (efi_guid_cmp (&CertList->SignatureType, &efi_guid_sha256) != 0) &&
+-		    (efi_guid_cmp (&CertList->SignatureType, &efi_guid_sha384) != 0) &&
+-		    (efi_guid_cmp (&CertList->SignatureType, &efi_guid_sha512) != 0)) {
++		efi_guid_t sigtype = CertList->SignatureType;
++
++		if ((efi_guid_cmp (&sigtype, &efi_guid_x509_cert) != 0) &&
++		    (efi_guid_cmp (&sigtype, &efi_guid_sha1) != 0) &&
++		    (efi_guid_cmp (&sigtype, &efi_guid_sha224) != 0) &&
++		    (efi_guid_cmp (&sigtype, &efi_guid_sha256) != 0) &&
++		    (efi_guid_cmp (&sigtype, &efi_guid_sha384) != 0) &&
++		    (efi_guid_cmp (&sigtype, &efi_guid_sha512) != 0)) {
+ 			dbsize -= CertList->SignatureListSize;
+ 			CertList = (EFI_SIGNATURE_LIST *)((uint8_t *) CertList +
+ 						  CertList->SignatureListSize);
+ 			continue;
+ 		}
+ 
+-		if ((efi_guid_cmp (&CertList->SignatureType, &efi_guid_x509_cert) != 0) &&
+-		    (CertList->SignatureSize != signature_size (&CertList->SignatureType))) {
++		if ((efi_guid_cmp (&sigtype, &efi_guid_x509_cert) != 0) &&
++		    (CertList->SignatureSize != signature_size (&sigtype))) {
+ 			dbsize -= CertList->SignatureListSize;
+ 			CertList = (EFI_SIGNATURE_LIST *)((uint8_t *) CertList +
+ 						  CertList->SignatureListSize);
+@@ -312,7 +314,7 @@ build_mok_list (void *data, unsigned long data_size, uint32_t *mok_num)
+ 		}
+ 
+ 		list[count].header = CertList;
+-		if (efi_guid_cmp (&CertList->SignatureType, &efi_guid_x509_cert) == 0) {
++		if (efi_guid_cmp (&sigtype, &efi_guid_x509_cert) == 0) {
+ 			/* X509 certificate */
+ 			list[count].mok_size = CertList->SignatureSize -
+ 					       sizeof(efi_guid_t);
+@@ -442,10 +444,11 @@ list_keys (uint8_t *data, size_t data_size)
+ 
+ 	for (unsigned int i = 0; i < mok_num; i++) {
+ 		printf ("[key %d]\n", i+1);
+-		if (efi_guid_cmp (&list[i].header->SignatureType, &efi_guid_x509_cert) == 0) {
++		efi_guid_t sigtype = list[i].header->SignatureType;
++		if (efi_guid_cmp (&sigtype, &efi_guid_x509_cert) == 0) {
+ 			print_x509 ((char *)list[i].mok, list[i].mok_size);
+ 		} else {
+-			print_hash_array (&list[i].header->SignatureType,
++			print_hash_array (&sigtype,
+ 					  list[i].mok, list[i].mok_size);
+ 		}
+ 		if (i < mok_num - 1)
+@@ -523,7 +526,8 @@ delete_data_from_list (const efi_guid_t *var_guid, const char *var_name,
+ 	remain = total;
+ 	for (unsigned int i = 0; i < mok_num; i++) {
+ 		remain -= list[i].header->SignatureListSize;
+-		if (efi_guid_cmp (&list[i].header->SignatureType, type) != 0)
++		efi_guid_t sigtype = list[i].header->SignatureType;
++		if (efi_guid_cmp (&sigtype, type) != 0)
+ 			continue;
+ 
+ 		sig_list_size = list[i].header->SignatureListSize;
+@@ -1057,7 +1061,8 @@ is_duplicate (const efi_guid_t *type, const void *data, const uint32_t data_size
+ 	}
+ 
+ 	for (unsigned int i = 0; i < node_num; i++) {
+-		if (efi_guid_cmp (&list[i].header->SignatureType, type) != 0)
++		efi_guid_t sigtype = list[i].header->SignatureType;
++		if (efi_guid_cmp (&sigtype, type) != 0)
+ 			continue;
+ 
+ 		if (efi_guid_cmp (type, &efi_guid_x509_cert) == 0) {
+@@ -1510,8 +1515,8 @@ issue_hash_request (const char *hash_str, MokRequest req,
+ 			goto error;
+ 		/* Check if there is a signature list with the same type */
+ 		for (unsigned int i = 0; i < mok_num; i++) {
+-			if (efi_guid_cmp (&mok_list[i].header->SignatureType,
+-					 &hash_type) == 0) {
++			efi_guid_t sigtype = mok_list[i].header->SignatureType;
++			if (efi_guid_cmp (&sigtype, &hash_type) == 0) {
+ 				merge_ind = i;
+ 				list_size -= sizeof(EFI_SIGNATURE_LIST);
+ 				break;
+@@ -1678,8 +1683,9 @@ export_db_keys (const DBName db_name)
+ 	for (unsigned i = 0; i < mok_num; i++) {
+ 		off_t offset = 0;
+ 		ssize_t write_size;
++		efi_guid_t sigtype = list[i].header->SignatureType;
+ 
+-		if (efi_guid_cmp (&list[i].header->SignatureType, &efi_guid_x509_cert) != 0)
++		if (efi_guid_cmp (&sigtype, &efi_guid_x509_cert) != 0)
+ 			continue;
+ 
+ 		/* Dump X509 certificate to files */
+-- 
+2.21.0
+

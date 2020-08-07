@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "go1.13.11.src.tar.gz": "89ed1abce25ad003521c125d6583c93c1280de200ad221f961085200a6c00679",
+  "go1.4-bootstrap-20171003.tar.gz": "f4ff5b5eb3a3cae1c993723f3eab519c5bae18866b5e5f96fe1102f0cb5c3e52"
+ }
+}

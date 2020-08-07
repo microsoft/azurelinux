@@ -1,0 +1,37 @@
+--- a/open-vm-tools/lib/user/utilBacktrace.c	2020-05-18 15:17:38.566170714 -0700
++++ b/open-vm-tools/lib/user/utilBacktrace.c	2020-05-18 15:19:32.678018476 -0700
+@@ -431,13 +431,16 @@
+       }
+    }
+ #else
+-   uintptr_t *x = (uintptr_t *) &bugNr;
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Warray-bounds"
++   uintptr_t *x = ((uintptr_t *) &bugNr) - 2;
++#pragma GCC diagnostic pop
+ 
+    if (bugNr == 0) {
+       outFunc(outFuncData, "Backtrace:\n");
+    } else {
+       outFunc(outFuncData, "Backtrace for bugNr=%d\n",bugNr);
+    }
+-   UtilBacktraceFromPointerWithFunc(&x[-2], outFunc, outFuncData);
++   UtilBacktraceFromPointerWithFunc(x, outFunc, outFuncData);
+ #endif
+ }
+--- a/open-vm-tools/services/plugins/dndcp/copyPasteCompatX11.c	2020-05-18 16:42:56.135715690 -0700
++++ b/open-vm-tools/services/plugins/dndcp/copyPasteCompatX11.c	2020-05-18 16:44:25.952405005 -0700
+@@ -73,11 +73,11 @@
+ #endif
+ 
+ #ifndef GDK_SELECTION_TYPE_TIMESTAMP
+-GdkAtom GDK_SELECTION_TYPE_TIMESTAMP;
++extern GdkAtom GDK_SELECTION_TYPE_TIMESTAMP;
+ #endif
+ 
+ #ifndef GDK_SELECTION_TYPE_UTF8_STRING
+-GdkAtom GDK_SELECTION_TYPE_UTF8_STRING;
++extern GdkAtom GDK_SELECTION_TYPE_UTF8_STRING;
+ #endif
+ 
+ /*

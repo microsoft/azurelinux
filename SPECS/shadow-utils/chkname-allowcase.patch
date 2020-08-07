@@ -1,0 +1,21 @@
+--- a/libmisc/chkname.c	2014-05-08 01:43:11.000000000 -0700
++++ b/libmisc/chkname.c	2017-04-27 11:47:16.789145415 -0700
+@@ -52,15 +52,17 @@
+ 	 * User/group names must match [a-z_][a-z0-9_-]*[$]
+ 	 */
+ 	if (('\0' == *name) ||
+-	    !((('a' <= *name) && ('z' >= *name)) || ('_' == *name))) {
++	    !((('a' <= *name) && ('z' >= *name)) || ('_' == *name) || (('A' <= *name) && ('Z' >= *name)))) {
+ 		return false;
+ 	}
+ 
+ 	while ('\0' != *++name) {
+ 		if (!(( ('a' <= *name) && ('z' >= *name) ) ||
++		      ( ('A' <= *name) && ('Z' >= *name) ) ||
+ 		      ( ('0' <= *name) && ('9' >= *name) ) ||
+ 		      ('_' == *name) ||
+ 		      ('-' == *name) ||
++		      ('.' == *name) ||
+ 		      ( ('$' == *name) && ('\0' == *(name + 1)) )
+ 		     )) {
+ 			return false;

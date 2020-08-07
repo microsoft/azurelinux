@@ -1,0 +1,263 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 14 Feb 2017 16:18:54 -0500
+Subject: [PATCH] Handle multi-arch (64-on-32) boot in linuxefi loader.
+
+Allow booting 64-bit kernels on 32-bit EFI on x86.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/efi/linux.c      |   9 +++-
+ grub-core/loader/i386/efi/linux.c | 110 ++++++++++++++++++++++++++------------
+ include/grub/i386/linux.h         |   7 ++-
+ 3 files changed, 89 insertions(+), 37 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index c8ecce6dfd0..0622dfa48d4 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -69,12 +69,17 @@ grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+ typedef void (*handover_func) (void *, grub_efi_system_table_t *, void *);
+ 
+ grub_err_t
+-grub_efi_linux_boot (void *kernel_addr, grub_off_t offset,
++grub_efi_linux_boot (void *kernel_addr, grub_off_t handover_offset,
+ 		     void *kernel_params)
+ {
+   handover_func hf;
++  int offset = 0;
+ 
+-  hf = (handover_func)((char *)kernel_addr + offset);
++#ifdef __x86_64__
++  offset = 512;
++#endif
++
++  hf = (handover_func)((char *)kernel_addr + handover_offset + offset);
+   hf (grub_efi_image_handle, grub_efi_system_table, kernel_params);
+ 
+   return GRUB_ERR_BUG;
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 8db228c5bf5..800c3e54022 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -44,14 +44,10 @@ static char *linux_cmdline;
+ static grub_err_t
+ grub_linuxefi_boot (void)
+ {
+-  int offset = 0;
+-
+-#ifdef __x86_64__
+-  offset = 512;
+-#endif
+   asm volatile ("cli");
+ 
+-  return grub_efi_linux_boot ((char *)kernel_mem, handover_offset + offset,
++  return grub_efi_linux_boot ((char *)kernel_mem,
++			      handover_offset,
+ 			      params);
+ }
+ 
+@@ -154,14 +150,20 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+   return grub_errno;
+ }
+ 
++#define MIN(a, b) \
++  ({ typeof (a) _a = (a); \
++     typeof (b) _b = (b); \
++     _a < _b ? _a : _b; })
++
+ static grub_err_t
+ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 		int argc, char *argv[])
+ {
+   grub_file_t file = 0;
+-  struct linux_kernel_header lh;
+-  grub_ssize_t len, start, filelen;
++  struct linux_i386_kernel_header *lh = NULL;
++  grub_ssize_t start, filelen;
+   void *kernel = NULL;
++  int setup_header_end_offset;
+   int rc;
+ 
+   grub_dl_ref (my_mod);
+@@ -201,48 +203,79 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  params = grub_efi_allocate_pages_max (0x3fffffff, BYTES_TO_PAGES(16384));
+-
++  params = grub_efi_allocate_pages_max (0x3fffffff,
++					BYTES_TO_PAGES(sizeof(*params)));
+   if (! params)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, "cannot allocate kernel parameters");
+       goto fail;
+     }
+ 
+-  grub_dprintf ("linux", "params = %lx\n", (unsigned long) params);
++  grub_dprintf ("linux", "params = %p\n", params);
+ 
+-  grub_memset (params, 0, 16384);
++  grub_memset (params, 0, sizeof(*params));
+ 
+-  grub_memcpy (&lh, kernel, sizeof (lh));
+-
+-  if (lh.boot_flag != grub_cpu_to_le16 (0xaa55))
++  setup_header_end_offset = *((grub_uint8_t *)kernel + 0x201);
++  grub_dprintf ("linux", "copying %lu bytes from %p to %p\n",
++		MIN((grub_size_t)0x202+setup_header_end_offset,
++		    sizeof (*params)) - 0x1f1,
++		(grub_uint8_t *)kernel + 0x1f1,
++		(grub_uint8_t *)params + 0x1f1);
++  grub_memcpy ((grub_uint8_t *)params + 0x1f1,
++	       (grub_uint8_t *)kernel + 0x1f1,
++		MIN((grub_size_t)0x202+setup_header_end_offset,sizeof (*params)) - 0x1f1);
++  lh = (struct linux_i386_kernel_header *)params;
++  grub_dprintf ("linux", "lh is at %p\n", lh);
++  grub_dprintf ("linux", "checking lh->boot_flag\n");
++  if (lh->boot_flag != grub_cpu_to_le16 (0xaa55))
+     {
+       grub_error (GRUB_ERR_BAD_OS, N_("invalid magic number"));
+       goto fail;
+     }
+ 
+-  if (lh.setup_sects > GRUB_LINUX_MAX_SETUP_SECTS)
++  grub_dprintf ("linux", "checking lh->setup_sects\n");
++  if (lh->setup_sects > GRUB_LINUX_MAX_SETUP_SECTS)
+     {
+       grub_error (GRUB_ERR_BAD_OS, N_("too many setup sectors"));
+       goto fail;
+     }
+ 
+-  if (lh.version < grub_cpu_to_le16 (0x020b))
++  grub_dprintf ("linux", "checking lh->version\n");
++  if (lh->version < grub_cpu_to_le16 (0x020b))
+     {
+       grub_error (GRUB_ERR_BAD_OS, N_("kernel too old"));
+       goto fail;
+     }
+ 
+-  if (!lh.handover_offset)
++  grub_dprintf ("linux", "checking lh->handover_offset\n");
++  if (!lh->handover_offset)
+     {
+       grub_error (GRUB_ERR_BAD_OS, N_("kernel doesn't support EFI handover"));
+       goto fail;
+     }
+ 
++#if defined(__x86_64__) || defined(__aarch64__)
++  grub_dprintf ("linux", "checking lh->xloadflags\n");
++  if (!(lh->xloadflags & LINUX_XLF_KERNEL_64))
++    {
++      grub_error (GRUB_ERR_BAD_OS, N_("kernel doesn't support 64-bit CPUs"));
++      goto fail;
++    }
++#endif
++
++#if defined(__i386__)
++  if ((lh->xloadflags & LINUX_XLF_KERNEL_64) &&
++      !(lh->xloadflags & LINUX_XLF_EFI_HANDOVER_32))
++    {
++      grub_error (GRUB_ERR_BAD_OS,
++		  N_("kernel doesn't support 32-bit handover"));
++      goto fail;
++    }
++#endif
++
+   grub_dprintf ("linux", "setting up cmdline\n");
+   linux_cmdline = grub_efi_allocate_pages_max(0x3fffffff,
+-					 BYTES_TO_PAGES(lh.cmdline_size + 1));
+-
++					 BYTES_TO_PAGES(lh->cmdline_size + 1));
+   if (!linux_cmdline)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate cmdline"));
+@@ -255,21 +288,23 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_memcpy (linux_cmdline, LINUX_IMAGE, sizeof (LINUX_IMAGE));
+   grub_create_loader_cmdline (argc, argv,
+                               linux_cmdline + sizeof (LINUX_IMAGE) - 1,
+-			      lh.cmdline_size - (sizeof (LINUX_IMAGE) - 1));
++			      lh->cmdline_size - (sizeof (LINUX_IMAGE) - 1));
+ 
+-  lh.cmd_line_ptr = (grub_uint32_t)(grub_addr_t)linux_cmdline;
++  grub_dprintf ("linux", "cmdline:%s\n", linux_cmdline);
++  grub_dprintf ("linux", "setting lh->cmd_line_ptr\n");
++  lh->cmd_line_ptr = (grub_uint32_t)(grub_addr_t)linux_cmdline;
+ 
+-  handover_offset = lh.handover_offset;
++  grub_dprintf ("linux", "computing handover offset\n");
++  handover_offset = lh->handover_offset;
+ 
+-  start = (lh.setup_sects + 1) * 512;
+-  len = grub_file_size(file) - start;
++  start = (lh->setup_sects + 1) * 512;
+ 
+-  kernel_mem = grub_efi_allocate_pages_max(lh.pref_address,
+-					   BYTES_TO_PAGES(lh.init_size));
++  kernel_mem = grub_efi_allocate_pages_max(lh->pref_address,
++					   BYTES_TO_PAGES(lh->init_size));
+ 
+   if (!kernel_mem)
+     kernel_mem = grub_efi_allocate_pages_max(0x3fffffff,
+-					     BYTES_TO_PAGES(lh.init_size));
++					     BYTES_TO_PAGES(lh->init_size));
+ 
+   if (!kernel_mem)
+     {
+@@ -277,14 +312,21 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  grub_memcpy (kernel_mem, (char *)kernel + start, len);
++  grub_dprintf ("linux", "kernel_mem = %lx\n", (unsigned long) kernel_mem);
++
+   grub_loader_set (grub_linuxefi_boot, grub_linuxefi_unload, 0);
+   loaded=1;
++  grub_dprintf ("linux", "setting lh->code32_start to %p\n", kernel_mem);
++  lh->code32_start = (grub_uint32_t)(grub_addr_t) kernel_mem;
+ 
+-  lh.code32_start = (grub_uint32_t)(grub_uint64_t) kernel_mem;
+-  grub_memcpy (params, &lh, 2 * 512);
++  grub_memcpy (kernel_mem, (char *)kernel + start, filelen - start);
+ 
+-  params->type_of_loader = 0x21;
++  grub_dprintf ("linux", "setting lh->type_of_loader\n");
++  lh->type_of_loader = 0x6;
++
++  grub_dprintf ("linux", "setting lh->ext_loader_{type,ver}\n");
++  params->ext_loader_type = 0;
++  params->ext_loader_ver = 2;
+   grub_dprintf("linux", "kernel_mem: %p handover_offset: %08x\n",
+ 	       kernel_mem, handover_offset);
+ 
+@@ -301,10 +343,10 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       loaded = 0;
+     }
+ 
+-  if (linux_cmdline && !loaded)
++  if (linux_cmdline && lh && !loaded)
+     grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)
+ 			 linux_cmdline,
+-			 BYTES_TO_PAGES(lh.cmdline_size + 1));
++			 BYTES_TO_PAGES(lh->cmdline_size + 1));
+ 
+   if (kernel_mem && !loaded)
+     grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)kernel_mem,
+diff --git a/include/grub/i386/linux.h b/include/grub/i386/linux.h
+index bb19dbd5a77..8474a857ed2 100644
+--- a/include/grub/i386/linux.h
++++ b/include/grub/i386/linux.h
+@@ -133,7 +133,12 @@ struct linux_i386_kernel_header
+   grub_uint32_t kernel_alignment;
+   grub_uint8_t relocatable;
+   grub_uint8_t min_alignment;
+-  grub_uint8_t pad[2];
++#define LINUX_XLF_KERNEL_64                   (1<<0)
++#define LINUX_XLF_CAN_BE_LOADED_ABOVE_4G      (1<<1)
++#define LINUX_XLF_EFI_HANDOVER_32             (1<<2)
++#define LINUX_XLF_EFI_HANDOVER_64             (1<<3)
++#define LINUX_XLF_EFI_KEXEC                   (1<<4)
++  grub_uint16_t xloadflags;
+   grub_uint32_t cmdline_size;
+   grub_uint32_t hardware_subarch;
+   grub_uint64_t hardware_subarch_data;

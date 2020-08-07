@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "xinetd-2.3.15.tar.gz": "bf4e060411c75605e4dcbdf2ac57c6bd9e1904470a2f91e01ba31b50a80a5be3",
+  "xinetd.service": "08cac54426560e2abe02ac0f15c0afda0ee3d8286c1fc9a5b46a0c7c29097b95"
+ }
+}

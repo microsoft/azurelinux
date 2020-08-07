@@ -1,0 +1,40 @@
+{
+    "SystemConfigs": [
+        {
+            "Name": "CBL-Mariner Full",
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/developer-packages.json",
+                "packagelists/virtualization-host-packages.json",
+                "packagelists/core-packages-image.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv": "kernel-hyperv"
+            }
+        },
+        {
+            "Name": "CBL-Mariner Virtualization Host",
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/virtualization-host-packages.json",
+                "packagelists/core-packages-image.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv": "kernel-hyperv"
+            }
+        },
+        {
+            "Name": "CBL-Mariner Core",
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/core-packages-image.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv": "kernel-hyperv"
+            }
+        }
+    ]
+}

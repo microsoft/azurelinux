@@ -1,0 +1,279 @@
+diff -ur calamares-3.2.11/CMakeLists.txt calamares-3.2.11-default-settings/CMakeLists.txt
+--- calamares-3.2.11/CMakeLists.txt	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/CMakeLists.txt	2019-07-08 22:25:32.488871708 +0200
+@@ -44,7 +44,7 @@
+ 
+ ### OPTIONS
+ #
+-option( INSTALL_CONFIG "Install configuration files" OFF )
++option( INSTALL_CONFIG "Install configuration files" ON )
+ option( INSTALL_POLKIT "Install Polkit configuration" ON )
+ option( BUILD_TESTING "Build the testing tree." ON )
+ option( WITH_PYTHON "Enable Python modules API (requires Boost.Python)." ON )
+diff -ur calamares-3.2.11/settings.conf calamares-3.2.11-default-settings/settings.conf
+--- calamares-3.2.11/settings.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/settings.conf	2019-07-08 22:25:32.579871089 +0200
+@@ -107,21 +107,22 @@
+   - locale
+   - keyboard
+   - localecfg
+-#  - luksbootkeyfile
++  - luksbootkeyfile
+ #  - luksopenswaphookcfg
+-#  - dracutlukscfg
++  - dracutlukscfg
+ #  - plymouthcfg
+-  - initcpiocfg
+-  - initcpio
++#  - initcpiocfg
++#  - initcpio
+   - users
+   - displaymanager
+   - networkcfg
+   - hwclock
+   - services-systemd
+-#  - dracut
+-  - initramfs
+-#  - grubcfg
++  - dracut
++#  - initramfs
++  - grubcfg
+   - bootloader
++  - packages
+   - umount
+ - show:
+ #  - webview@owncloud
+@@ -139,7 +140,7 @@
+ # here, Calamares then takes care of finding it and loading the contents.
+ #
+ # YAML: string.
+-branding: default
++branding: auto
+ 
+ # If this is set to true, Calamares will show an "Are you sure?" prompt right
+ # before each execution phase, i.e. at points of no return. If this is set to
+@@ -167,7 +168,7 @@
+ # If this is set to true, Calamares refers to itself as a "setup program"
+ # rather than an "installer". Defaults to the value of dont-chroot, but
+ # Calamares will complain if this is not explicitly set.
+-# oem-setup: true
++oem-setup: false
+ 
+ # If this is set to true, the "Cancel" button will be disabled entirely.
+ # The button is also hidden from view.
+diff -ur calamares-3.2.11/src/branding/default/branding.desc calamares-3.2.11-default-settings/src/branding/default/branding.desc
+--- calamares-3.2.11/src/branding/default/branding.desc	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/branding/default/branding.desc	2019-07-08 23:49:58.245637521 +0200
+@@ -58,12 +58,12 @@
+ # if it contains substitutions, or you'll get YAML exceptions.
+ strings:
+     productName:         "@{NAME}"
+-    shortProductName:    Generic
+-    version:             2017.8 LTS
+-    shortVersion:        2017.8
+-    versionedName:       Generic GNU/Linux 2017.8 LTS "Soapy Sousaphone"
+-    shortVersionedName:  Generic 2017.8
+-    bootloaderEntryName: Generic
++    shortProductName:    "@{NAME}"
++    version:             "@{VERSION}"
++    shortVersion:        "@{VERSION_ID}"
++    versionedName:       "@{NAME} @{VERSION}"
++    shortVersionedName:  "@{NAME} @{VERSION_ID}"
++    bootloaderEntryName: "@{NAME}"
+     productUrl:          https://calamares.io/
+     supportUrl:          https://github.com/calamares/calamares/issues
+     knownIssuesUrl:      https://calamares.io/about/
+diff -ur calamares-3.2.11/src/modules/bootloader/bootloader.conf calamares-3.2.11-default-settings/src/modules/bootloader/bootloader.conf
+--- calamares-3.2.11/src/modules/bootloader/bootloader.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/bootloader/bootloader.conf	2019-07-08 22:25:32.579871089 +0200
+@@ -4,7 +4,7 @@
+ ---
+ # Define which bootloader you want to use for EFI installations
+ # Possible options are 'grub', 'sb-shim' and 'systemd-boot'.
+-efiBootLoader: "grub"
++efiBootLoader: "sb-shim"
+ 
+ # systemd-boot configuration files settings, set kernel and initramfs file names
+ # and amount of time before default selection boots
+@@ -26,10 +26,10 @@
+ # GRUB functionality (notably grub-probe) to work. As needed, you may use
+ # complete paths like `/usr/bin/efibootmgr` for the executables.
+ #
+-grubInstall: "grub-install"
+-grubMkconfig: "grub-mkconfig"
+-grubCfg: "/boot/grub/grub.cfg"
+-grubProbe: "grub-probe"
++grubInstall: "grub2-install"
++grubMkconfig: "grub2-mkconfig"
++grubCfg: "/boot/grub2/grub.cfg"
++grubProbe: "grub2-probe"
+ efiBootMgr: "efibootmgr"
+ 
+ # Optionally set the bootloader ID to use for EFI. This is passed to
+@@ -43,7 +43,9 @@
+ # setting the option here, keep in mind that the name is sanitized
+ # (problematic characters, see above, are replaced).
+ #
+-# efiBootloaderId: "dirname"
++# PACKAGER NOTE: If you really want to change this value, you will also have to
++#                change the hardcoded directory name in the grub2(-efi) package.
++efiBootloaderId: "fedora"
+ 
+ # Optionally install a copy of the GRUB EFI bootloader as the EFI
+ # fallback loader (either bootia32.efi or bootx64.efi depending on
+diff -ur calamares-3.2.11/src/modules/keyboard/keyboard.conf calamares-3.2.11-default-settings/src/modules/keyboard/keyboard.conf
+--- calamares-3.2.11/src/modules/keyboard/keyboard.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/keyboard/keyboard.conf	2019-07-08 22:25:32.579871089 +0200
+@@ -13,4 +13,4 @@
+ # Write keymap configuration to /etc/default/keyboard, usually
+ # found on Debian-related systems.
+ # Defaults to true if nothing is set.
+-#writeEtcDefaultKeyboard:   true
++writeEtcDefaultKeyboard: false
+diff -ur calamares-3.2.11/src/modules/locale/locale.conf calamares-3.2.11-default-settings/src/modules/locale/locale.conf
+--- calamares-3.2.11/src/modules/locale/locale.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/locale/locale.conf	2019-07-08 22:25:32.580871083 +0200
+@@ -85,7 +85,7 @@
+ #
+ # Legacy settings "geoipStyle", "geoipUrl" and "geoipSelector"
+ # in the top-level are still supported, but I'd advise against.
+-geoip:
+-    style:  "json"
+-    url:    "https://geoip.kde.org/v1/calamares"
+-    selector: ""  # leave blank for the default
++#geoip:
++#    style:  "json"
++#    url:    "https://geoip.kde.org/v1/calamares"
++#    selector: ""  # leave blank for the default
+diff -ur calamares-3.2.11/src/modules/netinstall/netinstall.conf calamares-3.2.11-default-settings/src/modules/netinstall/netinstall.conf
+--- calamares-3.2.11/src/modules/netinstall/netinstall.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/netinstall/netinstall.conf	2019-07-08 22:25:32.580871083 +0200
+@@ -5,6 +5,9 @@
+ # or it can be a locally installed file:
+ #   groupsUrl: file:///usr/share/calamares/netinstall.yaml
+ # groupsUrl: file:///usr/share/calamares/netinstall.yaml
++# Packager note: If you want to enable the netinstall module, you will also have
++#                to create such a file (see the example in the source code).
++groupsUrl: file:///etc/calamares/modules/netinstall.yaml
+ 
+ # If the installation can proceed without netinstall (e.g. the Live CD
+ # can create a working installed system, but netinstall is preferred
+diff -ur calamares-3.2.11/src/modules/packages/packages.conf calamares-3.2.11-default-settings/src/modules/packages/packages.conf
+--- calamares-3.2.11/src/modules/packages/packages.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/packages/packages.conf	2019-07-08 22:25:32.580871083 +0200
+@@ -12,7 +12,7 @@
+ #  - entropy     - Sabayon package manager
+ #  - dummy       - Dummy manager, only logs
+ #
+-backend: dummy
++backend: dnf
+ 
+ #
+ # Often package installation needs an internet connection.
+@@ -36,7 +36,7 @@
+ # Therefore set also "update_system" to 'true'. 
+ #
+ skip_if_no_internet: false
+-update_db: true
++update_db: false
+ update_system: false
+ 
+ #
+@@ -143,12 +143,5 @@
+ # of packages, this can lead to a considerable time savings.
+ #
+ operations:
+-  - install:
+-    - vi
+-    - vi-${LOCALE}
+-    - wget
+-    - binutils
+-  - remove:
+-    - vi
+-    - wget
+-    - binutils
++  - try_remove:
++    - calamares
+diff -ur calamares-3.2.11/src/modules/plasmalnf/plasmalnf.conf calamares-3.2.11-default-settings/src/modules/plasmalnf/plasmalnf.conf
+--- calamares-3.2.11/src/modules/plasmalnf/plasmalnf.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/plasmalnf/plasmalnf.conf	2019-07-08 22:25:32.581871076 +0200
+@@ -19,7 +19,7 @@
+ # to the originating username; the lnftool will be run through
+ # "sudo -H -u <liveuser>" instead of directly.
+ #
+-# liveuser:	"live"
++liveuser:	"liveuser"
+ 
+ # You can limit the list of Plasma look-and-feel themes by listing ids
+ # here. If this key is not present, all of the installed themes are listed.
+@@ -47,20 +47,20 @@
+ # The image screenshot is resized to 12x8 the current font size, with
+ # a minimum of 120x80 pixels. This allows the screenshot to scale up
+ # on HiDPI displays where the fonts are larger (in pixels).
+-themes:
+-    - org.kde.fuzzy-pig.desktop
+-    - theme: org.kde.breeze.desktop
+-      image: "breeze.png"
+-    - theme: org.kde.breezedark.desktop
+-      image: "breeze-dark.png"
+-    - org.kde.fluffy-bunny.desktop
++#themes:
++#    - org.kde.fuzzy-pig.desktop
++#    - theme: org.kde.breeze.desktop
++#      image: "breeze.png"
++#    - theme: org.kde.breezedark.desktop
++#      image: "breeze-dark.png"
++#    - org.kde.fluffy-bunny.desktop
+ 
+ # If *showAll* is true, then all installed themes are shown in the
+ # UI for selection, even if they are not listed in *themes*. This
+ # allows selection of all themes even while not all of them are
+ # listed in *themes* -- which is useful to show screenshots for those
+ # you do have a screenshot for.
+-showAll: false
++showAll: true
+ 
+ # You can pre-select one of the themes; it is not applied
+ # immediately, but its radio-button is switched on to indicate
+diff -ur calamares-3.2.11/src/modules/tracking/tracking.conf calamares-3.2.11-default-settings/src/modules/tracking/tracking.conf
+--- calamares-3.2.11/src/modules/tracking/tracking.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/tracking/tracking.conf	2019-07-08 22:25:32.581871076 +0200
+@@ -54,7 +54,7 @@
+ 
+ # This is the default level to enable for tracking. If commented out,
+ # empty, or otherwise invalid, "none" is used, so no tracking by default.
+-default:    user
++default:    none
+ 
+ # The install area has one specific configuration key:
+ #   url:    this URL (remember to include the protocol, and prefer https)
+diff -ur calamares-3.2.11/src/modules/umount/umount.conf calamares-3.2.11-default-settings/src/modules/umount/umount.conf
+--- calamares-3.2.11/src/modules/umount/umount.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/umount/umount.conf	2019-07-08 22:25:32.581871076 +0200
+@@ -35,8 +35,8 @@
+ ---
+ # example when using the normal Calamares log:
+ srcLog:      "/root/.cache/calamares/session.log"
+-destLog:     "/var/log/Calamares.log"
++destLog:     "/var/log/calamares.log"
+ 
+ # example when using a log created by `sudo calamares -d`:
+-#srcLog:      "/home/live/installation.log"
++#srcLog:      "/home/liveuser/installation.log"
+ #destLog:     "/var/log/installation.log"
+diff -ur calamares-3.2.11/src/modules/unpackfs/unpackfs.conf calamares-3.2.11-default-settings/src/modules/unpackfs/unpackfs.conf
+--- calamares-3.2.11/src/modules/unpackfs/unpackfs.conf	2019-07-06 00:52:35.000000000 +0200
++++ calamares-3.2.11-default-settings/src/modules/unpackfs/unpackfs.conf	2019-07-08 22:25:32.582871069 +0200
+@@ -33,6 +33,10 @@
+ 
+ # You can list filesystem source paths relative to the Calamares run
+ # directory, if you use -d (this is only useful for testing, though).
+-    -   source: ./example.sqfs
+-        sourcefs: squashfs
++#    -   source: ./example.sqfs
++#        sourcefs: squashfs
++#        destination: ""
++
++    -   source: "/dev/mapper/live-base"
++        sourcefs: "ext4"
+         destination: ""

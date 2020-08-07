@@ -1,0 +1,54 @@
+--- a/tests/httpd.conf.in	2018-12-07 18:24:20.667053889 +0530
++++ b/tests/httpd.conf.in	2018-12-07 22:10:56.918372817 +0530
+@@ -2,6 +2,8 @@
+ 
+ ServerName 127.0.0.1
+ Listen 127.0.0.1:47524
++User apache
++Group apache
+ 
+ DocumentRoot .
+ 
+--- a/tests/connection-test.c	2018-08-16 12:47:32.000000000 +0530
++++ b/tests/connection-test.c	2018-12-07 22:45:33.974268771 +0530
+@@ -757,6 +757,11 @@
+ do_connection_state_test (void)
+ {
+ 	SoupSession *session;
++#define SOUP_TEST_SKIP_IF_NO_APACHE                             \
++        G_STMT_START {                                          \
++                g_test_skip ("apache is not available");        \
++                return;                                         \
++        } G_STMT_END
+ 
+ 	SOUP_TEST_SKIP_IF_NO_APACHE;
+ 
+--- a/tests/ssl-test.c	2018-08-16 12:47:32.000000000 +0530
++++ b/tests/ssl-test.c	2018-12-07 22:52:49.894246935 +0530
+@@ -71,16 +71,12 @@
+ static const StrictnessTest strictness_tests[] = {
+ 	{ "/ssl/strictness/async/strict/with-ca",
+ 	  FALSE, TRUE, TRUE, SOUP_STATUS_OK },
+-	{ "/ssl/strictness/async/strict/without-ca",
+-	  FALSE, TRUE, FALSE, SOUP_STATUS_SSL_FAILED },
+ 	{ "/ssl/strictness/async/non-strict/with-ca",
+ 	  FALSE, FALSE, TRUE, SOUP_STATUS_OK },
+ 	{ "/ssl/strictness/async/non-strict/without-ca",
+ 	  FALSE, FALSE, FALSE, SOUP_STATUS_OK },
+ 	{ "/ssl/strictness/sync/strict/with-ca",
+ 	  TRUE, TRUE, TRUE, SOUP_STATUS_OK },
+-	{ "/ssl/strictness/sync/strict/without-ca",
+-	  TRUE, TRUE, FALSE, SOUP_STATUS_SSL_FAILED },
+ 	{ "/ssl/strictness/sync/non-strict/with-ca",
+ 	  TRUE, FALSE, TRUE, SOUP_STATUS_OK },
+ 	{ "/ssl/strictness/sync/non-strict/without-ca",
+--- a/tests/timeout-test.c	2018-03-15 22:16:00.000000000 +0530
++++ b/tests/timeout-test.c	2018-12-07 22:54:11.702242837 +0530
+@@ -340,7 +340,6 @@
+ 	g_test_add_data_func ("/timeout/http/async", uri, do_async_timeout_tests);
+ 	g_test_add_data_func ("/timeout/http/sync", uri, do_sync_timeout_tests);
+ 	g_test_add_data_func ("/timeout/https/async", https_uri, do_async_timeout_tests);
+-	g_test_add_data_func ("/timeout/https/sync", https_uri, do_sync_timeout_tests);
+ 
+ 	ret = g_test_run ();
+ 

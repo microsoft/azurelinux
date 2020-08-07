@@ -1,0 +1,13 @@
+# init
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+# Allow local-only connections
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+#keep commented till upgrade issues are sorted
+#-A INPUT -j LOG --log-prefix "FIREWALL:INPUT "
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A OUTPUT -j ACCEPT
+COMMIT

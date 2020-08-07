@@ -1,0 +1,23 @@
+#cloud-config
+users:
+ - default
+ - name: mariner_user
+   shell: /bin/bash
+   sudo: [ "ALL=(ALL:ALL) ALL" ]
+   lock_passwd: false
+   # The usage of plain_text_password and passwd is strongly discouraged in the production setting.
+   # ssh-authorized-keys should be used instead for enhanced security.
+   plain_text_passwd: p@ssw0rd
+   groups: sudo, docker
+ - name: sshuser
+   shell: /bin/bash
+   sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+   lock_passwd: true
+   groups: sudo, docker
+   ssh-authorized-keys:
+    - ssh-rsa <YOUR SSH KEY HERE>
+packages:
+ - openssh-server
+runcmd:
+ - sudo systemctl start sshd
+ 

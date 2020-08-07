@@ -1,0 +1,22 @@
+--- lib/Makefile.in	2013-10-09 16:59:44.000000000 +0000
++++ lib/Makefile.in.1	2017-04-25 07:08:57.225642841 +0000
+@@ -20,7 +20,7 @@
+ 
+ ### Installation programs and flags
+ INSTALL		= @INSTALL@
+-INSTALL_PROGRAM	= @INSTALL_PROGRAM@ -s
++INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+ INSTALL_DATA	= @INSTALL_DATA@
+ LN_S		= @LN_S@
+ MKDIR		= @MKDIR@
+--- libtar/Makefile.in	2013-10-09 16:59:44.000000000 +0000
++++ libtar/Makefile.in.1	2017-04-25 07:06:50.598826545 +0000
+@@ -20,7 +20,7 @@
+ 
+ ### Installation programs and flags
+ INSTALL		= @INSTALL@
+-INSTALL_PROGRAM	= @INSTALL_PROGRAM@ -s
++INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+ INSTALL_DATA	= @INSTALL_DATA@
+ LN_S		= @LN_S@
+ MKDIR		= @MKDIR@

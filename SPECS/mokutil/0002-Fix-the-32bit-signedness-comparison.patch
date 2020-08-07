@@ -1,0 +1,34 @@
+From cdb4b6f3bfd6ada6558ddfb889e27150f0841b28 Mon Sep 17 00:00:00 2001
+From: Gary Ching-Pang Lin <glin@suse.com>
+Date: Mon, 24 Nov 2014 11:38:54 +0800
+Subject: [PATCH 2/7] Fix the 32bit signedness comparison
+
+---
+ src/mokutil.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index 93fb6fa..a7e83f7 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -1284,7 +1284,7 @@ issue_mok_request (char **files, uint32_t total, MokRequest req,
+ 
+ 		/* Mok */
+ 		read_size = read (fd, ptr, sizes[i]);
+-		if (read_size < 0 || read_size != sizes[i]) {
++		if (read_size < 0 || read_size != (int64_t)sizes[i]) {
+ 			fprintf (stderr, "Failed to read %s\n", files[i]);
+ 			goto error;
+ 		}
+@@ -1645,7 +1645,7 @@ export_moks ()
+ 			goto error;
+ 		}
+ 
+-		while (offset < list[i].mok_size) {
++		while (offset < (int64_t)list[i].mok_size) {
+ 			write_size = write (fd, list[i].mok + offset,
+ 						list[i].mok_size - offset);
+ 			if (write_size < 0) {
+-- 
+2.7.4
+

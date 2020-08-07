@@ -1,0 +1,54 @@
+diff -ru cmake-3.12.1/Source/kwsys/CMakeLists.txt cmake-3.12.1-new/Source/kwsys/CMakeLists.txt
+--- cmake-3.12.1/Source/kwsys/CMakeLists.txt	2018-08-09 17:44:08.000000000 +0530
++++ cmake-3.12.1-new/Source/kwsys/CMakeLists.txt	2018-09-21 09:11:46.011100539 +0530
+@@ -1078,7 +1078,6 @@
+     ENDIF()
+     SET(KWSYS_CXX_TESTS ${KWSYS_CXX_TESTS}
+       testConfigure.cxx
+-      testSystemTools.cxx
+       testCommandLineArguments.cxx
+       testCommandLineArguments1.cxx
+       testDirectory.cxx
+diff -ruN a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
+--- a/Tests/CMakeLists.txt	2020-06-23 15:56:37.066386295 -0700
++++ b/Tests/CMakeLists.txt	2020-06-23 15:58:16.918966343 -0700
+@@ -2668,20 +2668,6 @@
+   endif()
+ 
+   configure_file(
+-    "${CMake_SOURCE_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake.in"
+-    "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake"
+-    @ONLY ESCAPE_QUOTES)
+-  add_test(CTestCoverageCollectGCOV ${CMAKE_CTEST_COMMAND}
+-    -C \${CTEST_CONFIGURATION_TYPE}
+-    -S "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake" -VV
+-    --output-log "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/testOut.log"
+-    )
+-  set_tests_properties(CTestCoverageCollectGCOV PROPERTIES
+-    PASS_REGULAR_EXPRESSION
+-    "PASSED with correct output.*Testing/CoverageInfo/main.cpp.gcov")
+-  set_property(TEST CTestCoverageCollectGCOV PROPERTY ENVIRONMENT CTEST_PARALLEL_LEVEL=)
+-
+-  configure_file(
+     "${CMake_SOURCE_DIR}/Tests/CTestTestEmptyBinaryDirectory/test.cmake.in"
+     "${CMake_BINARY_DIR}/Tests/CTestTestEmptyBinaryDirectory/test.cmake"
+     @ONLY ESCAPE_QUOTES)
+@@ -3050,18 +3036,6 @@
+     PASS_REGULAR_EXPRESSION "The stop time has been passed")
+ 
+   configure_file(
+-    "${CMake_SOURCE_DIR}/Tests/CTestTestSubdir/test.cmake.in"
+-    "${CMake_BINARY_DIR}/Tests/CTestTestSubdir/test.cmake"
+-    @ONLY ESCAPE_QUOTES)
+-  add_test(CTestTestSubdir ${CMAKE_CTEST_COMMAND}
+-    -S "${CMake_BINARY_DIR}/Tests/CTestTestSubdir/test.cmake" -V
+-    --output-log "${CMake_BINARY_DIR}/Tests/CTestTestSubdir/testOutput.log"
+-    )
+-  #make sure all 3 subdirs were added
+-  set_tests_properties(CTestTestSubdir PROPERTIES
+-    PASS_REGULAR_EXPRESSION "0 tests failed out of 3")
+-
+-  configure_file(
+     "${CMake_SOURCE_DIR}/Tests/CTestTestTimeout/test.cmake.in"
+     "${CMake_BINARY_DIR}/Tests/CTestTestTimeout/test.cmake"
+     @ONLY ESCAPE_QUOTES)

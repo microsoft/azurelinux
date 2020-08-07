@@ -1,0 +1,13 @@
+[Unit]
+Description=LVM2 activate volume groups
+After=systemd-udevd.service
+Before=local-fs-pre.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/lvm vgchange -ay
+RemainAfterExit=yes
+
+[Install]
+WantedBy=local-fs.target

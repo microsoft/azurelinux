@@ -1,0 +1,29 @@
+diff -up qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/configure.json.firebird qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/configure.json
+--- qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/configure.json.firebird	2019-01-28 11:11:52.000000000 -0600
++++ qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/configure.json	2019-02-03 13:41:27.392305128 -0600
+@@ -49,10 +49,11 @@
+         "ibase": {
+             "label": "InterBase",
+             "test": {},
+-            "headers": "ibase.h",
++            "headers": "firebird/ibase.h",
+             "sources": [
+                 { "libs": "-lgds32_ms", "condition": "config.win32" },
+-                { "libs": "-lgds", "condition": "!config.win32" }
++                { "libs": "-lgds", "condition": "!config.win32" },
++                { "libs": "-lfbclient", "condition": "!config.win32" }
+             ]
+         },
+         "mysql": {
+diff -up qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+--- qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird	2019-01-28 11:11:52.000000000 -0600
++++ qtbase-everywhere-src-5.12.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h	2019-02-03 13:27:30.683142996 -0600
+@@ -52,7 +52,7 @@
+ //
+ 
+ #include <QtSql/qsqldriver.h>
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ #ifdef QT_PLUGIN
+ #define Q_EXPORT_SQLDRIVER_IBASE

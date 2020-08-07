@@ -1,0 +1,13 @@
+diff -ru kexec-tools-2.0.11/kexec_test/Makefile kexec-tools-2.0.11-1/kexec_test/Makefile
+--- kexec-tools-2.0.11/kexec_test/Makefile	2010-07-29 02:22:16.000000000 -0700
++++ kexec-tools-2.0.11-1/kexec_test/Makefile	2016-02-27 02:20:35.017775312 -0800
+@@ -11,9 +11,6 @@
+ ifeq ($(ARCH),i386)
+ BUILD_KEXEC_TEST = yes
+ endif
+-ifeq ($(ARCH),x86_64)
+-BUILD_KEXEC_TEST = yes
+-endif
+ 
+ ifeq ($(BUILD_KEXEC_TEST),yes)
+ 

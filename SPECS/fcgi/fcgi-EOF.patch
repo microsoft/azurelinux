@@ -1,0 +1,11 @@
+diff -rupr a/libfcgi/fcgio.cpp b/libfcgi/fcgio.cpp
+--- a/libfcgi/fcgio.cpp	2002-02-24 20:12:22.000000000 +0000
++++ b/libfcgi/fcgio.cpp	2016-12-19 07:52:08.208120000 +0000
+@@ -23,6 +23,7 @@
+ #endif
+ 
+ #include <limits.h>
++#include <cstdio>
+ #include "fcgio.h"
+ 
+ using std::streambuf;

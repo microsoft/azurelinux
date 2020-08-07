@@ -1,0 +1,25 @@
+From: "Laszlo Boszormenyi (GCS)" <gcs@debian.org>
+Date: Fri, 2 May 2014 22:20:45 +0200
+Subject: fix soname
+
+Add soname switch to linker, regardless of Operating System
+
+Bug-Debian: http://bugs.debian.org/746705
+---
+ config/rules.mk | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/config/rules.mk b/config/rules.mk
+index eb86b0c..1bb3988 100644
+--- a/config/rules.mk
++++ b/config/rules.mk
+@@ -359,6 +359,9 @@ endif
+ endif
+ EXTRA_DEPS += $(SYMBOLS_FILE)
+ endif
++
++EXTRA_DSO_LDOPTS += -Wl,-soname,lib$(JS_LIBRARY_NAME).so.0
++
+ #
+ # GNU doesn't have path length limitation
+ #

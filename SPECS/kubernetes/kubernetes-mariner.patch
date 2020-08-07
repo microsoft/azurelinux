@@ -1,0 +1,136 @@
+diff -ru kubernetes-1.16.2-orig/hack/lib/golang.sh kubernetes-1.16.2/hack/lib/golang.sh
+--- kubernetes-1.16.2-orig/hack/lib/golang.sh	2019-10-11 21:42:37.000000000 -0700
++++ kubernetes-1.16.2/hack/lib/golang.sh	2020-04-22 16:29:42.391063645 -0700
+@@ -146,13 +146,17 @@
+ # Returns a sorted newline-separated list containing only duplicated items.
+ kube::golang::dups() {
+   # We use printf to insert newlines, which are required by sort.
+-  printf "%s\n" "$@" | sort | uniq -d
++  local __tmpfile=$(mktemp dups-XXXXXX)
++  printf "%s\n" "$@" | sort | uniq -d > $__tmpfile
++  echo $__tmpfile
+ }
+ 
+ # Returns a sorted newline-separated list with duplicated items removed.
+ kube::golang::dedup() {
+   # We use printf to insert newlines, which are required by sort.
+-  printf "%s\n" "$@" | sort -u
++  local __tmpfile=$(mktemp dedup-XXXXXX)
++  printf "%s\n" "$@" | sort -u > $__tmpfile
++  echo $__tmpfile
+ }
+ 
+ # Depends on values of user-facing KUBE_BUILD_PLATFORMS, KUBE_FASTBUILD,
+@@ -175,33 +179,43 @@
+ 
+     # Deduplicate to ensure the intersection trick with kube::golang::dups
+     # is not defeated by duplicates in user input.
+-    kube::util::read-array platforms < <(kube::golang::dedup "${platforms[@]}")
++    TMPFILE=$(kube::golang::dedup "${platforms[@]}")
++    kube::util::read-array truc < $TMPFILE
++    rm -f $TMPFILE
+ 
+     # Use kube::golang::dups to restrict the builds to the platforms in
+     # KUBE_SUPPORTED_*_PLATFORMS. Items should only appear at most once in each
+     # set, so if they appear twice after the merge they are in the intersection.
+-    kube::util::read-array KUBE_SERVER_PLATFORMS < <(kube::golang::dups \
++    TMPFILE=$(kube::golang::dups \
+         "${platforms[@]}" \
+         "${KUBE_SUPPORTED_SERVER_PLATFORMS[@]}" \
+       )
++    kube::util::read-array KUBE_SERVER_PLATFORMS < $TMPFILE
++    rm -f $TMPFILE
+     readonly KUBE_SERVER_PLATFORMS
+ 
+-    kube::util::read-array KUBE_NODE_PLATFORMS < <(kube::golang::dups \
++    TMPFILE=$(kube::golang::dups \
+         "${platforms[@]}" \
+         "${KUBE_SUPPORTED_NODE_PLATFORMS[@]}" \
+       )
++    kube::util::read-array KUBE_NODE_PLATFORMS < $TMPFILE
++    rm -f $TMPFILE
+     readonly KUBE_NODE_PLATFORMS
+ 
+-    kube::util::read-array KUBE_TEST_PLATFORMS < <(kube::golang::dups \
++    TMPFILE=$(kube::golang::dups \
+         "${platforms[@]}" \
+         "${KUBE_SUPPORTED_TEST_PLATFORMS[@]}" \
+       )
++    kube::util::read-array KUBE_TEST_PLATFORMS < $TMPFILE
++    rm -f $TMPFILE
+     readonly KUBE_TEST_PLATFORMS
+ 
+-    kube::util::read-array KUBE_CLIENT_PLATFORMS < <(kube::golang::dups \
++    TMPFILE=$(kube::golang::dups \
+         "${platforms[@]}" \
+         "${KUBE_SUPPORTED_CLIENT_PLATFORMS[@]}" \
+       )
++    kube::util::read-array KUBE_CLIENT_PLATFORMS < $TMPFILE
++    rm -f $TMPFILE
+     readonly KUBE_CLIENT_PLATFORMS
+ 
+   elif [[ "${KUBE_FASTBUILD:-}" == "true" ]]; then
+@@ -456,6 +470,7 @@
+ 
+ # Ensure the go tool exists and is a viable version.
+ kube::golang::verify_go_version() {
++
+   if [[ -z "$(command -v go)" ]]; then
+     kube::log::usage_from_stdin <<EOF
+ Can't find 'go' in PATH, please fix and retry.
+@@ -808,21 +823,24 @@
+     fi
+ 
+     local -a binaries
+-    while IFS="" read -r binary; do binaries+=("$binary"); done < <(kube::golang::binaries_from_targets "${targets[@]}")
++    TMPFILE=$(mktemp mkbin-XXXXXX)
++    kube::golang::binaries_from_targets "${targets[@]}" > $TMPFILE
++    while IFS="" read -r binary; do binaries+=("$binary"); done < $TMPFILE
++    rm $TMPFILE
+ 
+     local parallel=false
+-    if [[ ${#platforms[@]} -gt 1 ]]; then
+-      local gigs
+-      gigs=$(kube::golang::get_physmem)
+-
+-      if [[ ${gigs} -ge ${KUBE_PARALLEL_BUILD_MEMORY} ]]; then
+-        kube::log::status "Multiple platforms requested and available ${gigs}G >= threshold ${KUBE_PARALLEL_BUILD_MEMORY}G, building platforms in parallel"
+-        parallel=true
+-      else
+-        kube::log::status "Multiple platforms requested, but available ${gigs}G < threshold ${KUBE_PARALLEL_BUILD_MEMORY}G, building platforms in serial"
+-        parallel=false
+-      fi
+-    fi
++    # if [[ ${#platforms[@]} -gt 1 ]]; then
++    #   local gigs
++    #   gigs=$(kube::golang::get_physmem)
++
++    #   if [[ ${gigs} -ge ${KUBE_PARALLEL_BUILD_MEMORY} ]]; then
++    #     kube::log::status "Multiple platforms requested and available ${gigs}G >= threshold ${KUBE_PARALLEL_BUILD_MEMORY}G, building platforms in parallel"
++    #     parallel=true
++    #   else
++    #     kube::log::status "Multiple platforms requested, but available ${gigs}G < threshold ${KUBE_PARALLEL_BUILD_MEMORY}G, building platforms in serial"
++    #     parallel=false
++    #   fi
++    # fi
+ 
+     if [[ "${parallel}" == "true" ]]; then
+       kube::log::status "Building go targets for {${platforms[*]}} in parallel (output will appear in a burst when complete):" "${targets[@]}"
+diff -ru kubernetes-1.16.2-orig/hack/make-rules/clean.sh kubernetes-1.16.2/hack/make-rules/clean.sh
+--- kubernetes-1.16.2-orig/hack/make-rules/clean.sh	2019-10-11 21:42:37.000000000 -0700
++++ kubernetes-1.16.2/hack/make-rules/clean.sh	2020-04-22 16:29:52.483010688 -0700
+@@ -29,10 +29,13 @@
+ )
+ 
+ for pattern in "${CLEAN_PATTERNS[@]}"; do
++  TMPFILE=$(mktemp clean-XXXXXX)
++  find "${KUBE_ROOT}" -iregex "^${KUBE_ROOT}/${pattern}$" > $TMPFILE
+   while IFS=$'\n' read -r match; do
+     echo "Removing ${match#${KUBE_ROOT}\/} .."
+     rm -rf "${match#${KUBE_ROOT}\/}"
+-  done <   <(find "${KUBE_ROOT}" -iregex "^${KUBE_ROOT}/${pattern}$")
++  done <   $TMPFILE
++  rm $TMPFILE
+ done
+ 
+ # ex: ts=2 sw=2 et filetype=sh
