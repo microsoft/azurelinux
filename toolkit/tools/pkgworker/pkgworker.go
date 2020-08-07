@@ -358,7 +358,6 @@ func removeLibArchivesFromSystem() (err error) {
 // copyFilesIntoChroot copies several required build specific files into the chroot.
 func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string) (srpmFileInChroot string, err error) {
 	const (
-		resolv            = "/etc/resolv.conf"
 		chrootRepoDestDir = "/etc/yum.repos.d"
 		chrootSrpmDestDir = "/home/root/SRPMS"
 		rpmmacrosDest     = "/usr/lib/rpm/macros.d/macros.override"
@@ -375,10 +374,6 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 		safechroot.FileToCopy{
 			Src:  srpmFile,
 			Dest: srpmFileInChroot,
-		},
-		safechroot.FileToCopy{
-			Src:  resolv,
-			Dest: resolv,
 		},
 	}
 
