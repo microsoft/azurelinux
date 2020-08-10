@@ -28,7 +28,7 @@
 
 Name:             open-vm-tools
 Version:          %{toolsversion}
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          Open Virtual Machine Tools for virtual machines hosted on VMware
 License:          GPLv2
 URL:              https://github.com/vmware/%{name}
@@ -36,7 +36,7 @@ Source0:          https://github.com/vmware/%{name}/releases/download/stable-%{v
 
 Source1:          %{toolsdaemon}.service
 Source2:          %{vgauthdaemon}.service
-Source3:          run-vmblock\x2dfuse.mount
+Source3:          vmblock.mount
 Source4:          open-vm-tools.conf
 Source5:          vmtoolsd.pam
 
@@ -344,6 +344,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 11.1.0-4
+- Rename input file for run-vmblock\x2dfuse.mount to avoid problems with backslash in the name.
+
 * Wed Aug 05 2020 Mateusz Malisz <mamalisz@microsoft.com> 11.1.0-3
 - Initial CBL-Mariner import from Fedora 32 (License: MIT)
 
