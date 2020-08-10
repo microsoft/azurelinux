@@ -158,9 +158,9 @@ The build system pulls files two ways:
 Direct file downloads are by default pulled from:
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL        ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-base-$(build_arch)-rpms
-PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-update-$(build_arch)-rpms
-SRPM_URL           ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-base-srpms
+PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
+SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 ```
 While `tdnf` uses a list of repo files:
 ```makefile
