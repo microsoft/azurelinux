@@ -50,6 +50,7 @@ pyyaml
 mariadb
 lvm2
 systemtap
+squashfs-tools
 
 SPEC files that are derived from OpenSuse SPEC files, which are under the license of the package itself, or MIT license if it the package is not under an open source license (https://en.opensuse.org/openSUSE:Specfile_guidelines):
 python-jinja2
