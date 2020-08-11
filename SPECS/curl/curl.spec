@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.66.0
+Version:        7.68.0
 Release:        1%{?dist}
 License:        MIT
 URL:            http://curl.haxx.se
@@ -87,6 +87,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+*   Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-1
+-   Upgrading to 7.68.0 to enable verification against a partial cert chain.
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.66.0-1
 -   Upgrade to version 7.66.0, which fixes CVE-2018-16890 and CVE-2019-3822/3833.
 *   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
