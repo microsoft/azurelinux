@@ -1,7 +1,7 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.44.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 and LGPLv2 and BSD and MIT
 URL:            http://e2fsprogs.sourceforge.net
 Group:          System Environment/Base
@@ -38,7 +38,7 @@ sed -i -e 's|^LD_LIBRARY_PATH.*|&:/tools/lib|' tests/test_config
 
 %build
 LIBS=-L/tools/lib \
-CFLAGS=-I/tools/include \
+CFLAGS="%{build_cflags} -I/tools/include" \
 PKG_CONFIG_PATH=/tools/lib/pkgconfig \
 %configure \
     --with-root-prefix='' \
@@ -127,6 +127,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.44.6-3
+- Don't stomp on CFLAGS.
 * Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.44.6-2
 - Added %%license line automatically
 

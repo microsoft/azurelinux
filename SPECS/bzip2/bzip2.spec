@@ -1,7 +1,7 @@
 Summary:        Contains programs for compressing and decompressing files
 Name:           bzip2
 Version:        1.0.6
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/bzip2/
 Group:          System Environment/Base
@@ -12,6 +12,7 @@ Provides:       libbz2.so.1()(64bit)
 Patch0:         http://www.linuxfromscratch.org/patches/lfs/7.2/bzip2-1.0.6-install_docs-1.patch
 Patch1:         CVE-2016-3189.patch
 Patch2:         CVE-2019-12900.patch
+Patch3:         cflags-fix.patch
 Requires:       bzip2-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -37,6 +38,7 @@ This package contains minimal set of shared bzip2 libraries.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
 sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
 
@@ -96,6 +98,8 @@ make %{?_smp_mflags} check
 %{_lib}/libbz2.so.*
 
 %changelog
+*   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 1.0.6-15
+-   Don't stomp on CFLAGS.
 *   Tue May 26 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.6-14
 -   Fix CVE-2019-12900. This was erroneously named CVE-2019-1353 before, which is not even related to bzip2.
 *   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.6-13
