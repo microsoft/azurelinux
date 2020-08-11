@@ -23,7 +23,6 @@ python-iniparse
 SPEC files that are derived from Fedora SPEC files, which are under the MIT license unless specifically noted otherwise (https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files):
 c-ares
 chkconfig
-kexec-tools
 initscripts
 oniguruma
 elfutils
@@ -50,7 +49,6 @@ pyyaml
 mariadb
 lvm2
 systemtap
-squashfs-tools
 
 SPEC files that are derived from OpenSuse SPEC files, which are under the license of the package itself, or MIT license if it the package is not under an open source license (https://en.opensuse.org/openSUSE:Specfile_guidelines):
 python-jinja2
