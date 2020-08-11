@@ -138,9 +138,9 @@ gzip-debuginfo-1.9-4.cm1.aarch64.rpm
 integritysetup-2.3.3-2.cm1.aarch64.rpm
 intltool-0.51.0-7.cm1.noarch.rpm
 itstool-2.0.6-3.cm1.noarch.rpm
-json-c-0.14-1.cm1.aarch64.rpm
-json-c-debuginfo-0.14-1.cm1.aarch64.rpm
-json-c-devel-0.14-1.cm1.aarch64.rpm
+json-c-0.14-2.cm1.aarch64.rpm
+json-c-debuginfo-0.14-2.cm1.aarch64.rpm
+json-c-devel-0.14-2.cm1.aarch64.rpm
 kbd-2.0.4-5.cm1.aarch64.rpm
 kbd-debuginfo-2.0.4-5.cm1.aarch64.rpm
 kernel-headers-5.4.42-1.cm1.noarch.rpm
