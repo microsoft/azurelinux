@@ -36,7 +36,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -370,6 +370,9 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 %{_mandir}/man8/ca-legacy.8.gz
 
 %changelog
+* Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-4
+- Updating base certificates.
+
 * Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-3
 - Changing base certificates to trust packages.microsoft.com.
 
