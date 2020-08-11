@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        4.4.18
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 URL:            http://www.gnu.org/software/bash/
 Group:          System Environment/Base
@@ -42,7 +42,7 @@ These are the additional language files of bash.
 %patch0 -p1
 %build
 %configure \
-    "CFLAGS=-fPIC" \
+    "CFLAGS=-fPIC %{build_cflags}" \
     --bindir=/bin \
     --htmldir=%{_defaultdocdir}/%{name}-%{version} \
     --without-bash-malloc \
@@ -325,9 +325,10 @@ fi
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4
-- Added %%license line automatically
-
+*   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 4.4.18-5
+-   Don't stomp on CFLAGS.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4
+-   Added %%license line automatically
 *   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 4.4.18-3
 -   Explicitly provide /usr/bin/sh and /usr/bin/bash
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.4.18-2

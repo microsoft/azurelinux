@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://web.mit.edu/kerberos/
 Group:          System Environment/Security
@@ -39,7 +39,7 @@ These are the additional language files of krb5.
 cd src &&
 sed -e 's@\^u}@^u cols 300}@' \
     -i tests/dejagnu/config/default.exp &&
-CPPFLAGS="-D_GNU_SOURCE" \
+CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" \
 autoconf &&
 ./configure \
     --prefix=%{_prefix} \
@@ -117,6 +117,8 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Jul 31 12:53:00 PST 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
+- Don't stomp on CPPFLAGS
 * Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.17-2
 - Added %%license line automatically
 
