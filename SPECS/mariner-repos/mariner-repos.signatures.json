@@ -1,8 +1,8 @@
 {
  "Signatures": {
-  "MICROSOFT-RPM-GPG-KEY": "eb12973679a692551df1cd803cc99ce56a74d7357e24530ce003bd4846134a6c",
-  "MICROSOFT-METADATA-GPG-KEY": "c29e5709ec534383acf34a0da5ffce45313bc175a94f14b9f0414d376933e78f",
-  "mariner-official-base.repo": "56a5a8ef0b9008c0ada68ac61362501238bae433512f62c3e967849f9cf3c9ae",
-  "mariner-official-update.repo": "54e30c0cd07caf3513a6bbb4b0df70ea63e60475512199179135c36dd53562dd"
+  "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
+  "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
+  "mariner-official-base.repo": "af485f85c5c856536c6ec2f73f0afd1d9c424396fce1c9ae6f40745a5f41503d",
+  "mariner-official-update.repo": "d80ed87ba6cf1e535131a9a68499b832dc87fc9add29cbae0f6cc76ebc36fbf3"
  }
 }
