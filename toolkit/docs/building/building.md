@@ -67,7 +67,7 @@ The toolkit comes as an archive containing pre-compiled go tools, go sources, st
 
 By default all build commands are executed from inside the `./toolkit` folder.
 
-A full list of targets and options is available [here](#all-build-targets) and [here](#all-build-variables.)
+A full list of targets and options is available [here](#all-build-targets) and [here](#all-build-variables).
 ```bash
 cd ~/my/workspace
 tar -xzf ~/toolkit.tar.gz
@@ -152,7 +152,7 @@ Keys, Certs, and Remote Sources
 ===
 ## Sources
 The build system pulls files two ways:
-- Downloading files directly
+- Downloading files directly.
 - Using the `tdnf` package management tool running inside a chroot.
 
 Direct file downloads are by default pulled from:
@@ -170,9 +170,9 @@ The `REPO_LIST` variable supports multiple repo files, and they are prioritized 
 The CBL-Mariner base repo is implicitly provided, and an optional update repo is available by setting `USE_UPDATE_REPO=y`.
 
 ## Authentication
-Depending on the selected endpoints, accessing these resources may require keys and certificates. The keys and certificates can be set using:
+If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
 ```bash
-sudo make image CA_CERT=~/mycerts/rootca.crt TLS_CERT=~/mycerts/user.crt TLS_KEY=~/mycerts/user.key
+sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
 Building Everything From Scratch
