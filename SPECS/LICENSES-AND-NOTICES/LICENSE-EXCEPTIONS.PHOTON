@@ -23,6 +23,7 @@ python-iniparse
 SPEC files that are derived from Fedora SPEC files, which are under the MIT license unless specifically noted otherwise (https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files):
 c-ares
 chkconfig
+kexec-tools
 initscripts
 oniguruma
 elfutils
