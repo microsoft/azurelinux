@@ -1,7 +1,7 @@
 Summary:          Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:             systemd-bootstrap
 Version:          239
-Release:          28%{?dist}
+Release:          29%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -256,11 +256,13 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
+-  Reduce kptr_restrict to 1
 *  Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-28
--  Change summary to address circular dependency. 
+-  Change summary to address circular dependency.
 *  Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-27
 -  Fork from systemd.spec.
--  Do not include cryptsetup in BR. This breaks a circular dependency. 
+-  Do not include cryptsetup in BR. This breaks a circular dependency.
 *  Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 239-26
 -  Remove 99-vmware-hotplug.rules.
 *  Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 239-25
