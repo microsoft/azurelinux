@@ -1,7 +1,7 @@
 Summary:        A JSON implementation in C
 Name:           json-c
 Version:        0.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -10,6 +10,7 @@ URL:            https://github.com/json-c/json-c
 #Source0:       %{url}/archive/%{name}-%{version}-20200419.tar.gz
 Source0:        %{name}-%{name}-%{version}-20200419.tar.gz
 Patch0:         CVE-2020-12762.patch
+Patch1:         Fix-CVE-2020-12762.patch
 
 BuildRequires: cmake
 
@@ -27,6 +28,7 @@ developing applications that use json-c.
 %prep
 %setup -q -n %{name}-%{name}-%{version}-20200419
 %patch0 -p1
+%patch1 -p1
 
 %build
 mkdir build
@@ -57,6 +59,8 @@ make %{?_smp_mflags} check -C build
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+*   Tue Aug 04 2020 Henry Beberman <henry.beberman@microsoft.com> 0.14-2
+-   Add a patch to fix a bug introduced by CVE-2020-12762.patch
 *   Mon Jun 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.14-1
 -   Bumping up version and adding a patch to fix CVE-2020-12762.
 -   License verified.
