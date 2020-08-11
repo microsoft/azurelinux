@@ -1,0 +1,95 @@
+Early Kdump HOWTO
+
+Introduction
+------------
+
+Early kdump is a mechanism to make kdump operational earlier than normal kdump
+service.  The kdump service starts early enough for general crash cases, but
+there are some cases where it has no chance to make kdump operational in boot
+sequence, such as detecting devices and starting early services.  If you hit
+such a case, early kdump may allow you to get more information of it.
+
+Early kdump is implemented as a dracut module.  It adds a kernel (vmlinuz) and
+initramfs for kdump to your system's initramfs in order to load them as early
+as possible.  After that, if you provide "rd.earlykdump" in kernel command line,
+then in the initramfs, early kdump will load those files like the normal kdump
+service.  This is disabled by default.
+
+For the normal kdump service, it can check whether the early kdump has loaded
+the crash kernel and initramfs. It has no conflict with the early kdump.
+
+How to configure early kdump
+----------------------------
+
+We assume if you're reading this document, you should already have kexec-tools
+installed.
+
+You can rebuild the initramfs with earlykdump support with below steps:
+
+1. start kdump service to make sure kdump initramfs is created.
+
+    # systemctl start kdump
+
+    NOTE: If a crash occurs during boot process, early kdump captures a vmcore
+    and reboot the system by default, so the system might go into crash loop.
+    You can avoid such a crash loop by adding the following settings, which
+    power off the system after dump capturing, to kdump.conf in advance:
+
+        final_action poweroff
+        failure_action poweroff
+
+    For the failure_action, you can choose anything other than "reboot".
+
+2. rebuild system initramfs with earlykdump support.
+
+    # dracut --force --add earlykdump
+
+    NOTE: Recommend to backup the original system initramfs before performing
+    this step to put it back if something happens during boot-up.
+
+3. add rd.earlykdump in grub kernel command line.
+
+After making said changes, reboot your system to take effect. Of course, if you
+want to disable early kdump, you can simply remove "rd.earlykdump" from kernel
+boot parameters in grub, and reboot system like above.
+
+Once the boot is completed, you can check the status of the early kdump support
+on the command prompt:
+
+    # journalctl -b | grep early-kdump
+
+Then, you will see some useful logs, for example:
+
+- if early kdump is successful.
+
+Mar 09 09:57:56 localhost dracut-cmdline[190]: early-kdump is enabled.
+Mar 09 09:57:56 localhost dracut-cmdline[190]: kexec: loaded early-kdump kernel
+
+- if early kdump is disabled.
+
+Mar 09 10:02:47 localhost dracut-cmdline[189]: early-kdump is disabled.
+
+Notes
+-----
+
+- The size of early kdump initramfs will be large because it includes vmlinuz
+  and kdump initramfs.
+
+- Early kdump inherits the settings of normal kdump, so any changes that
+  caused normal kdump rebuilding also require rebuilding the system initramfs
+  to make sure that the changes take effect for early kdump. Therefore, after
+  the rebuilding of kdump initramfs is completed, provide a prompt message to
+  tell the fact.
+
+- If you install an updated kernel and reboot the system with it, the early
+  kdump will be disabled by default.  To enable it with the new kernel, you
+  need to take the above steps again.
+
+Limitation
+----------
+
+- At present, early kdump doesn't support fadump.
+
+- Early kdump loads a crash kernel and initramfs at the beginning of the
+  process in system's initramfs, so a crash at earlier than that (e.g. in
+  kernel initialization) cannot be captured even with the early kdump.

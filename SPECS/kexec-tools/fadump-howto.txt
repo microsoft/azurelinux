@@ -1,0 +1,338 @@
+Firmware assisted dump (fadump) HOWTO
+
+Introduction
+
+Firmware assisted dump is a new feature in the 3.4 mainline kernel supported
+only on powerpc architecture. The goal of firmware-assisted dump is to enable
+the dump of a crashed system, and to do so from a fully-reset system, and to
+minimize the total elapsed time until the system is back in production use. A
+complete documentation on implementation can be found at
+Documentation/powerpc/firmware-assisted-dump.txt in upstream linux kernel tree
+from 3.4 version and above.
+
+Please note that the firmware-assisted dump feature is only available on Power6
+and above systems with recent firmware versions.
+
+Overview
+
+Fadump
+
+Fadump is a robust kernel crash dumping mechanism to get reliable kernel crash
+dump with assistance from firmware. This approach does not use kexec, instead
+firmware assists in booting the kdump kernel while preserving memory contents.
+Unlike kdump, the system is fully reset, and loaded with a fresh copy of the
+kernel. In particular, PCI and I/O devices are reinitialized and are in a
+clean, consistent state.  This second kernel, often called a capture kernel,
+boots with very little memory and captures the dump image.
+
+The first kernel registers the sections of memory with the Power firmware for
+dump preservation during OS initialization. These registered sections of memory
+are reserved by the first kernel during early boot. When a system crashes, the
+Power firmware fully resets the system, preserves all the system memory
+contents, save the low memory (boot memory of size larger of 5% of system
+RAM or 256MB) of RAM to the previous registered region. It will also save
+system registers, and hardware PTE's.
+
+Fadump is supported only on ppc64 platform. The standard kernel and capture
+kernel are one and the same on ppc64.
+
+If you're reading this document, you should already have kexec-tools
+installed. If not, you install it via the following command:
+
+    # yum install kexec-tools
+
+Fadump Operational Flow:
+
+Like kdump, fadump also exports the ELF formatted kernel crash dump through
+/proc/vmcore. Hence existing kdump infrastructure can be used to capture fadump
+vmcore. The idea is to keep the functionality transparent to end user. From
+user perspective there is no change in the way kdump init script works.
+
+However, unlike kdump, fadump does not pre-load kdump kernel and initrd into
+reserved memory, instead it always uses default OS initrd during second boot
+after crash. Hence, for fadump, we rebuild the new kdump initrd and replace it
+with default initrd. Before replacing existing default initrd we take a backup
+of original default initrd for user's reference. The dracut package has been
+enhanced to rebuild the default initrd with vmcore capture steps. The initrd
+image is rebuilt as per the configuration in /etc/kdump.conf file.
+
+The control flow of fadump works as follows:
+01. System panics.
+02. At the crash, kernel informs power firmware that kernel has crashed.
+03. Firmware takes the control and reboots the entire system preserving
+    only the memory (resets all other devices).
+04. The reboot follows the normal booting process (non-kexec).
+05. The boot loader loads the default kernel and initrd from /boot
+06. The default initrd loads and runs /init
+07. dracut-kdump.sh script present in fadump aware default initrd checks if
+    '/proc/device-tree/rtas/ibm,kernel-dump'  file exists  before executing
+    steps to capture vmcore.
+    (This check will help to bypass the vmcore capture steps during normal boot
+     process.)
+09. Captures dump according to /etc/kdump.conf
+10. Is dump capture successful (yes goto 12, no goto 11)
+11. Perform the failure action specified in /etc/kdump.conf
+    (The default failure action is reboot, if unspecified)
+12. Perform the final action specified in /etc/kdump.conf
+    (The default final action is reboot, if unspecified)
+
+
+How to configure fadump:
+
+Again, we assume if you're reading this document, you should already have
+kexec-tools installed. If not, you install it via the following command:
+
+    # yum install kexec-tools
+
+Make the kernel to be configured with FADump as the default boot entry, if
+it isn't already:
+
+   # grubby --set-default=/boot/vmlinuz-<kver>
+
+Boot into the kernel to be configured for FADump. To be able to do much of
+anything interesting in the way of debug analysis, you'll also need to install
+the kernel-debuginfo package, of the same arch as your running kernel, and the
+crash utility:
+
+    # yum --enablerepo=\*debuginfo install kernel-debuginfo.$(uname -m) crash
+
+Next up, we need to modify some boot parameters to enable firmware assisted
+dump. With the help of grubby, it's very easy to append "fadump=on" to the end
+of your kernel boot parameters. To reserve the appropriate amount of memory
+for boot memory preservation, pass 'crashkernel=X' kernel cmdline parameter.
+For the recommended value of X, see 'FADump Memory Requirements' section.
+
+   # grubby --args="fadump=on crashkernel=6G" --update-kernel=/boot/vmlinuz-`uname -r`
+
+The term 'boot memory' means size of the low memory chunk that is required for
+a kernel to boot successfully when booted with restricted memory.  By default,
+the boot memory size will be the larger of 5% of system RAM or 256MB.
+Alternatively, user can also specify boot memory size through boot parameter
+'fadump_reserve_mem=' which will override the default calculated size. Use this
+option if default boot memory size is not sufficient for second kernel to boot
+successfully.
+
+After making said changes, reboot your system, so that the specified memory is
+reserved and left untouched by the normal system. Take note that the output of
+'free -m' will show X MB less memory than without this parameter, which is
+expected. If you see OOM (Out Of Memory) error messages while loading capture
+kernel, then you should bump up the memory reservation size.
+
+Now that you've got that reserved memory region set up, you want to turn on
+the kdump init script:
+
+    # systemctl enable kdump.service
+
+Then, start up kdump as well:
+
+    # systemctl start kdump.service
+
+This should turn on the firmware assisted functionality in kernel by
+echo'ing 1 to /sys/kernel/fadump_registered, leaving the system ready
+to capture a vmcore upon crashing. For journaling filesystems like XFS an
+additional step is required to ensure bootloader does not pick the
+older initrd (without vmcore capture scripts):
+
+  * If /boot is a separate partition, run the below commands as the root user,
+    or as a user with CAP_SYS_ADMIN rights:
+
+        # fsfreeze -f
+        # fsfreeze -u
+
+  * If /boot is not a separate partition, reboot the system.
+
+After reboot check if the kdump service is up and running with:
+
+  # systemctl status kdump.service
+
+To test out whether FADump is configured properly, you can force-crash your
+system by echo'ing a 'c' into /proc/sysrq-trigger:
+
+    # echo c > /proc/sysrq-trigger
+
+You should see some panic output, followed by the system reset and booting into
+fresh copy of kernel. When default initrd loads and runs /init, vmcore should
+be copied out to disk (by default, in /var/crash/<YYYY.MM.DD-HH:MM:SS>/vmcore),
+then the system rebooted back into your normal kernel.
+
+Once back to your normal kernel, you can use the previously installed crash
+kernel in conjunction with the previously installed kernel-debuginfo to
+perform postmortem analysis:
+
+    # crash /usr/lib/debug/lib/modules/2.6.17-1.2621.el5/vmlinux
+    /var/crash/2006-08-23-15:34/vmcore
+
+    crash> bt
+
+and so on...
+
+Saving vmcore-dmesg.txt
+-----------------------
+Kernel log bufferes are one of the most important information available
+in vmcore. Now before saving vmcore, kernel log bufferes are extracted
+from /proc/vmcore and saved into a file vmcore-dmesg.txt. After
+vmcore-dmesg.txt, vmcore is saved. Destination disk and directory for
+vmcore-dmesg.txt is same as vmcore. Note that kernel log buffers will
+not be available if dump target is raw device.
+
+FADump Memory Requirements:
+
+  System Memory          Recommended memory
+--------------------- ----------------------
+    4 GB - 16 GB     :        768 MB
+   16 GB - 64 GB     :       1024 MB
+   64 GB - 128 GB    :          2 GB
+  128 GB - 1 TB      :          4 GB
+    1 TB - 2 TB      :          6 GB
+    2 TB - 4 TB      :         12 GB
+    4 TB - 8 TB      :         20 GB
+    8 TB - 16 TB     :         36 GB
+   16 TB - 32 TB     :         64 GB
+   32 TB - 64 TB     :        128 GB
+   64 TB & above     :        180 GB
+
+Things to remember:
+
+1) The memory required to boot capture Kernel is a moving target that depends
+   on many factors like hardware attached to the system, kernel and modules in
+   use, packages installed and services enabled, there is no one-size-fits-all.
+   But the above recommendations are based on system memory. So, the above
+   recommendations for FADump come with a few assumptions, based on available
+   system memory, about the resources the system could have. So, please take
+   the recommendations with a pinch of salt and remember to try capturing dump
+   a few times to confirm that the system is configured successfully with dump
+   capturing support.
+
+2) Though the memory requirements for FADump seem high, this memory is not
+   completely set aside but made available for userspace applications to use,
+   through the CMA allocator.
+
+3) As the same initrd is used for booting production kernel as well as capture
+   kernel and with dump being captured in a restricted memory environment, few
+   optimizations (like not inclding network dracut module, disabling multipath
+   and such) are applied while building the initrd. In case, the production
+   environment needs these optimizations to be avoided, dracut_args option in
+   /etc/kdump.conf file could be leveraged. For example, if a user wishes for
+   network module to be included in the initrd, adding the below entry in
+   /etc/kdump.conf file and restarting kdump service would take care of it.
+
+   dracut_args --add "network"
+
+4) If FADump is configured to capture vmcore to a remote dump target using SSH
+   or NFS protocol, the network interface is renamed to kdump-<interface-name>
+   if <interface-name> is generic, for example, *eth#, or net#. This problem
+   occurs because the vmcore capture scripts in the initial RAM disk (initrd)
+   add the kdump- prefix to the network interface name to secure persistent
+   naming. As the same initrd is used for production kernel boot, the interface
+   name is changed for the production kernel too.
+
+Dump Triggering methods:
+
+This section talks about the various ways, other than a Kernel Panic, in which
+fadump can be triggered. The following methods assume that fadump is configured
+on your system, with the scripts enabled as described in the section above.
+
+1) AltSysRq C
+
+FAdump can be triggered with the combination of the 'Alt','SysRq' and 'C'
+keyboard keys. Please refer to the following link for more details:
+
+https://fedoraproject.org/wiki/QA/Sysrq
+
+In addition, on PowerPC boxes, fadump can also be triggered via Hardware
+Management Console(HMC) using 'Ctrl', 'O' and 'C' keyboard keys.
+
+2) Kernel OOPs
+
+If we want to generate a dump everytime the Kernel OOPses, we can achieve this
+by setting the 'Panic On OOPs' option as follows:
+
+    # echo 1 > /proc/sys/kernel/panic_on_oops
+
+3) PowerPC specific methods:
+
+On IBM PowerPC machines, issuing a soft reset invokes the XMON debugger(if
+XMON is configured). To configure XMON one needs to compile the kernel with
+the CONFIG_XMON and CONFIG_XMON_DEFAULT options, or by compiling with
+CONFIG_XMON and booting the kernel with xmon=on option.
+
+Following are the ways to remotely issue a soft reset on PowerPC boxes, which
+would drop you to XMON. Pressing a 'X' (capital alphabet X) followed by an
+'Enter' here will trigger the dump.
+
+3.1) HMC
+
+Hardware Management Console(HMC) available on Power4 and Power5 machines allow
+partitions to be reset remotely. This is specially useful in hang situations
+where the system is not accepting any keyboard inputs.
+
+Once you have HMC configured, the following steps will enable you to trigger
+fadump via a soft reset:
+
+On Power4
+  Using GUI
+
+    * In the right pane, right click on the partition you wish to dump.
+    * Select "Operating System->Reset".
+    * Select "Soft Reset".
+    * Select "Yes".
+
+  Using HMC Commandline
+
+    # reset_partition -m <machine> -p <partition> -t soft
+
+On Power5
+  Using GUI
+
+    * In the right pane, right click on the partition you wish to dump.
+    * Select "Restart Partition".
+    * Select "Dump".
+    * Select "OK".
+
+  Using HMC Commandline
+
+    # chsysstate -m <managed system name> -n <lpar name> -o dumprestart -r lpar
+
+3.2) Blade Management Console for Blade Center
+
+To initiate a dump operation, go to Power/Restart option under "Blade Tasks" in
+the Blade Management Console. Select the corresponding blade for which you want
+to initate the dump and then click "Restart blade with NMI". This issues a
+system reset and invokes xmon debugger.
+
+
+Advanced Setups & Failure action:
+
+Kdump and fadump exhibit similar behavior in terms of setup & failure action.
+For fadump advanced setup related information see section "Advanced Setups" in
+"kexec-kdump-howto.txt" document. Refer to "Failure action" section in "kexec-
+kdump-howto.txt" document for fadump failure action related information.
+
+Compression and filtering
+
+Refer "Compression and filtering" section in "kexec-kdump-howto.txt" document.
+Compression and filtering are same for kdump & fadump.
+
+
+Notes on rootfs mount:
+Dracut is designed to mount rootfs by default. If rootfs mounting fails it
+will refuse to go on. So fadump leaves rootfs mounting to dracut currently.
+We make the assumtion that proper root= cmdline is being passed to dracut
+initramfs for the time being. If you need modify "KDUMP_COMMANDLINE=" in
+/etc/sysconfig/kdump, you will need to make sure that appropriate root=
+options are copied from /proc/cmdline. In general it is best to append
+command line options using "KDUMP_COMMANDLINE_APPEND=" instead of replacing
+the original command line completely.
+
+How to disable FADump:
+
+Remove "fadump=on" from kernel cmdline parameters:
+
+   # grubby --update-kernel=/boot/vmlinuz-`uname -r` --remove-args="fadump=on"
+
+If KDump is to be used as the dump capturing mechanism, update the crashkernel
+parameter (Else, remove "crashkernel=" parameter too, using grubby):
+
+   # grubby --update-kernel=/boot/vmlinuz-$kver --args="crashkernl=auto"
+
+Reboot the system for the settings to take effect.

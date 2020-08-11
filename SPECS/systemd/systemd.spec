@@ -1,7 +1,7 @@
 Summary:          Systemd-239
 Name:             systemd
 Version:          239
-Release:          29%{?dist}
+Release:          30%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -270,6 +270,8 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+*  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30
+-  Reduce kptr_restrict to 1
 *  Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-29
 -  Include cryptsetup to build cryptsetup generator.
 *  Wed May 27 2020 Chris Co <chrco@microsoft.com> 239-28

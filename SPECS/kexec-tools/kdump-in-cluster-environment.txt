@@ -1,0 +1,91 @@
+Kdump-in-cluster-environment HOWTO
+
+Introduction
+
+Kdump is a kexec based crash dumping mechansim for Linux. This docuement 
+illustrate how to configure kdump in cluster environment to allow the kdump 
+crash recovery service complete without being preempted by traditional power
+fencing methods. 
+
+Overview
+
+Kexec/Kdump
+
+Details about Kexec/Kdump are available in Kexec-Kdump-howto file and will not
+be described here.
+
+fence_kdump
+
+fence_kdump is an I/O fencing agent to be used with the kdump crash recovery 
+service. When the fence_kdump agent is invoked, it will listen for a message 
+from the failed node that acknowledges that the failed node is executing the 
+kdump crash kernel. Note that fence_kdump is not a replacement for traditional
+fencing methods. The fence_kdump agent can only detect that a node has entered
+the kdump crash recovery service. This allows the kdump crash recovery service
+complete without being preempted by traditional power fencing methods. 
+
+fence_kdump_send
+
+fence_kdump_send is a utility used to send messages that acknowledge that the 
+node itself has entered the kdump crash recovery service. The fence_kdump_send
+utility is typically run in the kdump kernel after a cluster node has 
+encountered a kernel panic. Once the cluster node has entered the kdump crash 
+recovery service, fence_kdump_send will periodically send messages to all 
+cluster nodes. When the fence_kdump agent receives a valid message from the 
+failed nodes, fencing is complete.
+
+How to configure Pacemaker cluster environment:
+
+If we want to use kdump in Pacemaker cluster environment, fence-agents-kdump
+should be installed in every nodes in the cluster. You can achieve this via
+the following command:
+
+  # yum install -y fence-agents-kdump
+
+Next is to add kdump_fence to the cluster. Assuming that the cluster consists 
+of three nodes, they are node1, node2 and node3, and use Pacemaker to perform
+resource management and pcs as cli configuration tool. 
+
+With pcs it is easy to add a stonith resource to the cluster. For example, add
+a stonith resource named mykdumpfence with fence type of fence_kdump via the 
+following commands:
+  
+   # pcs stonith create mykdumpfence fence_kdump \
+     pcmk_host_check=static-list pcmk_host_list="node1 node2 node3"
+   # pcs stonith update mykdumpfence pcmk_monitor_action=metadata --force
+   # pcs stonith update mykdumpfence pcmk_status_action=metadata --force
+   # pcs stonith update mykdumpfence pcmk_reboot_action=off --force
+   
+Then enable stonith
+   # pcs property set stonith-enabled=true
+
+How to configure kdump:
+
+Actually there are two ways how to configure fence_kdump support:
+
+1) Pacemaker based clusters
+     If you have successfully configured fence_kdump in Pacemaker, there is
+     no need to add some special configuration in kdump. So please refer to
+     Kexec-Kdump-howto file for more information.
+
+2) Generic clusters
+     For other types of clusters there are two configuration options in
+     kdump.conf which enables fence_kdump support:
+
+       fence_kdump_nodes <node(s)>
+            Contains list of cluster node(s) separated by space to send
+            fence_kdump notification to (this option is mandatory to enable
+            fence_kdump)
+
+       fence_kdump_args <arg(s)>
+            Command line arguments for fence_kdump_send (it can contain
+            all valid arguments except hosts to send notification to)
+
+     These options will most probably be configured by your cluster software,
+     so please refer to your cluster documentation how to enable fence_kdump
+     support.
+
+Please be aware that these two ways cannot be combined and 2) has precedence
+over 1). It means that if fence_kdump is configured using fence_kdump_nodes
+and fence_kdump_args options in kdump.conf, Pacemaker configuration is not
+used even if it exists.

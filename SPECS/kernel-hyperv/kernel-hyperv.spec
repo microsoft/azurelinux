@@ -3,7 +3,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.4.42
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -137,7 +137,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}/usr/lib/debug/lib/modules/%{uname_r}/vmlin
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -248,6 +248,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.4.42-6
+-   Add crashkernel=128M to kernel cmdline
 *   Tue Aug 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.4.42-5
 -   Updating "KBUILD_BUILD_VERSION" and "KBUILD_BUILD_HOST" with correct
     distribution name.

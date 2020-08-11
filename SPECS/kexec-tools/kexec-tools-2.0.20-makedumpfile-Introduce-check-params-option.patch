@@ -1,0 +1,255 @@
+From 989152e113bfcb4fbfbad6f3aed6f43be4455919 Mon Sep 17 00:00:00 2001
+From: Kazuhito Hagio <k-hagio-ab@nec.com>
+Date: Tue, 25 Feb 2020 16:04:55 -0500
+Subject: [PATCH] Introduce --check-params option
+
+Currently it's difficult to check whether a makedumpfile command-line
+is valid or not without an actual panic.  This is inefficient and if
+a wrong configuration is not tested, you will miss the vmcore when an
+actual panic occurs.
+
+In order for kdump facilities like kexec-tools to be able to check
+the specified command-line parameters in advance, introduce the
+--check-params option that only checks them and exits immediately.
+
+Signed-off-by: Kazuhito Hagio <k-hagio-ab@nec.com>
+---
+ makedumpfile.8 |  5 ++++
+ makedumpfile.c | 75 ++++++++++++++++++++++++++++++++++++++------------
+ print_info.c   |  4 +++
+ 4 files changed, 69 insertions(+), 17 deletions(-)
+
+diff --git a/makedumpfile-1.6.7/makedumpfile.8 b/makedumpfile-1.6.7/makedumpfile.8
+index bf156a8..c5d4806 100644
+--- a/makedumpfile-1.6.7/makedumpfile.8
++++ b/makedumpfile-1.6.7/makedumpfile.8
+@@ -632,6 +632,11 @@ Show help message and LZO/snappy support status (enabled/disabled).
+ \fB\-v\fR
+ Show the version of makedumpfile.
+ 
++.TP
++\fB\-\-check-params\fR
++Only check whether the command-line parameters are valid or not, and exit.
++Preferable to be given as the first parameter.
++
+ .SH ENVIRONMENT VARIABLES
+ 
+ .TP 8
+diff --git a/makedumpfile-1.6.7/makedumpfile.c b/makedumpfile-1.6.7/makedumpfile.c
+index 607e07f..f5860a1 100644
+--- a/makedumpfile-1.6.7/makedumpfile.c
++++ b/makedumpfile-1.6.7/makedumpfile.c
+@@ -10978,12 +10978,6 @@ check_param_for_creating_dumpfile(int argc, char *argv[])
+ 	if (info->flag_generate_vmcoreinfo || info->flag_rearrange)
+ 		return FALSE;
+ 
+-	if ((message_level < MIN_MSG_LEVEL)
+-	    || (MAX_MSG_LEVEL < message_level)) {
+-		message_level = DEFAULT_MSG_LEVEL;
+-		MSG("Message_level is invalid.\n");
+-		return FALSE;
+-	}
+ 	if ((info->flag_compress && info->flag_elf_dumpfile)
+ 	    || (info->flag_read_vmcoreinfo && info->name_vmlinux)
+ 	    || (info->flag_read_vmcoreinfo && info->name_xen_syms))
+@@ -11013,6 +11007,11 @@ check_param_for_creating_dumpfile(int argc, char *argv[])
+ 	if (info->flag_partial_dmesg && !info->flag_dmesg)
+ 		return FALSE;
+ 
++	if (info->flag_excludevm && !info->working_dir) {
++		MSG("-%c requires --work-dir\n", OPT_EXCLUDE_UNUSED_VM);
++		return FALSE;
++	}
++
+ 	if ((argc == optind + 2) && !info->flag_flatten
+ 				 && !info->flag_split
+ 				 && !info->flag_sadump_diskset) {
+@@ -11408,6 +11407,23 @@ int show_mem_usage(void)
+ 	return TRUE;
+ }
+ 
++static int set_message_level(char *str_ml)
++{
++	int ml;
++
++	ml = atoi(str_ml);
++	if ((ml < MIN_MSG_LEVEL) || (MAX_MSG_LEVEL < ml)) {
++		message_level = DEFAULT_MSG_LEVEL;
++		MSG("Message_level(%d) is invalid.\n", ml);
++		return FALSE;
++	}
++
++	if (info->flag_check_params)
++		return TRUE;
++
++	message_level = ml;
++	return TRUE;
++}
+ 
+ static struct option longopts[] = {
+ 	{"split", no_argument, NULL, OPT_SPLIT},
+@@ -11429,6 +11445,7 @@ static struct option longopts[] = {
+ 	{"splitblock-size", required_argument, NULL, OPT_SPLITBLOCK_SIZE},
+ 	{"work-dir", required_argument, NULL, OPT_WORKING_DIR},
+ 	{"num-threads", required_argument, NULL, OPT_NUM_THREADS},
++	{"check-params", no_argument, NULL, OPT_CHECK_PARAMS},
+ 	{0, 0, 0, 0}
+ };
+ 
+@@ -11527,7 +11544,8 @@ main(int argc, char *argv[])
+ 			info->flag_compress = DUMP_DH_COMPRESSED_LZO;
+ 			break;
+ 		case OPT_MESSAGE_LEVEL:
+-			message_level = atoi(optarg);
++			if (!set_message_level(optarg))
++				goto out;
+ 			break;
+ 		case OPT_DUMP_DMESG:
+ 			info->flag_dmesg = 1;
+@@ -11590,6 +11608,10 @@ main(int argc, char *argv[])
+ 		case OPT_NUM_THREADS:
+ 			info->num_threads = MAX(atoi(optarg), 0);
+ 			break;
++		case OPT_CHECK_PARAMS:
++			info->flag_check_params = TRUE;
++			message_level = DEFAULT_MSG_LEVEL;
++			break;
+ 		case '?':
+ 			MSG("Commandline parameter is invalid.\n");
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+@@ -11599,11 +11621,9 @@ main(int argc, char *argv[])
+ 	if (flag_debug)
+ 		message_level |= ML_PRINT_DEBUG_MSG;
+ 
+-	if (info->flag_excludevm && !info->working_dir) {
+-		ERRMSG("Error: -%c requires --work-dir\n", OPT_EXCLUDE_UNUSED_VM);
+-		ERRMSG("Try `makedumpfile --help' for more information\n");
+-		return COMPLETED;
+-	}
++	if (info->flag_check_params)
++		/* suppress debugging messages */
++		message_level = DEFAULT_MSG_LEVEL;
+ 
+ 	if (info->flag_show_usage) {
+ 		print_usage();
+@@ -11634,6 +11654,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (!open_files_for_generating_vmcoreinfo())
+ 			goto out;
+ 
+@@ -11657,6 +11680,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (!check_dump_file(info->name_dumpfile))
+ 			goto out;
+ 
+@@ -11677,6 +11703,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (!check_dump_file(info->name_dumpfile))
+ 			goto out;
+ 
+@@ -11690,6 +11719,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (!check_dump_file(info->name_dumpfile))
+ 			goto out;
+ 		if (!dump_dmesg())
+@@ -11703,6 +11735,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (!populate_kernel_version())
+ 			goto out;
+ 
+@@ -11721,6 +11756,9 @@ main(int argc, char *argv[])
+ 			MSG("Try `makedumpfile --help' for more information.\n");
+ 			goto out;
+ 		}
++		if (info->flag_check_params)
++			goto check_ok;
++
+ 		if (info->flag_split) {
+ 			for (i = 0; i < info->num_dumpfile; i++) {
+ 				SPLITTING_FD_BITMAP(i) = -1;
+@@ -11748,13 +11786,16 @@ main(int argc, char *argv[])
+ 			MSG("The dumpfile is saved to %s.\n", info->name_dumpfile);
+ 		}
+ 	}
++check_ok:
+ 	retcd = COMPLETED;
+ out:
+-	MSG("\n");
+-	if (retcd != COMPLETED)
+-		MSG("makedumpfile Failed.\n");
+-	else if (!info->flag_mem_usage)
+-		MSG("makedumpfile Completed.\n");
++	if (!info->flag_check_params) {
++		MSG("\n");
++		if (retcd != COMPLETED)
++			MSG("makedumpfile Failed.\n");
++		else if (!info->flag_mem_usage)
++			MSG("makedumpfile Completed.\n");
++	}
+ 
+ 	free_for_parallel();
+ 
+diff --git a/makedumpfile-1.6.7/makedumpfile.h b/makedumpfile-1.6.7/makedumpfile.h
+index 7217407..03fb4ce 100644
+--- a/makedumpfile-1.6.7/makedumpfile.h
++++ b/makedumpfile-1.6.7/makedumpfile.h
+@@ -1303,6 +1303,7 @@ struct DumpInfo {
+ 	int		flag_read_vmcoreinfo;    /* flag of reading vmcoreinfo file */
+ 	int		flag_show_usage;     /* flag of showing usage */
+ 	int		flag_show_version;   /* flag of showing version */
++	int		flag_check_params;   /* only check parameters */
+ 	int		flag_flatten;        /* flag of outputting flattened
+ 						format to a standard out */
+ 	int		flag_rearrange;      /* flag of creating dumpfile from
+@@ -2364,6 +2365,7 @@ struct elf_prstatus {
+ #define OPT_WORKING_DIR         OPT_START+15
+ #define OPT_NUM_THREADS         OPT_START+16
+ #define OPT_PARTIAL_DMESG       OPT_START+17
++#define OPT_CHECK_PARAMS        OPT_START+18
+ 
+ /*
+  * Function Prototype.
+diff --git a/makedumpfile-1.6.7/print_info.c b/makedumpfile-1.6.7/print_info.c
+index 0be12ea..e0c38b4 100644
+--- a/makedumpfile-1.6.7/print_info.c
++++ b/makedumpfile-1.6.7/print_info.c
+@@ -321,6 +321,10 @@ print_usage(void)
+ 	MSG("  [-v]:\n");
+ 	MSG("      Show the version of makedumpfile.\n");
+ 	MSG("\n");
++	MSG("  [--check-params]:\n");
++	MSG("      Only check whether the command-line parameters are valid or not, and exit.\n");
++	MSG("      Preferable to be given as the first parameter.\n");
++	MSG("\n");
+ 	MSG("  VMLINUX:\n");
+ 	MSG("      This is a pathname to the first kernel's vmlinux.\n");
+ 	MSG("      This file must have the debug information of the first kernel to analyze\n");
+-- 
+2.24.1
+
+

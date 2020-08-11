@@ -1,0 +1,15 @@
+[Unit]
+Description=Crash recovery kernel arming
+After=network.target network-online.target remote-fs.target basic.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/kdumpctl start
+ExecStop=/usr/bin/kdumpctl stop
+ExecReload=/usr/bin/kdumpctl reload
+RemainAfterExit=yes
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target
