@@ -14,8 +14,8 @@
 %define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
 %define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
 
-# Rebuilding cert bundles with remaining certificates.
-%global uninstall_clean_up \
+# Rebuilding cert bundles with source certificates.
+%global refresh_bundles \
 %{_bindir}/ca-legacy install\
 %{_bindir}/update-ca-trust
 
@@ -273,25 +273,20 @@ ln -s %{catrustdir}/extracted/%{java_bundle} \
     $RPM_BUILD_ROOT%{pkidir}/%{java_bundle}
 
 %post
-#if [ $1 -gt 1 ] ; then
-#  # when upgrading or downgrading
-#fi
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
-%{_bindir}/ca-legacy install
-%{_bindir}/update-ca-trust
+%refresh_bundles
 
 %post base
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-%{_bindir}/ca-legacy install
-%{_bindir}/update-ca-trust
+%refresh_bundles
 
 %postun
-%uninstall_clean_up
+%refresh_bundles
 
 %postun base
-%uninstall_clean_up
+%refresh_bundles
 
 %clean
 
@@ -301,10 +296,16 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 %{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle}
 %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle}
 
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
+
 %files base
 %{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
 %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle}
 %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle}
+
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
 
 %files shared
 %license LICENSE
@@ -358,8 +359,6 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 %ghost %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle}
 %ghost %{catrustdir}/extracted/%{java_bundle}
 %ghost %{catrustdir}/extracted/edk2/cacerts.bin
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
 
 %files tools
 # update/extract tool
@@ -371,7 +370,9 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 
 %changelog
 * Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-4
-- Updating base certificates.
+- Updating base certificates to current intermediate CAs.
+- Re-assigning ownership of legacy bundles from '*-shared' to subpackages creating them.
+- Removing commented lines.
 
 * Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-3
 - Changing base certificates to trust packages.microsoft.com.
