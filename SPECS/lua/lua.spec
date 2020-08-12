@@ -4,7 +4,7 @@
 Summary:        Programming language
 Name:           lua
 Version:        5.3.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 URL:            https://www.lua.org
 Group:          Development/Tools
@@ -31,7 +31,7 @@ Static libraries and header files for the support library for lua
 %setup -q
 %patch0 -p1
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
-sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -DLUA_COMPAT_MODULE /' src/Makefile
+sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
 cp %{SOURCE1} ./
 
 %build
@@ -91,6 +91,8 @@ rm -rf %{buildroot}
 %{_libdir}/liblua.so
 
 %changelog
+*   Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.3.5-6
+-   Append -fPIC and -O2 to CFLAGS to fix build issues.
 *   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 5.3.5-5
 -   Don't stomp on CFLAGS.
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 5.3.5-4
