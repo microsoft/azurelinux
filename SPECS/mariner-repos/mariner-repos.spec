@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -12,6 +12,10 @@ Source3:        mariner-official-update.repo
 Vendor:         Microsoft Corporation
 Distribution:   mariner
 Provides:       mariner-repos
+Requires(post): gpgme
+Requires(post): rpm
+Requires(preun): gpgme
+Requires(preun): rpm
 BuildArch:      noarch
 
 %description
@@ -30,6 +34,16 @@ install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+gpg --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpg --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+
+%preun
+# Remove the MICROSOFT-METADATA-GPG-KEY
+gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
+# Remove the MICROSOFT-RPM-GPG-KEY
+gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
+
 %files
 %defattr(-,root,root,-)
 %dir /etc/yum.repos.d
@@ -39,6 +53,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
 
 %changelog
+*   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
+-   Enable GPG Check and Import
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
 -   Adding Metadata Key and Updating to Prod GPG Key.
 *   Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
