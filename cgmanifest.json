@@ -1825,8 +1825,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.19",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.19.tar.xz"
+          "version": "2.0.20",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.20.tar.xz"
         }
       }
     },
@@ -5277,6 +5277,16 @@
           "name": "socat",
           "version": "1.7.3.4",
           "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "squashfs-tools",
+          "version": "4.3",
+          "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
         }
       }
     },

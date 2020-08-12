@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.42
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -171,7 +171,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}/usr/lib/debug/lib/modules/%{uname_r}/vmlin
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -311,6 +311,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.4.42-9
+-   Add crashkernel=128M to the kernel cmdline
+-   Update config to support kexec and kexec_file_load
 *   Tue Aug 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.4.42-8
 -   Updating "KBUILD_BUILD_VERSION" and "KBUILD_BUILD_HOST" with correct
     distribution name.

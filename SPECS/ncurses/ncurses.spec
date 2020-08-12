@@ -1,7 +1,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://invisible-island.net/ncurses/
 Group:          Applications/System
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source0:        ftp://ftp.invisible-island.net/%{name}/%{name}-%{version}.tar.gz
 
 Requires:       ncurses-libs = %{version}-%{release}
+
 %description
 The Ncurses package contains libraries for terminal-independent
 handling of character screens.
@@ -48,144 +49,170 @@ It contains all terminfo files
 %setup -q -n %{name}-%{version}
 
 %build
-mkdir v6
-pushd v6
-ln -s ../configure .
-./configure \
-    --prefix=%{_prefix} \
-    --mandir=%{_mandir} \
-    --with-shared \
-    --without-debug \
+common_options="\
+    --enable-colorfgbg \
+    --enable-hard-tabs \
+    --enable-overwrite \
     --enable-pc-files \
-    --enable-widec \
-    --disable-lp64 \
-    --with-chtype='long' \
-    --with-mmask-t='long' \
-    --disable-silent-rules
-make %{?_smp_mflags}
-popd
-mkdir v5
-pushd v5
-ln -s ../configure .
-./configure \
-    --prefix=%{_prefix} \
-    --mandir=%{_mandir} \
+    --enable-xmc-glitch \
+    --disable-stripping \
+    --disable-wattr-macros \
+    --with-cxx-shared \
+    --with-ospeed=unsigned \
+    --with-pkg-config-libdir=%{_libdir}/pkgconfig \
     --with-shared \
-    --without-debug \
-    --enable-pc-files \
-    --enable-widec \
-    --disable-lp64 \
-    --with-chtype='long' \
-    --with-mmask-t='long' \
-    --disable-silent-rules \
-    --with-abi-version=5
-make %{?_smp_mflags}
-popd
-%install
-make -C v5 DESTDIR=%{buildroot} install.libs
-make -C v6 DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/%{_lib}
-ln -sfv ../..%{_lib}/$(readlink %{buildroot}%{_libdir}/libncursesw.so) %{buildroot}%{_libdir}/libncursesw.so
-for lib in ncurses form panel menu ; do \
-    rm -vf %{buildroot}%{_libdir}/lib${lib}.so ; \
-    echo "INPUT(-l${lib}w)" > %{buildroot}%{_libdir}/lib${lib}.so ; \
-    ln -sfv lib${lib}w.a %{buildroot}%{_libdir}/lib${lib}.a ; \
-    ln -sfv /lib/pkgconfig/${lib}w.pc %{buildroot}/lib/pkgconfig/${lib}.pc
-done
-ln -sfv libncurses++w.a %{buildroot}%{_libdir}/libncurses++.a
-rm -vf %{buildroot}%{_libdir}/libcursesw.so
-echo "INPUT(-lncursesw)" > %{buildroot}%{_libdir}/libcursesw.so
-ln -sfv libncurses.so %{buildroot}%{_libdir}/libcurses.so
-ln -sfv libncursesw.a %{buildroot}%{_libdir}/libcursesw.a
-ln -sfv libncurses.a %{buildroot}%{_libdir}/libcurses.a
-install -vdm 755  %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-ln -sv libncursesw.so.6.0 %{buildroot}%{_libdir}/libncurses.so.6
-ln -sv libncursesw.so.5.9 %{buildroot}%{_libdir}/libncurses.so.5
-cp -v -R doc/* %{buildroot}%{_defaultdocdir}/%{name}-%{version}
+    --with-terminfo-dirs=%{_sysconfdir}/terminfo:%{_datadir}/terminfo \
+    --with-termlib=tinfo \
+    --with-ticlib=tic \
+    --with-xterm-kbs=DEL \
+    --without-ada"
+abi5_options="--with-chtype=long"
 
-%check
-cd test
-./configure
-make
+for abi in 5 6; do
+    for char in narrowc widec; do
+        mkdir $char$abi
+        pushd $char$abi
+        ln -s ../configure .
+
+        [ $abi = 6 -a $char = widec ] && progs=yes || progs=no
+
+        %configure $(
+            echo $common_options --with-abi-version=$abi
+            [ $abi = 5 ] && echo $abi5_options
+            [ $char = widec ] && echo --enable-widec
+            [ $progs = yes ] || echo --without-progs
+        )
+
+        make %{?_smp_mflags} libs
+        [ $progs = yes ] && make %{?_smp_mflags} -C progs
+
+        popd
+    done
+done
+
+%install
+make -C narrowc5 DESTDIR=$RPM_BUILD_ROOT install.libs
+rm ${RPM_BUILD_ROOT}%{_libdir}/lib{tic,tinfo}.so.5*
+make -C widec5 DESTDIR=$RPM_BUILD_ROOT install.libs
+make -C narrowc6 DESTDIR=$RPM_BUILD_ROOT install.libs
+rm ${RPM_BUILD_ROOT}%{_libdir}/lib{tic,tinfo}.so.6*
+make -C widec6 DESTDIR=$RPM_BUILD_ROOT install.{libs,progs,data,includes,man}
+
+chmod 755 ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*.*
+chmod 644 ${RPM_BUILD_ROOT}%{_libdir}/lib*.a
+
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/terminfo
+
+baseterms=
+
+# prepare -base and -term file lists
+for termname in \
+    ansi dumb linux vt100 vt100-nav vt102 vt220 vt52 \
+    Eterm\* aterm bterm cons25 cygwin eterm\* gnome gnome-256color hurd jfbterm \
+    konsole konsole-256color mach\* mlterm mrxvt nsterm putty{,-256color} pcansi \
+    rxvt{,-\*} screen{,-\*color,.[^mlp]\*,.linux,.mlterm\*,.putty{,-256color},.mrxvt} \
+    st{,-\*color} sun teraterm teraterm2.3 tmux{,-\*} vte vte-256color vwmterm \
+    wsvt25\* xfce xterm xterm-\*
+do
+    for i in $RPM_BUILD_ROOT%{_datadir}/terminfo/?/$termname; do
+        for t in $(find $RPM_BUILD_ROOT%{_datadir}/terminfo -samefile $i); do
+            baseterms="$baseterms $(basename $t)"
+        done
+    done
+done 2> /dev/null
+for t in $baseterms; do
+    echo "%dir %{_datadir}/terminfo/${t::1}"
+    echo %{_datadir}/terminfo/${t::1}/$t
+done 2> /dev/null | sort -u > terms.base
+find $RPM_BUILD_ROOT%{_datadir}/terminfo \! -type d | \
+    sed "s|^$RPM_BUILD_ROOT||" | while read t
+do
+    echo "%dir $(dirname $t)"
+    echo $t
+done 2> /dev/null | sort -u | comm -2 -3 - terms.base > terms.term
+
+# can't replace directory with symlink (rpm bug), symlink all headers
+mkdir $RPM_BUILD_ROOT%{_includedir}/ncurses{,w}
+for l in $RPM_BUILD_ROOT%{_includedir}/*.h; do
+    ln -s ../$(basename $l) $RPM_BUILD_ROOT%{_includedir}/ncurses
+    ln -s ../$(basename $l) $RPM_BUILD_ROOT%{_includedir}/ncursesw
+done
+
+# don't require -ltinfo when linking with --no-add-needed
+for l in $RPM_BUILD_ROOT%{_libdir}/libncurses{,w}.so; do
+    soname=$(basename $(readlink $l))
+    rm -f $l
+    echo "INPUT($soname -ltinfo)" > $l
+done
+
+rm -f $RPM_BUILD_ROOT%{_libdir}/libcurses{,w}.so
+echo "INPUT(-lncurses)" > $RPM_BUILD_ROOT%{_libdir}/libcurses.so
+echo "INPUT(-lncursesw)" > $RPM_BUILD_ROOT%{_libdir}/libcursesw.so
+
+echo "INPUT(-ltinfo)" > $RPM_BUILD_ROOT%{_libdir}/libtermcap.so
+
+rm -f $RPM_BUILD_ROOT%{_bindir}/ncurses*5-config
+rm -f $RPM_BUILD_ROOT%{_libdir}/terminfo
+rm -f $RPM_BUILD_ROOT%{_libdir}/pkgconfig/*_g.pc
+
+xz NEWS
 
 %post libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
+
 %post compat -p /sbin/ldconfig
 %postun compat -p /sbin/ldconfig
+
+%post devel -p /sbin/ldconfig
+%postun devel -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_bindir}/captoinfo
-%{_bindir}/clear
-%{_bindir}/tabs
-%{_bindir}/tic
-%{_bindir}/tset
-%{_bindir}/reset
-%{_bindir}/infocmp
-%{_bindir}/tput
-%{_bindir}/infotocap
-%{_bindir}/toe
-%{_mandir}/man7/*
-%{_mandir}/man1/*
+%doc ANNOUNCE AUTHORS NEWS.xz README TO-DO
+%{_bindir}/[cirt]*
+%{_mandir}/man1/[cirt]*
 %{_mandir}/man5/*
+%{_mandir}/man7/*
 
-%files libs
+%files libs -f terms.base
+%{!?_licensedir:%global license %%doc}
+%doc README
+%license COPYING
 %{_datadir}/terminfo/l/linux
-%{_datadir}/tabset/*
-%{_libdir}/terminfo
+%dir %{_sysconfdir}/terminfo
+%{_datadir}/tabset
+%dir %{_datadir}/terminfo
 %{_libdir}/lib*.so.6*
 
 %files compat
 %{_libdir}/lib*.so.5*
-%{_bindir}/ncursesw5-config
 
 %files devel
-%{_bindir}/ncursesw6-config
+%doc doc/html/hackguide.html
+%doc doc/html/ncurses-intro.html
+%doc c++/README*
+%doc misc/ncurses.supp
+%{_bindir}/ncurses*-config
+%{_libdir}/lib*.so
+%{_libdir}/pkgconfig/*.pc
+%dir %{_includedir}/ncurses
+%dir %{_includedir}/ncursesw
+%{_includedir}/ncurses/*.h
+%{_includedir}/ncursesw/*.h
 %{_includedir}/*.h
-%{_libdir}/libncurses.a
-%{_libdir}/libformw.a
-%{_libdir}/libpanel.a
-%{_libdir}/libmenuw.a
-/lib/pkgconfig/panelw.pc
-/lib/pkgconfig/panel.pc
-/lib/pkgconfig/form.pc
-/lib/pkgconfig/menu.pc
-/lib/pkgconfig/ncursesw.pc
-/lib/pkgconfig/ncurses++w.pc
-/lib/pkgconfig/menuw.pc
-/lib/pkgconfig/formw.pc
-/lib/pkgconfig/ncurses.pc
-%{_libdir}/libncursesw.a
-%{_libdir}/libcursesw.a
-%{_libdir}/libncurses++w.a
-%{_libdir}/libform.a
-%{_libdir}/libcurses.a
-%{_libdir}/libpanelw.a
-%{_libdir}/libncurses++.a
-%{_libdir}/libmenu.a
-%{_libdir}/libncursesw.so
-%{_libdir}/libpanelw.so
-%{_libdir}/libcurses.so
-%{_libdir}/libformw.so
-%{_libdir}/libmenuw.so
-%{_libdir}/libncurses.so
-%{_libdir}/libform.so
-%{_libdir}/libcursesw.so
-%{_libdir}/libpanel.so
-%{_libdir}/libmenu.so
-%{_docdir}/ncurses-%{version}/html/*
-%{_docdir}/ncurses-%{version}/*.doc
+%{_mandir}/man1/ncurses*-config*
 %{_mandir}/man3/*
+%{_libdir}/lib*.a
 
-%files term
-%defattr(-,root,root)
-%{_datadir}/terminfo/*
-%exclude %{_datadir}/terminfo/l/linux
+%files term -f terms.term
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.2-3
-- Added %%license line automatically
-
+*   Thu Aug 06 2020 Mateusz Malisz <mamalisz@microsoft.com> 6.2-4
+-   Sync build process with Fedora 32.
+-   Add libtinfo
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 6.2-3
+-   Added %%license line automatically
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 6.2-2
 -   Rename ncurses-terminfo to ncurses-term.
 *   Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 6.2-1

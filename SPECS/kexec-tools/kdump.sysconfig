@@ -1,0 +1,37 @@
+# Kernel Version string for the -kdump kernel, such as 2.6.13-1544.FC5kdump
+# If no version is specified, then the init script will try to find a
+# kdump kernel with the same version number as the running kernel.
+KDUMP_KERNELVER=""
+
+# The kdump commandline is the command line that needs to be passed off to
+# the kdump kernel.  This will likely match the contents of the grub kernel
+# line.  For example:
+#   KDUMP_COMMANDLINE="ro root=LABEL=/"
+# Dracut depends on proper root= options, so please make sure that appropriate
+# root= options are copied from /proc/cmdline. In general it is best to append
+# command line options using "KDUMP_COMMANDLINE_APPEND=".
+# If a command line is not specified, the default will be taken from
+# /proc/cmdline
+KDUMP_COMMANDLINE=""
+
+# This variable lets us remove arguments from the current kdump commandline
+# as taken from either KDUMP_COMMANDLINE above, or from /proc/cmdline
+# NOTE: some arguments such as crashkernel will always be removed
+KDUMP_COMMANDLINE_REMOVE="hugepages hugepagesz slub_debug quiet log_buf_len swiotlb"
+
+# This variable lets us append arguments to the current kdump commandline
+# after processed by KDUMP_COMMANDLINE_REMOVE
+KDUMP_COMMANDLINE_APPEND="irqpoll maxcpus=1 reset_devices novmcoredd"
+
+# Any additional kexec arguments required.  In most situations, this should
+# be left empty
+#
+# Example:
+#   KEXEC_ARGS="--elf32-core-headers"
+KEXEC_ARGS=""
+
+#Where to find the boot image
+#KDUMP_BOOTDIR="/boot"
+
+#What is the image type used for kdump
+KDUMP_IMG="vmlinuz"
