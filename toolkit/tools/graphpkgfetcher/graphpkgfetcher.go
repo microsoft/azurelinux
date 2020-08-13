@@ -93,11 +93,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	}
 	defer cloner.Close()
 
-	if tlsKey != "" || tlsCert != "" {
-		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-		if err != nil {
-			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
-		}
+	err = cloner.AddNetworkFiles(tlsCert, tlsKey)
+	if err != nil {
+		logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
 	}
 
 	if strings.TrimSpace(inputSummaryFile) == "" {
