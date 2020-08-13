@@ -355,8 +355,8 @@ systemd-bootstrap-devel-239-29.cm1.aarch64.rpm
 systemd-debuginfo-239-30.cm1.aarch64.rpm
 systemd-devel-239-30.cm1.aarch64.rpm
 systemd-lang-239-30.cm1.aarch64.rpm
-tar-1.32-1.cm1.aarch64.rpm
-tar-debuginfo-1.32-1.cm1.aarch64.rpm
+tar-1.32-2.cm1.aarch64.rpm
+tar-debuginfo-1.32-2.cm1.aarch64.rpm
 tdnf-2.1.0-3.cm1.aarch64.rpm
 tdnf-cli-libs-2.1.0-3.cm1.aarch64.rpm
 tdnf-debuginfo-2.1.0-3.cm1.aarch64.rpm

@@ -1,7 +1,7 @@
 Summary:          Programs for basic networking
 Name:             iputils
 Version:          20180629
-Release:          4%{?dist}
+Release:          5%{?dist}
 License:          BSD-3 and GPLv2+ and Rdisc
 URL:              https://github.com/iputils/iputils
 Group:            Applications/Communications
@@ -43,6 +43,7 @@ install -cp tracepath %{buildroot}%{_bindir}/
 install -cp traceroute6 %{buildroot}%{_bindir}/
 install -cp ninfod/ninfod %{buildroot}%{_sbindir}/
 
+ln -sf ../bin/ping %{buildroot}%{_bindir}/ping6
 ln -sf ../bin/tracepath %{buildroot}%{_sbindir}
 ln -sf ../bin/traceroute6 %{buildroot}%{_sbindir}
 
@@ -63,11 +64,13 @@ mv -f RELNOTES.tmp RELNOTES.old
 %caps(cap_net_raw=p) %{_sbindir}/clockdiff
 %caps(cap_net_raw=p) %{_sbindir}/arping
 %caps(cap_net_raw=p cap_net_admin=p) %{_bindir}/ping
+%caps(cap_net_raw=p cap_net_admin=p) %{_bindir}/ping6
 
 %changelog
-* Sat May 09 00:21:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 20180629-4
-- Added %%license line automatically
-
+*   Wed Jul 29 2020 Andrew Phelps 20180629-5
+-   Add ping6 symlink.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 20180629-4
+-   Added %%license line automatically
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 20180629-3
 -   Verified license. Removed sha1. Fixed commented out URL. Fixed formatting.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 20180629-2
