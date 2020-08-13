@@ -55,10 +55,10 @@
                 {
                     "Path": "postinstallscripts/mariner/import-keys-patch.sh"
                 }
-            ],			
+            ],
             "Users": [
                 {
-                    "Name": "root",
+                    "Name": "root"
                 }
             ]
         }
