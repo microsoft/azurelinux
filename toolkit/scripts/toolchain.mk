@@ -179,7 +179,6 @@ $(toolchain_rpms):
 	for url in $(toolchain_package_urls); do \
 		wget $${url}/$(notdir $@) \
 			--no-verbose \
-			--no-check-certificate \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 			&& \
