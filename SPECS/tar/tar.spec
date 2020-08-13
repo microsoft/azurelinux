@@ -1,7 +1,7 @@
 Summary:        Archiving program
 Name:           tar
 Version:        1.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
@@ -25,6 +25,7 @@ make %{?_smp_mflags}
 install -vdm 755 %{buildroot}%{_sbindir}
 make DESTDIR=%{buildroot} install
 make DESTDIR=%{buildroot} -C doc install-html docdir=%{_defaultdocdir}/%{name}-%{version}
+ln -sf tar %{buildroot}/bin/gtar
 install -vdm 755 %{buildroot}/usr/share/man/man1
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
@@ -36,11 +37,14 @@ make  %{?_smp_mflags} check
 %defattr(-,root,root)
 %license COPYING
 /bin/tar
+/bin/gtar
 %{_libexecdir}/rmt
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 
 %changelog
+*   Wed Jul 29 2020 Andrew Phelps <anphel@microsoft.com> 1.32-2
+-   Add symlink for gtar.
 *   Wed Jun 03 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-1
 -   Update to version 1.32 to resolve CVE-2019-9923.
 -   Fix macro in changelog.
