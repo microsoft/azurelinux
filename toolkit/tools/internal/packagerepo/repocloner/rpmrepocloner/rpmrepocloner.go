@@ -146,16 +146,21 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 }
 
 // AddNetworkFiles adds files needed for networking capabilities into the cloner.
+// tlsClientCert and tlsClientKey are optional.
 func (r *RpmRepoCloner) AddNetworkFiles(tlsClientCert, tlsClientKey string) (err error) {
-	if tlsClientCert == "" || tlsClientKey == "" {
-		err = fmt.Errorf("one of tlsClientCert(%s) or tlsClientKey(%s) is not set", tlsClientCert, tlsClientKey)
-		return
-	}
 	files := []safechroot.FileToCopy{
 		{Src: "/etc/resolv.conf", Dest: "/etc/resolv.conf"},
-		{Src: tlsClientCert, Dest: "/etc/tdnf/mariner_user.crt"},
-		{Src: tlsClientKey, Dest: "/etc/tdnf/mariner_user.key"},
 	}
+
+	if tlsClientCert != "" && tlsClientKey != "" {
+		tlsFiles := []safechroot.FileToCopy{
+			{Src: tlsClientCert, Dest: "/etc/tdnf/mariner_user.crt"},
+			{Src: tlsClientKey, Dest: "/etc/tdnf/mariner_user.key"},
+		}
+
+		files = append(files, tlsFiles...)
+	}
+
 	err = r.chroot.AddFiles(files...)
 	return
 }
