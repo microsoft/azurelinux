@@ -28,7 +28,6 @@ toolchain_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # the exact path of the required rpm
 # Outputs: $(toolchain_rpms_dir)/<arch>/<name>.<arch>.rpm
 sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
-sed_regex_arch_only = 's`(.*\.([^\.]+)\.rpm)`\2`p'
 toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(toolchain_manifest))
 toolchain_rpms_buildarch := $(shell grep $(build_arch) $(toolchain_manifest))
 toolchain_rpms_noarch := $(shell grep noarch $(toolchain_manifest))
@@ -175,14 +174,14 @@ else
 toolchain_package_urls := $(PACKAGE_URL)
 endif
 $(toolchain_rpms):
-	arch=$$(echo $(notdir $@) | sed -nr $(sed_regex_arch_only)) && \
 	mkdir -p $(dir $@) && \
 	cd $(dir $@) && \
 	for url in $(toolchain_package_urls); do \
-		wget $${url}/$${arch}/$(notdir $@) \
+		wget $${url}/$(notdir $@) \
 			--no-verbose \
-			--certificate=$(TLS_CERT) \
-			--private-key=$(TLS_KEY) && \
+			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
+			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
+			&& \
 		break; \
 	done || $(call print_error,Loop in $@ failed) ; \
 	{ [ -f $@ ] || \
