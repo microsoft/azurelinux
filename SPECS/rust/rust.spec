@@ -1,7 +1,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.39.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 and MIT
 URL:            https://www.rust-lang.org/
 Group:          Applications/System
@@ -15,6 +15,8 @@ Source4:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-x86
 Source5:        https://static.rust-lang.org/dist/2019-09-26/cargo-0.39.0-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/2019-09-26/rustc-1.38.0-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-aarch64-unknown-linux-gnu.tar.gz
+
+Patch0:         robust-build.patch
 
 BuildRequires:  git
 BuildRequires:  cmake
@@ -33,6 +35,9 @@ pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
 %setup -q -n rustc-%{version}-src
+
+%patch0 -p1
+
 # Setup build/cache directory
 %define BUILD_CACHE_DIR build/cache/2019-09-26/
 mkdir -pv %{BUILD_CACHE_DIR}
@@ -97,6 +102,8 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+*   Wed Aug 12 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.39.0-7
+-   Add patch for the build to not fail on file not found error.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 1.39.0-6
 -   Temporarily disable generation of debug symbols.
 *   Thu May 28 2020 Chris Co <chrco@microsoft.com> - 1.39.0-5
