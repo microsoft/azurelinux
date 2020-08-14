@@ -50,11 +50,6 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "PostInstallScripts":[
-                {
-                    "Path": "postinstallscripts/mariner/import-keys-patch.sh"
-                }
-            ],			
             "Hostname": "cbl-mariner"
         }
     ]

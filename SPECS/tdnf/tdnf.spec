@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        LGPLv2.1 and GPLv2
@@ -45,6 +45,7 @@ Patch3:         tdnf-add-showorder-argument.patch
 Patch4:         tdnf-add-mariner-release.patch
 Patch5:         tdnf-support-multiple-gpgkeys.patch
 Patch6:         tdnf-add-download-no-deps-command.patch
+Patch7:         tdnf-use-custom-keyring-for-gpg-checks.patch
 
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
@@ -185,6 +186,8 @@ find %{buildroot} -name '*.pyc' -delete
     %{python3_sitelib}/*
     
 %changelog
+*   Fri Aug 14 2020 Joe Schmitt <joschmit@microsoft.com> 2.1.0-4
+-   Add tdnf-use-custom-keyring-for-gpg-checks.patch
 *   Thu Jul 30 2020 Joe Schmitt <joschmit@microsoft.com> 2.1.0-3
 -   Add tdnf-add-download-no-deps-command.patch.
 *   Wed Jul 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.1.0-2
