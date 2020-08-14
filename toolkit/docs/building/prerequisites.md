@@ -1,35 +1,23 @@
 
 # Build Requirements
 ---
-## Basic Build
 ### Requirements were validated on `Ubuntu 18.04`.
 Requirements for building images with a toolkit:
 ```bash
-sudo apt -y install make tar wget curl rpm qemu-utils
-```
-
-Recommended but not required: `pigz` for faster compression operations.
-
----
-## Rebuilding the Toolkit
-Requirements for regenerating the toolkit (toolkits include pre-built Go binaries):
-```bash
+# Add a backports repo in order to install the latest version of Go.
 sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
-sudo apt install golang-1.13-go
-```
 
-You may need to run the following to correctly link go:
-```bash
+# Install required dependencies.
+sudo apt -y install make tar wget curl rpm qemu-utils golang-1.13-go
+
+# Recommended but not required: `pigz` for faster compression operations.
+sudo apt -y install pigz
+
+# Fix go 1.13 link
 sudo ln -vs /usr/lib/go-1.13/bin/go /usr/bin/go
-```
 
-
-
----
-## Bootstrapping the Toolchain
-Requirements for bootstrapping the toolchain using a docker container
-```bash
+# Install Docker.
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
