@@ -14,7 +14,7 @@ index d776d30..ca90fa7 100644
 +        // If not checking gpg sigs, ignore signature errors.
 +        //
 +        // If checking GPG signatures, ignore signatures errors.
-+        // These errors can be ignored safely as the gpg signatures have already been validated on file
++        // These errors can be ignored safely as the gpg signatures have already been validated for the file
 +        // in the above `TDNFGPGCheck` call. If an RPM with an invalid signature is provided,
 +        // the code will never reach this point.
 +        // TDNF's gpg keyring is a superset of RPM's built in one, and any gpg files provided in the repo config.
