@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        10%{?dist}
+Release:        9%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -36,18 +36,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
-rpm --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
-
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
-rpm --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %preun
 # Remove the MICROSOFT-METADATA-GPG-KEY
 gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
-rpm --erase gpg-pubkey-be1229cf-5631588c
 # Remove the MICROSOFT-RPM-GPG-KEY
 gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
-rpm --erase gpg-pubkey-3135ce90-5e6fda74
 
 %files
 %defattr(-,root,root,-)
@@ -58,8 +53,6 @@ rpm --erase gpg-pubkey-3135ce90-5e6fda74
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
 
 %changelog
-*   Fri Aug 14 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-10
--   Import GPG keys into rpm keyring.
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
