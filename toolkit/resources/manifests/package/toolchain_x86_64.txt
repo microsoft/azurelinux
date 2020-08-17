@@ -301,6 +301,8 @@ perl-Test-Warnings-0.028-3.cm1.noarch.rpm
 perl-Text-Template-1.51-2.cm1.noarch.rpm
 perl-XML-Parser-2.44-10.cm1.x86_64.rpm
 perl-XML-Parser-debuginfo-2.44-10.cm1.x86_64.rpm
+pinentry-1.1.0-3.cm1.x86_64.rpm
+pinentry-debuginfo-1.1.0-3.cm1.x86_64.rpm
 pkg-config-0.29.2-4.cm1.x86_64.rpm
 pkg-config-debuginfo-0.29.2-4.cm1.x86_64.rpm
 popt-1.16-7.cm1.x86_64.rpm

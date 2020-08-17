@@ -407,6 +407,7 @@ chroot_and_install_rpms libsolv
 chroot_and_install_rpms curl
 
 chroot_and_install_rpms gpgme
+build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf
 

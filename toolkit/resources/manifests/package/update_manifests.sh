@@ -68,7 +68,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
     sed -i '/libffi/d' $TmpPkgGen
-    sed -i '/libgpg-error/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
