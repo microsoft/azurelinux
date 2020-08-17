@@ -29,9 +29,10 @@ var (
 	existingRpmDir = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	tmpDir         = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").Required().String()
 
-	workertar     = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	repoFiles     = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
-	useUpdateRepo = app.Flag("use-update-repo", "Pull packages from the upstream update repo").Bool()
+	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
+	useUpdateRepo        = app.Flag("use-update-repo", "Pull packages from the upstream update repo").Bool()
+	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -55,8 +56,6 @@ func main() {
 		logger.Log.Fatal("input-graph must be provided if external-only is set.")
 	}
 
-	tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-
 	cloner := rpmrepocloner.New()
 	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *useUpdateRepo, *repoFiles)
 	if err != nil {
@@ -64,9 +63,12 @@ func main() {
 	}
 	defer cloner.Close()
 
-	err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-	if err != nil {
-		logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
+	if !*disableUpstreamRepos {
+		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
+		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
+		if err != nil {
+			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
+		}
 	}
 
 	if strings.TrimSpace(*inputSummaryFile) != "" {

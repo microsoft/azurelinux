@@ -34,6 +34,9 @@ Building
     - [`USE_UPDATE_REPO=...`](#use_update_repo)
       - [`USE_UPDATE_REPO=`**`y`**:*(default)*](#use_update_repoydefault)
       - [`USE_UPDATE_REPO=`**`n`**:](#use_update_repon)
+    - [`DISABLE_UPSTREAM_REPOS=...`](#disable_upstream_repos)
+      - [`DISABLE_UPSTREAM_REPOS=`**`n`**:*(default)*](#disable_upstream_reposndefault)
+      - [`DISABLE_UPSTREAM_REPOS=`**`y`**:](#disable_upstream_reposy)
     - [`REBUILD_PACKAGES=...`](#rebuild_packages)
       - [`REBUILD_PACKAGES=`**`y`**:*(default)*](#rebuild_packagesydefault)
       - [NOTE:](#note-1)
@@ -167,7 +170,7 @@ While `tdnf` uses a list of repo files:
 REPO_LIST ?=
 ```
 The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
-The CBL-Mariner base repo is implicitly provided, and an optional update repo is available by setting `USE_UPDATE_REPO=y`.
+The CBL-Mariner base repo is implicitly provided, and an optional update repo is available by setting `USE_UPDATE_REPO=y`. If `$(DISABLE_UPSTREAM_REPOS)` is set to `y`, any repo that is accessed through the network is disabled.
 
 ## Authentication
 If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
@@ -186,13 +189,14 @@ SRPM_URL           ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELE
 REPO_LIST          ?=
 ```
 ```makefile
-DOWNLOAD_SRPMS     ?= n
-REBUILD_TOOLCHAIN  ?= n
-REBUILD_PACKAGES   ?= y
-REBUILD_TOOLS      ?= n
-USE_UPDATE_REPO    ?= y
-TOOLCHAIN_ARCHIVE  ?=
-PACKAGE_ARCHIVE    ?=
+DOWNLOAD_SRPMS         ?= n
+REBUILD_TOOLCHAIN      ?= n
+REBUILD_PACKAGES       ?= y
+REBUILD_TOOLS          ?= n
+USE_UPDATE_REPO        ?= y
+DISABLE_UPSTREAM_REPOS ?= n
+TOOLCHAIN_ARCHIVE      ?=
+PACKAGE_ARCHIVE        ?=
 ```
 See [Local Build Variables](#local-build-variables) for details on what each variable does.
 
@@ -248,6 +252,12 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > Pull missing packages from the upstream update repository in addition to the base repository.
 #### `USE_UPDATE_REPO=`**`n`**:
 > Only pull missing packages from the upstream base repository.
+
+### `DISABLE_UPSTREAM_REPOS=...`
+#### `DISABLE_UPSTREAM_REPOS=`**`n`**:*(default)*
+> Pull packages from all set repositories, including external ones accessed through the network.
+#### `DISABLE_UPSTREAM_REPOS=`**`y`**:
+> Only pull missing packages from local repositories. This does not affect hydrating the toolchain from `$(PACKAGE_URL)` and `$(PACKAGE_UPDATE_URL)`.
 
 ### `REBUILD_PACKAGES=...`
 #### `REBUILD_PACKAGES=`**`y`**:*(default)*
@@ -384,6 +394,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_UPDATE_REPO               | y                                                                                                      | Pull missing packages from the upstream update repository in addition to the base repository?
+| DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL)` and `$(PACKAGE_UPDATE_URL)`.
+
 
 ---
 #### Remote Connections

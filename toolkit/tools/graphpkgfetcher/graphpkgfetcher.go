@@ -28,9 +28,10 @@ var (
 	existingRpmDir = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	tmpDir         = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
 
-	workertar     = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	repoFiles     = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
-	useUpdateRepo = app.Flag("use-update-repo", "Pull packages from the upstream update repo").Bool()
+	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
+	useUpdateRepo        = app.Flag("use-update-repo", "Pull packages from the upstream update repo").Bool()
+	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -55,7 +56,7 @@ func main() {
 	}
 
 	if hasUnresolvedNodes(dependencyGraph) {
-		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile)
+		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, *disableUpstreamRepos)
 		if err != nil {
 			logger.Log.Panicf("Failed to resolve graph. Error: %s", err)
 		}
@@ -81,9 +82,7 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
-func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string) (err error) {
-	tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-
+func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, disableUpstreamRepos bool) (err error) {
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *useUpdateRepo, *repoFiles)
@@ -93,9 +92,12 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	}
 	defer cloner.Close()
 
-	err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-	if err != nil {
-		logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
+	if !disableUpstreamRepos {
+		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
+		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
+		if err != nil {
+			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
+		}
 	}
 
 	if strings.TrimSpace(inputSummaryFile) == "" {
@@ -149,14 +151,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	desiredPackageList := []*pkgjson.PackageVer{desiredPackage}
 
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
-	// Some unresolved nodes are virtual file requirements (such as /usr/sbin/groupadd from shadow-utils).
-	// The spec file may not explicitly provide it, so we need to try finding a package which supplies the file.
-	if strings.HasPrefix(node.VersionedPkg.Name, "/") {
-		logger.Log.Debugf("Searching for a package which supplies %s", node.VersionedPkg.Name)
-		err = cloner.SearchAndClone(cloneDeps, desiredPackage)
-	} else {
-		err = cloner.Clone(cloneDeps, desiredPackageList...)
-	}
+	err = cloner.Clone(cloneDeps, desiredPackageList...)
 	if err != nil {
 		logger.Log.Errorf("Failed to clone %s from RPM repo. Error: %s", node, err)
 	} else {
