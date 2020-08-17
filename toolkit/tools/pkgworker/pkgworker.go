@@ -359,7 +359,7 @@ func removeLibArchivesFromSystem() (err error) {
 func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string) (srpmFileInChroot string, err error) {
 	const (
 		chrootRepoDestDir = "/etc/yum.repos.d"
-		chrootSrpmDestDir = "/home/root/SRPMS"
+		chrootSrpmDestDir = "/root/SRPMS"
 		rpmmacrosDest     = "/usr/lib/rpm/macros.d/macros.override"
 	)
 
