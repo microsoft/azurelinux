@@ -51,11 +51,6 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "PostInstallScripts":[
-                {
-                    "Path": "postinstallscripts/mariner/import-keys-patch.sh"
-                }
-            ],
             "Users": [
                 {
                     "Name": "root"

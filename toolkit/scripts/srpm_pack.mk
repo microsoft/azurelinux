@@ -44,9 +44,10 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
 		wget $(SRPM_URL)/$${srpm_file} \
 			-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
-			--no-verbose \
-			--certificate=$(TLS_CERT) \
-			--private-key=$(TLS_KEY) && \
+            --no-verbose \
+            $(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
+            $(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
+            && \
 		touch $(BUILD_SRPMS_DIR)/$${srpm_file}  || \
 			$(call print_error,Failed to download $${srpm_file}) ; \
 	done || $(call print_error,Loop in $@ failed) ; \
