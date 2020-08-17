@@ -357,7 +357,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 	// Disable all repos first so we can gradually enable them below.
 	// TDNF processes enable/disable repo requests in the order that they are passed.
-	// So if `--disablerepo=foo` and then `--enablerepo=foo` are pased, `foo` will be enabled.
+	// So if `--disablerepo=foo` and then `--enablerepo=foo` are passed, `foo` will be enabled.
 	baseArgs = append(baseArgs, "--disablerepo=*")
 
 	var enabledRepoArgs []string
@@ -378,7 +378,12 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		if !r.useUpdateRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
 		}
-		stdout, stderr, err := shell.Execute("tdnf", args...)
+
+		var (
+			stdout string
+			stderr string
+		)
+		stdout, stderr, err = shell.Execute("tdnf", args...)
 
 		logger.Log.Debugf("stdout: %s", stdout)
 		logger.Log.Debugf("stderr: %s", stderr)
