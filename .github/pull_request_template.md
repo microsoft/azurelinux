@@ -36,6 +36,7 @@ NO
 <!-- These should all be checked before merging a PR -->
 <!-- You can set them now ([x]) or set them later using the Github UI -->
 - [ ] The toolchain has been rebuilt successfully if any changes were made to it
+- [ ] The toolchain/worker package manifests have been updated if this is a toolchain package
 - [ ] Updated packages have been successfully built
 - [ ] New source files have updated hashes in the `*.signatures.json` files
 - [ ] Documentation has been updated to match any changes to the build system
