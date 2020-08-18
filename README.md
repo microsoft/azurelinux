@@ -13,7 +13,7 @@ When security vulnerabilities arise, CBL-Mariner supports both a package-based u
 
 # Getting Started with CBL-Mariner: 
 
-CBL-Mariner is not released for commercial use, but we understand developers may be interested to examine what we have built.  Instructions for building Mariner may be found here: [Toolkit Documentation](./toolkit/README.md)
+CBL-Mariner is not released for commercial use, but we understand developers may be interested to examine what we have built.  Instructions for building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md)
 
 # Acknowledgments 
 
@@ -26,3 +26,4 @@ Any Linux distribution, including CBL-Mariner, benefits from contributions by th
 3) [GNU](https://www.gnu.org/) and the [Free Software Foundation](https://www.fsf.org/)
 
 4) [Linux from Scratch](http://www.linuxfromscratch.org)
+
