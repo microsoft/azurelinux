@@ -1,21 +1,15 @@
-%global with_signed 0
 %define debug_package %{nil}
 %define __os_install_post %{nil}
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.02
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/grub
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz
-
-%if 0%{?with_signed}
-Source100:    grubx64.efi.%{version}-%{release}.signed
-Source101:    grubaa64.efi.%{version}-%{release}.signed
-%endif
 
 Patch0:     release-to-master.patch
 Patch1:     0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -141,15 +135,6 @@ Summary: GRUB UEFI image
 Group: System Environment/Base
 %description efi-binary
 GRUB UEFI bootloader binaries
-
-%if 0%{?with_signed}
-%package efi-binary-signed
-Summary: Production Signed GRUB UEFI image
-Group: System Environment/Base
-Requires:  %{name}-efi-binary = %{version}-%{release}
-%description efi-binary-signed
-GRUB UEFI image signed with the secure boot production key
-%endif
 
 %prep
 %setup -qn grub-%{version}
@@ -307,24 +292,12 @@ install -d $EFI_BOOT_DIR
 
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
-
-%if 0%{?with_signed}
-GRUB_MODULE_SOURCE=%{SOURCE100}
-%else
 GRUB_MODULE_SOURCE=%{buildroot}/usr/share/grub2-efi/grubx64.efi
-%endif
-
 %endif
 
 %ifarch aarch64
 GRUB_MODULE_NAME=grubaa64.efi
-
-%if 0%{?with_signed}
-GRUB_MODULE_SOURCE=%{SOURCE101}
-%else
 GRUB_MODULE_SOURCE=%{buildroot}/usr/share/grub2-efi/grubaa64.efi
-%endif
-
 %endif
 
 cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
@@ -370,10 +343,6 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 /boot/efi/EFI/BOOT/grubaa64.efi
 %endif
 
-%if 0%{?with_signed}
-%files efi-binary-signed
-%endif
-
 %ifarch aarch64
 %files efi
 %{_libdir}/grub/*
@@ -384,6 +353,8 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %{_datarootdir}/locale/*
 
 %changelog
+*   Thu Aug 13 2020 Chris Co <chrco@microsoft.com> 2.02-24
+-   Remove signed subpackage and macro
 *   Thu Jul 30 2020 Chris Co <chrco@microsoft.com> 2.02-23
 -   Fix CVE-2020-10713 (BootHole)
 -   Fix CVE-2020-14308
