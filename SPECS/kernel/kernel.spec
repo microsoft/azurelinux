@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.42
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -311,6 +311,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Mon Aug 17 2020 Chris Co <chrco@microsoft.com> 5.4.42-10
+-   Enable BPF, PC104, userfaultfd, SLUB sysfs, SMC, XDP sockets monitoring configs
 *   Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.4.42-9
 -   Add crashkernel=128M to the kernel cmdline
 -   Update config to support kexec and kexec_file_load
