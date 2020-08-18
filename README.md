@@ -17,11 +17,11 @@ CBL-Mariner is not released for commercial use, but we understand developers may
 
 # Acknowledgments 
 
-Any Linux distribution, including CBL-Mariner, benefits from countless contributions by the open software community. We gratefully acknowledge all contributions made from the community at large as well as the following: 
+Any Linux distribution, including CBL-Mariner, benefits from contributions by the open software community. We gratefully acknowledge all contributions made from the broader open source community, in particular:
 
-1) [VMWare](https://www.vmware.com/) and the developers of [Photon OS](https://vmware.github.io/photon/) as most of the CBL-Mariner SPEC files originated from the Photon distribution.   
+1) The [Photon OS Project](https://vmware.github.io/photon/) for SPEC files originating from the Photon distribution.   
 
-2) [The Fedora Project](https://start.fedoraproject.org/) for certain SPEC files, particularly with respect to QT, DNF and several of their dependencies. 
+2) [The Fedora Project](https://start.fedoraproject.org/) for SPEC files, particularly with respect to QT, DNF and several of their dependencies. 
 
 3) [GNU](https://www.gnu.org/) and the [Free Software Foundation](https://www.fsf.org/)
 
