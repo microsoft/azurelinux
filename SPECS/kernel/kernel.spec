@@ -1,9 +1,8 @@
-%global with_signed 0
 %global security_hardening none
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.42
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -12,10 +11,6 @@ Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-%if 0%{?with_signed}
-Source100:      vmlinuz-x86_64.%{version}-%{release}.signed
-Source101:      vmlinuz-aarch64.%{version}-%{release}.signed
-%endif
 Patch0:         e1000e-add-support-for-comet-lake.patch
 
 Patch1000:      CVE-2020-8992.nopatch
@@ -42,20 +37,11 @@ Requires(postun): coreutils
 %description
 The kernel package contains the Linux kernel.
 
-%if 0%{?with_signed}
-%package signed
-Summary:        Production-signed Linux Kernel
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-%description signed
-This package contains the Linux kernel package with kernel signed with the production key
-%endif
-
 %package devel
 Summary:        Kernel Dev
 Group:          System Environment/Kernel
 Obsoletes:      linux-dev
-Requires:       %{name} = %{version}-%{release}
+Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
 Requires:       python3 gawk
 %description devel
 This package contains the Linux kernel dev files
@@ -63,7 +49,7 @@ This package contains the Linux kernel dev files
 %package drivers-sound
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
+Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
 %description drivers-sound
 This package contains the Linux kernel sound support
 
@@ -78,7 +64,7 @@ This package contains the Linux kernel doc files
 %package oprofile
 Summary:        Kernel driver for oprofile, a statistical profiler for Linux systems
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
+Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
 %description oprofile
 Kernel driver for oprofile, a statistical profiler for Linux systems
 %endif
@@ -86,7 +72,7 @@ Kernel driver for oprofile, a statistical profiler for Linux systems
 %package tools
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
-Requires:       %{name} = %{version}
+Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
 Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
@@ -210,17 +196,6 @@ cp arch/arm64/kernel/module.lds %{buildroot}/usr/src/linux-headers-%{uname_r}/ar
 # Linux version that was affected is 4.4.26
 make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 
-# Incorporate signed kernel binaries if enabled
-%if 0%{?with_signed}
-%ifarch x86_64
-echo "Overwriting kernel binary with signed x86_64 kernel binary"
-cp %{SOURCE100} %{buildroot}/boot/vmlinuz-%{uname_r}
-%else
-echo "Overwriting kernel binary with signed aarch64 kernel binary"
-cp %{SOURCE101} %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
-%endif
-
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -269,10 +244,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 %endif
 
-%if 0%{?with_signed}
-%files signed
-%endif
-
 %files docs
 %defattr(-,root,root)
 %{_defaultdocdir}/linux-%{uname_r}/*
@@ -311,6 +282,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Tue Aug 18 2020 Chris Co <chrco@microsoft.com> 5.4.42-11
+-   Remove signed subpackage
 *   Mon Aug 17 2020 Chris Co <chrco@microsoft.com> 5.4.42-10
 -   Enable BPF, PC104, userfaultfd, SLUB sysfs, SMC, XDP sockets monitoring configs
 *   Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.4.42-9
