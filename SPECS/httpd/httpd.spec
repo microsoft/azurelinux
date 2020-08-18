@@ -1,6 +1,6 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.43
+Version:        2.4.46
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
+
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
@@ -19,6 +20,7 @@ BuildRequires:  apr-util-devel
 BuildRequires:  openldap
 BuildRequires:  expat-devel
 BuildRequires:  lua-devel
+
 Requires:       pcre
 Requires:       apr-util
 Requires:       openssl
@@ -26,6 +28,7 @@ Requires:       openldap
 Requires:       lua
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
+
 Provides:       apache2
 
 %define _confdir %{_sysconfdir}
@@ -182,6 +185,9 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+* Tue Aug 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-1
+- Updated to 2.4.46 to resolve CVE-2020-11984.
+
 * Tue May 19 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.43-1
 - Updated to 2.4.43 to resolve the following CVEs
 - CVE-2019-10081, CVE-2019-10082, CVE-2019-10092, CVE-2019-10097
