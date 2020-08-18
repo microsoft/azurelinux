@@ -2,8 +2,8 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 %global libdnf_major_version 0
-%global libdnf_minor_version 48
-%global libdnf_micro_version 0
+%global libdnf_minor_version 43
+%global libdnf_micro_version 1
 
 Name:           libdnf
 Version:        %{libdnf_major_version}.%{libdnf_minor_version}.%{libdnf_micro_version}
