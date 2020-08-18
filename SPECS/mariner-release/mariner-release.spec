@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       6%{?dist}
+Release:       7%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -25,17 +25,17 @@ echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}/etc/mariner-release
 echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}/etc/mariner-release
 
 cat > %{buildroot}/etc/lsb-release <<- "EOF"
-DISTRIB_ID="CBL-Mariner"
+DISTRIB_ID="Mariner"
 DISTRIB_RELEASE="%{mariner_release_version}"
-DISTRIB_CODENAME=CBL-Mariner
-DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
+DISTRIB_CODENAME=Mariner
+DISTRIB_DESCRIPTION="Mariner %{mariner_release_version}"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/usr/lib/os-release << EOF
-NAME="CBL-Mariner"
+NAME="Mariner"
 VERSION="%{mariner_release_version}"
-ID=CBL-Mariner
+ID=Mariner
 VERSION_ID=$version_id
 PRETTY_NAME="CBL-Mariner/Linux"
 ANSI_COLOR="1;34"
@@ -69,6 +69,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Tue Aug 18 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-7
+-   Restoring correct Name, Distribution Name, CodeName and ID.
 *   Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-6
 -   Updating distribution name.
 *   Wed Jul 29 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
