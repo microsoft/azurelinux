@@ -92,6 +92,12 @@ $(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIS
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
 $(CACHED_RPMS_DIR)/%: ;
 
+ifeq ($(DISABLE_UPSTREAM_REPOS),y)
+graphpkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
+else
+graphpkgfetcher_disable_upstream_repos_flag :=
+endif
+
 ifeq ($(USE_UPDATE_REPO),y)
 graphpkgfetcher_update_repo_flag := --use-update-repo
 else
@@ -110,6 +116,7 @@ $(cached_file): $(optimized_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkgge
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
 		$(graphpkgfetcher_update_repo_flag) \
+		$(graphpkgfetcher_disable_upstream_repos_flag) \
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \

@@ -27,6 +27,7 @@ DOWNLOAD_SRPMS                  ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
 USE_UPDATE_REPO                 ?= y
+DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
 TOOLCHAIN_ARCHIVE               ?=
 TOOLCHAIN_SOURCES_ARCHIVE       ?=
