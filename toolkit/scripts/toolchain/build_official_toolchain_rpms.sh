@@ -356,8 +356,9 @@ build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
-# libxslt needs libxml2
+# libxslt needs libxml2, libgcrypt
 chroot_and_install_rpms libxml2
+chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
 # docbook-style-xsl needs pam
@@ -385,14 +386,13 @@ build_rpm_in_chroot_no_install libassuan
 build_rpm_in_chroot_no_install npth
 build_rpm_in_chroot_no_install libksba
 
-# gnupg2 requires zlib, bzip2, readline, npth, libassuan, libksba, libgcrypt
+# gnupg2 requires zlib, bzip2, readline, npth, libassuan, libksba
 chroot_and_install_rpms zlib
 chroot_and_install_rpms bzip2
 chroot_and_install_rpms readline
 chroot_and_install_rpms npth
 chroot_and_install_rpms libassuan
 chroot_and_install_rpms libksba
-chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install gnupg2
 build_rpm_in_chroot_no_install swig
 
