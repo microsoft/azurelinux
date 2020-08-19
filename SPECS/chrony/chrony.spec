@@ -50,10 +50,6 @@ It can synchronise the system clock with NTP servers, reference clocks
 can also operate as an NTPv4 (RFC 5905) server and peer to provide a time
 service to other computers in the network.
 
-%if 0%{!?vendorzone:1}
-%global vendorzone %(source /etc/os-release && echo ${ID}.)
-%endif
-
 %prep
 %{gpgverify} --keyring=%{SOURCE2} --signature=%{SOURCE1} --data=%{SOURCE0}
 
@@ -71,17 +67,20 @@ md5sum -c <<-EOF | (! grep -v 'OK$')
         b23bcc3bd78e195ca2849459e459f3ed  examples/chronyd.service
 EOF
 
-# don't allow packaging without vendor zone
-test -n "%{vendorzone}"
-
 # use example chrony.conf as the default config with some modifications:
-# - use our vendor zone (2.*pool.ntp.org names include IPv6 addresses)
+# - use Windows NTP server (time.windows.com) instead of a pool
 # - enable leapsectz to get TAI-UTC offset and leap seconds from tzdata
 # - enable keyfile
-sed -e 's|^\(pool \)\(pool.ntp.org\)|\12.%{vendorzone}\2|' \
+sed -e 's|^pool.*|server time.windows.com|' \
     -e 's|#\(leapsectz\)|\1|' \
     -e 's|#\(keyfile\)|\1|' \
         < examples/chrony.conf.example2 > chrony.conf
+
+cat >> chrony.conf << EOF
+
+# Setting larger 'maxdistance' to tolerate time.windows.com delay
+maxdistance 16.0
+EOF
 
 touch -r examples/chrony.conf.example2 chrony.conf
 
@@ -194,6 +193,7 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 - License verified.
 - Removed workaround for 'chrony' < 3.3-2.
 - Removed build-time dependency on 'pps-tools-devel'.
+- Using Windows NTP server instead of pool in the default config.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
