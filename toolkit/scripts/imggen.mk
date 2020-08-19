@@ -67,6 +67,18 @@ $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(de
 		--input=$(CONFIG_FILE) && \
 	touch $@
 
+
+ifeq ($(DISABLE_UPSTREAM_REPOS),y)
+imagepkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
+else
+imagepkgfetcher_disable_upstream_repos_flag :=
+endif
+
+ifeq ($(USE_UPDATE_REPO),y)
+imagepkgfetcher_update_repo_flag := --use-update-repo
+else
+imagepkgfetcher_update_repo_flag :=
+endif
 $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(packagelist_files) $(RPMS_DIR) $(imggen_rpms)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
@@ -80,6 +92,8 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(imagefetcher_local_repo) $(imagefetcher_cloned_repo) $(REPO_LIST),--repo-file="$(repo)" ) \
+		$(imagepkgfetcher_update_repo_flag) \
+		$(imagepkgfetcher_disable_upstream_repos_flag) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
 		--output-dir=$(local_and_external_rpm_cache)
@@ -122,11 +136,6 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--log-file $(LOGS_DIR)/imggen/roast.log \
 		--image-tag=$(IMAGE_TAG)
 
-ifeq ($(USE_UPDATE_REPO),y)
-imagepkgfetcher_update_repo_flag := --use-update-repo
-else
-imagepkgfetcher_update_repo_flag :=
-endif
 $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
@@ -143,6 +152,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(imagefetcher_local_repo) $(imagefetcher_cloned_repo) $(REPO_LIST),--repo-file="$(repo)" ) \
 		$(imagepkgfetcher_update_repo_flag) \
+		$(imagepkgfetcher_disable_upstream_repos_flag) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
 		--output-dir=$(external_rpm_cache)

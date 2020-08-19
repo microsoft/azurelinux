@@ -2,7 +2,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 %global libdnf_major_version 0
-%global libdnf_minor_version 39
+%global libdnf_minor_version 43
 %global libdnf_micro_version 1
 
 Name:           libdnf
@@ -176,6 +176,9 @@ popd
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Mon Aug 17 2020 Emre Girgin <mrgirgin@microsoft.com> 0.43.1-1
+- Updating to version 0.43.1.
+
 * Mon May 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.39.1-1
 - Updating to version 0.39.1.
 

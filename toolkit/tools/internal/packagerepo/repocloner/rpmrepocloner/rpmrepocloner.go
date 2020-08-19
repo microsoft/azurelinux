@@ -24,7 +24,8 @@ const (
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
-	updateRepoIDPrefix     = "mariner-official-update*"
+	updateRepoID           = "mariner-official-update"
+	fetcherRepoID          = "fetcher-cloned-repo"
 )
 
 var (
@@ -228,67 +229,18 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 	})
 }
 
-// SearchAndClone attempts to find a package which supplies the requested file or package. It
-// wraps Clone() to acquire the requested package once found.
-func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkgjson.PackageVer) (err error) {
-	var (
-		pkgName string
-		stderr  string
-	)
-
-	err = r.chroot.Run(func() (err error) {
-		args := []string{
-			"provides",
-			singlePackageToClone.Name,
-		}
-
-		if !r.useUpdateRepo {
-			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoIDPrefix))
-		}
-
-		stdout, stderr, err := shell.Execute("tdnf", args...)
-		logger.Log.Debugf("tdnf search for dependency '%s':\n%s", singlePackageToClone.Name, stdout)
-
-		if err != nil {
-			logger.Log.Errorf("Failed to lookup dependency '%s', tdnf error: '%s'", singlePackageToClone.Name, stderr)
-			return
-		}
-
-		splitStdout := strings.Split(stdout, "\n")
-		for _, line := range splitStdout {
-			matches := packageLookupNameMatchRegex.FindStringSubmatch(line)
-			if len(matches) == 0 {
-				continue
-			}
-			// Local sources are listed last, keep searching for the last possible match
-			pkgName = matches[1]
-			logger.Log.Debugf("'%s' is available from package '%s'", singlePackageToClone.Name, pkgName)
-		}
-		return
-	})
-
-	if err != nil {
-		logger.Log.Error(stderr)
-		return
-	}
-
-	logger.Log.Warnf("Translated '%s' to package '%s'", singlePackageToClone.Name, pkgName)
-
-	err = r.Clone(cloneDeps, &pkgjson.PackageVer{Name: pkgName})
-	return
-}
-
 // Clone clones the provided list of packages.
 // If cloneDeps is set, package dependencies will also be cloned.
+// It will automatically resolve packages that describe a provide or file from a package.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (err error) {
 	const (
-		unresolvedOutputPrefix  = "No package"
-		toyboxConflictsPrefix   = "toybox conflicts"
-		unresolvedOutputPostfix = "available"
-
 		strictComparisonOperator          = "="
 		lessThanOrEqualComparisonOperator = "<="
 		versionSuffixFormat               = "-%s"
+
+		builtRepoID  = "local-repo"
+		cachedRepoID = "upstream-cache-repo"
+		allRepoIDs   = "*"
 	)
 
 	for _, pkg := range packagesToClone {
@@ -301,55 +253,24 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 			builder.WriteString(fmt.Sprintf(versionSuffixFormat, pkg.Version))
 		}
 
+		pkgName := builder.String()
+		logger.Log.Debugf("Cloning: %s", pkgName)
+		args := []string{
+			"--destdir",
+			chrootDownloadDir,
+			pkgName,
+		}
+
+		if cloneDeps {
+			args = append([]string{"download", "--alldeps"}, args...)
+		} else {
+			args = append([]string{"download-nodeps"}, args...)
+		}
+
 		err = r.chroot.Run(func() (err error) {
-			args := []string{
-				"--destdir",
-				chrootDownloadDir,
-				builder.String(),
-			}
-
-			if !r.useUpdateRepo {
-				args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoIDPrefix))
-			}
-
-			if cloneDeps {
-				args = append([]string{"download", "--alldeps"}, args...)
-			} else {
-				args = append([]string{"download-nodeps"}, args...)
-			}
-
-			stdout, stderr, err := shell.Execute("tdnf", args...)
-
-			logger.Log.Debugf("stdout: %s", stdout)
-			logger.Log.Debugf("stderr: %s", stderr)
-
-			if err != nil {
-				logger.Log.Errorf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
-			}
-
-			// ============== TDNF SPECIFIC IMPLEMENTATION ==============
-			// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
-			// it will not error. Instead it will print a message to stdout. Check for this message.
-			//
-			// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
-			// it will still download N-1 packages while also printing the message.
-			splitStdout := strings.Split(stdout, "\n")
-			for _, line := range splitStdout {
-				trimmedLine := strings.TrimSpace(line)
-				// Toybox conflicts are a known issue, reset the err value if encountered
-				if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
-					logger.Log.Warn("Ignoring known toybox conflict")
-					err = nil
-					continue
-				}
-				// If a package was not available, update err
-				if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-					err = fmt.Errorf(trimmedLine)
-					break
-				}
-			}
-
-			return
+			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+			repoOrderList := []string{builtRepoID, cachedRepoID, allRepoIDs}
+			return r.clonePackage(args, repoOrderList...)
 		})
 
 		if err != nil {
@@ -375,8 +296,6 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 
 // ClonedRepoContents returns the packages contained in the cloned repository.
 func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoContents, err error) {
-	const fetcherRepoID = "fetcher-cloned-repo"
-
 	repoContents = &repocloner.RepoContents{}
 	onStdout := func(args ...interface{}) {
 		if len(args) == 0 {
@@ -421,4 +340,84 @@ func (r *RpmRepoCloner) CloneDirectory() string {
 // Close closes the given RpmRepoCloner.
 func (r *RpmRepoCloner) Close() error {
 	return r.chroot.Close(leaveChrootFilesOnDisk)
+}
+
+// clonePackage clones a given package using prepopulated arguments.
+// It will gradually enable more repos to consider using enabledRepoOrder until the package is found.
+func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...string) (err error) {
+	const (
+		unresolvedOutputPrefix  = "No package"
+		toyboxConflictsPrefix   = "toybox conflicts"
+		unresolvedOutputPostfix = "available"
+	)
+
+	if len(enabledRepoOrder) == 0 {
+		return fmt.Errorf("enabledRepoOrder cannot be empty")
+	}
+
+	// Disable all repos first so we can gradually enable them below.
+	// TDNF processes enable/disable repo requests in the order that they are passed.
+	// So if `--disablerepo=foo` and then `--enablerepo=foo` are passed, `foo` will be enabled.
+	baseArgs = append(baseArgs, "--disablerepo=*")
+
+	var enabledRepoArgs []string
+	for _, repoID := range enabledRepoOrder {
+		logger.Log.Debugf("Enabling repo ID: %s", repoID)
+		// Gradually increase the scope of allowed repos. Keep repos already considered enabled
+		// as packages from one repo may depend on another.
+		// e.g. packages in upstream update repo may require packages in upstream base repo.
+		enabledRepoArgs = append(enabledRepoArgs, fmt.Sprintf("--enablerepo=%s", repoID))
+		args := append(baseArgs, enabledRepoArgs...)
+
+		// Do not enable the fetcher's own repo as it is only used for listing cloned files
+		// and will not been initialized until ConvertDownloadedPackagesIntoRepo is called on it
+		// when all cloning is complete.
+		args = append(args, fmt.Sprintf("--disablerepo=%s", fetcherRepoID))
+
+		// Explicitly disable the update repo if it is turned off.
+		if !r.useUpdateRepo {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
+		}
+
+		var (
+			stdout string
+			stderr string
+		)
+		stdout, stderr, err = shell.Execute("tdnf", args...)
+
+		logger.Log.Debugf("stdout: %s", stdout)
+		logger.Log.Debugf("stderr: %s", stderr)
+
+		if err != nil {
+			logger.Log.Errorf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
+		}
+
+		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
+		// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
+		// it will not error. Instead it will print a message to stdout. Check for this message.
+		//
+		// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
+		// it will still download N-1 packages while also printing the message.
+		splitStdout := strings.Split(stdout, "\n")
+		for _, line := range splitStdout {
+			trimmedLine := strings.TrimSpace(line)
+			// Toybox conflicts are a known issue, reset the err value if encountered
+			if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
+				logger.Log.Warn("Ignoring known toybox conflict")
+				err = nil
+				continue
+			}
+			// If a package was not available, update err
+			if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
+				err = fmt.Errorf(trimmedLine)
+				break
+			}
+		}
+
+		if err == nil {
+			break
+		}
+	}
+
+	return
 }

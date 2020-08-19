@@ -46,7 +46,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/libffi-d/d' $TmpPkgGen
     sed -i '/p11-kit-d/d' $TmpPkgGen
     sed -i '/p11-kit-server/d' $TmpPkgGen
-    sed -i '/check/d' $TmpPkgGen
+    sed -i '/^check/d' $TmpPkgGen
     sed -i '/cmake/d' $TmpPkgGen
     sed -i '/cracklib/d' $TmpPkgGen
     sed -i '/createrepo_c-devel/d' $TmpPkgGen
@@ -67,7 +67,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
-    sed -i '/libffi/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
@@ -162,6 +161,15 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^krb5-" >> $1
     cat $TmpPkgGen | grep "^lua-" >> $1
     cat $TmpPkgGen | grep "^mariner-rpm-macros-" >> $1
+    cat $TmpPkgGen | grep "^mariner-check-" >> $1
+    cat $TmpPkgGen | grep "^libassuan-" >> $1
+    cat $TmpPkgGen | grep "^libgpg-error-" >> $1
+    cat $TmpPkgGen | grep "^libksba-" >> $1
+    cat $TmpPkgGen | grep "^npth-" >> $1
+    cat $TmpPkgGen | grep "^pinentry-" >> $1
+    cat $TmpPkgGen | grep "^gnupg2-" >> $1
+    cat $TmpPkgGen | grep "^gpgme-" >> $1
+    cat $TmpPkgGen | grep "^mariner-repos-" >> $1
     cat $TmpPkgGen | grep "^libffi-" >> $1
     cat $TmpPkgGen | grep "^libtasn1-" >> $1
     cat $TmpPkgGen | grep "^p11-kit-" >> $1
