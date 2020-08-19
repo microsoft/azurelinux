@@ -281,6 +281,56 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	return
 }
 
+// SearchAndClone attempts to find a package which supplies the requested file or package. It
+// wraps Clone() to acquire the requested package once found.
+func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkgjson.PackageVer) (err error) {
+	var (
+		pkgName string
+		stderr  string
+	)
+
+	err = r.chroot.Run(func() (err error) {
+		args := []string{
+			"provides",
+			singlePackageToClone.Name,
+		}
+
+		if !r.useUpdateRepo {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
+		}
+
+		stdout, stderr, err := shell.Execute("tdnf", args...)
+		logger.Log.Debugf("tdnf search for dependency '%s':\n%s", singlePackageToClone.Name, stdout)
+
+		if err != nil {
+			logger.Log.Errorf("Failed to lookup dependency '%s', tdnf error: '%s'", singlePackageToClone.Name, stderr)
+			return
+		}
+
+		splitStdout := strings.Split(stdout, "\n")
+		for _, line := range splitStdout {
+			matches := packageLookupNameMatchRegex.FindStringSubmatch(line)
+			if len(matches) == 0 {
+				continue
+			}
+			// Local sources are listed last, keep searching for the last possible match
+			pkgName = matches[1]
+			logger.Log.Debugf("'%s' is available from package '%s'", singlePackageToClone.Name, pkgName)
+		}
+		return
+	})
+
+	if err != nil {
+		logger.Log.Error(stderr)
+		return
+	}
+
+	logger.Log.Warnf("Translated '%s' to package '%s'", singlePackageToClone.Name, pkgName)
+
+	err = r.Clone(cloneDeps, &pkgjson.PackageVer{Name: pkgName})
+	return
+}
+
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 	fullRpmDownloadDir := buildpipeline.GetRpmsDir(r.chroot.RootDir(), chrootDownloadDir)
