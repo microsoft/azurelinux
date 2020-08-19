@@ -29,12 +29,10 @@ BuildRequires:  libseccomp-devel
 
 BuildRequires:  bison
 BuildRequires:  gcc
-BuildRequires:  gcc-c++
 BuildRequires:  gnupg2
 BuildRequires:  libcap-devel
 BuildRequires:  libedit-devel
 BuildRequires:  nettle-devel
-BuildRequires:  pps-tools-devel
 BuildRequires:  systemd
 
 Requires(pre):  shadow-utils
@@ -196,6 +194,7 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
 - Removed workaround for 'chrony' < 3.3-2.
+- Removed build-time dependency on 'pps-tools-devel'.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
