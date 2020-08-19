@@ -151,7 +151,14 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	desiredPackageList := []*pkgjson.PackageVer{desiredPackage}
 
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
-	err = cloner.Clone(cloneDeps, desiredPackageList...)
+	// Some unresolved nodes are virtual file requirements (such as /usr/sbin/groupadd from shadow-utils).
+	// The spec file may not explicitly provide it, so we need to try finding a package which supplies the file.
+	if strings.HasPrefix(node.VersionedPkg.Name, "/") {
+		logger.Log.Debugf("Searching for a package which supplies %s", node.VersionedPkg.Name)
+		err = cloner.SearchAndClone(cloneDeps, desiredPackage)
+	} else {
+		err = cloner.Clone(cloneDeps, desiredPackageList...)
+	}
 	if err != nil {
 		logger.Log.Errorf("Failed to clone %s from RPM repo. Error: %s", node, err)
 	} else {
