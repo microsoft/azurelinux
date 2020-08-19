@@ -2,7 +2,7 @@
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.4.42
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -80,5 +80,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+*   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.42-12
+-   Update release number
 *   Tue Aug 18 2020 Chris Co <chrco@microsoft.com> 5.4.42-11
 -   Original version
