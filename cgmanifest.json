@@ -364,16 +364,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bzr",
-          "version": "2.7.0",
-          "downloadUrl": "https://launchpad.net/bzr/2.7/2.7.0/+download/bzr-2.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ca-certificates",
           "version": "20200720",
           "downloadUrl": "https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt"
