@@ -47,9 +47,14 @@ rm -f ${chroot_log}
 mkdir -p ${chroot_builder_folder}
 mkdir -p ${log_path}
 
+ORIGINAL_HOME=$HOME
+HOME=/root
+
 while read package; do
     install_one_toolchain_rpm ${package}
 done < ${packages}
+
+HOME=$ORIGINAL_HOME
 
 # In case of Docker based build do not add the below folders into chroot tarball 
 # otherwise safechroot will fail to "untar" the tarball

@@ -69,6 +69,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
+    sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
@@ -167,6 +168,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^mariner-check-" >> $1
     cat $TmpPkgGen | grep "^libassuan-" >> $1
     cat $TmpPkgGen | grep "^libgpg-error-" >> $1
+    cat $TmpPkgGen | grep "^libgcrypt-" >> $1
     cat $TmpPkgGen | grep "^libksba-" >> $1
     cat $TmpPkgGen | grep "^npth-" >> $1
     cat $TmpPkgGen | grep "^pinentry-" >> $1
