@@ -62,16 +62,19 @@ remove_packages_for_pkggen_core () {
     sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
+    sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/gtest/d' $TmpPkgGen
     sed -i '/kbd/d' $TmpPkgGen
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
+    sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
+    sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-[0-9]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-D/d' $TmpPkgGen
