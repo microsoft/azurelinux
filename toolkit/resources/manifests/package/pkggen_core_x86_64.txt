@@ -135,6 +135,7 @@ curl-libs-7.68.0-1.cm1.x86_64.rpm
 tdnf-2.1.0-4.cm1.x86_64.rpm
 tdnf-cli-libs-2.1.0-4.cm1.x86_64.rpm
 tdnf-devel-2.1.0-4.cm1.x86_64.rpm
+tdnf-plugin-repogpgcheck-2.1.0-4.cm1.x86_64.rpm
 createrepo_c-0.11.1-6.cm1.x86_64.rpm
 libxml2-2.9.10-1.cm1.x86_64.rpm
 libxml2-devel-2.9.10-1.cm1.x86_64.rpm
@@ -146,6 +147,13 @@ krb5-1.17-3.cm1.x86_64.rpm
 lua-5.3.5-6.cm1.x86_64.rpm
 mariner-rpm-macros-1.0-3.cm1.noarch.rpm
 mariner-check-macros-1.0-3.cm1.noarch.rpm
+libassuan-2.5.1-3.cm1.x86_64.rpm
+libgpg-error-1.32-4.cm1.x86_64.rpm
+libksba-1.3.5-3.cm1.x86_64.rpm
+npth-1.6-3.cm1.x86_64.rpm
+pinentry-1.1.0-3.cm1.x86_64.rpm
+gnupg2-2.2.20-3.cm1.x86_64.rpm
+gpgme-1.13.1-4.cm1.x86_64.rpm
 mariner-repos-1.0-9.cm1.noarch.rpm
 libffi-3.2.1-10.cm1.x86_64.rpm
 libtasn1-4.14-2.cm1.x86_64.rpm
