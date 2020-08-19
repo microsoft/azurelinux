@@ -25,13 +25,12 @@ Patch2:         chrony-service-helper.patch
 # fix test suite to work with newer clknetsim
 Patch3:         chrony-packettest.patch
 
-BuildRequires:  libseccomp-devel
-
 BuildRequires:  bison
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libcap-devel
 BuildRequires:  libedit-devel
+BuildRequires:  libseccomp-devel
 BuildRequires:  nettle-devel
 BuildRequires:  systemd
 
