@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.42
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -41,7 +41,7 @@ The kernel package contains the Linux kernel.
 Summary:        Kernel Dev
 Group:          System Environment/Kernel
 Obsoletes:      linux-dev
-Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3 gawk
 %description devel
 This package contains the Linux kernel dev files
@@ -49,7 +49,7 @@ This package contains the Linux kernel dev files
 %package drivers-sound
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
-Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
+Requires:       %{name} = %{version}-%{release}
 %description drivers-sound
 This package contains the Linux kernel sound support
 
@@ -64,7 +64,7 @@ This package contains the Linux kernel doc files
 %package oprofile
 Summary:        Kernel driver for oprofile, a statistical profiler for Linux systems
 Group:          System Environment/Kernel
-Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
+Requires:       %{name} = %{version}-%{release}
 %description oprofile
 Kernel driver for oprofile, a statistical profiler for Linux systems
 %endif
@@ -72,7 +72,7 @@ Kernel driver for oprofile, a statistical profiler for Linux systems
 %package tools
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
-Requires:       (%{name} = %{version}-%{release} or kernel-signed-x64 = %{version}-%{release} or kernel-signed-aarch64 = %{version}-%{release})
+Requires:       %{name} = %{version}-%{release}
 Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
@@ -282,6 +282,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.42-12
+-   Remove the signed package depends
 *   Tue Aug 18 2020 Chris Co <chrco@microsoft.com> 5.4.42-11
 -   Remove signed subpackage
 *   Mon Aug 17 2020 Chris Co <chrco@microsoft.com> 5.4.42-10
