@@ -37,6 +37,9 @@ BuildRequires:  systemd
 Requires(pre):  shadow-utils
 %{?systemd_requires}
 
+# The 'chrony.helper' script requires the 'dig' command from 'bind-utils'.
+Requires:       bind-utils
+
 # Old NetworkManager expects the dispatcher scripts in a different place
 Conflicts:      NetworkManager < 1.20
 
@@ -194,6 +197,7 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 - Removed workaround for 'chrony' < 3.3-2.
 - Removed build-time dependency on 'pps-tools-devel'.
 - Using Windows NTP server instead of pool in the default config.
+- Adding a dependency on 'bind-utils' since we need the 'dig' command.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
