@@ -122,9 +122,9 @@ gnupg2-2.2.20-3.cm1.aarch64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
 gperf-debuginfo-3.1-3.cm1.aarch64.rpm
-gpgme-1.13.1-4.cm1.aarch64.rpm
-gpgme-debuginfo-1.13.1-4.cm1.aarch64.rpm
-gpgme-devel-1.13.1-4.cm1.aarch64.rpm
+gpgme-1.13.1-5.cm1.aarch64.rpm
+gpgme-debuginfo-1.13.1-5.cm1.aarch64.rpm
+gpgme-devel-1.13.1-5.cm1.aarch64.rpm
 grep-3.1-3.cm1.aarch64.rpm
 grep-debuginfo-3.1-3.cm1.aarch64.rpm
 grep-lang-3.1-3.cm1.aarch64.rpm

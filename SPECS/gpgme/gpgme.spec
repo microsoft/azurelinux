@@ -3,7 +3,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.13.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ or LGPLv2+
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Group:          System Environment/Security
@@ -84,6 +84,7 @@ make check
 %{_datadir}/common-lisp/source/gpgme/*
 %{_includedir}/*.h
 %{_libdir}/*.so*
+%exclude %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/%{name}*.pc
 
 %files -n python3-gpg
@@ -98,10 +99,12 @@ make check
 %{python_sitearch}/gpg/
 
 %changelog
+*   Thu Aug 20 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.1-5
+-   Resolve file conflicts for shared objects.
 *   Wed May 13 2020 Emre Girgin <mrgirgin@microsoft.com> 1.13.1-4
 -   Add python-gpg subpackage.
-* Sat May 09 00:21:33 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.13.1-3
-- Added %%license line automatically
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.13.1-3
+-   Added %%license line automatically
 *   Tue Apr 21 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.13.1-2
 -   Use gnupg2 for Requires and BR.
 *   Fri Apr 17 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.13.1-1
