@@ -1,0 +1,29 @@
+name: Check Manifests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Check Manifests
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Check x86_64 manifests
+      run: |
+        pushd toolkit
+        make check-x86_64-manifests
+        popd
+
+    - name: Check aarch64 manifests
+      run: |
+        pushd toolkit
+        make check-aarch64-manifests
+        popd
+      if: always()
