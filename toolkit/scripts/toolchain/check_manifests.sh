@@ -12,8 +12,8 @@ write_rpms_from_spec () {
     # $1 = spec file
     # $2 = file to save to
 
-    exlusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --qf="%{EXCLUSIVEARCH}" --srpm 2>/dev/null)
-    if [ "$exlusiveArch" != "(none)" -a "$exlusiveArch" != "$ARCH" ]; then
+    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --qf="%{EXCLUSIVEARCH}" --srpm 2>/dev/null)
+    if [ "$exclusiveArch" != "(none)" -a "$exclusiveArch" != "$ARCH" ]; then
         return 0
     fi
 
@@ -24,8 +24,8 @@ write_rpms_from_spec () {
     do
         echo "$rpm.rpm" >> $2
 
-        # debuginfo packages are generated dynamically, and so will not be returned by rpmspec.
-        # Create a superset manifest that assumes every package will have a debuginfo version.
+        # Since we cannot know if a debuginfo package is generated at check time, we are appending it unilaterally to the file.
+        # The consequence of this action yields a manifest file that is a superset of the real manifest file.
         debuginfo_pkg=$(sed "0,/-$version/s//-debuginfo-$version/" <<< $rpm)
         echo "$debuginfo_pkg.rpm" >> $2
     done
