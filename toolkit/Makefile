@@ -126,7 +126,7 @@ all: toolchain go-tools chroot-tools
 include $(SCRIPTS_DIR)/utils.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
-#	toolchain, raw-toolchain, clean-toolchain
+#	toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
 # go utilities with:
