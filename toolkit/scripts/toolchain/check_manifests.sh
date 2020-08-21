@@ -77,7 +77,7 @@ if [[ -s $pkggen_diff_file ]]; then
     echo ""
 fi
 
-if [[ -s $manifest_diff_file || -s $pkggen_diff_file ]]; then
+if [[ -s $toolchain_diff_file || -s $pkggen_diff_file ]]; then
     echo "$ARCH manifests do not match toolchain specs!"
     exit 1
 else
