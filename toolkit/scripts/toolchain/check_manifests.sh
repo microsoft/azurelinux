@@ -20,7 +20,6 @@ write_rpms_from_spec () {
     version=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --qf="%{VERSION}" --srpm 2>/dev/null)
     rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --target=$ARCH 2>/dev/null)
 
-    rpms=""
     for rpm in $rpmWithoutExtension
     do
         echo "$rpm.rpm" >> $2
