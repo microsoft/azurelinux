@@ -9,6 +9,7 @@ Feel free to delete sections of the template which do not apply to your PR, or a
 - [ ] The toolchain has been rebuilt successfully (or no changes were made to it)
 - [ ] The toolchain/worker package manifests are up-to-date
 - [ ] Any updated packages successfully build (or no packages were changed)
+- [ ] All package sources are available
 - [ ] All source files have up-to-date hashes in the `*.signatures.json` files
 - [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
 - [ ] Documentation has been updated to match any changes to the build system
