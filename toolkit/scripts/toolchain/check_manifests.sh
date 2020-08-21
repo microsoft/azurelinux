@@ -57,13 +57,13 @@ write_rpms_from_toolchain $generated_manifest
 toolchain_file="$MANIFESTS_DIR/toolchain_$ARCH.txt"
 pkggen_core_file="$MANIFESTS_DIR/pkggen_core_$ARCH.txt"
 
-manifest_diff_file=$(mktemp)
-diff_manifest $generated_manifest $toolchain_file $manifest_diff_file
-if [[ -s $manifest_diff_file ]]; then
+toolchain_diff_file=$(mktemp)
+diff_manifest $generated_manifest $toolchain_file $toolchain_diff_file
+if [[ -s $toolchain_diff_file ]]; then
     echo ""
     echo "$(basename $toolchain_file)"
     echo "============================="
-    echo "$(cat $manifest_diff_file)"
+    echo "$(cat $toolchain_diff_file)"
     echo ""
 fi
 
