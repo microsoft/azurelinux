@@ -2,7 +2,7 @@
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
 Version:        5.4.51
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -27,6 +27,10 @@ Source1:        vmlinuz-%{version}-%{release}
 ExclusiveArch:  x86_64
 
 BuildRequires:  cpio
+Requires:       filesystem
+Requires:       kmod
+Requires(post): coreutils
+Requires(postun): coreutils
 
 Conflicts:      kernel
 
@@ -80,6 +84,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+*   Tue Aug 25 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
+-   Add missing requires
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
 -   Update source to 5.4.51
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.42-12
