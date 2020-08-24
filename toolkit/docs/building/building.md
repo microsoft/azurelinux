@@ -2,11 +2,11 @@ Building
 ===
 - [Building](#building)
 - [Quick Start](#quick-start)
-  - [Toolkit](#toolkit)
   - [Prerequisites](#prerequisites)
-  - [Images](#images)
-  - [ISOs](#isos)
-      - [NOTE:](#note)
+  - [Build Tools](#build-toolkit)
+  - [Build Packages](#build-packages)
+  - [Build Images](#build-images)
+  - [Build ISOs](#build-isos)   
   - [Packages](#packages)
     - [Working on Packages](#working-on-packages)
       - [Force Rebuilds](#force-rebuilds)
@@ -65,22 +65,28 @@ Building
 
 Quick Start
 ===
-## Toolkit
-The toolkit comes as an archive containing pre-compiled go tools, go sources, static resources, default configuration files, and documentation.
-
-By default all build commands are executed from inside the `./toolkit` folder.
-
-A full list of targets and options is available [here](#all-build-targets) and [here](#all-build-variables).
-```bash
-cd ~/my/workspace
-tar -xzf ~/toolkit.tar.gz
-cd ./toolkit
-```
 
 ## Prerequisites
 Install prerequisites [here](prerequisites.md).
 
-## Images
+## Build Tools
+By default all build commands are executed from inside the `./toolkit` folder.  A set of GO Based Tools and a Toolchain must be built before building Mariner Packages and Images.
+
+```bash
+cd ~/git/CBL-Mariner/toolkit
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y
+```
+
+NOTE: A full list of targets and options to sudo make is available [here](#all-build-targets) and [here](#all-build-variables).
+
+## Build Packages
+Once the toolchain is built, all packages can be built with the toolchain.  Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of hyper-threads available on your system, or less)
+
+```bash
+sudo make build-packages -j8 REBUILD_TOOLS=n REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y DOWNLOAD_SRPMS=y CONFIG_FILE=
+```
+
+## Build Images
 Build the default image (`core-efi.json`) and create the `vhdx` specified in the config file while using prebuilt components where possible (i.e. download from Microsoft servers):
 ```bash
 # Build out/images/core-efi/core-efi.vhdx image from remote components
@@ -105,12 +111,11 @@ ISO installers can be built with:
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json
 ```
 To create an unattended ISO installer (no interactable UI):
-```bash
+````bash
 # Build out/images/developer_iso/*.iso from remote components with unattended installer
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json UNATTENDED_INSTALLER=y
-```
-#### NOTE:
-ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).
+````
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).
 
 ## Packages
 The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current config will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
