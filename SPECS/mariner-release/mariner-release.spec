@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       7%{?dist}
+Release:       8%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -69,6 +69,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Tue Aug 24 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-8
+-   Changing CBL-Mariner ID from "Mariner" to "mariner" to conform to standard.
 *   Tue Aug 18 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-7
 -   Restoring correct Name, Distribution Name, CodeName and ID.
 *   Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-6
