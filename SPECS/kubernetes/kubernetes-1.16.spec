@@ -17,7 +17,7 @@ URL:            https://github.com/kubernetes
 Source0:        %{name}-%{version}.tar.gz
 #Source1:       %{url}-retired/contrib/archive/0.7.0.tar.gz
 # This is NOT the source from the project page linked above. Its name is identical to the official version
-# but the signature is different. To be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.
+# but the signature is different.
 Source1:        contrib-0.7.0.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
