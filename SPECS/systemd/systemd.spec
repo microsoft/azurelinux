@@ -1,7 +1,7 @@
 Summary:          Systemd-239
 Name:             systemd
 Version:          239
-Release:          30%{?dist}
+Release:          31%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -153,6 +153,7 @@ sed -i '/srv/d' %{buildroot}/usr/lib/tmpfiles.d/home.conf
 sed -i "s:0775 root lock:0755 root root:g" %{buildroot}/usr/lib/tmpfiles.d/legacy.conf
 sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}/lib/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}/etc/systemd/resolved.conf
+sed -i "s:#NTP=:NTP=time.windows.com:g" %{buildroot}/etc/systemd/timesyncd.conf
 rm -f %{buildroot}%{_var}/log/README
 mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
 mkdir -p %{buildroot}%{_localstatedir}/log
@@ -270,6 +271,8 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+*  Mon Aug 24 2020 Leandro Pereira <leperei@microsoft.com> 239-31
+-  Use time.windows.com as the default NTP server in timesyncd.
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30
 -  Reduce kptr_restrict to 1
 *  Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-29
