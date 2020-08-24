@@ -4,13 +4,13 @@ componentName:  mariner
 welcomeStyleCalamares:   false
 
 strings:
-    productName:         "@{NAME}"
-    shortProductName:    "@{NAME}"
+    productName:         "CBL-Mariner"
+    shortProductName:    "CBL-Mariner"
     version:             "@{VERSION}"
     shortVersion:        "@{VERSION_ID}"
-    versionedName:       "@{NAME} @{VERSION_ID}"
-    shortVersionedName:  "@{NAME} @{VERSION_ID}"
-    bootloaderEntryName: "@{NAME}"
+    versionedName:       "CBL-Mariner @{VERSION_ID}"
+    shortVersionedName:  "CBL-Mariner @{VERSION_ID}"
+    bootloaderEntryName: "CBL-Mariner"
 
 welcomeExpandingLogo:   true
 
