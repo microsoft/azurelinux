@@ -35,7 +35,7 @@ version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head 
 cat > %{buildroot}/usr/lib/os-release << EOF
 NAME="Mariner"
 VERSION="%{mariner_release_version}"
-ID=Mariner
+ID=mariner
 VERSION_ID=$version_id
 PRETTY_NAME="CBL-Mariner/Linux"
 ANSI_COLOR="1;34"
