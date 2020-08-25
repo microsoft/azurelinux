@@ -1,0 +1,67 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Check for bad go formatting
+      run: |
+        pushd toolkit
+        sudo make go-fmt-all
+        changes=$(git diff *.go)
+        if [ -n "$changes" ]; then
+          echo Unformatted go files!
+          git diff *.go
+          exit 1
+        fi
+
+    - name: Check for out of date go modules
+      run: |
+        pushd toolkit
+        sudo make go-mod-tidy
+        modchanges=$(git diff tools/go.mod)
+        sumchanges=$(git diff tools/go.sum)
+        if [ -n "$modchanges$sumchanges" ]; then
+          echo Module files out of date!
+          git diff tools/go.mod
+          git diff tools/go.sum
+          exit 1
+        fi
+
+    - name: Check for missing tests
+      run: |
+        pushd toolkit
+        noTestCount=$(sudo make go-test-coverage | grep "no test files" | wc -l)
+        if [ "$noTestCount" -ne "0" ]; then
+          sudo make go-test-coverage | grep "no test files"
+          echo Missing $noTestCount Go Tests!
+        fi
+    
+    - name: Evaluate test coverage
+      run: |
+        pushd toolkit
+        sudo make go-test-coverage
+    
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v2.1.4
+      with:
+        name: TestCoverage
+        path: toolkit/out/tools/test_coverage_report.html
