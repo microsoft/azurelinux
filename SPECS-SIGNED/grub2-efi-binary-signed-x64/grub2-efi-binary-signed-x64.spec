@@ -44,4 +44,4 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
 * Thu Aug 13 2020 Chris Co <chrco@microsoft.com> 2.02-24
-- Original version
+- Original version for CBL-Mariner.
