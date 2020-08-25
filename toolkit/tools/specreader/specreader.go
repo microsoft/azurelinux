@@ -131,7 +131,6 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 	const (
 		emptyQueryFormat      = ""
 		queryProvidedPackages = `srpm %{NAME}-%{VERSION}-%{RELEASE}.src.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
-		queryExclusiveArch    = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
 	)
 
 	var (
@@ -161,14 +160,7 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 		return
 	}
 
-	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	results, err = rpm.QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, rpm.QueryHeaderArgument)
-	if err != nil {
-		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
-		return
-	}
-
-	if !specArchMatchesBuild(results) {
+	if !specArchMatchesBuild(specfile, sourcedir, emptyQueryFormat, defines) {
 		logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
 		return
 	}
@@ -380,14 +372,24 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 }
 
 // specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
-func specArchMatchesBuild(exclusiveArchList []string) (shouldBeBuilt bool) {
+func specArchMatchesBuild(specfile, sourcedir, queryformat string, defines map[string]string, extraArgs ...string) (shouldBeBuilt bool) {
+	const (
+		queryExclusiveArch = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
+		noExclusiveArch    = "(none)"
+	)
+
 	const (
 		MachineArchField   = iota
 		ExclusiveArchField = iota
 		MinimumFieldsCount = iota
 	)
 
-	const noExclusiveArch = "(none)"
+	// Sanity check that this SPEC is meant to be built for the current machine architecture
+	exclusiveArchList, err := rpm.QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, rpm.QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
 
 	if len(exclusiveArchList) < MinimumFieldsCount {
 		logger.Log.Warnf("The query for spec architecture did not return enough lines!")
