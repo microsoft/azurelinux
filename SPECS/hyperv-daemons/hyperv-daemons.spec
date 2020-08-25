@@ -231,7 +231,7 @@ fi
 
 %changelog
 * Tue Jun 16 2020 Paul Monson <paulmon@microsoft.com> 5.4.42-1
-- Initial version from Fedora 32 (license: MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Update to match version 5.4.42 of the kernel.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0-0.32.20190303git

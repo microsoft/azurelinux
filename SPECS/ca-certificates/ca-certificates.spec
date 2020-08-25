@@ -394,7 +394,7 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 - Reordering (Build)Requires to increase clarity.
 
 * Tue May 26 2020 Paul Monson <paulmon@microsoft.com> - 2020.4.28-3
-- Initial CBL-Mariner version from Fedora 27
+- Initial CBL-Mariner import from Fedora 27 (license: MIT).
 - License verified.
 - Updated Mozilla certdata.txt to latest version from the "FIREFOX_76_0_RELEASE" release.
 - Added a '-base` sub package with certificates allowing for verification of the packages repository.
