@@ -7,8 +7,6 @@ URL: http://waterlan.home.xs4all.nl/dos2unix.html
 Source: http://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: gettext
-# perl modules, required for tests
-# BuildRequires: perl-Test-Harness perl-Test-Simple
 Provides: unix2dos = %{version}-%{release}
 Obsoletes: unix2dos < 5.1-1
 
@@ -29,9 +27,6 @@ make DESTDIR=$RPM_BUILD_ROOT install
 rm -rf $RPM_BUILD_ROOT%{_docdir}
 
 %find_lang %{name} --with-man --all-name
-
-%check
-make test
 
 %files -f %{name}.lang
 %doc man/man1/dos2unix.htm  ChangeLog.txt COPYING.txt
