@@ -83,8 +83,8 @@ NOTE: A full list of targets and options to sudo make is available [here](#all-b
 Once the toolchain is built, all packages can be built with the toolchain.  Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of hyper-threads available on your system, or less)
 
 ```bash
-# Still from the toolkit folder, copy the toolchain archive from the previous step into the toolkit folder
-mv ../build/toolchain/toolchain_built_rpms_all.tar.gz
+# Still from the toolkit folder, copy the toolchain archive built in the previous step into the toolkit folder
+mv ../build/toolchain/toolchain_built_rpms_all.tar.gz .
 
 # Build ALL packages
 sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8"
