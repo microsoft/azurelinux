@@ -54,7 +54,7 @@ make
 
 %changelog
 * Wed May 20 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.6-2
-- Initial import from Fedora 26 (license: MIT).
+- Initial CBL-Mariner import from Fedora 26 (license: MIT).
 - Changed package name from 'hardening-wrapper'.
 
 * Fri Jun 16 2017 Björn Esser <besser82@fedoraproject.org> - 2.6-1
