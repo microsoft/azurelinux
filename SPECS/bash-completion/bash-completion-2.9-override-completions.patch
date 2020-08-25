@@ -1,0 +1,35 @@
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -121,6 +121,31 @@ A. No. Use `M-/` to (in the words of the bash man page) attempt file
+ A. Put them in `~/.bash_completion`, which is parsed at the end of the
+    main completion script. See also the next question.
+ 
++**Q. How can I override a completion shipped by bash-completion?**
++
++A. Install a local completion of your own appropriately for the desired
++   command, and it will take precedence over the one shipped by us. See the
++   next answer for details where to install it, if you are doing it on per
++   user basis. If you want to do it system wide, you can install eagerly
++   loaded files in `compatdir` (see a couple of questions further down for
++   more info) and install a completion for the commands to override
++   completions shipped by us.
++
++   If you want to use bash's default completion instead of one of ours,
++   something like this should work (where `$cmd` is the command to override
++   completion for): `complete -o default -o bashdefault $cmd`
++
++**Q. Where should I install my own local completions?**
++
++A. Put them in the `completions` subdir of `$BASH_COMPLETION_USER_DIR`
++   (defaults to `$XDG_DATA_HOME/bash-completion` or
++    `~/.local/share/bash-completion`
++   if `$XDG_DATA_HOME` is not set) to have them loaded on demand.
++   See also the next question's answer for considerations for these
++   files' names, they apply here as well. Alternatively, you can write
++   them directly in `~/.bash_completion` which is loaded eagerly by
++   our main script.
++
+ **Q. I author/maintain package X and would like to maintain my own
+    completion code for this package. Where should I put it to be sure
+    that interactive bash shells will find it and source it?**

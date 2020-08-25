@@ -1,0 +1,12 @@
+diff -up bash-completion-1.99/bash_completion~ bash-completion-1.99/bash_completion
+--- bash-completion-1.99/bash_completion~	2012-01-08 01:03:46.000000000 +0200
++++ bash-completion-1.99/bash_completion	2012-01-08 13:50:33.412012530 +0200
+@@ -45,7 +45,7 @@ readonly BASH_COMPLETION_COMPAT_DIR
+ 
+ # Blacklisted completions, causing problems with our code.
+ #
+-_blacklist_glob='@(acroread.sh)'
++_blacklist_glob='@()' 
+ 
+ # Turn on extended globbing and programmable completion
+ shopt -s extglob progcomp
