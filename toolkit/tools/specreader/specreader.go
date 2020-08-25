@@ -131,6 +131,7 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 	const (
 		emptyQueryFormat      = ""
 		queryProvidedPackages = `srpm %{NAME}-%{VERSION}-%{RELEASE}.src.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
+		queryExclusiveArch    = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
 	)
 
 	var (
@@ -157,6 +158,18 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 	_, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, defines)
 	if err != nil {
 		logger.Log.Warnf(`rpmspec could not parse %s`, specfile)
+		return
+	}
+
+	// Sanity check that this SPEC is meant to be built for the current machine architecture
+	results, err = rpm.QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, rpm.QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
+
+	if !specArchMatchesBuild(results) {
+		logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
 		return
 	}
 
@@ -361,6 +374,29 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 			continue
 		}
 		filteredPkgVers = append(filteredPkgVers, req)
+	}
+
+	return
+}
+
+// specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
+func specArchMatchesBuild(exclusiveArchList []string) (shouldBeBuilt bool) {
+	const (
+		MachineArchField   = iota
+		ExclusiveArchField = iota
+		MinimumFieldsCount = iota
+	)
+
+	const noExclusiveArch = "(none)"
+
+	if len(exclusiveArchList) < MinimumFieldsCount {
+		logger.Log.Warnf("The query for spec architecture did not return enough lines!")
+		return
+	}
+
+	if exclusiveArchList[ExclusiveArchField] == noExclusiveArch ||
+		exclusiveArchList[ExclusiveArchField] == exclusiveArchList[MachineArchField] {
+		shouldBeBuilt = true
 	}
 
 	return
