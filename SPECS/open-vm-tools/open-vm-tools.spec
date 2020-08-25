@@ -348,7 +348,7 @@ fi
 - Rename input file for run-vmblock\x2dfuse.mount to avoid problems with backslash in the name.
 
 * Wed Aug 05 2020 Mateusz Malisz <mamalisz@microsoft.com> 11.1.0-3
-- Initial CBL-Mariner import from Fedora 32 (License: MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 
 * Sun Jun 21 2020 Ravindra Kumar <ravindrakumar@vmware.com> - 11.1.0-2
 - Added sdmp-fixes.patch from upstream to remove net-tools dependency

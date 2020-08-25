@@ -335,7 +335,7 @@ done
 - Update configuration to fit CBL-Mariner naming and kernel configuration
 - Remove PPC/s390x parts.
 * Wed Aug 05 2020 Mateusz Malisz <mamalisz@microsoft.com> 2.0.20-15
-- Initial CBL-Mariner drop from Fedora33
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 * Wed Jul 1 2020 Kairui Song <kasong@redhat.com> - 2.0.20-14
 - s390x: enable the kexec file load by default
 - x86_64: enable the kexec file load by default
