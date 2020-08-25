@@ -7,6 +7,8 @@ Building
   - [Build Packages](#build-packages)
   - [Build Images](#build-images)
   - [Build ISOs](#build-isos)   
+- [Further Reading](#further-reading)
+  - [ISOs](#isos)
   - [Packages](#packages)
     - [Working on Packages](#working-on-packages)
       - [Force Rebuilds](#force-rebuilds)
@@ -86,29 +88,34 @@ Once the toolchain is built, all packages can be built with the toolchain.  Larg
 # Still from the toolkit folder, copy the toolchain archive built in the previous step into the toolkit folder
 mv ../build/toolchain/toolchain_built_rpms_all.tar.gz .
 
-# Build ALL packages
-sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8"
+# Build ALL packages FOR AMD64
+sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+
+# Build ALL packages FOR ARM64
+sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
 ```
 
 ## Build Images
-Build the default image (`core-efi.json`) and create the `vhdx` specified in the config file while using prebuilt components where possible (i.e. download from Microsoft servers):
+Different images can be produced from the build system.  All images are generated in the out/images folder.
+
 ```bash
 # Still from the toolkit folder
-# Build out/images/core-efi/core-efi.vhdx image from remote components
-sudo make image
-```
-Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow:
-```bash
-# Run the build in parallel using one thread per CPU core.
-sudo make image -j$(nproc)
+
+# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
+
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner ISO Image (ISO folder: ../out/images/full)
+sudo make iso CONFIG_FILE=./imageconfigs/full.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json TOOLCHAIN_ARCHIVE=./toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
 ```
 
-Build a different image using prebuilt components:
-```bash
-# Build out/images/config/config.* image from remote components
-sudo make image CONFIG_FILE="/path/to/my/config.json" -j$(nproc)
-```
-
+# Further Reading
 ## ISOs
 ISO installers can be built with:
 ```bash
