@@ -14,6 +14,10 @@
 %define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
 %define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
 
+# List of packages triggering legacy certs generation if 'ca-certificates-legacy'
+# is installed.
+%global watched_pkgs %{name}, %{name}-base
+
 # Rebuilding cert bundles with source certificates.
 %global refresh_bundles \
 %{_bindir}/ca-legacy install\
@@ -36,7 +40,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -62,8 +66,9 @@ Source17:       README.edk2
 Source18:       README.src
 Source19:       pem2bundle.sh
 Source20:       LICENSE
-
 Source21:       certdata.base.txt
+Source22:       bundle2pem.sh
+
 BuildArch:      noarch
 
 BuildRequires:      asciidoc
@@ -127,11 +132,21 @@ Requires:           %{name}-shared = %{version}-%{release}
 Summary:  Cert generation tools.
 Group:    System Environment/Security
 
-Requires:           p11-kit-trust >= 0.23.10
-Requires:           p11-kit >= 0.23.10
+Requires: p11-kit-trust >= 0.23.10
+Requires: p11-kit >= 0.23.10
 
 %description tools
 Set of scripts to generate certificates out of a certdata.txt file.
+
+%package legacy
+Summary:  Support for legacy certificates configuration.
+Group:    System Environment/Security
+
+Requires: %{name}-shared = %{version}-%{release}
+
+%description legacy
+Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
+pairs under /etc/pki/tls/certs.
 
 %prep -q
 rm -rf %{name}
@@ -240,6 +255,8 @@ install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/update-ca-trust
 
 install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/ca-legacy
 
+install -p -m 755 %{SOURCE22} $RPM_BUILD_ROOT%{_bindir}/bundle2pem.sh
+
 # touch ghosted files that will be extracted dynamically
 # Set chmod 444 to use identical permission
 touch $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/tls-ca-bundle.pem
@@ -287,6 +304,12 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 
 %postun base
 %refresh_bundles
+
+%triggerin -n %{name}-legacy -- %{watched_pkgs}
+%{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
+
+%triggerpostun -n %{name}-legacy -- %{watched_pkgs}
+%{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
 %clean
 
@@ -368,7 +391,17 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 %{_mandir}/man8/update-ca-trust.8.gz
 %{_mandir}/man8/ca-legacy.8.gz
 
+%files legacy
+%{_bindir}/bundle2pem.sh
+
+# single PEM-encoded certs and symbolic links.
+%ghost %{pkidir}/tls/certs/*.0
+%ghost %{pkidir}/tls/certs/*.pem
+
 %changelog
+* Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5
+- Adding 'ca-certificates-legacy' to support apps, which only work with
+  a single cert per *.pem file.
 * Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-4
 - Updating base certificates to current intermediate CAs.
 - Re-assigning ownership of legacy bundles from '*-shared' to subpackages creating them.
