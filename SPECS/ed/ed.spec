@@ -55,6 +55,6 @@ make  %{?_smp_mflags} check
 -   Delete invalid ed-devel package
 -   Delete unused sha1
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.2-2
--   Initial CBL-Mariner import from Photon (license: dual Apache2/GPL2).
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Thu Sep 27 2018 Sujay G <gsujay@vmware.com> 1.14.2-1
 -   Initial build.
