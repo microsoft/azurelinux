@@ -160,7 +160,7 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 		return
 	}
 
-	if !specArchMatchesBuild(specfile, sourcedir, emptyQueryFormat, defines) {
+	if !specArchMatchesBuild(specfile, sourcedir, defines) {
 		logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
 		return
 	}
@@ -372,7 +372,7 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 }
 
 // specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
-func specArchMatchesBuild(specfile, sourcedir, queryformat string, defines map[string]string) (shouldBeBuilt bool) {
+func specArchMatchesBuild(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool) {
 	const (
 		queryExclusiveArch = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
 		noExclusiveArch    = "(none)"
