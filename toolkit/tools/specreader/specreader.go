@@ -372,7 +372,7 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 }
 
 // specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
-func specArchMatchesBuild(specfile, sourcedir, queryformat string, defines map[string]string, extraArgs ...string) (shouldBeBuilt bool) {
+func specArchMatchesBuild(specfile, sourcedir, queryformat string, defines map[string]string) (shouldBeBuilt bool) {
 	const (
 		queryExclusiveArch = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
 		noExclusiveArch    = "(none)"
