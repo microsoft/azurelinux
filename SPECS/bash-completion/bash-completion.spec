@@ -78,7 +78,7 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 2.7-1
 - Version update to 2.7. License verified.
 * Wed Oct 9 2019 Andrew Phelps <anphel@microsoft.com> 2.5-1
-- Initial version bringup for CBL-Mariner.
+- Initial CBL-Mariner import from OpenMamba
 * Tue Feb 07 2017 Automatic Build System <autodist@mambasoft.it> 2.5-1mamba
 - automatic version update by autodist
 * Wed Sep 07 2016 Automatic Build System <autodist@mambasoft.it> 2.4-1mamba
