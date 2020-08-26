@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 # Best effort validation of the package cgmanifest. It will check, for each spec file passed, that:
 #
