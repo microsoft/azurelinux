@@ -28,12 +28,12 @@ cat > %{buildroot}/etc/lsb-release <<- "EOF"
 DISTRIB_ID="Mariner"
 DISTRIB_RELEASE="%{mariner_release_version}"
 DISTRIB_CODENAME=Mariner
-DISTRIB_DESCRIPTION="Mariner %{mariner_release_version}"
+DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/usr/lib/os-release << EOF
-NAME="Mariner"
+NAME="Common Base Linux Mariner"
 VERSION="%{mariner_release_version}"
 ID=mariner
 VERSION_ID=$version_id
