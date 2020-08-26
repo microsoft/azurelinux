@@ -17,9 +17,9 @@ In addition to the certificates, the `ca-certificates-tools` package provides to
 
 ## Certificate locations
 
-The directory /etc/pki/ca-trust/source/ contains CA certificates and 
+The directory /etc/pki/ca-trust/source/ contains CA certificates and
 trust settings in the PEM file format. The trust settings found here will be
-interpreted with a high priority - higher than the ones found in 
+interpreted with a high priority - higher than the ones found in
 /usr/share/pki/ca-trust-source/.
 
 QUICK HELP: To add a certificate in the simple PEM or DER file formats to the list of CAs trusted on the system:
