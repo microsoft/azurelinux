@@ -305,6 +305,16 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 %postun base
 %refresh_bundles
 
+%postun legacy
+# During build time it is unknown what files will get created by the
+# 'legacy' subpackage's triggers, so we cannot inform RPM to delete
+# them for us through the '%%files' section and the '%%ghost' macro.
+rm -f %{pkidir}/tls/certs/*.{0,pem}
+
+# If the 'legacy' subpackage is installed, we need to always refresh the
+# single PEM-encoded certificates every time a certificate bundle gets modified.
+# The cert bundle gets modified whenever one of the packages from %{watched_pkgs}
+# get installed, removed, or updated.
 %triggerin -n %{name}-legacy -- %{watched_pkgs}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
@@ -393,10 +403,6 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/
 
 %files legacy
 %{_bindir}/bundle2pem.sh
-
-# single PEM-encoded certs and symbolic links.
-%ghost %{pkidir}/tls/certs/*.0
-%ghost %{pkidir}/tls/certs/*.pem
 
 %changelog
 * Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5

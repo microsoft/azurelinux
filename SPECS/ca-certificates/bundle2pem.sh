@@ -8,9 +8,12 @@ then
     error 1
 fi
 
-PREFIX="temp_cert"
+TARGET_DIR="$( cd "$(dirname "$1")" >/dev/null 2>&1 ; pwd -P )"
+BUNDLE_NAME="$(basename "$1")"
 
-pushd $(dirname $1)
+pushd "$(mktemp -d)"
+
+echo "-----EXTRACTING SINGLE CERTS FROM BUNDLE-----"
 
 # Splitting bundle into separate files with following content each:
 #
@@ -18,17 +21,21 @@ pushd $(dirname $1)
 # -----BEGIN CERTIFICATE-----
 # [Base64 certificate data]
 # -----END CERTIFICATE-----
-csplit --elide-empty-files --prefix "$PREFIX" --suffix "%d.pem" $1 '/^#/' '{*}'
+csplit --quiet --elide-empty-files --prefix "" --suffix "%d.pem" "$TARGET_DIR/$BUNDLE_NAME" '/^#/' '{*}'
 
-for pem_file in $PREFIX*
+for pem_file in *.pem
 do
-    echo "Working on $pem_file"
-
     HASH=$(openssl x509 -noout -hash -inform PEM -in $pem_file)
     PEM_FILE_NAME=$HASH.pem
 
     mv $pem_file $PEM_FILE_NAME
     ln -s $PEM_FILE_NAME $HASH.0
 done
+
+echo "-----REMOVING PREVIOUS SINGLE CERTS-----"
+rm -f "$TARGET_DIR"/*.{0,pem}
+
+echo "-----INSTALLING EXTRACTED SINGLE CERTS-----"
+mv *.{0,pem} "$TARGET_DIR"
 
 popd
