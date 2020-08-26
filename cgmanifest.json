@@ -1465,8 +1465,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1725,8 +1725,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1735,8 +1735,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1745,8 +1745,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
