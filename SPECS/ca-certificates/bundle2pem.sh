@@ -11,10 +11,10 @@ then
     error 1
 fi
 
-TARGET_DIR="$( cd "$(dirname "$1")" >/dev/null 2>&1 ; pwd -P )"
+TARGET_DIR="$( cd "$(dirname "$1")" > /dev/null 2>&1 ; pwd -P )"
 BUNDLE_NAME="$(basename "$1")"
 
-pushd "$(mktemp -d)"
+pushd "$(mktemp -d)" > /dev/null
 
 echo "-----EXTRACTING SINGLE CERTS FROM BUNDLE-----"
 
@@ -31,8 +31,13 @@ do
     HASH=$(openssl x509 -noout -hash -inform PEM -in $pem_file)
     PEM_FILE_NAME=$HASH.pem
 
-    mv $pem_file $PEM_FILE_NAME
-    ln -s $PEM_FILE_NAME $HASH.0
+    if [ -f $PEM_FILE_NAME ]
+    then
+        echo "SKIPPING '$(head -n 1 $pem_file | tr -d '# ')' - the same as '$(head -n 1 $PEM_FILE_NAME | tr -d '# ')'"
+    else
+        mv $pem_file $PEM_FILE_NAME
+        ln -s $PEM_FILE_NAME $HASH.0
+    fi
 done
 
 echo "-----REMOVING PREVIOUS SINGLE CERTS-----"
@@ -41,4 +46,4 @@ rm -f "$TARGET_DIR"/*.{0,pem}
 echo "-----INSTALLING EXTRACTED SINGLE CERTS-----"
 mv *.{0,pem} "$TARGET_DIR"
 
-popd
+popd > /dev/null
