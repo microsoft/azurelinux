@@ -44,4 +44,4 @@ install -D -m 0744 /usr/share/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/bo
 * Thu Jul 30 2020 Chris Co <chrco@microsoft.com> 15-2
 - Update aarch64 source binary path
 * Wed Jul 29 2020 Chris Co <chrco@microsoft.com> 15-1
-- Original version
+- Original version for CBL-Mariner.

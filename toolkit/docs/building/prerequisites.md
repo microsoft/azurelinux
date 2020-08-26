@@ -9,7 +9,7 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 
 # Install required dependencies.
-sudo apt -y install make tar wget curl rpm qemu-utils golang-1.13-go
+sudo apt -y install make tar wget curl rpm qemu-utils golang-1.13-go genisoimage
 
 # Recommended but not required: `pigz` for faster compression operations.
 sudo apt -y install pigz

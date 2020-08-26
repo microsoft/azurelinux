@@ -83,4 +83,4 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.42-12
 -   Update release number
 *   Tue Aug 18 2020 Chris Co <chrco@microsoft.com> 5.4.42-11
--   Original version
+-   Original version for CBL-Mariner.
