@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/topo"
@@ -309,7 +310,10 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 		dependencyNodes = append(dependencyNodes, g.Node(id).(*pkggraph.PkgNode).This)
 	}
 
-	g.AddMetaNode(trimmedCycle, dependencyNodes)
+	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
+
+	// Enable cycle detection between meta nodes within the same spec file
+	metaNode.SrpmPath = specFile
 
 	return
 }
@@ -317,36 +321,37 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 // validateGraph makes sure the graph is a directed acyclic graph (DAG)
 func validateGraph(g *pkggraph.PkgGraph) (err error) {
 	cycles := topo.DirectedCyclesIn(g)
+
 	// Try to fix the cycles if we can before reporting them
-	if len(cycles) > 0 {
+	// Keep track of which cycles we've failed to fix
+	unfixableCycleCount := 0
+	for len(cycles) > 0 {
 		for _, cycle := range cycles {
 			// Convert our list to pkggraph.PkgNodes
 			pkgCycle := make([]*pkggraph.PkgNode, 0, len(cycle))
 			for _, node := range cycle {
 				pkgCycle = append(pkgCycle, node.(*pkggraph.PkgNode).This)
 			}
+
 			err = fixCycle(g, pkgCycle)
 			if err != nil {
-				// Just print the error, still valuable to list all existing cycles.
-				logger.Log.Errorf("Failed to resolve dependency cycle: '%s'", err)
+				var cycleStringBuilder strings.Builder
+				fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
+				for _, node := range pkgCycle[1:] {
+					fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+				}
+				logger.Log.Errorf("Unfixable circular dependency found %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
+				unfixableCycleCount++
 			}
 		}
-	}
 
-	// Make sure the fixups worked, otherwise report the failure
-	cycles = topo.DirectedCyclesIn(g)
-	if len(cycles) > 0 {
-		for idx, cycle := range cycles {
-			firstNode := cycle[0].(*pkggraph.PkgNode)
-			cycleString := fmt.Sprintf("{%s}", firstNode.FriendlyName())
-			for _, node := range cycle[1:] {
-				pkgNode := node.(*pkggraph.PkgNode)
-				cycleString = fmt.Sprintf("%s --> {%s}", cycleString, pkgNode.FriendlyName())
-			}
-
-			logger.Log.Errorf("Unfixable circular dependency found %d:    %s", idx, cycleString)
+		if unfixableCycleCount > 0 {
+			err = fmt.Errorf("cycles detected in dependency graph")
+			return err
 		}
-		err = fmt.Errorf("cycles detected in dependency graph")
+
+		// Recalculate the list of cycles
+		cycles = topo.DirectedCyclesIn(g)
 	}
 	return
 }
