@@ -1845,8 +1845,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.16.10",
-          "downloadUrl": "https://github.com/kubernetes/kubernetes/archive/v1.16.10.tar.gz"
+          "version": "1.16.14",
+          "downloadUrl": "https://github.com/kubernetes/kubernetes/archive/v1.16.14.tar.gz"
         }
       }
     },
