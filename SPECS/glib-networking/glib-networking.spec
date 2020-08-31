@@ -1,13 +1,15 @@
 Summary:        Glib networking modules
 Name:           glib-networking
 Version:        2.59.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ with exceptions
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/%{name}-%{version}.tar.xz
+
+Patch0:         CVE-2020-13645.patch
 
 BuildRequires:	nettle-devel
 BuildRequires:	autogen-libopts-devel
@@ -38,6 +40,7 @@ These are the additional language files of glib-networking.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 mkdir build &&
@@ -69,8 +72,10 @@ ninja test
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.59.1-5
-- Added %%license line automatically, updated license line
+*   Tue Aug 18 2020 Henry Beberman <hebeberm@microsoft.com> - 2.59.1-6
+-   Backport patch for CVE-2020-13645
+*   Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.59.1-5
+-   Added %%license line automatically, updated license line
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.59.1-4
 -   Removing *Requires for "ca-certificates".
 *   Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 2.59.1-3
