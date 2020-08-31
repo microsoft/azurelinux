@@ -35,7 +35,7 @@ toolchain_rpms_noarch := $(shell grep noarch $(toolchain_manifest))
 $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(populated_toolchain_chroot))
 
-.PHONY: raw-toolchain toolchain clean-toolchain
+.PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
 
@@ -58,6 +58,27 @@ clean-toolchain-rpms:
 copy-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do cp -vf $(toolchain_rpms_dir)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
 	for f in $(toolchain_rpms_noarch); do cp -vf $(toolchain_rpms_dir)/noarch/$$f $(RPMS_DIR)/noarch; done
+
+
+# check that the manifest files only contain RPMs that could have been generated from toolchain specs.
+check-manifests: check-x86_64-manifests check-aarch64-manifests
+
+check-aarch64-manifests:
+	cd $(SCRIPTS_DIR)/toolchain && \
+		./check_manifests.sh \
+			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(SPECS_DIR) \
+			$(TOOLCHAIN_MANIFESTS_DIR) \
+			$(DIST_TAG) \
+			aarch64
+check-x86_64-manifests:
+	cd $(SCRIPTS_DIR)/toolchain && \
+		./check_manifests.sh \
+			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(SPECS_DIR) \
+			$(TOOLCHAIN_MANIFESTS_DIR) \
+			$(DIST_TAG) \
+			x86_64
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
