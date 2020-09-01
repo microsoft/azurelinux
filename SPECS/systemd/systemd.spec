@@ -1,7 +1,7 @@
 Summary:          Systemd-239
 Name:             systemd
 Version:          239
-Release:          31%{?dist}
+Release:          32%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -59,9 +59,9 @@ BuildRequires:    docbook-dtd-xml
 BuildRequires:    glib-devel
 BuildRequires:    meson
 BuildRequires:    gettext
-BuildRequires:    shadow-utils
 BuildRequires:    libgcrypt-devel
 BuildRequires:    cryptsetup-devel
+BuildRequires:    libselinux-devel
 
 %description
 Systemd is an init replacement with better process control and security
@@ -137,6 +137,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbussystemservicedir=%{_prefix}/share/dbus-1/system-services \
        -Dsysvinit-path=/etc/rc.d/init.d                               \
        -Drc-local=/etc/rc.d/rc.local                                  \
+       -Dselinux=true                                                 \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -271,6 +272,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+*  Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 239-32
+-  Enable SELinux support
+-  Remove unused BuildRequires shadow-utils
 *  Mon Aug 24 2020 Leandro Pereira <leperei@microsoft.com> 239-31
 -  Use time.windows.com as the default NTP server in timesyncd.
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30

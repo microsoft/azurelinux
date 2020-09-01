@@ -1,7 +1,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ or AFL
 URL:            http://www.freedesktop.org/wiki/Software/dbus
 Group:          Applications/File
@@ -12,6 +12,7 @@ Distribution:   Mariner
 BuildRequires:  expat-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
+BuildRequires:  libselinux-devel
 Requires:       expat
 Requires:       systemd
 Requires:       xz
@@ -32,7 +33,8 @@ It contains the libraries and header files to create applications
             --sysconfdir=%{_sysconfdir}         \
             --localstatedir=%{_var}             \
             --docdir=%{_datadir}/doc/dbus-1.11.12  \
-            --enable-libaudit=no --enable-selinux=no \
+            --enable-libaudit=no                \
+            --enable-selinux=yes                \
             --with-console-auth-dir=/run/console
 
 make %{?_smp_mflags}
@@ -74,9 +76,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3
-- Added %%license line automatically
-
+*   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> - 1.13.6-4
+-   Enable SELinux support
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.13.6-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Sep 10 2018 Ajay Kaher <akaher@vmware.com> 1.13.6-1
