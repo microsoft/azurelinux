@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        4.4.18
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 URL:            http://www.gnu.org/software/bash/
 Group:          System Environment/Base
@@ -17,10 +17,8 @@ Provides:       /usr/bin/sh
 Provides:       /usr/bin/bash
 BuildRequires:  readline
 Requires:       readline
-Requires(post):    /bin/grep
-Requires(post):    /bin/cp
-Requires(postun):  /bin/grep
-Requires(postun):  /bin/mv
+Requires(post): /bin/grep
+Requires(postun): /bin/grep
 %description
 The package contains the Bourne-Again SHell
 
@@ -259,9 +257,6 @@ make  NON_ROOT_USERNAME=nobody %{?_smp_mflags} check
 
 %post
 if [ $1 -eq 1 ] ; then
-    if [ ! -f "/root/.bash_logout" ] ; then
-        cp /etc/skel/.bash_logout /root/.bash_logout
-    fi
     if [ ! -f /etc/shells ]; then
         echo "/bin/sh" >> /etc/shells
         echo "/bin/bash" >> /etc/shells
@@ -325,6 +320,8 @@ fi
 %defattr(-,root,root)
 
 %changelog
+*   Thu Sep 03 2020 Daniel Burgener <daburgen@microsoft.com> - 4.4.18-6
+-   Removed coreutils dependencies.  This is necessary for SELinux enablement in coreutils to avoid circular dependencies
 *   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 4.4.18-5
 -   Don't stomp on CFLAGS.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4

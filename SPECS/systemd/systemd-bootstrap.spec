@@ -1,7 +1,7 @@
 Summary:          Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:             systemd-bootstrap
 Version:          239
-Release:          29%{?dist}
+Release:          30%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -58,7 +58,6 @@ BuildRequires:    docbook-dtd-xml
 BuildRequires:    glib-devel
 BuildRequires:    meson
 BuildRequires:    gettext
-BuildRequires:    shadow-utils
 BuildRequires:    libgcrypt-devel
 
 %description
@@ -256,6 +255,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*  Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 239-30
+-  Remove build dependency on shadow-utils to break circular dependency
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
 -  Reduce kptr_restrict to 1
 *  Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-28
