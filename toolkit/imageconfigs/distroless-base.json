@@ -1,0 +1,20 @@
+{
+    "Disks": [
+        {
+            "Artifacts": [
+                {
+                    "Name": "core",
+                    "Compression": "tar.gz"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "PackageLists": [
+                "packagelists/distroless-packages-container.json"
+            ]
+        }
+    ]
+}
