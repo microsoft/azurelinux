@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -300,6 +300,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-4
+-   Apply additional kernel hardening configs
 *   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-3
 -   Bump release number due to kernel-signed-<arch> package update
 -   Minor aarch64 config and changelog cleanup
