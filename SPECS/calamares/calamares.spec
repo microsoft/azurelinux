@@ -8,7 +8,7 @@
 
 Name:           calamares
 Version:        3.2.11
-Release:        34%{?dist}
+Release:        35%{?dist}
 Summary:        Installer from a live CD/DVD/USB to disk
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -234,6 +234,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Wed Sep 2 2020 Jon Slobodzian <joslobo@microsoft.com> 3.2.11-35
+- Replaced temporary placeholder logo and images
+
 * Wed Jul 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 3.2.11-34
 - Update component tarballs to 1.1.0 version.
 
