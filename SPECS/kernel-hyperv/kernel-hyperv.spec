@@ -1,9 +1,8 @@
-%global with_signed 0
 %global security_hardening none
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.4.42
-Release:        6%{?dist}
+Version:        5.4.51
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -11,9 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
-%if 0%{?with_signed}
-Source100:      vmlinuz-hyperv-x86_64.%{version}-%{release}.signed
-%endif
 
 ExclusiveArch:  x86_64
 
@@ -35,15 +31,6 @@ Requires(postun): coreutils
 
 %description
 The kernel-hyperv package contains the Linux kernel, optimized for Hyper-V
-
-%if 0%{?with_signed}
-%package signed
-Summary:        Production-signed Linux Kernel optimized for Hyper-V
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-%description signed
-This package contains the Linux kernel package optimized for Hyper-V, with kernel signed with the production key
-%endif
 
 %package devel
 Summary:        Kernel Dev
@@ -170,12 +157,6 @@ find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 # Linux version that was affected is 4.4.26
 make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 
-# Incorporate signed kernel binaries if enabled
-%if 0%{?with_signed}
-echo "Overwriting kernel binary with signed x86_64 kernel binary"
-cp %{SOURCE100} %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
-
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -217,10 +198,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/sound
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 
-%if 0%{?with_signed}
-%files signed
-%endif
-
 %files docs
 %defattr(-,root,root)
 %{_defaultdocdir}/linux-%{uname_r}/*
@@ -248,6 +225,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
+-   Update source to 5.4.51
+-   Remove signed subpackage
+-   Enable DXGKRNL config
 *   Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.4.42-6
 -   Add crashkernel=128M to kernel cmdline
 *   Tue Aug 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.4.42-5

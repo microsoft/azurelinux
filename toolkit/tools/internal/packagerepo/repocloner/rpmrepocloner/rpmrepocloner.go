@@ -439,7 +439,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		logger.Log.Debugf("stderr: %s", stderr)
 
 		if err != nil {
-			logger.Log.Errorf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
+			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
 		}
 
 		// ============== TDNF SPECIFIC IMPLEMENTATION ==============

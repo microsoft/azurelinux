@@ -1,0 +1,31 @@
+name: Check Package CGManifests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Validate Manifests
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Get base commit
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        echo "::set-env name=base_sha::$(git rev-parse origin/${{ github.base_ref }})"
+        echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+    - name: Get the changed files
+      run: |
+        echo "::set-env name=updated-specs::$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | grep "\.spec$")"
+
+    - name: Check each spec
+      run: |
+        .github/workflows/validate-cg-manifest.sh ${{ env.updated-specs }}

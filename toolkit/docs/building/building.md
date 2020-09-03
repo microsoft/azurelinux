@@ -2,11 +2,13 @@ Building
 ===
 - [Building](#building)
 - [Quick Start](#quick-start)
-  - [Toolkit](#toolkit)
   - [Prerequisites](#prerequisites)
-  - [Images](#images)
+  - [Build Tools](#build-toolkit)
+  - [Build Packages](#build-packages)
+  - [Build Images](#build-images)
+  - [Build ISOs](#build-isos)   
+- [Further Reading](#further-reading)
   - [ISOs](#isos)
-      - [NOTE:](#note)
   - [Packages](#packages)
     - [Working on Packages](#working-on-packages)
       - [Force Rebuilds](#force-rebuilds)
@@ -65,39 +67,55 @@ Building
 
 Quick Start
 ===
-## Toolkit
-The toolkit comes as an archive containing pre-compiled go tools, go sources, static resources, default configuration files, and documentation.
-
-By default all build commands are executed from inside the `./toolkit` folder.
-
-A full list of targets and options is available [here](#all-build-targets) and [here](#all-build-variables).
-```bash
-cd ~/my/workspace
-tar -xzf ~/toolkit.tar.gz
-cd ./toolkit
-```
 
 ## Prerequisites
 Install prerequisites [here](prerequisites.md).
 
-## Images
-Build the default image (`core-efi.json`) and create the `vhdx` specified in the config file while using prebuilt components where possible (i.e. download from Microsoft servers):
+## Build Tools
+By default all build commands are executed from inside the `./toolkit` folder.  A set of GO Based Tools and a Toolchain must be built before building Mariner Packages and Images.
+
 ```bash
-# Build out/images/core-efi/core-efi.vhdx image from remote components
-sudo make image
-```
-Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow:
-```bash
-# Run the build in parallel using one thread per CPU core.
-sudo make image -j$(nproc)
+cd ~/git/CBL-Mariner/toolkit
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y
 ```
 
-Build a different image using prebuilt components:
+NOTE: A full list of targets and options to sudo make is available [here](#all-build-targets) and [here](#all-build-variables).
+
+## Build Packages
+Once the toolchain is built, all packages can be built with the toolchain.  Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of hyper-threads available on your system, or less)
+
 ```bash
-# Build out/images/config/config.* image from remote components
-sudo make image CONFIG_FILE="/path/to/my/config.json" -j$(nproc)
+# Still from the toolkit folder, copy the toolchain archive built in the previous step into the toolkit folder
+mv ../build/toolchain/toolchain_built_rpms_all.tar.gz .
+
+# Build ALL packages FOR AMD64
+sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+
+# Build ALL packages FOR ARM64
+sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
 ```
 
+## Build Images
+Different images can be produced from the build system.  All images are generated in the out/images folder.
+
+```bash
+# Still from the toolkit folder
+
+# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
+
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner ISO Image (ISO folder: ../out/images/full)
+sudo make iso CONFIG_FILE=./imageconfigs/full.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+
+# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json TOOLCHAIN_ARCHIVE=./toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+```
+
+# Further Reading
 ## ISOs
 ISO installers can be built with:
 ```bash
@@ -105,12 +123,11 @@ ISO installers can be built with:
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json
 ```
 To create an unattended ISO installer (no interactable UI):
-```bash
+````bash
 # Build out/images/developer_iso/*.iso from remote components with unattended installer
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json UNATTENDED_INSTALLER=y
-```
-#### NOTE:
-ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).
+````
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).
 
 ## Packages
 The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current config will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.

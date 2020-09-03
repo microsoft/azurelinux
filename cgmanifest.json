@@ -364,16 +364,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bzr",
-          "version": "2.7.0",
-          "downloadUrl": "https://launchpad.net/bzr/2.7/2.7.0/+download/bzr-2.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ca-certificates",
           "version": "20200720",
           "downloadUrl": "https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt"
@@ -1475,8 +1465,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1735,8 +1725,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1745,8 +1735,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1755,8 +1745,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.42",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.42.tar.gz"
+          "version": "5.4.51",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
         }
       }
     },
@@ -1855,8 +1845,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.16.10",
-          "downloadUrl": "https://github.com/kubernetes/kubernetes/archive/v1.16.10.tar.gz"
+          "version": "1.16.14",
+          "downloadUrl": "https://github.com/kubernetes/kubernetes/archive/v1.16.14.tar.gz"
         }
       }
     },
