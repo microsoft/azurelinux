@@ -1,7 +1,7 @@
 Name:           core-packages
 Summary:        Metapackage with core sets of packages
 Version:        0.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://aka.ms/mariner
@@ -41,6 +41,7 @@ Requires:   procps-ng
 Requires:   rpm
 Requires:   tzdata
 Requires:   which
+Requires:   chrony
 
 %description base-image
 %{summary}
@@ -96,12 +97,14 @@ Requires:   zlib
 %files container
 
 %changelog
+*   Wed Sep 02 2020 Mateusz Malisz <mamalisz@microsoft.com> 0.1-20
+-   Add chrony package to the base-image.
 *   Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-19
 -   Removing 'ca-certificates' from container subpackage.
 *   Fri Jul 17 2020 Andrew Phelps <anphel@microsoft.com> 0.1-18
 -   Add ca-certificates to container subpackage.
 *   Wed Jun 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 0.1-17
--   Add 'lvm2' to base-image Requires. 
+-   Add 'lvm2' to base-image Requires.
 *   Mon Jun 15 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-16
 -   Removing 'dnf' from core containter packages.
 *   Fri Jun 05 2020 Paul Monson <paulmon@microsoft.com> 0.1-15
