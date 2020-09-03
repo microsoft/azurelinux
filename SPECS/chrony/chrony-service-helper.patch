@@ -1,0 +1,11 @@
+diff -up chrony-3.5/examples/chronyd.service.service-helper chrony-3.5/examples/chronyd.service
+--- chrony-3.5/examples/chronyd.service.service-helper	2019-05-10 12:22:57.000000000 +0200
++++ chrony-3.5/examples/chronyd.service	2019-05-14 13:42:38.069516800 +0200
+@@ -10,6 +10,7 @@ Type=forking
+ PIDFile=/run/chrony/chronyd.pid
+ EnvironmentFile=-/etc/sysconfig/chronyd
+ ExecStart=/usr/sbin/chronyd $OPTIONS
++ExecStartPost=/usr/libexec/chrony-helper update-daemon
+ PrivateTmp=yes
+ ProtectHome=yes
+ ProtectSystem=full

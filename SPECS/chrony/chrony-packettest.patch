@@ -1,0 +1,25 @@
+commit 62d6aed6a64b887c9e3b7f03d9e0db1deaa2696a
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Jun 18 15:41:50 2019 +0200
+
+    test: update processing of packet log
+    
+    Two new fields have been added to the packet log, which broke some
+    of the simulation tests.
+
+diff --git a/test/simulation/test.common b/test/simulation/test.common
+index 951a794b..8ed6ad9e 100644
+--- a/test/simulation/test.common
++++ b/test/simulation/test.common
+@@ -391,9 +391,9 @@ check_packet_port() {
+ 	for i in $(seq 1 $(get_chronyd_nodes)); do
+ 		test_message 3 0 "node $i:"
+ 
+-		grep -E -q "	$port	[0-9]+\$" tmp/log.packets && \
++		grep -E -q "^([0-9e.+-]+	){5}$port	" tmp/log.packets && \
+ 			! grep -E "^[0-9e.+-]+	$i	" tmp/log.packets | \
+-			grep -E -q -v "	$port	[0-9]+\$" && \
++			grep -E -q -v "^([0-9e.+-]+	){5}$port	" && \
+ 			test_ok || test_bad
+ 		[ $? -eq 0 ] || ret=1
+ 	done

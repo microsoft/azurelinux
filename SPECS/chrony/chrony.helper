@@ -1,0 +1,265 @@
+#!/bin/bash
+# This script configures running chronyd to use NTP servers obtained from
+# DHCP and _ntp._udp DNS SRV records. Files with servers from DHCP are managed
+# externally (e.g. by a dhclient script). Files with servers from DNS SRV
+# records are updated here using the dig utility. The script can also list
+# and set static sources in the chronyd configuration file.
+
+chronyc=/usr/bin/chronyc
+chrony_conf=/etc/chrony.conf
+chrony_service=chronyd.service
+helper_dir=/var/run/chrony-helper
+added_servers_file=$helper_dir/added_servers
+
+network_sysconfig_file=/etc/sysconfig/network
+dhclient_servers_files="/var/lib/dhclient/chrony.servers.*"
+dnssrv_servers_files="$helper_dir/dnssrv@*"
+dnssrv_timer_prefix=chrony-dnssrv@
+
+. $network_sysconfig_file &> /dev/null
+
+chrony_command() {
+    $chronyc -a -n -m "$1"
+}
+
+is_running() {
+    chrony_command "tracking" &> /dev/null
+}
+
+get_servers_files() {
+    [ "$PEERNTP" != "no" ] && echo "$dhclient_servers_files"
+    echo "$dnssrv_servers_files"
+}
+
+is_update_needed() {
+    for file in $(get_servers_files) $added_servers_file; do
+        [ -e "$file" ] && return 0
+    done
+    return 1
+}
+
+update_daemon() {
+    local all_servers_with_args all_servers added_servers
+
+    if ! is_running; then
+        rm -f $added_servers_file
+        return 0
+    fi
+
+    all_servers_with_args=$(cat $(get_servers_files) 2> /dev/null)
+
+    all_servers=$(
+        echo "$all_servers_with_args" |
+            while read -r server serverargs; do
+                echo "$server"
+            done | sort -u)
+    added_servers=$( (
+        cat $added_servers_file 2> /dev/null
+        echo "$all_servers_with_args" |
+            while read -r server serverargs; do
+                [ -z "$server" ] && continue
+                chrony_command "add server $server $serverargs" &> /dev/null &&
+                    echo "$server"
+            done) | sort -u)
+
+    comm -23 <(echo -n "$added_servers") <(echo -n "$all_servers") |
+        while read -r server; do
+            chrony_command "delete $server" &> /dev/null
+        done
+
+    added_servers=$(comm -12 <(echo -n "$added_servers") <(echo -n "$all_servers"))
+
+    if [ -n "$added_servers" ]; then
+        echo "$added_servers" > $added_servers_file
+    else
+        rm -f $added_servers_file
+    fi
+}
+
+get_dnssrv_servers() {
+    local name=$1 output
+
+    if ! command -v dig &> /dev/null; then
+        echo "Missing dig (DNS lookup utility)" >&2
+        return 1
+    fi
+
+    output=$(dig "$name" srv +short +ndots=2 +search 2> /dev/null) || return 0
+
+    echo "$output" | while read -r _ _ port target; do
+        server=${target%.}
+        [ -z "$server" ] && continue
+        echo "$server port $port ${NTPSERVERARGS:-iburst}"
+    done
+}
+
+check_dnssrv_name() {
+    local name=$1
+
+    if [ -z "$name" ]; then
+        echo "No DNS SRV name specified" >&2
+        return 1
+    fi
+
+    if [ "${name:0:9}" != _ntp._udp ]; then
+        echo "DNS SRV name $name doesn't start with _ntp._udp" >&2
+        return 1
+    fi
+}
+
+update_dnssrv_servers() {
+    local name=$1
+    local srv_file=$helper_dir/dnssrv@$name servers
+
+    check_dnssrv_name "$name" || return 1
+
+    servers=$(get_dnssrv_servers "$name")
+    if [ -n "$servers" ]; then
+        echo "$servers" > "$srv_file"
+    else
+        rm -f "$srv_file"
+    fi
+}
+
+set_dnssrv_timer() {
+    local state=$1 name=$2
+    local srv_file=$helper_dir/dnssrv@$name servers
+    local timer
+
+    timer=$dnssrv_timer_prefix$(systemd-escape "$name").timer || return 1
+
+    check_dnssrv_name "$name" || return 1
+
+    if [ "$state" = enable ]; then
+        systemctl enable "$timer"
+        systemctl start "$timer"
+    elif [ "$state" = disable ]; then
+        systemctl stop "$timer"
+        systemctl disable "$timer"
+        rm -f "$srv_file"
+    fi
+}
+
+list_dnssrv_timers() {
+    systemctl --all --full -t timer list-units | grep "^$dnssrv_timer_prefix" | \
+            sed "s|^$dnssrv_timer_prefix\(.*\)\.timer.*|\1|" |
+        while read -r name; do
+            systemd-escape --unescape "$name"
+        done
+}
+
+prepare_helper_dir() {
+    mkdir -p $helper_dir
+    exec 100> $helper_dir/lock
+    if ! flock -w 20 100; then
+        echo "Failed to lock $helper_dir" >&2
+        return 1
+    fi
+}
+
+is_source_line() {
+    local pattern="^[ \t]*(server|pool|peer|refclock)[ \t]+[^ \t]+"
+    [[ "$1" =~ $pattern ]]
+}
+
+list_static_sources() {
+    while read -r line; do
+        if is_source_line "$line"; then
+            echo "$line"
+        fi
+    done < $chrony_conf
+}
+
+set_static_sources() {
+    local new_config tmp_conf
+
+    new_config=$(
+        sources=$(
+            while read -r line; do
+                is_source_line "$line" && echo "$line"
+            done)
+
+        while read -r line; do
+            if ! is_source_line "$line"; then
+                echo "$line"
+                continue
+            fi
+
+            tmp_sources=$(
+                local removed=0
+
+                echo "$sources" | while read -r line2; do
+                    if [ "$removed" -ne 0 ] || [ "$line" != "$line2" ]; then
+                        echo "$line2"
+                    else
+                        removed=1
+                    fi
+                done)
+
+            [ "$sources" == "$tmp_sources" ] && continue
+            sources=$tmp_sources
+            echo "$line"
+        done < $chrony_conf
+
+        echo "$sources"
+    )
+
+    tmp_conf=${chrony_conf}.tmp
+
+    cp -a $chrony_conf $tmp_conf &&
+        echo "$new_config" > $tmp_conf &&
+        mv $tmp_conf $chrony_conf || return 1
+
+    systemctl try-restart $chrony_service
+}
+
+print_help() {
+    echo "Usage: $0 COMMAND"
+    echo
+    echo "Commands:"
+    echo "	update-daemon"
+    echo "	update-dnssrv-servers NAME"
+    echo "	enable-dnssrv NAME"
+    echo "	disable-dnssrv NAME"
+    echo "	list-dnssrv"
+    echo "	list-static-sources"
+    echo "	set-static-sources < sources.list"
+    echo "	is-running"
+    echo "	command CHRONYC-COMMAND"
+}
+
+case "$1" in
+    update-daemon|add-dhclient-servers|remove-dhclient-servers)
+        is_update_needed || exit 0
+        prepare_helper_dir && update_daemon
+        ;;
+    update-dnssrv-servers)
+        prepare_helper_dir && update_dnssrv_servers "$2" && update_daemon
+        ;;
+    enable-dnssrv)
+        set_dnssrv_timer enable "$2"
+        ;;
+    disable-dnssrv)
+        set_dnssrv_timer disable "$2" && prepare_helper_dir && update_daemon
+        ;;
+    list-dnssrv)
+        list_dnssrv_timers
+        ;;
+    list-static-sources)
+        list_static_sources
+        ;;
+    set-static-sources)
+        set_static_sources
+        ;;
+    is-running)
+        is_running
+        ;;
+    command|forced-command)
+        chrony_command "$2"
+        ;;
+    *)
+        print_help
+        exit 2
+esac
+
+exit $?
