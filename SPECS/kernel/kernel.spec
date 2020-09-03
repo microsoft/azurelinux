@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -300,6 +300,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-3
+-   Bump release number due to kernel-signed-<arch> package update
+-   Minor aarch64 config and changelog cleanup
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
@@ -360,7 +363,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   Update x86_64 security configs
 *   Wed May 20 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.23-8
 -   Adding InfiniBand config flags
-*   Tue May 11 2020 Anand Muthurajan <anandm@microsoft.com> 5.4.23-7
+*   Mon May 11 2020 Anand Muthurajan <anandm@microsoft.com> 5.4.23-7
 -   Adding PPP config flags
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.23-6
 -   Renaming Linux-PAM to pam
