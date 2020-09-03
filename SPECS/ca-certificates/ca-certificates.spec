@@ -18,6 +18,10 @@
 %define legacy_default_microsoft_bundle ca-bundle.legacy.default.microsoft.crt
 %define legacy_disable_microsoft_bundle ca-bundle.legacy.disable.microsoft.crt
 
+# List of packages triggering legacy certs generation if 'ca-certificates-legacy'
+# is installed.
+%global watched_pkgs %{name}, %{name}-base, %{name}-microsoft
+
 # Rebuilding cert bundles with source certificates.
 %global refresh_bundles \
 %{_bindir}/ca-legacy install\
@@ -96,9 +100,9 @@ Source17:       README.edk2
 Source18:       README.src
 Source19:       pem2bundle.sh
 Source20:       LICENSE
-
 Source21:       certdata.base.txt
-Source22:       certdata.microsoft.txt
+Source22:       bundle2pem.sh
+Source23:       certdata.microsoft.txt
 
 BuildArch:      noarch
 
@@ -178,11 +182,21 @@ Requires:           %{name}-shared = %{version}-%{release}
 Summary:  Cert generation tools.
 Group:    System Environment/Security
 
-Requires:           p11-kit-trust >= 0.23.10
-Requires:           p11-kit >= 0.23.10
+Requires: p11-kit-trust >= 0.23.10
+Requires: p11-kit >= 0.23.10
 
 %description tools
 Set of scripts to generate certificates out of a certdata.txt file.
+
+%package legacy
+Summary:  Support for legacy certificates configuration.
+Group:    System Environment/Security
+
+Requires: %{name}-shared = %{version}-%{release}
+
+%description legacy
+Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
+pairs under /etc/pki/tls/certs.
 
 %prep -q
 rm -rf %{name}
@@ -253,6 +267,8 @@ install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/update-ca-trust
 
 install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/ca-legacy
 
+install -p -m 755 %{SOURCE22} $RPM_BUILD_ROOT%{_bindir}/bundle2pem.sh
+
 # touch ghosted files that will be extracted dynamically
 # Set chmod 444 to use identical permission
 touch $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/tls-ca-bundle.pem
@@ -305,6 +321,23 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_data
 
 %postun base
 %refresh_bundles
+
+
+%postun legacy
+# During build time it is unknown what files will get created by the
+# 'legacy' subpackage's triggers, so we cannot inform RPM to delete
+# them for us through the '%%files' section and the '%%ghost' macro.
+rm -f %{pkidir}/tls/certs/*.{0,pem}
+
+# If the 'legacy' subpackage is installed, we need to always refresh the
+# single PEM-encoded certificates every time a certificate bundle gets modified.
+# The cert bundle gets modified whenever one of the packages from %{watched_pkgs}
+# get installed, removed, or updated.
+%triggerin -n %{name}-legacy -- %{watched_pkgs}
+%{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
+
+%triggerpostun -n %{name}-legacy -- %{watched_pkgs}
+%{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
 %postun microsoft
 %refresh_bundles
@@ -397,11 +430,14 @@ cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_data
 %{_mandir}/man8/update-ca-trust.8.gz
 %{_mandir}/man8/ca-legacy.8.gz
 
+%files legacy
+%{_bindir}/bundle2pem.sh
+
 %changelog
-* Fri Aug 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5
-- Adding a new 'ca-certificates-microsoft' subpackage with CAs trusted through
-  the Microsoft Trusted Root Program.
-- Converting common steps into parametrized macros.
+* Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5
+- Adding 'ca-certificates-legacy' to support apps, which only work with
+  a single cert per *.pem file.  Adding a new 'ca-certificates-microsoft' subpackage with CAs trusted through
+  the Microsoft Trusted Root Program.  Converting common steps into parametrized macros.
 
 * Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-4
 - Updating base certificates to current intermediate CAs.

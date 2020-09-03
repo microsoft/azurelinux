@@ -19,6 +19,7 @@ bzip2-devel-1.0.6-15.cm1.aarch64.rpm
 bzip2-libs-1.0.6-15.cm1.aarch64.rpm
 ca-certificates-20200720-5.cm1.noarch.rpm
 ca-certificates-base-20200720-5.cm1.noarch.rpm
+ca-certificates-legacy-20200720-5.cm1.noarch.rpm
 ca-certificates-microsoft-20200720-5.cm1.noarch.rpm
 ca-certificates-shared-20200720-5.cm1.noarch.rpm
 ca-certificates-tools-20200720-5.cm1.noarch.rpm
