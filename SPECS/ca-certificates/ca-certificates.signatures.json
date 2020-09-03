@@ -13,6 +13,7 @@
   "ca-legacy.8.txt": "4fef2b8fed41d21ae559803b06074ca61a3f46648f174832542e3223d16dabf4",
   "ca-legacy.conf": "400b96da374503fa6b6350a867347082d0c90e05ba4d02cc6b51b11229199c4d",
   "certdata.base.txt": "3b56f4cd90cdd1b8e569e900a4016c5c0fda5574715e2e65669d011e073d3264",
+  "certdata.microsoft.txt": "d647ba9622bd973b2a2cb5114825a8ff6016ba3a5499a6a7cccdc1d07af25fdb",
   "certdata.txt": "cc6408bd4be7fbfb8699bdb40ccb7f6de5780d681d87785ea362646e4dad5e8e",
   "certdata2pem.py": "0be02cecc27a6e55e1cad1783033b147f502b26f9fb1bb5a53e7a43bbcb68fa0",
   "nssckbi.h": "4019b4b68df6b89b22d350ffea652707864ee995b399de2f876c6d52d41f11ac",
