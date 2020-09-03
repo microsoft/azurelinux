@@ -3,16 +3,15 @@
 %bcond_without debug
 
 Name:           chrony
-Version:        3.5
-Release:        9%{?dist}
+Version:        3.5.1
+Release:        1%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv2
 URL:            https://chrony.tuxfamily.org
 Source0:        https://download.tuxfamily.org/%{name}/%{name}-%{version}.tar.gz
-Source1:        https://download.tuxfamily.org/%{name}/%{name}-%{version}-tar-gz-asc.txt
-Source2:        %{url}/gpgkey-8B1F4A9ADA73D401E3085A0B5FF06F29BA1E013B.asc
+# Source 1-2 left for a possible GPG check
 Source3:        chrony.dhclient
 Source4:        chrony.helper
 Source5:        chrony-dnssrv@.service
@@ -54,7 +53,6 @@ can also operate as an NTPv4 (RFC 5905) server and peer to provide a time
 service to other computers in the network.
 
 %prep
-%{gpgverify} --keyring=%{SOURCE2} --signature=%{SOURCE1} --data=%{SOURCE0}
 
 %setup -q -n %{name}-%{version} -a 10
 %patch2 -p1 -b .service-helper
@@ -162,6 +160,8 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 # workaround for late reload of unit file (#1614751)
 %{_bindir}/systemctl daemon-reload
 %systemd_post chronyd.service chrony-wait.service
+# Start chrony right away
+systemctl start chronyd.service
 
 %preun
 %systemd_preun chronyd.service chrony-wait.service
@@ -191,6 +191,11 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Tue Sep 01 2020 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.1-1
+- Update version to 3.5.1
+- Remove gpg signature check
+- Start chronyd after installation
+
 * Wed Aug 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
@@ -534,7 +539,7 @@ getent passwd chrony > /dev/null || /usr/sbin/useradd -r -g chrony \
 - update to 1.25-pre1
 - use iburst, four pool servers, rtcsync, stratumweight in default config
 - add systemd support
-- drop sysconfig file 
+- drop sysconfig file
 - suppress install-info errors
 
 * Thu Apr 29 2010 Miroslav Lichvar <mlichvar@redhat.com> 1.24-4.20100428git73d775
