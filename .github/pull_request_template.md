@@ -1,11 +1,22 @@
 <!--
 COMMENT BLOCKS WILL NOT BE INCLUDED IN THE PR.
 Feel free to delete sections of the template which do not apply to your PR, or add additional details
-
-Checklist:
-1. Make PRs from either a forked repo, or a feature branch (user/feature).
-2. Either use a squash merge PR, or squash your commits locally before creating the PR.
 -->
+
+###### Merge Checklist  <!-- REQUIRED -->
+<!-- You can set them now ([x]) or set them later using the Github UI -->
+**All** boxes should be checked before merging the PR *(just tick any boxes which don't apply to this PR)*
+- [ ] The toolchain has been rebuilt successfully (or no changes were made to it)
+- [ ] The toolchain/worker package manifests are up-to-date
+- [ ] Any updated packages successfully build (or no packages were changed)
+- [ ] All package sources are available
+- [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/tools/cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`)
+- [ ] All source files have up-to-date hashes in the `*.signatures.json` files
+- [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
+- [ ] Documentation has been updated to match any changes to the build system
+- [ ] Ready to merge
+
+---
 
 ###### Summary <!-- REQUIRED -->
 <!-- Quick explanation of the changes. -->
@@ -32,12 +43,6 @@ NO
 ###### Links to CVEs  <!-- optional -->
 - https://nvd.nist.gov/...
 
-###### Merge Checklist  <!-- REQUIRED -->
-<!-- These should all be checked before merging a PR -->
-<!-- You can set them now ([x]) or set them later using the Github UI -->
-- [ ] The toolchain has been rebuilt successfully if any changes were made to it
-- [ ] The toolchain/worker package manifests have been updated if this is a toolchain package
-- [ ] Updated packages have been successfully built
-- [ ] New source files have updated hashes in the `*.signatures.json` files
-- [ ] Documentation has been updated to match any changes to the build system
-- [ ] Ready to merge
+###### Test Methodology
+<!-- How as this test validated? i.e. local build, pipeline build etc. -->
+- Pipeline build id: xxxx
