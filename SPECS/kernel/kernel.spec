@@ -302,6 +302,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 *   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-3
 -   Bump release number due to kernel-signed-<arch> package update
+-   Minor aarch64 config cleanup
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
