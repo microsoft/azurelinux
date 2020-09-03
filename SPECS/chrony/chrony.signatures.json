@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "chrony-3.5.1.tar.gz": "1ba82f70db85d414cd7420c39858e3ceca4b9eb8b028cbe869512c3a14a2dca7",
+  "chrony-dnssrv@.service": "5d0fda11f750b179b798a221be6b2da634e762a1ba6e5df62a99661633ed72c3",
+  "chrony-dnssrv@.timer": "df830c5bcde1a55d78f19016f65b927adb9cbeb165181a56fb35fdfce8f6f5ae",
+  "chrony.dhclient": "7bbe9f0320c68ea4a5a6c810d3ebe2ca030be34e15c85051592a5ae92a429bec",
+  "chrony.helper": "cbf96f4cf851f0fbbdfbab98d8fd10504ed4fa666699aecc30b9b9e23a062a21",
+  "clknetsim-79ffe4.tar.gz": "2d60fb5d6a12dd12fafa07b86a0ed8eba2bf552987e960c6d468c4869199dd6a"
+ }
+}
