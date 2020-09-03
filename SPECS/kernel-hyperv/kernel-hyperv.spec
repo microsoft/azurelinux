@@ -14,6 +14,7 @@ Source1:        config
 ExclusiveArch:  x86_64
 
 BuildRequires:  bc
+BuildRequires:  diffutils
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  glib-devel
