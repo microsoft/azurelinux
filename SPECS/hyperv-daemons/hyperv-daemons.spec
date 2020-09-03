@@ -9,7 +9,7 @@
 
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.4.42
+Version:        5.4.51
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
@@ -230,6 +230,9 @@ fi
 
 
 %changelog
+* Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
+- Update source to 5.4.51
+
 * Tue Jun 16 2020 Paul Monson <paulmon@microsoft.com> 5.4.42-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Update to match version 5.4.42 of the kernel.
