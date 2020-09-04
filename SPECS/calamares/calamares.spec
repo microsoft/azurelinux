@@ -8,7 +8,7 @@
 
 Name:           calamares
 Version:        3.2.11
-Release:        35%{?dist}
+Release:        36%{?dist}
 Summary:        Installer from a live CD/DVD/USB to disk
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,7 @@ Source0:        https://github.com/calamares/calamares/releases/download/v%{vers
 Source1: calamares-users-1.1.0.tar.gz
 Source2: calamares-finished-1.1.0.tar.gz
 Source3: calamares-welcome-1.1.0.tar.gz
-Source4: calamares-partition-1.1.0.tar.gz
+Source4: calamares-partition-1.1.1.tar.gz
 Source5: calamares-license-1.1.0.tar.gz
 
 # Source20..39 - configuration files
@@ -234,11 +234,14 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Fri Sep 04 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.2.11-36
+- Add dictionary check for root encryption passphrase.
+
 * Wed Sep 2 2020 Jon Slobodzian <joslobo@microsoft.com> 3.2.11-35
 - Replaced temporary placeholder logo and images
 
 * Wed Jul 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 3.2.11-34
-- Update component tarballs to 1.1.0 version.
+- Update component tarballs to 1.1.0 version.+
 
 * Wed Jul 01 2020 Andrew Phelps <anphel@microsoft.com> 3.2.11-33
 - Wait for installation to complete.
