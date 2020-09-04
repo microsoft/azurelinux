@@ -241,7 +241,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 - Replaced temporary placeholder logo and images
 
 * Wed Jul 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 3.2.11-34
-- Update component tarballs to 1.1.0 version.+
+- Update component tarballs to 1.1.0 version.
 
 * Wed Jul 01 2020 Andrew Phelps <anphel@microsoft.com> 3.2.11-33
 - Wait for installation to complete.
