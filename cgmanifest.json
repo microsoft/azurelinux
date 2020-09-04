@@ -804,6 +804,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dos2unix",
+          "version": "7.4.1",
+          "downloadUrl": "http://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dotnet-runtime-3.1",
           "version": "3.1.5",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz"
@@ -5547,6 +5557,16 @@
           "name": "which",
           "version": "2.21",
           "downloadUrl": "http://ftp.gnu.org/gnu/which/which-2.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "words",
+          "version": "3.0",
+          "downloadUrl": "http://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
         }
       }
     },
