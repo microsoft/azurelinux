@@ -14,7 +14,7 @@
 
 Summary:        Go
 Name:           golang
-Version:        1.13.11
+Version:        1.13.15
 Release:        1%{?dist}
 License:        BSD
 URL:            https://golang.org
@@ -124,9 +124,11 @@ rm -rf %{buildroot}/*
 %{_bindir}/*
 
 %changelog
+*   Tue Sep 08 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.13.15-1
+-   Updated to version 1.13.15, which fixes CVE-2020-14039 and CVE-2020-16845.
 *   Sun May 24 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.11-1
 -   Updated to version 1.13.11
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.12.5-7
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.12.5-7
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.12.5-6
 -   Renaming go to golang
