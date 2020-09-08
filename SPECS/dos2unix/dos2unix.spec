@@ -1,14 +1,17 @@
-Summary: Text file format converters
-Name: dos2unix
-Version: 7.4.1
-Release: 4%{?dist}
-License: BSD
-URL: http://waterlan.home.xs4all.nl/dos2unix.html
-Source: http://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
+Summary:       Text file format converters
+Name:          dos2unix
+Version:       7.4.1
+Release:       4%{?dist}
+License:       BSD
+URL:           https://waterlan.home.xs4all.nl/dos2unix.html
+Source:        https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+
 BuildRequires: gcc
 BuildRequires: gettext
-Provides: unix2dos = %{version}-%{release}
-Obsoletes: unix2dos < 5.1-1
+Provides:      unix2dos = %{version}-%{release}
+Obsoletes:     unix2dos < 5.1-1
 
 %description
 Convert text files with DOS or Mac line endings to Unix line endings and 
@@ -29,7 +32,8 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 %find_lang %{name} --with-man --all-name
 
 %files -f %{name}.lang
-%doc man/man1/dos2unix.htm  ChangeLog.txt COPYING.txt
+%license COPYING.txt 
+%doc man/man1/dos2unix.htm ChangeLog.txt
 %doc NEWS.txt README.txt TODO.txt
 %{_bindir}/dos2unix
 %{_bindir}/mac2unix
@@ -39,7 +43,8 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 
 %changelog
 * Tue Aug 25 2020 Nicolas Ontiveros <niontive@microsoft.com> - 7.4.1-4
-- Initial CBL-Mariner version.
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified.
 
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

@@ -1,15 +1,17 @@
-Summary: A dictionary of English words for the /usr/share/dict directory
-Name: words
-Version: 3.0
-Release: 37%{?dist}
-License: Public Domain
+Summary:       A dictionary of English words for the /usr/share/dict directory
+Name:          words
+Version:       3.0
+Release:       37%{?dist}
+License:       Public Domain
 # Note that Moby Project officially does not exist any more. The most complete
 # information about the project is in Wikipedia.
-URL: http://en.wikipedia.org/wiki/Moby_Project
+URL:           https://en.wikipedia.org/wiki/Moby_Project
 # Source: http://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z
-Source: words-3.0.tar.Z
-
-BuildArch: noarch
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+Source0:       words-3.0.tar.Z
+Source1:       LICENSE
+BuildArch:     noarch
 BuildRequires: dos2unix
 BuildRequires: grep
 
@@ -18,9 +20,9 @@ BuildRequires: grep
 #457309 - contains both 'unnecessary' and 'unneccesary'
 #1626689 - linux.words contains "half-embracinghalf-embracingly"
 #1652919 - malformed entry in words file
-Patch0: words-3.0-typos.patch
+Patch0:        words-3.0-typos.patch
 #470921 -"Barack" and "Obama" are not in /usr/share/dict/words
-Patch1: words-3.0-presidents.patch
+Patch1:        words-3.0-presidents.patch
 
 %description
 The words file is a dictionary of English words for the
@@ -29,40 +31,16 @@ words to check spelling. Password checkers use it to look for bad
 passwords.
 
 %prep
-%setup -q -c
-%patch0 -p1 -b .typos
-%patch1 -p1 -b .presidents
+%autosetup -c -p1
 
 %build
+cp %{SOURCE1} .
 cd mwords
-dos2unix -o *; chmod a+r *
+dos2unix -o *
+chmod a+r *
+
+# Extract unique words from content files
 cat [1-9]*.??? | egrep --invert-match "'s$" | egrep  "^[[:alnum:]'&!,./-]+$" | sort --ignore-case --dictionary-order | uniq > moby
-
-cat <<EOF >license.txt
-***
-    The license in the readme.txt file is original and DEPRECATED
-    license of The Moby lexicon project.
-***
-
-On June 1, 1996 Grady Ward announced that the fruits of
-the Moby project were being placed in the public domain:
-
-The Moby lexicon project is complete and has
-been place into the public domain. Use, sell,
-rework, excerpt and use in any way on any platform.
-
-Placing this material on internal or public servers is
-also encouraged. The compiler is not aware of any
-export restrictions so freely distribute world-wide.
-
-You can verify the public domain status by contacting
-
-Grady Ward
-3449 Martha Ct.
-Arcata, CA  95521-4884
-
-daedal@myrealbox.com
-EOF
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -71,13 +49,15 @@ install -m644 mwords/moby $RPM_BUILD_ROOT%{_datadir}/dict/linux.words
 ln -sf linux.words $RPM_BUILD_ROOT%{_datadir}/dict/words
 
 %files
-%doc mwords/readme.txt mwords/license.txt
+%license LICENSE
+%doc mwords/readme.txt
 %{_datadir}/dict/linux.words
 %{_datadir}/dict/words
 
 %changelog
 * Tue Aug 25 2020 Nicolas Ontiveros <niontive@microsoft.com> - 3.0-37
-- Initial version for CBL-Mariner
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified.
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-36
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
