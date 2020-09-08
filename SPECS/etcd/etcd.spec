@@ -88,7 +88,7 @@ rm -rf %{buildroot}/*
 -   License verified and "License" tag updated.
 -   Removed "%%define sha1".
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.3.9-2
--   Initial import from Photon (license: dual Apache2/GPL2).
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Sujay G <gsujay@vmware.com> 3.3.9-1
 -   Bump etcd version to 3.3.9
 *   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1.5-4
