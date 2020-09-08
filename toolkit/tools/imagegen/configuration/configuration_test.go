@@ -4,7 +4,10 @@
 package configuration
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,6 +23,32 @@ func TestMain(m *testing.M) {
 	testResult = m.Run()
 
 	os.Exit(testResult)
+}
+
+// remarshalJSON takes a struct, marshals it into a JSON format, then
+// unmarshals it back into a structure.
+func remarshalJSON(structIn interface{}, structOut interface{}) (err error) {
+	tIn := reflect.TypeOf(structIn)
+	tOut := reflect.TypeOf(structOut)
+	if tOut.Kind() != reflect.Ptr {
+		return fmt.Errorf("can't remarshal JSON, structOut must be a pointer to a struct")
+	}
+
+	if !tIn.ConvertibleTo(tOut.Elem()) {
+		return fmt.Errorf("can't remarshal JSON, types are incorrect (%v, %v). Should be (myStruct, *myStruct)", tIn, tOut)
+	}
+	jsonData, err := json.Marshal(structIn)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(jsonData, structOut)
+	return
+}
+
+// marshalJSONString coverts a JSON string into a struct
+func marshalJSONString(jsonString string, structOut interface{}) (err error) {
+	err = json.Unmarshal([]byte(jsonString), structOut)
+	return
 }
 
 func TestConfigurationShouldContainExpectedFields(t *testing.T) {
@@ -38,7 +67,7 @@ func TestShouldErrorForMissingFile(t *testing.T) {
 
 var expectedConfiguration Config = Config{
 	Disks: []Disk{
-		Disk{
+		{
 			PartitionTableType: "gpt",
 			MaxSize:            uint64(1024),
 			TargetDisk: TargetDisk{
@@ -46,30 +75,30 @@ var expectedConfiguration Config = Config{
 				Value: "/dev/sda",
 			},
 			Artifacts: []Artifact{
-				Artifact{
+				{
 					Name:        "CompressedVHD",
 					Type:        "vhd",
 					Compression: "gz",
 				},
-				Artifact{
+				{
 					Name: "UncompressedVHD",
 					Type: "vhd",
 				},
 			},
 			RawBinaries: []RawBinary{
-				RawBinary{
+				{
 					BinPath:   "binaries/1.bin",
 					BlockSize: uint64(1024),
 					Seek:      uint64(1),
 				},
-				RawBinary{
+				{
 					BinPath:   "binaries/2.bin",
 					BlockSize: uint64(1024),
 					Seek:      uint64(2),
 				},
 			},
 			Partitions: []Partition{
-				Partition{
+				{
 					ID: "MyBoot",
 					Flags: []string{
 						"esp",
@@ -79,7 +108,7 @@ var expectedConfiguration Config = Config{
 					End:    uint64(9),
 					FsType: "fat32",
 				},
-				Partition{
+				{
 					ID:     "MyRootfs",
 					Start:  uint64(9),
 					End:    uint64(1024),
@@ -87,7 +116,7 @@ var expectedConfiguration Config = Config{
 				},
 			},
 		},
-		Disk{
+		{
 			PartitionTableType: "mbr",
 			MaxSize:            uint64(4096),
 			TargetDisk: TargetDisk{
@@ -95,7 +124,7 @@ var expectedConfiguration Config = Config{
 				Value: "/dev/sdb",
 			},
 			Partitions: []Partition{
-				Partition{
+				{
 					ID: "MyBootA",
 					Flags: []string{
 						"boot",
@@ -103,13 +132,13 @@ var expectedConfiguration Config = Config{
 					Start:  uint64(3),
 					FsType: "fat32",
 				},
-				Partition{
+				{
 					ID:     "MyRootfsA",
 					Start:  uint64(9),
 					End:    uint64(1024),
 					FsType: "ext4",
 				},
-				Partition{
+				{
 					ID: "MyBootB",
 					Flags: []string{
 						"boot",
@@ -117,13 +146,13 @@ var expectedConfiguration Config = Config{
 					Start:  uint64(1024),
 					FsType: "fat32",
 				},
-				Partition{
+				{
 					ID:     "MyRootfsB",
 					Start:  uint64(1033),
 					End:    uint64(2048),
 					FsType: "ext4",
 				},
-				Partition{
+				{
 					ID:     "SharedData",
 					Start:  uint64(2048),
 					End:    uint64(0),
@@ -133,16 +162,16 @@ var expectedConfiguration Config = Config{
 		},
 	},
 	SystemConfigs: []SystemConfig{
-		SystemConfig{
+		{
 			Name:      "SmallerDisk",
 			IsDefault: true,
 			PartitionSettings: []PartitionSetting{
-				PartitionSetting{
+				{
 					ID:           "MyBoot",
 					MountPoint:   "/boot",
 					MountOptions: "ro,exec",
 				},
-				PartitionSetting{
+				{
 					ID:         "MyRootfs",
 					MountPoint: "/",
 					RemoveDocs: true,
@@ -163,23 +192,23 @@ var expectedConfiguration Config = Config{
 			Hostname: "Mariner-Test",
 			BootType: "efi",
 			Groups: []Group{
-				Group{
+				{
 					Name: "groupa",
 				},
-				Group{
+				{
 					Name: "groupb",
 				},
-				Group{
+				{
 					Name: "testgroup",
 					GID:  "109",
 				},
 			},
 			Users: []User{
-				User{
+				{
 					Name:     "basicuser",
 					Password: "abc",
 				},
-				User{
+				{
 					Name:                "advancedSecureCoolUser",
 					Password:            "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
 					PasswordHashed:      true,
@@ -198,10 +227,10 @@ var expectedConfiguration Config = Config{
 				},
 			},
 			PostInstallScripts: []PostInstallScript{
-				PostInstallScript{
+				{
 					Path: "arglessScript.sh",
 				},
-				PostInstallScript{
+				{
 					Path: "thisOneNeedsArguments.sh",
 					Args: "--input abc --output cba",
 				},
@@ -211,19 +240,19 @@ var expectedConfiguration Config = Config{
 				Password: "EncryptPassphrase123",
 			},
 		},
-		SystemConfig{
+		{
 			Name: "BiggerDiskA",
 			PartitionSettings: []PartitionSetting{
-				PartitionSetting{
+				{
 					ID:         "MyBootA",
 					MountPoint: "/boot",
 				},
-				PartitionSetting{
+				{
 					ID:         "MyRootfsA",
 					MountPoint: "/",
 					RemoveDocs: true,
 				},
-				PartitionSetting{
+				{
 					ID:           "SharedData",
 					MountPoint:   "/some/path/to/data",
 					MountOptions: "ro,noexec",
@@ -232,27 +261,31 @@ var expectedConfiguration Config = Config{
 			PackageLists: []string{
 				"path/to/packages.json",
 			},
+			KernelOptions: map[string]string{
+				"default": "kernel",
+				"hyperv":  "kernel-hyperv",
+			},
 			Hostname: "Mariner-TestA",
 			Users: []User{
-				User{
+				{
 					Name:     "basicuser",
 					Password: "abc",
 				},
 			},
 		},
-		SystemConfig{
+		{
 			Name: "BiggerDiskB",
 			PartitionSettings: []PartitionSetting{
-				PartitionSetting{
+				{
 					ID:         "MyBootB",
 					MountPoint: "/boot",
 				},
-				PartitionSetting{
+				{
 					ID:         "MyRootfsB",
 					MountPoint: "/",
 					RemoveDocs: true,
 				},
-				PartitionSetting{
+				{
 					ID:           "SharedData",
 					MountPoint:   "/some/path/to/data",
 					MountOptions: "ro,noexec",
@@ -261,9 +294,13 @@ var expectedConfiguration Config = Config{
 			PackageLists: []string{
 				"path/to/packages.json",
 			},
+			KernelOptions: map[string]string{
+				"default": "kernel",
+				"hyperv":  "kernel-hyperv",
+			},
 			Hostname: "Mariner-TestB",
 			Users: []User{
-				User{
+				{
 					Name:     "basicuser",
 					Password: "abc",
 				},
