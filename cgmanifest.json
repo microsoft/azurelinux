@@ -806,7 +806,7 @@
         "other": {
           "name": "dos2unix",
           "version": "7.4.1",
-          "downloadUrl": "http://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
+          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
         }
       }
     },
@@ -5566,7 +5566,7 @@
         "other": {
           "name": "words",
           "version": "3.0",
-          "downloadUrl": "http://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
+          "downloadUrl": "https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
         }
       }
     },
