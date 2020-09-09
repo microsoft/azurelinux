@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -434,6 +434,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-6
+- Adding 2 Microsoft-trusted, intermediate CAs into 'ca-certificates-base'.
+
 * Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5
 - Adding 'ca-certificates-legacy' to support apps, which only work with
   a single cert per *.pem file.  Adding a new 'ca-certificates-microsoft' subpackage with CAs trusted through
