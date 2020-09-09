@@ -1,5 +1,7 @@
 {
  "Signatures": {
+  "CVE-2019-20388.patch": "fe79e639713c6a711bd42681b63bf67c1f962e6b0f9dd93961e110984633a15b",
+  "CVE-2020-7595.patch": "d4a7e2b2abae5b29266891b6b0310b00efd90e42f16adee52897b092e6ba360b",
   "libxml2-2.9.10.tar.gz": "aafee193ffb8fe0c82d4afef6ef91972cbaf5feea100edc2f262750611b4be1f"
  }
 }
