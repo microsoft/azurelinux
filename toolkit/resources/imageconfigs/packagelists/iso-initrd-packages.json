@@ -61,6 +61,7 @@
         "usbutils",
         "util-linux",
         "vim",
+        "words",
         "xz",
         "zlib"
     ]
