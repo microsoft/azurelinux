@@ -92,7 +92,7 @@ mv ../build/toolchain/toolchain_built_rpms_all.tar.gz .
 sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
 
 # Build ALL packages FOR ARM64
-sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
+sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_amd64 shim-unsigned-amd64"
 ```
 
 ## Build Images
