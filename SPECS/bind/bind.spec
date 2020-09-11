@@ -12,7 +12,8 @@ Patch2:         CVE-2020-8619.patch
 Patch3:         CVE-2020-8620.patch
 Patch4:         CVE-2020-8621.patch
 Patch5:         CVE-2020-8622.patch
-Patch6:         CVE-2020-8623.patch
+# CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
+Patch6:         CVE-2020-8623.nopatch
 Patch7:         CVE-2020-8624.patch 
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
