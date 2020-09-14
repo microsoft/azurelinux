@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        9.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 URL:            https://gcc.gnu.org/
 Group:          Development/Tools
@@ -11,6 +11,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         090_all_pr55930-dependency-tracking.patch
+# Only applies to the Power9 ISA
+Patch1:         CVE-2019-15847.nopatch
 Requires:       libstdc++-devel = %{version}-%{release}
 Requires:       libgcc-devel = %{version}-%{release}
 Requires:       libgomp-devel = %{version}-%{release}
@@ -209,66 +211,99 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
-*   Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> 9.1.0-6
--   Comment out with_check BuildRequires to break circular dependency in build graph.
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 9.1.0-5
--   Disable -Werror=format-security to build with hardened cflags
-*   Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> 9.1.0-4
--   Added %%license line automatically
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 9.1.0-3
--   Renaming mpc to libmpc
-*   Thu Apr 09 2020 Emre Girgin <mrgirgin@microsoft.com> 9.1.0-2
--   Add the "--enable-default-pie" flag in order to enforce ASLR-enabled binaries.
-*   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 9.1.0-1
--   Update to version 9.1.0. License verified. Add libstdc++fs.a
-*   Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> 7.3.0-6
--   Fixing build issues for multiple architectures
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.3.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Nov 02 2018 Alexey Makhalov <amakhalov@vmware.com> 7.3.0-4
--   Use nofortify security_hardening instead of sed hacking
--   Use %configure
-*   Wed Sep 19 2018 Alexey Makhalov <amakhalov@vmware.com> 7.3.0-3
--   Fix compilation issue for glibc-2.28
-*   Thu Aug 30 2018 Keerthana K <keerthanak@vmware.com> 7.3.0-2
--   Packaging .a files (libstdc++-static files).
-*   Wed Aug 01 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 7.3.0-1
--   Update to version 7.3.0 to get retpoline support.
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-7
--   Aarch64 support
-*   Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-6
--   Added smp_mflags for parallel build
-*   Mon Sep 25 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-5
--   Enable elfdeps for libgcc_s to generate libgcc_s.so.1(*)(64bit) provides
-*   Mon Aug 28 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-4
--   Fix makecheck
-*   Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-3
--   Fix compilation issue for glibc-2.26
-*   Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-2
--   Improve make check
-*   Thu Mar 9 2017 Alexey Makhalov <amakhalov@vmware.com> 6.3.0-1
--   Update version to 6.3
-*   Thu Mar 02 2017 Xiaolin Li <xiaolinl@vmware.com> 5.3.0-6
--   Enabled fortran.
-*   Wed Feb 22 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.0-5
--   Added new plugin entry point: PLUGIN_TYPE_CAST (.patch)
-*   Thu Sep  8 2016 Alexey Makhalov <amakhalov@vmware.com> 5.3.0-4
--   Enable plugins and linker build id.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.0-3
--   GA - Bump release of all rpms
-*   Tue May 17 2016 Anish Swaminathan <anishs@vmware.com> 5.3.0-2
--   Change package dependencies
-*   Mon Mar 28 2016 Alexey Makhalov <amakhalov@vmware.com> 5.3.0-1
--   Update version to 5.3
-*   Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 4.8.2-6
--   Handled locale files with macro find_lang
-*   Mon Nov 02 2015 Vinay Kulkarni <kulkarniv@vmware.com> 4.8.2-5
--   Put libatomic.so into its own package.
-*   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 4.8.2-4
--   Updated group.
-*   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 4.8.2-3
--   Update according to UsrMove.
-*   Fri May 15 2015 Divya Thaluru <dthaluru@vmware.com> 4.8.2-2
--   Packaging .la files
-*   Tue Apr 01 2014 baho-utot <baho-utot@columbus.rr.com> 4.8.2-1
--   Initial build. First version
+* Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 9.1.0-7
+- Ignore CVE-2019-15847, as it applies to an unsupported ISA
+
+* Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> - 9.1.0-6
+- Comment out with_check BuildRequires to break circular dependency in build graph.
+
+* Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 9.1.0-5
+- Disable -Werror=format-security to build with hardened cflags
+
+* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.1.0-4
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 9.1.0-3
+- Renaming mpc to libmpc
+
+* Thu Apr 09 2020 Emre Girgin <mrgirgin@microsoft.com> - 9.1.0-2
+- Add the "--enable-default-pie" flag in order to enforce ASLR-enabled binaries.
+
+* Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> - 9.1.0-1
+- Update to version 9.1.0. License verified. Add libstdc++fs.a
+
+* Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> - 7.3.0-6
+- Fixing build issues for multiple architectures
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 7.3.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Nov 02 2018 Alexey Makhalov <amakhalov@vmware.com> - 7.3.0-4
+- Use nofortify security_hardening instead of sed hacking
+- Use %configure
+
+* Wed Sep 19 2018 Alexey Makhalov <amakhalov@vmware.com> - 7.3.0-3
+- Fix compilation issue for glibc-2.28
+
+* Thu Aug 30 2018 Keerthana K <keerthanak@vmware.com> - 7.3.0-2
+- Packaging .a files (libstdc++-static files).
+
+* Wed Aug 01 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 7.3.0-1
+- Update to version 7.3.0 to get retpoline support.
+
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-7
+- Aarch64 support
+
+* Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-6
+- Added smp_mflags for parallel build
+
+* Mon Sep 25 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-5
+- Enable elfdeps for libgcc_s to generate libgcc_s.so.1(*)(64bit) provides
+
+* Mon Aug 28 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-4
+- Fix makecheck
+
+* Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-3
+- Fix compilation issue for glibc-2.26
+
+* Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-2
+- Improve make check
+
+* Thu Mar 9 2017 Alexey Makhalov <amakhalov@vmware.com> - 6.3.0-1
+- Update version to 6.3
+
+* Thu Mar 02 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.3.0-6
+- Enabled fortran.
+
+* Wed Feb 22 2017 Alexey Makhalov <amakhalov@vmware.com> - 5.3.0-5
+- Added new plugin entry point: PLUGIN_TYPE_CAST (.patch)
+
+* Thu Sep  8 2016 Alexey Makhalov <amakhalov@vmware.com> - 5.3.0-4
+- Enable plugins and linker build id.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 5.3.0-3
+- GA - Bump release of all rpms
+
+* Tue May 17 2016 Anish Swaminathan <anishs@vmware.com> - 5.3.0-2
+- Change package dependencies
+
+* Mon Mar 28 2016 Alexey Makhalov <amakhalov@vmware.com> - 5.3.0-1
+- Update version to 5.3
+
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> - 4.8.2-6
+- Handled locale files with macro find_lang
+
+* Mon Nov 02 2015 Vinay Kulkarni <kulkarniv@vmware.com> - 4.8.2-5
+- Put libatomic.so into its own package.
+
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> - 4.8.2-4
+- Updated group.
+
+* Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> - 4.8.2-3
+- Update according to UsrMove.
+
+* Fri May 15 2015 Divya Thaluru <dthaluru@vmware.com> - 4.8.2-2
+- Packaging .la files
+
+* Tue Apr 01 2014 baho-utot <baho-utot@columbus.rr.com> - 4.8.2-1
+- Initial build. First version

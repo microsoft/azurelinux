@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.20
-Release:        2%{?dist}
+Version:        8.0.21
+Release:        1%{?dist}
 License:        GPLv2 with exceptions and LGPLv2 and BSD
 Group:          Applications/Databases
 Vendor:         Microsoft Corporation
@@ -32,7 +32,7 @@ Development headers for developing applications linking to maridb
 %build
 cmake . \
       -DCMAKE_INSTALL_PREFIX=/usr   \
-      -DWITH_BOOST=boost/boost_1_70_0 \
+      -DWITH_BOOST=boost/boost_1_72_0 \
       -DINSTALL_MANDIR=share/man \
       -DINSTALL_DOCDIR=share/doc \
       -DINSTALL_DOCREADMEDIR=share/doc \
@@ -76,9 +76,10 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-* Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.20-2
-- Added %%license line automatically
-
+*   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.21-1
+-   Upgrade to 8.0.21. Fixes 32 CVEs.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.20-2
+-   Added %%license line automatically
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 8.0.20-1
 -   Upgrade to 8.0.20. Fixes 70 CVEs.
 -   Update URL.

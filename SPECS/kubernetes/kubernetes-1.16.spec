@@ -9,7 +9,7 @@
 
 Summary:        Kubernetes cluster management
 Name:           kubernetes
-Version:        1.16.10
+Version:        1.16.14
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes
@@ -17,9 +17,8 @@ URL:            https://github.com/kubernetes
 Source0:        %{name}-%{version}.tar.gz
 #Source1:       %{url}-retired/contrib/archive/0.7.0.tar.gz
 # This is NOT the source from the project page linked above. Its name is identical to the official version
-# but the signature is different. To be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.
+# but the signature is different.
 Source1:        contrib-0.7.0.tar.gz
-Patch0:         kubernetes-mariner.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,7 +68,6 @@ A pod setup process that holds a pod's namespace.
 
 %prep -p exit
 %setup -q
-%patch0 -p1
 cd ..
 tar xf %{SOURCE1} --no-same-owner
 sed -i -e 's|127.0.0.1:4001|127.0.0.1:2379|g' contrib-0.7.0/init/systemd/environ/apiserver
@@ -236,6 +234,8 @@ fi
 %endif
 
 %changelog
+*   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.16.14-1
+-   Update to 1.16.14 to fix: CVE-2020-8557, CVE-2020-8558, CVE-2020-8559
 *   Tue Jun 16 2020 Andrew Phelps <anphel@microsoft.com> 1.16.10-1
 -   Update to 1.16.10 to fix: CVE-2020-8552, CVE-2019-11254
 *   Tue May 26 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.16.2-8
