@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -106,7 +106,9 @@ Source23:       certdata.microsoft.txt
 
 BuildArch:      noarch
 
+BuildRequires:      /bin/ln
 BuildRequires:      asciidoc
+BuildRequires:      coreutils
 BuildRequires:      docbook-dtd-xml
 BuildRequires:      docbook-style-xsl
 BuildRequires:      libxslt
@@ -114,21 +116,12 @@ BuildRequires:      openssl
 BuildRequires:      perl
 BuildRequires:      python3
 
-Requires(post):     /bin/ln
 Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     bash
 Requires(post):     coreutils
-Requires(post):     grep
-Requires(post):     openssl
-Requires(post):     sed
 
 Requires(postun):   %{name}-tools = %{version}-%{release}
-Requires(postun):   openssl
 
 Requires:           %{name}-shared = %{version}-%{release}
-Requires:           bash
-Requires:           grep
-Requires:           sed
 
 Provides:           ca-certificates-mozilla
 
@@ -152,9 +145,8 @@ Group:      System Environment/Security
 Summary:    Basic set of trusted CAs required to authenticate the packages repository.
 Group:      System Environment/Security
 
-Requires(post):     /bin/ln
 Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     openssl
+Requires(post):     coreutils
 
 Requires(postun):   %{name}-tools = %{version}-%{release}
 
@@ -167,9 +159,8 @@ Requires:           %{name}-shared = %{version}-%{release}
 Summary:    A list of CAs trusted through the Microsoft Trusted Root Program.
 Group:      System Environment/Security
 
-Requires(post):     /bin/ln
 Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     openssl
+Requires(post):     coreutils
 
 Requires(postun):   %{name}-tools = %{version}-%{release}
 
@@ -434,6 +425,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-7
+- Removing unused 'Requires*'.
+
 * Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-6
 - Adding 2 Microsoft-trusted, intermediate CAs into 'ca-certificates-base'.
 
