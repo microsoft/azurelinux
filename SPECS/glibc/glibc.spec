@@ -1,6 +1,9 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
+# Don't depend on bash by default - distroless
+%define __requires_exclude ^/(bin|usr/bin).*$
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
@@ -97,8 +100,6 @@ Name Service Cache Daemon
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
-%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
-%define __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
 
 # create find-provides and find-requires script in order to ignore GLIBC_PRIVATE errors
 cat > find_provides.sh << _EOF
@@ -121,7 +122,6 @@ else
 fi
 _EOF
 chmod +x find_requires.sh
-#___EOF
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`"
@@ -199,6 +199,9 @@ popd
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
+echo find_provies %{__find_provides}
+echo find_requies %{__find_requires}
+
 %check
 cd %{_builddir}/glibc-build
 make %{?_smp_mflags} check ||:
@@ -239,8 +242,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %ifarch aarch64
 %exclude /lib
 %endif
-%exclude /lib64/libpcprofile.so
 %{_lib64dir}/*.so
+%{_lib64dir}/audit/*
 /sbin/ldconfig
 /sbin/locale-gen.sh
 %{_bindir}/*
@@ -277,8 +280,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_sbindir}/zdump
 %{_sbindir}/zic
 /sbin/sln
-%{_lib64dir}/audit/*
-/lib64/libpcprofile.so
 
 %files nscd
 %defattr(-,root,root)
