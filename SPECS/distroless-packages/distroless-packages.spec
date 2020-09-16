@@ -16,7 +16,13 @@ Summary:    Metapackage defining the basic set of packages (no kernel) used by i
 
 Requires:   filesystem
 Requires:   tzdata
+Requires:   iana-etc
+Requires:   ca-certificates-static
 Requires:   mariner-release
+Requires:   openssl
+Requires:   openssl-libs
+Requires:   glibc-iconv
+
 
 %description base
 %{summary}
