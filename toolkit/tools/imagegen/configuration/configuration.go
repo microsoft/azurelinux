@@ -105,7 +105,7 @@ type Config struct {
 	DefaultSystemConfig *SystemConfig // A system configuration with the "IsDefault" field set or the first system configuration if there is no explicit default.
 }
 
-// IsValid returns an error if the SystemConfig is not valid
+// IsValid returns an error if the Config is not valid
 func (c *Config) IsValid() (err error) {
 	for _, disk := range c.Disks {
 		if err = disk.IsValid(); err != nil {
