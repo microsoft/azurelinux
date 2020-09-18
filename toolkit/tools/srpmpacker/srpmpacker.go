@@ -387,7 +387,7 @@ func packSRPMWorker(allSpecStates chan *specState, results chan *packResult, dis
 		err = os.MkdirAll(fullOutDirPath, os.ModePerm)
 		logger.PanicOnError(err)
 
-		outputPath, err := packSingleSPEC(specState.specFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
+		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
 		logger.PanicOnError(err)
 
 		result.srpmFile = outputPath
@@ -440,9 +440,9 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 }
 
 // packSingleSPEC will pack a given SPEC file into an SRPM.
-func packSingleSPEC(specFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration) (outputPath string, err error) {
-	specName := strings.TrimSuffix(filepath.Base(specFile), filepath.Ext(specFile))
-	workingDir := filepath.Join(buildDir, specName)
+func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration) (outputPath string, err error) {
+	srpmName := filepath.Base(srpmFile)
+	workingDir := filepath.Join(buildDir, srpmName)
 
 	logger.Log.Debugf("Working directory: %s", workingDir)
 
