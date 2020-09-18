@@ -1,6 +1,7 @@
 [Unit]
 Description=OpenSSH Daemon
 After=network.target sshd-keygen.service
+Wants=sshd-keygen.service
 
 [Service]
 ExecStart=/usr/sbin/sshd -D

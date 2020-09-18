@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -16,6 +16,11 @@ Patch2:         python2-support-mariner-platform.patch
 Patch3:         Replace-unsupported-TLS-methods.patch
 # Ignore CVE-2015-5652 because it only applies to Windows
 Patch4:         CVE-2015-5652.nopatch
+# Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
+# and is not a security issue
+Patch5:         CVE-2017-17522.nopatch
+# Ignore CVE-2013-1753 as it was patched in upstream 2.7.9, but NVD has not been updated with that fact
+Patch6:         CVE-2013-1753.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -236,98 +241,136 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
-*   Tue Jun 09 2020 Paul Monson <paulmon@microsoft.com> 2.7.18-2
--   Ignore CVE-2015-5652 because it only applies to Windows
-*   Thu May 21 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.7.18-1
--   Upgrade to version 2.7.18, which fixes CVE-2020-8492.
-*   Tue May 19 2020 Paul Monson <paulmon@microsoft.com> 2.7.15-12
--   Fix TLS methods patch.
-*   Wed May 13 2020 Nick Samson <nisamson@microsoft.com> 2.7.15-11
--   Added %%license line automatically
-*   Mon May 11 2020 Paul Monson <paulmon@microsoft.com> 2.7.15-10
--   Replace unsupported TLS methods with a patch.
-*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.7.15-9
--   Remove toybox and only use coreutils in requires.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7.15-8
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed May 22 2019 Tapas Kundu <tkundu@vmware.com> 2.7.15-7
--   Patched reworked changes for CVE-2019-9948
--   Patch for CVE-2019-9740
--   Fix for CVE-2019-10160
-*   Thu Mar 28 2019 Tapas Kundu <tkundu@vmware.com> 2.7.15-6
--   Fix for CVE-2019-9948
-*   Tue Mar 12 2019 Tapas Kundu <tkundu@vmware.com> 2.7.15-5
--   Added fix for CVE-2019-9636
-*   Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> 2.7.15-4
--   Mode libpython2.7.so to python2-libs
--   Remove python2 dependency from python2-libs
-*   Fri Dec 21 2018 Tapas Kundu <tkundu@vmware.com> 2.7.15-3
--   Fix for CVE-2018-14647
-*   Mon Sep 17 2018 Dweep Advani <dadvani@vmware.com> 2.7.15-2
--   Remove vulnerable Windows installers from python-libs rpm
-*   Mon Aug 20 2018 Dweep Advani <dadvani@vmware.com> 2.7.15-1
--   Update to version 2.7.15
-*   Mon Dec 04 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.13-12
--   Fix CVE-2017-1000030
-*   Mon Dec 04 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.13-11
--   Fix CVE-2017-1000158
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 2.7.13-10
--   Requires coreutils or toybox
--   Requires bzip2-libs
-*   Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 2.7.13-9
--   Remove devpts mount in check
-*   Mon Aug 28 2017 Chang Lee <changlee@vmware.com> 2.7.13-8
--   Add %check with pty
-*   Wed Jul 12 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.13-7
--   Add python2-test package.
-*   Sun Jun 04 2017 Bo Gan <ganb@vmware.com> 2.7.13-6
--   Fix dependency for libs
-*   Tue May 16 2017 Kumar Kaushik <kaushikk@vmware.com> 2.7.13-5
--   Fixing python issue 29188, backport random.c from 3.5 to 2.7.
-*   Fri Apr 28 2017 Harish Udaiya <hudaiyakumar@vmware.com> 2.7.13-4
--   Excluded unwanted binaries from python2-tools.
-*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.7.13-3
--   Python2-devel requires expat-devel.
-*   Fri Mar 24 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.13-2
--   Provides /bin/python2.
-*   Wed Mar 22 2017 Divya Thaluru <dthaluru@vmware.com> 2.7.13-1
--   Updated to version 2.7.13
-*   Fri Jan 20 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.11-11
--   Added patch to support Photon OS
-*   Wed Nov 16 2016 Alexey Makhalov <ppadmavilasom@vmware.com> 2.7.11-10
--   Use sqlite-{devel,libs}
-*   Thu Oct 27 2016 Anish Swaminathan <anishs@vmware.com> 2.7.11-9
--   Patch for CVE-2016-5636
-*   Mon Oct 10 2016 ChangLee <changlee@vmware.com> 2.7.11-8
--   Modified %check
-*   Wed Sep 14 2016 Divya Thaluru <dthaluru@vmware.com> 2.7.11-7
--   Improvised pyopenssl patch
-*   Wed Sep 7 2016 Divya Thaluru <dthaluru@vmware.com> 2.7.11-6
--   Added patch to python openssl to validate certificates by ipaddress
-*   Mon Jun 20 2016 Divya Thaluru <dthaluru@vmware.com> 2.7.11-5
--   Added stack-protector flag for ncurses module
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.11-4
--   GA - Bump release of all rpms
-*   Tue Apr 26 2016 Nick Shi <nshi@vmware.com> 2.7.11-3
--   Adding readline module into python2-libs
+* Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
+- Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
+- Ignore CVE-2013-1753 because NVD erroneously lists this version as being vulnerable
 
-*   Wed Apr 13 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.11-2
--   update python to require python-libs
+* Tue Jun 09 2020 Paul Monson <paulmon@microsoft.com> - 2.7.18-2
+- Ignore CVE-2015-5652 because it only applies to Windows
 
-*   Thu Jan 28 2016 Anish Swaminathan <anishs@vmware.com> 2.7.11-1
--   Upgrade version
+* Thu May 21 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-1
+- Upgrade to version 2.7.18, which fixes CVE-2020-8492.
 
-*   Fri Jan 22 2016 Divya Thaluru <dthaluru@vmware.com> 2.7.9-5
--   Seperate python-curses package from python-libs package
+* Tue May 19 2020 Paul Monson <paulmon@microsoft.com> - 2.7.15-12
+- Fix TLS methods patch.
 
-*   Thu Oct 29 2015 Mahmoud Bassiouny <mbassiouny@vmware.com> 2.7.9-4
--   Seperate python-xml package from python-libs package
+* Wed May 13 2020 Nick Samson <nisamson@microsoft.com> - 2.7.15-11
+- Added %%license line automatically
 
-*   Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> 2.7.9-3
--   Provide /bin/python
+* Mon May 11 2020 Paul Monson <paulmon@microsoft.com> - 2.7.15-10
+- Replace unsupported TLS methods with a patch.
 
-*   Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 2.7.9-2
--   Adding coreutils package to run time required package
+* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.15-9
+- Remove toybox and only use coreutils in requires.
 
-*   Mon Apr 6 2015 Divya Thaluru <dthaluru@vmware.com> 2.7.9-1
--   Initial build.  First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.7.15-8
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed May 22 2019 Tapas Kundu <tkundu@vmware.com> - 2.7.15-7
+- Patched reworked changes for CVE-2019-9948
+- Patch for CVE-2019-9740
+- Fix for CVE-2019-10160
+
+* Thu Mar 28 2019 Tapas Kundu <tkundu@vmware.com> - 2.7.15-6
+- Fix for CVE-2019-9948
+
+* Tue Mar 12 2019 Tapas Kundu <tkundu@vmware.com> - 2.7.15-5
+- Added fix for CVE-2019-9636
+
+* Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> - 2.7.15-4
+- Mode libpython2.7.so to python2-libs
+- Remove python2 dependency from python2-libs
+
+* Fri Dec 21 2018 Tapas Kundu <tkundu@vmware.com> - 2.7.15-3
+- Fix for CVE-2018-14647
+
+* Mon Sep 17 2018 Dweep Advani <dadvani@vmware.com> - 2.7.15-2
+- Remove vulnerable Windows installers from python-libs rpm
+
+* Mon Aug 20 2018 Dweep Advani <dadvani@vmware.com> - 2.7.15-1
+- Update to version 2.7.15
+
+* Mon Dec 04 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.7.13-12
+- Fix CVE-2017-1000030
+
+* Mon Dec 04 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.7.13-11
+- Fix CVE-2017-1000158
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.7.13-10
+- Requires coreutils or toybox
+- Requires bzip2-libs
+
+* Fri Sep 15 2017 Bo Gan <ganb@vmware.com> - 2.7.13-9
+- Remove devpts mount in check
+
+* Mon Aug 28 2017 Chang Lee <changlee@vmware.com> - 2.7.13-8
+- Add %check with pty
+
+* Wed Jul 12 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.7.13-7
+- Add python2-test package.
+
+* Sun Jun 04 2017 Bo Gan <ganb@vmware.com> - 2.7.13-6
+- Fix dependency for libs
+
+* Tue May 16 2017 Kumar Kaushik <kaushikk@vmware.com> - 2.7.13-5
+- Fixing python issue 29188, backport random.c from 3.5 to 2.7.
+
+* Fri Apr 28 2017 Harish Udaiya <hudaiyakumar@vmware.com> - 2.7.13-4
+- Excluded unwanted binaries from python2-tools.
+
+* Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.7.13-3
+- Python2-devel requires expat-devel.
+
+* Fri Mar 24 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.7.13-2
+- Provides /bin/python2.
+
+* Wed Mar 22 2017 Divya Thaluru <dthaluru@vmware.com> - 2.7.13-1
+- Updated to version 2.7.13
+
+* Fri Jan 20 2017 Dheeraj Shetty <dheerajs@vmware.com> - 2.7.11-11
+- Added patch to support Photon OS
+
+* Wed Nov 16 2016 Alexey Makhalov <ppadmavilasom@vmware.com> - 2.7.11-10
+- Use sqlite-{devel,libs}
+
+* Thu Oct 27 2016 Anish Swaminathan <anishs@vmware.com> - 2.7.11-9
+- Patch for CVE-2016-5636
+
+* Mon Oct 10 2016 ChangLee <changlee@vmware.com> - 2.7.11-8
+- Modified %check
+
+* Wed Sep 14 2016 Divya Thaluru <dthaluru@vmware.com> - 2.7.11-7
+- Improvised pyopenssl patch
+
+* Wed Sep 7 2016 Divya Thaluru <dthaluru@vmware.com> - 2.7.11-6
+- Added patch to python openssl to validate certificates by ipaddress
+
+* Mon Jun 20 2016 Divya Thaluru <dthaluru@vmware.com> - 2.7.11-5
+- Added stack-protector flag for ncurses module
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.7.11-4
+- GA - Bump release of all rpms
+
+* Tue Apr 26 2016 Nick Shi <nshi@vmware.com> - 2.7.11-3
+- Adding readline module into python2-libs
+
+* Wed Apr 13 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.7.11-2
+- update python to require python-libs
+
+* Thu Jan 28 2016 Anish Swaminathan <anishs@vmware.com> - 2.7.11-1
+- Upgrade version
+
+* Fri Jan 22 2016 Divya Thaluru <dthaluru@vmware.com> - 2.7.9-5
+- Seperate python-curses package from python-libs package
+
+* Thu Oct 29 2015 Mahmoud Bassiouny <mbassiouny@vmware.com> - 2.7.9-4
+- Seperate python-xml package from python-libs package
+
+* Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> - 2.7.9-3
+- Provide /bin/python
+
+* Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> - 2.7.9-2
+- Adding coreutils package to run time required package
+
+* Mon Apr 6 2015 Divya Thaluru <dthaluru@vmware.com> - 2.7.9-1
+- Initial build.  First version

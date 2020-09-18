@@ -5,7 +5,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 URL:            https://www.gnu.org/software/libc
 Group:          Applications/System
@@ -28,6 +28,9 @@ Patch8:         CVE-2020-6096.nopatch
 Patch9:         CVE-2019-6488.nopatch
 # Only applicable on PowerPC targets.
 Patch10:        CVE-2020-1751.nopatch
+# Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
+# Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
+Patch11:		CVE-2018-20796.nopatch
 ExcludeArch:    armv7 ppc i386 i686
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -305,100 +308,149 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 
 %changelog
-*   Wed Jul 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.28-11
--   Disable the debuginfo package for glibc, and use unstripped binaries instead.
-*   Fri Jun 26 2020 Ruying Chen <v-ruyche@microsoft.com> 2.28-10
--   Added provides for binary capability.
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 2.28-9
--   Disable -Wp,-D_FORTIFY_SOURCE=2 to build with hardened cflags.
-*   Tue May 19 2020 Emre Girgin <mrgirgin@microsoft.com> 2.28-8
--   Ignore CVE-2019-6488, CVE-2020-1751, CVE-2020-6096 as they don't apply to aarch64 or x86_64.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.28-7
--   Added %%license line automatically
-*   Fri Mar 20 2020 Andrew Phelps <anphel@microsoft.com> 2.28-6
--   Configure with --disable-werror.
-*   Mon Dec 02 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 2.28-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Jul 12 2019 Ankit Jain <ankitja@vmware.com> 2.28-4
--   Replaced spaces with tab in nsswitch.conf file
-*   Fri Mar 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.28-3
--   Fix CVE-2019-9169
-*   Tue Jan 22 2019 Anish Swaminathan <anishs@vmware.com> 2.28-2
--   Fix CVE-2018-19591
-*   Tue Aug 28 2018 Alexey Makhalov <amakhalov@vmware.com> 2.28-1
--   Version update. Disable obsolete rpc (use libtirpc) and nsl.
-*   Tue Jan 23 2018 Xiaolin Li <xiaolinl@vmware.com> 2.26-10
--   Fix CVE-2018-1000001 and CVE-2018-6485
-*   Mon Jan 08 2018 Xiaolin Li <xiaolinl@vmware.com> 2.26-9
--   Fix CVE-2017-16997
-*   Thu Dec 21 2017 Xiaolin Li <xiaolinl@vmware.com> 2.26-8
--   Fix CVE-2017-17426
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.26-7
--   Aarch64 support
-*   Wed Oct 25 2017 Xiaolin Li <xiaolinl@vmware.com> 2.26-6
--   Fix CVE-2017-15670 and CVE-2017-15804
-*   Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> 2.26-5
--   Compile out tcache.
-*   Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 2.26-4
--   exclude tst-eintr1 per official wiki recommendation.
-*   Tue Sep 12 2017 Alexey Makhalov <amakhalov@vmware.com> 2.26-3
--   Fix makecheck for run in docker.
-*   Tue Aug 29 2017 Alexey Makhalov <amakhalov@vmware.com> 2.26-2
--   Fix tunables setter.
--   Add malloc arena fix.
--   Fix makecheck.
-*   Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> 2.26-1
--   Version update
-*   Tue Aug 08 2017 Anish Swaminathan <anishs@vmware.com> 2.25-4
--   Apply fix for CVE-2017-1000366
-*   Thu May 4  2017 Bo Gan <ganb@vmware.com> 2.25-3
--   Remove bash dependency in post/postun script
-*   Fri Apr 21 2017 Alexey Makhalov <amakhalov@vmware.com> 2.25-2
--   Added -iconv -tools and -nscd subpackages
-*   Wed Mar 22 2017 Alexey Makhalov <amakhalov@vmware.com> 2.25-1
--   Version update
-*   Wed Dec 14 2016 Alexey Makhalov <amakhalov@vmware.com> 2.24-1
--   Version update
-*   Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 2.22-13
--   Install en_US.UTF-8 locale by default
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 2.22-12
--   Added i18n subpackage
-*   Tue Oct 25 2016 Alexey Makhalov <amakhalov@vmware.com> 2.22-11
--   Workaround for build failure with "out of memory" message
-*   Wed Sep 28 2016 Alexey Makhalov <amakhalov@vmware.com> 2.22-10
--   Added pthread_create-fix-use-after-free.patch
-*   Tue Jun 14 2016 Divya Thaluru <dthaluru@vmware.com> 2.22-9
--   Enabling rpm debug package and stripping the libraries
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.22-8
--   GA - Bump release of all rpms
-*   Mon May 23 2016 Divya Thaluru <dthaluru@vmware.com> 2.22-7
--   Added patch for CVE-2014-9761
-*   Mon Mar 21 2016 Alexey Makhalov <amakhalov@vmware.com>  2.22-6
--   Security hardening: nonow
-*   Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com>  2.22-5
--   Change conf file qualifiers
-*   Fri Mar 11 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com>  2.22-4
--   Added patch for res_qeury assertion with bad dns config
--   Details: https://sourceware.org/bugzilla/show_bug.cgi?id=19791
-*   Tue Feb 16 2016 Anish Swaminathan <anishs@vmware.com>  2.22-3
--   Added patch for CVE-2015-7547
-*   Mon Feb 08 2016 Anish Swaminathan <anishs@vmware.com>  2.22-2
--   Added patch for bindresvport blacklist
-*   Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 2.22-1
--   Updated to version 2.22
-*   Tue Dec 1 2015 Divya Thaluru <dthaluru@vmware.com> 2.19-8
--   Disabling rpm debug package and stripping the libraries
-*   Wed Nov 18 2015 Divya Thaluru <dthaluru@vmware.com> 2.19-7
--   Adding patch to close nss files database
-*   Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 2.19-6
--   Handled locale files with macro find_lang
-*   Wed Aug 05 2015 Kumar Kaushik <kaushikk@vmware.com> 2.19-5
--   Adding postun section for ldconfig.
-*   Tue Jul 28 2015 Alexey Makhalov <amakhalov@vmware.com> 2.19-4
--   Support glibc building against current rpm version.
-*   Thu Jul 23 2015 Divya Thaluru <dthaluru@vmware.com> 2.19-3
--   Packing locale-gen scripts
-*   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 2.19-2
--   Update according to UsrMove.
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.19-1
--   Initial build. First version
+* Wed Jul 29 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-12
+- Ignore CVE-2018-20796, as it is not a security issue
+
+* Wed Jul 29 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.28-11
+- Disable the debuginfo package for glibc, and use unstripped binaries instead.
+
+* Fri Jun 26 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.28-10
+- Added provides for binary capability.
+
+* Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.28-9
+- Disable -Wp,-D_FORTIFY_SOURCE=2 to build with hardened cflags.
+
+* Tue May 19 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.28-8
+- Ignore CVE-2019-6488, CVE-2020-1751, CVE-2020-6096 as they don't apply to aarch64 or x86_64.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.28-7
+- Added %%license line automatically
+
+* Fri Mar 20 2020 Andrew Phelps <anphel@microsoft.com> - 2.28-6
+- Configure with --disable-werror.
+
+* Mon Dec 02 2019 Saravanan Somasundaram <sarsoma@microsoft.com> - 2.28-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Jul 12 2019 Ankit Jain <ankitja@vmware.com> - 2.28-4
+- Replaced spaces with tab in nsswitch.conf file
+
+* Fri Mar 08 2019 Alexey Makhalov <amakhalov@vmware.com> - 2.28-3
+- Fix CVE-2019-9169
+
+* Tue Jan 22 2019 Anish Swaminathan <anishs@vmware.com> - 2.28-2
+- Fix CVE-2018-19591
+
+* Tue Aug 28 2018 Alexey Makhalov <amakhalov@vmware.com> - 2.28-1
+- Version update. Disable obsolete rpc (use libtirpc) and nsl.
+
+* Tue Jan 23 2018 Xiaolin Li <xiaolinl@vmware.com> - 2.26-10
+- Fix CVE-2018-1000001 and CVE-2018-6485
+
+* Mon Jan 08 2018 Xiaolin Li <xiaolinl@vmware.com> - 2.26-9
+- Fix CVE-2017-16997
+
+* Thu Dec 21 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.26-8
+- Fix CVE-2017-17426
+
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.26-7
+- Aarch64 support
+
+* Wed Oct 25 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.26-6
+- Fix CVE-2017-15670 and CVE-2017-15804
+
+* Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.26-5
+- Compile out tcache.
+
+* Fri Sep 15 2017 Bo Gan <ganb@vmware.com> - 2.26-4
+- exclude tst-eintr1 per official wiki recommendation.
+
+* Tue Sep 12 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.26-3
+- Fix makecheck for run in docker.
+
+* Tue Aug 29 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.26-2
+- Fix tunables setter.
+- Add malloc arena fix.
+- Fix makecheck.
+
+* Tue Aug 15 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.26-1
+- Version update
+
+* Tue Aug 08 2017 Anish Swaminathan <anishs@vmware.com> - 2.25-4
+- Apply fix for CVE-2017-1000366
+
+* Thu May 4  2017 Bo Gan <ganb@vmware.com> - 2.25-3
+- Remove bash dependency in post/postun script
+
+* Fri Apr 21 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.25-2
+- Added -iconv -tools and -nscd subpackages
+
+* Wed Mar 22 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.25-1
+- Version update
+
+* Wed Dec 14 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.24-1
+- Version update
+
+* Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.22-13
+- Install en_US.UTF-8 locale by default
+
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.22-12
+- Added i18n subpackage
+
+* Tue Oct 25 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.22-11
+- Workaround for build failure with "out of memory" message
+
+* Wed Sep 28 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.22-10
+- Added pthread_create-fix-use-after-free.patch
+
+* Tue Jun 14 2016 Divya Thaluru <dthaluru@vmware.com> - 2.22-9
+- Enabling rpm debug package and stripping the libraries
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.22-8
+- GA - Bump release of all rpms
+
+* Mon May 23 2016 Divya Thaluru <dthaluru@vmware.com> - 2.22-7
+- Added patch for CVE-2014-9761
+
+* Mon Mar 21 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.22-6
+- Security hardening: nonow
+
+* Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com> - 2.22-5
+- Change conf file qualifiers
+
+* Fri Mar 11 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.22-4
+- Added patch for res_qeury assertion with bad dns config
+- Details: https://sourceware.org/bugzilla/show_bug.cgi?id=19791
+
+* Tue Feb 16 2016 Anish Swaminathan <anishs@vmware.com> - 2.22-3
+- Added patch for CVE-2015-7547
+
+* Mon Feb 08 2016 Anish Swaminathan <anishs@vmware.com> - 2.22-2
+- Added patch for bindresvport blacklist
+
+* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> - 2.22-1
+- Updated to version 2.22
+
+* Tue Dec 1 2015 Divya Thaluru <dthaluru@vmware.com> - 2.19-8
+- Disabling rpm debug package and stripping the libraries
+
+* Wed Nov 18 2015 Divya Thaluru <dthaluru@vmware.com> - 2.19-7
+- Adding patch to close nss files database
+
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> - 2.19-6
+- Handled locale files with macro find_lang
+
+* Wed Aug 05 2015 Kumar Kaushik <kaushikk@vmware.com> - 2.19-5
+- Adding postun section for ldconfig.
+
+* Tue Jul 28 2015 Alexey Makhalov <amakhalov@vmware.com> - 2.19-4
+- Support glibc building against current rpm version.
+
+* Thu Jul 23 2015 Divya Thaluru <dthaluru@vmware.com> - 2.19-3
+- Packing locale-gen scripts
+
+* Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> - 2.19-2
+- Update according to UsrMove.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.19-1
+- Initial build. First version

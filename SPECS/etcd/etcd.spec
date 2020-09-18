@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.3.11
-Release:        2%{?dist}
+Version:        3.3.25
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/etcd-io/etcd/
 Group:          System Environment/Security
@@ -11,7 +11,8 @@ Distribution:   Mariner
 Source0:        %{name}-%{version}.tar.gz
 Source1:        etcd.service
 
-BuildRequires:  golang >= 1.7
+BuildRequires:  golang >= 1.13
+BuildRequires:  git
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -20,6 +21,18 @@ A highly-available key value store for shared configuration and service discover
 %setup -q
 
 %build
+# Turn off auto moduling. golang 1.13 does not automatically consider the vendor folder (it does as of 1.14).
+# To successfully build, manually hydrate the go package cache (GOPATH) with the included vendor folder and
+# etcd's source code before invoking the build script.
+export GO111MODULE=off
+
+%define OUR_GOPATH %{_topdir}/.gopath
+mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos"
+export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
+
+ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
+ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos/etcd"
+
 ./build
 
 %install
@@ -61,7 +74,9 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog
-*   Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.3.11-2
+*   Thu Sep 03 2020 Joe Schmitt <joschmit@microsoft.com> 3.3.25-1
+-   Update to version 3.3.25 which fixes CVE-2020-15106, CVE-2020-15112, CVE-2020-15114, and CVE-2020-15115.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.3.11-2
 -   Added %%license line automatically
 *   Thu May 07 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.3.11-1
 -   Upgrade to version 3.3.11, which fixes CVE-2018-16886.

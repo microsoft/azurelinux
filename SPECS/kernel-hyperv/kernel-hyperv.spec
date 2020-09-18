@@ -2,7 +2,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.4.51
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -14,6 +14,7 @@ Source1:        config
 ExclusiveArch:  x86_64
 
 BuildRequires:  bc
+BuildRequires:  diffutils
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  glib-devel
@@ -28,6 +29,20 @@ Requires:       filesystem kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 %define uname_r %{version}-%{release}
+
+# When updating the config files it is important to sanitize them.
+# Steps for updating a config file:
+#  1. Extract the linux sources into a folder
+#  2. Add the current config file to the folder
+#  3. Run `make menuconfig` to edit the file (Manually editing is not recommended)
+#  4. Save the config file
+#  5. Copy the config file back into the kernel spec folder
+#  6. Revert any undesired changes (GCC related changes, etc)
+#  8. Build the kernel package
+#  9. Apply the changes listed in the log file (if any) to the config file
+#  10. Verify the rest of the config file looks ok
+# If there are significant changes to the config file, disable the config check and build the
+# kernel rpm. The final config file is included in /boot in the rpm.
 
 %description
 The kernel-hyperv package contains the Linux kernel, optimized for Hyper-V
@@ -70,8 +85,25 @@ make mrproper
 
 cp %{SOURCE1} .config
 
+cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL= oldconfig
+make LC_ALL=  ARCH=x86_64 oldconfig
+
+# Verify the config files match
+cp .config new_config
+sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+diff --unified new_config current_config > config_diff || true
+if [ -s config_diff ]; then
+    printf "\n\n\n\n\n\n\n\n"
+    cat config_diff
+    printf "\n\n\n\n\n\n\n\n"
+    echo "Config file has unexpected changes"
+    echo "Update config file to set changed values explicitly"
+
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    exit 1
+fi
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=x86_64 %{?_smp_mflags}
 make -C tools perf
 
@@ -225,6 +257,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-3
+-   Add code to check for missing config flags in the checked in configs
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1

@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       8%{?dist}
+Release:       9%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -54,8 +54,6 @@ cat > %{buildroot}/etc/issue.net <<- EOF
 Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
 EOF
 
-%post
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -69,6 +67,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Fri Sep 04 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-9
+-   Remove empty %%post section, dropping dependency on /bin/sh
 *   Tue Aug 24 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-8
 -   Changing CBL-Mariner ID from "Mariner" to "mariner" to conform to standard.  Also updated Distrib-Description and Name per internal review.
 *   Tue Aug 18 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-7
