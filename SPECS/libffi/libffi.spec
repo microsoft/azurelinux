@@ -29,12 +29,15 @@ It contains the libraries and header files to create applications
 
 %build
 sed -e '/^includesdir/ s:$(libdir)/@PACKAGE_NAME@-@PACKAGE_VERSION@/include:$(includedir):' \
-    -i include/Makefile.in &&
+    -i include/Makefile.in
+# Fix .so files getting placed in $(libdir)/../lib64/
 sed -e 's:$(DESTDIR)$(toolexeclibdir):$(DESTDIR)$(libdir):g' \
-    -i Makefile.in &&
+    -i Makefile.in
+
 sed -e '/^includedir/ s:${libdir}/@PACKAGE_NAME@-@PACKAGE_VERSION@/include:@includedir@:' \
     -e 's/^Cflags: -I${includedir}/Cflags:/' \
-    -i libffi.pc.in        &&
+    -i libffi.pc.in
+
 %configure \
     --disable-static
 
