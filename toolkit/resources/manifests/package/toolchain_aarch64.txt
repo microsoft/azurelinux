@@ -168,9 +168,9 @@ libdb-5.3.28-4.cm1.aarch64.rpm
 libdb-debuginfo-5.3.28-4.cm1.aarch64.rpm
 libdb-devel-5.3.28-4.cm1.aarch64.rpm
 libdb-docs-5.3.28-4.cm1.aarch64.rpm
-libffi-3.2.1-10.cm1.aarch64.rpm
-libffi-debuginfo-3.2.1-10.cm1.aarch64.rpm
-libffi-devel-3.2.1-10.cm1.aarch64.rpm
+libffi-3.2.1-11.cm1.aarch64.rpm
+libffi-debuginfo-3.2.1-11.cm1.aarch64.rpm
+libffi-devel-3.2.1-11.cm1.aarch64.rpm
 libgcc-9.1.0-7.cm1.aarch64.rpm
 libgcc-atomic-9.1.0-7.cm1.aarch64.rpm
 libgcc-devel-9.1.0-7.cm1.aarch64.rpm
