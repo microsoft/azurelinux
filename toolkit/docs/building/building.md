@@ -306,7 +306,7 @@ sudo make go-tools REBUILD_TOOLS=y
 
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
@@ -316,7 +316,7 @@ sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UP
 
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make image PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
