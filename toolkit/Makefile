@@ -100,8 +100,8 @@ BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
 RELEASE_MAJOR_ID   ?= 1.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
-ifneq ($(wildcard $(OUT_DIR)/version-minor-id.txt),)
-	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.txt)
+ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
+	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
 else
 	RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
 endif
