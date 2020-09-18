@@ -6,6 +6,8 @@
 package configuration
 
 import (
+	"encoding/json"
+	"fmt"
 	"path/filepath"
 
 	"microsoft.com/pkggen/internal/file"
@@ -52,17 +54,6 @@ type TargetDisk struct {
 	Value string `json:"Value"`
 }
 
-// Disk holds the disk partitioning, formatting and size information.
-// It may also define artifacts generated for each disk.
-type Disk struct {
-	PartitionTableType string      `json:"PartitionTableType"`
-	MaxSize            uint64      `json:"MaxSize"`
-	TargetDisk         TargetDisk  `json:"TargetDisk"`
-	Artifacts          []Artifact  `json:"Artifacts"`
-	Partitions         []Partition `json:"Partitions"`
-	RawBinaries        []RawBinary `json:"RawBinaries"`
-}
-
 // PartitionSetting holds the mounting information for each partition.
 type PartitionSetting struct {
 	RemoveDocs   bool   `json:"RemoveDocs"`
@@ -103,22 +94,6 @@ type RootEncryption struct {
 	Password string `json:"Password"`
 }
 
-// SystemConfig defines how each system present on the image is supposed to be configured.
-type SystemConfig struct {
-	IsDefault          bool                `json:"IsDefault"`
-	BootType           string              `json:"BootType"`
-	Hostname           string              `json:"Hostname"`
-	Name               string              `json:"Name"`
-	PackageLists       []string            `json:"PackageLists"`
-	KernelOptions      map[string]string   `json:"KernelOptions"`
-	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
-	PartitionSettings  []PartitionSetting  `json:"PartitionSettings"`
-	PostInstallScripts []PostInstallScript `json:"PostInstallScripts"`
-	Groups             []Group             `json:"Groups"`
-	Users              []User              `json:"Users"`
-	Encryption         RootEncryption      `json:"Encryption"`
-}
-
 // Config holds the parsed values of the configuration schemas as well as
 // a few computed values simplifying access to certain pieces of the configuration.
 type Config struct {
@@ -128,6 +103,51 @@ type Config struct {
 
 	// Computed values not present in the config JSON.
 	DefaultSystemConfig *SystemConfig // A system configuration with the "IsDefault" field set or the first system configuration if there is no explicit default.
+}
+
+// IsValid returns an error if the Config is not valid
+func (c *Config) IsValid() (err error) {
+	for _, disk := range c.Disks {
+		if err = disk.IsValid(); err != nil {
+			return fmt.Errorf("invalid [Disks]: %w", err)
+		}
+	}
+
+	if len(c.SystemConfigs) == 0 {
+		return fmt.Errorf("config file must provide at least one system configuration inside the [SystemConfigs] field")
+	}
+	for _, sysConfig := range c.SystemConfigs {
+		if err = sysConfig.IsValid(); err != nil {
+			return fmt.Errorf("invalid [SystemConfigs]: %w", err)
+		}
+	}
+	defaultFound := false
+	for _, sysConfig := range c.SystemConfigs {
+		if sysConfig.IsDefault {
+			if defaultFound {
+				return fmt.Errorf("config file must have no more than one default system configuration. Please remove redundant [IsDefault] fields")
+			}
+			defaultFound = true
+		}
+	}
+	return
+}
+
+// UnmarshalJSON Unmarshals a Config entry
+func (c *Config) UnmarshalJSON(b []byte) (err error) {
+	// Use an intermediate type which will use the default JSON unmarshal implementation
+	type IntermediateTypeConfig Config
+	err = json.Unmarshal(b, (*IntermediateTypeConfig)(c))
+	if err != nil {
+		return fmt.Errorf("failed to parse [Config]: %w", err)
+	}
+
+	// Now validate the resulting unmarshaled object
+	err = c.IsValid()
+	if err != nil {
+		return fmt.Errorf("failed to parse [Config]: %w", err)
+	}
+	return
 }
 
 // Load loads the config schema from a JSON file found under the 'configFilePath'.
