@@ -1,7 +1,7 @@
 Summary:    A portable, high level programming interface to various calling conventions
 Name:       libffi
 Version:    3.2.1
-Release:    10%{?dist}
+Release:    11%{?dist}
 License:    BSD
 URL:        http://sourceware.org/libffi/
 Group:      System Environment/GeneralLibraries
@@ -29,17 +29,18 @@ It contains the libraries and header files to create applications
 
 %build
 sed -e '/^includesdir/ s:$(libdir)/@PACKAGE_NAME@-@PACKAGE_VERSION@/include:$(includedir):' \
-    -i include/Makefile.in &&
+    -i include/Makefile.in
+# Fix .so files getting placed in $(libdir)/../lib64/
+sed -e 's:$(DESTDIR)$(toolexeclibdir):$(DESTDIR)$(libdir):g' \
+    -i Makefile.in
+
 sed -e '/^includedir/ s:${libdir}/@PACKAGE_NAME@-@PACKAGE_VERSION@/include:@includedir@:' \
     -e 's/^Cflags: -I${includedir}/Cflags:/' \
-    -i libffi.pc.in        &&
-./configure \
-	CFLAGS="%{optflags}" \
-	CXXFLAGS="%{optflags}" \
-	--prefix=%{_prefix} \
-	--bindir=%{_bindir} \
-	--libdir=%{_libdir} \
-	--disable-static
+    -i libffi.pc.in
+
+%configure \
+    --disable-static
+
 make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
@@ -76,6 +77,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Fri Sep 18 2020 Mateusz Malisz <mamalisz@microsoft.com> 3.2.1-11
+-   Fix normal libffi build by replacing destination for .so files from $(toolexeclibdir) to $(libdir)
+-   Replace ./configure and manual options with %%configure macro
 *   Tue Jul 07 2020 Henry Beberman <henry.beberman@microsoft.com> 3.2.1-10
 -   Comment out dejagnu dependency and check to prevent a rebuild.
 *   Wed May 13 2020 Nick Samson <nisamson@microsoft.com> 3.2.1-9
