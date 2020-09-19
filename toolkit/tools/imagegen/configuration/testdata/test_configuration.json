@@ -194,6 +194,10 @@
             "PackageLists": [
                 "path/to/packages.json"
             ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv":  "kernel-hyperv"
+            },
             "Hostname": "Mariner-TestA",
             "Users": [
                 {
@@ -223,6 +227,10 @@
             "PackageLists": [
                 "path/to/packages.json"
             ],
+            "KernelOptions": {
+                "default": "kernel",
+                "hyperv":  "kernel-hyperv"
+            },
             "Hostname": "Mariner-TestB",
             "Users": [
                 {

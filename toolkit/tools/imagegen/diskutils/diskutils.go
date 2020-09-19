@@ -244,7 +244,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 	// Create new partition table
 	partitionTableType := disk.PartitionTableType
-	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partitionTableType)
+	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partitionTableType.String())
 	if err != nil {
 		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
 		return
@@ -253,7 +253,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	// Partitions assumed to be defined in sorted order
 	for idx, partition := range disk.Partitions {
 		partitionNumber := idx + 1
-		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
+		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition)
 		if err != nil {
 			logger.Log.Warnf("Failed to create single partition")
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err

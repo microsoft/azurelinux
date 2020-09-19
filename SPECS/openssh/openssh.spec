@@ -1,7 +1,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 URL:            https://www.openssh.com/
 Group:          System Environment/Security
@@ -171,6 +171,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
+*   Wed Sep 02 2020 Jim Perrin <jim.perrin@microsoft.com> 8.0p1-8
+-   Add wants=sshd-keygen.service to sshd.service for easier service starting
 *   Thu Jun 04 2020 Chris Co <chrco@microsoft.com> 8.0p1-7
 -   Use default MaxAuthTries value of 6
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.0p1-6

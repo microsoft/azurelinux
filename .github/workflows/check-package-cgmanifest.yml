@@ -2,9 +2,9 @@ name: Check Package CGManifests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev, 1.0* ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev, 1.0* ]
 
 jobs:
 
@@ -16,15 +16,26 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
-    - name: Get base commit
+    - name: Get base commit for PRs
+      if: ${{ github.event_name == 'pull_request' }}
       run: |
         git fetch origin ${{ github.base_ref }}
         echo "::set-env name=base_sha::$(git rev-parse origin/${{ github.base_ref }})"
         echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
+    - name: Get base commit for Pushes
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        git fetch origin ${{ github.event.before }}
+        echo "::set-env name=base_sha::${{ github.event.before }}"
+        echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
     - name: Get the changed files
       run: |
-        echo "::set-env name=updated-specs::$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | grep "\.spec$")"
+        echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+        changed_specs=$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
+        echo "Files to validate: '${changed_specs}'"
+        echo "::set-env name=updated-specs::$(echo ${changed_specs})"
 
     - name: Check each spec
       run: |
