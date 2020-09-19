@@ -64,3 +64,4 @@ cp "$INPUT_CERTDATA" "$MICROSOFT_CERTDATA_PATH"
 update_signatures
 update_spec
 update_manifests
+create_pull_request
