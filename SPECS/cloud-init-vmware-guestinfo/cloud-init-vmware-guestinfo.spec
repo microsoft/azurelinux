@@ -31,6 +31,7 @@ install -dm 0755 %{buildroot}%{python3_sitelib}/cloudinit/sources/
 install -m 0644 DataSourceVMwareGuestInfo.py %{buildroot}%{python3_sitelib}/cloudinit/sources/DataSourceVMwareGuestInfo.py
 
 %files
+%license LICENSE
 %config %{_sysconfdir}/cloud/cloud.cfg.d/99-DataSourceVMwareGuestInfo.cfg
 %{python3_sitelib}/cloudinit/sources/DataSourceVMwareGuestInfo.py
 
