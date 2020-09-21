@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -425,6 +425,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
+- Aligning 'nssckbi.h' with the used 'certdata.txt' version for the Mozilla bundle.
+
 * Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
 - Removing unused 'Requires*'.
 
