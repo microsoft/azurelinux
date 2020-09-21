@@ -8,12 +8,12 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/vmware/cloud-init-vmware-guestinfo
-BuildArch:      noarch
 
-#Source0:  https://github.com/vmware/%{name}/archive/v%{version}.tar.gz
+#Source0:      https://github.com/vmware/%{name}/archive/v%{version}.tar.gz
 Source0:       %{name}-%{version}.tar.gz
 BuildRequires: python3
 Requires:      cloud-init
+BuildArch:     noarch
 
 %description
 Provides a cloud-init datasource for pulling meta, user,
@@ -37,5 +37,5 @@ install -m 0644 DataSourceVMwareGuestInfo.py %{buildroot}%{python3_sitelib}/clou
 
 %changelog
 * Thu Sep 17 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.3.1-1
-- Initial CBL-Mariner packaging.
+- Original version for CBL-Mariner.
 - License Verified
