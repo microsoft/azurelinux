@@ -4,10 +4,10 @@ Version:        1.3.1
 Release:        1
 Summary:        A cloud-init datasource for VMware
 Group:          System/Management
-License:        Apache-2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Url:            https://github.com/vmware/cloud-init-vmware-guestinfo
+URL:            https://github.com/vmware/cloud-init-vmware-guestinfo
 BuildArch:      noarch
 
 #Source0:  https://github.com/vmware/%{name}/archive/v%{version}.tar.gz
