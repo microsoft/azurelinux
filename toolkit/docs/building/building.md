@@ -1,7 +1,5 @@
 # Building
 
-===
-
 - [Building](#building)
   - [Quick Start](#quick-start)
     - [Prerequisites](#prerequisites)
@@ -71,8 +69,6 @@
     - [Build Details](#build-details)
 
 ## Quick Start
-
-===
 
 ### Prerequisites
 
@@ -278,8 +274,6 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ## Keys, Certs, and Remote Sources
 
-===
-
 ### Sources
 
 The build system pulls files two ways:
@@ -315,8 +309,6 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 ```
 
 ## Building Everything From Scratch
-
-===
 
 **NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources**
 
@@ -498,8 +490,6 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 ## All Build Targets
 
-===
-
 These are the useful build targets:
 | Target                           | Description
 |:---------------------------------|:---
@@ -535,8 +525,6 @@ These are the useful build targets:
 | workplan                         | Create the package build workplan.
 
 ## Reproducing a Build
-
-===
 
 By default the build system will pull the highest possible version of external packages when building. However, there may be circumstances when you wish to reproduce a build using the exact same external package versions as before, even if newer versions are available.
 
