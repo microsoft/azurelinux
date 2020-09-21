@@ -84,6 +84,11 @@ By default all build commands are executed from inside the `./toolkit` folder.
 A few one-time steps can be run now (they will re-run automatically later if needed)
 
 Remote files are generally only available for release branches.
+
+**IMPORTANT:** HEAD of many branches is not guaranteed to build successfully. To avoid build issues it is recommended to check out the `[BRANCH-NAME]-stable` tag.
+
+Example: to safely build the `1.0`  branch check out the `1.0-stable` tag.
+
 ```bash
 # Get the source code
 git clone https://github.com/microsoft/CBL-Mariner.git
