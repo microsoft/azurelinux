@@ -738,7 +738,7 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 	}
 
 	// Append any additional command line parameters
-	err = setGrubCfgAdditional(installGrubCfgFile, kernelCommandLine)
+	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
 		return
