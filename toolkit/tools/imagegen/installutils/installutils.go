@@ -744,15 +744,6 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 		return
 	}
 
-	logger.Log.Errorf("Grub at %s", installGrubCfgFile)
-	stdout, stderr, err := shell.Execute("ls", filepath.Join(installRoot, "boot/grub2/"))
-	logger.Log.Error(stdout)
-	logger.Log.Error(stderr)
-
-	stdout, stderr, err = shell.Execute("cat", installGrubCfgFile)
-	logger.Log.Error(stdout)
-	logger.Log.Error(stderr)
-
 	return
 }
 
@@ -1313,7 +1304,6 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 func setGrubCfgAdditional(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
 		extraPattern = "{{.ExtraCommandLine}}"
-		sedDelimiter = "@"
 	)
 
 	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
@@ -1346,17 +1336,17 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 
 func setGrubCfgLVM(grubPath, luksUUID string) (err error) {
 	const (
-		lvmPrefix    = "rd.lvm.lv="
-		lvmPattern   = "{{.LVM}}"
-		sedDelimiter = "@"
+		lvmPrefix  = "rd.lvm.lv="
+		lvmPattern = "{{.LVM}}"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	var lvm string
 	if luksUUID != "" {
 		lvm = fmt.Sprintf("%v%v", lvmPrefix, diskutils.GetEncryptedRootVolPath())
 	}
 
-	err = sed(lvmPattern, lvm, sedDelimiter, grubPath)
+	err = sed(lvmPattern, lvm, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's LVM setting: %v", err)
 	}
@@ -1368,14 +1358,16 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 	const (
 		luksUUIDPrefix  = "luks.uuid="
 		luksUUIDPattern = "{{.LuksUUID}}"
-		sedDelimiter    = "/"
 	)
-	var luksUUID string
+	var (
+		cmdline  configuration.KernelCommandLine
+		luksUUID string
+	)
 	if uuid != "" {
 		luksUUID = fmt.Sprintf("%v%v", luksUUIDPrefix, uuid)
 	}
 
-	err = sed(luksUUIDPattern, luksUUID, sedDelimiter, grubPath)
+	err = sed(luksUUIDPattern, luksUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's luksUUID: %v", err)
 		return
@@ -1387,10 +1379,10 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	const (
 		bootUUIDPattern = "{{.BootUUID}}"
-		sedDelimiter    = "/"
 	)
+	var cmdline configuration.KernelCommandLine
 
-	err = sed(bootUUIDPattern, bootUUID, sedDelimiter, grubPath)
+	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
 		return
@@ -1401,12 +1393,12 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 	const (
 		encryptedVolPattern = "{{.EncryptedVolume}}"
-		sedDelimiter        = "@"
 		lvmPrefix           = "lvm/"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	err = sed(encryptedVolPattern, encryptedVol, sedDelimiter, grubPath)
+	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
 		return
@@ -1417,14 +1409,14 @@ func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 	const (
 		rootDevicePattern = "{{.RootPartition}}"
-		sedDelimiter      = "@"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	if luksUUID != "" {
 		rootDevice = diskutils.GetEncryptedRootVolMapping()
 	}
 
-	err = sed(rootDevicePattern, rootDevice, sedDelimiter, grubPath)
+	err = sed(rootDevicePattern, rootDevice, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's rootDevice: %v", err)
 		return
