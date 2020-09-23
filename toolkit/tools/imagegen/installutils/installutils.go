@@ -1301,7 +1301,7 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	return
 }
 
-func setGrubCfgAdditional(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
 		extraPattern = "{{.ExtraCommandLine}}"
 	)
