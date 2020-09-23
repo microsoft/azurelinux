@@ -1306,6 +1306,7 @@ func setGrubCfgAdditional(grubPath string, kernelCommandline configuration.Kerne
 		extraPattern = "{{.ExtraCommandLine}}"
 	)
 
+	logger.Log.Debugf("Adding ExtraCommandLine('%s') to %s", kernelCommandline.ExtraCommandLine, grubPath)
 	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
@@ -1326,6 +1327,7 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 		ima += fmt.Sprintf("%v%v ", imaPrefix, policy)
 	}
 
+	logger.Log.Debugf("Adding ImaPolicy('%s') to %s", ima, grubPath)
 	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
@@ -1346,6 +1348,7 @@ func setGrubCfgLVM(grubPath, luksUUID string) (err error) {
 		lvm = fmt.Sprintf("%v%v", lvmPrefix, diskutils.GetEncryptedRootVolPath())
 	}
 
+	logger.Log.Debugf("Adding lvm('%s') to %s", lvm, grubPath)
 	err = sed(lvmPattern, lvm, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's LVM setting: %v", err)
@@ -1367,6 +1370,7 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 		luksUUID = fmt.Sprintf("%v%v", luksUUIDPrefix, uuid)
 	}
 
+	logger.Log.Debugf("Adding luks('%s') to %s", luksUUID, grubPath)
 	err = sed(luksUUIDPattern, luksUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's luksUUID: %v", err)
@@ -1382,6 +1386,7 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	)
 	var cmdline configuration.KernelCommandLine
 
+	logger.Log.Debugf("Adding UUID('%s') to %s", bootUUID, grubPath)
 	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
@@ -1398,6 +1403,7 @@ func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 	var cmdline configuration.KernelCommandLine
 
 	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
+	logger.Log.Debugf("Adding EncryptedVolume('%s') to %s", encryptedVol, grubPath)
 	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
@@ -1416,6 +1422,7 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 		rootDevice = diskutils.GetEncryptedRootVolMapping()
 	}
 
+	logger.Log.Debugf("Adding RootDevice('%s') to %s", rootDevice, grubPath)
 	err = sed(rootDevicePattern, rootDevice, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's rootDevice: %v", err)
