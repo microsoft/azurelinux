@@ -1,7 +1,7 @@
 Summary:          OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:             tpm2-tss
-Version:          2.2.0
-Release:          4%{?dist}
+Version:          2.4.0
+Release:          1%{?dist}
 License:          BSD
 URL:              https://github.com/tpm2-software/tpm2-tss
 Group:            System Environment/Security
@@ -9,7 +9,9 @@ Vendor:           Microsoft Corporation
 Distribution:     Mariner
 Source0:          https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:    openssl-devel
+BuildRequires:    json-c-devel
 Requires:         openssl
+Requires:         json-c
 Requires(pre):    /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel /usr/sbin/groupdel
 %description
@@ -64,7 +66,10 @@ fi
 %defattr(-,root,root)
 %license LICENSE
 %{_sysconfdir}/udev/rules.d/tpm-udev.rules
+%{_sysconfdir}/tmpfiles.d/tpm2-tss-fapi.conf
+%{_sysconfdir}/tpm2-tss/*
 %{_libdir}/*.so.0.0.0
+%exclude %{_sysconfdir}/sysusers.d/tpm2-tss.conf
 
 %files devel
 %defattr(-,root,root)
@@ -77,9 +82,10 @@ fi
 %{_mandir}/man7
 
 %changelog
-* Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-4
-- Added %%license line automatically
-
+*   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.0-1
+-   Update to 2.4.0.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-4
+-   Added %%license line automatically
 *   Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 2.2.0-3
 -   Updated Source0. Removed %%define sha1. Updated license abbreviation and validated license.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
