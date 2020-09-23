@@ -230,3 +230,36 @@ func InstallRPM(rpmFile string) (err error) {
 
 	return
 }
+
+// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
+func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	const (
+		queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH}]\n"
+		// "(none)" means no ExclusiveArch tag has been set.
+		noExclusiveArch = "(none)"
+	)
+
+	const (
+		MachineArchField   = iota
+		ExclusiveArchField = iota
+		MinimumFieldsCount = iota
+	)
+
+	// Sanity check that this SPEC is meant to be built for the current machine architecture
+	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
+
+	// If the list does not return enough lines then there is no exclusive arch set
+	if len(exclusiveArchList) < MinimumFieldsCount {
+		return
+	}
+
+	if !strings.Contains(exclusiveArchList[ExclusiveArchField], exclusiveArchList[MachineArchField]) {
+		isCompatible = false
+	}
+
+	return
+}
