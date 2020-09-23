@@ -686,9 +686,10 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
+// - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -728,6 +729,29 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 		logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
 		return
 	}
+
+	// Configure IMA policy
+	err = setGrubCfgIMA(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
+		return
+	}
+
+	// Append any additional command line parameters
+	err = setGrubCfgAdditional(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
+		return
+	}
+
+	logger.Log.Errorf("Grub at %s", installGrubCfgFile)
+	stdout, stderr, err := shell.Execute("ls", filepath.Join(installRoot, "boot/grub2/"))
+	logger.Log.Error(stdout)
+	logger.Log.Error(stderr)
+
+	stdout, stderr, err = shell.Execute("cat", installGrubCfgFile)
+	logger.Log.Error(stdout)
+	logger.Log.Error(stderr)
 
 	return
 }
@@ -1281,6 +1305,40 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 		if err != nil {
 			return
 		}
+	}
+
+	return
+}
+
+func setGrubCfgAdditional(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		extraPattern = "{{.ExtraCommandLine}}"
+		sedDelimiter = "@"
+	)
+
+	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
+	}
+
+	return
+}
+
+func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		imaPrefix  = "ima_policy="
+		imaPattern = "{{.IMAPolicy}}"
+	)
+
+	var ima string
+
+	for _, policy := range kernelCommandline.ImaPolicy {
+		ima += fmt.Sprintf("%v%v ", imaPrefix, policy)
+	}
+
+	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
 	}
 
 	return
