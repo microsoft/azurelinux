@@ -34,6 +34,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		}
 
 		// This node is not yet solvable
+		logger.Log.Debugf("Could not subgraph due to node: %v", pkgNode)
 		return true
 	})
 
