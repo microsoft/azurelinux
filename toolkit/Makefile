@@ -16,7 +16,6 @@ CONFIG_FILE            ?= $(toolkit_root)/imageconfigs/core-efi.json
 CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
-PACKAGE_IGNORE_LIST    ?=
 SSH_KEY_FILE           ?=
 
 REBUILD_TOOLCHAIN               ?= n
@@ -37,6 +36,8 @@ IMAGE_CACHE_SUMMARY             ?=
 INITRD_CACHE_SUMMARY            ?=
 PACKAGE_ARCHIVE                 ?=
 PACKAGE_BUILD_RETRIES           ?= 1
+# Set to 0 to use the number of logical CPUs.
+CONCURRENT_PACKAGE_BUILDS       ?= 0
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
