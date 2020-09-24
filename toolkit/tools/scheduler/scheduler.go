@@ -227,7 +227,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
-		// useCachedImplicit tracks if cached implicit provides can be used to satsify unresolve dynamic dependencies.
+		// useCachedImplicit tracks if cached implicit provides can be used to satsify unresolved dynamic dependencies.
 		// Local packages are preferred over cached remotes ones to satsify these unresolved dependencies, however
 		// the scheduler does not know what packages provide which implicit provides until the packages have been built.
 		// Therefore the scheduler will attempt to build all possible packages without consuming any cached dynamic dependencies first.
@@ -250,7 +250,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running try enabling cached packages for unresolve dynamic dependencies to unblocked more nodes.
+		// If there are no active builds running try enabling cached packages for unresolved dynamic dependencies to unblocked more nodes.
 		// Otherwise there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {
