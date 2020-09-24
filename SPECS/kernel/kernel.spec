@@ -333,7 +333,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 *   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-7
--   Enable Mellanox kernel configs for SR-IOV support
+-   Enable Mellanox kernel configs
 *   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
 -   Enable CONFIG_IMA (measurement only) and associated configs
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5
