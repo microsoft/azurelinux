@@ -231,6 +231,21 @@ func InstallRPM(rpmFile string) (err error) {
 	return
 }
 
+// QueryRPMProvides returns what an RPM file provides.
+func QueryRPMProvides(rpmFile string) (provides []string, err error) {
+	const queryProvidesOption = "-qpP"
+
+	logger.Log.Debugf("Querying RPM provides (%s)", rpmFile)
+	stdout, stderr, err := shell.Execute(rpmProgram, queryProvidesOption, rpmFile)
+	if err != nil {
+		logger.Log.Warn(stderr)
+		return
+	}
+
+	provides = sanitizeOutput(stdout)
+	return
+}
+
 // SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
 func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
 	const (
