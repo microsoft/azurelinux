@@ -81,6 +81,10 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, buildSta
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
 func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+	if res.Err != nil {
+		return
+	}
+
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
 	// Filter the nodes to ensure no duplicates.

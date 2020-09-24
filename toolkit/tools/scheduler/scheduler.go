@@ -250,7 +250,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running try enabling cached packages for unresolved dynamic dependencies to unblocked more nodes.
+		// If there are no active builds running try enabling cached packages for unresolve dynamic dependencies to unblocked more nodes.
 		// Otherwise there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {
@@ -270,18 +270,21 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		buildState.RecordBuildResult(res)
 
 		if !stopBuilding {
-			if res.Err == nil && !isGraphOptimized {
-				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, buildState)
-				didOptimize, newGraph, newGoalNode := updateGraphWithImplicitProvides(res, pkgGraph, useCachedImplicit)
-				if didOptimize {
-					isGraphOptimized = true
-					// Replace the graph and goal node pointers.
-					// Any outstanding builds of nodes that are no longer in the graph will gracefully handle this.
-					// When querying their edges, the graph library will return an empty iterator (graph.Empty).
-					pkgGraph = newGraph
-					goalNode = newGoalNode
+			if res.Err == nil {
+				if !isGraphOptimized {
+					didOptimize, newGraph, newGoalNode := updateGraphWithImplicitProvides(res, pkgGraph, useCachedImplicit)
+					if didOptimize {
+						isGraphOptimized = true
+						// Replace the graph and goal node pointers.
+						// Any outstanding builds of nodes that are no longer in the graph will gracefully handle this.
+						// When querying their edges, the graph library will return an empty iterator (graph.Empty).
+						pkgGraph = newGraph
+						goalNode = newGoalNode
+					}
 				}
-			} else if res.Err != nil && stopOnFailure {
+
+				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, buildState)
+			} else if stopOnFailure {
 				stopBuilding = true
 				err = res.Err
 				stopBuild(channels, buildState)
