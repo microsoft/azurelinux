@@ -27,6 +27,8 @@ import (
 )
 
 const (
+	// NullDevice represents the /dev/null device used as a mount device for overlay images.
+	NullDevice     = "/dev/null"
 	rootMountPoint = "/"
 	rootUser       = "root"
 
@@ -53,19 +55,25 @@ type PackageList struct {
 // - mountPointDevPathMap is a map of mountpoint to partition device path
 // - mountPointToFsTypeMap is a map of mountpoint to filesystem type
 // - mountPointToMountArgsMap is a map of mountpoint to mount arguments to be passed on a call to mount
-func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, config configuration.SystemConfig) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string) {
+// - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
+func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, config configuration.SystemConfig) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, diffDiskBuild bool) {
 	mountPointDevPathMap = make(map[string]string)
 	mountPointToFsTypeMap = make(map[string]string)
 	mountPointToMountArgsMap = make(map[string]string)
+	diffDiskBuild = false
 
 	// Go through each PartitionSetting
 	for _, partitionSetting := range config.PartitionSettings {
 		logger.Log.Tracef("%v[%v]", partitionSetting.ID, partitionSetting.MountPoint)
 		partDevPath, ok := partDevPathMap[partitionSetting.ID]
 		if ok {
-			mountPointDevPathMap[partitionSetting.MountPoint] = partDevPath
-			mountPointToFsTypeMap[partitionSetting.MountPoint] = partIDToFsTypeMap[partitionSetting.ID]
-			mountPointToMountArgsMap[partitionSetting.MountPoint] = partitionSetting.MountOptions
+			if partitionSetting.OverlayBaseImage == "" {
+				mountPointDevPathMap[partitionSetting.MountPoint] = partDevPath
+				mountPointToFsTypeMap[partitionSetting.MountPoint] = partIDToFsTypeMap[partitionSetting.ID]
+				mountPointToMountArgsMap[partitionSetting.MountPoint] = partitionSetting.MountOptions
+			} else {
+				diffDiskBuild = true
+			}
 		}
 		logger.Log.Tracef("%v", mountPointDevPathMap)
 	}
@@ -95,17 +103,66 @@ func sortMountPoints(mountPointMap *map[string]string, sortForUnmount bool) (rem
 		sort.Sort(sort.Reverse(sort.StringSlice(remainingMounts)))
 	}
 
+// UpdatePartitionMapWithOverlays Creates Overlay map and updates the partition map with required parameters.
+// - partDevPathMap is a map of partition IDs to partition device paths
+// - partIDToFsTypeMap is a map of partition IDs to filesystem type
+// - mountPointDevPathMap is a map of mountpoint to partition device path
+// - mountPointToFsTypeMap is a map of mountpoint to filesystem type
+// - mountPointToMountArgsMap is a map of mountpoint to mount arguments to be passed on a call to mount
+// - config is the SystemConfig from a config file
+// Output
+// - mountPointToOverlayMap is a map of mountpoint to overlay data
+func UpdatePartitionMapWithOverlays(partDevPathMap, partIDToFsTypeMap, mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, config configuration.SystemConfig) (mountPointToOverlayMap map[string]*Overlay, err error) {
+	mountPointToOverlayMap = make(map[string]*Overlay)
+
+	// Go through each PartitionSetting
+	for _, partitionSetting := range config.PartitionSettings {
+		logger.Log.Tracef("%v[%v]", partitionSetting.ID, partitionSetting.MountPoint)
+		if partitionSetting.OverlayBaseImage != "" {
+			err = createOverlayPartition(partitionSetting, mountPointDevPathMap, mountPointToMountArgsMap, mountPointToFsTypeMap, mountPointToOverlayMap)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return
+}
+
+func createOverlayPartition(partitionSetting configuration.PartitionSetting, mountPointDevPathMap, mountPointToMountArgsMap, mountPointToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+	//Mount the base image
+	//Create a temp upper dir
+	//Add to the mount args
+	devicePath, err := diskutils.SetupLoopbackDevice(partitionSetting.OverlayBaseImage)
+
+	if err != nil {
+		logger.Log.Errorf("Could not setup loop back device for mount (%s)", partitionSetting.OverlayBaseImage)
+		return
+	}
+
+	overlayMount := Overlay{
+		DevicePath: devicePath,
+	}
+	mountPointToOverlayMap[partitionSetting.MountPoint] = &overlayMount
+
+	// For overlays the device to be mounted is /dev/null. The actual device is synthesized from the lower and upper dir args
+	// These args are passed to the mount command using -o
+	mountPointDevPathMap[partitionSetting.MountPoint] = NullDevice
+	mountPointToMountArgsMap[partitionSetting.MountPoint] = overlayMount.getMountArgs()
+	mountPointToFsTypeMap[partitionSetting.MountPoint] = "overlay"
 	return
 }
 
 // CreateInstallRoot walks through the map of mountpoints and mounts the partitions into installroot
 // - installRoot is the destination path to mount these partitions
 // - mountPointMap is the map of mountpoint to partition device path
-func CreateInstallRoot(installRoot string, mountPointMap, mountPointToMountArgsMap map[string]string) (installMap map[string]string, err error) {
+// - mountPointToFsTypeMap is the map of mountpoint to the file type
+// - mountPointToMountArgsMap is the map of mountpoint to the parameters sent to
+// - mountPointToOverlayMap is the map of mountpoint to the overlay structure containing the base image
+func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (installMap map[string]string, err error) {
 	installMap = make(map[string]string)
 	for _, mountPoint := range sortMountPoints(&mountPointMap, false) {
 		device := mountPointMap[mountPoint]
-		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToMountArgsMap[mountPoint])
+		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
 		if err != nil {
 			return
 		}
@@ -117,7 +174,12 @@ func CreateInstallRoot(installRoot string, mountPointMap, mountPointToMountArgsM
 // DestroyInstallRoot unmounts each of the installroot mountpoints in order, ensuring that the root mountpoint is last
 // - installRoot is the path to the root where the mountpoints exist
 // - mountPointMap is the map of mountpoints to partition device paths
-func DestroyInstallRoot(installRoot string, mountPointMap map[string]string) (err error) {
+// - mountPointToOverlayMap is the map of mountpoints to overlay devices
+func DestroyInstallRoot(installRoot string, mountPointMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+	logger.Log.Trace("Destroying InstallRoot")
+
+	defer OverlayUnmount(mountPointToOverlayMap)
+
 	logger.Log.Trace("Destroying InstallRoot")
 	// Reverse order for unmounting
 	for _, mountPoint := range sortMountPoints(&mountPointMap, true) {
@@ -135,36 +197,62 @@ func DestroyInstallRoot(installRoot string, mountPointMap map[string]string) (er
 	return
 }
 
-func mountSingleMountPoint(installRoot, mountPoint, device, extraOptions string) (err error) {
-	logger.Log.Debugf("Mounting %s to %s", device, mountPoint)
+// OverlayUnmount unmounts the overlay devices that are stored in the map, It ignores the errors and returns the last error.
+// - mountPointToOverlayMap is the map of mountpoints to overlay devices
+func OverlayUnmount(mountPointToOverlayMap map[string]*Overlay) (err error) {
+	for _, overlay := range mountPointToOverlayMap {
+		temperr := overlay.unmount()
+		if temperr != nil {
+			// Log a warning on error. Return the last error.
+			logger.Log.Warnf("Failed to unmount the overlay (%+v). Continuing without unmounting: (%v)", overlay, temperr)
+			err = temperr
+		}
+	}
+	return
+}
+
+func mountSingleMountPoint(installRoot, mountPoint, device, fsType, extraOptions string, overlayDevice *Overlay) (err error) {
 	mountPath := filepath.Join(installRoot, mountPoint)
 	err = os.MkdirAll(mountPath, os.ModePerm)
 	if err != nil {
 		logger.Log.Warnf("Failed to create mountpoint: %v", err)
 		return
 	}
-	err = mount(mountPath, device, extraOptions)
+
+	if overlayDevice != nil {
+		err = overlayDevice.setupFolders()
+		if err != nil {
+			logger.Log.Errorf("Failed to create mount for overlay device: %v", err)
+			return
+		}
+	}
+	err = mount(mountPath, device, fsType, extraOptions)
 	return
 }
 
 func unmountSingleMountPoint(installRoot, mountPoint string) (err error) {
+
 	mountPath := filepath.Join(installRoot, mountPoint)
 	err = umount(mountPath)
 	return
 }
 
-func mount(path, device, extraOptions string) (err error) {
+func mount(path, device, fsType, extraOptions string) (err error) {
 	const squashErrors = false
 
-	if extraOptions == "" {
-		err = shell.ExecuteLive(squashErrors, "mount", device, path)
-	} else {
-		err = shell.ExecuteLive(squashErrors, "mount", "-o", extraOptions, device, path)
+	var mountArgs []string
+
+	if fsType != "" {
+		mountArgs = append(mountArgs, "-t", fsType)
 	}
 
-	if err != nil {
-		return
+	if extraOptions != "" {
+		mountArgs = append(mountArgs, "-o", extraOptions)
 	}
+
+	mountArgs = append(mountArgs, device, path)
+
+	err = shell.ExecuteLive(squashErrors, "mount", mountArgs...)
 	return
 }
 
@@ -268,7 +356,8 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - mountPointToMountArgsMap is a map of mountpoints to mount options
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+//- diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild bool) (err error) {
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -280,7 +369,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 
 	// Initialize RPM Database so we can install RPMs into the installroot
-	err = initializeRpmDatabase(installRoot)
+	err = initializeRpmDatabase(installRoot, diffDiskBuild)
 	if err != nil {
 		return
 	}
@@ -315,7 +404,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	hostname := config.Hostname
-	if !isRootFS {
+	if !isRootFS && mountPointToFsTypeMap[rootMountPoint] != "overlay" {
 		// Add /etc/hostname
 		err = updateHostname(installChroot.RootDir(), hostname)
 		if err != nil {
@@ -377,15 +466,18 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	return
 }
 
-func initializeRpmDatabase(installRoot string) (err error) {
-	stdout, stderr, err := shell.Execute("rpm", "--root", installRoot, "--initdb")
-	if err != nil {
-		logger.Log.Warnf("Failed to create rpm database: %v", err)
-		logger.Log.Warn(stdout)
-		logger.Log.Warn(stderr)
-		return
+func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
+	if !diffDiskBuild {
+		stdout := ""
+		stderr := ""
+		stdout, stderr, err = shell.Execute("rpm", "--root", installRoot, "--initdb")
+		if err != nil {
+			logger.Log.Warnf("Failed to create rpm database: %v", err)
+			logger.Log.Warn(stdout)
+			logger.Log.Warn(stderr)
+			return err
+		}
 	}
-
 	err = initializeTdnfConfiguration(installRoot)
 	return
 }
@@ -653,7 +745,7 @@ func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPoi
 	ReportAction("Configuring fstab")
 
 	for mountPoint, devicePath := range installMap {
-		if mountPoint != "" {
+		if mountPoint != "" && devicePath != NullDevice {
 			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint])
 			if err != nil {
 				return
@@ -1495,6 +1587,7 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 		logger.Log.Infof("Running post-install script: %s", script.Path)
 		err = installChroot.UnsafeRun(func() error {
 			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", scriptPath, script.Args)
+
 			if err != nil {
 				return err
 			}
@@ -1711,24 +1804,54 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 }
 
 // ExtractPartitionArtifacts scans through the SystemConfig and generates all the partition-based artifacts specified.
+// - setupChrootDirPath is the path to the setup root dir where the build takes place
 // - workDirPath is the directory to place the artifacts
+// - diskIndex is the index of the disk this is added to the parition artifact generated
+// - disk configuration settings for the disk
+// - systemConfig system configration corresponding to the disk configuration
 // - partIDToDevPathMap is a map of partition IDs to partition device paths
-func ExtractPartitionArtifacts(workDirPath string, diskIndex int, disk configuration.Disk, partIDToDevPathMap map[string]string) (err error) {
+// - mountPointToOverlayMap is a map of mountpoints to the overlay details for this mount if any
+func ExtractPartitionArtifacts(setupChrootDirPath, workDirPath string, diskIndex int, disk configuration.Disk, systemConfig configuration.SystemConfig, partIDToDevPathMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
 	const (
-		ext4ArtifactType = "ext4"
+		ext4ArtifactType  = "ext4"
+		diffArtifactType  = "diff"
+		rdiffArtifactType = "rdiff"
 	)
-
 	// Scan each partition for Artifacts
 	for i, partition := range disk.Partitions {
 		for _, artifact := range partition.Artifacts {
-			if artifact.Type == ext4ArtifactType {
-				devPath := partIDToDevPathMap[partition.ID]
+			devPath := partIDToDevPathMap[partition.ID]
 
+			switch artifact.Type {
+			case ext4ArtifactType:
 				// Ext4 artifact type output is a .raw of the partition
 				finalName := fmt.Sprintf("disk%d.partition%d.raw", diskIndex, i)
 				err = createRawArtifact(workDirPath, devPath, finalName)
 				if err != nil {
 					return err
+				}
+			case diffArtifactType:
+				for _, setting := range systemConfig.PartitionSettings {
+					if setting.ID == partition.ID {
+						if setting.OverlayBaseImage != "" {
+							// Diff artifact type output
+							finalName := fmt.Sprintf("disk%d.partition%d.diff", diskIndex, i)
+							err = createDiffArtifact(setupChrootDirPath, workDirPath, finalName, mountPointToOverlayMap[setting.MountPoint])
+						}
+						break
+					}
+				}
+
+			case rdiffArtifactType:
+				for _, setting := range systemConfig.PartitionSettings {
+					if setting.ID == partition.ID {
+						if setting.RdiffBaseImage != "" {
+							// Diff artifact type output
+							finalName := fmt.Sprintf("disk%d.partition%d.rdiff", diskIndex, i)
+							err = createRDiffArtifact(workDirPath, devPath, setting.RdiffBaseImage, finalName)
+						}
+						break
+					}
 				}
 			}
 		}
@@ -1736,6 +1859,24 @@ func ExtractPartitionArtifacts(workDirPath string, diskIndex int, disk configura
 	return
 }
 
+func createDiffArtifact(setupChrootDirPath, workDirPath, name string, overlay *Overlay) (err error) {
+	const (
+		squashErrors = true
+	)
+
+	fullPath := filepath.Join(workDirPath, name)
+
+	upperDir := overlay.getUpperDir()
+	upperDir = filepath.Join(setupChrootDirPath, upperDir)
+	tarArgs := []string{
+		"cvf",
+		fullPath,
+		"-C",
+		upperDir,
+		"."}
+
+	return shell.ExecuteLive(squashErrors, "tar", tarArgs...)
+}
 func createRawArtifact(workDirPath, devPath, name string) (err error) {
 	const (
 		defaultBlockSize = 1024 * 1024 // 1MB
@@ -1751,6 +1892,56 @@ func createRawArtifact(workDirPath, devPath, name string) (err error) {
 	}
 
 	return shell.ExecuteLive(squashErrors, "dd", ddArgs...)
+}
+
+func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err error) {
+	const (
+		signatureFileName = "./signature"
+		squashErrors      = true
+	)
+
+	fullPath := filepath.Join(workDirPath, name)
+
+	rdiffArgs := []string{
+		"signature",
+		rDiffBaseImage,
+		signatureFileName,
+	}
+
+	err = shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
+	if err != nil {
+		return
+	}
+	defer os.Remove(signatureFileName)
+
+	rdiffArgs = []string{
+		"delta",
+		signatureFileName,
+		devPath,
+		fullPath,
+	}
+
+	return shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
+}
+
+// randomString generates a random string of the length specified
+// using the provided legalCharacters.  crypto.rand is more secure
+// than math.rand and does not need to be seeded.
+func randomString(length int, legalCharacters string) (output string, err error) {
+	b := make([]byte, length)
+	_, err = rand.Read(b)
+	if err != nil {
+		return
+	}
+
+	count := byte(len(legalCharacters))
+	for i := range b {
+		idx := b[i] % count
+		b[i] = legalCharacters[idx]
+	}
+
+	output = string(b)
+	return
 }
 
 // isRunningInHyperV checks if the program is running in a Hyper-V Virtual Machine.

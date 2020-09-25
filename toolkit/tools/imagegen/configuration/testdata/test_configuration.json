@@ -111,12 +111,14 @@
                 {
                     "ID": "MyBoot",
                     "MountPoint": "/boot",
-                    "MountOptions": "ro,exec"
+                    "MountOptions": "ro,exec",
+                    "RdiffBaseImage": "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 },
                 {
                     "ID": "MyRootfs",
                     "MountPoint": "/",
-                    "RemoveDocs": true
+                    "RemoveDocs": true,
+                    "OverlayBaseImage": "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 }
             ],
             "PackageLists": [
