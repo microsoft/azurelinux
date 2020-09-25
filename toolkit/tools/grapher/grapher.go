@@ -188,7 +188,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	// - Only test run nodes as if a build node has a reflexive cycle then it cannot be built without a boostrap version.
 	if packageNode.Type == pkggraph.TypeRun && dependentNode.Type == pkggraph.TypeRun {
 		if packageNode.RpmPath == dependentNode.RpmPath {
-			logger.Log.Warnf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)
+			logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)
 			return nil
 		}
 	}
