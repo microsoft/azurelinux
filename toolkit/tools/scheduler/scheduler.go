@@ -271,6 +271,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 
 		if !stopBuilding {
 			if res.Err == nil {
+				// If the graph has already been optimized and is now solvable without any additional information
+				// then skip processing any new implicit provides.
 				if !isGraphOptimized {
 					didOptimize, newGraph, newGoalNode := updateGraphWithImplicitProvides(res, pkgGraph, useCachedImplicit)
 					if didOptimize {
