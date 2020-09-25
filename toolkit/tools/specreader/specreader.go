@@ -385,7 +385,10 @@ func parseProvides(rpmsDir, srpmPath string, list []string) (providerlist []*pkg
 			return
 		}
 
-		if listEntry[tag] == "provides" {
+		if listEntry[tag] == "rpm" {
+			logger.Log.Trace("rpm ", listEntry[value])
+			rpmPath = filepath.Join(rpmsDir, listEntry[value])
+		} else if listEntry[tag] == "provides" {
 			logger.Log.Trace("provides ", listEntry[value])
 			for _, v := range list[i:] {
 				sublistEntry = strings.SplitN(v, " ", 2)
