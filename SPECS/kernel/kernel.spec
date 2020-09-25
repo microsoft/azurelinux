@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -332,6 +332,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
+-   Enable CONFIG_IMA (measurement only) and associated configs
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5
 -   Add code to check for missing config flags in the checked in configs
 *   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-4
