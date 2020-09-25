@@ -1,9 +1,7 @@
-%define  debug_package %{nil}
-
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
 Version:        2019.11
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            https://sbabic.github.io/swupdate/
 Group:          System Environment/Base
@@ -140,6 +138,9 @@ fi
 
 
 %changelog
+*   Fri Sep 25 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.11-6
+-   Disable debug symbol stripping in .config, and create the debuginfo package.
+
 *   Tue Jun 09 2020 Daniel McIlvaney <damcilva@microsoft.com> 2019.11-5
 -   Use Grub on aarch64 systems to abstract firmware (no longer require U-Boot)
 
