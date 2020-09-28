@@ -2,7 +2,7 @@ Summary:        The source repository for the TPM (Trusted Platform Module) 2 to
 Name:           tpm2-tools
 Version:        4.2
 Release:        1%{?dist}
-License:        BSD 2-Clause
+License:        BSD 3-Clause
 URL:            https://github.com/tpm2-software/tpm2-tools
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
