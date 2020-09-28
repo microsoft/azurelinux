@@ -508,15 +508,17 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// generated during boot and saved to this file if possible.
 
 	const (
-		squashErrors  = false
-		setupProgram  = "touch"
-		machineIDFile = "/etc/machine-id"
+		squashErrors       = false
+		setupProgram       = "install"
+		machineIDFile      = "/etc/machine-id"
+		machineIDFilePerms = "0644"
 	)
 
 	ReportAction("Configuring machine id")
 
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, setupProgram, machineIDFile)
+		setupArgs := []string{"-m", machineIDFilePerms, "/dev/null", machineIDFile}
+		return shell.ExecuteLive(squashErrors, setupProgram, setupArgs...)
 	})
 	return
 }
