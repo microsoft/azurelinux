@@ -5356,8 +5356,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.1.1/tpm2-abrmd-2.1.1.tar.gz"
+          "version": "2.3.3",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
         }
       }
     },
