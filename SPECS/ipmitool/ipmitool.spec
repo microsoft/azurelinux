@@ -4,7 +4,7 @@
 Name:          ipmitool
 Summary:       Utility for IPMI control
 Version:       1.8.18
-Release:       21%{?dist}
+Release:       22%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -29,6 +29,7 @@ Patch8:        0008-add-extern.patch
 Patch9:        0009-best-cipher.patch
 Patch10:       0010-pef-missing-newline.patch
 Patch11:       0011-expand-sensor-name-column.patch
+# This patch fixes CVE-2020-5208
 Patch12:       0012-CVE-2020-5208.patch
 
 BuildRequires: openssl-devel readline-devel ncurses-devel
@@ -187,6 +188,9 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 %{_libexecdir}/bmc-snmp-proxy
 
 %changelog
+* Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.18-22
+- Add comment so CVE tooling can find CVE-2020-5208
+
 * Fri Jun 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.8.18-21
 - Require net-tools instead of hostname
 
