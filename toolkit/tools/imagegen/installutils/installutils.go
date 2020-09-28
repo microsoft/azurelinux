@@ -508,7 +508,6 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// generated during boot and saved to this file if possible.
 
 	const (
-		squashErrors       = false
 		machineIDFile      = "/etc/machine-id"
 		machineIDFilePerms = 0644
 	)
