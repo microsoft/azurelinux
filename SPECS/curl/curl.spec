@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.68.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            http://curl.haxx.se
 Group:          System Environment/NetworkingLibraries
@@ -26,12 +26,14 @@ functions like streaming media.
 %package devel
 Summary:    Libraries and header files for curl
 Requires:   %{name} = %{version}-%{release}
+Provides:   libcurl-devel = %{version}-%{release}
 %description devel
 Static libraries and header files for the support library for curl
 
 %package libs
 Summary: Libraries for curl
 Group:      System Environment/Libraries
+Provides:   libcurl = %{version}-%{release}
 %description libs
 This package contains minimal set of shared curl libraries.
 
@@ -87,11 +89,13 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 7.68.0-2
+-   Add explicit provides for libcurl and libcurl-devel
 *   Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-1
 -   Upgrading to 7.68.0 to enable verification against a partial cert chain.
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.66.0-1
 -   Upgrade to version 7.66.0, which fixes CVE-2018-16890 and CVE-2019-3822/3833.
-*   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
 -   Added %%license line automatically
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.61.1-5
 -   Removing *Requires for "ca-certificates".

@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD and Public Domain and (ASL 2.0 or CC0 1.0 or OpenSSL)
 URL:            https://www.libarchive.org/
@@ -9,6 +9,7 @@ Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.libarchive.org/downloads/%{name}-%{version}.tar.gz
+Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
 BuildRequires:  xz-devel
@@ -60,9 +61,10 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.4.2-2
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.4.2-3
+-   Provide bsdtar for base package
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.4.2-2
+-   Added %%license line automatically
 *   Fri May 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.4.2-1
 -   Bumping version up to 3.4.2 to fix following CVEs:
 -       CVE-2018-1000877,
@@ -76,7 +78,7 @@ make %{?_smp_mflags} check
 -   Fixed "Source0" and "URL" tags.
 -   License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.3.3-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+-   Initial CBL-Mariner import from Photon (license: dual Apache2/GPL2).
 *   Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> 3.3.3-1
 -   Updated to latest version
 *   Fri Sep 15 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.3.1-2

@@ -1,0 +1,51 @@
+%python2_sitelib %(%{__python2} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+%python2_sitearch %(%{__python2} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
+%python2_version %(%{__python2} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
+%python2_version_nodots %(%{__python2} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+
+%py2_shbang_opts -s
+%py2_shbang_opts_nodash %(opts=%{py2_shbang_opts}; echo ${opts#-})
+%py2_shebang_flags %(opts=%{py2_shbang_opts}; echo ${opts#-})
+%py2_shebang_fix %{expand:/usr/bin/pathfix.py -pni %{__python2} -k%{?py2_shebang_flags:a %py2_shebang_flags}}
+
+# Use the slashes after expand so that the command starts on the same line as
+# the macro
+# The `sleep 1` commands work around a race in install; see:
+#   https://bugzilla.redhat.com/show_bug.cgi?id=1644923
+%py2_build() %{expand:\\\
+  sleep 1
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python2} %{py_setup} %{?py_setup_args} build --executable="%{__python2} %{py2_shbang_opts}" %{?*}
+  sleep 1
+}
+
+%py2_build_egg() %{expand:\\\
+  sleep 1
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python2} %{py_setup} %{?py_setup_args} bdist_egg %{?*}
+  sleep 1
+}
+
+%py2_build_wheel() %{expand:\\\
+  sleep 1
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python2} %{py_setup} %{?py_setup_args} bdist_wheel %{?*}
+  sleep 1
+}
+
+%py2_install() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python2} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py2_install_egg() %{expand:\\\
+  mkdir -p %{buildroot}%{python2_sitelib}
+  easy_install-%{python2_version} -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python2_version}.egg %{?*}
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py2_install_wheel() %{expand:\\\
+  pip%{python2_version} install -I dist/%{1} --root %{buildroot} --no-deps
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}

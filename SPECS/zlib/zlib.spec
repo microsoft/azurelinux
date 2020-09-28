@@ -1,19 +1,19 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            http://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.zlib.net/%{name}-%{version}.tar.xz
-%define sha1    zlib=e1cb0d5c92da8e9a8c2635dfa249c341dfd00322
 %description
 Compression and decompression routines
 %package    devel
 Summary:    Header and development files for zlib
 Requires:   %{name} = %{version}
+Provides:   zlib-static = %{version}-%{release}
 %description    devel
 It contains the libraries and header files to create applications
 for handling compiled objects.
@@ -47,9 +47,10 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.2.11-4
+-   Add explicit provide for zlib-static
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.2.11-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.11-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.11-1

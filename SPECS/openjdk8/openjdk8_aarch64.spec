@@ -8,7 +8,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.181
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u/
 Group:          Development/Tools
@@ -23,7 +23,6 @@ BuildRequires:	which
 BuildRequires:	zip
 BuildRequires:	unzip
 BuildRequires:  zlib-devel
-BuildRequires:	chkconfig
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
@@ -32,6 +31,8 @@ Requires:       chkconfig
 Obsoletes:      openjdk <= %{version}
 AutoReqProv: 	no
 %define bootstrapjdk /usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap
+
+Provides: java-1.8.0-openjdk-headless = %{version}-%{release}
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
@@ -248,9 +249,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.181-8
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-9
+-   Remove unused buildrequires.
+-   Provide java-1.8.0-openjdk-headless.
+*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.0.181-8
 -   Disable -Werrors that break the build in cflags and cxxflags.
-*   Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.0.181-7
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.0.181-7
 -   Added %%license line automatically
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.181-6
 -   Removing *Requires for "ca-certificates".

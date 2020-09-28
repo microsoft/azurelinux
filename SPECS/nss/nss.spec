@@ -1,7 +1,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Group:          Applications/System
@@ -12,6 +12,8 @@ Patch:          nss-3.44-standalone-1.patch
 Requires:       nspr
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel
+Provides:       %{name}-tools = %{version}-%{release}
+Provides:       %{name}-softokn = %{version}-%{release}
 Requires:       nss-libs = %{version}-%{release}
 
 %description
@@ -26,6 +28,10 @@ Requires:       nss-libs = %{version}-%{release}
 %package devel
 Summary: Development Libraries for Network Security Services
 Group: Development/Libraries
+Provides: %{name}-static = %{version}-%{release}
+Provides: %{name}-softokn-devel = %{version}-%{release}
+Provides: %{name}-pkcs11-devel = %{version}-%{release}
+Provides: %{name}-pkcs11-devel-static = %{version}-%{release}
 Requires: nspr-devel
 Requires: nss = %{version}-%{release}
 %description devel
@@ -34,6 +40,7 @@ Header files for doing development with Network Security Services.
 %package libs
 Summary: Libraries for Network Security Services
 Group:      System Environment/Libraries
+Provides:   %{name}-util = %{version}-%{release}
 Requires:   sqlite-libs
 Requires:   nspr
 %description libs
@@ -97,9 +104,11 @@ sudo -u test ./all.sh && userdel test -r -f
 %{_libdir}/libsoftokn3.so
 
 %changelog
-* Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.44-2
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3
+-   Provide nss-tools, -util, -static, -softokn, -softokn-devel
+-   Provide nss-pkcs11-devel, -pkcs11-devel-static
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.44-2
+-   Added %%license line automatically
 *   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 3.44-1
 -   Update version to 3.44. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.39-2

@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        5.4.51
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 BuildArch:      noarch
+Provides:       glibc-kernheaders = %{version}-%{release}
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 %prep
@@ -27,6 +28,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %defattr(-,root,root)
 %{_includedir}/*
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.4.51-3
+-   Add explicit provide for glibc-kernheaders
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1

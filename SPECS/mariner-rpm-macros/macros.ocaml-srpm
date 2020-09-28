@@ -1,0 +1,15 @@
+# Note that OCaml is compiled on all architectures.  However
+# on some (rare) architectures, only bytecode compilation is
+# available.  Use these macros to find out if native code
+# compilation is available on a particular architecture.
+
+# Architectures that support the OCaml native code compiler.
+%ocaml_native_compiler  aarch64 %{arm} %{ix86} ppc ppc64 ppc64le riscv64 s390x sparc sparcv9 x86_64
+
+# Architectures that support native dynamic linking of OCaml code.
+%ocaml_natdynlink       aarch64 %{arm} %{ix86} ppc ppc64 ppc64le riscv64 s390x sparc sparcv9 x86_64
+
+# Architectures that support profiling of native code (ocamlopt -p).
+# This was removed in OCaml 4.09.
+# https://github.com/ocaml/ocaml/pull/2314
+%ocaml_native_profiling %{nil}

@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      7%{?dist}
+Release:      8%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -31,7 +31,7 @@ install -vdm 755 %{buildroot}/usr/{,local/}share/{misc,terminfo,zoneinfo}
 install -vdm 755 %{buildroot}/usr/libexec
 install -vdm 755 %{buildroot}/usr/{,local/}share/man/man{1..8}
 install -vdm 755 %{buildroot}/etc/profile.d
-install -vdm 755 %{buildroot}/usr/lib/debug/{lib,bin,sbin,usr}
+install -vdm 755 %{buildroot}/usr/lib/debug/{lib,bin,sbin,usr,.dwz}
 
 ln -svfn usr/lib %{buildroot}/lib
 ln -svfn usr/bin %{buildroot}/bin
@@ -47,6 +47,7 @@ ln -svfn ../lib %{buildroot}/usr/lib/debug/usr/lib
 	ln -svfn lib %{buildroot}/usr/local/lib64
         ln -svfn lib %{buildroot}/usr/lib/debug/lib64
         ln -svfn ../lib %{buildroot}/usr/lib/debug/usr/lib64
+        ln -svfn ../.dwz %{buildroot}/usr/lib/debug/usr/.dwz
 
 install -vdm 755 %{buildroot}/var/{log,mail,spool,mnt,srv}
 
@@ -422,6 +423,7 @@ posix.symlink("../bin", "/usr/lib/debug/usr/bin")
 posix.symlink("../sbin", "/usr/lib/debug/usr/sbin")
 posix.symlink("../lib", "/usr/lib/debug/usr/lib")
 posix.symlink("../lib", "/usr/lib/debug/usr/lib64")
+posix.symlink("../.dwz", "/usr/lib/debug/usr/.dwz")
 return 0
 
 %files
@@ -478,6 +480,7 @@ return 0
 %dir /usr/lib/debug/lib
 %dir /usr/lib/debug/sbin
 %dir /usr/lib/debug/usr
+%dir /usr/lib/debug/.dwz
 %dir /usr/libexec
 %dir /usr/local
 %dir /usr/local/bin
@@ -532,6 +535,7 @@ return 0
 %ghost /usr/lib/debug/usr/lib
 %ghost /usr/lib/debug/usr/lib64
 %ghost /usr/lib/debug/usr/sbin
+%ghost /usr/lib/debug/usr/.dwz
 
 #	var filesystem
 %dir /var/cache
@@ -558,6 +562,8 @@ return 0
 /usr/local/lib64
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1-8
+-   Add folders and symlinks for .dwz files.
 *   Mon Jun 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.1-7
 -   Use ghost directive for /usr/lib/debug/* symlinks to avoid conflicting with debuginfo packages.
 *   Wed May 20 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1-6

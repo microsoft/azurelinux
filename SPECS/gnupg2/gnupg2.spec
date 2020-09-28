@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.2.20
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 URL:            https://gnupg.org/index.html
 Group:          Applications/Cryptography.
@@ -24,7 +24,9 @@ Requires:       npth
 Requires:       libassuan
 Requires:       pinentry
 
-Provides:       gpg
+Provides:       gpg = %{version}-%{release}
+Provides:       gnupg = %{version}-%{release}
+Provides:       %{name}-smime = %{version}-%{release}
 
 %description
 GnuPG is GNU's tool for secure communication and data storage.  It can
@@ -42,11 +44,17 @@ is provided by the gnupg2-smime package.
 %setup -q -n gnupg-%{version}
 
 %build
-%configure
+%configure \
+  --enable-gpg-is-gpg2
 make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+
+pushd %{buildroot}%{_bindir}
+ln -s gpg2 gpg
+ln -s gpgv2 gpgv
+popd
 
 %check
 make %{?_smp_mflags} check
@@ -65,6 +73,9 @@ make %{?_smp_mflags} check
 %exclude /usr/share/doc/*
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.2.20-4
+-   Build with gpg2 option and gpg compatibility
+-   Provide gnupg2-smime, gnupg
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.2.20-3
 -   Adding a license reference.
 -   License verified.

@@ -1,13 +1,14 @@
 Summary:	Docbook-xsl-1.79.1
 Name:		docbook-style-xsl
 Version:	1.79.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:	ASL 2.0
 URL:		http://www.docbook.org
 Source0:	http://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Provides:       docbook-xsl = %{version}-%{release}
 Requires:	libxml2
 BuildRequires:	libxml2
 BuildRequires:  zip
@@ -91,9 +92,10 @@ fi
 %{_docdir}/*
 
 %changelog
-* Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.79.1-11
+-   Provide docbook-xsl
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.79.1-10
+-   Added %%license line automatically
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.79.1-9
 -   Renaming docbook-xsl to docbook-style-xsl
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.79.1-8
