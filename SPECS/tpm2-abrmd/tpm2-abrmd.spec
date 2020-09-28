@@ -1,16 +1,16 @@
-Summary:	TPM2 Access Broker & Resource Management Daemon implementing the TCG spec
-Name:		tpm2-abrmd
-Version:	2.3.3
+Summary:    TPM2 Access Broker & Resource Management Daemon implementing the TCG spec
+Name:       tpm2-abrmd
+Version:    2.3.3
 Release:    1%{?dist}
-License:	BSD 2-Clause
+License:    BSD 2-Clause
 URL:        https://github.com/tpm2-software/tpm2-abrmd/releases/
 Source0:    https://github.com/tpm2-software/tpm2-abrmd/releases/download/%{version}/%{name}-%{version}.tar.gz
-Group:		System Environment/Security
+Group:      System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:	which dbus-devel glib-devel tpm2-tss-devel
-Requires:	dbus glib tpm2-tss
+BuildRequires:  which dbus-devel glib-devel tpm2-tss-devel
+Requires:   dbus glib tpm2-tss
 %description
 TPM2 Access Broker & Resource Management Daemon implementing the TCG spec
 
@@ -60,7 +60,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 *   Sun Sep 27 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.3.3-1
 -   Update to 2.3.3 to solve incompatibility with tpm2-tss 2.4.0
-*   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.1.1-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.1.1-2
 -   Added %%license line automatically
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 2.1.1-1
 -   Update to 2.1.1. Fix URL. Fix Source0 URL. License verified.
