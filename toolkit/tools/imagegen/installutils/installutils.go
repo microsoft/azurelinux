@@ -509,16 +509,15 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	const (
 		squashErrors       = false
-		setupProgram       = "install"
 		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = "0644"
+		machineIDFilePerms = 0644
 	)
 
 	ReportAction("Configuring machine id")
 
 	err = installChroot.UnsafeRun(func() error {
-		setupArgs := []string{"-m", machineIDFilePerms, "/dev/null", machineIDFile}
-		return shell.ExecuteLive(squashErrors, setupProgram, setupArgs...)
+		file.Create(machineIDFile, machineIDFilePerms)
+		return file.Create(machineIDFile, machineIDFilePerms)
 	})
 	return
 }
