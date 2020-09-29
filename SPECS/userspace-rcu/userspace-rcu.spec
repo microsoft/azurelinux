@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
 Version:        0.10.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 URL:            https://liburcu.org
 #Source0:       https://github.com/urcu/userspace-rcu/archive/v%{version}.tar.gz
@@ -11,7 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 BuildRequires:  libxml2-devel
-BuildRequires:  nss-devel
 BuildRequires:  m4
 BuildRequires:  elfutils-devel
 BuildRequires:  popt-devel
@@ -58,9 +57,10 @@ make %{?_smp_mflags} check
 
 
 %changelog
-* Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.10.1-4
-- Added %%license line automatically
-
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.10.1-5
+-   Removing dependency on NSS.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.10.1-4
+-   Added %%license line automatically
 *   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 0.10.1-3
 -   Update URL.
 -   Update Source0 with valid URL.

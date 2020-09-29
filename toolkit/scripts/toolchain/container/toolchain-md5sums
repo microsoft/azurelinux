@@ -109,8 +109,6 @@ ab41db551f500e4a595b11203b86c67a  man-db-2.8.4.tar.xz
 b8dd19bd9bb1ec8831a6a582a7308073  mpfr-4.0.1.tar.xz
 e812da327b1c2214ac1aed440ea3ae8d  ncurses-6.2.tar.gz
 b865586f19912a50acc3755d8a45dbaa  nspr-4.21.tar.gz
-ee90a1dc6ae266ec6c842d8019a6ef48  nss-3.44-standalone-1.patch
-e9222b9573452b9f4e6ff4915d6407c2  nss-3.44.tar.gz
 76766e98997660138cdaf13a187bd234  openssl-1.1.1g.tar.gz
 78ad9937e4caadcba1526ef1853730d5  patch-2.7.6.tar.xz
 8bd8bdf9d495777e140af1a5810fee6a  perl-5.30.3.tar.gz
@@ -124,7 +122,7 @@ a46765c8dcacb7114c821baf0df1e797  randrproto-1.5.0.tar.bz2
 1b4e5dede5ea51906f1530ca1e21d216  recordproto-1.14.2.tar.bz2
 a914ccc1de66ddeb4b611c6b0686e274  renderproto-0.11.1.tar.bz2
 cfdb57dae221b71b2703f8e2980eaaf4  resourceproto-1.2.0.tar.bz2
-63095570fe83584aaebe8affecc80a09  rpm-4.14.2.tar.bz2
+434e166a812e35ef181f6dd176326920  rpm-4.16.0.tar.bz2
 edd8a73775e8ece1d69515dd17767bfb  scrnsaverproto-1.2.2.tar.bz2
 ade8f8c2c548bf41f74db2dcfc37e4e3  sed-4.5.tar.xz
 bc7afc06f1e30b09ac930957af68d723  sqlite-autoconf-3320100.tar.gz

@@ -10,7 +10,7 @@
 
 Name:          systemtap
 Version:       4.1
-Release:       6%{?dist}
+Release:       7%{?dist}
 Summary:       Programmable system-wide instrumentation system
 Group:         Development/System
 Vendor:         Microsoft Corporation
@@ -24,14 +24,12 @@ BuildRequires: glibc-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: libgcc
 BuildRequires: nspr-devel
-BuildRequires: nss-devel
 BuildRequires: sqlite-devel
 BuildRequires: libstdc++-devel
 BuildRequires: libtirpc-devel
 BuildRequires: libxml2-devel
 BuildRequires: perl
 BuildRequires: python3-setuptools
-BuildRequires: nss
 BuildRequires: shadow-utils
 BuildRequires: python3-devel
 %if %with_boost
@@ -102,7 +100,6 @@ Summary:       Instrumentation System Server
 Requires:      %{name} = %{?epoch:%epoch:}%{version}-%{release}
 Requires:      %{name}-runtime = %{?epoch:%epoch:}%{version}-%{release}
 Requires:      coreutils
-Requires:      nss
 Requires:      unzip
 Requires:      gzip
 
@@ -118,31 +115,32 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 %build
 %configure \
 %if %with_crash
-	--enable-crash \
+    --enable-crash \
 %else
-	--disable-crash \
+    --disable-crash \
 %endif
-	--disable-docs \
+    --disable-docs \
 %if %with_sqlite
-	--enable-sqlite \
+    --enable-sqlite \
 %else
-	--disable-sqlite \
+    --disable-sqlite \
 %endif
 %if %with_rpm
-	--with-rpm \
+    --with-rpm \
 %else
-	--without-rpm \
+    --without-rpm \
 %endif
 %if %with_pie
-	--enable-pie \
+    --enable-pie \
 %else
-	--disable-pie \
+    --disable-pie \
 %endif
-	--disable-grapher \
+    --disable-grapher \
     --disable-virt \
-	--without-python2-probes \
-	--with-python3 \
-	--disable-silent-rules
+    --without-python2-probes \
+    --with-python3 \
+    --disable-silent-rules \
+    --without-nss
 
 make
 
@@ -221,10 +219,10 @@ if [ $1 -eq 1 ] ; then
   }
 
   if test ! -e ~stap-server/.systemtap/ssl/server/stap.cert; then
-	runuser -s /bin/sh - stap-server -c %{_libexecdir}/%{name}/stap-gen-cert >/dev/null
+    runuser -s /bin/sh - stap-server -c %{_libexecdir}/%{name}/stap-gen-cert >/dev/null
 
-	%{_bindir}/stap-authorize-server-cert ~stap-server/.systemtap/ssl/server/stap.cert
-	%{_bindir}/stap-authorize-signing-cert ~stap-server/.systemtap/ssl/server/stap.cert
+    %{_bindir}/stap-authorize-server-cert ~stap-server/.systemtap/ssl/server/stap.cert
+    %{_bindir}/stap-authorize-signing-cert ~stap-server/.systemtap/ssl/server/stap.cert
   fi
   /sbin/chkconfig --add stap-server
   exit 0
@@ -232,46 +230,46 @@ fi
 
 %preun server
 if [ $1 = 0 ] ; then
-	/sbin/service stap-server stop >/dev/null 2>&1
-	/sbin/chkconfig --del stap-server
+    /sbin/service stap-server stop >/dev/null 2>&1
+    /sbin/chkconfig --del stap-server
 fi
 exit 0
 
 %postun server
 if [ "$1" -ge "1" ] ; then
-	/sbin/service stap-server condrestart >/dev/null 2>&1 || :
+    /sbin/service stap-server condrestart >/dev/null 2>&1 || :
 fi
 exit 0
 
 %post initscript
 if [ $1 -eq 1 ] ; then
-	/sbin/chkconfig --add systemtap
-	exit 0
+    /sbin/chkconfig --add systemtap
+    exit 0
 fi
 
 %preun initscript
 if [ $1 = 0 ] ; then
-	/sbin/service systemtap stop >/dev/null 2>&1
-	/sbin/chkconfig --del systemtap
+    /sbin/service systemtap stop >/dev/null 2>&1
+    /sbin/chkconfig --del systemtap
 fi
 exit 0
 
 %postun initscript
 if [ "$1" -ge "1" ] ; then
-	/sbin/service systemtap condrestart >/dev/null 2>&1 || :
+    /sbin/service systemtap condrestart >/dev/null 2>&1 || :
 fi
 exit 0
 
 %post
 if [ $1 -eq 1 ] ; then
-	(make -C %{_datadir}/systemtap/runtime/linux/uprobes clean) >/dev/null 3>&1 || true
-	(/sbin/rmmod uprobes) >/dev/null 2>&1 || true
+    (make -C %{_datadir}/systemtap/runtime/linux/uprobes clean) >/dev/null 3>&1 || true
+    (/sbin/rmmod uprobes) >/dev/null 2>&1 || true
 fi
 
 %preun
 if [ $1 -eq 0 ] ; then
-	(make -C %{_datadir}/systemtap/runtime/linux/uprobes clean) >/dev/null 3>&1 || true
-	(/sbin/rmmod uprobes) >/dev/null 2>&1 || true
+    (make -C %{_datadir}/systemtap/runtime/linux/uprobes clean) >/dev/null 3>&1 || true
+    (/sbin/rmmod uprobes) >/dev/null 2>&1 || true
 fi
 
 %files -f %{name}.lang
@@ -327,7 +325,6 @@ fi
 %attr(4111,root,root) %{_bindir}/staprun
 %{_libexecdir}/systemtap/stapio
 %{_libexecdir}/systemtap/stap-env
-%{_libexecdir}/systemtap/stap-authorize-cert
 %if %with_crash
 %{_libdir}/systemtap/staplog.so*
 %endif
@@ -341,12 +338,6 @@ fi
 
 %files server
 %defattr(-,root,root)
-%{_bindir}/stap-server
-%{_libexecdir}/systemtap/stap-serverd
-%{_libexecdir}/systemtap/stap-start-server
-%{_libexecdir}/systemtap/stap-stop-server
-%{_libexecdir}/systemtap/stap-gen-cert
-%{_libexecdir}/systemtap/stap-sign-module
 %{_sysconfdir}/rc.d/init.d/stap-server
 %config(noreplace) %{_sysconfdir}/logrotate.d/stap-server
 %dir %{_sysconfdir}/stap-server
@@ -357,16 +348,16 @@ fi
 %ghost %config %attr(0644,stap-server,stap-server) %{_localstatedir}/opt/stap-server/log/log
 %{_mandir}/man7/error::*.7stap*
 %{_mandir}/man7/warning::debuginfo.7stap*
-%{_mandir}/man8/stap-server.8*
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.1-7
+-   Removing dependency on NSS.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 4.1-6
 -   Explicitly use python3 during build.
 -   Use lib macros for paths.
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
-- Added %%license line automatically
-
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.1-5
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-4
 -   Renaming linux to kernel
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-3

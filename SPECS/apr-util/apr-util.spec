@@ -1,63 +1,69 @@
-Summary:    The Apache Portable Runtime Utility Library
-Name:       apr-util
-Version:    1.6.1
-Release:        4%{?dist}
-License:    Apache License 2.0
-URL:        https://apr.apache.org/
-Group:      System Environment/Libraries
+%define apuver  1
+
+Summary:        The Apache Portable Runtime Utility Library
+Name:           apr-util
+Version:        1.6.1
+Release:        5%{?dist}
+License:        Apache License 2.0
+URL:            https://apr.apache.org/
+Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    http://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
-%define sha1 %{name}=5bae4ff8f1dad3d7091036d59c1c0b2e76903bf4
-%define     apuver    1
+Source0:        http://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
 
-BuildRequires:   apr-devel
-BuildRequires:   sqlite-devel
-BuildRequires:   openssl-devel
-BuildRequires:   nss-devel
-BuildRequires:   expat-devel
-Requires:   apr
-Requires:   openssl
-Requires:   expat
-Requires:	nss
+BuildRequires:  apr-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  openssl-devel
+BuildRequires:  expat-devel
+
+Requires:       apr
+Requires:       openssl-libs
+Requires:       expat
 
 %description
 The Apache Portable Runtime Utility Library.
 
 %package devel
-Group: Development/Libraries
-Summary: APR utility library development kit
-Requires: apr-devel
-Requires: expat-devel
-Requires: %{name} = %{version}-%{release}
+Group:          Development/Libraries
+Summary:        APR utility library development kit
+
+Requires:       apr-devel
+Requires:       expat-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description devel
 This package provides the support files which can be used to
 build applications using the APR utility library.
 
 %package ldap
-Group: Development/Libraries
-Summary: APR utility library LDAP support
-BuildRequires: openldap
-Requires: apr-util
-Requires: openldap
+Group:          Development/Libraries
+Summary:        APR utility library LDAP support
+
+BuildRequires:  openldap
+
+Requires:       apr-util
+Requires:       openldap
 
 %description ldap
 This package provides the LDAP support for the apr-util.
 
 %package pgsql
-Group: Development/Libraries
-Summary: APR utility library PostgreSQL DBD driver
-BuildRequires: postgresql-devel >= 10.5
-Requires: apr-util
-Requires: postgresql >= 10.5
+Group:          Development/Libraries
+Summary:        APR utility library PostgreSQL DBD driver
+
+BuildRequires:  postgresql-devel >= 10.5
+
+Requires:       apr-util
+Requires:       postgresql >= 10.5
 
 %description pgsql
 This package provides the PostgreSQL driver for the apr-util DBD (database abstraction) interface.
 
 %package sqlite
-Group: Development/Libraries
-Summary: APR utility library SQLite DBD driver.
-Requires: apr-util
+Group:          Development/Libraries
+Summary:        APR utility library SQLite DBD driver.
+
+Requires:       apr-util
 
 %description sqlite
 This package provides the SQLite driver for the apr-util DBD
@@ -72,7 +78,6 @@ This package provides the SQLite driver for the apr-util DBD
         --with-sqlite3 --with-pgsql \
         --without-sqlite2 \
         --with-openssl=/usr \
-        --with-nss \
         --with-crypto
 
 
@@ -97,7 +102,6 @@ rm -rf %{buildroot}
 %license LICENSE
 %{_libdir}/aprutil.exp
 %{_libdir}/libaprutil-%{apuver}.so.*
-%{_libdir}/apr-util-%{apuver}/apr_crypto_nss*
 %{_libdir}/apr-util-%{apuver}/apr_crypto_openssl*
 %exclude %{_libdir}/debug
 
@@ -122,9 +126,10 @@ rm -rf %{buildroot}
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
-- Added %%license line automatically
-
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.6.1-5
+-   Removing dependency on NSS.
+*   Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.6.1-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.6.1-2

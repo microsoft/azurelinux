@@ -1,7 +1,7 @@
 Summary:        LTTng is an open source tracing framework for Linux.
 Name:           lttng-tools
 Version:        2.11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 and LGPLv2+
 URL:            https://lttng.org/
 Source0:        https://lttng.org/files/lttng-tools/%{name}-%{version}.tar.bz2
@@ -10,7 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 BuildRequires: libxml2-devel >= 2.7.6
-BuildRequires: nss-devel
 BuildRequires: m4
 BuildRequires: elfutils-devel
 BuildRequires: popt-devel
@@ -19,7 +18,6 @@ BuildRequires: lttng-ust-devel >= 2.9.0
 Requires:      lttng-ust = %{version}
 Requires:      userspace-rcu
 Requires:      elfutils
-Requires:      nss
 Requires:      libxml2
 
 %description
@@ -47,6 +45,8 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_libdir}/debug
 
 %changelog
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.11.2-2
+-   Removing dependency on NSS.
 *   Thu May 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.11.2-1
 -   Updating to version 2.11.2.
 -   Adding explicit dependency on "lttng-ust".

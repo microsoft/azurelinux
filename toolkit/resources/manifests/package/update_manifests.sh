@@ -247,7 +247,6 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^popt-" >> $1
     cat $TmpPkgGen | grep "^nspr-" >> $1
     cat $TmpPkgGen | grep "^sqlite-" >> $1
-    cat $TmpPkgGen | grep "^nss-" >> $1
     cat $TmpPkgGen | grep "^elfutils-" >> $1
     cat $TmpPkgGen | grep "^expat-" >> $1
     cat $TmpPkgGen | grep "^libpipeline-" >> $1

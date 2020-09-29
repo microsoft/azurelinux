@@ -1,7 +1,7 @@
 Name:           core-packages
 Summary:        Metapackage with core sets of packages
 Version:        0.1
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://aka.ms/mariner
@@ -67,7 +67,6 @@ Requires:   mariner-rpm-macros
 Requires:   ncurses-libs
 Requires:   net-tools
 Requires:   nspr
-Requires:   nss-libs
 Requires:   openssl
 Requires:   pkg-config
 Requires:   readline
@@ -97,6 +96,8 @@ Requires:   zlib
 %files container
 
 %changelog
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-21
+-   Removing dependency on NSS.
 *   Wed Sep 02 2020 Mateusz Malisz <mamalisz@microsoft.com> 0.1-20
 -   Add chrony package to the base-image.
 *   Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-19

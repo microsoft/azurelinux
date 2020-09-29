@@ -1,7 +1,7 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
 Version:        1.2.26
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -11,9 +11,11 @@ Source0:        %{url}/download/older-releases/%{name}-%{version}.tar.gz
 
 BuildRequires: libxml2-devel
 BuildRequires: libltdl-devel
+BuildRequires: openssl-devel
 
 Requires:      libxml2
 Requires:      libltdl
+Requires:      openssl-libs
 
 %description
 XML Security Library is a C library based on LibXML2  and OpenSSL.
@@ -35,7 +37,9 @@ Signatures and XML Encryption support.
 %setup -q
 
 %build
-%configure --disable-static
+%configure \
+    --disable-static \
+    --with-nss=no
 make %{?_smp_mflags}
 
 %install
@@ -55,9 +59,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/lib/libxmlsec1.so.1
 %{_prefix}/lib/libxmlsec1.so.1.2.26
 %{_prefix}/lib/libxmlsec1.so
-%{_prefix}/lib/libxmlsec1-nss.so.1
-%{_prefix}/lib/libxmlsec1-nss.so.1.2.26
-%{_prefix}/lib/libxmlsec1-nss.so
 %{_prefix}/lib/libxmlsec1-openssl.so.1
 %{_prefix}/lib/libxmlsec1-openssl.so.1.2.26
 %{_prefix}/lib/libxmlsec1-openssl.so
@@ -69,13 +70,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/bin/xmlsec1-config
 %{_prefix}/include/xmlsec1/xmlsec/*.h
 %{_prefix}/include/xmlsec1/xmlsec/private/*.h
-%{_prefix}/include/xmlsec1/xmlsec/nss/*.h
 %{_prefix}/include/xmlsec1/xmlsec/openssl/*.h
 %{_prefix}/lib/libxmlsec1.*a
-%{_prefix}/lib/libxmlsec1-nss.*a
 %{_prefix}/lib/libxmlsec1-openssl.*a
 %{_prefix}/lib/pkgconfig/xmlsec1.pc
-%{_prefix}/lib/pkgconfig/xmlsec1-nss.pc
 %{_prefix}/lib/pkgconfig/xmlsec1-openssl.pc
 %{_prefix}/lib/xmlsec1Conf.sh
 %{_prefix}/share/doc/xmlsec1/*
@@ -84,9 +82,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/share/man/man1/xmlsec1-config.1.gz
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.26-5
-- Added %%license line automatically
-
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.2.26-6
+-   Removing dependency on NSS.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.26-5
+-   Added %%license line automatically
 *   Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.2.26-4
 -   License verified.
 -   Fixed Source0 tag.

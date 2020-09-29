@@ -1,36 +1,34 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 Summary:        Package manager
 Name:           rpm
-Version:        4.14.2
-Release:        10%{?dist}
+Version:        4.16.0
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD
 URL:            https://rpm.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
+Source0:        http://ftp.rpm.org/releases/rpm-4.16.x/%{name}-%{version}.tar.bz2
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
-Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
 Requires:       bash
 Requires:       libdb
 Requires:       rpm-libs = %{version}-%{release}
 Requires:       libarchive
 Requires:       lua
+Requires:       openssl-libs
 BuildRequires:  libarchive-devel
 BuildRequires:  libdb-devel
 BuildRequires:  popt-devel
-BuildRequires:  nss-devel
 BuildRequires:  elfutils-devel
 BuildRequires:  libcap-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 BuildRequires:  file-devel
-BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 BuildRequires:  lua-devel
+BuildRequires:  openssl-devel
 
 %description
 RPM package manager
@@ -44,7 +42,6 @@ Static libraries and header files for the support library for rpm
 
 %package libs
 Summary:        Libraries for rpm
-Requires:       nss-libs
 Requires:       popt
 Requires:       libgcc
 Requires:       libcap
@@ -84,12 +81,6 @@ Requires:       %{name} = %{version}-%{release}
 %description lang
 These are the additional language files of rpm.
 
-%package -n     python-rpm
-Summary:        Python 2 bindings for rpm.
-Group:          Development/Libraries
-Requires:       python2
-%description -n python-rpm
-
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
@@ -100,8 +91,7 @@ Requires:       python3
 Python3 rpm.
 
 %prep
-%setup -n rpm-%{name}-%{version}-release
-%patch0 -p1
+%setup -q
 
 %build
 sed -i '/define _GNU_SOURCE/a #include "../config.h"' tools/sepdebugcrcfix.c
@@ -112,7 +102,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 
 ./autogen.sh --noconfigure
 %configure \
-    CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
+    CPPFLAGS='-I/usr/include/nspr -DLUA_COMPAT_APIINTCASTS' \
+        --with-crypto=openssl \
         --program-prefix= \
         --disable-dependency-tracking \
         --disable-static \
@@ -125,7 +116,6 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 make %{?_smp_mflags}
 
 pushd python
-python2 setup.py build
 python3 setup.py build
 popd
 
@@ -145,7 +135,6 @@ install -vm755 %{SOURCE1} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
 
 pushd python
-python2 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 popd
 
@@ -171,6 +160,7 @@ rm -rf %{buildroot}
 %{_bindir}/rpmquery
 %{_bindir}/rpmverify
 
+%{_libdir}/rpm/ocamldeps.sh
 %{_libdir}/rpm/rpmpopt-*
 %{_libdir}/rpm/rpmdb_*
 %{_libdir}/rpm/rpm.daily
@@ -180,15 +170,18 @@ rm -rf %{buildroot}
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
 %{_libdir}/rpm-plugins/*
-%{_libdir}/rpm/python-macro-helper
 %{_libdir}/rpm/pythondistdeps.py
+%{_mandir}/man8/rpm-plugin-ima.8.gz
+%{_mandir}/man8/rpm-plugin-prioreset.8.gz
+%{_mandir}/man8/rpm-plugin-syslog.8.gz
+%{_mandir}/man8/rpm-plugins.8.gz
 %{_mandir}/man8/rpm.8.gz
+%{_mandir}/man8/rpm2archive.8.gz
 %{_mandir}/man8/rpm2cpio.8.gz
 %{_mandir}/man8/rpmdb.8.gz
 %{_mandir}/man8/rpmgraph.8.gz
 %{_mandir}/man8/rpmkeys.8.gz
 %{_mandir}/man8/rpm-misc.8.gz
-%{_mandir}/man8/rpm-plugin-systemd-inhibit.8.gz
 %exclude %{_mandir}/fr/man8/*.gz
 %exclude %{_mandir}/ja/man8/*.gz
 %exclude %{_mandir}/ko/man8/*.gz
@@ -218,10 +211,6 @@ rm -rf %{buildroot}
 %{_libdir}/rpm/find-provides
 %{_libdir}/rpm/find-requires
 %{_libdir}/rpm/brp-*
-%{_libdir}/rpm/mono-find-provides
-%{_libdir}/rpm/mono-find-requires
-%{_libdir}/rpm/ocaml-find-provides.sh
-%{_libdir}/rpm/ocaml-find-requires.sh
 %{_libdir}/rpm/fileattrs/*
 %{_libdir}/rpm/script.req
 %{_libdir}/rpm/check-buildroot
@@ -229,8 +218,6 @@ rm -rf %{buildroot}
 %{_libdir}/rpm/check-prereqs
 %{_libdir}/rpm/check-rpaths
 %{_libdir}/rpm/check-rpaths-worker
-%{_libdir}/rpm/config.guess
-%{_libdir}/rpm/config.sub
 %{_libdir}/rpm/debugedit
 %{_libdir}/rpm/elfdeps
 %{_libdir}/rpm/libtooldeps.sh
@@ -239,7 +226,6 @@ rm -rf %{buildroot}
 %{_libdir}/rpm/*.prov
 %{_libdir}/rpm/sepdebugcrcfix
 
-%{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/rpmdeps
 
 %{_mandir}/man1/gendiff.1*
@@ -260,15 +246,16 @@ rm -rf %{buildroot}
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
-%files -n python-rpm
-%defattr(-,root,root)
-%{python2_sitelib}/*
-
 %files -n python3-rpm
 %defattr(-,root,root)
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Sep 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.16.0-1
+-   Removing dependency on NSS.
+-   Upgrading to 4.16.0 to prevent usage of the MD2 hashing algorithm.
+-   Removing 'python-rpm' package and 'find-debuginfo-do-not-generate-dir-entries.patch'
+    to closer align with Fedora.
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-10
 -   Add a vendor definition so rpm will search /usr/lib/rpm/<vendor> for macros.
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.2-9
