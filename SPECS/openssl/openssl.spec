@@ -1,18 +1,21 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenSSL
 URL:            http://www.openssl.org/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.openssl.org/source/%{name}-%{version}.tar.gz
-Patch0:         openssl-1.1.1-no-html.patch
 
+Patch0:         openssl-1.1.1-no-html.patch
 # CVE only applies when Apache HTTP Server version 2.4.37 or less.
 Patch1:         CVE-2019-0190.nopatch
 Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+# CVE-2018-16395 affects Ruby version < 2.6.0-preview3. Ruby version in Mariner is >= 2.6.3.
+Patch3:         CVE-2018-16395.nopatch
+
 Conflicts:      httpd <= 2.4.37
 
 BuildRequires:  perl-Test-Warnings
@@ -257,6 +260,9 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Tue Sep 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.1.1g-7
+- Nopatch CVE-2018-16395 as it affects old version of Ruby.
+
 * Tue Jul 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-6
 - Replacing removal of functions through the 'no-<prot>-method' option
   with returning a method negotiating the highest supported protocol
