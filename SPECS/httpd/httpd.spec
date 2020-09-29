@@ -198,7 +198,7 @@ fi
 -   Updated to 2.4.43 to resolve the following CVEs
 -   CVE-2019-10081, CVE-2019-10082, CVE-2019-10092, CVE-2019-10097
 -   CVE-2019-10098, CVE-2020-1927, CVE-2020-1934
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.39-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.4.39-4
 -   Added %%license line automatically
 *   Tue Apr 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.39-3
 -   Updated and verified 'Source0', 'Patch0' and 'URL' tags.
