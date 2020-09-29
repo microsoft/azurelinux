@@ -13,7 +13,7 @@ Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
 Patch0:         lua-5.3.4-shared_library-1.patch
-# CVE-2020-15889 is in the Lua generational garbage collection code, which is new to 5.4.0. 3.3.5 is not affected.
+# CVE-2020-15889 is in the Lua generational garbage collection code, which is new to 5.4.0. 5.3.5 is not affected.
 Patch1:         CVE-2020-15889.nopatch
 BuildRequires:  readline-devel
 Requires:       readline
