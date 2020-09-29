@@ -269,11 +269,13 @@ func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[strin
 
 	// If the list does not return enough lines then there is no exclusive arch set
 	if len(exclusiveArchList) < MinimumFieldsCount {
+		isCompatible = true
 		return
 	}
 
-	if !strings.Contains(exclusiveArchList[ExclusiveArchField], exclusiveArchList[MachineArchField]) {
-		isCompatible = false
+	if strings.Contains(exclusiveArchList[ExclusiveArchField], exclusiveArchList[MachineArchField]) {
+		isCompatible = true
+		return
 	}
 
 	return
