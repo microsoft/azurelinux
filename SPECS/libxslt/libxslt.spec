@@ -70,7 +70,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Sep 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.1.34-3
+*   Tue Sep 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.1.34-3
 -   Add nopatch for CVE-2016-4607
 -   Add nopatch for CVE-2016-4609
 *   Wed Aug 19 2020 Henry Beberman <henry.beberman@microsoft.com> 1.1.34-2
