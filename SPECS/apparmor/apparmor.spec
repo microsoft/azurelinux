@@ -355,7 +355,7 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
-*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.13-11
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.13-11
 -   Nopatch CVE-2016-1585
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.13-10
 -   Added %%license line automatically
