@@ -1,7 +1,7 @@
 Summary:       QEMU is a machine emulator and virtualizer
 Name:          qemu-kvm
 Version:       4.2.0
-Release:       12%{?dist}
+Release:       13%{?dist}
 License:       GPLv2 and GPLv2+ and CC-BY and BSD
 Group:         Development/Tools
 URL:           https://www.qemu.org/
@@ -20,8 +20,14 @@ Patch4:        CVE-2019-20175.patch
 Patch5:        CVE-2020-13659.patch
 Patch6:        CVE-2020-16092.patch
 Patch7:        CVE-2020-15863.patch
-# CVE-2016-7161 was fixed in 2.7.0, but the CVE database was not updated.
+# CVE-2016-7161 was fixed in 2.7.0, but the CVE database was not updated. (a0d1cbdacff5df4ded16b753b38fdd9da6092968)
 Patch8:        CVE-2016-7161.nopatch
+# CVE-2015-7504 was fixed in 2.5.0, but the CVE database was not updated. (837f21aacf5a714c23ddaadbbc5212f9b661e3f7)
+Patch9:        CVE-2015-7504.nopatch
+# CVE-2017-5931 was fixed in 2.9.0, but the CVE database was not updated.  (a08aaff811fb194950f79711d2afe5a892ae03a4)
+Patch10:       CVE-2017-5931.nopatch
+# CVE-2017-14167 was fixed in 2.11.0, but the CVE database was not updated. (ed4f86e8b6eff8e600c69adee68c7cd34dd2cccb)
+Patch11:       CVE-2017-14167.nopatch
 
 BuildRequires: python3-devel
 BuildRequires: glib-devel
@@ -116,6 +122,10 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+*   Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
+-   Nopatch CVE-2015-7504, it was fixed in 2.5.0
+-   Nopatch CVE-2017-5931, it was fixed in 2.9.0
+-   Nopatch CVE-2017-14167, it was fixed in 2.11.0
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-12
 -   Nopatch CVE-2016-7161, it was fixed in 2.7
 *   Mon Sep 14 2020 Nicolas Guibourge <nicolasg@microsoft.com> 4.2.0-11
