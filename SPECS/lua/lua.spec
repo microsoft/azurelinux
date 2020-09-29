@@ -8,10 +8,10 @@
 
 Name:           lua
 Version:        %{major_version}.5
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Powerful light-weight programming language
 License:        MIT
-URL:            http://www.lua.org/
+URL:            https://www.lua.org/
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,6 +152,10 @@ install -Dpm 0644 %{SOURCE1000} $RPM_BUILD_ROOT/%{macrosdir}/macros.lua
 
 
 %changelog
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.5-9
+- Update URL to https.
+- License verified.
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> - 5.3.5-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Remove bootstrap option

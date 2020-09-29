@@ -58,7 +58,8 @@ make install DESTDIR=%{buildroot} doc_DATA= testsdir=%{_testsdir}
 rm %{buildroot}%{_libdir}/liblutok.la
 
 %files
-%doc AUTHORS COPYING NEWS README
+%doc AUTHORS NEWS README
+%license COPYING
 %{_libdir}/liblutok.so.3
 %{_libdir}/liblutok.so.3.0.0
 
@@ -114,6 +115,8 @@ details on how to run the installed tests.
 - Update Source0.
 - Explicitly provide pkgconfig(lutok).
 - Rename README.Fedora to README.
+- Add %%license file.
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

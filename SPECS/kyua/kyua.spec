@@ -85,6 +85,7 @@ HOME=$(pwd)/check %make_build check %{_make_args} || :
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove build requires for gcc-c++.
 - Add with_check conditional.
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

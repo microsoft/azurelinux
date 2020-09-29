@@ -91,6 +91,7 @@ This package provides the run-time libraries to run tests that use the
 ATF C bindings.
 
 %files -n libatf-c
+%license COPYING
 %{_libdir}/libatf-c.so.0
 %{_libdir}/libatf-c.so.0.0.0
 %{_datadir}/man/man1/atf-test-program.1.gz
@@ -129,6 +130,7 @@ This package provides the run-time libraries to run tests that use the
 ATF C++ bindings.
 
 %files -n libatf-c++
+%license COPYING
 %{_libdir}/libatf-c++.so.1
 %{_libdir}/libatf-c++.so.1.0.0
 
@@ -199,6 +201,8 @@ applications that use the ATF POSIX shell bindings.
 - Update URL.
 - Add with_check conditional.
 - Rename README.Fedora to README.
+- Add %%license file.
+- License verified.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
