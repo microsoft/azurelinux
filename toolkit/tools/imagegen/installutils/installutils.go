@@ -787,13 +787,18 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 }
 
 func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err error) {
+	const (
+		squashErrors = false
+	)
+	var isRoot bool
+
 	for _, user := range users {
 		logger.Log.Infof("Adding user (%s)", user.Name)
 		ReportActionf("Adding user: %s", user.Name)
 
 		var homeDir string
 
-		homeDir, err = createUserWithPassword(installChroot, user)
+		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
 		}
@@ -814,10 +819,16 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		}
 	}
 
+	// If no root entry was specified in the config file, never expire the root password
+	if !isRoot {
+		err = installChroot.UnsafeRun(func() error {
+			return shell.ExecuteLive(squashErrors, "chage", "-M", "-1", "root")
+		})
+	}
 	return
 }
 
-func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, err error) {
+func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, isRoot bool, err error) {
 	const (
 		squashErrors        = false
 		rootHomeDir         = "/root"
@@ -869,6 +880,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 		// Update shadow file
 		err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+		isRoot = true
 	} else {
 		homeDir = filepath.Join(userHomeDirPrefix, user.Name)
 
