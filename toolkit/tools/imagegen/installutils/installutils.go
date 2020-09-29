@@ -515,7 +515,6 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	ReportAction("Configuring machine id")
 
 	err = installChroot.UnsafeRun(func() error {
-		file.Create(machineIDFile, machineIDFilePerms)
 		return file.Create(machineIDFile, machineIDFilePerms)
 	})
 	return
