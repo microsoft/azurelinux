@@ -4665,7 +4665,7 @@
         "type": "other",
         "other": {
           "name": "python-kubernetes",
-          "version": "21.0.0",
+          "version": "11.0.0",
           "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
         }
       }
@@ -4836,7 +4836,7 @@
         "other": {
           "name": "python-pecan",
           "version": "1.4.0",
-          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.4.0.tar.gzz"
+          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.4.0.tar.gz"
         }
       }
     },
