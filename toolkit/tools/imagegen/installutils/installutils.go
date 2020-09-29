@@ -791,6 +791,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		squashErrors = false
 	)
 	var isRoot bool
+	var rootUserAdded bool
 
 	for _, user := range users {
 		logger.Log.Infof("Adding user (%s)", user.Name)
@@ -801,6 +802,9 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
+		}
+		if isRoot {
+			rootUserAdded = true
 		}
 
 		err = configureUserGroupMembership(installChroot, user)
@@ -820,7 +824,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 	}
 
 	// If no root entry was specified in the config file, never expire the root password
-	if !isRoot {
+	if !rootUserAdded {
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "chage", "-M", "-1", "root")
 		})
