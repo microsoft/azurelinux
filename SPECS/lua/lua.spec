@@ -4,7 +4,7 @@
 Summary:        Programming language
 Name:           lua
 Version:        5.3.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 URL:            https://www.lua.org
 Group:          Development/Tools
@@ -13,6 +13,8 @@ Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
 Patch0:         lua-5.3.4-shared_library-1.patch
+# CVE-2020-15889 is in the Lua generational garbage collection code, which is new to 5.4.0. 5.3.5 is not affected.
+Patch1:         CVE-2020-15889.nopatch
 BuildRequires:  readline-devel
 Requires:       readline
 
@@ -22,8 +24,8 @@ applications. Lua is also frequently used as a general-purpose, stand-alone
 language. Lua is free software
 
 %package devel
-Summary:	Libraries and header files for lua
-Requires:	%{name} = %{version}
+Summary:    Libraries and header files for lua
+Requires:   %{name} = %{version}
 %description devel
 Static libraries and header files for the support library for lua
 
@@ -39,33 +41,33 @@ make V=%{majmin} R=%{version} VERBOSE=1 %{?_smp_mflags} linux
 
 %install
 make %{?_smp_mflags} \
-	V=%{majmin} \
-	R=%{version} \
-	INSTALL_TOP=%{buildroot}/usr TO_LIB="liblua.so \
-	liblua.so.%{majmin} liblua.so.%{version}" \
-	INSTALL_DATA="cp -d" \
-	INSTALL_MAN=%{buildroot}/usr/share/man/man1 \
-	install
+    V=%{majmin} \
+    R=%{version} \
+    INSTALL_TOP=%{buildroot}/usr TO_LIB="liblua.so \
+    liblua.so.%{majmin} liblua.so.%{version}" \
+    INSTALL_DATA="cp -d" \
+    INSTALL_MAN=%{buildroot}/usr/share/man/man1 \
+    install
 install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
 cat > %{buildroot}%{_libdir}/pkgconfig/lua.pc <<- "EOF"
-	V=%{majmin}
-	R=%{version}
+    V=%{majmin}
+    R=%{version}
 
-	prefix=/usr
-	INSTALL_BIN=${prefix}/bin
-	INSTALL_INC=${prefix}/include
-	INSTALL_LIB=${prefix}/lib
-	INSTALL_MAN=${prefix}/man/man1
-	exec_prefix=${prefix}
-	libdir=${exec_prefix}/lib
-	includedir=${prefix}/include
+    prefix=/usr
+    INSTALL_BIN=${prefix}/bin
+    INSTALL_INC=${prefix}/include
+    INSTALL_LIB=${prefix}/lib
+    INSTALL_MAN=${prefix}/man/man1
+    exec_prefix=${prefix}
+    libdir=${exec_prefix}/lib
+    includedir=${prefix}/include
 
-	Name: Lua
-	Description: An Extensible Extension Language
-	Version: ${R}
-	Requires:
-	Libs: -L${libdir} -llua -lm
-	Cflags: -I${includedir}
+    Name: Lua
+    Description: An Extensible Extension Language
+    Version: ${R}
+    Requires:
+    Libs: -L${libdir} -llua -lm
+    Cflags: -I${includedir}
 EOF
 rmdir %{buildroot}%{_libdir}/lua/5.3
 rmdir %{buildroot}%{_libdir}/lua
@@ -91,6 +93,8 @@ rm -rf %{buildroot}
 %{_libdir}/liblua.so
 
 %changelog
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-7
+-   Nopatch CVE-2020-15889 since it only affects 5.4.0
 *   Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.3.5-6
 -   Append -fPIC and -O2 to CFLAGS to fix build issues.
 *   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 5.3.5-5
