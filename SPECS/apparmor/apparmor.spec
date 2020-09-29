@@ -357,7 +357,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.13-11
 -   Nopatch CVE-2016-1585
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.13-10
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-10
 -   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2.13-9
 -   Renaming Linux-PAM to pam
