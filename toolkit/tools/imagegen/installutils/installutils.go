@@ -790,14 +790,17 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 	const (
 		squashErrors = false
 	)
-	var isRoot bool
-	var rootUserAdded bool
+
+	rootUserAdded := false
 
 	for _, user := range users {
 		logger.Log.Infof("Adding user (%s)", user.Name)
 		ReportActionf("Adding user: %s", user.Name)
 
-		var homeDir string
+		var (
+			homeDir string
+			isRoot  bool
+		)
 
 		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
