@@ -45,7 +45,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/ca-certificates-microsoft/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
-    sed -i '/libffi-d/d' $TmpPkgGen
+    sed -i '/libpkgconf-devel/d' $TmpPkgGen
+    sed -i '/lua-static/d' $TmpPkgGen
     sed -i '/p11-kit-d/d' $TmpPkgGen
     sed -i '/p11-kit-server/d' $TmpPkgGen
     sed -i '/^check/d' $TmpPkgGen
@@ -85,9 +86,18 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
     sed -i '/perl-Text-Template/d' $TmpPkgGen
-    sed -i '/python/d' $TmpPkgGen
+    sed -i '/python2-test/d' $TmpPkgGen
+    sed -i '/python2-tools/d' $TmpPkgGen
+    sed -i '/python3-curses/d' $TmpPkgGen
+    sed -i '/python3-gpg/d' $TmpPkgGen
+    sed -i '/python3-libxml2/d' $TmpPkgGen
+    sed -i '/python3-pip/d' $TmpPkgGen
+    sed -i '/python3-pwquality/d' $TmpPkgGen
+    sed -i '/python3-rpm/d' $TmpPkgGen
+    sed -i '/python3-test/d' $TmpPkgGen
+    sed -i '/python3-tools/d' $TmpPkgGen
     sed -i '/shadow/d' $TmpPkgGen
-    sed -i '/unzip/d' $TmpPkgGen
+    sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
     sed -i '/which/d' $TmpPkgGen
@@ -112,7 +122,8 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^libstdc++-" >> $1
     cat $TmpPkgGen | grep "^libgomp-" >> $1
     cat $TmpPkgGen | grep "^gcc-" >> $1
-    cat $TmpPkgGen | grep "^pkg-config-" >> $1
+    cat $TmpPkgGen | grep "^libpkgconf-" >> $1
+    cat $TmpPkgGen | grep "^pkgconf-" >> $1
     cat $TmpPkgGen | grep "^ncurses-" >> $1
     cat $TmpPkgGen | grep "^readline-" >> $1
     cat $TmpPkgGen | grep "^coreutils-" >> $1
@@ -167,6 +178,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^krb5-" >> $1
     cat $TmpPkgGen | grep "^lua-" >> $1
     cat $TmpPkgGen | grep "^mariner-rpm-macros-" >> $1
+    cat $TmpPkgGen | grep "^mariner-python-macros-" >> $1
     cat $TmpPkgGen | grep "^mariner-check-" >> $1
     cat $TmpPkgGen | grep "^libassuan-" >> $1
     cat $TmpPkgGen | grep "^libgpg-error-" >> $1
@@ -183,6 +195,12 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^ca-certificates-shared-" >> $1
     cat $TmpPkgGen | grep "^ca-certificates-tools-" >> $1
     cat $TmpPkgGen | grep "^ca-certificates-base-" >> $1
+    cat $TmpPkgGen | grep "^dwz-" >> $1
+    cat $TmpPkgGen | grep "^unzip-" >> $1
+    cat $TmpPkgGen | grep "^libffi-" >> $1
+    cat $TmpPkgGen | grep "^python2-" >> $1
+    cat $TmpPkgGen | grep "^python-xml-" >> $1
+    cat $TmpPkgGen | grep "^python3-" >> $1
 }
 
 # Generate toolchain_*.txt based on the toolchain_built_rpms_all.tar.gz file contents
