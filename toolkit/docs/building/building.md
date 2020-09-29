@@ -30,8 +30,7 @@
       - [`SOURCE_URL=...`](#source_url)
       - [`PACKAGE_URL=...`](#package_url)
       - [`PACKAGE_UPDATE_URL=...`](#package_update_url)
-      - [`SRPM_URL=...`](#srpm_url)
-      - [`SRPM_UPDATE_URL=...`](#srpm_update_url)
+      - [`SRPM_URL_LIST=...`](#srpm_url_list)
       - [`REPO_LIST=...`](#repo_list)
       - [Build Enable/Disable Flags](#build-enabledisable-flags)
       - [`REBUILD_TOOLCHAIN=...`](#rebuild_toolchain)
@@ -292,8 +291,7 @@ Direct file downloads are by default pulled from:
 SOURCE_URL         ?=
 PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
 PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
-SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
-SRPM_UPDATE_URL    ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
+SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
 ```
 
 While `tdnf` uses a list of repo files:
@@ -323,8 +321,7 @@ The build system can operate without using pre-built components if desired. Ther
 SOURCE_URL         ?=
 PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
 PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
-SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
-SRPM_UPDATE_URL    ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
+SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
 REPO_LIST          ?=
 ```
 
@@ -355,7 +352,7 @@ sudo make go-tools REBUILD_TOOLS=y
 #  then rebuild the toolchain properly using the provided sources
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
@@ -365,7 +362,7 @@ sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UP
 # Complete rebuild of all tool, package, and image files from source.
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make image PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
@@ -391,13 +388,9 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > URL to download RPM packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`, used to populate the toolchain packages if they are missing.
 
-#### `SRPM_URL=...`
+#### `SRPM_URL_LIST=...`
 
-> URL to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
-
-#### `SRPM_UPDATE_URL=...`
-
-> URL to download updated versions of packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
+> Space seperated list of URLs to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
 
 #### `REPO_LIST=...`
 
@@ -616,8 +609,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                  | Description
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                             | URL to request package sources from
-| SRPM_URL                      | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                           | URL to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| SRPM_UPDATE_URL               | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms`                         | URL to request updated versions of packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
+| SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms` | Space seperated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
 | PACKAGE_URL                   | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms`              | URL to request full toolchain packages from
 | PACKAGE_UPDATE_URL            | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms`            | URL to request full toolchain packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
