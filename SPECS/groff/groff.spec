@@ -48,9 +48,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
-*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.22.3-5
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.22.3-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22.3-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
