@@ -377,6 +377,8 @@ build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
+# libxslt needs libgcrypt
+chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
 # docbook-style-xsl needs pam
