@@ -50,10 +50,11 @@ cp %{SOURCE1} .
 
 %build
 # Configure accordingly.
-make %{?_smp_mflags}
+make %{?_smp_mflags} SKIP_STRIP=y
 
 %install
 make install    DESTDIR=$RPM_BUILD_ROOT \
+                SKIP_STRIP=y            \
                 HAVE_LUA=n
 
 %pre
