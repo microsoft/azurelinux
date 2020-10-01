@@ -444,6 +444,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "chrony",
+          "version": "3.5.1",
+          "downloadUrl": "https://download.tuxfamily.org/chrony/chrony-3.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chrpath",
           "version": "0.16",
           "downloadUrl": "https://alioth-archive.debian.org/releases/chrpath/chrpath/0.16/chrpath-0.16.tar.gz"
