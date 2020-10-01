@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -34,7 +34,7 @@ install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
+%posttrans
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
@@ -53,6 +53,8 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
 
 %changelog
+*   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-10
+-   Change %%post scriptlet to %%posttrans
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
