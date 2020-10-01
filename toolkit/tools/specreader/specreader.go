@@ -144,7 +144,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 		dirsToCopy := []string{specsDir, srpmsDir}
 		for _, dir := range dirsToCopy {
 			dirInChroot := filepath.Join(chroot.RootDir(), dir)
-			err = directory.CopyContents(dirInChroot, dir)
+			err = directory.CopyContents(dir, dirInChroot)
 			if err != nil {
 				closeErr := chroot.Close(leaveFilesOnDisk)
 				if closeErr != nil {

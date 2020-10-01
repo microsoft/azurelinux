@@ -4,6 +4,7 @@
 package directory
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -31,19 +32,36 @@ func LastModifiedFile(dirPath string) (modTime time.Time, latestFile string, err
 	return
 }
 
-// CopyContents will recursively copy the contents of srcDir into destDir.
-// It will create destDir if it does not already exist.
-func CopyContents(srcDir, destDir string) (err error) {
+// CopyContents will recursively copy the contents of srcDir into dstDir.
+// - It will create dstDir if it does not already exist.
+func CopyContents(srcDir, dstDir string) (err error) {
 	const squashErrors = false
 
-	err = os.MkdirAll(destDir, os.ModePerm)
+	err = os.MkdirAll(dstDir, os.ModePerm)
 	if err != nil {
 		return
 	}
 
-	recursiveSrcDir := filepath.Join(srcDir, "*")
+	fds, err := ioutil.ReadDir(srcDir)
+	if err != nil {
+		return
+	}
 
-	err = shell.ExecuteLive(squashErrors, "cp", "-r", recursiveSrcDir, destDir)
+	for _, fd := range fds {
+		srcPath := filepath.Join(srcDir, fd.Name())
+		dstPath := filepath.Join(dstDir, fd.Name())
+
+		cpArgs := []string{"-a", srcPath, dstPath}
+		if fd.IsDir() {
+			cpArgs = append([]string{"-r"}, cpArgs...)
+		}
+
+		err = shell.ExecuteLive(squashErrors, "cp", cpArgs...)
+		if err != nil {
+			return
+		}
+	}
+
 	return
 
 }
