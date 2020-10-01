@@ -1,8 +1,7 @@
 %global libauditver     3.0
-%global libsepolver     2.9-1
-%global libsemanagever  2.9-1
-%global libselinuxver   2.9-1
-%global sepolgenver     2.9
+%global libsepolver     %{version}-1
+%global libsemanagever  %{version}-1
+%global libselinuxver   %{version}-1
 %global __python3	/usr/bin/python3
 %global generatorsdir %{_prefix}/lib/systemd/system-generators
 
@@ -152,6 +151,43 @@ BuildArch:  noarch
 The policycoreutils-python-utils package contains the management tools use to manage
 an SELinux environment.
 
+%package python3
+Summary: SELinux policy core python3 interfaces
+Requires:policycoreutils = %{version}-%{release}
+Requires:libsemanage-python3 >= %{libsemanagever} libselinux-python3
+Requires: python3-audit
+Requires: checkpolicy
+Requires: setools-python3 >= 4.1.1
+BuildArch: noarch
+
+%description python3
+The policycoreutils-python3 package contains the interfaces that can be used
+by python 3 in an SELinux environment.
+
+%package devel
+Summary: SELinux policy core policy devel utilities
+Requires: policycoreutils-python-utils
+Requires: make dnf
+
+%description devel
+The policycoreutils-devel package contains the management tools use to develop policy in an SELinux environment.
+
+%package newrole
+Summary: The newrole application for RBAC/MLS
+BuildRequires: libcap-ng-devel
+Requires: policycoreutils = %{version}-%{release}
+
+%description newrole
+RBAC/MLS policy machines require newrole as a way of changing the role
+or level of a logged in user.
+
+%package restorecond
+Summary: SELinux restorecond utilities
+BuildRequires: systemd
+
+%description restorecond
+The policycoreutils-restorecond package contains the restorecond service.
+
 %files python-utils
 %license python/copying
 %{_sbindir}/semanage
@@ -167,19 +203,6 @@ an SELinux environment.
 %{_mandir}/man8/semanage*.8*
 %{_mandir}/ru/man8/semanage*.8*
 %{_datadir}/bash-completion/completions/semanage
-
-%package python3
-Summary: SELinux policy core python3 interfaces
-Requires:policycoreutils = %{version}-%{release}
-Requires:libsemanage-python3 >= %{libsemanagever} libselinux-python3
-Requires: python3-audit
-Requires: checkpolicy
-Requires: setools-python3 >= 4.1.1
-BuildArch: noarch
-
-%description python3
-The policycoreutils-python3 package contains the interfaces that can be used
-by python 3 in an SELinux environment.
 
 %files python3
 %license python/COPYING
@@ -204,14 +227,6 @@ by python 3 in an SELinux environment.
 %{python3_sitelib}/sepolicy/__pycache__
 %_mandir}/man8/sepolicy-gui.8.gz
 
-%package devel
-Summary: SELinux policy core policy devel utilities
-Requires: policycoreutils-python-utils
-Requires: make dnf
-
-%description devel
-The policycoreutils-devel package contains the management tools use to develop policy in an SELinux environment.
-
 %files devel
 %{_bindir}/sepolgen
 %{_bindir}/sepolgen-ifgen
@@ -232,15 +247,6 @@ The policycoreutils-devel package contains the management tools use to develop p
 %{_mandir}/ru/man8/sepolicy*.8*
 %{_usr}/share/bash-completion/completions/sepolicy
 
-%package newrole
-Summary: The newrole application for RBAC/MLS
-BuildRequires: libcap-ng-devel
-Requires: policycoreutils = %{version}-%{release}
-
-%description newrole
-RBAC/MLS policy machines require newrole as a way of changing the role
-or level of a logged in user.
-
 %files newrole
 %license policycoreutils/COPYING
 %attr(0755,root,root) %caps(cap_dac_read_search,cap_setpcap,cap_audit_write,cap_sys_admin,cap_fowner,cap_chown,cap_dac_override=pe) %{_bindir}/newrole
@@ -248,7 +254,50 @@ or level of a logged in user.
 %{_mandir}/ru/man1/newrole.1.gz
 %config(noreplace) %{_sysconfdir}/pam.d/newrole
 
+%files restorecond
+%license restorecond/COPYING
+%{_sbindir}/restorecond
+%{_unitdir}/restorecond.service
+%config(noreplace) %{_sysconfdir}/selinux/restorecond.conf
+%config(noreplace) %{_sysconfdir}/selinux/restorecond_user.conf
+%{_sysconfdir}/xdg/autostart/restorecond.desktop
+%{_datadir}/dbus-1/services/org.selinux.Restorecond.service
+%{_mandir}/man8/restorecond.8*
+%{_mandir}/ru/man8/restorecond.8*
+%{_mandir}/ru/man1/audit2why.1*
+%{_mandir}/ru/man1/newrole.1*
+%{_mandir}/ru/man5/selinux_config.5*
+%{_mandir}/ru/man5/sestatus.conf.5*
+%{_mandir}/ru/man8/genhomedircon.8*
+%{_mandir}/ru/man8/restorecon_xattr.8*
+%{_mandir}/ru/man8/semanage-boolean.8*
+%{_mandir}/ru/man8/semanage-dontaudit.8*
+%{_mandir}/ru/man8/semanage-export.8*
+%{_mandir}/ru/man8/semanage-fcontext.8*
+%{_mandir}/ru/man8/semanage-ibendport.8*
+%{_mandir}/ru/man8/semanage-ibpkey.8*
+%{_mandir}/ru/man8/semanage-import.8*
+%{_mandir}/ru/man8/semanage-interface.8*
+%{_mandir}/ru/man8/semanage-login.8*
+%{_mandir}/ru/man8/semanage-module.8*
+%{_mandir}/ru/man8/semanage-node.8*
+%{_mandir}/ru/man8/semanage-permissive.8*
+%{_mandir}/ru/man8/semanage-port.8*
+%{_mandir}/ru/man8/semanage-user.8*
+%{_mandir}/ru/man8/semodule_unpackage.8*
+%{_mandir}/ru/man8/sepolgen.8*
+%{_mandir}/ru/man8/sepolicy-booleans.8*
+%{_mandir}/ru/man8/sepolicy-communicate.8*
+%{_mandir}/ru/man8/sepolicy-generate.8*
+%{_mandir}/ru/man8/sepolicy-gui.8*
+%{_mandir}/ru/man8/sepolicy-interface.8*
+%{_mandir}/ru/man8/sepolicy-manpage.8*
+%{_mandir}/ru/man8/sepolicy-network.8*
+%{_mandir}/ru/man8/sepolicy-transition.8*
+%{_mandir}/ru/man8/sepolicy.8*
+
 %files
+%license policycoreutils/COPYING
 %{_sbindir}/restorecon
 %{_sbindir}/restorecon_xattr
 %{_sbindir}/fixfiles
@@ -304,58 +353,8 @@ or level of a logged in user.
 %{_mandir}/ru/man8/semodule_package.8*
 %dir %{_datadir}/bash-completion
 %{_datadir}/bash-completion/completions/setsebool
-%license policycoreutils/COPYING
 %doc %{_usr}/share/doc/%{name}
 /usr/share/locale/*
-
-%package restorecond
-Summary: SELinux restorecond utilities
-BuildRequires: systemd
-
-%description restorecond
-The policycoreutils-restorecond package contains the restorecond service.
-
-%files restorecond
-%{_sbindir}/restorecond
-%{_unitdir}/restorecond.service
-%config(noreplace) %{_sysconfdir}/selinux/restorecond.conf
-%config(noreplace) %{_sysconfdir}/selinux/restorecond_user.conf
-%{_sysconfdir}/xdg/autostart/restorecond.desktop
-%{_datadir}/dbus-1/services/org.selinux.Restorecond.service
-%{_mandir}/man8/restorecond.8*
-%{_mandir}/ru/man8/restorecond.8*
-%{_mandir}/ru/man1/audit2why.1*
-%{_mandir}/ru/man1/newrole.1*
-%{_mandir}/ru/man5/selinux_config.5*
-%{_mandir}/ru/man5/sestatus.conf.5*
-%{_mandir}/ru/man8/genhomedircon.8*
-%{_mandir}/ru/man8/restorecon_xattr.8*
-%{_mandir}/ru/man8/semanage-boolean.8*
-%{_mandir}/ru/man8/semanage-dontaudit.8*
-%{_mandir}/ru/man8/semanage-export.8*
-%{_mandir}/ru/man8/semanage-fcontext.8*
-%{_mandir}/ru/man8/semanage-ibendport.8*
-%{_mandir}/ru/man8/semanage-ibpkey.8*
-%{_mandir}/ru/man8/semanage-import.8*
-%{_mandir}/ru/man8/semanage-interface.8*
-%{_mandir}/ru/man8/semanage-login.8*
-%{_mandir}/ru/man8/semanage-module.8*
-%{_mandir}/ru/man8/semanage-node.8*
-%{_mandir}/ru/man8/semanage-permissive.8*
-%{_mandir}/ru/man8/semanage-port.8*
-%{_mandir}/ru/man8/semanage-user.8*
-%{_mandir}/ru/man8/semodule_unpackage.8*
-%{_mandir}/ru/man8/sepolgen.8*
-%{_mandir}/ru/man8/sepolicy-booleans.8*
-%{_mandir}/ru/man8/sepolicy-communicate.8*
-%{_mandir}/ru/man8/sepolicy-generate.8*
-%{_mandir}/ru/man8/sepolicy-gui.8*
-%{_mandir}/ru/man8/sepolicy-interface.8*
-%{_mandir}/ru/man8/sepolicy-manpage.8*
-%{_mandir}/ru/man8/sepolicy-network.8*
-%{_mandir}/ru/man8/sepolicy-transition.8*
-%{_mandir}/ru/man8/sepolicy.8*
-%license restorecond/COPYING
 
 %post
 %systemd_post selinux-autorelabel-mark.service

@@ -56,11 +56,11 @@ Requires:    python3-setuptools
 %description python3
 SETools is a collection of graphical tools, command-line tools, and
 Python 3 modules designed to facilitate SELinux policy analysis.
+
 %prep
 %setup -n %{name}
 
 %build
-pwd
 %{__python3} setup.py build_ext
 %{__python3} setup.py build
 

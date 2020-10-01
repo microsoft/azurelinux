@@ -1,5 +1,3 @@
-%global libsepolver 2.9-1
-
 Name:           secilc
 Version:        2.9
 Release:        3%{?dist}
@@ -9,7 +7,7 @@ URL:            https://github.com/SELinuxProject/selinux
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
-Patch0001:	0001-Allow-setting-arguments-to-xmlto-via-environmental-v.patch
+Patch0001:      0001-Allow-setting-arguments-to-xmlto-via-environmental-v.patch
 
 BuildRequires: gcc
 BuildRequires: libsepol-devel >= %{libsepolver}
