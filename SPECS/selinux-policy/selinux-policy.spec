@@ -264,6 +264,9 @@ exit 0
 %changelog
 * Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> 2.20200818-1
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
+- Heavy modifications to build from upstream reference policy rather than from fedora selinux policy.
+  Fedora's policy and versioning tracks their policy fork specificially, whereas this tracks the upstream
+  policy that Fedora's policy is based on.
 - License verified
 
 * Wed Oct 09 2019 Lukas Vrabec <lvrabec@redhat.com> - 3.14.4-37
