@@ -54,7 +54,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %changelog
 *   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-10
--   Change %%post scriptlet to %%posttrans
+-   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
