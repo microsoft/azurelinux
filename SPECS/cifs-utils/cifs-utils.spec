@@ -28,8 +28,7 @@ Requires:   cifs-utils = %{version}-%{release}
 Provides header files needed for Cifs-Utils development.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup
 
 %build
 autoreconf -fiv &&./configure --prefix=%{_prefix}
@@ -51,9 +50,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
-*   Wed Sep 30 2020 Henry Beberman <henry.beberman@microsoft.com> - 6.8-4
+*   Wed Sep 30 2020 Henry Beberman <henry.beberman@microsoft.com> 6.8-4
 -   Add patch for CVE-2020-14342
-*   Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.8-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 6.8-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.8-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
