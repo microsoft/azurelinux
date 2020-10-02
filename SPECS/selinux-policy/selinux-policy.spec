@@ -1,4 +1,6 @@
-# upstream does not currently support a mariner distro
+# upstream does not currently have a build tag for mariner customizations
+# Work item to refine Mariner-specific policy customizations:
+# https://microsoft.visualstudio.com/OS/_workitems/edit/29662332
 %define distro redhat
 %define polyinstatiate n
 %define monolithic n
