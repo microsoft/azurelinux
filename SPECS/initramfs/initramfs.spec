@@ -1,7 +1,7 @@
 Summary:	initramfs
 Name:		initramfs
 Version:	2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Source0:	fscks.conf
 License:	Apache License
 Group:		System Environment/Base
@@ -66,6 +66,22 @@ mkdir -p %{_localstatedir}/lib/rpm-state/initramfs \
 touch %{_localstatedir}/lib/rpm-state/initramfs/regenerate \
 echo "initramfs (re)generation" %* >&2
 
+# kdump currently uses the host system's initrd when enrolling a crash kernel
+# and initrd. There is a limitation where the kdump initrd must be generated
+# with dracut in "host-only" mode.
+#
+# The -k option forces "host-only" initrd build for the specified kernel version.
+# The -q option suppresses verbose output
+#
+# If mkinitrd is called without <image> and <kernel-version> parameters, it will
+# default to invoking dracut in "host-mode" mode on every kernel version it can
+# find in /boot.
+#
+# If mkinitrd is called with <image> and <kernel-version> parameters, it will
+# default to invoking dracut in "generic host" mode to create an initrd.
+#
+# So in order to be compatible with kdump, we need to make sure to add the -k
+# option when invoking mkinitrd with an explicit <image> and <kernel version>
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
@@ -74,7 +90,7 @@ if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
-        mkinitrd -q /boot/initrd.img-$k $k \
+        mkinitrd -q /boot/initrd.img-$k $k -k \
     done; \
 fi \
 %removal_action
@@ -111,6 +127,8 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+*   Thu Oct 01 2020 Chris Co <chrco@microsoft.com> 2.0-6
+-   Update file-triggered initrd generation to workaround kdump initrd limitations
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0-5
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Aug 27 2018 Dheeraj Shetty <dheerajs@vmware.com> 2.0-4

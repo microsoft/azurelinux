@@ -2,7 +2,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.4.51
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -202,7 +202,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
-     if [ `ls /boot/linux-*.cfg 1> /dev/null 2>&1` ]
+     ls /boot/linux-*.cfg 1> /dev/null 2>&1
+     if [ $? -eq 0 ]
      then
           list=`ls -tu /boot/linux-*.cfg | head -n1`
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
@@ -257,6 +258,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-4
+-   Update postun script to deal with removal in case of another installed kernel.
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-3
 -   Add code to check for missing config flags in the checked in configs
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2

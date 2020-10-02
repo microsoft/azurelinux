@@ -2,7 +2,7 @@
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.4.51
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -67,7 +67,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
-     if [ `ls /boot/linux-*.cfg 1> /dev/null 2>&1` ]
+     ls /boot/linux-*.cfg 1> /dev/null 2>&1
+     if [ $? -eq 0 ]
      then
           list=`ls -tu /boot/linux-*.cfg | head -n1`
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
@@ -84,6 +85,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
+-   Update postun script to deal with removal in case of another installed kernel.
 *   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-7
 -   Update release number
 *   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
