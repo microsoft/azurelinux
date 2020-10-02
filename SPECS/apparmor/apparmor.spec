@@ -1,15 +1,16 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           apparmor
 Version:        2.13
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 License:        GNU LGPL v2.1
 URL:            https://launchpad.net/apparmor
 Source0:        https://launchpad.net/apparmor/2.13/2.13.0/+download/%{name}-%{version}.tar.gz
-%define sha1    apparmor=54202cafce24911c45141d66e2d1e037e8aa5746
 Patch0:         apparmor-set-profiles-complain-mode.patch
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         apparmor-fix-make-check.patch
+# CVE-2016-1585 has no upstream fix as of 2020/09/28
+Patch100:       CVE-2016-1585.nopatch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Security
@@ -354,9 +355,10 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
-* Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.13-10
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.13-11
+-   Nopatch CVE-2016-1585
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-10
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2.13-9
 -   Renaming Linux-PAM to pam
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.13-8

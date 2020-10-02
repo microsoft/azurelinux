@@ -1,25 +1,27 @@
-Summary:	QEMU is a machine emulator and virtualizer
-Name:		qemu-kvm
-Version:	4.2.0
-Release:    11%{?dist}
-License:    GPLv2 and GPLv2+ and CC-BY and BSD
-Group:      Development/Tools
-URL:        https://www.qemu.org/
-Source0:    https://download.qemu.org/qemu-%{version}.tar.xz
-Source1:    65-kvm.rules
+Summary:       QEMU is a machine emulator and virtualizer
+Name:          qemu-kvm
+Version:       4.2.0
+Release:       12%{?dist}
+License:       GPLv2 and GPLv2+ and CC-BY and BSD
+Group:         Development/Tools
+URL:           https://www.qemu.org/
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+Source0:       https://download.qemu.org/qemu-%{version}.tar.xz
+Source1:       65-kvm.rules
 # https://git.qemu.org/?p=qemu.git;a=commit;h=8ffb7265af64ec81748335ec8f20e7ab542c3850
-Patch0:      CVE-2020-11102.patch
+Patch0:        CVE-2020-11102.patch
 # This vulnerability is in libslirp source code. And qemu is exposed to it when configured with libslirp.
 # Since Mariner does not have libslirp, it is not applicable.
-Patch1:      CVE-2020-7039.nopatch
-Patch2:      CVE-2020-1711.patch
-Patch3:      CVE-2020-7211.patch
-Patch4:      CVE-2019-20175.patch
-Patch5:      CVE-2020-13659.patch
-Patch6:      CVE-2020-16092.patch
-Patch7:      CVE-2020-15863.patch
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Patch1:        CVE-2020-7039.nopatch
+Patch2:        CVE-2020-1711.patch
+Patch3:        CVE-2020-7211.patch
+Patch4:        CVE-2019-20175.patch
+Patch5:        CVE-2020-13659.patch
+Patch6:        CVE-2020-16092.patch
+Patch7:        CVE-2020-15863.patch
+# CVE-2016-7161 was fixed in 2.7.0, but the CVE database was not updated.
+Patch8:        CVE-2016-7161.nopatch
 
 BuildRequires: python3-devel
 BuildRequires: glib-devel
@@ -114,6 +116,8 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-12
+-   Nopatch CVE-2016-7161, it was fixed in 2.7
 *   Mon Sep 14 2020 Nicolas Guibourge <nicolasg@microsoft.com> 4.2.0-11
 -   Add patch for CVE-2020-15863
 *   Wed Sep 02 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.2.0-10

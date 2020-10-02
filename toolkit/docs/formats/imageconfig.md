@@ -141,6 +141,23 @@ A sample KernelOptions specifying a default kernel and a specialized kernel for 
 },
 ```
 
+### KernelCommandLine
+
+KernelCommandLine is an optional key which allows additional parameters to be passed to the kernel when it is launched from Grub.
+
+ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enable, they may be any combination of `tcb`, `appraise_tcb`, `secure_boot`.
+
+ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used.
+
+A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:
+
+``` json
+"KernelCommandLine": {
+    "ImaPolicy": ["tcb"],
+    "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
+},
+```
+
 # Sample image configuration
 
 A sample image configuration, producing a VHDX disk image:
@@ -199,6 +216,10 @@ A sample image configuration, producing a VHDX disk image:
             ],
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "KernelCommandLine": {
+                "ImaPolicy": ["tcb"],
+                "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
             },
             "Hostname": "cbl-mariner"
         }

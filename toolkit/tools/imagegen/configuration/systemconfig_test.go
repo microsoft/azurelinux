@@ -106,6 +106,21 @@ func TestShouldSucceedParsingMissingDefaultKernelForRootfs_SystemConfig(t *testi
 	assert.Equal(t, rootfsNoKernelConfig, checkedSystemConfig)
 }
 
+func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	badKernelCommandConfig := validSystemConfig
+	badKernelCommandConfig.KernelCommandLine = KernelCommandLine{ExtraCommandLine: invalidExtraCommandLine}
+
+	err := badKernelCommandConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [KernelCommandLine]: ExtraCommandLine contains character ` which is reserved for use by sed", err.Error())
+
+	err = remarshalJSON(badKernelCommandConfig, &checkedSystemConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [KernelCommandLine]: ExtraCommandLine contains character ` which is reserved for use by sed", err.Error())
+}
+
 func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 
