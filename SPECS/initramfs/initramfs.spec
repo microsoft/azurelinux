@@ -70,17 +70,18 @@ echo "initramfs (re)generation" %* >&2
 # and initrd. There is a limitation where the kdump initrd must be generated
 # with dracut in "host-only" mode.
 #
-# The -k option forces a host-only initrd build.
+# The -k option forces "host-only" initrd build for the specified kernel version.
 # The -q option suppresses verbose output
 #
 # If mkinitrd is called without <image> and <kernel-version> parameters, it will
-# default to calling dracut in "host-mode" mode on every kernel version it can
+# default to invoking dracut in "host-mode" mode on every kernel version it can
 # find in /boot.
 #
 # If mkinitrd is called with <image> and <kernel-version> parameters, it will
-# default to calling dracut in "generic host" mode for rebuilding the specific
-# initrd. Therefore we need to make sure to add the -k option when invoking
-# mkinitrd with an explicit <image> and <kernel version>
+# default to invoking dracut in "generic host" mode to create an initrd.
+#
+# So in order to be compatible with kdump, we need to make sure to add the -k
+# option when invoking mkinitrd with an explicit <image> and <kernel version>
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
