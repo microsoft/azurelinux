@@ -133,6 +133,7 @@ gpgme-devel-1.13.1-5.cm1.x86_64.rpm
 grep-3.1-3.cm1.x86_64.rpm
 grep-debuginfo-3.1-3.cm1.x86_64.rpm
 grep-lang-3.1-3.cm1.x86_64.rpm
+groff-1.22.3-5.cm1.x86_64.rpm
 gtest-1.8.1-5.cm1.x86_64.rpm
 gtest-debuginfo-1.8.1-5.cm1.x86_64.rpm
 gtest-devel-1.8.1-5.cm1.x86_64.rpm
@@ -167,6 +168,10 @@ libassuan-debuginfo-2.5.1-3.cm1.x86_64.rpm
 libcap-2.26-2.cm1.x86_64.rpm
 libcap-debuginfo-2.26-2.cm1.x86_64.rpm
 libcap-devel-2.26-2.cm1.x86_64.rpm
+libcap-ng-0.7.9-2.cm1.x86_64.rpm
+python2-libcap-ng-0.7.9.cm1.x86_64.rpm
+python3-libcap-ng-0.7.9.cm1.x86_64.rpm
+libcap-ng-devel-0.7.9-2.cm1.x86_64.rpm
 libdb-5.3.28-4.cm1.x86_64.rpm
 libdb-debuginfo-5.3.28-4.cm1.x86_64.rpm
 libdb-devel-5.3.28-4.cm1.x86_64.rpm
@@ -192,6 +197,8 @@ libltdl-2.4.6-5.cm1.x86_64.rpm
 libltdl-devel-2.4.6-5.cm1.x86_64.rpm
 libmpc-1.1.0-5.cm1.x86_64.rpm
 libmpc-debuginfo-1.1.0-5.cm1.x86_64.rpm
+libnsl2-1.2.0-4.cm1.x86_64.rpm
+libnsl2-devel-1.2.0-4.cm1.x86_64.rpm
 libpipeline-1.5.0-3.cm1.x86_64.rpm
 libpipeline-debuginfo-1.5.0-3.cm1.x86_64.rpm
 libpipeline-devel-1.5.0-3.cm1.x86_64.rpm
@@ -224,6 +231,8 @@ libtasn1-debuginfo-4.14-2.cm1.x86_64.rpm
 libtasn1-devel-4.14-2.cm1.x86_64.rpm
 libtool-2.4.6-5.cm1.x86_64.rpm
 libtool-debuginfo-2.4.6-5.cm1.x86_64.rpm
+libtirpc-1.1.4-4.cm1.x86_64.rpm
+libtirpc-devel-1.1.4-4.cm1.x86_64.rpm
 libxml2-2.9.10-2.cm1.x86_64.rpm
 libxml2-debuginfo-2.9.10-2.cm1.x86_64.rpm
 libxml2-devel-2.9.10-2.cm1.x86_64.rpm
@@ -274,6 +283,7 @@ openjdk8-doc-1.8.0.212-10.cm1.x86_64.rpm
 openjdk8-sample-1.8.0.212-10.cm1.x86_64.rpm
 openjdk8-src-1.8.0.212-10.cm1.x86_64.rpm
 openjre8-1.8.0.212-10.cm1.x86_64.rpm
+openldap-2.4.50-1.cm1.x86_64.rpm
 openssl-1.1.1g-6.cm1.x86_64.rpm
 openssl-debuginfo-1.1.1g-6.cm1.x86_64.rpm
 openssl-devel-1.1.1g-6.cm1.x86_64.rpm
@@ -340,6 +350,8 @@ python-xml-2.7.18-4.cm1.x86_64.rpm
 readline-7.0-4.cm1.x86_64.rpm
 readline-debuginfo-7.0-4.cm1.x86_64.rpm
 readline-devel-7.0-4.cm1.x86_64.rpm
+rpcsvc-proto-1.4-3.cm1.x86_64.rpm
+rpcsvc-proto-devel-1.4-3.cm1.x86_64.rpm
 rpm-4.14.2-11.cm1.x86_64.rpm
 rpm-build-4.14.2-11.cm1.x86_64.rpm
 rpm-build-libs-4.14.2-11.cm1.x86_64.rpm
@@ -367,6 +379,8 @@ systemd-devel-239-32.cm1.x86_64.rpm
 systemd-lang-239-32.cm1.x86_64.rpm
 tar-1.32-2.cm1.x86_64.rpm
 tar-debuginfo-1.32-2.cm1.x86_64.rpm
+tcp_wrappers-7.6-9.cm1.x86_64.rpm
+tcp_wrappers-devel-7.6-9.cm1.x86_64.rpm
 tdnf-2.1.0-4.cm1.x86_64.rpm
 tdnf-cli-libs-2.1.0-4.cm1.x86_64.rpm
 tdnf-debuginfo-2.1.0-4.cm1.x86_64.rpm
