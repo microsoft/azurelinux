@@ -1,17 +1,18 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
 Source1:        MICROSOFT-METADATA-GPG-KEY
 Source2:        mariner-official-base.repo
 Source3:        mariner-official-update.repo
-Vendor:         Microsoft Corporation
-Distribution:   mariner
-Provides:       mariner-repos
+Source4:        mariner-preview.repo
+
 Requires(post): gpgme
 Requires(post): rpm
 Requires(preun): gpgme
@@ -21,11 +22,20 @@ BuildArch:      noarch
 %description
 CBL-Mariner repo files and gpg keys
 
+%package preview
+Summary:    CBL-Mariner preview repo file.
+Group:      System Environment/Base
+Requires:   %{name} = %{version}-%{release}
+
+%description preview
+%{summary}
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
 install -m 644 %{SOURCE2} $RPM_BUILD_ROOT/etc/yum.repos.d
 install -m 644 %{SOURCE3} $RPM_BUILD_ROOT/etc/yum.repos.d
+install -m 644 %{SOURCE4} $RPM_BUILD_ROOT/etc/yum.repos.d
 
 install -d -m 755 $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 install -m 644 %{SOURCE0} $RPM_BUILD_ROOT/etc/pki/rpm-gpg
@@ -52,9 +62,16 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) /etc/yum.repos.d/mariner-official-base.repo
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
 
+%files preview
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-preview.repo
+
 %changelog
-*   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-10
+*   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-11
 -   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
+*   Mon Sep 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-10
+-   Adding configuration to access the preview repository.
+-   Removing redundant 'Provides'.
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8

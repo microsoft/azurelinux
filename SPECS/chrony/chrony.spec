@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        3.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,13 +77,17 @@ sed -e 's|^pool.*|server time.windows.com|' \
     -e 's|#\(keyfile\)|\1|' \
         < examples/chrony.conf.example2 > chrony.conf
 
+# use the example chrony-wait service, but comment out the line adding
+# chrony-wait as a boot dependency
+sed -i '/WantedBy=multi-user.target/s/^/#/g' examples/chrony-wait.service
+
 cat >> chrony.conf << EOF
 
 # Setting larger 'maxdistance' to tolerate time.windows.com delay
 maxdistance 16.0
 EOF
 
-touch -r examples/chrony.conf.example2 chrony.conf
+touch -r examples/chrony.conf.example2 examples/chrony-wait.service chrony.conf
 
 # regenerate the file from getdate.y
 rm -f getdate.c
@@ -191,6 +195,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Thu Oct 01 2020 Thomas Crain <thcrain@microsoft.com> - 3.5.1-2
+- Remove chrony-wait service as a boot dependency
+
 * Tue Sep 01 2020 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.1-1
 - Update version to 3.5.1
 - Remove gpg signature check

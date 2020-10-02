@@ -444,6 +444,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "chrony",
+          "version": "3.5.1",
+          "downloadUrl": "https://download.tuxfamily.org/chrony/chrony-3.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chrpath",
           "version": "0.16",
           "downloadUrl": "https://alioth-archive.debian.org/releases/chrpath/chrpath/0.16/chrpath-0.16.tar.gz"
@@ -490,6 +500,17 @@
         }
       }
     },
+    {
+      "component": {
+      "type": "other",
+      "other": {
+        "name": "cloud-init-vmware-guestinfo",
+        "version": "1.3.1",
+        "downloadUrl": "https://github.com/vmware/cloud-init-vmware-guestinfo/archive/v1.3.1.tar.gz"
+        }
+      }
+    },
+
     {
       "component": {
         "type": "other",
@@ -804,6 +825,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dos2unix",
+          "version": "7.4.1",
+          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dotnet-runtime-3.1",
           "version": "3.1.5",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz"
@@ -925,8 +956,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.3.11",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.3.11.tar.gz"
+          "version": "3.3.25",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.3.25.tar.gz"
         }
       }
     },
@@ -1255,8 +1286,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.13.11",
-          "downloadUrl": "https://dl.google.com/go/go1.13.11.src.tar.gz"
+          "version": "1.13.15",
+          "downloadUrl": "https://dl.google.com/go/go1.13.15.src.tar.gz"
         }
       }
     },
@@ -1445,8 +1476,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.43",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2"
+          "version": "2.4.46",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
         }
       }
     },
@@ -5335,8 +5366,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.1.1/tpm2-abrmd-2.1.1.tar.gz"
+          "version": "2.3.3",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
         }
       }
     },
@@ -5345,8 +5376,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "3.1.4",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/3.1.4/tpm2-tools-3.1.4.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.2/tpm2-tools-4.2.tar.gz"
         }
       }
     },
@@ -5355,8 +5386,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.2.0/tpm2-tss-2.2.0.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
         }
       }
     },
@@ -5547,6 +5578,16 @@
           "name": "which",
           "version": "2.21",
           "downloadUrl": "http://ftp.gnu.org/gnu/which/which-2.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "words",
+          "version": "3.0",
+          "downloadUrl": "https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
         }
       }
     },

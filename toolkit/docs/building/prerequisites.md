@@ -1,8 +1,10 @@
 
 # Build Requirements
----
-### Requirements were validated on `Ubuntu 18.04`.
+
+## Requirements were validated on `Ubuntu 18.04`
+
 Requirements for building images with a toolkit:
+
 ```bash
 # Add a backports repo in order to install the latest version of Go.
 sudo add-apt-repository ppa:longsleep/golang-backports

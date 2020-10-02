@@ -9,8 +9,7 @@
                 "packagelists/core-packages-image.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv": "kernel-hyperv"
+                "default": "kernel"
             }
         },
         {
@@ -21,8 +20,7 @@
                 "packagelists/core-packages-image.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv": "kernel-hyperv"
+                "default": "kernel"
             }
         },
         {
@@ -32,8 +30,7 @@
                 "packagelists/core-packages-image.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv": "kernel-hyperv"
+                "default": "kernel"
             }
         }
     ]

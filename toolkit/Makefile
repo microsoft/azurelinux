@@ -87,7 +87,9 @@ endif
 SOURCE_URL         ?= 
 PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
 PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
-SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms \
+                      https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms \
+                      https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
 REPO_LIST   ?=
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -99,8 +101,8 @@ BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
 RELEASE_MAJOR_ID   ?= 1.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
-ifneq ($(wildcard $(OUT_DIR)/version-minor-id.txt),)
-	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.txt)
+ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
+	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
 else
 	RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
 endif

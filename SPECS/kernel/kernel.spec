@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        2%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -37,6 +37,7 @@ Patch1013:      CVE-2020-9383.nopatch
 Patch1014:      CVE-2020-11725.nopatch
 
 BuildRequires:  bc
+BuildRequires:  diffutils
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  glib-devel
@@ -51,6 +52,20 @@ Requires:       filesystem kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 %define uname_r %{version}-%{release}
+
+# When updating the config files it is important to sanitize them.
+# Steps for updating a config file:
+#  1. Extract the linux sources into a folder
+#  2. Add the current config file to the folder
+#  3. Run `make menuconfig` to edit the file (Manually editing is not recommended)
+#  4. Save the config file
+#  5. Copy the config file back into the kernel spec folder
+#  6. Revert any undesired changes (GCC related changes, etc)
+#  8. Build the kernel package
+#  9. Apply the changes listed in the log file (if any) to the config file
+#  10. Verify the rest of the config file looks ok
+# If there are significant changes to the config file, disable the config check and build the
+# kernel rpm. The final config file is included in /boot in the rpm.
 
 %description
 The kernel package contains the Linux kernel.
@@ -115,8 +130,25 @@ arch="arm64"
 archdir="arm64"
 %endif
 
+cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL= oldconfig
+make LC_ALL=  ARCH=${arch} oldconfig
+
+# Verify the config files match
+cp .config new_config
+sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+diff --unified new_config current_config > config_diff || true
+if [ -s config_diff ]; then
+    printf "\n\n\n\n\n\n\n\n"
+    cat config_diff
+    printf "\n\n\n\n\n\n\n\n"
+    echo "Config file has unexpected changes"
+    echo "Update config file to set changed values explicitly"
+
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    exit 1
+fi
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 make -C tools perf
 
@@ -227,7 +259,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
-     if [ `ls /boot/linux-*.cfg 1> /dev/null 2>&1` ]
+     ls /boot/linux-*.cfg 1> /dev/null 2>&1
+     if [ $? -eq 0 ]
      then
           list=`ls -tu /boot/linux-*.cfg | head -n1`
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
@@ -300,6 +333,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
+-   Update postun script to deal with removal in case of another installed kernel.
+*   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-7
+-   Enable Mellanox kernel configs
+*   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
+-   Enable CONFIG_IMA (measurement only) and associated configs
+*   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5
+-   Add code to check for missing config flags in the checked in configs
+*   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-4
+-   Apply additional kernel hardening configs
+*   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-3
+-   Bump release number due to kernel-signed-<arch> package update
+-   Minor aarch64 config and changelog cleanup
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
@@ -360,7 +406,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   Update x86_64 security configs
 *   Wed May 20 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.23-8
 -   Adding InfiniBand config flags
-*   Tue May 11 2020 Anand Muthurajan <anandm@microsoft.com> 5.4.23-7
+*   Mon May 11 2020 Anand Muthurajan <anandm@microsoft.com> 5.4.23-7
 -   Adding PPP config flags
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.23-6
 -   Renaming Linux-PAM to pam
