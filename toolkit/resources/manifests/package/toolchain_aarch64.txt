@@ -169,8 +169,8 @@ libcap-2.26-2.cm1.aarch64.rpm
 libcap-debuginfo-2.26-2.cm1.aarch64.rpm
 libcap-devel-2.26-2.cm1.aarch64.rpm
 libcap-ng-0.7.9-2.cm1.aarch64.rpm
-python2-libcap-ng-0.7.9.cm1.aarch64.rpm
-python3-libcap-ng-0.7.9.cm1.aarch64.rpm
+python2-libcap-ng-0.7.9-2.cm1.aarch64.rpm
+python3-libcap-ng-0.7.9-2.cm1.aarch64.rpm
 libcap-ng-devel-0.7.9-2.cm1.aarch64.rpm
 libdb-5.3.28-4.cm1.aarch64.rpm
 libdb-debuginfo-5.3.28-4.cm1.aarch64.rpm
