@@ -2,7 +2,7 @@
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
 Version:        5.4.51
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -85,6 +85,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-9
+-   Update release number
 *   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
 -   Update postun script to deal with removal in case of another installed kernel.
 *   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-7
