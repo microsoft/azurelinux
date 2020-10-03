@@ -39,6 +39,7 @@ Patch1015:      CVE-2020-10757.nopatch
 Patch1016:      CVE-2020-12653.nopatch
 Patch1017:      CVE-2020-12657.nopatch
 Patch1018:      CVE-2010-3865.nopatch
+Patch1019:      CVE-2020-11668.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -338,7 +339,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
--   Address CVE-2020-10757, CVE-2020-12653, CVE-2020-12657, CVE-2010-3865
+-   Address CVE-2020-10757, CVE-2020-12653, CVE-2020-12657, CVE-2010-3865,
+-   CVE-2020-11668
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-9
 -   Fix aarch64 build error
 *   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
