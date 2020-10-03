@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -44,7 +44,7 @@ install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
+%posttrans
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpg --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
@@ -67,6 +67,8 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) /etc/yum.repos.d/mariner-preview.repo
 
 %changelog
+*   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-11
+-   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
 *   Mon Sep 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-10
 -   Adding configuration to access the preview repository.
 -   Removing redundant 'Provides'.
