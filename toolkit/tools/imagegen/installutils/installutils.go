@@ -828,6 +828,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 
 	// If no root entry was specified in the config file, never expire the root password
 	if !rootUserAdded {
+		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "chage", "-M", "-1", "root")
 		})
