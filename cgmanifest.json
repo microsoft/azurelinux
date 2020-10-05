@@ -885,7 +885,7 @@
         "type": "other",
         "other": {
           "name": "docbook5-schemas",
-          "version": "4.5",
+          "version": "5.1",
           "downloadUrl": "https://www.docbook.org/xml/5.1/docbook-v5.1-os.zip"
         }
       }
