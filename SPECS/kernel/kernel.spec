@@ -135,12 +135,9 @@ cp %{SOURCE1} .config
 cp %{SOURCE2} .config
 %endif
 
-arch=%{arch}
-archdir=%{archdir}
-
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=${arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -157,7 +154,7 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 make -C tools perf
 
 %define __modules_install_post \
