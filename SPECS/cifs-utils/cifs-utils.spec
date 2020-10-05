@@ -8,6 +8,8 @@ Group:		Applications/Nfs-utils-client
 Source0:        https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-%{version}.tar.bz2
 
 Patch0:         CVE-2020-14342.patch
+Patch1:         CVE-2020-14342-fix.patch
+
 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
