@@ -186,7 +186,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	}
 
 	// Defer cleanup after it has been confirmed rootDir will not
-	// overwrite an existing directory when isExistingDir is set to true.
+	// overwrite an existing directory when isExistingDir is set to false.
 	defer func() {
 		if err != nil {
 			if buildpipeline.IsRegularBuild() {

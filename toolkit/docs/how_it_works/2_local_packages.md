@@ -16,8 +16,7 @@ The build system monitors `$(SPEC_DIR)` for changes to SPEC files or sources and
 The intermediate SRPMs can be built using the `input-srpms` target.
 
 ### SRPM Packing
-The `srpmpacker` tool's job is to convert SPEC files into SRPMs. To do this it parses the SPEC files inside the `chroot worker`, determines which source files it needs, checks for matching files locally, and failing that searches the online source server for them. `srpmpacker` will only accept a source file if it matches the hash recorded in the associated `*.signature.json` file.
-The tool uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)).
+The `srpmpacker` tool's job is to convert SPEC files into SRPMs. To do this it parses the SPEC files inside the [Chroot Worker](1_initial_prep.md#chroot_worker), determines which source files it needs, checks for matching files locally, and failing that searches the online source server for them. `srpmpacker` will only accept a source file if it matches the hash recorded in the associated `*.signature.json` file.
 
 #### File Hashes
 Each source file should have a matching entry in the `*.signature.json` file for its SPEC file. If a source file's hash does not match the entry in the file the build system will attempt to find a matching file from the source server. If that fails `srpmpacker` will return a `404` error.

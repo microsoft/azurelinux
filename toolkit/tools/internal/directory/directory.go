@@ -4,11 +4,13 @@
 package directory
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
+	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/shell"
 )
 
@@ -36,6 +38,15 @@ func LastModifiedFile(dirPath string) (modTime time.Time, latestFile string, err
 // - It will create dstDir if it does not already exist.
 func CopyContents(srcDir, dstDir string) (err error) {
 	const squashErrors = false
+
+	isSrcDir, err := file.IsDir(srcDir)
+	if err != nil {
+		return err
+	}
+
+	if !isSrcDir {
+		return fmt.Errorf("source (%s) must be a directory", srcDir)
+	}
 
 	err = os.MkdirAll(dstDir, os.ModePerm)
 	if err != nil {

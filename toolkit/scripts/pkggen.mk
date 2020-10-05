@@ -51,10 +51,15 @@ clean-cache:
 	rm -rf $(cache_working_dir)
 
 # Optionally generate a summary of any blocked packages after a build.
-analyze-built-graph: $(go-graphanalytics) $(RPMS_DIR)
-	$(go-graphanalytics) \
-		--input=$(built_file) \
-		$(logging_command)
+analyze-built-graph: $(go-graphanalytics)
+	if [ ! -f $(build_file) ]; then \
+		$(go-graphanalytics) \
+			--input=$(built_file) \
+			$(logging_command); \
+	else \
+		echo "No built graph to analyze"; \
+		exit 1; \
+	fi
 
 # Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
 $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
@@ -75,6 +80,18 @@ $(graph_file): $(specs_file) $(go-grapher)
 		$(logging_command) \
 		--output $@
 
+ifeq ($(DISABLE_UPSTREAM_REPOS),y)
+graphpkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
+else
+graphpkgfetcher_disable_upstream_repos_flag :=
+endif
+
+ifeq ($(USE_UPDATE_REPO),y)
+graphpkgfetcher_update_repo_flag := --use-update-repo
+else
+graphpkgfetcher_update_repo_flag :=
+endif
+
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
 $(CACHED_RPMS_DIR)/%: ;
 
@@ -87,18 +104,6 @@ ifneq ($(CONFIG_FILE),)
 $(cached_file): $(validate-pkggen-config)
 endif
 
-ifeq ($(DISABLE_UPSTREAM_REPOS),y)
-graphpkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
-else
-graphpkgfetcher_disable_upstream_repos_flag :=
-endif
-
-ifeq ($(USE_UPDATE_REPO),y)
-graphpkgfetcher_update_repo_flag := --use-update-repo
-else
-graphpkgfetcher_update_repo_flag :=
-endif
-# Compare files via checksum (-c) instead of timestamp so unchanged RPMs are left intact without updating the timestamp of the directories
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
@@ -113,7 +118,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		$(graphpkgfetcher_update_repo_flag) \
 		$(graphpkgfetcher_disable_upstream_repos_flag) \
 		$(logging_command) \
-	--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
+		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \
 		--output=$(cached_file) && \
 	touch $@
@@ -153,27 +158,27 @@ endif
 
 $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-scheduler) \
-		--input=$(cached_file) \
-		--output=$(built_file) \
-		--workers=$(CONCURRENT_PACKAGE_BUILDS) \
-		--work-dir=$(CHROOT_DIR) \
-		--worker-tar=$(chroot_worker) \
-		--repo-file=$(pkggen_local_repo) \
-		--rpm-dir=$(RPMS_DIR) \
-		--srpm-dir=$(SRPMS_DIR) \
-		--cache-dir=$(CACHED_RPMS_DIR)/cache \
-		--build-logs-dir=$(rpmbuilding_logs_dir) \
-		--dist-tag=$(DIST_TAG) \
-		--distro-release-version=$(RELEASE_VERSION) \
-		--distro-build-number=$(BUILD_NUMBER) \
-		--rpmmacros-file=$(TOOLCHAIN_MANIFESTS_DIR)/macros.override \
+		--input="$(cached_file)" \
+		--output="$(built_file)" \
+		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
+		--work-dir="$(CHROOT_DIR)" \
+		--worker-tar="$(chroot_worker)" \
+		--repo-file="$(pkggen_local_repo)" \
+		--rpm-dir="$(RPMS_DIR)" \
+		--srpm-dir="$(SRPMS_DIR)" \
+		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
+		--build-logs-dir="$(rpmbuilding_logs_dir)" \
+		--dist-tag="$(DIST_TAG)" \
+		--distro-release-version="$(RELEASE_VERSION)" \
+		--distro-build-number="$(BUILD_NUMBER)" \
+		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
-		--build-agent=chroot-agent \
-		--build-agent-program=$(go-pkgworker) \
+		--build-agent="chroot-agent" \
+		--build-agent-program="$(go-pkgworker)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		$(if $(CONFIG_FILE),--base-dir=$(CONFIG_BASE_DIR)) \
+		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(logging_command) && \

@@ -62,6 +62,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 	done || $(call print_error,Loop in $@ failed) ; \
 	touch $@
 
+# Since all the SRPMs are being downloaded by the "input-srpms" target there is no need to differentiate toolchain srpms.
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else

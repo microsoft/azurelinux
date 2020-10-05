@@ -75,7 +75,7 @@ The `grapher` tool is responsible for creating the initial dependency graph from
 #### graphanalytics
 `graphanalytics` is an optional tool that analyzes the built graph from `scheduler` and generates a summary with information regarding any packages that are blocked from building. The summary includes the packages that are most blocking other packages from building and the packages closest to being ready to build.
 #### graphpkgfetcher
-The `graphpkgfetcher` tool takes the output from the `grapher` tool and attempts to resolve any unresolved nodes (see [Stage 2: Graphpkgfetcher](3_package_building.md#stage-3-graphpkgfetcher)). It does this by looking for packages in the locally build environment, or failing that downloading them from a set of remote package servers.
+The `graphpkgfetcher` tool takes the output from the `grapher` tool and attempts to resolve any unresolved nodes (see [Stage 2: Graphpkgfetcher](3_package_building.md#stage-2-graphpkgfetcher)). It does this by looking for packages in the locally build environment, or failing that downloading them from a set of remote package servers.
 #### imageconfigvalidator
 The `imageconfigvalidator` tool checks if the selected configuration file is valid.
 #### imagepkgfetcher
@@ -95,6 +95,6 @@ The `specreader` tool scans all the `*.spec` files in a directory and generates 
 #### srpmpacker
 The `srpmpacker` tool creates `.src.rpm` files from local specs and sources. The sources can be present locally, or downloaded from a source server. It is responsible for enforcing a matching hash for every source file. This tool runs using the [chroot worker](#Chroot-Worker) to support macros.
 #### scheduler
-The `scheduler` tool takes the output from the `grapher` tool and schedules builds for each local spec file using [pkgworker](###pkgworker) (see [Stage 3: Scheduler](3_package_building.md#stage-4-scheduler)). `scheduler` will skip building any spec if it and all of its dependencies have been already built. The `scheduler` tool bases its decisions on the currently selected image configuration.
+The `scheduler` tool takes the output from the `grapher` tool and schedules builds for each local spec file using [pkgworker](###pkgworker) (see [Stage 3: Scheduler](3_package_building.md#stage-3-scheduler)). `scheduler` will skip building any spec if it and all of its dependencies have been already built. The `scheduler` tool bases its decisions on the currently selected image configuration.
 
 ## Prev: [Intro](0_intro.md), Next: [Local Packages](2_local_packages.md)

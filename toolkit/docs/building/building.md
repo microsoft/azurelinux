@@ -478,7 +478,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE)) `                                                                               | Base directory to search for image files in (see [image_config.md](../images/image_config.md))
 | TERMINAL_ISO_INSTALLER        | n                                                                                                      | Use a command line ISO installer instead of the GUI installer
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
-| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package may be skipped if the build system thinks it is already up-to-date.
+| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 

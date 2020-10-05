@@ -65,6 +65,7 @@ func analyzeGraph(inputFile string, maxResults int) (err error) {
 	return
 }
 
+// printIndirectlyMostUnresolved will print the top unresolved packages that are indirectly most blocking.
 func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 	unresolvedPackageDependents := make(map[string][]string)
 
@@ -83,12 +84,10 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 		search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
 			dependencyNode := n.(*pkggraph.PkgNode)
 
-			if dependencyNode.State != pkggraph.StateUnresolved {
-				return
+			if dependencyNode.State == pkggraph.StateUnresolved {
+				unresolvedPkgName := dependencyNode.VersionedPkg.Name
+				insertIfMissing(unresolvedPackageDependents, unresolvedPkgName, dependentName)
 			}
-
-			unresolvedPkgName := dependencyNode.VersionedPkg.Name
-			insertIfMissing(unresolvedPackageDependents, unresolvedPkgName, dependentName)
 
 			return
 		})
@@ -100,6 +99,7 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 	return
 }
 
+// printDirectlyMostUnresolved will print the top unresolved packages that are directly most blocking.
 func printDirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 	unresolvedPackageDependents := make(map[string][]string)
 
@@ -113,6 +113,8 @@ func printDirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 		dependents := pkgGraph.To(node.ID())
 		for dependents.Next() {
 			dependent := dependents.Node().(*pkggraph.PkgNode)
+
+			// Do not consider goal nodes
 			if dependent.Type == pkggraph.TypeGoal {
 				continue
 			}
@@ -128,6 +130,7 @@ func printDirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 	return
 }
 
+// printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved direct build requires.
 func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 	srpmsBlockedBy := make(map[string][]string)
 
@@ -145,10 +148,12 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 		dependencies := pkgGraph.From(node.ID())
 		for dependencies.Next() {
 			dependency := dependencies.Node().(*pkggraph.PkgNode)
+			// Only consider unresolved build nodes.
 			if dependency.State != pkggraph.StateBuild && dependency.State != pkggraph.StateUnresolved {
 				continue
 			}
 
+			// Skip requirements that come from the same srpm.
 			dependencySRPM := filepath.Base(dependency.SrpmPath)
 			if pkgSRPM == dependencySRPM {
 				continue
@@ -163,6 +168,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 	printReversedMap(srpmsBlockedBy, "unmet dependencies", maxResults)
 }
 
+// printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved indrect build requires.
 func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 	srpmsBlockedBy := make(map[string][]string)
 
@@ -181,10 +187,12 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 		search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
 			dependency := n.(*pkggraph.PkgNode)
 
+			// Only consider unresolved build nodes.
 			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuild {
 				return
 			}
 
+			// Skip requirements that come from the same srpm.
 			dependencySRPM := filepath.Base(dependency.SrpmPath)
 			if pkgSRPM == dependencySRPM {
 				return

@@ -185,12 +185,13 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	// Avoid creating runtime dependencies from an RPM to a different provide from the same RPM as the dependency will always be met on RPM installation.
 	// Creating these edges may cause non-problematic cycles that can significantly increase memory usage and runtime during cycle resolution.
 	// If there are enough of these cycles it can exhaust the system's memory when resolving them.
-	// - Only test run nodes as if a build node has a reflexive cycle then it cannot be built without a boostrap version.
-	if packageNode.Type == pkggraph.TypeRun && dependentNode.Type == pkggraph.TypeRun {
-		if packageNode.RpmPath == dependentNode.RpmPath {
-			logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)
-			return nil
-		}
+	// - Only check run nodes. If a build node has a reflexive cycle then it cannot be built without a bootstrap version.
+	if packageNode.Type == pkggraph.TypeRun &&
+		dependentNode.Type == pkggraph.TypeRun &&
+		packageNode.RpmPath == dependentNode.RpmPath {
+
+		logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)
+		return nil
 	}
 
 	g.SetEdge(newEdge)
