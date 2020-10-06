@@ -2,9 +2,9 @@ name: Check Package CGManifests
 
 on:
   push:
-    branches: [ main, dev, 1.0*, thcrain/workflow-set-env-fix ]
+    branches: [ main, dev, 1.0* ]
   pull_request:
-    branches: [ main, dev, 1.0*, thcrain/workflow-set-env-fix ]
+    branches: [ main, dev, 1.0* ]
 
 jobs:
 
