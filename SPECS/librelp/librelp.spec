@@ -55,7 +55,7 @@ make check
 %{_libdir}/pkgconfig/*.pc
 %changelog
 *   Mon Sep 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.2.17-7
--   Remove the valgrinf workaround in the check section.
+-   Remove the Valgrind workaround in the check section.
 *   Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
 -   Added %%license line automatically
 *   Wed Mar 11 2020 Christopher Co <chrco@microsoft.com> 1.2.17-5
