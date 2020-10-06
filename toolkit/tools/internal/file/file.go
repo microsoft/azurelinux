@@ -101,6 +101,18 @@ func ReadLines(path string) (lines []string, err error) {
 	return lines, scanner.Err()
 }
 
+// Create creates a new file with the provided Unix permissions
+func Create(dst string, perm os.FileMode) (err error) {
+	logger.Log.Debugf("Creating (%s) with mode (%v)", dst, perm)
+
+	dstFile, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL, perm)
+	if err != nil {
+		return
+	}
+	defer dstFile.Close()
+	return
+}
+
 // Write writes a string to the file dst.
 func Write(data string, dst string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", dst)
