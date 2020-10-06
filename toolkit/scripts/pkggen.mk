@@ -52,7 +52,7 @@ clean-cache:
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
-	if [ ! -f $(build_file) ]; then \
+	if [ -f $(build_file) ]; then \
 		$(go-graphanalytics) \
 			--input=$(built_file) \
 			$(logging_command); \

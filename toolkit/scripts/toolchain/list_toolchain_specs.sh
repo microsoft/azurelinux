@@ -11,4 +11,4 @@ OUTPUT_FILE=$2
 # build_rpm_in_chroot_no_install foo
 #
 # The below sed command will extract every spec name that follows the above pattern and place it in $OUTPUT_FILE.
-sed -ne 's/^\s*build_rpm_in_chroot_no_install\s\+\(\w\+\)/\1/p' $TOOLCHAIN_BUILD_FILE > $OUTPUT_FILE
+sed -nE 's/^\s*build_rpm_in_chroot_no_install\s+(\w+)/\1/p' $TOOLCHAIN_BUILD_FILE > $OUTPUT_FILE
