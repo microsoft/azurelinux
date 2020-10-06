@@ -300,6 +300,8 @@ func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string,
 
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
+	foundNoMatchingPackages := false
+
 	if err != nil {
 		logger.Log.Warnf("Failed to install build requirements. stderr: %s\nstdout: %s", stderr, stdout)
 		// TDNF will output an error if all packages are already installed.
@@ -309,6 +311,10 @@ func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string,
 			trimmedLine := strings.TrimSpace(line)
 			if trimmedLine == "" {
 				continue
+			}
+
+			if strings.Contains(trimmedLine, noMatchingPackagesErr) {
+				foundNoMatchingPackages = true
 			}
 
 			if !strings.HasSuffix(trimmedLine, alreadyInstalledPostfix) && trimmedLine != noMatchingPackagesErr {
@@ -330,6 +336,12 @@ func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string,
 		}
 
 		failedToInstall = append(failedToInstall, matches[packageMatchGroup])
+	}
+
+	// TDNF will output the error "Error(1011) : No matching packages" if all packages could not be found.
+	// In this case it will not print any of the individual packages that failed.
+	if foundNoMatchingPackages && len(failedToInstall) == 0 {
+		failedToInstall = packages
 	}
 
 	if len(failedToInstall) != 0 {
