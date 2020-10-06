@@ -228,8 +228,7 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 
 func installBuildRequires(defines map[string]string) (err error) {
 	const (
-		emptyQueryFormat    = ""
-		allowCacheInitially = false
+		emptyQueryFormat = ""
 	)
 	// Find the SPEC file extracted from the SRPM
 	specDir := filepath.Join(chrootRpmBuildRoot, "SPECS")
@@ -269,9 +268,10 @@ func installBuildRequires(defines map[string]string) (err error) {
 
 	// Try matching dependencies from locally build RPMs first. If some are not available,
 	// then consider the package cache. This will ensure that local packages are preferred over remote ones.
-	failedToInstall, err := tdnfInstall(packagesToInstall, allowCacheInitially)
+	allowCache := true
+	failedToInstall, err := tdnfInstall(packagesToInstall, allowCache)
 	if len(failedToInstall) != 0 {
-		const allowCache = true
+		allowCache = false
 		failedToInstall, err = tdnfInstall(failedToInstall, allowCache)
 	}
 
