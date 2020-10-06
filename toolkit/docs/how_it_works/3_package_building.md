@@ -126,7 +126,7 @@ Edges in the graph represent dependencies. A package cannot be installed (`run`)
 
 Once all packages have been added to the graph, the inter-package dependencies are added. For each `BuildRequires` in a package an edge is created from the current `build` node to the `run` node associated with the required package. The same is done for each `Requires`, but from the current `run` node instead of the `build` node.
 
-Edges will not be created for `Requires` between two `TypeRun` nodes that have the same `RpmPath` since the dependency will automatically be met when the rpm is installed. If the edges were created it could introduces extra cycles that would need to be solved.
+Edges will not be created for `Requires` between two `run` nodes that have the same `RpmPath` since the dependency will automatically be met when the rpm is installed. If the edges were created it could introduce extra cycles that would need to be solved.
 
 #### Package Lookup
 A critical part of adding edges is finding the correct node to connect to. Package dependencies can specify their requirements with varying levels of detail. The most basic dependency is just a package name. The dependency can be further refined by setting a limit on the version (`Requires: example >= 1.0.0`), or double conditionals (`Requires: example >= 1.0.0`, `Requires: example < 2.0.0 `). A dependency can also require a specific version (`Requires: example = 1.0.0`)
@@ -174,9 +174,9 @@ The `graphpkgfetcher` tool outputs `./../build/pkg_artifacts/cached_graph.dot`
 ### Stage 3: Scheduler
 The `scheduler` tool's job is to walk the dependency graph and build every specified package and their dependencies.
 
-`scheduler` controls a pool of build agents (`pkgworker`). It starts at the leaf nodes of the dependency graph and processes every node. Only processing `TypeBuild` nodes causes srpms to be built. Other node types are effectively NoOps, only processed to enforce dependency ordering.
+`scheduler` controls a pool of build agents (`pkgworker`). It starts at the leaf nodes of the dependency graph and processes every node. Only processing `build` nodes causes srpms to be built. Other node types are effectively NoOps, only processed to enforce dependency ordering.
 
-`scheduler` will avoid building an srpm if it detects the package has already been built, and all of its dependencies were also prebuilt. If any dependencies of an SRPM needed to be built, then that SRPM will be built regardless.
+`scheduler` will avoid building an srpm if it detects the package has already been built, and all of its build dependencies were also prebuilt. If any build dependencies of an SRPM needed to be built, then that SRPM will be built regardless.
 
 `scheduler` supports dynamic dependencies. These are dependencies a package has on an implicit provide from another package. For example, package `foo` may `Requires: pkgconfig(bar)`. When `grapher` runs it is not known which package will provide `pkgconfig(bar)`. It is only known after packages are built and one of them reports that it provides `pkgconfig(bar)`. To handle this `scheduler` analyzes every rpm built for these implicit provides. If it finds one that is needed by another package in the graph it will modify the graph's nodes and edges so that it reflects this new information.
 
