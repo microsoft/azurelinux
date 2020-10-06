@@ -74,6 +74,7 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 			continue
 		}
 
+		// Traverse each package (not unresolved) to find all unresolved nodes that are blocking it.
 		if node.State == pkggraph.StateUnresolved {
 			continue
 		}
@@ -213,11 +214,9 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 // nodeDependencyName returns a common dependency name for a node that will be shared across similair Meta/Run/Build nodes for the same package.
 func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
-	srpmName := filepath.Base(node.SrpmPath)
-	if srpmName == "" || srpmName == "<NO_SRPM_PATH>" {
+	name = filepath.Base(node.SrpmPath)
+	if name == "" || name == "<NO_SRPM_PATH>" {
 		name = node.VersionedPkg.Name
-	} else {
-		name = srpmName
 	}
 
 	return
@@ -241,15 +240,18 @@ func sortMap(mapToSort map[string][]string, inverse bool) (pairList []mapPair) {
 	}
 
 	sort.Slice(pairList, func(i, j int) bool {
-		if len(pairList[i].value) == len(pairList[j].value) {
+		iValueLen := len(pairList[i].value)
+		jValueLen := len(pairList[j].value)
+
+		if iValueLen == jValueLen {
 			return pairList[i].key < pairList[j].key
 		}
 
 		if inverse {
-			return len(pairList[i].value) < len(pairList[j].value)
+			return iValueLen < jValueLen
 		}
 
-		return len(pairList[i].value) > len(pairList[j].value)
+		return iValueLen > jValueLen
 	})
 
 	return
@@ -279,14 +281,11 @@ func printMap(data map[string][]string, valueDescription string, maxResults int)
 
 // printSlice prints the first maxResults entries, using the valueDescription in the format.
 func printSlice(pairList []mapPair, valueDescription string, maxResults int) {
-	if len(pairList) == 0 {
-		return
-	}
-
 	for i, pair := range pairList {
-		if i >= maxResults {
+		if maxResults != 0 && i >= maxResults {
 			break
 		}
+
 		logger.Log.Infof("%d: %s - %d %s", i+1, pair.key, len(pair.value), valueDescription)
 		for _, value := range pair.value {
 			logger.Log.Debugf("--> %s", value)

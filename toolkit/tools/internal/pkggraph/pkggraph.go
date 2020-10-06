@@ -387,7 +387,7 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeSt
 	return
 }
 
-// RemovePkgNode removes a node to the package graph and lookup tables.
+// RemovePkgNode removes a node from the package graph and lookup tables.
 func (g *PkgGraph) RemovePkgNode(pkgNode *PkgNode) {
 	g.RemoveNode(pkgNode.ID())
 

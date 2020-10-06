@@ -59,8 +59,6 @@ var (
 )
 
 func main() {
-	const delimiter = ","
-
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
@@ -87,7 +85,7 @@ func main() {
 
 	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
 	// Any output from logger will be on stderr so stdout will only contain this output.
-	fmt.Printf(strings.Join(builtRPMs, delimiter))
+	fmt.Printf(strings.Join(builtRPMs, ","))
 }
 
 func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
