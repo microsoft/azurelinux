@@ -338,7 +338,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 *   Thu Sep 24 2020 Emre Girgin <mrgirgin@microsoft.cpm> 5.4.51-6
--   Replace the misuse of the 'archdir' shell variable.
+-   Replace the misuse of the 'archdir' and `arch` shell variables.
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5
 -   Add code to check for missing config flags in the checked in configs
 *   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-4
