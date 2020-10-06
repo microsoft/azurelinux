@@ -392,8 +392,6 @@ texinfo-6.5-7.cm1.aarch64.rpm
 texinfo-debuginfo-6.5-7.cm1.aarch64.rpm
 unzip-6.0-16.cm1.aarch64.rpm
 unzip-debuginfo-6.0-16.cm1.aarch64.rpm
-unzip-6.0-15.cm1.aarch64.rpm
-unzip-debuginfo-6.0-15.cm1.aarch64.rpm
 util-linux-2.32.1-4.cm1.aarch64.rpm
 util-linux-debuginfo-2.32.1-4.cm1.aarch64.rpm
 util-linux-devel-2.32.1-4.cm1.aarch64.rpm
