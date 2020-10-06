@@ -11,7 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://releases.ansible.com/ansible/%{name}-%{version}.tar.gz
 
-
 BuildArch:      noarch
 
 BuildRequires:  python2
