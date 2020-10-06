@@ -13,6 +13,11 @@ Distribution:   Mariner
 BuildRequires:  gnutls-devel
 BuildRequires:  autogen
 Requires:       gnutls
+
+%if %{with_check}
+BuildRequires:  valgrind
+%endif
+
 %description
 Librelp is an easy to use library for the RELP protocol. RELP (stands
 for Reliable Event Logging Protocol) is a general-purpose, extensible
