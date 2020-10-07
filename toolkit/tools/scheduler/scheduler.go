@@ -64,7 +64,7 @@ var (
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
-	buildAgentProgram    = app.Flag("build-agent-program", "Path to the build agent that will be involed to build packages.").String()
+	buildAgentProgram    = app.Flag("build-agent-program", "Path to the build agent that will be invoked to build packages.").String()
 	workers              = app.Flag("workers", "Number of concurrent build agents to spawn. If set to 0, will automatically set to the logical CPU count.").Default(defaultWorkerCount).Int()
 
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit for all packages.").String()
