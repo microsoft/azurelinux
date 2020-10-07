@@ -1,7 +1,7 @@
 Summary:        Reading, writing, and converting info pages
 Name:           texinfo
 Version:        6.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/texinfo/
 Group:          Applications/System
@@ -9,6 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:         texinfo-perl-fix.patch
+Provides:       info = %{version}-%{release}
+Provides:       %{name}-tex = %{version}-%{release}
 BuildRequires:  perl
 
 Requires:       perl-libintl-perl
@@ -56,9 +58,10 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/texinfo/*
 
 %changelog
-* Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.5-7
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 6.5-8
+-   Provide info and texinfo-tex
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 6.5-7
+-   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 6.5-6
 -   Renaming perl-libintl to perl-libintl-perl
 *   Mon Apr 20 2020 Eric Li <eli@microsoft.com> 6.5-5

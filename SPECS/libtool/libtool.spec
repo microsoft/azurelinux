@@ -1,7 +1,7 @@
 Summary:        Shared libraries, portable interface
 Name:           libtool
 Version:        2.4.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
@@ -15,6 +15,7 @@ consistent, portable interface.
 %package -n libltdl
 Summary:       Shared library files for %{name}
 Group:         Development/Libraries
+Provides:      %{name}-ltdl = %{version}-%{release}
 %description -n libltdl
 The libtool package contains the GNU libtool, a set of shell scripts which automatically configure UNIX and UNIX-like architectures to generically build shared libraries.
 Libtool provides a consistent, portable interface which simplifies the process of using shared libraries.
@@ -22,6 +23,7 @@ Shared library files for libtool DLL library from the libtool package.
 %package -n libltdl-devel
 Summary:       Development files for %{name}
 Group:         Development/Libraries
+Provides:      %{name}-ltdl-devel = %{version}-%{release}
 Requires:      libltdl = %{version}
 %description -n libltdl-devel
 The libtool package contains the GNU libtool, a set of shell scripts which automatically configure UNIX and UNIX-like architectures to generically build shared libraries.
@@ -79,9 +81,10 @@ make %{?_smp_mflags} check
 %{_libdir}/libltdl.so.7.3.1
 
 %changelog
-* Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.6-6
+-   Add explicit provides for libtool-ltdl, libtool-ltdl-devel
+*   Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.6-4
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.4.6-3

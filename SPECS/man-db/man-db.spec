@@ -1,13 +1,14 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
 Version:        2.8.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.savannah.nongnu.org/releases/man-db/%{name}-%{version}.tar.xz
+Provides:       man = %{version}-%{release}
 Requires:       libpipeline
 Requires:       gdbm
 Requires:       xz
@@ -76,9 +77,10 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
-* Sat May 09 00:21:02 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.8.4-6
+-   Add explicit provide for "man"
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.8.4-5
+-   Added %%license line automatically
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 2.8.4-4
 -   Rename shadow to shadow-utils.
 *   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 2.8.4-3

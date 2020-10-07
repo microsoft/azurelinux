@@ -1,0 +1,192 @@
+diff -up lua-5.3.0/configure.ac.autoxxx lua-5.3.0/configure.ac
+--- lua-5.3.0/configure.ac.autoxxx	2015-01-15 10:20:03.826889574 -0500
++++ lua-5.3.0/configure.ac	2015-01-15 10:20:03.826889574 -0500
+@@ -0,0 +1,69 @@
++AC_PREREQ(2.59)
++AC_INIT([lua], [5.3.0], [https://bugzilla.redhat.com/], [lua-at], [http://www.lua.org])
++AC_SUBST([MAJOR_VERSION], [5.3])
++
++AC_CONFIG_HEADERS([config.h])
++AC_CONFIG_SRCDIR([src/lapi.c])
++
++AM_INIT_AUTOMAKE([1.9 foreign])
++
++AC_PROG_CC
++AC_PROG_LIBTOOL
++
++AC_ARG_WITH(
++  [readline],
++  [AC_HELP_STRING([--with-readline], [Use readline for interpreter input [default=yes]])],
++  [use_readline=$withval],
++  [use_readline=yes]
++)
++
++LUA_LIBS="-lm"
++
++# Check for readline
++READLINE_DEFS="#undef LUA_USE_READLINE"
++if test "x$use_readline" == "xyes"; then
++  AC_CHECK_LIB([readline], [readline], [:], [use_readline=no], [-lncurses])
++  AC_CHECK_HEADERS([readline/readline.h readline/history.h], [], [use_readline=no])
++  if test "x$use_readline" == "xno"; then
++    AC_MSG_WARN([readline headers could not be found, disabling readline support])
++  else
++    READLINE_DEFS="#define LUA_USE_READLINE"
++    READLINE_LIBS="-lreadline -lncurses"
++  fi
++fi
++AC_SUBST(READLINE_DEFS)
++AC_SUBST(READLINE_LIBS)
++
++case "$host" in
++  *-mingw*)  use_os=win32  ;;
++  *-darwin*) use_os=macosx ;;
++  *)         use_os=posix  ;;
++esac
++
++POSIX_DEFS="#undef LUA_USE_POSIX"
++LUA_DL_DEFS="#undef LUA_USE_DLOPEN"
++LUA_BUILD_AS_DLL_DEFS="#undef LUA_BUILD_AS_DLL"
++
++if test "x$use_os" == "xwin32"; then
++  LUA_BUILD_AS_DLL_DEFS="#define LUA_BUILD_AS_DLL"
++elif test "x$use_os" == "xmacosx"; then
++  POSIX_DEFS="#define LUA_USE_POSIX"
++  LUA_DL_DEFS="#define LUA_DL_DYLD"
++elif test "x$use_os" == "xposix"; then
++  POSIX_DEFS="#define LUA_USE_POSIX"
++  LUA_DL_DEFS="#define LUA_DL_DLOPEN"
++  LUA_LIBS="$LUA_LIBS -ldl"
++fi
++AC_SUBST(POSIX_DEFS)
++AC_SUBST(LUA_DL_DEFS)
++AC_SUBST(LUA_BUILD_AS_DLL_DEFS)
++
++AC_SUBST(LUA_LIBS)
++
++AC_CONFIG_FILES([Makefile
++                 src/Makefile
++                 src/lua.pc
++                 src/luaconf.h.template
++                 doc/Makefile
++])
++AC_OUTPUT
+diff -up lua-5.3.0/doc/Makefile.am.autoxxx lua-5.3.0/doc/Makefile.am
+--- lua-5.3.0/doc/Makefile.am.autoxxx	2015-01-15 10:20:03.826889574 -0500
++++ lua-5.3.0/doc/Makefile.am	2015-01-15 10:20:03.826889574 -0500
+@@ -0,0 +1,4 @@
++man1_MANS = lua.1 luac.1
++
++EXTRA_DIST = \
++	contents.html logo.gif lua.1 luac.1 lua.css manual.css manual.html osi-certified-72x60.png readme.html
+diff -up lua-5.3.0/Makefile.am.autoxxx lua-5.3.0/Makefile.am
+--- lua-5.3.0/Makefile.am.autoxxx	2015-01-15 10:20:03.826889574 -0500
++++ lua-5.3.0/Makefile.am	2015-01-15 10:20:03.826889574 -0500
+@@ -0,0 +1,3 @@
++SUBDIRS = src doc
++
++EXTRA_DIST = README
+diff -up lua-5.3.0/src/.gitignore.autoxxx lua-5.3.0/src/.gitignore
+--- lua-5.3.0/src/.gitignore.autoxxx	2015-01-15 10:20:03.826889574 -0500
++++ lua-5.3.0/src/.gitignore	2015-01-15 10:20:03.826889574 -0500
+@@ -0,0 +1,5 @@
++lua
++lua.pc
++luac
++luaconf.h
++luaconf.h.template
+diff -up lua-5.3.0/src/luaconf.h.template.in.autoxxx lua-5.3.0/src/luaconf.h.template.in
+--- lua-5.3.0/src/luaconf.h.template.in.autoxxx	2015-01-15 10:20:03.828889562 -0500
++++ lua-5.3.0/src/luaconf.h.template.in	2015-01-15 10:22:37.420027778 -0500
+@@ -11,6 +11,11 @@
+ #include <limits.h>
+ #include <stddef.h>
+ 
++@POSIX_DEFS@
++@LUA_DL_DEFS@
++@LUA_BUILD_AS_DLL_DEFS@
++@READLINE_DEFS@
++
+ 
+ /*
+ ** ===================================================================
+@@ -175,9 +180,9 @@
+ 
+ #else			/* }{ */
+ 
+-#define LUA_ROOT	"/usr/local/"
+-#define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR "/"
+-#define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR "/"
++#define LUA_ROOT	"@prefix@/"
++#define LUA_LDIR	"@pkgdatadir@/lua/" LUA_VDIR "/"
++#define LUA_CDIR	"@libdir@/lua/" LUA_VDIR "/"
+ #define LUA_PATH_DEFAULT  \
+ 		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
+ 		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
+diff -up lua-5.3.0/src/lua.pc.in.autoxxx lua-5.3.0/src/lua.pc.in
+--- lua-5.3.0/src/lua.pc.in.autoxxx	2015-01-15 10:20:03.827889568 -0500
++++ lua-5.3.0/src/lua.pc.in	2015-01-15 10:20:03.827889568 -0500
+@@ -0,0 +1,13 @@
++V= @MAJOR_VERSION@
++R= @VERSION@
++prefix= @prefix@
++exec_prefix=${prefix}
++libdir= @libdir@
++includedir=${prefix}/include
++
++Name: Lua
++Description: An Extensible Extension Language
++Version: ${R}
++Requires:
++Libs: -llua @LUA_LIBS@
++Cflags: -I${includedir}
+diff -up lua-5.3.0/src/Makefile.am.autoxxx lua-5.3.0/src/Makefile.am
+--- lua-5.3.0/src/Makefile.am.autoxxx	2015-01-15 10:20:03.826889574 -0500
++++ lua-5.3.0/src/Makefile.am	2015-01-15 10:20:03.826889574 -0500
+@@ -0,0 +1,46 @@
++AM_CFLAGS = -Wall
++
++include_HEADERS = lua.h lualib.h lauxlib.h lua.hpp
++
++nodist_include_HEADERS = luaconf.h
++
++lib_LTLIBRARIES = liblua.la
++liblua_la_LDFLAGS = -release @MAJOR_VERSION@
++liblua_la_SOURCES = \
++	lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c lcorolib.c lctype.c ldblib.c \
++	ldebug.c ldo.c ldump.c lfunc.c lgc.c linit.c liolib.c llex.c lmathlib.c lmem.c \
++	loadlib.c lobject.c lopcodes.c loslib.c lparser.c lstate.c lstring.c lstrlib.c \
++	ltable.c ltablib.c ltm.c lundump.c lutf8lib.c lvm.c lzio.c \
++	lapi.h lcode.h lctype.h ldebug.h ldo.h lfunc.h lgc.h llex.h llimits.h \
++	lmem.h lobject.h lopcodes.h lparser.h lstate.h lstring.h ltable.h ltm.h \
++	lundump.h lvm.h lzio.h
++
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = lua.pc
++
++bin_PROGRAMS = lua luac
++
++lua_SOURCES = lua.c
++lua_LDADD = liblua.la @LUA_LIBS@ @READLINE_LIBS@
++lua_DEPENDENCIES = liblua.la
++
++luac_SOURCES = luac.c
++# Statically link liblua against luac since luac uses symbols not exported in liblua
++luac_LDADD = .libs/liblua.a @LUA_LIBS@
++luac_DEPENDENCIES = liblua.la
++
++EXTRA_DIST = luaconf.h.template
++BUILT_SOURCES = luaconf.h
++CLEANFILES = luaconf.h luaconf.h.template
++
++readline_defs = @READLINE_DEFS@
++
++edit = 	sed \
++	  -e 's,%prefix%,$(prefix),g' \
++	  -e 's,%lua_datadir%,$(datadir),g' \
++	  -e 's,%lua_libdir%,$(libdir),g'
++
++luaconf.h : luaconf.h.template
++	rm -f $@ $@.tmp
++	$(edit) $< >$@.tmp
++	mv $@.tmp $@

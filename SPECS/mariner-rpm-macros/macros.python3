@@ -1,0 +1,69 @@
+%python3_sitelib %(%{__python3} -Ic "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+%python3_sitearch %(%{__python3} -Ic "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
+%python3_version %(%{__python3} -Ic "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
+%python3_version_nodots %(%{__python3} -Ic "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+%python3_platform %(%{__python3} -Ic "import sysconfig; print(sysconfig.get_platform())")
+%py3dir %{_builddir}/python3-%{name}-%{version}-%{release}
+
+%py3_shbang_opts -s
+%py3_shbang_opts_nodash %(opts=%{py3_shbang_opts}; echo ${opts#-})
+%py3_shebang_flags %(opts=%{py3_shbang_opts}; echo ${opts#-})
+%py3_shebang_fix %{expand:/usr/bin/pathfix.py -pni %{__python3} -k%{?py3_shebang_flags:a %py3_shebang_flags}}
+
+# Use the slashes after expand so that the command starts on the same line as
+# the macro
+%py3_build() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python3} %{py_setup} %{?py_setup_args} build --executable="%{__python3} %{py3_shbang_opts}" %{?*}
+}
+
+%py3_build_egg() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python3} %{py_setup} %{?py_setup_args} bdist_egg %{?*}
+}
+
+%py3_build_wheel() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python3} %{py_setup} %{?py_setup_args} bdist_wheel %{?*}
+}
+
+%py3_install() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python3} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}
+   rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py3_install_egg() %{expand:\\\
+  mkdir -p %{buildroot}%{python3_sitelib}
+  easy_install-%{python3_version} -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python3_version}.egg %{?*}
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py3_install_wheel() %{expand:\\\
+  pip%{python3_version} install -I dist/%{1} --root %{buildroot} --no-deps
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+# This only supports Python 3.5+ and will never work with Python 2.
+# Hence, it has no Python version in the name.
+%pycached() %{lua:
+  path = rpm.expand("%{?*}")
+  if (string.sub(path, "-3") ~= ".py") then
+    rpm.expand("%{error:%%pycached can only be used with paths explicitly ending with .py}")
+  else
+    print(path)
+    pyminor = path:match("/python3.(%d+)/") or "*"
+    dirname = path:match("(.*/)")
+    modulename = path:match(".*/([^/]+).py")
+    print("\\n" .. dirname .. "__pycache__/" .. modulename .. ".cpython-3" .. pyminor .. "{,.opt-?}.pyc")
+  end
+}
+
+# This is intended for Python 3 only, hence also no Python version in the name.
+%__pytest /usr/bin/pytest
+%pytest %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  PATH="%{buildroot}%{_bindir}:$PATH"\\\
+  PYTHONPATH="${PYTHONPATH:-%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}}"\\\
+  PYTHONDONTWRITEBYTECODE=1\\\
+  %__pytest}

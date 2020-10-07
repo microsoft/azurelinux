@@ -1,14 +1,14 @@
-Summary:	Utilities for internationalization and localization
-Name:		gettext
-Version:	0.19.8.1
-Release:        3%{?dist}
-License:	GPLv3
-URL:		http://www.gnu.org/software/gettext
-Group:		Applications/System
+Summary:        Utilities for internationalization and localization
+Name:           gettext
+Version:        0.21
+Release:        1%{?dist}
+License:        GPLv3
+URL:            https://www.gnu.org/software/gettext
+Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
-%define sha1 gettext=e0fe90ede22f7f16bbde7bdea791a835f2773fc9
+Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
+Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 These allow programs to be compiled with NLS
@@ -56,6 +56,10 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.21-1
+-   Update to version 0.21.
+-   Update URL and Source0 to use https.
+-   Provide gettext-devel
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 0.19.8.1-3
 -   Disable -Wno-error=format-security to build with hardened cflags
 *   Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.19.8.1-2

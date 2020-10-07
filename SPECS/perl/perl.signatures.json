@@ -1,5 +1,7 @@
 {
  "Signatures": {
+  "additional-provides.inc": "1f13a675ca5e857811d6720e579c53a9ba677e2b085d136254285afe6b250b08",
+  "macros.perl": "0597172591cea26c81e92b580b63cb1c5e812cc354c34ac21b8ebc1854713183",
   "perl-5.30.3.tar.gz": "32e04c8bb7b1aecb2742a7f7ac0eabac100f38247352a73ad7fa104e39e7406f"
  }
 }

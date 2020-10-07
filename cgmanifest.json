@@ -104,6 +104,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "atf",
+          "version": "0.20",
+          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atftp",
           "version": "0.7.2",
           "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
@@ -645,7 +655,7 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.66.0",
+          "version": "7.68.0",
           "downloadUrl": "http://curl.haxx.se/download/curl-7.66.0.tar.gz"
         }
       }
@@ -857,6 +867,16 @@
           "name": "dtc",
           "version": "1.5.1",
           "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dwz",
+          "version": "0.13",
+          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
         }
       }
     },
@@ -1135,8 +1155,8 @@
         "type": "other",
         "other": {
           "name": "gettext",
-          "version": "0.19.8.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz"
+          "version": "0.21",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
         }
       }
     },
@@ -1847,6 +1867,16 @@
           "name": "krb5",
           "version": "1.17",
           "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.17/krb5-1.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kyua",
+          "version": "0.13",
+          "downloadUrl": "https://github.com/jmmv/kyua/releases/download/kyua-0.13/kyua-0.13.tar.gz"
         }
       }
     },
@@ -2787,6 +2817,16 @@
           "name": "lua",
           "version": "5.3.5",
           "downloadUrl": "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lutok",
+          "version": "0.4",
+          "downloadUrl": "https://github.com/jmmv/lutok/releases/download/lutok-0.4/lutok-0.4.tar.gz"
         }
       }
     },
@@ -3784,9 +3824,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "pkg-config",
-          "version": "0.29.2",
-          "downloadUrl": "http://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+          "name": "pkgconf",
+          "version": "1.7.0",
+          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.7.0.tar.xz"
         }
       }
     },

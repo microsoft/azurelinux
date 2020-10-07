@@ -1,0 +1,19 @@
+# Copyright (c) 2012  Petr Pisar <ppisar@redhat.com>.
+# This file is distributed under the terms of GNU GPL license version 3, or
+# any later version.
+
+# This file contains macros that can be used for building source RPM package
+# from git source repository. This file must present in minimal build root to
+# take effect.
+# This file must not use Perl or any non-minimal-build-root package. The
+# purpose is to enable bootstrapping perl.
+ 
+# Perl bootstrap For rebuild of Perl and all related packages is needed
+# switch, which enable only vital build requires. This could help cyclic
+# dependencies, for example: perl-Test-Minimum-Version <->
+# perl-Perl-Minimum-Version Defined for bootstraping, undefined otherwise.
+# Usage: %%if !%%{defined perl_bootstrap} ... %%endif
+%perl_bootstrap 1
+
+# Perl macro, no longer part of rpm >= 4.15
+%__perl %{_bindir}/perl

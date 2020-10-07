@@ -3,7 +3,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.212
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://openjdk.java.net
 Group:          Development/Tools
@@ -17,11 +17,11 @@ Patch1:         check-system-ca-certs.patch
 ExclusiveArch:  x86_64
 BuildRequires:  alsa-lib
 BuildRequires:  alsa-lib-devel
-BuildRequires:  chkconfig
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
 BuildRequires:  pcre-devel
+BuildRequires:  zip
 BuildRequires:  unzip
 BuildRequires:  which
 BuildRequires:  zlib-devel
@@ -29,6 +29,8 @@ Requires:       openjre8 = %{version}-%{release}
 Requires:       chkconfig
 Obsoletes:      openjdk <= %{version}
 AutoReqProv:    no
+
+Provides: java-1.8.0-openjdk-headless = %{version}-%{release}
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
@@ -248,7 +250,11 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.212-10
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.212-11
+-   Remove unused buildrequires.
+-   Provide java-1.8.0-openjdk-headless.
+-   Add zip as a build requires.
+*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.0.212-10
 -   Disable -Werrors that break the build in cflags and cxxflags.
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.212-9
 -   Adding the "%%license" macro.

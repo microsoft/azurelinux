@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -33,10 +33,10 @@ Provides:       /usr/bin/python
 Provides:       /bin/python
 Provides:       /bin/python3
 
-%if %{with_check}
-BuildRequires:  iana-etc
-BuildRequires:  tzdata
-%endif
+# %if %{with_check}
+# BuildRequires:  iana-etc
+# BuildRequires:  tzdata
+# %endif
 
 %description
 The Python 3 package contains a new version of Python development environment.
@@ -82,6 +82,8 @@ The python3-curses package provides interface for ncurses library.
 Summary: The libraries and header files needed for Python development.
 Group:          Development/Libraries
 Requires:       python3 = %{version}-%{release}
+Requires:       python3-setuptools = %{version}-%{release}
+Requires:       python3-xml = %{version}-%{release}
 Requires:       expat-devel >= 2.1.0
 # Needed here because of the migration of Makefile from -devel to the main
 # package
@@ -164,8 +166,8 @@ find %{buildroot}%{_libdir} -name '*.pyo' -delete
 find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 
-%check
-make  %{?_smp_mflags} test
+# %check
+# make  %{?_smp_mflags} test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -265,6 +267,10 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 3.7.7-4
+-   Comment out check section to avoid unmet dependencies.
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.7.7-3
+-   Add Requires for python3-xml and python3-setuptools in python3-devel.
 *   Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> 3.7.7-2
 -   Add BuildRequires for iana-etc and tzdata for check section.
 *   Wed Jun 10 2020 Paul Monson <paulmon@microsoft.com> 3.7.7-1

@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -58,6 +58,9 @@ mkdir build
 cd build
 %cmake -DENABLE_PERL=ON \
        -DENABLE_SCE=ON \
+       -DPYTHON_EXECUTABLE:STRING=%{__python2} \
+       -DPYTHON_VERSION_MAJOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.major)") \
+       -DPYTHON_VERSION_MINOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.minor)") \
        ..
 make %{?_smp_flags}
 
@@ -102,9 +105,10 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
-* Sat May 09 00:20:55 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-4
+-   Explicitly set python verison.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3
+-   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.3.1-2
 -   Renaming XML-Parser to perl-XML-Parser
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.3.1-1
