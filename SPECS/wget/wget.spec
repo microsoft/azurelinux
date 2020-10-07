@@ -62,7 +62,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 
 %changelog
-*   Wed Oct 07 2020 Pawel Winogrodzki <joschmit@microsoft.com> 1.20.3-2
+*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.20.3-2
 -   Updating certificate bundle path to include full set of trust information.
 *   Mon Jun 08 2020 Joe Schmitt <joschmit@microsoft.com> 1.20.3-1
 -   Update to version 1.20.3 to resolve CVE-2019-5953.

@@ -87,7 +87,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
-*   Wed Oct 07 2020 Pawel Winogrodzki <joschmit@microsoft.com> 7.68.0-2
+*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-2
 -   Updating certificate bundle path to include full set of trust information.
 *   Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-1
 -   Upgrading to 7.68.0 to enable verification against a partial cert chain.
