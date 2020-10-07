@@ -26,7 +26,7 @@ const (
 	defaultBuildAttempts = "1"
 )
 
-// schedulerChannels represents the communicate channels used by a build agent.
+// schedulerChannels represents the communication channels used by a build agent.
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
 // only the top-level scheduler should have. BuildChannels contains directional channels.
 type schedulerChannels struct {
