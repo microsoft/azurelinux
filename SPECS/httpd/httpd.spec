@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -15,6 +15,8 @@ Patch1:         httpd-uncomment-ServerName.patch
 Patch100: CVE-1999-0236.nopatch
 # CVE-1999-1412 applies only to MacOS X
 Patch101: CVE-1999-1412.nopatch
+# CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
+Patch102: CVE-2007-0086.nopatch
 
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
@@ -190,6 +192,8 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
+-   Mark CVE-2007-0086 as nopatch
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.46-2
 -   Mark CVE-1999-0236 CVE-1999-1412 as nopatch
 *   Tue Aug 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-1
