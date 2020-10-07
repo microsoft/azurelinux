@@ -44,7 +44,7 @@ If the `TOOLCHAIN_ARCHIVE` variable is not set, but `REBUILD_TOOLCHAIN=y` is, th
 The chroot worker is an archive containing all the toolchain RPMs installed into a chroot environment. This archive can be extracted into a folder, then a chroot call can be made to switch into the environment. Once in the chroot environment only the RPM based tools and filesystem are available. This creates a clean build environment.
 
 The chroot worker is used at several points to perform various tasks using the RPM packaged tools without interfering with the host system. The three major ones are:
-1) Processing spec files with macro support.
+1) Processing spec files using Mariner's RPM macros.
 2) Using `tdnf` to download packages.
 3) Building new packages using only the RPM based compilers/tools etc.
 
@@ -95,6 +95,6 @@ The `specreader` tool scans all the `*.spec` files in a directory and generates 
 #### srpmpacker
 The `srpmpacker` tool creates `.src.rpm` files from local specs and sources. The sources can be present locally, or downloaded from a source server. It is responsible for enforcing a matching hash for every source file. This tool runs using the [chroot worker](#Chroot-Worker) to support macros.
 #### scheduler
-The `scheduler` tool takes the output from the `grapher` tool and schedules builds for each local spec file using [pkgworker](###pkgworker) (see [Stage 3: Scheduler](3_package_building.md#stage-3-scheduler)). `scheduler` will skip building any spec if it and all of its dependencies have been already built. The `scheduler` tool bases its decisions on the currently selected image configuration.
+The `scheduler` tool takes the output from the `grapher` tool and schedules builds for each local spec file using [pkgworker](###pkgworker) (see [Stage 3: Scheduler](3_package_building.md#stage-3-scheduler)). `scheduler` will skip building any spec if it and all of its dependencies have already been built. The `scheduler` tool bases its decisions on the currently selected image configuration.
 
 ## Prev: [Intro](0_intro.md), Next: [Local Packages](2_local_packages.md)

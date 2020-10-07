@@ -191,7 +191,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		if err != nil {
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
-				// Best effort cleanup incase mountpoint creation failed mid-way through
+				// Best effort cleanup in case mountpoint creation failed mid-way through
 				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)

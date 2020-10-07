@@ -38,7 +38,7 @@ var (
 	repoFile             = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
 	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
-	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
+	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the choot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
