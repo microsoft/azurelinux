@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch22:        CVE-2020-13776.patch
 # This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
+<<<<<<< HEAD
 Patch23:        CVE-2018-21029.nopatch
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
@@ -60,11 +61,11 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  shadow-utils
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
 Requires:       filesystem >= 1.1
@@ -133,6 +134,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
        -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                     \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
+       -Dselinux=true                                                 \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -267,6 +269,10 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 239-35
+- Enable SELinux support
+- Remove unused BuildRequires shadow-utils
+
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-34
 - Fix CVE-2019-6454 patch. Add upstream patch info.
 - Fix CVE-2020-1712 patch. Add upstream patch info.

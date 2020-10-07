@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,6 @@ code. It is incompatible with Python 2.x releases.
 Summary:        The libraries for python runtime
 Group:          Applications/System
 Requires:       bzip2-libs
-Requires:       coreutils
 Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
@@ -263,6 +262,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 3.7.7-5
+- Remove coreutils dependency to remove circular dependency with libselinux
+
 * Fri Jan 29 2021 Nick Samson <nisamson@microsoft.com> - 3.7.9-4
 - Patched CVE-2021-3177 with backported patch. Moved to autosetup.
 
@@ -405,3 +407,92 @@ rm -rf %{buildroot}/*
 
 * Wed Jul 1 2015 Vinay Kulkarni <kulkarniv@vmware.com> - 3.4.3
 - Add Python3 package to Photon.
+||||||| parent of b2d918ef... Add SELinux packages to Mariner. (#100)
+*   Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> 3.7.7-2
+-   Add BuildRequires for iana-etc and tzdata for check section.
+*   Wed Jun 10 2020 Paul Monson <paulmon@microsoft.com> 3.7.7-1
+-   Update to Python 3.7.7 to fix CVEs
+*   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.7.3-10
+-   Fix CVE-2019-16056.
+*   Wed May 20 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.7.3-9
+-   Fix CVE-2020-8492.
+*   Wed May 20 2020 Paul Monson <paulmon@microsoft.com> 3.7.3-8
+-   Fix variable use.
+*   Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.7.3-7
+-   Added %%license line automatically
+*   Wed May 06 2020 Paul Monson <paulmon@microsoft.com> 3.7.3-6
+-   Replace unsupported TLS methods with a patch.
+*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.7.3-5
+-   Remove toybox and only use coreutils for requires.
+*   Mon Nov 25 2019 Andrew Phelps <anphel@microsoft.com> 3.7.3-4
+-   Remove duplicate libpython3.so from devel package
+*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.7.3-3
+-   Initial CBL-Mariner import from Photon (license: Apache2).
+*   Mon Jun 17 2019 Tapas Kundu <tkundu@vmware.com> 3.7.3-2
+-   Fix for CVE-2019-10160
+*   Mon Jun 10 2019 Tapas Kundu <tkundu@vmware.com> 3.7.3-1
+-   Update to Python 3.7.3 release
+*   Thu May 23 2019 Tapas Kundu <tkundu@vmware.com> 3.7.0-6
+-   Fix for CVE-2019-5010
+-   Fix for CVE-2019-9740
+*   Tue Mar 12 2019 Tapas Kundu <tkundu@vmware.com> 3.7.0-5
+-   Fix for CVE-2019-9636
+*   Mon Feb 11 2019 Taps Kundu <tkundu@vmware.com> 3.7.0-4
+-   Fix for CVE-2018-20406
+*   Fri Dec 21 2018 Tapas Kundu <tkundu@vmware.com> 3.7.0-3
+-   Fix for CVE-2018-14647
+*   Tue Dec 04 2018 Tapas Kundu <tkundu@vmware.com> 3.7.0-2
+-   Excluded windows installer from python3 libs packaging.
+*   Wed Sep 26 2018 Tapas Kundu <tkundu@vmware.com> 3.7.0-1
+-   Updated to version 3.7.0
+*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.6.1-9
+-   Requires coreutils or toybox
+-   Requires bzip2-libs
+*   Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 3.6.1-8
+-   Remove devpts mount in check
+*   Mon Aug 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.6.1-7
+-   Add pty for tests to pass
+*   Wed Jul 12 2017 Xiaolin Li <xiaolinl@vmware.com> 3.6.1-6
+-   Add python3-test package.
+*   Fri Jun 30 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.6.1-5
+-   Remove the imaplib tests.
+*   Mon Jun 05 2017 Xiaolin Li <xiaolinl@vmware.com> 3.6.1-4
+-   Added pip, setuptools, xml, and curses sub packages.
+*   Sun Jun 04 2017 Bo Gan <ganb@vmware.com> 3.6.1-3
+-   Fix symlink and script
+*   Wed May 10 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.6.1-2
+-   Exclude idle3.
+*   Wed Apr 26 2017 Siju Maliakkal <smaliakkal@vmware.com> 3.6.1-1
+-   Updating to latest
+*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 3.5.3-3
+-   Python3-devel requires expat-devel.
+*   Thu Mar 23 2017 Xiaolin Li <xiaolinl@vmware.com> 3.5.3-2
+-   Provides /bin/python3.
+*   Tue Feb 28 2017 Xiaolin Li <xiaolinl@vmware.com> 3.5.3-1
+-   Updated to version 3.5.3.
+*   Fri Jan 20 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.5.1-10
+-   Added patch to support Photon OS
+*   Tue Dec 20 2016 Xiaolin Li <xiaolinl@vmware.com> 3.5.1-9
+-   Move easy_install-3.5 to devel subpackage.
+*   Wed Nov 16 2016 Alexey Makhalov <ppadmavilasom@vmware.com> 3.5.1-8
+-   Use sqlite-{devel,libs}
+*   Thu Oct 27 2016 Anish Swaminathan <anishs@vmware.com> 3.5.1-7
+-   Patch for CVE-2016-5636
+*   Mon Oct 10 2016 ChangLee <changlee@vmware.com> 3.5.1-6
+-   Modified %check
+*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.5.1-5
+-   GA - Bump release of all rpms
+*   Wed May 04 2016 Anish Swaminathan <anishs@vmware.com> 3.5.1-4
+-   Edit scriptlets.
+*   Wed Apr 13 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.5.1-3
+-   update python to require python-libs
+*   Thu Apr 07 2016 Mahmoud Bassiouny <mbassiouny@vmware.com> 3.5.1-2
+-   Providing python3 binaries instead of the minor versions.
+*   Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.5.1-1
+-   Updated to version 3.5.1
+*   Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 3.4.3-3
+-   Edit post script.
+*   Mon Aug 17 2015 Vinay Kulkarni <kulkarniv@vmware.com> 3.4.3-2
+-   Remove python.o file, and minor cleanups.
+*   Wed Jul 1 2015 Vinay Kulkarni <kulkarniv@vmware.com> 3.4.3
+-   Add Python3 package to Photon.

@@ -234,7 +234,6 @@ build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
-build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install findutils
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
@@ -316,7 +315,6 @@ chroot_and_install_rpms python2
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
-build_rpm_in_chroot_no_install rpm
 build_rpm_in_chroot_no_install cpio
 
 # Build tdnf-2.1.0
@@ -371,10 +369,6 @@ build_rpm_in_chroot_no_install libxslt
 # docbook-style-xsl needs pam
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
-
-# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
-cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
-build_rpm_in_chroot_no_install shadow-utils
 
 # gtest needs cmake
 chroot_and_install_rpms cmake
@@ -451,14 +445,18 @@ build_rpm_in_chroot_no_install libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, shadow-utils
+# util-linux, rpm, libsemanage and shadow-utils require libselinux
+chroot_and_install_rpms libselinux
+build_rpm_in_chroot_no_install util-linux
+build_rpm_in_chroot_no_install rpm
+
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
 chroot_and_install_rpms libcap
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
 chroot_and_install_rpms meson
-chroot_and_install_rpms shadow-utils
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
@@ -484,6 +482,47 @@ chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
+
+build_rpm_in_chroot_no_install golang-1.13
+build_rpm_in_chroot_no_install groff
+
+# libtiprc needs krb5
+chroot_and_install_rpms krb5
+build_rpm_in_chroot_no_install libtirpc
+build_rpm_in_chroot_no_install rpcsvc-proto
+
+# libnsl2 needs libtirpc and rpcsvc-proto
+chroot_and_install_rpms libtirpc
+chroot_and_install_rpms rpcsvc-proto
+build_rpm_in_chroot_no_install libnsl2
+
+# tcp_wrappers needs libnsl2
+chroot_and_install_rpms libnsl2
+build_rpm_in_chroot_no_install tcp_wrappers
+
+# openldap needs groff
+chroot_and_install_rpms groff
+build_rpm_in_chroot_no_install openldap
+
+build_rpm_in_chroot_no_install libcap-ng
+
+# audit needs systemd, golang, openldap, tcp_wrappers and libcap-ng
+chroot_and_install_rpms systemd
+chroot_and_install_rpms golang
+chroot_and_install_rpms openldap
+chroot_and_install_rpms tcp_wrappers
+chroot_and_install_rpms libcap-ng
+build_rpm_in_chroot_no_install audit
+
+# libsemanage requires libaudit
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install libsemanage
+
+# shadow-utils requires libsemanage
+chroot_and_install_rpms libsemanage
+# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
+cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
+build_rpm_in_chroot_no_install shadow-utils
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1

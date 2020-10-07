@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,8 @@ BuildRequires:  cracklib-devel
 BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       pam
+BuildRequires:  libselinux-devel
+BuildRequires:  libsemanage-devel
 
 %description
 The Shadow package contains programs for handling passwords
@@ -42,8 +44,10 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
 
 %build
+<<<<<<< HEAD
 %configure --sysconfdir=%{_sysconfdir} --with-libpam \
-           --with-libcrack --with-group-name-max-length=32
+           --with-libcrack --with-group-name-max-length=32 \
+           --with-selinux
 make %{?_smp_mflags}
 
 %install
@@ -139,6 +143,9 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 4.6-10
+- Add SELinux support
+
 * Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9
 - Remove PASS_MAX_DAYS customized value 90 to set default value
 

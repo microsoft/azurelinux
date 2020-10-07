@@ -1,7 +1,7 @@
 Summary:        Programs for processing and formatting text
 Name:           groff
 Version:        1.22.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/groff
 Group:          Applications/Text
@@ -25,29 +25,40 @@ Requires:       perl-File-HomeDir
 %description
 The Groff package contains programs for processing
 and formatting text.
+
 %prep
 %setup -q
+
 %build
 PAGE=letter ./configure \
     --prefix=%{_prefix} \
     --with-grofferdir=%{_datadir}/%{name}/%{version}/groffer
 make
+
 %install
 install -vdm 755 %{_defaultdocdir}/%{name}-1.22/pdf
 make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
+
 %post	-p /sbin/ldconfig
+
 %postun	-p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license LICENSES
 %{_bindir}/*
 %{_libdir}/groff/*
+%{_libdir}/X11/app-defaults/GXditview
+%{_libdir}/X11/app-defaults/GXditview-color
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_datarootdir}/%{name}/*
 %{_mandir}/*/*
 
 %changelog
+*   Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> 1.22.3-6
+-   Add installed but unpackaged files to %files list
+-   Clean up formatting
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4

@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -59,7 +59,6 @@ Requires:       sqlite-libs
 Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
-Requires:       coreutils
 Requires:       gdbm
 Requires:       bzip2-libs
 %global __requires_exclude ^(/usr/bin/python|python\\(abi\\) = 2\\.7)$
@@ -247,6 +246,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Mon Sep 14 2020 Daniel Burgener <daburgen@microsoft.com> 2.7.18-4
+- Remove coreutils dependency to remove circular dependency with libselinux
+
 * Tue Nov 03 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-5
 - Patch CVE-2020-27619
 

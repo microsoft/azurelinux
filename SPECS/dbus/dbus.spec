@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Patch0:         CVE-2019-12749.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
+BuildRequires:  libselinux-devel
 Requires:       expat
 Requires:       systemd
 Requires:       xz
@@ -35,7 +36,7 @@ It contains the libraries and header files to create applications
 %configure \
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=no \
-    --enable-selinux=no \
+    --enable-selinux=yes \
     --with-console-auth-dir=/run/console
 
 make %{?_smp_mflags}
@@ -78,6 +79,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> - 1.13.6-5
+- Enable SELinux support
+
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4
 - Patch CVE-2019-12749
 
