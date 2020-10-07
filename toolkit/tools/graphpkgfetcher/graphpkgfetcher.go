@@ -104,16 +104,21 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		// Cache an RPM for each unresolved node in the graph.
 		for _, n := range dependencyGraph.AllRunNodes() {
 			if n.State == pkggraph.StateUnresolved {
-				err = resolveSingleNode(cloner, n)
-				if err != nil {
-					errorMessage := strings.Builder{}
-					errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
-					errorMessage.WriteString("Nodes which have this as a dependency:\n")
-					for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-						errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
+				resolveErr := resolveSingleNode(cloner, n)
+				// Failing to clone a dependency should not halt a build.
+				// The build should continue and attempt best effort to build as many packages as possible.
+				if resolveErr != nil {
+					if n.Implicit {
+						logger.Log.Warnf("Failed to resolve implicit node '%s', assuming it will be provided during package build", n)
+					} else {
+						errorMessage := strings.Builder{}
+						errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
+						errorMessage.WriteString("Nodes which have this as a dependency:\n")
+						for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
+							errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
+						}
+						logger.Log.Error(errorMessage.String())
 					}
-					logger.Log.Error(errorMessage.String())
-					return
 				}
 			}
 		}

@@ -87,7 +87,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemote, "<NO_SRPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
+	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemote, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
 	if err != nil {
 		return
 	}
@@ -118,7 +118,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 
 	if newRunNode == nil {
 		// Add "Run" node
-		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeRun, pkg.SrpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
 		if err != nil {
 			return
@@ -127,7 +127,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 
 	if newBuildNode == nil {
 		// Add "Build" node
-		newBuildNode, err = g.AddPkgNode(pkgVer, pkggraph.StateBuild, pkggraph.TypeBuild, pkg.SrpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newBuildNode, err = g.AddPkgNode(pkgVer, pkggraph.StateBuild, pkggraph.TypeBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		logger.Log.Debugf("Adding build node %s with id %d\n", newBuildNode.FriendlyName(), newBuildNode.ID())
 		if err != nil {
 			return
@@ -178,10 +178,23 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		}
 	}()
 	if newEdge.To() == newEdge.From() {
-		logger.Log.Warnf("Package %+v requires itself!", packageNode)
-	} else {
-		g.SetEdge(newEdge)
+		logger.Log.Debugf("Package %+v requires itself!", packageNode)
+		return nil
 	}
+
+	// Avoid creating runtime dependencies from an RPM to a different provide from the same RPM as the dependency will always be met on RPM installation.
+	// Creating these edges may cause non-problematic cycles that can significantly increase memory usage and runtime during cycle resolution.
+	// If there are enough of these cycles it can exhaust the system's memory when resolving them.
+	// - Only check run nodes. If a build node has a reflexive cycle then it cannot be built without a bootstrap version.
+	if packageNode.Type == pkggraph.TypeRun &&
+		dependentNode.Type == pkggraph.TypeRun &&
+		packageNode.RpmPath == dependentNode.RpmPath {
+
+		logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)
+		return nil
+	}
+
+	g.SetEdge(newEdge)
 
 	return err
 }

@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 
 	"golang.org/x/sys/unix"
 	"microsoft.com/pkggen/internal/logger"
@@ -38,10 +37,10 @@ func CurrentEnvironment() []string {
 	return currentEnv
 }
 
-// PermanentlyStopAllProcesses will send a SIGKILL to all processes spawned by this package,
+// PermanentlyStopAllProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
-func PermanentlyStopAllProcesses() {
+func PermanentlyStopAllProcesses(signal unix.Signal) {
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
 	logger.Log.Info("Waiting for outstanding processes to be created")
@@ -52,15 +51,15 @@ func PermanentlyStopAllProcesses() {
 	// Disallow future processes from being created
 	allowProcessCreation = false
 
-	// For every running process, issue a SIGKILL to its process group,
+	// For every running process, issue the provided signal to its process group,
 	// resulting in both the process and all of its children being stopped.
 	for cmd := range activeCommands {
 		processCommand := strings.Join(cmd.Args, " ")
 		logger.Log.Infof("Stopping (%s)", processCommand)
 
-		// Issue the SIGKILL to the negative Pid, this signifies it should be
+		// Issue the provided signal to the negative Pid, this signifies it should be
 		// sent to the process's process group.
-		err := unix.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		err := unix.Kill(-cmd.Process.Pid, signal)
 		if err != nil {
 			logger.Log.Errorf("Unable to stop (%s): %v", processCommand, err)
 			continue

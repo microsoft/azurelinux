@@ -15,6 +15,7 @@ toolchain_local_temp = $(BUILD_DIR)/toolchain_temp
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
+toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
@@ -62,23 +63,29 @@ copy-toolchain-rpms:
 
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
-
-check-aarch64-manifests:
+check-aarch64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(toolchain_spec_list) \
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
 			aarch64
-check-x86_64-manifests:
+check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(toolchain_spec_list) \
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
 			x86_64
+
+# Generate a list of a specs built as part of the toolchain.
+$(toolchain_spec_list): $(toolchain_files)
+	cd $(SCRIPTS_DIR)/toolchain && \
+		./list_toolchain_specs.sh \
+			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(toolchain_spec_list)
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
@@ -130,7 +137,7 @@ $(raw_toolchain): $(toolchain_files)
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(raw_toolchain) $(BUILD_SRPMS_DIR)
+$(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo "Building base packages"
 	# Always clean the existing chroot
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))

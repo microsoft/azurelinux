@@ -17,13 +17,16 @@ local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
 local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_sources = $(shell find $(SPECS_DIR)/ -name '*')
 
+toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(BUILD_DIR)/SRPM_packaging)
 
 # General targets
-.PHONY: input-srpms clean-input-srpms
+.PHONY: toolchain-input-srpms input-srpms clean-input-srpms
 input-srpms: $(BUILD_SRPMS_DIR)
+toolchain-input-srpms: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 
 clean: clean-input-srpms
 clean-input-srpms:
@@ -58,8 +61,12 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 			$(call print_error,Failed to download $${srpm_file});  } \
 	done || $(call print_error,Loop in $@ failed) ; \
 	touch $@
+
+# Since all the SRPMs are being downloaded by the "input-srpms" target there is no need to differentiate toolchain srpms.
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
+	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_sources) $(SPECS_DIR) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker)
 	$(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -69,6 +76,25 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
-		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING)
+		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
+		--worker-tar=$(chroot_worker) \
+		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
+		--log-level=$(LOG_LEVEL)
+	touch $@
+
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
+	$(go-srpmpacker) \
+		--dir=$(SPECS_DIR) \
+		--output-dir=$(BUILD_SRPMS_DIR) \
+		--source-url=$(SOURCE_URL) \
+		--dist-tag=$(DIST_TAG) \
+		--ca-cert=$(CA_CERT) \
+		--tls-cert=$(TLS_CERT) \
+		--tls-key=$(TLS_KEY) \
+		--build-dir=$(BUILD_DIR)/SRPM_packaging \
+		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
+		--pack-list=$(toolchain_spec_list) \
+		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
+		--log-level=$(LOG_LEVEL)
 	touch $@
 endif

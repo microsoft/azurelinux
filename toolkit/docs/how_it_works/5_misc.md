@@ -49,7 +49,7 @@ The config tracking behavior consists of four components:
 > For example, the variable `CONFIG_FILE` will cause `$(depend_CONFIG_FILE)` and `$(STATUS_FLAGS_DIR)/CONFIG_FILE_tracking_flag` to be created.
 
 #### `$(depend_$1)`
-> Any target which wishes to depend on the value of a variable can add these as a dependency. For example, the graph optimization step `$(optimized_file):` relies on `$(depend_PACKAGE_BUILD_LIST)`. This variable actually maps to the associated status flag.
+> Any target which wishes to depend on the value of a variable can add these as a dependency. For example, the scheduler step `$(STATUS_FLAGS_DIR)/build-rpms.flag:` relies on `$(depend_STOP_ON_PKG_FAIL)`. This variable actually maps to the associated status flag.
 
 #### `$(STATUS_FLAGS_DIR)/$1_tracking_flag:`
 > The actual logic to track the variables is present in this recipe. Every tracking flag depends on the phony target `variable_depends_on_phony`, so it will always be guaranteed to be updated. When the recipe runs it reads the current value of the tracking flag and compares it to the value of the variable. The tracking flag file is updated only if the current contents do not match the value of the variable

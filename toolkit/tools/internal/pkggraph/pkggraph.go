@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 
 	"gonum.org/v1/gonum/graph"
@@ -68,11 +69,13 @@ type PkgNode struct {
 	State        NodeState           // The current state of the node (ie needs to be build, up-to-date, cached, etc)
 	Type         NodeType            // The purpose of the node (build, run , meta goal, etc)
 	SrpmPath     string              // SRPM file used to generate this package (likely shared with multiple other nodes)
+	RpmPath      string              // RPM file that produces this package (likely shared with multiple other nodes)
 	SpecPath     string              // The SPEC file extracted from the SRPM
 	SourceDir    string              // The directory containing extracted sources from the SRPM
 	Architecture string              // The architecture of the resulting package built.
 	SourceRepo   string              // The location this package was acquired from
 	GoalName     string              // Optional string for goal nodes
+	Implicit     bool                // If the package is an implicit provide
 	This         *PkgNode            // Self reference since the graph library returns nodes by value, not reference
 }
 
@@ -352,17 +355,19 @@ func (g *PkgGraph) NewNode() graph.Node {
 }
 
 // AddPkgNode adds a new node to the package graph. Run, Build, and Unresolved nodes are recorded in the lookup table.
-func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeState, nodeType NodeType, srpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
+func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeState, nodeType NodeType, srpmPath, rpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
 	newNode = &PkgNode{
 		nodeID:       g.NewNode().ID(),
 		VersionedPkg: versionedPkg,
 		State:        nodestate,
 		Type:         nodeType,
 		SrpmPath:     srpmPath,
+		RpmPath:      rpmPath,
 		SpecPath:     specPath,
 		SourceDir:    sourceDir,
 		Architecture: architecture,
 		SourceRepo:   sourceRepo,
+		Implicit:     isImplicitPackage(versionedPkg),
 	}
 	newNode.This = newNode
 
@@ -380,6 +385,21 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeSt
 	err = g.addToLookup(newNode, false)
 
 	return
+}
+
+// RemovePkgNode removes a node from the package graph and lookup tables.
+func (g *PkgGraph) RemovePkgNode(pkgNode *PkgNode) {
+	g.RemoveNode(pkgNode.ID())
+
+	pkgName := pkgNode.VersionedPkg.Name
+	lookupSlice := g.lookupTable()[pkgName]
+
+	for i, lookupNode := range lookupSlice {
+		if lookupNode.BuildNode == pkgNode || lookupNode.RunNode == pkgNode {
+			g.lookupTable()[pkgName] = append(lookupSlice[:i], lookupSlice[i+1:]...)
+			break
+		}
+	}
 }
 
 // FindDoubleConditionalPkgNodeFromPkg has the same behavior as FindConditionalPkgNodeFromPkg but supports two conditionals
@@ -561,7 +581,7 @@ func (n *PkgNode) String() string {
 		name = "<NO NAME>"
 	}
 
-	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s> from '%s' in '%s'", name, version, n.nodeID, n.Type.String(), n.State.String(), n.SrpmPath, n.SourceRepo)
+	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from '%s' in '%s'", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
 }
 
 // Equal returns true if these nodes represent the same data
@@ -585,11 +605,13 @@ func (n *PkgNode) Equal(otherNode *PkgNode) bool {
 	return n.State == otherNode.State &&
 		n.Type == otherNode.Type &&
 		n.SrpmPath == otherNode.SrpmPath &&
+		n.RpmPath == otherNode.RpmPath &&
 		n.SpecPath == otherNode.SpecPath &&
 		n.SourceDir == otherNode.SourceDir &&
 		n.Architecture == otherNode.Architecture &&
 		n.SourceRepo == otherNode.SourceRepo &&
-		n.GoalName == otherNode.GoalName
+		n.GoalName == otherNode.GoalName &&
+		n.Implicit == otherNode.Implicit
 }
 
 func registerTypes() {
@@ -629,6 +651,11 @@ func (n PkgNode) MarshalBinary() (data []byte, err error) {
 		err = fmt.Errorf("encoding SrpmPath: %s", err.Error())
 		return
 	}
+	err = encoder.Encode(n.RpmPath)
+	if err != nil {
+		err = fmt.Errorf("encoding RpmPath: %s", err.Error())
+		return
+	}
 	err = encoder.Encode(n.SpecPath)
 	if err != nil {
 		err = fmt.Errorf("encoding SpecPath: %s", err.Error())
@@ -652,6 +679,11 @@ func (n PkgNode) MarshalBinary() (data []byte, err error) {
 	err = encoder.Encode(n.GoalName)
 	if err != nil {
 		err = fmt.Errorf("encoding GoalName: %s", err.Error())
+		return
+	}
+	err = encoder.Encode(n.Implicit)
+	if err != nil {
+		err = fmt.Errorf("encoding Implicit: %s", err.Error())
 		return
 	}
 	return outBuffer.Bytes(), err
@@ -688,6 +720,11 @@ func (n *PkgNode) UnmarshalBinary(inBuffer []byte) (err error) {
 		err = fmt.Errorf("decoding SrpmPath: %s", err.Error())
 		return
 	}
+	err = decoder.Decode(&n.RpmPath)
+	if err != nil {
+		err = fmt.Errorf("decoding RpmPath: %s", err.Error())
+		return
+	}
 	err = decoder.Decode(&n.SpecPath)
 	if err != nil {
 		err = fmt.Errorf("decoding SpecPath: %s", err.Error())
@@ -711,6 +748,11 @@ func (n *PkgNode) UnmarshalBinary(inBuffer []byte) (err error) {
 	err = decoder.Decode(&n.GoalName)
 	if err != nil {
 		err = fmt.Errorf("decoding GoalName: %s", err.Error())
+		return
+	}
+	err = decoder.Decode(&n.Implicit)
+	if err != nil {
+		err = fmt.Errorf("decoding Implicit: %s", err.Error())
 		return
 	}
 	n.This = n
@@ -882,6 +924,7 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		State:      StateMeta,
 		Type:       TypeGoal,
 		SrpmPath:   "<NO_SRPM_PATH>",
+		RpmPath:    "<NO_RPM_PATH>",
 		SourceRepo: "<NO_REPO>",
 		nodeID:     g.NewNode().ID(),
 		GoalName:   goalName,
@@ -1013,4 +1056,10 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 	deepCopy = NewPkgGraph()
 	err = ReadDOTGraph(deepCopy, &buf)
 	return
+}
+
+// isImplicitPackage returns true if a PackageVer represents an implicit provide.
+func isImplicitPackage(versionedPkg *pkgjson.PackageVer) bool {
+	// Implicit provides will contain "(" and ")"
+	return strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")")
 }
