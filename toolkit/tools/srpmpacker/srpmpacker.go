@@ -105,7 +105,7 @@ var (
 
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	packListFile = app.Flag("pack-list", "Path to a list of SPECs to path. If empty will pack all SPECs.").ExistingFile()
+	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
@@ -117,7 +117,7 @@ var (
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 
-	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").ExistingFile()
+	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz. If this argument is empty, SRPMs will be packed in the host environment.").ExistingFile()
 
 	validSignatureLevels = []string{signatureEnforceString, signatureSkipCheckString, signatureUpdateString}
 	signatureHandling    = app.Flag("signature-handling", "Specifies how to handle signature mismatches for source files.").Default(signatureEnforceString).PlaceHolder(exe.PlaceHolderize(validSignatureLevels)).Enum(validSignatureLevels...)
@@ -325,16 +325,21 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 		return
 	}
 
+	defer func() {
+		if err != nil {
+			closeErr := chroot.Close(leaveFilesOnDisk)
+			if closeErr != nil {
+				logger.Log.Errorf("Failed to close chroot, err: %s", closeErr)
+			}
+		}
+	}()
+
 	// If this is container build then the bind mounts will not have been created.
 	// Copy in all of the SPECs so they can be packed.
 	if !buildpipeline.IsRegularBuild() {
 		specsInChroot := filepath.Join(chroot.RootDir(), newSpecsDir)
 		err = directory.CopyContents(specsDir, specsInChroot)
 		if err != nil {
-			closeErr := chroot.Close(leaveFilesOnDisk)
-			if closeErr != nil {
-				logger.Log.Errorf("Failed to close chroot, err: %s", err)
-			}
 			return
 		}
 	}
@@ -345,10 +350,6 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	}
 
 	err = chroot.AddFiles(files...)
-	if err != nil {
-		chroot.Close(leaveFilesOnDisk)
-	}
-
 	return
 }
 

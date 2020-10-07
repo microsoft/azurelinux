@@ -45,7 +45,7 @@ var (
 	srpmsDir  = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
 	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
 	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").ExistingFile()
+	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
 )
@@ -81,9 +81,9 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFil
 	}
 
 	doParse := func() error {
-		var err error
-		packageRepo, err = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, workers)
-		return err
+		var parseError error
+		packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, workers)
+		return parseError
 	}
 
 	if chroot != nil {
