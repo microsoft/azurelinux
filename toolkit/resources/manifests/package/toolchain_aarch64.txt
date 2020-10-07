@@ -49,10 +49,10 @@ cryptsetup-debuginfo-2.3.3-2.cm1.aarch64.rpm
 cryptsetup-devel-2.3.3-2.cm1.aarch64.rpm
 cryptsetup-libs-2.3.3-2.cm1.aarch64.rpm
 cryptsetup-reencrypt-2.3.3-2.cm1.aarch64.rpm
-curl-7.68.0-1.cm1.aarch64.rpm
-curl-debuginfo-7.68.0-1.cm1.aarch64.rpm
-curl-devel-7.68.0-1.cm1.aarch64.rpm
-curl-libs-7.68.0-1.cm1.aarch64.rpm
+curl-7.68.0-2.cm1.aarch64.rpm
+curl-debuginfo-7.68.0-2.cm1.aarch64.rpm
+curl-devel-7.68.0-2.cm1.aarch64.rpm
+curl-libs-7.68.0-2.cm1.aarch64.rpm
 device-mapper-2.03.05-5.cm1.aarch64.rpm
 device-mapper-devel-2.03.05-5.cm1.aarch64.rpm
 device-mapper-event-2.03.05-5.cm1.aarch64.rpm
@@ -399,8 +399,8 @@ util-linux-devel-2.32.1-4.cm1.aarch64.rpm
 util-linux-lang-2.32.1-4.cm1.aarch64.rpm
 util-linux-libs-2.32.1-4.cm1.aarch64.rpm
 veritysetup-2.3.3-2.cm1.aarch64.rpm
-wget-1.20.3-1.cm1.aarch64.rpm
-wget-debuginfo-1.20.3-1.cm1.aarch64.rpm
+wget-1.20.3-2.cm1.aarch64.rpm
+wget-debuginfo-1.20.3-2.cm1.aarch64.rpm
 which-2.21-7.cm1.aarch64.rpm
 which-debuginfo-2.21-7.cm1.aarch64.rpm
 xz-5.2.4-3.cm1.aarch64.rpm

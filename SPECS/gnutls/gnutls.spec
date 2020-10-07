@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
@@ -44,7 +44,7 @@ developing applications that use gnutls.
     --disable-openssl-compatibility \
     --with-included-unistring \
     --with-system-priority-file=%{_sysconfdir}/gnutls/default-priorities \
-    --with-default-trust-store-file=%{_sysconfdir}/pki/tls/certs/ca-bundle.crt \
+    --with-default-trust-store-file=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-default-trust-store-dir=%{_sysconfdir}/ssl/certs
 make %{?_smp_mflags}
 
@@ -88,6 +88,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.14-2
+-   Updating certificate bundle path to include full set of trust information.
 *   Fri Aug 21 2020 Andrew Phelps <anphel@microsoft.com> 3.6.14-1
 -   Update to version 3.6.14 for CVE-2020-13777
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.6.8-3

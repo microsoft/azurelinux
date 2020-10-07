@@ -1,7 +1,7 @@
 Summary:        A network utility to retrieve files from the Web
 Name:           wget
 Version:        1.20.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/wget/wget.html
 Group:          System Environment/NetworkingPrograms
@@ -40,7 +40,7 @@ make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/etc
 cat >> %{buildroot}/etc/wgetrc <<-EOF
 #   default root certs location
-    ca_certificate=/etc/pki/tls/certs/ca-bundle.crt
+    ca_certificate=/etc/pki/tls/certs/ca-bundle.trust.crt
     ca_directory = /etc/ssl/certs
 EOF
 rm -rf %{buildroot}/%{_infodir}
@@ -62,6 +62,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 
 %changelog
+*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.20.3-2
+-   Updating certificate bundle path to include full set of trust information.
 *   Mon Jun 08 2020 Joe Schmitt <joschmit@microsoft.com> 1.20.3-1
 -   Update to version 1.20.3 to resolve CVE-2019-5953.
 -   Use https for URL.

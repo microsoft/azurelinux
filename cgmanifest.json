@@ -676,8 +676,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.66.0",
-          "downloadUrl": "http://curl.haxx.se/download/curl-7.66.0.tar.gz"
+          "version": "7.68.0",
+          "downloadUrl": "http://curl.haxx.se/download/curl-7.68.0.tar.gz"
         }
       }
     },
@@ -1276,8 +1276,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.8",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
+          "version": "3.6.14",
+          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
         }
       }
     },
