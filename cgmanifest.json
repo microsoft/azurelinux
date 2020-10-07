@@ -1725,9 +1725,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jsonbuilder",
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "json-glib",
           "version": "1.4.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jsonbuilder",
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
         }
       }
     },
