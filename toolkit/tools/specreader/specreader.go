@@ -7,14 +7,18 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 
+	"microsoft.com/pkggen/internal/buildpipeline"
+	"microsoft.com/pkggen/internal/directory"
 	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/rpm"
+	"microsoft.com/pkggen/internal/safechroot"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -26,16 +30,24 @@ const (
 	defaultWorkerCount = "10"
 )
 
+// parseResult holds the worker results from parsing a SPEC file.
+type parseResult struct {
+	packages []*pkgjson.Package
+	err      error
+}
+
 var (
-	app      = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
-	dir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	output   = exe.OutputFlag(app, "Output file to export the JSON")
-	workers  = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
-	srpmDir  = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
-	macroDir = app.Flag("macro-dir", "Directory containing rpm macros.").Default("").String()
-	distTag  = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	app       = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
+	specsDir  = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	output    = exe.OutputFlag(app, "Output file to export the JSON")
+	workers   = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
+	buildDir  = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
+	srpmsDir  = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
+	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
+	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
+	logFile   = exe.LogFileFlag(app)
+	logLevel  = exe.LogLevelFlag(app)
 )
 
 func main() {
@@ -43,61 +55,167 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	var (
-		packageRepo pkgjson.PackageRepo
-		packageList []*pkgjson.Package
-		wg          sync.WaitGroup
-		specFiles   []string
-		err         error
-	)
-
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
 
-	// Override the host's RPM config dir
-	_, err = rpm.SetMacroDir(*macroDir)
-	logger.PanicOnError(err, "Unable to set rpm macro directory (%s). Error: %v", *macroDir, err)
+	err := parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *distTag, *output, *workerTar, *workers)
+	logger.PanicOnError(err)
+}
+
+// parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
+// If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFile, workerTar string, workers int) (err error) {
+	var (
+		chroot      *safechroot.Chroot
+		packageRepo *pkgjson.PackageRepo
+	)
+
+	if workerTar != "" {
+		const leaveFilesOnDisk = false
+		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir)
+		if err != nil {
+			return
+		}
+		defer chroot.Close(leaveFilesOnDisk)
+	}
+
+	doParse := func() error {
+		var parseError error
+		packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, workers)
+		return parseError
+	}
+
+	if chroot != nil {
+		logger.Log.Info("Parsing SPECs inside a chroot environment")
+		err = chroot.Run(doParse)
+	} else {
+		logger.Log.Info("Parsing SPECs in the host environment")
+		err = doParse()
+	}
+
+	if err != nil {
+		return
+	}
+
+	b, err := json.MarshalIndent(packageRepo, "", "  ")
+	if err != nil {
+		logger.Log.Error("Unable to marshal package info JSON")
+		return
+	}
+
+	err = file.Write(string(b), outputFile)
+	if err != nil {
+		logger.Log.Errorf("Failed to write file (%s)", outputFile)
+		return
+	}
+
+	return
+}
+
+// createChroot creates a chroot to parse SPECs inside of.
+func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safechroot.Chroot, err error) {
+	const (
+		chrootName       = "specparser_chroot"
+		existingDir      = false
+		leaveFilesOnDisk = false
+	)
+
+	// Mount the specs and srpms directories to an identical path inside the chroot.
+	// Since specreader saves the full paths to specs in its output that grapher will then consume,
+	// the pathing needs to be preserved from the host system.
+	var extraDirectories []string
+
+	extraMountPoints := []*safechroot.MountPoint{
+		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
+		safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	chrootDir := filepath.Join(buildDir, chrootName)
+	chroot = safechroot.NewChroot(chrootDir, existingDir)
+
+	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints)
+	if err != nil {
+		return
+	}
+
+	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
+	if !buildpipeline.IsRegularBuild() {
+		dirsToCopy := []string{specsDir, srpmsDir}
+		for _, dir := range dirsToCopy {
+			dirInChroot := filepath.Join(chroot.RootDir(), dir)
+			err = directory.CopyContents(dir, dirInChroot)
+			if err != nil {
+				closeErr := chroot.Close(leaveFilesOnDisk)
+				if closeErr != nil {
+					logger.Log.Errorf("Failed to close chroot, err: %s", err)
+				}
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// parseSPECs will parse all specs in specsDir and return a summmary of the SPECs.
+func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int) (packageRepo *pkgjson.PackageRepo, err error) {
+	var (
+		packageList []*pkgjson.Package
+		wg          sync.WaitGroup
+		specFiles   []string
+	)
+
+	packageRepo = &pkgjson.PackageRepo{}
 
 	// Find the filepath for each spec in the SPECS directory.
-	specsearch, err := filepath.Abs(filepath.Join(*dir, "**/*.spec"))
+	specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
 	if err == nil {
-		specFiles, err = filepath.Glob(specsearch)
+		specFiles, err = filepath.Glob(specSearch)
 	}
 	if err != nil {
-		logger.Log.Panicf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", *dir, err)
+		logger.Log.Errorf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", specsDir, err)
+		return
 	}
 
-	ch := make(chan []*pkgjson.Package)
-	sem := make(chan int, *workers)
+	results := make(chan *parseResult, len(specFiles))
+	requests := make(chan string, len(specFiles))
+	cancel := make(chan struct{})
 
-	for _, file := range specFiles {
+	// Start the workers now so they begin working as soon as a new job is buffered.
+	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readspec(file, *distTag, *srpmDir, &wg, ch, sem)
+		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir)
 	}
 
-	// Set a goroutine to wait for all workers to finish so it can clean up the channel.
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
+	for _, specFile := range specFiles {
+		requests <- specFile
+	}
+
+	close(requests)
 
 	// Receive the parsed spec structures from the workers and place them into a list.
-	for specparsed := range ch {
-		packageList = append(packageList, specparsed...)
+	for i := 0; i < len(specFiles); i++ {
+		parseResult := <-results
+		if parseResult.err != nil {
+			err = parseResult.err
+			close(cancel)
+			break
+		}
+		packageList = append(packageList, parseResult.packages...)
+	}
+
+	logger.Log.Debug("Waiting for outstanding workers to finish")
+	wg.Wait()
+
+	if err != nil {
+		return
 	}
 
 	packageRepo.Repo = packageList
-	sortPackages(&packageRepo)
-	b, err := json.MarshalIndent(&packageRepo, "", "  ")
-	if err != nil {
-		logger.Log.Panic("Unable to marshal package info JSON. Error: ", err)
-	}
+	sortPackages(packageRepo)
 
-	err = file.Write(string(b), *output)
-	if err != nil {
-		logger.Log.Panicf("Failed to write file (%s). Error: %v", *output, err)
-	}
+	return
 }
 
 // sortPackages orders the package lists into reasonable and deterministic orders.
@@ -127,66 +245,101 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*pkgjson.Package, sem chan int) {
+func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string) {
 	const (
-		emptyQueryFormat      = ""
-		queryProvidedPackages = `srpm %{NAME}-%{VERSION}-%{RELEASE}.src.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
+		emptyQueryFormat      = ``
+		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
+		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
 	)
 
-	var (
-		sourcedir         string
-		results           []string
-		providerList      []*pkgjson.Package
-		buildRequiresList []*pkgjson.PackageVer
-		err               error
-	)
+	defer wg.Done()
 
-	sourcedir = filepath.Dir(specfile)
 	defines := rpm.DefaultDefines()
 	defines[rpm.DistTagDefine] = distTag
 
-	sem <- 1
+	for specfile := range requests {
+		select {
+		case <-cancel:
+			logger.Log.Debug("Cancellation signal received")
+			return
+		default:
+		}
 
-	// Clear the semaphore and signal the wait group whenever the function returns.
-	defer func() {
-		<-sem
-		wg.Done()
-	}()
+		result := &parseResult{}
 
-	// Sanity check that rpmspec can read the spec file so we dont flood the log with warning if it cant.
-	_, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, defines)
-	if err != nil {
-		logger.Log.Warnf(`rpmspec could not parse %s`, specfile)
-		return
+		providerList := []*pkgjson.Package{}
+		buildRequiresList := []*pkgjson.PackageVer{}
+		sourcedir := filepath.Dir(specfile)
+
+		// Find the SRPM associated with the SPEC.
+		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, defines, rpm.QueryHeaderArgument)
+		if err != nil {
+			result.err = err
+			results <- result
+			continue
+		}
+
+		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
+
+		isCompatible, err := rpm.SpecExclusiveArchIsCompatible(specfile, sourcedir, defines)
+		if err != nil {
+			result.err = err
+			results <- result
+			continue
+		}
+
+		if !isCompatible {
+			logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
+			results <- result
+			continue
+		}
+
+		// Find every package that the spec provides
+		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, defines)
+		if err == nil && len(queryResults) != 0 {
+			providerList, err = parseProvides(rpmsDir, srpmPath, queryResults)
+			if err != nil {
+				result.err = err
+				results <- result
+				continue
+			}
+		}
+
+		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
+		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, defines, rpm.BuildRequiresArgument)
+		if err == nil && len(queryResults) != 0 {
+			buildRequiresList, err = parsePackageVersionList(queryResults)
+			if err != nil {
+				result.err = err
+				results <- result
+				continue
+			}
+		}
+
+		// Every package provided by a spec will have the same BuildRequires and SrpmPath
+		for i := range providerList {
+			providerList[i].SpecPath = specfile
+			providerList[i].SourceDir = sourcedir
+			providerList[i].Requires, err = condensePackageVersionArray(providerList[i].Requires, specfile)
+			if err != nil {
+				break
+			}
+
+			providerList[i].BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
+			if err != nil {
+				break
+			}
+		}
+
+		if err != nil {
+			result.err = err
+		} else {
+			result.packages = providerList
+		}
+
+		// Submit the result to the main thread, the defered function will clear the semaphore.
+		results <- result
 	}
-
-	if !specArchMatchesBuild(specfile, sourcedir, defines) {
-		logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
-		return
-	}
-
-	// Find every package that the spec provides
-	results, err = rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, defines)
-	if err == nil && len(results) != 0 {
-		providerList = parseProvides(srpmDir, results)
-	}
-
-	// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
-	results, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, defines, rpm.BuildRequiresArgument)
-	if err == nil && len(results) != 0 {
-		buildRequiresList = parsePackageVersionList(results)
-	}
-
-	// Every package provided by a spec will have the same BuildRequires and SrpmPath
-	for i := range providerList {
-		providerList[i].SpecPath = specfile
-		providerList[i].SourceDir = sourcedir
-		providerList[i].Requires = condensePackageVersionArray(providerList[i].Requires, specfile)
-		providerList[i].BuildRequires = condensePackageVersionArray(buildRequiresList, specfile)
-	}
-
-	// Submit the result to the main thread, the defered function will clear the semaphore.
-	ch <- providerList
 }
 
 // parseProvides parses a newline separated list of Provides, Requires, and Arch from a single spec file.
@@ -197,11 +350,11 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 // Require: requiresb
 // Arch: noarch
 // The return is an array of Package structures, one for each Provides in the spec (implicit and explicit).
-func parseProvides(srpmDir string, list []string) (providerlist []*pkgjson.Package) {
+func parseProvides(rpmsDir, srpmPath string, list []string) (providerlist []*pkgjson.Package, err error) {
 	var (
 		reqlist      []*pkgjson.PackageVer
 		packagearch  string
-		srpmPath     string
+		rpmPath      string
 		listEntry    []string
 		sublistEntry []string
 	)
@@ -211,24 +364,46 @@ func parseProvides(srpmDir string, list []string) (providerlist []*pkgjson.Packa
 		value = iota
 	)
 
-	listEntry = minArrayLength(strings.SplitN(list[0], " ", 2), 2)
-	if listEntry[tag] == "srpm" {
-		srpmPath = filepath.Join(srpmDir, listEntry[value])
-	} else {
-		logger.Log.Panic("First element returned by rpmspec was not an srpm tag: ", list)
+	listEntry = strings.SplitN(list[0], " ", 2)
+	err = minSliceLength(listEntry, 2)
+	if err != nil {
+		return
 	}
+
+	if listEntry[tag] != "rpm" {
+		err = fmt.Errorf("first element returned by rpmspec was not an rpm tag: %v", list)
+		return
+	}
+
+	rpmPath = filepath.Join(rpmsDir, listEntry[value])
 
 	logger.Log.Trace(list)
 	for i := range list {
-		listEntry = minArrayLength(strings.SplitN(list[i], " ", 2), 1)
+		listEntry = strings.SplitN(list[i], " ", 2)
+		err = minSliceLength(listEntry, 1)
+		if err != nil {
+			return
+		}
 
-		if listEntry[tag] == "provides" {
+		if listEntry[tag] == "rpm" {
+			logger.Log.Trace("rpm ", listEntry[value])
+			rpmPath = filepath.Join(rpmsDir, listEntry[value])
+		} else if listEntry[tag] == "provides" {
 			logger.Log.Trace("provides ", listEntry[value])
 			for _, v := range list[i:] {
-				sublistEntry = minArrayLength(strings.SplitN(v, " ", 2), 2)
+				sublistEntry = strings.SplitN(v, " ", 2)
+				err = minSliceLength(sublistEntry, 2)
+				if err != nil {
+					return
+				}
+
 				if sublistEntry[tag] == "requires" {
 					logger.Log.Trace("   requires ", sublistEntry[value])
-					requirePkgVers := parsePackageVersions(sublistEntry[value])
+					var requirePkgVers []*pkgjson.PackageVer
+					requirePkgVers, err = parsePackageVersions(sublistEntry[value])
+					if err != nil {
+						return
+					}
 					filteredRequirePkgVers := filterOutDynamicDependencies(requirePkgVers)
 					reqlist = append(reqlist, filteredRequirePkgVers...)
 				} else if sublistEntry[tag] == "arch" {
@@ -237,8 +412,22 @@ func parseProvides(srpmDir string, list []string) (providerlist []*pkgjson.Packa
 					break
 				}
 			}
-			newProviderVer := parsePackageVersions(listEntry[value])[0]
-			providerlist = append(providerlist, &pkgjson.Package{Provides: newProviderVer, SrpmPath: srpmPath, Architecture: packagearch, Requires: reqlist})
+
+			var newProviderVer []*pkgjson.PackageVer
+			newProviderVer, err = parsePackageVersions(listEntry[value])
+			if err != nil {
+				return
+			}
+
+			providerPkgVer := &pkgjson.Package{
+				Provides:     newProviderVer[0],
+				SrpmPath:     srpmPath,
+				RpmPath:      rpmPath,
+				Architecture: packagearch,
+				Requires:     reqlist,
+			}
+
+			providerlist = append(providerlist, providerPkgVer)
 			reqlist = nil
 		}
 	}
@@ -251,14 +440,18 @@ func parseProvides(srpmDir string, list []string) (providerlist []*pkgjson.Packa
 // parsePackageVersions takes a package name and splits it into a set of PackageVer structures.
 // Normally a list of length 1 is returned, however parsePackageVersions is also responsible for
 // identifying if the package name is an "or" condition and returning all options.
-func parsePackageVersions(packagename string) (newpkgs []*pkgjson.PackageVer) {
+func parsePackageVersions(packagename string) (newpkgs []*pkgjson.PackageVer, err error) {
 	const (
 		NameField      = iota
 		ConditionField = iota
 		VersionField   = iota
 	)
 
-	packageSplit := minArrayLength(strings.Split(packagename, " "), 1)
+	packageSplit := strings.Split(packagename, " ")
+	err = minSliceLength(packageSplit, 1)
+	if err != nil {
+		return
+	}
 
 	// If first character of the packagename is a "(" then its an "or" condition
 	if packagename[0] == '(' {
@@ -277,22 +470,28 @@ func parsePackageVersions(packagename string) (newpkgs []*pkgjson.PackageVer) {
 		newpkg.Name = substr
 	}
 
-	return append(newpkgs, newpkg)
+	newpkgs = append(newpkgs, newpkg)
+	return
 }
 
 // parsePackageVersionList takes the output from rpmspec --buildrequires
 // and parses it into an array of PackageVersion structures
-func parsePackageVersionList(pkgList []string) (pkgVerList []*pkgjson.PackageVer) {
+func parsePackageVersionList(pkgList []string) (pkgVerList []*pkgjson.PackageVer, err error) {
 	for _, pkgListEntry := range pkgList {
-		pkgVerList = append(pkgVerList, parsePackageVersions(pkgListEntry)...)
+		var parsedPkgVers []*pkgjson.PackageVer
+		parsedPkgVers, err = parsePackageVersions(pkgListEntry)
+		if err != nil {
+			return
+		}
+		pkgVerList = append(pkgVerList, parsedPkgVers...)
 	}
 	return
 }
 
 // condensePackageVersionArray deduplicates entries in an array of Package Versions
 // and represents double conditionals in a single PackageVersion structure.
-// If a non-blank package version is specified more than twice in a SPEC then panic.
-func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile string) (processedPkgList []*pkgjson.PackageVer) {
+// If a non-blank package version is specified more than twice in a SPEC then return an error.
+func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile string) (processedPkgList []*pkgjson.PackageVer, err error) {
 	for _, pkg := range packagelist {
 		nameMatch := false
 		for i, processedPkg := range processedPkgList {
@@ -313,7 +512,8 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 					processedPkgList[i].SCondition = pkg.Condition
 					break
 				} else {
-					logger.Log.Panicf("Spec '%s' attempted to set more than two conditions for package '%s'.", specfile, processedPkg.Name)
+					err = fmt.Errorf("spec (%s) attempted to set more than two conditions for package (%s)", specfile, processedPkg.Name)
+					return
 				}
 			}
 		}
@@ -325,26 +525,37 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 }
 
 // parseOrCondition splits a package name like (foo or bar) and returns both foo and bar as separate requirements.
-func parseOrCondition(packagename string) (versions []*pkgjson.PackageVer) {
+func parseOrCondition(packagename string) (versions []*pkgjson.PackageVer, err error) {
 	logger.Log.Warnf("'OR' clause found (%s), make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", packagename)
 	packagename = strings.ReplaceAll(packagename, "(", "")
 	packagename = strings.ReplaceAll(packagename, ")", "")
-	packageSplit := minArrayLength(strings.Split(packagename, " or "), 1)
+
+	packageSplit := strings.Split(packagename, " or ")
+	err = minSliceLength(packageSplit, 1)
+	if err != nil {
+		return
+	}
+
 	versions = make([]*pkgjson.PackageVer, 0, len(packageSplit))
 	for _, condition := range packageSplit {
-		versions = append(versions, parsePackageVersions(condition)...)
+		var parsedPkgVers []*pkgjson.PackageVer
+		parsedPkgVers, err = parsePackageVersions(condition)
+		if err != nil {
+			return
+		}
+		versions = append(versions, parsedPkgVers...)
 	}
-	return versions
+
+	return
 }
 
-// minArrayLength checks that a string array is >= a minimum length and panics
-// explicitly if the condition is not met rather than letting an index into the array
-// crash later.
-func minArrayLength(array []string, minLength int) []string {
-	if len(array) < minLength {
-		logger.Log.Panicf("Array not required length (minLength = %d) %+v", minLength, array)
+// minSliceLength checks that a string slice is >= a minimum length and returns an error
+// if the condition is not met.
+func minSliceLength(slice []string, minLength int) (err error) {
+	if len(slice) < minLength {
+		return fmt.Errorf("slice is not required length (minLength = %d) %+v", minLength, slice)
 	}
-	return array
+	return
 }
 
 // filterOutDynamicDependencies removes dynamic RPM dependencies from pkgVers.
@@ -366,39 +577,6 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 			continue
 		}
 		filteredPkgVers = append(filteredPkgVers, req)
-	}
-
-	return
-}
-
-// specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
-func specArchMatchesBuild(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool) {
-	const (
-		queryExclusiveArch = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
-		noExclusiveArch    = "(none)"
-	)
-
-	const (
-		MachineArchField   = iota
-		ExclusiveArchField = iota
-		MinimumFieldsCount = iota
-	)
-
-	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	exclusiveArchList, err := rpm.QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, rpm.QueryHeaderArgument)
-	if err != nil {
-		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
-		return
-	}
-
-	if len(exclusiveArchList) < MinimumFieldsCount {
-		logger.Log.Warnf("The query for spec architecture did not return enough lines!")
-		return
-	}
-
-	if exclusiveArchList[ExclusiveArchField] == noExclusiveArch ||
-		exclusiveArchList[ExclusiveArchField] == exclusiveArchList[MachineArchField] {
-		shouldBeBuilt = true
 	}
 
 	return

@@ -325,6 +325,10 @@ func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkg
 		return
 	}
 
+	if pkgName == "" {
+		return fmt.Errorf("could not resolve %s", singlePackageToClone.Name)
+	}
+
 	logger.Log.Warnf("Translated '%s' to package '%s'", singlePackageToClone.Name, pkgName)
 
 	err = r.Clone(cloneDeps, &pkgjson.PackageVer{Name: pkgName})

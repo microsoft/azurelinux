@@ -104,6 +104,7 @@ func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 		State:        StateMeta,
 		Type:         TypeRun,
 		SrpmPath:     pkgCopy.Name + ".src.rpm",
+		RpmPath:      pkgCopy.Name + ".rpm",
 		SpecPath:     pkgCopy.Name + ".spec",
 		SourceDir:    pkgCopy.Name + "/src/",
 		Architecture: "test_arch",
@@ -122,6 +123,7 @@ func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 		State:        StateBuild,
 		Type:         TypeBuild,
 		SrpmPath:     pkgCopy.Name + ".src.rpm",
+		RpmPath:      pkgCopy.Name + ".rpm",
 		SpecPath:     pkgCopy.Name + ".spec",
 		SourceDir:    pkgCopy.Name + "/src/",
 		Architecture: "test_arch",
@@ -140,6 +142,7 @@ func buildUnresolvedNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 		State:        StateUnresolved,
 		Type:         TypeRemote,
 		SrpmPath:     "url://" + pkgCopy.Name + ".src.rpm",
+		RpmPath:      "url://" + pkgCopy.Name + ".rpm",
 		SpecPath:     "url://" + pkgCopy.Name + ".spec",
 		SourceDir:    "url://" + pkgCopy.Name + "/src/",
 		Architecture: "test_arch",
@@ -156,6 +159,7 @@ func addNodeToGraphHelper(g *PkgGraph, node *PkgNode) (newNode *PkgNode, err err
 		node.State,
 		node.Type,
 		node.SrpmPath,
+		node.RpmPath,
 		node.SpecPath,
 		node.SourceDir,
 		node.Architecture,
@@ -350,10 +354,10 @@ func TestDOTID(t *testing.T) {
 
 // TestNodeString tests the built-in String() function for PkgNodes
 func TestNodeString(t *testing.T) {
-	assert.Equal(t, "A(1,):<ID:0 Type:Run State:Meta> from 'A.src.rpm' in 'test_repo'", pkgARun.String())
-	assert.Equal(t, "D(<1,):<ID:0 Type:Remote State:Unresolved> from 'url://D.src.rpm' in 'test_repo'", pkgD1Unresolved.String())
+	assert.Equal(t, "A(1,):<ID:0 Type:Run State:Meta Rpm:A.rpm> from 'A.src.rpm' in 'test_repo'", pkgARun.String())
+	assert.Equal(t, "D(<1,):<ID:0 Type:Remote State:Unresolved Rpm:url://D.rpm> from 'url://D.src.rpm' in 'test_repo'", pkgD1Unresolved.String())
 	goalNode := PkgNode{GoalName: "goal", Type: TypeGoal, State: StateMeta}
-	assert.Equal(t, "goal():<ID:0 Type:Goal State:Meta> from '' in ''", goalNode.String())
+	assert.Equal(t, "goal():<ID:0 Type:Goal State:Meta Rpm:> from '' in ''", goalNode.String())
 	emptyNode := PkgNode{}
 	assert.Panics(t, func() { _ = emptyNode.String() })
 }
