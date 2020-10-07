@@ -70,7 +70,7 @@ Summary: gconv modules for glibc
 Group: Applications/System
 Requires: %{name} = %{version}-%{release}
 %description iconv
-These is gconv modules for iconv().
+These are gconv modules for iconv().
 
 %package tools
 Summary: tools for glibc

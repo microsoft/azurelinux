@@ -250,7 +250,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-11
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.212-11
 -   Remove unused buildrequires.
 -   Provide java-1.8.0-openjdk-headless.
 -   Add zip as a build requires.

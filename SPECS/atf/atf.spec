@@ -26,6 +26,7 @@ responsible for gathering the results of all tests and composing reports. \
 The current runtime of choice is Kyua.
 
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 
 %description
 There is no main package being built here.  This is unused.
@@ -197,7 +198,6 @@ applications that use the ATF POSIX shell bindings.
 %changelog
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 0.20-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove build requires for gcc-c++.
 - Update URL.
 - Add with_check conditional.
 - Rename README.Fedora to README.

@@ -78,7 +78,7 @@ fi
 
 %changelog
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.8.4-6
--   Add explicit provide
+-   Add explicit provide for "man"
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.8.4-5
 -   Added %%license line automatically
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 2.8.4-4

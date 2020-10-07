@@ -13,6 +13,7 @@ URL:            https://github.com/jmmv/kyua
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
+BuildRequires:  gcc-c++
 BuildRequires:  libatf-c++-devel >= 0.17
 BuildRequires:  libatf-sh-devel >= 0.15
 BuildRequires:  pkgconfig(lutok) >= 0.4
@@ -83,7 +84,6 @@ HOME=$(pwd)/check %make_build check %{_make_args} || :
 %changelog
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 0.13-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove build requires for gcc-c++.
 - Add with_check conditional.
 - License verified.
 
