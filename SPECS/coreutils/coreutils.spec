@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.30
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 URL:            http://www.gnu.org/software/coreutils
 Group:          System Environment/Base
@@ -13,6 +13,7 @@ Source1:        serial-console.sh
 Patch0:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.30-i18n-1.patch
 Patch1:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.10-uname-1.patch
 Requires:       gmp
+BuildRequires:  selinux-headers
 Provides:       sh-utils
 Conflicts:      toybox
 %description
@@ -84,6 +85,8 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %defattr(-,root,root)
 
 %changelog
+* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 8.30-6
+- Enable SELinux support
 * Mon Jun 15 2020 Andrew Phelps <anphel@microsoft.com> 8.30-5
 - Add patch for uname processor type
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 8.30-4

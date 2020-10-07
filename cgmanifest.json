@@ -434,6 +434,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "checkpolicy",
+          "version": "2.9",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/checkpolicy-2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chkconfig",
           "version": "1.11",
           "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
@@ -2455,6 +2465,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libsemanage",
+          "version": "2.9",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsemanage-2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libsepol",
           "version": "2.9",
           "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsepol-2.9.tar.gz"
@@ -2918,6 +2938,16 @@
           "name": "mc",
           "version": "4.8.21",
           "downloadUrl": "https://ftp.midnight-commander.org/mc-4.8.21.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mcstrans",
+          "version": "2.9",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/mcstrans-2.9.tar.gz"
         }
       }
     },
@@ -3808,6 +3838,16 @@
           "name": "pkg-config",
           "version": "0.29.2",
           "downloadUrl": "http://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "policycoreutils",
+          "version": "2.9",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/policycoreutils-2.9.tar.gz"
         }
       }
     },
@@ -5055,9 +5095,39 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "secilc",
+          "version": "2.9",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/secilc-2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sed",
           "version": "4.5",
           "downloadUrl": "http://ftp.gnu.org/gnu/sed/sed-4.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "selinux-policy",
+          "version": "2.20200818",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20200818/refpolicy-2.20200818.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "setools",
+          "version": "4.2.2",
+          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.2.2/setools-4.2.2.tar.bz2"
         }
       }
     },
