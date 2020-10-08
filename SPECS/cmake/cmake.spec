@@ -1,7 +1,9 @@
+%global major_version 3
+
 Summary:        Cmake
 Name:           cmake
 Version:        3.17.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and LGPLv2+
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -10,6 +12,7 @@ Patch0:         disableUnstableUT.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Provides:       %{name}%{major_version} = %{version}-%{release}
 BuildRequires:  ncurses-devel
 BuildRequires:  xz
 BuildRequires:  xz-devel
@@ -48,6 +51,7 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
+sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{major_version}|" %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 
 %check
 make  %{?_smp_mflags} test
@@ -62,6 +66,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.17.3-3
+-   Update cmake version related macros
+-   Provide cmake3
 *   Mon Jul 06 2020 Eric Li <eli@microsoft.com> 3.17.3-2
 -   Update Source0: to the new location
 *   Tue Jun 23 2020 Paul Monson <paulmon@microsoft.com> 3.17.3-1

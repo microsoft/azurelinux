@@ -3,7 +3,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        2.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Public Domain
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
@@ -66,6 +66,7 @@ SELinux applications.
 %package        python3
 Summary:        SELinux python3 bindings for libselinux
 Group:          Development/Libraries
+Provides:       python3-%{name} = %{version}-%{release}
 Requires:       libselinux = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
@@ -133,9 +134,10 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-4
+-   Provide python3-libselinux for -python3 subpackage
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9-3
+-   Added %%license line automatically
 *   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-2
 -   Add -Wno-error=strict-overflow to resolve build break with gcc9
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-1

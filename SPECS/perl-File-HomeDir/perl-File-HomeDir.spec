@@ -1,7 +1,7 @@
 Summary:        File-HomeDir
 Name:           perl-File-HomeDir
 Version:        1.004
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-HomeDir/
@@ -47,21 +47,22 @@ make test
 %{perl_vendorlib}/File/HomeDir/Unix.pm
 %{perl_vendorlib}/File/HomeDir/Windows.pm
 %{_mandir}/man3
-%{_mandir}/man3/File::HomeDir.3.gz
-%{_mandir}/man3/File::HomeDir::Darwin.3.gz
-%{_mandir}/man3/File::HomeDir::Darwin::Carbon.3.gz
-%{_mandir}/man3/File::HomeDir::Darwin::Cocoa.3.gz
-%{_mandir}/man3/File::HomeDir::Driver.3.gz
-%{_mandir}/man3/File::HomeDir::FreeDesktop.3.gz
-%{_mandir}/man3/File::HomeDir::MacOS9.3.gz
-%{_mandir}/man3/File::HomeDir::Test.3.gz
-%{_mandir}/man3/File::HomeDir::Unix.3.gz
-%{_mandir}/man3/File::HomeDir::Windows.3.gz
+%{_mandir}/man3/File::HomeDir.3pm.gz
+%{_mandir}/man3/File::HomeDir::Darwin.3pm.gz
+%{_mandir}/man3/File::HomeDir::Darwin::Carbon.3pm.gz
+%{_mandir}/man3/File::HomeDir::Darwin::Cocoa.3pm.gz
+%{_mandir}/man3/File::HomeDir::Driver.3pm.gz
+%{_mandir}/man3/File::HomeDir::FreeDesktop.3pm.gz
+%{_mandir}/man3/File::HomeDir::MacOS9.3pm.gz
+%{_mandir}/man3/File::HomeDir::Test.3pm.gz
+%{_mandir}/man3/File::HomeDir::Unix.3pm.gz
+%{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
-* Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-4
+-   Switch to new perl man page extension.
+*   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> 1.004-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.004-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.004-1

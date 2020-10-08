@@ -2,7 +2,7 @@ Building Packages
 ===
 ## Prev: [Local Packages](2_local_packages.md), Next: [Image Generation](4_image_generation.md)
 ## Initial Dependency Information
-Once the intermediate SPEC files are extracted (see [Creating SPECS](#2_local_packages.md#creating_specs)) the dependency information from them needs to be extracted. The `specreader` tool scans each SPEC file in the intermediate SPECs folder and uses `rpmspec -q` to list the dependencies for each package found in the SPEC file.
+Once the intermediate SPEC files are extracted (see [Creating SPECS](#2_local_packages.md#creating_specs)) the dependency information from them needs to be extracted. The `specreader` tool scans each SPEC file in the intermediate SPECs folder and uses `rpmspec -q` to list the dependencies for each package found in the SPEC file. The tool operates inside of the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)).
 
 Each SPEC file will have one base package, and may have additional virtual packages. Each of these packages is recorded as a `Provides` entry, along with a version and release if set.
 
@@ -19,6 +19,7 @@ For example, a very simple SPEC may be parsed to give:
         "SCondition": ""
     },
     "SrpmPath": "build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm",
+    "RpmPath": "out/RPMS/x86_64/example-1.0.0-1.x86_64.cm1.rpm",
     "SourceDir": "build/INTERMEDIATE_SPECS/example-1.0.0-1.cm1",
     "SpecPath": "build/INTERMEDIATE_SPECS/example-1.0.0-1.cm1/example.spec",
     "Architecture": "x86_64",
@@ -42,6 +43,7 @@ For example, a very simple SPEC may be parsed to give:
         "SCondition": ""
     },
     "SrpmPath": "build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm",
+    "RpmPath": "out/RPMS/x86_64/example-devel-1.0.0-1.x86_64.cm1.rpm",
     "SourceDir": "build/INTERMEDIATE_SPECS/example-1.0.0-1.cm1",
     "SpecPath": "build/INTERMEDIATE_SPECS/example-1.0.0-1.cm1/example.spec",
     "Architecture": "x86_64",
@@ -72,7 +74,7 @@ The graph contains several types of nodes, with various states. As the graph is 
 > It can be either:
 >
 > `StateBuild`: Should be built
-> 
+>
 > `StateUpToDate`: Package is already available locally
 
 #### TypeRun
@@ -124,6 +126,8 @@ Edges in the graph represent dependencies. A package cannot be installed (`run`)
 
 Once all packages have been added to the graph, the inter-package dependencies are added. For each `BuildRequires` in a package an edge is created from the current `build` node to the `run` node associated with the required package. The same is done for each `Requires`, but from the current `run` node instead of the `build` node.
 
+Edges will not be created for `Requires` between two `run` nodes that have the same `RpmPath` since the dependency will automatically be met when the rpm is installed. If the edges were created it could introduce extra cycles that would need to be solved.
+
 #### Package Lookup
 A critical part of adding edges is finding the correct node to connect to. Package dependencies can specify their requirements with varying levels of detail. The most basic dependency is just a package name. The dependency can be further refined by setting a limit on the version (`Requires: example >= 1.0.0`), or double conditionals (`Requires: example >= 1.0.0`, `Requires: example < 2.0.0 `). A dependency can also require a specific version (`Requires: example = 1.0.0`)
 
@@ -144,31 +148,17 @@ In the example below nodes `A-a` and `A-b` are from the same spec file and requi
 ![Cycle Before](images/cycle_before.png)
 ![Cycle Before](images/cycle_after.png)
 
+#### Dynamic Dependencies
+There exists `provides` that are not known until a package is built. For example, package `bar` may provide `pkgconfig(bar)` but this information is only known after `bar` has been built. This type of provide is called an **implicit provide** . If a package takes a dependency on an implicit provide, it is called a **dynamic dependency**.
+
+The existence of dynamic dependencies will result in a graph that may not be solvable until packages are built and the graph knows their implicit provides. The `scheduler` tool handles this logic.
+
+
 #### Default Goal Node
-The `grapher` tool automatically adds an "ALL" goal node to the graph which links to every node. Building this node will case every known package to be built.
+The `grapher` tool automatically adds an "ALL" goal node to the graph which links to every node. Building this node will cause every known package to be built.
 
-### Stage 2: Graphoptimizer
-The `grapher` tool makes no attempt to avoid rebuilds of up-to-date or unneeded packages. The `graphoptimizer` tool takes a pair of arguments which are used to narrow the focus of the build: `--packages` and `--image-config-file`.
 
-The `graphoptimizer` tool outputs `./../build/pkg_artifacts/scrubbed_graph.dot`
-
-##### `--packages`
-This is a space separated list of package names which should be built. The build system will make sure these packages, and all runtime dependencies for them, are built. Normally blank, this can be set via the `Make` argument `PACKAGE_BUILD_LIST=` at build time.
-
-##### `--image-config-file`
-The `graphoptimizer` tool will parse the currently selected config file to determine what packages are needed to compose the image. It will only build the subset of packages needed for the image. This is set with `CONFIG_FILE=` at build time.
-
-#### Trimming
-Depending on which packages have been selected for building only some parts of the full graph are needed. The `graphoptimizer` tool adds a `TypeGoal` node to the graph which depends on all the high level packages it has been asked to make available. It then creates a sub-graph rooted at that goal node and continues processing the sub-graph.
-
-#### Marking as Up-To-Date
-A node which is `TypeBuild`/`StateBuild` will be marked as `StateUpToDate` if `graphoptimizer` is able to find all the expected output packages with the correct version numbers. `Graphoptimizer` WILL NOT trigger rebuilds due to changes in the timestamps of SPEC files and packages. If a package must be rebuilt its base package name (name of SPEC file) should be passed via the variable `PACKAGE_REBUILD_LIST=`. This will cause `graphoptimizer` to never mark the packages as up-to-date.
-
-`Graphoptimizer` is also able to detect changes in dependencies which should trigger a rebuild of other packages. For example if package `A` depends on package `B`, and package `B` is rebuilt, then package `A` will also be marked for rebuild.
-
-Sometimes packages fail to build correctly, or are otherwise not suitable for building in the build system. `Graphoptimizer` would normally complain that they are missing, possibly causing undesired rebuilds. The `PACKAGE_IGNORE_LIST=` variable can be used to set the `--ignore-packages` argument which instructs `graphoptimizer` to never worry about the listed packages (again using the package base name).
-
-### Stage 3: Graphpkgfetcher
+### Stage 2: Graphpkgfetcher
 The `graphpkgfetcher` tool's job is to resolve unresolved remote nodes. Unresolved nodes occur when a local package has `Requires` or `BuildRequires` which are not available from another local package.
 
 The tool uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) to locate packages. The worker will search in five locations: 1) the local chroot environment, 2) already build RPMs in `./../out/RPMS/`, 3) the upstream base repository 4) the upstream update repository if `$(USE_UPDATE_REPO)` is set to `y` 5) any remote repo listed in `REPO_LIST ?=`. If `$(DISABLE_UPSTREAM_REPOS)` is set to `y`, any repo that is accessed through the network is disabled.
@@ -181,42 +171,22 @@ Once the packages are cached they are copied into `./../out/RPMs` for use in fur
 
 The `graphpkgfetcher` tool outputs `./../build/pkg_artifacts/cached_graph.dot`
 
-### Stage 4: Unravel
-The `unravel` tool's job is to convert the dependency graph into something which can be consumed by a build system to successfully build the requested packages.
+### Stage 3: Scheduler
+The `scheduler` tool's job is to walk the dependency graph and build every specified package and their dependencies.
 
-`Unravel` implements a modular setup which can output different formats. The most basic format is a simple topologically sorted list of packages which can be build sequentially. Only `TypeBuild` nodes need to be printed as all other node types are simply to enforce ordering in the grpah.
+`scheduler` controls a pool of build agents (`pkgworker`). It starts at the leaf nodes of the dependency graph and processes every node. Only processing `build` nodes causes srpms to be built. Other node types are effectively NoOps, only processed to enforce dependency ordering.
 
-The more useful system, and what is used in further steps by the build system, is a recursive `Makefile`. Since the build system is already using `Make` it is reasonably straight forward to make recursive calls into `Make`, and use its own build ordering algorithms.
+`scheduler` will avoid building an srpm if it detects the package has already been built, and all of its build dependencies were also prebuilt. If any build dependencies of an SRPM needed to be built, then that SRPM will be built regardless.
 
-The `unravel` tool outputs `./../build/pkg_artifacts/workplan.mk`
+`scheduler` supports dynamic dependencies. These are dependencies a package has on an implicit provide from another package. For example, package `foo` may `Requires: pkgconfig(bar)`. When `grapher` runs it is not known which package will provide `pkgconfig(bar)`. It is only known after packages are built and one of them reports that it provides `pkgconfig(bar)`. To handle this `scheduler` analyzes every rpm built for these implicit provides. If it finds one that is needed by another package in the graph it will modify the graph's nodes and edges so that it reflects this new information.
 
-#### Workplan Makefile
-`Unravel` creates a workplan which encodes both the ordering information and the build instructions for each package to be built. It creates a `.PHONY` target and recipe for every node in the graph. Many of these recipes are empty (i.e. `GOAL_PackagesToBuild: ;`), but any `TypeBuild` node with `StateBuild` will be given an actual build command invoking the `pkgworker` tool. The dependencies between nodes are encoded as dependencies between targets.
+During the build `scheduler` will continually try to optimize the build graph. When the graph is first loaded, `scheduler` walks the dependencies of every package that needs to be built. If it does not find any dynamic dependencies it will create a subgraph that only contains the needed packages.
+If there are dynamic dependencies found then the graph cannot be subgraphed as the `scheduler` does not know which package in the graph, if any, will satisfy this dynamic dependency. As the `scheduler` fills in information about implicit provides during the build, it will continuously attempt to create a solvable subgraph and finish building using that.
 
-A very simple workplan might look like:
-```makefile
-.PHONY: GOAL_PackagesToBuild
-GOAL_PackagesToBuild: ;
-GOAL_PackagesToBuild:  RUN_0_./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm_example
+The `scheduler` tool outputs the final state of the dependency graph to `./../build/pkg_artifacts/built_graph.dot`.
 
-.PHONY: RUN_0_./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm_example
-RUN_0_/home/damcilva/repos/demo/build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm_example: ;
-RUN_0_/home/damcilva/repos/demo/build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm_example:  BUILD_./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm
-
-.PHONY: BUILD_./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm
-BUILD_./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm:
-	MAKEFLAGS= $(go-pkgworker) --input=./../build/INTERMEDIATE_SRPMS/x86_64/example-1.0.0-1.cm1.src.rpm --work-dir=$(CHROOT_DIR) ... >> $(LOGS_DIR)/pkggen/failures.txt 
-```
-
-The entry point is `GOAL_PackagesToBuild`, which depends on the run node for the desired package (since run nodes indicate a package can be installed). Each run node will list its dependencies.
-
-In this case the example package has no other dependencies, so it only depends on its own build node. That build node invokes the `pkgworker` tool to actually build the `*.rpm` file.
-
-### Stage 5: Pkgworker
-The `pkgworker` tool is not invoked directly by the build system, instead it is invoked from a recursive `Make` call to the dynamically generated `workplan.mk` file.
-
-`Pkgworker` uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) environment to build each package independently. First it creates an empty folder to build in (one for each package to build) and extracts the chroot archive into it. This preps the environment with all the toolchain packages which were made available during the prep stage (see [Toolchain](1_initial_prep.md#toolchain)). It then mounts the local RPM folder into the environment so the worker can access any build dependencies it has. Using `tdnf` and `rpmbuild` the worker installs the build dependencies from the local packages, then builds the require package. Once the build is complete the freshly build pacakge is placed into the `./../out/RPMS/` folder to be available to future workers.
-
-Because the dependency information has been encoded in `workplan.mk` it is possible to build multiple pacakges in parallel. `Make` will guarantee that no package is built before its `BuildRequires` are all satisfied as encoded in the graph.
+### Stage 4: Pkgworker
+The `pkgworker` tool is not invoked directly by the build system. Instead it is invoked from the `scheduler` tool.
+`pkgworker` uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) environment to build each package independently. First it creates an empty folder to build in (one for each package to build) and extracts the chroot archive into it. This preps the environment with all the toolchain packages which were made available during the prep stage (see [Toolchain](1_initial_prep.md#toolchain)). It then mounts the local RPM folder into the environment so the worker can access any build dependencies it has. Using `tdnf` the worker installs the build dependencies from the local packages, then using `rpmbuild` it builds the specified package. Once the build is complete the freshly built packages are placed into the `./../out/RPMS/` folder so that they are available to future workers.
 
 ## Prev: [Initial Prep](2_local_packages.md), Next: [Image Generation](4_image_generation.md)

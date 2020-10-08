@@ -1,14 +1,15 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
 Version:        5.2.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            http://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://tukaani.org/xz/%{name}-%{version}.tar.xz
-%define sha1    xz=1d3a6910c28d40df0134f4a49e5570e8249120c5
+Provides:       xz-lzma-compat = %{version}-%{release}
+Provides:       lzma = %{version}-%{release}
 Requires:       xz-libs = %{version}-%{release}
 %description
 The Xz package contains programs for compressing and
@@ -97,9 +98,10 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.2.4-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.2.4-4
+-   Provide xz-lzma-compat and lzma
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com>  5.2.4-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.2.4-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> 5.2.4-1

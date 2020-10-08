@@ -1,0 +1,91 @@
+# unversioned macros: used with user defined __python, no longer part of rpm >= 4.15
+# __python is defined to error by default in the srpm macros
+%python_sitelib %(%{__python} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+%python_sitearch %(%{__python} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
+%python_version %(%{__python} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
+%python_version_nodots %(%{__python} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+
+%py_setup setup.py
+%py_shbang_opts -s
+%py_shbang_opts_nodash %(opts=%{py_shbang_opts}; echo ${opts#-})
+%py_shebang_flags %(opts=%{py_shbang_opts}; echo ${opts#-})
+%py_shebang_fix %{expand:/usr/bin/pathfix.py -pni %{__python} -k%{?py_shebang_flags:a %py_shebang_flags}}
+
+# Use the slashes after expand so that the command starts on the same line as
+# the macro
+%py_build() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python} %{py_setup} %{?py_setup_args} build --executable="%{__python} %{py_shbang_opts}" %{?*}
+  sleep 1
+}
+
+%py_build_egg() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python} %{py_setup} %{?py_setup_args} bdist_egg %{?*}
+  sleep 1
+}
+
+%py_build_wheel() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python} %{py_setup} %{?py_setup_args} bdist_wheel %{?*}
+  sleep 1
+}
+
+%py_install() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py_install_egg() %{expand:\\\
+  mkdir -p %{buildroot}%{python_sitelib}
+  easy_install -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python_version}.egg %{?*}
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%py_install_wheel() %{expand:\\\
+  pip install -I dist/%{1} --root %{buildroot} --strip-file-prefix %{buildroot} --no-deps
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+}
+
+%python_provide() %{lua:
+  function string.starts(String,Start)
+    return string.sub(String,1,string.len(Start))==Start
+  end
+  package = rpm.expand("%{?1}")
+  vr = rpm.expand("%{?epoch:%{epoch}:}%{version}-%{release}")
+  if (string.starts(package, "python2-")) then
+    --No unversioned provides as python2 is not default
+  elseif (string.starts(package, "python" .. rpm.expand("%{python3_pkgversion}") .. "-")) then
+    print("\\nProvides: python-")
+    l = 8 + string.len(rpm.expand("%{python3_pkgversion}"))
+    print(string.sub(package,l,string.len(package)))
+    print(" = ")
+    print(vr)
+    --Obsoleting the previous default python package (if it doesn't have isa)
+    if (string.sub(package, "-1") ~= ")") then
+      print("\\nObsoletes: python-")
+      print(string.sub(package,l,string.len(package)))
+      print(" < ")
+      print(vr)
+    end
+  elseif (rpm.expand("%{?python3_other_pkgversion}") ~= "" and string.starts(package, "python" .. rpm.expand("%{python3_other_pkgversion}") .. "-")) then
+    --No unversioned provides as python3_other is not default
+  elseif (string.starts(package, "pypy-")) then
+    --No unversioned provides as pypy is not default
+  elseif (string.starts(package, "pypy2-")) then
+    --No unversioned provides as pypy is not default
+  elseif (string.starts(package, "pypy3-")) then
+    --No unversioned provides as pypy is not default
+  elseif (string.starts(package, "python-")) then
+    --No unversioned provides needed for unversioned python
+  else
+    print("%python_provide: ERROR: ")
+    print(package)
+    print(" not recognized.")
+  end
+}
+
+%python_disable_dependency_generator() \
+%undefine __pythondist_requires \
+%{nil}

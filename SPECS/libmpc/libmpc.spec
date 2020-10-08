@@ -1,7 +1,7 @@
 Summary:        Library for the arithmetic of complex numbers
 Name:           libmpc
 Version:        1.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv3+
 URL:            http://www.multiprecision.org
 Group:          Applications/System
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/mpc/mpc-%{version}.tar.gz
 Requires:       gmp
+Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 The MPC package contains a library for the arithmetic of complex
@@ -44,9 +45,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so.*
 
 %changelog
-* Sat May 09 00:20:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.0-5
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1.0-6
+-   Provide libmpc-devel
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.0-5
+-   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1.0-4
 -   Renaming mpc to libmpc
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.1.0-3

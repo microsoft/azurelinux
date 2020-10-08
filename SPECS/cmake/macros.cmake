@@ -23,3 +23,4 @@
 %endif \
 	-DBUILD_SHARED_LIBS:BOOL=ON
 
+%cmake@@CMAKE_MAJOR_VERSION@@ %cmake

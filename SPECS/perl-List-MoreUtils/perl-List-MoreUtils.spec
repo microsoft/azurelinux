@@ -2,7 +2,7 @@
 Summary:	Provide the stuff missing in List::Util
 Name:		perl-List-MoreUtils
 Version:	0.428
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	GPL+ or Artistic
 Group:          Development/Libraries
 URL:		http://search.cpan.org/dist/List-MoreUtils/
@@ -44,12 +44,13 @@ make test
 %{perl_vendorlib}/List/
 %{_mandir}/man3/List::MoreUtils.3*
 %{_mandir}/man3/List::MoreUtils::PP.3*
-%{_mandir}/man3/List::MoreUtils::Contributing.3.gz
+%{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.428-4
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-5
+-   Switch to new perl man page extension.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.428-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.428-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Dec 03 2018 Dweep Advani <dadvani@vmware.com> 0.428-2

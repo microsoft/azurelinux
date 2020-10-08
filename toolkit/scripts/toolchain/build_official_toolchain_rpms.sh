@@ -170,7 +170,8 @@ build_rpm_in_chroot_no_install () {
     else
         echo only building RPM $1 within the chroot
         specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
-        srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
+        specDir=$(dirname $specPath)
+        srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
         chroot_and_run_rpmbuild $srpmName 2>&1 | tee $TOOLCHAIN_LOGS/$1.txt
@@ -215,7 +216,6 @@ build_rpm_in_chroot_no_install gmp
 build_rpm_in_chroot_no_install mpfr
 build_rpm_in_chroot_no_install libmpc
 build_rpm_in_chroot_no_install gcc
-build_rpm_in_chroot_no_install pkg-config
 build_rpm_in_chroot_no_install ncurses
 build_rpm_in_chroot_no_install readline
 build_rpm_in_chroot_no_install bash
@@ -265,6 +265,12 @@ build_rpm_in_chroot_no_install perl-DBIx-Simple
 build_rpm_in_chroot_no_install elfutils
 build_rpm_in_chroot_no_install automake
 
+build_rpm_in_chroot_no_install pkgconf
+
+# Need to install elfutils to build dwz
+chroot_and_install_rpms elfutils
+build_rpm_in_chroot_no_install dwz
+
 # Need to install perl-Text-Template and perl-Test-Warnings
 # to build openssl
 build_rpm_in_chroot_no_install perl-Test-Warnings
@@ -287,6 +293,28 @@ build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
 build_rpm_in_chroot_no_install alsa-lib
 chroot_and_install_rpms alsa-lib
+build_rpm_in_chroot_no_install gperf
+chroot_and_install_rpms gperf
+
+# Python2 needs to be installed for RPM and openjdk's dependencies to build
+build_rpm_in_chroot_no_install python2
+rm -vf $FINISHED_RPM_DIR/python2*debuginfo*.rpm
+chroot_and_install_rpms python2
+
+# Python3 needs to be installed for RPM to build
+build_rpm_in_chroot_no_install python3
+rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
+chroot_and_install_rpms python3
+
+
+# openjdk needs fontconfig to build, which needs libxml
+build_rpm_in_chroot_no_install libxml2
+chroot_and_install_rpms libxml2
+chroot_and_install_rpms expat
+chroot_and_install_rpms freetype
+build_rpm_in_chroot_no_install fontconfig
+chroot_and_install_rpms fontconfig
+
 
 # Build OpenJDK and OpenJRE
 echo Java bootstrap version:
@@ -307,11 +335,6 @@ chroot_and_install_rpms openjdk8
 cp -v $CHROOT_RPMS_DIR_ARCH/openjre8* $FINISHED_RPM_DIR
 chroot_and_install_rpms openjre8
 
-# Python2 needs to be installed for RPM to build
-build_rpm_in_chroot_no_install python2
-rm -vf $FINISHED_RPM_DIR/python2*debuginfo*.rpm
-chroot_and_install_rpms python2
-
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
@@ -324,7 +347,6 @@ build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
 build_rpm_in_chroot_no_install perl-libintl-perl
-build_rpm_in_chroot_no_install gperf
 build_rpm_in_chroot_no_install python-setuptools
 build_rpm_in_chroot_no_install libgpg-error
 
@@ -346,7 +368,6 @@ build_rpm_in_chroot_no_install krb5
 # curl needs libssh2
 chroot_and_install_rpms libssh2
 build_rpm_in_chroot_no_install curl
-build_rpm_in_chroot_no_install libxml2
 
 # cracklib needs python-setuptools
 chroot_and_install_rpms python-setuptools
@@ -356,8 +377,7 @@ build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
-# libxslt needs libxml2, libgcrypt
-chroot_and_install_rpms libxml2
+# libxslt needs libgcrypt
 chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
@@ -477,9 +497,8 @@ chroot_and_install_rpms libpwquality
 chroot_and_install_rpms json-c
 build_rpm_in_chroot_no_install cryptsetup
 
-# systemd needs intltool, gperf, util-linux
+# systemd needs intltool, util-linux
 chroot_and_install_rpms intltool
-chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
 

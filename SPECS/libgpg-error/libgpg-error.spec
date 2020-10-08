@@ -1,7 +1,7 @@
 Summary:        libgpg-error
 Name:           libgpg-error
 Version:        1.32
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
@@ -17,6 +17,7 @@ pinentry, SmartCard Daemon and possibly more in the future.
 %package devel
 Summary:	Libraries and header files for libgpg-error
 Requires:	%{name} = %{version}-%{release}
+Provides:   pkgconfig(gpg-error) = %{version}-%{release}
 %description devel
 Static libraries and header files for the support library for libgpg-error
 
@@ -71,9 +72,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.32-4
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5
+-   Explicitly add Provides pkgconfig(gpg-error) to devel package.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.32-4
+-   Added %%license line automatically
 *   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.32-3
 -   Updated Source0, URL. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.32-2

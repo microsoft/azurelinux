@@ -1,15 +1,16 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
 Version:        3.3.15
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            http://procps.sourceforge.net/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://sourceforge.net/projects/procps-ng/files/Production/%{name}-%{version}.tar.xz
-%define sha1    procps-ng=2929bc64f0cf7b2db997eef79b7187658e47230d
 BuildRequires:  ncurses-devel
+Provides:       /bin/ps
+Provides:       procps = %{version}-%{release}
 Requires:       ncurses
 Conflicts:      toybox
 %description
@@ -101,9 +102,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:21:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.3.15-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.3.15-4
+-   Provide procps and /bin/ps
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.3.15-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.3.15-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Aug 10 2018 Tapas Kundu <tkundu@vmware.com> 3.3.15-1

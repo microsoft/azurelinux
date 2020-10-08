@@ -1,7 +1,7 @@
 Summary:        A utility for generating programs that recognize patterns in text
 Name:           flex
 Version:        2.6.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://github.com/westes/flex
 Group:          Applications/System
@@ -18,6 +18,7 @@ that recognize patterns in text.
 %package devel
 Summary: Development libraries and header files for the flex library
 Group: Development/Libraries
+Provides: %{name}-static = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -70,9 +71,10 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
-* Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.6.4-5
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.6.4-6
+-   Provide flex-static
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.6.4-5
+-   Added %%license line automatically
 *   Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 2.6.4-4
 -   Fix URL.
 -   License verified.

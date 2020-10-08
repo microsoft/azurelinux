@@ -116,7 +116,7 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n
 This is a **much slower** process which will download and compile sources rather than use pre-compiled packages.
 ```bash
 # Build an image without downloading pre-compiled packages
-sudo make image REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64" -j$(nproc)
+sudo make image REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y -j$(nproc)
 ```
 
 # Further Reading
@@ -139,7 +139,7 @@ If you want to build **everything** from scratch, including the bootstrapping pr
 cd ~/git/CBL-Mariner/toolkit
 # Do a FULL bootstrap + rebuild from sources instead (much slower)
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y
 ```
 This will download the source files (SRPMs) from the package sever, and build them locally.
 See the detailed section on building from scratch [here](#building-everything-from-scratch)
@@ -159,11 +159,11 @@ Large parts of the build are parallelized. Enable this by setting the `-j` flag 
 **NOTE: If you are building your toolchain packages from source, add `REBUILD_TOOLCHAIN=y`**
 ```bash
 # Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
+sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y
 ```
 
 ### 3) Build Images
@@ -223,14 +223,6 @@ When `DOWNLOAD_SRPMS=y` is set, the local sources and spec files will not be use
 
 #### Force Rebuilds
 Adding `PACKAGE_REBUILD_LIST="nano"` will tell the build system to always rebuild `nano.spec` even if it thinks the rpm file is up to date.
-
-#### Ignoring Packages
-In the event the ncurses package is currently having issues, `PACKAGE_IGNORE_LIST="ncurses"` will tell the build system to pretend the `ncurses.spec` file was already successfully built regardless of the actual local state. As before, explicitly clear the `CONFIG_FILE` variable to skip adding `core-efi.json`'s packages.
-```bash
-# Work on the nano package while ignoring the state of the ncurses package
-sudo make build-packages PACKAGE_BUILD_LIST="nano" PACKAGE_REBUILD_LIST="nano" PACKAGE_IGNORE_LIST="ncurses" CONFIG_FILE=
-```
-Any build which requires the ignored packages will still attempt to use them during a build, so ensure they are available in the `../out/RPMS` folder.
 
 #### Source Hashes
 The build system also enforces hash checking for sources when packaging SRPMs. For a given `*.spec` file a hash of each source is recorded in `*.signatures.json`. The build system will attempt to find a source which matches the recorded hash. If you change a source the signature file can be updated by setting `SRPM_FILE_SIGNATURE_HANDLING=update`.
@@ -374,11 +366,11 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > - If:
 >   - it is present in `CONFIG_FILE=config.json`
 >   - or it is listed in `PACKAGE_BUILD_LIST="..."`
+>   - or it is listed in `PACKAGE_REBUILD_LIST="..."`
 >   - or it is a dependency of a package listed in one of the above
 > - And:
 >   - the corresponding *.rpm files are missing
 >   - or the *.rpm files are out of date (based on version numbers)
->   - or the base package is listed in `PACKAGE_REBUILD_LIST`
 
 #### NOTE:
 The `*.spec` files are converted to `*.src.rpm` files which bundle the spec files with their source files. If the build tools are not able to find valid source files **which match the SHA1 hash recorded in `*.signatures.json`** then they will attempt to locate the source files from `$(SOURCE_URL)` and download them.
@@ -486,9 +478,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE)) `                                                                               | Base directory to search for image files in (see [image_config.md](../images/image_config.md))
 | TERMINAL_ISO_INSTALLER        | n                                                                                                      | Use a command line ISO installer instead of the GUI installer
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
-| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build
+| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
-| PACKAGE_IGNORE_LIST           |                                                                                                        | Pretend this package is always available, never rebuild it. Base package name, will match all virtual packages produced as well.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---
@@ -532,6 +523,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
 | PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
+| CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 
 ---
 #### Reproducing a Build

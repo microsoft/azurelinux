@@ -1,3 +1,5 @@
+%define _unpackaged_files_terminate_build 0
+
 %define        with_boost     1
 %define        with_crash     1
 %define        with_docs      0
@@ -8,7 +10,7 @@
 
 Name:          systemtap
 Version:       4.1
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       Programmable system-wide instrumentation system
 Group:         Development/System
 Vendor:         Microsoft Corporation
@@ -28,10 +30,10 @@ BuildRequires: libstdc++-devel
 BuildRequires: libtirpc-devel
 BuildRequires: libxml2-devel
 BuildRequires: perl
-BuildRequires: python-setuptools
+BuildRequires: python3-setuptools
 BuildRequires: nss
 BuildRequires: shadow-utils
-BuildRequires: python2-devel
+BuildRequires: python3-devel
 %if %with_boost
 BuildRequires: boost-devel
 %endif
@@ -73,7 +75,7 @@ Initscript for Systemtap scripts.
 %package python
 Group:         System/Tools
 Summary:       Python interface for systemtap
-Requires:      python2
+Requires:      python3
 
 %description python
 This packages has the python interface to systemtap
@@ -137,7 +139,9 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 	--disable-pie \
 %endif
 	--disable-grapher \
-        --disable-virt \
+    --disable-virt \
+	--without-python2-probes \
+	--with-python3 \
 	--disable-silent-rules
 
 make
@@ -315,8 +319,8 @@ fi
 
 %files python
 %defattr(-,root,root)
-/usr/lib/python2.7/site-packages/*
-/usr/libexec/systemtap/python/stap-resolve-module-function.py
+%{_libdir}/python3.7/site-packages/*
+%{_libexecdir}/systemtap/python/stap-resolve-module-function.py
 
 %files runtime
 %defattr(-,root,root)
@@ -357,6 +361,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 4.1-6
+-   Explicitly use python3 during build.
+-   Use lib macros for paths.
 * Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
 - Added %%license line automatically
 

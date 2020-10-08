@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.50
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenLDAP
 URL:            https://www.openldap.org/
 Group:          System Environment/Security
@@ -18,6 +18,7 @@ BuildRequires:  cyrus-sasl >= 2.1
 BuildRequires:  openssl-devel >= 1.0.1
 BuildRequires:  groff
 BuildRequires:  e2fsprogs-devel
+Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 OpenLDAP is an open source suite of LDAP (Lightweight Directory Access
@@ -77,6 +78,8 @@ rm -rf %{buildroot}/*
 /etc/openldap/*
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.50-2
+-   Explicit provide -devel subpackage
 *   Wed Jun 03 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.4.50-1
 -   Upgrade to version 2.4.50, which resolves CVE-2020-12243.
 *   Tue May 12 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.4.48-1

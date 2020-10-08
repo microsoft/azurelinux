@@ -161,25 +161,6 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	activeChrootsMutex.Lock()
 	defer activeChrootsMutex.Unlock()
 
-	defer func() {
-		if err != nil {
-			if buildpipeline.IsRegularBuild() {
-				// mount/unmount is only supported in regular pipeline
-				// Best effort cleanup incase mountpoint creation failed mid-way through
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk)
-				if cleanupErr != nil {
-					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
-				}
-			} else {
-				// release chroot dir
-				cleanupErr := buildpipeline.ReleaseChrootDir(c.rootDir)
-				if cleanupErr != nil {
-					logger.Log.Warnf("Failed to release chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
-				}
-			}
-		}
-	}()
-
 	if c.isExistingDir {
 		_, err = os.Stat(c.rootDir)
 		if os.IsNotExist(err) {
@@ -203,6 +184,27 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			return
 		}
 	}
+
+	// Defer cleanup after it has been confirmed rootDir will not
+	// overwrite an existing directory when isExistingDir is set to false.
+	defer func() {
+		if err != nil {
+			if buildpipeline.IsRegularBuild() {
+				// mount/unmount is only supported in regular pipeline
+				// Best effort cleanup in case mountpoint creation failed mid-way through
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk)
+				if cleanupErr != nil {
+					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
+				}
+			} else {
+				// release chroot dir
+				cleanupErr := buildpipeline.ReleaseChrootDir(c.rootDir)
+				if cleanupErr != nil {
+					logger.Log.Warnf("Failed to release chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
+				}
+			}
+		}
+	}()
 
 	// Extract a given tarball if necessary
 	if tarPath != "" {
@@ -389,8 +391,12 @@ func cleanupAllChroots() {
 	// Thus it could leave other goroutine's Chroots in a bad state, where the routine believes the chroot is in-fact initialized,
 	// but really it has already been cleaned up.
 
-	// On cleanup, remove all chroot files
-	const leaveChrootOnDisk = false
+	const (
+		// On cleanup, remove all chroot files
+		leaveChrootOnDisk = false
+		// On cleanup SIGKILL all children processes.
+		stopSignal = unix.SIGKILL
+	)
 
 	// Acquire and permanently hold the global activeChrootsMutex to ensure no
 	// new Chroots are initialized or unmounted during this teardown routine
@@ -400,7 +406,7 @@ func cleanupAllChroots() {
 	// Acquire and permanently hold the global inChrootMutex lock to ensure this application is not
 	// inside any Chroot.
 	logger.Log.Info("Waiting for outstanding chroot commands to finish")
-	shell.PermanentlyStopAllProcesses()
+	shell.PermanentlyStopAllProcesses(stopSignal)
 	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline

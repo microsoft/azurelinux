@@ -11,12 +11,12 @@ Each SPEC file is accompanied by a `*.signature.json` file which records the exp
 The build system operates on `*.src.rpm` files, or SRPMs. SRPMs include both the SPEC file which defines the package, and all associated source files used to build the binary package. These sources could include archives of source code, patches, configuration files, etc.
 
 The build system monitors `$(SPEC_DIR)` for changes to SPEC files or sources and builds all the dependent files if they are changed.
-> Note: The graph optimizer step will skip rebuilding a package if it thinks it is up-to-date, see [Working on Packages](../building/building.md#working-on-packages) for tips on iterating on a single package.
+> Note: The scheduler step will skip rebuilding a package if it thinks it is up-to-date, see [Working on Packages](../building/building.md#working-on-packages) for tips on iterating on a single package.
 
 The intermediate SRPMs can be built using the `input-srpms` target.
 
 ### SRPM Packing
-The `srpmpacker` tool's job is to convert SPEC files into SRPMs. To do this it parses the SPEC files, determines which source files it needs, checks for matching files locally, and failing that searches the online source server for them. `srpmpacker` will only accept a source file if it matches the hash recorded in the associated `*.signature.json` file.
+The `srpmpacker` tool's job is to convert SPEC files into SRPMs. To do this it parses the SPEC files inside the [Chroot Worker](1_initial_prep.md#chroot_worker), determines which source files it needs, checks for matching files locally, and failing that searches the online source server for them. `srpmpacker` will only accept a source file if it matches the hash recorded in the associated `*.signature.json` file.
 
 #### File Hashes
 Each source file should have a matching entry in the `*.signature.json` file for its SPEC file. If a source file's hash does not match the entry in the file the build system will attempt to find a matching file from the source server. If that fails `srpmpacker` will return a `404` error.

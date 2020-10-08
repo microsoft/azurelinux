@@ -21,6 +21,7 @@ ignore_list=" \
   mariner-rpm-macros \
   moby-buildx \
   moby-containerd \
+  openjdk8 \
   python-nocasedict \
   python-pywbem \
   python-repoze-lru \
