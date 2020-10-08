@@ -78,7 +78,7 @@ make %{?_smp_mflags} check
 -   Fixed "Source0" and "URL" tags.
 -   License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.3.3-2
--   Initial CBL-Mariner import from Photon (license: dual Apache2/GPL2).
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> 3.3.3-1
 -   Updated to latest version
 *   Fri Sep 15 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.3.1-2
