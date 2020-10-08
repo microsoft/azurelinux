@@ -64,24 +64,20 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 		}
 	}()
 
-	// Mirror the attributes of the node that resulted in this provides
-	for _, node := range res.AncillaryNodes {
-		if node.Type != pkggraph.TypeBuild {
-			continue
-		}
-
+	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
+	// Make this node the parent node for the new implicit provide node.
+	// - By making a run node the parent node, it will inherit all runtime dependencies of the already setup node.
+	for _, node := range pkgGraph.AllRunNodes() {
 		if rpmFileProviding == node.RpmPath {
-			logger.Log.Debugf("Linked implicit provide (%s) to build node (%s)", provides, node.FriendlyName())
+			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s)", provides, node.FriendlyName())
 			parentNode = node
 			break
 		}
 	}
 
+	// If there is no clear match between the implicit provide and which node produced it, error out.
 	if parentNode == nil {
-		// If there is no clear match between the implicit provide and which node produced it,
-		// default to the primary build node.
-		parentNode = res.Node
-		logger.Log.Warnf("Unable to find suitable parent node for implicit provides (%s), defaulting to (%s)", provides, parentNode.FriendlyName())
+		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s)", provides)
 	}
 
 	providesNode, err = pkgGraph.AddPkgNode(provides, pkggraph.StateMeta, pkggraph.TypeRun, parentNode.SrpmPath, parentNode.RpmPath, parentNode.SpecPath, parentNode.SourceDir, parentNode.Architecture, parentNode.SourceRepo)

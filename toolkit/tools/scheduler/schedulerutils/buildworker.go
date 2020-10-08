@@ -100,11 +100,18 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 	dependencyLookup := make(map[string]bool)
 
 	search := traverse.BreadthFirst{}
+	// Skip traversing any build nodes to only consider runtime dependencies.
+	search.Traverse = func(e graph.Edge) bool {
+		toNode := e.To().(*pkggraph.PkgNode)
+		return toNode.Type != pkggraph.TypeBuild
+	}
+
 	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
 		dependencyNode := n.(*pkggraph.PkgNode)
 
+		var dependencyName string
 		if dependencyNode.State == pkggraph.StateCached {
-			dependencyName := dependencyNode.VersionedPkg.Name
+			dependencyName = dependencyNode.VersionedPkg.Name
 			// Encode any version specific information into the dependency.
 			// Use the same logic as the fetchers.
 			switch dependencyNode.VersionedPkg.Condition {
@@ -120,17 +127,16 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 			default:
 			}
 
-			dependencyLookup[dependencyName] = true
-
 			return
+		} else {
+
+			rpmPath := dependencyNode.RpmPath
+			if rpmPath == "" || rpmPath == "<NO_RPM_PATH>" || rpmPath == node.RpmPath {
+				return
+			}
 		}
 
-		rpmPath := dependencyNode.RpmPath
-		if rpmPath == "" || rpmPath == "<NO_RPM_PATH>" || rpmPath == node.RpmPath {
-			return
-		}
-
-		dependencyLookup[rpmPath] = true
+		dependencyLookup[dependencyName] = true
 
 		return
 	})
