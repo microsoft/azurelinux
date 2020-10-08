@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Tue, 29 Mar 2016 15:36:49 -0700
+Subject: [PATCH] Fix event log prefix
+
+We're not passing the prefixed version of the description to the event log.
+Fix that.
+
+(cherry picked from commit aab446306b8a78c741e229861c4988738cfc6426)
+---
+ grub-core/kern/tpm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/tpm.c b/grub-core/kern/tpm.c
+index cb5a812035d..e5e8fced624 100644
+--- a/grub-core/kern/tpm.c
++++ b/grub-core/kern/tpm.c
+@@ -13,7 +13,7 @@ grub_tpm_measure (unsigned char *buf, grub_size_t size, grub_uint8_t pcr,
+   char *desc = grub_xasprintf("%s %s", kind, description);
+   if (!desc)
+     return GRUB_ERR_OUT_OF_MEMORY;
+-  ret = grub_tpm_log_event(buf, size, pcr, description);
++  ret = grub_tpm_log_event(buf, size, pcr, desc);
+   grub_free(desc);
+   return ret;
+ }

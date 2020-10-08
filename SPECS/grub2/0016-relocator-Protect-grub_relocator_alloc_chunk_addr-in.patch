@@ -1,0 +1,216 @@
+From 6d0ad1bbd91553d683282d8c3d6ff54dca65293e Mon Sep 17 00:00:00 2001
+From: Alexey Makhalov <amakhalov@vmware.com>
+Date: Wed, 15 Jul 2020 06:42:37 +0000
+Subject: [PATCH] relocator: Protect grub_relocator_alloc_chunk_addr() input
+ args against integer underflow/overflow
+
+Use arithmetic macros from safemath.h to accomplish it. In this commit,
+I didn't want to be too paranoid to check every possible math equation
+for overflow/underflow. Only obvious places (with non zero chance of
+overflow/underflow) were refactored.
+
+Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/i386/linux.c    | 17 +++++++++++------
+ grub-core/loader/i386/pc/linux.c | 11 ++++++++---
+ grub-core/loader/i386/xen.c      | 12 ++++++++++--
+ grub-core/loader/xnu.c           | 21 ++++++++++++---------
+ 4 files changed, 41 insertions(+), 20 deletions(-)
+
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index 76304f0..20e9405 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -37,6 +37,7 @@
+ #include <grub/linux.h>
+ #include <grub/efi/sb.h>
+ #include <grub/tpm.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -335,7 +336,7 @@ grub_linux_setup_video (struct linux_kernel_params *params)
+ 	  params->lfb_size >>= 16;
+ 	  params->have_vga = GRUB_VIDEO_LINUX_TYPE_VESA;
+ 	  break;
+-	
++
+ 	case GRUB_VIDEO_DRIVER_EFI_UGA:
+ 	case GRUB_VIDEO_DRIVER_EFI_GOP:
+ 	  params->have_vga = GRUB_VIDEO_LINUX_TYPE_EFIFB;
+@@ -593,9 +594,13 @@ grub_linux_boot (void)
+ 
+   {
+     grub_relocator_chunk_t ch;
++    grub_size_t sz;
++
++    if (grub_add (ctx.real_size, efi_mmap_size, &sz))
++      return GRUB_ERR_OUT_OF_RANGE;
++
+     err = grub_relocator_alloc_chunk_addr (relocator, &ch,
+-					   ctx.real_mode_target,
+-					   (ctx.real_size + efi_mmap_size));
++					   ctx.real_mode_target, sz);
+     if (err)
+      return err;
+     real_mode_mem = get_virtual_current_address (ch);
+@@ -629,9 +634,9 @@ grub_linux_boot (void)
+ 					 &efi_desc_size, &efi_desc_version);
+     if (err)
+       return err;
+-    
++
+     /* Note that no boot services are available from here.  */
+-    efi_mmap_target = ctx.real_mode_target 
++    efi_mmap_target = ctx.real_mode_target
+       + ((grub_uint8_t *) efi_mmap_buf - (grub_uint8_t *) real_mode_mem);
+     /* Pass EFI parameters.  */
+     if (grub_le_to_cpu16 (ctx.params->version) >= 0x0208)
+@@ -798,7 +803,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       align = 0;
+       relocatable = 0;
+     }
+-    
++
+   if (grub_le_to_cpu16 (lh.version) >= 0x020a)
+     {
+       min_align = lh.min_alignment;
+diff --git a/grub-core/loader/i386/pc/linux.c b/grub-core/loader/i386/pc/linux.c
+index 783a3cd..fd534a5 100644
+--- a/grub-core/loader/i386/pc/linux.c
++++ b/grub-core/loader/i386/pc/linux.c
+@@ -36,6 +36,7 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/linux.h>
+ #include <grub/efi/sb.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -67,7 +68,7 @@ grub_linux16_boot (void)
+   grub_video_set_mode ("text", 0, 0);
+ 
+   grub_stop_floppy ();
+-  
++
+   return grub_relocator16_boot (relocator, state);
+ }
+ 
+@@ -231,8 +232,12 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     setup_sects = GRUB_LINUX_DEFAULT_SETUP_SECTS;
+ 
+   real_size = setup_sects << GRUB_DISK_SECTOR_BITS;
+-  grub_linux16_prot_size = grub_file_size (file)
+-    - real_size - GRUB_DISK_SECTOR_SIZE;
++  if (grub_sub (grub_file_size (file), real_size, &grub_linux16_prot_size) ||
++      grub_sub (grub_linux16_prot_size, GRUB_DISK_SECTOR_SIZE, &grub_linux16_prot_size))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow is detected"));
++      goto fail;
++    }
+ 
+   if (! grub_linux_is_bzimage
+       && GRUB_LINUX_ZIMAGE_ADDR + grub_linux16_prot_size
+diff --git a/grub-core/loader/i386/xen.c b/grub-core/loader/i386/xen.c
+index 3073f64..85b9334 100644
+--- a/grub-core/loader/i386/xen.c
++++ b/grub-core/loader/i386/xen.c
+@@ -40,6 +40,7 @@
+ #include <grub/xen_file.h>
+ #include <grub/linux.h>
+ #include <grub/i386/memory.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -635,6 +636,7 @@ grub_cmd_xen (grub_command_t cmd __attribute__ ((unused)),
+   grub_relocator_chunk_t ch;
+   grub_addr_t kern_start;
+   grub_addr_t kern_end;
++  grub_size_t sz;
+ 
+   if (argc == 0)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("filename expected"));
+@@ -699,8 +701,14 @@ grub_cmd_xen (grub_command_t cmd __attribute__ ((unused)),
+ 
+   xen_state.max_addr = ALIGN_UP (kern_end, PAGE_SIZE);
+ 
+-  err = grub_relocator_alloc_chunk_addr (xen_state.relocator, &ch, kern_start,
+-					 kern_end - kern_start);
++
++  if (grub_sub (kern_end, kern_start, &sz))
++    {
++      err = GRUB_ERR_OUT_OF_RANGE;
++      goto fail;
++    }
++
++  err = grub_relocator_alloc_chunk_addr (xen_state.relocator, &ch, kern_start, sz);
+   if (err)
+     goto fail;
+   kern_chunk_src = get_virtual_current_address (ch);
+diff --git a/grub-core/loader/xnu.c b/grub-core/loader/xnu.c
+index dc7d540..fcb6c4b 100644
+--- a/grub-core/loader/xnu.c
++++ b/grub-core/loader/xnu.c
+@@ -34,6 +34,7 @@
+ #include <grub/env.h>
+ #include <grub/i18n.h>
+ #include <grub/efi/sb.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -59,15 +60,17 @@ grub_xnu_heap_malloc (int size, void **src, grub_addr_t *target)
+ {
+   grub_err_t err;
+   grub_relocator_chunk_t ch;
+-  
+-  err = grub_relocator_alloc_chunk_addr (grub_xnu_relocator, &ch,
+-					 grub_xnu_heap_target_start
+-					 + grub_xnu_heap_size, size);
++  grub_addr_t tgt;
++
++  if (grub_add (grub_xnu_heap_target_start, grub_xnu_heap_size, &tgt))
++    return GRUB_ERR_OUT_OF_RANGE;
++
++  err = grub_relocator_alloc_chunk_addr (grub_xnu_relocator, &ch, tgt, size);
+   if (err)
+     return err;
+ 
+   *src = get_virtual_current_address (ch);
+-  *target = grub_xnu_heap_target_start + grub_xnu_heap_size;
++  *target = tgt;
+   grub_xnu_heap_size += size;
+   grub_dprintf ("xnu", "val=%p\n", *src);
+   return GRUB_ERR_NONE;
+@@ -1372,10 +1375,10 @@ grub_xnu_fill_devicetree (void)
+     nextdot = curdot + grub_strlen (curdot) + 1;
+ 
+     name = grub_realloc (name, nextdot - curdot + 1);
+-   
++
+     if (!name)
+       return grub_errno;
+-   
++
+     unescape (name, curdot, nextdot, &len);
+     name[len] = 0;
+ 
+@@ -1383,11 +1386,11 @@ grub_xnu_fill_devicetree (void)
+     if (!curvalue)
+       return grub_errno;
+     grub_free (name);
+-   
++
+     data = grub_malloc (grub_strlen (var->value) + 1);
+     if (!data)
+       return grub_errno;
+-   
++
+     unescape (data, var->value, var->value + grub_strlen (var->value),
+ 	      &len);
+     curvalue->datasize = len;
+-- 
+2.17.1
+

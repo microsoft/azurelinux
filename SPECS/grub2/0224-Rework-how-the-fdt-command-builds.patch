@@ -1,0 +1,118 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 12 Jul 2018 11:00:45 -0400
+Subject: [PATCH] Rework how the fdt command builds.
+
+Trying to avoid all variants of:
+cat syminfo.lst | sort | gawk -f ../../grub-core/genmoddep.awk > moddep.lst || (rm -f moddep.lst; exit 1)
+grub_fdt_install in linux is not defined
+grub_fdt_load in linux is not defined
+grub_fdt_unload in linux is not defined
+grub_fdt_install in xen_boot is not defined
+grub_fdt_load in xen_boot is not defined
+grub_fdt_unload in xen_boot is not defined
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/Makefile.core.def | 5 ++---
+ grub-core/lib/fdt.c         | 2 --
+ grub-core/loader/efi/fdt.c  | 2 ++
+ include/grub/fdt.h          | 4 ++++
+ grub-core/Makefile.am       | 1 +
+ 5 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 715d3a3ec02..203584fb00b 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -166,7 +166,6 @@ kernel = {
+   arm_coreboot = kern/arm/coreboot/init.c;
+   arm_coreboot = kern/arm/coreboot/timer.c;
+   arm_coreboot = kern/arm/coreboot/coreboot.S;
+-  arm_coreboot = lib/fdt.c;
+   arm_coreboot = bus/fdt.c;
+   arm_coreboot = term/ps2.c;
+   arm_coreboot = term/arm/pl050.c;
+@@ -317,6 +316,8 @@ kernel = {
+   arm64 = kern/arm64/dl.c;
+   arm64 = kern/arm64/dl_helper.c;
+
++  fdt = lib/fdt.c;
++
+   emu = disk/host.c;
+   emu = kern/emu/cache_s.S;
+   emu = kern/emu/hostdisk.c;
+@@ -1714,7 +1715,6 @@ module = {
+   arm_uboot = loader/arm/linux.c;
+   arm64 = loader/arm64/linux.c;
+   emu = loader/emu/linux.c;
+-  fdt = lib/fdt.c;
+
+   common = loader/linux.c;
+   common = lib/cmdline.c;
+@@ -1725,7 +1725,6 @@ module = {
+ module = {
+   name = fdt;
+   efi = loader/efi/fdt.c;
+-  common = lib/fdt.c;
+   enable = fdt;
+ };
+
+diff --git a/grub-core/lib/fdt.c b/grub-core/lib/fdt.c
+index 0d371c5633e..37e04bd69e7 100644
+--- a/grub-core/lib/fdt.c
++++ b/grub-core/lib/fdt.c
+@@ -21,8 +21,6 @@
+ #include <grub/mm.h>
+ #include <grub/dl.h>
+
+-GRUB_MOD_LICENSE ("GPLv3+");
+-
+ #define FDT_SUPPORTED_VERSION	17
+
+ #define FDT_BEGIN_NODE	0x00000001
+diff --git a/grub-core/loader/efi/fdt.c b/grub-core/loader/efi/fdt.c
+index a4c6e803645..a9dbcfdfeaf 100644
+--- a/grub-core/loader/efi/fdt.c
++++ b/grub-core/loader/efi/fdt.c
+@@ -26,6 +26,8 @@
+ #include <grub/efi/fdtload.h>
+ #include <grub/efi/memory.h>
+
++GRUB_MOD_LICENSE ("GPLv3+");
++
+ static void *loaded_fdt;
+ static void *fdt;
+
+diff --git a/include/grub/fdt.h b/include/grub/fdt.h
+index 158b1bc4b3a..6ee57e11ab3 100644
+--- a/include/grub/fdt.h
++++ b/include/grub/fdt.h
+@@ -19,6 +19,8 @@
+ #ifndef GRUB_FDT_HEADER
+ #define GRUB_FDT_HEADER	1
+
++#if defined(__arm__) || defined(__aarch64__)
++
+ #include <grub/types.h>
+ #include <grub/symbol.h>
+
+@@ -141,4 +143,6 @@ int EXPORT_FUNC(grub_fdt_set_prop) (void *fdt, unsigned int nodeoffset, const ch
+   grub_fdt_set_prop ((fdt), (nodeoffset), "reg", reg_64, 16);  \
+ })
+
++#endif /* defined(__arm__) || defined(__aarch64__) */
++
+ #endif	/* ! GRUB_FDT_HEADER */
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index 3781bb9cbb9..4062652506d 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -76,6 +76,7 @@ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/efi/sb.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/env.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/env_private.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/err.h
++KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/fdt.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/file.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/fs.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/i18n.h

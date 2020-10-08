@@ -1,0 +1,46 @@
+From 0f3f5b7c13fa9b677a64cf11f20eca0f850a2b20 Mon Sep 17 00:00:00 2001
+From: Lukasz Hawrylko <lukasz.hawrylko@linux.intel.com>
+Date: Mon, 16 Dec 2019 11:15:55 +0100
+Subject: [PATCH] multiboot2: Set min address for mbi allocation to 0x1000
+
+In some cases GRUB2 allocates multiboot2 structure at 0 address, that is
+a confusing behavior. Consumers of that structure can have internal NULL-checks
+that will throw an error when get a pointer to data allocated at address 0.
+To prevent that, define min address for mbi allocation on x86 and x86_64
+platforms.
+
+Signed-off-by: Lukasz Hawrylko <lukasz.hawrylko@linux.intel.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/multiboot_mbi2.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/multiboot_mbi2.c b/grub-core/loader/multiboot_mbi2.c
+index 53da78615..18e766c7b 100644
+--- a/grub-core/loader/multiboot_mbi2.c
++++ b/grub-core/loader/multiboot_mbi2.c
+@@ -48,6 +48,12 @@
+ #define HAS_VGA_TEXT 0
+ #endif
+ 
++#if defined (__i386__) || defined (__x86_64__)
++#define MBI_MIN_ADDR 0x1000
++#else
++#define MBI_MIN_ADDR 0
++#endif
++
+ struct module
+ {
+   struct module *next;
+@@ -708,7 +714,7 @@ grub_multiboot2_make_mbi (grub_uint32_t *target)
+   COMPILE_TIME_ASSERT (MULTIBOOT_TAG_ALIGN % sizeof (grub_properly_aligned_t) == 0);
+ 
+   err = grub_relocator_alloc_chunk_align (grub_multiboot2_relocator, &ch,
+-					  0, 0xffffffff - bufsize,
++					  MBI_MIN_ADDR, 0xffffffff - bufsize,
+ 					  bufsize, MULTIBOOT_TAG_ALIGN,
+ 					  GRUB_RELOCATOR_PREFERENCE_NONE, 1);
+   if (err)
+-- 
+2.17.1
+

@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Thu, 16 Jul 2015 15:22:34 -0700
+Subject: [PATCH] Measure kernel + initrd
+
+Measure the kernel and initrd when loaded on UEFI systems
+---
+ grub-core/loader/i386/efi/linux.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 800c3e54022..d837249b4a1 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -27,6 +27,7 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/efi/efi.h>
+ #include <grub/efi/linux.h>
++#include <grub/tpm.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -131,6 +132,7 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+                         argv[i]);
+           goto fail;
+         }
++      grub_tpm_measure (ptr, cursize, GRUB_INITRD_PCR, "UEFI Linux initrd");
+       ptr += cursize;
+       grub_memset (ptr, 0, ALIGN_UP_OVERHEAD (cursize, 4));
+       ptr += ALIGN_UP_OVERHEAD (cursize, 4);
+@@ -195,6 +197,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
++  grub_tpm_measure (kernel, filelen, GRUB_KERNEL_PCR, "UEFI Linux kernel");
++
+   rc = grub_linuxefi_secure_validate (kernel, filelen);
+   if (rc < 0)
+     {

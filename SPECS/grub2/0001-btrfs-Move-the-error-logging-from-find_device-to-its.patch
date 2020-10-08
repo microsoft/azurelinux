@@ -1,0 +1,48 @@
+From 908cdb1d029e27f8059f9e3571e8dcbd67f74d8a Mon Sep 17 00:00:00 2001
+From: Goffredo Baroncelli <kreijack@inwind.it>
+Date: Mon, 22 Oct 2018 19:29:33 +0200
+Subject: [PATCH] btrfs: Move the error logging from find_device() to its
+ caller
+
+The caller knows better if this error is fatal or not, i.e. another disk is
+available or not.
+
+This is a preparatory patch.
+
+Signed-off-by: Goffredo Baroncelli <kreijack@inwind.it>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/btrfs.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index af40db7ee..9818385e1 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -603,12 +603,7 @@ find_device (struct grub_btrfs_data *data, grub_uint64_t id, int do_rescan)
+   if (do_rescan)
+     grub_device_iterate (find_device_iter, &ctx);
+   if (!ctx.dev_found)
+-    {
+-      grub_error (GRUB_ERR_BAD_FS,
+-		  N_("couldn't find a necessary member device "
+-		     "of multi-device filesystem"));
+-      return NULL;
+-    }
++    return NULL;
+   data->n_devices_attached++;
+   if (data->n_devices_attached > data->n_devices_allocated)
+     {
+@@ -905,6 +900,9 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 		dev = find_device (data, stripe->device_id, j);
+ 		if (!dev)
+ 		  {
++		    grub_dprintf ("btrfs",
++				  "couldn't find a necessary member device "
++				  "of multi-device filesystem\n");
+ 		    err = grub_errno;
+ 		    grub_errno = GRUB_ERR_NONE;
+ 		    continue;
+-- 
+2.17.1
+

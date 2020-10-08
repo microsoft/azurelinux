@@ -1,0 +1,64 @@
+From 50fb577b1835fade8d1dc45f8927c647de684253 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 11 Apr 2019 17:14:08 +0800
+Subject: [PATCH] chainloader: Fix gcc9 error -Waddress-of-packed-member
+
+The address of fp->path_name could be unaligned since seeking into the
+device path buffer for a given node could end in byte boundary.
+
+The fix is using aligned buffer allocated by grub_malloc for receiving
+the converted UTF16 string by grub_utf8_to_utf16 and also the processing
+after. The resulting string then gets copied to fp->path_name.
+
+[  243s] ../../grub-core/loader/efi/chainloader.c: In function 'copy_file_path':
+[  243s] ../../grub-core/loader/efi/chainloader.c:136:32: error: taking address of packed member of 'struct grub_efi_file_path_device_path' may result in an unaligned pointer value [-Werror=address-of-packed-member]
+[  243s]   136 |   size = grub_utf8_to_utf16 (fp->path_name, len * GRUB_MAX_UTF16_PER_UTF8,
+[  243s]       |                              ~~^~~~~~~~~~~
+[  243s] ../../grub-core/loader/efi/chainloader.c:138:12: error: taking address of packed member of 'struct grub_efi_file_path_device_path' may result in an unaligned pointer value [-Werror=address-of-packed-member]
+[  243s]   138 |   for (p = fp->path_name; p < fp->path_name + size; p++)
+[  243s]       |            ^~
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/efi/chainloader.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 5cd9b6e..17eb359 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -119,21 +119,27 @@ static void
+ copy_file_path (grub_efi_file_path_device_path_t *fp,
+ 		const char *str, grub_efi_uint16_t len)
+ {
+-  grub_efi_char16_t *p;
++  grub_efi_char16_t *p, *path_name;
+   grub_efi_uint16_t size;
+ 
+   fp->header.type = GRUB_EFI_MEDIA_DEVICE_PATH_TYPE;
+   fp->header.subtype = GRUB_EFI_FILE_PATH_DEVICE_PATH_SUBTYPE;
+ 
+-  size = grub_utf8_to_utf16 (fp->path_name, len * GRUB_MAX_UTF16_PER_UTF8,
++  path_name = grub_malloc (len * GRUB_MAX_UTF16_PER_UTF8 * sizeof (*path_name));
++  if (!path_name)
++    return;
++
++  size = grub_utf8_to_utf16 (path_name, len * GRUB_MAX_UTF16_PER_UTF8,
+ 			     (const grub_uint8_t *) str, len, 0);
+-  for (p = fp->path_name; p < fp->path_name + size; p++)
++  for (p = path_name; p < path_name + size; p++)
+     if (*p == '/')
+       *p = '\\';
+ 
++  grub_memcpy (fp->path_name, path_name, size * sizeof (*fp->path_name));
+   /* File Path is NULL terminated */
+   fp->path_name[size++] = '\0';
+   fp->header.length = size * sizeof (grub_efi_char16_t) + sizeof (*fp);
++  grub_free (path_name);
+ }
+ 
+ static grub_efi_device_path_t *
+-- 
+2.17.1
+

@@ -1,0 +1,68 @@
+From dc052e5ac77c727645bef437021bf3268cce6996 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Thu, 9 Jul 2020 19:04:43 +0100
+Subject: [PATCH 10/28] json: Avoid a double-free when parsing fails.
+
+When grub_json_parse() succeeds, it returns the root object which
+contains a pointer to the provided JSON string. Callers are
+responsible for ensuring that this string outlives the root
+object and for freeing its memory when it's no longer needed.
+
+If grub_json_parse() fails to parse the provided JSON string,
+it frees the string before returning an error. This results
+in a double free in luks2_recover_key(), which also frees the
+same string after grub_json_parse() returns an error.
+
+This changes grub_json_parse() to never free the JSON string
+passed to it, and updates the documentation for it to make it
+clear that callers are responsible for ensuring that the string
+outlives the root JSON object.
+
+Fixes: CID 292465
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/lib/json/json.c | 9 +++------
+ grub-core/lib/json/json.h | 5 ++++-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/lib/json/json.c b/grub-core/lib/json/json.c
+index 913b8f404..1c20c75ea 100644
+--- a/grub-core/lib/json/json.c
++++ b/grub-core/lib/json/json.c
+@@ -71,12 +71,9 @@ grub_json_parse (grub_json_t **out, char *string, grub_size_t string_len)
+   *out = json;
+ 
+  err:
+-  if (ret && json)
+-    {
+-      grub_free (json->string);
+-      grub_free (json->tokens);
+-      grub_free (json);
+-    }
++  if (ret)
++    grub_json_free (json);
++
+   return ret;
+ }
+ 
+diff --git a/grub-core/lib/json/json.h b/grub-core/lib/json/json.h
+index d9f99454d..01614f6df 100644
+--- a/grub-core/lib/json/json.h
++++ b/grub-core/lib/json/json.h
+@@ -50,7 +50,10 @@ typedef struct grub_json grub_json_t;
+  * Parse a JSON-encoded string. Note that the string passed to
+  * this function will get modified on subsequent calls to
+  * grub_json_get*(). Returns the root object of the parsed JSON
+- * object, which needs to be free'd via grub_json_free().
++ * object, which needs to be free'd via grub_json_free(). Callers
++ * must ensure that the string outlives the returned root object,
++ * and that child objects must not be used after the root object
++ * has been free'd.
+  */
+ extern grub_err_t EXPORT_FUNC(grub_json_parse) (grub_json_t **out,
+ 					        char *string,
+-- 
+2.17.1
+

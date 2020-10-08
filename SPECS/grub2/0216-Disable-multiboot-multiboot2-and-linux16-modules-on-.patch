@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 11 Jul 2018 13:48:48 -0400
+Subject: [PATCH] Disable multiboot, multiboot2, and linux16 modules on EFI
+ builds.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/Makefile.core.def | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index aa44d66aca4..d3e3bfd4d7a 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -1680,7 +1680,7 @@ module = {
+ 
+   common = loader/multiboot.c;
+   common = loader/multiboot_mbi2.c;
+-  enable = x86;
++  enable = i386_pc;
+   enable = mips;
+ };
+ 
+@@ -1689,7 +1689,7 @@ module = {
+   common = loader/multiboot.c;
+   x86 = loader/i386/multiboot_mbi.c;
+   extra_dist = loader/multiboot_elfxx.c;
+-  enable = x86;
++  enable = i386_pc;
+ };
+ 
+ module = {

@@ -1,15 +1,13 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.0
-Release:        4%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Utilities/System
 URL:            https://subversion.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
-
-Patch0:         CVE-2020-17525.patch
 
 BuildRequires:  apr-devel
 BuildRequires:  apr-util
@@ -55,7 +53,7 @@ Requires:       perl
 Provides Perl (SWIG) support for Subversion version control system.
 
 %prep
-%autosetup -p1
+%setup -q
 
 %build
 export CFLAGS="%{build_cflags} -Wformat"
@@ -108,9 +106,6 @@ sudo -u test make check && userdel test -r -f
 %exclude %{_libdir}/perl5/*/*/perllocal.pod
 
 %changelog
-* Wed Mar 24 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.14.0-4
-- Patch CVE-2020-17525.
-
 * Wed Nov 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-3
 - Adding 'BuildRequires' on 'python', 'shadow-utils' and 'sudo' to fix the package tests.
 

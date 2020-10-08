@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Sun, 9 Aug 2015 16:32:29 -0700
+Subject: [PATCH] Measure the kernel commandline
+
+Measure the kernel commandline to ensure that it hasn't been modified
+---
+ grub-core/lib/cmdline.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/lib/cmdline.c b/grub-core/lib/cmdline.c
+index 970ea868c14..6b56304d4a7 100644
+--- a/grub-core/lib/cmdline.c
++++ b/grub-core/lib/cmdline.c
+@@ -19,6 +19,7 @@
+ 
+ #include <grub/lib/cmdline.h>
+ #include <grub/misc.h>
++#include <grub/tpm.h>
+ 
+ static unsigned int check_arg (char *c, int *has_space)
+ {
+@@ -79,7 +80,7 @@ int grub_create_loader_cmdline (int argc, char *argv[], char *buf,
+ {
+   int i, space;
+   unsigned int arg_size;
+-  char *c;
++  char *c, *orig = buf;
+ 
+   for (i = 0; i < argc; i++)
+     {
+@@ -125,5 +126,8 @@ int grub_create_loader_cmdline (int argc, char *argv[], char *buf,
+ 
+   *buf = 0;
+ 
++  grub_tpm_measure ((void *)orig, grub_strlen (orig), GRUB_CMDLINE_PCR,
++		    "Kernel Commandline");
++
+   return i;
+ }

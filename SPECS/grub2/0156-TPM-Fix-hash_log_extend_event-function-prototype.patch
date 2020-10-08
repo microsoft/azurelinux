@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Fri, 15 Jun 2018 09:25:00 +0200
+Subject: [PATCH] TPM: Fix hash_log_extend_event function prototype
+
+The DataToHash argument is a efi_physical_address, not a *pointer* to
+a efi_physical_address.
+
+This distinction is important for 32 bits builds, where the pointer is
+only 32 bits where as an efi_physical_address is 64 bits.
+
+Fixing this fixes the tpm code not working with 32 bits build and grub
+showing multiple:
+
+error: Invalid parameter
+
+Messages during boot, followed by a "press any key to continue" message.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ grub-core/kern/efi/tpm.c | 2 +-
+ include/grub/efi/tpm.h   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/kern/efi/tpm.c b/grub-core/kern/efi/tpm.c
+index c9fb3c133f3..36e1f69df16 100644
+--- a/grub-core/kern/efi/tpm.c
++++ b/grub-core/kern/efi/tpm.c
+@@ -245,7 +245,7 @@ grub_tpm2_log_event(grub_efi_handle_t tpm_handle, unsigned char *buf,
+   event->Size = sizeof(*event) - sizeof(event->Event) + grub_strlen(description) + 1;
+   grub_memcpy(event->Event, description, grub_strlen(description) + 1);
+ 
+-  status = efi_call_5 (tpm->hash_log_extend_event, tpm, 0, buf,
++  status = efi_call_5 (tpm->hash_log_extend_event, tpm, 0, (unsigned long) buf,
+ 		       (grub_uint64_t) size, event);
+ 
+   switch (status) {
+diff --git a/include/grub/efi/tpm.h b/include/grub/efi/tpm.h
+index e2aff4a3c22..63d8a0fe714 100644
+--- a/include/grub/efi/tpm.h
++++ b/include/grub/efi/tpm.h
+@@ -129,7 +129,7 @@ struct grub_efi_tpm2_protocol
+ 				      grub_efi_boolean_t *EventLogTruncated);
+   grub_efi_status_t (*hash_log_extend_event) (struct grub_efi_tpm2_protocol *this,
+ 					      grub_efi_uint64_t Flags,
+-					      grub_efi_physical_address_t *DataToHash,
++					      grub_efi_physical_address_t DataToHash,
+ 					      grub_efi_uint64_t DataToHashLen,
+ 					      EFI_TCG2_EVENT *EfiTcgEvent);
+   grub_efi_status_t (*submit_command) (struct grub_efi_tpm2_protocol *this,

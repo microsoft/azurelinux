@@ -1,0 +1,227 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett <mjg59@coreos.com>
+Date: Wed, 23 Mar 2016 17:03:43 -0700
+Subject: [PATCH] Rework TPM measurements
+
+Rework TPM measurements to use fewer PCRs. After discussion with upstream,
+it's preferable to avoid using so many PCRs. Instead, measure into PCRs 8
+and 9 but use a prefix in the event log to indicate which subsystem carried
+out the measurements.
+
+(cherry picked from commit bb3473d7c8741ad5ef7cf8aafbbcf094df08bfc9)
+---
+ grub-core/kern/dl.c                   |  2 +-
+ grub-core/kern/tpm.c                  | 10 ++++++++--
+ grub-core/lib/cmdline.c               |  4 ++--
+ grub-core/loader/i386/efi/linux.c     |  4 ++--
+ grub-core/loader/i386/linux.c         |  5 ++
+ grub-core/loader/i386/multiboot_mbi.c |  2 +-
+ grub-core/loader/linux.c              |  2 ++
+ grub-core/loader/multiboot.c          |  2 +-
+ grub-core/loader/multiboot_mbi2.c     |  2 +-
+ grub-core/script/execute.c            |  4 ++--
+ include/grub/tpm.h                    |  9 +++------
+ 11 files changed, 28 insertions(+), 18 deletions(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 387d1e6446d..d0989573866 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -830,7 +830,7 @@ grub_dl_load_file (const char *filename)
+      opens of the same device.  */
+   grub_file_close (file);
+ 
+-  grub_tpm_measure(core, size, GRUB_TPM_PCR, filename);
++  grub_tpm_measure(core, size, GRUB_BINARY_PCR, "grub_module", filename);
+ 
+   mod = grub_dl_load_core (core, size);
+   grub_free (core);
+diff --git a/grub-core/kern/tpm.c b/grub-core/kern/tpm.c
+index 1a991876c83..cb5a812035d 100644
+--- a/grub-core/kern/tpm.c
++++ b/grub-core/kern/tpm.c
+@@ -7,7 +7,13 @@
+ 
+ grub_err_t
+ grub_tpm_measure (unsigned char *buf, grub_size_t size, grub_uint8_t pcr,
+-		  const char *description)
++		  const char *kind, const char *description)
+ {
+-  return grub_tpm_log_event(buf, size, pcr, description);
++  grub_err_t ret;
++  char *desc = grub_xasprintf("%s %s", kind, description);
++  if (!desc)
++    return GRUB_ERR_OUT_OF_MEMORY;
++  ret = grub_tpm_log_event(buf, size, pcr, description);
++  grub_free(desc);
++  return ret;
+ }
+diff --git a/grub-core/lib/cmdline.c b/grub-core/lib/cmdline.c
+index 6b56304d4a7..178f7382f07 100644
+--- a/grub-core/lib/cmdline.c
++++ b/grub-core/lib/cmdline.c
+@@ -126,8 +126,8 @@ int grub_create_loader_cmdline (int argc, char *argv[], char *buf,
+ 
+   *buf = 0;
+ 
+-  grub_tpm_measure ((void *)orig, grub_strlen (orig), GRUB_CMDLINE_PCR,
+-		    "Kernel Commandline");
++  grub_tpm_measure ((void *)orig, grub_strlen (orig), GRUB_ASCII_PCR,
++		    "grub_kernel_cmdline", orig);
+ 
+   return i;
+ }
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index d837249b4a1..074dbd6513e 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -132,7 +132,7 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+                         argv[i]);
+           goto fail;
+         }
+-      grub_tpm_measure (ptr, cursize, GRUB_INITRD_PCR, "UEFI Linux initrd");
++      grub_tpm_measure (ptr, cursize, GRUB_BINARY_PCR, "grub_linuxefi", "Initrd");
+       ptr += cursize;
+       grub_memset (ptr, 0, ALIGN_UP_OVERHEAD (cursize, 4));
+       ptr += ALIGN_UP_OVERHEAD (cursize, 4);
+@@ -197,7 +197,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  grub_tpm_measure (kernel, filelen, GRUB_KERNEL_PCR, "UEFI Linux kernel");
++  grub_tpm_measure (kernel, filelen, GRUB_BINARY_PCR, "grub_linuxefi", "Kernel");
+ 
+   rc = grub_linuxefi_secure_validate (kernel, filelen);
+   if (rc < 0)
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index c84747ea857..94526966e8a 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -36,6 +36,7 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/linux.h>
+ #include <grub/efi/sb.h>
++#include <grub/tpm.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -724,7 +725,10 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
++  grub_tpm_measure (kernel, len, GRUB_BINARY_PCR, "grub_linux", "Kernel");
++
+   grub_memcpy (&lh, kernel, sizeof (lh));
++
+   kernel_offset = sizeof (lh);
+ 
+   if (lh.boot_flag != grub_cpu_to_le16_compile_time (0xaa55))
+@@ -1038,6 +1042,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 
+   len = prot_file_size;
+   grub_memcpy (prot_mode_mem, kernel + kernel_offset, len);
++  kernel_offset += len;
+ 
+   if (grub_errno == GRUB_ERR_NONE)
+     {
+diff --git a/grub-core/loader/i386/multiboot_mbi.c b/grub-core/loader/i386/multiboot_mbi.c
+index 1c5b0ac25ce..2ce424a997b 100644
+--- a/grub-core/loader/i386/multiboot_mbi.c
++++ b/grub-core/loader/i386/multiboot_mbi.c
+@@ -174,7 +174,7 @@ grub_multiboot_load (grub_file_t file, const char *filename)
+       return grub_errno;
+     }
+ 
+-  grub_tpm_measure((unsigned char*)buffer, len, GRUB_KERNEL_PCR, filename);
++  grub_tpm_measure((unsigned char*)buffer, len, GRUB_BINARY_PCR, "grub_multiboot", filename);
+ 
+   header = find_header (buffer, len);
+ 
+diff --git a/grub-core/loader/linux.c b/grub-core/loader/linux.c
+index be6fa0f4d45..3005c0d19c9 100644
+--- a/grub-core/loader/linux.c
++++ b/grub-core/loader/linux.c
+@@ -4,6 +4,7 @@
+ #include <grub/misc.h>
+ #include <grub/file.h>
+ #include <grub/mm.h>
++#include <grub/tpm.h>
+ 
+ struct newc_head
+ {
+@@ -288,6 +289,7 @@ grub_initrd_load (struct grub_linux_initrd_context *initrd_ctx,
+ 	  grub_initrd_close (initrd_ctx);
+ 	  return grub_errno;
+ 	}
++      grub_tpm_measure (ptr, cursize, GRUB_BINARY_PCR, "grub_initrd", "Initrd");
+       ptr += cursize;
+     }
+   if (newc)
+diff --git a/grub-core/loader/multiboot.c b/grub-core/loader/multiboot.c
+index 93e026c53db..3b87dc4fab3 100644
+--- a/grub-core/loader/multiboot.c
++++ b/grub-core/loader/multiboot.c
+@@ -441,7 +441,7 @@ grub_cmd_module (grub_command_t cmd __attribute__ ((unused)),
+     }
+ 
+   grub_file_close (file);
+-  grub_tpm_measure (module, size, GRUB_KERNEL_PCR, argv[0]);
++  grub_tpm_measure (module, size, GRUB_BINARY_PCR, "grub_multiboot", argv[0]);
+   return GRUB_ERR_NONE;
+ }
+ 
+diff --git a/grub-core/loader/multiboot_mbi2.c b/grub-core/loader/multiboot_mbi2.c
+index d5ad02a33a1..60ae4606fda 100644
+--- a/grub-core/loader/multiboot_mbi2.c
++++ b/grub-core/loader/multiboot_mbi2.c
+@@ -132,7 +132,7 @@ grub_multiboot2_load (grub_file_t file, const char *filename)
+ 
+   COMPILE_TIME_ASSERT (MULTIBOOT_HEADER_ALIGN % 4 == 0);
+ 
+-  grub_tpm_measure ((unsigned char *)buffer, len, GRUB_KERNEL_PCR, filename);
++  grub_tpm_measure ((unsigned char *)mld.buffer, len, GRUB_BINARY_PCR, "grub_multiboot", filename);
+ 
+   header = find_header (mld.buffer, len);
+   if (header == 0)
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index 9ae04a05160..976643c47b0 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -995,8 +995,8 @@ grub_script_execute_cmdline (struct grub_script_cmd *cmd)
+ 				   argv.args[i]);
+   }
+   cmdstring[cmdlen-1]= '\0';
+-  grub_tpm_measure ((unsigned char *)cmdstring, cmdlen, GRUB_COMMAND_PCR,
+-		    cmdstring);
++  grub_tpm_measure ((unsigned char *)cmdstring, cmdlen, GRUB_ASCII_PCR,
++		    "grub_cmd", cmdstring);
+   grub_free(cmdstring);
+   invert = 0;
+   argc = argv.argc - 1;
+diff --git a/include/grub/tpm.h b/include/grub/tpm.h
+index 7fc9d77d277..ecb2d09ff5d 100644
+--- a/include/grub/tpm.h
++++ b/include/grub/tpm.h
+@@ -26,11 +26,8 @@
+ #define TPM_AUTHFAIL (TPM_BASE + 0x1)
+ #define TPM_BADINDEX (TPM_BASE + 0x2)
+ 
+-#define GRUB_TPM_PCR 9
+-#define GRUB_KERNEL_PCR 10
+-#define GRUB_INITRD_PCR 11
+-#define GRUB_CMDLINE_PCR 12
+-#define GRUB_COMMAND_PCR 13
++#define GRUB_ASCII_PCR 8
++#define GRUB_BINARY_PCR 9
+ 
+ #define TPM_TAG_RQU_COMMAND 0x00C1
+ #define TPM_ORD_Extend 0x14
+@@ -70,7 +67,7 @@ typedef struct {
+ } GRUB_PACKED ExtendOutgoing;
+ 
+ grub_err_t EXPORT_FUNC(grub_tpm_measure) (unsigned char *buf, grub_size_t size,
+-					  grub_uint8_t pcr,
++					  grub_uint8_t pcr, const char *kind,
+ 					  const char *description);
+ #if defined (GRUB_MACHINE_EFI) || defined (GRUB_MACHINE_PCBIOS)
+ grub_err_t grub_tpm_execute(PassThroughToTPM_InputParamBlock *inbuf,

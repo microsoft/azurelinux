@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.5p1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,17 +70,23 @@ tar xf %{SOURCE1} --no-same-owner
     --with-maintype=man \
     --enable-strip=no \
     --with-kerberos5=%{_prefix}
-%make_build
+make
 
 %install
-%make_install
+[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
+make DESTDIR=%{buildroot} install
 install -vdm755 %{buildroot}%{_sharedstatedir}/sshd
 
-sed -i 's/#UsePAM no/UsePAM yes/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i 's/#PrintMotd yes/PrintMotd no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+cat <<EOF >>%{buildroot}%{_sysconfdir}/ssh/sshd_config
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+#MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+PermitRootLogin no
+UsePAM yes
+EOF
 
 #   Install daemon script
 pushd blfs-systemd-units-%{systemd_units_rel}
@@ -183,9 +189,6 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
-* Fri Mar 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.5p1-2
-- Update default sshd_config to align more closely with other cloud images
-
 * Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
 - Updating to 8.5p1 to patch CVE-2021-28041.
 - Added "TEST_SSH_UNSAFE_PERMISSIONS=1" to enable running more tests.
