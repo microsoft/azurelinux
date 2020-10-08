@@ -6,7 +6,8 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gflags.github.io/gflags/
-Source0:        https://github.com/gflags/gflags/archive/v%{version}.tar.gz
+#Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  build-essential

@@ -5,10 +5,11 @@ Summary:        A library that provides an embeddable, persistent key-value stor
 Version:        6.7.3
 Release:        2%{?dist}
 License:        GPLv2+ and ASL 2.0 and BSD
-URL:            https://rocksdb.org
-Source0:        https://github.com/facebook/rocksdb/archive/v%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://rocksdb.org
+#Source0:       https://github.com/facebook/%{name}/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  build-essential
