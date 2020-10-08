@@ -1175,6 +1175,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gflags",
+          "version": "2.2.2",
+          "downloadUrl": "https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "git",
           "version": "2.23.3",
           "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.23.3.tar.xz"

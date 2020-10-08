@@ -3,7 +3,7 @@
 Name:           rocksdb
 Summary:        A library that provides an embeddable, persistent key-value store for fast storage.
 Version:        6.7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ and ASL 2.0 and BSD
 URL:            https://rocksdb.org
 Source0:        https://github.com/facebook/rocksdb/archive/v%{version}.tar.gz
@@ -59,6 +59,8 @@ make install DESTDIR=%{buildroot}
 /usr/src/debug/*
 
 %changelog
+*   Thu Oct 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 6.7.3-2
+-   Fixed 'Source0' URL.
+-   License verified.
 *   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 6.7.3-1
 -   Original version for CBL-Mariner.
--   License verified.
