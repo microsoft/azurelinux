@@ -454,6 +454,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "chrony",
+          "version": "3.5.1",
+          "downloadUrl": "https://download.tuxfamily.org/chrony/chrony-3.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chrpath",
           "version": "0.16",
           "downloadUrl": "https://alioth-archive.debian.org/releases/chrpath/chrpath/0.16/chrpath-0.16.tar.gz"
@@ -1305,8 +1315,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.8",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
+          "version": "3.6.14",
+          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
         }
       }
     },
@@ -1515,8 +1525,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.43",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2"
+          "version": "2.4.46",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
         }
       }
     },
