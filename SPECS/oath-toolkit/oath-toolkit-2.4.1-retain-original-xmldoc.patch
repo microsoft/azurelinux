@@ -1,0 +1,42 @@
+--- a/libpskc/build.c	
++++ a/libpskc/build.c	
+@@ -510,7 +510,7 @@ pskc_build_xml (pskc_t * container, char **out, size_t * len)
+ 
+   xmlDocSetRootElement (doc, keycont);
+ 
+-  if (container->xmldoc)
++  if (container->xmldoc && container->xmldoc != container->original_xmldoc)
+     xmlFreeDoc (container->xmldoc);
+   container->xmldoc = doc;
+   doc = NULL;
+--- a/libpskc/internal.h	
++++ a/libpskc/internal.h	
+@@ -103,7 +103,7 @@ struct pskc_key
+ struct pskc
+ {
+   /* raw XML */
+-  xmlDocPtr xmldoc;
++  xmlDocPtr xmldoc, original_xmldoc;
+   /* Is there a Signature element in xmldoc? */
+   int signed_p;
+ 
+--- a/libpskc/parser.c	
++++ a/libpskc/parser.c	
+@@ -677,6 +677,8 @@ pskc_done (pskc_t * container)
+     return;
+ 
+   xmlFreeDoc (container->xmldoc);
++  if (container->original_xmldoc != container->xmldoc)
++	  xmlFreeDoc (container->original_xmldoc);
+ 
+   for (i = 0; i < container->nkeypackages; i++)
+     {
+@@ -717,7 +719,7 @@ pskc_parse_from_memory (pskc_t * container, size_t len, const char *buffer)
+   if (xmldoc == NULL)
+     return PSKC_XML_ERROR;
+ 
+-  container->xmldoc = xmldoc;
++  container->original_xmldoc = container->xmldoc = xmldoc;
+ 
+   root = xmlDocGetRootElement (xmldoc);
+   parse_keycontainer (container, root, &rc);
