@@ -33,8 +33,9 @@ func (c *ChrootAgent) Initialize(config *BuildAgentConfig) (err error) {
 
 // BuildPackage builds a given file and returns the output files or error.
 // - inputFile is the SRPM to build.
-// - logFile is the file name to save the package build log to.
-func (c *ChrootAgent) BuildPackage(inputFile, logName string) (builtFiles []string, logFile string, err error) {
+// - logName is the file name to save the package build log to.
+// - dependencies is a list of dependencies that need to be installed before building.
+func (c *ChrootAgent) BuildPackage(inputFile, logName string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	// On success, pkgworker will print a comma-seperated list of all RPMs built to stdout.
 	// This will be the last stdout line written.
 	const delimiter = ","
@@ -51,7 +52,7 @@ func (c *ChrootAgent) BuildPackage(inputFile, logName string) (builtFiles []stri
 		logger.Log.Trace(lastStdoutLine)
 	}
 
-	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile)
+	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile, dependencies)
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
@@ -72,7 +73,7 @@ func (c *ChrootAgent) Close() (err error) {
 }
 
 // serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker.
-func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFile string) (serializedArgs []string) {
+func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFile string, dependencies []string) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -98,6 +99,10 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 
 	if config.RunCheck {
 		serializedArgs = append(serializedArgs, "--run-check")
+	}
+
+	for _, dependency := range dependencies {
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--install-package=%s", dependency))
 	}
 
 	return

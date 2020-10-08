@@ -5,7 +5,6 @@ package schedulerutils
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"microsoft.com/pkggen/internal/logger"
@@ -66,15 +65,12 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	}()
 
 	// Mirror the attributes of the node that resulted in this provides
-	providingRPMBaseName := filepath.Base(rpmFileProviding)
-
 	for _, node := range res.AncillaryNodes {
 		if node.Type != pkggraph.TypeBuild {
 			continue
 		}
 
-		expectedRPMName := fmt.Sprintf("%s-%s.%s.rpm", node.VersionedPkg.Name, node.VersionedPkg.Version, node.Architecture)
-		if providingRPMBaseName == expectedRPMName {
+		if rpmFileProviding == node.RpmPath {
 			logger.Log.Debugf("Linked implicit provide (%s) to build node (%s)", provides, node.FriendlyName())
 			parentNode = node
 			break
