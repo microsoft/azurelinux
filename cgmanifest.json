@@ -4975,6 +4975,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rocksdb",
+          "version": "6.7.3",
+          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v6.7.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rpcbind",
           "version": "1.2.5",
           "downloadUrl": "http://downloads.sourceforge.net/rpcbind/rpcbind-1.2.5.tar.bz2"
