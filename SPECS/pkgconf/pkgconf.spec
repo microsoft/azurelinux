@@ -184,9 +184,11 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Thu Oct 08 2020 Joe Schmitt <joschmit@microsoft.com> - 1.7.0-3
+- License verified.
+
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 1.7.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Mon May 25 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 1.7.0-1
 - Update to 1.7.0
