@@ -28,8 +28,7 @@
     - [Local Build Variables](#local-build-variables)
       - [URLS and Repos](#urls-and-repos)
       - [`SOURCE_URL=...`](#source_url)
-      - [`PACKAGE_URL=...`](#package_url)
-      - [`PACKAGE_UPDATE_URL=...`](#package_update_url)
+      - [`PACKAGE_URL_LIST=...`](#package_url_list)
       - [`SRPM_URL_LIST=...`](#srpm_url_list)
       - [`REPO_LIST=...`](#repo_list)
       - [Build Enable/Disable Flags](#build-enabledisable-flags)
@@ -289,8 +288,7 @@ Direct file downloads are by default pulled from:
 
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
-PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/$(build_arch)/rpms
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
 ```
 
@@ -319,8 +317,7 @@ The build system can operate without using pre-built components if desired. Ther
 
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
-PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/$(build_arch)/rpms
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
 REPO_LIST          ?=
 ```
@@ -355,7 +352,7 @@ sudo make go-tools REBUILD_TOOLS=y
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
-sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
+sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
 ```
 
 ```bash
@@ -365,7 +362,7 @@ sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UP
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
-sudo make image PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
+sudo make image PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
 ```
 
 ### Local Build Variables
@@ -380,13 +377,9 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > URL to download unavailable source files from when creating `*.src.rpm` files prior to build.
 
-#### `PACKAGE_URL=...`
+#### `PACKAGE_URL_LIST=...`
 
-> URL to download RPM packages from, used to populate the toolchain packages if they are missing.
-
-#### `PACKAGE_UPDATE_URL=...`
-
-> URL to download RPM packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`, used to populate the toolchain packages if they are missing.
+> Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 
 #### `SRPM_URL_LIST=...`
 
@@ -402,7 +395,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 ##### `REBUILD_TOOLCHAIN=`**`n`** *(default)*
 
-> Use pre-existing toolchain packages from another source. If `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz` is also set the build system will extract the required packages from that archive. If `TOOLCHAIN_ARCHIVE` is not set the build system will download the required toolchain packages from `$(PACKAGE_URL)` and `$(PACKAGE_UPDATE_URL)`.
+> Use pre-existing toolchain packages from another source. If `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz` is also set the build system will extract the required packages from that archive. If `TOOLCHAIN_ARCHIVE` is not set the build system will download the required toolchain packages from `$(PACKAGE_URL_LIST)`.
 
 ##### `REBUILD_TOOLCHAIN=`**`y`**
 
@@ -436,7 +429,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 ##### `DISABLE_UPSTREAM_REPOS=`**`y`**
 
-> Only pull missing packages from local repositories. This does not affect hydrating the toolchain from `$(PACKAGE_URL)` and `$(PACKAGE_UPDATE_URL)`.
+> Only pull missing packages from local repositories. This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 
 #### `REBUILD_PACKAGES=...`
 
@@ -600,7 +593,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_UPDATE_REPO               | y                                                                                                      | Pull missing packages from the upstream update repository in addition to the base repository?
-| DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL)` and `$(PACKAGE_UPDATE_URL)`.
+| DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 
 ---
 
@@ -610,8 +603,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                             | URL to request package sources from
 | SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms` | Space seperated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL                   | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms`              | URL to request full toolchain packages from
-| PACKAGE_UPDATE_URL            | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms`            | URL to request full toolchain packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/$(build_arch)/rpms` | Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
