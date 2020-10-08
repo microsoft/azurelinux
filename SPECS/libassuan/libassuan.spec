@@ -54,7 +54,7 @@ make %{?_smp_mflags} check
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.1-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.5.1-2
--   Initial CBL-Mariner import from Photon (license: dual Apache2/GPL2).
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Keerthana K <keerthanak@vmware.com> 2.5.1-1
 -   Update to version 2.5.1
 *   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 2.4.3-1
