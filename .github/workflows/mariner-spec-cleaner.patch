@@ -83,7 +83,7 @@ index b108ad5..0000000
 -  full: true
 diff --git a/.pipelines/calculate_upstream_diff.yaml b/.pipelines/calculate_upstream_diff.yaml
 new file mode 100644
-index 0000000..7da7601
+index 0000000..9577d23
 --- /dev/null
 +++ b/.pipelines/calculate_upstream_diff.yaml
 @@ -0,0 +1,17 @@
@@ -98,20 +98,20 @@ index 0000000..7da7601
 +
 +steps:
 +- bash: |
-+    git diff $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
++    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
 +
 +- task: PublishBuildArtifacts@1
 +  inputs:
-+    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
-+    artifactName: 'drop' 
++    pathToPublish: '$(Build.ArtifactStagingDirectory)'
++    artifactName: 'drop'
 diff --git a/.pre-commit-config-sample.yaml b/.pre-commit-config-sample.yaml
 new file mode 100644
-index 0000000..6c34efd
+index 0000000..f716d88
 --- /dev/null
 +++ b/.pre-commit-config-sample.yaml
 @@ -0,0 +1,4 @@
 +repos:
-+    -   repo: /home/thcrain/src/spec-cleaner
++    -   repo: spec-cleaner
 +        hooks:
 +        - id: spec-clean
 diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
@@ -147,14 +147,14 @@ index fd16220..0000000
 -    - id: mypy
 diff --git a/.pre-commit-hooks.yaml b/.pre-commit-hooks.yaml
 new file mode 100644
-index 0000000..8042f8f
+index 0000000..fef6859
 --- /dev/null
 +++ b/.pre-commit-hooks.yaml
 @@ -0,0 +1,7 @@
 +-   id: spec-clean
 +    name: Spec Cleaner
 +    description: This hook cleans specs
-+    entry: spec-cleaner -i 
++    entry: spec-cleaner -i
 +    language: python
 +    files: '^.*.spec$'
 +    types: [text]
@@ -1648,10 +1648,20 @@ index 3ad3e6c..0000000
 -yaml-cpp-devel: yaml-cpp 
 -z3-devel: Z3 
 diff --git a/data/excludes-bracketing.txt b/data/excludes-bracketing.txt
-index 81b95ca..22d7068 100644
+index 81b95ca..36e8a8d 100644
 --- a/data/excludes-bracketing.txt
 +++ b/data/excludes-bracketing.txt
-@@ -134,6 +134,8 @@ pypy(.?)_only
+@@ -79,6 +79,9 @@ kf5_makeinstall
+ lang_package
+ lang(\s*\([^)]*\))
+ langpack
++ldconfig_post
++ldconfig_postun
++ldconfig_scriptlets
+ license
+ limit_build
+ make_build
+@@ -134,6 +137,8 @@ pypy(.?)_only
  pycache_only
  pytest
  pytest_arch
@@ -9572,7 +9582,7 @@ index 7d53b64..0000000
 -ignore = E402,E501,E502,W503,W504,D413,D100,D401
 -import-order-style = google
 diff --git a/setup.py b/setup.py
-index 6888d0d..f4fbb25 100755
+index 6888d0d..a49f311 100755
 --- a/setup.py
 +++ b/setup.py
 @@ -1,6 +1,4 @@
@@ -9591,13 +9601,15 @@ index 6888d0d..f4fbb25 100755
      ),
      url='https://github.com/rpm-software-management/spec-cleaner',
      download_url='https://github.com/rpm-software-management/spec-cleaner',
-@@ -32,8 +30,6 @@ setup(
+@@ -32,8 +30,8 @@ setup(
      ],
      platforms=['Linux'],
      keywords=['SUSE', 'RPM', '.spec', 'cleaner'],
 -    tests_require=['pytest', 'pytest-cov', 'pytest-xdist'],
      packages=['spec_cleaner'],
 -    data_files=[('lib/obs/service/', glob('obs/*')), ('share/spec-cleaner', glob('data/*'))],
++    package_data={'spec_cleaner': ['data/*']},
++    include_package_data=True,
      entry_points={'console_scripts': ['spec-cleaner = spec_cleaner:main']},
  )
 diff --git a/spec-cleaner-exec-profile.svg b/spec-cleaner-exec-profile.svg
@@ -10886,23 +10898,96 @@ index 1335e25..417dc9a 100644
 -            self.lines.insert(position, msg)
 diff --git a/spec_cleaner/rpmchangelog.py b/spec_cleaner/rpmchangelog.py
 new file mode 100644
-index 0000000..cd3d276
+index 0000000..c0bf37e
 --- /dev/null
 +++ b/spec_cleaner/rpmchangelog.py
-@@ -0,0 +1,15 @@
-+from typing import IO
+@@ -0,0 +1,88 @@
++import dataclasses
++from typing import Any, Dict, IO, List
++import datetime
 +
 +from .rpmsection import Section
 +
 +
++@dataclasses.dataclass
++class ChangelogEntry:
++    name: str = ''
++    date: datetime.date = datetime.date(1970, 1, 1)
++    email: str = ''
++    version: str = ''
++    release: int = -1
++    description_lines: List[str] = dataclasses.field(default_factory=list)
++
++    def __str__(self):
++        formatted_date = self.date.strftime('%a %b %d %Y')
++        header = '* {} {} <{}> - {}-{}\n'.format(formatted_date, self.name, self.email, self.version, self.release)
++        comments = ['- {}'.format(description.strip()) for description in self.description_lines]
++        return header + '\n'.join(comments)
++
++
 +class RpmChangelog(Section):
 +    """A class providing methods for %changelog section cleaning."""
++    first_entry: ChangelogEntry
++    entry_header_parsed: bool
++    entry_parse_failed: bool
++    in_first_entry: bool
++
++    def __init__(self, options: Dict[str, Any]) -> None:
++        Section.__init__(self, options)
++        self.in_first_entry = True
++        self.first_entry = ChangelogEntry()
++        self.entry_header_parsed = False
++        self.entry_parse_failed = False
 +
 +    def add(self, line: str) -> None:
-+        """Preserve the changelog in its entirety."""
-+        self.lines.append(line)
-+        self.previous_line = line
++        """Preserve the changelog in its entirety, except for the first entry."""
++        if not line.strip():
++            return
++        if len(self.lines) == 0 and line.startswith('%changelog'):
++            self.lines.append(line)
++            return
++        elif self.in_first_entry:
++            if line.startswith('*'):
++                if self.entry_header_parsed:
++                    if not self.entry_parse_failed:
++                        for first_entry_line in str(self.first_entry).split('\n'):
++                            self.lines.append(first_entry_line)
++                    self.in_first_entry = False
++                    self.lines.append('')
++                    self.lines.append(line)
++                else:
++                    self.parse_first_entry_header(line)
++            elif line.startswith('-'):
++                if self.entry_parse_failed:
++                    self.lines.append(line)
++                else:
++                    line = line[1:]
++                    line = line.lstrip()
++                    self.first_entry.description_lines.append(line)
++        else:
++            if line.startswith('*'):
++                self.lines.append('')
++            self.lines.append(line)
 +
++    def parse_first_entry_header(self, line: str) -> None:
++        self.entry_header_parsed = True
++        match = self.reg.re_changelog_header.match(line)
++        if match:
++            try:
++                self.first_entry.date = datetime.datetime.strptime(match.group(1), '%a %b %d %Y').date()
++                self.first_entry.name = match.group(2)
++                self.first_entry.email = match.group(3)
++                self.first_entry.version = match.group(4)
++                self.first_entry.release = int(match.group(5))
++            except ValueError:
++                self.lines.append('#FIXME: Bad date in this changelog header')
++                self.lines.append(line)
++                self.entry_parse_failed = True
++        else:
++            self.lines.append('#FIXME: First changelog entry header failed to parse')
++            self.lines.append(line)
++            self.entry_parse_failed = True
++        
 +    def output(self, fout: IO[str], newline: bool = True, new_class_name: str = None) -> None:
 +        Section.output(self, fout, newline, 'RpmChangelog')
 diff --git a/spec_cleaner/rpmcheck.py b/spec_cleaner/rpmcheck.py
@@ -10982,16 +11067,17 @@ index 0000000..d0aa320
 +        """Preserve the clean section entirely"""
 +        Section.add(self, line)
 diff --git a/spec_cleaner/rpmcleaner.py b/spec_cleaner/rpmcleaner.py
-index 9ae2f85..98fc7e1 100644
+index 9ae2f85..d23ba8c 100644
 --- a/spec_cleaner/rpmcleaner.py
 +++ b/spec_cleaner/rpmcleaner.py
-@@ -1,5 +1,3 @@
+@@ -1,5 +1,4 @@
 -# vim: set ts=4 sw=4 et: coding=UTF-8
 -
++import os
  import os.path
  import shlex
  import subprocess
-@@ -9,7 +7,9 @@ from typing import IO, Any, Dict, List, Optional, Type
+@@ -9,7 +8,9 @@ from typing import IO, Any, Dict, List, Optional, Type
  
  from .fileutils import open_stringio_spec
  from .rpmbuild import RpmBuild
@@ -11001,16 +11087,17 @@ index 9ae2f85..98fc7e1 100644
  from .rpmcopyright import RpmCopyright
  from .rpmdescription import RpmDescription
  from .rpmexception import RpmException
-@@ -18,24 +18,18 @@ from .rpmhelpers import (
+@@ -18,24 +19,18 @@ from .rpmhelpers import (
      find_macros_with_arg,
      load_keywords_whitelist,
      parse_rpm_showrc,
 -    read_cmake_changes,
 -    read_group_changes,
-     read_licenses_changes,
+-    read_licenses_changes,
 -    read_perl_changes,
 -    read_pkgconfig_changes,
 -    read_tex_changes,
++    read_licenses_changes
  )
  from .rpminstall import RpmInstall
  from .rpmpackage import RpmPackage
@@ -11027,7 +11114,7 @@ index 9ae2f85..98fc7e1 100644
      """
      Class wrapping all sections parser is responsible for.
  
-@@ -85,23 +79,7 @@ class RpmSpecCleaner(object):
+@@ -85,23 +80,7 @@ class RpmSpecCleaner(object):
          self.options['unbrace_keywords'] = self._unbrace_keywords()
  
          # Load all the remaining file operations
@@ -11051,11 +11138,10 @@ index 9ae2f85..98fc7e1 100644
          self.options['reg'] = Regexp(self.options['unbrace_keywords'])
  
          # If gvim is used for the diff then run it in foreground mode
-@@ -110,6 +88,9 @@ class RpmSpecCleaner(object):
+@@ -110,6 +89,8 @@ class RpmSpecCleaner(object):
  
          self.reg = self.options['reg']
          self.fin = open_stringio_spec(self.options['specfile'])
-+        self.fout = None
 +        # Set what will be the output of the cleaning
 +        self._select_mode()
  
@@ -11298,7 +11384,7 @@ index fc1d47d..4951cc2 100644
          """
          Move license file from %doc to %license.
 diff --git a/spec_cleaner/rpmhelpers.py b/spec_cleaner/rpmhelpers.py
-index 8600954..dc8ea1a 100644
+index 8600954..6e501e7 100644
 --- a/spec_cleaner/rpmhelpers.py
 +++ b/spec_cleaner/rpmhelpers.py
 @@ -1,5 +1,3 @@
@@ -11345,6 +11431,16 @@ index 8600954..dc8ea1a 100644
  def read_licenses_changes() -> Dict[str, str]:
      """
      Create mapping of old licences to new licences.
+@@ -239,7 +213,8 @@ def add_group(group):
+     elif isinstance(group, RpmRequiresToken):
+         items = []
+         if group.comments:
+-            items += group.comments
++            for line in group.comments:
++                items.append(line)
+         items.append(group)
+         return items
+     elif isinstance(group, list):
 diff --git a/spec_cleaner/rpminstall.py b/spec_cleaner/rpminstall.py
 index 900a184..824a0b8 100644
 --- a/spec_cleaner/rpminstall.py
@@ -11764,7 +11860,7 @@ index 9e2490c..64bfd8d 100644
              match = self.reg.re_buildarch.match(line)
              value = match.group(2)
 diff --git a/spec_cleaner/rpmpreambleelements.py b/spec_cleaner/rpmpreambleelements.py
-index f99860c..64d047d 100644
+index f99860c..d8c40bf 100644
 --- a/spec_cleaner/rpmpreambleelements.py
 +++ b/spec_cleaner/rpmpreambleelements.py
 @@ -1,5 +1,3 @@
@@ -11781,19 +11877,33 @@ index f99860c..64d047d 100644
          'license': 'License',
          'summary': 'Summary',
          # The localized summary can contain various values, so it can't be here
-@@ -56,9 +55,12 @@ class RpmPreambleElements(object):
+@@ -50,20 +49,23 @@ class RpmPreambleElements(object):
+     }
+ 
+     categories_order = (
+-        'define',
+         'bconds',
+         'bcond_conditions',
++        'summary',
++        'summary_localized',
          'name',
          'version',
          'release',
+-        'summary',
+-        'summary_localized',
 +        'epoch',
-         'summary',
-         'summary_localized',
          'license',
 +        'vendor',
 +        'distribution',
          'group',
          'url',
          'source',
+         'nosource',
+         'patch',
++        'define',  
+         'patternprovides',  # fake provides with special function for patterns
+         'patternobsoletes',  # fake provide/obsoletes with old pattern symbols
+         'patterncodeblock',  # fake condition placement for patterns to stay on top
 @@ -116,8 +118,6 @@ class RpmPreambleElements(object):
          for i in self.categories_order:
              self.items[i] = []
@@ -11813,7 +11923,7 @@ index f99860c..64d047d 100644
  
          return elements
 diff --git a/spec_cleaner/rpmprep.py b/spec_cleaner/rpmprep.py
-index da2a96c..66537bf 100644
+index da2a96c..8acef3b 100644
 --- a/spec_cleaner/rpmprep.py
 +++ b/spec_cleaner/rpmprep.py
 @@ -1,5 +1,3 @@
@@ -11855,14 +11965,6 @@ index da2a96c..66537bf 100644
      def _prepare_patch(self, line: str) -> str:
          """
          Convert patchlines to something pretty.
-@@ -82,3 +63,7 @@ class RpmPrep(Section):
-             )
- 
-         return line
-+
-+    def _warn_bare_configure(self, line: str) -> str:
-+        if self.reg.re_configure_call.match(line):
-+            self.warnings.add(r'Prefer using the %configure macro over direct calls to ./configure')
 diff --git a/spec_cleaner/rpmprune.py b/spec_cleaner/rpmprune.py
 deleted file mode 100644
 index c918be1..0000000
@@ -11896,7 +11998,7 @@ index c918be1..0000000
 -        if len(self.lines) == 0:
 -            Section.add(self, '%changelog')
 diff --git a/spec_cleaner/rpmregexp.py b/spec_cleaner/rpmregexp.py
-index 1370ddd..58d4edd 100644
+index 1370ddd..5d1ff2c 100644
 --- a/spec_cleaner/rpmregexp.py
 +++ b/spec_cleaner/rpmregexp.py
 @@ -1,5 +1,3 @@
@@ -11905,17 +12007,20 @@ index 1370ddd..58d4edd 100644
  import re
  from typing import List
  
-@@ -30,6 +28,9 @@ class Regexp(object):
+@@ -29,6 +27,12 @@ class Regexp(object):
+     )
      re_spec_files = re.compile(r'^%files(\s+|$)', re.IGNORECASE)
      re_spec_changelog = re.compile(r'^%changelog\s*$', re.IGNORECASE)
- 
++    
++    # rpm changelog
++    re_changelog_header = re.compile(r'^\*\s*(\w*\s*\w*\s*\d*\s*\d*)\s*(.*)\s* <(.*)>\s*-?\s*(.*)-(\d*)\s*$')
++
 +    # rpm package
 +    re_dev_package = re.compile(r'^%package.*(dev)\s*$', re.IGNORECASE)
-+
+ 
      # rpmpreamble
      # WARNING: keep in sync with rpmcleaner Section change detection
-     re_if = re.compile(
-@@ -54,6 +55,7 @@ class Regexp(object):
+@@ -54,6 +58,7 @@ class Regexp(object):
      re_url = re.compile(r'^Url:\s*(\S*)', re.IGNORECASE)
      re_group = re.compile(r'^Group:\s*(.*)', re.IGNORECASE)
      re_vendor = re.compile(r'^Vendor:\s*(.*)', re.IGNORECASE)
@@ -11923,7 +12028,7 @@ index 1370ddd..58d4edd 100644
      re_source = re.compile(r'^Source(\d*):\s*(.*)', re.IGNORECASE)
      re_nosource = re.compile(r'^NoSource:\s*(.*)', re.IGNORECASE)
      re_patch = re.compile(r'^((?:#[#\s]*)?)Patch(\d*):\s*(\S*)', re.IGNORECASE)
-@@ -126,6 +128,12 @@ class Regexp(object):
+@@ -126,6 +131,12 @@ class Regexp(object):
      re_pytest_arch = re.compile(
          r'%python_(expand|exec)\s+(PYTHONPATH=%{buildroot}%{\$?python_sitearch}\s+)?(\$?python\s+)?(%{_bindir}/?|-m\s+)?py\.?test(-(%{\$?python_version}|%{\$?python_bin_suffix})?)?(\s+(-v|-o addopts=-v))?'
      )
@@ -11936,7 +12041,7 @@ index 1370ddd..58d4edd 100644
      re_python_expand = re.compile(
          r'%{?(python_sitelib|python_sitearch|python_bin_suffix|python_version)}?'
      )
-@@ -162,6 +170,7 @@ class Regexp(object):
+@@ -162,6 +173,7 @@ class Regexp(object):
      re_patch_prep = re.compile(r'^%patch\s*([^P]*)-P\s*(\d*)\s*([^P]*)$')
      re_setup = re.compile(r'\s*-n\s+"?%{name}-%{version}"?($|\s)')
      re_dephell_setup = re.compile(r'\s*dephell[s]?.*convert')
@@ -11944,7 +12049,7 @@ index 1370ddd..58d4edd 100644
  
      # rpmfiles
      re_man_compression = re.compile(r'(\d)(\.?\*|\.gz|%{?ext_man}?)$')
-@@ -208,12 +217,14 @@ class Regexp(object):
+@@ -208,12 +220,14 @@ class Regexp(object):
      re_datadir = re.compile(r'%{?_prefix}?/share' + endmacro)
      re_mandir = re.compile(r'%{?_datadir}?/man' + endmacro)
      re_infodir = re.compile(r'%{?_datadir}?/info' + endmacro)
@@ -11961,6 +12066,25 @@ index 1370ddd..58d4edd 100644
      re_rpmbuildroot = re.compile(r'(\${?RPM_BUILD_ROOT}?|"%{?buildroot}?")([/\s%]|$)')
      re_rpmbuildroot_quotes = re.compile(r'"\${?RPM_BUILD_ROOT}?"')
      # deprecated greps
+diff --git a/spec_cleaner/rpmrequirestoken.py b/spec_cleaner/rpmrequirestoken.py
+index 4ed54af..0b78a81 100644
+--- a/spec_cleaner/rpmrequirestoken.py
++++ b/spec_cleaner/rpmrequirestoken.py
+@@ -1,4 +1,4 @@
+-from typing import Optional
++from typing import List, Optional
+ 
+ from .rpmexception import RpmException
+ from .rpmregexp import Regexp
+@@ -17,7 +17,7 @@ class RpmRequiresToken(object):
+     BuildRequires:    boringpackage >=         5.2.8
+     """
+ 
+-    comments: Optional[str] = None
++    comments: Optional[List[str]] = None
+ 
+     def __init__(
+         self,
 diff --git a/spec_cleaner/rpmscriplets.py b/spec_cleaner/rpmscriplets.py
 index 7148b61..e7852ba 100644
 --- a/spec_cleaner/rpmscriplets.py
@@ -21548,7 +21672,7 @@ index 54715dc..0000000
 -NOTE:
 -
 -To make sure your perldoc/Pod viewing setup for viewing this page is
--working: The six-letter word "rï¿½sumï¿½" should look like "resume" with an "/"
+-working: The six-letter word "résumé" should look like "resume" with an "/"
 -accent on each "e".
 -
 -For further tests, and help if that doesn't work, see below, A POD ENCODING
