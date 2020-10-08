@@ -1175,6 +1175,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gflags",
+          "version": "2.2.2",
+          "downloadUrl": "https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "git",
           "version": "2.23.3",
           "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.23.3.tar.xz"
@@ -4968,6 +4978,16 @@
           "name": "rng-tools",
           "version": "5",
           "downloadUrl": "https://github.com/nhorman/rng-tools/archive/rng-tools-5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rocksdb",
+          "version": "6.7.3",
+          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v6.7.3.tar.gz"
         }
       }
     },
