@@ -77,7 +77,7 @@ jobs:
       # Set continue-on-error to true if we're blocking too many PRs here
       # We don't want this tool to have a low signal-to-noise ratio
       - name: Lint changed spec files
-        continue-on-error: false
+        continue-on-error: true
         run: |
           mkdir -p linted_specs
           spec-cleaner -o linted_specs ${{ env.updated-specs }}
