@@ -19,27 +19,26 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v2
 
-      # The next three steps are taken from check-package-cgmanifest.yml
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           git fetch origin ${{ github.base_ref }}
-          echo "::set-env name=base_sha::$(git rev-parse origin/${{ github.base_ref }})"
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
           echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
       - name: Get base commit for Pushes
         if: ${{ github.event_name == 'push' }}
         run: |
           git fetch origin ${{ github.event.before }}
-          echo "::set-env name=base_sha::${{ github.event.before }}"
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
           echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
-          
+
       - name: Get the changed files
         run: |
           echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
           changed_specs=$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
           echo "Files to validate: '${changed_specs}'"
-          echo "::set-env name=updated-specs::$(echo ${changed_specs})"
+          echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
       - name: Main branch checkout 
         uses: actions/checkout@v2
