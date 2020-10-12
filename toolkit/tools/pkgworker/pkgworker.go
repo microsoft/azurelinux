@@ -229,6 +229,10 @@ func tdnfInstall(packages []string) (err error) {
 		packageMatchGroup       = 1
 	)
 
+	if len(packages) == 0 {
+		return
+	}
+
 	// TDNF supports requesting versioned packages in the form of {name}-{version}.{dist}.{arch}.
 	// The packages to install list may contain file paths to rpm files so those will need to be filtered:
 	// - Strip any .rpm from packages as TDNF does not support requesting a package with the extension.

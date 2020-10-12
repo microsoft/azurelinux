@@ -96,7 +96,16 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 		}
 	}
 
-	// get all build dependencies
+	dependencies := getBuildDependencies(node, pkgGraph)
+
+	logger.Log.Infof("Building %s", baseSrpmName)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
+	return
+}
+
+// getBuildDependencies returns a list of all dependencies that need to be installed before the node can be built.
+func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph) (dependencies []string) {
+	// Use a map to avoid duplicate entries
 	dependencyLookup := make(map[string]bool)
 
 	search := traverse.BreadthFirst{}
@@ -126,8 +135,6 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 			case ">", ">=":
 			default:
 			}
-
-			return
 		} else {
 
 			rpmPath := dependencyNode.RpmPath
@@ -141,13 +148,11 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 		return
 	})
 
-	dependencies := make([]string, 0, len(dependencyLookup))
+	dependencies = make([]string, 0, len(dependencyLookup))
 	for depName := range dependencyLookup {
 		dependencies = append(dependencies, depName)
 	}
 
-	logger.Log.Infof("Building %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
 	return
 }
 

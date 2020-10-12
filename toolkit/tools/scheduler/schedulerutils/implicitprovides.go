@@ -75,7 +75,7 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 		}
 	}
 
-	// If there is no clear match between the implicit provide and which node produced it, error out.
+	// If there is no clear parent node for the implicit provide, error out.
 	if parentNode == nil {
 		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s)", provides)
 	}
