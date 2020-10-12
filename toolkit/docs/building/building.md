@@ -580,7 +580,6 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
 | CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | Image config file to build
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                               | Base directory to search for image files in (see [image_config.md](../images/image_config.md))
-| TERMINAL_ISO_INSTALLER        | n                                                                                                      | Use a command line ISO installer instead of the GUI installer
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
