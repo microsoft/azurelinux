@@ -2,7 +2,7 @@
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
 Version:        1.62
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -14,7 +14,7 @@ BuildRequires:  sqlite-devel >= 3.22.0
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-DBI
 Requires:       perl-DBI
-Requires:       perl >= 5.28.0
+Requires:       perl-libs >= 5.28.0
 
 %description
 SQLite is a public domain RDBMS database engine that you can find at
@@ -46,9 +46,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:20:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.62-3
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
+-   Use new perl package names.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.62-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.62-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Tue Jan 22 2019 Michelle Wang <michellew@vmware.com> 1.62-1

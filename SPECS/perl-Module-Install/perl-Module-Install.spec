@@ -5,7 +5,7 @@
 Summary:        Standalone, extensible Perl module installer
 Name:           perl-Module-Install
 Version:        1.19
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Install/
@@ -16,8 +16,11 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-YAML-Tiny
-Requires:  perl-YAML-Tiny
-Requires:	perl >= 5.28.0
+Requires:       perl-YAML-Tiny
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Archive::Zip) >= 1.37
+Requires:       perl(Carp)
+Requires:       perl(CPAN)
 
 %description
 Module::Install is a package for writing installers for CPAN (or CPAN-like)
@@ -50,6 +53,8 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.19-4
+-   Use new perl package names.
 * Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
 - Added %%license line automatically
 

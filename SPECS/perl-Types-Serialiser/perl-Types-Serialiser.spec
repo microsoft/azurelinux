@@ -2,7 +2,7 @@
 Summary:	Simple data types for common serialization formats
 Name:		perl-Types-Serialiser
 Version:	1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
@@ -12,8 +12,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:	noarch
 BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
 BuildRequires:	perl-common-sense
+
+Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:	perl(Carp)
 Requires:	perl-common-sense
 
 # Filter bogus provide of JSON::PP::Boolean (for rpm ≥ 4.9)
@@ -54,6 +56,8 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
+-   Use new perl package names.
 * Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
 - Added %%license line automatically
 

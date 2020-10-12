@@ -1,0 +1,12 @@
+diff -up perl-5.10.0/Configure.didi perl-5.10.0/Configure
+--- perl-5.10.0/Configure.didi	2007-12-18 11:47:07.000000000 +0100
++++ perl-5.10.0/Configure	2008-07-21 10:51:16.000000000 +0200
+@@ -1483,7 +1483,7 @@ archname=''
+ usereentrant='undef'
+ : List of libraries we want.
+ : If anyone needs extra -lxxx, put those in a hint file.
+-libswanted="cl pthread socket bind inet nsl ndbm gdbm dbm db malloc dl ld"
++libswanted="cl pthread socket resolv inet nsl ndbm gdbm dbm db malloc dl ld"
+ libswanted="$libswanted sun m crypt sec util c cposix posix ucb bsd BSD"
+ : We probably want to search /usr/shlib before most other libraries.
+ : This is only used by the lib/ExtUtils/MakeMaker.pm routine extliblist.

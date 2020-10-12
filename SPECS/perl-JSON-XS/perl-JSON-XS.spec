@@ -3,7 +3,7 @@ Summary:        JSON serializing/deserializing, done correctly and fast
 Name:           perl-JSON-XS
 Epoch:          1
 Version:        3.04
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
@@ -15,7 +15,8 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Canary-Stability
 BuildRequires:  perl-Types-Serialiser
 BuildRequires:  perl-common-sense
-Requires:  perl >= 5.28.0
+
+Requires:  perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:  perl-Canary-Stability
 Requires:  perl-Types-Serialiser
 Requires:  perl-common-sense
@@ -52,6 +53,8 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
+-   Use new perl package names.
 * Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 1:3.04-3
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
 Version:        2.44
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/pod/XML::Parser
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{version}.tar.gz
@@ -11,7 +11,9 @@ Distribution:   Mariner
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
 Requires:       expat
-Requires:       perl >= 5.28.0
+Requires:       perl-libs >= 5.28.0
+Requires:       perl(IO::File)
+Requires:       perl(IO::Handle)
 
 %description
 The XML::Parser module is a Perl extension interface to James Clark's XML parser, expat
@@ -35,6 +37,8 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-11
+-   Use new perl package names.
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.44-10
 -   Added %%license invocation
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.44-9

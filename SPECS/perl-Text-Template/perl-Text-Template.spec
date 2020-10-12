@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Text-Template
 Version:        1.51
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://metacpan.org/pod/Text::Template
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
@@ -11,7 +11,8 @@ Source:         https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-
 %define sha1    Text-Template=423945fbe09c31f341d51afafcf635d2fbe6850b
 
 BuildArch:      noarch
-Requires:       perl >= 5.28.0
+Requires:       perl-libs >= 5.28.0
+Requires:       perl(Carp)
 Requires:       perl-Test-Warnings
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Test-Warnings
@@ -39,6 +40,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.51-3
+-   Use new perl package names.
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.51-2
 -   Added %%license line automatically
 

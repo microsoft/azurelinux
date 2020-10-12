@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -36,7 +36,7 @@ Header files for doing development with openscap.
 
 %package perl
 Summary: openscap perl scripts
-Requires: perl
+Requires: perl-interpreter
 Requires: openscap = %{version}-%{release}
 %description perl
 Perl scripts.
@@ -105,6 +105,8 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-5
+-   Use new perl package names.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-4
 -   Explicitly set python verison.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3

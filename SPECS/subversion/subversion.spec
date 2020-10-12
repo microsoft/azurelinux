@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://subversion.apache.org/
 Group:          Utilities/System
@@ -35,7 +35,7 @@ Requires:   %{name} = %{version}
 
 %package    perl
 Summary:    Allows Perl scripts to directly use Subversion repositories.
-Requires:   perl
+Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:   %{name} = %{version}
 %description    perl
 Provides Perl (SWIG) support for Subversion version control system.
@@ -95,6 +95,8 @@ sudo -u test make check && userdel test -r -f
 %exclude %{_libdir}/perl5/*/*/perllocal.pod
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.14.0-3
+-   Use new perl package names.
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.14.0-2
 -   Add -Wformat to fix the build because -Werror=format-security is enabled.
 *   Tue Jun 09 2020 Andrew Phelps <anphel@microsoft.com> 1.14.0-1

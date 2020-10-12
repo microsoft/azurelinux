@@ -1,0 +1,77 @@
+From 390fe0c0d09aadc66f644e9eee4aa1245221188c Mon Sep 17 00:00:00 2001
+From: David Mitchell <davem@iabyn.com>
+Date: Tue, 25 Aug 2020 13:15:25 +0100
+Subject: [PATCH] sort { return foo() } ...
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+GH #18081
+
+A sub call via return in a sort block was called in void rather than
+scalar context, causing the comparison result to be discarded.
+
+This because when a sort block is called it is not a real function
+call, even though a sort block can be returned from. Instead, a
+CXt_NULL is pushed on the context stack. Because this isn't a sub-ish
+context type (unlike CXt_SUB, CXt_EVAL etc) there is no 'caller sub'
+on the context stack to be found to retrieve the caller's context
+(i.e. cx->cx_gimme).
+
+This commit fixes it by special-casing Perl_gimme_V().
+
+Ideally at some future point, a new context type, CXt_SORT, should be
+added. This would be used instead of CXt_NULL when a sort BLOCK is
+called. Like other sub-ish context types, it would have an old_cxsubix
+field and PL_curstackinfo->si_cxsubix would point to it. This would
+eliminate needing special-case handling in places like Perl_gimme_V().
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ inline.h    |  2 +-
+ t/op/sort.t | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/inline.h b/inline.h
+index a8240efb9c..6fbd5abfea 100644
+--- a/inline.h
++++ b/inline.h
+@@ -2086,7 +2086,7 @@ Perl_gimme_V(pTHX)
+         return gimme;
+     cxix = PL_curstackinfo->si_cxsubix;
+     if (cxix < 0)
+-        return G_VOID;
++        return PL_curstackinfo->si_type == PERLSI_SORT ? G_SCALAR: G_VOID;
+     assert(cxstack[cxix].blk_gimme & G_WANT);
+     return (cxstack[cxix].blk_gimme & G_WANT);
+ }
+diff --git a/t/op/sort.t b/t/op/sort.t
+index f2e139dff0..8e387fb90d 100644
+--- a/t/op/sort.t
++++ b/t/op/sort.t
+@@ -7,7 +7,7 @@ BEGIN {
+     set_up_inc('../lib');
+ }
+ use warnings;
+-plan(tests => 203);
++plan(tests => 204);
+ use Tie::Array; # we need to test sorting tied arrays
+ 
+ # these shouldn't hang
+@@ -1202,3 +1202,13 @@ SKIP:
+     $fillb = undef;
+     is $act, "01[sortb]2[fillb]";
+ }
++
++# GH #18081
++# sub call via return in sort block was called in void rather than scalar
++# context
++
++{
++    sub sort18081 { $a + 1 <=> $b + 1 }
++    my @a = sort { return &sort18081 } 6,1,2;
++    is "@a", "1 2 6", "GH #18081";
++}
+-- 
+2.25.4
+

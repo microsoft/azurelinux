@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.88
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -11,10 +11,13 @@ Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Requires:       perl >= 5.28.0
-Requires:       openssl
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  openssl-devel
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(MIME::Base64)
+Requires:       perl(XSLoader)
+Requires:       openssl
 
 %description
 Net::SSLeay module contains perl bindings to openssl (http://www.openssl.org) library.
@@ -57,6 +60,8 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.88-3
+-   Use new perl package names.
 * Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
 - Added %%license line automatically
 

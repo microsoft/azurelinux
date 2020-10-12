@@ -2,7 +2,7 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD (like)
 URL:            http://net-snmp.sourceforge.net/
 Group:          Productivity/Networking/Other
@@ -15,7 +15,7 @@ Source2:        snmptrapd.service
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  systemd
-Requires:       perl
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       systemd
 %description
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
@@ -94,9 +94,10 @@ rm -rf %{buildroot}/*
 %exclude /usr/lib/perl5/*/*/perllocal.pod
 
 %changelog
-* Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.8-5
+-   Use new perl package names.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.8-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.8-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 5.8-2

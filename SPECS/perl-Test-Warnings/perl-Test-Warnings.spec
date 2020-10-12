@@ -1,7 +1,7 @@
 Summary:        Test for warnings and the lack of them in Perl
 Name:           perl-Test-Warnings
 Version:        0.028
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            https://metacpan.org/release/Test-Warnings
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -10,7 +10,8 @@ Distribution:   Mariner
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-%{version}.tar.gz
 
 BuildArch:      noarch
-Requires:       perl >= 5.28.0
+Requires:       perl-libs >= 5.28.0
+Requires:       perl(Carp)
 BuildRequires:  perl >= 5.28.0
 
 %description
@@ -36,6 +37,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.028-4
+-   Use new perl package names.
+
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.028-3
 -   Adding the "%%license" macro.
 

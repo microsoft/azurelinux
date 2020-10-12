@@ -1,0 +1,33 @@
+From 589464a875768e4b4a609d972488e3b592103097 Mon Sep 17 00:00:00 2001
+From: "E. Choroba" <choroba@matfyz.cz>
+Date: Mon, 27 Jul 2020 11:32:51 +0200
+Subject: [PATCH] Clearing DB::action at the end is no longer needed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+as it's cleared right after it's been run.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/perl5db.pl | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/lib/perl5db.pl b/lib/perl5db.pl
+index e04a0e17fa..af3b972da0 100644
+--- a/lib/perl5db.pl
++++ b/lib/perl5db.pl
+@@ -3347,10 +3347,6 @@ use B<o> I<inhibit_exit> to avoid stopping after program termination,
+ B<h q>, B<h R> or B<h o> to get additional info.
+ EOP
+ 
+-        # Set the DB::eval context appropriately.
+-        # At program termination disable any user actions.
+-        $DB::action = undef;
+-
+         $DB::package     = 'main';
+         $DB::usercontext = DB::_calc_usercontext($DB::package);
+     } ## end elsif ($package eq 'DB::fake')
+-- 
+2.25.4
+

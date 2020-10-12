@@ -1,0 +1,17 @@
+diff -up perl-5.14.1/cpan/File-Temp/t/fork.t.off perl-5.14.1/cpan/File-Temp/t/fork.t
+--- perl-5.14.1/cpan/File-Temp/t/fork.t.off	2011-04-13 13:36:34.000000000 +0200
++++ perl-5.14.1/cpan/File-Temp/t/fork.t	2011-06-20 10:29:31.536282611 +0200
+@@ -12,12 +12,8 @@ BEGIN {
+      $Config::Config{useithreads} and
+      $Config::Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+     );
+-  if ( $can_fork ) {
+-    print "1..8\n";
+-  } else {
+-    print "1..0 # Skip No fork available\n";
++    print "1..0 # Skip Koji doesn't work with Perl fork tests\n";
+     exit;
+-  }
+ }
+ 
+ use File::Temp;

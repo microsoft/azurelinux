@@ -11,7 +11,7 @@
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.641
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -23,7 +23,10 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.ta
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
-Requires:	perl >= 5.28.0
+Requires:       perl-libs >= 5.28.0
+Requires:       perl(FileHandle)
+Requires:       perl(Math::BigInt)
+Requires:       perl(DB_File)
 
 %description
 DBI is a database access Application Programming Interface (API) for
@@ -87,9 +90,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.641-3
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
+-   Use new perl package names.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.641-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.641-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.641-1

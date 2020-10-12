@@ -2,7 +2,7 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Public Domain
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/J/JU/JUERD/DBIx-Simple-%{version}.tar.gz
@@ -13,8 +13,8 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl-DBI >= 1.21
 BuildRequires:  perl >= 5.28.0
-Requires:  	perl >= 5.28.0
-Requires:  	perl-Object-Accessor
+Requires:       perl-libs >= 5.28.0
+Requires:       perl-Object-Accessor
 Requires:       perl-DBI >= 1.21
 
 %description
@@ -48,6 +48,8 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.37-3
+-   Use new perl package names.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.37-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.37-1

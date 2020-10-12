@@ -3,7 +3,7 @@
 Summary:        Handle Common Gateway Interface requests and responses
 Name:           perl-CGI
 Version:        4.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
@@ -17,7 +17,11 @@ BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  sed
-Requires:	perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(File::Spec) >= 0.82
+Requires:       perl(File::Temp) >= 0.17
+Requires:       perl(Text::ParseWords)
 
 %{?perl_default_filter}
 # Remove under-specified dependencies
@@ -69,6 +73,8 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*.3*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.40-3
+-   Use new perl package names.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.40-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 4.40-1

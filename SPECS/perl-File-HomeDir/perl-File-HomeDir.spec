@@ -1,7 +1,7 @@
 Summary:        File-HomeDir
 Name:           perl-File-HomeDir
 Version:        1.004
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-HomeDir/
@@ -14,7 +14,12 @@ BuildRequires:	perl >= 5.28.0
 %if %{with_check}
 BuildRequires:  perl-File-Which
 %endif
-Requires:	perl >= 5.28.0
+
+Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:   perl(Cwd) >= 3.12
+Requires:   perl(File::Path) >= 2.01
+Requires:   perl(File::Spec) >= 3.12
+Requires:   perl(File::Temp) >= 0.19
 Requires:   perl-File-Which
 
 %description
@@ -59,7 +64,9 @@ make test
 %{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-4
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-5
+-   Use new perl package names.
+*   Thu Sep 10 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-4
 -   Switch to new perl man page extension.
 *   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> 1.004-3
 -   Added %%license line automatically

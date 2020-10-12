@@ -1,7 +1,7 @@
 Summary:        Manages IPv4 and IPv6 addresses and subnets
 Name:           perl-NetAddr-IP
 Version:        4.079
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/NetAddr-IP
@@ -10,7 +10,9 @@ Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIKER/NetAddr-IP-%{ver
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl
-Requires:       perl
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Math::BigInt)
 
 %description
 This module provides an object-oriented abstraction on top of IP
@@ -36,6 +38,8 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
+-   Use new perl package names.
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
 - Added %%license line automatically
 

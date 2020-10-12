@@ -2,7 +2,7 @@
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
 Version:        1.25
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
@@ -12,7 +12,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
-Requires:	perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(B)
+Requires:       perl(DynaLoader)
+Requires:       perl(Data::Dumper)
+Requires:       perl(Encode)
+Requires:       perl(File::Find)
+Requires:       perl(Text::ParseWords)
+Requires:       perl(Digest::MD5)
+Requires:       perl(Storable)
 
 %description
 This module scans potential modules used by perl programs and returns a
@@ -45,6 +54,8 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.25-4
+-   Use new perl package names.
 * Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.25-3
 - Added %%license line automatically
 
