@@ -335,10 +335,17 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	}()
 
 	// If this is container build then the bind mounts will not have been created.
-	// Copy in all of the SPECs so they can be packed.
 	if !buildpipeline.IsRegularBuild() {
+		// Copy in all of the SPECs so they can be packed.
 		specsInChroot := filepath.Join(chroot.RootDir(), newSpecsDir)
 		err = directory.CopyContents(specsDir, specsInChroot)
+		if err != nil {
+			return
+		}
+
+		// Copy any prepacked srpms so they will not be repacked.
+		srpmsInChroot := filepath.Join(chroot.RootDir(), newOutDir)
+		err = directory.CopyContents(outDir, srpmsInChroot)
 		if err != nil {
 			return
 		}
