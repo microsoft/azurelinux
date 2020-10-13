@@ -14,17 +14,24 @@ Metapackage holding sets of core packages for different applications.
 %package base
 Summary:    Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
 
-Requires:   filesystem
-Requires:   tzdata
-Requires:   iana-etc
-Requires:   ca-certificates-static
-Requires:   mariner-release
-Requires:   openssl
-Requires:   openssl-libs
-Requires:   glibc-iconv
-
+Requires: filesystem
+Requires: tzdata
+Requires: iana-etc
+Requires: ca-certificates-static
+Requires: mariner-release
+Requires: openssl
+Requires: openssl-libs
+Requires: glibc-iconv
 
 %description base
+%{summary}
+
+%package debug
+Summary:  Debug packages for distroless
+Requires: busybox
+Requires: %{name}-base = %{version}-%{release}
+
+%description debug
 %{summary}
 
 %prep
@@ -33,7 +40,12 @@ Requires:   glibc-iconv
 
 %files base
 
+%files debug
 
 %changelog
-*   Tue Sep 1 2020 Jon Slobodzian <joslobo@microsoft.com> 0.1-1
--   Initial Mariner Version
+* Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-2
+- Extend the set of requirements for the base image
+- Add debug package with busybox
+
+* Tue Sep 01 2020 Jon Slobodzian <joslobo@microsoft.com> - 0.1-1
+- Initial Mariner Version
