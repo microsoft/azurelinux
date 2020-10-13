@@ -260,6 +260,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 			"--destdir",
 			chrootDownloadDir,
 			pkgName,
+			"--rpmverbosity=yes",
 		}
 
 		if cloneDeps {
@@ -294,6 +295,7 @@ func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkg
 		args := []string{
 			"provides",
 			singlePackageToClone.Name,
+			"--rpmverbosity=yes",
 		}
 
 		if !r.useUpdateRepo {
