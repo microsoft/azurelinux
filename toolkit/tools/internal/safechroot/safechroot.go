@@ -408,8 +408,8 @@ func cleanupAllChroots() {
 	// inside any Chroot.
 	logger.Log.Info("Waiting for outstanding chroot commands to finish")
 	shell.PermanentlyStopAllProcesses()
-	if err := inChrootSemaphore.Acquire(context.TODO, 1); err != nil {
-		logger.Log.Errorf("Failed to cleanup chroots: %s" err)
+	if err := inChrootSemaphore.Acquire(context.TODO(), 1); err != nil {
+		logger.Log.Errorf("Failed to cleanup chroots: %s", err)
 		return
 	}
 
