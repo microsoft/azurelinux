@@ -102,10 +102,10 @@ gawk-debuginfo-4.2.1-3.cm1.aarch64.rpm
 gcc-9.1.0-8.cm1.aarch64.rpm
 gcc-c++-9.1.0-8.cm1.aarch64.rpm
 gcc-debuginfo-9.1.0-8.cm1.aarch64.rpm
-gdbm-1.18-3.cm1.aarch64.rpm
-gdbm-debuginfo-1.18-3.cm1.aarch64.rpm
-gdbm-devel-1.18-3.cm1.aarch64.rpm
-gdbm-lang-1.18-3.cm1.aarch64.rpm
+gdbm-1.18-4.cm1.aarch64.rpm
+gdbm-debuginfo-1.18-4.cm1.aarch64.rpm
+gdbm-devel-1.18-4.cm1.aarch64.rpm
+gdbm-lang-1.18-4.cm1.aarch64.rpm
 gettext-0.21-1.cm1.aarch64.rpm
 gettext-debuginfo-0.21-1.cm1.aarch64.rpm
 gfortran-9.1.0-8.cm1.aarch64.rpm

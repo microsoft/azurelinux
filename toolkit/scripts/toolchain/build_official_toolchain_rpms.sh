@@ -245,7 +245,13 @@ build_rpm_in_chroot_no_install make
 build_rpm_in_chroot_no_install patch
 build_rpm_in_chroot_no_install procps-ng
 build_rpm_in_chroot_no_install sed
+
+# perl needs gdbm, bzip2, zlib
+chroot_and_install_rpms gdbm
+chroot_and_install_rpms bzip2
+chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
+
 build_rpm_in_chroot_no_install nss
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
@@ -406,9 +412,7 @@ build_rpm_in_chroot_no_install libassuan
 build_rpm_in_chroot_no_install npth
 build_rpm_in_chroot_no_install libksba
 
-# gnupg2 requires zlib, bzip2, readline, npth, libassuan, libksba
-chroot_and_install_rpms zlib
-chroot_and_install_rpms bzip2
+# gnupg2 requires readline, npth, libassuan, libksba
 chroot_and_install_rpms readline
 chroot_and_install_rpms npth
 chroot_and_install_rpms libassuan
