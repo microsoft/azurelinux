@@ -30,6 +30,9 @@ const (
 	rootMountPoint = "/"
 	rootUser       = "root"
 
+	// RpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
+	RpmDependenciesDirectory = "/var/lib/rpm"
+
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0600
 	bootDirectoryDirMode  = 0700
@@ -273,6 +276,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	if err != nil {
 		return
 	}
+	defer cleanupRpmDatabase(installRoot, isRootFS, packagesToInstall)
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
@@ -1278,6 +1282,37 @@ func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.
 	}
 
 	return
+}
+
+// cleanupRpmDatabase removes RPM database if the image does not require a package manager.
+// rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
+// isRootFS should be set to true if the resulting image will be a rootfs (not a file)
+// packagesToInstall is a list of packages that will be installed on the image
+func cleanupRpmDatabase(rootPrefix string, isRootFS bool, packagesToInstall []string) {
+	if isRootFS {
+		// If the image doesn't contain the package manager
+		// We can remove the RPM database files
+		rpmInChroot := false
+		for _, name := range packagesToInstall {
+			if name == "rpm" || name == "dnf" || name == "tdnf" || name == "yum" {
+				logger.Log.Info("Package manager found in package list. Keeping the RPM database.")
+				rpmInChroot = true
+				break
+			}
+		}
+
+		if !rpmInChroot {
+			logger.Log.Info("No package manager found in package list. Removing the RPM database.")
+			rpmDir := strings.Join([]string{rootPrefix, RpmDependenciesDirectory}, "")
+			err := os.RemoveAll(rpmDir)
+			if err != nil {
+				logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
+			} else {
+				logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
+			}
+
+		}
+	}
 }
 
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
