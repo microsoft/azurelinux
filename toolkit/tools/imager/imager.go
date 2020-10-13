@@ -110,7 +110,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-	isRootFS = (len(systemConfig.PartitionSettings) == 0)
+	isRootFS = isRootFs(systemConfig)
 	if isRootFS {
 		logger.Log.Infof("Creating rootfs")
 		additionalExtraMountPoints, additionalExtraDirectories, err := setupRootFS(outputDir, installRoot)
@@ -188,7 +188,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 
-		err = cleanupExtraFilesInChroot(setupChroot, systemConfig)
+		err = cleanupExtraFilesInChroot(setupChroot)
 		if err != nil {
 			logger.Log.Error("Failed to cleanup extra files in setup chroot")
 			return
@@ -403,15 +403,24 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 	return
 }
 
-func cleanupExtraFilesInChroot(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+func cleanupExtraFiles() {
 	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, sshPubKeysTempDirectory}
+
 	for _, dir := range dirsToRemove {
-		err = os.RemoveAll(dir)
+		logger.Log.Infof("Cleaning up directory %s", dir)
+		err := os.RemoveAll(dir)
 		if err != nil {
 			logger.Log.Errorf("Failed to cleanup directory (%s). Error: %s", dir, err)
-			return
 		}
 	}
+}
+
+func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
+	logger.Log.Infof("Proceeding to cleanup extra files in chroot %s.", chroot.RootDir())
+	err = chroot.Run(func() error {
+		cleanupExtraFiles()
+		return nil
+	})
 	return
 }
 
@@ -510,4 +519,8 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	return
+}
+
+func isRootFs(config configuration.SystemConfig) bool {
+	return len(config.PartitionSettings) == 0
 }
