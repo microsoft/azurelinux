@@ -3684,6 +3684,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-inc-latest",
+          "version": "0.500",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/inc-latest-0.500.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-IO-Socket-SSL",
           "version": "2.066",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.066.tar.gz"
