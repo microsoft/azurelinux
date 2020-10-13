@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           cloud-init-vmware-guestinfo
 Version:        1.3.1
-Release:        1
+Release:        2%{?dist}
 Summary:        A cloud-init datasource for VMware
 Group:          System/Management
 License:        ASL 2.0
@@ -36,6 +36,8 @@ install -m 0644 DataSourceVMwareGuestInfo.py %{buildroot}%{python3_sitelib}/clou
 %{python3_sitelib}/cloudinit/sources/DataSourceVMwareGuestInfo.py
 
 %changelog
+* Mon Oct 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.3.1-2
+- Adding a missing %%{?dist} tag.
 * Thu Sep 17 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.3.1-1
 - Original version for CBL-Mariner.
 - License Verified
