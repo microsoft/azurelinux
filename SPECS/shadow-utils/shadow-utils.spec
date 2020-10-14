@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        9%{?dist}
+Release:        8%{?dist}
 URL:            https://github.com/shadow-maint/shadow/
 License:        BSD
 Group:          Applications/System
@@ -25,8 +25,6 @@ BuildRequires:  cracklib-devel
 Requires:       cracklib
 BuildRequires:  pam-devel
 Requires:       pam
-BuildRequires:  libselinux-devel
-BuildRequires:  libsemanage-devel
 
 %description
 The Shadow package contains programs for handling passwords
@@ -44,11 +42,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
 
 %build
-%configure --sysconfdir=/etc \
-           --with-libpam     \
-           --with-libcrack   \
-           --with-selinux    \
-           --with-group-name-max-length=32
+%configure --sysconfdir=/etc --with-libpam \
+           --with-libcrack --with-group-name-max-length=32
 make %{?_smp_mflags}
 
 %install
@@ -146,10 +141,9 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-*   Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 4.6-9
--   Add SELinux support
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
--   Added %%license line automatically
+* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
+- Added %%license line automatically
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-7
 -   Renaming Linux-PAM to pam
 *   Mon Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-6

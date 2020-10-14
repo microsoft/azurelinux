@@ -11,8 +11,7 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/2019
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  libsepol-devel
-BuildRequires:  pcre-devel
-BuildRequires:  swig
+BuildRequires:  pcre-devel, swig
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 Requires:       pcre-libs
