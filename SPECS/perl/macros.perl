@@ -24,6 +24,7 @@ export PERL_MM_USE_DEFAULT=1
 
 #############################################################################
 # Perl specific macros, no longer part of rpm >= 4.15
+%perl_sitelib    %(eval "`%{__perl} -V:installsitelib`"; echo $installsitelib)
 %perl_vendorarch %(eval "`%{__perl} -V:installvendorarch`"; echo $installvendorarch)
 %perl_vendorlib  %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)
 %perl_archlib    %(eval "`%{__perl} -V:installarchlib`"; echo $installarchlib)

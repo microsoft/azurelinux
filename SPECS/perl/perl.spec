@@ -24,9 +24,10 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        463%{?dist}
+Release:        464%{?dist}
 Summary:        Practical Extraction and Report Language
-Url:            https://www.perl.org/
+Group:          Development/Languages
+URL:            https://www.perl.org/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -6702,6 +6703,9 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-464
+- Added the %%perl_sitelib macro.
+- Added the 'Group' tag.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 4:5.32.0-463
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
@@ -8669,5 +8673,3 @@ related to tests!
 
 * Thu Nov 29 2007 Robin Norwood <rnorwood@redhat.com> - 4:5.10.0_RC2-0.1
 - first attempt at building 5.10.0
-
-

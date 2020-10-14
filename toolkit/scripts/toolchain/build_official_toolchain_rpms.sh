@@ -420,9 +420,10 @@ chroot_and_install_rpms libksba
 build_rpm_in_chroot_no_install gnupg2
 build_rpm_in_chroot_no_install swig
 
-# gpgme needs swig, gnupg2 and python3
+# gpgme needs swig, gnupg2, mariner-python-macros and python3
 chroot_and_install_rpms swig
 chroot_and_install_rpms gnupg2
+chroot_and_install_rpms mariner-python-macros
 chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gpgme
 
