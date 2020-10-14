@@ -1,7 +1,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        9%{?dist}
+Release:        8%{?dist}
 License:        BSD
 URL:            https://www.openssh.com/
 Group:          System Environment/Security
@@ -19,7 +19,6 @@ BuildRequires:  krb5-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  systemd
 BuildRequires:  groff
-BuildRequires:  libselinux-devel
 Requires:       openssh-clients = %{version}-%{release}
 Requires:       openssh-server = %{version}-%{release}
 
@@ -57,7 +56,6 @@ tar xf %{SOURCE1} --no-same-owner
     --with-md5-passwords \
     --with-privsep-path=/var/lib/sshd \
     --with-pam \
-    --with-selinux \
     --with-maintype=man \
     --enable-strip=no \
     --with-kerberos5=/usr
@@ -173,8 +171,6 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
-*   Tue Sep 22 2020 Daniel Burgener <daburgen@microsoft.com> 8.0p1-9
--   Add SELinux support
 *   Wed Sep 02 2020 Jim Perrin <jim.perrin@microsoft.com> 8.0p1-8
 -   Add wants=sshd-keygen.service to sshd.service for easier service starting
 *   Thu Jun 04 2020 Chris Co <chrco@microsoft.com> 8.0p1-7
