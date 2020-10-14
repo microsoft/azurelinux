@@ -68,17 +68,19 @@ $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(de
 	touch $@
 
 
+imagepkgfetcher_extra_flags :=
 ifeq ($(DISABLE_UPSTREAM_REPOS),y)
-imagepkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
-else
-imagepkgfetcher_disable_upstream_repos_flag :=
+imagepkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
 ifeq ($(USE_UPDATE_REPO),y)
-imagepkgfetcher_update_repo_flag := --use-update-repo
-else
-imagepkgfetcher_update_repo_flag :=
+imagepkgfetcher_extra_flags += --use-update-repo
 endif
+
+ifeq ($(USE_PREVIEW_REPO),y)
+imagepkgfetcher_extra_flags += --use-preview-repo
+endif
+
 $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(packagelist_files) $(RPMS_DIR) $(imggen_rpms)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
@@ -92,8 +94,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(imagefetcher_local_repo) $(imagefetcher_cloned_repo) $(REPO_LIST),--repo-file="$(repo)" ) \
-		$(imagepkgfetcher_update_repo_flag) \
-		$(imagepkgfetcher_disable_upstream_repos_flag) \
+		$(imagepkgfetcher_extra_flags) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
 		--output-dir=$(local_and_external_rpm_cache)
