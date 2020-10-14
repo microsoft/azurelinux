@@ -5255,6 +5255,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "syslog-ng",
+          "version": "3.23.1",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sysstat",
           "version": "12.3.3",
           "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.3.3.tar.gz"

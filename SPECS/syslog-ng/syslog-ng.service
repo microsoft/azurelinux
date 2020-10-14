@@ -1,0 +1,16 @@
+[Unit]
+Description=System Logger Daemon
+Documentation=man:syslog-ng(8)
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/syslog-ng -F $SYSLOGNG_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+EnvironmentFile=-/etc/default/syslog-ng
+EnvironmentFile=-/etc/sysconfig/syslog-ng
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
