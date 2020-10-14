@@ -8,6 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/kkos/oniguruma/
 Source0:        https://github.com/kkos/oniguruma/releases/download/v%{version}/onig-%{version}.tar.gz
+# https://github.com/kkos/oniguruma/commit/cbe9f8bd9cfc6c3c87a60fbae58fa1a85db59df0.patch
+Patch0:         CVE-2020-26159.patch
 
 %description
 Oniguruma is a regular expressions library.
@@ -24,7 +26,8 @@ Requires:       oniguruma = %{version}-%{release}
 Development files for libonig
 
 %prep
-%setup -q -n onig-%{version}
+%autosetup -n onig-%{version}
+
 
 %build
 %configure                     \
