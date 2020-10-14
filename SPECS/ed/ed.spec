@@ -1,7 +1,7 @@
 Summary:        Ed - A line-oriented text editor
 Name:           ed
 Version:        1.14.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 URL:            https://www.gnu.org/software/ed/
 License:        GPLv3
 Group:          Applications/System
@@ -10,11 +10,15 @@ Distribution:   Mariner
 # Official source under https://ftp.gnu.org/gnu/ed/ed-1.14.2.tar.lz.
 # We don't have lzip to decompress it.
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/sha512/de838a6df785c7dc80f4b5ba84330bbe743983fd81218321d4ab84c4c3688fdafb4c005502f3228f0bfa2b6bcf342d64d9523ab73ee440b4f305a033f567cbc2/%{name}-%{version}.tar.xz
+
+# CVE-2015-2987 applies to a different program named ED
+Patch0:         CVE-2015-2987.nopatch
+
 %description
 Ed - A line-oriented text editor
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -42,6 +46,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+*   Wed Oct 14 2020 Henry Beberman <henry.beberman@microsoft.com> 1.14.2-8
+-   Nopatch CVE-2015-2987. Applies to a different program named ed.
+-   Switch setup to autosetup
 *   Wed Aug 05 2020 Andrew Phelps <anphel@microsoft.com> 1.14.2-7
 -   Remove conflicting 'dir' file from _infodir
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.14.2-6
