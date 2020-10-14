@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -47,6 +47,7 @@ code. It is incompatible with Python 2.x releases.
 %package libs
 Summary: The libraries for python runtime
 Group: Applications/System
+Requires:       coreutils
 Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
@@ -264,8 +265,6 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
-*   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 3.7.7-3
--   Remove coreutils dependency to remove circular dependency with libselinux
 *   Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> 3.7.7-2
 -   Add BuildRequires for iana-etc and tzdata for check section.
 *   Wed Jun 10 2020 Paul Monson <paulmon@microsoft.com> 3.7.7-1

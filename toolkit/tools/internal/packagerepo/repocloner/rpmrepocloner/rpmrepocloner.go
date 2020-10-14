@@ -27,6 +27,7 @@ const (
 	updateRepoID           = "mariner-official-update"
 	previewRepoID          = "mariner-preview"
 	fetcherRepoID          = "fetcher-cloned-repo"
+	cacheRepoDir           = "/upstream-cached-rpms"
 )
 
 var (
@@ -345,14 +346,31 @@ func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkg
 
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
-	fullRpmDownloadDir := buildpipeline.GetRpmsDir(r.chroot.RootDir(), chrootDownloadDir)
+	srcDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
+	repoDir := srcDir
 
-	err = rpmrepomanager.OrganizePackagesByArch(fullRpmDownloadDir, fullRpmDownloadDir)
+	if !buildpipeline.IsRegularBuild() {
+		// Docker based build don't use overlay so repo folder
+		// must be explicitely set to the RPMs cache folder
+		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
+	}
+
+	err = rpmrepomanager.OrganizePackagesByArch(srcDir, repoDir)
 	if err != nil {
 		return
 	}
 
 	err = r.initializeMountedChrootRepo(chrootDownloadDir)
+	if err != nil {
+		return
+	}
+
+	if !buildpipeline.IsRegularBuild() {
+		// Docker based build don't use overlay so cache repo
+		// must be explicitely initialized
+		err = r.initializeMountedChrootRepo(cacheRepoDir)
+	}
+
 	return
 }
 

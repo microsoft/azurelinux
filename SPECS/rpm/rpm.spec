@@ -4,7 +4,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        11%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD
 URL:            https://rpm.org
 Group:          Applications/System
@@ -31,7 +31,6 @@ BuildRequires:  file-devel
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 BuildRequires:  lua-devel
-BuildRequires:  libselinux-devel
 
 %description
 RPM package manager
@@ -122,8 +121,7 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
         --with-cap \
         --with-lua \
         --disable-silent-rules \
-        --with-external-db \
-        --with-selinux
+        --with-external-db
 make %{?_smp_mflags}
 
 pushd python
@@ -271,8 +269,6 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-*   Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-11
--   Add SELinux support
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-10
 -   Add a vendor definition so rpm will search /usr/lib/rpm/<vendor> for macros.
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.2-9
