@@ -2965,6 +2965,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mm-common",
+          "version": "1.0.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "moby-buildx",
           "version": "0.4.1+azure",
           "downloadUrl": "https://github.com/docker/buildx/archive/v0.4.1.tar.gz"
