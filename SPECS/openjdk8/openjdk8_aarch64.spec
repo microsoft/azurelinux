@@ -8,7 +8,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.181
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u/
 Group:          Development/Tools
@@ -33,6 +33,7 @@ AutoReqProv: 	no
 %define bootstrapjdk /usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap
 
 Provides: java-1.8.0-openjdk-headless = %{version}-%{release}
+Provides: java-1.8.0-openjdk-devel = %{version}-%{release}
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
@@ -249,6 +250,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+*   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-10
+-   Provide java-1.8.0-openjdk-devel.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-9
 -   Remove unused buildrequires.
 -   Provide java-1.8.0-openjdk-headless.

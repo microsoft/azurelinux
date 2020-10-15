@@ -1,9 +1,9 @@
-%global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2
+%global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
 
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -267,6 +267,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+*   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 3.7.7-5
+-   Add OPENSSL_NO_COMP flag to configuration.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 3.7.7-4
 -   Comment out check section to avoid unmet dependencies.
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.7.7-3

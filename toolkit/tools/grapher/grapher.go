@@ -288,7 +288,7 @@ func populateGraph(g *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) 
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if all nodes are from the same spec file.
 // If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
 func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
-	specFile := cycle[0].SrpmPath
+	srpmPath := cycle[0].SrpmPath
 	// Omit the first element of the cycle, since it is repeated as the last element
 	trimmedCycle := cycle[1:]
 	logger.Log.Debugf("Found cycle starting at %s", cycle[0].FriendlyName())
@@ -298,8 +298,8 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 	groupedDependencies := make(map[int64]bool)
 	for _, currentNode := range trimmedCycle {
 		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
-		if currentNode.SrpmPath != specFile {
-			return fmt.Errorf("cycle contains packages from multiple SPEC files, unresolvable")
+		if currentNode.SrpmPath != srpmPath {
+			return fmt.Errorf("cycle contains packages from multiple SRPM files (%s - %s), unresolvable", currentNode.SrpmPath, srpmPath)
 		}
 		if currentNode.Type == pkggraph.TypeBuild {
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
@@ -325,8 +325,8 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 
 	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
 
-	// Enable cycle detection between meta nodes within the same spec file
-	metaNode.SrpmPath = specFile
+	// Enable cycle detection between meta nodes within the same srpm file
+	metaNode.SrpmPath = srpmPath
 
 	return
 }
@@ -339,23 +339,22 @@ func validateGraph(g *pkggraph.PkgGraph) (err error) {
 	// Keep track of which cycles we've failed to fix
 	unfixableCycleCount := 0
 	for len(cycles) > 0 {
-		for _, cycle := range cycles {
-			// Convert our list to pkggraph.PkgNodes
-			pkgCycle := make([]*pkggraph.PkgNode, 0, len(cycle))
-			for _, node := range cycle {
-				pkgCycle = append(pkgCycle, node.(*pkggraph.PkgNode).This)
-			}
+		cycle := cycles[0]
+		// Convert our list to pkggraph.PkgNodes
+		pkgCycle := make([]*pkggraph.PkgNode, 0, len(cycle))
+		for _, node := range cycle {
+			pkgCycle = append(pkgCycle, node.(*pkggraph.PkgNode).This)
+		}
 
-			err = fixCycle(g, pkgCycle)
-			if err != nil {
-				var cycleStringBuilder strings.Builder
-				fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
-				for _, node := range pkgCycle[1:] {
-					fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
-				}
-				logger.Log.Errorf("Unfixable circular dependency found %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
-				unfixableCycleCount++
+		err = fixCycle(g, pkgCycle)
+		if err != nil {
+			var cycleStringBuilder strings.Builder
+			fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
+			for _, node := range pkgCycle[1:] {
+				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 			}
+			logger.Log.Errorf("Unfixable circular dependency found %d:\t%s\terror: %s", unfixableCycleCount, cycleStringBuilder.String(), err)
+			unfixableCycleCount++
 		}
 
 		if unfixableCycleCount > 0 {
