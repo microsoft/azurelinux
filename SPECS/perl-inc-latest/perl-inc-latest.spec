@@ -4,6 +4,8 @@ Version:        0.500
 Release:        16%{?dist}
 Summary:        Use modules bundled in inc/ if they are newer than installed ones
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/inc-latest
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/inc-latest-%{version}.tar.gz
 BuildArch:      noarch

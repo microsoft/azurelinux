@@ -23,7 +23,7 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.ta
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
 Requires:       perl(DB_File)

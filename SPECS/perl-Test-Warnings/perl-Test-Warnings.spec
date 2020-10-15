@@ -10,7 +10,7 @@ Distribution:   Mariner
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-%{version}.tar.gz
 
 BuildArch:      noarch
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl(Carp)
 BuildRequires:  perl >= 5.28.0
 

@@ -12,7 +12,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl(deprecate)
 
 %description

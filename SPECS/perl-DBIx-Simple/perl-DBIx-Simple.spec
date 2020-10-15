@@ -13,7 +13,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl-DBI >= 1.21
 BuildRequires:  perl >= 5.28.0
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl-Object-Accessor
 Requires:       perl-DBI >= 1.21
 

@@ -11,7 +11,7 @@ Source:         https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-
 %define sha1    Text-Template=423945fbe09c31f341d51afafcf635d2fbe6850b
 
 BuildArch:      noarch
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl-Test-Warnings
 BuildRequires:  perl >= 5.28.0

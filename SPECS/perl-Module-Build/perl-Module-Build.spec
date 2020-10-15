@@ -47,7 +47,6 @@ BuildRequires:  perl(File::Spec) >= 0.82
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp) >= 0.15
 BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(inc::latest)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Module::Metadata) >= 1.000002
 BuildRequires:  perl(Parse::CPAN::Meta) >= 1.4401
@@ -72,7 +71,6 @@ Requires:       perl(ExtUtils::Install) >= 0.3
 Requires:       perl(ExtUtils::Manifest) >= 1.54
 Requires:       perl(ExtUtils::Mkbootstrap)
 Requires:       perl(ExtUtils::ParseXS) >= 2.21
-Requires:       perl(inc::latest)
 Requires:       perl(Module::Metadata) >= 1.000002
 
 Provides:       perl(Module::Build) = %{version}-%{release}

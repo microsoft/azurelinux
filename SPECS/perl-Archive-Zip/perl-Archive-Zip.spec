@@ -8,6 +8,8 @@ Summary:        Perl library for accessing Zip archives
 # other files:                  GPL+ or Artistic
 License:        (GPL+ or Artistic) and BSD
 URL:            https://metacpan.org/release/Archive-Zip
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Source0:        https://cpan.metacpan.org/authors/id/P/PH/PHRED/Archive-Zip-%{version}.tar.gz
 BuildArch:      noarch
 # For a Git binary patch

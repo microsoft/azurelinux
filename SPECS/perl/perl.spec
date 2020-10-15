@@ -1,6 +1,7 @@
 %define _unpackaged_files_terminate_build 0
 
 %global perl_version    5.32.0
+%global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
  
@@ -98,6 +99,7 @@ Name:           perl
 # Nevertheless, it needs a License tag, so we'll use the generic
 # "perl" license.
 License:        GPL+ or Artistic 
+Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
 Release:        463%{?dist}
@@ -303,9 +305,9 @@ Requires:  rsyslog
 %global perl_compat perl(:MODULE_COMPAT_5.32.0)
 
 Requires:       %perl_compat
-Requires:       perl-interpreter%{?_isa} = %{perl_version}-%{release}
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
-Requires:       perl-devel%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-devel%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl-macros
 Requires:       perl-utils
 %if %{defined perl_bootstrap}
@@ -428,8 +430,9 @@ License:        GPL+ or Artistic
 # <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
 # bug #1464903.
 Version:        %{perl_version}
+Epoch:          %{perl_epoch}
 
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 # Require this till perl-interpreter sub-package provides any modules
 Requires:       %perl_compat
 Suggests:       perl-doc = %{perl_version}-%{release}
@@ -535,7 +538,7 @@ Requires:       systemtap-sdt-devel
 Requires:       perl(ExtUtils::ParseXS)
 Requires:       %perl_compat
 # Match library and header files when downgrading releases
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Recommends:     perl-doc = %{perl_version}-%{release}
 # Devel::PPPort for h2xs script
 Requires:       perl(Devel::PPPort)
@@ -589,7 +592,7 @@ Epoch:          0
 Version:        %{perl_version}
 BuildArch:      noarch
 # Match library exactly for perlbug version string
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 # Keep /usr/sbin/sendmail and Module::CoreList optional for the perlbug tool
 %if %{defined perl_bootstrap}
 %gendep_perl_utils
@@ -1014,7 +1017,7 @@ Requires:       perl(ExtUtils::CBuilder)
 # local::lib recommended by CPAN::FirstTime default choice, bug #1122498
 Requires:       perl(local::lib)
 %endif
-Requires:       perl(Module::Build)
+Recommends:     perl(Module::Build)
 %if ! %{defined perl_bootstrap}
 Requires:       perl(Text::Glob)
 %endif
@@ -1289,7 +1292,7 @@ Version:        1.37
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match library exactly for diagnostics messages
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Getopt::Std)
 %if %{defined perl_bootstrap}
 %gendep_perl_diagnostics
@@ -1571,7 +1574,7 @@ Version:        1.30
 Requires:       %perl_compat
 # Errno.pm bakes in kernel version at build time and compares it against
 # $Config{osvers} at run time. Match exact interpreter build. Bug #1393421.
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Errno
@@ -3191,7 +3194,7 @@ Epoch:          0
 Version:        %{perl_version}
 Requires:       %perl_compat
 # Match header files used when building perl.
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(warnings)
 # We deliver this package only for these three files mentioned in
 # a documentation.
@@ -3251,7 +3254,7 @@ Version:        1.13
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match perl the functions come from
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Functions
 %endif
@@ -7010,11 +7013,11 @@ popd
 # Old changelog entries are preserved in CVS.
 %changelog
 
-* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 5.32.0-463
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 4:5.32.0-463
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Remove redhat rpm macros requirement.
 - Remove libxcrypt requirement.
-- Remove epoch and conflicts.
+- Make perl(Module::Build) a recommends for CPAN.
 
 * Thu Aug 27 2020 Petr Pisar <ppisar@redhat.com> - 4:5.32.0-462
 - Fix inheritance resolution of lexial objects in a debugger (GH#17661)

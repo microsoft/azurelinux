@@ -14,7 +14,7 @@ Patch0:		autoconf-make-check.patch
 BuildRequires:	perl
 BuildRequires:	m4
 Requires:	m4
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 BuildArch:      noarch
 
 %description

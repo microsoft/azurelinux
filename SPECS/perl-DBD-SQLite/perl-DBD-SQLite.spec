@@ -14,7 +14,7 @@ BuildRequires:  sqlite-devel >= 3.22.0
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-DBI
 Requires:       perl-DBI
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 
 %description
 SQLite is a public domain RDBMS database engine that you can find at

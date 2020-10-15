@@ -111,6 +111,7 @@ perl-PathTools-3.78-463.cm1.x86_64.rpm
 perl-Errno-1.30-463.cm1.x86_64.rpm
 perl-Scalar-List-Utils-1.55-463.cm1.x86_64.rpm
 perl-Carp-1.50-463.cm1.noarch.rpm
+perl-macros-5.32.0-463.cm1.noarch.rpm
 texinfo-6.5-8.cm1.x86_64.rpm
 autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
