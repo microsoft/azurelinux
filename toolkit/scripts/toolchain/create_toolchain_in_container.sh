@@ -55,6 +55,7 @@ rm -rvf ./populated_toolchain
 mv ./lfs ./populated_toolchain
 rm -rvf ./populated_toolchain/.dockerenv
 rm -rvf ./populated_toolchain/sources
+rm ./container/toolchain-local-wget-list
 tar czf toolchain_from_container.tar.gz populated_toolchain
 ls -la ./
 ls -la ./populated_toolchain
