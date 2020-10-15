@@ -30,7 +30,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications.
 
 %prep
-%autosetup -p
+%autosetup -p1
 %build
 %configure \
     --disable-silent-rules \
