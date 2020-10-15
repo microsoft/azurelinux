@@ -50,7 +50,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 0.1.10-5
-- Remove %sha1 line
+- Remove %%sha1 line
 - Lint to Mariner style
 - Remove *.la files
 - License verified.
