@@ -1,0 +1,31 @@
+diff --git a/plugins/inputs/procstat/process.go b/plugins/inputs/procstat/process.go
+index 042929f0..cf4f5185 100644
+--- a/plugins/inputs/procstat/process.go
++++ b/plugins/inputs/procstat/process.go
+@@ -26,6 +26,7 @@ type Process interface {
+ 	RlimitUsage(bool) ([]process.RlimitStat, error)
+ 	Username() (string, error)
+ 	CreateTime() (int64, error)
++	MemoryMaps(bool) (*[]process.MemoryMapsStat, error)
+ }
+ 
+ type PIDFinder interface {
+diff --git a/plugins/inputs/procstat/procstat.go b/plugins/inputs/procstat/procstat.go
+index 8e56e4bf..bf2d5503 100644
+--- a/plugins/inputs/procstat/procstat.go
++++ b/plugins/inputs/procstat/procstat.go
+@@ -250,6 +250,14 @@ func (p *Procstat) addMetric(proc Process, acc telegraf.Accumulator) {
+ 		fields[prefix+"memory_locked"] = mem.Locked
+ 	}
+ 
++	memMaps, err := proc.MemoryMaps(true)
++	if err == nil {
++		fields[prefix+"memory_maps_shared_dirty"] = (*memMaps)[0].SharedDirty
++		fields[prefix+"memory_maps_shared_clean"] = (*memMaps)[0].SharedClean
++		fields[prefix+"memory_maps_private_dirty"] = (*memMaps)[0].PrivateDirty
++		fields[prefix+"memory_maps_private_clean"] = (*memMaps)[0].PrivateClean
++	}
++
+ 	mem_perc, err := proc.MemoryPercent()
+ 	if err == nil {
+ 		fields[prefix+"memory_usage"] = mem_perc
