@@ -5405,6 +5405,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "toml11",
+          "version": "3.3.0",
+          "downloadUrl": "https://github.com/ToruNiina/toml11/archive/v3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tpm2-abrmd",
           "version": "2.3.3",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
