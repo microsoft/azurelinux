@@ -2215,6 +2215,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblogging",
+          "version": "1.0.6",
+          "downloadUrl": "http://download.rsyslog.com/liblogging/liblogging-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmbim",
           "version": "1.18.2",
           "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.18.2.tar.xz"
