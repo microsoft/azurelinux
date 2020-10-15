@@ -5385,6 +5385,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tinyxml2",
+          "version": "7.1.0",
+          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tmux",
           "version": "2.7",
           "downloadUrl": "https://github.com/tmux/tmux/releases/download/2.7/tmux-2.7.tar.gz"
