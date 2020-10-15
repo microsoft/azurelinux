@@ -27,6 +27,7 @@ DOWNLOAD_SRPMS                  ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
 USE_UPDATE_REPO                 ?= y
+USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
 TOOLCHAIN_ARCHIVE               ?=
@@ -84,12 +85,21 @@ toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache/
 endif
 
 # External source server
-SOURCE_URL         ?= 
-PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
-PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
-SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms \
-                      https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms \
-                      https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
+SOURCE_URL         ?=
+
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+
+ifeq ($(USE_UPDATE_REPO),y)
+PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
+SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
+endif
+
+ifeq ($(USE_PREVIEW_REPO),y)
+PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/$(build_arch)/rpms
+SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/preview/srpms
+endif
+
 REPO_LIST   ?=
 CA_CERT     ?=
 TLS_CERT    ?=
