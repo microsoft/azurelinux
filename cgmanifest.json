@@ -2235,6 +2235,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblogging",
+          "version": "1.0.6",
+          "downloadUrl": "http://download.rsyslog.com/liblogging/liblogging-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmbim",
           "version": "1.18.2",
           "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.18.2.tar.xz"
@@ -2665,6 +2675,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxml++",
+          "version": "3.2.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxml2",
           "version": "2.9.10",
           "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.10.tar.gz"
@@ -2985,6 +3005,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mm-common",
+          "version": "1.0.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "moby-buildx",
           "version": "0.4.1+azure",
           "downloadUrl": "https://github.com/docker/buildx/archive/v0.4.1.tar.gz"
@@ -3068,6 +3098,16 @@
           "name": "mpfr",
           "version": "4.0.1",
           "downloadUrl": "http://www.mpfr.org/mpfr-4.0.1/mpfr-4.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msgpack",
+          "version": "3.2.1",
+          "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.2.1.tar.gz"
         }
       }
     },
@@ -3208,6 +3248,16 @@
           "name": "ninja-build",
           "version": "1.8.2",
           "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nlohmann-json",
+          "version": "3.6.1",
+          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.6.1.tar.gz"
         }
       }
     },
@@ -5175,6 +5225,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "span-lite",
+          "version": "0.7.0",
+          "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sqlite",
           "version": "3.32.3",
           "downloadUrl": "https://www.sqlite.org/2020/sqlite-autoconf-3320300.tar.gz"
@@ -5268,6 +5328,16 @@
           "name": "syslinux",
           "version": "6.04",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.04/syslinux-6.04-pre1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "syslog-ng",
+          "version": "3.23.1",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
         }
       }
     },
@@ -5385,6 +5455,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "telegraf",
+          "version": "1.14.5",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.14.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "texinfo",
           "version": "6.5",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.5.tar.xz"
@@ -5395,9 +5475,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tinyxml2",
+          "version": "7.1.0",
+          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tmux",
           "version": "2.7",
           "downloadUrl": "https://github.com/tmux/tmux/releases/download/2.7/tmux-2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "toml11",
+          "version": "3.3.0",
+          "downloadUrl": "https://github.com/ToruNiina/toml11/archive/v3.3.0.tar.gz"
         }
       }
     },
@@ -5428,6 +5528,16 @@
           "name": "tpm2-tss",
           "version": "2.4.0",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tracelogging",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.2.tar.gz"
         }
       }
     },
@@ -5738,6 +5848,16 @@
           "name": "zip",
           "version": "3.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "zipper",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.1.tar.gz"
         }
       }
     },
