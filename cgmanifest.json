@@ -5445,6 +5445,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tracelogging",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "traceroute",
           "version": "2.1.0",
           "downloadUrl": "http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-2.1.0/traceroute-2.1.0.tar.gz"
@@ -5748,6 +5758,16 @@
           "name": "zip",
           "version": "3.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "zipper",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.1.tar.gz"
         }
       }
     },
