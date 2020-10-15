@@ -2215,6 +2215,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblogging",
+          "version": "1.0.6",
+          "downloadUrl": "http://download.rsyslog.com/liblogging/liblogging-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmbim",
           "version": "1.18.2",
           "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.18.2.tar.xz"
@@ -2645,6 +2655,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxml++",
+          "version": "3.2.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxml2",
           "version": "2.9.10",
           "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.10.tar.gz"
@@ -2958,6 +2978,16 @@
           "name": "mlocate",
           "version": "0.26",
           "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mm-common",
+          "version": "1.0.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.0.tar.xz"
         }
       }
     },
