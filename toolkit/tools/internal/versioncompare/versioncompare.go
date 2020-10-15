@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	componentRegex = regexp.MustCompile(`(\d+|[a-z]+)`)
+	componentRegex      = regexp.MustCompile(`(\d+|[a-z]+)`)
+	epochComponentRegex = regexp.MustCompile(`^(\d+|[a-z])\:`)
 )
 
 // TolerantVersion is a flexible version representation
@@ -135,6 +136,12 @@ func (v *TolerantVersion) parse(versionString string) {
 	}
 
 	rawComponents := componentRegex.FindAllString(versionSubstring, -1)
+
+	// If no epoch is set in the version, apply an epoch of 0 so all versions have one.
+	if epochComponentRegex.FindString(versionSubstring) == "" {
+		rawComponents = append([]string{"0"}, rawComponents...)
+	}
+
 	v.versionComponents = make([]uint64, len(rawComponents))
 	for i := range rawComponents {
 		// Base36 to support lowercase characters
@@ -149,6 +156,11 @@ func (v *TolerantVersion) parse(versionString string) {
 	// Run again if we have a release version as well
 	if releaseSubstring != "" {
 		rawComponents = componentRegex.FindAllString(releaseSubstring, -1)
+		// If no epoch is set in the version, apply an epoch of 0 so all versions have one.
+		if epochComponentRegex.FindString(releaseSubstring) == "" {
+			rawComponents = append([]string{"0"}, rawComponents...)
+		}
+
 		v.releaseComponents = make([]uint64, len(rawComponents))
 		for i := range rawComponents {
 			// Base36 to support lowercase characters
