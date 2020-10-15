@@ -19,6 +19,7 @@ Requires:       libdb
 Requires:       rpm-libs = %{version}-%{release}
 Requires:       libarchive
 Requires:       lua
+Requires:       libselinux
 BuildRequires:  libarchive-devel
 BuildRequires:  libdb-devel
 BuildRequires:  popt-devel

@@ -496,12 +496,18 @@ chroot_and_install_rpms libtirpc
 chroot_and_install_rpms rpcsvc-proto
 build_rpm_in_chroot_no_install libnsl2
 
-# tcp_wrappers needs libnsl2
+build_rpm_in_chroot_no_install finger
+
+# tcp_wrappers needs libnsl2, finger
 chroot_and_install_rpms libnsl2
+chroot_and_install_rpms finger
 build_rpm_in_chroot_no_install tcp_wrappers
 
-# openldap needs groff
+build_rpm_in_chroot_no_install cyrus-sasl
+
+# openldap needs groff, cyrus-sasl
 chroot_and_install_rpms groff
+chroot_and_install_rpms cyrus-sasl
 build_rpm_in_chroot_no_install openldap
 
 build_rpm_in_chroot_no_install libcap-ng

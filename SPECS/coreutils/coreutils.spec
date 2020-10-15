@@ -22,7 +22,7 @@ Patch4:         CVE-2013-0222.nopatch
 # CVE-2013-0223 is fixed in coreutils-8.30-i18n-1.patch
 Patch5:         CVE-2013-0223.nopatch
 Requires:       gmp
-BuildRequires:  selinux-headers
+BuildRequires:  libselinux-devel
 Conflicts:      toybox
 Provides:       sh-utils
 

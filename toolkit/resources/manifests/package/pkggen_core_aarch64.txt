@@ -113,6 +113,7 @@ openssl-static-1.1.1g-12.cm1.aarch64.rpm
 openssl-debuginfo-1.1.1g-12.cm1.aarch64.rpm
 libcap-2.26-2.cm1.aarch64.rpm
 libcap-devel-2.26-2.cm1.aarch64.rpm
+libcap-ng-0.7.9-2.cm1.aarch64.rpm
 libdb-5.3.28-4.cm1.aarch64.rpm
 libdb-devel-5.3.28-4.cm1.aarch64.rpm
 libdb-docs-5.3.28-4.cm1.aarch64.rpm
@@ -164,3 +165,10 @@ p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
 ca-certificates-shared-20200720-10.cm1.noarch.rpm
 ca-certificates-tools-20200720-10.cm1.noarch.rpm
 ca-certificates-base-20200720-10.cm1.noarch.rpm
+finger-0.17-4.cm1.aarch64.rpm
+tcp_wrappers-7.6-9.cm1.aarch64.rpm
+audit-libs-3.0-4.cm1.aarch64.rpm
+openldap-2.4.50-1.cm1.aarch64.rpm
+libsepol-2.9-5.cm1.aarch64.rpm
+libselinux-2.9-3.cm1.aarch64.rpm
+libsemanage-2.9-4.cm1.aarch64.rpm
