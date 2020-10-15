@@ -3225,6 +3225,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nlohmann-json",
+          "version": "3.6.1",
+          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs",
           "version": "8.11.4",
           "downloadUrl": "https://nodejs.org/download/release/v8.11.4/node-v8.11.4.tar.xz"
