@@ -1,14 +1,13 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 URL:            http://www.netfilter.org/projects/iptables
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.bz2
-%define sha1    %{name}-%{version}=6df99e90cb4d59032ab2050ebb426fe065249bd3
 Source1:        iptables.service
 Source2:        iptables
 Source3:        iptables.stop
@@ -31,7 +30,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications.
 
 %prep
-%setup -q
+%autosetup -p
 %build
 %configure \
     --disable-silent-rules \
@@ -96,9 +95,11 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
-- Added %%license line automatically
-
+*   Thu Oct 15 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-4
+-   Use Autosetup and removed old sha1 define
+-   Modified the ip4, ip6 to default to ACCEPT all connections 
+*   Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.3-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Tue Jul 30 2019 Shreyas B. <shreyasb@vmware.com> 1.8.3-1
