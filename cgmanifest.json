@@ -2805,6 +2805,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lttng-consume",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/lttng-consume/archive/v0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lttng-tools",
           "version": "2.11.2",
           "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.11.2.tar.bz2"
