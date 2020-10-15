@@ -189,15 +189,10 @@ $(toolchain_rpms): $(toolchain_manifest) $(toolchain_local_temp)
 	touch $@
 else
 # Download from online package server
-ifeq ($(USE_UPDATE_REPO),y)
-toolchain_package_urls := $(PACKAGE_URL) $(PACKAGE_UPDATE_URL)
-else
-toolchain_package_urls := $(PACKAGE_URL)
-endif
 $(toolchain_rpms):
 	mkdir -p $(dir $@) && \
 	cd $(dir $@) && \
-	for url in $(toolchain_package_urls); do \
+	for url in $(PACKAGE_URL_LIST); do \
 		wget $${url}/$(notdir $@) \
 			--no-verbose \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \

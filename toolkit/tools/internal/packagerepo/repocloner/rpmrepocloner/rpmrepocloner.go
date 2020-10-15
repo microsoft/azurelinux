@@ -25,6 +25,7 @@ const (
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
 	updateRepoID           = "mariner-official-update"
+	previewRepoID          = "mariner-preview"
 	fetcherRepoID          = "fetcher-cloned-repo"
 	cacheRepoDir           = "/upstream-cached-rpms"
 )
@@ -48,9 +49,10 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot        *safechroot.Chroot
-	useUpdateRepo bool
-	cloneDir      string
+	chroot         *safechroot.Chroot
+	useUpdateRepo  bool
+	usePreviewRepo bool
+	cloneDir       string
 }
 
 // New creates a new RpmRepoCloner
@@ -64,8 +66,9 @@ func New() *RpmRepoCloner {
 //  - workerTar is the path to the worker tar used to seed the chroot
 //  - existingRpmsDir is the directory with prebuilt RPMs
 //  - useUpdateRepo if set, the upstream update repository will be used.
+//  - usePreviewRepo if set, the upstream preview repository will be used.
 //  - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, useUpdateRepo bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, useUpdateRepo, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
@@ -80,8 +83,13 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	)
 
 	r.useUpdateRepo = useUpdateRepo
-	if !useUpdateRepo {
-		logger.Log.Warnf("Disabling update repo")
+	if useUpdateRepo {
+		logger.Log.Info("Enabling update repo")
+	}
+
+	r.usePreviewRepo = usePreviewRepo
+	if usePreviewRepo {
+		logger.Log.Info("Enabling preview repo")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -300,6 +308,10 @@ func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkg
 			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
 		}
 
+		if !r.usePreviewRepo {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+		}
+
 		stdout, stderr, err := shell.Execute("tdnf", args...)
 		logger.Log.Debugf("tdnf search for dependency '%s':\n%s", singlePackageToClone.Name, stdout)
 
@@ -445,6 +457,10 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		// Explicitly disable the update repo if it is turned off.
 		if !r.useUpdateRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
+		}
+
+		if !r.usePreviewRepo {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
 		}
 
 		var (
