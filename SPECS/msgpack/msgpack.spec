@@ -50,7 +50,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.2.1-2
-- License verified and %license added
+- License verified and %%license added
 - Update Source0
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.2.1-1
