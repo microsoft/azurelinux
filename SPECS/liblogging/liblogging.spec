@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.liblogging.org/
 Source0:        http://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
+BuildRequires:	gcc
 
 %description
 liblogging (the upstream project) is a collection of several components.
@@ -40,7 +41,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %check
 make %{?_smp_mflags} check
 
-%post   -p /sbin/ldconfig
+%post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
