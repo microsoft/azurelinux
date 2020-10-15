@@ -59,7 +59,7 @@ make test -C build
 %changelog
 * Wed Oct 07 2020 Thomas Crain <thcrain@microsoft.com> - 0.2.1-2
 - Updated #Source0 URL
-- Verified License field and %license macro
+- Verified License field and %%license macro
 
 * Fri Aug 28 2020 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 0.2.1-1
 - Update to v0.2.1
