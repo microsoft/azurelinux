@@ -92,17 +92,19 @@ $(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIS
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
 $(CACHED_RPMS_DIR)/%: ;
 
+graphpkgfetcher_extra_flags :=
 ifeq ($(DISABLE_UPSTREAM_REPOS),y)
-graphpkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
-else
-graphpkgfetcher_disable_upstream_repos_flag :=
+graphpkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
 ifeq ($(USE_UPDATE_REPO),y)
-graphpkgfetcher_update_repo_flag := --use-update-repo
-else
-graphpkgfetcher_update_repo_flag :=
+graphpkgfetcher_extra_flags += --use-update-repo
 endif
+
+ifeq ($(USE_PREVIEW_REPO),y)
+graphpkgfetcher_extra_flags += --use-preview-repo
+endif
+
 # Compare files via checksum (-c) instead of timestamp so unchanged RPMs are left intact without updating the timestamp of the directories
 $(cached_file): $(optimized_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
@@ -115,8 +117,7 @@ $(cached_file): $(optimized_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkgge
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
-		$(graphpkgfetcher_update_repo_flag) \
-		$(graphpkgfetcher_disable_upstream_repos_flag) \
+		$(graphpkgfetcher_extra_flags) \
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \

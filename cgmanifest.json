@@ -2655,6 +2655,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxml++",
+          "version": "3.2.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxml2",
           "version": "2.9.10",
           "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.10.tar.gz"
@@ -2968,6 +2978,16 @@
           "name": "mlocate",
           "version": "0.26",
           "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mm-common",
+          "version": "1.0.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.0.tar.xz"
         }
       }
     },
@@ -5265,6 +5285,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "syslog-ng",
+          "version": "3.23.1",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sysstat",
           "version": "12.3.3",
           "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.3.3.tar.gz"
@@ -5385,9 +5415,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tinyxml2",
+          "version": "7.1.0",
+          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tmux",
           "version": "2.7",
           "downloadUrl": "https://github.com/tmux/tmux/releases/download/2.7/tmux-2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "toml11",
+          "version": "3.3.0",
+          "downloadUrl": "https://github.com/ToruNiina/toml11/archive/v3.3.0.tar.gz"
         }
       }
     },
@@ -5418,6 +5468,16 @@
           "name": "tpm2-tss",
           "version": "2.4.0",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tracelogging",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.2.tar.gz"
         }
       }
     },
@@ -5728,6 +5788,16 @@
           "name": "zip",
           "version": "3.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "zipper",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.1.tar.gz"
         }
       }
     },
