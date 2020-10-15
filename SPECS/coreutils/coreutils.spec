@@ -13,7 +13,7 @@ Source1:        serial-console.sh
 Patch0:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.30-i18n-1.patch
 Patch1:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.10-uname-1.patch
 Requires:       gmp
-BuildRequires:  selinux-headers
+BuildRequires:  libselinux-devel
 Provides:       sh-utils
 Conflicts:      toybox
 %description
