@@ -2,10 +2,12 @@ Summary:        mm-common module
 Name:           mm-common
 Version:        1.0.0
 Release:        3%{?dist}
-License:        LGPL
+License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/C and C++
 URL:            https://gtkmm.org
-Source0:        http://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/1.0/%{name}-%{version}.tar.xz
 %define debug_package %{nil}
 BuildRequires:  pkg-config
 BuildArch:      noarch
@@ -41,9 +43,10 @@ make install DESTDIR=%{buildroot}
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.0-3
 - Update Source0 (removes need for libstdc++.tag file)
 - Lint for Mariner style
+- License verified
 
 * Tue Jun 09 2020 Jonathan Chiu <jochi@microsoft.com> - 1.0.0-2
 - Include libstdc++.tag in source files so package can be built offline
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 1.0.0-1
--   Original version for CBL-Mariner
+- Original version for CBL-Mariner

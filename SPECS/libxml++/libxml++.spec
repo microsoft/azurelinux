@@ -1,10 +1,12 @@
 Summary:        libxml++
 Name:           libxml++
 Version:        3.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://libxmlplusplus.sourceforge.net/
-Source0:        http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/3.2/%{name}-%{version}.tar.xz
 BuildRequires:  glibmm24-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  mm-common
@@ -62,9 +64,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.2.0-3
 - Remove .la files
+- License verified
 
 * Fri Jun 05 2020 Jonathan Chiu <jochi@microsoft.com> - 3.2.0-2
 - Update dependency names
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.2.0-1
-- Original version for Mariner
+- Original version for CBL-Mariner
