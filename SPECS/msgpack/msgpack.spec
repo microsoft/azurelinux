@@ -7,15 +7,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://msgpack.org
 #Source0:       https://github.com/%{name}/%{name}-c/archive/cpp-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{name}-c-cpp-%{version}.tar.gz
 %define _build_id_links none
 BuildRequires:  boost-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 
 %description
-Fluent Bit is a fast Log Processor and Forwarder for Linux, Embedded Linux, MacOS and BSD
-family operating systems. It's part of the Fluentd Ecosystem and a CNCF sub-project.
+MessagePack is an efficient binary serialization format,
+which lets you exchange data among multiple languages like JSON,
+except that it's faster and smaller.
 
 %package devel
 Summary:        Development files for %{name}
