@@ -1,6 +1,6 @@
 Name:           oniguruma
 Version:        6.9.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Summary:        Regular expressions library
 Group:          System Environment/Libraries
@@ -26,7 +26,7 @@ Requires:       oniguruma = %{version}-%{release}
 Development files for libonig
 
 %prep
-%autosetup -n onig-%{version}
+%autosetup -n onig-%{version} -p1
 
 
 %build
@@ -65,6 +65,8 @@ make  check
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 6.9.5-2
+- Fix CVE-2020-26159. 
 * Tue May 19 2020 Andrew Phelps <anphel@microsoft.com> 6.9.5-1
 - Upgrade to 6.9.5.
 * Wed Apr 22 2020 Emre Girgin <mrgirgin@microsoft.com> 6.9.0-4
