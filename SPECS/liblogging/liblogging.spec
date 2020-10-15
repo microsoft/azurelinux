@@ -7,8 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.liblogging.org/
-Source0:        http://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
-BuildRequires:	gcc
+Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
 
 %description
 liblogging (the upstream project) is a collection of several components.
@@ -63,10 +63,10 @@ make %{?_smp_mflags} check
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.6-3
 - Remove .la files
 - Lint to Mariner style
-- License verified, %license added
+- License verified, %%license added
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.0.6-2
-- Initial import from Photon (license: dual Apache2/GPL2).
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
 * Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 1.0.6-1
 - Updated to version 1.0.6
