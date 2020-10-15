@@ -3,7 +3,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.212
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://openjdk.java.net
 Group:          Development/Tools
@@ -31,6 +31,7 @@ Obsoletes:      openjdk <= %{version}
 AutoReqProv:    no
 
 Provides: java-1.8.0-openjdk-headless = %{version}-%{release}
+Provides: java-1.8.0-openjdk-devel = %{version}-%{release}
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
@@ -250,6 +251,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+*   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.212-12
+-   Provide java-1.8.0-openjdk-devel.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.212-11
 -   Remove unused buildrequires.
 -   Provide java-1.8.0-openjdk-headless.
