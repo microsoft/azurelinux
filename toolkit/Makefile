@@ -108,6 +108,10 @@ TLS_KEY     ?=
 # Build defines
 DIST_TAG           ?= .cm1
 BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
+# an empty BUILD_NUMBER breaks the build later on
+ifeq ($(BUILD_NUMBER),)
+        BUILD_NUMBER = non-git
+endif
 RELEASE_MAJOR_ID   ?= 1.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
