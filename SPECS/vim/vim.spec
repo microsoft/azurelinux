@@ -190,7 +190,7 @@ fi
 
 %changelog
 *   Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 8.1.0388-7
--   Fix CVE-2019-12735, CVE-2019-20079, CVE-2019-20807.
+-   Fix CVE-2019-12735.
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.1.0388-6
 -   Adding a license reference.
 *   Mon Apr 13 2020 Eric Li <eli@microsoft.com> 8.1.0388-5
