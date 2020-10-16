@@ -14,8 +14,7 @@ Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl(Encode::Alias)
 Requires:       perl(POSIX)
-Recommends:     perl(File::ShareDir)
-Recommends:     perl(I18N::Langinfo)
+Requires:       perl(I18N::Langinfo)
 
 %description
 The package libintl-perl is an internationalization library for Perl that
