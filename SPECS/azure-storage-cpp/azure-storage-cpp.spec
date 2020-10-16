@@ -6,7 +6,7 @@ Version:        7.3.0
 Release:        2%{?dist}
 License:        ASL 2.0
 URL:            http://azure.github.io/azure-storage-cpp/
-#Source0:       https://github.com/Azure/azure.github.io/azure-storage-cpp/archive/v%{version}.tar.gz
+#Source0:       https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  util-linux-devel
