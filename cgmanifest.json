@@ -5725,8 +5725,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2019c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2019c.tar.gz"
+          "version": "2020b",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2020b.tar.gz"
         }
       }
     },
