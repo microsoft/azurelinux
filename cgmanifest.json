@@ -2127,7 +2127,7 @@
         "other": {
           "name": "libffi",
           "version": "3.2.1",
-          "downloadUrl": "ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz"
+          "downloadUrl": "https://gcc.gnu.org/pub/libffi/libffi-3.2.1.tar.gz"
         }
       }
     },

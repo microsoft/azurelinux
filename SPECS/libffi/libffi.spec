@@ -1,13 +1,13 @@
 Summary:    A portable, high level programming interface to various calling conventions
 Name:       libffi
 Version:    3.2.1
-Release:    11%{?dist}
+Release:    12%{?dist}
 License:    BSD
 URL:        http://sourceware.org/libffi/
 Group:      System Environment/GeneralLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    ftp://sourceware.org/pub/libffi/%{name}-%{version}.tar.gz
+Source0:    https://gcc.gnu.org/pub/libffi/%{name}-%{version}.tar.gz
 Provides:   pkgconfig(libffi)
 #%if %{with_check}
 #BuildRequires:  dejagnu
@@ -77,6 +77,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Thu Oct 15 2020 Andrew Phelps <anphel@microsoft.com> 3.2.1-12
+-   Update Source0 to use more reliable https URL instead of ftp
 *   Fri Sep 18 2020 Mateusz Malisz <mamalisz@microsoft.com> 3.2.1-11
 -   Fix normal libffi build by replacing destination for .so files from $(toolexeclibdir) to $(libdir)
 -   Replace ./configure and manual options with %%configure macro
