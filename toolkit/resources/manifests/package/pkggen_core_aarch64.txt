@@ -153,6 +153,7 @@ perl-MIME-Base64-3.15-463.cm1.aarch64.rpm
 perl-Getopt-Std-1.12-463.cm1.noarch.rpm
 perl-Encode-3.06-463.cm1.aarch64.rpm
 perl-I18N-Langinfo-0.19-463.cm1.aarch64.rpm
+perl-locale-1.09-463.cm1.noarch.rpm
 perl-macros-5.32.0-463.cm1.noarch.rpm
 perl-libintl-perl-1.29-5.cm1.aarch64.rpm
 texinfo-6.5-8.cm1.aarch64.rpm
