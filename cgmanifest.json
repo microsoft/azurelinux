@@ -224,6 +224,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "babeltrace2",
+          "version": "2.0.1",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bash",
           "version": "4.4.18",
           "downloadUrl": "http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz"
@@ -1725,9 +1735,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jsonbuilder",
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "json-glib",
           "version": "1.4.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jsonbuilder",
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
         }
       }
     },
@@ -2107,7 +2137,7 @@
         "other": {
           "name": "libffi",
           "version": "3.2.1",
-          "downloadUrl": "ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz"
+          "downloadUrl": "https://gcc.gnu.org/pub/libffi/libffi-3.2.1.tar.gz"
         }
       }
     },
@@ -2808,6 +2838,16 @@
           "name": "ltrace",
           "version": "0.7.3",
           "downloadUrl": "http://www.ltrace.org/ltrace_0.7.3.orig.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lttng-consume",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/lttng-consume/archive/v0.2.tar.gz"
         }
       }
     },
@@ -3958,6 +3998,16 @@
           "name": "pth",
           "version": "2.0.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/pth/pth-2.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pugixml",
+          "version": "1.10",
+          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
         }
       }
     },
