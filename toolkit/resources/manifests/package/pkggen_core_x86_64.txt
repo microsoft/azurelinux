@@ -154,6 +154,9 @@ perl-Getopt-Std-1.12-463.cm1.noarch.rpm
 perl-Encode-3.06-463.cm1.x86_64.rpm
 perl-I18N-Langinfo-0.19-463.cm1.x86_64.rpm
 perl-locale-1.09-463.cm1.noarch.rpm
+perl-Unicode-Normalize-1.27-463.cm1.x86_64.rpm
+perl-base-2.27-463.cm1.noarch.rpm
+perl-if-0.60.800-463.cm1.noarch.rpm
 perl-macros-5.32.0-463.cm1.noarch.rpm
 perl-libintl-perl-1.29-5.cm1.x86_64.rpm
 texinfo-6.5-8.cm1.x86_64.rpm
