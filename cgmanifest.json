@@ -4005,6 +4005,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pugixml",
+          "version": "1.10",
+          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pyasn1-modules",
           "version": "0.2.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
