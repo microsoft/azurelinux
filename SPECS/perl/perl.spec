@@ -28,7 +28,7 @@
 # We can bootstrap without gdbm
 %bcond_without gdbm
 # Support for groff, bug #135101
-%bcond_without perl_enables_groff
+%bcond_with perl_enables_groff
 # Run Turkish locale tests
 %bcond_with perl_enables_turkish_test
 # Run syslog tests
@@ -445,6 +445,8 @@ Suggests:       perl-doc = %{perl_version}-%{release}
 Requires(post): perl-libs
 # Same as perl-libs. We need macros in basic buildroot.
 Requires(post): perl-macros
+
+Provides: /bin/perl
 
 # suidperl isn't created by upstream since 5.12.0
 Obsoletes:      perl-suidperl <= 4:5.12.2
@@ -7017,7 +7019,11 @@ popd
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Remove redhat rpm macros requirement.
 - Remove libxcrypt requirement.
+- Explicitly provide /bin/perl from perl-interpreter.
+- Disable groff.
+- Enable gdbm.
 - Make perl(Module::Build) a recommends for CPAN.
+- License verified.
 
 * Thu Aug 27 2020 Petr Pisar <ppisar@redhat.com> - 4:5.32.0-462
 - Fix inheritance resolution of lexial objects in a debugger (GH#17661)
