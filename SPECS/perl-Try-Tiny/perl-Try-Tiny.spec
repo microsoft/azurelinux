@@ -24,7 +24,7 @@ This is unlike TryCatch which provides a nice syntax and avoids adding another c
 %setup -q -n Try-Tiny-%{version}
 
 %build
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}"
 make %{?_smp_mflags}
 
 %install
@@ -42,6 +42,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.30-5
 -   Use new perl package names.
+-   Build with NO_PACKLIST option.
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.30-4
 -   Adding the "%%license" macro.
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 0.30-3

@@ -50,12 +50,13 @@ make test
 
 %files
 %license %{LICENSE_PATH}
-%{perl_vendorlib}/*
+%{perl_vendorarch}/*
 %{_mandir}/man?/*
 
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-7
 -   Use new perl package names.
+-   Change perl_vendorlib to perl_vendorarch directory for packaging.
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-6
 -   Added %%license macro.
 -   Update License.

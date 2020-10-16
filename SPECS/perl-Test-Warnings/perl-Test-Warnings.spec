@@ -21,7 +21,7 @@ Test::Warnings tests for warnings and the lack of them
 %setup -q -n Test-Warnings-%{version}
 
 %build
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}"
 make %{?_smp_mflags}
 
 %install
@@ -39,6 +39,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.028-4
 -   Use new perl package names.
+-   Build with NO_PACKLIST option.
 
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.028-3
 -   Adding the "%%license" macro.

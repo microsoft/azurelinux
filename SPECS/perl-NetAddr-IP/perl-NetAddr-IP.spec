@@ -34,12 +34,13 @@ make test
 
 %files
 %license Copying
-%{perl_vendorlib}/*
+%{perl_vendorarch}/*
 %{_mandir}/man3/*
 
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
 -   Use new perl package names.
+-   Change perl_vendorlib to perl_vendorarch directory for packaging.
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
 - Added %%license line automatically
 

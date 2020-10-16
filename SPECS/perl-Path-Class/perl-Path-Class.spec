@@ -27,7 +27,7 @@ The well-known module File::Spec also provides this service, but it's sort of aw
 %setup -q -n Path-Class-%{version}
 
 %build
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}"
 make %{?_smp_mflags}
 
 %install
@@ -45,6 +45,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.37-6
 -   Use new perl package names.
+-   Build with NO_PACKLIST option.
 * Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.37-5
 - Added %%license line automatically
 

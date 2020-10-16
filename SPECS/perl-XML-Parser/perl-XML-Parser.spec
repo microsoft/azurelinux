@@ -20,7 +20,7 @@ The XML::Parser module is a Perl extension interface to James Clark's XML parser
 %prep
 %setup -q -n XML-Parser-%{version}
 %build
-perl Makefile.PL --prefix=%{_prefix}
+perl Makefile.PL INSTALLDIRS=vendor --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
@@ -33,12 +33,14 @@ make %{?_smp_mflags} test
 %files
 %defattr(-,root,root)
 %license README
-%{_libdir}/perl5/*
+%{perl_vendorarch}/XML/
+%{perl_vendorarch}/auto/XML/
 %{_mandir}/man3/*
 
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-11
 -   Use new perl package names.
+-   Set vendor INSTALLDIRS and update packaging directories.
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.44-10
 -   Added %%license invocation
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.44-9
