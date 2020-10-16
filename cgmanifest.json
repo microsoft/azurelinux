@@ -224,6 +224,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "babeltrace2",
+          "version": "2.0.1",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bash",
           "version": "4.4.18",
           "downloadUrl": "http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz"
@@ -2828,6 +2838,16 @@
           "name": "ltrace",
           "version": "0.7.3",
           "downloadUrl": "http://www.ltrace.org/ltrace_0.7.3.orig.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lttng-consume",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/lttng-consume/archive/v0.2.tar.gz"
         }
       }
     },
