@@ -11,9 +11,9 @@ Source0:	http://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
 %define sha1 autoconf=e891c3193029775e83e0534ac0ee0c4c711f6d23
 Patch0:		autoconf-make-check.patch
 
-BuildRequires:	perl
-BuildRequires:	m4
-Requires:	m4
+BuildRequires:  perl
+BuildRequires:  m4
+Requires:       m4
 Requires:       perl-libs
 BuildArch:      noarch
 

@@ -9,8 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://ftp.gnu.org/gnu/groff/%{name}-%{version}.tar.gz
 %define sha1 groff=61a6808ea1ef715df9fa8e9b424e1f6b9fa8c091
-Provides:	perl(oop_fh.pl) = %{version}-%{release}
-Provides:	perl(main_subs.pl) = %{version}-%{release}
+Provides:   perl(oop_fh.pl) = %{version}-%{release}
+Provides:   perl(main_subs.pl) = %{version}-%{release}
 Provides:   perl(man.pl) = %{version}-%{release}
 Provides:   perl(subs.pl) = %{version}-%{release}
 Provides:   groff-base = %{version}-%{release}

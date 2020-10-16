@@ -38,7 +38,7 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-11
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.44-11
 -   Use new perl package names.
 -   Set vendor INSTALLDIRS and update packaging directories.
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.44-10

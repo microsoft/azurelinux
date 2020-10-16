@@ -9,7 +9,7 @@ URL: 		http://search.cpan.org/dist/libintl-perl/
 Source: 	https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires: 	perl >= 5.28.0
+BuildRequires:  perl >= 5.28.0
 Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl(Encode::Alias)

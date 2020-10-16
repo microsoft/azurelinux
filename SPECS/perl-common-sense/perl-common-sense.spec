@@ -13,7 +13,7 @@ Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{ver
 %define sha1 common-sense=b32990086501a68bdb10bfa85160866d270aa8ae
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:	perl >= 5.28.0
+BuildRequires:  perl >= 5.28.0
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 

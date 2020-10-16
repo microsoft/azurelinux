@@ -11,12 +11,12 @@ Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:	noarch
-BuildRequires:	perl >= 5.28.0
-BuildRequires:	perl-common-sense
+BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-common-sense
 
-Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(Carp)
-Requires:	perl-common-sense
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Carp)
+Requires:       perl-common-sense
 
 # Filter bogus provide of JSON::PP::Boolean (for rpm ≥ 4.9)
 %global __provides_exclude ^perl\\(JSON::PP::Boolean\\)

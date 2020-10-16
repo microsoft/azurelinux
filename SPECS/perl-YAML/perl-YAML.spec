@@ -11,7 +11,7 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-%{version}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl
+BuildRequires:  perl >= 5.28.0
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B::Deparse)
 Requires:       perl(Carp)

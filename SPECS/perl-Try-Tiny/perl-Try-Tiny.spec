@@ -12,8 +12,8 @@ Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-%{versi
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 
-Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:   perl(Sub::Util)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Sub::Util)
 
 %description
 This module provides bare bones try/catch/finally statements that are designed to minimize common mistakes with eval blocks, and NOTHING else.

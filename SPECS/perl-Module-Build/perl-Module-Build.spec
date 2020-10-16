@@ -16,51 +16,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 
-BuildRequires:  perl-interpreter
-BuildRequires:  perl-devel
-BuildRequires:  perl(Archive::Tar)
-BuildRequires:  perl(AutoSplit)
-BuildRequires:  perl(base)
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Config)
-BuildRequires:  perl(CPAN::Meta) >= 2.142060
-BuildRequires:  perl(CPAN::Meta::Converter) >= 2.141170
-BuildRequires:  perl(CPAN::Meta::Merge)
-BuildRequires:  perl(CPAN::Meta::YAML) >= 0.003
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(DynaLoader)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::CBuilder) >= 0.27
-BuildRequires:  perl(ExtUtils::Install) >= 0.3
-BuildRequires:  perl(ExtUtils::Installed)
-BuildRequires:  perl(ExtUtils::Manifest) >= 1.54
-BuildRequires:  perl(ExtUtils::Mkbootstrap)
-BuildRequires:  perl(ExtUtils::Packlist)
-BuildRequires:  perl(ExtUtils::ParseXS) >= 2.21
-BuildRequires:  perl(File::Basename)
-BuildRequires:  perl(File::Compare)
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(File::Find)
-BuildRequires:  perl(File::Path)
-BuildRequires:  perl(File::Spec) >= 0.82
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(File::Temp) >= 0.15
-BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(Module::Metadata) >= 1.000002
-BuildRequires:  perl(Parse::CPAN::Meta) >= 1.4401
-BuildRequires:  perl(Perl::OSType) >= 1
-BuildRequires:  perl(strict)
-BuildRequires:  perl(TAP::Harness)
-BuildRequires:  perl(TAP::Harness::Env)
-BuildRequires:  perl(Test::Harness) >= 3.29
-BuildRequires:  perl(Test::More) >= 0.49
-BuildRequires:  perl(Text::ParseWords)
-BuildRequires:  perl(utf8)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(version) >= 0.87
-BuildRequires:  perl(warnings)
+BuildRequires:  perl >= 5.28.0
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(CPAN::Meta) >= 2.142060

@@ -11,12 +11,12 @@ Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{vers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl >= 5.28.0
-BuildRequires:	perl-Exporter-Tiny
+BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-Exporter-Tiny
 
-Requires:	perl-Exporter-Tiny
-Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(Carp)
+Requires:       perl-Exporter-Tiny
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Carp)
 
 %description
 List::MoreUtils provides some trivial but commonly needed functionality
