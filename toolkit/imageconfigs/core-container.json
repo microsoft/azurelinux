@@ -13,12 +13,7 @@
         {
             "Name": "Standard",
             "PackageLists": [
-                "packagelists/core-packages-container.json"
-            ],
-            "PostInstallScripts": [
-                {
-                    "Path": "postinstallscripts/core-container/cleanup-and-set-term.sh"
-                }
+                "packagelists/distroless-packages-container.json"
             ]
         }
     ]
