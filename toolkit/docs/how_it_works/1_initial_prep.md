@@ -24,6 +24,7 @@ Prepping the Build Environment
         - [specreader](#specreader)
         - [srpmpacker](#srpmpacker)
         - [unravel](#unravel)
+        - [validatechroot](#validatechroot)
 
 ## The Makefile
 
@@ -93,5 +94,7 @@ The `specreader` tool scans all the `*.spec` files in a directory and generates 
 The `srpmpacker` tool creates `.src.rpm` files from local specs and sources. The sources can be found locally, or downloaded from a source server. It is responsible for enforcing a matching hash for every source file.
 #### unravel
 The `unravel` tool converts a dependency graph into a set of build instructions which can be used to successfully build all local packages.
+#### validatechroot
+A tool which double checks the worker chroot has all its dependencies correctly installed.
 
 ## Prev: [Intro](0_intro.md), Next: [Local Packages](2_local_packages.md)
