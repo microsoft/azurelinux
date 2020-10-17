@@ -9,6 +9,7 @@ Group:          System Environment
 URL:            https://github.com/nlohmann/json
 #Source0:       https://github.com/nlohmann/json/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+%global debug_package %{nil}
 BuildRequires:  cmake
 BuildRequires:  gcc
 

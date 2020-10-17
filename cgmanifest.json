@@ -234,6 +234,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "babeltrace2",
+          "version": "2.0.1",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bash",
           "version": "4.4.18",
           "downloadUrl": "http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz"
@@ -2845,6 +2855,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lttng-consume",
+          "version": "0.2",
+          "downloadUrl": "https://github.com/microsoft/lttng-consume/archive/v0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lttng-tools",
           "version": "2.11.2",
           "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.11.2.tar.bz2"
@@ -3995,6 +4015,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pugixml",
+          "version": "1.10",
+          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pyasn1-modules",
           "version": "0.2.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
@@ -4995,6 +5025,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rapidjson",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "readline",
           "version": "7.0",
           "downloadUrl": "http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz"
@@ -5116,8 +5156,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.3",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.3.tar.xz"
+          "version": "2.6.6",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.xz"
         }
       }
     },
