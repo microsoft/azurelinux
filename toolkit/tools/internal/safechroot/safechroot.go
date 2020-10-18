@@ -4,7 +4,6 @@
 package safechroot
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -14,7 +13,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"golang.org/x/sync/semaphore"
 	"golang.org/x/sys/unix"
 	"microsoft.com/pkggen/internal/buildpipeline"
 	"microsoft.com/pkggen/internal/file"
@@ -25,7 +23,7 @@ import (
 )
 
 // BindMountPointFlags is a set of flags to do a bind mount.
-const BindMountPointFlags = unix.MS_BIND
+const BindMountPointFlags = unix.MS_BIND | unix.MS_MGC_VAL
 
 // FileToCopy represents a file to copy into a chroot using AddFiles. Dest is relative to the chroot directory.
 type FileToCopy struct {
@@ -55,7 +53,7 @@ type Chroot struct {
 	isExistingDir bool
 }
 
-// inChrootSemaphore guards against multiple Chroots entering their respective Chroots
+// inChrootMutex guards against multiple Chroots entering their respective Chroots
 // and running commands. Only a single Chroot can be active at a given time.
 //
 // activeChrootsMutex guards activeChroots reads and writes.
@@ -68,7 +66,7 @@ type Chroot struct {
 //   a pre-existing pool of chroots
 //   (as opposed to regular build which create a new chroot each time a spec is built)
 var (
-	inChrootSemaphore  = semaphore.NewWeighted(1)
+	inChrootMutex      sync.Mutex
 	activeChrootsMutex sync.Mutex
 	activeChroots      []*Chroot
 )
@@ -274,10 +272,8 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 func (c *Chroot) Run(toRun func() error) (err error) {
 	// Only a single chroot can be active at a given time for a single GO application.
 	// acquire a global mutex to ensure this behavior.
-	if !inChrootSemaphore.TryAcquire(1) {
-		return fmt.Errorf("tried to run two chroots at once! Second chroot: %s", c.RootDir())
-	}
-	defer inChrootSemaphore.Release(1)
+	inChrootMutex.Lock()
+	defer inChrootMutex.Unlock()
 
 	// Alter the environment variables while inside the chroot, upon exit restore them.
 	originalEnv := shell.CurrentEnvironment()
@@ -286,9 +282,6 @@ func (c *Chroot) Run(toRun func() error) (err error) {
 
 	err = c.UnsafeRun(toRun)
 
-	if err != nil {
-		err = fmt.Errorf("failed to execute in chroot (%s): %s", c.RootDir(), err)
-	}
 	return
 }
 
@@ -404,14 +397,11 @@ func cleanupAllChroots() {
 	logger.Log.Info("Waiting for outstanding chroot initialization and cleanup to finish")
 	activeChrootsMutex.Lock()
 
-	// Acquire and permanently hold the global inChrootSemaphore lock to ensure this application is not
+	// Acquire and permanently hold the global inChrootMutex lock to ensure this application is not
 	// inside any Chroot.
 	logger.Log.Info("Waiting for outstanding chroot commands to finish")
 	shell.PermanentlyStopAllProcesses()
-	if err := inChrootSemaphore.Acquire(context.TODO(), 1); err != nil {
-		logger.Log.Errorf("Failed to cleanup chroots: %s", err)
-		return
-	}
+	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline
 	if buildpipeline.IsRegularBuild() {
@@ -499,7 +489,7 @@ func defaultMountPoints() []*MountPoint {
 // restoreRoot will restore the original root of the GO application, cleaning up
 // after the run command. Will panic on error.
 func (c *Chroot) restoreRoot(originalRoot, originalWd *os.File) {
-	logger.Log.Debugf("Exiting Chroot %s to original root %s", c.rootDir, originalRoot.Name())
+	logger.Log.Debug("Exiting Chroot")
 
 	err := originalRoot.Chdir()
 	if err != nil {
