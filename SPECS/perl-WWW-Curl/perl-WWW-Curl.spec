@@ -20,7 +20,7 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
 BuildRequires:  curl-devel
-Requires:       perl-libs
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       curl
 
 Provides:       perl(WWW::Curl::Easy) = %{version}-%{release}

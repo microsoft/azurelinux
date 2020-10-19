@@ -11,7 +11,7 @@ Distribution:   Mariner
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
 Requires:       expat
-Requires:       perl-libs >= 5.28.0
+Requires:       perl-libs
 Requires:       perl(IO::File)
 Requires:       perl(IO::Handle)
 
@@ -23,9 +23,7 @@ The XML::Parser module is a Perl extension interface to James Clark's XML parser
 perl Makefile.PL INSTALLDIRS=vendor --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install
-make DESTDIR=%{buildroot} install
-
-find %{buildroot}/%{_libdir}/perl5/ -name "perllocal.pod" | xargs rm -v
+make DESTDIR=%{buildroot} pure_install
 
 %check
 make %{?_smp_mflags} test
@@ -40,6 +38,7 @@ make %{?_smp_mflags} test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.44-11
 -   Use new perl package names.
+-   Use pure_install instead of install.
 -   Set vendor INSTALLDIRS and update packaging directories.
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.44-10
 -   Added %%license invocation

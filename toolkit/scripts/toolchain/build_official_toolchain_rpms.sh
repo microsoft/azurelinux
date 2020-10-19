@@ -251,6 +251,7 @@ chroot_and_install_rpms gdbm
 chroot_and_install_rpms bzip2
 chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
+chroot_and_install_rpms perl
 
 build_rpm_in_chroot_no_install nss
 build_rpm_in_chroot_no_install flex
