@@ -86,7 +86,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
--   Update release number
+-   Update release number to match kernel spec
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-9
 -   Update release number
 *   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
