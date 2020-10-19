@@ -1648,10 +1648,18 @@ index 3ad3e6c..0000000
 -yaml-cpp-devel: yaml-cpp 
 -z3-devel: Z3 
 diff --git a/data/excludes-bracketing.txt b/data/excludes-bracketing.txt
-index 81b95ca..36e8a8d 100644
+index 81b95ca..1763108 100644
 --- a/data/excludes-bracketing.txt
 +++ b/data/excludes-bracketing.txt
-@@ -79,6 +79,9 @@ kf5_makeinstall
+@@ -42,6 +42,7 @@ find_lang
+ firewalld_reload
+ gem_install
+ gem_packages
++gendep_perl_Perl_OSType
+ ghc_bin_build
+ ghc_bin_install
+ ghc_check_bootstrap
+@@ -79,6 +80,9 @@ kf5_makeinstall
  lang_package
  lang(\s*\([^)]*\))
  langpack
@@ -1661,7 +1669,7 @@ index 81b95ca..36e8a8d 100644
  license
  limit_build
  make_build
-@@ -134,6 +137,8 @@ pypy(.?)_only
+@@ -134,6 +138,8 @@ pypy(.?)_only
  pycache_only
  pytest
  pytest_arch
@@ -11384,7 +11392,7 @@ index fc1d47d..4951cc2 100644
          """
          Move license file from %doc to %license.
 diff --git a/spec_cleaner/rpmhelpers.py b/spec_cleaner/rpmhelpers.py
-index 8600954..6e501e7 100644
+index 8600954..42991ed 100644
 --- a/spec_cleaner/rpmhelpers.py
 +++ b/spec_cleaner/rpmhelpers.py
 @@ -1,5 +1,3 @@
@@ -11441,6 +11449,14 @@ index 8600954..6e501e7 100644
          items.append(group)
          return items
      elif isinstance(group, list):
+@@ -281,6 +256,6 @@ def find_pkgconfig_declaration(elements):
+     """
+     for i in elements:
+         if isinstance(i, RpmRequiresToken):
+-            if 'pkgconfig ' in i.name or i.name.endswith('pkgconfig'):
++            if 'pkg-config ' in i.name or i.name.endswith('pkg-config'):
+                 return True
+     return False
 diff --git a/spec_cleaner/rpminstall.py b/spec_cleaner/rpminstall.py
 index 900a184..824a0b8 100644
 --- a/spec_cleaner/rpminstall.py
@@ -11497,7 +11513,7 @@ index 900a184..824a0b8 100644
          """
          Replace all known variations of .la files deletion with one unified.
 diff --git a/spec_cleaner/rpmpackage.py b/spec_cleaner/rpmpackage.py
-index b002ca2..18bc91e 100644
+index b002ca2..bbd77d3 100644
 --- a/spec_cleaner/rpmpackage.py
 +++ b/spec_cleaner/rpmpackage.py
 @@ -1,5 +1,3 @@
@@ -11506,7 +11522,7 @@ index b002ca2..18bc91e 100644
  from .rpmpreamble import RpmPreamble
  from .rpmsection import Section
  
-@@ -15,20 +13,9 @@ class RpmPackage(RpmPreamble):
+@@ -15,20 +13,12 @@ class RpmPackage(RpmPreamble):
          # The first line (%package) should always be added and is different
          # from the lines we handle in RpmPreamble.
          if not self.previous_line:
@@ -11529,8 +11545,11 @@ index b002ca2..18bc91e 100644
 -                Section.add(self, '# FIXME: consider using %%lang_package macro')
 -
          RpmPreamble.add(self, line)
++
++    def output(self, fout, newline=True, new_class=None):
++        RpmPreamble.output(self, fout, newline, 'RpmPackage')
 diff --git a/spec_cleaner/rpmpreamble.py b/spec_cleaner/rpmpreamble.py
-index 9e2490c..64bfd8d 100644
+index 9e2490c..05b5ff6 100644
 --- a/spec_cleaner/rpmpreamble.py
 +++ b/spec_cleaner/rpmpreamble.py
 @@ -1,7 +1,5 @@
@@ -11583,30 +11602,32 @@ index 9e2490c..64bfd8d 100644
              'group': self.reg.re_group,
              'nosource': self.reg.re_nosource,
              # for source, we have a special match to keep the source number
-@@ -97,11 +81,7 @@ class RpmPreamble(Section):
+@@ -97,13 +81,13 @@ class RpmPreamble(Section):
              'buildignores': self.reg.re_buildignores,
              'conflicts': self.reg.re_conflicts,
              # for prereq we append warning comment so we don't mess it there
 -            # requires has a special match - pwdutils -> shadow replacement
--            'recommends': self.reg.re_recommends,
--            'suggests': self.reg.re_suggests,
--            'enhances': self.reg.re_enhances,
--            'supplements': self.reg.re_supplements,
 +            # requires has a special match - pwdutils -> shadow-utils replacement
-             # for provides/obsoletes, we have a special case because we group them
-             # for build root, we have a special match because we force its value
++            # for provides/obsoletes, we have a special case because we group them
++            # for build root, we have a special match because we force its value
+             'recommends': self.reg.re_recommends,
+             'suggests': self.reg.re_suggests,
+-            'enhances': self.reg.re_enhances,
+             'supplements': self.reg.re_supplements,
+-            # for provides/obsoletes, we have a special case because we group them
+-            # for build root, we have a special match because we force its value
++            'autoreqprov': self.reg.re_autoreqprov,
              'buildarch': self.reg.re_buildarch,
-@@ -112,9 +92,11 @@ class RpmPreamble(Section):
+             'excludearch': self.reg.re_excludearch,
+             'exclusivearch': self.reg.re_exclusivearch,
+@@ -112,9 +96,7 @@ class RpmPreamble(Section):
  
          # deprecated definitions that we no longer want to see
          self.category_to_clean = {
 -            'vendor': self.reg.re_vendor,
-+            'recommends': self.reg.re_recommends,
-+            'suggests': self.reg.re_suggests,
-+            'enhances': self.reg.re_enhances,
-+            'supplements': self.reg.re_supplements,
-             'autoreqprov': self.reg.re_autoreqprov,
+-            'autoreqprov': self.reg.re_autoreqprov,
 -            'epoch': self.reg.re_epoch,
++            'enhances': self.reg.re_enhances,
              'icon': self.reg.re_icon,
              'copyright': self.reg.re_copyright,
              'packager': self.reg.re_packager,
@@ -11859,8 +11880,21 @@ index 9e2490c..64bfd8d 100644
          elif self.reg.re_buildarch.match(line):
              match = self.reg.re_buildarch.match(line)
              value = match.group(2)
+@@ -663,6 +517,12 @@ class RpmPreamble(Section):
+ 
+     def output(self, fout, newline=True, new_class=None):
+         """Dump the results to the output list."""
++        if new_class != 'RpmPackage':
++            if len(self.paragraph.items['vendor']) == 0:
++                self._add_line_value_to('vendor', 'Microsoft Corporation', key='Vendor')
++            if len(self.paragraph.items['distribution']) == 0:
++                self._add_line_value_to('distribution', 'Mariner', key='Distribution')
++
+         lines = self.paragraph.flatten_output(self.subpkglicense)
+         self.lines += lines
+         Section.output(self, fout, newline, new_class)
 diff --git a/spec_cleaner/rpmpreambleelements.py b/spec_cleaner/rpmpreambleelements.py
-index f99860c..d8c40bf 100644
+index f99860c..0dd5933 100644
 --- a/spec_cleaner/rpmpreambleelements.py
 +++ b/spec_cleaner/rpmpreambleelements.py
 @@ -1,5 +1,3 @@
@@ -11877,11 +11911,20 @@ index f99860c..d8c40bf 100644
          'license': 'License',
          'summary': 'Summary',
          # The localized summary can contain various values, so it can't be here
-@@ -50,20 +49,23 @@ class RpmPreambleElements(object):
+@@ -42,6 +41,7 @@ class RpmPreambleElements(object):
+         'suggests': 'Suggests',
+         'enhances': 'Enhances',
+         'supplements': 'Supplements',
++        'autoreqprov': 'AutoReqProv',
+         # Provides/Obsoletes cannot be part of this since we want to keep them
+         # mixed, so we'll have to specify the key when needed
+         'buildarch': 'BuildArch',
+@@ -50,20 +50,23 @@ class RpmPreambleElements(object):
      }
  
      categories_order = (
 -        'define',
++        'define', 
          'bconds',
          'bcond_conditions',
 +        'summary',
@@ -11899,12 +11942,20 @@ index f99860c..d8c40bf 100644
          'url',
          'source',
          'nosource',
-         'patch',
-+        'define',  
+-        'patch',
++        'patch', 
          'patternprovides',  # fake provides with special function for patterns
          'patternobsoletes',  # fake provide/obsoletes with old pattern symbols
          'patterncodeblock',  # fake condition placement for patterns to stay on top
-@@ -116,8 +118,6 @@ class RpmPreambleElements(object):
+@@ -79,6 +82,7 @@ class RpmPreambleElements(object):
+         'suggests',
+         'enhances',
+         'supplements',
++        'autoreqprov',
+         'conflicts',
+         'provides_obsoletes',
+         'buildarch',
+@@ -116,8 +120,6 @@ class RpmPreambleElements(object):
          for i in self.categories_order:
              self.items[i] = []
          self.current_group = []
@@ -11913,7 +11964,16 @@ index f99860c..d8c40bf 100644
          # regexp object
          self.reg = options['reg']
          # pkgconfig requirement detection
-@@ -283,7 +283,7 @@ class RpmPreambleElements(object):
+@@ -187,7 +189,7 @@ class RpmPreambleElements(object):
+         # only in case we are in main scope
+         if not nested:
+             if self.br_pkgconfig_required and not find_pkgconfig_declaration(buildrequires):
+-                self._insert_value('buildrequires', 'pkgconfig')
++                self._insert_value('buildrequires', 'pkg-config')
+ 
+     @staticmethod
+     def _verify_prereq_message(elements):
+@@ -283,7 +285,7 @@ class RpmPreambleElements(object):
          rather than on invidiual value.
          """
          # check if we need to add comment for the prereq
@@ -12067,7 +12127,7 @@ index 1370ddd..5d1ff2c 100644
      re_rpmbuildroot_quotes = re.compile(r'"\${?RPM_BUILD_ROOT}?"')
      # deprecated greps
 diff --git a/spec_cleaner/rpmrequirestoken.py b/spec_cleaner/rpmrequirestoken.py
-index 4ed54af..0b78a81 100644
+index 4ed54af..f4afbae 100644
 --- a/spec_cleaner/rpmrequirestoken.py
 +++ b/spec_cleaner/rpmrequirestoken.py
 @@ -1,4 +1,4 @@
@@ -12085,6 +12145,17 @@ index 4ed54af..0b78a81 100644
  
      def __init__(
          self,
+@@ -59,8 +59,8 @@ class RpmRequiresToken(object):
+             Formatted name.
+         """
+         # we just rename pkgconfig names to one unified one working everywhere
+-        if name == 'pkgconfig(pkg-config)' or name == 'pkg-config':
+-            name = 'pkgconfig'
++        if name == 'pkgconfig(pkg-config)' or name == 'pkgconfig':
++            name = 'pkg-config'
+ 
+         # omit legacy 'otherproviders' codeblock
+         match = Regexp.re_otherproviders.match(name)
 diff --git a/spec_cleaner/rpmscriplets.py b/spec_cleaner/rpmscriplets.py
 index 7148b61..e7852ba 100644
 --- a/spec_cleaner/rpmscriplets.py
@@ -21672,7 +21743,7 @@ index 54715dc..0000000
 -NOTE:
 -
 -To make sure your perldoc/Pod viewing setup for viewing this page is
--working: The six-letter word "résumé" should look like "resume" with an "/"
+-working: The six-letter word "rï¿½sumï¿½" should look like "resume" with an "/"
 -accent on each "e".
 -
 -For further tests, and help if that doesn't work, see below, A POD ENCODING
