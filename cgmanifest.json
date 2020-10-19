@@ -314,6 +314,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bond",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
@@ -1058,6 +1068,16 @@
           "name": "flex",
           "version": "2.6.4",
           "downloadUrl": "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fluent-bit",
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
         }
       }
     },
