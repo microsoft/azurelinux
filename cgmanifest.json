@@ -314,6 +314,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bond",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
@@ -1065,6 +1075,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fluent-bit",
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fontconfig",
           "version": "2.13.91",
           "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.91.tar.gz"
@@ -1688,6 +1708,16 @@
           "name": "itstool",
           "version": "2.0.6",
           "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ivykis",
+          "version": "0.42.4",
+          "downloadUrl": "https://github.com/buytenh/ivykis/archive/v0.42.4.tar.gz"
         }
       }
     },
