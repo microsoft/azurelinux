@@ -101,6 +101,9 @@ sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
 
+%global __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
+%global __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
+
 # create find-provides and find-requires script in order to ignore GLIBC_PRIVATE errors
 cat > find_provides.sh << _EOF
 #! /bin/sh
@@ -198,9 +201,6 @@ popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
-
-echo find_provies %{__find_provides}
-echo find_requies %{__find_requires}
 
 %check
 cd %{_builddir}/glibc-build
