@@ -5,7 +5,7 @@ Summary:        Azure Storage Client Library for C++
 Version:        7.3.0
 Release:        2%{?dist}
 License:        ASL 2.0
-URL:            http://azure.github.io/azure-storage-cpp/
+URL:            https://azure.github.io/azure-storage-cpp/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz
