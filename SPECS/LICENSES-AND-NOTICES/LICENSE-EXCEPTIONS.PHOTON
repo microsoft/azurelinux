@@ -39,7 +39,6 @@ perl-Compress-Bzip2
 perl-DBI
 perl-DBIx-simple
 perl-exporter-tiny
-perl-inc-latest
 perl-json-xs
 perl-libintl-perl
 perl-list-moreutils

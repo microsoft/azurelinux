@@ -24,7 +24,7 @@ Text::Template is a library for generating form letters, building HTML pages, or
 %setup -q -n Text-Template-%{version}
 
 %build
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}"
 make %{?_smp_mflags}
 
 %install
@@ -42,6 +42,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.51-3
 -   Use new perl package names.
+-   Disable PACK_LIST for packaging.
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.51-2
 -   Added %%license line automatically
