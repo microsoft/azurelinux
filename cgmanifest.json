@@ -214,6 +214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-storage-cpp",
+          "version": "7.3.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "babel",
           "version": "2.6.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-2.6.0.tar.gz"
