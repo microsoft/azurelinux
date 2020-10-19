@@ -1715,6 +1715,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ivykis",
+          "version": "0.42.4",
+          "downloadUrl": "https://github.com/buytenh/ivykis/archive/v0.42.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jansson",
           "version": "2.11",
           "downloadUrl": "http://www.digip.org/jansson/releases/jansson-2.11.tar.gz"
