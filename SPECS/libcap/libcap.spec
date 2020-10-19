@@ -1,7 +1,7 @@
 Summary:		Libcap
 Name:			libcap
-Version:        2.26
-Release:        3%{?dist}
+Version:		2.26
+Release:		3%{dist}
 License:		GPLv2+
 URL:			https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
 Source0:		https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/%{name}-%{version}.tar.xz
