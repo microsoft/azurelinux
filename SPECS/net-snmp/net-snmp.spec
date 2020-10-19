@@ -40,6 +40,7 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
                 --with-sys-location="unknown" \
                 --with-logfile=/var/log/net-snmpd.log \
                 --with-persistent-directory=/var/lib/net-snmp \
+                --with-perl-modules="INSTALLDIRS=vendor" \
                 --with-sys-contact="root@localhost" \
                 --with-defaults \
                 --with-systemd \
@@ -88,14 +89,17 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 %{_includedir}
 %{_libdir}/*.la
-%{_libdir}/perl5
+%{perl_vendorarch}/*
+%{_mandir}/man3/*.3.*
 %{_libdir}/*.so
 %{_datadir}
-%exclude /usr/lib/perl5/*/*/perllocal.pod
+%exclude /usr/lib/perl5/perllocal.pod
 
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.8-5
 -   Use new perl package names.
+-   Change perl library path to perl_vendorarch directory for packaging.
+-   Include man pages in devel.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.8-4
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.8-3
