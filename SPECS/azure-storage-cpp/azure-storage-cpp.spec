@@ -6,6 +6,8 @@ Version:        7.3.0
 Release:        2%{?dist}
 License:        ASL 2.0
 URL:            http://azure.github.io/azure-storage-cpp/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 #Source0:       https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
@@ -63,8 +65,8 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 
 %changelog
 *   Fri Oct 16 2020 Jonathan Slobodzian <joslobo@microsoft.com> 7.3.0-2
--   Veried License.  Update Source0 Location.  Integrated into Mariner Core.
+-   License Verified.  Update Source0 Location.  Integrated into Mariner Core.
 
 *   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 7.3.0-1
--   Original version for Mariner.
+-   Original version for CBL-Mariner.
 

@@ -215,8 +215,8 @@
         "type": "other",
         "other": {
           "name": "azure-storage-cpp",
-          "version": "2.7.3",
-          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v2.7.3.tar.gz"
+          "version": "7.3.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.3.0.tar.gz"
         }
       }
     },
