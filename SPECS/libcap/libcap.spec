@@ -1,7 +1,7 @@
 Summary:		Libcap
 Name:			libcap
-Version:		2.26
-Release:        2%{?dist}
+Version:        2.26
+Release:        3%{?dist}
 License:		GPLv2+
 URL:			https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
 Source0:		https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/%{name}-%{version}.tar.xz
@@ -17,6 +17,7 @@ into a set of distinct privileges.
 Summary:        Development files for libcap
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
+Provides:       pkgconfig(libcap)
 
 %description    devel
 The libcap-devel package contains libraries, header files and documentation
@@ -54,9 +55,10 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
-- Added %%license line automatically
-
+*   Mon Oct 19 2020 Emre Girgin <mrgirgin@microsoft.com> 2.26-3
+-   Add `Provides: pkgconfig(libcap)` as it is not picked up by rpm automatically.
+*   Sat May 09 00:21:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
+-   Added %%license line automatically
 *   Mon Mar 16 2020 Andrew Phelps <anphel@microsoft.com> 2.26-1
 -   Update version to 2.26. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.25-9
