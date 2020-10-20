@@ -144,7 +144,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-perlfaq/d' $TmpPkgGen
     sed -i '/perl-ph/d' $TmpPkgGen
     sed -i '/perl-Pod-Checker/d' $TmpPkgGen
-    sed -i '/perl-Pod-Escapes/d' $TmpPkgGen
     sed -i '/perl-Pod-Functions/d' $TmpPkgGen
     sed -i '/perl-Pod-Html/d' $TmpPkgGen
     sed -i '/perl-Pod-Safe/d' $TmpPkgGen
@@ -161,7 +160,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-SelfLoader/d' $TmpPkgGen
     sed -i '/perl-sigtrap/d' $TmpPkgGen
     sed -i '/perl-sort/d' $TmpPkgGen
-    sed -i '/perl-subs/d' $TmpPkgGen
     sed -i '/perl-Sys/d' $TmpPkgGen
     sed -i '/perl-Test/d' $TmpPkgGen
     sed -i '/perl-tests/d' $TmpPkgGen
