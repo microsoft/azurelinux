@@ -14,6 +14,8 @@ Requires:       perl-libs
 Requires:       perl(Carp)
 BuildRequires:  perl >= 5.28.0
 
+Provides:       perl(Test::Warnings) = %{version}-%{release}
+
 %description
 Test::Warnings tests for warnings and the lack of them
 
@@ -40,6 +42,7 @@ make test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.028-4
 -   Use new perl package names.
 -   Build with NO_PACKLIST option.
+-   Provide perl(Test::Warnings).
 
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.028-3
 -   Adding the "%%license" macro.

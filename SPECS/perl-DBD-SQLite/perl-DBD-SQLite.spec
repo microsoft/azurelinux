@@ -16,6 +16,16 @@ BuildRequires:  perl-DBI
 Requires:       perl-DBI
 Requires:       perl-libs
 
+Provides:       perl(DBD::SQLite) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::Constants) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::GetInfo) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable::Cursor) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable::FileContent) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable::FileContent::Cursor) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable::PerlData) = %{version}-%{release}
+Provides:       perl(DBD::SQLite::VirtualTable::PerlData::Cursor) = %{version}-%{release}
+
 %description
 SQLite is a public domain RDBMS database engine that you can find at
 http://www.hwaci.com/sw/sqlite/.
@@ -48,6 +58,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
 -   Use new perl package names.
+-   Provide perl(DBD::SQLite::*).
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.62-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.62-2

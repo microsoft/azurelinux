@@ -16,6 +16,7 @@ Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Provides:       perl(common::sense) = %{version}-%{release}
 
 Patch1:		common-sense-3.71-podenc.patch
 
@@ -73,6 +74,7 @@ rm -rf %{buildroot}
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 13.74-6
 -   Use new perl package names.
+-   Provide perl(common::sense).
 * Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.74-5
 - Added %%license line automatically
 

@@ -4,7 +4,9 @@
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
- 
+
+%global perl_bootstrap 1
+
 %global multilib_64_archs aarch64 %{power64} s390x sparc64 x86_64 
 %global parallel_tests 1
 %global tapsetdir   %{_datadir}/systemtap/tapset

@@ -17,6 +17,10 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Copy)
 Requires:       perl(Perl::OSType)
 
+Provides:       perl(Path::Class) = %{version}-%{release}
+Provides:       perl(Path::Class::Dir) = %{version}-%{release}
+Provides:       perl(Path::Class::Entity) = %{version}-%{release}
+Provides:       perl(Path::Class::File) = %{version}-%{release}
 
 %description
 Path::Class is a module for manipulation of file and directory specifications (strings describing their locations, like '/home/ken/foo.txt' or 'C:\Windows\Foo.txt') in a cross-platform manner. It supports pretty much every platform Perl runs on, including Unix, Windows, Mac, VMS, Epoc, Cygwin, OS/2, and NetWare.
@@ -46,6 +50,7 @@ make test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.37-6
 -   Use new perl package names.
 -   Build with NO_PACKLIST option.
+-   Provide perl(Path::Class*).
 * Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.37-5
 - Added %%license line automatically
 

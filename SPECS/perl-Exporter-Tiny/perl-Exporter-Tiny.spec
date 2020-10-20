@@ -16,6 +16,8 @@ BuildRequires:  perl >= 5.28.0
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 
+Provides:       perl(Exporter::Shiny) = %{version}-%{release}
+Provides:       perl(Exporter::Tiny) = %{version}-%{release}
 
 %description
 Exporter::Tiny supports many of Sub::Exporter's external-facing features
@@ -61,6 +63,7 @@ rm -rf %{buildroot}
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.002001-4
 -   Use new perl package names.
+-   Provide perl(Exporter::*).
 * Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.002001-3
 - Added %%license line automatically
 

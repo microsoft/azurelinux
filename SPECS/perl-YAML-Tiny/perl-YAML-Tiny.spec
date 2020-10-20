@@ -17,6 +17,7 @@ Requires:       perl(Carp)
 Requires:       perl(Exporter)
 Requires:       perl(Fcntl)
 Requires:       perl(Scalar::Util)
+Provides:       perl(YAML::Tiny) = %{version}-%{release}
 
 %description
 YAML::Tiny is a Perl class for reading and writing YAML-style files,
@@ -46,6 +47,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.73-4
 -   Use new perl package names.
+-   Provide perl(YAML::Tiny).
 * Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.73-3
 - Added %%license line automatically
 

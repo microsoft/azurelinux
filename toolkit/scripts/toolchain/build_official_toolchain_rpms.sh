@@ -245,6 +245,8 @@ build_rpm_in_chroot_no_install make
 build_rpm_in_chroot_no_install patch
 build_rpm_in_chroot_no_install procps-ng
 build_rpm_in_chroot_no_install sed
+build_rpm_in_chroot_no_install check
+build_rpm_in_chroot_no_install cpio
 
 # perl needs gdbm, bzip2, zlib
 chroot_and_install_rpms gdbm
@@ -347,7 +349,6 @@ build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
 build_rpm_in_chroot_no_install rpm
-build_rpm_in_chroot_no_install cpio
 
 # Build tdnf-2.1.0
 build_rpm_in_chroot_no_install kmod
@@ -360,7 +361,6 @@ build_rpm_in_chroot_no_install libgpg-error
 # intltool needs perl-XML-Parser
 chroot_and_install_rpms perl-XML-Parser
 build_rpm_in_chroot_no_install intltool
-build_rpm_in_chroot_no_install check
 build_rpm_in_chroot_no_install e2fsprogs
 
 # libgcrypt needs libgpg-error

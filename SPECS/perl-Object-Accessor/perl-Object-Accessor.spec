@@ -15,6 +15,8 @@ BuildRequires:  perl >= 5.28.0
 Requires:       perl-libs
 Requires:       perl(deprecate)
 
+Provides:       perl(Object::Accessor) = %{version}-%{release}
+
 %description
 Object::Accessor provides an interface to create per object accessors (as
 opposed to per Class accessors, as, for example, Class::Accessor provides).
@@ -44,6 +46,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.48-7
 -   Use new perl package names.
+-   Provide perl(Object::Accessor).
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 0.48-6
 -   Added LICENSE file and %%license invocation
 *   Thu Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.48-5

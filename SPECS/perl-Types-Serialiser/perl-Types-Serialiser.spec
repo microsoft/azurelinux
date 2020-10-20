@@ -18,6 +18,10 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl-common-sense
 
+Provides:       perl(Types::Serialiser) = %{version}-%{release}
+Provides:       perl(Types::Serialiser::BooleanBase) = %{version}-%{release}
+Provides:       perl(Types::Serialiser::Error) = %{version}-%{release}
+
 # Filter bogus provide of JSON::PP::Boolean (for rpm ≥ 4.9)
 %global __provides_exclude ^perl\\(JSON::PP::Boolean\\)
 
@@ -58,6 +62,7 @@ rm -rf %{buildroot}
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
 -   Use new perl package names.
+-   Provide perl(Types::Serialiser*).
 * Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
 - Added %%license line automatically
 

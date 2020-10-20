@@ -19,6 +19,9 @@ Requires:       perl(MIME::Base64)
 Requires:       perl(XSLoader)
 Requires:       openssl
 
+Provides:       perl(Net::SSLeay) = %{version}-%{release}
+Provides:       perl(Net::SSLeay::Handle) = %{version}-%{release}
+
 %description
 Net::SSLeay module contains perl bindings to openssl (http://www.openssl.org) library.
 
@@ -63,6 +66,7 @@ make test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.88-3
 -   Use new perl package names.
 -   Change perl_vendorlib to perl_vendorarch directory for packaging.
+-   Provide perl(Net::SSLeay*).
 * Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
 - Added %%license line automatically
 

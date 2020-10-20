@@ -23,6 +23,15 @@ Requires:       openssl-libs >= 0.9.8
 
 Requires:       perl-Net-SSLeay
 
+Provides:       perl(IO::Socket::SSL) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::Intercept) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::OCSP_Cache) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::OCSP_Resolver) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::PublicSuffix) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::SSL_Context) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::SSL_HANDLE) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::Session_Cache) = %{version}-%{release}
+Provides:       perl(IO::Socket::SSL::Utils) = %{version}-%{release}
 
 %description
 IO::Socket::SSL makes using SSL/TLS much easier by wrapping the necessary functionality into the familiar IO::Socket interface and providing secure defaults whenever possible. This way, existing applications can be made SSL-aware without much effort, at least if you do blocking I/O and don't use select or poll.
@@ -52,6 +61,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.066-4
 -   Use new perl package names.
+-   Provide perl(IO::Socket::SSL*).
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.066-3
 -   Added LICENSE file and %%license invocation.
 *   Wed Apr 15 2020 Nick Samson <nisamson@microsoft.com> 2.066-2

@@ -23,6 +23,9 @@ Requires:       perl(Text::ParseWords)
 Requires:       perl(Digest::MD5)
 Requires:       perl(Storable)
 
+Provides:       perl(Module::ScanDeps) = %{version}-%{release}
+Provides:       perl(Module::ScanDeps::Cache) = %{version}-%{release}
+
 %description
 This module scans potential modules used by perl programs and returns a
 hash reference.  Its keys are the module names as they appear in %%INC (e.g.
@@ -56,6 +59,7 @@ make %{?_smp_mflags} test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.25-4
 -   Use new perl package names.
+-   Provide perl(Module::ScanDeps*).
 * Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.25-3
 - Added %%license line automatically
 

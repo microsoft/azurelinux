@@ -18,6 +18,9 @@ Requires:       perl-Exporter-Tiny
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 
+Provides:       perl(List::MoreUtils) = %{version}-%{release}
+Provides:       perl(List::MoreUtils::PP) = %{version}-%{release}
+
 %description
 List::MoreUtils provides some trivial but commonly needed functionality
 on lists that is not going to go into List::Util.
@@ -51,6 +54,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-6
 -   Use new perl package names.
+-   Provide perl(List::MoreUtils*).
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-5
 -   Switch to new perl man page extension.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.428-4

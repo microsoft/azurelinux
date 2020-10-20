@@ -30,6 +30,26 @@ Requires:       perl(ExtUtils::ParseXS) >= 2.21
 Requires:       perl(Module::Metadata) >= 1.000002
 
 Provides:       perl(Module::Build) = %{version}-%{release}
+Provides:       perl(Module::Build::Base) = %{version}-%{release}
+Provides:       perl(Module::Build::Compat) = %{version}-%{release}
+Provides:       perl(Module::Build::Config) = %{version}-%{release}
+Provides:       perl(Module::Build::ConfigData) = %{version}-%{release}
+Provides:       perl(Module::Build::Cookbook) = %{version}-%{release}
+Provides:       perl(Module::Build::Dumper) = %{version}-%{release}
+Provides:       perl(Module::Build::Notes) = %{version}-%{release}
+Provides:       perl(Module::Build::PPMMaker) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Default) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::MacOS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Unix) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::VMS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::VOS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Windows) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::aix) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::cygwin) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::darwin) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::os2) = %{version}-%{release}
+Provides:       perl(Module::Build::PodParser) = %{version}-%{release}
+
 
 %description
 Module::Build is a system for building, testing, and installing Perl
@@ -61,6 +81,7 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.4224-4
 -   Use new perl package names.
+-   Provide perl(Module::Build*)
 * Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.4224-3
 - Added %%license line automatically
 

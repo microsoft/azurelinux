@@ -15,6 +15,8 @@ BuildRequires:  perl >= 5.28.0
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Spec) >= 0.60
 
+Provides:       perl(File::Which) = %{version}-%{release}
+
 %description
 File::Which finds the full or relative paths to executable programs on
     the system. This is normally the function of which utility. which is
@@ -57,6 +59,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-5
 -   Use new perl package names.
+-   Provide perl(File::Which).
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-4
 -   Switch to new perl man page extension.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22-3

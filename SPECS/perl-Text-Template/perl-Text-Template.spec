@@ -17,6 +17,9 @@ Requires:       perl-Test-Warnings
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Test-Warnings
 
+Provides:       perl(Text::Template) = %{version}-%{release}
+Provides:       perl(Text::Template::Preprocess) = %{version}-%{release}
+
 %description
 Text::Template is a library for generating form letters, building HTML pages, or filling in templates generally.  A template is a piece of text that has little Perl programs embedded in it here and there.  When you fill in a template, you evaluate the little programs and replace them with their values.
 
@@ -43,6 +46,7 @@ make test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.51-3
 -   Use new perl package names.
 -   Disable PACK_LIST for packaging.
+-   Provide perl(Text::Template*).
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.51-2
 -   Added %%license line automatically

@@ -19,6 +19,15 @@ BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
 
+Provides:       perl(Crypt::SSLeay) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::CTX) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Conn) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Err) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::MainContext) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Version) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::X509) = %{version}-%{release}
+Provides:       perl(Net::SSL) = %{version}-%{release}
+
 %description
 This Perl module provides support for the HTTPS protocol under LWP, to allow an LWP::UserAgent object to perform GET, HEAD and POST requests. Please see LWP for more information on POST requests.
 
@@ -57,6 +66,7 @@ make test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-7
 -   Use new perl package names.
 -   Change perl_vendorlib to perl_vendorarch directory for packaging.
+-   Provide perl(Crypt::*).
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-6
 -   Added %%license macro.
 -   Update License.

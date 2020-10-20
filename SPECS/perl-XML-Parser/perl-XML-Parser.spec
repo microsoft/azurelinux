@@ -15,6 +15,14 @@ Requires:       perl-libs
 Requires:       perl(IO::File)
 Requires:       perl(IO::Handle)
 
+Provides:       perl(XML::Parser) = %{version}-%{release}
+Provides:       perl(XML::Parser::Expat) = %{version}-%{release}
+Provides:       perl(XML::Parser::Style::Debug) = %{version}-%{release}
+Provides:       perl(XML::Parser::Style::Objects) = %{version}-%{release}
+Provides:       perl(XML::Parser::Style::Stream) = %{version}-%{release}
+Provides:       perl(XML::Parser::Style::Subs) = %{version}-%{release}
+Provides:       perl(XML::Parser::Style::Tree) = %{version}-%{release}
+
 %description
 The XML::Parser module is a Perl extension interface to James Clark's XML parser, expat
 %prep
@@ -40,6 +48,7 @@ make %{?_smp_mflags} test
 -   Use new perl package names.
 -   Use pure_install instead of install.
 -   Set vendor INSTALLDIRS and update packaging directories.
+-   Provide perl(XML::Parser*).
 *   Wed May 27 2020 Nick Samson <nisamson@microsoft.com> 2.44-10
 -   Added %%license invocation
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.44-9

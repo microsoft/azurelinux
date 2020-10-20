@@ -9,6 +9,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://ftp.gnu.org/gnu/groff/%{name}-%{version}.tar.gz
 %define sha1 groff=61a6808ea1ef715df9fa8e9b424e1f6b9fa8c091
+Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:   perl-DBI
+Requires:   perl-DBIx-Simple
+Requires:   perl-DBD-SQLite
+Requires:   perl-File-HomeDir
+
 Provides:   perl(oop_fh.pl) = %{version}-%{release}
 Provides:   perl(main_subs.pl) = %{version}-%{release}
 Provides:   perl(man.pl) = %{version}-%{release}
@@ -41,7 +47,7 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-5
--   Remove dependencies on perl.
+-   Use new perl package names.
 -   Provide groff-base.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
 -   Added %%license line automatically

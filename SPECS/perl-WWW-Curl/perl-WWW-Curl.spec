@@ -23,7 +23,11 @@ BuildRequires:  curl-devel
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       curl
 
+Provides:       perl(WWW::Curl) = %{version}-%{release}
 Provides:       perl(WWW::Curl::Easy) = %{version}-%{release}
+Provides:       perl(WWW::Curl::Form) = %{version}-%{release}
+Provides:       perl(WWW::Curl::Multi) = %{version}-%{release}
+Provides:       perl(WWW::Curl::Share) = %{version}-%{release}
 
 %description
 WWW::Curl is a Perl extension interface for libcurl.
@@ -71,6 +75,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.17-9
 -   Use new perl package names.
+-   Provide perl(WWW::Curl*).
 *   Tue May 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.17-8
 -   Adding a patch to build with "curl" version >= 7.66.0.
 -   License verified.

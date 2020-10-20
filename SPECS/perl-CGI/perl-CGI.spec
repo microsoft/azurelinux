@@ -23,6 +23,17 @@ Requires:       perl(File::Spec) >= 0.82
 Requires:       perl(File::Temp) >= 0.17
 Requires:       perl(Text::ParseWords)
 
+Provides:       perl(CGI) = %{version}-%{release}
+Provides:       perl(CGI::Carp) = %{version}-%{release}
+Provides:       perl(CGI::Cookie) = %{version}-%{release}
+Provides:       perl(CGI::File::Temp) = %{version}-%{release}
+Provides:       perl(CGI::HTML::Functions) = %{version}-%{release}
+Provides:       perl(CGI::MultipartBuffer) = %{version}-%{release}
+Provides:       perl(CGI::Pretty) = %{version}-%{release}
+Provides:       perl(CGI::Push) = %{version}-%{release}
+Provides:       perl(CGI::Util) = %{version}-%{release}
+
+
 %{?perl_default_filter}
 # Remove under-specified dependencies
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((File::Spec)\\)$
@@ -75,6 +86,7 @@ make %{?_smp_mflags} test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.40-3
 -   Use new perl package names.
+-   Provide perl(CGI::*).
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.40-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 4.40-1

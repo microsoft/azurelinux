@@ -21,6 +21,8 @@ Requires:  perl-Canary-Stability
 Requires:  perl-Types-Serialiser
 Requires:  perl-common-sense
 
+Provides:       perl(JSON::XS) = %{version}-%{release}
+
 %description
 This module converts Perl data structures to JSON and vice versa. Its
 primary goal is to be correct and its secondary goal is to be fast. To
@@ -55,6 +57,7 @@ make test
 %changelog
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
 -   Use new perl package names.
+-   Provide perl(JSON::XS).
 * Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 1:3.04-3
 - Added %%license line automatically
 
