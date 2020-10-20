@@ -214,6 +214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-storage-cpp",
+          "version": "7.3.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "babel",
           "version": "2.6.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-2.6.0.tar.gz"
@@ -307,6 +317,16 @@
           "name": "blktrace",
           "version": "1.2.0",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bond",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
         }
       }
     },
@@ -1065,6 +1085,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fluent-bit",
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fontconfig",
           "version": "2.13.91",
           "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.91.tar.gz"
@@ -1688,6 +1718,16 @@
           "name": "itstool",
           "version": "2.0.6",
           "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ivykis",
+          "version": "0.42.4",
+          "downloadUrl": "https://github.com/buytenh/ivykis/archive/v0.42.4.tar.gz"
         }
       }
     },
@@ -5015,6 +5055,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rapidjson",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "readline",
           "version": "7.0",
           "downloadUrl": "http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz"
@@ -5136,8 +5186,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.3",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.3.tar.xz"
+          "version": "2.6.6",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.xz"
         }
       }
     },
