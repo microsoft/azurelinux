@@ -72,7 +72,7 @@ rm -rf %{buildroot}
 %{_mandir}/man3/common::sense.3*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 13.74-6
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
 -   Use new perl package names.
 -   Provide perl(common::sense).
 * Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.74-5
