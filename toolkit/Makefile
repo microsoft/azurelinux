@@ -16,7 +16,6 @@ CONFIG_FILE            ?= $(toolkit_root)/imageconfigs/core-efi.json
 CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
-PACKAGE_IGNORE_LIST    ?=
 SSH_KEY_FILE           ?=
 
 REBUILD_TOOLCHAIN               ?= n
@@ -37,6 +36,8 @@ IMAGE_CACHE_SUMMARY             ?=
 INITRD_CACHE_SUMMARY            ?=
 PACKAGE_ARCHIVE                 ?=
 PACKAGE_BUILD_RETRIES           ?= 1
+# Set to 0 to use the number of logical CPUs.
+CONCURRENT_PACKAGE_BUILDS       ?= 0
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -88,6 +89,7 @@ SOURCE_URL         ?=
 PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
 PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
 SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+SRPM_UPDATE_URL    ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
 REPO_LIST   ?=
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -99,8 +101,8 @@ BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
 RELEASE_MAJOR_ID   ?= 1.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
-ifneq ($(wildcard $(OUT_DIR)/version-minor-id.txt),)
-	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.txt)
+ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
+	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
 else
 	RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
 endif

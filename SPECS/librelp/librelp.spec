@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.2.17
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 URL:            https://github.com/rsyslog/librelp
 #Source0:        https://github.com/rsyslog/librelp/archive/v%{version}.tar.gz
@@ -13,6 +13,11 @@ Distribution:   Mariner
 BuildRequires:  gnutls-devel
 BuildRequires:  autogen
 Requires:       gnutls
+
+%if %{with_check}
+BuildRequires:  valgrind
+%endif
+
 %description
 Librelp is an easy to use library for the RELP protocol. RELP (stands
 for Reliable Event Logging Protocol) is a general-purpose, extensible
@@ -38,16 +43,6 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
-#There are two tests(out of 16) which run under valgrind.
-#Currently these two tests just greps for a message output after test.
-#If we need to enable valgrind, it needs 'unstripped' version of ld.so
-#This is available in glibc-debuginfo which needs to be installed in
-#sandbox environment. This needs tdnf package which in turn needs to
-#install glibc-debuginfo package (which has unstripped version of ld.so).
-#Due to above dependecy overhead which needs more analysis
-#and since tests are not using any valgrind functionality,
-#disabling valgrind.
-sed -ie 's/export valgrind=.*/export valgrind""/' tests/test-framework.sh
 make check
 
 %post	-p /sbin/ldconfig
@@ -64,9 +59,10 @@ make check
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
-- Added %%license line automatically
-
+*   Mon Sep 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.2.17-7
+-   Remove the Valgrind workaround in the check section.
+*   Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
+-   Added %%license line automatically
 *   Wed Mar 11 2020 Christopher Co <chrco@microsoft.com> 1.2.17-5
 -   Updated Source location
 *   Mon Mar 09 2020 Jon Slobodzian <joslobo@microsoft.com> 1.2.17-4

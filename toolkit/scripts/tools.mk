@@ -17,8 +17,8 @@ go_tool_list = \
 	boilerplate \
 	depsearch \
 	grapher \
-	graphoptimizer \
 	graphpkgfetcher \
+	graphanalytics \
 	imageconfigvalidator \
 	imagepkgfetcher \
 	imager \
@@ -26,9 +26,9 @@ go_tool_list = \
 	liveinstaller \
 	pkgworker \
 	roast \
+	scheduler \
 	specreader \
 	srpmpacker \
-	unravel \
 
 # For each utility "util", create a "out/tools/util" target which references code in "tools/util/"
 go_tool_targets = $(foreach target,$(go_tool_list),$(TOOL_BINS_DIR)/$(target))
@@ -138,7 +138,7 @@ worker_chroot_deps := \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 $(chroot_worker): $(worker_chroot_deps)
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(CACHED_RPMS_DIR)/cache $(LOGS_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR)
 
 ######## MACRO TOOLS ########
 

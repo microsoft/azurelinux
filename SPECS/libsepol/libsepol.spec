@@ -1,7 +1,7 @@
 Summary:	    SELinux binary policy manipulation library
 Name:		    libsepol
 Version:	    2.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	    LGPLv2+
 Group:		    System Environment/Libraries
 URL:		    http://www.selinuxproject.org
@@ -26,11 +26,12 @@ It is used by checkpolicy (the policy compiler) and similar tools, as well
 as by programs like load_policy that need to perform specific transformations
 on binary policies such as customizing policy boolean settings.
 
-%package	devel
-Summary:	Header files and libraries used to build policy manipulation tools
-Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
-Provides:	pkgconfig(libsepol)
+%package       devel
+Summary:       Header files and libraries used to build policy manipulation tools
+Group:         Development/Libraries
+Requires:      %{name} = %{version}-%{release}
+Provides:      pkgconfig(libsepol) = %{version}-%{release}
+Provides:      %{name}-static = %{version}-%{release}
 
 %description	devel
 The libsepol-devel package contains the libraries and header files
@@ -94,6 +95,8 @@ exit 0
 %{_lib}/libsepol.so.1
 
 %changelog
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-6
+-   Add explicit provide for libsepol-static
 *   Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9-5
 -   Remove unused "systemd-bootstrap" from requires.
 *   Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9-4

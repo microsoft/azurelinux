@@ -2,7 +2,7 @@
 
 set -e
 
-TOOLCHAIN_BUILD_FILE=$1
+TOOLCHAIN_SPEC_LIST_FILE=$1
 SPECS_DIR=$2
 MANIFESTS_DIR=$3
 DIST_TAG=$4
@@ -11,14 +11,14 @@ ARCH=$5
 write_rpms_from_spec () {
     # $1 = spec file
     # $2 = file to save to
-
-    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --qf="%{EXCLUSIVEARCH}" --srpm 2>/dev/null)
+    spec_dir=$(dirname $1)
+    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="%{EXCLUSIVEARCH}" --srpm 2>/dev/null)
     if [ "$exclusiveArch" != "(none)" -a "$exclusiveArch" != "$ARCH" ]; then
         return 0
     fi
 
-    version=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --qf="%{VERSION}" --srpm 2>/dev/null)
-    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="dist $DIST_TAG" --target=$ARCH 2>/dev/null)
+    version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="%{VERSION}" --srpm 2>/dev/null)
+    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --target=$ARCH 2>/dev/null)
 
     for rpm in $rpmWithoutExtension
     do
@@ -33,7 +33,7 @@ write_rpms_from_spec () {
 
 write_rpms_from_toolchain () {
     # $1 = file to save to
-    specs=$(sed -e '/^\s*build_rpm_in_chroot_no_install/!d; s/\s*build_rpm_in_chroot_no_install //; /^()/d' $TOOLCHAIN_BUILD_FILE)
+    specs=$(cat $TOOLCHAIN_SPEC_LIST_FILE)
     for specName in $specs
     do
         specFile=$(find $SPECS_DIR/**/$specName.spec)

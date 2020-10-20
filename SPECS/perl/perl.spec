@@ -9,17 +9,20 @@
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.30.3
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 URL:            https://www.perl.org/
 Group:          Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/%{name}-%{version}.tar.gz
+Source1:        additional-provides.inc
+Source2:        macros.perl
 Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
 Provides:       perl(s)
 Provides:       /bin/perl
+%include %{SOURCE1}
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  gdbm-devel
@@ -46,6 +49,7 @@ sh Configure -des \
     -Dvendorprefix=%{_prefix} \
     -Dman1dir=%{_mandir}/man1 \
     -Dman3dir=%{_mandir}/man3 \
+    -Dman3ext=3pm \
     -Dpager=%{_bindir}"/less -isR" \
     -Duseshrplib \
     -Dusethreads \
@@ -55,6 +59,10 @@ make VERBOSE=1 %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 unset BUILD_ZLIB BUILD_BZIP2
+
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -p -m 644 %{SOURCE2} %{buildroot}%{_rpmconfigdir}/macros.d
+
 %check
 sed -i '/02zlib.t/d' MANIFEST
 sed -i '/cz-03zlib-v1.t/d' MANIFEST
@@ -71,8 +79,13 @@ make test TEST_SKIP_VERSION_CHECK=1
 %dir %{_libdir}/perl5/%{version}
 %{_libdir}/perl5/%{version}/*
 %{_mandir}/*/*
+%{_rpmconfigdir}/macros.d/macros.perl
 
 %changelog
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 5.30.3-3
+-   Configue man3 extension to 3pm.
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.30.3-2
+-   Add additional explicit provides and macros
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.30.3-1
 -   Updating to newer version to fix CVE-2020-10878 and CVE-2020-12723.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.28.1-4

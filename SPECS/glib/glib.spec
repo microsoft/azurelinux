@@ -1,7 +1,7 @@
 Summary:	Low-level libraries useful for providing data structure handling for C.
 Name:		glib
 Version:	2.58.0
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:	LGPLv2+
 URL:		https://developer.gnome.org/glib/
 Group:		Applications/System
@@ -21,13 +21,8 @@ BuildRequires:	python2 >= 2.7
 BuildRequires:	python2-libs >= 2.7
 Requires:	pcre-libs
 Requires:	libffi
-Provides:	pkgconfig(glib-2.0)
-Provides:	pkgconfig(gmodule-2.0)
-Provides:	pkgconfig(gmodule-no-export-2.0)
-Provides:	pkgconfig(gobject-2.0)
-Provides:	pkgconfig(gio-2.0)
-Provides:	pkgconfig(gio-unix-2.0)
-Provides:	pkgconfig(gthread-2.0)
+Provides:	glib2 = %{version}-%{release}
+
 %description
 The GLib package contains a low-level libraries useful for providing data structure handling for C, portability wrappers and interfaces for such runtime functionality as an event loop, threads, dynamic loading and an object system. Development libs and headers are in glib-devel.
 
@@ -40,6 +35,15 @@ Requires:	pcre-devel
 Requires:	python2
 Requires:	libffi-devel
 
+Provides:	glib2-devel = %{version}-%{release}
+Provides:	pkgconfig(glib-2.0)
+Provides:	pkgconfig(gmodule-2.0)
+Provides:	pkgconfig(gmodule-no-export-2.0)
+Provides:	pkgconfig(gobject-2.0)
+Provides:	pkgconfig(gio-2.0)
+Provides:	pkgconfig(gio-unix-2.0)
+Provides:	pkgconfig(gthread-2.0)
+
 %description devel
 Static libraries and header files for the support library for the glib library
 
@@ -47,6 +51,7 @@ Static libraries and header files for the support library for the glib library
 Summary:	gsettings schemas compiling tool
 Group:		Development/Libraries
 Requires:	glib
+Provides:	glib2-schemas = %{version}-%{release}
 
 %description schemas
 Gsettings schemas compiling tool
@@ -96,6 +101,10 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 2.58.0-8
+-   Provide glib2 versions from each package.
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.58.0-7
+-   Move "Provides:pkgconfig(...)" to glib-devel
 * Sat May 09 00:21:11 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
 - Added %%license line automatically
 

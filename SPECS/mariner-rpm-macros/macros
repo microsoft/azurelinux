@@ -25,7 +25,13 @@
 %_var               /var
 %_localstatedir     /var
 
+# https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
+%_pkgdocdir         %{_docdir}/%{name}
+%_docdir_fmt        %%{NAME}
+
 %__tar              /bin/tar --no-same-owner
+
+%_fmoddir           %{_libdir}/gfortran/modules
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
@@ -58,6 +64,13 @@
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
 %build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}
+
+# Deprecated names.  For backwards compatibility only.
+%__global_cflags %{build_cflags}
+%__global_cxxflags %{build_cxxflags}
+%__global_fflags %{build_fflags}
+%__global_fcflags %{build_fflags}
+%__global_ldflags %{build_ldflags}
 
 %set_build_flags \
   CFLAGS="${CFLAGS:-%{build_cflags}}" ; export CFLAGS ; \
@@ -119,3 +132,14 @@
 %_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
 
 %__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}
+
+# https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
+#%ldconfig /sbin/ldconfig
+%ldconfig_post(n:) %{?ldconfig:%post -p %ldconfig %{?*} %{-n:-n %{-n*}}\
+%end}
+%ldconfig_postun(n:) %{?ldconfig:%postun -p %ldconfig %{?*} %{-n:-n %{-n*}}\
+%end}
+%ldconfig_scriptlets(n:) %{?ldconfig:\
+%ldconfig_post %{?*} %{-n:-n %{-n*}}\
+%ldconfig_postun %{?*} %{-n:-n %{-n*}}\
+}

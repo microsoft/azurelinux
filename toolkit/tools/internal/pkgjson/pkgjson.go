@@ -42,6 +42,7 @@ func (pkgVer *PackageVer) String() string {
 type Package struct {
 	Provides      *PackageVer   `json:"Provides"`      // Version information and name of package
 	SrpmPath      string        `json:"SrpmPath"`      // Reconstructed name of the SRPM the spec is from
+	RpmPath       string        `json:"RpmPath"`       // Reconstructed name of the RPM the package comes from
 	SourceDir     string        `json:"SourceDir"`     // The path to the directory of sources for this package
 	SpecPath      string        `json:"SpecPath"`      // The path to the spec file that builds this package
 	Architecture  string        `json:"Architecture"`  // The architecture of the package

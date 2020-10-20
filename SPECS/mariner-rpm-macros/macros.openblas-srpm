@@ -1,0 +1,2 @@
+# Architectures that OpenBLAS supports
+%openblas_arches x86_64 %{ix86} armv7hl %{power64} aarch64 s390x

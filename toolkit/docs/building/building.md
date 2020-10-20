@@ -3,14 +3,20 @@ Building
 - [Building](#building)
 - [Quick Start](#quick-start)
   - [Prerequisites](#prerequisites)
-  - [Build Tools](#build-toolkit)
-  - [Build Packages](#build-packages)
-  - [Build Images](#build-images)
-  - [Build ISOs](#build-isos)   
+  - [Configure the Environment](#configure-the-environment)
+  - [ISO Quick Start](#iso-quick-start)
+  - [VHDX Quick Start](#vhdx-quick-start)
+  - [Build from Sources Quick Start](#build-from-sources-quick-start)
 - [Further Reading](#further-reading)
+  - [Building in Stages](#building-in-stages)
+    - [1) Bootstrap Toolchain](#1-bootstrap-toolchain)
+      - [Full toolchain Bootstrap From Sources](#full-toolchain-bootstrap-from-sources)
+    - [2) Build All Packages](#2-build-all-packages)
+    - [3) Build Images](#3-build-images)
   - [ISOs](#isos)
   - [Packages](#packages)
     - [Working on Packages](#working-on-packages)
+      - [DOWNLOAD_SRPMS](#download_srpms)
       - [Force Rebuilds](#force-rebuilds)
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
@@ -25,6 +31,7 @@ Building
     - [`PACKAGE_URL=...`](#package_url)
     - [`PACKAGE_UPDATE_URL=...`](#package_update_url)
     - [`SRPM_URL=...`](#srpm_url)
+    - [`SRPM_UPDATE_URL=...`](#srpm_update_url)
     - [`REPO_LIST=...`](#repo_list)
     - [Build Enable/Disable Flags](#build-enabledisable-flags)
     - [`REBUILD_TOOLCHAIN=...`](#rebuild_toolchain)
@@ -71,58 +78,119 @@ Quick Start
 ## Prerequisites
 Install prerequisites [here](prerequisites.md).
 
-## Build Tools
-By default all build commands are executed from inside the `./toolkit` folder.  A set of GO Based Tools and a Toolchain must be built before building Mariner Packages and Images.
+## Configure the Environment
+By default all build commands are executed from inside the `./toolkit` folder.
 
+A few one-time steps can be run now (they will re-run automatically later if needed)
+
+Remote files are generally only available for release branches.
 ```bash
-cd ~/git/CBL-Mariner/toolkit
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y
+# Get the source code
+git clone https://github.com/microsoft/CBL-Mariner.git
+cd CBL-Mariner/toolkit
+
+# Checkout the desired release branch. The 1.0-stable tag tracks the most recent successful release of the 1.0 branch.
+git checkout 1.0-stable
+
+# Build the Go tools
+sudo make go-tools REBUILD_TOOLS=y
+
+# Get the package sources
+sudo make input-srpms DOWNLOAD_SRPMS=y
+```
+**NOTE: All subsequent commands are assumed to be executed from inside the toolkit directory.**
+
+## ISO Quick Start
+```bash
+# Build an ISO version of ./imageconfigs/core-efi.json entirely from downloaded, pre-built packages
+sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n
 ```
 
-NOTE: A full list of targets and options to sudo make is available [here](#all-build-targets) and [here](#all-build-variables).
-
-## Build Packages
-Once the toolchain is built, all packages can be built with the toolchain.  Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of hyper-threads available on your system, or less)
-
+## VHDX Quick Start
 ```bash
-# Still from the toolkit folder, copy the toolchain archive built in the previous step into the toolkit folder
-mv ../build/toolchain/toolchain_built_rpms_all.tar.gz .
-
-# Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
-
-# Build ALL packages FOR ARM64
-sudo make build-packages -j$(nproc) CONFIG_FILE= TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz DOWNLOAD_SRPMS=y REBUILD_TOOLS=y REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_amd64 shim-unsigned-amd64"
+# Build a VHDX of ./imageconfigs/core-efi.json entirely from downloaded, pre-built packages
+sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n
 ```
 
-## Build Images
-Different images can be produced from the build system.  All images are generated in the out/images folder.
-
+## Build from Sources Quick Start
+This is a **much slower** process which will download and compile sources rather than use pre-compiled packages.
 ```bash
-# Still from the toolkit folder
-
-# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
-
-# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
-
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
-
-# To build a Mariner ISO Image (ISO folder: ../out/images/full)
-sudo make iso CONFIG_FILE=./imageconfigs/full.json TOOLCHAIN_ARCHIVE=toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
-
-# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json TOOLCHAIN_ARCHIVE=./toolchain_built_rpms_all.tar.gz REBUILD_TOOLCHAIN=n REBUILD_PACKAGES=n REBUILD_TOOLS=y REPO_LIST=
+# Build an image without downloading pre-compiled packages
+sudo make image REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y -j$(nproc)
 ```
 
 # Further Reading
+## Building in Stages
+This section runs through a build one step at a time, briefly explaining the purpose. `Make` will generally automate this flow if given a target, however it can be useful for debugging.
+### 1) Bootstrap Toolchain
+A set of bootstrapped toolchain packages (gcc etc.) are used to build CBL-Mariner packages and images.
+
+```bash
+# Download the pre-built toolchain packages (REBUILD_TOOLCHAIN=n is the default value)
+sudo make toolchain REBUILD_TOOLS=y
+# Move the downloaded bootstrap packages to the general RPM out folder
+sudo make copy-toolchain-rpms
+```
+NOTE: A full list of targets and options to `make` is available [here](#all-build-targets) and [here](#all-build-variables).
+
+#### Full toolchain Bootstrap From Sources
+If you want to build **everything** from scratch, including the bootstrapping process, run:
+```bash
+cd ~/git/CBL-Mariner/toolkit
+# Do a FULL bootstrap + rebuild from sources instead (much slower)
+# Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y
+```
+This will download the source files (SRPMs) from the package sever, and build them locally.
+See the detailed section on building from scratch [here](#building-everything-from-scratch)
+
+
+### 2) Build All Packages
+(**this step may be omitted if desired**)
+
+Once the toolchain is bootstrapped, packages can be built with the toolchain.
+
+The image build commands in [3) Build Images](#3-build-images) will **automatically** build only the required packages based on the selected configuration.
+
+However, to manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.
+
+Large parts of the build are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
+
+**NOTE: If you are building your toolchain packages from source, add `REBUILD_TOOLCHAIN=y`**
+```bash
+# Build ALL packages FOR AMD64
+sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y
+
+# Build ALL packages FOR ARM64
+# (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
+sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y
+```
+
+### 3) Build Images
+Different images can be produced from the build system.  All images are generated in the `out/images` folder.
+
+**NOTE: If you are building your toolchain packages from source, add `REBUILD_TOOLCHAIN=y`**
+```bash
+# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+
+# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+
+# To build a Mariner ISO Image (ISO folder: ../out/images/full)
+sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+
+# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+```
+
 ## ISOs
 ISO installers can be built with:
 ```bash
 # Build out/images/developer_iso/*.iso from remote components
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json
 ```
-To create an unattended ISO installer (no interactable UI):
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y`:
 ````bash
 # Build out/images/developer_iso/*.iso from remote components with unattended installer
 sudo make iso -j$(nproc) CONFIG_FILE=./resources/imageconfigs/developer_iso/developer_iso.json UNATTENDED_INSTALLER=y
@@ -150,16 +218,11 @@ sudo make build-packages SPECS_DIR="/my/packages/SPECS" -j$(nproc)
 ### Working on Packages
 The build system will attempt to minimize rebuilds, but sometimes it is useful to force packages to rebuild, or ignore missing packages. Say you want to iterate on the `nano` package, but the `ncurses-devel` package is broken (`ncurses-devel` is a dependency of `nano`)...
 
+#### DOWNLOAD_SRPMS
+When `DOWNLOAD_SRPMS=y` is set, the local sources and spec files will not be used, and changes will not be reflected in the final packages.
+
 #### Force Rebuilds
 Adding `PACKAGE_REBUILD_LIST="nano"` will tell the build system to always rebuild `nano.spec` even if it thinks the rpm file is up to date.
-
-#### Ignoring Packages
-In the event the ncurses package is currently having issues, `PACKAGE_IGNORE_LIST="ncurses"` will tell the build system to pretend the `ncurses.spec` file was already successfully built regardless of the actual local state. As before, explicitly clear the `CONFIG_FILE` variable to skip adding `core-efi.json`'s packages.
-```bash
-# Work on the nano package while ignoring the state of the ncurses package
-sudo make build-packages PACKAGE_BUILD_LIST="nano" PACKAGE_REBUILD_LIST="nano" PACKAGE_IGNORE_LIST="ncurses" CONFIG_FILE=
-```
-Any build which requires the ignored packages will still attempt to use them during a build, so ensure they are available in the `../out/RPMS` folder.
 
 #### Source Hashes
 The build system also enforces hash checking for sources when packaging SRPMs. For a given `*.spec` file a hash of each source is recorded in `*.signatures.json`. The build system will attempt to find a source which matches the recorded hash. If you change a source the signature file can be updated by setting `SRPM_FILE_SIGNATURE_HANDLING=update`.
@@ -181,6 +244,7 @@ SOURCE_URL         ?=
 PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
 PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
 SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+SRPM_UPDATE_URL    ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
 ```
 While `tdnf` uses a list of repo files:
 ```makefile
@@ -197,12 +261,16 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 
 Building Everything From Scratch
 ===
+
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources**
+
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 ```makefile
 SOURCE_URL         ?= 
-PACKAGE_URL        ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-base-$(build_arch)-rpms
-PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-update-$(build_arch)-rpms
-SRPM_URL           ?= https://packages.microsoft.com/yumrepos/cbl-mariner-$(RELEASE_MAJOR_ID)-prod-base-srpms
+PACKAGE_URL        ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+PACKAGE_UPDATE_URL ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
+SRPM_URL           ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+SRPM_UPDATE_URL    ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
 REPO_LIST          ?=
 ```
 ```makefile
@@ -222,15 +290,28 @@ This command will build all components locally, including all toolchain packages
 
 Just the toolchain build will take several hours, building `core-efi.json` may take the better part of a day.
 ```bash
-# Bootstrap just the toolchain
-sudo make toolchain SOURCE_URL="" PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" REBUILD_TOOLCHAIN=y
-
-# Rebuild just the tools
+# Rebuild just the Go tools
 sudo make go-tools REBUILD_TOOLS=y
+
+# Bootstrap just the toolchain using publicly available sources via wget (or from SOURCE_URL if set),
+#  then rebuild the toolchain properly using the provided sources
+
+# NOTE: Source files must made available via one of:
+# - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
+# - manually placing the correct sources in each /SPECS/* package folder
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+sudo make toolchain PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
 ```
 ```bash
 # Complete rebuild of all tool, package, and image files from source.
-sudo make image SOURCE_URL="" PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
+
+# NOTE: Source files must made available via one of:
+# - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
+# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL=... and SRPM_UPDATE_URL=...)
+# - manually placing the correct sources in each /SPECS/* package folder
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+sudo make image PACKAGE_URL="" PACKAGE_UPDATE_URL="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
 ```
 
 ## Local Build Variables
@@ -247,6 +328,8 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > URL to download RPM packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`, used to populate the toolchain packages if they are missing.
 ### `SRPM_URL=...`
 > URL to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
+### `SRPM_UPDATE_URL=...`
+> URL to download updated versions of packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
 ### `REPO_LIST=...`
 > List of RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: Repos earlier in the list are higher priority.
 
@@ -283,11 +366,11 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > - If:
 >   - it is present in `CONFIG_FILE=config.json`
 >   - or it is listed in `PACKAGE_BUILD_LIST="..."`
+>   - or it is listed in `PACKAGE_REBUILD_LIST="..."`
 >   - or it is a dependency of a package listed in one of the above
 > - And:
 >   - the corresponding *.rpm files are missing
 >   - or the *.rpm files are out of date (based on version numbers)
->   - or the base package is listed in `PACKAGE_REBUILD_LIST`
 
 #### NOTE:
 The `*.spec` files are converted to `*.src.rpm` files which bundle the spec files with their source files. If the build tools are not able to find valid source files **which match the SHA1 hash recorded in `*.signatures.json`** then they will attempt to locate the source files from `$(SOURCE_URL)` and download them.
@@ -395,9 +478,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE)) `                                                                               | Base directory to search for image files in (see [image_config.md](../images/image_config.md))
 | TERMINAL_ISO_INSTALLER        | n                                                                                                      | Use a command line ISO installer instead of the GUI installer
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
-| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build
+| PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
-| PACKAGE_IGNORE_LIST           |                                                                                                        | Pretend this package is always available, never rebuild it. Base package name, will match all virtual packages produced as well.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---
@@ -419,9 +501,10 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                  | Description
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                             | URL to request package sources from
-| SRPM_URL                      | https://packages.microsoft.com/yumrepos/cbl-mariner-`$(RELEASE_MAJOR_ID)-`prod-base-srpms                                                                                                        | URL to request pre-packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL                   | https://packages.microsoft.com/yumrepos/cbl-mariner-`$(RELEASE_MAJOR_ID)`-prod-base-`$(build_arch)`-rpms   | URL to request full toolchain packages from
-| PACKAGE_UPDATE_URL            | https://packages.microsoft.com/yumrepos/cbl-mariner-`$(RELEASE_MAJOR_ID)`-prod-update-`$(build_arch)`-rpms | URL to request full toolchain packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`
+| SRPM_URL                      | https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms                           | URL to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
+| SRPM_UPDATE_URL               | https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms                         | URL to request updated versions of packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
+| PACKAGE_URL                   | https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms              | URL to request full toolchain packages from
+| PACKAGE_UPDATE_URL            | https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms            | URL to request full toolchain packages from if not found under `$(PACKAGE_URL)` and `$(USE_UPDATE_REPO)` is set to `y`
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
@@ -440,6 +523,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
 | PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
+| CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 
 ---
 #### Reproducing a Build

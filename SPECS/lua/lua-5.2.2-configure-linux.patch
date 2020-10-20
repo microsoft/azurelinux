@@ -1,0 +1,22 @@
+diff -up lua-5.2.2/configure.ac.linux lua-5.2.2/configure.ac
+--- lua-5.2.2/configure.ac.linux	2013-05-10 15:42:27.269437631 -0400
++++ lua-5.2.2/configure.ac	2013-05-10 15:43:23.530435620 -0400
+@@ -50,6 +50,7 @@ AC_SUBST(READLINE_LIBS)
+ case "$host" in
+   *-mingw*)  use_os=win32  ;;
+   *-darwin*) use_os=macosx ;;
++  *-linux*)  use_os=linux  ;;
+   *)         use_os=posix  ;;
+ esac
+ 
+@@ -62,6 +63,10 @@ if test "x$use_os" == "xwin32"; then
+ elif test "x$use_os" == "xmacosx"; then
+   POSIX_DEFS="#define LUA_USE_POSIX"
+   LUA_DL_DEFS="#define LUA_DL_DYLD"
++elif test "x$use_os" == "xlinux"; then
++  POSIX_DEFS="#define LUA_USE_LINUX"
++  LUA_DL_DEFS="#define LUA_DL_DLOPEN"
++  LUA_LIBS="$LUA_LIBS -ldl"
+ elif test "x$use_os" == "xposix"; then
+   POSIX_DEFS="#define LUA_USE_POSIX"
+   LUA_DL_DEFS="#define LUA_DL_DLOPEN"
