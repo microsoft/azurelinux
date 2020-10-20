@@ -149,10 +149,10 @@ kernel-headers-5.4.51-2.cm1.noarch.rpm
 kmod-25-4.cm1.x86_64.rpm
 kmod-debuginfo-25-4.cm1.x86_64.rpm
 kmod-devel-25-4.cm1.x86_64.rpm
-krb5-1.17-3.cm1.x86_64.rpm
-krb5-debuginfo-1.17-3.cm1.x86_64.rpm
-krb5-devel-1.17-3.cm1.x86_64.rpm
-krb5-lang-1.17-3.cm1.x86_64.rpm
+krb5-1.17-4.cm1.x86_64.rpm
+krb5-debuginfo-1.17-4.cm1.x86_64.rpm
+krb5-devel-1.17-4.cm1.x86_64.rpm
+krb5-lang-1.17-4.cm1.x86_64.rpm
 libaio-0.3.112-2.cm1.x86_64.rpm
 libaio-debuginfo-0.3.112-2.cm1.x86_64.rpm
 libaio-devel-0.3.112-2.cm1.x86_64.rpm
@@ -234,8 +234,8 @@ lvm2-devel-2.03.05-5.cm1.x86_64.rpm
 lvm2-libs-2.03.05-5.cm1.x86_64.rpm
 m4-1.4.18-4.cm1.x86_64.rpm
 m4-debuginfo-1.4.18-4.cm1.x86_64.rpm
-make-4.2.1-4.cm1.x86_64.rpm
-make-debuginfo-4.2.1-4.cm1.x86_64.rpm
+make-4.2.1-5.cm1.x86_64.rpm
+make-debuginfo-4.2.1-5.cm1.x86_64.rpm
 mariner-check-macros-1.0-3.cm1.noarch.rpm
 mariner-release-1.0-9.cm1.noarch.rpm
 mariner-repos-1.0-11.cm1.noarch.rpm
