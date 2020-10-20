@@ -5304,16 +5304,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "runc",
-          "version": "1.0.0.rc8",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.0.0-rc8.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rust",
           "version": "1.39.0",
           "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.39.0-src.tar.xz"
