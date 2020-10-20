@@ -3,7 +3,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.1.0388
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Vim
 URL:            https://www.vim.org
 Group:          Applications/Editors
@@ -11,6 +11,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Based on:
+# https://github.com/vim/vim/commit/53575521406739cf20bbe4e384d88e7dca11f040.patch
+# Had some modifications for patch to apply cleanly.
+Patch0:         CVE-2019-12735.patch
+
 BuildRequires:  ncurses-devel
 
 %description
@@ -26,7 +31,7 @@ Conflicts:  toybox
 The vim extra package contains a extra files for powerful text editor.
 
 %prep
-%setup -q
+%autosetup -p1
 
 echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 %build
@@ -184,6 +189,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 8.1.0388-7
+-   Fix CVE-2019-12735.
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.1.0388-6
 -   Adding a license reference.
 *   Mon Apr 13 2020 Eric Li <eli@microsoft.com> 8.1.0388-5
