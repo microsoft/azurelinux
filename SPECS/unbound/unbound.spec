@@ -11,7 +11,7 @@ URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 
-# Also fixes    CVE-2020-12663
+# CVE-2020-12662.patch also fixes CVE-2020-12663
 Patch1:         CVE-2020-12662.patch
 Patch2:         CVE-2020-12663.nopatch
 
