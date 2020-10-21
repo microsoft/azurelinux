@@ -81,7 +81,103 @@ remove_packages_for_pkggen_core () {
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-[0-9]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
-    sed -i '/perl-D/d' $TmpPkgGen
+    sed -i '/perl-5/d' $TmpPkgGen
+    sed -i '/perl-A/d' $TmpPkgGen
+    sed -i '/perl-a/d' $TmpPkgGen
+    sed -i '/perl-Benchmark/d' $TmpPkgGen
+    sed -i '/perl-bignum/d' $TmpPkgGen
+    sed -i '/perl-blib/d' $TmpPkgGen
+    sed -i '/perl-Compress/d' $TmpPkgGen
+    sed -i '/perl-Config/d' $TmpPkgGen
+    sed -i '/perl-CPAN/d' $TmpPkgGen
+    sed -i '/perl-DB/d' $TmpPkgGen
+    sed -i '/perl-Digest/d' $TmpPkgGen
+    sed -i '/perl-Dir/d' $TmpPkgGen
+    sed -i '/perl-Dump/d' $TmpPkgGen
+    sed -i '/perl-de/d' $TmpPkgGen
+    sed -i '/perl-Devel/d' $TmpPkgGen
+    sed -i '/perl-diagnostics/d' $TmpPkgGen
+    sed -i '/perl-doc/d' $TmpPkgGen
+    sed -i '/perl-Encode-devel/d' $TmpPkgGen
+    sed -i '/perl-encoding/d' $TmpPkgGen
+    sed -i '/perl-English/d' $TmpPkgGen
+    sed -i '/perl-Env/d' $TmpPkgGen
+    sed -i '/perl-experimental/d' $TmpPkgGen
+    sed -i '/perl-ExtUtils/d' $TmpPkgGen
+    sed -i '/perl-fields/d' $TmpPkgGen
+    sed -i '/perl-File-Dos/d' $TmpPkgGen
+    sed -i '/perl-File-Fetch/d' $TmpPkgGen
+    sed -i '/perl-File-Find/d' $TmpPkgGen
+    sed -i '/perl-FileCache/d' $TmpPkgGen
+    sed -i '/perl-filetest/d' $TmpPkgGen
+    sed -i '/perl-Filter/d' $TmpPkgGen
+    sed -i '/perl-Find/d' $TmpPkgGen
+    sed -i '/perl-GDBM_File/d' $TmpPkgGen
+    sed -i '/perl-Hash/d' $TmpPkgGen
+    sed -i '/perl-I18N-Collate/d' $TmpPkgGen
+    sed -i '/perl-I18N-LangTags/d' $TmpPkgGen
+    sed -i '/perl-IO-Compress/d' $TmpPkgGen
+    sed -i '/perl-IO-Socket/d' $TmpPkgGen
+    sed -i '/perl-IO-Zlib/d' $TmpPkgGen
+    sed -i '/perl-IPC-Cmd/d' $TmpPkgGen
+    sed -i '/perl-IPC-SysV/d' $TmpPkgGen
+    sed -i '/perl-JSON/d' $TmpPkgGen
+    sed -i '/perl-less/d' $TmpPkgGen
+    sed -i '/perl-lib-/d' $TmpPkgGen
+    sed -i '/perl-libnet/d' $TmpPkgGen
+    sed -i '/perl-libintl/d' $TmpPkgGen
+    sed -i '/perl-Locale/d' $TmpPkgGen
+    sed -i '/perl-Math/d' $TmpPkgGen
+    sed -i '/perl-Memoize/d' $TmpPkgGen
+    sed -i '/perl-meta/d' $TmpPkgGen
+    sed -i '/perl-Module/d' $TmpPkgGen
+    sed -i '/perl-mro/d' $TmpPkgGen
+    sed -i '/perl-NDBM_File/d' $TmpPkgGen
+    sed -i '/perl-Net/d' $TmpPkgGen
+    sed -i '/perl-NEXT/d' $TmpPkgGen
+    sed -i '/perl-ODBM_File/d' $TmpPkgGen
+    sed -i '/perl-Opcode/d' $TmpPkgGen
+    sed -i '/perl-open/d' $TmpPkgGen
+    sed -i '/perl-Params/d' $TmpPkgGen
+    sed -i '/perl-Perl/d' $TmpPkgGen
+    sed -i '/perl-perlfaq/d' $TmpPkgGen
+    sed -i '/perl-ph/d' $TmpPkgGen
+    sed -i '/perl-Pod-Checker/d' $TmpPkgGen
+    sed -i '/perl-Pod-Functions/d' $TmpPkgGen
+    sed -i '/perl-Pod-Html/d' $TmpPkgGen
+    sed -i '/perl-Pod-Safe/d' $TmpPkgGen
+    sed -i '/perl-Pod-Search/d' $TmpPkgGen
+    sed -i '/perl-Pod-SelfLoader/d' $TmpPkgGen
+    sed -i '/perl-Pod-sigtrap/d' $TmpPkgGen
+    sed -i '/perl-Pod-sort/d' $TmpPkgGen
+    sed -i '/perl-Pod-subs/d' $TmpPkgGen
+    sed -i '/perl-Pod-Sys/d' $TmpPkgGen
+    sed -i '/perl-Pod-Term-Complete/d' $TmpPkgGen
+    sed -i '/perl-Pod-Term-ReadLine/d' $TmpPkgGen
+    sed -i '/perl-Safe/d' $TmpPkgGen
+    sed -i '/perl-Search/d' $TmpPkgGen
+    sed -i '/perl-SelfLoader/d' $TmpPkgGen
+    sed -i '/perl-sigtrap/d' $TmpPkgGen
+    sed -i '/perl-sort/d' $TmpPkgGen
+    sed -i '/perl-Sys/d' $TmpPkgGen
+    sed -i '/perl-Test/d' $TmpPkgGen
+    sed -i '/perl-tests/d' $TmpPkgGen
+    sed -i '/perl-Term-Complete/d' $TmpPkgGen
+    sed -i '/perl-Term-ReadLine/d' $TmpPkgGen
+    sed -i '/perl-Text-Abbrev/d' $TmpPkgGen
+    sed -i '/perl-Text-Balanced/d' $TmpPkgGen
+    sed -i '/perl-Thread-3/d' $TmpPkgGen
+    sed -i '/perl-Thread-Semaphore/d' $TmpPkgGen
+    sed -i '/perl-Tie/d' $TmpPkgGen
+    sed -i '/perl-Time-1/d' $TmpPkgGen
+    sed -i '/perl-Time-HiRes/d' $TmpPkgGen
+    sed -i '/perl-Time-Piece/d' $TmpPkgGen
+    sed -i '/perl-Unicode-Collate/d' $TmpPkgGen
+    sed -i '/perl-Unicode-UCD/d' $TmpPkgGen
+    sed -i '/perl-User/d' $TmpPkgGen
+    sed -i '/perl-utils/d' $TmpPkgGen
+    sed -i '/perl-version/d' $TmpPkgGen
+    sed -i '/perl-vmsish/d' $TmpPkgGen
     sed -i '/perl-libintl/d' $TmpPkgGen
     sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
@@ -197,7 +293,6 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^ca-certificates-base-" >> $1
     cat $TmpPkgGen | grep "^dwz-" >> $1
     cat $TmpPkgGen | grep "^unzip-" >> $1
-    cat $TmpPkgGen | grep "^libffi-" >> $1
     cat $TmpPkgGen | grep "^python2-" >> $1
     cat $TmpPkgGen | grep "^python-xml-" >> $1
     cat $TmpPkgGen | grep "^python3-" >> $1

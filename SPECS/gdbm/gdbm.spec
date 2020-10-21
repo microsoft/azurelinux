@@ -1,7 +1,7 @@
 Summary:        The GNU Database Manager
 Name:           gdbm
 Version:        1.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/gdbm
 Group:          Applications/Databases
@@ -45,6 +45,12 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
+# create symlinks for compatibility
+mkdir -p %{buildroot}/%{_includedir}/gdbm
+ln -sf ../gdbm.h %{buildroot}/%{_includedir}/gdbm/gdbm.h
+ln -sf ../ndbm.h %{buildroot}/%{_includedir}/gdbm/ndbm.h
+ln -sf ../dbm.h %{buildroot}/%{_includedir}/gdbm/dbm.h
+
 %check
 make %{?_smp_mflags} check
 
@@ -70,6 +76,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.18-4
+-   Symlink headers for compatibility.
 * Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.18-3
 - Added %%license line automatically
 

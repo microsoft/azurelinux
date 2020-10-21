@@ -1,0 +1,90 @@
+From b248789b64d6bd277c52bfe608ed3192023af1bd Mon Sep 17 00:00:00 2001
+From: "E. Choroba" <choroba@matfyz.cz>
+Date: Fri, 26 Jun 2020 21:19:24 +0200
+Subject: [PATCH] After running an action in the debugger, turn it off
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When running with "c", there was no problem, but when running with "n"
+or "s", once the action was executed, it kept executing on the
+following lines, which wasn't expected. Clearing $action here prevents
+this unwanted behaviour.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/perl5db.pl                   |  3 ++-
+ lib/perl5db.t                    | 22 ++++++++++++++++++++++
+ lib/perl5db/t/test-a-statement-3 |  6 ++++++
+ 3 files changed, 30 insertions(+), 1 deletion(-)
+ create mode 100644 lib/perl5db/t/test-a-statement-3
+
+diff --git a/lib/perl5db.pl b/lib/perl5db.pl
+index 69a9bb6e64..e04a0e17fa 100644
+--- a/lib/perl5db.pl
++++ b/lib/perl5db.pl
+@@ -529,7 +529,7 @@ BEGIN {
+ use vars qw($VERSION $header);
+ 
+ # bump to X.XX in blead, only use X.XX_XX in maint
+-$VERSION = '1.57';
++$VERSION = '1.58';
+ 
+ $header = "perl5db.pl version $VERSION";
+ 
+@@ -2708,6 +2708,7 @@ If there are any preprompt actions, execute those as well.
+         # The &-call is here to ascertain the mutability of @_.
+         &DB::eval;
+     }
++    undef $action;
+ 
+     # Are we nested another level (e.g., did we evaluate a function
+     # that had a breakpoint in it at the debugger prompt)?
+diff --git a/lib/perl5db.t b/lib/perl5db.t
+index 421229a54a..913a301d98 100644
+--- a/lib/perl5db.t
++++ b/lib/perl5db.t
+@@ -2799,6 +2799,28 @@ SKIP:
+     );
+ }
+ 
++{
++    # GitHub #17901
++    my $wrapper = DebugWrap->new(
++        {
++            cmds =>
++            [
++                'a 4 $s++',
++                ('s') x 5,
++                'x $s',
++                'q'
++            ],
++            prog => '../lib/perl5db/t/test-a-statement-3',
++            switches => [ '-d' ],
++            stderr => 0,
++        }
++    );
++    $wrapper->contents_like(
++        qr/^0 +2$/m,
++        'Test that the a command runs only on the given lines.',
++    );
++}
++
+ {
+     # perl 5 RT #126735 regression bug.
+     local $ENV{PERLDB_OPTS} = "NonStop=0 RemotePort=non-existent-host.tld:9001";
+diff --git a/lib/perl5db/t/test-a-statement-3 b/lib/perl5db/t/test-a-statement-3
+new file mode 100644
+index 0000000000..b188c1c5c5
+--- /dev/null
++++ b/lib/perl5db/t/test-a-statement-3
+@@ -0,0 +1,6 @@
++use strict; use warnings;
++
++for my $x (1 .. 2) {
++    my $y = $x + 1;
++    my $x = $x - 1;
++}
+-- 
+2.25.4
+

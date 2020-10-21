@@ -1,7 +1,8 @@
 {
  "Signatures": {
-  "additional-provides.inc": "1f13a675ca5e857811d6720e579c53a9ba677e2b085d136254285afe6b250b08",
+  "Pod-Html-license-clarification": "8667642d6d3a4ca8d8281b33b5e83a264e7681eb5080256331ae34b09d63b0cc",
+  "gendep.macros": "da82d722bb361facada9d68cdb7851039c4975678d15129e6f46f34a8440a75c",
   "macros.perl": "0597172591cea26c81e92b580b63cb1c5e812cc354c34ac21b8ebc1854713183",
-  "perl-5.30.3.tar.gz": "32e04c8bb7b1aecb2742a7f7ac0eabac100f38247352a73ad7fa104e39e7406f"
+  "perl-5.32.0.tar.xz": "6f436b447cf56d22464f980fac1916e707a040e96d52172984c5d184c09b859b"
  }
 }

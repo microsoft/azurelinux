@@ -3584,6 +3584,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Archive-Zip",
+          "version": "1.67",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PH/PHRED/Archive-Zip-1.67.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2012",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2012.tar.gz"
@@ -3607,6 +3617,16 @@
           "name": "perl-common-sense",
           "version": "3.74",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Compress-Bzip2",
+          "version": "2.28",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Compress-Bzip2-2.28.tar.gz"
         }
       }
     },
@@ -3805,8 +3825,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.30.3",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.30.3.tar.gz"
+          "version": "5.32.0",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz"
         }
       }
     },

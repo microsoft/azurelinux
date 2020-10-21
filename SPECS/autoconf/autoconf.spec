@@ -1,7 +1,7 @@
 Summary:	The package automatically configure source code
 Name:		autoconf
 Version:	2.69
-Release:        9%{?dist}
+Release:    10%{?dist}
 License:	GPLv2
 URL:		http://www.gnu.org/software/autoconf
 Group:		System Environment/Base
@@ -11,9 +11,10 @@ Source0:	http://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
 %define sha1 autoconf=e891c3193029775e83e0534ac0ee0c4c711f6d23
 Patch0:		autoconf-make-check.patch
 
-Requires:	perl
-BuildRequires:	m4
-Requires:	m4
+BuildRequires:  perl
+BuildRequires:  m4
+Requires:       m4
+Requires:       perl-libs
 BuildArch:      noarch
 
 %description
@@ -40,9 +41,10 @@ make -k check %{?_smp_mflags}  TESTSUITEFLAGS="1-500"
 %{_mandir}/*/*
 %{_datarootdir}/autoconf/*
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.69-9
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-10
+-   Use new perl package names.
+*   Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> 2.69-9
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.69-8
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Wed Oct 17 2018 Dweep Advani <dadvani@vmware.com> 2.69-7

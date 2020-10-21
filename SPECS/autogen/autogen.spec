@@ -1,7 +1,7 @@
 Summary:	The Automated Text and Program Generation Tool
 Name:		autogen
 Version:    5.18.16
-Release:    5%{?dist}
+Release:    6%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/autogen/
 Source0:        ftp://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 BuildRequires:	guile-devel
 BuildRequires:	gc-devel
 BuildRequires:	which
+BuildRequires:  perl
 
 Requires:	guile
 Requires:	gc
@@ -79,6 +80,8 @@ make %{?_smp_mflags} check
 %exclude /usr/share/info/
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.18.16-6
+-   Add BuildRequires on perl.
 * Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.18.16-5
 - Added %%license line automatically
 

@@ -5,7 +5,7 @@
 Summary:        Standalone, extensible Perl module installer
 Name:           perl-Module-Install
 Version:        1.19
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Install/
@@ -16,8 +16,48 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-YAML-Tiny
-Requires:  perl-YAML-Tiny
-Requires:	perl >= 5.28.0
+Requires:       perl-YAML-Tiny
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Archive::Zip) >= 1.37
+Requires:       perl(Carp)
+Requires:       perl(CPAN)
+
+Provides:       perl(Module::AutoInstall) = %{version}-%{release}
+Provides:       perl(Module::Install) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Bundle) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Compiler) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Find) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Include) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Makefile) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Manifest) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::Metadata) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::ScanDeps) = %{version}-%{release}
+Provides:       perl(Module::Install::Admin::WriteAll) = %{version}-%{release}
+Provides:       perl(Module::Install::AutoInstall) = %{version}-%{release}
+Provides:       perl(Module::Install::Base) = %{version}-%{release}
+Provides:       perl(Module::Install::Base::FakeAdmin) = %{version}-%{release}
+Provides:       perl(Module::Install::Bundle) = %{version}-%{release}
+Provides:       perl(Module::Install::Can) = %{version}-%{release}
+Provides:       perl(Module::Install::Compiler) = %{version}-%{release}
+Provides:       perl(Module::Install::DSL) = %{version}-%{release}
+Provides:       perl(Module::Install::Deprecated) = %{version}-%{release}
+Provides:       perl(Module::Install::External) = %{version}-%{release}
+Provides:       perl(Module::Install::Fetch) = %{version}-%{release}
+Provides:       perl(Module::Install::Include) = %{version}-%{release}
+Provides:       perl(Module::Install::Inline) = %{version}-%{release}
+Provides:       perl(Module::Install::MakeMaker) = %{version}-%{release}
+Provides:       perl(Module::Install::Makefile) = %{version}-%{release}
+Provides:       perl(Module::Install::Metadata) = %{version}-%{release}
+Provides:       perl(Module::Install::PAR) = %{version}-%{release}
+Provides:       perl(Module::Install::Run) = %{version}-%{release}
+Provides:       perl(Module::Install::Scripts) = %{version}-%{release}
+Provides:       perl(Module::Install::Share) = %{version}-%{release}
+Provides:       perl(Module::Install::Win32) = %{version}-%{release}
+Provides:       perl(Module::Install::With) = %{version}-%{release}
+Provides:       perl(Module::Install::WriteAll) = %{version}-%{release}
+Provides:       perl(inc::Module::Install) = %{version}-%{release}
+Provides:       perl(inc::Module::Install::DSL) = %{version}-%{release}
 
 %description
 Module::Install is a package for writing installers for CPAN (or CPAN-like)
@@ -50,6 +90,9 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.19-4
+-   Use new perl package names.
+-   Provide perl(Module::*).
 * Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
 - Added %%license line automatically
 

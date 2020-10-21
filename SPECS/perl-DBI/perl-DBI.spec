@@ -11,7 +11,7 @@
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.641
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -23,7 +23,83 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.ta
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
-Requires:	perl >= 5.28.0
+Requires:       perl-libs
+Requires:       perl(FileHandle)
+Requires:       perl(Math::BigInt)
+Requires:       perl(DB_File)
+
+Provides:       perl(DBD::DBM) = %{version}-%{release}
+Provides:       perl(DBD::DBM::Statement) = %{version}-%{release}
+Provides:       perl(DBD::DBM::Table) = %{version}-%{release}
+Provides:       perl(DBD::DBM::db) = %{version}-%{release}
+Provides:       perl(DBD::DBM::dr) = %{version}-%{release}
+Provides:       perl(DBD::DBM::st) = %{version}-%{release}
+Provides:       perl(DBD::ExampleP) = %{version}-%{release}
+Provides:       perl(DBD::File) = %{version}-%{release}
+Provides:       perl(DBD::File::DataSource::File) = %{version}-%{release}
+Provides:       perl(DBD::File::DataSource::Stream) = %{version}-%{release}
+Provides:       perl(DBD::File::Statement) = %{version}-%{release}
+Provides:       perl(DBD::File::Table) = %{version}-%{release}
+Provides:       perl(DBD::File::TableSource::FileSystem) = %{version}-%{release}
+Provides:       perl(DBD::File::db) = %{version}-%{release}
+Provides:       perl(DBD::File::dr) = %{version}-%{release}
+Provides:       perl(DBD::File::st) = %{version}-%{release}
+Provides:       perl(DBD::Gofer) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Policy::Base) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Policy::classic) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Policy::pedantic) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Policy::rush) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Transport::Base) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Transport::null) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Transport::pipeone) = %{version}-%{release}
+Provides:       perl(DBD::Gofer::Transport::stream) = %{version}-%{release}
+Provides:       perl(DBD::Mem) = %{version}-%{release}
+Provides:       perl(DBD::Mem::DataSource) = %{version}-%{release}
+Provides:       perl(DBD::Mem::Statement) = %{version}-%{release}
+Provides:       perl(DBD::Mem::Table) = %{version}-%{release}
+Provides:       perl(DBD::Mem::db) = %{version}-%{release}
+Provides:       perl(DBD::Mem::dr) = %{version}-%{release}
+Provides:       perl(DBD::Mem::st) = %{version}-%{release}
+Provides:       perl(DBD::NullP) = %{version}-%{release}
+Provides:       perl(DBD::Sponge) = %{version}-%{release}
+Provides:       perl(DBDI) = %{version}-%{release}
+Provides:       perl(DBI) = %{version}-%{release}
+Provides:       perl(DBI::Const::GetInfo::ANSI) = %{version}-%{release}
+Provides:       perl(DBI::Const::GetInfo::ODBC) = %{version}-%{release}
+Provides:       perl(DBI::Const::GetInfoReturn) = %{version}-%{release}
+Provides:       perl(DBI::Const::GetInfoType) = %{version}-%{release}
+Provides:       perl(DBI::DBD) = %{version}-%{release}
+Provides:       perl(DBI::DBD::Metadata) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::DataSource) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::Statement) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::Table) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::TableSource) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::TieMeta) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::TieTables) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::db) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::dr) = %{version}-%{release}
+Provides:       perl(DBI::DBD::SqlEngine::st) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Execute) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Request) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Response) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Serializer::Base) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Serializer::DataDumper) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Serializer::Storable) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Transport::Base) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Transport::pipeone) = %{version}-%{release}
+Provides:       perl(DBI::Gofer::Transport::stream) = %{version}-%{release}
+Provides:       perl(DBI::Profile) = %{version}-%{release}
+Provides:       perl(DBI::ProfileData) = %{version}-%{release}
+Provides:       perl(DBI::ProfileDumper) = %{version}-%{release}
+Provides:       perl(DBI::ProfileDumper::Apache) = %{version}-%{release}
+Provides:       perl(DBI::ProfileSubs) = %{version}-%{release}
+Provides:       perl(DBI::SQL::Nano) = %{version}-%{release}
+Provides:       perl(DBI::SQL::Nano::Statement_) = %{version}-%{release}
+Provides:       perl(DBI::SQL::Nano::Table_) = %{version}-%{release}
+Provides:       perl(DBI::Util::CacheMemory) = %{version}-%{release}
+Provides:       perl(DBI::Util::_accessor) = %{version}-%{release}
+Provides:       perl(DBI::common) = %{version}-%{release}
 
 %description
 DBI is a database access Application Programming Interface (API) for
@@ -87,9 +163,11 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.641-3
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
+-   Use new perl package names.
+-   Provide perl(DB*)
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.641-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.641-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.641-1

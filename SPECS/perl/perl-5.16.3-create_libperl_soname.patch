@@ -1,0 +1,57 @@
+From fa2f0dd5a7767223df10149d3f16d7ed7013e16f Mon Sep 17 00:00:00 2001
+From: Torsten Veller <tove@gentoo.org>
+Date: Sat, 14 Apr 2012 13:49:18 +0200
+Subject: Set libperl soname
+
+Bug-Gentoo: https://bugs.gentoo.org/286840
+
+Patch-Name: gentoo/create_libperl_soname.diff
+---
+ Makefile.SH | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.SH b/Makefile.SH
+index d1da0a0..7733a32 100755
+--- a/Makefile.SH
++++ b/Makefile.SH
+@@ -70,11 +70,11 @@ true)
+ 				${revision}.${patchlevel}.${subversion}"
+ 		case "$osvers" in
+ 	        1[5-9]*|[2-9]*)
+-			shrpldflags="$shrpldflags -install_name `pwd`/\$@ -Xlinker -headerpad_max_install_names"
++			shrpldflags="$shrpldflags -install_name `pwd`/libperl.${revision}.${patchlevel}.dylib -Xlinker -headerpad_max_install_names"
+ 			exeldflags="-Xlinker -headerpad_max_install_names"
+ 			;;
+ 		*)
+-			shrpldflags="$shrpldflags -install_name \$(shrpdir)/\$@"
++			shrpldflags="$shrpldflags -install_name \$(shrpdir)/libperl.${revision}.${patchlevel}.dylib"
+ 			;;
+ 		esac
+ 		;;
+@@ -76,13 +76,15 @@ true)
+ 		;;
+ 	sunos*)
+ 		linklibperl="-lperl"
++		shrpldflags="$shrpldflags -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
+ 		;;
+ 	netbsd*|freebsd[234]*|openbsd*|dragonfly*|bitrig*)
+ 		linklibperl="-L. -lperl"
++		shrpldflags="$shrpldflags -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
+ 		;;
+ 	interix*)
+ 		linklibperl="-L. -lperl"
+-		shrpldflags="$shrpldflags -Wl,--image-base,0x57000000"
++		shrpldflags="$shrpldflags -Wl,--image-base,0x57000000 -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
+ 		;;
+ 	aix*)
+ 		case "$cc" in
+@@ -120,6 +122,9 @@ true)
+ 	    linklibperl='libperl.x'
+ 	    DPERL_EXTERNAL_GLOB=''
+ 	    ;;
++	linux*)
++		shrpldflags="$shrpldflags -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
++	    ;;
+ 	esac
+ 	case "$ldlibpthname" in
+ 	'') ;;

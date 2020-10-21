@@ -2,7 +2,7 @@
 Summary:        YAML Ain't Markup Language (tm)
 Name:           perl-YAML
 Version:        1.26
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
@@ -11,9 +11,29 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-%{version}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
-
+BuildRequires:  perl >= 5.28.0
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(B::Deparse)
+Requires:       perl(Carp)
+Provides:       perl(YAML) = %{version}-%{release}
+Provides:       perl(YAML::Any) = %{version}-%{release}
+Provides:       perl(YAML::Dumper) = %{version}-%{release}
+Provides:       perl(YAML::Dumper::Base) = %{version}-%{release}
+Provides:       perl(YAML::Error) = %{version}-%{release}
+Provides:       perl(YAML::Loader) = %{version}-%{release}
+Provides:       perl(YAML::Loader::Base) = %{version}-%{release}
+Provides:       perl(YAML::Marshall) = %{version}-%{release}
+Provides:       perl(YAML::Mo) = %{version}-%{release}
+Provides:       perl(YAML::Node) = %{version}-%{release}
+Provides:       perl(YAML::Tag) = %{version}-%{release}
+Provides:       perl(YAML::Type::blessed) = %{version}-%{release}
+Provides:       perl(YAML::Type::code) = %{version}-%{release}
+Provides:       perl(YAML::Type::glob) = %{version}-%{release}
+Provides:       perl(YAML::Type::ref) = %{version}-%{release}
+Provides:       perl(YAML::Type::regexp) = %{version}-%{release}
+Provides:       perl(YAML::Type::undef) = %{version}-%{release}
+Provides:       perl(YAML::Types) = %{version}-%{release}
+Provides:       perl(YAML::Warning)
 # Filter private provides:
 # perl(yaml_mapping) perl(yaml_scalar) perl(yaml_sequence)
 %global __provides_exclude ^perl\\(yaml_
@@ -84,6 +104,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/YAML::Types.3*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.26-4
+-   Use new perl package names.
+-   Provide perl(YAML::*).
 * Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.26-3
 - Added %%license line automatically
 

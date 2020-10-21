@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://subversion.apache.org/
 Group:          Utilities/System
@@ -22,6 +22,7 @@ BuildRequires:  libserf-devel
 BuildRequires:  lz4
 BuildRequires:  utf8proc-devel
 BuildRequires:  swig
+BuildRequires:  perl(ExtUtils::Embed)
 Requires:       utf8proc
 
 %description
@@ -35,7 +36,7 @@ Requires:   %{name} = %{version}
 
 %package    perl
 Summary:    Allows Perl scripts to directly use Subversion repositories.
-Requires:   perl
+Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:   %{name} = %{version}
 %description    perl
 Provides Perl (SWIG) support for Subversion version control system.
@@ -62,7 +63,9 @@ make -j1 DESTDIR=%{buildroot} install
 %find_lang %{name}
 
 # For Perl bindings
-make -j1 DESTDIR=%{buildroot} install-swig-pl
+make install-swig-pl-lib DESTDIR=$RPM_BUILD_ROOT
+make pure_vendor_install -C subversion/bindings/swig/perl/native \
+        PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 
 %check
 # subversion expect nonroot user to run tests
@@ -87,14 +90,17 @@ sudo -u test make check && userdel test -r -f
 
 %files perl
 %defattr(-,root,root)
-%{perl_sitearch}/SVN
-%{perl_sitearch}/auto/SVN
+%{perl_vendorarch}/SVN
+%{perl_vendorarch}/auto/SVN
 %{_libdir}/libsvn_swig_perl*so*
 %{_libdir}/perl5/*
 %{_mandir}/man3/SVN*
-%exclude %{_libdir}/perl5/*/*/perllocal.pod
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.14.0-3
+-   Use new perl package names.
+-   Add perl(ExtUtils::Embed) build requirement.
+-   Update perl installation and packaging to perl_vendorarch directory.
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.14.0-2
 -   Add -Wformat to fix the build because -Werror=format-security is enabled.
 *   Tue Jun 09 2020 Andrew Phelps <anphel@microsoft.com> 1.14.0-1
