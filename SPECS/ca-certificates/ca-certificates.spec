@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -198,7 +198,7 @@ cp -p %{SOURCE20} .
 
 %convert_certdata %{SOURCE0}
 %convert_certdata %{SOURCE21}
-%convert_certdata %{SOURCE22}
+%convert_certdata %{SOURCE23}
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
@@ -250,7 +250,7 @@ install -p -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{catrustdir}/ca-legacy.conf
 %install_bundles %{SOURCE21} %{p11_format_base_bundle} %{legacy_default_base_bundle} %{legacy_disable_base_bundle}
 
 # Microsoft certs
-%install_bundles %{SOURCE22} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
+%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
@@ -425,6 +425,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Oct 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-9
+- Switching to the correct source for the Microsoft bundle.
+
 * Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
 - Aligning 'nssckbi.h' with the used 'certdata.txt' version for the Mozilla bundle.
 
