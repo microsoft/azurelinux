@@ -4,7 +4,7 @@
 
 Name:           brotli
 Version:        1.0.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Lossless compression algorithm
 Group: Applications/File
 
@@ -18,6 +18,9 @@ Distribution:   Mariner
 BuildRequires:  cmake
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-xml
+%endif
 
 %description
 Brotli is a generic-purpose lossless compression algorithm that compresses
@@ -130,6 +133,9 @@ python3 setup.py test
 
 
 %changelog
+* Tue Oct 20 2020 Andrew Phelps <anphel@microsoft.com> 1.0.7-8
+- Fix check test
+
 * Mon Dec 9 2019 Emre Girgin <mrgirgin@microsoft.com>  1.0.7-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
