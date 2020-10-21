@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
@@ -22,6 +22,8 @@ Requires:       gmp
 Requires:       guile
 Requires:       gc
 
+Patch0:         CVE-2020-24659.patch
+
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
 
@@ -36,7 +38,8 @@ The package contains libraries and header files for
 developing applications that use gnutls.
 
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 
 %configure \
@@ -88,6 +91,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+*   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
+-   Apply patch for CVE-2020-24659 from upstream.
+-   Switch setup to autosetup.
 *   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.14-2
 -   Updating certificate bundle path to include full set of trust information.
 *   Fri Aug 21 2020 Andrew Phelps <anphel@microsoft.com> 3.6.14-1
