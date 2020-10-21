@@ -12,8 +12,8 @@ Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 
 # CVE-2020-12662.patch also fixes CVE-2020-12663
-Patch1:         CVE-2020-12662.patch
-Patch2:         CVE-2020-12663.nopatch
+Patch0:         CVE-2020-12662.patch
+Patch1:         CVE-2020-12663.nopatch
 
 BuildRequires:  systemd
 BuildRequires:  expat-devel
@@ -41,7 +41,7 @@ unbound dns server docs
 
 %prep
 %setup -q -n %{name}-release-%{version}
-%patch1 -p1
+%patch0 -p1
 
 %build
 ./configure \
