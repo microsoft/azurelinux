@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
-	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -16,6 +16,10 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/safechroot"
 	"microsoft.com/pkggen/internal/shell"
+)
+
+const (
+	leaveChrootFilesOnDisk = false
 )
 
 var (
@@ -29,8 +33,6 @@ var (
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
-
-	leaveChrootFilesOnDisk = false
 )
 
 func main() {
@@ -38,14 +40,14 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	err := validateWorker()
+	err := validateWorker(*toolchainRpmsDir, *tmpDir, *workerTar, *workerManifest)
 
 	if err != nil {
 		logger.Log.Fatalf("Failed to validate worker. Error: %s", err)
 	}
 }
 
-func validateWorker() (err error) {
+func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err error) {
 	const (
 		chrootToolchainRpmsDir = "/toolchainrpms"
 		isExistingDir          = false
@@ -67,23 +69,26 @@ func validateWorker() (err error) {
 		}
 	}()
 
-	logger.Log.Infof("Creating chroot environment to validate '%s' against '%s'", *workerTar, *workerManifest)
+	logger.Log.Infof("Creating chroot environment to validate '%s' against '%s'", workerTarPath, manifestPath)
 
-	chroot = safechroot.NewChroot(*tmpDir, isExistingDir)
-	rpmMount := safechroot.NewMountPoint(*toolchainRpmsDir, chrootToolchainRpmsDir, "", safechroot.BindMountPointFlags, "")
+	chroot = safechroot.NewChroot(chrootDir, isExistingDir)
+	rpmMount := safechroot.NewMountPoint(rpmsDir, chrootToolchainRpmsDir, "", safechroot.BindMountPointFlags, "")
 	extraDirectories := []string{chrootToolchainRpmsDir}
 	rpmMounts := []*safechroot.MountPoint{rpmMount}
-	err = chroot.Initialize(*workerTar, extraDirectories, rpmMounts)
+	err = chroot.Initialize(workerTarPath, extraDirectories, rpmMounts)
 	if err != nil {
 		chroot = nil
 		return
 	}
 
-	manifestEntires, err := file.ReadLines(*workerManifest)
+	manifestEntries, err := file.ReadLines(manifestPath)
+	if err != nil {
+		return
+	}
 	badEntries := make(map[string]string)
 
 	err = chroot.Run(func() (err error) {
-		for _, rpm := range manifestEntires {
+		for _, rpm := range manifestEntries {
 			archMatches := packageArchLookupRegex.FindStringSubmatch(rpm)
 			if len(archMatches) != 2 {
 				logger.Log.Errorf("%v", archMatches)
@@ -99,14 +104,18 @@ func validateWorker() (err error) {
 				"--nosignature",
 				rpmPath,
 			}
-			logger.Log.Infof("Running rpm %s", strings.Join(args, " "))
+			logger.Log.Infof("Validating %s", filepath.Base(rpmPath))
 			stdout, stderr, err := shell.Execute("rpm", args...)
 
 			logger.Log.Debug(stdout)
 
 			if err != nil || len(stderr) > 0 {
 				logger.Log.Warn(stderr)
-				badEntries[rpm] = stderr
+				if len(stderr) > 0 {
+					badEntries[rpm] = stderr
+				} else {
+					badEntries[rpm] = err.Error()
+				}
 			}
 		}
 		return
