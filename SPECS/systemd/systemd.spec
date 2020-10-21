@@ -35,10 +35,11 @@ Patch16:          CVE-2019-3842.patch
 Patch17:          CVE-2019-3843.patch
 Patch18:          CVE-2019-3844.patch
 Patch19:          CVE-2019-6454.patch
+Patch20:          CVE-2019-20386.patch
 # This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
-Patch20:          CVE-2018-21029.nopatch
+Patch21:          CVE-2018-21029.nopatch
 
 Obsoletes:        systemd-bootstrap
 Requires:         pam
@@ -115,6 +116,7 @@ EOF
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
+%patch20 -p1
 
 sed -i "s#\#DefaultTasksMax=512#DefaultTasksMax=infinity#g" src/core/system.conf.in
 
@@ -284,6 +286,7 @@ rm -rf %{buildroot}/*
 -  Fix CVE-2019-3843
 -  Fix CVE-2019-3844
 -  Fix CVE-2019-6454
+-  Fix CVE-2019-20386
 *  Mon Aug 24 2020 Leandro Pereira <leperei@microsoft.com> 239-31
 -  Use time.windows.com as the default NTP server in timesyncd.
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30
