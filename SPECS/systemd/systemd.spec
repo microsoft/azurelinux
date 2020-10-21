@@ -1,7 +1,7 @@
 Summary:          Systemd-239
 Name:             systemd
 Version:          239
-Release:          31%{?dist}
+Release:          32%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -35,6 +35,15 @@ Patch15:          https://github.com/systemd/systemd/commit/8f6b442a78d0b485f044
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch16:          CVE-2018-21029.nopatch
+
+#Portablectl patches for --now --enable and --no-block flags support
+Patch100:          100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
+Patch101:          101-Portabled-fix-inspect-on-image-attached-as-directory.patch
+Patch102:          102-portablectl-add-now-and-enable-to-attach-detach.patch
+Patch103:          103-core-allow-portablectl-to-load-new-services-without-.patch
+Patch104:          104-portablectl-block-when-stopping-a-unit-on-detach-now.patch
+Patch105:          105-portablectl-use-replace-unload-when-stopping-a-servi.patch
+Patch106:          106-portabled-implement-container-host-os-release-interf.patch
 
 Obsoletes:        systemd-bootstrap
 Requires:         pam
@@ -107,6 +116,15 @@ EOF
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
+
+# Portablectl patches
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
+%patch103 -p1
+%patch104 -p1
+%patch105 -p1
+%patch106 -p1
 
 sed -i "s#\#DefaultTasksMax=512#DefaultTasksMax=infinity#g" src/core/system.conf.in
 
@@ -271,6 +289,8 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+*  Wed Sep 23 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 239-32
+-  Portablectl patches for --now --enable and --no-block flags support
 *  Mon Aug 24 2020 Leandro Pereira <leperei@microsoft.com> 239-31
 -  Use time.windows.com as the default NTP server in timesyncd.
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30
