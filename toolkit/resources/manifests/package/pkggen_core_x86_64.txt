@@ -119,6 +119,7 @@ perl-Fcntl-1.13-463.cm1.x86_64.rpm
 perl-File-Basename-2.85-463.cm1.noarch.rpm
 perl-File-Compare-1.100.600-463.cm1.noarch.rpm
 perl-File-Copy-2.34-463.cm1.noarch.rpm
+perl-FileHandle-2.03-463.cm1.noarch.rpm
 perl-File-Path-2.16-463.cm1.noarch.rpm
 perl-File-stat-1.09-463.cm1.noarch.rpm
 perl-File-Temp-0.230.900-463.cm1.noarch.rpm

@@ -7,16 +7,11 @@
 
 %global perl_bootstrap 1
 
-%global multilib_64_archs aarch64 %{power64} s390x sparc64 x86_64 
-%global parallel_tests 1
-%global tapsetdir   %{_datadir}/systemtap/tapset
-
 %global dual_life 0
 %global rebuild_from_scratch %{defined perl_bootstrap}
 
 # This overrides filters from build root (/usr/lib/rpm/macros.d/macros.perl)
 # intentionally (unversioned perl(DB) is removed and versioned one is kept).
-# Filter provides from *.pl files, bug #924938
 %global __provides_exclude_from .*%{_docdir}|.*%{perl_archlib}/.*\\.pl$|.*%{perl_privlib}/.*\\.pl$
 %global __requires_exclude_from %{_docdir}
 %global __provides_exclude perl\\((VMS|Win32|BSD::|DB\\)$)
@@ -24,82 +19,7 @@
 # same as we provide in /usr/lib/rpm/macros.d/macros.perl
 %global perl5_testdir   %{_libexecdir}/perl5-tests
 
-# Optional features
-# Run C++ tests
-%bcond_with perl_enables_cplusplus_test
-# We can bootstrap without gdbm
-%bcond_without gdbm
-# Support for groff, bug #135101
-%bcond_with perl_enables_groff
-# Run Turkish locale tests
-%bcond_with perl_enables_turkish_test
-# Run syslog tests
-%bcond_with perl_enables_syslog_test
-# SystemTap support
-%bcond_with perl_enables_systemtap
-# <> operator uses File::Glob nowadays. CSH is not needed.
-%bcond_with perl_enables_tcsh
-# We can skip %%check phase
-%bcond_with test
-
 Name:           perl
-# These are all found licenses. They are distributed among various
-# subpackages.
-# dist/Tie-File/lib/Tie/File.pm:        GPLv2+ or Artistic
-# cpan/Getopt-Long/lib/Getopt/Long.pm:  GPLv2+ or Artistic
-# cpan/Compress-Raw-Zlib/Zlib.xs:       (GPL+ or Artistic) and zlib
-# cpan/Digest-MD5/MD5.xs:               (GPL+ or Artistic) and BSD
-# cpan/Time-Piece/Piece.xs:             (GPL+ or Artistic) and BSD
-# dist/PathTools/Cwd.xs:                (GPL+ or Artistic) and BSD
-# util.c:                               (GPL+ or Artistic) and BSD
-# cpan/perlfaq/lib/perlfaq4.pod:        (GPL+ or Artistic) and Public Domain
-# cpan/Test-Simple/lib/Test/Tutorial.pod:   (GPL+ or Artistic) and
-#                                           Public Domain
-# cpan/MIME-Base64/Base64.xs:           (GPL+ or Artistic) and MIT
-# cpan/Test-Simple/lib/ok.pm:           CC0
-# cpan/Text-Tabs/lib/Text/Wrap.pm:      TTWL
-# cpan/Encode/bin/encguess:             Artistic 2.0
-# cpan/libnet/lib/Net/libnetFAQ.pod:    Artistic    (CPAN RT#117888)
-# cpan/Unicode-Collate/Collate/allkeys.txt:     Unicode
-# inline.h:                             MIT
-# lib/unicore:                          UCD
-# ext/SDBM_File/sdbm.{c,h}:             Public domain
-# regexec.c, regcomp.c:                 HSRL
-# cpan/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm:    MIT (with
-#                                       exception for Perl)
-# time64.c:                             MIT
-# perly.h:                              GPLv3+ with Bison exception
-# pod/perlpodstyle.pod:                 MIT
-# pod/perlunicook.pod:                  (GPL+ or Artistic) and Public Domain
-# pod/perlgpl.pod:                      GPL text
-# pod/perlartistic.pod:                 Artistic text
-# ext/File-Glob/bsd_glob.{c,h}:         BSD
-# Other files:                          GPL+ or Artistic
-## Not in a binary package
-# ebcdic_tables.h:                                  MIT
-# cpan/podlators/t/docs/pod.t:                      MIT
-# cpan/podlators/t/docs/pod-spelling.t:             MIT
-# cpan/podlators/t/docs/spdx-license.t:             MIT
-# cpan/podlators/t/docs/synopsis.t:                 MIT
-# cpan/podlators/t/docs/urls.t :                    MIT
-# cpan/podlators/t/lib/Test/RRA.pm:                 MIT
-# cpan/podlators/t/lib/Test/RRA/Config.pm:          MIT
-# cpan/podlators/t/lib/Test/RRA/ModuleVersion.pm:   MIT
-# cpan/podlators/t/style/minimum-version.t:         MIT
-# cpan/podlators/t/style/module-version.t:          MIT
-# cpan/podlators/t/style/strict.t:                  MIT
-# cpan/Term-ANSIColor/t/lib/Test/RRA/Config.pm:     MIT
-## Unbundled
-# cpan/Compress-Raw-Bzip2/bzip2-src:    BSD
-# cpan/Compress-Raw-Zlib/zlib-src:      zlib
-# perl.h (EBDIC parts)                              MIT
-## perl sub-package notice
-# perluniprops.pod is generated from lib/unicore sources:   UCD
-# uni_keywords.h is generated from lib/unicore sources:     UCD
-#
-# This sub-subpackage doesn't contain any copyrightable material.
-# Nevertheless, it needs a License tag, so we'll use the generic
-# "perl" license.
 License:        GPL+ or Artistic 
 Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
@@ -111,10 +31,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
 Source3:        macros.perl
-#Systemtap tapset and example that make use of systemtap-sdt-devel
-# build requirement. Written by lberk; Not yet upstream.
-Source4:        perl.stp
-Source5:        perl-example.stp
+
 # Tom Christiansen confirms Pod::Html uses the same license as perl
 Source6:        Pod-Html-license-clarification
 
@@ -126,29 +43,8 @@ Source7:        gendep.macros
 %include %{SOURCE7}
 %endif
 
-# Removes date check, Fedora/RHEL specific
-Patch1:         perl-perlbug-tag.patch
-
-# Fedora/RHEL only (64bit only)
-Patch2:         perl-5.8.0-libdir64.patch
-
-# Fedora/RHEL specific (use libresolv instead of libbind), bug #151127
-Patch3:         perl-5.10.0-libresolv.patch
-
-# FIXME: May need the "Fedora" references removed before upstreaming
-# patches ExtUtils-MakeMaker
-Patch4:         perl-USE_MM_LD_RUN_PATH.patch
-
-# Provide maybe_command independently, bug #1129443
+# Provide maybe_command independently
 Patch5:         perl-5.22.1-Provide-ExtUtils-MM-methods-as-standalone-ExtUtils-M.patch
-
-# The Fedora builders started randomly failing this futime test
-# only on x86_64, so we just don't run it. Works fine on normal
-# systems.
-Patch6:         perl-5.10.0-x86_64-io-test-failure.patch
-
-# switch off test, which is failing only on koji (fork)
-Patch7:         perl-5.14.1-offtest.patch
 
 # Define SONAME for libperl.so
 Patch8:         perl-5.16.3-create_libperl_soname.patch
@@ -156,11 +52,11 @@ Patch8:         perl-5.16.3-create_libperl_soname.patch
 # Install libperl.so to -Dshrpdir value
 Patch9:         perl-5.22.0-Install-libperl.so-to-shrpdir-on-Linux.patch
 
-# Make *DBM_File desctructors thread-safe, bug #1107543, RT#61912
+# Make *DBM_File desctructors thread-safe
 Patch10:        perl-5.18.2-Destroy-GDBM-NDBM-ODBM-SDBM-_File-objects-only-from-.patch
 
 # Replace ExtUtils::MakeMaker dependency with ExtUtils::MM::Utils.
-# This allows not to require perl-devel. Bug #1129443
+# This allows not to require perl-devel.
 Patch11:        perl-5.22.1-Replace-EU-MM-dependnecy-with-EU-MM-Utils-in-IPC-Cmd.patch
 
 # Link XS modules to pthread library to fix linking with -z defs,
@@ -243,33 +139,25 @@ Patch34:        perl-5.33.1-die_unwind-global-destruction.patch
 # in upstream after 5.33.1
 Patch35:        perl-5.33.1-sort-return-foo.patch
 
-# Link XS modules to libperl.so with EU::CBuilder on Linux, bug #960048
+# Link XS modules to libperl.so with EU::CBuilder on Linux
 Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li.patch
 
-# Link XS modules to libperl.so with EU::MM on Linux, bug #960048
+# Link XS modules to libperl.so with EU::MM on Linux
 Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.patch
 
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  gdbm-devel
 
-# Update some of the bundled modules
-# see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
-
 Requires:  bash
 Requires:  bzip2-devel
 Requires:  coreutils
 Requires:  findutils
 Requires:  gcc
-%if %{with gdbm}
 Requires:  gdbm-devel
-%endif
+
 # glibc-common for iconv
 Requires:  glibc-common
-%if %{with perl_enables_groff}
-# Build-require groff tools for populating %%Config correctly, bug #135101
-Requires:  groff-base
-%endif
 Requires:  libdb-devel
 Requires:  make
 %if !%{defined perl_bootstrap}
@@ -277,30 +165,8 @@ Requires:  perl-interpreter
 Requires:  perl-generators
 %endif
 Requires:  sed
-%if %{with perl_enables_systemtap}
-Requires:  systemtap-sdt-devel
-%endif
 Requires:  tar
-%if %{with perl_enables_tcsh}
-Requires:  tcsh
-%endif
 Requires:  zlib-devel
-
-# For tests
-%if %{with test}
-%if %{with perl_enables_cplusplus_test}
-# An optional ExtUtils-CBuilder's test
-Requires:  gcc-c++
-%endif
-Requires:  procps
-%if %{with perl_enables_turkish_test}
-# An optional t/re/fold_grind_T.t test
-Requires:  glibc-langpack-tr
-%endif
-%if %{with perl_enables_syslog_test}
-Requires:  rsyslog
-%endif
-%endif
 
 
 # compat macro needed for rebuild
@@ -347,9 +213,7 @@ Requires:       perl-File-Find, perl-File-Path, perl-File-stat, perl-File-Temp,
 Requires:       perl-FileCache, perl-FileHandle, perl-filetest,
 Requires:       perl-Filter, perl-Filter-Simple,
 Requires:       perl-FindBin,
-%if %{with gdbm}
 Requires:       perl-GDBM_File,
-%endif
 Requires:       perl-Getopt-Long, perl-Getopt-Std,
 Requires:       perl-Hash-Util, perl-Hash-Util-FieldHash, perl-HTTP-Tiny,
 Requires:       perl-if, perl-IO, perl-IO-Compress, perl-IO-Socket-IP,
@@ -366,13 +230,9 @@ Requires:       perl-Module-CoreList, perl-Module-CoreList-tools,
 Requires:       perl-Module-Load, perl-Module-Load-Conditional,
 Requires:       perl-Module-Loaded, perl-Module-Metadata,
 Requires:       perl-mro,
-%if %{with gdbm}
 Requires:       perl-NDBM_File,
-%endif
 Requires:       perl-Net, perl-Net-Ping, perl-NEXT,
-%if %{with gdbm}
 Requires:       perl-ODBM_File,
-%endif
 Requires:       perl-Opcode, perl-open, perl-overload, perl-overloading,
 Requires:       perl-parent, perl-PathTools, perl-Params-Check, perl-perlfaq,
 Requires:       perl-PerlIO-via-QuotedPrint, perl-Perl-OSType,
@@ -399,9 +259,6 @@ Requires:       perl-Unicode-Collate, perl-Unicode-Normalize, perl-Unicode-UCD,
 Requires:       perl-User-pwent,
 Requires:       perl-vars, perl-version, perl-vmsish,
 
-# Full EVR is for compatibility with systems that swapped perl and perl-core
-# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
-# bug #1464903.
 Provides:       perl-core = %{perl_version}-%{release}
 Provides:       perl-core%{?_isa} = %{perl_version}-%{release}
 # perl was renamed to perl-interpreter and perl-core renamed to perl
@@ -428,9 +285,6 @@ details on the Perl decomposition into packages.
 Summary:        Standalone executable Perl interpreter
 License:        GPL+ or Artistic
 # perl-interpreter denotes a package with the perl executable.
-# Full EVR is for compatibility with systems that swapped perl and perl-core
-# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
-# bug #1464903.
 Version:        %{perl_version}
 Epoch:          %{perl_epoch}
 
@@ -450,12 +304,6 @@ Requires(post): perl-macros
 
 Provides: /bin/perl
 
-# suidperl isn't created by upstream since 5.12.0
-Obsoletes:      perl-suidperl <= 4:5.12.2
-# perl was renamed to perl-interpreter and perl-core renamed to perl
-# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
-# bug #1464903.
-Obsoletes:      perl < 4:5.26.0-395
 
 %description interpreter
 This is a Perl interpreter as a standalone executable %{_bindir}/perl
@@ -511,12 +359,10 @@ Provides:       perl(utf8_heavy.pl)
 Suggests:       perl(DB_File)
 # File::Spec loaded by _charnames.pm that is loaded by \N{}
 Requires:       perl(File::Spec)
-%if %{with gdbm}
 # For AnyDBM_File
 Suggests:       perl(GDBM_File)
 Recommends:     perl(NDBM_File)
 Suggests:       perl(ODBM_File)
-%endif
 # Term::Cap is optional
 %if %{defined perl_bootstrap}
 %gendep_perl_libs
@@ -536,9 +382,6 @@ directories).
 Summary:        Header files for use in perl development
 # l1_char_class_tab.h is generated from lib/unicore sources:    UCD
 License:        (GPL+ or Artistic) and UCD
-%if %{with perl_enables_systemtap}
-Requires:       systemtap-sdt-devel
-%endif
 Requires:       perl(ExtUtils::ParseXS)
 Requires:       %perl_compat
 # Match library and header files when downgrading releases
@@ -576,7 +419,6 @@ License:        GPL+ or Artistic
 # right?
 AutoReqProv:    0
 Requires:       %perl_compat
-# FIXME - note this will need to change when doing the core/minimal swizzle
 Requires:       perl
 %if %{defined perl_bootstrap}
 %gendep_perl_tests
@@ -1018,7 +860,7 @@ Requires:       perl(Dumpvalue)
 Requires:       perl(ExtUtils::CBuilder)
 %if ! %{defined perl_bootstrap}
 # Avoid circular deps local::lib -> Module::Install -> CPAN when bootstraping
-# local::lib recommended by CPAN::FirstTime default choice, bug #1122498
+# local::lib recommended by CPAN::FirstTime default choice
 Requires:       perl(local::lib)
 %endif
 Recommends:     perl(Module::Build)
@@ -1474,7 +1316,7 @@ Version:        3.00
 Requires:       %perl_compat
 Requires:       perl(Carp)
 # Config not needed on perl ≥ 5.008
-# Consider Filter::Util::Call as mandatory, bug #1165183, CPAN RT#100427
+# Consider Filter::Util::Call as mandatory
 Requires:       perl(Filter::Util::Call)
 # I18N::Langinfo is optional
 # PerlIO::encoding is optional
@@ -1577,7 +1419,7 @@ Epoch:          0
 Version:        1.30
 Requires:       %perl_compat
 # Errno.pm bakes in kernel version at build time and compares it against
-# $Config{osvers} at run time. Match exact interpreter build. Bug #1393421.
+# $Config{osvers} at run time. Match exact interpreter build.
 Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
@@ -1639,7 +1481,7 @@ Epoch:          1
 Version:        0.280234
 BuildArch:      noarch
 # C and C++ compilers are highly recommended because compiling code is the
-# purpose of ExtUtils::CBuilder, bug #1547165
+# purpose of ExtUtils::CBuilder
 Requires:       gcc
 Requires:       gcc-c++
 Requires:       perl-devel
@@ -1742,7 +1584,7 @@ License:        GPL+ or Artistic
 Epoch:          2
 Version:        7.44
 # These dependencies are weak in order to relieve building noarch
-# packages from perl-devel and gcc. See bug #1547165.
+# packages from perl-devel and gcc.
 # If an XS module is built, the generated Makefile executes gcc.
 Recommends:     gcc
 # If an XS module is built, code generated from XS will be compiled and it
@@ -2114,7 +1956,6 @@ filetest" may help the permission operators to return results more consistent
 with other tools.
 
 %if %{dual_life} || %{rebuild_from_scratch}
-# FIXME Filter-Simple? version?
 %package Filter
 Summary:        Perl source filters
 License:        GPL+ or Artistic
@@ -2167,7 +2008,6 @@ BuildArch:      noarch
 Locates the full path to the script bin directory to allow the use of paths
 relative to the bin directory.
 
-%if %{with gdbm}
 %package GDBM_File
 Summary:        Perl5 access to the gdbm library
 License:        GPL+ or Artistic
@@ -2176,7 +2016,6 @@ Version:        1.18
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_GDBM_File
-%endif
 
 
 %description GDBM_File
@@ -2906,7 +2745,6 @@ Requires:       %perl_compat
 The "mro" name space provides several utilities for dealing with method
 resolution order and method caching in general.
 
-%if %{with gdbm}
 %package NDBM_File
 Summary:        Tied access to ndbm files
 License:        GPL+ or Artistic
@@ -2915,7 +2753,6 @@ Version:        1.15
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_NDBM_File
-%endif
 
 
 %description NDBM_File
@@ -2974,7 +2811,6 @@ The NEXT module adds a pseudo-class named "NEXT" to any program that uses it.
 If a method "m" calls "$self->NEXT::m()", the call to "m" is redispatched as
 if the calling method had not originally been found.
 
-%if %{with gdbm}
 %package ODBM_File
 Summary:        Tied access to odbm files
 License:        GPL+ or Artistic
@@ -2983,7 +2819,6 @@ Version:        1.16
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_ODBM_File
-%endif
 
 
 %description ODBM_File
@@ -3291,10 +3126,6 @@ License:        GPL+ or Artistic
 Epoch:          0
 # Real version 3.2801
 Version:        3.28.01
-%if %{with perl_enables_groff}
-# Pod::Perldoc::ToMan executes roff
-Requires:       groff-base
-%endif
 Requires:       %perl_compat
 Requires:       perl(File::Temp) >= 0.22
 Requires:       perl(HTTP::Tiny)
@@ -4224,15 +4055,7 @@ you're not running VMS, this module does nothing.
 
 %prep
 %setup -q -n perl-%{perl_version}
-%patch1 -p1
-%ifarch %{multilib_64_archs}
-%patch2 -p1
-%endif
-%patch3 -p1
-%patch4 -p1
 %patch5 -p1
-%patch6 -p1
-%patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
@@ -4264,53 +4087,6 @@ you're not running VMS, this module does nothing.
 %patch200 -p1
 %patch201 -p1
 
-%if !%{defined perl_bootstrap}
-# Local patch tracking
-perl -x patchlevel.h \
-    'Fedora Patch1: Removes date check, Fedora/RHEL specific' \
-%ifarch %{multilib_64_archs}
-    'Fedora Patch2: support for libdir64' \
-%endif
-    'Fedora Patch3: use libresolv instead of libbind' \
-    'Fedora Patch4: USE_MM_LD_RUN_PATH' \
-    'Fedora Patch5: Provide MM::maybe_command independently (bug #1129443)' \
-    'Fedora Patch6: Dont run one io test due to random builder failures' \
-    'Fedora Patch8: Define SONAME for libperl.so' \
-    'Fedora Patch9: Install libperl.so to -Dshrpdir value' \
-    'Fedora Patch10: Make *DBM_File desctructors thread-safe (RT#61912)' \
-    'Fedora Patch11: Replace EU::MakeMaker dependency with EU::MM::Utils in IPC::Cmd (bug #1129443)' \
-    'Fedora Patch12: Link XS modules to pthread library to fix linking with -z defs' \
-    'Fedora Patch13: Pass the correct CFLAGS to dtrace' \
-    'Fedora Patch14: Do not use a C compiler reserved identifiers' \
-    'Fedora Patch15: Fix SvUV_nomg() macro definition' \
-    'Fedora Patch16: Fix SvTRUE() documentation' \
-    'Fedora Patch17: Fix ext/XS-APItest/t/utf8_warn_base.pl tests' \
-    'Fedora Patch18: Fix IO::Handle::error() to report write errors (GH#6799)' \
-    'Fedora Patch19: Fix IO::Handle::error() to report write errors (GH#6799)' \
-    'Fedora Patch20: Fix a link to Unicode Technical Standard #18 (GH#17881)' \
-    'Fedora Patch21: Fix setting a non-blocking mode in IO::Socket::UNIX (GH#17787)' \
-    'Fedora Patch22: Fix running actions after stepping in a debugger (GH#17901)' \
-    'Fedora Patch23: Fix running actions after stepping in a debugger (GH#17901)' \
-    'Fedora Patch24: Fix running actions after stepping in a debugger (GH#17901)' \
-    'Fedora Patch25: Fix a buffer size for asctime_r() and ctime_r() functions' \
-    'Fedora Patch26: Prevent from an integer overflow in RenewDouble() macro' \
-    'Fedora Patch27: Fix a buffer overread in when reallocating formats (GH#17844)' \
-    'Fedora Patch28: Fix a number of arguments passed to a BOOT XS subroutine (GH#17755)' \
-    'Fedora Patch29: Fix an IO::Handle spurious error reported for regular file handles (GH#18019)' \
-    'Fedora Patch30: Fix inheritance resolution of lexial objects in a debugger (GH#17661)' \
-    'Fedora Patch31: Fix a misoptimization when assignig a list in a list context (GH#17816)' \
-    'Fedora Patch32: Fix handling left-hand-side undef when assigning a list (GH#16685)' \
-    'Fedora Patch33: Fix a memory leak when compiling a long regular expression (GH#18054)' \
-    'Fedora Patch34: Fix handling exceptions in a global destruction (GH#18063)' \
-    'Fedora Patch35: Fix sorting with a block that calls return (GH#18081)' \
-    'Fedora Patch200: Link XS modules to libperl.so with EU::CBuilder on Linux' \
-    'Fedora Patch201: Link XS modules to libperl.so with EU::MM on Linux' \
-    %{nil}
-%endif
-
-#copy the example script
-install -m 0644 %{SOURCE5} .
-
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
 
@@ -4323,13 +4099,6 @@ recode()
         touch -r "$1" "${1}_"
         mv -f "${1}_" "$1"
 }
-# TODO iconv fail on this one
-##recode README.tw big5
-#recode pod/perlebcdic.pod
-#recode pod/perlhack.pod
-#recode pod/perlhist.pod
-#recode pod/perlthrtut.pod
-#recode AUTHORS
 
 find . -name \*.orig -exec rm -fv {} \;
 
@@ -4343,13 +4112,6 @@ sed -i 's|BUILD_ZLIB      = True|BUILD_ZLIB      = False|
 rm -rf cpan/Compress-Raw-Zlib/zlib-src
 rm -rf cpan/Compress-Raw-Bzip2/bzip2-src
 sed -i '/\(bzip2\|zlib\)-src/d' MANIFEST
-
-%if !%{with gdbm}
-# Do not install anything requiring NDBM_File if NDBM is not available.
-rm -rf 'cpan/Memoize/Memoize/NDBM_File.pm'
-sed -i '\|cpan/Memoize/Memoize/NDBM_File.pm|d' MANIFEST
-%endif
-
 
 %build
 echo "RPM Build arch: %{_arch}"
@@ -4391,10 +4153,8 @@ echo "RPM Build arch: %{_arch}"
         -Dcc='%{__cc}' \
         -Dcf_by='Red Hat, Inc.' \
         -Dprefix=%{_prefix} \
-%if %{without perl_enables_groff}
         -Dman1dir="%{_mandir}/man1" \
         -Dman3dir="%{_mandir}/man3" \
-%endif
         -Dvendorprefix=%{_prefix} \
         -Dsiteprefix=%{_prefix}/local \
         -Dsitelib="%{_prefix}/local/share/perl5/%{perl_abi}" \
@@ -4404,27 +4164,18 @@ echo "RPM Build arch: %{_arch}"
         -Darchlib="%{archlib}" \
         -Dvendorarch="%{perl_vendorarch}" \
         -Darchname=%{perl_archname} \
-%ifarch %{multilib_64_archs}
-        -Dlibpth="/usr/local/lib64 /lib64 %{_prefix}/lib64" \
-%endif
 %ifarch sparc sparcv9
         -Ud_longdbl \
 %endif
         -Duseshrplib \
         -Dusethreads \
         -Duseithreads \
-%if %{with perl_enables_systemtap}
-        -Dusedtrace='/usr/bin/dtrace' \
-%else
         -Uusedtrace \
-%endif
         -Duselargefiles \
         -Dd_semctl_semun \
         -Di_db \
-%if %{with gdbm}
         -Ui_ndbm \
         -Di_gdbm \
-%endif
         -Di_shadow \
         -Di_syslog \
         -Dman3ext=3pm \
@@ -4520,27 +4271,11 @@ ln -s ../../../bin/xsubpp %{build_privlib}/ExtUtils/
 # Don't need the .packlist
 rm %{build_archlib}/.packlist
 
-# Do not distribute File::Spec::VMS as it works on VMS only (bug #973713)
+# Do not distribute File::Spec::VMS as it works on VMS only.
 # We cannot remove it in %%prep because dist/Cwd/t/Spec.t test needs it.
 rm %{build_archlib}/File/Spec/VMS.pm
-# rm $RPM_BUILD_ROOT%{_mandir}/man3/File::Spec::VMS.3*
 
-# # Fix some manpages to be UTF-8
-# mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1/
-# pushd $RPM_BUILD_ROOT%{_mandir}/man1/
-#   for i in perl588delta.1 perldelta.1 ; do
-#     iconv -f MS-ANSI -t UTF-8 $i --output new-$i
-#     rm $i
-#     mv new-$i $i
-#   done
-# popd
-
-# for now, remove Bzip2:
-# Why? Now is missing Bzip2 files and provides
-##find $RPM_BUILD_ROOT -name Bzip2 | xargs rm -r
-##find $RPM_BUILD_ROOT -name '*B*zip2*'| xargs rm
-
-# tests -- FIXME need to validate that this all works as expected
+# tests
 mkdir -p %{buildroot}%{perl5_testdir}/perl-tests
 
 # "core"
@@ -4558,44 +4293,7 @@ done
     -e 's"\A#!(?:perl|\./perl|/perl|/usr/bin/perl|/usr/bin/env perl)\b"$Config{startperl}"' \
     $(find %{buildroot}%{perl5_testdir}/perl-tests -type f)
 
-%if %{with perl_enables_systemtap}
-# Systemtap tapset install
-mkdir -p %{buildroot}%{tapsetdir}
-%ifarch %{multilib_64_archs}
-%global libperl_stp libperl%{perl_version}-64.stp
-%else
-%global libperl_stp libperl%{perl_version}-32.stp
-%endif
-
-sed \
-  -e "s|LIBRARY_PATH|%{_libdir}/%{soname}|" \
-  %{SOURCE4} \
-  > %{buildroot}%{tapsetdir}/%{libperl_stp}
-%endif
-
-# TODO: Canonicalize test files (rewrite intrerpreter path, fix permissions)
-# XXX: We cannot rewrite ./perl before %%check phase. Otherwise the test
-# would run against system perl at build-time.
-# See __spec_check_pre global macro in macros.perl.
-#T_FILES=`find %%{buildroot}%%{perl5_testdir} -type f -name '*.t'`
-#%%fix_shbang_line $T_FILES
-#%%{__chmod} +x $T_FILES
-#%%{_fixperms} %%{buildroot}%%{perl5_testdir}
-#
-# lib/perl5db.t will fail if Term::ReadLine::Gnu is available
 %check
-%if %{with test}
-%{new_perl} -I/lib regen/lib_cleanup.pl
-pushd t
-%{new_perl} -I../lib porting/customized.t --regen
-popd
-%if %{parallel_tests}
-    JOBS=$(printf '%%s' "%{?_smp_mflags}" | sed 's/.*-j\([0-9][0-9]*\).*/\1/')
-    LC_ALL=C TEST_JOBS=$JOBS make test_harness
-%else
-    LC_ALL=C make test
-%endif
-%endif
 
 %ldconfig_scriptlets libs
 
@@ -4718,12 +4416,6 @@ popd
 %dir %{privlib}/ExtUtils
 %{privlib}/ExtUtils/typemap
 %{_libdir}/libperl.so
-%if %{with perl_enables_systemtap}
-%dir %{_datadir}/systemtap
-%dir %{_datadir}/systemtap/tapset
-%{tapsetdir}/%{libperl_stp}
-%doc perl-example.stp
-%endif
 
 %files macros
 %{_rpmmacrodir}/macros.perl
@@ -5805,12 +5497,10 @@ popd
 %{privlib}/FindBin.pm
 %{_mandir}/man3/FindBin.*
 
-%if %{with gdbm}
 %files GDBM_File
 %{archlib}/GDBM_File.pm
 %{archlib}/auto/GDBM_File
 %{_mandir}/man3/GDBM_File.3*
-%endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files Getopt-Long
@@ -6335,12 +6025,10 @@ popd
 %{archlib}/mro.pm
 %{_mandir}/man3/mro.3*
 
-%if %{with gdbm}
 %files NDBM_File
 %{archlib}/NDBM_File.pm
 %{archlib}/auto/NDBM_File
 %{_mandir}/man3/NDBM_File.3*
-%endif
 
 %files Net
 %dir %{privlib}/Net
@@ -6362,12 +6050,10 @@ popd
 %{privlib}/NEXT.pm
 %{_mandir}/man3/NEXT.*
 
-%if %{with gdbm}
 %files ODBM_File
 %{archlib}/ODBM_File.pm
 %{archlib}/auto/ODBM_File
 %{_mandir}/man3/ODBM_File.3*
-%endif
 
 %files open
 %{privlib}/open.pm
@@ -7022,9 +6708,7 @@ popd
 - Remove redhat rpm macros requirement.
 - Remove libxcrypt requirement.
 - Explicitly provide /bin/perl from perl-interpreter.
-- Disable groff.
-- Enable gdbm.
-- Make perl(Module::Build) a recommends for CPAN.
+- Remove patches and options that do not apply to CBL-Mariner.
 - License verified.
 
 * Thu Aug 27 2020 Petr Pisar <ppisar@redhat.com> - 4:5.32.0-462
