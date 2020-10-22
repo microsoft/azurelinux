@@ -3,10 +3,10 @@
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
-#block null packets
--A INPUT -p tcp --tcp-flags ALL NONE -j DROP
-#block syn attack
--A INPUT -p tcp ! --syn -m state --state NEW -j DROP
-#block XMAS packets
--A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+#-A FORWARD -j REJECT --reject-with icmp-host-prohibited
 COMMIT
