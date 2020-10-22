@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -19,8 +19,9 @@ Patch4:         CVE-2015-5652.nopatch
 # Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
 # and is not a security issue
 Patch5:         CVE-2017-17522.nopatch
-# Ignore CVE-2013-1753 as it was patched in upstream 2.7.9, but NVD has not been updated with that fact
-Patch6:         CVE-2013-1753.nopatch
+# Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
+# documentation is updated
+Patch6:         CVE-2019-9674.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -241,6 +242,10 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-4
+- Remove CVE-2013-1753 nopatch
+- Ignore CVE-2019-9674
+
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
 - Ignore CVE-2013-1753 because NVD erroneously lists this version as being vulnerable
