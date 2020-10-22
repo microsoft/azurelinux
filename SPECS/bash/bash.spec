@@ -1,16 +1,16 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        4.4.18
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
-URL:            http://www.gnu.org/software/bash/
+URL:            https://www.gnu.org/software/bash/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/bash/%{name}-%{version}.tar.gz
-%define sha1    bash=6cf9b3c23930ba8a721fee177d1558e5b7cb6104
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
 Patch0:         bash-4.4.patch
+Patch1:         CVE-2019-18276.patch
 Provides:       /bin/sh
 Provides:       /bin/bash
 Provides:       /usr/bin/sh
@@ -38,8 +38,8 @@ Requires: bash >= 4.4
 These are the additional language files of bash.
 
 %prep
-%setup -q -n bash-4.4.18
-%patch0 -p1
+%autosetup -p 1
+
 %build
 %configure \
     "CFLAGS=-fPIC %{build_cflags}" \
@@ -325,6 +325,8 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
+- Patch CVE-2019-18276
 *   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 4.4.18-5
 -   Don't stomp on CFLAGS.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4
