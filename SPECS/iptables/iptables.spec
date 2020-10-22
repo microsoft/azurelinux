@@ -96,7 +96,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 *   Wed Oct 21 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-5
--   Modified the ip4, ip6 to match rules of other distros bug
+-   Modified the ip4, ip6 to match rules of other distros
 *   Thu Oct 15 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-4
 -   Use Autosetup and removed old sha1 define
 -   Modified the ip4, ip6 to default to ACCEPT all connections 
