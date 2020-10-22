@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	6%{?dist}
+Release:	7%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -85,6 +85,8 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.python*
 
 %changelog
+* Thu Oct 22 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-7
+- Define __make macro.
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-6
 - Add backwards compatibility macros for compiling and linking.
 - Define _fmoddir macro.
