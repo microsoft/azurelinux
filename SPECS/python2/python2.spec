@@ -14,14 +14,16 @@ Patch0:         cgi.patch
 Patch1:         added-pyopenssl-ipaddress-certificate-validation.patch
 Patch2:         python2-support-mariner-platform.patch
 Patch3:         Replace-unsupported-TLS-methods.patch
+Patch4:         CVE-2019-20907.patch
+Patch5:         CVE-2020-26116.patch
 # Ignore CVE-2015-5652 because it only applies to Windows
-Patch4:         CVE-2015-5652.nopatch
+Patch6:         CVE-2015-5652.nopatch
 # Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
 # and is not a security issue
-Patch5:         CVE-2017-17522.nopatch
+Patch7:         CVE-2017-17522.nopatch
 # Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
 # documentation is updated
-Patch6:         CVE-2019-9674.nopatch
+Patch8:         CVE-2019-9674.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -123,6 +125,8 @@ The test package contains all regression tests for Python as well as the modules
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -243,8 +247,10 @@ make test
 
 %changelog
 * Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-4
-- Remove CVE-2013-1753 nopatch
+- Remove CVE-2013-1753 no patch
 - Ignore CVE-2019-9674
+- Fix CVE-2019-20907
+- Fix CVE-2020-26116
 
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
