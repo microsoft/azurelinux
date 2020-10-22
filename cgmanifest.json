@@ -444,6 +444,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ccache",
+          "version": "3.6",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v3.6/ccache-3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cdrkit",
           "version": "1.1.11",
           "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/cdrkit/cdrkit-1.1.11.tar.gz/efe08e2f3ca478486037b053acd512e9/cdrkit-1.1.11.tar.gz"
@@ -497,6 +507,16 @@
           "name": "cifs-utils",
           "version": "6.8",
           "downloadUrl": "https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.8.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clamav",
+          "version": "0.101.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.101.2.tar.gz"
         }
       }
     },
