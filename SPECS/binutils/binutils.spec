@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.32
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 URL:            http://www.gnu.org/software/binutils
 Group:          System Environment/Base
@@ -11,6 +11,7 @@ Source0:        http://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 Patch0:         CVE-2019-9070.nopatch
 Patch1:         CVE-2019-9075.patch
 Patch2:         CVE-2019-9077.patch
+Patch3:         CVE-2019-12972.patch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -28,6 +29,7 @@ for handling compiled objects.
 %setup -q
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %configure \
@@ -111,9 +113,10 @@ make %{?_smp_mflags} check
 %{_libdir}/libopcodes.so
 
 %changelog
-* Sat May 09 00:21:17 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.32-3
-- Added %%license line automatically
-
+*   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-4
+-   Fix CVE-2019-12972.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.32-3
+-   Added %%license line automatically
 *   Wed May 06 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-2
 -   Fix CVE-2019-9077.
 -   Fix CVE-2019-9075.
