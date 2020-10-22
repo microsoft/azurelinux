@@ -1,6 +1,6 @@
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.8
+Version:        1.10.9
 Release:        1%{?dist}
 License:        ASL 2.0 and BSD and W3C
 URL:            https://ant.apache.org
@@ -118,6 +118,8 @@ bootstrap/bin/ant -v run-tests
 %{_bindir}/runant.pl
 
 %changelog
+*   Wed Oct 21 2020 Henry Li <lihl@microsoft.com> - 1.10.9-1
+-   Updated to version 1.10.9 to resolve CVE-2020-1945
 *   Thu May 21 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.10.8-1
 -   Updated to version 1.10.8 to resolve CVE-2020-1945
 *   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.10.5-8
