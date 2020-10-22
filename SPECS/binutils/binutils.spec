@@ -14,6 +14,7 @@ Patch2:         CVE-2019-9077.patch
 Patch3:         CVE-2019-12972.patch
 Patch4:         CVE-2019-14250.patch
 Patch5:         CVE-2019-14444.patch
+Patch6:         CVE-2019-9071.patch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -34,6 +35,7 @@ for handling compiled objects.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 %configure \
@@ -121,6 +123,7 @@ make %{?_smp_mflags} check
 -   Fix CVE-2019-12972.
 -   Fix CVE-2019-14250.
 -   Fix CVE-2019-14444.
+-   Fix CVE-2019-9071.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.32-3
 -   Added %%license line automatically
 *   Wed May 06 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-2
