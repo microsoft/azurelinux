@@ -18,6 +18,7 @@ Patch6:         CVE-2019-9071.patch
 # Binutils commmunity does not consider this a bug
 Patch7:         CVE-2019-9072.nopatch
 Patch8:         CVE-2019-9073.patch
+Patch9:         CVE-2019-9074.patch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -40,6 +41,7 @@ for handling compiled objects.
 %patch5 -p1
 %patch6 -p1
 %patch8 -p1
+%patch9 -p1
 
 %build
 %configure \
@@ -130,6 +132,7 @@ make %{?_smp_mflags} check
 -   Fix CVE-2019-9071.
 -   No patch CVE-2019-9072.
 -   Fix CVE-2019-9073.
+-   Fix CVE-2019-9074.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.32-3
 -   Added %%license line automatically
 *   Wed May 06 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-2
