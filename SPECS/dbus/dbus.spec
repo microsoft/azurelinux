@@ -1,3 +1,5 @@
+%{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
+
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
@@ -8,6 +10,7 @@ Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2019-12749.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
@@ -27,15 +30,14 @@ Requires:       expat-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup
 
 %build
-./configure --prefix=%{_prefix}                 \
-            --sysconfdir=%{_sysconfdir}         \
-            --localstatedir=%{_var}             \
-            --docdir=%{_docdir}/dbus-1.11.12  \
-            --enable-libaudit=no --enable-selinux=no \
-            --with-console-auth-dir=/run/console
+%configure 
+    --docdir=%{_versioneddocdir}  \
+    --enable-libaudit=no \
+    --enable-selinux=no \
+    --with-console-auth-dir=/run/console
 
 make %{?_smp_mflags}
 
@@ -59,7 +61,7 @@ make %{?_smp_mflags} check
 %exclude %{_libdir}/sysusers.d
 /lib/*
 %{_libexecdir}/*
-%{_docdir}/*
+%{_versioneddocdir}/*
 %{_datadir}/dbus-1
 
 #%{_sharedstatedir}/*
@@ -79,6 +81,10 @@ make %{?_smp_mflags} check
 %changelog
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4
 - Patch CVE-2019-12749
+- Correct documentation directory
+- License verified
+- Change URL/Source0 to https versions
+- Lint to Mariner style
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3
 - Added %%license line automatically
