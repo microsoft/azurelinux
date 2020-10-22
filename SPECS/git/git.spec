@@ -1,13 +1,18 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.23.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+# CVE-2018-1000110, CVE-2018-1000182, CVE-2019-14860, CVE-2020-2136 apply to Jenkins Git Plugin
+Patch0:         CVE-2018-1000110.nopatch
+Patch1:         CVE-2018-1000182.nopatch
+Patch2:         CVE-2019-1003010.nopatch
+Patch3:         CVE-2020-2136.nopatch
 BuildRequires:  curl-devel
 BuildRequires:  python2
 Requires:       openssl
@@ -38,7 +43,7 @@ Requires: git >= 2.1.2
 These are the additional language files of git.
 
 %prep
-%setup -q
+%autosetup -p1
 %build
 %configure \
     CFLAGS="%{optflags}" \
@@ -87,6 +92,8 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+*   Thu Oct 22 2020 Ruying Chen <v-ruyche@microsoft.com> 2.23.3-3
+-   Nopatch CVE-2018-1000110, CVE-2018-1000182, CVE-2019-1003010, CVE-2020-2136
 *   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 2.23.3-2
 -   Fix check test
 *   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.23.3-1
