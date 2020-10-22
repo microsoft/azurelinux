@@ -6,9 +6,13 @@ Version:        2.2.5
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/OMS-Auditd-Plugin
+#Source0:       https://github.com/microsoft/OMS-Auditd-Plugin/archive/v2.2.5-0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+#Source1:       https://github.com/microsoft/pal/archive/v1.6.6-0.tar.gz
 Source1:        pal-1.6.6-0.tar.gz
+#Source2:       https://github.com/msgpack/msgpack-c/archive/cpp-2.0.0.zip
 Source2:        msgpack-c-cpp-2.0.0.zip
+#Source3:       https://github.com/Tencent/rapidjson/archive/v1.0.2.tar.gz
 Source3:        rapidjson-1.0.2.tar.gz
 Patch0:         auoms.patch
 Group:          Applications/System
