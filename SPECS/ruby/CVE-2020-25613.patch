@@ -1,0 +1,35 @@
+From 8946bb38b4d87549f0d99ed73c62c41933f97cc7 Mon Sep 17 00:00:00 2001
+From: Yusuke Endoh <mame@ruby-lang.org>
+Date: Tue, 29 Sep 2020 13:15:58 +0900
+Subject: [PATCH] Make it more strict to interpret some headers
+
+Some regexps were too tolerant.
+---
+ lib/webrick/httprequest.rb | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/webrick/httprequest.rb b/lib/webrick/httprequest.rb
+index 294bd91..d34eac7 100644
+--- a/lib/webrick/httprequest.rb
++++ b/lib/webrick/httprequest.rb
+@@ -227,9 +227,9 @@ def parse(socket=nil)
+         raise HTTPStatus::BadRequest, "bad URI `#{@unparsed_uri}'."
+       end
+ 
+-      if /close/io =~ self["connection"]
++      if /\Aclose\z/io =~ self["connection"]
+         @keep_alive = false
+-      elsif /keep-alive/io =~ self["connection"]
++      elsif /\Akeep-alive\z/io =~ self["connection"]
+         @keep_alive = true
+       elsif @http_version < "1.1"
+         @keep_alive = false
+@@ -508,7 +508,7 @@ def read_body(socket, block)
+       return unless socket
+       if tc = self['transfer-encoding']
+         case tc
+-        when /chunked/io then read_chunked(socket, block)
++        when /\Achunked\z/io then read_chunked(socket, block)
+         else raise HTTPStatus::NotImplemented, "Transfer-Encoding: #{tc}."
+         end
+       elsif self['content-length'] || @remaining_size
