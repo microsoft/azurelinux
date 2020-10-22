@@ -46,6 +46,7 @@ Patch1022:      CVE-2020-8428.nopatch
 Patch1023:      CVE-2018-1000026.nopatch
 Patch1024:      CVE-2018-16880.nopatch
 Patch1025:      CVE-2020-12464.nopatch
+Patch1026:      CVE-2020-12465.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -345,7 +346,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 *   Wed Oct 21 2020 Chris Co <chrco@microsoft.com> 5.4.51-12
--   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464
+-   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Enable QAT kernel configs
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
