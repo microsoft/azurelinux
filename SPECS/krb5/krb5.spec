@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.17
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://web.mit.edu/kerberos/
 Group:          System Environment/Security
@@ -12,6 +12,11 @@ Requires:       openssl
 Requires:       e2fsprogs-libs
 BuildRequires:  openssl-devel
 BuildRequires:  e2fsprogs-devel
+
+%if %{with_check}
+BuildRequires:  iana-etc
+%endif
+
 Provides:       pkgconfig(mit-krb5)
 Provides:       pkgconfig(mit-krb5-gssapi)
 %description
@@ -117,6 +122,8 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.17-4
+- Fix check tests by adding iana-etc which supplies required /etc/services file
 * Fri Jul 31 12:53:00 PST 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
 - Don't stomp on CPPFLAGS
 * Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.17-2

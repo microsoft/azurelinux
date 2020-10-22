@@ -1,14 +1,18 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
 Version:        1.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/gzip
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	    http://ftp.gnu.org/gnu/gzip/%{name}-%{version}.tar.xz
-%define sha1 gzip=0249ad4c4ca1f144714e8e21b6d0db24651fc122
+
+%if %{with_check}
+BuildRequires:  less
+%endif
+
 %description
 The Gzip package contains programs for compressing and
 decompressing files.
@@ -34,10 +38,12 @@ make %{?_smp_mflags} check
 %license COPYING
 %{_bindir}/*
 %{_mandir}/*/*
+
 %changelog
+* Tue Oct 20 2020 Andrew Phelps <anphel@microsoft.com> 1.9-5
+- Fix check test
 * Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9-4
 - Added %%license line automatically
-
 * Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 1.9-3
 - Fixed reference URL. Verified license.
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.9-2

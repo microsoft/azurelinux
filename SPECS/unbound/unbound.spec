@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          System/Servers
 Vendor:         Microsoft Corporation
 License:        BSD
@@ -10,6 +10,10 @@ URL:            https://nlnetlabs.nl/projects/unbound/about/
 #Source0:       https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz
 Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
+
+# CVE-2020-12662.patch also fixes CVE-2020-12663
+Patch0:         CVE-2020-12662.patch
+Patch1:         CVE-2020-12663.nopatch
 
 BuildRequires:  systemd
 BuildRequires:  expat-devel
@@ -37,6 +41,7 @@ unbound dns server docs
 
 %prep
 %setup -q -n %{name}-release-%{version}
+%patch0 -p1
 
 %build
 ./configure \
@@ -87,6 +92,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+*  Tue Oct 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.10.0-3
+-  Fix CVE-2020-12662 and CVE-2020-12663.
 *  Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.10.0-2
 -  Added %%license line automatically
 *  Fri May 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.10.0-1

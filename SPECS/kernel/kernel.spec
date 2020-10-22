@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -341,6 +341,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
+-   Enable QAT kernel configs
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
 -   Address CVE-2020-10757, CVE-2020-12653, CVE-2020-12657, CVE-2010-3865,
 -   CVE-2020-11668, CVE-2020-12654, CVE-2020-24394, CVE-2020-8428

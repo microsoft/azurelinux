@@ -4,7 +4,7 @@
 Summary:        POSIX capability Library
 Name:           libcap-ng
 Version:        0.7.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Group:          System Environment/Libraries
 URL:            http://people.redhat.com/sgrubb/libcap-ng
@@ -61,8 +61,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 
 %check
-chown -Rv nobody .
-sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
+make check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -90,6 +89,8 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/*.a
 
 %changelog
+*   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 0.7.9-3
+-   Fix check test
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.7.9-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 -   Added %%license line automatically

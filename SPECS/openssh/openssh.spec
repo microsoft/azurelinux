@@ -1,7 +1,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD
 URL:            https://www.openssh.com/
 Group:          System Environment/Security
@@ -13,6 +13,7 @@ Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/bl
 Source2:        sshd.service
 Source3:        sshd-keygen.service
 Patch0:         blfs_systemd_fixes.patch
+Patch1:         CVE-2019-16905.patch
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  krb5-devel
@@ -49,6 +50,7 @@ This provides the ssh server daemons, utilities, configuration and service files
 %setup -q
 tar xf %{SOURCE1} --no-same-owner
 %patch0 -p0
+%patch1 -p0
 %build
 %configure \
     --sysconfdir=/etc/ssh \
@@ -171,6 +173,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
+*   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 8.0p1-9
+-   Add patch for CVE-2019-16905
 *   Wed Sep 02 2020 Jim Perrin <jim.perrin@microsoft.com> 8.0p1-8
 -   Add wants=sshd-keygen.service to sshd.service for easier service starting
 *   Thu Jun 04 2020 Chris Co <chrco@microsoft.com> 8.0p1-7
