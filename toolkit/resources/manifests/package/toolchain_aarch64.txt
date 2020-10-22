@@ -327,11 +327,11 @@ python3-gpg-1.13.1-5.cm1.aarch64.rpm
 python3-libxml2-2.9.10-2.cm1.aarch64.rpm
 python3-pwquality-1.4.2-4.cm1.aarch64.rpm
 python3-rpm-4.14.2-10.cm1.aarch64.rpm
-python-curses-2.7.18-3.cm1.aarch64.rpm
+python-curses-2.7.18-4.cm1.aarch64.rpm
 python-gpg-1.13.1-5.cm1.aarch64.rpm
 python-rpm-4.14.2-10.cm1.aarch64.rpm
 python-setuptools-40.2.0-5.cm1.noarch.rpm
-python-xml-2.7.18-3.cm1.aarch64.rpm
+python-xml-2.7.18-4.cm1.aarch64.rpm
 readline-7.0-4.cm1.aarch64.rpm
 readline-debuginfo-7.0-4.cm1.aarch64.rpm
 readline-devel-7.0-4.cm1.aarch64.rpm
