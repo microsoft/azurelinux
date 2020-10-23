@@ -32,12 +32,7 @@ line scanner and an advanced tool for automatic database updates.
 %setup -q
 
 %build
-./configure \
-    --prefix=%{_prefix} \
-    --exec_prefix=/usr \
-    --sbindir=%{_sbindir} \
-    --libdir=%{_libdir} \
-    --sysconfdir=%{_sysconfdir}
+%configure
 
 make %{?_smp_mflags}
 
@@ -74,6 +69,7 @@ make %{?_smp_mflags} check
 * Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.101.2-3
 - License verified.
 - Added %%license macro.
+- Switching to using the %%configure macro.
 - Extended package's summary and description.
 * Wed Oct 02 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.101.2-2
 - Fix vendor and distribution. Add systemd files to the list.
