@@ -1060,6 +1060,15 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 
 // isImplicitPackage returns true if a PackageVer represents an implicit provide.
 func isImplicitPackage(versionedPkg *pkgjson.PackageVer) bool {
-	// Implicit provides will contain "(" and ")"
-	return strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")")
+	// Auto generated provides will contain "(" and ")".
+	if strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")") {
+		return true
+	}
+
+	// File paths will start with a / and are implicitly provided by an RPM that contains that file.
+	if strings.HasPrefix(versionedPkg.Name, "/") {
+		return true
+	}
+
+	return false
 }
