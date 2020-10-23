@@ -24,6 +24,8 @@ Patch7:         CVE-2017-17522.nopatch
 # Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
 # documentation is updated
 Patch8:         CVE-2019-9674.nopatch
+# Ignore CVE-2007-4559 since upstream community agreed it shouldn't be patched
+Patch9:         CVE-2007-4559.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -251,6 +253,7 @@ make test
 - Ignore CVE-2019-9674
 - Fix CVE-2019-20907
 - Fix CVE-2020-26116
+- Ignore CVE-2007-4559
 
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
