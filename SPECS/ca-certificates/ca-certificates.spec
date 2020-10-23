@@ -195,7 +195,7 @@ Group:    System Environment/Security
 Requires: %{name}-shared = %{version}-%{release}
 
 %description static
-Provides ca-certificates while minimizing the runtime dependencies.
+Provides ca-certificates while minimizing the runtime dependencies. This package does not contain the post section.
 
 %prep -q
 rm -rf %{name}
