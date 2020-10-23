@@ -913,7 +913,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Warnf("Ignoring UID for (%s) user, using default", rootUser)
 		}
 
-		if _, err2 := os.Stat(shadowFile); err2 != nil {
+		if exists, _ := file.PathExists(shadowFile); !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping.")
 		} else {
 			// Update shadow file
@@ -944,7 +944,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	// Update password expiration
 	if user.PasswordExpiresDays != 0 {
 		// Ignore updating if there is no shadow file to update
-		if _, err2 := os.Stat(shadowFile); err2 != nil {
+		if exists, _ := file.PathExists(shadowFile); !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping.")
 			return
 		}
