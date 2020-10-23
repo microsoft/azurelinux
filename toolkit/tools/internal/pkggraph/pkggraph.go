@@ -1065,7 +1065,7 @@ func isImplicitPackage(versionedPkg *pkgjson.PackageVer) bool {
 		return true
 	}
 
-	// File paths will start with a / and are implicitly provided by an RPM that contains that file.
+	// File paths will start with a / and are implicitly provided by an rpm that contains that file.
 	if strings.HasPrefix(versionedPkg.Name, "/") {
 		return true
 	}
