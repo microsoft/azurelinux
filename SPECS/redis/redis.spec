@@ -1,14 +1,13 @@
-Summary:	advanced key-value store
-Name:		redis
-Version:	5.0.5
+Summary:	    advanced key-value store
+Name:		    redis
+Version:	    5.0.5
 Release:        4%{?dist}
-License:	BSD
-URL:		http://redis.io/
-Group:		Applications/Databases
+License:	    BSD
+URL:		    http://redis.io/
+Group:		    Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
-%define sha1 redis=71e38ae09ac70012b5bc326522b976bcb8e269d6
+Source0:	    http://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         CVE-2020-14147.patch
 BuildRequires:  gcc
@@ -17,7 +16,7 @@ BuildRequires:  make
 BuildRequires:  which
 BuildRequires:  tcl
 BuildRequires:  tcl-devel
-Requires:	systemd
+Requires:	    systemd
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 
 %description
