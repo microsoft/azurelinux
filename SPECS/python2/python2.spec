@@ -26,7 +26,9 @@ Patch8:         CVE-2017-17522.nopatch
 # documentation is updated
 Patch9:         CVE-2019-9674.nopatch
 # Ignore CVE-2007-4559 since upstream community agreed it shouldn't be patched
-Patch10:         CVE-2007-4559.nopatch
+Patch10:        CVE-2007-4559.nopatch
+# Ignore CVE-2019-18348 since it is patched in Python 2.7
+Patch11:        CVE-2019-18348.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -257,6 +259,7 @@ make test
 - Fix CVE-2020-26116
 - Ignore CVE-2007-4559
 - Fix CVE-2017-18207
+- Ignore CVE-2019-18348
 
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
