@@ -1,7 +1,7 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
-# Don't depend on bash by default - distroless
+# Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
 Summary:        Main C library

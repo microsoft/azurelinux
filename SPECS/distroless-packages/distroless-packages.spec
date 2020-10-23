@@ -1,7 +1,7 @@
 Name:           distroless-packages
 Summary:        Metapackage with core sets of packages for distroless containers
 Version:        0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          System Environment/Base
 URL:            http://aka.ms/cbl-mariner
@@ -12,7 +12,7 @@ Distribution:   Mariner
 Metapackage holding sets of core packages for different applications.
 
 %package base
-Summary:    Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
+Summary: Metapackage defining the basic set of packages (no kernel) used to create a "distroless" container.
 
 Requires: filesystem
 Requires: tzdata

@@ -1,4 +1,4 @@
-# Don't depend on bash by default - distroless
+# Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
