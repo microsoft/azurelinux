@@ -3423,6 +3423,16 @@
     },
     {
       "component": {
+	"type": "other",
+	"other": {
+	  "name": "omi",
+	  "version": "1.6.6",
+	  "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
+	}
+      }
+    },
+    {
+      "component": {
         "type": "other",
         "other": {
           "name": "oniguruma",
