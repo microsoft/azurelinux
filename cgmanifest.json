@@ -134,6 +134,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "auoms",
+          "version": "2.2.5",
+          "downloadUrl": "https://github.com/microsoft/OMS-Auditd-Plugin/archive/v2.2.5-0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "autoconf213",
           "version": "2.13",
           "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
@@ -3186,6 +3196,16 @@
         "type": "other",
         "other": {
           "name": "msgpack",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-2.0.0.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msgpack",
           "version": "3.2.1",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.2.1.tar.gz"
         }
@@ -3558,6 +3578,16 @@
           "name": "p11-kit",
           "version": "0.23.16.1",
           "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.23.16.1/p11-kit-0.23.16.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pal",
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/microsoft/pal/archive/v1.6.6-0.tar.gz"
         }
       }
     },
@@ -5078,6 +5108,16 @@
           "name": "qt5-qttools",
           "version": "5.12.5",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rapidjson",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.0.2.tar.gz"
         }
       }
     },
