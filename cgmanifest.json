@@ -354,6 +354,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "busybox",
+          "version": "1.31.1",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.31.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
@@ -5448,6 +5458,16 @@
           "name": "squashfs-tools",
           "version": "4.3",
           "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uclibc",
+          "version": "0.9.33.2",
+          "downloadUrl": "http://www.uclibc.org/downloads/uClibc-0.9.33.2.tar.xz"
         }
       }
     },
