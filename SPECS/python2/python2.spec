@@ -16,16 +16,17 @@ Patch2:         python2-support-mariner-platform.patch
 Patch3:         Replace-unsupported-TLS-methods.patch
 Patch4:         CVE-2019-20907.patch
 Patch5:         CVE-2020-26116.patch
+Patch6:         CVE-2017-18207.patch
 # Ignore CVE-2015-5652 because it only applies to Windows
-Patch6:         CVE-2015-5652.nopatch
+Patch7:         CVE-2015-5652.nopatch
 # Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
 # and is not a security issue
-Patch7:         CVE-2017-17522.nopatch
+Patch8:         CVE-2017-17522.nopatch
 # Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
 # documentation is updated
-Patch8:         CVE-2019-9674.nopatch
+Patch9:         CVE-2019-9674.nopatch
 # Ignore CVE-2007-4559 since upstream community agreed it shouldn't be patched
-Patch9:         CVE-2007-4559.nopatch
+Patch10:         CVE-2007-4559.nopatch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -129,6 +130,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -254,6 +256,7 @@ make test
 - Fix CVE-2019-20907
 - Fix CVE-2020-26116
 - Ignore CVE-2007-4559
+- Fix CVE-2017-18207
 
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
