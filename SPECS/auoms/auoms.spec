@@ -175,8 +175,8 @@ done
 %{_sysconfdir}/opt/microsoft/auoms/outconf.d
 %{_sysconfdir}/opt/microsoft/auoms/rules.d
 /opt/microsoft/auoms
-/opt/microsoft/auoms/LICENSE
-/opt/microsoft/auoms/THIRD_PARTY_IP_NOTICE
+%license /opt/microsoft/auoms/LICENSE
+%license /opt/microsoft/auoms/THIRD_PARTY_IP_NOTICE
 /opt/microsoft/auoms/auoms.service
 /opt/microsoft/auoms/bin
 /opt/microsoft/auoms/bin/auomscollect
@@ -188,4 +188,4 @@ done
 
 %changelog
 * Thu Oct 22 2020 Andrew Phelps <anphel@microsoft.com> 2.2.5-1
-- Initial CBL-Mariner Version.
+- Initial CBL-Mariner version.
