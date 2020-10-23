@@ -1,7 +1,7 @@
 Summary:	advanced key-value store
 Name:		redis
 Version:	5.0.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	BSD
 URL:		http://redis.io/
 Group:		Applications/Databases
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source0:	http://download.redis.io/releases/%{name}-%{version}.tar.gz
 %define sha1 redis=71e38ae09ac70012b5bc326522b976bcb8e269d6
 Patch0:         redis-conf.patch
+Patch1:         CVE-2020-14147.patch
 BuildRequires:  gcc
 BuildRequires:  systemd
 BuildRequires:  make
@@ -25,6 +26,7 @@ Redis is an in-memory data structure store, used as database, cache and message 
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 make %{?_smp_mflags}
@@ -84,6 +86,8 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Fri Oct 23 2020 Henry Li <lihl@microsoft.com> - 5.0.5-4
+- Add patch to resolve CVE-2020-14147
 * Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.0.5-3
 - Added %%license line automatically
 
