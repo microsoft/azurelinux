@@ -188,6 +188,4 @@ done
 
 %changelog
 * Thu Oct 22 2020 Andrew Phelps <anphel@microsoft.com> 2.2.5-1
-- Initial CBL-Mariner version.  
-* Tue Sep 15 2020 Henry Li <lihl@microsoft.com> 2.2.5-0
-- Initial build. First version
+- Initial CBL-Mariner Version.
