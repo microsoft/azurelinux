@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "busybox",
+          "version": "1.31.1",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.31.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "brotli",
           "version": "1.0.7",
           "downloadUrl": "https://github.com/google/brotli/archive/v1.0.7/brotli-1.0.7.tar.gz"
@@ -5488,6 +5498,16 @@
           "name": "syslog-ng",
           "version": "3.23.1",
           "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uclibc",
+          "version": "0.9.33.2",
+          "downloadUrl": "http://www.uclibc.org/downloads/uClibc-0.9.33.2.tar.xz"
         }
       }
     },
