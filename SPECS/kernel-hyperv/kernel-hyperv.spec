@@ -1,8 +1,8 @@
 %global security_hardening none
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.4.51
-Release:        4%{?dist}
+Version:        5.4.72
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -258,6 +258,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+*   Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
+-   Update source to 5.4.72
 *   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-4
 -   Update postun script to deal with removal in case of another installed kernel.
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-3

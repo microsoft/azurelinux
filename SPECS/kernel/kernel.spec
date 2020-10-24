@@ -1,8 +1,8 @@
 %global security_hardening none
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.51
-Release:        12%{?dist}
+Version:        5.4.72
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -347,7 +347,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-*   Wed Oct 21 2020 Chris Co <chrco@microsoft.com> 5.4.51-12
+*   Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
+-   Update source to 5.4.72
 -   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465,
 -   CVE-2020-12659, CVE-2020-15780
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11

@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.4.51
-Release:        2%{?dist}
+Version:        5.4.72
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -27,6 +27,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %defattr(-,root,root)
 %{_includedir}/*
 %changelog
+*   Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
+-   Update source to 5.4.72
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1

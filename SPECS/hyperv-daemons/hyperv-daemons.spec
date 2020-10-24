@@ -9,8 +9,8 @@
 
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.4.51
-Release:        2%{?dist}
+Version:        5.4.72
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System/Kernel
@@ -230,6 +230,9 @@ fi
 
 
 %changelog
+* Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
+- Update source to 5.4.72
+
 * Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 - Update source hash
 
