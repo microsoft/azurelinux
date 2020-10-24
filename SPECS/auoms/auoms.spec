@@ -3,7 +3,7 @@
 Summary:        Auditd plugin that forwards audit events to OMS Agent for Linux
 Name:           auoms
 Version:        2.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/OMS-Auditd-Plugin
 #Source0:       https://github.com/microsoft/OMS-Auditd-Plugin/archive/v2.2.5-0.tar.gz
@@ -47,7 +47,7 @@ OMS Audit data collection daemon
 tar xf %{SOURCE1} --no-same-owner --one-top-level=pal --strip-components 1
 cp %{SOURCE2} ./
 cp %{SOURCE3} ./
-%setup
+%setup -q -n OMS-Auditd-Plugin-2.2.5-0
 %patch0 -p1
 
 %build
@@ -187,5 +187,7 @@ done
 /var/opt/microsoft/auoms/data/outputs
 
 %changelog
+* Sat Oct 24 2020 Andrew Phelps <anphel@microsoft.com> 2.2.5-2
+- Fix setup macro
 * Thu Oct 22 2020 Andrew Phelps <anphel@microsoft.com> 2.2.5-1
 - Initial CBL-Mariner version.
