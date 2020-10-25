@@ -2,13 +2,15 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.32.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 URL:            https://www.sqlite.org
 Group:          System Environment/GeneralLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sqlite.org/2020/%{name}-autoconf-%{sourcever}.tar.gz
+# CVE-2015-3717 applies to versions shipped in iOS and OS X 
+Patch0:         CVE-2015-3717.nopatch
 Obsoletes:      sqlite-autoconf
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
@@ -35,7 +37,7 @@ Obsoletes:      sqlite-autoconf
 The sqlite3 library.
 
 %prep
-%setup -q -n %{name}-autoconf-%{sourcever}
+%autosetup -p1 -n %{name}-autoconf-%{sourcever}
 
 %build
 %configure \
@@ -89,6 +91,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+*   Thu Oct 22 2020 Ruying Chen <v-ruyche@microsoft.com> 3.32.3-2
+-   Nopatch CVE-2015-3717. Applies to versions shipped in iOS and OS X.
 *   Tue Jul 07 2020 Joe Schmitt <joschmit@microsoft.com> 3.32.3-1
 -   Update to version 3.32.3 to fix CVE-2020-15358.
 -   Update URL to use https.

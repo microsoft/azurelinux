@@ -4,7 +4,7 @@
 Summary:        Programming language
 Name:           lua
 Version:        5.3.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 URL:            https://www.lua.org
 Group:          Development/Tools
@@ -13,8 +13,22 @@ Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
 Patch0:         lua-5.3.4-shared_library-1.patch
+# CVE-2020-15888 patch taken from Open Embedded's Lua meta layer https://github.com/openembedded/meta-openembedded/blob/master/meta-oe/recipes-devtools/lua/lua/CVE-2020-15888.patch
+# NOTE: Upstream patches needed if updating to 5.4:
+#   - eb41999461b6f428186c55abd95f4ce1a76217d5
+#   - 6298903e35217ab69c279056f925fb72900ce0b7
+Patch1:         CVE-2020-15888.patch
 # CVE-2020-15889 is in the Lua generational garbage collection code, which is new to 5.4.0. 5.3.5 is not affected.
-Patch1:         CVE-2020-15889.nopatch
+# NOTE: Patches needed if updating to 5.4:
+#   - 127e7a6c8942b362aa3c6627f44d660a4fb75312
+Patch2:         CVE-2020-15889.nopatch
+# CVE-2020-24342 appears to not affect 5.3.5 (no repro of exploit)
+# NOTE: Patches needed if updating to 5.4:
+#   - 34affe7a63fc5d842580a9f23616d057e17dfe27
+Patch3:         CVE-2020-24342.nopatch
+# From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
+Patch4:         CVE-2019-6706-use-after-free-lua_upvaluejoin.patch
+
 BuildRequires:  readline-devel
 Requires:       readline
 
@@ -32,6 +46,8 @@ Static libraries and header files for the support library for lua
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch4 -p1
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
 cp %{SOURCE1} ./
@@ -93,6 +109,10 @@ rm -rf %{buildroot}
 %{_libdir}/liblua.so
 
 %changelog
+*   Thu Oct 01 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-8
+-   Nopatch CVE-2020-24342
+-   Apply patch for CVE-2019-6706 from Lua mailing list
+-   Apply patch for CVE-2020-15888 from Open Embedded
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-7
 -   Nopatch CVE-2020-15889 since it only affects 5.4.0
 *   Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 5.3.5-6

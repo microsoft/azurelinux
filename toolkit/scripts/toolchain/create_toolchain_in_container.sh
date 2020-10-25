@@ -65,5 +65,6 @@ rm -vf ./container/texinfo-perl-fix.patch
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
 rm -vf ./container/.bashrc
+rm -vf ./container/toolchain-local-wget-list
 
 echo Raw toolchain build complete

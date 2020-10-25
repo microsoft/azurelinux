@@ -1,12 +1,16 @@
 Summary:	cifs client utils
 Name:		cifs-utils
 Version:	6.8
-Release:        3%{?dist}
+Release:	4%{?dist}
 License:	GPLv3
 URL:		http://wiki.samba.org/index.php/LinuxCIFS_utils
 Group:		Applications/Nfs-utils-client
 Source0:        https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-%{version}.tar.bz2
-%define sha1 cifs-utils=3440625e73a2e8ea58c63c61b46a61f5b7f95bac
+
+Patch0:         CVE-2020-14342.patch
+Patch1:         CVE-2020-14342-fix.patch
+
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  libcap-ng-devel
@@ -26,7 +30,7 @@ Requires:   cifs-utils = %{version}-%{release}
 Provides header files needed for Cifs-Utils development.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 autoreconf -fiv &&./configure --prefix=%{_prefix}
@@ -48,9 +52,10 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.8-3
-- Added %%license line automatically
-
+*   Wed Sep 30 2020 Henry Beberman <henry.beberman@microsoft.com> 6.8-4
+-   Add patch for CVE-2020-14342
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 6.8-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.8-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *       Fri Sep 07 2017 Ajay Kaher <akaher@vmware.com> 6.8-1

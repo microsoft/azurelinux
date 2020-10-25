@@ -24,15 +24,20 @@ import (
 	"microsoft.com/pkggen/internal/retry"
 	"microsoft.com/pkggen/internal/safechroot"
 	"microsoft.com/pkggen/internal/shell"
+	"microsoft.com/pkggen/internal/sliceutils"
 )
 
 const (
 	rootMountPoint = "/"
 	rootUser       = "root"
 
+	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
+	rpmDependenciesDirectory = "/var/lib/rpm"
+
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0600
 	bootDirectoryDirMode  = 0700
+	shadowFile            = "/etc/shadow"
 )
 
 // PackageList represents the list of packages to install into an image
@@ -273,6 +278,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	if err != nil {
 		return
 	}
+	defer cleanupRpmDatabase(installRoot, isRootFS, packagesToInstall)
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
@@ -499,24 +505,23 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 	return
 }
 
+// addMachineID creates the /etc/machine-id file in the installChroot
 func addMachineID(installChroot *safechroot.Chroot) (err error) {
-	const (
-		squashErrors = false
-		setupProgram = "/bin/systemd-machine-id-setup"
-	)
+	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
+	// For operating system images which are created once and used on multiple
+	// machines, for example for containers or in the cloud, /etc/machine-id
+	// should be an empty file in the generic file system image. An ID will be
+	// generated during boot and saved to this file if possible.
 
-	// Check if systemd-machine-id-setup is present before invoking it,
-	// some images will not use systemd (such as a container)
-	exists, _ := file.PathExists(filepath.Join(installChroot.RootDir(), setupProgram))
-	if !exists {
-		logger.Log.Debugf("'%s' not found inside chroot '%s', skipping adding machine ID", setupProgram, installChroot.RootDir())
-		return
-	}
+	const (
+		machineIDFile      = "/etc/machine-id"
+		machineIDFilePerms = 0644
+	)
 
 	ReportAction("Configuring machine id")
 
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, setupProgram)
+		return file.Create(machineIDFile, machineIDFilePerms)
 	})
 	return
 }
@@ -802,15 +807,27 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 }
 
 func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err error) {
+	const (
+		squashErrors = false
+	)
+
+	rootUserAdded := false
+
 	for _, user := range users {
 		logger.Log.Infof("Adding user (%s)", user.Name)
 		ReportActionf("Adding user: %s", user.Name)
 
-		var homeDir string
+		var (
+			homeDir string
+			isRoot  bool
+		)
 
-		homeDir, err = createUserWithPassword(installChroot, user)
+		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
+		}
+		if isRoot {
+			rootUserAdded = true
 		}
 
 		err = configureUserGroupMembership(installChroot, user)
@@ -829,10 +846,24 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		}
 	}
 
+	// If no root entry was specified in the config file, never expire the root password
+	if !rootUserAdded {
+		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
+
+		// Ignore updating if there is no shadow file to update
+		if exists, _ := file.PathExists(shadowFile); !exists {
+			logger.Log.Debugf("No shadow file to update. Skipping.")
+			return
+		}
+
+		err = installChroot.UnsafeRun(func() error {
+			return chage("-1", "root")
+		})
+	}
 	return
 }
 
-func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, err error) {
+func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, isRoot bool, err error) {
 	const (
 		squashErrors        = false
 		rootHomeDir         = "/root"
@@ -882,8 +913,17 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Warnf("Ignoring UID for (%s) user, using default", rootUser)
 		}
 
-		// Update shadow file
-		err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+		if exists, _ := file.PathExists(shadowFile); !exists {
+			logger.Log.Debugf("No shadow file to update. Skipping.")
+		} else {
+			// Update shadow file
+			err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+			if err != nil {
+				logger.Log.Warnf("Encountered a problem when updating root user password: %s", err)
+				return
+			}
+		}
+		isRoot = true
 	} else {
 		homeDir = filepath.Join(userHomeDirPrefix, user.Name)
 
@@ -903,12 +943,107 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 	// Update password expiration
 	if user.PasswordExpiresDays != 0 {
+		// Ignore updating if there is no shadow file to update
+		if exists, _ := file.PathExists(shadowFile); !exists {
+			logger.Log.Debugf("No shadow file to update. Skipping.")
+			return
+		}
+
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "chage", "-M", strconv.FormatUint(user.PasswordExpiresDays, passwordExpiresBase), user.Name)
+			return chage(strconv.FormatUint(user.PasswordExpiresDays, passwordExpiresBase), user.Name)
 		})
 	}
 
 	return
+}
+
+// chage works in the same way as invoking "chage -M passwordExpirationInDays username"
+// i.e. it sets the maximum password expiration date.
+func chage(passwordExpirationInDays string, username string) (err error) {
+	var (
+		shadow             []string
+		passwordExpiration int64
+		usernameWithColon  = fmt.Sprintf("%s:", username)
+	)
+
+	shadow, err = file.ReadLines(shadowFile)
+	if err != nil {
+		return
+	}
+
+	passwordExpiration, err = strconv.ParseInt(passwordExpirationInDays, 10, 64)
+	if err != nil {
+		return
+	}
+
+	for n, entry := range shadow {
+		done := false
+		// Entries in shadow are separated by colon and start with a username
+		// Finding one that starts like that means we've found our entry
+		if strings.HasPrefix(entry, usernameWithColon) {
+			// Each line in shadow contains 9 fields separated by colon ("") in the following order:
+			// login name, encrypted password, date of last password change,
+			// minimum password age, maximum password age, password warning period,
+			// password inactivity period, account expiration date, reserved field for future use
+			const (
+				loginNameField         = 0
+				encryptedPasswordField = 1
+				passwordChangedField   = 2
+				minPasswordAgeField    = 3
+				maxPasswordAgeField    = 4
+				warnPeriodField        = 5
+				inactivityPeriodField  = 6
+				expirationField        = 7
+				reservedField          = 8
+			)
+
+			fields := strings.Split(entry, ":")
+			// Any value other than 9 indicates error in parsing
+			if len(fields) != 9 {
+				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": 9 fields expected, but %d found.`, fields, username, len(fields))
+			}
+
+			if passwordExpiration == -1 {
+				// If passwordExpiration is equal to -1, it means that password never expires.
+				// This is expressed by leaving account expiration date field (and fields after it) empty.
+				for _, fieldToChange := range []int{maxPasswordAgeField, warnPeriodField, inactivityPeriodField, expirationField, reservedField} {
+					fields[fieldToChange] = ""
+				}
+				// Each user is unique, so we are done here; save the changes and exit.
+				done = true
+			} else if passwordExpiration < -1 {
+				// Values smaller than -1 make no sense
+				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration: %d`, username, passwordExpiration)
+			} else {
+				// If passwordExpiration has any other value, it's the maximum expiration date: set it accordingly
+				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpiration.
+				var (
+					passwordAge     int64
+					passwordChanged = fields[passwordChangedField]
+				)
+
+				if passwordChanged == "" {
+					// Set to the number of days since epoch
+					fields[passwordChangedField] = fmt.Sprintf("%d", int64(time.Since(time.Unix(0, 0)).Hours()/24))
+				}
+				passwordAge, err = strconv.ParseInt(fields[passwordChangedField], 10, 64)
+				if err != nil {
+					return
+				}
+				fields[expirationField] = fmt.Sprintf("%d", passwordAge+passwordExpiration)
+
+				//Each user is unique, so we are done here; save the changes and exit.
+				done = true
+			}
+			if done {
+				shadow[n] = strings.Join(fields, ":")
+				err = file.Write(strings.Join(shadow, "\n"), shadowFile)
+				return
+			}
+		}
+	}
+
+	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
 func configureUserGroupMembership(installChroot *safechroot.Chroot, user configuration.User) (err error) {
@@ -1017,14 +1152,11 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 }
 
 func updateUserPassword(installRoot, username, password string) (err error) {
-	const (
-		shadowFilePath = "etc/shadow"
-		sedDelimiter   = "|"
-	)
+	const sedDelimiter = "|"
 
 	findPattern := fmt.Sprintf("%v:x:", username)
 	replacePattern := fmt.Sprintf("%v:%v:", username, password)
-	filePath := filepath.Join(installRoot, shadowFilePath)
+	filePath := filepath.Join(installRoot, shadowFile)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
 		logger.Log.Warnf("Failed to write hashed password to shadow file")
@@ -1259,6 +1391,42 @@ func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.
 	}
 
 	return
+}
+
+// cleanupRpmDatabase removes RPM database if the image does not require a package manager.
+// rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
+// isRootFS should be set to true if the resulting image will be a rootfs (not a file)
+// packagesToInstall is a list of packages that will be installed on the image
+func cleanupRpmDatabase(rootPrefix string, isRootFS bool, packagesToInstall []string) {
+	if !isRootFS {
+		logger.Log.Debug("Processing a non-rootfs. Skipping RPM database cleanup.")
+		return
+	}
+
+	// If the image doesn't contain the package manager
+	// We can remove the RPM database files
+	rpmInChroot := false
+
+	for _, name := range []string{"rpm", "dnf", "tdnf", "yum"} {
+		if sliceutils.Find(packagesToInstall, name) != -1 {
+			logger.Log.Infof(`Package manager "%s" found in package list. Keeping the RPM database.`, name)
+			rpmInChroot = true
+			break
+		}
+	}
+
+	if !rpmInChroot {
+		logger.Log.Info("No package manager found in package list. Removing the RPM database.")
+		rpmDir := strings.Join([]string{rootPrefix, rpmDependenciesDirectory}, "")
+		err := os.RemoveAll(rpmDir)
+		if err != nil {
+			logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
+		} else {
+			logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
+		}
+
+	}
+
 }
 
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
