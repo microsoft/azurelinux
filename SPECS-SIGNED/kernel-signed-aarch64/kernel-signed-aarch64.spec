@@ -85,13 +85,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
-<<<<<<< HEAD
-=======
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Update release number
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
 -   Update release number to match kernel spec
->>>>>>> 1.0-dev
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-9
 -   Update release number
 *   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
