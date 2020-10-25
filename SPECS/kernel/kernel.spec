@@ -11,7 +11,6 @@ Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-Patch0:         e1000e-add-support-for-comet-lake.patch
 
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
@@ -126,8 +125,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
-
-%patch0 -p1
 
 %build
 make mrproper
@@ -351,6 +348,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   Update source to 5.4.72
 -   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465,
 -   CVE-2020-12659, CVE-2020-15780
+-   Remove patch to support CometLake e1000e ethernet. Integrated in 5.4.72.
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Enable QAT kernel configs
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
