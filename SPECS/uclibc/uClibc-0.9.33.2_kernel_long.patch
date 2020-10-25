@@ -1,0 +1,81 @@
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/arm/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/arm/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/arm/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/arm/bits/kernel_types.h	2013-05-06 16:59:13.539258761 +0200
+@@ -16,6 +16,8 @@ typedef int			__kernel_pid_t;
+ typedef unsigned short		__kernel_ipc_pid_t;
+ typedef unsigned short		__kernel_uid_t;
+ typedef unsigned short		__kernel_gid_t;
++typedef long			__kernel_long_t;
++typedef unsigned long		__kernel_ulong_t;
+ typedef unsigned int		__kernel_size_t;
+ typedef int			__kernel_ssize_t;
+ typedef int			__kernel_ptrdiff_t;
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/i386/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/i386/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/i386/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/i386/bits/kernel_types.h	2013-05-06 16:57:50.881426451 +0200
+@@ -25,6 +25,8 @@ typedef int		__kernel_pid_t;
+ typedef unsigned short	__kernel_ipc_pid_t;
+ typedef unsigned short	__kernel_uid_t;
+ typedef unsigned short	__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned int	__kernel_size_t;
+ typedef int		__kernel_ssize_t;
+ typedef int		__kernel_ptrdiff_t;
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/ia64/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/ia64/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/ia64/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/ia64/bits/kernel_types.h	2013-05-06 16:59:29.934225595 +0200
+@@ -27,6 +27,8 @@ typedef int		__kernel_pid_t;
+ typedef int		__kernel_ipc_pid_t;
+ typedef unsigned int	__kernel_uid_t;
+ typedef unsigned int	__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned long	__kernel_size_t;
+ typedef long		__kernel_ssize_t;
+ typedef long		__kernel_ptrdiff_t;
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/mips/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/mips/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/mips/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/mips/bits/kernel_types.h	2016-02-18 12:35:35.951010968 +0100
+@@ -17,6 +17,8 @@ typedef int		__kernel_pid_t;
+ typedef long int		__kernel_ipc_pid_t;
+ typedef int		__kernel_uid_t;
+ typedef int		__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned long	__kernel_size_t;
+ typedef long		__kernel_ssize_t;
+ typedef long		__kernel_ptrdiff_t;
+@@ -53,6 +55,8 @@ typedef int		__kernel_pid_t;
+ typedef long int		__kernel_ipc_pid_t;
+ typedef int		__kernel_uid_t;
+ typedef int		__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned int	__kernel_size_t;
+ typedef int		__kernel_ssize_t;
+ typedef int		__kernel_ptrdiff_t;
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/powerpc/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/powerpc/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/powerpc/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/powerpc/bits/kernel_types.h	2013-05-06 16:58:17.379372606 +0200
+@@ -21,6 +21,8 @@ typedef int		__kernel_pid_t;
+ typedef int             __kernel_ipc_pid_t;
+ typedef unsigned int	__kernel_uid_t;
+ typedef unsigned int	__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned long	__kernel_size_t;
+ typedef long		__kernel_ssize_t;
+ typedef long		__kernel_ptrdiff_t;
+diff -urpN uClibc-0.9.33.2.old/libc/sysdeps/linux/x86_64/bits/kernel_types.h uClibc-0.9.33.2/libc/sysdeps/linux/x86_64/bits/kernel_types.h
+--- uClibc-0.9.33.2.old/libc/sysdeps/linux/x86_64/bits/kernel_types.h	2012-05-15 09:20:09.000000000 +0200
++++ uClibc-0.9.33.2/libc/sysdeps/linux/x86_64/bits/kernel_types.h	2013-05-06 16:57:33.139462550 +0200
+@@ -25,6 +25,8 @@ typedef int		__kernel_pid_t;
+ typedef int		__kernel_ipc_pid_t;
+ typedef unsigned int	__kernel_uid_t;
+ typedef unsigned int	__kernel_gid_t;
++typedef long		__kernel_long_t;
++typedef unsigned long	__kernel_ulong_t;
+ typedef unsigned long	__kernel_size_t;
+ typedef long		__kernel_ssize_t;
+ typedef long		__kernel_ptrdiff_t;

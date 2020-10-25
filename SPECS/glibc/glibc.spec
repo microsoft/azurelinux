@@ -1,6 +1,8 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
 
 Summary:        Main C library
 Name:           glibc
@@ -30,7 +32,7 @@ Patch9:         CVE-2019-6488.nopatch
 Patch10:        CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
-Patch11:		CVE-2018-20796.nopatch
+Patch11:        CVE-2018-20796.nopatch
 ExcludeArch:    armv7 ppc i386 i686
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -96,8 +98,9 @@ sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 %patch7 -p1
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
-%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
-%define __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
+
+%global __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
+%global __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
 
 # create find-provides and find-requires script in order to ignore GLIBC_PRIVATE errors
 cat > find_provides.sh << _EOF
@@ -110,17 +113,6 @@ fi
 exit 0
 _EOF
 chmod +x find_provides.sh
-
-cat > find_requires.sh << _EOF
-#! /bin/sh
-if [ -d /tools ]; then
-/tools/lib/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
-else
-%{_prefix}/lib/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
-fi
-_EOF
-chmod +x find_requires.sh
-#___EOF
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`"
@@ -239,8 +231,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %ifarch aarch64
 %exclude /lib
 %endif
-%exclude /lib64/libpcprofile.so
 %{_lib64dir}/*.so
+%{_lib64dir}/audit/*
 /sbin/ldconfig
 /sbin/locale-gen.sh
 %{_bindir}/*
@@ -277,8 +269,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 /usr/sbin/zdump
 /usr/sbin/zic
 /sbin/sln
-%{_lib64dir}/audit/*
-/lib64/libpcprofile.so
 
 %files nscd
 %defattr(-,root,root)
