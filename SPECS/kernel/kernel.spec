@@ -54,6 +54,7 @@ Patch1031:      CVE-2020-25645.nopatch
 Patch1032:      CVE-2020-25643.nopatch
 Patch1033:      CVE-2020-25211.nopatch
 Patch1034:      CVE-2020-25212.nopatch
+Patch1035:      CVE-2008-4609.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -354,7 +355,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   Update source to 5.4.72
 -   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465,
 -   CVE-2020-12659, CVE-2020-15780, CVE-2020-14356, CVE-2020-14386,
--   CVE-2020-25645, CVE-2020-25643, CVE-2020-25211, CVE-2020-25212
+-   CVE-2020-25645, CVE-2020-25643, CVE-2020-25211, CVE-2020-25212,
+-   CVE-2008-4609
 -   Remove patch to support CometLake e1000e ethernet. Integrated in 5.4.72.
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Enable QAT kernel configs
