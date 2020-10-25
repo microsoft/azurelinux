@@ -2,11 +2,7 @@
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.4.51
-<<<<<<< HEAD
-Release:        9%{?dist}
-=======
 Release:        11%{?dist}
->>>>>>> 1.0-dev
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
