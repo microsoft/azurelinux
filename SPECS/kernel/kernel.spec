@@ -55,6 +55,33 @@ Patch1032:      CVE-2020-25643.nopatch
 Patch1033:      CVE-2020-25211.nopatch
 Patch1034:      CVE-2020-25212.nopatch
 Patch1035:      CVE-2008-4609.nopatch
+Patch1036:      CVE-2020-14331.nopatch
+Patch1037:      CVE-2010-0298.nopatch
+Patch1038:      CVE-2020-10690.nopatch
+Patch1039:      CVE-2020-25285.nopatch
+Patch1040:      CVE-2020-10711.nopatch
+Patch1041:      CVE-2019-3887.nopatch
+Patch1042:      CVE-2020-14390.nopatch
+Patch1043:      CVE-2019-19338.nopatch
+Patch1044:      CVE-2019-20810.nopatch
+Patch1045:      CVE-2020-10766.nopatch
+Patch1046:      CVE-2020-10767.nopatch
+Patch1047:      CVE-2020-10768.nopatch
+Patch1048:      CVE-2020-10781.nopatch
+Patch1049:      CVE-2020-12768.nopatch
+Patch1050:      CVE-2020-14314.nopatch
+Patch1051:      CVE-2020-14385.nopatch
+Patch1052:      CVE-2020-25641.nopatch
+Patch1053:      CVE-2020-26088.nopatch
+Patch1054:      CVE-2020-10942.nopatch
+Patch1055:      CVE-2020-12826.nopatch
+Patch1056:      CVE-2019-3016.nopatch
+Patch1057:      CVE-2019-3819.nopatch
+Patch1058:      CVE-2020-16166.nopatch
+Patch1059:      CVE-2020-11608.nopatch
+Patch1060:      CVE-2020-11609.nopatch
+Patch1061:      CVE-2020-25284.nopatch
+Patch1062:      CVE-2020-12888.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -353,11 +380,16 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 *   Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
 -   Update source to 5.4.72
--   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465,
--   CVE-2020-12659, CVE-2020-15780, CVE-2020-14356, CVE-2020-14386,
--   CVE-2020-25645, CVE-2020-25643, CVE-2020-25211, CVE-2020-25212,
--   CVE-2008-4609
 -   Remove patch to support CometLake e1000e ethernet. Integrated in 5.4.72.
+-   Address CVE-2018-1000026, CVE-2018-16880, CVE-2020-12464, CVE-2020-12465,
+-   CVE-2020-12659, CVE-2020-15780, CVE-2020-14356, CVE-2020-14386, CVE-2020-25645,
+-   CVE-2020-25643, CVE-2020-25211, CVE-2020-25212, CVE-2008-4609, CVE-2020-14331,
+-   CVE-2010-0298, CVE-2020-10690, CVE-2020-25285, CVE-2020-10711, CVE-2019-3887,
+-   CVE-2020-14390, CVE-2019-19338, CVE-2019-20810, CVE-2020-10766, CVE-2020-10767,
+-   CVE-2020-10768, CVE-2020-10781, CVE-2020-12768, CVE-2020-14314, CVE-2020-14385,
+-   CVE-2020-25641, CVE-2020-26088, CVE-2020-10942, CVE-2020-12826, CVE-2019-3016,
+-   CVE-2019-3819, CVE-2020-16166, CVE-2020-11608, CVE-2020-11609, CVE-2020-25284,
+-   CVE-2020-12888
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Enable QAT kernel configs
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
