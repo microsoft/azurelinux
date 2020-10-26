@@ -2,7 +2,7 @@
 
 Name:           cloud-init
 Version:        19.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Cloud instance init scripts
 Group:          System Environment/Base
 License:        GPLv3
@@ -23,6 +23,7 @@ Patch6:         systemd-resolved-config.patch
 Patch7:         cloud-init-azureds.patch
 Patch8:         ds-identity.patch
 Patch9:         CVE-2020-8631.patch
+Patch10:        CVE-2020-8632.patch
 
 BuildRequires:  python3
 BuildRequires:  python3-libs
@@ -141,6 +142,7 @@ rm -rf $RPM_BUILD_ROOT
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.1-5
 -   Use autosetup
 -   Fix CVE-2020-8631
+-   Fix CVE-2020-8632
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 19.1-4
 -   Rename iproute2 to iproute.
 -   License verified.
