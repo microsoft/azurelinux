@@ -125,14 +125,7 @@ Requires: python2 = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%setup -q -n Python-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
+%autosetup -p1 -n Python-%{version}
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -253,6 +246,7 @@ make test
 
 %changelog
 * Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-4
+- Use autosetup
 - Remove CVE-2013-1753 no patch
 - Ignore CVE-2019-9674
 - Fix CVE-2019-20907
