@@ -1,6 +1,3 @@
-# Don't depend on bash by default
-%define __requires_exclude ^/(bin|usr/bin).*$
-
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
@@ -20,6 +17,7 @@ Conflicts:      httpd <= 2.4.37
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
+Requires:       bash
 Requires:       glibc
 Requires:       libgcc
 Requires:       %{name}-libs = %{version}-%{release}
@@ -40,6 +38,7 @@ Group: System Environment/Libraries
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
 package contains the libraries that are used by various applications which
 support cryptographic algorithms and protocols.
+Requires: openssl = %{version}-%{release}
 
 %package devel
 Summary: Development Libraries for openssl
