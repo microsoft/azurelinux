@@ -122,8 +122,8 @@ func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err
 	})
 
 	if len(badEntries) > 0 {
-		for rpm, stderr := range badEntries {
-			logger.Log.Errorf("%s:\n %s", rpm, stderr)
+		for rpm, errMsg := range badEntries {
+			logger.Log.Errorf("%s:\n %s", rpm, errMsg)
 		}
 		err = fmt.Errorf("found invalid packages in the worker chroot")
 	}
