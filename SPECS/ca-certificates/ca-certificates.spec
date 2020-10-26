@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        10%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
