@@ -356,7 +356,7 @@ swig-debuginfo-3.0.12-4.cm1.aarch64.rpm
 systemd-239-33.cm1.aarch64.rpm
 systemd-bootstrap-239-30.cm1.aarch64.rpm
 systemd-bootstrap-debuginfo-239-30.cm1.aarch64.rpm
-systemd-bootstrap-devel-23930.cm1.aarch64.rpm
+systemd-bootstrap-devel-239-30.cm1.aarch64.rpm
 systemd-debuginfo-239-33.cm1.aarch64.rpm
 systemd-devel-239-33.cm1.aarch64.rpm
 systemd-lang-239-33.cm1.aarch64.rpm
