@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "apache-ant-1.10.8-src.tar.gz": "53d06ed062297366569fe563b77e8187973be1383749181938b597177514d318",
+  "apache-ant-1.10.9-src.tar.gz": "3f00fe29988ff1af83cb100089bfcbaf5d3e533d42fba3ea4861a982c920e874",
   "hamcrest-1.3.tgz": "c6428e40d069fff3f99780efaae96c35ebdbf7cbfd475504254ebffcc19620c2",
   "maven-ant-tasks-2.1.3.tar.gz": "ae5b6548dbb3f0d71865e1be9bffd13ca7bb65a3cb5d89eaee97ea7e70e1f0ba"
  }
