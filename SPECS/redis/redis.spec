@@ -3,11 +3,11 @@ Name:		    redis
 Version:	    5.0.5
 Release:        4%{?dist}
 License:	    BSD
-URL:		    http://redis.io/
+URL:		    https://redis.io/
 Group:		    Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	    http://download.redis.io/releases/%{name}-%{version}.tar.gz
+Source0:	    https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         CVE-2020-14147.patch
 BuildRequires:  gcc
@@ -23,9 +23,7 @@ Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Redis is an in-memory data structure store, used as database, cache and message broker.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 make %{?_smp_mflags}
