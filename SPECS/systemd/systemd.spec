@@ -98,7 +98,7 @@ Requires:       %{name} = %{version}-%{release}
 Language pack for systemd
 
 %prep
-%setup -q
+%autosetup -p1
 cat > config.cache << "EOF"
 KILL=/bin/kill
 HAVE_BLKID=1
@@ -106,39 +106,6 @@ BLKID_LIBS="-lblkid"
 BLKID_CFLAGS="-I/usr/include/blkid"
 cc_cv_CFLAGS__flto=no
 EOF
-
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-
-# Portablectl patches
-%patch100 -p1
-%patch101 -p1
-%patch102 -p1
-%patch103 -p1
-%patch104 -p1
-%patch105 -p1
-%patch106 -p1
 
 sed -i "s#\#DefaultTasksMax=512#DefaultTasksMax=infinity#g" src/core/system.conf.in
 
@@ -304,6 +271,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 *  Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-33
+-  Use autosetup
 -  Fix CVE-2019-3842
 -  Fix CVE-2019-3843
 -  Fix CVE-2019-3844

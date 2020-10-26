@@ -1,7 +1,7 @@
 Summary:          Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:             systemd-bootstrap
 Version:          239
-Release:          29%{?dist}
+Release:          30%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -31,10 +31,17 @@ Patch13:          Backport-FOREACH_STRING-fix-for-gcc9.patch
 Patch14:          Disable-argument-to-mount_cgroup_controllers.patch
 # This commit from upstream fixes an issue caused by using a later version of meson.
 Patch15:          https://github.com/systemd/systemd/commit/8f6b442a78d0b485f044742ad90b2e8271b4e68e.patch
+Patch16:          CVE-2019-3842.patch
+Patch17:          CVE-2019-3843.patch
+Patch18:          CVE-2019-3844.patch
+Patch19:          CVE-2019-6454.patch
+Patch20:          CVE-2019-20386.patch
+Patch21:          CVE-2020-1712.patch
+Patch22:          CVE-2020-13776.patch
 # This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
-Patch16:          CVE-2018-21029.nopatch
+Patch23:          CVE-2018-21029.nopatch
 
 Requires:         pam
 Requires:         libcap
@@ -73,7 +80,7 @@ Requires:       glib-devel
 Development headers for developing applications linking to libsystemd
 
 %prep
-%setup -q -n systemd-%{version}
+%autosetup -p1 -n systemd-%{version}
 cat > config.cache << "EOF"
 KILL=/bin/kill
 HAVE_BLKID=1
@@ -81,23 +88,6 @@ BLKID_LIBS="-lblkid"
 BLKID_CFLAGS="-I/usr/include/blkid"
 cc_cv_CFLAGS__flto=no
 EOF
-
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
 
 sed -i "s#\#DefaultTasksMax=512#DefaultTasksMax=infinity#g" src/core/system.conf.in
 
@@ -256,6 +246,15 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*  Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-30
+-  Use autosetup
+-  Fix CVE-2019-3842
+-  Fix CVE-2019-3843
+-  Fix CVE-2019-3844
+-  Fix CVE-2019-6454
+-  Fix CVE-2019-20386
+-  Fix CVE-2020-1712
+-  Fix CVE-2020-13776
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
 -  Reduce kptr_restrict to 1
 *  Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-28
