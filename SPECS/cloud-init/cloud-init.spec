@@ -14,14 +14,15 @@ Source1:        cloud-mariner.cfg
 Source2:        99-disable-networking-config.cfg
 
 Patch0:         mariner-distro.patch
-Patch2:         vca-admin-pwd.patch
-Patch3:         mariner-hosts-template.patch
-Patch5:         datasource-guestinfo.patch
-Patch6:         systemd-service-changes.patch
-Patch7:         makecheck.patch
-Patch8:         systemd-resolved-config.patch
-Patch9:         cloud-init-azureds.patch
-Patch10:        ds-identity.patch
+Patch1:         vca-admin-pwd.patch
+Patch2:         mariner-hosts-template.patch
+Patch3:         datasource-guestinfo.patch
+Patch4:         systemd-service-changes.patch
+Patch5:         makecheck.patch
+Patch6:         systemd-resolved-config.patch
+Patch7:         cloud-init-azureds.patch
+Patch8:         ds-identity.patch
+Patch9:         CVE-2020-8631.patch
 
 BuildRequires:  python3
 BuildRequires:  python3-libs
@@ -68,16 +69,7 @@ ssh keys and to let the user run various scripts.
 
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch0 -p1
-%patch2 -p1
-%patch3 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
+%autosetup -p1 -n %{name}-%{version}
 
 find systemd -name "cloud*.service*" | xargs sed -i s/StandardOutput=journal+console/StandardOutput=journal/g
 
@@ -146,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/cloud
 
 %changelog
+*   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.1-5
+-   Use autosetup
+-   Fix CVE-2020-8631
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 19.1-4
 -   Rename iproute2 to iproute.
 -   License verified.
