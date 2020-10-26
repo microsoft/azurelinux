@@ -36,22 +36,7 @@ for extracting files from ZIP archives. ZIP archives are created
 with PKZIP or Info-ZIP utilities, primarily in a DOS environment.
 
 %prep
-%setup -qn unzip60
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
+%autosetup -p1 -n unzip60
 
 %build
 case `uname -m` in
@@ -87,6 +72,7 @@ make %{?_smp_mflags}  check
 
 %changelog
 *   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 6.0-17
+-   Use autosetup
 -   Fix names for CVE patches
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 6.0-16
 -   Nopatch CVE-2008-0888, fixed in 6.0
