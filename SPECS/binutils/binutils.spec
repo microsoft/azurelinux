@@ -37,17 +37,7 @@ It contains the libraries and header files to create applications
 for handling compiled objects.
 
 %prep
-%setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch8 -p1
-%patch9 -p1
-%patch11 -p1
-%patch12 -p1
+%autosetup -p1
 
 %build
 %configure \
@@ -132,6 +122,7 @@ make %{?_smp_mflags} check
 
 %changelog
 *   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-4
+-   Use autosetup
 -   Fix CVE-2019-12972.
 -   Fix CVE-2019-14250.
 -   Fix CVE-2019-14444.
