@@ -82,6 +82,11 @@ Patch1059:      CVE-2020-11608.nopatch
 Patch1060:      CVE-2020-11609.nopatch
 Patch1061:      CVE-2020-25284.nopatch
 Patch1062:      CVE-2020-12888.nopatch
+Patch1063:      CVE-2017-8244.nopatch
+Patch1064:      CVE-2017-8245.nopatch
+Patch1065:      CVE-2017-8246.nopatch
+Patch1066:      CVE-2009-4484.nopatch
+Patch1067:      CVE-2015-5738.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -389,7 +394,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   CVE-2020-10768, CVE-2020-10781, CVE-2020-12768, CVE-2020-14314, CVE-2020-14385,
 -   CVE-2020-25641, CVE-2020-26088, CVE-2020-10942, CVE-2020-12826, CVE-2019-3016,
 -   CVE-2019-3819, CVE-2020-16166, CVE-2020-11608, CVE-2020-11609, CVE-2020-25284,
--   CVE-2020-12888
+-   CVE-2020-12888, CVE-2017-8244, CVE-2017-8245, CVE-2017-8246, CVE-2009-4484,
+-   CVE-2015-5738
 *   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
 -   Enable QAT kernel configs
 *   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
