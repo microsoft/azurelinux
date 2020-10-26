@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/UnZip.html
 Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -9,16 +9,16 @@ Group:          System Environment/Utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-Patch0:         cve-2014-9636.patch
-Patch1:         cve-2015-1315.patch
+Patch0:         CVE-2014-9636.patch
+Patch1:         CVE-2015-1315.patch
 Patch2:         CVE-2015-7696.patch
-Patch3:         unzip-CVE-2016-9844.patch
-Patch4:         unzip-CVE-2014-9913.patch
+Patch3:         CVE-2016-9844.patch
+Patch4:         CVE-2014-9913.patch
 # Fixes CVE-2018-18384
 Patch5:         unzip_cfactor_overflow.patch
-Patch6:         unzip-6.0-cve-2014-8139.patch
-Patch7:         unzip-6.0-cve-2014-8140.patch
-Patch8:         unzip-6.0-cve-2014-8141.patch
+Patch6:         CVE-2014-8139.patch
+Patch7:         CVE-2014-8140.patch
+Patch8:         CVE-2014-8141.patch
 # Fixes CVE-2019-13232
 Patch9:         unzip-zipbomb-part1.patch
 Patch10:        unzip-zipbomb-part2.patch
@@ -26,7 +26,7 @@ Patch11:        unzip-zipbomb-part3.patch
 Patch12:        unzip-zipbomb-manpage.patch
 Patch13:        CVE-2015-7697.patch
 # Fixes CVE-2018-1000035
-Patch14:        unzip-6.0-cve-2018-1000035-heap-based-overflow.patch
+Patch14:        CVE-2018-1000035.patch
 # Upstream has fixed CVE-2008-0888 in 6.0
 Patch15:        CVE-2008-0888.nopatch
 
@@ -36,22 +36,7 @@ for extracting files from ZIP archives. ZIP archives are created
 with PKZIP or Info-ZIP utilities, primarily in a DOS environment.
 
 %prep
-%setup -qn unzip60
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
+%autosetup -p1 -n unzip60
 
 %build
 case `uname -m` in
@@ -86,6 +71,9 @@ make %{?_smp_mflags}  check
 %{_bindir}/*
 
 %changelog
+*   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 6.0-17
+-   Use autosetup
+-   Fix names for CVE patches
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 6.0-16
 -   Nopatch CVE-2008-0888, fixed in 6.0
 *   Thu Jul 09 2020 Daniel McIlvaney <damcilva@microsoft.com> 6.0-15
