@@ -257,7 +257,7 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
-* Tue Jul 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-7
+* Mon Oct 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-7
 - Removing support for the deprecated MD4 algorithm.
 
 * Tue Jul 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-6
