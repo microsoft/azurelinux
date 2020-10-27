@@ -82,6 +82,7 @@ jobs:
           spec-cleaner -d --diff-prog="git --no-pager diff" ${{ env.updated-specs }} | tee linted_specs.diff
           if [ -s linted_specs.diff ]
           then
+            echo -e "\n====================== LINTING FAILED ======================"
             echo "Specs are not correctly formatted."
             echo "A diff of the changes required is printed above."
             echo "Linting output is available in the linted_specs artifact."
