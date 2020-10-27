@@ -82,9 +82,9 @@ jobs:
           spec-cleaner -o linted_specs ${{ env.updated-specs }}
           [ -n "$(ls -A linted_specs)" ] \
           && echo "Specs are not correctly formatted." \
-          && echo "Linting output is available in the linted_specs artifact."
+          && echo "Linting output is available in the linted_specs artifact." \
           && echo "Please properly format your specs according to that output before merging." \
-          && echo "A diff of the changes required is printed below:"
+          && echo "A diff of the changes required is printed below:" \
           && spec-cleaner -d --diff-prog="git --no-pager diff" ${{ env.updated-specs }} \
           && exit 1
 
