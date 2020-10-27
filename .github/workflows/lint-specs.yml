@@ -78,19 +78,22 @@ jobs:
       # We don't want this tool to have a low signal-to-noise ratio
       - name: Lint changed spec files
         run: |
-          mkdir -p linted_specs
-          spec-cleaner -o linted_specs ${{ env.updated-specs }}
-          [ -n "$(ls -A linted_specs)" ] \
-          && echo "Specs are not correctly formatted." \
-          && echo "Linting output is available in the linted_specs artifact." \
-          && echo "Please properly format your specs according to that output before merging." \
-          && echo "A diff of the changes required is printed below:" \
-          && spec-cleaner -d --diff-prog="git --no-pager diff" ${{ env.updated-specs }} \
-          && exit 1
+          touch linted_specs.diff
+          spec-cleaner -d --diff-prog="git --no-pager diff" ${{ env.updated-specs }} | tee linted_specs.diff
+          if [ -s linted_specs.diff ]
+          then
+            echo -e "\n====================== LINTING FAILED ======================"
+            echo "Specs are not correctly formatted."
+            echo "A diff of the changes required is printed above."
+            echo "Linting output is available in the linted_specs artifact."
+            echo "Please properly format your specs according to the output before merging."
+            exit 1
+          fi
+          exit 0
 
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
           name: linted_specs
-          path: linted_specs
+          path: linted_specs.diff
           if-no-files-found: ignore
