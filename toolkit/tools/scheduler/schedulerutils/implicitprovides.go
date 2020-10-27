@@ -148,7 +148,7 @@ func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pk
 					continue
 				}
 
-				logger.Log.Infof("Satisfiying unresolved dynamic dependency (%s) with (%s)", node.FriendlyName(), provide)
+				logger.Log.Infof("Satisfying unresolved dynamic dependency (%s) with (%s)", node.FriendlyName(), provide)
 				matches[provide] = append(matches[provide], node)
 				nodeToSatisfier[node] = provide
 			}
