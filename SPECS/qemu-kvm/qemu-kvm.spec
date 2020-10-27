@@ -41,7 +41,6 @@ BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
-
 Requires:       alsa-lib
 Requires:       cyrus-sasl
 Requires:       pixman
