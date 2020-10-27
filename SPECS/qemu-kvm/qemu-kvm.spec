@@ -1,7 +1,7 @@
 Summary:       QEMU is a machine emulator and virtualizer
 Name:          qemu-kvm
 Version:       4.2.0
-Release:       13%{?dist}
+Release:       14%{?dist}
 License:       GPLv2 and GPLv2+ and CC-BY and BSD
 Group:         Development/Tools
 URL:           https://www.qemu.org/
@@ -28,6 +28,8 @@ Patch9:        CVE-2015-7504.nopatch
 Patch10:       CVE-2017-5931.nopatch
 # CVE-2017-14167 was fixed in 2.11.0, but the CVE database was not updated. (ed4f86e8b6eff8e600c69adee68c7cd34dd2cccb)
 Patch11:       CVE-2017-14167.nopatch
+Patch12:       CVE-2020-10702.patch
+Patch13:       CVE-2020-10761.patch
 
 BuildRequires: python3-devel
 BuildRequires: glib-devel
@@ -62,7 +64,8 @@ This package provides a command line tool for manipulating disk images.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-
+%patch12 -p1
+%patch13 -p1
 %build
 
 %ifarch aarch64
@@ -122,6 +125,11 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+*   Tue Oct 27 2020 Henry Li <lihl@microsoft.com> 4.2.0-14
+-   Add patch for CVE-2020-10702
+-   Add patch for CVE-2020-10761
+-   Nopatch CVE-2017-5931, it was fixed in 2.9.0
+-   Nopatch CVE-2017-14167, it was fixed in 2.11.0
 *   Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
 -   Nopatch CVE-2015-7504, it was fixed in 2.5.0
 -   Nopatch CVE-2017-5931, it was fixed in 2.9.0
