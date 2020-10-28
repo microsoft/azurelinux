@@ -176,6 +176,7 @@ iso: $(go-isomaker) $(go-liveinstaller) $(go-imager) $(depend_CONFIG_FILE) $(CON
 		--resources $(RESOURCES_DIR) \
 		--iso-repo $(local_and_external_rpm_cache) \
 		--log-level $(LOG_LEVEL) \
+		--log-file $(LOGS_DIR)/imggen/isomaker.log \
 		$(if $(UNATTENDED_INSTALLER),--unattended-install) \
 		--output-dir $(artifact_dir) \
 		--image-tag=$(IMAGE_TAG)
