@@ -5,7 +5,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        LGPLv2+
 URL:            https://www.gnu.org/software/libc
 Group:          Applications/System
@@ -31,6 +31,7 @@ Patch10:        CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch11:		CVE-2018-20796.nopatch
+Patch12:		CVE-2019-7309.patch
 ExcludeArch:    armv7 ppc i386 i686
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -84,16 +85,8 @@ Requires: %{name} = %{version}-%{release}
 Name Service Cache Daemon
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
 %define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
@@ -308,6 +301,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 
 %changelog
+* Wed Oct 28 2020 Henry Li <lihl@microsoft.com> - 2.28-13
+- Used autosetup
+- Added patch to resolve CVE-2019-7309
+
 * Wed Jul 29 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-12
 - Ignore CVE-2018-20796, as it is not a security issue
 
