@@ -1,7 +1,7 @@
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 Version:        1.16.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD 2-Clause
 URL:            http://nginx.org/
 Group:          Applications/System
@@ -10,7 +10,7 @@ Distribution:   Mariner
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-%define sha1    nginx-njs=fd8c3f2d219f175be958796e3beaa17f3b465126
+Patch0:         CVE-2019-20372.patch
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
@@ -18,7 +18,7 @@ BuildRequires:  which
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
 
 %prep
-%setup -q
+%autosetup -p1
 pushd ../
 mkdir nginx-njs
 tar -C nginx-njs -xf %{SOURCE2}
@@ -76,6 +76,9 @@ install -p -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/nginx.service
 %{_var}/log/nginx
 
 %changelog
+* Wed Oct 28 2020 Henry Li <lihl@microsoft.com> - 1.16.1-3
+- Used autosetup
+- Added patch to resolve CVE-2019-20372
 * Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
 - Added %%license line automatically
 
