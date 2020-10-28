@@ -2,7 +2,7 @@ Summary:        TCG Software Stack (TSS)
 Name:           trousers
 Version:        0.3.14
 Release:        7%{?dist}
-License:        BSD-3-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
