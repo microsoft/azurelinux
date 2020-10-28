@@ -55,16 +55,7 @@ Requires:       pixman
 This package provides a command line tool for manipulating disk images.
 
 %prep
-%setup -q -n qemu-%{version}
-%patch0 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch12 -p1
-%patch13 -p1
+%autosetup -p1 -n qemu-%{version}
 
 %build
 
@@ -128,8 +119,7 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 * Tue Oct 27 2020 Henry Li <lihl@microsoft.com> - 4.2.0-14
 - Add patch for CVE-2020-10702
 - Add patch for CVE-2020-10761
-- Nopatch CVE-2017-5931, it was fixed in 2.9.0
-- Nopatch CVE-2017-14167, it was fixed in 2.11.0
+- Use autosetup
 
 *   Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
 -   Nopatch CVE-2015-7504, it was fixed in 2.5.0
