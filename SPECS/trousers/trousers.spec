@@ -33,8 +33,7 @@ Summary:        TSPI library
 TSPI library
 
 %prep
-%setup -q -c %{name}-%{version}
-%patch0 -p1
+%autosetup -c %{name}-%{version} -p1
 
 %build
 %configure \
