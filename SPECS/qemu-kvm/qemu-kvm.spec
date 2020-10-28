@@ -125,11 +125,11 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
-*   Tue Oct 27 2020 Henry Li <lihl@microsoft.com> - 4.2.0-14
--   Add patch for CVE-2020-10702
--   Add patch for CVE-2020-10761
--   Nopatch CVE-2017-5931, it was fixed in 2.9.0
--   Nopatch CVE-2017-14167, it was fixed in 2.11.0
+* Tue Oct 27 2020 Henry Li <lihl@microsoft.com> - 4.2.0-14
+- Add patch for CVE-2020-10702
+- Add patch for CVE-2020-10761
+- Nopatch CVE-2017-5931, it was fixed in 2.9.0
+- Nopatch CVE-2017-14167, it was fixed in 2.11.0
 
 *   Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
 -   Nopatch CVE-2015-7504, it was fixed in 2.5.0
