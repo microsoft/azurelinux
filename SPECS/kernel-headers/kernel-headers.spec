@@ -25,10 +25,12 @@ mkdir -p /%{buildroot}%{_includedir}
 cp -rv usr/include/* /%{buildroot}%{_includedir}
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_includedir}/*
 %changelog
 *   Mon Oct 26 2020 Chris Co <chrco@microsoft.com> 5.4.72-1
 -   Update source to 5.4.72
+-   Add license file
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
 -   Update source hash
 *   Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
