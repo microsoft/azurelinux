@@ -34,14 +34,15 @@ Patch13:        CVE-2020-10761.patch
 Patch14:        CVE-2020-13253.patch
 Patch15:        CVE-2020-13754.patch
 
-BuildRequires: python3-devel
-BuildRequires: glib-devel
-BuildRequires: pixman-devel
-BuildRequires: alsa-lib-devel
-BuildRequires: zlib-devel
-Requires: alsa-lib
-Requires: cyrus-sasl
-Requires: pixman
+BuildRequires:  alsa-lib-devel
+BuildRequires:  glib-devel
+BuildRequires:  pixman-devel
+BuildRequires:  python3-devel
+BuildRequires:  zlib-devel
+
+Requires:       alsa-lib
+Requires:       cyrus-sasl
+Requires:       pixman
 
 %description
 QEMU is a generic and open source machine & userspace emulator and virtualizer.
