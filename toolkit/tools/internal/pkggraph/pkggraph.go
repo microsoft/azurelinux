@@ -402,7 +402,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 		return
 	}
 
-	// Create and edge for the dependency of newNode on parentNode.
+	// Create an edge for the dependency of newNode on parentNode.
 	parentEdge := g.NewEdge(newNode, parentNode)
 	g.SetEdge(parentEdge)
 
