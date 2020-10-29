@@ -4,9 +4,10 @@ Version:        8.30
 Release:        6%{?dist}
 License:        GPLv3
 URL:            http://www.gnu.org/software/coreutils
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
+URL:            http://www.gnu.org/software/coreutils
 Source0:        http://ftp.gnu.org/gnu/coreutils/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
@@ -17,16 +18,18 @@ Patch2:         CVE-2016-2781.nopatch
 # Fixed in coreutils-8.30-i18n-1.patch
 Patch3:         CVE-2013-0221.nopatch
 Requires:       gmp
-Provides:       sh-utils
 Conflicts:      toybox
+Provides:       sh-utils
+
 %description
 The Coreutils package contains utilities for showing and setting
 the basic system
 
 %package lang
-Summary: Additional language files for coreutils
-Group: System Environment/Base
-Requires: coreutils >= %{version}
+Summary:        Additional language files for coreutils
+Group:          System Environment/Base
+Requires:       coreutils >= %{version}
+
 %description lang
 These are the additional language files of coreutils.
 
@@ -54,8 +57,8 @@ mv -v %{buildroot}%{_mandir}/man1/chroot.1 %{buildroot}%{_mandir}/man8/chroot.8
 sed -i s/\"1\"/\"8\"/1 %{buildroot}%{_mandir}/man8/chroot.8
 mv -v %{buildroot}%{_bindir}/{head,sleep,nice} %{buildroot}/bin
 rm -rf %{buildroot}%{_infodir}
-install -vdm755 %{buildroot}/etc/profile.d
-install -m 0644 %{SOURCE1} %{buildroot}/etc/profile.d/
+install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
+install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/
 %find_lang %{name}
 
 %check
@@ -86,7 +89,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %defattr(-,root,root)
 
 %changelog
-* Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.30-6
+* Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 8.30-6
 - No patch CVE-2016-2781
 - No patch CVE-2013-0221
 * Mon Jun 15 2020 Andrew Phelps <anphel@microsoft.com> 8.30-5
