@@ -132,58 +132,58 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
-*   Wed Oct 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2.0-15
--   Add patch for CVE-2020-13253.
--   Add patch for CVE-2020-13754.
--   Adding back regular %%setup as %%autosetup fails on the *.nopatch files.
+* Wed Oct 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2.0-15
+- Add patch for CVE-2020-13253.
+- Add patch for CVE-2020-13754.
+- Adding back regular %%setup as %%autosetup fails on the *.nopatch files.
 
-*   Tue Oct 27 2020 Henry Li <lihl@microsoft.com> - 4.2.0-14
--   Add patch for CVE-2020-10702
--   Add patch for CVE-2020-10761
--   Use autosetup
+* Tue Oct 27 2020 Henry Li <lihl@microsoft.com> - 4.2.0-14
+- Add patch for CVE-2020-10702
+- Add patch for CVE-2020-10761
+- Use autosetup
 
-*   Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
--   Nopatch CVE-2015-7504, it was fixed in 2.5.0
--   Nopatch CVE-2017-5931, it was fixed in 2.9.0
--   Nopatch CVE-2017-14167, it was fixed in 2.11.0
+* Tue Sep 29 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-13
+- Nopatch CVE-2015-7504, it was fixed in 2.5.0
+- Nopatch CVE-2017-5931, it was fixed in 2.9.0
+- Nopatch CVE-2017-14167, it was fixed in 2.11.0
 
-*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-12
--   Nopatch CVE-2016-7161, it was fixed in 2.7
+* Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2.0-12
+- Nopatch CVE-2016-7161, it was fixed in 2.7
 
-*   Mon Sep 14 2020 Nicolas Guibourge <nicolasg@microsoft.com> 4.2.0-11
--   Add patch for CVE-2020-15863
+* Mon Sep 14 2020 Nicolas Guibourge <nicolasg@microsoft.com> 4.2.0-11
+- Add patch for CVE-2020-15863
 
-*   Wed Sep 02 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.2.0-10
--   Add patch for CVE-2020-16092
+* Wed Sep 02 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.2.0-10
+- Add patch for CVE-2020-16092
 
-*   Tue Jun 09 2020 Paul Monson <paulmon@microsoft.com> 4.2.0-9
--   Add patch for CVE-2019-20175
--   Add patch for CVE-2020-13659
+* Tue Jun 09 2020 Paul Monson <paulmon@microsoft.com> 4.2.0-9
+- Add patch for CVE-2019-20175
+- Add patch for CVE-2020-13659
 
-*   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.0-8
--   Fix CVE-2020-1711 and CVE-2020-7211.
+* Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.0-8
+- Fix CVE-2020-1711 and CVE-2020-7211.
 
-*   Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.0-7
--   Added %%license line automatically
+* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.0-7
+- Added %%license line automatically
 
-*   Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.0-6
--   Renaming qemu to qemu-kvm
+* Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.0-6
+- Renaming qemu to qemu-kvm
 
-*   Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.0-5
--   Fix CVE-2020-11102.
--   Ignore CVE-2020-7039.
--   Update license and URL.
--   License verified.
+* Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.0-5
+- Fix CVE-2020-11102.
+- Ignore CVE-2020-7039.
+- Update license and URL.
+- License verified.
 
-*   Mon Mar 30 2020 Chris Co <chrco@microsoft.com> 4.2.0-4
--   Fix changelog to not define a sha1 macro
+* Mon Mar 30 2020 Chris Co <chrco@microsoft.com> 4.2.0-4
+- Fix changelog to not define a sha1 macro
 
-*   Fri Mar 27 2020 Chris Co <chrco@microsoft.com> 4.2.0-3
--   Add elf2dmp and virtfs-proxy-helper binaries to package
--   Delete unused sha1
+* Fri Mar 27 2020 Chris Co <chrco@microsoft.com> 4.2.0-3
+- Add elf2dmp and virtfs-proxy-helper binaries to package
+- Delete unused sha1
 
-*   Tue Mar 24 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.0-2
--   Add Qemu KVM support
+* Tue Mar 24 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.0-2
+- Add Qemu KVM support
 
-*   Wed Jan 8 2020 Paul Monson <paulmon@microsoft.com> 4.2.0-1
--   Original version for CBL-Mariner.
+* Wed Jan 8 2020 Paul Monson <paulmon@microsoft.com> 4.2.0-1
+- Original version for CBL-Mariner.
