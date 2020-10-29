@@ -204,6 +204,7 @@ libltdl-devel-2.4.6-6.cm1.aarch64.rpm
 pcre-libs-8.42-4.cm1.aarch64.rpm
 krb5-1.17-4.cm1.aarch64.rpm
 lua-5.3.5-11.cm1.aarch64.rpm
+lua-libs-5.3.5-11.cm1.aarch64.rpm
 mariner-rpm-macros-1.0-7.cm1.noarch.rpm
 mariner-python-macros-1.0-7.cm1.noarch.rpm
 mariner-check-macros-1.0-7.cm1.noarch.rpm
@@ -218,6 +219,7 @@ gpgme-1.13.1-5.cm1.aarch64.rpm
 mariner-repos-1.0-11.cm1.noarch.rpm
 mariner-repos-preview-1.0-11.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.aarch64.rpm
+libffi-devel-3.2.1-12.cm1.aarch64.rpm
 libtasn1-4.14-2.cm1.aarch64.rpm
 p11-kit-0.23.16.1-2.cm1.aarch64.rpm
 p11-kit-trust-0.23.16.1-2.cm1.aarch64.rpm
