@@ -14,6 +14,8 @@ Patch0:         http://www.linuxfromscratch.org/patches/downloads/coreutils/core
 Patch1:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.10-uname-1.patch
 # Upstream community agreed to not fix this
 Patch2:         CVE-2016-2781.nopatch
+# Fixed in coreutils-8.30-i18n-1.patch
+Patch3:         CVE-2013-0221.nopatch
 Requires:       gmp
 Provides:       sh-utils
 Conflicts:      toybox
@@ -86,6 +88,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %changelog
 * Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.30-6
 - No patch CVE-2016-2781
+- No patch CVE-2013-0221
 * Mon Jun 15 2020 Andrew Phelps <anphel@microsoft.com> 8.30-5
 - Add patch for uname processor type
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 8.30-4
