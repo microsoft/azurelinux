@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.30
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 URL:            http://www.gnu.org/software/coreutils
 Group:          System Environment/Base
@@ -12,6 +12,8 @@ Source0:        http://ftp.gnu.org/gnu/coreutils/%{name}-%{version}.tar.xz
 Source1:        serial-console.sh
 Patch0:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.30-i18n-1.patch
 Patch1:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.10-uname-1.patch
+# Upstream community agreed to not fix this
+Patch2:         CVE-2016-2781.nopatch
 Requires:       gmp
 Provides:       sh-utils
 Conflicts:      toybox
@@ -27,9 +29,7 @@ Requires: coreutils >= %{version}
 These are the additional language files of coreutils.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 autoreconf -fi
@@ -84,6 +84,8 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.30-6
+- No patch CVE-2016-2781
 * Mon Jun 15 2020 Andrew Phelps <anphel@microsoft.com> 8.30-5
 - Add patch for uname processor type
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 8.30-4
