@@ -3276,8 +3276,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.8",
-          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.8/net-snmp-5.8.tar.gz"
+          "version": "5.9",
+          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
         }
       }
     },
