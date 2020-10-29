@@ -884,6 +884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dpdk",
+          "version": "18.11.2",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dracut",
           "version": "049",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-049.tar.xz"
