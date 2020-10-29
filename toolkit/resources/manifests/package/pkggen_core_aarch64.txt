@@ -60,9 +60,9 @@ gawk-4.2.1-3.cm1.aarch64.rpm
 findutils-4.6.0-7.cm1.aarch64.rpm
 findutils-lang-4.6.0-7.cm1.aarch64.rpm
 gettext-0.21-1.cm1.aarch64.rpm
-gzip-1.9-4.cm1.aarch64.rpm
-make-4.2.1-4.cm1.aarch64.rpm
-mariner-release-1.0-9.cm1.noarch.rpm
+gzip-1.9-5.cm1.aarch64.rpm
+make-4.2.1-5.cm1.aarch64.rpm
+mariner-release-1.0-10.cm1.noarch.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
 util-linux-2.32.1-4.cm1.aarch64.rpm
 util-linux-devel-2.32.1-4.cm1.aarch64.rpm
@@ -227,7 +227,7 @@ ca-certificates-shared-20200720-9.cm1.noarch.rpm
 ca-certificates-tools-20200720-9.cm1.noarch.rpm
 ca-certificates-base-20200720-9.cm1.noarch.rpm
 dwz-0.13-4.cm1.aarch64.rpm
-unzip-6.0-15.cm1.aarch64.rpm
+unzip-6.0-16.cm1.aarch64.rpm
 python2-2.7.18-3.cm1.aarch64.rpm
 python2-devel-2.7.18-3.cm1.aarch64.rpm
 python2-libs-2.7.18-3.cm1.aarch64.rpm
