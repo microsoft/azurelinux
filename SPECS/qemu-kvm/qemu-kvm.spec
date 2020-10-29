@@ -28,6 +28,7 @@ Patch9:        CVE-2015-7504.nopatch
 Patch10:       CVE-2017-5931.nopatch
 # CVE-2017-14167 was fixed in 2.11.0, but the CVE database was not updated. (ed4f86e8b6eff8e600c69adee68c7cd34dd2cccb)
 Patch11:       CVE-2017-14167.nopatch
+# CVE-2020-13253 backported to 4.2.0. Original version: https://github.com/qemu/qemu/commit/790762e5487114341cccc5bffcec4cb3c022c3cd
 Patch12:       CVE-2020-13253.patch
 Patch13:       CVE-2020-13754.patch
 
