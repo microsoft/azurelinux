@@ -32,7 +32,6 @@ Patch12:        CVE-2020-10702.patch
 Patch13:        CVE-2020-10761.patch
 Patch14:        CVE-2020-13800.patch
 Patch15:        CVE-2020-14364.patch
-
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
