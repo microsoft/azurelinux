@@ -385,7 +385,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 				g.RemovePkgNode(newNode)
 			}
 
-			// Add the nodes that were ment to be collapsed back to the lookup.
+			// Add the nodes that were meant to be collapsed back to the lookup table.
 			for _, node := range nodesToCollapse {
 				lookupErr := g.addToLookup(node, false)
 				if lookupErr != nil {
