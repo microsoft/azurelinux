@@ -16,7 +16,8 @@ Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
-Source1:        %{LICENSE_PATH}
+# copied from doc/readme.html on 2014-07-18
+Source1:        mit.txt
 Source2:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 # multilib
 Source3:        luaconf.h
