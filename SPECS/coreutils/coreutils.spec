@@ -6,7 +6,7 @@ License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
-URL:            http://www.gnu.org/software/coreutils
+URL:            https://www.gnu.org/software/coreutils
 Source0:        http://ftp.gnu.org/gnu/coreutils/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
@@ -91,29 +91,42 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 * Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 8.30-6
 - No patch CVE-2016-2781
 - No patch CVE-2013-0221
+
 * Mon Jun 15 2020 Andrew Phelps <anphel@microsoft.com> 8.30-5
 - Add patch for uname processor type
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 8.30-4
 - Added %%license line automatically
+
 * Tue Dec 03 2019 Andrew Phelps <anphel@microsoft.com> 8.30-3
 - Run autoconf to remake build system files
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.30-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Fri Sep 07 2018 Alexey Makhalov <amakhalov@vmware.com> 8.30-1
 - Version update to support glibc-2.28
+
 * Tue Aug 28 2018 Alexey Makhalov <amakhalov@vmware.com> 8.27-4
 - Add serial-console profile.d script
+
 * Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 8.27-3
 - Added conflicts toybox
+
 * Wed Aug 09 2017 Rongrong Qiu <rqiu@vmware.com> 8.27-2
 - Fix make check for bug 1900253
+
 * Thu Apr 06 2017 Anish Swaminathan <anishs@vmware.com> 8.27-1
 - Upgraded to version 8.27
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 8.25-2
 - GA - Bump release of all rpms
+
 * Tue May 17 2016 Divya Thaluru <dthaluru@vmware.com> 8.25-1
 - Updated to version 8.25
+
 * Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 8.24-1
 - Updated to version 8.24
+
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 8.22-1
 - Initial build. First version
