@@ -2,7 +2,7 @@
 Summary:	An exporter with the features of Sub::Exporter but only core dependencies
 Name:		perl-Exporter-Tiny
 Version:	1.002001
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	(GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Exporter-Tiny/
@@ -10,9 +10,14 @@ Source0:	https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{versi
 %define sha1 Exporter-Tiny=9ecca5df5613f948a0d50335ba9fd7854238464b
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildArch:	noarch
-BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
+BuildArch:      noarch
+BuildRequires:  perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Carp)
+
+Provides:       perl(Exporter::Shiny) = %{version}-%{release}
+Provides:       perl(Exporter::Tiny) = %{version}-%{release}
 
 %description
 Exporter::Tiny supports many of Sub::Exporter's external-facing features
@@ -56,6 +61,9 @@ rm -rf %{buildroot}
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.002001-4
+-   Use new perl package names.
+-   Provide perl(Exporter::*).
 * Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.002001-3
 - Added %%license line automatically
 

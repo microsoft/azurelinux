@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -60,6 +60,15 @@ Requires:       filesystem kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 %define uname_r %{version}-%{release}
+%ifarch x86_64
+%define arch x86_64
+%define archdir x86
+%endif
+
+%ifarch aarch64
+%define arch arm64
+%define archdir arm64
+%endif
 
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -128,19 +137,15 @@ make mrproper
 
 %ifarch x86_64
 cp %{SOURCE1} .config
-arch="x86_64"
-archdir="x86"
 %endif
 
 %ifarch aarch64
 cp %{SOURCE2} .config
-arch="arm64"
-archdir="arm64"
 %endif
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=${arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -157,7 +162,7 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 make -C tools perf
 
 %define __modules_install_post \
@@ -232,9 +237,9 @@ rm -rf %{buildroot}/lib/modules/%{uname_r}/source
 rm -rf %{buildroot}/lib/modules/%{uname_r}/build
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
-find $(find arch/${archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}/usr/src/linux-headers-%{uname_r}' copy
 %ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
 install -vsm 755 tools/objtool/objtool %{buildroot}/usr/src/linux-headers-%{uname_r}/tools/objtool/
@@ -341,17 +346,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-*   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-11
+*   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-12
 -   Enable QAT kernel configs
-*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
+*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-11
 -   Address CVE-2020-10757, CVE-2020-12653, CVE-2020-12657, CVE-2010-3865,
 -   CVE-2020-11668, CVE-2020-12654, CVE-2020-24394, CVE-2020-8428
-*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-9
+*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
 -   Fix aarch64 build error
-*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-8
+*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-9
 -   Update postun script to deal with removal in case of another installed kernel.
-*   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-7
+*   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-8
 -   Enable Mellanox kernel configs
+*   Thu Sep 24 2020 Emre Girgin <mrgirgin@microsoft.cpm> 5.4.51-7
+-   Replace the misuse of the 'archdir' and `arch` shell variables.
 *   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
 -   Enable CONFIG_IMA (measurement only) and associated configs
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5

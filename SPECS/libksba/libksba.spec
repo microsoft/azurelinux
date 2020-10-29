@@ -1,14 +1,14 @@
 Summary:	Library for accessing X.509 and CMS data structure.
 Name:		libksba
 Version:	1.3.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv3+
 URL:		https://www.gnupg.org/(fr)/download/index.html#libksba
 Group:		Security/Libraries.
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
-%define sha1 libksba=a98385734a0c3f5b713198e8d6e6e4aeb0b76fde
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Provides:       %{name}-devel = %{version}-%{release}
 BuildRequires:  libgpg-error-devel >= 1.2
 
 %description
@@ -46,9 +46,10 @@ make %{?_smp_mflags} -k check
 %exclude %{_datadir}/info/dir
 
 %changelog
-* Sat May 09 00:20:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.5-3
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.3.5-4
+-   Provide libksba-devel for base package
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.5-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.5-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *	Tue	Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1

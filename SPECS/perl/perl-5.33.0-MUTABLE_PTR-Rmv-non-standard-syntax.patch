@@ -1,0 +1,32 @@
+From 6c2255e0e80e0dc00c7fd96e073f1f524bbaa3e0 Mon Sep 17 00:00:00 2001
+From: Karl Williamson <khw@cpan.org>
+Date: Mon, 29 Jun 2020 09:21:24 -0600
+Subject: [PATCH] MUTABLE_PTR() Rmv non-standard syntax
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Variables in C are beginning with an underscore are reserved for use by
+the C implementation.  Change this non-conformant usage.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ handy.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/handy.h b/handy.h
+index 287e2e206d..890b2b11a2 100644
+--- a/handy.h
++++ b/handy.h
+@@ -54,7 +54,7 @@ Null SV pointer.  (No longer available when C<PERL_CORE> is defined.)
+  */
+ 
+ #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+-#  define MUTABLE_PTR(p) ({ void *_p = (p); _p; })
++#  define MUTABLE_PTR(p) ({ void *p_ = (p); p_; })
+ #else
+ #  define MUTABLE_PTR(p) ((void *) (p))
+ #endif
+-- 
+2.25.4
+

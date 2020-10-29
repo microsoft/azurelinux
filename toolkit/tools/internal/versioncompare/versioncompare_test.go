@@ -16,6 +16,25 @@ const (
 	emojiMidString     = "1👌2🤣3🤢ab~52*^&%$6"
 )
 
+func TestCompareShouldProcessHigherEpochVersion(t *testing.T) {
+	highVer := New("2:1.2.1")
+	lowVer := New("4.2.2.1")
+	assert.Equal(t, 1, highVer.Compare(lowVer))
+}
+
+func TestCompareShouldProcessLowerEpochVersion(t *testing.T) {
+	highVer := New("2:1.2.1")
+	lowVer := New("4.2.2.1")
+	assert.Equal(t, 1, highVer.Compare(lowVer))
+}
+
+func TestCompareShouldProcessSameEpochVersion(t *testing.T) {
+	highVer := New("1.2.3")
+	lowVer := New("0:1.2.3")
+	assert.Equal(t, 0, lowVer.Compare(highVer))
+	assert.Equal(t, 0, highVer.Compare(lowVer))
+}
+
 func TestCompareShouldProcessHigherVersion(t *testing.T) {
 	highVer := New("1.2.3")
 	lowVer := New("1.2.2")

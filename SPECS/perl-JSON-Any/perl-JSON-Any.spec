@@ -1,7 +1,7 @@
 Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
 Version:        1.39
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Perl Artistic License 2.0
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
@@ -10,8 +10,12 @@ Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{ver
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-Requires:       perl >= 5.28.0
 BuildRequires:  perl >= 5.28.0
+
+Requires:       perl(Carp)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
+Provides:       perl(JSON::Any) = %{version}-%{release}
 
 %description
 This module tries to provide a coherent API to bring together the various JSON modules currently on CPAN. This module will allow you to code to any JSON API and have it work regardless of which JSON module is actually installed.
@@ -40,6 +44,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.39-7
+-   Use new perl package names.
+-   Provide perl(JSON::Any).
 * Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.39-6
 - Added %%license line automatically
 

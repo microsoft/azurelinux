@@ -6,7 +6,7 @@
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
 Version:        0.4224
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Build/
@@ -15,8 +15,41 @@ Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-%{v
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
+
 BuildRequires:  perl >= 5.28.0
-Requires:	perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(CPAN::Meta) >= 2.142060
+Requires:       perl(CPAN::Meta::Converter) >= 2.141170
+Requires:       perl(CPAN::Meta::Merge)
+Requires:       perl(ExtUtils::CBuilder) >= 0.27
+Requires:       perl(ExtUtils::Install) >= 0.3
+Requires:       perl(ExtUtils::Manifest) >= 1.54
+Requires:       perl(ExtUtils::Mkbootstrap)
+Requires:       perl(ExtUtils::ParseXS) >= 2.21
+Requires:       perl(Module::Metadata) >= 1.000002
+
+Provides:       perl(Module::Build) = %{version}-%{release}
+Provides:       perl(Module::Build::Base) = %{version}-%{release}
+Provides:       perl(Module::Build::Compat) = %{version}-%{release}
+Provides:       perl(Module::Build::Config) = %{version}-%{release}
+Provides:       perl(Module::Build::ConfigData) = %{version}-%{release}
+Provides:       perl(Module::Build::Cookbook) = %{version}-%{release}
+Provides:       perl(Module::Build::Dumper) = %{version}-%{release}
+Provides:       perl(Module::Build::Notes) = %{version}-%{release}
+Provides:       perl(Module::Build::PPMMaker) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Default) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::MacOS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Unix) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::VMS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::VOS) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::Windows) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::aix) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::cygwin) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::darwin) = %{version}-%{release}
+Provides:       perl(Module::Build::Platform::os2) = %{version}-%{release}
+Provides:       perl(Module::Build::PodParser) = %{version}-%{release}
+
 
 %description
 Module::Build is a system for building, testing, and installing Perl
@@ -46,6 +79,9 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.4224-4
+-   Use new perl package names.
+-   Provide perl(Module::Build*)
 * Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.4224-3
 - Added %%license line automatically
 

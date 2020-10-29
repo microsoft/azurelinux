@@ -2,7 +2,7 @@
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
 Version:        8.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 URL:            https://lldb.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
@@ -58,7 +58,10 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLDB_PATH_TO_CLANG_BUILD=%{_prefix} \
       -DLLVM_DIR=/usr/lib/cmake/llvm        \
       -DLLVM_BUILD_LLVM_DYLIB=ON ..         \
-      -DLLDB_DISABLE_LIBEDIT:BOOL=ON
+      -DLLDB_DISABLE_LIBEDIT:BOOL=ON        \
+      -DPYTHON_EXECUTABLE:STRING=%{__python2} \
+      -DPYTHON_VERSION_MAJOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.major)") \
+      -DPYTHON_VERSION_MINOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.minor)")
 
 make %{?_smp_mflags}
 
@@ -98,6 +101,8 @@ rm -rf %{buildroot}/*
 %{python2_sitelib}/*
 
 %changelog
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 8.0.1-4
+-   Explicitly set python verison.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
 -   Temporarily disable generation of debug symbols.
 *   Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2

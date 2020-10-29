@@ -3,7 +3,7 @@
 Summary:        Crypt::SSLeay - OpenSSL support for LWP
 Name:           perl-Crypt-SSLeay
 Version:        0.72
-Release:        6%{?dist}
+Release:        7%{?dist}
 URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -11,12 +11,22 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
-Requires:       perl >= 5.28.0
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(XSLoader)
 Requires:       openssl
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
+
+Provides:       perl(Crypt::SSLeay) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::CTX) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Conn) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Err) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::MainContext) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::Version) = %{version}-%{release}
+Provides:       perl(Crypt::SSLeay::X509) = %{version}-%{release}
+Provides:       perl(Net::SSL) = %{version}-%{release}
 
 %description
 This Perl module provides support for the HTTPS protocol under LWP, to allow an LWP::UserAgent object to perform GET, HEAD and POST requests. Please see LWP for more information on POST requests.
@@ -49,10 +59,14 @@ make test
 
 %files
 %license %{LICENSE_PATH}
-%{perl_vendorlib}/*
+%{perl_vendorarch}/*
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-7
+-   Use new perl package names.
+-   Change perl_vendorlib to perl_vendorarch directory for packaging.
+-   Provide perl(Crypt::*).
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-6
 -   Added %%license macro.
 -   Update License.

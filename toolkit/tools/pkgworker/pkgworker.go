@@ -12,14 +12,12 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/packagerepo/repomanager/rpmrepomanager"
-	"microsoft.com/pkggen/internal/retry"
 	"microsoft.com/pkggen/internal/rpm"
 	"microsoft.com/pkggen/internal/safechroot"
 	"microsoft.com/pkggen/internal/shell"
@@ -30,7 +28,6 @@ const (
 	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
-	defaultRetryAttempts    = "1"
 )
 
 var (
@@ -39,15 +36,14 @@ var (
 	workDir              = app.Flag("work-dir", "The directory to create the build folder").Required().String()
 	workerTar            = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFile             = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
-	rpmsDirPath          = app.Flag("rpms-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
-	srpmsDirPath         = app.Flag("srpms-dir", "The output directory for source RPM packages").Required().String()
+	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
+	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the choot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
-	retryAttempts        = app.Flag("retry-attempts", "Sets the number of times pkgworker will retry building the package").Default(defaultRetryAttempts).Int()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
 
 	logFile  = exe.LogFileFlag(app)
@@ -58,13 +54,11 @@ var (
 	greaterThanOrEqualRegex = regexp.MustCompile(` '?>='? [^ ]*`)
 	equalToRegex            = regexp.MustCompile(` '?='? `)
 	lessThanOrEqualToRegex  = regexp.MustCompile(` '?<='? `)
+
+	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
 func main() {
-	const (
-		retryDuration = time.Second
-	)
-
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
@@ -83,17 +77,15 @@ func main() {
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 
-	err = retry.Run(func() error {
-		err = buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck)
-		if err != nil {
-			logger.Log.Warnf("Failed package build attempt (%v), error (%v)", *srpmFile, err)
-		}
-		return err
-	}, *retryAttempts, retryDuration)
-	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s.", *srpmFile, *logFile)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck)
+	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
 	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
 	logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+
+	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
+	// Any output from logger will be on stderr so stdout will only contain this output.
+	fmt.Printf(strings.Join(builtRPMs, ","))
 }
 
 func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
@@ -107,7 +99,7 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	return
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup bool, runCheck bool) (err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup bool, runCheck bool) (builtRPMs []string, err error) {
 	const (
 		existingChrootDir = false
 		squashErrors      = false
@@ -139,8 +131,6 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	if err != nil {
 		return
 	}
-
-	var builtRPMs []string
 
 	err = chroot.Run(func() (err error) {
 		return buildRPMFromSRPMInChroot(srpmFileInChroot, runCheck, defines)
@@ -229,7 +219,7 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 			return
 		}
 
-		builtRPMs = append(builtRPMs, filepath.Base(path))
+		builtRPMs = append(builtRPMs, dstFile)
 		return
 	})
 
@@ -237,13 +227,8 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 }
 
 func installBuildRequires(defines map[string]string) (err error) {
-	// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
 	const (
-		emptyQueryFormat        = ""
-		unresolvedOutputPrefix  = "No package"
-		unresolvedOutputPostfix = "available"
-		alreadyInstalledPostfix = "is already installed."
-		noMatchingPackagesErr   = "Error(1011) : No matching packages"
+		emptyQueryFormat = ""
 	)
 	// Find the SPEC file extracted from the SRPM
 	specDir := filepath.Join(chrootRpmBuildRoot, "SPECS")
@@ -264,61 +249,101 @@ func installBuildRequires(defines map[string]string) (err error) {
 		return
 	}
 
-	if len(buildRequires) > 0 {
-		defaultArgs := []string{"install", "-y"}
-		installArgs := make([]string, 0, len(buildRequires)+len(defaultArgs))
+	if len(buildRequires) == 0 {
+		return
+	}
 
-		installArgs = append(installArgs, defaultArgs...)
+	packagesToInstall := make([]string, 0, len(buildRequires))
+	for _, pkg := range buildRequires {
+		// Replace version conditionals with tdnf friendly version:
+		// - replace >= with "latest" (no version)
+		// - replace = and <= with the exact version
+		buildReq := greaterThanOrEqualRegex.ReplaceAllString(pkg, "")
+		buildReq = equalToRegex.ReplaceAllString(buildReq, "-")
+		buildReq = lessThanOrEqualToRegex.ReplaceAllString(buildReq, "-")
 
-		for _, pkg := range buildRequires {
-			// Replace version conditionals with tdnf friendly version:
-			// - replace >= with "latest" (no version)
-			// - replace = and <= with the exact version
-			buildReq := greaterThanOrEqualRegex.ReplaceAllString(pkg, "")
-			buildReq = equalToRegex.ReplaceAllString(buildReq, "-")
-			buildReq = lessThanOrEqualToRegex.ReplaceAllString(buildReq, "-")
+		// Add each package to the installArgs
+		packagesToInstall = append(packagesToInstall, strings.TrimSpace(buildReq))
+	}
 
-			// Add each package to the installArgs
-			installArgs = append(installArgs, strings.TrimSpace(buildReq))
-		}
+	// Try matching dependencies from locally build RPMs first. If some are not available,
+	// then consider the package cache. This will ensure that local packages are preferred over remote ones.
+	allowCache := true
+	failedToInstall, err := tdnfInstall(packagesToInstall, allowCache)
+	if len(failedToInstall) != 0 {
+		allowCache = false
+		failedToInstall, err = tdnfInstall(failedToInstall, allowCache)
+	}
 
-		var (
-			stderr string
-			stdout string
-		)
+	if len(failedToInstall) != 0 {
+		logger.Log.Errorf("Failed to install the following packages: %v", failedToInstall)
+	}
 
-		stdout, stderr, err = shell.Execute("tdnf", installArgs...)
-		if err != nil {
-			logger.Log.Warnf("Failed to install build requirements. stderr: %s\nstdout: %s", stderr, stdout)
-			// TDNF will output an error if all packages are already installed.
-			// Ignore it iff there is no other error present in stderr.
-			splitStderr := strings.Split(stderr, "\n")
-			for _, line := range splitStderr {
-				trimmedLine := strings.TrimSpace(line)
-				if trimmedLine == "" {
-					continue
-				}
+	return
+}
 
-				if !strings.HasSuffix(trimmedLine, alreadyInstalledPostfix) && trimmedLine != noMatchingPackagesErr {
-					return fmt.Errorf(trimmedLine)
-				}
+func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string, err error) {
+	const (
+		alreadyInstalledPostfix = "is already installed."
+		noMatchingPackagesErr   = "Error(1011) : No matching packages"
+		builtPackagesRepo       = "local-repo"
+		cachedPackagesRepo      = "upstream-cache-repo"
+		packageMatchGroup       = 1
+	)
+
+	installArgs := []string{"install", "-y", "--disablerepo=*", fmt.Sprintf("--enablerepo=%s", builtPackagesRepo)}
+	if allowCached {
+		installArgs = append(installArgs, fmt.Sprintf("--enablerepo=%s", cachedPackagesRepo))
+	}
+
+	installArgs = append(installArgs, packages...)
+	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
+	foundNoMatchingPackages := false
+
+	if err != nil {
+		logger.Log.Warnf("Failed to install build requirements. stderr: %s\nstdout: %s", stderr, stdout)
+		// TDNF will output an error if all packages are already installed.
+		// Ignore it iff there is no other error present in stderr.
+		splitStderr := strings.Split(stderr, "\n")
+		for _, line := range splitStderr {
+			trimmedLine := strings.TrimSpace(line)
+			if trimmedLine == "" {
+				continue
+			}
+
+			if strings.Contains(trimmedLine, noMatchingPackagesErr) {
+				foundNoMatchingPackages = true
+			}
+
+			if !strings.HasSuffix(trimmedLine, alreadyInstalledPostfix) && trimmedLine != noMatchingPackagesErr {
+				err = fmt.Errorf(trimmedLine)
+				return
 			}
 		}
+	}
 
-		if err == nil {
-			// TDNF will ignore unavailable packages that have been requested to be installed without reporting an error code.
-			// Search the stdout of TDNF for such a failure and warn the user.
-			// This may happen if a SPEC requires the the path to a tool (e.g. /bin/cp), so mark it as a warning for now.
-			splitStdout := strings.Split(stdout, "\n")
-			for _, line := range splitStdout {
-				trimmedLine := strings.TrimSpace(line)
-
-				// If a package was not available, update err
-				if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-					logger.Log.Warnf("Unable to install buildrequires: %s", trimmedLine)
-				}
-			}
+	// TDNF will ignore unavailable packages that have been requested to be installed without reporting an error code.
+	// Search the stdout of TDNF for such a failure and warn the user.
+	// This may happen if a SPEC requires the the path to a tool (e.g. /bin/cp), so mark it as a warning for now.
+	splitStdout := strings.Split(stdout, "\n")
+	for _, line := range splitStdout {
+		trimmedLine := strings.TrimSpace(line)
+		matches := packageUnavailableRegex.FindStringSubmatch(trimmedLine)
+		if len(matches) == 0 {
+			continue
 		}
+
+		failedToInstall = append(failedToInstall, matches[packageMatchGroup])
+	}
+
+	// TDNF will output the error "Error(1011) : No matching packages" if all packages could not be found.
+	// In this case it will not print any of the individual packages that failed.
+	if foundNoMatchingPackages && len(failedToInstall) == 0 {
+		failedToInstall = packages
+	}
+
+	if len(failedToInstall) != 0 {
+		err = fmt.Errorf("unable to install the following packages: %v", failedToInstall)
 	}
 
 	return

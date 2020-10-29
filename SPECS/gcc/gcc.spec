@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        9.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 URL:            https://gcc.gnu.org/
 Group:          Development/Tools
@@ -13,12 +13,15 @@ Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version
 Patch0:         090_all_pr55930-dependency-tracking.patch
 # Only applies to the Power9 ISA
 Patch1:         CVE-2019-15847.nopatch
+Requires:       gcc-c++ = %{version}-%{release}
 Requires:       libstdc++-devel = %{version}-%{release}
 Requires:       libgcc-devel = %{version}-%{release}
 Requires:       libgomp-devel = %{version}-%{release}
 Requires:       libgcc-atomic = %{version}-%{release}
 Requires:       gmp
 Requires:       libmpc
+Provides:       cpp = %{version}-%{release}
+
 #%if %{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
@@ -31,6 +34,8 @@ which includes the C and C++ compilers.
 %package -n     gfortran
 Summary:        GNU Fortran compiler.
 Group:          Development/Tools
+Requires:       gcc = %{version}-%{release}
+Provides:       gcc-gfortran = %{version}-%{release}
 %description -n gfortran
 The gfortran package contains GNU Fortran compiler.
 
@@ -44,6 +49,7 @@ The libgcc package contains GCC shared libraries for gcc.
 Summary:        GNU C Library for atomic counter updates
 Group:          System Environment/Libraries
 Requires:       libgcc = %{version}-%{release}
+Provides:       libatomic = %{version}-%{release}
 %description -n libgcc-atomic
 The libgcc package contains GCC shared libraries for atomic counter updates.
 
@@ -54,6 +60,18 @@ Requires:       libgcc = %{version}-%{release}
 %description -n libgcc-devel
 The libgcc package contains GCC shared libraries for gcc .
 This package contains development headers and static library for libgcc.
+
+%package        c++
+Summary:        C++ support for GCC
+Group:          System Environment/Libraries
+Requires:       gcc = %{version}-%{release}
+Requires:       libstdc++-devel = %{version}-%{release}
+Provides:       gcc-g++ = %{version}-%{release}
+Provides:       g++ = %{version}-%{release}
+%description    c++
+This package adds C++ support to the GNU Compiler Collection.
+It includes support for most of the current C++ specification,
+including templates and exception handling.
 
 %package -n     libstdc++
 Summary:        GNU C Library
@@ -66,6 +84,7 @@ This package contains the GCC Standard C++ Library v3, an ongoing project to imp
 Summary:        GNU C Library
 Group:          Development/Libraries
 Requires:       libstdc++ = %{version}-%{release}
+Provides:       libstdc++-static = %{version}-%{release}
 %description -n libstdc++-devel
 This is the GNU implementation of the standard C++ libraries.
 This package includes the headers files and libraries needed for C++ development.
@@ -144,10 +163,13 @@ make %{?_smp_mflags} check-gcc
 %{_lib}/cpp
 #   Executables
 %exclude %{_bindir}/*gfortran
+%exclude %{_bindir}/*c++
+%exclude %{_bindir}/*g++
 %{_bindir}/*
 #   Libraries
 %{_lib64dir}/*
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 %{_libdir}/gcc/*
 #   Library executables
 %{_libexecdir}/gcc/*
@@ -163,6 +185,7 @@ make %{?_smp_mflags} check-gcc
 
 %exclude %{_lib64dir}/libgcc*
 %exclude %{_lib64dir}/libstdc++*
+%exclude %{_lib64dir}/libsupc++*
 %exclude %{_lib64dir}/libgomp*
 
 %files -n gfortran
@@ -184,6 +207,12 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgcc_s.so
 %{_lib}/libcc1.*
 
+%files c++
+%defattr(-,root,root)
+%{_bindir}/*c++
+%{_bindir}/*g++
+%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
+
 %files -n libstdc++
 %defattr(-,root,root)
 %{_lib64dir}/libstdc++.so.*
@@ -196,6 +225,8 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libstdc++.la
 %{_lib64dir}/libstdc++.a
 %{_lib64dir}/libstdc++fs.a
+%{_lib64dir}/libsupc++.a
+%{_lib64dir}/libsupc++.la
 
 %{_includedir}/c++/*
 
@@ -211,6 +242,10 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 9.1.0-8
+- Split gcc-c++ subpackage.
+- Provide cpp, gcc-gfortran, libatomic, and listdc++-static.
+
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 9.1.0-7
 - Ignore CVE-2019-15847, as it applies to an unsupported ISA
 

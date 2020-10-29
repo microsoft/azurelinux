@@ -1,7 +1,7 @@
 Summary:        File-Which
 Name:           perl-File-Which
 Version:        1.22
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-Which/
@@ -10,8 +10,12 @@ Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-%{
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
+BuildRequires:  perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(File::Spec) >= 0.60
+
+Provides:       perl(File::Which) = %{version}-%{release}
 
 %description
 File::Which finds the full or relative paths to executable programs on
@@ -49,13 +53,17 @@ make test
 %license LICENSE
 %{perl_vendorlib}/*
 %{perl_vendorlib}/File/Which.pm
-%{_mandir}/man3/File::Which.3.gz
+%{_mandir}/man3/File::Which.3pm.gz
 
 
 %changelog
-* Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.22-3
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-5
+-   Use new perl package names.
+-   Provide perl(File::Which).
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-4
+-   Switch to new perl man page extension.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.22-1

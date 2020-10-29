@@ -1,7 +1,7 @@
 Summary:        Programs for processing and formatting text
 Name:           groff
 Version:        1.22.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/groff
 Group:          Applications/Text
@@ -11,12 +11,13 @@ Source0:        http://ftp.gnu.org/gnu/groff/%{name}-%{version}.tar.gz
 # No patch has been made available for CVE-2000-0803
 Patch0:         CVE-2000-0803.nopatch
 
-Provides:       perl(oop_fh.pl)
-Provides:       perl(main_subs.pl)
-Provides:       perl(man.pl)
-Provides:       perl(subs.pl)
+Provides:       perl(oop_fh.pl) = %{version}-%{release}
+Provides:       perl(main_subs.pl) = %{version}-%{release}
+Provides:       perl(man.pl) = %{version}-%{release}
+Provides:       perl(subs.pl) = %{version}-%{release}
+Provides:       groff-base = %{version}-%{release}
 
-Requires:       perl
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl-DBI
 Requires:       perl-DBIx-Simple
 Requires:       perl-DBD-SQLite
@@ -48,6 +49,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-6
+-   Use new perl package names.
+-   Provide groff-base.
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4

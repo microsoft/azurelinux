@@ -1,7 +1,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenSSL
 URL:            http://www.openssl.org/
 Group:          System Environment/Security
@@ -65,7 +65,7 @@ protocols.
 %package perl
 Summary: Perl scripts provided with OpenSSL
 Group: Applications/Internet
-Requires: perl
+Requires: perl-interpreter
 Requires: openssl = %{version}-%{release}
 
 %description perl
@@ -257,6 +257,9 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon Oct 12 2020 2020 Joe Schmitt <joschmit@microsoft.com> 1.1.1g-7
+- Use new perl package names.
+
 * Tue Jul 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-6
 - Replacing removal of functions through the 'no-<prot>-method' option
   with returning a method negotiating the highest supported protocol

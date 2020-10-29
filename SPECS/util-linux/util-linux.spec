@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.32.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 License:        GPLv2+
 Group:          Applications/System
@@ -28,6 +28,9 @@ These are the additional language files of util-linux.
 %package devel
 Summary: Header and library files for util-linux
 Group: Development/Libraries
+Provides: libmount-devel = %{version}-%{release}
+Provides: libblkid-devel = %{version}-%{release}
+Provides: libuuid-devel = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
 %description devel
 These are the header and library files of util-linux.
@@ -101,9 +104,10 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.32.1-4
+-   Provide libmount-devel, libblkid-devel, libuuid-devel in util-linux-devel
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.23.1-3
+-   Added %%license line automatically
 *   Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 2.32.1-2
 -   Rename ncurses-terminfo to ncurses-term.
 *   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 2.32.1-1

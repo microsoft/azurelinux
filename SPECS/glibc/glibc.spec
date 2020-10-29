@@ -5,7 +5,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        LGPLv2+
 URL:            https://www.gnu.org/software/libc
 Group:          Applications/System
@@ -32,6 +32,7 @@ Patch10:        CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch11:		CVE-2018-20796.nopatch
 ExcludeArch:    armv7 ppc i386 i686
+Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
 Requires:       filesystem
@@ -44,6 +45,8 @@ and so on.
 %package devel
 Summary: Header files for glibc
 Group: Applications/System
+Provides: %{name}-headers = %{version}-%{release}
+Provides: %{name}-static = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
 %description devel
 These are the header files of glibc.
@@ -67,7 +70,7 @@ Summary: gconv modules for glibc
 Group: Applications/System
 Requires: %{name} = %{version}-%{release}
 %description iconv
-These is gconv modules for iconv() and iconv tools.
+These are gconv modules for iconv().
 
 %package tools
 Summary: tools for glibc
@@ -243,6 +246,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_lib64dir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
+/usr/sbin/zdump
+/usr/sbin/zic
+/usr/sbin/iconvconfig
 %{_bindir}/*
 %{_libexecdir}/*
 %{_datadir}/i18n/charmaps/UTF-8.gz
@@ -250,32 +256,19 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_datadir}/i18n/locales/en_US
 %{_datarootdir}/locale/locale.alias
 %exclude %{_localstatedir}/lib/nss_db/Makefile
-%exclude /usr/bin/catchsegv
-%exclude /usr/bin/iconv
 %exclude /usr/bin/mtrace
 %exclude /usr/bin/pcprofiledump
-%exclude /usr/bin/pldd
-%exclude /usr/bin/sotruss
-%exclude /usr/bin/sprof
 %exclude /usr/bin/xtrace
 
 %files iconv
 %defattr(-,root,root)
 %{_lib64dir}/gconv/*
-/usr/bin/iconv
-/usr/sbin/iconvconfig
 
 %files tools
 %defattr(-,root,root)
-/usr/bin/catchsegv
 /usr/bin/mtrace
 /usr/bin/pcprofiledump
-/usr/bin/pldd
-/usr/bin/sotruss
-/usr/bin/sprof
 /usr/bin/xtrace
-/usr/sbin/zdump
-/usr/sbin/zic
 /sbin/sln
 %{_lib64dir}/audit/*
 /lib64/libpcprofile.so
@@ -308,6 +301,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 
 %changelog
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.28-13
+- Move some tools from glibc-tools and glibc-iconv to glibc and provide glibc-common
+- Provide glibc-static and glibc-headers under glibc-devel
+
 * Wed Jul 29 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-12
 - Ignore CVE-2018-20796, as it is not a security issue
 

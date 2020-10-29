@@ -1,14 +1,15 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        25
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2.1+ and GPLv2+
 URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{version}.tar.xz
-%define sha1    %{name}-%{version}=761ee76bc31f5db10d470dad607a5f9d68acef68
+Provides:       module-init-tools
+Provides:       /sbin/modprobe
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       xz
@@ -60,9 +61,10 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> - 25-4
-- Added %%license line automatically
-
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 25-5
+-   Provide /sbin/modprobe and module-init-tools for base package
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 25-4
+-   Added %%license line automatically
 *   Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> 25-3
 -   Fix changelog date
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 25-2

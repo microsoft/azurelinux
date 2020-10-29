@@ -1,0 +1,875 @@
+diff --git a/liboath/gl/fflush.c b/liboath/gl/fflush.c
+index 3664842..a140b7a 100644
+--- a/liboath/gl/fflush.c
++++ b/liboath/gl/fflush.c
+@@ -1,18 +1,18 @@
+ /* fflush.c -- allow flushing input streams
+-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
++   Copyright (C) 2007-2018 Free Software Foundation, Inc.
+ 
+    This program is free software: you can redistribute it and/or modify
+-   it under the terms of the GNU Lesser General Public License as published by
+-   the Free Software Foundation; either version 2.1 of the License, or
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+ 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-   GNU Lesser General Public License for more details.
++   GNU General Public License for more details.
+ 
+-   You should have received a copy of the GNU Lesser General Public License
+-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ 
+ /* Written by Eric Blake. */
+ 
+@@ -33,7 +33,8 @@
+ #undef fflush
+ 
+ 
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
++/* GNU libc, BeOS, Haiku, Linux libc5 */
+ 
+ /* Clear the stream's ungetc buffer, preserving the value of ftello (fp).  */
+ static void
+@@ -51,7 +52,7 @@ static void
+ clear_ungetc_buffer (FILE *fp)
+ {
+ # if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
++  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+   if (HASUB (fp))
+     {
+       fp_->_p += fp_->_r;
+@@ -63,7 +64,7 @@ clear_ungetc_buffer (FILE *fp)
+       fp->_ungetc_count = 0;
+       fp->_rcount = - fp->_rcount;
+     }
+-# elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
++# elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel, OpenVMS */
+   /* Nothing to do.  */
+ # else                              /* other implementations */
+   fseeko (fp, 0, SEEK_CUR);
+@@ -72,10 +73,11 @@ clear_ungetc_buffer (FILE *fp)
+ 
+ #endif
+ 
+-#if ! (defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */)
++#if ! (defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1)
++/* GNU libc, BeOS, Haiku, Linux libc5 */
+ 
+ # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
+-/* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
++/* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+ 
+ static int
+ disable_seek_optimization (FILE *fp)
+@@ -98,7 +100,7 @@ update_fpos_cache (FILE *fp _GL_UNUSED_PARAMETER,
+                    off_t pos _GL_UNUSED_PARAMETER)
+ {
+ #  if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
++  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+ #   if defined __CYGWIN__
+   /* fp_->_offset is typed as an integer.  */
+   fp_->_offset = pos;
+@@ -148,7 +150,8 @@ rpl_fflush (FILE *stream)
+   if (stream == NULL || ! freading (stream))
+     return fflush (stream);
+ 
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
++  /* GNU libc, BeOS, Haiku, Linux libc5 */
+ 
+   clear_ungetc_buffer_preserving_position (stream);
+ 
+@@ -199,7 +202,7 @@ rpl_fflush (FILE *stream)
+     }
+ 
+ # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
+-    /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
++    /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+ 
+     {
+       /* Disable seek optimization for the next fseeko call.  This tells the
+diff --git a/liboath/gl/fpurge.c b/liboath/gl/fpurge.c
+index acf5905..f9c2d25 100644
+--- a/liboath/gl/fpurge.c
++++ b/liboath/gl/fpurge.c
+@@ -62,7 +62,7 @@ fpurge (FILE *fp)
+   /* Most systems provide FILE as a struct and the necessary bitmask in
+      <stdio.h>, because they need it for implementing getc() and putc() as
+      fast macros.  */
+-# if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++# if defined _IO_ftrylockfile || __GNU_LIBRARY__ /* GNU libc, BeOS, Haiku, Linux libc5 */
+   fp->_IO_read_end = fp->_IO_read_ptr;
+   fp->_IO_write_ptr = fp->_IO_write_base;
+   /* Avoid memory leak when there is an active ungetc buffer.  */
+diff --git a/liboath/gl/freading.c b/liboath/gl/freading.c
+index 8ab19fd..54c3d5a 100644
+--- a/liboath/gl/freading.c
++++ b/liboath/gl/freading.c
+@@ -31,7 +31,7 @@ freading (FILE *fp)
+   /* Most systems provide FILE as a struct and the necessary bitmask in
+      <stdio.h>, because they need it for implementing getc() and putc() as
+      fast macros.  */
+-# if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++# if defined _IO_ftrylockfile || __GNU_LIBRARY__ /* GNU libc, BeOS, Haiku, Linux libc5 */
+   return ((fp->_flags & _IO_NO_WRITES) != 0
+           || ((fp->_flags & (_IO_NO_READS | _IO_CURRENTLY_PUTTING)) == 0
+               && fp->_IO_read_base != NULL));
+diff --git a/liboath/gl/fseeko.c b/liboath/gl/fseeko.c
+index 67bb9ec..5616221 100644
+--- a/liboath/gl/fseeko.c
++++ b/liboath/gl/fseeko.c
+@@ -47,7 +47,7 @@ fseeko (FILE *fp, off_t offset, int whence)
+ #endif
+ 
+   /* These tests are based on fpurge.c.  */
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_ftrylockfile || __GNU_LIBRARY__ /* GNU libc, BeOS, Haiku, Linux libc5 */
+   if (fp->_IO_read_end == fp->_IO_read_ptr
+       && fp->_IO_write_ptr == fp->_IO_write_base
+       && fp->_IO_save_base == NULL)
+@@ -123,7 +123,7 @@ fseeko (FILE *fp, off_t offset, int whence)
+           return -1;
+         }
+ 
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_ftrylockfile || __GNU_LIBRARY__ /* GNU libc, BeOS, Haiku, Linux libc5 */
+       fp->_flags &= ~_IO_EOF_SEEN;
+       fp->_offset = pos;
+ #elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
+diff --git a/liboath/gl/stdio-impl.h b/liboath/gl/stdio-impl.h
+index 4c02c9f..393ef0c 100644
+--- a/liboath/gl/stdio-impl.h
++++ b/liboath/gl/stdio-impl.h
+@@ -1,23 +1,29 @@
+ /* Implementation details of FILE streams.
+-   Copyright (C) 2007-2008, 2010-2016 Free Software Foundation, Inc.
++   Copyright (C) 2007-2008, 2010-2018 Free Software Foundation, Inc.
+ 
+    This program is free software: you can redistribute it and/or modify
+-   it under the terms of the GNU Lesser General Public License as published by
+-   the Free Software Foundation; either version 2.1 of the License, or
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+ 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-   GNU Lesser General Public License for more details.
++   GNU General Public License for more details.
+ 
+-   You should have received a copy of the GNU Lesser General Public License
+-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ 
+ /* Many stdio implementations have the same logic and therefore can share
+    the same implementation of stdio extension API, except that some fields
+    have different naming conventions, or their access requires some casts.  */
+ 
++/* Glibc 2.28 made _IO_IN_BACKUP private.  For now, work around this
++   problem by defining it ourselves.  FIXME: Do not rely on glibc
++   internals.  */
++#if !defined _IO_IN_BACKUP && defined _IO_EOF_SEEN
++# define _IO_IN_BACKUP 0x100
++#endif
+ 
+ /* BSD stdio derived implementations.  */
+ 
+@@ -29,10 +35,10 @@
+ #include <errno.h>                             /* For detecting Plan9.  */
+ 
+ #if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
++  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+ 
+ # if defined __DragonFly__          /* DragonFly */
+-  /* See <http://www.dragonflybsd.org/cvsweb/src/lib/libc/stdio/priv_stdio.h?rev=HEAD&content-type=text/x-cvsweb-markup>.  */
++  /* See <https://gitweb.dragonflybsd.org/dragonfly.git/blob_plain/HEAD:/lib/libc/stdio/priv_stdio.h>.  */
+ #  define fp_ ((struct { struct __FILE_public pub; \
+                          struct { unsigned char *_base; int _size; } _bf; \
+                          void *cookie; \
+@@ -49,30 +55,84 @@
+                          fpos_t _offset; \
+                          /* More fields, not relevant here.  */ \
+                        } *) fp)
+-  /* See <http://www.dragonflybsd.org/cvsweb/src/include/stdio.h?rev=HEAD&content-type=text/x-cvsweb-markup>.  */
++  /* See <https://gitweb.dragonflybsd.org/dragonfly.git/blob_plain/HEAD:/include/stdio.h>.  */
+ #  define _p pub._p
+ #  define _flags pub._flags
+ #  define _r pub._r
+ #  define _w pub._w
++# elif defined __ANDROID__ /* Android */
++  /* Up to this commit from 2015-10-12
++     <https://android.googlesource.com/platform/bionic.git/+/f0141dfab10a4b332769d52fa76631a64741297a>
++     the innards of FILE were public, and fp_ub could be defined like for OpenBSD,
++     see <https://android.googlesource.com/platform/bionic.git/+/e78392637d5086384a5631ddfdfa8d7ec8326ee3/libc/stdio/fileext.h>
++     and <https://android.googlesource.com/platform/bionic.git/+/e78392637d5086384a5631ddfdfa8d7ec8326ee3/libc/stdio/local.h>.
++     After this commit, the innards of FILE are hidden.  */
++#  define fp_ ((struct { unsigned char *_p; \
++                         int _r; \
++                         int _w; \
++                         int _flags; \
++                         int _file; \
++                         struct { unsigned char *_base; size_t _size; } _bf; \
++                         int _lbfsize; \
++                         void *_cookie; \
++                         void *_close; \
++                         void *_read; \
++                         void *_seek; \
++                         void *_write; \
++                         struct { unsigned char *_base; size_t _size; } _ext; \
++                         unsigned char *_up; \
++                         int _ur; \
++                         unsigned char _ubuf[3]; \
++                         unsigned char _nbuf[1]; \
++                         struct { unsigned char *_base; size_t _size; } _lb; \
++                         int _blksize; \
++                         fpos_t _offset; \
++                         /* More fields, not relevant here.  */ \
++                       } *) fp)
+ # else
+ #  define fp_ fp
+ # endif
+ 
+-# if (defined __NetBSD__ && __NetBSD_Version__ >= 105270000) || defined __OpenBSD__ || defined __ANDROID__ /* NetBSD >= 1.5ZA, OpenBSD, Android */
++# if (defined __NetBSD__ && __NetBSD_Version__ >= 105270000) || defined __OpenBSD__ || defined __minix /* NetBSD >= 1.5ZA, OpenBSD, Minix 3 */
+   /* See <http://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libc/stdio/fileext.h?rev=HEAD&content-type=text/x-cvsweb-markup>
+-     and <http://www.openbsd.org/cgi-bin/cvsweb/src/lib/libc/stdio/fileext.h?rev=HEAD&content-type=text/x-cvsweb-markup> */
++     and <https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/lib/libc/stdio/fileext.h?rev=HEAD&content-type=text/x-cvsweb-markup>
++     and <https://github.com/Stichting-MINIX-Research-Foundation/minix/blob/master/lib/libc/stdio/fileext.h> */
+   struct __sfileext
+     {
+       struct  __sbuf _ub; /* ungetc buffer */
+       /* More fields, not relevant here.  */
+     };
+ #  define fp_ub ((struct __sfileext *) fp->_ext._base)->_ub
+-# else                                         /* FreeBSD, NetBSD <= 1.5Z, DragonFly, Mac OS X, Cygwin, Android */
++# elif defined __ANDROID__                     /* Android */
++  struct __sfileext
++    {
++      struct { unsigned char *_base; size_t _size; } _ub; /* ungetc buffer */
++      /* More fields, not relevant here.  */
++    };
++#  define fp_ub ((struct __sfileext *) fp_->_ext._base)->_ub
++# else                                         /* FreeBSD, NetBSD <= 1.5Z, DragonFly, Mac OS X, Cygwin */
+ #  define fp_ub fp_->_ub
+ # endif
+ 
+ # define HASUB(fp) (fp_ub._base != NULL)
+ 
++# if defined __ANDROID__ /* Android */
++  /* Needed after this commit from 2016-01-25
++     <https://android.googlesource.com/platform/bionic.git/+/e70e0e9267d069bf56a5078c99307e08a7280de7> */
++#  ifndef __SEOF
++#   define __SLBF 1
++#   define __SNBF 2
++#   define __SRD 4
++#   define __SWR 8
++#   define __SRW 0x10
++#   define __SEOF 0x20
++#   define __SERR 0x40
++#  endif
++#  ifndef __SOFF
++#   define __SOFF 0x1000
++#  endif
++# endif
++
+ #endif
+ 
+ 
+@@ -81,7 +141,7 @@
+ #ifdef __TANDEM                     /* NonStop Kernel */
+ # ifndef _IOERR
+ /* These values were determined by the program 'stdioext-flags' at
+-   <http://lists.gnu.org/archive/html/bug-gnulib/2010-12/msg00165.html>.  */
++   <https://lists.gnu.org/r/bug-gnulib/2010-12/msg00165.html>.  */
+ #  define _IOERR   0x40
+ #  define _IOREAD  0x80
+ #  define _IOWRT    0x4
+@@ -99,6 +159,8 @@
+                          int _file; \
+                          unsigned int _flag; \
+                        } *) fp)
++# elif defined __VMS                /* OpenVMS */
++#  define fp_ ((struct _iobuf *) fp)
+ # else
+ #  define fp_ fp
+ # endif
+@@ -110,4 +172,31 @@
+ #  define _flag __flag
+ # endif
+ 
++#elif defined _WIN32 && ! defined __CYGWIN__  /* newer Windows with MSVC */
++
++/* <stdio.h> does not define the innards of FILE any more.  */
++# define WINDOWS_OPAQUE_FILE
++
++struct _gl_real_FILE
++{
++  /* Note: Compared to older Windows and to mingw, it has the fields
++     _base and _cnt swapped. */
++  unsigned char *_ptr;
++  unsigned char *_base;
++  int _cnt;
++  int _flag;
++  int _file;
++  int _charbuf;
++  int _bufsiz;
++};
++# define fp_ ((struct _gl_real_FILE *) fp)
++
++/* These values were determined by a program similar to the one at
++   <https://lists.gnu.org/r/bug-gnulib/2010-12/msg00165.html>.  */
++# define _IOREAD   0x1
++# define _IOWRT    0x2
++# define _IORW     0x4
++# define _IOEOF    0x8
++# define _IOERR   0x10
++
+ #endif
+diff --git a/libpskc/gl/intprops.h b/libpskc/gl/intprops.h
+index feb02c3..af456ff 100644
+--- a/libpskc/gl/intprops.h
++++ b/libpskc/gl/intprops.h
+@@ -1,6 +1,6 @@
+ /* intprops.h -- properties of integer types
+ 
+-   Copyright (C) 2001-2016 Free Software Foundation, Inc.
++   Copyright (C) 2001-2018 Free Software Foundation, Inc.
+ 
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published
+@@ -13,7 +13,7 @@
+    GNU Lesser General Public License for more details.
+ 
+    You should have received a copy of the GNU Lesser General Public License
+-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ 
+ /* Written by Paul Eggert.  */
+ 
+@@ -21,13 +21,12 @@
+ #define _GL_INTPROPS_H
+ 
+ #include <limits.h>
+-#include <verify.h>
+ 
+ /* Return a value with the common real type of E and V and the value of V.  */
+ #define _GL_INT_CONVERT(e, v) (0 * (e) + (v))
+ 
+ /* Act like _GL_INT_CONVERT (E, -V) but work around a bug in IRIX 6.5 cc; see
+-   <http://lists.gnu.org/archive/html/bug-gnulib/2011-05/msg00406.html>.  */
++   <https://lists.gnu.org/r/bug-gnulib/2011-05/msg00406.html>.  */
+ #define _GL_INT_NEGATE_CONVERT(e, v) (0 * (e) - (v))
+ 
+ /* The extra casts in the following macros work around compiler bugs,
+@@ -47,12 +46,16 @@
+ 
+ /* Minimum and maximum values for integer types and expressions.  */
+ 
++/* The width in bits of the integer type or expression T.
++   Padding bits are not supported; this is checked at compile-time below.  */
++#define TYPE_WIDTH(t) (sizeof (t) * CHAR_BIT)
++
+ /* The maximum and minimum values for the integer type T.  */
+ #define TYPE_MINIMUM(t) ((t) ~ TYPE_MAXIMUM (t))
+ #define TYPE_MAXIMUM(t)                                                 \
+   ((t) (! TYPE_SIGNED (t)                                               \
+         ? (t) -1                                                        \
+-        : ((((t) 1 << (sizeof (t) * CHAR_BIT - 2)) - 1) * 2 + 1)))
++        : ((((t) 1 << (TYPE_WIDTH (t) - 2)) - 1) * 2 + 1)))
+ 
+ /* The maximum and minimum values for the type of the expression E,
+    after integer promotion.  E should not have side effects.  */
+@@ -65,29 +68,23 @@
+    ? _GL_SIGNED_INT_MAXIMUM (e)                                         \
+    : _GL_INT_NEGATE_CONVERT (e, 1))
+ #define _GL_SIGNED_INT_MAXIMUM(e)                                       \
+-  (((_GL_INT_CONVERT (e, 1) << (sizeof ((e) + 0) * CHAR_BIT - 2)) - 1) * 2 + 1)
++  (((_GL_INT_CONVERT (e, 1) << (TYPE_WIDTH ((e) + 0) - 2)) - 1) * 2 + 1)
++
++/* Work around OpenVMS incompatibility with C99.  */
++#if !defined LLONG_MAX && defined __INT64_MAX
++# define LLONG_MAX __INT64_MAX
++# define LLONG_MIN __INT64_MIN
++#endif
+ 
+ /* This include file assumes that signed types are two's complement without
+    padding bits; the above macros have undefined behavior otherwise.
+    If this is a problem for you, please let us know how to fix it for your host.
+-   As a sanity check, test the assumption for some signed types that
+-   <limits.h> bounds.  */
+-verify (TYPE_MINIMUM (signed char) == SCHAR_MIN);
+-verify (TYPE_MAXIMUM (signed char) == SCHAR_MAX);
+-verify (TYPE_MINIMUM (short int) == SHRT_MIN);
+-verify (TYPE_MAXIMUM (short int) == SHRT_MAX);
+-verify (TYPE_MINIMUM (int) == INT_MIN);
+-verify (TYPE_MAXIMUM (int) == INT_MAX);
+-verify (TYPE_MINIMUM (long int) == LONG_MIN);
+-verify (TYPE_MAXIMUM (long int) == LONG_MAX);
+-#ifdef LLONG_MAX
+-verify (TYPE_MINIMUM (long long int) == LLONG_MIN);
+-verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+-#endif
++   This assumption is tested by the intprops-tests module.  */
+ 
+ /* Does the __typeof__ keyword work?  This could be done by
+    'configure', but for now it's easier to do it by hand.  */
+-#if (2 <= __GNUC__ || defined __IBM__TYPEOF__ \
++#if (2 <= __GNUC__ \
++     || (1210 <= __IBMC__ && defined __IBM__TYPEOF__) \
+      || (0x5110 <= __SUNPRO_C && !__STDC__))
+ # define _GL_HAVE___TYPEOF__ 1
+ #else
+@@ -116,8 +113,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    signed, this macro may overestimate the true bound by one byte when
+    applied to unsigned types of size 2, 4, 16, ... bytes.  */
+ #define INT_STRLEN_BOUND(t)                                     \
+-  (INT_BITS_STRLEN_BOUND (sizeof (t) * CHAR_BIT                 \
+-                          - _GL_SIGNED_TYPE_OR_EXPR (t))        \
++  (INT_BITS_STRLEN_BOUND (TYPE_WIDTH (t) - _GL_SIGNED_TYPE_OR_EXPR (t)) \
+    + _GL_SIGNED_TYPE_OR_EXPR (t))
+ 
+ /* Bound on buffer size needed to represent an integer type or expression T,
+@@ -183,7 +179,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ /* Return 1 if A * B would overflow in [MIN,MAX] arithmetic.
+    See above for restrictions.  Avoid && and || as they tickle
+    bugs in Sun C 5.11 2010/08/13 and other compilers; see
+-   <http://lists.gnu.org/archive/html/bug-gnulib/2011-05/msg00401.html>.  */
++   <https://lists.gnu.org/r/bug-gnulib/2011-05/msg00401.html>.  */
+ #define INT_MULTIPLY_RANGE_OVERFLOW(a, b, min, max)     \
+   ((b) < 0                                              \
+    ? ((a) < 0                                           \
+@@ -222,20 +218,27 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    ? (a) < (min) >> (b)                                 \
+    : (max) >> (b) < (a))
+ 
+-/* True if __builtin_add_overflow (A, B, P) works when P is null.  */
+-#define _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL (7 <= __GNUC__)
++/* True if __builtin_add_overflow (A, B, P) works when P is non-null.  */
++#if 5 <= __GNUC__ && !defined __ICC
++# define _GL_HAS_BUILTIN_OVERFLOW 1
++#else
++# define _GL_HAS_BUILTIN_OVERFLOW 0
++#endif
++
++/* True if __builtin_add_overflow_p (A, B, C) works.  */
++#define _GL_HAS_BUILTIN_OVERFLOW_P (7 <= __GNUC__)
+ 
+ /* The _GL*_OVERFLOW macros have the same restrictions as the
+    *_RANGE_OVERFLOW macros, except that they do not assume that operands
+    (e.g., A and B) have the same type as MIN and MAX.  Instead, they assume
+    that the result (e.g., A + B) has that type.  */
+-#if _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL
+-# define _GL_ADD_OVERFLOW(a, b, min, max)
+-   __builtin_add_overflow (a, b, (__typeof__ ((a) + (b)) *) 0)
+-# define _GL_SUBTRACT_OVERFLOW(a, b, min, max)
+-   __builtin_sub_overflow (a, b, (__typeof__ ((a) - (b)) *) 0)
+-# define _GL_MULTIPLY_OVERFLOW(a, b, min, max)
+-   __builtin_mul_overflow (a, b, (__typeof__ ((a) * (b)) *) 0)
++#if _GL_HAS_BUILTIN_OVERFLOW_P
++# define _GL_ADD_OVERFLOW(a, b, min, max)                               \
++   __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
++# define _GL_SUBTRACT_OVERFLOW(a, b, min, max)                          \
++   __builtin_sub_overflow_p (a, b, (__typeof__ ((a) - (b))) 0)
++# define _GL_MULTIPLY_OVERFLOW(a, b, min, max)                          \
++   __builtin_mul_overflow_p (a, b, (__typeof__ ((a) * (b))) 0)
+ #else
+ # define _GL_ADD_OVERFLOW(a, b, min, max)                                \
+    ((min) < 0 ? INT_ADD_RANGE_OVERFLOW (a, b, min, max)                  \
+@@ -315,7 +318,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+   _GL_BINARY_OP_OVERFLOW (a, b, _GL_ADD_OVERFLOW)
+ #define INT_SUBTRACT_OVERFLOW(a, b) \
+   _GL_BINARY_OP_OVERFLOW (a, b, _GL_SUBTRACT_OVERFLOW)
+-#if _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL
++#if _GL_HAS_BUILTIN_OVERFLOW_P
+ # define INT_NEGATE_OVERFLOW(a) INT_SUBTRACT_OVERFLOW (0, a)
+ #else
+ # define INT_NEGATE_OVERFLOW(a) \
+@@ -349,10 +352,6 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ #define INT_MULTIPLY_WRAPV(a, b, r) \
+   _GL_INT_OP_WRAPV (a, b, r, *, __builtin_mul_overflow, INT_MULTIPLY_OVERFLOW)
+ 
+-#ifndef __has_builtin
+-# define __has_builtin(x) 0
+-#endif
+-
+ /* Nonzero if this compiler has GCC bug 68193 or Clang bug 25390.  See:
+    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68193
+    https://llvm.org/bugs/show_bug.cgi?id=25390
+@@ -369,17 +368,17 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    the operation.  BUILTIN is the builtin operation, and OVERFLOW the
+    overflow predicate.  Return 1 if the result overflows.  See above
+    for restrictions.  */
+-#if 5 <= __GNUC__ || __has_builtin (__builtin_add_overflow)
++#if _GL_HAS_BUILTIN_OVERFLOW
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) builtin (a, b, r)
+ #elif 201112 <= __STDC_VERSION__ && !_GL__GENERIC_BOGUS
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) \
+    (_Generic \
+     (*(r), \
+      signed char: \
+-       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned char, \
++       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                         signed char, SCHAR_MIN, SCHAR_MAX), \
+      short int: \
+-       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned short int, \
++       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                         short int, SHRT_MIN, SHRT_MAX), \
+      int: \
+        _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+@@ -393,10 +392,10 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ #else
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) \
+    (sizeof *(r) == sizeof (signed char) \
+-    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned char, \
++    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                        signed char, SCHAR_MIN, SCHAR_MAX) \
+     : sizeof *(r) == sizeof (short int) \
+-    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned short int, \
++    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                        short int, SHRT_MIN, SHRT_MAX) \
+     : sizeof *(r) == sizeof (int) \
+     ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+@@ -412,15 +411,14 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ # else
+ #  define _GL_INT_OP_WRAPV_LONGISH(a, b, r, op, overflow) \
+     _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned long int, \
+-                     long int, LONG_MIN, LONG_MAX))
++                     long int, LONG_MIN, LONG_MAX)
+ # endif
+ #endif
+ 
+ /* Store the low-order bits of A <op> B into *R, where the operation
+    is given by OP.  Use the unsigned type UT for calculation to avoid
+-   overflow problems.  *R's type is T, with extremal values TMIN and
+-   TMAX.  T must be a signed integer type.  Return 1 if the result
+-   overflows.  */
++   overflow problems.  *R's type is T, with extrema TMIN and TMAX.
++   T must be a signed integer type.  Return 1 if the result overflows.  */
+ #define _GL_INT_OP_CALC(a, b, r, op, overflow, ut, t, tmin, tmax) \
+   (sizeof ((a) op (b)) < sizeof (t) \
+    ? _GL_INT_OP_CALC1 ((t) (a), (t) (b), r, op, overflow, ut, t, tmin, tmax) \
+@@ -429,17 +427,27 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+   ((overflow (a, b) \
+     || (EXPR_SIGNED ((a) op (b)) && ((a) op (b)) < (tmin)) \
+     || (tmax) < ((a) op (b))) \
+-   ? (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t, tmin, tmax), 1) \
+-   : (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t, tmin, tmax), 0))
+-
+-/* Return A <op> B, where the operation is given by OP.  Use the
+-   unsigned type UT for calculation to avoid overflow problems.
+-   Convert the result to type T without overflow by subtracting TMIN
+-   from large values before converting, and adding it afterwards.
+-   Compilers can optimize all the operations except OP.  */
+-#define _GL_INT_OP_WRAPV_VIA_UNSIGNED(a, b, op, ut, t, tmin, tmax) \
+-  (((ut) (a) op (ut) (b)) <= (tmax) \
+-   ? (t) ((ut) (a) op (ut) (b)) \
+-   : ((t) (((ut) (a) op (ut) (b)) - (tmin)) + (tmin)))
++   ? (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t), 1) \
++   : (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t), 0))
++
++/* Return the low-order bits of A <op> B, where the operation is given
++   by OP.  Use the unsigned type UT for calculation to avoid undefined
++   behavior on signed integer overflow, and convert the result to type T.
++   UT is at least as wide as T and is no narrower than unsigned int,
++   T is two's complement, and there is no padding or trap representations.
++   Assume that converting UT to T yields the low-order bits, as is
++   done in all known two's-complement C compilers.  E.g., see:
++   https://gcc.gnu.org/onlinedocs/gcc/Integers-implementation.html
++
++   According to the C standard, converting UT to T yields an
++   implementation-defined result or signal for values outside T's
++   range.  However, code that works around this theoretical problem
++   runs afoul of a compiler bug in Oracle Studio 12.3 x86.  See:
++   https://lists.gnu.org/r/bug-gnulib/2017-04/msg00049.html
++   As the compiler bug is real, don't try to work around the
++   theoretical problem.  */
++
++#define _GL_INT_OP_WRAPV_VIA_UNSIGNED(a, b, op, ut, t) \
++  ((t) ((ut) (a) op (ut) (b)))
+ 
+ #endif /* _GL_INTPROPS_H */
+diff --git a/oathtool/gl/intprops.h b/oathtool/gl/intprops.h
+index e1fce5c..af456ff 100644
+--- a/oathtool/gl/intprops.h
++++ b/oathtool/gl/intprops.h
+@@ -1,19 +1,19 @@
+ /* intprops.h -- properties of integer types
+ 
+-   Copyright (C) 2001-2016 Free Software Foundation, Inc.
++   Copyright (C) 2001-2018 Free Software Foundation, Inc.
+ 
+    This program is free software: you can redistribute it and/or modify it
+-   under the terms of the GNU General Public License as published
+-   by the Free Software Foundation; either version 3 of the License, or
++   under the terms of the GNU Lesser General Public License as published
++   by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+ 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-   GNU General Public License for more details.
++   GNU Lesser General Public License for more details.
+ 
+-   You should have received a copy of the GNU General Public License
+-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++   You should have received a copy of the GNU Lesser General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ 
+ /* Written by Paul Eggert.  */
+ 
+@@ -21,13 +21,12 @@
+ #define _GL_INTPROPS_H
+ 
+ #include <limits.h>
+-#include <verify.h>
+ 
+ /* Return a value with the common real type of E and V and the value of V.  */
+ #define _GL_INT_CONVERT(e, v) (0 * (e) + (v))
+ 
+ /* Act like _GL_INT_CONVERT (E, -V) but work around a bug in IRIX 6.5 cc; see
+-   <http://lists.gnu.org/archive/html/bug-gnulib/2011-05/msg00406.html>.  */
++   <https://lists.gnu.org/r/bug-gnulib/2011-05/msg00406.html>.  */
+ #define _GL_INT_NEGATE_CONVERT(e, v) (0 * (e) - (v))
+ 
+ /* The extra casts in the following macros work around compiler bugs,
+@@ -47,12 +46,16 @@
+ 
+ /* Minimum and maximum values for integer types and expressions.  */
+ 
++/* The width in bits of the integer type or expression T.
++   Padding bits are not supported; this is checked at compile-time below.  */
++#define TYPE_WIDTH(t) (sizeof (t) * CHAR_BIT)
++
+ /* The maximum and minimum values for the integer type T.  */
+ #define TYPE_MINIMUM(t) ((t) ~ TYPE_MAXIMUM (t))
+ #define TYPE_MAXIMUM(t)                                                 \
+   ((t) (! TYPE_SIGNED (t)                                               \
+         ? (t) -1                                                        \
+-        : ((((t) 1 << (sizeof (t) * CHAR_BIT - 2)) - 1) * 2 + 1)))
++        : ((((t) 1 << (TYPE_WIDTH (t) - 2)) - 1) * 2 + 1)))
+ 
+ /* The maximum and minimum values for the type of the expression E,
+    after integer promotion.  E should not have side effects.  */
+@@ -65,29 +68,23 @@
+    ? _GL_SIGNED_INT_MAXIMUM (e)                                         \
+    : _GL_INT_NEGATE_CONVERT (e, 1))
+ #define _GL_SIGNED_INT_MAXIMUM(e)                                       \
+-  (((_GL_INT_CONVERT (e, 1) << (sizeof ((e) + 0) * CHAR_BIT - 2)) - 1) * 2 + 1)
++  (((_GL_INT_CONVERT (e, 1) << (TYPE_WIDTH ((e) + 0) - 2)) - 1) * 2 + 1)
++
++/* Work around OpenVMS incompatibility with C99.  */
++#if !defined LLONG_MAX && defined __INT64_MAX
++# define LLONG_MAX __INT64_MAX
++# define LLONG_MIN __INT64_MIN
++#endif
+ 
+ /* This include file assumes that signed types are two's complement without
+    padding bits; the above macros have undefined behavior otherwise.
+    If this is a problem for you, please let us know how to fix it for your host.
+-   As a sanity check, test the assumption for some signed types that
+-   <limits.h> bounds.  */
+-verify (TYPE_MINIMUM (signed char) == SCHAR_MIN);
+-verify (TYPE_MAXIMUM (signed char) == SCHAR_MAX);
+-verify (TYPE_MINIMUM (short int) == SHRT_MIN);
+-verify (TYPE_MAXIMUM (short int) == SHRT_MAX);
+-verify (TYPE_MINIMUM (int) == INT_MIN);
+-verify (TYPE_MAXIMUM (int) == INT_MAX);
+-verify (TYPE_MINIMUM (long int) == LONG_MIN);
+-verify (TYPE_MAXIMUM (long int) == LONG_MAX);
+-#ifdef LLONG_MAX
+-verify (TYPE_MINIMUM (long long int) == LLONG_MIN);
+-verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+-#endif
++   This assumption is tested by the intprops-tests module.  */
+ 
+ /* Does the __typeof__ keyword work?  This could be done by
+    'configure', but for now it's easier to do it by hand.  */
+-#if (2 <= __GNUC__ || defined __IBM__TYPEOF__ \
++#if (2 <= __GNUC__ \
++     || (1210 <= __IBMC__ && defined __IBM__TYPEOF__) \
+      || (0x5110 <= __SUNPRO_C && !__STDC__))
+ # define _GL_HAVE___TYPEOF__ 1
+ #else
+@@ -116,8 +113,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    signed, this macro may overestimate the true bound by one byte when
+    applied to unsigned types of size 2, 4, 16, ... bytes.  */
+ #define INT_STRLEN_BOUND(t)                                     \
+-  (INT_BITS_STRLEN_BOUND (sizeof (t) * CHAR_BIT                 \
+-                          - _GL_SIGNED_TYPE_OR_EXPR (t))        \
++  (INT_BITS_STRLEN_BOUND (TYPE_WIDTH (t) - _GL_SIGNED_TYPE_OR_EXPR (t)) \
+    + _GL_SIGNED_TYPE_OR_EXPR (t))
+ 
+ /* Bound on buffer size needed to represent an integer type or expression T,
+@@ -183,7 +179,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ /* Return 1 if A * B would overflow in [MIN,MAX] arithmetic.
+    See above for restrictions.  Avoid && and || as they tickle
+    bugs in Sun C 5.11 2010/08/13 and other compilers; see
+-   <http://lists.gnu.org/archive/html/bug-gnulib/2011-05/msg00401.html>.  */
++   <https://lists.gnu.org/r/bug-gnulib/2011-05/msg00401.html>.  */
+ #define INT_MULTIPLY_RANGE_OVERFLOW(a, b, min, max)     \
+   ((b) < 0                                              \
+    ? ((a) < 0                                           \
+@@ -222,20 +218,27 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    ? (a) < (min) >> (b)                                 \
+    : (max) >> (b) < (a))
+ 
+-/* True if __builtin_add_overflow (A, B, P) works when P is null.  */
+-#define _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL (7 <= __GNUC__)
++/* True if __builtin_add_overflow (A, B, P) works when P is non-null.  */
++#if 5 <= __GNUC__ && !defined __ICC
++# define _GL_HAS_BUILTIN_OVERFLOW 1
++#else
++# define _GL_HAS_BUILTIN_OVERFLOW 0
++#endif
++
++/* True if __builtin_add_overflow_p (A, B, C) works.  */
++#define _GL_HAS_BUILTIN_OVERFLOW_P (7 <= __GNUC__)
+ 
+ /* The _GL*_OVERFLOW macros have the same restrictions as the
+    *_RANGE_OVERFLOW macros, except that they do not assume that operands
+    (e.g., A and B) have the same type as MIN and MAX.  Instead, they assume
+    that the result (e.g., A + B) has that type.  */
+-#if _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL
+-# define _GL_ADD_OVERFLOW(a, b, min, max)
+-   __builtin_add_overflow (a, b, (__typeof__ ((a) + (b)) *) 0)
+-# define _GL_SUBTRACT_OVERFLOW(a, b, min, max)
+-   __builtin_sub_overflow (a, b, (__typeof__ ((a) - (b)) *) 0)
+-# define _GL_MULTIPLY_OVERFLOW(a, b, min, max)
+-   __builtin_mul_overflow (a, b, (__typeof__ ((a) * (b)) *) 0)
++#if _GL_HAS_BUILTIN_OVERFLOW_P
++# define _GL_ADD_OVERFLOW(a, b, min, max)                               \
++   __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
++# define _GL_SUBTRACT_OVERFLOW(a, b, min, max)                          \
++   __builtin_sub_overflow_p (a, b, (__typeof__ ((a) - (b))) 0)
++# define _GL_MULTIPLY_OVERFLOW(a, b, min, max)                          \
++   __builtin_mul_overflow_p (a, b, (__typeof__ ((a) * (b))) 0)
+ #else
+ # define _GL_ADD_OVERFLOW(a, b, min, max)                                \
+    ((min) < 0 ? INT_ADD_RANGE_OVERFLOW (a, b, min, max)                  \
+@@ -315,7 +318,7 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+   _GL_BINARY_OP_OVERFLOW (a, b, _GL_ADD_OVERFLOW)
+ #define INT_SUBTRACT_OVERFLOW(a, b) \
+   _GL_BINARY_OP_OVERFLOW (a, b, _GL_SUBTRACT_OVERFLOW)
+-#if _GL_HAS_BUILTIN_OVERFLOW_WITH_NULL
++#if _GL_HAS_BUILTIN_OVERFLOW_P
+ # define INT_NEGATE_OVERFLOW(a) INT_SUBTRACT_OVERFLOW (0, a)
+ #else
+ # define INT_NEGATE_OVERFLOW(a) \
+@@ -349,10 +352,6 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ #define INT_MULTIPLY_WRAPV(a, b, r) \
+   _GL_INT_OP_WRAPV (a, b, r, *, __builtin_mul_overflow, INT_MULTIPLY_OVERFLOW)
+ 
+-#ifndef __has_builtin
+-# define __has_builtin(x) 0
+-#endif
+-
+ /* Nonzero if this compiler has GCC bug 68193 or Clang bug 25390.  See:
+    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68193
+    https://llvm.org/bugs/show_bug.cgi?id=25390
+@@ -369,17 +368,17 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+    the operation.  BUILTIN is the builtin operation, and OVERFLOW the
+    overflow predicate.  Return 1 if the result overflows.  See above
+    for restrictions.  */
+-#if 5 <= __GNUC__ || __has_builtin (__builtin_add_overflow)
++#if _GL_HAS_BUILTIN_OVERFLOW
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) builtin (a, b, r)
+ #elif 201112 <= __STDC_VERSION__ && !_GL__GENERIC_BOGUS
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) \
+    (_Generic \
+     (*(r), \
+      signed char: \
+-       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned char, \
++       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                         signed char, SCHAR_MIN, SCHAR_MAX), \
+      short int: \
+-       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned short int, \
++       _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                         short int, SHRT_MIN, SHRT_MAX), \
+      int: \
+        _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+@@ -393,10 +392,10 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ #else
+ # define _GL_INT_OP_WRAPV(a, b, r, op, builtin, overflow) \
+    (sizeof *(r) == sizeof (signed char) \
+-    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned char, \
++    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                        signed char, SCHAR_MIN, SCHAR_MAX) \
+     : sizeof *(r) == sizeof (short int) \
+-    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned short int, \
++    ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+                        short int, SHRT_MIN, SHRT_MAX) \
+     : sizeof *(r) == sizeof (int) \
+     ? _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned int, \
+@@ -412,15 +411,14 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+ # else
+ #  define _GL_INT_OP_WRAPV_LONGISH(a, b, r, op, overflow) \
+     _GL_INT_OP_CALC (a, b, r, op, overflow, unsigned long int, \
+-                     long int, LONG_MIN, LONG_MAX))
++                     long int, LONG_MIN, LONG_MAX)
+ # endif
+ #endif
+ 
+ /* Store the low-order bits of A <op> B into *R, where the operation
+    is given by OP.  Use the unsigned type UT for calculation to avoid
+-   overflow problems.  *R's type is T, with extremal values TMIN and
+-   TMAX.  T must be a signed integer type.  Return 1 if the result
+-   overflows.  */
++   overflow problems.  *R's type is T, with extrema TMIN and TMAX.
++   T must be a signed integer type.  Return 1 if the result overflows.  */
+ #define _GL_INT_OP_CALC(a, b, r, op, overflow, ut, t, tmin, tmax) \
+   (sizeof ((a) op (b)) < sizeof (t) \
+    ? _GL_INT_OP_CALC1 ((t) (a), (t) (b), r, op, overflow, ut, t, tmin, tmax) \
+@@ -429,17 +427,27 @@ verify (TYPE_MAXIMUM (long long int) == LLONG_MAX);
+   ((overflow (a, b) \
+     || (EXPR_SIGNED ((a) op (b)) && ((a) op (b)) < (tmin)) \
+     || (tmax) < ((a) op (b))) \
+-   ? (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t, tmin, tmax), 1) \
+-   : (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t, tmin, tmax), 0))
+-
+-/* Return A <op> B, where the operation is given by OP.  Use the
+-   unsigned type UT for calculation to avoid overflow problems.
+-   Convert the result to type T without overflow by subtracting TMIN
+-   from large values before converting, and adding it afterwards.
+-   Compilers can optimize all the operations except OP.  */
+-#define _GL_INT_OP_WRAPV_VIA_UNSIGNED(a, b, op, ut, t, tmin, tmax) \
+-  (((ut) (a) op (ut) (b)) <= (tmax) \
+-   ? (t) ((ut) (a) op (ut) (b)) \
+-   : ((t) (((ut) (a) op (ut) (b)) - (tmin)) + (tmin)))
++   ? (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t), 1) \
++   : (*(r) = _GL_INT_OP_WRAPV_VIA_UNSIGNED (a, b, op, ut, t), 0))
++
++/* Return the low-order bits of A <op> B, where the operation is given
++   by OP.  Use the unsigned type UT for calculation to avoid undefined
++   behavior on signed integer overflow, and convert the result to type T.
++   UT is at least as wide as T and is no narrower than unsigned int,
++   T is two's complement, and there is no padding or trap representations.
++   Assume that converting UT to T yields the low-order bits, as is
++   done in all known two's-complement C compilers.  E.g., see:
++   https://gcc.gnu.org/onlinedocs/gcc/Integers-implementation.html
++
++   According to the C standard, converting UT to T yields an
++   implementation-defined result or signal for values outside T's
++   range.  However, code that works around this theoretical problem
++   runs afoul of a compiler bug in Oracle Studio 12.3 x86.  See:
++   https://lists.gnu.org/r/bug-gnulib/2017-04/msg00049.html
++   As the compiler bug is real, don't try to work around the
++   theoretical problem.  */
++
++#define _GL_INT_OP_WRAPV_VIA_UNSIGNED(a, b, op, ut, t) \
++  ((t) ((ut) (a) op (ut) (b)))
+ 
+ #endif /* _GL_INTPROPS_H */
+ 

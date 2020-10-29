@@ -47,7 +47,7 @@
         "mariner-release",
         "parted",
         "pcre",
-        "pkg-config",
+        "pkgconfig",
         "popt",
         "readline",
         "rpm",
