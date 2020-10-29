@@ -45,7 +45,6 @@ Patch7:         CVE-2020-15889.nopatch
 #   - 34affe7a63fc5d842580a9f23616d057e17dfe27
 Patch8:         CVE-2020-24342.nopatch
 # From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
-Patch9:         CVE-2019-6706-use-after-free-lua_upvaluejoin.patch
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
 Requires:       lua-libs = %{version}-%{release}
@@ -95,8 +94,6 @@ mv src/luaconf.h src/luaconf.h.template.in
 %patch4 -p1 -b .CVE-2019-6706
 %patch5 -p1
 %patch6 -p1
-%patch9 -p1
-sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
 # Put proper version in configure.ac, patch0 hardcodes 5.3.0
 sed -i 's|5.3.0|%{version}|g' configure.ac
