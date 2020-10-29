@@ -3,7 +3,6 @@ Name:           coreutils
 Version:        8.30
 Release:        6%{?dist}
 License:        GPLv3
-URL:            http://www.gnu.org/software/coreutils
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
