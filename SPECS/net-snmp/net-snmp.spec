@@ -4,10 +4,10 @@ Name:           net-snmp
 Version:        5.9
 Release:        1%{?dist}
 License:        MIT
-URL:            http://net-snmp.sourceforge.net/
-Group:          Productivity/Networking/Other
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Productivity/Networking/Other
+URL:            http://net-snmp.sourceforge.net/
 Source0:        http://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1:        snmpd.service
 Source2:        snmptrapd.service
@@ -23,9 +23,10 @@ Requires:       systemd
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 
 %package devel
-Group: Development/Libraries
-Summary: The includes and static libraries from the Net-SNMP package.
-Requires: net-snmp = %{version}
+Summary:    The includes and static libraries from the Net-SNMP package.
+Group:      Development/Libraries
+
+Requires:   net-snmp = %{version}
 
 %description devel
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
@@ -40,8 +41,8 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
                 --target=ia64-linux \
                 --sbindir=/sbin \
                 --with-sys-location="unknown" \
-                --with-logfile=/var/log/net-snmpd.log \
-                --with-persistent-directory=/var/lib/net-snmp \
+                --with-logfile=%{_var}/log/net-snmpd.log \
+                --with-persistent-directory=%{_sharedstatedir}/net-snmp \
                 --with-sys-contact="root@localhost" \
                 --with-defaults \
                 --with-systemd \
@@ -77,9 +78,9 @@ make %{?_smp_mflags} test
 rm -rf %{buildroot}/*
 
 %files
-%doc COPYING NEWS README ChangeLog
-%defattr(-,root,root)
 %license COPYING
+%doc NEWS README ChangeLog
+%defattr(-,root,root)
 /lib/systemd/system/snmpd.service
 /lib/systemd/system/snmptrapd.service
 %{_bindir}
