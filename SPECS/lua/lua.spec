@@ -28,7 +28,7 @@ Patch0:         %{name}-5.3.0-autotoolize.patch
 Patch1:         %{name}-5.3.0-idsize.patch
 Patch2:         %{name}-5.2.2-configure-linux.patch
 Patch3:         %{name}-5.3.0-configure-compat-module.patch
-# Fixes CVE-2019-6706
+# From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
 Patch4:         CVE-2019-6706-use-after-free-lua_upvaluejoin.patch
 Patch5:         lua-5.3.4-shared_library-1.patch
 # CVE-2020-15888 patch taken from Open Embedded's Lua meta layer https://github.com/openembedded/meta-openembedded/blob/master/meta-oe/recipes-devtools/lua/lua/CVE-2020-15888.patch
@@ -44,7 +44,6 @@ Patch7:         CVE-2020-15889.nopatch
 # NOTE: Patches needed if updating to 5.4:
 #   - 34affe7a63fc5d842580a9f23616d057e17dfe27
 Patch8:         CVE-2020-24342.nopatch
-# From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
 Requires:       lua-libs = %{version}-%{release}
@@ -174,7 +173,6 @@ install -Dpm 0644 %{SOURCE1000} $RPM_BUILD_ROOT/%{macrosdir}/macros.lua
 %changelog
 * Thu Oct 01 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-11
 - Nopatch CVE-2020-24342
-- Apply patch for CVE-2019-6706 from Lua mailing list
 - Apply patch for CVE-2020-15888 from Open Embedded
 
 * Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-10
