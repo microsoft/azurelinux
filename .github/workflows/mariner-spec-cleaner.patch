@@ -83,7 +83,7 @@ index b108ad5..0000000
 -  full: true
 diff --git a/.pipelines/calculate_upstream_diff.yaml b/.pipelines/calculate_upstream_diff.yaml
 new file mode 100644
-index 0000000..9577d23
+index 0000000..b9007ee
 --- /dev/null
 +++ b/.pipelines/calculate_upstream_diff.yaml
 @@ -0,0 +1,17 @@
@@ -98,7 +98,7 @@ index 0000000..9577d23
 +
 +steps:
 +- bash: |
-+    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
++    git diff -p --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
 +
 +- task: PublishBuildArtifacts@1
 +  inputs:
@@ -199,10 +199,10 @@ index 99bfb9e..0000000
 -data/licenses_changes.txt: license-update.sh
 -	sh license-update.sh
 diff --git a/README.md b/README.md
-index e89d188..b4e231d 100644
+index e89d188..10b2b22 100644
 --- a/README.md
 +++ b/README.md
-@@ -1,615 +1,31 @@
+@@ -1,615 +1,110 @@
  
  # spec-cleaner
  
@@ -212,92 +212,153 @@ index e89d188..b4e231d 100644
 -[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/rpm-software-management/spec-cleaner.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rpm-software-management/spec-cleaner/context:python)
 -[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 -[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-+spec-cleaner is a tool that cleans the given RPM spec file according to the Mariner style and returns the result.
++spec-cleaner is a tool that lints a given RPM spec file according to the CBL-Mariner style and returns the result.
  
--
++This is a fork of [openSUSE's spec-cleaner](https://github.com/rpm-softwaremanagement/spec-cleaner).
+ 
 -spec-cleaner is a tool that cleans the given RPM spec file according to the style guide and returns the result.
--
++## Installation and usage
+ 
 -It's used for [openSUSE](https://www.opensuse.org), where it's planned to be a replacement for `osc service localrun format_spec_file` and it is intended to provide the same or better features in order to be able to unify all the spec files in [OBS](https://build.opensuse.org/).
--
++### Prerequisites
+ 
 -# Table of contents
 -* [Installation and usage](#installation-and-usage)
 -* [Tests](#tests)
 -* [Contributing](#contributing)
 -* [Versioning and releasing](#versioning-and-releasing)
 -* [Authors](#authors)
-+This is a fork of [openSUSE's spec-cleaner](https://github.com/rpm-softwaremanagement/spec-cleaner).
++This tool requires Python 3.6 or later, and pip3. 
  
- ## Installation and usage
+-## Installation and usage
++This tool currently makes use of the `dataclasses` feature introduced in Python 3.7. If using Python 3.6 (the version shipped with Ubuntu 18.04), you will need to run the following to install the backport package for this feature:
++
++```bash
++pip3 install dataclasses
++```
++
++### Installation - stand-alone
++
++Clone this repository into your development environment and checkout the fork branch:
++
++```bash
++git clone https://mariner-org@dev.azure.com/mariner-org/mariner/_git/spec-cleaner-fork
++cd spec-cleaner-fork
++git checkout fork
++```
++
++Install this project using pip in "editable" mode:
  
- ### Installation
+-### Installation
 -The latest version is available on [PyPI](https://pypi.org/project/spec_cleaner/). It can be installed by running `pip install spec_cleaner`.
--
++```bash
++pip3 install -e <path to this repo>
++```
+ 
 -spec-cleaner is also provided as an RPM package for openSUSE Leap ([15.0](https://build.opensuse.org/package/show/openSUSE:Leap:15.0:Update/spec-cleaner) and [15.1](https://build.opensuse.org/package/show/openSUSE:Leap:15.1:Update/spec-cleaner)) and [openSUSE Tumbleweed](https://build.opensuse.org/package/show/openSUSE:Factory/spec-cleaner). When the new version of spec-cleaner is released then the version updates are performed for all maintained openSUSE codestreams. That means that there is always the latest version available in openSUSE:Leap.
--
++The command will be installed to `~/.local/bin` by default. Add that directory to your `PATH` environment variable, if it is not already present:
+ 
 -### Usage
 -Simply run `spec-cleaner -i <specfile>` to clean your specfile up.
--
--
++```bash
++# Change .bashrc to the equivalent file for your chosen shell
++echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
++```
+ 
+ 
 -## Tests
--
++### Usage - stand-alone
+ 
 -### Running the tests
 -spec-cleaner provides quite an extensive testsuite. You can run these tests locally either directly via `pytest`.
--
++`spec-cleaner` takes one of three possible flags to determine its output mode.
+ 
 -#### pytest
 -Just install `python3-pytest`, `python3-pytest-cov`, `python3-pytest-isort` and `python3-pytest-sugar` (for a nice progress bar) and then run all tests via:
--
++- The `-i` flag directly edits the given spec files with the suggested changes.
++- The `-d` flag will show a diff of the input files and the suggested changes, using the diff tool specified by the optional `--diff-prog` argument (with GNU diff being the default).
++- The `-o <path to output folder>` argument will output the linted version of the input specs into the provided output folder.
+ 
 -    pytest
--
++As this is an actively developed tool, please pull changes from ADO periodically. Because this tool was installed using pip's `-e` flag, pip will automatically reflect changes to the project files in the installed package.
+ 
 -## Contributing
 -You are more than welcome to contribute to this project. If you are not sure about your changes, feel free to create an issue where you can discuss it before the implementation.
--
++The following may be useful functions to add to your `.bashrc`/`.zshrc`/equivalent for your shell of choice. Feel free to change the `diff-prog` argument in the `scd` function to your favorite diff tool.
+ 
 -### Contribution Guidelines
--
++```bash
++# USAGE: `scd <spec name>` will run spec-cleaner in diff mode
++# for the specified spec in your current git root.
++# EXAMPLE: `scd bash`
++function scd {
++    GIT_ROOT=$(git rev-parse --show-toplevel)
++    spec-cleaner -d --diff-prog="git diff" $GIT_ROOT/SPECS/${1}/${1}.spec
++}
+ 
 -When changing anything in the code, make sure that you don't forget to:
--
++# USAGE: `sci bash` will run spec-cleaner in inline mode
++# for the specified spec in your current git root.
++# EXAMPLE: `sci python3`
++function sci {
++    GIT_ROOT=$(git rev-parse --show-toplevel)
++    spec-cleaner -i $GIT_ROOT/SPECS/$1/$1.spec
++}
++```
+ 
 -  * Follow [pep8](https://www.python.org/dev/peps/pep-0008/).
 -  * Install [pre-commit](https://pre-commit.com/) framework and run `pre-commit install` to install `pre-commit` into your git hooks.
 -  * Add proper comments and docstrings (follow [pep257](https://www.python.org/dev/peps/pep-0257/) and [Google Python Style Guide for docstrings and comments](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings))
 -  * Add [tests](TESTSUITE.md) (mainly if you implement a new feature).
 -  * Add `mypy` support for the new code.
 -  * Run and pass all tests, `flake8` and `mypy` checks.
-+To use as a pre-commit hook, clone this repository into your development environment.
++### Installation - pre-commit hook
  
 -See below for more details.
-+Install the pre-commit framework using `pip install pre-commit`.
++To use as a pre-commit hook for CBL-Mariner, clone this repository into your development environment.
  
 -### pre-commit
-+Copy the `.pre-commit-config-sample.yaml` file to the root of your repo as `.pre-commit-config.yaml` and change the `repo` property to point to the root of your local clone of this repository.
++Install the pre-commit framework using pip:
  
 -spec-cleaner project adopted `pre-commit` framework for managing and maintaining pre-commit hooks. After you clone the spec-cleaner repository, please install [pre-commit](https://pre-commit.com/) framework (`pip install pre-commit`) and run `pre-commit install` to install `pre-commit` into your git hooks. Then `pre-commit` will run automatically on `git commit` and it will check your contribution with `isort`, `black`, `flake8`, `flake8-docstrings` and `mypy`.
-+Run `pre-commit install` to install this as a pre-commit hook.
++```bash
++pip3 install pre-commit
++```
  
 -Please note that similar checks run in CI when you submit a PR and it won't pass code review without passing these checks.
-+To skip this lint, set an environment variable when commiting, like so:
++Copy the `.pre-commit-config-sample.yaml` file to the root of the CBL-Mariner repo, rename it to  `.pre-commit-config.yaml`, and change the `repo` property to point to the root of your local clone of this repository.
  
 -### mypy
++Run `pre-commit install` while in your CBL-Mariner repo to install spec-cleaner as a pre-commit hook.
+ 
+-Optional static type checker support was implemented for the most important parts of the code. If you want to run it on your own, just install `python3-mypy` and run
++### Usage- pre-commit hook
+ 
+-     mypy spec_cleaner
++The pre-commit tool will automatically run `spec-cleaner` on the spec files being committed, and will fail the commit if the output of `spec-cleaner` does not match the committed specs.
+ 
+-### Black
++To skip this lint, set the SKIP environment variable like so when committing:
+ 
+-The code of spec-cleaner is formated with [Black](https://github.com/psf/black). We use `--skip-string-normalization` and `--line-length 100` options. Black runs automatically in the `pre-commit` hook.
 +```bash
 +SKIP=spec-clean git commit -m "foo"
 +```
  
--Optional static type checker support was implemented for the most important parts of the code. If you want to run it on your own, just install `python3-mypy` and run
--
--     mypy spec_cleaner
--
--### Black
--
--The code of spec-cleaner is formated with [Black](https://github.com/psf/black). We use `--skip-string-normalization` and `--line-length 100` options. Black runs automatically in the `pre-commit` hook.
--
 -### Adding new tests
 -When a new feature is added to spec-cleaner then a test for this piece of code must be added. See [how to write tests for spec-cleaner](TESTSUITE.md).
--
--
++To skip all pre-commit hooks, use the `-n` flag with `git commit`:
+ 
++```bash
++git commit -n -m "foo"
++```
+ 
 -## Versioning and releasing
 -For the versions available, see the [tags on this repository](https://github.com/openSUSE/spec-cleaner/releases).
-+### Usage
-+Simply run `spec-cleaner -i <specfile>` to inline your changes to the specfile.
++## Problems?
  
 -If you have proper permissions you can find handy [how to do a new release](RELEASE.md).
++Feel free to report problems to [Thomas Crain](//who/is/thcrain). Reports involving the tool making breaking changes to spec files will be addressed ASAP, feature requests may take longer.
  
  ## Authors
  
@@ -830,7 +891,7 @@ index e89d188..b4e231d 100644
 -|SUSE-mirror|
 -|SUSE-mplus|
 -|SUSE-wxWidgets-3.1|
-+* See the list of [upstream contributors](AUTHORS) who participated in this project
++See the list of [upstream contributors](AUTHORS) who participated in this project
 diff --git a/README.md.in b/README.md.in
 deleted file mode 100644
 index 329445a..0000000
@@ -1648,10 +1709,18 @@ index 3ad3e6c..0000000
 -yaml-cpp-devel: yaml-cpp 
 -z3-devel: Z3 
 diff --git a/data/excludes-bracketing.txt b/data/excludes-bracketing.txt
-index 81b95ca..1763108 100644
+index 81b95ca..6e540d7 100644
 --- a/data/excludes-bracketing.txt
 +++ b/data/excludes-bracketing.txt
-@@ -42,6 +42,7 @@ find_lang
+@@ -13,6 +13,7 @@ cake_install
+ caps(\s*\([^)]*\))?
+ changelog
+ check
++clean
+ cmake
+ cmake_[^\s]*
+ config(\s*\([^)]*\))?
+@@ -42,6 +43,7 @@ find_lang
  firewalld_reload
  gem_install
  gem_packages
@@ -1659,7 +1728,7 @@ index 81b95ca..1763108 100644
  ghc_bin_build
  ghc_bin_install
  ghc_check_bootstrap
-@@ -79,6 +80,9 @@ kf5_makeinstall
+@@ -79,6 +81,9 @@ kf5_makeinstall
  lang_package
  lang(\s*\([^)]*\))
  langpack
@@ -1669,7 +1738,7 @@ index 81b95ca..1763108 100644
  license
  limit_build
  make_build
-@@ -134,6 +138,8 @@ pypy(.?)_only
+@@ -134,6 +139,8 @@ pypy(.?)_only
  pycache_only
  pytest
  pytest_arch
@@ -1678,6 +1747,16 @@ index 81b95ca..1763108 100644
  python(.?)_build
  python(.?)_install
  py(.?)_build
+@@ -157,6 +164,9 @@ stop_on_removal
+ suse_kernel_module_package
+ suse_update_desktop_file
+ systemd_ordering
++systemd_post
++systemd_postun
++systemd_postun_with_restart
+ systemd_preun
+ systemd_requires
+ sysusers_create
 diff --git a/data/licenses_changes.txt b/data/licenses_changes.txt
 index 3f9e69c..b08a76f 100644
 --- a/data/licenses_changes.txt
@@ -10906,10 +10985,10 @@ index 1335e25..417dc9a 100644
 -            self.lines.insert(position, msg)
 diff --git a/spec_cleaner/rpmchangelog.py b/spec_cleaner/rpmchangelog.py
 new file mode 100644
-index 0000000..c0bf37e
+index 0000000..32f5e9a
 --- /dev/null
 +++ b/spec_cleaner/rpmchangelog.py
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,93 @@
 +import dataclasses
 +from typing import Any, Dict, IO, List
 +import datetime
@@ -10972,6 +11051,11 @@ index 0000000..c0bf37e
 +                    line = line[1:]
 +                    line = line.lstrip()
 +                    self.first_entry.description_lines.append(line)
++            else:  # Treat non-empty, non-dash-prefixed lines as continuations of the previous comment
++                if len(self.first_entry.description_lines) > 0:
++                    self.first_entry.description_lines[-1] += '\n  ' + line.lstrip()
++                else:
++                    self.lines.append('#FIXME: Changelog description lines require a dash at the beginning')
 +        else:
 +            if line.startswith('*'):
 +                self.lines.append('')
@@ -12058,7 +12142,7 @@ index c918be1..0000000
 -        if len(self.lines) == 0:
 -            Section.add(self, '%changelog')
 diff --git a/spec_cleaner/rpmregexp.py b/spec_cleaner/rpmregexp.py
-index 1370ddd..5d1ff2c 100644
+index 1370ddd..cb4df4d 100644
 --- a/spec_cleaner/rpmregexp.py
 +++ b/spec_cleaner/rpmregexp.py
 @@ -1,5 +1,3 @@
@@ -12109,16 +12193,28 @@ index 1370ddd..5d1ff2c 100644
  
      # rpmfiles
      re_man_compression = re.compile(r'(\d)(\.?\*|\.gz|%{?ext_man}?)$')
+@@ -200,7 +212,7 @@ class Regexp(object):
+     # cleaning path regexps
+     endmacro = r'([/\s%"]|$)'
+     re_oldprefix = re.compile(r'%{?_exec_prefix}?' + endmacro)
+-    re_prefix = re.compile(r'(?<!\w)/usr' + endmacro)
++    re_prefix = re.compile(r'(?<!\w)(?<!#!)(?<!#!\\s\*)(?<!\.)/usr' + endmacro)
+     re_bindir = re.compile(r'%{?_prefix}?/bin' + endmacro)
+     re_sbindir = re.compile(r'%{?_prefix}?/sbin' + endmacro)
+     re_libexecdir = re.compile(r'%{?_prefix}?/libexec' + endmacro)
 @@ -208,12 +220,14 @@ class Regexp(object):
      re_datadir = re.compile(r'%{?_prefix}?/share' + endmacro)
      re_mandir = re.compile(r'%{?_datadir}?/man' + endmacro)
      re_infodir = re.compile(r'%{?_datadir}?/info' + endmacro)
 -    re_docdir = re.compile(r'%{?_datadir}?/doc/packages' + endmacro)
-+    re_docdir = re.compile(r'%{?_datadir}?/doc' + endmacro)
-     re_initdir = re.compile(r'/etc/init.d' + endmacro)
-     re_sysconfdir = re.compile(r'/etc' + endmacro)
-     re_localstatedir = re.compile(r'/var' + endmacro)
+-    re_initdir = re.compile(r'/etc/init.d' + endmacro)
+-    re_sysconfdir = re.compile(r'/etc' + endmacro)
+-    re_localstatedir = re.compile(r'/var' + endmacro)
 -    re_libdir = re.compile(r'%{?_prefix}?/(%{?_lib}?|lib64)' + endmacro)
++    re_docdir = re.compile(r'%{?_datadir}?/doc' + endmacro)
++    re_initdir = re.compile(r'(?<!\w)(?<!#!)(?<!#!\\s\*)(?<!\.)/etc/init.d' + endmacro)
++    re_sysconfdir = re.compile(r'(?<!\w)(?<!#!)(?<!#!\\s\*)(?<!\.)/etc' + endmacro)
++    re_localstatedir = re.compile(r'(?<!\w)(?<!#!)(?<!#!\\s\*)(?<!\.)/var' + endmacro)
 +    re_libdir = re.compile(r'%{?_prefix}?/lib' + endmacro)
 +    re_lib64dir = re.compile(r'%{?_prefix}?/lib64' + endmacro)
      re_initddir = re.compile(r'%{?_initrddir}?' + endmacro)
