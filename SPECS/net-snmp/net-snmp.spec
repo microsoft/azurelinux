@@ -103,29 +103,42 @@ rm -rf %{buildroot}/*
 - License verified.
 - Removed %%sha1 macro.
 - Updating whitespaces to fix issues reported by the linter.
+
 * Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
 - Added %%license line automatically
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 5.8-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> - 5.8-2
 - Using %configure and changing for perl upgrade
+
 * Wed Sep 19 2018 Keerthana K <keerthanak@vmware.com> - 5.8-1
 - Update to version 5.8
+
 * Tue Jul 31 2018 Ajay Kaher <akaher@vmware.com> - 5.7.3-9
 - Excluded perllocal.pod for aarch64
+
 * Mon Apr 16 2018 Xiaolin Li <xiaolinl@vmware.com> - 5.7.3-8
 - Apply patch for CVE-2018-1000116
+
 * Mon Jul 24 2017 Dheeraj Shetty <dheerajs@vmware.com> - 5.7.3-7
 - Make service file a different source
+
 * Tue Apr 04 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 5.7.3-6
 - Patch to remove U64 typedef
+
 * Tue Oct 04 2016 ChangLee <changLee@vmware.com> - 5.7.3-5
 - Modified %check
+
 * Thu May 26 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 5.7.3-4
 - Excluded the perllocal.pod log.
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 5.7.3-3
 - GA - Bump release of all rpms
+
 * Wed May 04 2016 Nick Shi <nshi@vmware.com> - 5.7.3-2
 - Add snmpd and snmptrapd to systemd service.
+
 * Mon Nov 30 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 5.7.3-1
 - Initial build.  First version
