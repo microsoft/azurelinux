@@ -1,18 +1,17 @@
+%define systemd_units_rel 20191026
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.4p1
 Release:        1%{?dist}
 License:        BSD
-URL:            https://www.openssh.com/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.openssh.com/
 Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{version}.tar.gz
-%define systemd_units_rel 20191026
 Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/blfs-systemd-units-%{systemd_units_rel}.tar.xz
 Source2:        sshd.service
 Source3:        sshd-keygen.service
-
 Patch0:         blfs_systemd_fixes.patch
 
 BuildRequires:  e2fsprogs-devel
@@ -32,14 +31,16 @@ network. The ssh and scp commands are secure implementions of telnet
 and rcp respectively.
 
 %package clients
-Summary:    openssh client applications.
-Requires:   openssl
+Summary:        openssh client applications.
+
+Requires:       openssl
 
 %description clients
 This provides the ssh client utilities.
 
 %package server
-Summary: openssh server applications
+Summary:        openssh server applications
+
 Requires:       ncurses-term
 Requires:       openssh-clients = %{version}-%{release}
 Requires:       pam
@@ -54,32 +55,36 @@ This provides the ssh server daemons, utilities, configuration and service files
 %prep
 %setup -q
 tar xf %{SOURCE1} --no-same-owner
-%patch0 -p0
+%patch0
 
 %build
 %configure \
-    --sysconfdir=/etc/ssh \
-    --datadir=/usr/share/sshd \
+    --sysconfdir=%{_sysconfdir}/ssh \
+    --datadir=%{_datadir}/sshd \
     --with-md5-passwords \
-    --with-privsep-path=/var/lib/sshd \
+    --with-privsep-path=%{_sharedstatedir}/sshd \
     --with-pam \
     --with-maintype=man \
     --enable-strip=no \
-    --with-kerberos5=/usr
+    --with-kerberos5=%{_prefix}
 make
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
-install -vdm755 %{buildroot}/var/lib/sshd
-echo "AllowTcpForwarding no" >> %{buildroot}/etc/ssh/sshd_config
-echo "ClientAliveCountMax 2" >> %{buildroot}/etc/ssh/sshd_config
-echo "Compression no" >> %{buildroot}/etc/ssh/sshd_config
-#echo "MaxSessions 2" >> %{buildroot}/etc/ssh/sshd_config
-echo "TCPKeepAlive no" >> %{buildroot}/etc/ssh/sshd_config
-echo "AllowAgentForwarding no" >> %{buildroot}/etc/ssh/sshd_config
-echo "PermitRootLogin no" >> %{buildroot}/etc/ssh/sshd_config
-echo "UsePAM yes" >> %{buildroot}/etc/ssh/sshd_config
+install -vdm755 %{buildroot}%{_sharedstatedir}/sshd
+
+cat <<EOF >>%{buildroot}%{_sysconfdir}/ssh/sshd_config
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+#MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+PermitRootLogin no
+UsePAM yes
+EOF
+
 #   Install daemon script
 pushd blfs-systemd-units-%{systemd_units_rel}
 make DESTDIR=%{buildroot} install-sshd
@@ -96,18 +101,18 @@ install -m644 contrib/ssh-copy-id.1 %{buildroot}/%{_mandir}/man1/
 if ! getent passwd sshd >/dev/null; then
    useradd sshd
 fi
-if [ ! -d /var/lib/sshd ]; then
-   mkdir /var/lib/sshd
-   chmod 0755 /var/lib/sshd
+if [ ! -d %{_sharedstatedir}/sshd ]; then
+   mkdir %{_sharedstatedir}/sshd
+   chmod 0755 %{_sharedstatedir}/sshd
 fi
-cp %{buildroot}/usr/bin/scp /usr/bin
+cp %{buildroot}%{_bindir}/scp %{_bindir}
 chmod g+w . -R
 useradd test -G root -m
 sudo -u test -s /bin/bash -c "PATH=$PATH make tests"
 
 %pre server
 getent group sshd >/dev/null || groupadd -g 50 sshd
-getent passwd sshd >/dev/null || useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd
+getent passwd sshd >/dev/null || useradd -c 'sshd PrivSep' -d %{_sharedstatedir}/sshd -g sshd -s /bin/false -u 50 sshd
 
 %preun server
 %systemd_preun sshd.service sshd-keygen.service
@@ -115,7 +120,7 @@ getent passwd sshd >/dev/null || useradd -c 'sshd PrivSep' -d /var/lib/sshd -g s
 %post server
 /sbin/ldconfig
 if [ $1 -eq 1 ] ; then
-    chown -v root:sys /var/lib/sshd
+    chown -v root:sys %{_sharedstatedir}/sshd
 fi
 %systemd_post sshd.service sshd-keygen.service
 
@@ -184,7 +189,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.4p1-1
 - Updating to 8.4p1 to fix CVE-2020-14145. No single patch available.
-- Applying some spec linter suggestions.
+- Applying spec linter's suggestions.
 
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 8.0p1-9
 - Add patch for CVE-2019-16905
