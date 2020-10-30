@@ -94,7 +94,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/*.so
 %{_libdir}/perl5
 %{_libdir}/pkgconfig/*.pc
-%exclude /usr/lib/perl5/*/*/perllocal.pod
+%exclude %{_lib}/perl5/*/*/perllocal.pod
 
 %changelog
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 5.9-1
