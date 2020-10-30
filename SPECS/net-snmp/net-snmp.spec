@@ -99,7 +99,7 @@ rm -rf %{buildroot}/*
 %exclude %{_lib}/perl5/*/*/perllocal.pod
 
 %changelog
-* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 5.9-1
+* Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.9-1
 - Updating to 5.9 to fix CVE-2019-20892. A patch couldn't be applied without backporting.
 - Switching to %%autosetup.
 - License verified.
