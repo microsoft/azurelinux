@@ -3,13 +3,14 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.02
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
 Source0:        ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz
+
 Patch0:         release-to-master.patch
 Patch1:         0001-Add-support-for-Linux-EFI-stub-loading.patch
 Patch2:         0002-Rework-linux-command.patch
@@ -41,6 +42,7 @@ Patch24:        0001-btrfs-Avoid-a-rescan-for-a-device-which-was-already-.patch
 Patch25:        0001-multiboot2-Set-min-address-for-mbi-allocation-to-0x1.patch
 Patch26:        0001-Add-missing-strtoull_test.c.patch
 Patch27:        0001-misc-Make-grub_strtol-end-pointers-have-safer-const-.patch
+
 # Start of BootHole security patches
 # CVE-2020-10713 - 0001-yylex-Make-lexer-fatal-errors-actually-be-fatal.patch
 Patch28:        CVE-2020-10713.patch
@@ -84,11 +86,17 @@ Patch53:        0026-efi-Fix-use-after-free-in-halt-reboot-path.patch
 Patch54:        0027-loader-linux-Avoid-overflow-on-initrd-size-calculati.patch
 # CVE-2020-15707 - 0028-linux-Fix-integer-overflows-in-initrd-size-handling.patch
 Patch55:        CVE-2020-15707.patch
+# CVE-2020-15705 - 0029-linuxefi-fail-kernel-validation-without-shim-protocol.patch
+Patch56:        CVE-2020-15705.patch
+
 # End of BootHole security patches
+
 Patch100:       0001-efinet-do-not-start-EFI-networking-at-module-init-ti.patch
+
 BuildRequires:  device-mapper-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
+
 Requires:       device-mapper
 Requires:       xz
 
@@ -98,6 +106,7 @@ The GRUB package contains the GRand Unified Bootloader.
 %package lang
 Summary:        Additional language files for grub
 Group:          System Environment/Programming
+
 Requires:       %{name} = %{version}
 
 %description lang
@@ -107,6 +116,7 @@ These are the additional language files of grub.
 %package pc
 Summary:        GRUB Library for BIOS
 Group:          System Environment/Programming
+
 Requires:       %{name} = %{version}
 
 %description pc
@@ -116,6 +126,7 @@ Additional library files for grub
 %package efi
 Summary:        GRUB Library for UEFI
 Group:          System Environment/Programming
+
 Requires:       %{name} = %{version}
 
 %description efi
@@ -195,6 +206,7 @@ GRUB UEFI bootloader binaries
 %patch53 -p1
 %patch54 -p1
 %patch55 -p1
+%patch56 -p1
 
 %build
 ./autogen.sh
@@ -353,6 +365,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.02-25
+- Fix CVE-2020-15705 (BootHole cont.).
+
 * Thu Aug 13 2020 Chris Co <chrco@microsoft.com> - 2.02-24
 - Remove signed subpackage and macro
 
