@@ -18,7 +18,6 @@
       - [Working on Packages](#working-on-packages)
         - [DOWNLOAD_SRPMS](#download_srpms)
         - [Force Rebuilds](#force-rebuilds)
-        - [Ignoring Packages](#ignoring-packages)
         - [Source Hashes](#source-hashes)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
@@ -257,17 +256,6 @@ When `DOWNLOAD_SRPMS=y` is set, the local sources and spec files will not be use
 ##### Force Rebuilds
 
 Adding `PACKAGE_REBUILD_LIST="nano"` will tell the build system to always rebuild `nano.spec` even if it thinks the rpm file is up to date.
-
-##### Ignoring Packages
-
-In the event the ncurses package is currently having issues, `PACKAGE_IGNORE_LIST="ncurses"` will tell the build system to pretend the `ncurses.spec` file was already successfully built regardless of the actual local state. As before, explicitly clear the `CONFIG_FILE` variable to skip adding `core-efi.json`'s packages.
-
-```bash
-# Work on the nano package while ignoring the state of the ncurses package
-sudo make build-packages PACKAGE_BUILD_LIST="nano" PACKAGE_REBUILD_LIST="nano" PACKAGE_IGNORE_LIST="ncurses" CONFIG_FILE=
-```
-
-Any build which requires the ignored packages will still attempt to use them during a build, so ensure they are available in the `../out/RPMS` folder.
 
 ##### Source Hashes
 

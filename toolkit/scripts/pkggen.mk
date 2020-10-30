@@ -88,19 +88,6 @@ ifneq ($(CONFIG_FILE),)
 # Actual validation is handled in imggen.mk
 $(optimized_file): $(validate-pkggen-config)
 endif
-$(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(toolchain_rpms) $(pkggen_rpms) $(CONFIG_FILE) $(depend_CONFIG_FILE)
-	$(go-graphoptimizer) \
-		--input $(graph_file) \
-		--rpm-dir $(RPMS_DIR) \
-		--dist-tag $(DIST_TAG) \
-		--rebuild-missing-dep-chains \
-		--packages "$(PACKAGE_BUILD_LIST)" \
-		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
-		--ignore-packages="$(PACKAGE_IGNORE_LIST)" \
-		--image-config-file="$(CONFIG_FILE)" \
-		$(if $(CONFIG_FILE),--base-dir=$(CONFIG_BASE_DIR)) \
-		$(logging_command) \
-		--output $@
 
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
 $(CACHED_RPMS_DIR)/%: ;
