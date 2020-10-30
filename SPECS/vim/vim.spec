@@ -1,14 +1,13 @@
 %define debug_package %{nil}
-
 Summary:        Text editor
 Name:           vim
 Version:        8.1.1667
 Release:        1%{?dist}
 License:        Vim
-URL:            https://www.vim.org
-Group:          Applications/Editors
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/Editors
+URL:            https://www.vim.org
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
@@ -18,10 +17,11 @@ BuildRequires:  ncurses-devel
 The Vim package contains a powerful text editor.
 
 %package    extra
-Summary:    Extra files for Vim text editor
-Group:      Applications/Editors
-Requires:   tcsh
-Conflicts:  toybox
+Summary:        Extra files for Vim text editor
+Group:          Applications/Editors
+Requires:       tcsh
+
+Conflicts:      toybox
 
 %description extra
 The vim extra package contains a extra files for powerful text editor.
@@ -30,6 +30,7 @@ The vim extra package contains a extra files for powerful text editor.
 %autosetup
 
 echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+
 %build
 
 %configure --enable-multibyte
@@ -39,9 +40,9 @@ make VERBOSE=1 %{?_smp_mflags}
 #cd %{_builddir}/%{name}74
 make DESTDIR=%{buildroot} install
 ln -sv vim %{buildroot}%{_bindir}/vi
-install -vdm 755 %{buildroot}/etc
-cat > %{buildroot}/etc/vimrc << "EOF"
-" Begin /etc/vimrc
+install -vdm 755 %{buildroot}%{_sysconfdir}
+cat > %{buildroot}%{_sysconfdir}/vimrc << "EOF"
+" Begin %{_sysconfdir}/vimrc
 
 set shell=/bin/bash
 set nocompatible
@@ -66,7 +67,7 @@ if ! isdirectory("~/.vim/swap/")
         call system('install -d -m 700 ~/.vim/swap')
 endif
 set directory=~/.vim/swap//
-" End /etc/vimrc
+" End %{_sysconfdir}/vimrc
 EOF
 
 %check
@@ -158,21 +159,21 @@ fi
 %lang(zh_CN) %{_datarootdir}/vim/vim81/lang/zh_CN/LC_MESSAGES/vim.mo
 %lang(zh_TW.UTF-8) %{_datarootdir}/vim/vim81/lang/zh_TW.UTF-8/LC_MESSAGES/vim.mo
 %lang(zh_TW) %{_datarootdir}/vim/vim81/lang/zh_TW/LC_MESSAGES/vim.mo
-%lang(cs.cp1250)  %{_datarootdir}/vim/vim81/lang/cs.cp1250/LC_MESSAGES/vim.mo
-%lang(ja.euc-jp)  %{_datarootdir}/vim/vim81/lang/ja.euc-jp/LC_MESSAGES/vim.mo
-%lang(ja.sjis)    %{_datarootdir}/vim/vim81/lang/ja.sjis/LC_MESSAGES/vim.mo
-%lang(nl)     %{_datarootdir}/vim/vim81/lang/nl/LC_MESSAGES/vim.mo
-%lang(pl.UTF-8)   %{_datarootdir}/vim/vim81/lang/pl.UTF-8/LC_MESSAGES/vim.mo
-%lang(pl.cp1250)  %{_datarootdir}/vim/vim81/lang/pl.cp1250/LC_MESSAGES/vim.mo
-%lang(ru.cp1251)  %{_datarootdir}/vim/vim81/lang/ru.cp1251/LC_MESSAGES/vim.mo
-%lang(sk.cp1250)  %{_datarootdir}/vim/vim81/lang/sk.cp1250/LC_MESSAGES/vim.mo
-%lang(uk.cp1251)  %{_datarootdir}/vim/vim81/lang/uk.cp1251/LC_MESSAGES/vim.mo
+%lang(cs.cp1250) %{_datarootdir}/vim/vim81/lang/cs.cp1250/LC_MESSAGES/vim.mo
+%lang(ja.euc-jp) %{_datarootdir}/vim/vim81/lang/ja.euc-jp/LC_MESSAGES/vim.mo
+%lang(ja.sjis) %{_datarootdir}/vim/vim81/lang/ja.sjis/LC_MESSAGES/vim.mo
+%lang(nl) %{_datarootdir}/vim/vim81/lang/nl/LC_MESSAGES/vim.mo
+%lang(pl.UTF-8) %{_datarootdir}/vim/vim81/lang/pl.UTF-8/LC_MESSAGES/vim.mo
+%lang(pl.cp1250) %{_datarootdir}/vim/vim81/lang/pl.cp1250/LC_MESSAGES/vim.mo
+%lang(ru.cp1251) %{_datarootdir}/vim/vim81/lang/ru.cp1251/LC_MESSAGES/vim.mo
+%lang(sk.cp1250) %{_datarootdir}/vim/vim81/lang/sk.cp1250/LC_MESSAGES/vim.mo
+%lang(uk.cp1251) %{_datarootdir}/vim/vim81/lang/uk.cp1251/LC_MESSAGES/vim.mo
 %lang(zh_CN.cp936) %{_datarootdir}/vim/vim81/lang/zh_CN.cp936/LC_MESSAGES/vim.mo
 
 %files
 %defattr(-,root,root)
 %license README.txt
-%config(noreplace) /etc/vimrc
+%config(noreplace) %{_sysconfdir}/vimrc
 %{_datarootdir}/vim/vim81/syntax/syntax.vim
 %{_datarootdir}/vim/vim81/rgb.txt
 %{_datarootdir}/vim/vim81/colors/desert.vim
