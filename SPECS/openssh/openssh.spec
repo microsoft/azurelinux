@@ -136,7 +136,6 @@ fi
 %{clean}
 rm -rf %{buildroot}/*
 
-
 %files
 %license LICENCE
 
