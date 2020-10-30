@@ -42,7 +42,7 @@ make VERBOSE=1 %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
-install -m 755 %{SOURCE1} %{buildroot}/usr/bin/lex
+install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/lex
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
