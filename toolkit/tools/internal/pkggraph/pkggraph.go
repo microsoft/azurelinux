@@ -413,7 +413,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 		for dependents.Next() {
 			dependent := dependents.Node().(*PkgNode)
 
-			// Create and edge for the dependency of what used to depend on the collapsed node to the new node
+			// Create an edge for the dependency of what used to depend on the collapsed node to the new node
 			dependentEdge := g.NewEdge(dependent, newNode)
 			g.SetEdge(dependentEdge)
 		}
