@@ -80,17 +80,17 @@ $(graph_file): $(specs_file) $(go-grapher)
 		$(logging_command) \
 		--output $@
 
+# We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
+$(CACHED_RPMS_DIR)/%: ;
+
 # Remove any packages which don't need to be built, and flag any for rebuild if
 # their dependencies are updated.
 ifneq ($(CONFIG_FILE),)
 # If an optional config file is passed, validate it and any files it includes. The target should always depend
 # on the value of $(CONFIG_FILE) however, so keep $(depend_CONFIG_FILE) always.
 # Actual validation is handled in imggen.mk
-$(optimized_file): $(validate-pkggen-config)
+$(cached_file): $(validate-pkggen-config)
 endif
-
-# We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
-$(CACHED_RPMS_DIR)/%: ;
 
 graphpkgfetcher_extra_flags :=
 
@@ -106,9 +106,7 @@ ifeq ($(USE_PREVIEW_REPO),y)
 graphpkgfetcher_extra_flags += --use-preview-repo
 endif
 
-# Compare files via checksum (-c) instead of timestamp so unchanged RPMs are left intact without updating the timestamp of the directories
-$(cached_file): $(optimized_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
-
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
