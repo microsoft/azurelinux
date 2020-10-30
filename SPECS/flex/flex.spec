@@ -3,24 +3,24 @@ Name:           flex
 Version:        2.6.4
 Release:        6%{?dist}
 License:        BSD
-URL:            https://github.com/westes/flex
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/westes/flex
 Source0:        https://github.com/westes/flex/releases/download/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  m4
-Requires:       m4
 # Upstream community decided to not fix this
 Patch0:         CVE-2019-6293.nopatch
+BuildRequires:  m4
+Requires:       m4
 
 %description
 The Flex package contains a utility for generating programs
 that recognize patterns in text.
 
 %package devel
-Summary: Development libraries and header files for the flex library
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Summary:        Development libraries and header files for the flex library
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 The flex-devel package contains the development libraries and header files for
@@ -29,6 +29,7 @@ flex.
 %prep
 %setup -q
 sed -i -e '/test-bison/d' tests/Makefile.in
+
 %build
 CFLAGS="-D_GNU_SOURCE" \
 ./configure \
@@ -36,10 +37,11 @@ CFLAGS="-D_GNU_SOURCE" \
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules
 make VERBOSE=1 %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot}%{_libdir} -name '*.la' -delete
-cat > %{buildroot}/usr/bin/lex <<- "EOF"
+find %{buildroot} -type f -name "*.la" -delete -print
+cat > %{buildroot}%{_bindir}/lex <<- "EOF"
 #!/bin/sh
 # Begin /usr/bin/lex
 
@@ -55,6 +57,7 @@ make %{?_smp_mflags} check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
