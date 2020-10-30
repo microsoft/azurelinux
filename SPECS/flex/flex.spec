@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/westes/flex
 Source0:        https://github.com/westes/flex/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1:        lex
 # Upstream community decided to not fix this
 Patch0:         CVE-2019-6293.nopatch
 BuildRequires:  m4
@@ -41,14 +42,7 @@ make VERBOSE=1 %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
-cat > %{buildroot}%{_bindir}/lex <<- "EOF"
-#!/bin/sh
-# Begin /usr/bin/lex
-
-	exec /usr/bin/flex -l "$@"
-
-# End /usr/bin/lex
-EOF
+install -m 755 %{SOURCE1} %{buildroot}/usr/bin/lex
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
@@ -77,6 +71,7 @@ make %{?_smp_mflags} check
 %changelog
 * Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.6.4-6
 - No patch CVE-2019-6293
+- Move "lex" script to separate file
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.6.4-5
 - Added %%license line automatically
