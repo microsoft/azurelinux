@@ -72,11 +72,11 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
-*   Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.6.4-6
--   No patch CVE-2019-6293
+* Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.6.4-6
+- No patch CVE-2019-6293
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.6.4-5
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.6.4-5
+- Added %%license line automatically
 
 *   Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 2.6.4-4
 -   Fix URL.
