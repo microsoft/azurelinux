@@ -108,16 +108,16 @@ Contains tools and scripts useful for Hyper-V guests.
 pushd tools/hv
 
 # HYPERV KVP DAEMON
-gcc %{optflags} -c hv_kvp_daemon.c
-gcc $RPM_LD_FLAGS  hv_kvp_daemon.o -o %{hv_kvp_daemon}
+%{__cc} $RPM_OPT_FLAGS -c hv_kvp_daemon.c
+%{__cc} $RPM_LD_FLAGS  hv_kvp_daemon.o -o %{hv_kvp_daemon}
 
 # HYPERV VSS DAEMON
-gcc %{optflags} -c hv_vss_daemon.c
-gcc $RPM_LD_FLAGS hv_vss_daemon.o -o %{hv_vss_daemon}
+%{__cc} $RPM_OPT_FLAGS -c hv_vss_daemon.c
+%{__cc} $RPM_LD_FLAGS hv_vss_daemon.o -o %{hv_vss_daemon}
 
 # HYPERV FCOPY DAEMON
-gcc %{optflags} -c hv_fcopy_daemon.c
-gcc $RPM_LD_FLAGS hv_fcopy_daemon.o -o %{hv_fcopy_daemon}
+%{__cc} $RPM_OPT_FLAGS -c hv_fcopy_daemon.c
+%{__cc} $RPM_LD_FLAGS hv_fcopy_daemon.o -o %{hv_fcopy_daemon}
 
 popd
 
@@ -160,7 +160,7 @@ fi
 
 %postun -n hypervkvpd
 # hypervkvpd daemon does NOT support restarting (driver, neither)
-%{systemd_postun} hypervkvpd.service
+%systemd_postun hypervkvpd.service
 # If removing the package, delete %%{_sharedstatedir}/hyperv directory
 if [ "$1" -eq "0" ] ; then
     rm -rf %{_sharedstatedir}/hyperv || :
@@ -173,7 +173,7 @@ if [ $1 -gt 1 ] ; then
 fi
 
 %postun -n hypervvssd
-%{systemd_postun} hypervvssd.service
+%systemd_postun hypervvssd.service
 
 %preun -n hypervvssd
 %systemd_preun hypervvssd.service
@@ -185,7 +185,7 @@ if [ $1 -gt 1 ] ; then
 fi
 
 %postun -n hypervfcopyd
-%{systemd_postun} hypervfcopyd.service
+%systemd_postun hypervfcopyd.service
 
 %preun -n hypervfcopyd
 %systemd_preun hypervfcopyd.service

@@ -286,7 +286,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 * Tue Aug 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.42-5
 - Updating "KBUILD_BUILD_VERSION" and "KBUILD_BUILD_HOST" with correct
-    distribution name.
+  distribution name.
 
 * Mon Jul 06 2020 Chris Co <chrco@microsoft.com> - 5.4.42-4
 - Add NVMe and Mellanox driver configs
