@@ -77,6 +77,7 @@ make %{?_smp_mflags} test
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %license COPYING
 %doc NEWS README ChangeLog
