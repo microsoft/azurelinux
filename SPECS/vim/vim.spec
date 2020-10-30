@@ -19,6 +19,7 @@ The Vim package contains a powerful text editor.
 %package    extra
 Summary:        Extra files for Vim text editor
 Group:          Applications/Editors
+
 Requires:       tcsh
 
 Conflicts:      toybox
