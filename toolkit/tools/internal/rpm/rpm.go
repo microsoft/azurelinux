@@ -234,8 +234,7 @@ func InstallRPM(rpmFile string) (err error) {
 // QueryRPMProvides returns what an RPM file provides.
 // This includes any provides made by a generator and files provided by the rpm.
 func QueryRPMProvides(rpmFile string) (provides []string, err error) {
-	// the l option in rpm returns a superset of generator provides and files installed by the rpm.
-	const queryProvidesOption = "-qlp"
+	const queryProvidesOption = "-qlPp"
 
 	logger.Log.Debugf("Querying RPM provides (%s)", rpmFile)
 	stdout, stderr, err := shell.Execute(rpmProgram, queryProvidesOption, rpmFile)
