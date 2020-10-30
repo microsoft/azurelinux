@@ -2,8 +2,8 @@
 
 Summary:        Text editor
 Name:           vim
-Version:        8.1.0388
-Release:        7%{?dist}
+Version:        8.1.1667
+Release:        1%{?dist}
 License:        Vim
 URL:            https://www.vim.org
 Group:          Applications/Editors
@@ -11,10 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-# Based on:
-# https://github.com/vim/vim/commit/53575521406739cf20bbe4e384d88e7dca11f040.patch
-# Had some modifications for patch to apply cleanly.
-Patch0:         CVE-2019-12735.patch
 
 BuildRequires:  ncurses-devel
 
@@ -31,7 +27,7 @@ Conflicts:  toybox
 The vim extra package contains a extra files for powerful text editor.
 
 %prep
-%autosetup -p1
+%autosetup
 
 echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 %build
@@ -86,12 +82,12 @@ then
 fi
 
 %files extra
-%defattr(-,root,root)
 %license README.txt
+%doc %{_datarootdir}/vim/vim81/doc/*
+%defattr(-,root,root)
 %{_bindir}/vimtutor
 %{_bindir}/xxd
 %{_mandir}/*/*
-%doc %{_datarootdir}/vim/vim81/doc/*
 %{_datarootdir}/vim/vim81/autoload/*
 %{_datarootdir}/vim/vim81/bugreport.vim
 %{_datarootdir}/vim/vim81/colors/*
@@ -189,45 +185,68 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-*   Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 8.1.0388-7
--   Fix CVE-2019-12735.
-*   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.1.0388-6
--   Adding a license reference.
-*   Mon Apr 13 2020 Eric Li <eli@microsoft.com> 8.1.0388-5
--   Add #Source0: comment and delete sha1. Verified license.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.1.0388-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 29 2019 Dweep Advani <dadvani@vmware.com> 8.1.0388-3
--   Fixed swap file creation error for custom login shell
-*   Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> 8.1.0388-2
--   Add conflicts toybox for vim-extra.
-*   Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> 8.1.0388-1
--   Update to version 8.1.0388.
-*   Tue Jul 10 2018 Tapas Kundu <tkundu@vmware.com> 8.0.0533-4
--   Fix for CVE-2017-17087 and CVE-2017-1000382.
-*   Mon Aug 14 2017 Chang Lee <changlee@vmware.com>  8.0.0533-3
--   Disabled Test_recover_root_dir in %check.
-*   Tue May 02 2017 Anish Swaminathan <anishs@vmware.com>  8.0.0533-2
--   Remove tcsh requires.
-*   Fri Apr 14 2017 Xiaolin Li <xiaolinl@vmware.com> 8.0.0533-1
--   Updated to version 8.0.0533.
-*   Tue Feb 28 2017 Anish Swaminathan <anishs@vmware.com>  7.4-10
--   Fix for CVE-2017-6349 and CVE-2017-6350.
-*   Fri Feb 17 2017 Anish Swaminathan <anishs@vmware.com>  7.4-9
--   Fix for CVE-2017-5953.
-*   Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  7.4-8
--   Fix for CVE-2016-1248.
-*   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 7.4-7
--   Modified %check.
-*   Wed Aug 24 2016 Alexey Makhalov <amakhalov@vmware.com> 7.4-6
--   vimrc: Added tags search, tab->spaces and some bindings.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 7.4-5
--   GA - Bump release of all rpms.
-*   Thu Jul 16 2015 Touseef Liaqat <tliaqat@vmware.com> 7.4-3
--   Added profile related files in minimal vim package.
-*   Tue Jun 30 2015 Touseef Liaqat <tliaqat@vmware.com> 7.4-3
--   Pack extra files separately, to make vim package small.
-*   Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> 7.4-2
--   Disable debug package. Use 'desert' colorscheme.
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 7.4-1
--   Initial build First version.
+* Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.1667-1
+- Fix CVE-2019-20807 by updating to 8.1.1667.
+
+* Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> - 8.1.0388-7
+- Fix CVE-2019-12735.
+
+* Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.0388-6
+- Adding a license reference.
+
+* Mon Apr 13 2020 Eric Li <eli@microsoft.com> - 8.1.0388-5
+- Add #Source0: comment and delete sha1. Verified license.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 8.1.0388-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 29 2019 Dweep Advani <dadvani@vmware.com> - 8.1.0388-3
+- Fixed swap file creation error for custom login shell
+
+* Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> - 8.1.0388-2
+- Add conflicts toybox for vim-extra.
+
+* Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> - 8.1.0388-1
+- Update to version 8.1.0388.
+
+* Tue Jul 10 2018 Tapas Kundu <tkundu@vmware.com> - 8.0.0533-4
+- Fix for CVE-2017-17087 and CVE-2017-1000382.
+
+* Mon Aug 14 2017 Chang Lee <changlee@vmware.com> - 8.0.0533-3
+- Disabled Test_recover_root_dir in %check.
+
+* Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> - 8.0.0533-2
+- Remove tcsh requires.
+
+* Fri Apr 14 2017 Xiaolin Li <xiaolinl@vmware.com> - 8.0.0533-1
+- Updated to version 8.0.0533.
+
+* Tue Feb 28 2017 Anish Swaminathan <anishs@vmware.com> - 7.4-10
+- Fix for CVE-2017-6349 and CVE-2017-6350.
+
+* Fri Feb 17 2017 Anish Swaminathan <anishs@vmware.com> - 7.4-9
+- Fix for CVE-2017-5953.
+
+* Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com> - 7.4-8
+- Fix for CVE-2016-1248.
+
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> - 7.4-7
+- Modified %check.
+
+* Wed Aug 24 2016 Alexey Makhalov <amakhalov@vmware.com> - 7.4-6
+- vimrc: Added tags search, tab->spaces and some bindings.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 7.4-5
+- GA - Bump release of all rpms.
+
+* Thu Jul 16 2015 Touseef Liaqat <tliaqat@vmware.com> - 7.4-3
+- Added profile related files in minimal vim package.
+
+* Tue Jun 30 2015 Touseef Liaqat <tliaqat@vmware.com> - 7.4-3
+- Pack extra files separately, to make vim package small.
+
+* Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> - 7.4-2
+- Disable debug package. Use 'desert' colorscheme.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 7.4-1
+- Initial build First version.
