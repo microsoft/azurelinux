@@ -85,10 +85,10 @@ Patch52:        0025-efi-chainloader-Propagate-errors-from-copy_file_path.patch
 Patch53:        0026-efi-Fix-use-after-free-in-halt-reboot-path.patch
 Patch54:        0027-loader-linux-Avoid-overflow-on-initrd-size-calculati.patch
 # CVE-2020-15707 - 0028-linux-Fix-integer-overflows-in-initrd-size-handling.patch
-# Patch adjusted to CBL-Mariner's git code. See comments inside the patch for more info.
-# Original version: https://bugzilla.suse.com/attachment.cgi?id=839944 (https://bugzilla.suse.com/show_bug.cgi?id=1174421).
 Patch55:        CVE-2020-15707.patch
 # CVE-2020-15705 - 0029-linuxefi-fail-kernel-validation-without-shim-protocol.patch
+# Patch adjusted to CBL-Mariner's git code. See comments inside the patch for more info.
+# Original version: https://bugzilla.suse.com/attachment.cgi?id=839944 (https://bugzilla.suse.com/show_bug.cgi?id=1174421).
 Patch56:        CVE-2020-15705.patch
 
 # End of BootHole security patches
