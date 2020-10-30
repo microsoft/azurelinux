@@ -5826,8 +5826,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.0388",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.0388.tar.gz"
+          "version": "8.1.1667",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
         }
       }
     },
