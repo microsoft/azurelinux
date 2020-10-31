@@ -47,7 +47,6 @@ Patch8:         CVE-2020-24342.nopatch
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
 Requires:       lua-libs = %{version}-%{release}
-Requires:       readline
 
 %description
 Lua is a powerful light-weight programming language designed for
