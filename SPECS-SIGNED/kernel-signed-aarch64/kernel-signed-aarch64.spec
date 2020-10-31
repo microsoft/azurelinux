@@ -46,7 +46,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 
 cp -rp ./boot/* %{buildroot}/boot
 cp -rp ./lib/* %{buildroot}/lib
-cp -rp .%{_var}/* %{buildroot}/%{_localstatedir}
+cp -rp ./var/* %{buildroot}/%{_localstatedir}
 cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{version}-%{release}
 
 %triggerin -- initramfs
