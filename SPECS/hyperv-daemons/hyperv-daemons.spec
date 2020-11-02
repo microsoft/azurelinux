@@ -108,15 +108,15 @@ Contains tools and scripts useful for Hyper-V guests.
 pushd tools/hv
 
 # HYPERV KVP DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_kvp_daemon.c
+%{__cc} %{optflags} -c hv_kvp_daemon.c
 %{__cc} $RPM_LD_FLAGS  hv_kvp_daemon.o -o %{hv_kvp_daemon}
 
 # HYPERV VSS DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_vss_daemon.c
+%{__cc} %{optflags} -c hv_vss_daemon.c
 %{__cc} $RPM_LD_FLAGS hv_vss_daemon.o -o %{hv_vss_daemon}
 
 # HYPERV FCOPY DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_fcopy_daemon.c
+%{__cc} %{optflags} -c hv_fcopy_daemon.c
 %{__cc} $RPM_LD_FLAGS hv_fcopy_daemon.o -o %{hv_fcopy_daemon}
 
 popd
