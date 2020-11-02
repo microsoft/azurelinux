@@ -59,6 +59,9 @@
 %%install\
 %{nil}
 
+# Binary macros
+%__make %{_bindir}/make
+
 # Compilation and linking flag macros
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}

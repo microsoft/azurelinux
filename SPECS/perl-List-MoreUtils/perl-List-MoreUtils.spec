@@ -2,7 +2,7 @@
 Summary:	Provide the stuff missing in List::Util
 Name:		perl-List-MoreUtils
 Version:	0.428
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPL+ or Artistic
 Group:          Development/Libraries
 URL:		http://search.cpan.org/dist/List-MoreUtils/
@@ -11,10 +11,15 @@ Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{vers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
-BuildRequires:	perl-Exporter-Tiny
-Requires:	perl-Exporter-Tiny
+BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-Exporter-Tiny
+
+Requires:       perl-Exporter-Tiny
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Carp)
+
+Provides:       perl(List::MoreUtils) = %{version}-%{release}
+Provides:       perl(List::MoreUtils::PP) = %{version}-%{release}
 
 %description
 List::MoreUtils provides some trivial but commonly needed functionality
@@ -47,6 +52,9 @@ make test
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-6
+-   Use new perl package names.
+-   Provide perl(List::MoreUtils*).
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-5
 -   Switch to new perl man page extension.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.428-4

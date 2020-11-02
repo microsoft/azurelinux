@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.23.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
@@ -13,12 +13,14 @@ BuildRequires:  python2
 Requires:       openssl
 Requires:       curl
 Requires:       expat
-Requires:       perl
+Requires:       perl-interpreter
 Requires:       perl-YAML
 Requires:       perl-DBI
 Requires:       perl-CGI
 Requires:       subversion-perl
 Requires:       python2
+
+Provides:       git-core = %{version}-%{release}
 
 %description
 Git is a free and open source, distributed version control system
@@ -90,6 +92,9 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.23.3-2
+-   Use new perl package names.
+-   Provide git-core.
 *   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.23.3-1
 -   Update to version 2.23.3 for fix CVE-2020-11008 and CVE-2020-5260.
 * Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.20.2-2

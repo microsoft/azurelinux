@@ -1,0 +1,46 @@
+From 981fbfc16220a15e72457d8ece4e014988746946 Mon Sep 17 00:00:00 2001
+From: Karl Williamson <khw@cpan.org>
+Date: Thu, 12 Mar 2020 12:48:47 -0600
+Subject: [PATCH] reentr.c: Prevent infinite looping
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is an easy, though  paranoid hedge to prevent something that should
+never happen from causing an infinite loop if it were to happen.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ reentr.c        | 2 +-
+ regen/reentr.pl | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/reentr.c b/reentr.c
+index 8438c8f90f..2429aa2f5d 100644
+--- a/reentr.c
++++ b/reentr.c
+@@ -36,7 +36,7 @@
+ 
+ #define RenewDouble(data_pointer, size_pointer, type) \
+     STMT_START { \
+-	const size_t size = *(size_pointer) * 2; \
++	const size_t size = MAX(*(size_pointer), 1) * 2; \
+ 	Renew((data_pointer), (size), type); \
+ 	*(size_pointer) = size; \
+     } STMT_END
+diff --git a/regen/reentr.pl b/regen/reentr.pl
+index 94721e9dec..ba2e1c8fa6 100644
+--- a/regen/reentr.pl
++++ b/regen/reentr.pl
+@@ -818,7 +818,7 @@ print $c <<"EOF";
+ 
+ #define RenewDouble(data_pointer, size_pointer, type) \\
+     STMT_START { \\
+-	const size_t size = *(size_pointer) * 2; \\
++	const size_t size = MAX(*(size_pointer), 1) * 2; \\
+ 	Renew((data_pointer), (size), type); \\
+ 	*(size_pointer) = size; \\
+     } STMT_END
+-- 
+2.25.4
+

@@ -1,0 +1,31 @@
+From 530e9296a21b673d7e4c2b42f18d0d52d00f35c4 Mon Sep 17 00:00:00 2001
+From: Karl Williamson <khw@cpan.org>
+Date: Sun, 28 Jun 2020 12:03:54 -0600
+Subject: [PATCH] sv.h: Wanted UOK, but said IOK
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+I don't know the consequences of this bug
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ sv.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sv.h b/sv.h
+index 2f6431a826..3721b2fb1b 100644
+--- a/sv.h
++++ b/sv.h
+@@ -1711,7 +1711,7 @@ Like C<sv_catsv> but doesn't process magic.
+ #define SvNV(sv) (SvNOK_nog(sv) ? SvNVX(sv) : sv_2nv(sv))
+ 
+ #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
+-#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
++#define SvUV_nomg(sv) (SvUOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
+ #define SvNV_nomg(sv) (SvNOK(sv) ? SvNVX(sv) : sv_2nv_flags(sv, 0))
+ 
+ /* ----*/
+-- 
+2.25.4
+

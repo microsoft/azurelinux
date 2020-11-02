@@ -1,7 +1,7 @@
 Summary:        Canary to check perl compatibility for Schmorp's modules
 Name:           perl-Canary-Stability
 Version:        2012
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Canary-Stability/
@@ -11,7 +11,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
-Requires:       perl >= 5.28.0
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Provides:       perl(Canary::Stability) = %{version}-%{release}
 
 %description
 This module is used by Schmorp's modules during configuration stage to test
@@ -41,9 +42,11 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> - 2012-4
-- Added %%license line automatically
-
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2012-5
+-   Use new perl package names.
+-   Provide perl(Canary::Stability).
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2012-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2012-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 2012-2

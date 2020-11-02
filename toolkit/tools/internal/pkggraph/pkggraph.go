@@ -354,6 +354,79 @@ func (g *PkgGraph) NewNode() graph.Node {
 	return pkgNode
 }
 
+// CreateCollapsedNode creates a new run node linked to a given parent node. All nodes in nodesToCollapse will be collapsed into the new node.
+// - When a node is collapsed all of its dependents will be mirrored onto the new node.
+// - The parentNode must be a run node.
+// - The collapsed node will inherit all attributes of the parent node minus the versionedPkg.
+func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentNode *PkgNode, nodesToCollapse []*PkgNode) (newNode *PkgNode, err error) {
+	// enforce parent is run node
+	if parentNode.Type != TypeRun {
+		err = fmt.Errorf("cannot collapse nodes to a non run node (%s)", parentNode.FriendlyName())
+		return
+	}
+
+	logger.Log.Debugf("Collapsing (%v) into (%s) with (%s) as a parent.", nodesToCollapse, versionedPkg, parentNode)
+
+	// Remove the nodes to collapse from the lookup table so they do not conflict with the new node.
+	// This operation can be undone on failure.
+	for _, node := range nodesToCollapse {
+		g.removePkgNodeFromLookup(node)
+	}
+
+	// Defer cleanup now that the graph is being manipulated.
+	defer func() {
+		// graph manipulation calls may panic on error (such as duplicate node IDs)
+		if r := recover(); r != nil {
+			err = fmt.Errorf("collapsing nodes (%v) into (%s) failed, error: %s", nodesToCollapse, versionedPkg, r)
+		}
+
+		if err != nil {
+			if newNode != nil {
+				g.RemovePkgNode(newNode)
+			}
+
+			// Add the nodes that were meant to be collapsed back to the lookup table.
+			for _, node := range nodesToCollapse {
+				lookupErr := g.addToLookup(node, false)
+				if lookupErr != nil {
+					logger.Log.Errorf("Failed to add node (%s) back to lookup table. Error: %s", node.FriendlyName(), lookupErr)
+				}
+			}
+		}
+	}()
+
+	// Create a new node that the others will collapse into.
+	// This new node will mirror all attributes of the parent minus the versionedPkg.
+	newNode, err = g.AddPkgNode(versionedPkg, parentNode.State, parentNode.Type, parentNode.SrpmPath, parentNode.RpmPath, parentNode.SpecPath, parentNode.SourceDir, parentNode.Architecture, parentNode.SourceRepo)
+	if err != nil {
+		return
+	}
+
+	// Create an edge for the dependency of newNode on parentNode.
+	parentEdge := g.NewEdge(newNode, parentNode)
+	g.SetEdge(parentEdge)
+
+	// Mirror the dependents of nodesToCollapse to the new node
+	for _, node := range nodesToCollapse {
+		dependents := g.To(node.ID())
+
+		for dependents.Next() {
+			dependent := dependents.Node().(*PkgNode)
+
+			// Create an edge for the dependency of what used to depend on the collapsed node to the new node
+			dependentEdge := g.NewEdge(dependent, newNode)
+			g.SetEdge(dependentEdge)
+		}
+	}
+
+	// After removing nodes errors are unrecoverable so do it last.
+	for _, node := range nodesToCollapse {
+		g.RemovePkgNode(node)
+	}
+
+	return
+}
+
 // AddPkgNode adds a new node to the package graph. Run, Build, and Unresolved nodes are recorded in the lookup table.
 func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeState, nodeType NodeType, srpmPath, rpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
 	newNode = &PkgNode{
@@ -390,16 +463,7 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeSt
 // RemovePkgNode removes a node from the package graph and lookup tables.
 func (g *PkgGraph) RemovePkgNode(pkgNode *PkgNode) {
 	g.RemoveNode(pkgNode.ID())
-
-	pkgName := pkgNode.VersionedPkg.Name
-	lookupSlice := g.lookupTable()[pkgName]
-
-	for i, lookupNode := range lookupSlice {
-		if lookupNode.BuildNode == pkgNode || lookupNode.RunNode == pkgNode {
-			g.lookupTable()[pkgName] = append(lookupSlice[:i], lookupSlice[i+1:]...)
-			break
-		}
-	}
+	g.removePkgNodeFromLookup(pkgNode)
 }
 
 // FindDoubleConditionalPkgNodeFromPkg has the same behavior as FindConditionalPkgNodeFromPkg but supports two conditionals
@@ -1060,6 +1124,28 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 
 // isImplicitPackage returns true if a PackageVer represents an implicit provide.
 func isImplicitPackage(versionedPkg *pkgjson.PackageVer) bool {
-	// Implicit provides will contain "(" and ")"
-	return strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")")
+	// Auto generated provides will contain "(" and ")".
+	if strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")") {
+		return true
+	}
+
+	// File paths will start with a "/" are implicitly provided by an rpm that contains that file.
+	if strings.HasPrefix(versionedPkg.Name, "/") {
+		return true
+	}
+
+	return false
+}
+
+// removePkgNodeFromLookup removes a node from the lookup tables.
+func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
+	pkgName := pkgNode.VersionedPkg.Name
+	lookupSlice := g.lookupTable()[pkgName]
+
+	for i, lookupNode := range lookupSlice {
+		if lookupNode.BuildNode == pkgNode || lookupNode.RunNode == pkgNode {
+			g.lookupTable()[pkgName] = append(lookupSlice[:i], lookupSlice[i+1:]...)
+			break
+		}
+	}
 }

@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Path-Class
 Version:        0.37
-Release:        5%{?dist}
+Release:        6%{?dist}
 URL:            http://search.cpan.org/~kwilliams/Path-Class-0.37/
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
@@ -11,8 +11,16 @@ Source:         http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class
 %define sha1    Path-Class=448cc1089add95d6a616a8e22adbde83dcb8f562
 
 BuildArch:      noarch
-Requires:       perl >= 5.28.0
 BuildRequires:  perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(File::Copy)
+Requires:       perl(Perl::OSType)
+
+Provides:       perl(Path::Class) = %{version}-%{release}
+Provides:       perl(Path::Class::Dir) = %{version}-%{release}
+Provides:       perl(Path::Class::Entity) = %{version}-%{release}
+Provides:       perl(Path::Class::File) = %{version}-%{release}
 
 %description
 Path::Class is a module for manipulation of file and directory specifications (strings describing their locations, like '/home/ken/foo.txt' or 'C:\Windows\Foo.txt') in a cross-platform manner. It supports pretty much every platform Perl runs on, including Unix, Windows, Mac, VMS, Epoc, Cygwin, OS/2, and NetWare.
@@ -23,7 +31,7 @@ The well-known module File::Spec also provides this service, but it's sort of aw
 %setup -q -n Path-Class-%{version}
 
 %build
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}"
 make %{?_smp_mflags}
 
 %install
@@ -39,6 +47,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.37-6
+-   Use new perl package names.
+-   Build with NO_PACKLIST option.
+-   Provide perl(Path::Class*).
 * Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.37-5
 - Added %%license line automatically
 

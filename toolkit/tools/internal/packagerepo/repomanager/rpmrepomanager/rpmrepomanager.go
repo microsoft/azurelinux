@@ -18,13 +18,13 @@ import (
 func CreateRepo(repoDir string) (err error) {
 	const (
 		repoDataSubDir = "repodata"
-		repoLockFile   = ".repodata"
+		repoLockSubDir = ".repodata"
 	)
 
 	logger.Log.Debugf("Creating RPM repository in (%s)", repoDir)
 
 	repoDataPath := filepath.Join(repoDir, repoDataSubDir)
-	repoDataLockPath := filepath.Join(repoDir, repoLockFile)
+	repoDataLockPath := filepath.Join(repoDir, repoLockSubDir)
 
 	// Remove the repodata (and the repolock) if exists
 	err = os.RemoveAll(repoDataPath)
@@ -32,7 +32,7 @@ func CreateRepo(repoDir string) (err error) {
 		return
 	}
 
-	err = os.Remove(repoDataLockPath)
+	err = os.RemoveAll(repoDataLockPath)
 	if err != nil && !os.IsNotExist(err) {
 		return
 	}

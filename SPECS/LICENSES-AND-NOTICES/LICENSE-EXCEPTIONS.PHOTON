@@ -33,6 +33,9 @@ lutok
 lvm2
 mariadb
 oniguruma
+perl
+perl-Archive-Zip
+perl-Compress-Bzip2
 perl-DBI
 perl-DBIx-simple
 perl-exporter-tiny

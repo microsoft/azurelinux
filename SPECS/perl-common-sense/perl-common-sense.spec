@@ -5,7 +5,7 @@
 Summary:	"Common sense" Perl defaults
 Name:		perl-common-sense
 Version:	3.74
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/common-sense
@@ -13,8 +13,11 @@ Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{ver
 %define sha1 common-sense=b32990086501a68bdb10bfa85160866d270aa8ae
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:	perl >= 5.28.0
-Requires:	perl >= 5.28.0
+BuildRequires:  perl >= 5.28.0
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Provides:       perl(common::sense) = %{version}-%{release}
+
 Patch1:		common-sense-3.71-podenc.patch
 
 %description
@@ -69,6 +72,9 @@ rm -rf %{buildroot}
 %{_mandir}/man3/common::sense.3*
 
 %changelog
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
+-   Use new perl package names.
+-   Provide perl(common::sense).
 * Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.74-5
 - Added %%license line automatically
 
