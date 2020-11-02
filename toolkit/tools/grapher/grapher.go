@@ -298,9 +298,6 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 	groupedDependencies := make(map[int64]bool)
 	for _, currentNode := range trimmedCycle {
 		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
-		if currentNode.SrpmPath != srpmPath {
-			return fmt.Errorf("cycle contains packages from multiple SRPM files (%s - %s), unresolvable", currentNode.SrpmPath, srpmPath)
-		}
 		if currentNode.Type == pkggraph.TypeBuild {
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
