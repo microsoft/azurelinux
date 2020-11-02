@@ -205,9 +205,9 @@ pcre-libs-8.42-4.cm1.aarch64.rpm
 krb5-1.17-3.cm1.aarch64.rpm
 lua-5.3.5-9.cm1.aarch64.rpm
 lua-libs-5.3.5-9.cm1.aarch64.rpm
-mariner-rpm-macros-1.0-7.cm1.noarch.rpm
-mariner-python-macros-1.0-7.cm1.noarch.rpm
-mariner-check-macros-1.0-7.cm1.noarch.rpm
+mariner-rpm-macros-1.0-8.cm1.noarch.rpm
+mariner-python-macros-1.0-8.cm1.noarch.rpm
+mariner-check-macros-1.0-8.cm1.noarch.rpm
 libassuan-2.5.1-5.cm1.aarch64.rpm
 libgpg-error-1.32-5.cm1.aarch64.rpm
 libgcrypt-1.8.3-4.cm1.aarch64.rpm
