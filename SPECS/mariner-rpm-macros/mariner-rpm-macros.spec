@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	7%{?dist}
+Release:	8%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -21,6 +21,7 @@ Source11: macros.nodejs-srpm
 Source12: macros.mono-srpm
 Source13: macros.ocaml-srpm
 Source14: macros.perl-srpm
+Source15: gpgverify
 Provides: redhat-rpm-config
 Provides: openblas-srpm-macros
 Provides: ocaml-srpm-macros
@@ -62,6 +63,7 @@ mkdir -p %{buildroot}%{rcdir}
 install -p -m 644 -t %{buildroot}%{rcdir} macros rpmrc
 install -p -m 444 -t %{buildroot}%{rcdir} default-hardened-*
 install -p -m 444 -t %{buildroot}%{rcdir} default-annobin-*
+install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
@@ -72,6 +74,7 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{rcdir}/rpmrc
 %{rcdir}/default-hardened-*
 %{rcdir}/default-annobin-*
+%{rcdir}/gpgverify
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
@@ -85,6 +88,8 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.python*
 
 %changelog
+* Mon Nov 02 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.0-8
+- Define gpgverify macro.
 * Thu Oct 22 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-7
 - Define __make macro.
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-6
