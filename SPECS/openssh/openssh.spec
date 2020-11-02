@@ -119,11 +119,11 @@ getent passwd sshd >/dev/null || useradd -c 'sshd PrivSep' -d %{_sharedstatedir}
 if [ $1 -eq 1 ] ; then
     chown -v root:sys %{_sharedstatedir}/sshd
 fi
-%{systemd_post} sshd.service sshd-keygen.service
+%systemd_post sshd.service sshd-keygen.service
 
 %postun server
 /sbin/ldconfig
-%{systemd_postun_with_restart} sshd.service sshd-keygen.service
+%systemd_postun_with_restart sshd.service sshd-keygen.service
 if [ $1 -eq 0 ] ; then
     if getent passwd sshd >/dev/null; then
         userdel sshd
@@ -133,7 +133,7 @@ if [ $1 -eq 0 ] ; then
     fi
 fi
 
-%{clean}
+%clean
 rm -rf %{buildroot}/*
 
 %files
