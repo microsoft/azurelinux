@@ -154,12 +154,6 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 		return
 	}
 
-	// Install the SRPM like a regular RPM to expand it
-	err = rpm.InstallRPM(srpmFile)
-	if err != nil {
-		return
-	}
-
 	// install any additional packages, such as build dependencies.
 	err = tdnfInstall(packagesToInstall)
 	if err != nil {

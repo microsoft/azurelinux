@@ -172,7 +172,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
-	// Construct the rpmpath of the cloned package.
+	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", resolvedPackage)
 	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
 	rpmArch := resolvedPackage[strings.LastIndex(resolvedPackage, ".")+1:]
