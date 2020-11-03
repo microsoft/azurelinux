@@ -5,7 +5,6 @@ package schedulerutils
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"microsoft.com/pkggen/internal/logger"
@@ -49,74 +48,26 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
 func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
-	var (
-		providesNode *pkggraph.PkgNode
-		parentNode   *pkggraph.PkgNode
-	)
+	var parentNode *pkggraph.PkgNode
 
-	// pkgGraph.AddNode will panic on error (such as duplicate node IDs)
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("replacing unresolved nodes (%v) with (%s) failed, error: %s", nodes, provides, r)
-		}
-
-		if err != nil {
-			pkgGraph.RemovePkgNode(providesNode)
-		}
-	}()
-
-	// Mirror the attributes of the node that resulted in this provides
-	providingRPMBaseName := filepath.Base(rpmFileProviding)
-
-	for _, node := range res.AncillaryNodes {
-		if node.Type != pkggraph.TypeBuild {
-			continue
-		}
-
-		expectedRPMName := fmt.Sprintf("%s-%s.%s.rpm", node.VersionedPkg.Name, node.VersionedPkg.Version, node.Architecture)
-		if providingRPMBaseName == expectedRPMName {
-			logger.Log.Debugf("Linked implicit provide (%s) to build node (%s)", provides, node.FriendlyName())
+	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
+	// Make this node the parent node for the new implicit provide node.
+	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
+	for _, node := range pkgGraph.AllRunNodes() {
+		if rpmFileProviding == node.RpmPath {
+			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s)", provides, node.FriendlyName())
 			parentNode = node
 			break
 		}
 	}
 
+	// If there is no clear parent node for the implicit provide error out.
 	if parentNode == nil {
-		// If there is no clear match between the implicit provide and which node produced it,
-		// default to the primary build node.
-		parentNode = res.Node
-		logger.Log.Warnf("Unable to find suitable parent node for implicit provides (%s), defaulting to (%s)", provides, parentNode.FriendlyName())
+		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s)", provides)
 	}
 
-	providesNode, err = pkgGraph.AddPkgNode(provides, pkggraph.StateMeta, pkggraph.TypeRun, parentNode.SrpmPath, parentNode.RpmPath, parentNode.SpecPath, parentNode.SourceDir, parentNode.Architecture, parentNode.SourceRepo)
-	providesNode.Implicit = true
-	logger.Log.Debugf("Adding run node %s with id %d\n", providesNode.FriendlyName(), providesNode.ID())
-	if err != nil {
-		return
-	}
-
-	// Create and edge for the dependency of providesNode on parentNode
-	parentEdge := pkgGraph.NewEdge(providesNode, parentNode)
-	pkgGraph.SetEdge(parentEdge)
-
-	// Mirror the dependents of the unresolved nodes to the new provides node
-	for _, node := range nodes {
-		dependents := pkgGraph.To(node.ID())
-
-		for dependents.Next() {
-			dependent := dependents.Node().(*pkggraph.PkgNode)
-
-			// Create and edge for the dependency of what used to depend on the unresolved node to the new provides node
-			dependentEdge := pkgGraph.NewEdge(dependent, providesNode)
-			pkgGraph.SetEdge(dependentEdge)
-		}
-	}
-
-	// Remove replaced nodes last to ensure all the above operations
-	// can be undone incase of failure.
-	for _, node := range nodes {
-		pkgGraph.RemovePkgNode(node)
-	}
+	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
+	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
 
 	return
 }
@@ -197,7 +148,7 @@ func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pk
 					continue
 				}
 
-				logger.Log.Infof("Satisfiying unresolved dynamic dependency (%s) with (%s)", node.FriendlyName(), provide)
+				logger.Log.Infof("Satisfying unresolved dynamic dependency (%s) with (%s)", node.FriendlyName(), provide)
 				matches[provide] = append(matches[provide], node)
 				nodeToSatisfier[node] = provide
 			}
