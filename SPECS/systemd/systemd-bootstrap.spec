@@ -150,7 +150,6 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license LICENSE.GPL2
