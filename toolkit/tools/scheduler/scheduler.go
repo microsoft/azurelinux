@@ -288,6 +288,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, buildState)
 			} else if stopOnFailure {
 				stopBuilding = true
+				err = res.Err
 				stopBuild(channels, buildState)
 			}
 		}
