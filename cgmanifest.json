@@ -3276,8 +3276,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.8",
-          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.8/net-snmp-5.8.tar.gz"
+          "version": "5.9",
+          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
         }
       }
     },
@@ -5826,8 +5826,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.0388",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.0388.tar.gz"
+          "version": "8.1.1667",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
         }
       }
     },
