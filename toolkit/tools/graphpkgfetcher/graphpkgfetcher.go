@@ -155,7 +155,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
-	// Resolve all package versionions to exact package names so they can be referenced in the graph.
+	// Resolve nodes to exact package names so they can be referenced in the graph.
 	resolvedPackage, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
 		logger.Log.Errorf("Failed to resolve '%s' to a package. Error: %s", node, err)
