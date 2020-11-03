@@ -1,4 +1,4 @@
-%{!?_versioneddocdir: %global _versioneddocdir %{_datadir}/doc/%{name}-%{version}}
+%{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 
 Summary:        DBus for systemd
 Name:           dbus
