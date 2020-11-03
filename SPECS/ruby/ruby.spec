@@ -21,7 +21,7 @@ The Ruby package contains the Ruby development environment.
 This is useful for object-oriented scripting.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
