@@ -3,26 +3,27 @@ Name:           nghttp2
 Version:        1.41.0
 Release:        1%{?dist}
 License:        MIT
-URL:            https://nghttp2.org
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://nghttp2.org
 Source0:        https://github.com/nghttp2/nghttp2/releases/download/v%{version}/%{name}-%{version}.tar.xz
 
-BuildRequires: c-ares-devel
-BuildRequires: openssl-devel
-BuildRequires: systemd
-BuildRequires: zlib-devel
-BuildRequires: libxml2-devel
-BuildRequires: libevent-devel
-BuildRequires: jansson-devel
+BuildRequires:  c-ares-devel
+BuildRequires:  jansson-devel
+BuildRequires:  libevent-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  openssl-devel
+BuildRequires:  systemd
+BuildRequires:  zlib-devel
 
 %description
 Implementation of the Hypertext Transfer Protocol version 2 in C.
 
 %package devel
-Summary: Header files for nghttp2
-Requires: %{name} = %{version}-%{release}
+Summary:        Header files for nghttp2
+
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 These are the header files of nghttp2.
