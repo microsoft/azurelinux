@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -29,6 +29,8 @@ Patch9:         CVE-2019-9674.nopatch
 Patch10:        CVE-2007-4559.nopatch
 # Ignore CVE-2019-18348 since it is patched in Python 2.7
 Patch11:        CVE-2019-18348.nopatch
+# CVE-2020-27619 patch backported from 3.6
+Patch12:        CVE-2020-27619.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -245,6 +247,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Tue Nov 03 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-5
+- Patch CVE-2020-27619
+
 * Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-4
 - Use autosetup
 - Remove CVE-2013-1753 no patch
