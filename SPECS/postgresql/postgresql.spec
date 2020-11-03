@@ -3,38 +3,37 @@ Name:           postgresql
 Version:        12.4
 Release:        1%{?dist}
 License:        PostgreSQL
-URL:            https://www.postgresql.org
-Group:          Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/Databases
+URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
 
 # Common libraries needed
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openldap
+BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  readline-devel
-BuildRequires:  openssl-devel
-BuildRequires:  zlib-devel
 BuildRequires:  tzdata
+BuildRequires:  zlib-devel
 
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libxml2
 Requires:       openldap
 Requires:       openssl
 Requires:       readline
-Requires:       zlib
 Requires:       tzdata
-
-Requires:   %{name}-libs = %{version}-%{release}
+Requires:       zlib
 
 %description
 PostgreSQL is an object-relational database management system.
 
 %package libs
-Summary:    Libraries for use with PostgreSQL
-Group:      Applications/Databases
+Summary:        Libraries for use with PostgreSQL
+Group:          Applications/Databases
 
 %description libs
 The postgresql-libs package provides the essential shared libraries for any
@@ -45,6 +44,7 @@ PostgreSQL server.
 %package        devel
 Summary:        Development files for postgresql.
 Group:          Development/Libraries
+
 Requires:       postgresql = %{version}-%{release}
 
 %description    devel
@@ -53,6 +53,7 @@ developing applications that use postgresql.
 
 %prep
 %setup -q
+
 %build
 sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h &&
 ./configure \
@@ -88,8 +89,10 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-,root,root)
