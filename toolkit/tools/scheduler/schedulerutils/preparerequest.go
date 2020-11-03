@@ -28,6 +28,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, nodesToBuild []*pkggrap
 
 		req := &BuildRequest{
 			Node:           node,
+			PkgGraph:       pkgGraph,
 			AncillaryNodes: []*pkggraph.PkgNode{node},
 		}
 
@@ -41,6 +42,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, nodesToBuild []*pkggrap
 
 		req := &BuildRequest{
 			Node:           nodes[defaultNode],
+			PkgGraph:       pkgGraph,
 			AncillaryNodes: nodes,
 		}
 

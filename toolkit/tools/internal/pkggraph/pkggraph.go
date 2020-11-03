@@ -12,7 +12,6 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
-	"strings"
 	"sync"
 
 	"gonum.org/v1/gonum/graph"
@@ -440,7 +439,7 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeSt
 		SourceDir:    sourceDir,
 		Architecture: architecture,
 		SourceRepo:   sourceRepo,
-		Implicit:     isImplicitPackage(versionedPkg),
+		Implicit:     versionedPkg.IsImplicitPackage(),
 	}
 	newNode.This = newNode
 
@@ -1120,21 +1119,6 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 	deepCopy = NewPkgGraph()
 	err = ReadDOTGraph(deepCopy, &buf)
 	return
-}
-
-// isImplicitPackage returns true if a PackageVer represents an implicit provide.
-func isImplicitPackage(versionedPkg *pkgjson.PackageVer) bool {
-	// Auto generated provides will contain "(" and ")".
-	if strings.Contains(versionedPkg.Name, "(") && strings.Contains(versionedPkg.Name, ")") {
-		return true
-	}
-
-	// File paths will start with a "/" are implicitly provided by an rpm that contains that file.
-	if strings.HasPrefix(versionedPkg.Name, "/") {
-		return true
-	}
-
-	return false
 }
 
 // removePkgNodeFromLookup removes a node from the lookup tables.

@@ -234,26 +234,14 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (err error) {
 	const (
-		strictComparisonOperator          = "="
-		lessThanOrEqualComparisonOperator = "<="
-		versionSuffixFormat               = "-%s"
-
 		builtRepoID  = "local-repo"
 		cachedRepoID = "upstream-cache-repo"
 		allRepoIDs   = "*"
 	)
 
 	for _, pkg := range packagesToClone {
-		builder := strings.Builder{}
-		builder.WriteString(pkg.Name)
+		pkgName := convertPackageVersionToTdnfArg(pkg)
 
-		// Treat <= as =
-		// Treat > and >= as "latest"
-		if pkg.Condition == strictComparisonOperator || pkg.Condition == lessThanOrEqualComparisonOperator {
-			builder.WriteString(fmt.Sprintf(versionSuffixFormat, pkg.Version))
-		}
-
-		pkgName := builder.String()
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
 			"--destdir",
@@ -281,29 +269,25 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	return
 }
 
-// SearchAndClone attempts to find a package which supplies the requested file or package. It
-// wraps Clone() to acquire the requested package once found.
-func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkgjson.PackageVer) (err error) {
-	var (
-		pkgName string
-		stderr  string
-	)
+// WhatProvides attempts to find a package which provides the requested PackageVer.
+func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName string, err error) {
+	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
+
+	args := []string{
+		"provides",
+		provideQuery,
+	}
+
+	if !r.useUpdateRepo {
+		args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
+	}
 
 	err = r.chroot.Run(func() (err error) {
-		args := []string{
-			"provides",
-			singlePackageToClone.Name,
-		}
-
-		if !r.useUpdateRepo {
-			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
-		}
-
 		stdout, stderr, err := shell.Execute("tdnf", args...)
-		logger.Log.Debugf("tdnf search for dependency '%s':\n%s", singlePackageToClone.Name, stdout)
+		logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
 
 		if err != nil {
-			logger.Log.Errorf("Failed to lookup dependency '%s', tdnf error: '%s'", singlePackageToClone.Name, stderr)
+			logger.Log.Errorf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
 			return
 		}
 
@@ -314,24 +298,22 @@ func (r *RpmRepoCloner) SearchAndClone(cloneDeps bool, singlePackageToClone *pkg
 				continue
 			}
 			// Local sources are listed last, keep searching for the last possible match
-			pkgName = matches[1]
-			logger.Log.Debugf("'%s' is available from package '%s'", singlePackageToClone.Name, pkgName)
+			packageName = matches[1]
+			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 		}
 		return
 	})
 
 	if err != nil {
-		logger.Log.Error(stderr)
 		return
 	}
 
-	if pkgName == "" {
-		return fmt.Errorf("could not resolve %s", singlePackageToClone.Name)
+	if packageName == "" {
+		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
+		return
 	}
 
-	logger.Log.Warnf("Translated '%s' to package '%s'", singlePackageToClone.Name, pkgName)
-
-	err = r.Clone(cloneDeps, &pkgjson.PackageVer{Name: pkgName})
+	logger.Log.Debugf("Translated '%s' to package '%s'", pkgVer.Name, packageName)
 	return
 }
 
@@ -471,6 +453,33 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		if err == nil {
 			break
 		}
+	}
+
+	return
+}
+
+func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
+	tdnfArg = pkgVer.Name
+	// TDNF does not accept versioning information on implicit provides.
+	if pkgVer.IsImplicitPackage() {
+		if pkgVer.Condition != "" {
+			logger.Log.Warnf("Discarding version constraint for implicit package: %v", pkgVer)
+		}
+		return
+	}
+
+	// Treat <= as =
+	// Treat > and >= as "latest"
+	switch pkgVer.Condition {
+	case "<=":
+		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
+		fallthrough
+	case "=":
+		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
+	case "":
+		break
+	default:
+		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
 	}
 
 	return
