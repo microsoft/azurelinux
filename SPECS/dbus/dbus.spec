@@ -1,4 +1,4 @@
-%{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
+%{!?_versioneddocdir: %global _versioneddocdir %{_datadir}/doc/%{name}-%{version}}
 
 Summary:        DBus for systemd
 Name:           dbus
@@ -30,10 +30,10 @@ Requires:       expat-devel
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
-%configure 
+%configure \
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=no \
     --enable-selinux=no \
@@ -61,10 +61,10 @@ make %{?_smp_mflags} check
 %exclude %{_libdir}/sysusers.d
 /lib/*
 %{_libexecdir}/*
-%{_versioneddocdir}/*
+%{_docdir}/*
 %{_datadir}/dbus-1
 
-#%{_sharedstatedir}/*
+#%%{_sharedstatedir}/*
 
 %files devel
 %defattr(-,root,root)
@@ -81,10 +81,6 @@ make %{?_smp_mflags} check
 %changelog
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4
 - Patch CVE-2019-12749
-- Correct documentation directory
-- License verified
-- Change URL/Source0 to https versions
-- Lint to Mariner style
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3
 - Added %%license line automatically
