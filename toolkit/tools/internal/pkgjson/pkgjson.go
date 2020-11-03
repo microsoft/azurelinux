@@ -5,6 +5,7 @@ package pkgjson
 
 import (
 	"fmt"
+	"strings"
 
 	"microsoft.com/pkggen/internal/versioncompare"
 
@@ -55,6 +56,21 @@ func (pkg *PackageRepo) ParsePackageJSON(path string) (err error) {
 	logger.Log.Infof("Opening %s", path)
 
 	return jsonutils.ReadJSONFile(path, &pkg)
+}
+
+// IsImplicitPackage returns true if a PackageVer represents an implicit provide.
+func (pkgVer *PackageVer) IsImplicitPackage() bool {
+	// Auto generated provides will contain "(" and ")".
+	if strings.Contains(pkgVer.Name, "(") && strings.Contains(pkgVer.Name, ")") {
+		return true
+	}
+
+	// File paths will start with a "/" are implicitly provided by an rpm that contains that file.
+	if strings.HasPrefix(pkgVer.Name, "/") {
+		return true
+	}
+
+	return false
 }
 
 // Interval returns a PackageVerInterval struct which has been sanitized. The interval represents the range of versions a PackageVer

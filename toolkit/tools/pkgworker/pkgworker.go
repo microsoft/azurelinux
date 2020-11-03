@@ -44,7 +44,7 @@ var (
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
-	packagesToInstall    = app.Flag("install-package", "Names of packages to be installed before building.").Strings()
+	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
