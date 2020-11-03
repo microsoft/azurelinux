@@ -463,15 +463,23 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	// TDNF does not accept versioning information on implicit provides.
 	if pkgVer.IsImplicitPackage() {
 		if pkgVer.Condition != "" {
-			logger.Log.Warnf("Discarding version information on implicit package (%v)", pkgVer)
+			logger.Log.Warnf("Discarding version constraint for implicit package: %v", pkgVer)
 		}
 		return
 	}
 
 	// Treat <= as =
 	// Treat > and >= as "latest"
-	if pkgVer.Condition == "=" || pkgVer.Condition == "<=" {
+	switch pkgVer.Condition {
+	case "<=":
+		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
+		fallthrough
+	case "=":
 		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
+	case "":
+		break
+	default:
+		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
 	}
 
 	return
