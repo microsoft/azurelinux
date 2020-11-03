@@ -60,7 +60,7 @@ func PermanentlyStopAllProcesses(signal unix.Signal) {
 		// sent to the process's process group.
 		err := unix.Kill(-cmd.Process.Pid, signal)
 		if err != nil {
-			logger.Log.Errorf("Unable to stop (%s): %v", cmd.Path, err)
+			logger.Log.Errorf("Unable to stop (%s): %v", strings.Join(cmd.Args, " "), err)
 			continue
 		}
 
