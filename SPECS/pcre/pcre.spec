@@ -3,41 +3,46 @@ Name:           pcre
 Version:        8.43
 Release:        1%{?dist}
 License:        BSD
-URL:            https://www.pcre.org
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.pcre.org
 Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
+
 Requires:       libgcc
-Requires:       readline
 Requires:       libstdc++
 Requires:       pcre-libs = %{version}-%{release}
+Requires:       readline
 
 %description
 The PCRE package contains Perl Compatible Regular Expression libraries. These are useful for implementing regular expression pattern matching using the same syntax and semantics as Perl 5.
 
 %package        devel
-Group:          Development/Libraries
 Summary:        Headers and static lib for pcre development
+Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Provides:       pkgconfig(libpcre)
+
 %description    devel
 Install this package if you want do compile applications using the pcre
 library.
 
 %package libs
-Summary: Libraries for pcre
-Group:      System Environment/Libraries
+Summary:        Libraries for pcre
+Group:          System Environment/Libraries
+
 %description libs
 This package contains minimal set of shared pcre libraries.
 
 %prep
 %setup -q
+
 %build
-./configure --prefix=/usr                     \
-            --docdir=/usr/share/doc/pcre-%{version} \
+./configure --prefix=%{_prefix}                     \
+            --docdir=%{_docdir}/pcre-%{version} \
             --enable-unicode-properties       \
             --enable-pcre16                   \
             --enable-pcre32                   \
@@ -51,15 +56,14 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 mv -v %{buildroot}/usr/lib/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}/usr/lib/libpcre.so
-ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}/usr/lib/libpcre.so.0
+ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so
+ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
 
 %check
 make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-
 
 %files
 %defattr(-,root,root)
@@ -88,13 +92,12 @@ make %{?_smp_mflags} check
 %{_libdir}/libpcre.so.*
 
 %changelog
-* Mon Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.43-1
+* Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.43-1
 - Updating to 8.43 to fix CVE-2019-20838.
 - Addressing spec linter's suggestions.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.42-4
 - Added %%license line automatically
-
 
 * Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> - 8.42-3
 - Update URL.
