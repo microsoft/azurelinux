@@ -112,7 +112,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
-       --Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                    \
+       -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                    \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
        $PWD build &&
        cd build &&
@@ -220,6 +220,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/*
 /bin/*
 /sbin/*
+%{_datadir}/bash-completion/*
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
