@@ -2,7 +2,7 @@ Summary:        Bootstrap version of systemd. Workaround for systemd circular de
 Name:           systemd-bootstrap
 Version:        239
 Release:        30%{?dist}
-License:        LGPLv2+ and GPLv2+ and MIT
+License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
@@ -41,7 +41,6 @@ Patch22:        CVE-2020-13776.patch
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch23:        CVE-2018-21029.nopatch
-
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -151,6 +150,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-,root,root)
 %license LICENSE.GPL2
@@ -221,8 +221,6 @@ rm -rf %{buildroot}/*
 %{_bindir}/*
 /bin/*
 /sbin/*
-%{
-     /*
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
@@ -246,15 +244,15 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-*  Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-30
--  Use autosetup
--  Fix CVE-2019-3842
--  Fix CVE-2019-3843
--  Fix CVE-2019-3844
--  Fix CVE-2019-6454
--  Fix CVE-2019-20386
--  Fix CVE-2020-1712
--  Fix CVE-2020-13776
+* Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-30
+- Use autosetup
+- Fix CVE-2019-3842
+- Fix CVE-2019-3843
+- Fix CVE-2019-3844
+- Fix CVE-2019-6454
+- Fix CVE-2019-20386
+- Fix CVE-2020-1712
+- Fix CVE-2020-13776
 
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
 -  Reduce kptr_restrict to 1
