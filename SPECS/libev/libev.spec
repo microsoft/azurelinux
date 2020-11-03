@@ -1,7 +1,7 @@
 Summary:       A full-featured and high-performance event loop
 Name:          libev
 Version:       4.24
-Release:       4%{?dist}
+Release:       5%{?dist}
 License:       BSD-2-Clause
 URL:           http://software.schmorp.de/pkg/libev.html
 Source0:       http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
@@ -20,6 +20,15 @@ Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 The subpackage includes all development related headers and library for libev
+
+%package libevent-devel
+Summary:        Compability development header with libevent for %{name}
+Requires:       %{name}-devel = %{version}-%{release}
+# The event.h file conflicts with one from libevent-devel
+Conflicts:      libevent-devel
+
+%description libevent-devel
+This package contains a development header to make libev compatible with libevent.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -45,10 +54,17 @@ make %{?_smp_mflags} -k check
 
 %files devel
 %defattr(-,root,root)
+%exclude %{_includedir}/event.h
 %{_includedir}/*
 %{_libdir}/*.so
 
+%files libevent-devel
+%defattr(-,root,root)
+%{_includedir}/event.h
+
 %changelog
+* Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> 4.24-5
+- Split libev-libevent-devel subpackage to resolve event.h conflicts with libevent-devel.
 * Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.24-4
 - Added %%license line automatically
 
