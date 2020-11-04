@@ -406,7 +406,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			"--disablerepo=*",
 			fmt.Sprintf("--enablerepo=%s", fetcherRepoID),
 		}
-		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, "tdnf", tdnfArgs...)
+		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
 	})
 
 	return
