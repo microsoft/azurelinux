@@ -215,6 +215,7 @@ rm -rf %{buildroot}
 
 
 
+
 %check
 %ifnarch ppc64
 	make test
