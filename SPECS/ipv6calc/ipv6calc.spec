@@ -1,6 +1,3 @@
-# enable the following for intermediate builds
-#%#define gitcommit d3a4108cb7aeb6f731bb07989f91d8a7f449f0f0
-
 # mod_ipv6calc related
 %{!?_httpd_apxs:    %{expand: %%global _httpd_apxs    %%{_sbindir}/apxs}}
 %{!?_httpd_moddir:  %{expand: %%global _httpd_moddir  %%{_libdir}/httpd/modules}}
@@ -25,13 +22,6 @@
 %define external_db	%{_datadir}/%{name}/db
 # Berkeley DB selector
 %define require_db4 %(echo "%{dist}" | grep -E -q '^\.el(5|6)$' && echo 1 || echo 0)
-# RPM license macro detector
-%define rpm_license_extra %(echo "%{_defaultlicensedir}" | grep -q defaultlicensedir && echo 0 || echo 1)
-%if 0%{?gitcommit:1}
-%global shortcommit %(c=%{gitcommit}; echo ${c:0:7})
-%define build_timestamp %(date +"%{Y}%{m}%{d}")
-%global gittag .%{build_timestamp}git%{shortcommit}
-%endif
 # shared library support (deselectable)
 %if "%{?_without_shared:0}%{?!_without_shared:1}" == "1"
 %define enable_shared 1
@@ -39,11 +29,12 @@
 Summary:        IPv6 address format change and calculation utility
 Name:           ipv6calc
 Version:        2.2.0
-Release:        41%{?gittag}%{?dist}
+Release:        41%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.deepspace6.net/projects/%{name}.html
+Source0:        ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/%{name}-%{version}.tar.gz
 Patch0:         ipv6calc-2.2.0-patch-8c7eea58.diff
 BuildRequires:  gcc
 BuildRequires:  openssl-devel
@@ -52,17 +43,13 @@ BuildRequires:  procps-ng
 BuildRequires:  perl(Digest::MD5)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-%if 0%{?gitcommit:1}
-Source:         https://github.com/pbiering/%{name}/archive/%{gitcommit}/%{name}-%{gitcommit}.tar.gz
-%else
-Source:         ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/%{name}-%{version}.tar.gz
-%endif
 #Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 %if %{enable_shared}
 Provides:       ipv6calc-libs = %{version}-%{release}
 %else
 Conflicts:      ipv6calc-libs
 %endif
+
 %if %{require_db4}
 BuildRequires:  db4-devel
 %else
@@ -138,11 +125,7 @@ Check/adjust %{_sysconfdir}/httpd/conf.d/ipv6calcweb.conf
 Default restricts access to localhost
 
 %prep
-%if 0%{?gitcommit:1}
-%setup -q -n %{name}-%{gitcommit}
-%else
 %setup -q
-%endif
 
 %patch0 -p1
 
@@ -213,9 +196,6 @@ install -m 644 ipv6calcweb/ipv6calcweb-databases-in-var.te  %{buildroot}%{_datad
 %clean
 rm -rf %{buildroot}
 
-
-
-
 %check
 %ifnarch ppc64
 	make test
@@ -223,13 +203,8 @@ rm -rf %{buildroot}
 
 
 %files
-%if %{rpm_license_extra}
-%doc ChangeLog README README.* CREDITS TODO USAGE doc/ipv6calc.lyx doc/ipv6calc.sgml doc/ipv6calc.html doc/ipv6calc.xml
-%license COPYING LICENSE
-%else
 %license COPYING LICENSE
 %doc ChangeLog README README.* CREDITS TODO USAGE doc/ipv6calc.lyx doc/ipv6calc.sgml doc/ipv6calc.html doc/ipv6calc.xml
-%endif
 
 %defattr(644,root,root,755)
 
@@ -259,13 +234,8 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}/examples/ipv6logstats/
 
 %files ipv6calcweb
-%if %{rpm_license_extra}
-%doc ipv6calcweb/README ipv6calcweb/USAGE
-%license COPYING LICENSE
-%else
 %license COPYING LICENSE
 %doc ipv6calcweb/README ipv6calcweb/USAGE
-%endif
 
 %defattr(644,root,root,755)
 
@@ -277,9 +247,11 @@ rm -rf %{buildroot}
 
 %postun
 %{_sbindir}/ldconfig
+
 %changelog
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.2.0-41
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-40
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

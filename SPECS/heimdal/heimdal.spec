@@ -356,6 +356,8 @@ fi
 %endif
 
 %files libs -f %{name}.lang
+%license LICENSE
+%doc %{_pkgdocdir}
 %dir %{bindir}
 %dir %{bindir}/bin
 %dir %{libdir}
@@ -375,8 +377,6 @@ fi
 %{_bindir}/verify_krb5_conf
 %{_mandir}/man8/verify_krb5_conf.8*
 %{_libexecdir}/digest-service
-%doc %{_pkgdocdir}
-%license LICENSE
 
 %files server
 %if 0%{?_with_systemd}
@@ -465,10 +465,6 @@ fi
 %{_bindir}/%{name}-ktutil
 %{bindir}/bin/ktutil
 %{_mandir}/man1/%{name}-ktutil.1*
-# NOTICE: no support for X11
-#%%{_libexecdir}/kxd
-#%%{_mandir}/man8/kxd.8*
-#%%{_mandir}/cat8/kxd.8*
 %attr(04550,root,root) %{_bindir}/%{name}-su
 %{bindir}/bin/su
 %{_mandir}/man1/%{name}-su.1*
@@ -494,6 +490,7 @@ fi
 %changelog
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.7.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

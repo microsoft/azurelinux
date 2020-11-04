@@ -58,13 +58,15 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.02-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.02-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
