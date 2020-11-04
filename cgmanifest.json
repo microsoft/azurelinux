@@ -2775,6 +2775,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxcrypt",
+          "version": "4.4.17",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxml++",
           "version": "3.2.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
