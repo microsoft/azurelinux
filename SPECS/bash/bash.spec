@@ -10,7 +10,10 @@ URL:            https://www.gnu.org/software/bash/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
 Patch0:         bash-4.4.patch
-Patch1:         CVE-2019-18276.patch
+# CVE-2019-18276 has a negligible security impact, 
+# since we don't ship bash with suid.
+# Backporting the patch is non-trivial, as well.
+Patch1:         CVE-2019-18276.nopatch
 BuildRequires:  readline
 Requires:       readline
 Requires(post): /bin/cp
@@ -330,7 +333,7 @@ fi
 
 %changelog
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
-- Patch CVE-2019-18276
+- Nopatch CVE-2019-18276
 
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 4.4.18-5
 - Don't stomp on CFLAGS.
