@@ -4036,8 +4036,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.1",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.1/postgresql-12.1.tar.bz2"
+          "version": "12.4",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2"
         }
       }
     },
