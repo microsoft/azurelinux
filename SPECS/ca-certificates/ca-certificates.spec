@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -198,7 +198,7 @@ cp -p %{SOURCE20} .
 
 %convert_certdata %{SOURCE0}
 %convert_certdata %{SOURCE21}
-%convert_certdata %{SOURCE22}
+%convert_certdata %{SOURCE23}
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
@@ -250,7 +250,7 @@ install -p -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{catrustdir}/ca-legacy.conf
 %install_bundles %{SOURCE21} %{p11_format_base_bundle} %{legacy_default_base_bundle} %{legacy_disable_base_bundle}
 
 # Microsoft certs
-%install_bundles %{SOURCE22} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
+%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
@@ -425,42 +425,48 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
-* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-7
+* Wed Oct 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-9
+- Switching to the correct source for the Microsoft bundle.
+
+* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
+- Aligning 'nssckbi.h' with the used 'certdata.txt' version for the Mozilla bundle.
+
+* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
 - Removing unused 'Requires*'.
 
-* Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-6
+* Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-6
 - Adding 2 Microsoft-trusted, intermediate CAs into 'ca-certificates-base'.
 
-* Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-5
+* Mon Aug 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-5
 - Adding 'ca-certificates-legacy' to support apps, which only work with
   a single cert per *.pem file.  Adding a new 'ca-certificates-microsoft' subpackage with CAs trusted through
   the Microsoft Trusted Root Program.  Converting common steps into parametrized macros.
 
-* Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-4
+* Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-4
 - Updating base certificates to current intermediate CAs.
 - Re-assigning ownership of legacy bundles from '*-shared' to subpackages creating them.
 - Removing commented lines.
 
-* Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-3
+* Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-3
 - Changing base certificates to trust packages.microsoft.com.
 
-* Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-2
+* Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-2
 - Removed redundant 'ca-bundle.trust.p11-kit' certs bundle.
 - Removed unnecessary pre-install step.
 - Moved license and config to 'ca-certificates-shared' subpackage
   to guarantee these to be always present regardless of the installed
   certificates bundle.
 
-* Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.7.20-1
+* Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-1
 - Updating certdata.txt to Mozilla version from 2020/07/20.
 
-* Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.4.28-4
+* Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200428-4
 - Fixing installation of 'ca-certificates-base` subpackage by making
   shared files and directory structure a 'Requires' for all certificate packages.
 - Updating '%%uninstall_clean_up' macro to use pk11kit tooling.
 - Reordering (Build)Requires to increase clarity.
 
-* Tue May 26 2020 Paul Monson <paulmon@microsoft.com> - 2020.4.28-3
+* Tue May 26 2020 Paul Monson <paulmon@microsoft.com> - 20200428-3
 - Initial CBL-Mariner import from Fedora 27 (license: MIT).
 - License verified.
 - Updated Mozilla certdata.txt to latest version from the "FIREFOX_76_0_RELEASE" release.

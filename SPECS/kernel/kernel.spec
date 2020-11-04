@@ -2,7 +2,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.51
-Release:        6%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -35,6 +35,14 @@ Patch1011:      CVE-2020-8648.nopatch
 Patch1012:      CVE-2020-8649.nopatch
 Patch1013:      CVE-2020-9383.nopatch
 Patch1014:      CVE-2020-11725.nopatch
+Patch1015:      CVE-2020-10757.nopatch
+Patch1016:      CVE-2020-12653.nopatch
+Patch1017:      CVE-2020-12657.nopatch
+Patch1018:      CVE-2010-3865.nopatch
+Patch1019:      CVE-2020-11668.nopatch
+Patch1020:      CVE-2020-12654.nopatch
+Patch1021:      CVE-2020-24394.nopatch
+Patch1022:      CVE-2020-8428.nopatch
 
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -264,7 +272,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
-     if [ `ls /boot/linux-*.cfg 1> /dev/null 2>&1` ]
+     ls /boot/linux-*.cfg 1> /dev/null 2>&1
+     if [ $? -eq 0 ]
      then
           list=`ls -tu /boot/linux-*.cfg | head -n1`
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
@@ -337,8 +346,21 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-*   Thu Sep 24 2020 Emre Girgin <mrgirgin@microsoft.cpm> 5.4.51-6
+*   Fri Oct 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-12
+-   Enable QAT kernel configs
+*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-11
+-   Address CVE-2020-10757, CVE-2020-12653, CVE-2020-12657, CVE-2010-3865,
+-   CVE-2020-11668, CVE-2020-12654, CVE-2020-24394, CVE-2020-8428
+*   Fri Oct 02 2020 Chris Co <chrco@microsoft.com> 5.4.51-10
+-   Fix aarch64 build error
+*   Wed Sep 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.4.51-9
+-   Update postun script to deal with removal in case of another installed kernel.
+*   Fri Sep 25 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.51-8
+-   Enable Mellanox kernel configs
+*   Thu Sep 24 2020 Emre Girgin <mrgirgin@microsoft.cpm> 5.4.51-7
 -   Replace the misuse of the 'archdir' and `arch` shell variables.
+*   Wed Sep 23 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-6
+-   Enable CONFIG_IMA (measurement only) and associated configs
 *   Thu Sep 03 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.4.51-5
 -   Add code to check for missing config flags in the checked in configs
 *   Thu Sep 03 2020 Chris Co <chrco@microsoft.com> 5.4.51-4

@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.23.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
@@ -57,10 +57,7 @@ install -m 0644 contrib/completion/git-completion.bash %{buildroot}/usr/share/ba
 %{_fixperms} %{buildroot}/*
 
 %check
-# git expect nonroot user to run tests
-chmod g+w . -R
-useradd test -G root -m
-sudo -u test make %{?_smp_mflags} test
+make %{?_smp_mflags} test
 
 %post
 if [ $1 -eq 1 ];then
@@ -92,6 +89,8 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+*   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 2.23.3-3
+-   Fix check test
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.23.3-2
 -   Use new perl package names.
 -   Provide git-core.

@@ -80,18 +80,6 @@ $(graph_file): $(specs_file) $(go-grapher)
 		$(logging_command) \
 		--output $@
 
-ifeq ($(DISABLE_UPSTREAM_REPOS),y)
-graphpkgfetcher_disable_upstream_repos_flag := --disable-upstream-repos
-else
-graphpkgfetcher_disable_upstream_repos_flag :=
-endif
-
-ifeq ($(USE_UPDATE_REPO),y)
-graphpkgfetcher_update_repo_flag := --use-update-repo
-else
-graphpkgfetcher_update_repo_flag :=
-endif
-
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
 $(CACHED_RPMS_DIR)/%: ;
 
@@ -102,6 +90,20 @@ ifneq ($(CONFIG_FILE),)
 # on the value of $(CONFIG_FILE) however, so keep $(depend_CONFIG_FILE) always.
 # Actual validation is handled in imggen.mk
 $(cached_file): $(validate-pkggen-config)
+endif
+
+graphpkgfetcher_extra_flags :=
+
+ifeq ($(DISABLE_UPSTREAM_REPOS),y)
+graphpkgfetcher_extra_flags += --disable-upstream-repos
+endif
+
+ifeq ($(USE_UPDATE_REPO),y)
+graphpkgfetcher_extra_flags += --use-update-repo
+endif
+
+ifeq ($(USE_PREVIEW_REPO),y)
+graphpkgfetcher_extra_flags += --use-preview-repo
 endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
@@ -115,8 +117,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
-		$(graphpkgfetcher_update_repo_flag) \
-		$(graphpkgfetcher_disable_upstream_repos_flag) \
+		$(graphpkgfetcher_extra_flags) \
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \

@@ -1,7 +1,7 @@
 Summary:        Ruby
 Name:           ruby
-Version:        2.6.3
-Release:        3%{?dist}
+Version:        2.6.6
+Release:        1%{?dist}
 License:        (Ruby or BSD) and Public Domain and MIT and CC0 and zlib and UCD
 URL:            https://www.ruby-lang.org/en/
 Group:          System Environment/Security
@@ -53,6 +53,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man5/*
 
 %changelog
+*   Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 2.6.6-1
+-   Upgrade to 2.6.6 to resolve CVEs.
 *   Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.6.3-3
 -   Added %%license line automatically
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.6.3-2

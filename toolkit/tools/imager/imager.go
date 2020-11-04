@@ -503,7 +503,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		rootDevice = fmt.Sprintf("PARTUUID=%v", partUUID)
 	}
 
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, encryptedRoot)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, encryptedRoot, systemConfig.KernelCommandLine)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return

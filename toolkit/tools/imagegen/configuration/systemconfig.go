@@ -19,6 +19,7 @@ type SystemConfig struct {
 	Name               string              `json:"Name"`
 	PackageLists       []string            `json:"PackageLists"`
 	KernelOptions      map[string]string   `json:"KernelOptions"`
+	KernelCommandLine  KernelCommandLine   `json:"KernelCommandLine"`
 	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
 	PartitionSettings  []PartitionSetting  `json:"PartitionSettings"`
 	PostInstallScripts []PostInstallScript `json:"PostInstallScripts"`
@@ -65,6 +66,10 @@ func (s *SystemConfig) IsValid() (err error) {
 		// 		return fmt.Errorf("invalid [PartitionSettings]: %w", err)
 		// 	}
 		// }
+	}
+
+	if err = s.KernelCommandLine.IsValid(); err != nil {
+		return fmt.Errorf("invalid [KernelCommandLine]: %w", err)
 	}
 
 	//Validate PartitionSettings

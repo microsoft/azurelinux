@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/UnZip.html
 Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -27,6 +27,8 @@ Patch12:        unzip-zipbomb-manpage.patch
 Patch13:        CVE-2015-7697.patch
 # Fixes CVE-2018-1000035
 Patch14:        unzip-6.0-cve-2018-1000035-heap-based-overflow.patch
+# Upstream has fixed CVE-2008-0888 in 6.0
+Patch15:        CVE-2008-0888.nopatch
 
 %description
 The UnZip package contains ZIP extraction utilities. These are useful
@@ -84,6 +86,8 @@ make %{?_smp_mflags}  check
 %{_bindir}/*
 
 %changelog
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 6.0-16
+-   Nopatch CVE-2008-0888, fixed in 6.0
 *   Thu Jul 09 2020 Daniel McIlvaney <damcilva@microsoft.com> 6.0-15
 -   Add patch for CVE-2018-1000035 from Fedora 6.0-47 package 
 *   Thu May 13 2020 Henry Beberman <henry.beberman@microsoft.com> - 6.0-14

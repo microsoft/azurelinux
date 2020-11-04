@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.68.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            http://curl.haxx.se
 Group:          System Environment/NetworkingLibraries
@@ -49,7 +49,7 @@ This package contains minimal set of shared curl libraries.
     --with-ssl \
     --with-gssapi \
     --with-libssh2 \
-    --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt \
+    --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=/etc/ssl/certs
 make %{?_smp_mflags}
 
@@ -89,6 +89,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-3
+-   Updating certificate bundle path to include full set of trust information.
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 7.68.0-2
 -   Add explicit provides for libcurl and libcurl-devel
 *   Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-1

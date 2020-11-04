@@ -1,0 +1,23 @@
+From fe19b7b6016d446722621fb407738209d1a911e8 Mon Sep 17 00:00:00 2001
+From: Harry Wong <harrywong@live.com>
+Date: Thu, 4 May 2017 10:08:48 +0800
+Subject: [PATCH] Supress implicit fallthrough in GCC
+
+---
+ include/rapidjson/internal/regex.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/rapidjson/internal/regex.h b/include/rapidjson/internal/regex.h
+index 1369ea2..6d110bd 100644
+--- a/include/rapidjson/internal/regex.h
++++ b/include/rapidjson/internal/regex.h
+@@ -29,6 +29,7 @@ RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+ #ifdef __GNUC__
+ RAPIDJSON_DIAG_PUSH
+ RAPIDJSON_DIAG_OFF(effc++)
++RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+ #endif
+ 
+ #ifdef _MSC_VER
+-- 
+2.7.4

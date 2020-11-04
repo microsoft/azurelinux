@@ -12,6 +12,7 @@ Requires:       openssl
 Requires:       e2fsprogs-libs
 BuildRequires:  openssl-devel
 BuildRequires:  e2fsprogs-devel
+
 Provides:       pkgconfig(mit-krb5)
 Provides:       pkgconfig(mit-krb5-gssapi)
 %description

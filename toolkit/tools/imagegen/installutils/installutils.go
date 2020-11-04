@@ -499,24 +499,23 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 	return
 }
 
+// addMachineID creates the /etc/machine-id file in the installChroot
 func addMachineID(installChroot *safechroot.Chroot) (err error) {
-	const (
-		squashErrors = false
-		setupProgram = "/bin/systemd-machine-id-setup"
-	)
+	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
+	// For operating system images which are created once and used on multiple
+	// machines, for example for containers or in the cloud, /etc/machine-id
+	// should be an empty file in the generic file system image. An ID will be
+	// generated during boot and saved to this file if possible.
 
-	// Check if systemd-machine-id-setup is present before invoking it,
-	// some images will not use systemd (such as a container)
-	exists, _ := file.PathExists(filepath.Join(installChroot.RootDir(), setupProgram))
-	if !exists {
-		logger.Log.Debugf("'%s' not found inside chroot '%s', skipping adding machine ID", setupProgram, installChroot.RootDir())
-		return
-	}
+	const (
+		machineIDFile      = "/etc/machine-id"
+		machineIDFilePerms = 0644
+	)
 
 	ReportAction("Configuring machine id")
 
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, setupProgram)
+		return file.Create(machineIDFile, machineIDFilePerms)
 	})
 	return
 }
@@ -686,9 +685,10 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
+// - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -726,6 +726,20 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 	err = setGrubCfgLVM(installGrubCfgFile, encryptedRoot.LuksUUID)
 	if err != nil {
 		logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
+		return
+	}
+
+	// Configure IMA policy
+	err = setGrubCfgIMA(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
+		return
+	}
+
+	// Append any additional command line parameters
+	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
 		return
 	}
 
@@ -787,15 +801,27 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 }
 
 func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err error) {
+	const (
+		squashErrors = false
+	)
+
+	rootUserAdded := false
+
 	for _, user := range users {
 		logger.Log.Infof("Adding user (%s)", user.Name)
 		ReportActionf("Adding user: %s", user.Name)
 
-		var homeDir string
+		var (
+			homeDir string
+			isRoot  bool
+		)
 
-		homeDir, err = createUserWithPassword(installChroot, user)
+		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
+		}
+		if isRoot {
+			rootUserAdded = true
 		}
 
 		err = configureUserGroupMembership(installChroot, user)
@@ -814,10 +840,17 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		}
 	}
 
+	// If no root entry was specified in the config file, never expire the root password
+	if !rootUserAdded {
+		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
+		err = installChroot.UnsafeRun(func() error {
+			return shell.ExecuteLive(squashErrors, "chage", "-M", "-1", "root")
+		})
+	}
 	return
 }
 
-func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, err error) {
+func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, isRoot bool, err error) {
 	const (
 		squashErrors        = false
 		rootHomeDir         = "/root"
@@ -869,6 +902,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 		// Update shadow file
 		err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+		isRoot = true
 	} else {
 		homeDir = filepath.Join(userHomeDirPrefix, user.Name)
 
@@ -1286,19 +1320,55 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	return
 }
 
+func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		extraPattern = "{{.ExtraCommandLine}}"
+	)
+
+	logger.Log.Debugf("Adding ExtraCommandLine('%s') to %s", kernelCommandline.ExtraCommandLine, grubPath)
+	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
+	}
+
+	return
+}
+
+func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		imaPrefix  = "ima_policy="
+		imaPattern = "{{.IMAPolicy}}"
+	)
+
+	var ima string
+
+	for _, policy := range kernelCommandline.ImaPolicy {
+		ima += fmt.Sprintf("%v%v ", imaPrefix, policy)
+	}
+
+	logger.Log.Debugf("Adding ImaPolicy('%s') to %s", ima, grubPath)
+	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
+	}
+
+	return
+}
+
 func setGrubCfgLVM(grubPath, luksUUID string) (err error) {
 	const (
-		lvmPrefix    = "rd.lvm.lv="
-		lvmPattern   = "{{.LVM}}"
-		sedDelimiter = "@"
+		lvmPrefix  = "rd.lvm.lv="
+		lvmPattern = "{{.LVM}}"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	var lvm string
 	if luksUUID != "" {
 		lvm = fmt.Sprintf("%v%v", lvmPrefix, diskutils.GetEncryptedRootVolPath())
 	}
 
-	err = sed(lvmPattern, lvm, sedDelimiter, grubPath)
+	logger.Log.Debugf("Adding lvm('%s') to %s", lvm, grubPath)
+	err = sed(lvmPattern, lvm, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's LVM setting: %v", err)
 	}
@@ -1310,14 +1380,17 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 	const (
 		luksUUIDPrefix  = "luks.uuid="
 		luksUUIDPattern = "{{.LuksUUID}}"
-		sedDelimiter    = "/"
 	)
-	var luksUUID string
+	var (
+		cmdline  configuration.KernelCommandLine
+		luksUUID string
+	)
 	if uuid != "" {
 		luksUUID = fmt.Sprintf("%v%v", luksUUIDPrefix, uuid)
 	}
 
-	err = sed(luksUUIDPattern, luksUUID, sedDelimiter, grubPath)
+	logger.Log.Debugf("Adding luks('%s') to %s", luksUUID, grubPath)
+	err = sed(luksUUIDPattern, luksUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's luksUUID: %v", err)
 		return
@@ -1329,10 +1402,11 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	const (
 		bootUUIDPattern = "{{.BootUUID}}"
-		sedDelimiter    = "/"
 	)
+	var cmdline configuration.KernelCommandLine
 
-	err = sed(bootUUIDPattern, bootUUID, sedDelimiter, grubPath)
+	logger.Log.Debugf("Adding UUID('%s') to %s", bootUUID, grubPath)
+	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
 		return
@@ -1343,12 +1417,13 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 	const (
 		encryptedVolPattern = "{{.EncryptedVolume}}"
-		sedDelimiter        = "@"
 		lvmPrefix           = "lvm/"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	err = sed(encryptedVolPattern, encryptedVol, sedDelimiter, grubPath)
+	logger.Log.Debugf("Adding EncryptedVolume('%s') to %s", encryptedVol, grubPath)
+	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
 		return
@@ -1359,14 +1434,15 @@ func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 	const (
 		rootDevicePattern = "{{.RootPartition}}"
-		sedDelimiter      = "@"
 	)
+	var cmdline configuration.KernelCommandLine
 
 	if luksUUID != "" {
 		rootDevice = diskutils.GetEncryptedRootVolMapping()
 	}
 
-	err = sed(rootDevicePattern, rootDevice, sedDelimiter, grubPath)
+	logger.Log.Debugf("Adding RootDevice('%s') to %s", rootDevice, grubPath)
+	err = sed(rootDevicePattern, rootDevice, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's rootDevice: %v", err)
 		return

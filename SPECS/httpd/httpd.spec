@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -10,6 +10,13 @@ Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
+
+# CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
+Patch100: CVE-1999-0236.nopatch
+# CVE-1999-1412 applies only to MacOS X
+Patch101: CVE-1999-1412.nopatch
+# CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
+Patch102: CVE-2007-0086.nopatch
 
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
@@ -185,17 +192,18 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
-* Tue Aug 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-1
-- Updated to 2.4.46 to resolve CVE-2020-11984.
-
-* Tue May 19 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.43-1
-- Updated to 2.4.43 to resolve the following CVEs
-- CVE-2019-10081, CVE-2019-10082, CVE-2019-10092, CVE-2019-10097
-- CVE-2019-10098, CVE-2020-1927, CVE-2020-1934
-
-* Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.39-4
-- Added %%license line automatically
-
+*   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
+-   Mark CVE-2007-0086 as nopatch
+*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.46-2
+-   Mark CVE-1999-0236 CVE-1999-1412 as nopatch
+*   Tue Aug 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-1
+-   Updated to 2.4.46 to resolve CVE-2020-11984.
+*   Tue May 19 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.43-1
+-   Updated to 2.4.43 to resolve the following CVEs
+-   CVE-2019-10081, CVE-2019-10082, CVE-2019-10092, CVE-2019-10097
+-   CVE-2019-10098, CVE-2020-1927, CVE-2020-1934
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.4.39-4
+-   Added %%license line automatically
 *   Tue Apr 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.39-3
 -   Updated and verified 'Source0', 'Patch0' and 'URL' tags.
 -   License verified.
