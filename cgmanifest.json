@@ -1555,6 +1555,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "heimdal",
+          "version": "7.7.0",
+          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.0/heimdal-7.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "httpd",
           "version": "2.4.46",
           "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
@@ -1708,6 +1718,16 @@
           "name": "iputils",
           "version": "20180629",
           "downloadUrl": "https://github.com/iputils/iputils/archive/s20180629.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ipv6calc",
+          "version": "2.2.0",
+          "downloadUrl": "ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/ipv6calc-2.2.0.tar.gz"
         }
       }
     },
@@ -3768,6 +3788,16 @@
           "name": "perl-IO-Socket-SSL",
           "version": "2.066",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.066.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON",
+          "version": "4.02",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.02.tar.gz"
         }
       }
     },
