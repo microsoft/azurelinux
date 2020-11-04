@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -14,13 +14,23 @@ Patch0:         cgi.patch
 Patch1:         added-pyopenssl-ipaddress-certificate-validation.patch
 Patch2:         python2-support-mariner-platform.patch
 Patch3:         Replace-unsupported-TLS-methods.patch
+Patch4:         CVE-2019-20907.patch
+Patch5:         CVE-2020-26116.patch
+Patch6:         CVE-2017-18207.patch
 # Ignore CVE-2015-5652 because it only applies to Windows
-Patch4:         CVE-2015-5652.nopatch
+Patch7:         CVE-2015-5652.nopatch
 # Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
 # and is not a security issue
-Patch5:         CVE-2017-17522.nopatch
-# Ignore CVE-2013-1753 as it was patched in upstream 2.7.9, but NVD has not been updated with that fact
-Patch6:         CVE-2013-1753.nopatch
+Patch8:         CVE-2017-17522.nopatch
+# Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
+# documentation is updated
+Patch9:         CVE-2019-9674.nopatch
+# Ignore CVE-2007-4559 since upstream community agreed it shouldn't be patched
+Patch10:        CVE-2007-4559.nopatch
+# Ignore CVE-2019-18348 since it is patched in Python 2.7
+Patch11:        CVE-2019-18348.nopatch
+# CVE-2020-27619 patch backported from 3.6
+Patch12:        CVE-2020-27619.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -117,11 +127,7 @@ Requires: python2 = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%setup -q -n Python-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1 -n Python-%{version}
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -241,6 +247,19 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Tue Nov 03 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-5
+- Patch CVE-2020-27619
+
+* Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7.18-4
+- Use autosetup
+- Remove CVE-2013-1753 no patch
+- Ignore CVE-2019-9674
+- Fix CVE-2019-20907
+- Fix CVE-2020-26116
+- Ignore CVE-2007-4559
+- Fix CVE-2017-18207
+- Ignore CVE-2019-18348
+
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
 - Ignore CVE-2013-1753 because NVD erroneously lists this version as being vulnerable

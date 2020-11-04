@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.50
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenLDAP
 URL:            https://www.openldap.org/
 Group:          System Environment/Security
@@ -13,6 +13,7 @@ Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-r
 
 Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
+Patch2:         CVE-2015-3276.patch
 Requires:       openssl >= 1.0.1, cyrus-sasl >= 2.1
 BuildRequires:  cyrus-sasl >= 2.1
 BuildRequires:  openssl-devel >= 1.0.1
@@ -29,9 +30,7 @@ over the Internet. The openldap package contains configuration files,
 libraries, and documentation for OpenLDAP.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 %build
 
 autoconf
@@ -77,6 +76,9 @@ rm -rf %{buildroot}/*
 /etc/openldap/*
 
 %changelog
+*   Mon Oct 26 2020 Henry Li <lihl@microsoft.com> 2.4.50-2
+-   Used autosetup.
+-   Added patch to resolve CVE-2015-3276.
 *   Wed Jun 03 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.4.50-1
 -   Upgrade to version 2.4.50, which resolves CVE-2020-12243.
 *   Tue May 12 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.4.48-1

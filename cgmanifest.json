@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.8",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.8-src.tar.gz"
+          "version": "1.10.9",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
         }
       }
     },
@@ -127,6 +127,16 @@
           "name": "audit",
           "version": "3.0",
           "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0-alpha8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "auoms",
+          "version": "2.2.5",
+          "downloadUrl": "https://github.com/microsoft/OMS-Auditd-Plugin/archive/v2.2.5-0.tar.gz"
         }
       }
     },
@@ -444,6 +454,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ccache",
+          "version": "3.6",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v3.6/ccache-3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cdrkit",
           "version": "1.1.11",
           "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/cdrkit/cdrkit-1.1.11.tar.gz/efe08e2f3ca478486037b053acd512e9/cdrkit-1.1.11.tar.gz"
@@ -497,6 +517,16 @@
           "name": "cifs-utils",
           "version": "6.8",
           "downloadUrl": "https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.8.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clamav",
+          "version": "0.101.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.101.2.tar.gz"
         }
       }
     },
@@ -3166,6 +3196,16 @@
         "type": "other",
         "other": {
           "name": "msgpack",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-2.0.0.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msgpack",
           "version": "3.2.1",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.2.1.tar.gz"
         }
@@ -3236,8 +3276,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.8",
-          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.8/net-snmp-5.8.tar.gz"
+          "version": "5.9",
+          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
         }
       }
     },
@@ -3286,8 +3326,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.33.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.33.0/nghttp2-1.33.0.tar.xz"
+          "version": "1.41.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"
         }
       }
     },
@@ -3423,6 +3463,16 @@
     },
     {
       "component": {
+	"type": "other",
+	"other": {
+	  "name": "omi",
+	  "version": "1.6.6",
+	  "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
+	}
+      }
+    },
+    {
+      "component": {
         "type": "other",
         "other": {
           "name": "oniguruma",
@@ -3528,6 +3578,16 @@
           "name": "p11-kit",
           "version": "0.23.16.1",
           "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.23.16.1/p11-kit-0.23.16.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pal",
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/microsoft/pal/archive/v1.6.6-0.tar.gz"
         }
       }
     },
@@ -3976,8 +4036,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.1",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.1/postgresql-12.1.tar.bz2"
+          "version": "12.4",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2"
         }
       }
     },
@@ -5056,6 +5116,16 @@
         "type": "other",
         "other": {
           "name": "rapidjson",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rapidjson",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
         }
@@ -5756,8 +5826,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.0388",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.0388.tar.gz"
+          "version": "8.1.1667",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
         }
       }
     },
