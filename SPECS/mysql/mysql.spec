@@ -78,6 +78,7 @@ make test
 %changelog
 * Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
 - Upgrade to 8.0.22. Fixes 40 CVES.
+- Lint spec
 
 *   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.21-1
 -   Upgrade to 8.0.21. Fixes 32 CVEs.
