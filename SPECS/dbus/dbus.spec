@@ -1,5 +1,4 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
-
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
