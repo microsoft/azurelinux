@@ -291,6 +291,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName st
 		args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
 	}
 
+	if !r.usePreviewRepo {
+		args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+	}
+
 	err = r.chroot.Run(func() (err error) {
 
 		stdout, stderr, err := shell.Execute("tdnf", args...)
