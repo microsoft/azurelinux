@@ -64,7 +64,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 	logger.Log.Infof("Number of built SRPMs:    %d", len(builtSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs: %d", len(prebuiltSRPMs))
 	logger.Log.Infof("Number of failed SRPMs:   %d", len(failures))
-	logger.Log.Infof("Number of skipped SRPMs:  %d", len(unbuiltSRPMs))
+	logger.Log.Infof("Number of blocked SRPMs:  %d", len(unbuiltSRPMs))
 
 	if len(builtSRPMs) != 0 {
 		logger.Log.Info("Built SRPMs:")
@@ -88,7 +88,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 	}
 
 	if len(unbuiltSRPMs) != 0 {
-		logger.Log.Info("Skipped SRPMs:")
+		logger.Log.Info("Blocked SRPMs:")
 		for srpm := range unbuiltSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}

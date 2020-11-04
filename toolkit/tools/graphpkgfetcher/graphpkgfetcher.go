@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gonum.org/v1/gonum/graph"
@@ -105,21 +106,17 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		// Cache an RPM for each unresolved node in the graph.
 		for _, n := range dependencyGraph.AllRunNodes() {
 			if n.State == pkggraph.StateUnresolved {
-				resolveErr := resolveSingleNode(cloner, n)
+				resolveErr := resolveSingleNode(cloner, n, *outDir)
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
-					if n.Implicit {
-						logger.Log.Warnf("Failed to resolve implicit node '%s', assuming it will be provided during package build", n)
-					} else {
-						errorMessage := strings.Builder{}
-						errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
-						errorMessage.WriteString("Nodes which have this as a dependency:\n")
-						for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-							errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
-						}
-						logger.Log.Error(errorMessage.String())
+					errorMessage := strings.Builder{}
+					errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
+					errorMessage.WriteString("Nodes which have this as a dependency:\n")
+					for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
+						errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 					}
+					logger.Log.Debugf(errorMessage.String())
 				}
 			}
 		}
@@ -150,25 +147,34 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 }
 
 // resolveSingleNode caches the RPM for a single node
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode) (err error) {
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, outDir string) (err error) {
 	const cloneDeps = true
-
-	desiredPackage := node.VersionedPkg
-	desiredPackageList := []*pkgjson.PackageVer{desiredPackage}
-
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
-	// Some unresolved nodes are virtual file requirements (such as /usr/sbin/groupadd from shadow-utils).
-	// The spec file may not explicitly provide it, so we need to try finding a package which supplies the file.
-	if strings.HasPrefix(node.VersionedPkg.Name, "/") {
-		logger.Log.Debugf("Searching for a package which supplies %s", node.VersionedPkg.Name)
-		err = cloner.SearchAndClone(cloneDeps, desiredPackage)
-	} else {
-		err = cloner.Clone(cloneDeps, desiredPackageList...)
-	}
+
+	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
+	// Resolve nodes to exact package names so they can be referenced in the graph.
+	resolvedPackage, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
-		logger.Log.Errorf("Failed to clone %s from RPM repo. Error: %s", node, err)
-	} else {
-		node.State = pkggraph.StateCached
+		logger.Log.Errorf("Failed to resolve '%s' to a package. Error: %s", node, err)
+		return
 	}
+
+	desiredPackage := &pkgjson.PackageVer{
+		Name: resolvedPackage,
+	}
+
+	err = cloner.Clone(cloneDeps, desiredPackage)
+	if err != nil {
+		logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
+		return
+	}
+
+	// Construct the rpm path of the cloned package.
+	rpmName := fmt.Sprintf("%s.rpm", resolvedPackage)
+	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
+	rpmArch := resolvedPackage[strings.LastIndex(resolvedPackage, ".")+1:]
+	node.RpmPath = filepath.Join(outDir, rpmArch, rpmName)
+
+	node.State = pkggraph.StateCached
 	return
 }

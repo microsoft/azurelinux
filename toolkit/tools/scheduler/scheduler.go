@@ -141,7 +141,7 @@ func main() {
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph, error: %s", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
 }
 
@@ -254,7 +254,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		// Otherwise there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {
-				err = fmt.Errorf("graph is unsolvable")
+				err = fmt.Errorf("could not build all packages")
 				break
 			} else {
 				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")

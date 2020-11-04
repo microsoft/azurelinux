@@ -54,14 +54,13 @@ func PermanentlyStopAllProcesses(signal unix.Signal) {
 	// For every running process, issue the provided signal to its process group,
 	// resulting in both the process and all of its children being stopped.
 	for cmd := range activeCommands {
-		processCommand := strings.Join(cmd.Args, " ")
-		logger.Log.Infof("Stopping (%s)", processCommand)
+		logger.Log.Infof("Stopping (%s)", cmd.Path)
 
 		// Issue the provided signal to the negative Pid, this signifies it should be
 		// sent to the process's process group.
 		err := unix.Kill(-cmd.Process.Pid, signal)
 		if err != nil {
-			logger.Log.Errorf("Unable to stop (%s): %v", processCommand, err)
+			logger.Log.Errorf("Unable to stop (%s): %v", strings.Join(cmd.Args, " "), err)
 			continue
 		}
 

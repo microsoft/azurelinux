@@ -7,7 +7,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -45,16 +44,13 @@ var (
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
+	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
 )
 
 var (
-	greaterThanOrEqualRegex = regexp.MustCompile(` '?>='? [^ ]*`)
-	equalToRegex            = regexp.MustCompile(` '?='? `)
-	lessThanOrEqualToRegex  = regexp.MustCompile(` '?<='? `)
-
 	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
@@ -77,7 +73,7 @@ func main() {
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck, *packagesToInstall)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
 	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
@@ -99,7 +95,7 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	return
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup bool, runCheck bool) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string) (builtRPMs []string, err error) {
 	const (
 		existingChrootDir = false
 		squashErrors      = false
@@ -133,7 +129,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	}
 
 	err = chroot.Run(func() (err error) {
-		return buildRPMFromSRPMInChroot(srpmFileInChroot, runCheck, defines)
+		return buildRPMFromSRPMInChroot(srpmFileInChroot, runCheck, defines, packagesToInstall)
 	})
 
 	if err != nil {
@@ -151,21 +147,15 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	return
 }
 
-func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string) (err error) {
+func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
 	// Convert /localrpms into a repository that a package manager can use
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
 		return
 	}
 
-	// Install the SRPM like a regular RPM to expand it
-	err = rpm.InstallRPM(srpmFile)
-	if err != nil {
-		return
-	}
-
-	// Query and install the build requirements for this SRPM
-	err = installBuildRequires(defines)
+	// install any additional packages, such as build dependencies.
+	err = tdnfInstall(packagesToInstall)
 	if err != nil {
 		return
 	}
@@ -226,76 +216,26 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 	return
 }
 
-func installBuildRequires(defines map[string]string) (err error) {
-	const (
-		emptyQueryFormat = ""
-	)
-	// Find the SPEC file extracted from the SRPM
-	specDir := filepath.Join(chrootRpmBuildRoot, "SPECS")
-	allSpecFiles, err := ioutil.ReadDir(specDir)
-	if err != nil {
-		return
-	}
-
-	if len(allSpecFiles) != 1 {
-		return fmt.Errorf("unexpected number of SPEC files extracted, wanted (1) and found (%d)", len(allSpecFiles))
-	}
-
-	specFile := filepath.Join(specDir, allSpecFiles[0].Name())
-	logger.Log.Debugf("Querying SPEC (%s)", specFile)
-	sourceDir := filepath.Join(chrootRpmBuildRoot, "SOURCES")
-	buildRequires, err := rpm.QuerySPEC(specFile, sourceDir, emptyQueryFormat, defines, rpm.BuildRequiresArgument)
-	if err != nil {
-		return
-	}
-
-	if len(buildRequires) == 0 {
-		return
-	}
-
-	packagesToInstall := make([]string, 0, len(buildRequires))
-	for _, pkg := range buildRequires {
-		// Replace version conditionals with tdnf friendly version:
-		// - replace >= with "latest" (no version)
-		// - replace = and <= with the exact version
-		buildReq := greaterThanOrEqualRegex.ReplaceAllString(pkg, "")
-		buildReq = equalToRegex.ReplaceAllString(buildReq, "-")
-		buildReq = lessThanOrEqualToRegex.ReplaceAllString(buildReq, "-")
-
-		// Add each package to the installArgs
-		packagesToInstall = append(packagesToInstall, strings.TrimSpace(buildReq))
-	}
-
-	// Try matching dependencies from locally build RPMs first. If some are not available,
-	// then consider the package cache. This will ensure that local packages are preferred over remote ones.
-	allowCache := true
-	failedToInstall, err := tdnfInstall(packagesToInstall, allowCache)
-	if len(failedToInstall) != 0 {
-		allowCache = false
-		failedToInstall, err = tdnfInstall(failedToInstall, allowCache)
-	}
-
-	if len(failedToInstall) != 0 {
-		logger.Log.Errorf("Failed to install the following packages: %v", failedToInstall)
-	}
-
-	return
-}
-
-func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string, err error) {
+func tdnfInstall(packages []string) (err error) {
 	const (
 		alreadyInstalledPostfix = "is already installed."
 		noMatchingPackagesErr   = "Error(1011) : No matching packages"
-		builtPackagesRepo       = "local-repo"
-		cachedPackagesRepo      = "upstream-cache-repo"
 		packageMatchGroup       = 1
 	)
 
-	installArgs := []string{"install", "-y", "--disablerepo=*", fmt.Sprintf("--enablerepo=%s", builtPackagesRepo)}
-	if allowCached {
-		installArgs = append(installArgs, fmt.Sprintf("--enablerepo=%s", cachedPackagesRepo))
+	if len(packages) == 0 {
+		return
 	}
 
+	// TDNF supports requesting versioned packages in the form of {name}-{version}.{dist}.{arch}.
+	// The packages to install list may contain file paths to rpm files so those will need to be filtered:
+	// - Strip any .rpm from packages as TDNF does not support requesting a package with the extension.
+	// - Strip any filepath from packages.
+	for i := range packages {
+		packages[i] = filepath.Base(strings.TrimSuffix(packages[i], ".rpm"))
+	}
+
+	installArgs := []string{"install", "-y"}
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false
@@ -320,11 +260,13 @@ func tdnfInstall(packages []string, allowCached bool) (failedToInstall []string,
 				return
 			}
 		}
+		err = nil
 	}
 
 	// TDNF will ignore unavailable packages that have been requested to be installed without reporting an error code.
 	// Search the stdout of TDNF for such a failure and warn the user.
 	// This may happen if a SPEC requires the the path to a tool (e.g. /bin/cp), so mark it as a warning for now.
+	var failedToInstall []string
 	splitStdout := strings.Split(stdout, "\n")
 	for _, line := range splitStdout {
 		trimmedLine := strings.TrimSpace(line)
