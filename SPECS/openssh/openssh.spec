@@ -74,21 +74,24 @@ tar xf %{SOURCE1} --no-same-owner
     --with-maintype=man \
     --enable-strip=no \
     --with-kerberos5=%{_prefix}
-
 make
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
 install -vdm755 %{buildroot}%{_sharedstatedir}/sshd
-echo "AllowTcpForwarding no" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-echo "ClientAliveCountMax 2" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-echo "Compression no" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-#echo "MaxSessions 2" >> %{buildroot}/etc/ssh/sshd_config
-echo "TCPKeepAlive no" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-echo "AllowAgentForwarding no" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-echo "PermitRootLogin no" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-echo "UsePAM yes" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+
+cat <<EOF >>%{buildroot}%{_sysconfdir}/ssh/sshd_config
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+#MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+PermitRootLogin no
+UsePAM yes
+EOF
+
 #   Install daemon script
 pushd blfs-systemd-units-%{systemd_units_rel}
 make DESTDIR=%{buildroot} install-sshd
@@ -143,13 +146,14 @@ fi
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %license LICENCE
 
 %files server
 %defattr(-,root,root)
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config
-%attr(700,root,sys)%{_sharedstatedir}/sshd
+%attr(700,root,sys) %{_sharedstatedir}/sshd
 /lib/systemd/system/sshd-keygen.service
 /lib/systemd/system/sshd.service
 /lib/systemd/system/sshd.socket
