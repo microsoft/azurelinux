@@ -3,8 +3,8 @@
 
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.101.2
-Release:        3%{?dist}
+Version:        0.103.0
+Release:        1%{?dist}
 License:        ASL 2.0 and BSD and bzip2-1.0.4 and GPLv2 and LGPLv2+ and MIT and Public Domain and UnRar
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
@@ -66,6 +66,8 @@ make %{?_smp_mflags} check
 
 
 %changelog
+* Tue Oct 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.103.0-1
+- Updating to 0.103.0 to fix: CVE-2019-12625, CVE-2019-15961.
 * Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.101.2-3
 - License verified.
 - Added %%license macro.
