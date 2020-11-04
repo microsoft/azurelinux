@@ -28,7 +28,8 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
-#Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires:       perl
+Provides:       perl(JSON)
 BuildArch:      noarch
 %{?perl_default_filter}
 %{?perl_default_subpackage_tests}
