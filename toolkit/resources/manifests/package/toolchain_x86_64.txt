@@ -286,10 +286,10 @@ pam-devel-1.3.1-4.cm1.x86_64.rpm
 pam-lang-1.3.1-4.cm1.x86_64.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
 patch-debuginfo-2.7.6-7.cm1.x86_64.rpm
-pcre-8.42-4.cm1.x86_64.rpm
-pcre-debuginfo-8.42-4.cm1.x86_64.rpm
-pcre-devel-8.42-4.cm1.x86_64.rpm
-pcre-libs-8.42-4.cm1.x86_64.rpm
+pcre-8.44-1.cm1.x86_64.rpm
+pcre-debuginfo-8.44-1.cm1.x86_64.rpm
+pcre-devel-8.44-1.cm1.x86_64.rpm
+pcre-libs-8.44-1.cm1.x86_64.rpm
 perl-5.30.3-1.cm1.x86_64.rpm
 perl-DBD-SQLite-1.62-3.cm1.x86_64.rpm
 perl-DBD-SQLite-debuginfo-1.62-3.cm1.x86_64.rpm

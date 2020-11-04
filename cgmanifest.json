@@ -3676,8 +3676,8 @@
         "type": "other",
         "other": {
           "name": "pcre",
-          "version": "8.42",
-          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.bz2"
+          "version": "8.44",
+          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.bz2"
         }
       }
     },
