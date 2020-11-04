@@ -137,6 +137,8 @@ func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.Wai
 	for scanner := bufio.NewScanner(pipe); scanner.Scan(); {
 		line := scanner.Text()
 		logFunction(line)
+		
+		logger.Log.Tracef("StreamOutput:\t'%s'", line)
 
 		// Optionally buffer the output to print in the event of an error
 		if outputChan != nil {
