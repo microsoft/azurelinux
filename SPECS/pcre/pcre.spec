@@ -53,7 +53,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-mv -v %{buildroot}%{_lib}/libpcre.so.* %{buildroot}/lib &&
+mv -v %{buildroot}/usr/lib/libpcre.so.* %{buildroot}/lib &&	
 ln -sfv ../../lib/$(readlink %{buildroot}%{_lib}/libpcre.so) %{buildroot}%{_lib}/libpcre.so
 ln -sfv $(readlink %{buildroot}%{_lib}/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
 
@@ -93,7 +93,7 @@ make %{?_smp_mflags} check
 * Thu Oct 29 2020 Joe Schmitt <joschmit@microsoft.com> - 8.44-1
 - Update to version 8.44 to fix CVE-2020-14155.
 
-* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.42-4
+* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> 8.42-4
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 8.42-3
