@@ -2,7 +2,7 @@
 Summary:        Signed GRand Unified Bootloader for x86_64 systems
 Name:           grub2-efi-binary-signed-x64
 Version:        2.02
-Release:        24%{?dist}
+Release:        25%{?dist}
 URL:            https://www.gnu.org/software/grub
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -43,5 +43,7 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
+* Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.02-25
+- Updating release to be aligned with the unsigned bits.
 * Thu Aug 13 2020 Chris Co <chrco@microsoft.com> 2.02-24
 - Original version for CBL-Mariner.
