@@ -1,11 +1,11 @@
 # Add option to build without examples
 %bcond_without examples
 # Add option to build without tools
-%bcond_without tools
+%bcond_with tools
 
 Name:         dpdk
 Version:      18.11.2
-Release:      3%{?dist}
+Release:      4%{?dist}
 Epoch:        2
 Summary:      Set of libraries and drivers for fast packet processing
 License:      BSD and LGPLv2 and GPLv2
@@ -295,6 +295,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Thu Nov 05 2020 Joe Schmit <pawelwi@microsoft.com> - 2:18.11.2-4
+- Build without tools subpackage and dependencies.
+
 * Wed Oct 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:18.11.2-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Added the "Vendor" and "Distribution" tags.
