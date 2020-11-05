@@ -51,7 +51,6 @@ make test
 
 %files
 %defattr(-,root,root)
-%license LICENSE
 %license LICENSE router/LICENSE.router
 %doc README router/README.router
 %{_libdir}/plugin/*
