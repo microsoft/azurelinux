@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,29 +20,21 @@ Patch4:         CVE-2019-20175.patch
 Patch5:         CVE-2020-13659.patch
 Patch6:         CVE-2020-16092.patch
 Patch7:         CVE-2020-15863.patch
-# CVE-2016-7161 was fixed in 2.7.0, but the CVE database was not updated. (a0d1cbdacff5df4ded16b753b38fdd9da6092968)
-Patch8:         CVE-2016-7161.nopatch
-# CVE-2015-7504 was fixed in 2.5.0, but the CVE database was not updated. (837f21aacf5a714c23ddaadbbc5212f9b661e3f7)
-Patch9:         CVE-2015-7504.nopatch
-# CVE-2017-5931 was fixed in 2.9.0, but the CVE database was not updated.  (a08aaff811fb194950f79711d2afe5a892ae03a4)
-Patch10:        CVE-2017-5931.nopatch
-# CVE-2017-14167 was fixed in 2.11.0, but the CVE database was not updated. (ed4f86e8b6eff8e600c69adee68c7cd34dd2cccb)
-Patch11:        CVE-2017-14167.nopatch
-Patch12:        CVE-2020-10702.patch
-Patch13:        CVE-2020-10761.patch
+Patch8:         CVE-2020-10702.patch
+Patch9:         CVE-2020-10761.patch
 # CVE-2020-13253 backported to 4.2.0. Original version: https://github.com/qemu/qemu/commit/790762e5487114341cccc5bffcec4cb3c022c3cd
-Patch14:        CVE-2020-13253.patch
-Patch15:        CVE-2020-13754.patch
-Patch16:        CVE-2020-13800.patch
-Patch17:        CVE-2020-14364.patch
-Patch18:        CVE-2020-13791.patch
-
+Patch10:        CVE-2020-13253.patch
+Patch11:        CVE-2020-13754.patch
+Patch12:        CVE-2020-13800.patch
+Patch13:        CVE-2020-14364.patch
+Patch14:        CVE-2020-13791.patch
+# CVE-2018-19665 patch never merged upstream, link: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03570.html
+Patch15:        CVE-2018-19665.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
-
 Requires:       alsa-lib
 Requires:       cyrus-sasl
 Requires:       pixman
@@ -71,13 +63,14 @@ This package provides a command line tool for manipulating disk images.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
 
 %build
 
@@ -138,6 +131,11 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 4.2.0-18
+- Patch CVE-2018-19665
+- Remove nopatch files for CVE-2016-7161, CVE-2015-7504, CVE-2017-5931,
+  CVE-2017-14167, as NIST data for those has been corrected
+
 * Thu Oct 29 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.2.0-17
 - Patch CVE-2020-13791.
 
