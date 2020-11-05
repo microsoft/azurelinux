@@ -1,8 +1,5 @@
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
-%bcond_without examples
-# Add option to build without tools
-%bcond_with tools
 # machine_arch maps between rpm and dpdk arch name, often same as _target_cpu
 # machine_tmpl is the config template machine name, often "native"
 # machine is the actual machine name used in the dpdk make system
@@ -26,6 +23,9 @@
 %define machine_tmpl power8
 %define machine power8
 %endif
+%bcond_without examples
+# Add option to build without tools
+%bcond_with tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
