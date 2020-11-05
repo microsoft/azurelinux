@@ -40,6 +40,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 	prebuiltSRPMs := make(map[string]bool)
 	builtSRPMs := make(map[string]bool)
 	unbuiltSRPMs := make(map[string]bool)
+	unresolvedDependencies := make(map[string]bool)
 
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
@@ -57,14 +58,21 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 		}
 	}
 
+	for _, node := range pkgGraph.AllRunNodes() {
+		if node.State == pkggraph.StateUnresolved {
+			unresolvedDependencies[node.VersionedPkg.Name] = true
+		}
+	}
+
 	logger.Log.Info("---------------------------")
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof("Number of built SRPMs:    %d", len(builtSRPMs))
-	logger.Log.Infof("Number of prebuilt SRPMs: %d", len(prebuiltSRPMs))
-	logger.Log.Infof("Number of failed SRPMs:   %d", len(failures))
-	logger.Log.Infof("Number of blocked SRPMs:  %d", len(unbuiltSRPMs))
+	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
+	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
+	logger.Log.Infof("Number of failed SRPMs:            %d", len(failures))
+	logger.Log.Infof("Number of blocked SRPMs:           %d", len(unbuiltSRPMs))
+	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
 
 	if len(builtSRPMs) != 0 {
 		logger.Log.Info("Built SRPMs:")
@@ -91,6 +99,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 		logger.Log.Info("Blocked SRPMs:")
 		for srpm := range unbuiltSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(unresolvedDependencies) != 0 {
+		logger.Log.Info("Unresolved dependencies:")
+		for dependency := range unresolvedDependencies {
+			logger.Log.Infof("--> %s", dependency)
 		}
 	}
 }
