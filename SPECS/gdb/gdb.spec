@@ -9,8 +9,9 @@ Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:         gdb-7.12-pstack.patch
-# Backported from 9.1: 
-Patch1:         CVE-2019-1010180.patch
+# 8.3 contains a partial fix in the form of a warning when this bug is triggered
+# The complete fix is not easily backported from 9.1
+Patch1:         CVE-2019-1010180.nopatch
 BuildRequires:  expat-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
