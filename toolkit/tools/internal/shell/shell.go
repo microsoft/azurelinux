@@ -137,7 +137,7 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 // If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
 // the buffer the oldest buffered output is discarded.
 func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
-	var outputChan chan string = nil
+	var outputChan chan string
 	const outputChanBufferSize = 1500
 
 	cmd := exec.Command(program, args...)
