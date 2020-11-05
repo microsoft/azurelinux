@@ -1,39 +1,5 @@
 # Add option to build without examples
-%bcond_without examples
-# Add option to build without tools
-%bcond_without tools
-
-Name:         dpdk
-Version:      18.11.2
-Release:      3%{?dist}
-Epoch:        2
-Summary:      Set of libraries and drivers for fast packet processing
-License:      BSD and LGPLv2 and GPLv2
-Group:        System Environment/Libraries
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-URL:          https://dpdk.org
-Source0:      https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
-
-#
-# The DPDK is designed to optimize througput of network traffic using, among
-# other techniques, carefully crafted assembly instructions.  As such it
-# needs extensive work to port it to other architectures.
-#
-ExclusiveArch: x86_64 i686 aarch64 ppc64le
-
-Patch0: app-pie.patch
-Patch1: fcf-protection.patch
-Patch2: dpdk-rte-ether-align.patch
-
-BuildRequires: gcc
-BuildRequires: kernel-headers
-BuildRequires: libnuma-devel
-BuildRequires: libpcap-devel
-BuildRequires: mariner-rpm-macros
-BuildRequires: python3-sphinx
-BuildRequires: zlib-devel
-
+%define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
 # machine_arch maps between rpm and dpdk arch name, often same as _target_cpu
 # machine_tmpl is the config template machine name, often "native"
 # machine is the actual machine name used in the dpdk make system
@@ -45,7 +11,7 @@ BuildRequires: zlib-devel
 %ifarch i686
 %define machine_arch i686
 %define machine_tmpl native
-%define machine default 
+%define machine default
 %endif
 %ifarch aarch64
 %define machine_arch arm64
@@ -57,33 +23,66 @@ BuildRequires: zlib-devel
 %define machine_tmpl power8
 %define machine power8
 %endif
-
-%define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
+%bcond_without examples
+# Add option to build without tools
+%bcond_with tools
+Summary:        Set of libraries and drivers for fast packet processing
+Name:           dpdk
+Version:        18.11.2
+Release:        4%{?dist}
+Epoch:          2
+License:        BSD AND LGPLv2 AND GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://dpdk.org
+Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
+Patch0:         app-pie.patch
+Patch1:         fcf-protection.patch
+Patch2:         dpdk-rte-ether-align.patch
+BuildRequires:  gcc
+BuildRequires:  kernel-headers
+BuildRequires:  libnuma-devel
+BuildRequires:  libpcap-devel
+BuildRequires:  mariner-rpm-macros
+BuildRequires:  python3-sphinx
+BuildRequires:  zlib-devel
+#
+# The DPDK is designed to optimize througput of network traffic using, among
+# other techniques, carefully crafted assembly instructions.  As such it
+# needs extensive work to port it to other architectures.
+#
+ExclusiveArch:  x86_64 i686 aarch64 ppc64le
 
 %description
 The Data Plane Development Kit is a set of libraries and drivers for
 fast packet processing in the user space.
 
 %package devel
-Summary: Data Plane Development Kit development files
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release} python3
+Summary:        Data Plane Development Kit development files
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       python3
 
 %description devel
 This package contains the headers and other files needed for developing
 applications with the Data Plane Development Kit.
 
 %package doc
-Summary: Data Plane Development Kit API documentation
-BuildArch: noarch
+Summary:        Data Plane Development Kit API documentation
+BuildArch:      noarch
 
 %description doc
 API programming documentation for the Data Plane Development Kit.
 
 %if %{with tools}
 %package tools
-Summary: Tools for setting up Data Plane Development Kit environment
-Requires: %{name} = %{epoch}:%{version}-%{release}
-Requires: kmod pciutils findutils iproute python3-pyelftools
+Summary:        Tools for setting up Data Plane Development Kit environment
+Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       findutils
+Requires:       iproute
+Requires:       kmod
+Requires:       pciutils
+Requires:       python3-pyelftools
 
 %description tools
 %{summary}
@@ -91,8 +90,8 @@ Requires: kmod pciutils findutils iproute python3-pyelftools
 
 %if %{with examples}
 %package examples
-Summary: Data Plane Development Kit example applications
-BuildRequires: libvirt-devel
+Summary:        Data Plane Development Kit example applications
+BuildRequires:  libvirt-devel
 
 %description examples
 Example applications utilizing the Data Plane Development Kit, such
@@ -103,17 +102,19 @@ as L2 and L3 forwarding.
 %define docdir  %{_docdir}/%{name}
 %define incdir %{_includedir}/%{name}
 %define pmddir %{_libdir}/%{name}-pmds
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 %prep
 %setup -q -n dpdk-stable-%{version}
-%patch0 -p1 
+%patch0 -p1
 %ifarch x86_64 i686
 %patch1 -p1
 %endif
 %patch2 -p1
 
 %build
-%set_build_flags
+%{set_build_flags}
 # set up a method for modifying the resulting .config file
 function setconf() {
 	if grep -q ^$1= %{target}/.config; then
@@ -295,6 +296,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4
+- Build without tools subpackage and dependencies.
+
 * Wed Oct 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:18.11.2-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Added the "Vendor" and "Distribution" tags.
@@ -397,6 +401,7 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 - Update to 16.11
 
 * Tue Aug 02 2016 Neil Horman <nhorman@redhat.com> - 16.07-1
+
 * Update to 16.07
 
 * Thu Apr 14 2016 Panu Matilainen <pmatilai@redhat.com> - 16.04-1
@@ -512,4 +517,3 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 
 * Tue May 13 2014 - Neil Horman <nhorman@tuxdriver.com> - 1.7.0-0.6.20140603git5ebbb1728
 - Initial Build
-
