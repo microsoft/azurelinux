@@ -37,9 +37,9 @@ readline-7.0-4.cm1.aarch64.rpm
 readline-devel-7.0-4.cm1.aarch64.rpm
 coreutils-8.30-6.cm1.aarch64.rpm
 coreutils-lang-8.30-6.cm1.aarch64.rpm
-bash-4.4.18-5.cm1.aarch64.rpm
-bash-devel-4.4.18-5.cm1.aarch64.rpm
-bash-lang-4.4.18-5.cm1.aarch64.rpm
+bash-4.4.18-6.cm1.aarch64.rpm
+bash-devel-4.4.18-6.cm1.aarch64.rpm
+bash-lang-4.4.18-6.cm1.aarch64.rpm
 bzip2-1.0.6-15.cm1.aarch64.rpm
 bzip2-devel-1.0.6-15.cm1.aarch64.rpm
 bzip2-libs-1.0.6-15.cm1.aarch64.rpm
