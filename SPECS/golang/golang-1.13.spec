@@ -1,4 +1,4 @@
-%global goroot          %{_lib}/golang
+%global goroot          /usr/lib/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
 %global gohostarch      arm64
@@ -33,7 +33,7 @@ Go is an open source programming language that makes it easy to build simple, re
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
 %ifarch aarch64
-patch -Np1 --ignore-whitespace < %{_prefix}/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
+patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
 %endif
 mv -v go go-bootstrap
 
@@ -42,11 +42,11 @@ mv -v go go-bootstrap
 
 %build
 # Build go 1.4 bootstrap
-pushd %{_prefix}/src/mariner/BUILD/go-bootstrap/src
+pushd /usr/src/mariner/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v %{_prefix}/src/mariner/BUILD/go-bootstrap %{_lib}/golang
-export GOROOT=%{_lib}/golang
+mv -v /usr/src/mariner/BUILD/go-bootstrap /usr/lib/golang
+export GOROOT=/usr/lib/golang
 
 # Build current go version
 export GOHOSTOS=linux
