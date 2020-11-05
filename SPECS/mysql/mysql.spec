@@ -2,7 +2,7 @@ Summary:        MySQL.
 Name:           mysql
 Version:        8.0.22
 Release:        1%{?dist}
-License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
+License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
