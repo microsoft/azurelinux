@@ -1,7 +1,7 @@
 Summary:        Logging Libraries
 Name:           liblogging
 Version:        1.0.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,8 +11,7 @@ Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description
-liblogging (the upstream project) is a collection of several components.
-Namely: stdlog, journalemu, rfc3195.
+liblogging (the upstream project) is a collection of several components: stdlog, journalemu and rfc3195.
 The stdlog component of liblogging can be viewed as an enhanced version of the
 syslog(3) API. It retains the easy semantics, but makes the API more
 sophisticated "behind the scenes" with better support for multiple threads
@@ -60,6 +59,9 @@ make %{?_smp_mflags} check
 %{_includedir}/liblogging/*.h
 
 %changelog
+* Wed Oct 28 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.6-4
+- Address source RPM publishing issue on packages.microsoft.com
+
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.6-3
 - Remove .la files
 - Lint to Mariner style

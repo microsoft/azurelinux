@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/UnZip.html
 Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -14,13 +14,11 @@ Patch1:         CVE-2015-1315.patch
 Patch2:         CVE-2015-7696.patch
 Patch3:         CVE-2016-9844.patch
 Patch4:         CVE-2014-9913.patch
-# Fixes CVE-2018-18384
-Patch5:         unzip_cfactor_overflow.patch
+Patch5:         unzip_cfactor_overflow-CVE-2018-18384.patch
 Patch6:         CVE-2014-8139.patch
 Patch7:         CVE-2014-8140.patch
 Patch8:         CVE-2014-8141.patch
-# Fixes CVE-2019-13232
-Patch9:         unzip-zipbomb-part1.patch
+Patch9:         unzip-zipbomb-part1-CVE-2019-13232.patch
 Patch10:        unzip-zipbomb-part2.patch
 Patch11:        unzip-zipbomb-part3.patch
 Patch12:        unzip-zipbomb-manpage.patch
@@ -71,6 +69,8 @@ make %{?_smp_mflags}  check
 %{_bindir}/*
 
 %changelog
+*   Fri Oct 23 2020 Nick Samson <nisamson@microsoft.com> 6.0-18
+-   Renamed patch files for CVE-2019-13232 and CVE-2018-18384 to ensure detection by CVE tooling
 *   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 6.0-17
 -   Use autosetup
 -   Fix names for CVE patches
