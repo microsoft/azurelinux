@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           apparmor
 Version:        2.13
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 License:        GNU LGPL v2.1
 URL:            https://launchpad.net/apparmor
@@ -288,7 +288,7 @@ make DESTDIR=%{buildroot} install
 /lib/apparmor/apparmor.systemd
 %{_bindir}/aa-exec
 %{_bindir}/aa-enabled
-%attr(644,root,root) %{_prefix}%{_unitdir}/apparmor.service
+%attr(644,root,root) %{_unitdir}/apparmor.service
 %dir %{_sysconfdir}/apparmor
 %dir %{_sysconfdir}/apparmor.d
 %config(noreplace) %{_sysconfdir}/apparmor/parser.conf
@@ -355,10 +355,13 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+*   Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.13-12
+-   Systemd supports merged /usr. Update with corresponding file locations and macros.
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.13-11
 -   Nopatch CVE-2016-1585
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-10
 -   Added %%license line automatically
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2.13-9
 -   Renaming Linux-PAM to pam
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.13-8

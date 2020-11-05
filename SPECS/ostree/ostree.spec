@@ -1,7 +1,7 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2019.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 URL:            https://ostree.readthedocs.io/en/latest
 Group:          Applications/System
@@ -109,12 +109,6 @@ make DESTDIR=%{buildroot} INSTALL="install -p -c" install
 find %{buildroot} -name '*.la' -delete
 install -D -m 0644 %{SOURCE1} %{buildroot}%{_prefix}/lib/systemd/system-preset/91-ostree.preset
 install -vdm 755 %{buildroot}/etc/ostree/remotes.d
-mkdir -p %{buildroot}%{_prefix}/lib/systemd/system/
-cp -R %{buildroot}/lib/systemd/system/*.service %{buildroot}%{_prefix}/lib/systemd/system/
-cp -R %{buildroot}/lib/systemd/system/ostree-finalize-staged.path %{buildroot}%{_prefix}/lib/systemd/system/
-mkdir -p %{buildroot}%{_libdir}/systemd/system-generators/
-cp -R %{buildroot}/lib/systemd/system-generators/ostree-system-generator %{buildroot}%{_libdir}/systemd/system-generators/
-rm -rf %{buildroot}/lib
 
 %post
 %systemd_post ostree-remount.service
@@ -133,8 +127,8 @@ rm -rf %{buildroot}/lib
 %{_bindir}/rofiles-fuse
 %{_datadir}/ostree
 %dir %{_libdir}/dracut/modules.d/98ostree
-%{_libdir}/systemd/system/ostree*.service
-%{_libdir}/systemd/system/ostree-finalize-staged.path
+%{_unitdir}/ostree*.service
+%{_unitdir}/ostree-finalize-staged.path
 %{_libdir}/dracut/modules.d/98ostree/*
 %{_mandir}/man1/ostree-admin*
 %{_libdir}/systemd/system-generators/ostree-system-generator
@@ -168,6 +162,8 @@ rm -rf %{buildroot}/lib
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+*   Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> 2019.2-10
+-   Systemd supports merged /usr. Update installation and unit file directory macro.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2019.2-9
 -   Added %%license line automatically
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.2-8

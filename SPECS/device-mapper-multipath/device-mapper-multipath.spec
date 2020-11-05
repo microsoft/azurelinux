@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.8.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -55,7 +55,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot} \
-   SYSTEMDPATH=/lib \
+   SYSTEMDPATH=%{_libdir} \
    bindir=%{_sbindir} \
    syslibdir=%{_libdir} \
    libdir=%{_libdir}/multipath \
@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 %{_sbindir}/mpathpersist
 %{_sbindir}/multipath
 %{_sbindir}/multipathd
-/lib/udev/rules.d/*
+%{_udevrulesdir}/*
 /lib64/*.so
 /lib64/*.so.*
 %{_unitdir}/*
@@ -97,10 +97,12 @@ rm -rf %{buildroot}
 %files -n kpartx
 %defattr(-,root,root,-)
 %{_sbindir}/kpartx
-/lib/udev/kpartx_id
+%{_libdir}/udev/kpartx_id
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+*   Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> 0.8.4-3
+-   Systemd supports merged /usr. Update with corresponding file locations and macros.
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 0.8.4-2
 -   Update Source0 URL.
 -   Use release tag instead of commit.

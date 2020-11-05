@@ -28,7 +28,7 @@
 
 Name:             open-vm-tools
 Version:          %{toolsversion}
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          Open Virtual Machine Tools for virtual machines hosted on VMware
 License:          GPLv2
 URL:              https://github.com/vmware/%{name}
@@ -152,7 +152,8 @@ autoreconf -vif
     --enable-resolutionkms \
     --enable-servicediscovery \
     --%{usetirpc} \
-    --disable-static
+    --disable-static \
+    --with-udev-rules-dir=%{_udevrulesdir}
 
 sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 %make_build
@@ -344,6 +345,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Wed Nov 04 2020 Ruying Chen <v-ruyche@microsoft.com> 11.1.0-5
+- Systemd supports merged /usr. Configure to build with corresponding directory.
+
 * Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 11.1.0-4
 - Rename input file for run-vmblock\x2dfuse.mount to avoid problems with backslash in the name.
 

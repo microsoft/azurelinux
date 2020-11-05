@@ -1,7 +1,7 @@
 Summary:          Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:             systemd-bootstrap
 Version:          239
-Release:          29%{?dist}
+Release:          30%{?dist}
 License:          LGPLv2+ and GPLv2+ and MIT
 URL:              https://www.freedesktop.org/wiki/Software/systemd/
 Group:            System Environment/Security
@@ -116,7 +116,7 @@ meson  --prefix %{_prefix}                                            \
        -Dldconfig=false                                               \
        -Drootprefix=                                                  \
        -Drootlibdir=/lib                                              \
-       -Dsplit-usr=true                                               \
+       -Dsplit-usr=false                                               \
        -Dsysusers=false                                               \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
@@ -140,7 +140,7 @@ done
 ln -sfv ../lib/systemd/systemd %{buildroot}/sbin/init
 sed -i '/srv/d' %{buildroot}/usr/lib/tmpfiles.d/home.conf
 sed -i "s:0775 root lock:0755 root root:g" %{buildroot}/usr/lib/tmpfiles.d/legacy.conf
-sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}/lib/systemd/network/99-default.link
+sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}/usr/lib/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}/etc/systemd/resolved.conf
 rm -f %{buildroot}%{_var}/log/README
 mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
@@ -151,8 +151,8 @@ find %{buildroot} -name '*.la' -delete
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
 install -dm 0755 %{buildroot}/boot/
 install -m 0644 %{SOURCE2} %{buildroot}/boot/
-rm %{buildroot}/lib/systemd/system/default.target
-ln -sfv multi-user.target %{buildroot}/lib/systemd/system/default.target
+rm %{buildroot}/usr/lib/systemd/system/default.target
+ln -sfv multi-user.target %{buildroot}/usr/lib/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 
@@ -203,19 +203,13 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 %config(noreplace) /boot/systemd.cfg
 %{_sysconfdir}/systemd/system/*
-/lib/udev/*
-/lib/systemd/systemd*
-/lib/systemd/system-*
-/lib/systemd/system/*
-/lib/systemd/network/80-container*
-/lib/systemd/*.so
-/lib/systemd/resolv.conf
-/lib/systemd/portablectl
-%config(noreplace) /lib/systemd/network/99-default.link
-%config(noreplace) /lib/systemd/portable/profile/default/service.conf
-%config(noreplace) /lib/systemd/portable/profile/nonetwork/service.conf
-%config(noreplace) /lib/systemd/portable/profile/strict/service.conf
-%config(noreplace) /lib/systemd/portable/profile/trusted/service.conf
+%{_libdir}/udev/*
+%{_libdir}/systemd/*
+%config(noreplace) %{_libdir}/systemd/network/99-default.link
+%config(noreplace) %{_libdir}/systemd/portable/profile/default/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/nonetwork/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/strict/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/trusted/service.conf
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
@@ -225,12 +219,11 @@ rm -rf %{buildroot}/*
 %{_libdir}/rpm
 /lib/security
 %{_libdir}/sysctl.d
-%{_libdir}/systemd
 %{_libdir}/tmpfiles.d
 /lib/*.so*
-/lib/modprobe.d/systemd.conf
+%{_libdir}/modprobe.d/systemd.conf
 %{_bindir}/*
-/bin/*
+/usr/sbin/*
 /sbin/*
 %{_datadir}/bash-completion/*
 %{_datadir}/factory/*
@@ -256,6 +249,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*  Mon Nov 02 2020 Ruying Chen <v-ruyche@microsoft.com> 239-30
+-  Configure to support merged /usr.
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
 -  Reduce kptr_restrict to 1
 *  Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-28

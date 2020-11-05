@@ -1,7 +1,7 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2, BSD 2-Clause and LGPLv2.1
 Group:          System Environment/Base
 URL:            https://sourceware.org/lvm2/
@@ -153,7 +153,7 @@ the device-mapper event library.
 %define _default_dm_run_dir /run
 %define _default_run_dir /run/lvm
 %define _default_locking_dir /run/lock/lvm
-%define _udevdir /lib/udev/rules.d
+%define _udevdir /usr/lib/udev/rules.d
 
 %configure \
     --prefix=%{_prefix} \
@@ -187,7 +187,7 @@ make install_system_dirs DESTDIR=%{buildroot}
 make install_systemd_units DESTDIR=%{buildroot}
 make install_systemd_generators DESTDIR=%{buildroot}
 make install_tmpfiles_configuration DESTDIR=%{buildroot}
-cp %{SOURCE1} %{buildroot}/lib/systemd/system/lvm2-activate.service
+cp %{SOURCE1} %{buildroot}/usr/lib/systemd/system/lvm2-activate.service
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable lvm2-activate.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
@@ -236,9 +236,9 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_sbindir}/dmstats
 %{_mandir}/man8/dmsetup.8.gz
 %{_mandir}/man8/dmstats.8.gz
-/lib/udev/rules.d/10-dm.rules
-/lib/udev/rules.d/13-dm-disk.rules
-/lib/udev/rules.d/95-dm-notify.rules
+%{_udevdir}/10-dm.rules
+%{_udevdir}/13-dm-disk.rules
+%{_udevdir}/95-dm-notify.rules
 
 %files -n device-mapper-devel
 %defattr(-,root,root,-)
@@ -272,8 +272,8 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %dir %{_sysconfdir}/lvm/backup
 %dir %{_sysconfdir}/lvm/cache
 %dir %{_sysconfdir}/lvm/archive
-/lib/udev/rules.d/11-dm-lvm.rules
-/lib/udev/rules.d/69-dm-lvm-metad.rules
+%{_udevdir}/11-dm-lvm.rules
+%{_udevdir}/69-dm-lvm-metad.rules
 %{_sbindir}/blkdeactivate
 %{_sbindir}/fsadm
 %{_sbindir}/lv*
@@ -300,6 +300,8 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 
 
 %changelog
+*   Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> 2.03.05-6
+-   Systemd supports merged /usr. Update with corresponding file locations and macros.
 *   Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.03.05-5
 -   Remove systemd-bootstrap from Requires, which fixes chroot install issue. 
 *   Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.03.05-4

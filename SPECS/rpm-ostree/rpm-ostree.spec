@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2019.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/projectatomic/rpm-ostree
 Vendor:         Microsoft Corporation
@@ -127,7 +127,7 @@ make check
 %{_libdir}/*.so.1*
 %{_libdir}/girepository-1.0/*.typelib
 %{_sysconfdir}/dbus-1/system.d/*
-%{_prefix}%{_unitdir}/*.service
+%{_unitdir}/*.service
 %{_libexecdir}/*
 %{_datadir}/dbus-1/system-services/*
 %config(noreplace) %{_sysconfdir}/rpm-ostreed.conf
@@ -147,6 +147,8 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Wed Nov 04 2020 Ruying Chen <v-ruyche@microsoft.com> - 2019.3-7
+- Systemd supports merged /usr. Update unit file directory macro.
 * Sat May 09 00:20:55 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019.3-6
 - Added %%license line automatically
 

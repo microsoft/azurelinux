@@ -4,7 +4,7 @@
 
 Name:           dnf
 Version:        4.2.18
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python 3 version of the DNF package manager.
 License:        GPLv2+ or GPL
 URL:            https://github.com/rpm-software-management/dnf
@@ -89,8 +89,8 @@ ctest -VV
 %files -f %{name}.lang
 %{_bindir}/%{name}
 %{_sysconfdir}/bash_completion.d/dnf
-%{_prefix}%{_unitdir}/%{name}-makecache.service
-%{_prefix}%{_unitdir}/%{name}-makecache.timer
+%{_unitdir}/%{name}-makecache.service
+%{_unitdir}/%{name}-makecache.timer
 
 # Yum excludes
 %exclude %{confdir}/protected.d/yum.conf
@@ -129,17 +129,20 @@ ctest -VV
 %files automatic
 %{_bindir}/%{name}-automatic
 %config(noreplace) %{confdir}/automatic.conf
-%{_prefix}%{_unitdir}/%{name}-automatic.service
-%{_prefix}%{_unitdir}/%{name}-automatic.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-notifyonly.service
-%{_prefix}%{_unitdir}/%{name}-automatic-notifyonly.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-download.service
-%{_prefix}%{_unitdir}/%{name}-automatic-download.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-install.service
-%{_prefix}%{_unitdir}/%{name}-automatic-install.timer
+%{_unitdir}/%{name}-automatic.service
+%{_unitdir}/%{name}-automatic.timer
+%{_unitdir}/%{name}-automatic-notifyonly.service
+%{_unitdir}/%{name}-automatic-notifyonly.timer
+%{_unitdir}/%{name}-automatic-download.service
+%{_unitdir}/%{name}-automatic-download.timer
+%{_unitdir}/%{name}-automatic-install.service
+%{_unitdir}/%{name}-automatic-install.timer
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> 4.2.18-3
+- Systemd supports merged /usr. Update with corresponding file locations and macros.
+
 * Sun Apr 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2.18-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT). Added 'Distribution' and 'Vendor' tags.
 - Fixed "Source0" tag.

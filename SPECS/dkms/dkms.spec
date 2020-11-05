@@ -1,7 +1,7 @@
 Summary:       Dynamic Kernel Module Support
 Name:          dkms
 Version:       2.8.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 License:       GPLv2
 URL:           https://github.com/dell/dkms
 Group:         System Environment/Base
@@ -50,7 +50,7 @@ echo "disable dkms.service" > %{buildroot}/usr/lib/systemd/system-preset/50-dkms
 %{_sysconfdir}/%{name}/template-dkms-redhat-kmod.spec
 %{_sysconfdir}/kernel/postinst.d/dkms
 %{_sysconfdir}/kernel/prerm.d/dkms
-/lib/systemd/system/dkms.service
+%{_unitdir}/dkms.service
 %{_libdir}/systemd/system-preset/50-dkms.preset
 %{_libdir}/%{name}/*
 %{_sbindir}/dkms
@@ -58,6 +58,9 @@ echo "disable dkms.service" > %{buildroot}/usr/lib/systemd/system-preset/50-dkms
 %{_localstatedir}/lib/dkms/dkms_dbversion
 
 %changelog
+* Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.8.1-4
+- Systemd supports merged /usr. Update with corresponding file locations and macros.
+
 * Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.8.1-3
 - Added %%license line automatically
 

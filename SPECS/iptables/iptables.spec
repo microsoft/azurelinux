@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 URL:            http://www.netfilter.org/projects/iptables
 Group:          System Environment/Security
@@ -80,7 +80,7 @@ rm -rf %{buildroot}/*
 %config(noreplace) /etc/systemd/scripts/iptables.stop
 %config(noreplace) /etc/systemd/scripts/ip4save
 %config(noreplace) /etc/systemd/scripts/ip6save
-/lib/systemd/system/iptables.service
+%{_unitdir}/iptables.service
 %{_sbindir}/*
 %{_bindir}/*
 %{_libdir}/*.so.*
@@ -96,6 +96,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.8.3-4
+- Systemd supports merged /usr. Update with corresponding file locations and macros.
 * Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
 - Added %%license line automatically
 
