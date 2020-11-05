@@ -16,8 +16,8 @@ Patch0:         bash-4.4.patch
 Patch1:         CVE-2019-18276.nopatch
 BuildRequires:  readline
 Requires:       readline
-Requires(post): /bin/cp
-Requires(post): /bin/grep
+Requires(post):   /bin/cp
+Requires(post):   /bin/grep
 Requires(postun): /bin/grep
 Requires(postun): /bin/mv
 Provides:       /bin/sh
