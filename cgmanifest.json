@@ -4226,8 +4226,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.7",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tar.xz"
+          "version": "3.7.9",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tar.xz"
         }
       }
     },
