@@ -1,23 +1,21 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
-URL:            http://www.xmlsoft.org/
-Group:          System Environment/General Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/General Libraries
+URL:            http://www.xmlsoft.org/
 Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-20388.patch
 Patch1:         CVE-2020-7595.patch
-
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python3-devel
-Provides:       pkgconfig(libxml-2.0)
+Provides:       pkgconfig(libxml-2.0) = %{version}-%{release}
 
 %description
 The libxml2 package contains libraries and utilities used for parsing XML files.
@@ -42,8 +40,8 @@ Requires:       python3
 Python3 libxml2.
 
 %package devel
-Summary:    Libraries and header files for libxml
-Requires:   %{name} = %{version}
+Summary:        Libraries and header files for libxml
+Requires:       %{name} = %{version}
 
 %description devel
 Static libraries and header files for the support library for libxml
@@ -60,13 +58,13 @@ make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 make clean
 %configure \
     --disable-static \
-    --with-python=/usr/bin/python3
+    --with-python=%{_bindir}/python3
 make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
@@ -75,8 +73,10 @@ make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %clean
 rm -rf %{buildroot}/*
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -87,7 +87,6 @@ rm -rf %{buildroot}/*
 %{_datadir}/aclocal/*
 %{_datadir}/gtk-doc/*
 %{_mandir}/man1/*
-
 
 %files python
 %defattr(-,root,root)
@@ -105,6 +104,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-3
+- Version pkgconfig(libxml-2.0) provide.
+
 * Wed Sep 09 2020 Thomas Crain <thcrain@microsoft.com> - 2.9.10-2
 - Patch CVE-2019-20388 and CVE-2020-7595.
 

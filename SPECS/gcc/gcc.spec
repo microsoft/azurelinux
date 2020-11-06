@@ -3,25 +3,25 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        9.1.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
-URL:            https://gcc.gnu.org/
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
+URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         090_all_pr55930-dependency-tracking.patch
 # Only applies to the Power9 ISA
 Patch1:         CVE-2019-15847.nopatch
 Requires:       gcc-c++ = %{version}-%{release}
-Requires:       libstdc++-devel = %{version}-%{release}
+Requires:       gmp
+Requires:       libgcc-atomic = %{version}-%{release}
 Requires:       libgcc-devel = %{version}-%{release}
 Requires:       libgomp-devel = %{version}-%{release}
-Requires:       libgcc-atomic = %{version}-%{release}
-Requires:       gmp
 Requires:       libmpc
+Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       cpp = %{version}-%{release}
-
+Provides:       gcc-plugin-devel = %{version}-%{release}
 #%if %{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
@@ -36,12 +36,14 @@ Summary:        GNU Fortran compiler.
 Group:          Development/Tools
 Requires:       gcc = %{version}-%{release}
 Provides:       gcc-gfortran = %{version}-%{release}
+
 %description -n gfortran
 The gfortran package contains GNU Fortran compiler.
 
 %package -n     libgcc
-Summary:    GNU C Library
+Summary:        GNU C Library
 Group:          System Environment/Libraries
+
 %description -n libgcc
 The libgcc package contains GCC shared libraries for gcc.
 
@@ -50,6 +52,7 @@ Summary:        GNU C Library for atomic counter updates
 Group:          System Environment/Libraries
 Requires:       libgcc = %{version}-%{release}
 Provides:       libatomic = %{version}-%{release}
+
 %description -n libgcc-atomic
 The libgcc package contains GCC shared libraries for atomic counter updates.
 
@@ -57,6 +60,7 @@ The libgcc package contains GCC shared libraries for atomic counter updates.
 Summary:        GNU C Library
 Group:          Development/Libraries
 Requires:       libgcc = %{version}-%{release}
+
 %description -n libgcc-devel
 The libgcc package contains GCC shared libraries for gcc .
 This package contains development headers and static library for libgcc.
@@ -68,6 +72,7 @@ Requires:       gcc = %{version}-%{release}
 Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       gcc-g++ = %{version}-%{release}
 Provides:       g++ = %{version}-%{release}
+
 %description    c++
 This package adds C++ support to the GNU Compiler Collection.
 It includes support for most of the current C++ specification,
@@ -77,6 +82,7 @@ including templates and exception handling.
 Summary:        GNU C Library
 Group:          System Environment/Libraries
 Requires:       libgcc = %{version}-%{release}
+
 %description -n libstdc++
 This package contains the GCC Standard C++ Library v3, an ongoing project to implement the ISO/IEC 14882:1998 Standard C++ library.
 
@@ -85,6 +91,7 @@ Summary:        GNU C Library
 Group:          Development/Libraries
 Requires:       libstdc++ = %{version}-%{release}
 Provides:       libstdc++-static = %{version}-%{release}
+
 %description -n libstdc++-devel
 This is the GNU implementation of the standard C++ libraries.
 This package includes the headers files and libraries needed for C++ development.
@@ -92,6 +99,7 @@ This package includes the headers files and libraries needed for C++ development
 %package -n     libgomp
 Summary:        GNU C Library
 Group:          System Environment/Libraries
+
 %description -n libgomp
 An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU Compiler Collection.
 
@@ -99,6 +107,7 @@ An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU 
 Summary:        Development headers and static library for libgomp
 Group:          Development/Libraries
 Requires:       libgomp = %{version}-%{release}
+
 %description -n libgomp-devel
 An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU Compiler Collection.
 This package contains development headers and static library for libgomp
@@ -133,7 +142,7 @@ make %{?_smp_mflags}
 
 %install
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/%_lib
+install -vdm 755 %{buildroot}/%{_lib}
 ln -sv %{_bindir}/cpp %{buildroot}/%{_lib}
 ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
@@ -161,19 +170,19 @@ make %{?_smp_mflags} check-gcc
 %defattr(-,root,root)
 %license COPYING
 %{_lib}/cpp
-#   Executables
+# Executables
 %exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
 %exclude %{_bindir}/*g++
 %{_bindir}/*
-#   Libraries
+# Libraries
 %{_lib64dir}/*
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 %{_libdir}/gcc/*
-#   Library executables
+# Library executables
 %{_libexecdir}/gcc/*
-#   Man pages
+# Man pages
 %{_mandir}/man1/gcov.1.gz
 %{_mandir}/man1/gcov-dump.1.gz
 %{_mandir}/man1/gcov-tool.1.gz
@@ -242,6 +251,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-9
+- Provide gcc-plugin-devel.
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 9.1.0-8
 - Split gcc-c++ subpackage.
 - Provide cpp, gcc-gfortran, libatomic, and listdc++-static.
