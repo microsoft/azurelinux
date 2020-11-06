@@ -2,8 +2,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.7
-Release:        2%{?dist}
+Version:        3.7.9
+Release:        1%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -265,6 +265,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Nov 06 2020 Thomas Crain <thcrain@microsoft.com> - 3.7.9-1
+- Update to 3.7.9, the lastest security release for 3.7
 *   Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> 3.7.7-2
 -   Add BuildRequires for iana-etc and tzdata for check section.
 *   Wed Jun 10 2020 Paul Monson <paulmon@microsoft.com> 3.7.7-1
