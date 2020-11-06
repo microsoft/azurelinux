@@ -1,13 +1,14 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://cdn.mysql.com/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
+Patch0:         CVE-2012-5627.nopatch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -25,7 +26,7 @@ Requires:       %{name} = %{version}-%{release}
 Development headers for developing applications linking to maridb
 
 %prep
-%setup -q %{name}-boost-%{version}
+%autosetup -p1
 
 %build
 cmake . \
@@ -75,9 +76,12 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-* Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
-- Upgrade to 8.0.22. Fixes 40 CVES.
-- Lint spec
+*   Thu Nov 05 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-2
+-   Added no patch for CVE-2012-5627
+
+*   Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
+-   Upgrade to 8.0.22. Fixes 40 CVES.
+-   Lint spec
 
 *   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.21-1
 -   Upgrade to 8.0.21. Fixes 32 CVEs.
