@@ -77,7 +77,7 @@ make test
 
 %changelog
 * Thu Nov 05 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-2
-- No patch
+- Added no patch for CVE-2012-5627
 
 *   Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
 -   Upgrade to 8.0.22. Fixes 40 CVES.
