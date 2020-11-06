@@ -1,3 +1,4 @@
+%define _unpackaged_files_terminate_build 0
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
 # machine_arch maps between rpm and dpdk arch name, often same as _target_cpu
@@ -298,6 +299,7 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %changelog
 * Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4
 - Build without tools subpackage and dependencies.
+- Set _unpackaged_files_terminate_build since tools are not being packaged.
 
 * Wed Oct 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:18.11.2-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
