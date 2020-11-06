@@ -12,6 +12,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
+Patch3:         CVE-2020-27619.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -136,6 +137,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 export OPT="%{optflags} %{openssl_flags}"
@@ -260,6 +262,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Nov 06 2020 Thomas Crain <thcrain@microsoft.com> - 3.7.9-2
+- Patch CVE-2020-27619
+
 * Fri Nov 06 2020 Thomas Crain <thcrain@microsoft.com> - 3.7.9-1
 - Update to 3.7.9, the lastest security release for 3.7
 
