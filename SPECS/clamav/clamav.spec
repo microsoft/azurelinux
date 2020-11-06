@@ -4,7 +4,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.101.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 and BSD and bzip2-1.0.4 and GPLv2 and LGPLv2+ and MIT and Public Domain and UnRar
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
@@ -58,7 +58,7 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
-/lib/systemd/*
+%{_unitdir}/*
 %{_sbindir}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -66,6 +66,8 @@ make %{?_smp_mflags} check
 
 
 %changelog
+* Fri Nov 06 2020 Ruying Chen <v-ruyche@microsoft.com> 0.101.2-4
+- Systemd supports merged /usr. Update units file location and macro.
 * Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.101.2-3
 - License verified.
 - Added %%license macro.
