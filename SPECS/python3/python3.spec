@@ -174,8 +174,6 @@ rm -rf %{buildroot}/*
 %files
 %defattr(-, root, root)
 %license LICENSE
-%license LICENSE
-%doc README.rst
 %{_bindir}/pydoc*
 %{_bindir}/pyvenv*
 %{_bindir}/python3
@@ -199,8 +197,6 @@ rm -rf %{buildroot}/*
 
 %files libs
 %defattr(-,root,root)
-%license LICENSE
-%doc README.rst
 %{_libdir}/python3.7
 %{_libdir}/python3.7/site-packages/easy_install.py
 %{_libdir}/python3.7/site-packages/README.txt
