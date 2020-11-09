@@ -26,7 +26,7 @@ BuildRequires:  zip
 BuildRequires:  zlib-devel
 Requires:       chkconfig
 Requires:       openjre8 = %{version}-%{release}
-AutoReqProv:    AutoReqProv:    no
+AutoReqProv:    no
 Obsoletes:      openjdk <= %{version}
 Provides:       java-devel = %{version}-%{release}
 Provides:       java-1.8.0-openjdk = %{version}-%{release}
