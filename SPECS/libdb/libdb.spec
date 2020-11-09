@@ -1,4 +1,3 @@
-%define sha1 db=fa3f8a41ad5101f43d08bc0efb6241c9b6fc1ae9
 Summary:        The Berkley DB database library for C
 Name:           libdb
 Version:        5.3.28
