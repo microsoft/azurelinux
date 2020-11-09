@@ -41,7 +41,7 @@ The OpenJDK package installs java class library and javac java compiler.
 Summary:        Java runtime environment
 Requires:       chkconfig
 Requires:       libstdc++
-AutoReqProv:    AutoReqProv: 	no
+AutoReqProv:    no
 Obsoletes:      openjre <= %{version}
 
 %description	-n openjre8

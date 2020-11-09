@@ -27,7 +27,7 @@ BuildRequires:  zip
 BuildRequires:  zlib-devel
 Requires:       chkconfig
 Requires:       openjre8 = %{version}-%{release}
-AutoReqProv:    AutoReqProv: 	no
+AutoReqProv:    no
 Obsoletes:      openjdk <= %{version}
 Provides:       java-devel = %{version}-%{release}
 Provides:       java-1.8.0-openjdk = %{version}-%{release}
@@ -42,7 +42,7 @@ The OpenJDK package installs java class library and javac java compiler.
 Summary:        Java runtime environment
 Requires:       chkconfig
 Requires:       libstdc++
-AutoReqProv:    AutoReqProv: 	no
+AutoReqProv:    no
 Obsoletes:      openjre <= %{version}
 
 %description	-n openjre8
