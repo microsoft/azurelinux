@@ -9,7 +9,7 @@ Group:          Applications/System
 URL:            https://ftp.gnu.org/gnu/parted/parted-3.2.tar.xz
 Source0:        http://ftp.gnu.org/gnu/parted/%{name}-%{version}.tar.xz
 Conflicts:      toybox
-Provides:       parted-devel = %{version}-%{release}
+Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 This is useful for creating space for new operating systems,
