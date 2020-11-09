@@ -142,7 +142,7 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-10
+* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-9
 - Provide /sbin/nologin.
 
 * Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
