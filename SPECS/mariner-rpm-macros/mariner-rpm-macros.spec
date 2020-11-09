@@ -2,7 +2,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.python*
 
 %changelog
+* Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0-9
+- Define meson macros.
+
 * Mon Nov 02 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.0-8
 - Define gpgverify macro.
 

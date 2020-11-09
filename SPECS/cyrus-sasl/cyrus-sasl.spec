@@ -1,24 +1,25 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Custom
-URL:            https://www.cyrusimap.org/sasl/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-19906.patch
-
-BuildRequires:  systemd
-BuildRequires:  openssl-devel
-BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  e2fsprogs-devel
+BuildRequires:  krb5-devel >= 1.12
+BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
-Requires:       openssl
+BuildRequires:  systemd
 Requires:       krb5 >= 1.12
+Requires:       openssl
 Requires:       pam
 Requires:       systemd
+Provides:       %{name}-devel = %{version}-%{release}
+
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
 Layer, a method for adding authentication support to
@@ -31,6 +32,7 @@ protocol and the connection.
 %prep
 %setup -q
 %patch0 -p1
+
 %build
 autoreconf -fi
 ./configure \
@@ -39,7 +41,7 @@ autoreconf -fi
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
-    --sysconfdir=/etc \
+    --sysconfdir=%{_sysconfdir} \
     --with-plugindir=%{_libdir}/sasl2 \
     --without-dblib \
     --with-saslauthd=/run/saslauthd \
@@ -58,11 +60,12 @@ autoreconf -fi
     --enable-krb4
 
 make
+
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
-find %{buildroot}/%{_libdir} -name '*.la' -delete
-install -D -m644 COPYING %{buildroot}/usr/share/licenses/%{name}/LICENSE
+find %{buildroot} -type f -name "*.la" -delete -print
+install -D -m644 COPYING %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_fixperms} %{buildroot}/*
 
 mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
@@ -88,8 +91,8 @@ Description=SASL authentication daemon.
 [Service]
 Type=forking
 PIDFile=/run/saslauthd/saslauthd.pid
-EnvironmentFile=/etc/sysconfig/saslauthd
-ExecStart=/usr/sbin/saslauthd -m \$SOCKETDIR -a \$MECH \$FLAGS
+EnvironmentFile=%{_sysconfdir}/sysconfig/saslauthd
+ExecStart=%{_sbindir}/saslauthd -m \$SOCKETDIR -a \$MECH \$FLAGS
 RuntimeDirectory=saslauthd
 
 [Install]
@@ -115,10 +118,11 @@ make %{?_smp_mflags} check
 
 %clean
 rm -rf %{buildroot}/*
+
 %files
 %defattr(-,root,root)
 %license COPYING
-/etc/sysconfig/saslauthd
+%{_sysconfdir}/sysconfig/saslauthd
 /lib/systemd/system/saslauthd.service
 %{_libdir}/systemd/system-preset/50-saslauthd.preset
 %{_includedir}/*
@@ -131,41 +135,62 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1.27-5
+- Provide cyrus-sasl-devel.
+
 *   Thu May 28 2020 Andrew Phelps <anphel@microsoft.com> 2.1.27-4
 -   Add patch to fix CVE-2019-19906
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.1.27-3
 -   Added %%license line automatically
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2.1.27-2
 -   Renaming Linux-PAM to pam
+
 *   Wed Mar 25 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.1.27-1
 -   Update version to 2.1.27. License verified. URL and Source0 updated.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.26-15
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue Nov 21 2017 Anish Swaminathan <anishs@vmware.com>  2.1.26-14
 -   Update patch for memory leak fix
+
 *   Tue Oct 10 2017 Anish Swaminathan <anishs@vmware.com>  2.1.26-13
 -   Add patch for memory leak fix
+
 *   Thu Jun 29 2017 Divya Thaluru <dthaluru@vmware.com>  2.1.26-12
 -   Disabled saslauthd service by default
+
 *   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.1.26-11
 -   BuildRequires Linux-PAM-devel
+
 *   Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.1.26-10
 -   Required krb5-devel.
+
 *   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 2.1.26-9
 -   Modified %check
+
 *   Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com>  2.1.26-8
 -   Fixed logic to restart the active services after upgrade
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.1.26-7
 -   GA - Bump release of all rpms
+
 *   Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  2.1.26-6
 -   Fixing spec file to handle rpm upgrade scenario correctly
+
 *   Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  2.1.26-5
 -   Add systemd to Requires and BuildRequires.
+
 *   Wed Nov 11 2015 Xiaolin Li <xiaolinl@vmware.com> 2.1.26-4
 -   Add saslauthd service to systemd.
+
 *   Tue Sep 01 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.1.26-3
 -   Enable CRAM.
+
 *   Thu Jul 16 2015 Divya Thaluru <dthaluru@vmware.com> 2.1.26-2
 -   Disabling parallel threads in make
+
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.1.26-1
 -   Initial build. First version

@@ -71,6 +71,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
+    sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
@@ -296,6 +297,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^python2-" >> $1
     cat $TmpPkgGen | grep "^python-xml-" >> $1
     cat $TmpPkgGen | grep "^python3-" >> $1
+    cat $TmpPkgGen | grep "^systemd-rpm-macros-" >> $1
 }
 
 # Generate toolchain_*.txt based on the toolchain_built_rpms_all.tar.gz file contents
