@@ -1,35 +1,33 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define _python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
 Summary:        Repodata downloading library
 Name:           librepo
 Version:        1.11.0
 Release:        3%{?dist}
 License:        LGPLv2+
-URL:            https://github.com/rpm-software-management/librepo
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/rpm-software-management/librepo
 #Source0:       https://github.com/rpm-software-management/librepo/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # CVE-2020-14352 patch taken from upstream commit 7daea2a2429a54dad68b1de9b37a5f65c5cf2600
 Patch0:         CVE-2020-14352.patch
-
-BuildRequires:  cmake
-BuildRequires:  gcc
+BuildRequires:  attr-devel
 BuildRequires:  check
+BuildRequires:  cmake
+BuildRequires:  curl-devel
+BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  gpgme-devel
-BuildRequires:  attr-devel
-BuildRequires:  curl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
-BuildRequires:  zchunk-devel
 BuildRequires:  python-sphinx
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx
+BuildRequires:  zchunk-devel
 Requires:       curl-libs
 Requires:       gpgme
 Requires:       zchunk
@@ -40,24 +38,24 @@ metadata.
 
 %package devel
 Summary:        Repodata downloading library
-Requires:       curl-libs
-Requires:       curl-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       curl-devel
+Requires:       curl-libs
 
 %description devel
 Development files for librepo.
 
 %package -n python2-%{name}
-Summary:        Python bindings for the librepo library
 %{?python_provide:%python_provide python2-%{name}}
+Summary:        Python bindings for the librepo library
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python2-%{name}
 Python 2 bindings for the librepo library.
 
 %package -n python3-%{name}
-Summary:        Python 3 bindings for the librepo library
 %{?python_provide:%python_provide python3-%{name}}
+Summary:        Python 3 bindings for the librepo library
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-%{name}
@@ -70,12 +68,12 @@ mkdir build-py3
 
 %build
 pushd build-py2
-  %cmake -DPYTHON_DESIRED:FILEPATH=/usr/bin/python -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
+  %cmake -DPYTHON_DESIRED:FILEPATH=%{_bindir}/python -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
   make %{?_smp_mflags}
 popd
 
 pushd build-py3
-  %cmake -DPYTHON_DESIRED:FILEPATH=/usr/bin/python3 -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
+  %cmake -DPYTHON_DESIRED:FILEPATH=%{_bindir}/python3 -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
   make %{?_smp_mflags}
 popd
 
@@ -96,7 +94,6 @@ popd
 
 %files
 %license COPYING
-%doc COPYING
 %doc README.md
 %{_libdir}/%{name}.so.*
 
