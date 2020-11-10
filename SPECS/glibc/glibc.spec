@@ -32,7 +32,7 @@ Patch10:        CVE-2020-1751.nopatch
 Patch11:        CVE-2018-20796.nopatch
 Patch12:        CVE-2019-7309.patch
 # CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
-Patch13:		CVE-2019-19126.patch
+Patch13:        CVE-2019-19126.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
