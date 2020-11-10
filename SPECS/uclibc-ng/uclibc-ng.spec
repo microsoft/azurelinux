@@ -1,16 +1,14 @@
-%global uclibc_name uClibc
+%global uclibc_name uClibc-ng
 
-Name:    uclibc
-Version: 0.9.33.2
-Release: 22%{?dist}
+Name:    uclibc-ng
+Version: 1.0.36
+Release: 1%{?dist}
 Summary: C library for embedded Linux
 
 License: LGPLv2
 URL:     http://www.uclibc.org/
-Source0: http://www.uclibc.org/downloads/%{uclibc_name}-%{version}.tar.xz
+Source0: https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
 Source1: uClibc.config
-Patch1:  uClibc-0.9.33.2_kernel_long.patch
-Patch2:  CVE-2016-6264.patch
 
 BuildRequires: gcc
 
@@ -18,13 +16,14 @@ BuildRequires: gcc
 %global debug_package %{nil}
 
 %description
-uClibc is a C library for developing embedded Linux systems.
+uClibc-ng is a C library for developing embedded Linux systems.
 It is much smaller than the GNU C Library, but nearly all applications
 supported by glibc also work perfectly with uClibc.
 
 %package devel
 Summary: Header files and libraries for uClibc library
 Provides: uclibc-static = %{version}-%{release}
+Provides: uclibc-devel = %{version}-%{release}
 
 %description devel
 uClibc is a C library for developing embedded Linux systems.
@@ -35,8 +34,6 @@ needed for uClibc package.
 
 %prep
 %setup -q -n %{uclibc_name}-%{version}
-%patch1 -b .kernel_long -p1
-%patch2 -b .CVE-2016-6264 -p1
 
 cat %{SOURCE1} >.config1
 iconv -f windows-1252 -t utf-8 README >README.pom
@@ -79,15 +76,15 @@ mv  $RPM_BUILD_ROOT/include/*  $RPM_BUILD_ROOT/%{_includedir}/uClibc
 rm -rf  $RPM_BUILD_ROOT/include/
 
 %files devel
-%doc README docs/Glibc_vs_uClibc_Differences.txt docs/threads.txt docs/uClibc_vs_SuSv3.txt
-%doc TODO DEDICATION.mjn3 MAINTAINERS
-%doc docs/PORTING COPYING.LIB
+%doc docs/Glibc_vs_uClibc_Differences.txt docs/uClibc_vs_SuSv3.txt docs/porting.txt
+%doc README MAINTAINERS COPYING.LIB
 %{_includedir}/uClibc
 %{_libdir}/uClibc
 
 %changelog
-* Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 0.9.33.2-22
+* Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.0.36-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
+- Change uclibc to uclibc-ng
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.33.2-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
