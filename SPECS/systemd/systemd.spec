@@ -189,8 +189,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
 install -dm 0700 %{buildroot}/boot/
 install -m 0600 %{SOURCE2} %{buildroot}/boot/
-rm %{buildroot}/usr/lib/systemd/system/default.target
-ln -sfv multi-user.target %{buildroot}/usr/lib/systemd/system/default.target
+rm %{buildroot}%{_lib}/systemd/system/default.target
+ln -sfv multi-user.target %{buildroot}%{_lib}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
@@ -200,6 +200,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-,root,root)
@@ -261,7 +262,7 @@ rm -rf %{buildroot}/*
 /lib/*.so*
 %{_libdir}/modprobe.d/systemd.conf
 %{_bindir}/*
-/usr/sbin/*
+%{_sbindir}/*
 /sbin/*
 %{_datadir}/bash-completion/*
 %{_datadir}/factory/*
