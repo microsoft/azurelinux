@@ -69,7 +69,7 @@ Requires:       libgcrypt
 Requires:       pam
 Requires:       xz
 Obsoletes:      systemd-bootstrap
-Provides:       systemd-unit = %{version}-%{release}
+Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
 
 %description
@@ -300,7 +300,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 239-33
-- Provide systemd-libs, systemd-unit, and systemd-sysv.
+- Provide systemd-libs, systemd-units, and systemd-sysv.
 - Subpackage rpm-macros.
 
 *  Wed Sep 23 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 239-32
