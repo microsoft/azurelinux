@@ -133,9 +133,9 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 	return ExecuteLiveWithCallback(onStdout, onStderr, false, program, args...)
 }
 
-// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks it in real-time on each line of stdout and stderr.
+// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
 // If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
-// the buffer the oldest buffered output is discarded.
+// the buffer becomes full the oldest buffered output is discarded.
 func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
 	var outputChan chan string
 	const outputChanBufferSize = 1500
