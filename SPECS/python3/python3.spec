@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
