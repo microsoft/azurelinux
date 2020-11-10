@@ -5,7 +5,7 @@
 Summary:        Repodata downloading library
 Name:           librepo
 Version:        1.11.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/rpm-software-management/librepo
 Group:          Applications/System
@@ -13,6 +13,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://github.com/rpm-software-management/librepo/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# CVE-2020-14352 patch taken from upstream commit 7daea2a2429a54dad68b1de9b37a5f65c5cf2600
+Patch0:         CVE-2020-14352.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -62,7 +64,7 @@ Requires:       %{name} = %{version}-%{release}
 Python 3 bindings for the librepo library.
 
 %prep
-%setup -q
+%autosetup
 mkdir build-py2
 mkdir build-py3
 
@@ -110,14 +112,21 @@ popd
 %{_python3_sitearch}/%{name}/
 
 %changelog
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
+* Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 1.11.0-3
+- Patch CVE-2020-14352
+- Lint to Mariner style
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
 - Added %%license line automatically
 
-*   Tue May 05 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.11.0-1
--   Update version to 1.11.0.
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.10.3-1
--   Update to version 1.10.3. License verified.
-*   Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 1.10.2-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 1.10.2-1
--   Initial build. First version
+* Tue May 05 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-1
+- Update version to 1.11.0.
+
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> - 1.10.3-1
+- Update to version 1.10.3. License verified.
+
+* Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.10.2-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed May 15 2019 Ankit Jain <ankitja@vmware.com> - 1.10.2-1
+- Initial build. First version
