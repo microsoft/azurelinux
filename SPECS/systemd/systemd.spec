@@ -292,7 +292,7 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
-* Tue Nov 10 2020 Ruying Chen <v-ruyche@microsoft.com> 239-34
+* Tue Nov 10 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-34
 - Configure to support merged /usr.
 
 * Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 239-33
