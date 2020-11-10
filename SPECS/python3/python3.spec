@@ -12,6 +12,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
+# CVE-2020-27619 patch is pulled from upstream commit
 Patch3:         CVE-2020-27619.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -266,7 +267,7 @@ rm -rf %{buildroot}/*
 - Patch CVE-2020-27619
 
 * Fri Nov 06 2020 Thomas Crain <thcrain@microsoft.com> - 3.7.9-1
-- Update to 3.7.9, the lastest security release for 3.7
+- Update to 3.7.9, the latest security release for 3.7
 
 * Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.7.7-2
 - Add BuildRequires for iana-etc and tzdata for check section.
