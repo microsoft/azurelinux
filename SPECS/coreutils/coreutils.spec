@@ -10,6 +10,7 @@ URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
+# The following two patches are sourced from RedHat via Photon
 Patch0:         coreutils-8.30-i18n-1.patch
 Patch1:         coreutils-8.10-uname-1.patch
 # Upstream community agreed to not fix this
