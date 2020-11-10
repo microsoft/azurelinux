@@ -1,21 +1,26 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.30
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/coreutils
-Source0:        http://ftp.gnu.org/gnu/coreutils/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
-Patch0:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.30-i18n-1.patch
-Patch1:         http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.10-uname-1.patch
+# The following two patches are sourced from RedHat via Photon
+Patch0:         coreutils-8.30-i18n-1.patch
+Patch1:         coreutils-8.10-uname-1.patch
 # Upstream community agreed to not fix this
 Patch2:         CVE-2016-2781.nopatch
-# Fixed in coreutils-8.30-i18n-1.patch
+# CVE-2013-0221 is fixed in coreutils-8.30-i18n-1.patch
 Patch3:         CVE-2013-0221.nopatch
+# CVE-2013-0222 is fixed in coreutils-8.30-i18n-1.patch
+Patch4:         CVE-2013-0222.nopatch
+# CVE-2013-0223 is fixed in coreutils-8.30-i18n-1.patch
+Patch5:         CVE-2013-0223.nopatch
 Requires:       gmp
 Conflicts:      toybox
 Provides:       sh-utils
@@ -88,6 +93,11 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 8.30-7
+- Nopatch CVE-2013-0222, CVE-2013-0223
+- Remove references to Linux From Scratch
+- Change Source0 to HTTPS url
+
 * Thu Oct 29 2020 Nicolas Ontiveros <niontive@microsoft.com> - 8.30-6
 - No patch CVE-2016-2781
 - No patch CVE-2013-0221
