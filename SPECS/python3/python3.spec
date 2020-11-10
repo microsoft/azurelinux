@@ -249,14 +249,14 @@ rm -rf %{buildroot}/*
 %files pip
 %defattr(-,root,root,755)
 %{_libdir}/python3.7/site-packages/pip/*
-%{_libdir}/python3.7/site-packages/pip-19.2.3.dist-info/*
+%{_libdir}/python3.7/site-packages/pip-20.1.1.dist-info/*
 %{_bindir}/pip*
 
 %files setuptools
 %defattr(-,root,root,755)
 %{_libdir}/python3.7/site-packages/pkg_resources/*
 %{_libdir}/python3.7/site-packages/setuptools/*
-%{_libdir}/python3.7/site-packages/setuptools-41.2.0.dist-info/*
+%{_libdir}/python3.7/site-packages/setuptools-47.1.0.dist-info/*
 %{_bindir}/easy_install-3.7
 
 %files test
