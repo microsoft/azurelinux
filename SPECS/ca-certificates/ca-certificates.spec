@@ -74,7 +74,7 @@ Name:           ca-certificates
 # (but these files might have not yet been released).
 
 Version:        20200720
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MPLv2.0
 URL:            https://hg.mozilla.org
 Group:          System Environment/Security
@@ -425,6 +425,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-10
+- Updating Microsoft trusted root CAs.
+
 * Wed Oct 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-9
 - Switching to the correct source for the Microsoft bundle.
 
