@@ -1,6 +1,3 @@
-%define sha1    rpm-ostree=982c3b335debe04763c0b0b8769f7e43229beebc
-%define sha1    libglnx=ed1ee84156ff0d9e70b551a7932fda79fb59e8d4
-%define sha1    libdnf=dde7dd434d715c46c7e91c179caccb6eaff2bdd5
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2019.3
