@@ -25,75 +25,67 @@
 %global toolsversion    %{majorversion}.%{minorversion}
 %global toolsdaemon     vmtoolsd
 %global vgauthdaemon    vgauthd
-
-Name:             open-vm-tools
-Version:          %{toolsversion}
-Release:          4%{?dist}
-Summary:          Open Virtual Machine Tools for virtual machines hosted on VMware
-License:          GPLv2
-URL:              https://github.com/vmware/%{name}
-Source0:          https://github.com/vmware/%{name}/releases/download/stable-%{version}/%{name}-%{version}-%{toolsbuild}.tar.gz
-
-Source1:          %{toolsdaemon}.service
-Source2:          %{vgauthdaemon}.service
-Source3:          vmblock.mount
-Source4:          open-vm-tools.conf
-Source5:          vmtoolsd.pam
-
-ExclusiveArch:    x86_64
-
-Patch1:           gcc10-warning.patch
+Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
+Name:           open-vm-tools
+Version:        %{toolsversion}
+Release:        5%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/vmware/%{name}
+Source0:        https://github.com/vmware/%{name}/releases/download/stable-%{version}/%{name}-%{version}-%{toolsbuild}.tar.gz
+Source1:        %{toolsdaemon}.service
+Source2:        %{vgauthdaemon}.service
+Source3:        vmblock.mount
+Source4:        open-vm-tools.conf
+Source5:        vmtoolsd.pam
+Patch1:         gcc10-warning.patch
 # Cumulative patch for fixes from https://github.com/vmware/open-vm-tools/tree/stable-11.1.0-SDMP-fixes
-Patch2:           sdmp-fixes.patch
-
-BuildRequires:    autoconf
-BuildRequires:    automake
-BuildRequires:    libtool
-# This used to be gcc-c++ because it probably needs gcc-libstdc++-devel
-BuildRequires:    gcc
-
+Patch2:         sdmp-fixes.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
 #BuildRequires:    doxygen
 # Fuse is optional and enables vmblock-fuse
-BuildRequires:    fuse-devel
-BuildRequires:    glib-devel >= 2.14.0
-BuildRequires:    libdnet-devel
+BuildRequires:  fuse-devel
+# This used to be gcc-c++ because it probably needs gcc-libstdc++-devel
+BuildRequires:  gcc
+BuildRequires:  glib-devel >= 2.14.0
+BuildRequires:  libdnet-devel
 #BuildRequires:    libicu-devel
-BuildRequires:    libmspack-devel
+BuildRequires:  libmspack-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libtool
 # Unfortunately, xmlsec1-openssl does not add libtool-ltdl
 # dependency, so we need to add it ourselves.
 #BuildRequires:    libtool-ltdl-devel
-BuildRequires:    openssl-devel
-BuildRequires:    pam-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pam-devel
 #BuildRequires:    procps-devel
-
 #BuildRequires:    rpcgen
 # For Mariner, it's called
-BuildRequires:    rpcsvc-proto
-
-BuildRequires:    systemd
-BuildRequires:    libtirpc-devel
-BuildRequires:    xmlsec1-devel
-
-Requires:         coreutils
-Requires:         fuse
+BuildRequires:  rpcsvc-proto
+BuildRequires:  systemd
+BuildRequires:  xmlsec1-devel
+Requires:       coreutils
+Requires:       fuse
+Requires:       grep
 #Requires:         libdrm
-Requires:         iproute
-Requires:         grep
-Requires:         pciutils
-Requires:         sed
-Requires:         systemd
-Requires:         tar
-Requires:         util-linux
-Requires:         which
+Requires:       iproute
+Requires:       pciutils
+Requires:       sed
+Requires:       systemd
+Requires:       tar
+Requires:       util-linux
+Requires:       which
 # xmlsec1-openssl needs to be added explicitly
-Requires:         xmlsec1
-Requires(post):   /sbin/ldconfig
+Requires:       xmlsec1
+Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-
 # open-vm-tools >= 10.0.0 do not require open-vm-tools-deploypkg
 # provided by VMware. That functionality is now available as part
 # of open-vm-tools package itself.
-Obsoletes:        open-vm-tools-deploypkg <= 10.0.5
+Obsoletes:      open-vm-tools-deploypkg <= 10.0.5
+ExclusiveArch:  x86_64
 
 %description
 The %{name} project is an open source implementation of VMware Tools. It
@@ -103,13 +95,13 @@ This package contains only the core user-space programs and libraries of
 %{name}.
 
 %package          sdmp
-Summary:          Service Discovery components for Open Virtual Machine Tools
-Requires:         %{name}%{?_isa} = %{version}-%{release}
-Requires:         coreutils
-Requires:         gawk
-Requires:         glibc
-Requires:         grep
-Requires:         iproute
+Summary:        Service Discovery components for Open Virtual Machine Tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       coreutils
+Requires:       gawk
+Requires:       glibc
+Requires:       grep
+Requires:       iproute
 #Requires:         procps
 
 %description      sdmp
@@ -118,8 +110,8 @@ This package contains only the user-space programs and utility scripts of
 machines by vRealize Operations Service Discovery Management Pack.
 
 %package          devel
-Summary:          Development libraries for Open Virtual Machine Tools
-Requires:         %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development libraries for Open Virtual Machine Tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description      devel
 This package contains only the user-space programs and libraries of
@@ -127,8 +119,8 @@ This package contains only the user-space programs and libraries of
 VMware virtual machines.
 
 %package          test
-Summary:          Test utilities for Open Virtual Machine Tools
-Requires:         %{name}%{?_isa} = %{version}-%{release}
+Summary:        Test utilities for Open Virtual Machine Tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description      test
 This package contains only the test utilities for %{name} that are
@@ -152,7 +144,8 @@ autoreconf -vif
     --enable-resolutionkms \
     --enable-servicediscovery \
     --%{usetirpc} \
-    --disable-static
+    --disable-static \
+    --with-udev-rules-dir=%{_udevrulesdir}
 
 sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 %make_build
@@ -173,7 +166,7 @@ chmod a-x %{buildroot}%{_udevrulesdir}/99-vmware-scsi-udev.rules
 sed -i "s|\r||g" README
 
 # Remove unnecessary files from packaging
-find %{buildroot}%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -fr %{buildroot}%{_defaultdocdir}
 rm -f docs/api/build/html/FreeSans.ttf
 
@@ -215,8 +208,8 @@ if [ "$1" = "2" ]; then
    if [ -f %{_bindir}/vmware-guestproxycerttool ]; then
       %{_bindir}/vmware-guestproxycerttool -e &> /dev/null || /bin/true
    fi
-   if [ -d /etc/vmware-tools/GuestProxyData ]; then
-      rm -rf /etc/vmware-tools/GuestProxyData &> /dev/null || /bin/true
+   if [ -d %{_sysconfdir}/vmware-tools/GuestProxyData ]; then
+      rm -rf %{_sysconfdir}/vmware-tools/GuestProxyData &> /dev/null || /bin/true
    fi
 
    # Cleanup vmtoolsd-init.service in case of upgrades
@@ -317,7 +310,7 @@ fi
 %{_libdir}/%{name}/plugins/vmsvc/libtimeSync.so
 %{_libdir}/%{name}/plugins/vmsvc/libvmbackup.so
 #Usually in desktop package
-/usr/bin/vmware-vmblock-fuse
+%{_bindir}/vmware-vmblock-fuse
 
 %{_datadir}/%{name}/
 %{_udevrulesdir}/99-vmware-scsi-udev.rules
@@ -344,6 +337,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Wed Nov 04 2020 Ruying Chen <v-ruyche@microsoft.com> - 11.1.0-5
+- Systemd supports merged /usr. Configure to build with corresponding directory.
+
 * Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 11.1.0-4
 - Rename input file for run-vmblock\x2dfuse.mount to avoid problems with backslash in the name.
 

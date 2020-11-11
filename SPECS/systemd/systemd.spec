@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -151,7 +151,7 @@ meson  --prefix %{_prefix}                                            \
        -Dldconfig=false                                               \
        -Drootprefix=                                                  \
        -Drootlibdir=/lib                                              \
-       -Dsplit-usr=true                                               \
+       -Dsplit-usr=false                                               \
        -Dsysusers=false                                               \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
@@ -177,7 +177,7 @@ done
 ln -sfv ../lib/systemd/systemd %{buildroot}/sbin/init
 sed -i '/srv/d' %{buildroot}%{_lib}/tmpfiles.d/home.conf
 sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_lib}/tmpfiles.d/legacy.conf
-sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}/lib/systemd/network/99-default.link
+sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_lib}/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}%{_sysconfdir}/systemd/resolved.conf
 sed -i "s:#NTP=:NTP=time.windows.com:g" %{buildroot}%{_sysconfdir}/systemd/timesyncd.conf
 rm -f %{buildroot}%{_var}/log/README
@@ -189,8 +189,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
 install -dm 0700 %{buildroot}/boot/
 install -m 0600 %{SOURCE2} %{buildroot}/boot/
-rm %{buildroot}/lib/systemd/system/default.target
-ln -sfv multi-user.target %{buildroot}/lib/systemd/system/default.target
+rm %{buildroot}%{_lib}/systemd/system/default.target
+ln -sfv multi-user.target %{buildroot}%{_lib}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
@@ -200,6 +200,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-,root,root)
@@ -242,19 +243,13 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 %config(noreplace) /boot/systemd.cfg
 %{_sysconfdir}/systemd/system/*
-/lib/udev/*
-/lib/systemd/systemd*
-/lib/systemd/system-*
-/lib/systemd/system/*
-/lib/systemd/network/80-container*
-/lib/systemd/*.so
-/lib/systemd/resolv.conf
-/lib/systemd/portablectl
-%config(noreplace) /lib/systemd/network/99-default.link
-%config(noreplace) /lib/systemd/portable/profile/default/service.conf
-%config(noreplace) /lib/systemd/portable/profile/nonetwork/service.conf
-%config(noreplace) /lib/systemd/portable/profile/strict/service.conf
-%config(noreplace) /lib/systemd/portable/profile/trusted/service.conf
+%{_libdir}/udev/*
+%{_libdir}/systemd/*
+%config(noreplace) %{_libdir}/systemd/network/99-default.link
+%config(noreplace) %{_libdir}/systemd/portable/profile/default/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/nonetwork/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/strict/service.conf
+%config(noreplace) %{_libdir}/systemd/portable/profile/trusted/service.conf
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
@@ -263,12 +258,11 @@ rm -rf %{buildroot}/*
 %{_libdir}/modules-load.d
 /lib/security
 %{_libdir}/sysctl.d
-%{_libdir}/systemd
 %{_libdir}/tmpfiles.d
 /lib/*.so*
-/lib/modprobe.d/systemd.conf
+%{_libdir}/modprobe.d/systemd.conf
 %{_bindir}/*
-/bin/*
+%{_sbindir}/*
 /sbin/*
 %{_datadir}/bash-completion/*
 %{_datadir}/factory/*
@@ -299,6 +293,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Nov 10 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-34
+- Configure to support merged /usr.
+
 * Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 239-33
 - Provide systemd-libs, systemd-units, and systemd-sysv.
 - Subpackage rpm-macros.

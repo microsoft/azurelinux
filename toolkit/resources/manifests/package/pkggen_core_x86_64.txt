@@ -237,4 +237,4 @@ python3-devel-3.7.7-5.cm1.x86_64.rpm
 python3-libs-3.7.7-5.cm1.x86_64.rpm
 python3-setuptools-3.7.7-5.cm1.noarch.rpm
 python3-xml-3.7.7-5.cm1.x86_64.rpm
-systemd-rpm-macros-239-33.cm1.noarch.rpm
+systemd-rpm-macros-239-34.cm1.noarch.rpm

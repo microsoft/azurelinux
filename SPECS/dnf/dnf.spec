@@ -1,26 +1,24 @@
 %global confdir %{_sysconfdir}/%{name}
-%global python3_sitelib %(/usr/bin/python3 -c "import site; print(site.getsitepackages()[-1])")
+%global python3_sitelib %(%{_bindir}/python3 -c "import site; print(site.getsitepackages()[-1])")
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
-
+Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
 Version:        4.2.18
-Release:        2%{?dist}
-Summary:        Python 3 version of the DNF package manager.
-License:        GPLv2+ or GPL
+Release:        3%{?dist}
+License:        GPLv2+ OR GPL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildArch:      noarch
-
+BuildRequires:  bash-completion
 BuildRequires:  cmake
 BuildRequires:  gettext
-BuildRequires:  systemd
-BuildRequires:  bash-completion
 BuildRequires:  python3-sphinx
+BuildRequires:  systemd
 Requires:       python3
 Requires:       python3-%{name}
+BuildArch:      noarch
 
 %description
 DNF is a tool for managing RPM packages and communicating with Yum repositories.
@@ -38,8 +36,8 @@ Requires:       %{name}-data = %{version}-%{release}
 Requires:       python3-curses
 Requires:       python3-gpg
 Requires:       python3-hawkey
-Requires:       python3-libdnf
 Requires:       python3-libcomps
+Requires:       python3-libdnf
 Requires:       python3-rpm
 
 %description -n python3-%{name}
@@ -89,8 +87,8 @@ ctest -VV
 %files -f %{name}.lang
 %{_bindir}/%{name}
 %{_sysconfdir}/bash_completion.d/dnf
-%{_prefix}%{_unitdir}/%{name}-makecache.service
-%{_prefix}%{_unitdir}/%{name}-makecache.timer
+%{_unitdir}/%{name}-makecache.service
+%{_unitdir}/%{name}-makecache.timer
 
 # Yum excludes
 %exclude %{confdir}/protected.d/yum.conf
@@ -129,17 +127,20 @@ ctest -VV
 %files automatic
 %{_bindir}/%{name}-automatic
 %config(noreplace) %{confdir}/automatic.conf
-%{_prefix}%{_unitdir}/%{name}-automatic.service
-%{_prefix}%{_unitdir}/%{name}-automatic.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-notifyonly.service
-%{_prefix}%{_unitdir}/%{name}-automatic-notifyonly.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-download.service
-%{_prefix}%{_unitdir}/%{name}-automatic-download.timer
-%{_prefix}%{_unitdir}/%{name}-automatic-install.service
-%{_prefix}%{_unitdir}/%{name}-automatic-install.timer
+%{_unitdir}/%{name}-automatic.service
+%{_unitdir}/%{name}-automatic.timer
+%{_unitdir}/%{name}-automatic-notifyonly.service
+%{_unitdir}/%{name}-automatic-notifyonly.timer
+%{_unitdir}/%{name}-automatic-download.service
+%{_unitdir}/%{name}-automatic-download.timer
+%{_unitdir}/%{name}-automatic-install.service
+%{_unitdir}/%{name}-automatic-install.timer
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.2.18-3
+- Systemd supports merged /usr. Update with corresponding file locations and macros.
+
 * Sun Apr 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2.18-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT). Added 'Distribution' and 'Vendor' tags.
 - Fixed "Source0" tag.
