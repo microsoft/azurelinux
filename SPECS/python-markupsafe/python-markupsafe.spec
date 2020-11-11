@@ -1,22 +1,19 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define pypi_name MarkupSafe
-
 Summary:        A XML/HTML/XHTML Markup safe string for Python.
 Name:           python-markupsafe
 Version:        1.1.1
 Release:        1%{?dist}
 License:        BSD
-Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/MarkupSafe
-Source0:        http://pypi.python.org/packages/source/M/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-
+Source0:        https://pypi.python.org/packages/source/M/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+BuildRequires:  python-setuptools
 BuildRequires:  python2
 BuildRequires:  python2-libs
-BuildRequires:  python-setuptools
-
 Requires:       python2
 Requires:       python2-libs
 
