@@ -1,7 +1,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenSSL
 URL:            http://www.openssl.org/
 Group:          System Environment/Security
@@ -137,7 +137,6 @@ export HASHBANGPERL=/usr/bin/perl
     no-sm4 \
     no-ssl \
     no-ssl3 \
-    no-tests \
     no-tls1 \
     no-tls1_1 \
     no-weak-ssl-ciphers \
@@ -257,6 +256,9 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Tue Nov 10 2020 Johnson George <johgeorg@microsoft.com> 1.1.1g-7
+- Updated the config option to enable package test
+
 * Tue Jul 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.1g-6
 - Replacing removal of functions through the 'no-<prot>-method' option
   with returning a method negotiating the highest supported protocol
