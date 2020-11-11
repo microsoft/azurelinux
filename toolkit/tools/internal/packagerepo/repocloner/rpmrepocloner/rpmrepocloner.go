@@ -21,6 +21,7 @@ import (
 )
 
 const (
+	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
@@ -247,9 +248,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		lessThanOrEqualComparisonOperator = "<="
 		versionSuffixFormat               = "-%s"
 
-		builtRepoID  = "local-repo"
-		cachedRepoID = "upstream-cache-repo"
-		allRepoIDs   = "*"
+		builtRepoID = "local-repo"
+		allRepoIDs  = "*"
 	)
 
 	for _, pkg := range packagesToClone {
@@ -278,7 +278,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		err = r.chroot.Run(func() (err error) {
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cachedRepoID, allRepoIDs}
+			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
 			return r.clonePackage(args, repoOrderList...)
 		})
 
@@ -350,7 +350,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 	repoDir := srcDir
 
 	if !buildpipeline.IsRegularBuild() {
-		// Docker based build don't use overlay so repo folder
+		// Docker based build doesn't use overlay so repo folder
 		// must be explicitely set to the RPMs cache folder
 		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
 	}
@@ -366,7 +366,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 	}
 
 	if !buildpipeline.IsRegularBuild() {
-		// Docker based build don't use overlay so cache repo
+		// Docker based build doesn't use overlay so cache repo
 		// must be explicitely initialized
 		err = r.initializeMountedChrootRepo(cacheRepoDir)
 	}
@@ -398,13 +398,19 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		repoContents.Repo = append(repoContents.Repo, pkg)
 	}
 
+	checkedRepoID := fetcherRepoID
+	// Docker based build doesn't use overlay so cache repo was explicitely initialized
+	if !buildpipeline.IsRegularBuild() {
+		checkedRepoID = cacheRepoID
+	}
+
 	err = r.chroot.Run(func() (err error) {
 		// Disable all repositories except the fetcher repository (the repository with the cloned packages)
 		tdnfArgs := []string{
 			"list",
 			"ALL",
 			"--disablerepo=*",
-			fmt.Sprintf("--enablerepo=%s", fetcherRepoID),
+			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
 		}
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, "tdnf", tdnfArgs...)
 	})
