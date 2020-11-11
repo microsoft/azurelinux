@@ -1079,7 +1079,7 @@ func tdnfInstall(packageName, installRoot string, currentPackagesInstalled, tota
 		ReportPercentComplete(progress)
 	}
 
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, "tdnf", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -1562,7 +1562,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 // To be able to cleanly exit the setup chroot, we must stop it.
 func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, "gpgconf", "--kill", "gpg-agent")
+		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
 		if err != nil {
 			// This is non-fatal, as there is no guarentee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)

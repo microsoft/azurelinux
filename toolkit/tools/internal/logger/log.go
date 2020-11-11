@@ -133,9 +133,22 @@ func WarningOnError(err interface{}, args ...interface{}) {
 }
 
 // StreamOutput calls the provided logFunction on every line from the provided pipe
-func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.WaitGroup) {
+func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.WaitGroup, outputChan chan string) {
 	for scanner := bufio.NewScanner(pipe); scanner.Scan(); {
-		logFunction(scanner.Text())
+		line := scanner.Text()
+		logFunction(line)
+
+		Log.Tracef("StreamOutput:\t'%s'", line)
+
+		// Optionally buffer the output to print in the event of an error
+		if outputChan != nil {
+			select {
+			case outputChan <- line:
+			default:
+				// In the event the buffer is full, just print to console
+				Log.Warnf("Output buffer full: dropping: \"%s\"", line)
+			}
+		}
 	}
 
 	wg.Done()
