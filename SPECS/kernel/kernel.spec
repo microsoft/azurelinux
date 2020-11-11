@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.72
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,8 @@ URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
+# Arm64 HyperV support required patch
+Patch0:         ver5_4_72_arm64_hyperv_support.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -177,6 +179,10 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+
+%ifarch aarch64
+%patch0 -p1
+%endif
 
 %build
 make mrproper
@@ -397,6 +403,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Tue Nov 10 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-2
+- Enable kernel configs for Arm64 HyperV, Ampere and Cavium SoCs support
+
 * Mon Oct 26 2020 Chris Co <chrco@microsoft.com> - 5.4.72-1
 - Update source to 5.4.72
 - Remove patch to support CometLake e1000e ethernet. Integrated in 5.4.72.
