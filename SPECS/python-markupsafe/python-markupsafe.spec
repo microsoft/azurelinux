@@ -51,7 +51,7 @@ python3 setup.py test
 
 %files
 %defattr(-,root,root,-)
-%license LICENSE
+%license LICENSE.rst
 %{python2_sitelib}/*
 
 %files -n python3-markupsafe
@@ -62,6 +62,7 @@ python3 setup.py test
 * Wed Nov 11 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.1-1
 - Upgrade to 1.1.1 to fix setuptools compatibility issues
 - Change Source0
+- Correct license location
 - Remove inline sha1
 - Lint to Mariner style
 
