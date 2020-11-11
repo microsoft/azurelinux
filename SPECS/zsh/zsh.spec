@@ -1,17 +1,19 @@
 # this file is encoded in UTF-8  -*- coding: utf-8 -*-
 
-Summary:        Z shell
-Name:           zsh
-Version:        5.8
-Release:        3%{?dist}
-License:        MIT and GPLv2.0 and GPLv3.0 and GPLv2+
-URL:            http://zsh.sourceforge.net/
-Group:          System Environment/Shells
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
-Source1:        zprofile.rhs
-Source2:        zshrc
+Summary:      Z shell
+Name:         zsh
+Version:      5.8
+Release:      4%{?dist}
+License:      MIT and GPLv2.0 and GPLv3.0 and GPLv2+
+URL:          http://zsh.sourceforge.net/
+Group:        System Environment/Shells
+Vendor:       Microsoft Corporation
+Distribution: Mariner
+Source0:      https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
+Source1:      zprofile.rhs
+Source2:      zshrc
+
+Patch0:       0001-Skipping-test-if-ran-as-superuser.patch
 
 BuildRequires: coreutils
 BuildRequires: tar
@@ -27,7 +29,8 @@ BuildRequires: texinfo
 BuildRequires: gawk
 BuildRequires: elfutils
 Requires(post): /bin/grep
-Requires(postun): coreutils /bin/grep
+Requires(postun): /bin/grep
+Requires(postun): coreutils
 
 Provides: /bin/zsh
 
@@ -55,7 +58,7 @@ This package contains the Zsh manual in html format.
 
 %prep
 
-%setup -q
+%autosetup -p1
 
 %build
 # make loading of module's dependencies work again (#1277996)
@@ -143,30 +146,43 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-4
+- Adding a patch to skip globbing test if ran as root.
+
 * Sat May 09 00:20:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-3
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 5.8-2
--   Renaming linux-api-headers to kernel-headers
-*   Fri Apr 10 2020 Jon Slobodzian <joslobo@microsoft.com> 5.8-1
--   Updated to latest version to fix CVE CVE-2019-20044.
--   Fixed Source0 download link
--   Verified license.
-*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 5.6.1-3
--   Remove coreutils and only use toybox in requires.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.6.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> 5.6.1-1
--   Upgrading to latest
-*   Mon Mar 19 2018 Xiaolin Li <xiaolinl@vmware.com> 5.3.1-5
--   Fix CVE-2018-7548
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.1-4
--   Requires coreutils or toybox and /bin/grep
-*   Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 5.3.1-3
--   Clean up check
-*   Wed Aug 02 2017 Chang Lee <changlee@vmware.com> 5.3.1-2
--   Skip a test case that is not supported from photon OS chroot
-*   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 5.3.1-1
--   Updated to version 5.3.1.
-*   Sun Jul 24 2016 Ivan Porto Carrero <icarrero@vmware.com> - 5.2-1
--   Initial zsh for photon os
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 5.8-2
+- Renaming linux-api-headers to kernel-headers
+
+* Fri Apr 10 2020 Jon Slobodzian <joslobo@microsoft.com> - 5.8-1
+- Updated to latest version to fix CVE CVE-2019-20044.
+- Fixed Source0 download link
+- Verified license.
+
+* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.6.1-3
+- Remove coreutils and only use toybox in requires.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 5.6.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> - 5.6.1-1
+- Upgrading to latest
+
+* Mon Mar 19 2018 Xiaolin Li <xiaolinl@vmware.com> - 5.3.1-5
+- Fix CVE-2018-7548
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> - 5.3.1-4
+- Requires coreutils or toybox and /bin/grep
+
+* Fri Sep 15 2017 Bo Gan <ganb@vmware.com> - 5.3.1-3
+- Clean up check
+
+* Wed Aug 02 2017 Chang Lee <changlee@vmware.com> - 5.3.1-2
+- Skip a test case that is not supported from photon OS chroot
+
+* Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.3.1-1
+- Updated to version 5.3.1.
+
+* Sun Jul 24 2016 Ivan Porto Carrero <icarrero@vmware.com> - 5.2-1
+- Initial zsh for photon os
