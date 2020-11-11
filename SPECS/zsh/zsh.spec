@@ -1,38 +1,39 @@
 # this file is encoded in UTF-8  -*- coding: utf-8 -*-
 
-Summary:      Z shell
-Name:         zsh
-Version:      5.8
-Release:      4%{?dist}
-License:      MIT and GPLv2.0 and GPLv3.0 and GPLv2+
-URL:          http://zsh.sourceforge.net/
-Group:        System Environment/Shells
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-Source0:      https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
-Source1:      zprofile.rhs
-Source2:      zshrc
+Summary:        Z shell
+Name:           zsh
+Version:        5.8
+Release:        4%{?dist}
+License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Shells
+URL:            http://zsh.sourceforge.net/
+Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
+Source1:        zprofile.rhs
+Source2:        zshrc
 
-Patch0:       0001-Skipping-test-if-ran-as-superuser.patch
+Patch0:         0001-Skipping-test-if-ran-as-superuser.patch
 
-BuildRequires: coreutils
-BuildRequires: tar
-BuildRequires: diffutils
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: binutils
-BuildRequires: kernel-headers
-BuildRequires: sed
-BuildRequires: ncurses-devel
-BuildRequires: libcap-devel
-BuildRequires: texinfo
-BuildRequires: gawk
-BuildRequires: elfutils
+BuildRequires:  binutils
+BuildRequires:  coreutils
+BuildRequires:  diffutils
+BuildRequires:  elfutils
+BuildRequires:  gawk
+BuildRequires:  gcc
+BuildRequires:  kernel-headers
+BuildRequires:  libcap-devel
+BuildRequires:  make
+BuildRequires:  ncurses-devel
+BuildRequires:  sed
+BuildRequires:  tar
+BuildRequires:  texinfo
+
 Requires(post): /bin/grep
 Requires(postun): /bin/grep
 Requires(postun): coreutils
 
-Provides: /bin/zsh
+Provides:       /bin/zsh
 
 %description
 The zsh shell is a command interpreter usable as an interactive login
@@ -43,8 +44,8 @@ command completion, shell functions (with autoloading), a history
 mechanism, and more.
 
 %package html
-Summary: Zsh shell manual in html format
-Group: System Environment/Shells
+Summary:        Zsh shell manual in html format
+Group:          System Environment/Shells
 
 %description html
 The zsh shell is a command interpreter usable as an interactive login
@@ -71,42 +72,42 @@ make all html
 %check
 rm -f Test/C02cond.ztst
 make check
+
 %install
-rm -rf $RPM_BUILD_ROOT
 
 %makeinstall install.info \
-  fndir=$RPM_BUILD_ROOT%{_datadir}/%{name}/%{version}/functions \
-  sitefndir=$RPM_BUILD_ROOT%{_datadir}/%{name}/site-functions \
-  scriptdir=$RPM_BUILD_ROOT%{_datadir}/%{name}/%{version}/scripts \
-  sitescriptdir=$RPM_BUILD_ROOT%{_datadir}/%{name}/scripts \
-  runhelpdir=$RPM_BUILD_ROOT%{_datadir}/%{name}/%{version}/help
+  fndir=%{buildroot}%{_datadir}/%{name}/%{version}/functions \
+  sitefndir=%{buildroot}%{_datadir}/%{name}/site-functions \
+  scriptdir=%{buildroot}%{_datadir}/%{name}/%{version}/scripts \
+  sitescriptdir=%{buildroot}%{_datadir}/%{name}/scripts \
+  runhelpdir=%{buildroot}%{_datadir}/%{name}/%{version}/help
 
-rm -f ${RPM_BUILD_ROOT}%{_bindir}/zsh-%{version}
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f %{buildroot}%{_bindir}/zsh-%{version}
+rm -f %{buildroot}%{_infodir}/dir
 
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}
+mkdir -p %{buildroot}%{_sysconfdir}
 for i in %{SOURCE1}; do
-    install -m 644 $i $RPM_BUILD_ROOT%{_sysconfdir}/"$(basename $i .rhs)"
+    install -m 644 $i %{buildroot}%{_sysconfdir}/"$(basename $i .rhs)"
 done
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/skel
-install -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/skel/.zshrc
+mkdir -p %{buildroot}%{_sysconfdir}/skel
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/skel/.zshrc
 
 # This is just here to shut up rpmlint, and is very annoying.
 # Note that we can't chmod everything as then rpmlint will complain about
 # those without a she-bang line.
 for i in checkmail harden run-help zcalc zkbd; do
     sed -i -e 's!/usr/local/bin/zsh!%{_bindir}/zsh!' \
-    $RPM_BUILD_ROOT%{_datadir}/zsh/%{version}/functions/$i
-    chmod +x $RPM_BUILD_ROOT%{_datadir}/zsh/%{version}/functions/$i
+    %{buildroot}%{_datadir}/zsh/%{version}/functions/$i
+    chmod +x %{buildroot}%{_datadir}/zsh/%{version}/functions/$i
 done
 
-sed -i "s!$RPM_BUILD_ROOT%{_datadir}/%{name}/%{version}/help!%{_datadir}/%{name}/%{version}/help!" \
-    $RPM_BUILD_ROOT%{_datadir}/zsh/%{version}/functions/{run-help,_run-help}
+sed -i "s!%{buildroot}%{_datadir}/%{name}/%{version}/help!%{_datadir}/%{name}/%{version}/help!" \
+    %{buildroot}%{_datadir}/zsh/%{version}/functions/{run-help,_run-help}
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %post
 if [ "$1" = 1 ]; then
@@ -120,18 +121,16 @@ if [ "$1" = 1 ]; then
 fi
 
 %preun
-
 %postun
 if [ "$1" = 0 ] && [ -f %{_sysconfdir}/shells ] ; then
   sed -i '\!^%{_bindir}/%{name}$!d' %{_sysconfdir}/shells
   sed -i '\!^/bin/%{name}$!d' %{_sysconfdir}/shells
 fi
 
-
 %files
 %defattr(-,root,root)
 %license LICENCE
-%doc README LICENCE Etc/BUGS Etc/CONTRIBUTORS Etc/FAQ FEATURES MACHINES
+%doc README Etc/BUGS Etc/CONTRIBUTORS Etc/FAQ FEATURES MACHINES
 %doc NEWS Etc/zsh-development-guide Etc/completion-style-guide
 %attr(755,root,root) %{_bindir}/zsh
 %{_mandir}/*/*
