@@ -1,21 +1,19 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define pypi_name zope.interface
+Summary:        Interfaces for Python
 Name:           python-zope-interface
 Version:        4.7.2
 Release:        1%{?dist}
-URL:            https://github.com/zopefoundation/zope.interface
-Summary:        Interfaces for Python
 License:        ZPLv2.1
-Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages/Python
+URL:            https://github.com/zopefoundation/zope.interface
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-
+BuildRequires:  python-setuptools
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
-BuildRequires:  python-setuptools
-
 Requires:       python2
 Requires:       python2-libs
 
@@ -39,6 +37,7 @@ Requires:       python3-libs
 %description -n python3-zope-interface
 
 Python 3 version.
+
 %prep
 %setup -q -n %{pypi_name}-%{version}
 rm -rf ../p3dir
