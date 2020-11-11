@@ -62,7 +62,7 @@ Requires:       %{name} = %{version}-%{release}
 Python 3 bindings for the librepo library.
 
 %prep
-%autosetup
+%autosetup -p1
 mkdir build-py2
 mkdir build-py3
 
