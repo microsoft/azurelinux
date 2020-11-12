@@ -19,6 +19,8 @@ ignore_list=" \
   mariner-rpm-macros \
   moby-buildx \
   moby-containerd \
+  python-markupsafe \
+  python-zope-interface \
   qt5-rpm-macros \
   runc \
   grub2-efi-binary-signed-aarch64 \
