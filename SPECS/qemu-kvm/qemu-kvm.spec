@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,14 @@ Patch13:        CVE-2020-14364.patch
 Patch14:        CVE-2020-13791.patch
 # CVE-2018-19665 patch never merged upstream, link: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03570.html
 Patch15:        CVE-2018-19665.patch
+Patch16:        CVE-2020-13361.patch
+Patch17:        CVE-2020-11869.patch
+Patch18:        CVE-2020-14415.patch
+Patch19:        CVE-2020-15859.patch
+Patch20:        CVE-2020-13362.patch
+Patch21:        CVE-2020-25742.patch
+Patch22:        CVE-2020-25743.patch   
+Patch23:        CVE-2020-15469.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -71,6 +79,14 @@ This package provides a command line tool for manipulating disk images.
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
 
 %build
 
@@ -131,6 +147,16 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Wed Nov 11 2020 Henry Li <lihl@microsoft.com> - 4.2.0-19
+- Patch CVE-2020-13361
+- Patch CVE-2020-11869
+- Patch CVE-2020-14415
+- Patch CVE-2020-15859
+- Patch CVE-2020-13362
+- Patch CVE-2020-25742
+- Patch CVE-2020-25743
+- Patch CVE-2020-15469
+
 * Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 4.2.0-18
 - Patch CVE-2018-19665
 - Remove nopatch files for CVE-2016-7161, CVE-2015-7504, CVE-2017-5931,
