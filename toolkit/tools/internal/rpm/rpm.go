@@ -100,6 +100,22 @@ func formatCommandArgs(extrArgs []string, file, queryFormat string, defines map[
 	return
 }
 
+// formatSuCommandArgs will generate an RPM command to execute by a different user.
+func formatSuCommandArgs(extrArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
+	commandArgs = append(commandArgs, extrArgs...)
+	commandArgs = append(commandArgs, file)
+
+	if queryFormat != "" {
+		commandArgs = append(commandArgs, "--qf", queryFormat)
+	}
+
+	for k, v := range defines {
+		commandArgs = append(commandArgs, "-D", fmt.Sprintf(`"%s %s"`, k, v))
+	}
+
+	return
+}
+
 // executeRpmCommand will execute an RPM command and return its output split
 // by new line and whitespace trimmed.
 func executeRpmCommand(program string, args ...string) (results []string, err error) {
@@ -181,10 +197,32 @@ func BuildRPMFromSRPM(srpmFile string, defines map[string]string, extraArgs ...s
 		squashErrors = true
 	)
 
+	args := []string{
+		"-m",
+		"-s", "/bin/sh",
+		"builder",
+	}
+	err = shell.ExecuteLive(squashErrors, "useradd", args...)
+	if err != nil {
+		return
+	}
+
+	args = []string{
+		"-R",
+		"builder",
+		"/root",
+		"/usr/src",
+	}
+	err = shell.ExecuteLive(squashErrors, "chown", args...)
+	if err != nil {
+		return
+	}
+
 	extraArgs = append(extraArgs, "--rebuild", "--nodeps")
 
-	args := formatCommandArgs(extraArgs, srpmFile, queryFormat, defines)
-	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
+	args = []string{rpmBuildProgram}
+	args = append(args, formatSuCommandArgs(extraArgs, srpmFile, queryFormat, defines)...)
+	return shell.ExecuteLive(squashErrors, "su", "-", "builder", "-c", strings.Join(args, " "))
 }
 
 // GenerateSRPMFromSPEC generates an SRPM for the given SPEC file
