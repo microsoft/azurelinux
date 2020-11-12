@@ -1,9 +1,8 @@
 %define      debug_package %{nil}
-
 Summary:        Auditd plugin that forwards audit events to OMS Agent for Linux
 Name:           auoms
 Version:        2.2.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +20,6 @@ Patch0:         auoms.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bash-devel
-BuildRequires:  audit-devel
 BuildRequires:  boost-devel
 BuildRequires:  cmake
 BuildRequires:  grep
@@ -33,9 +31,11 @@ BuildRequires:  unzip
 BuildRequires:  wget
 Requires:       audit
 Requires:       bash
+Requires:       chkconfig
 Requires:       glibc
 Requires:       libstdc++
 Requires:       perl
+Requires:       procps-ng
 Requires:       sed
 Requires:       sudo
 
@@ -82,7 +82,6 @@ install -m 755 intermediate/builddir/release/bin/auomsctl       %{buildroot}/opt
 
 %clean
 rm -rf %{buildroot}
-
 
 %pre
 #!/bin/sh
@@ -187,6 +186,10 @@ done
 %{_var}/opt/microsoft/auoms/data/outputs
 
 %changelog
+* Wed Nov 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.2.5-4
+- Add dependnecy on chkconfig to avoid ownership conflict with /etc/init.d directory
+- Add dependency on procps-ng so auomsctl can use pgrep
+
 * Wed Nov 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.2.5-3
 - Clean up spec file with feedback from linter
 
