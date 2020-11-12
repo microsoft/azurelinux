@@ -33,6 +33,7 @@ Requires:       audit
 Requires:       bash
 Requires:       chkconfig
 Requires:       glibc
+Requires:       initscripts
 Requires:       libstdc++
 Requires:       perl
 Requires:       procps-ng
@@ -189,6 +190,7 @@ done
 * Wed Nov 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.2.5-4
 - Add dependnecy on chkconfig to avoid ownership conflict with /etc/init.d directory
 - Add dependency on procps-ng so auomsctl can use pgrep
+- Add dependnecy on initscripts so auomsctl can use /usr/sbin/service
 
 * Wed Nov 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.2.5-3
 - Clean up spec file with feedback from linter
