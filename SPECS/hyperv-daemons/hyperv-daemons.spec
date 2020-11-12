@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.4.72
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,6 @@ Requires:       hypervvssd = %{version}-%{release}
 # Hyper-V is available only on x86 architectures
 # The base empty (a.k.a. virtual) package can not be noarch
 # due to http://www.rpm.org/ticket/78
-ExclusiveArch:  x86_64
 
 %description
 Suite of daemons that are needed when Linux guest
@@ -218,6 +217,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Wed Nov 11 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-2
+- Enable Hyper-V daemons package building for Arm64 arch
+
 * Mon Oct 26 2020 Chris Co <chrco@microsoft.com> - 5.4.72-1
 - Update source to 5.4.72
 - Lint spec
