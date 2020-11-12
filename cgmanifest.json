@@ -4186,8 +4186,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.7",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tar.xz"
+          "version": "3.7.9",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tar.xz"
         }
       }
     },
@@ -4626,8 +4626,8 @@
         "type": "other",
         "other": {
           "name": "python-markupsafe",
-          "version": "1.0",
-          "downloadUrl": "https://pypi.python.org/packages/4d/de/32d741db316d8fdb7680822dd37001ef7a448255de9699ab4bfcbdf4172b/MarkupSafe-1.0.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-1.1.1.tar.gz"
         }
       }
     },
@@ -5036,8 +5036,8 @@
         "type": "other",
         "other": {
           "name": "python-zope-interface",
-          "version": "4.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4e/d0/c9d16bd5b38de44a20c6dc5d5ed80a49626fafcb3db9f9efdc2a19026db6/zope.interface-4.6.0.tar.gz"
+          "version": "4.7.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-4.7.2.tar.gz"
         }
       }
     },
