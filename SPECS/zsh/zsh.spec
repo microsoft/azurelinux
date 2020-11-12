@@ -93,15 +93,6 @@ done
 mkdir -p %{buildroot}%{_sysconfdir}/skel
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/skel/.zshrc
 
-# This is just here to shut up rpmlint, and is very annoying.
-# Note that we can't chmod everything as then rpmlint will complain about
-# those without a she-bang line.
-for i in checkmail harden run-help zcalc zkbd; do
-    sed -i -e 's!/usr/local/bin/zsh!%{_bindir}/zsh!' \
-    %{buildroot}%{_datadir}/zsh/%{version}/functions/$i
-    chmod +x %{buildroot}%{_datadir}/zsh/%{version}/functions/$i
-done
-
 sed -i "s!%{buildroot}%{_datadir}/%{name}/%{version}/help!%{_datadir}/%{name}/%{version}/help!" \
     %{buildroot}%{_datadir}/zsh/%{version}/functions/{run-help,_run-help}
 
@@ -147,6 +138,7 @@ fi
 %changelog
 * Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-4
 - Adding a patch to skip globbing test if ran as root.
+- Removing redundant 'sed' and 'chmod' commands in %%install.
 
 * Sat May 09 00:20:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-3
 - Added %%license line automatically
