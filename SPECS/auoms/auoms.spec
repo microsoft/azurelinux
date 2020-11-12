@@ -53,8 +53,8 @@ cp %{SOURCE3} ./
 %build
 grep AUOMS_BUILDVERSION auoms.version | head -n 4 | cut -d'=' -f2 | tr '\n' '.' | sed 's/.$//' | sed 's/^/#define AUOMS_VERSION "/' > auoms_version.h
 sed -i 's/$/"/' auoms_version.h
-cp -R %{_includedir}/boost %{_prefix}/local/include/boost
-mv %{_includedir}/boost %{_includedir}/boost148
+cp -R %{_includedir}/boost /usr/local/include/boost
+mv %{_includedir}/boost /usr/include/boost148
 cd build
 ./configure --enable-ulinux && make clean && make
 
