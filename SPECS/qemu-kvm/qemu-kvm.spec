@@ -36,8 +36,9 @@ Patch18:        CVE-2020-14415.patch
 Patch19:        CVE-2020-15859.patch
 Patch20:        CVE-2020-13362.patch
 Patch21:        CVE-2020-25742.patch
-Patch22:        CVE-2020-25743.patch   
+Patch22:        CVE-2020-25743.patch
 Patch23:        CVE-2020-15469.patch
+Patch24:        CVE-2020-24352.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -87,6 +88,7 @@ This package provides a command line tool for manipulating disk images.
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
+%patch24 -p1
 
 %build
 
@@ -156,6 +158,7 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 - Patch CVE-2020-25742
 - Patch CVE-2020-25743
 - Patch CVE-2020-15469
+- Patch CVE-2020-24352
 
 * Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 4.2.0-18
 - Patch CVE-2018-19665
