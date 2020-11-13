@@ -1,27 +1,21 @@
-Summary:        Microsoft .NET Core Runtime
-Name:           dotnet-runtime-3.1
+%define         debug_package %{nil}
+Summary:        Microsoft aspnetcore runtime
+Name:           aspnetcore-runtime-3.1
 Version:        3.1.5
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://github.com/dotnet/core
-Source0:        https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz
-Requires:       glibc
-Requires:       icu
-Requires:       krb5
-Requires:       libgcc
-Requires:       libstdc++
-Requires:       libunwind
-Requires:       lttng-ust
-Requires:       openssl
-Requires:       zlib
+URL:            https://github.com/dotnet/aspnetcore
+Source0:        https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz
+Requires:       dotnet-runtime-3.1
 ExclusiveArch:  x86_64
 
 %description
-.NET Core is a development platform that you can use to build command-line
-applications, microservices and modern websites.
+ASP.NET Core is an open-source and cross-platform framework for building
+modern cloud based internet connected applications, such as web apps,
+IoT apps and mobile backends
 
 %prep
 %setup -qc -T -a 0 dotnet-runtime-%{version}
@@ -29,13 +23,8 @@ applications, microservices and modern websites.
 %build
 
 %install
-mkdir -p %{buildroot}%{_libdir}/dotnet
-mkdir -p %{buildroot}%{_docdir}/dotnet-runtime-%{version}
-
-cp -r * %{buildroot}%{_libdir}/dotnet
-rm %{buildroot}%{_libdir}/dotnet/LICENSE.txt %{buildroot}%{_libdir}/dotnet/ThirdPartyNotices.txt
-mkdir -p %{buildroot}%{_bindir}
-ln -sf %{_libdir}/dotnet/dotnet %{buildroot}%{_bindir}/dotnet
+mkdir -p %{buildroot}%{_libdir}/dotnet/shared
+cp -r shared/Microsoft.AspNetCore.App %{buildroot}%{_libdir}/dotnet/shared
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -43,14 +32,11 @@ ln -sf %{_libdir}/dotnet/dotnet %{buildroot}%{_bindir}/dotnet
 %files
 %license LICENSE.txt ThirdPartyNotices.txt
 %defattr(-,root,root,0755)
-%exclude %{_libdir}/debug
-%{_docdir}/*
-%{_bindir}/dotnet
 %{_libdir}/*
 
 %changelog
 * Thu Nov 12 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.1.5-2
-- Fix scriptlets and move licenses to the correct folder
+- Adapt dotnet-runtime spec to new aspnetcore-runtime spec.
 
 *   Fri Jun 19 2020 Andrew Phelps <anphel@microsoft.com> 3.1.5-1
 -   Update version to 3.1.5. Fix runtime requirements.
