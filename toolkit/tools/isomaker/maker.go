@@ -218,7 +218,7 @@ func (im *IsoMaker) applyRufusWorkaround() {
 	)
 
 	if runtime.GOARCH == "arm64" {
-	        bootEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/bootaa64.efi")
+		bootEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/bootaa64.efi")
 		im.extractFromInitrdAndCopy(bootaa64BootloaderFile, bootEfiUsbFilePath)
 		grubEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/grubaa64.efi")
 		im.extractFromInitrdAndCopy(grubaa64BootloaderFile, grubEfiUsbFilePath)
