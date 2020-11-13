@@ -11,7 +11,7 @@ assets_files             = $(shell find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
-ifeq ($(shell uname -m),aarch64)
+ifeq ($(build_arch),aarch64)
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
 else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
@@ -39,7 +39,7 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
 imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
-ifeq ($(shell uname -m),aarch64)
+ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
