@@ -6,6 +6,7 @@ package schedulerutils
 import (
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkggraph"
@@ -15,7 +16,10 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similair build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
 	// Group build nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
 	buildNodes := make(map[string][]*pkggraph.PkgNode)
