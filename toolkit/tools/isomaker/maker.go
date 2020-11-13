@@ -131,15 +131,15 @@ func (im *IsoMaker) copyInitrd() {
 // which is booted in case of an UEFI boot of the ISO image.
 func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 	const (
-		blockSizeInBytes      = 1024 * 1024
-		numberOfBlocksToCopy  = 3
+		blockSizeInBytes     = 1024 * 1024
+		numberOfBlocksToCopy = 3
 		// x64 arch
 		bootx64BootloaderFile = "boot/efi/EFI/BOOT/bootx64.efi"
 		grubx64BootloaderFile = "boot/efi/EFI/BOOT/grubx64.efi"
 		// arm64 arch
 		bootaa64BootloaderFile = "boot/efi/EFI/BOOT/bootaa64.efi"
 		grubaa64BootloaderFile = "boot/efi/EFI/BOOT/grubaa64.efi"
-       )
+	)
 
 	logger.Log.Info("Preparing ISO's bootloaders.")
 
