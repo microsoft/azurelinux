@@ -183,7 +183,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, graphMutex)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
-	// After this call pkgGraph will be given to multiple routines and accessing it requires a mutex.
+	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
 	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, graphMutex, goalNode, channels)
 
 	if builtGraph != nil {
