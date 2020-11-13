@@ -104,6 +104,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "aspnetcore-runtime-3.1",
+          "version": "3.1.5",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atftp",
           "version": "0.7.2",
           "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
