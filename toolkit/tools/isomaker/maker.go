@@ -23,6 +23,7 @@ import (
 
 const (
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
+	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
 )
 
@@ -133,12 +134,6 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 	const (
 		blockSizeInBytes     = 1024 * 1024
 		numberOfBlocksToCopy = 3
-		// x64 arch
-		bootx64BootloaderFile = "boot/efi/EFI/BOOT/bootx64.efi"
-		grubx64BootloaderFile = "boot/efi/EFI/BOOT/grubx64.efi"
-		// arm64 arch
-		bootaa64BootloaderFile = "boot/efi/EFI/BOOT/bootaa64.efi"
-		grubaa64BootloaderFile = "boot/efi/EFI/BOOT/grubaa64.efi"
 	)
 
 	logger.Log.Info("Preparing ISO's bootloaders.")
@@ -181,19 +176,24 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 	logger.Log.Debug("Copying EFI modules into efiboot.img.")
 	// Copy Shim (boot<arch>64.efi) and grub2 (grub<arch>64.efi)
 	if runtime.GOARCH == "arm64" {
-		bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
-		bootEfiFilePath := filepath.Join(bootDirPath, "bootaa64.efi")
-		im.extractFromInitrdAndCopy(bootaa64BootloaderFile, bootEfiFilePath)
-		grubEfiFilePath := filepath.Join(bootDirPath, "grubaa64.efi")
-		im.extractFromInitrdAndCopy(grubaa64BootloaderFile, grubEfiFilePath)
+		im.copyShimFromInitrd(efiBootImgTempMountDir, "bootaa64.efi", "grubaa64.efi")
 	} else {
-		bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
-		bootEfiFilePath := filepath.Join(bootDirPath, "bootx64.efi")
-		im.extractFromInitrdAndCopy(bootx64BootloaderFile, bootEfiFilePath)
-		grubEfiFilePath := filepath.Join(bootDirPath, "grubx64.efi")
-		im.extractFromInitrdAndCopy(grubx64BootloaderFile, grubEfiFilePath)
+		im.copyShimFromInitrd(efiBootImgTempMountDir, "bootx64.efi", "grubx64.efi")
 	}
-	im.applyRufusWorkaround()
+}
+
+func (im *IsoMaker) copyShimFromInitrd(efiBootImgTempMountDir, bootBootloaderFile, grubBootloaderFile string) {
+	bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
+
+	initrdBootBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
+	buildDirBootEFIFilePath := filepath.Join(bootDirPath, bootBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdBootBootloaderFilePath, buildDirBootEFIFilePath)
+
+	initrdGrubBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, grubBootloaderFile)
+	buildDirGrubEFIFilePath := filepath.Join(bootDirPath, grubBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdGrubBootloaderFilePath, buildDirGrubEFIFilePath)
+
+	im.applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile)
 }
 
 // Rufus ISO-to-USB converter has a limitation where it will only copy the boot<arch>64.efi binary from a given efi*.img
@@ -207,27 +207,16 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 // Rufus prioritizes the presence of an EFI folder on the ISO disk over extraction of the efi*.img archive.
 // So to workaround the limitation, create an EFI folder and make a duplicate copy of the bootloader files
 // in EFI/Boot so Rufus doesn't attempt to extract the efi*.img in the first place.
-func (im *IsoMaker) applyRufusWorkaround() {
-	const (
-		//x64 arch
-		bootx64BootloaderFile = "boot/efi/EFI/BOOT/bootx64.efi"
-		grubx64BootloaderFile = "boot/efi/EFI/BOOT/grubx64.efi"
-		//arm64 arch
-		bootaa64BootloaderFile = "boot/efi/EFI/BOOT/bootaa64.efi"
-		grubaa64BootloaderFile = "boot/efi/EFI/BOOT/grubaa64.efi"
-	)
+func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile string) {
+	const buildDirBootEFIDirectoryPath = "efi/boot"
 
-	if runtime.GOARCH == "arm64" {
-		bootEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/bootaa64.efi")
-		im.extractFromInitrdAndCopy(bootaa64BootloaderFile, bootEfiUsbFilePath)
-		grubEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/grubaa64.efi")
-		im.extractFromInitrdAndCopy(grubaa64BootloaderFile, grubEfiUsbFilePath)
-	} else {
-		bootEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/bootx64.efi")
-		im.extractFromInitrdAndCopy(bootx64BootloaderFile, bootEfiUsbFilePath)
-		grubEfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/grubx64.efi")
-		im.extractFromInitrdAndCopy(grubx64BootloaderFile, grubEfiUsbFilePath)
-	}
+	initrdBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
+	buildDirBootEFIUsbFilePath := filepath.Join(im.buildDirPath, buildDirBootEFIDirectoryPath, bootBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdBootloaderFilePath, buildDirBootEFIUsbFilePath)
+
+	initrdGrubEFIFilePath := filepath.Join(initrdEFIBootDirectoryPath, grubBootloaderFile)
+	buildDirGrubEFIUsbFilePath := filepath.Join(im.buildDirPath, buildDirBootEFIDirectoryPath, grubBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdGrubEFIFilePath, buildDirGrubEFIUsbFilePath)
 }
 
 // createVmlinuzImage builds the 'vmlinuz' file containing the Linux kernel
