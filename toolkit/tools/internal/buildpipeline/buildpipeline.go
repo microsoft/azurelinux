@@ -171,7 +171,7 @@ func ReleaseChrootDir(chrootDir string) (err error) {
 // - proposeDir is suggested folder name and will be ignored in case of Docker based build
 func GetRpmsDir(chrootDir string, proposedDir string) string {
 	if IsRegularBuild() {
-		// just join chroot tdir and proposed dir in case of regular build
+		// just join chroot dir and proposed dir in case of regular build
 		return filepath.Join(chrootDir, proposedDir)
 	}
 

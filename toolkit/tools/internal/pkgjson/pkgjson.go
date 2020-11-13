@@ -268,7 +268,7 @@ func (interval *PackageVerInterval) Contains(queryInterval *PackageVerInterval) 
 }
 
 // Satisfies returns true the query interval overlaps the current interval at any point (ie it provides a version of a package
-// which satisfieds the query)
+// which satisfied the query)
 func (interval *PackageVerInterval) Satisfies(queryInterval *PackageVerInterval) (valid bool) {
 	var (
 		queryUpperValid, queryLowerValid, superset bool

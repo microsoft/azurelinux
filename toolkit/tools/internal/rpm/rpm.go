@@ -85,8 +85,8 @@ func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
 }
 
 // formatCommand will generate an RPM command to execute.
-func formatCommandArgs(extrArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
-	commandArgs = append(commandArgs, extrArgs...)
+func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
+	commandArgs = append(commandArgs, extraArgs...)
 	commandArgs = append(commandArgs, file)
 
 	if queryFormat != "" {

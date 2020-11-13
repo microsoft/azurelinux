@@ -223,14 +223,14 @@ func (im *IsoMaker) createVmlinuzImage() {
 // createIsoRpmsRepo initializes the RPMs repo on the ISO image
 // later accessed by the ISO installer.
 func (im *IsoMaker) createIsoRpmsRepo() {
-	isoRrpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
+	isoRpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
 
-	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRrpmsRepoDirPath)
+	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRpmsRepoDirPath)
 
-	logger.PanicOnError(os.MkdirAll(isoRrpmsRepoDirPath, os.ModePerm), "Failed to mkdir '%s'.", isoRrpmsRepoDirPath)
+	logger.PanicOnError(os.MkdirAll(isoRpmsRepoDirPath, os.ModePerm), "Failed to mkdir '%s'.", isoRpmsRepoDirPath)
 
 	fetchedRepoDirContentsPath := filepath.Join(im.fetchedRepoDirPath, "*")
-	recursiveCopyDereferencingLinks(fetchedRepoDirContentsPath, isoRrpmsRepoDirPath)
+	recursiveCopyDereferencingLinks(fetchedRepoDirContentsPath, isoRpmsRepoDirPath)
 }
 
 // prepareWorkDirectory makes sure we start with a clean directory
@@ -383,7 +383,7 @@ func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) {
 }
 
 // copyFileToConfigRoot copies a single file to its own, numbered subdirectory to avoid name conflicts
-// and returns the realitve path to the file for the sake of config updates for the installer.
+// and returns the relative path to the file for the sake of config updates for the installer.
 func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDirName, localAbsFilePath string) string {
 	fileName := filepath.Base(localAbsFilePath)
 	configFileSubDirRelativePath := fmt.Sprintf("%s/%d", configFilesSubDirName, im.configSubDirNumber)

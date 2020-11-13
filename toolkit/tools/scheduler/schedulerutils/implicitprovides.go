@@ -119,13 +119,13 @@ func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCa
 // matchProvidesToUnresolvedNodes matches a list of provides to unresolved nodes that they satisfy in the graph.
 func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (matches map[*pkgjson.PackageVer][]*pkggraph.PkgNode, err error) {
 	matches = make(map[*pkgjson.PackageVer][]*pkggraph.PkgNode)
-	implicitPackagesToUnresolvedoNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
+	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
 
 	// An unresolved node can only be satisfied by a single provide, prevent duplicate matching
 	nodeToSatisfier := make(map[*pkggraph.PkgNode]*pkgjson.PackageVer)
 
 	for _, provide := range provides {
-		for _, node := range implicitPackagesToUnresolvedoNodes[provide.Name] {
+		for _, node := range implicitPackagesToUnresolvedNodes[provide.Name] {
 			var (
 				provideInterval pkgjson.PackageVerInterval
 				nodeInterval    pkgjson.PackageVerInterval
@@ -144,7 +144,7 @@ func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pk
 			if provideInterval.Satisfies(&nodeInterval) {
 				satisfiedBy, found := nodeToSatisfier[node]
 				if found {
-					logger.Log.Warnf("Provides (%s) found that satifies an already satisfied unresolved node (%s) by (%s)", provide, node.FriendlyName(), satisfiedBy)
+					logger.Log.Warnf("Provides (%s) found that satisfies an already satisfied unresolved node (%s) by (%s)", provide, node.FriendlyName(), satisfiedBy)
 					continue
 				}
 

@@ -293,7 +293,7 @@ func findSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuilDir, newOutDir, newSpecsDir string, err error) {
+func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false
@@ -313,7 +313,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 		buildDirInChroot,
 	}
 
-	newBuilDir = buildDirInChroot
+	newBuildDir = buildDirInChroot
 	newOutDir = outMountPoint
 	newSpecsDir = specsMountPoint
 

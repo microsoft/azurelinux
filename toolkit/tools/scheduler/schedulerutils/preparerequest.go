@@ -14,7 +14,7 @@ import (
 
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
-// - It will group similair build nodes together into AncillaryNodes.
+// - It will group similar build nodes together into AncillaryNodes.
 func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
 	// Group build nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
