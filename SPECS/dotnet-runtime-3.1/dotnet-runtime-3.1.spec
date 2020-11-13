@@ -30,10 +30,8 @@ applications, microservices and modern websites.
 
 %install
 mkdir -p %{buildroot}%{_libdir}/dotnet
-mkdir -p %{buildroot}%{_docdir}/dotnet-runtime-%{version}
 
 cp -r * %{buildroot}%{_libdir}/dotnet
-rm %{buildroot}%{_libdir}/dotnet/LICENSE.txt %{buildroot}%{_libdir}/dotnet/ThirdPartyNotices.txt
 mkdir -p %{buildroot}%{_bindir}
 ln -sf %{_libdir}/dotnet/dotnet %{buildroot}%{_bindir}/dotnet
 
@@ -43,8 +41,9 @@ ln -sf %{_libdir}/dotnet/dotnet %{buildroot}%{_bindir}/dotnet
 %files
 %license LICENSE.txt ThirdPartyNotices.txt
 %defattr(-,root,root,0755)
+%exclude %{_libdir}/dotnet/LICENSE.txt
+%exclude %{_libdir}/dotnet/ThirdPartyNotices.txt
 %exclude %{_libdir}/debug
-%{_docdir}/*
 %{_bindir}/dotnet
 %{_libdir}/*
 
@@ -68,7 +67,7 @@ ln -sf %{_libdir}/dotnet/dotnet %{buildroot}%{_bindir}/dotnet
 -   Update to dotnet 3.1.3. License verified.
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
--   Initial import from Photon (license: dual Apache2/GPL2).
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 
 *   Wed Dec 05 2018 Ajay Kaher <akaher@vmware.com> 2.2.0-1
 -   upgraded to version 2.2.0
