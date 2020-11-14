@@ -11,7 +11,11 @@ assets_files             = $(shell find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
+ifeq ($(build_arch),aarch64)
+initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
+else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
+endif
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
@@ -35,7 +39,11 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
 imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
+ifeq ($(build_arch),aarch64)
+initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
+else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
+endif
 meta_user_data_iso       = ${IMAGES_DIR)/meta-user-data.iso
 
 $(call create_folder,$(workspace_dir))
