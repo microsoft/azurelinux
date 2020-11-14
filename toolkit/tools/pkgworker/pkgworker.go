@@ -387,6 +387,8 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 	}
 
 	if runCheck {
+		logger.Log.Warn("Enabling network access because we're running package tests (make argument 'RUN_CHECK' set to 'y').")
+
 		resolvFileCopy := safechroot.FileToCopy{
 			Src:  resolvFilePath,
 			Dest: resolvFilePath,
