@@ -47,8 +47,8 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %check
 # Install required modules for test - Test::Pod, Test::Exception, Test::Warn and Test::NoWarnings
 export PERL_MM_USE_DEFAULT=1
-cpan local::lib
 echo "yes" | cpan -a
+cpan local::lib
 cpan -i Test::Pod Test::Exception Test::Warn Test::NoWarnings
 make test
 
