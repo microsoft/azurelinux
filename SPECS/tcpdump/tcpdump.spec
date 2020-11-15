@@ -3,12 +3,12 @@ Name:           tcpdump
 Version:        4.9.3
 Release:        3%{?dist}
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
 Patch0:         CVE-2020-8037.patch
-Group:          Networking
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 BuildRequires:  libpcap-devel
 Requires:       libpcap
 
@@ -18,7 +18,7 @@ It allows the user to display TCP/IP and other packets being
 transmitted or received over a network to which the computer is attached.
 
 %prep
-%uatosetup -p1
+%autosetup -p1
 
 %build
 %configure
@@ -26,7 +26,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -51,16 +51,22 @@ make %{?_smp_mflags} check
 - Fixed CVE-2020-10105.
 - Update Source0 and URL.
 - License verified.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.9.2-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Thu Mar 14 2019 Michelle Wang <michellew@vmware.com> - 4.9.2-2
 - Add patch CVE-2018-19519
+
 * Fri Sep 15 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.9.2-1
 - Updating version to 4.9.2
+
 * Thu Sep 07 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.9.1-2
 - Fix for CVE-2017-11541 CVE-2017-11542 and CVE-2017-11543
+
 * Thu Aug 03 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.9.1-1
 - Updating version to 4.9.1
+
 * Thu Feb 02 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.9.0-1
 - Adding latest version to handle following CVEs
 - CVE-2016-7922, CVE-2016-7923, CVE-2016-7924, CVE-2016-7925,
@@ -74,11 +80,15 @@ make %{?_smp_mflags} check
 - CVE-2017-5204, CVE-2017-5205, CVE-2017-5341, CVE-2017-5342,
 - CVE-2017-5482, CVE-2017-5483, CVE-2017-5484, CVE-2017-5485,
 - CVE-2017-5486
+
 * Tue Oct 04 2016 ChangLee <changlee@vmware.com> - 4.7.4-3
 - Modified %check
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.7.4-2
 - GA - Bump release of all rpms
+
 * Wed Jan 20 2016 Anish Swaminathan <anishs@vmware.com> - 4.7.4-1
 - Upgrade version.
+
 * Mon Apr 6  2015 Mahmoud Bassiouny <mbassiouny@vmware.com> - 4.7.3-1
 - Updating version to 4.7.3
