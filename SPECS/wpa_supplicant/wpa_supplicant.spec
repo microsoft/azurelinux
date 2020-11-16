@@ -1,7 +1,7 @@
 Summary:          WPA client
 Name:             wpa_supplicant
 Version:          2.9
-Release:          1%{?dist}
+Release:          2%{?dist}
 License:          BSD
 URL:              https://w1.fi
 Group:            Applications/Communications
@@ -12,8 +12,7 @@ BuildRequires:    libnl3-devel openssl-devel
 Requires:         libnl3
 Requires:         openssl
 
-# This patch fixes CVE-2019-16275
-Patch0:           0001-AP-Silently-ignore-management-frame-from-unexpected-.patch
+Patch0:           CVE-2019-16275.patch
 
 %description
 WPA Supplicant is a Wi-Fi Protected Access (WPA) client and IEEE 802.1X supplicant
@@ -98,6 +97,8 @@ EOF
 %{_sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf
 
 %changelog
+*   Mon Nov 16 2020 Nicolas Guibourge <nicolasg@microsoft.com> 2.9-2
+-   Change name of CVE-2019-16275 patch.
 *   Thu May 14 2020 Henry Beberman <hebeberm@microsoft.com> 2.9-1
 -   Update version to 2.9.
 -   Add patch for CVE-2019-16275.
