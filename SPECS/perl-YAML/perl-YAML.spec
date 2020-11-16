@@ -2,7 +2,7 @@
 Summary:        YAML Ain't Markup Language (tm)
 Name:           perl-YAML
 Version:        1.26
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
@@ -40,6 +40,7 @@ find %{buildroot} -name 'perllocal.pod' -delete
 
 %check
 export PERL_MM_USE_DEFAULT=1
+cpan local::lib
 cpan Test::YAML
 make %{?_smp_mflags} test
 
@@ -84,6 +85,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/YAML::Types.3*
 
 %changelog
+* Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-4
+- Adding 'local::lib' perl5 library to fix test dependencies.
+
 * Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.26-3
 - Added %%license line automatically
 
