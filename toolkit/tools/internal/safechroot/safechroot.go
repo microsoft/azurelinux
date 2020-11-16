@@ -388,7 +388,7 @@ func cleanupAllChroots() {
 	// and frees the underlying OS handles associated with the chroots (unmounting them).
 	//
 	// However, it does not actually free the Chroot objects created by other goroutines, as they hold reference to them.
-	// Thus it could leave other go routine's Chroots in a bad state, where the routine believes the chroot is in-fact initialized,
+	// Thus it could leave other go routines' Chroots in a bad state, where the routine believes the chroot is in-fact initialized,
 	// but really it has already been cleaned up.
 
 	const (
