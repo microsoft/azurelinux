@@ -245,7 +245,8 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31
-- Fix CVE-2019-6454 patch
+- Fix CVE-2019-6454 patch. Add upstream patch info.
+- Fix CVE-2020-1712 patch. Add upstream patch info.
 
 * Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-30
 - Use autosetup
