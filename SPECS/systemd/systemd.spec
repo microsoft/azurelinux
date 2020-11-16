@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -267,6 +267,10 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-34
+- Fix CVE-2019-6454 patch. Add upstream patch info.
+- Fix CVE-2020-1712 patch. Add upstream patch info.
+
 * Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-33
 - Use autosetup
 - Fix CVE-2019-3842
@@ -298,7 +302,7 @@ rm -rf %{buildroot}/*
 *  Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 239-26
 -  Remove 99-vmware-hotplug.rules.
 
-*  Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 239-25
+*  Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 239-25
 -  Added %%license line automatically
 
 *  Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> 239-24
