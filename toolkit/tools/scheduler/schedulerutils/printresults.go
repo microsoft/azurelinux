@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"path/filepath"
+	"sync"
 
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkggraph"
@@ -30,7 +31,10 @@ func PrintBuildResult(res *BuildResult) {
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
-func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) {
+func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, buildState *GraphBuildState) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
 	failedSRPMs := make(map[string]bool)
 	failures := buildState.BuildFailures()
 	for _, failure := range failures {
