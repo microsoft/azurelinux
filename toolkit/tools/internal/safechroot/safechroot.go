@@ -150,14 +150,14 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 //   mount inside the chroot.
 // - extraMountPoints is an optional slice of additional mount points that should be created inside the chroot,
 //   they will automatically be unmounted on a Chroot Close.
-// This call will block until the chroot initializes succesfully.
+// This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
 func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) (err error) {
 	// On failed initialization, cleanup all chroot files
 	const leaveChrootOnDisk = false
 
 	// Acquire a lock on the global activeChrootsMutex to ensure SIGTERM
-	// teardown doesnt happen mid-initialization.
+	// teardown doesn't happen mid-initialization.
 	activeChrootsMutex.Lock()
 	defer activeChrootsMutex.Unlock()
 
@@ -168,7 +168,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			return
 		}
 	} else {
-		// Prevent a Chroot from being made ontop of an existing directory.
+		// Prevent a Chroot from being made on top of an existing directory.
 		// Chroot cleanup involves deleting the rootdir, so assume Chroot
 		// has exclusive ownership of it.
 		_, err = os.Stat(c.rootDir)
@@ -333,7 +333,7 @@ func (c *Chroot) RootDir() string {
 // Only one Chroot will close at a given time.
 func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 	// Acquire a lock on the global activeChrootsMutex to ensure SIGTERM
-	// teardown doesnt happen mid-close.
+	// teardown doesn't happen mid-close.
 	activeChrootsMutex.Lock()
 	defer activeChrootsMutex.Unlock()
 
@@ -388,7 +388,7 @@ func cleanupAllChroots() {
 	// and frees the underlying OS handles associated with the chroots (unmounting them).
 	//
 	// However, it does not actually free the Chroot objects created by other goroutines, as they hold reference to them.
-	// Thus it could leave other goroutine's Chroots in a bad state, where the routine believes the chroot is in-fact initialized,
+	// Thus it could leave other go routines' Chroots in a bad state, where the routine believes the chroot is in-fact initialized,
 	// but really it has already been cleaned up.
 
 	const (

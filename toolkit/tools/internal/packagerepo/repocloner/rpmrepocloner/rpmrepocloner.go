@@ -120,7 +120,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 
 	// Setup mount points for the chroot.
 	//
-	// 1) Mount the provided directory of existings RPMs into the chroot as an overlay,
+	// 1) Mount the provided directory of existing RPMs into the chroot as an overlay,
 	// ensuring the chroot can read the files, but not alter the actual directory outside
 	// the chroot.
 	//
@@ -133,7 +133,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
-	// be created succesfully
+	// be created successfully
 	err = r.chroot.Initialize(workerTar, overlayExtraDirs, extraMountPoints)
 	if err != nil {
 		r.chroot = nil
@@ -265,7 +265,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		}
 
 		err = r.chroot.Run(func() (err error) {
-			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+			// Consider the built RPMs first, then the already cached (e.g. toolchain), and finally all remote packages.
 			repoOrderList := []string{builtRepoID, cachedRepoID, allRepoIDs}
 			return r.clonePackage(args, repoOrderList...)
 		})

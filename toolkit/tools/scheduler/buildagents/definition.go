@@ -5,7 +5,7 @@ package buildagents
 
 import "fmt"
 
-// BuildAgentConfig represents configuration options a BuildAgent would need to succesfully build a given package.
+// BuildAgentConfig represents configuration options a BuildAgent would need to successfully build a given package.
 type BuildAgentConfig struct {
 	Program string
 

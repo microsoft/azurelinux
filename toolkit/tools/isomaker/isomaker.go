@@ -18,7 +18,7 @@ var (
 	buildDirPath      = app.Flag("build-dir", "Directory to store temporary files while building.").Required().String()
 	configFilePath    = exe.InputFlag(app, "Path to the image config file.")
 	initrdPath        = app.Flag("initrd-path", "Path to the ISO's initrd file.").Required().ExistingFile()
-	isoRepoDirPath    = app.Flag("iso-repo", "Path to repo with fatched RPMs required by the ISO installer.").Required().ExistingDir()
+	isoRepoDirPath    = app.Flag("iso-repo", "Path to repo with fetched RPMs required by the ISO installer.").Required().ExistingDir()
 	releaseVersion    = app.Flag("release-version", "The repository OS release version").Required().String()
 	resourcesDirPath  = app.Flag("resources", "Path to 'resources' directory").Required().ExistingDir()
 	outputDir         = app.Flag("output-dir", "Path to directory to place final image").Required().String()

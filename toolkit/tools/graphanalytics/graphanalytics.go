@@ -31,7 +31,7 @@ type mapPair struct {
 var (
 	app            = kingpin.New("graphanalytics", "A tool to print analytics of a given dependency graph.")
 	inputGraphFile = exe.InputFlag(app, "Path to the DOT graph file to analyze.")
-	maxResults     = app.Flag("max-results", "The number of results to print per catagory. Set 0 to print unlimited.").Default(defaultMaxResults).Int()
+	maxResults     = app.Flag("max-results", "The number of results to print per category. Set 0 to print unlimited.").Default(defaultMaxResults).Int()
 	logFile        = exe.LogFileFlag(app)
 	logLevel       = exe.LogLevelFlag(app)
 )

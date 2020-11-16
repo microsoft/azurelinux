@@ -59,7 +59,7 @@ var (
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
 	buildAttempts        = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	runCheck             = app.Flag("run-check", "Run the check during package builds.").Bool()
-	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the choot folder after the build is done").Bool()
+	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
 
@@ -237,8 +237,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
-		// useCachedImplicit tracks if cached implicit provides can be used to satsify unresolved dynamic dependencies.
-		// Local packages are preferred over cached remotes ones to satsify these unresolved dependencies, however
+		// useCachedImplicit tracks if cached implicit provides can be used to satisfy unresolved dynamic dependencies.
+		// Local packages are preferred over cached remotes ones to satisfy these unresolved dependencies, however
 		// the scheduler does not know what packages provide which implicit provides until the packages have been built.
 		// Therefore the scheduler will attempt to build all possible packages without consuming any cached dynamic dependencies first.
 		useCachedImplicit bool
@@ -260,7 +260,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running try enabling cached packages for unresolve dynamic dependencies to unblocked more nodes.
+		// If there are no active builds running try enabling cached packages for unresolved dynamic dependencies to unblocked more nodes.
 		// Otherwise there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {

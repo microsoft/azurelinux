@@ -74,7 +74,7 @@ func (g *GraphBuildState) RemoveBuildRequest(req *BuildRequest) {
 	delete(g.activeBuilds, req.Node.ID())
 }
 
-// RecordBuildResult recprds a build result in the graph build state.
+// RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
 func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {

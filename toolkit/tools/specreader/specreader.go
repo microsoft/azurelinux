@@ -158,7 +158,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	return
 }
 
-// parseSPECs will parse all specs in specsDir and return a summmary of the SPECs.
+// parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
 func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
@@ -337,7 +337,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			result.packages = providerList
 		}
 
-		// Submit the result to the main thread, the defered function will clear the semaphore.
+		// Submit the result to the main thread, the deferred function will clear the semaphore.
 		results <- result
 	}
 }
