@@ -4,7 +4,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,8 @@ Patch10:        CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch11:        CVE-2018-20796.nopatch
 Patch12:        CVE-2019-7309.patch
+# CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
+Patch13:        CVE-2019-19126.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -304,6 +306,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-14
+- Patch CVE-2019-19126
+
 * Wed Oct 28 2020 Henry Li <lihl@microsoft.com> - 2.28-13
 - Used autosetup
 - Added patch to resolve CVE-2019-7309

@@ -23,6 +23,7 @@ import (
 
 const (
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
+	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
 )
 
@@ -131,10 +132,8 @@ func (im *IsoMaker) copyInitrd() {
 // which is booted in case of an UEFI boot of the ISO image.
 func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 	const (
-		blockSizeInBytes      = 1024 * 1024
-		numberOfBlocksToCopy  = 3
-		bootx64BootloaderFile = "boot/efi/EFI/BOOT/bootx64.efi"
-		grubx64BootloaderFile = "boot/efi/EFI/BOOT/grubx64.efi"
+		blockSizeInBytes     = 1024 * 1024
+		numberOfBlocksToCopy = 3
 	)
 
 	logger.Log.Info("Preparing ISO's bootloaders.")
@@ -175,36 +174,49 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() {
 	}()
 
 	logger.Log.Debug("Copying EFI modules into efiboot.img.")
-	// Copy Shim (bootx64.efi) and grub2 (grubx64.efi)
-	bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
-	bootx64EfiFilePath := filepath.Join(bootDirPath, "bootx64.efi")
-	im.extractFromInitrdAndCopy(bootx64BootloaderFile, bootx64EfiFilePath)
-	grubx64EfiFilePath := filepath.Join(bootDirPath, "grubx64.efi")
-	im.extractFromInitrdAndCopy(grubx64BootloaderFile, grubx64EfiFilePath)
-
-	im.applyRufusWorkaround()
+	// Copy Shim (boot<arch>64.efi) and grub2 (grub<arch>64.efi)
+	if runtime.GOARCH == "arm64" {
+		im.copyShimFromInitrd(efiBootImgTempMountDir, "bootaa64.efi", "grubaa64.efi")
+	} else {
+		im.copyShimFromInitrd(efiBootImgTempMountDir, "bootx64.efi", "grubx64.efi")
+	}
 }
 
-// Rufus ISO-to-USB converter has a limitation where it will only copy the bootx64.efi binary from a given efi*.img
+func (im *IsoMaker) copyShimFromInitrd(efiBootImgTempMountDir, bootBootloaderFile, grubBootloaderFile string) {
+	bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
+
+	initrdBootBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
+	buildDirBootEFIFilePath := filepath.Join(bootDirPath, bootBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdBootBootloaderFilePath, buildDirBootEFIFilePath)
+
+	initrdGrubBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, grubBootloaderFile)
+	buildDirGrubEFIFilePath := filepath.Join(bootDirPath, grubBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdGrubBootloaderFilePath, buildDirGrubEFIFilePath)
+
+	im.applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile)
+}
+
+// Rufus ISO-to-USB converter has a limitation where it will only copy the boot<arch>64.efi binary from a given efi*.img
 // archive into the standard UEFI EFI/BOOT folder instead of extracting the whole archive as per the El Torito ISO
 // specification.
 //
 // Most distros (including ours) use a 2 stage bootloader flow (shim->grub->kernel). Since the Rufus limitation only
-// copies the 1st stage to EFI/BOOT/bootx64.efi, it cannot find the 2nd stage bootloader (grubx64.efi) which should
-// be in the same directory: EFI/BOOT/grubx64.efi. This causes the USB installation to fail to boot.
+// copies the 1st stage to EFI/BOOT/boot<arch>64.efi, it cannot find the 2nd stage bootloader (grub<arch>64.efi) which should
+// be in the same directory: EFI/BOOT/grub<arch>64.efi. This causes the USB installation to fail to boot.
 //
 // Rufus prioritizes the presence of an EFI folder on the ISO disk over extraction of the efi*.img archive.
 // So to workaround the limitation, create an EFI folder and make a duplicate copy of the bootloader files
 // in EFI/Boot so Rufus doesn't attempt to extract the efi*.img in the first place.
-func (im *IsoMaker) applyRufusWorkaround() {
-	const (
-		bootx64BootloaderFile = "boot/efi/EFI/BOOT/bootx64.efi"
-		grubx64BootloaderFile = "boot/efi/EFI/BOOT/grubx64.efi"
-	)
-	bootx64EfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/bootx64.efi")
-	im.extractFromInitrdAndCopy(bootx64BootloaderFile, bootx64EfiUsbFilePath)
-	grubx64EfiUsbFilePath := filepath.Join(im.buildDirPath, "efi/boot/grubx64.efi")
-	im.extractFromInitrdAndCopy(grubx64BootloaderFile, grubx64EfiUsbFilePath)
+func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile string) {
+	const buildDirBootEFIDirectoryPath = "efi/boot"
+
+	initrdBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
+	buildDirBootEFIUsbFilePath := filepath.Join(im.buildDirPath, buildDirBootEFIDirectoryPath, bootBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdBootloaderFilePath, buildDirBootEFIUsbFilePath)
+
+	initrdGrubEFIFilePath := filepath.Join(initrdEFIBootDirectoryPath, grubBootloaderFile)
+	buildDirGrubEFIUsbFilePath := filepath.Join(im.buildDirPath, buildDirBootEFIDirectoryPath, grubBootloaderFile)
+	im.extractFromInitrdAndCopy(initrdGrubEFIFilePath, buildDirGrubEFIUsbFilePath)
 }
 
 // createVmlinuzImage builds the 'vmlinuz' file containing the Linux kernel
