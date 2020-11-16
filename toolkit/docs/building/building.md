@@ -627,7 +627,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 | CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
-| NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool.
+| NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 
 ---
 
