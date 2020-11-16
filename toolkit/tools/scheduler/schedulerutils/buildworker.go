@@ -6,6 +6,7 @@ package schedulerutils
 import (
 	"fmt"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"gonum.org/v1/gonum/graph"
@@ -42,7 +43,7 @@ type BuildResult struct {
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, buildAttempts int) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex sync.RWMutex, buildAttempts int) {
 	for req := range channels.Requests {
 		select {
 		case <-channels.Cancel:
@@ -58,7 +59,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, buil
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			res.UsedCache, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, agent, req.CanUseCache, buildAttempts)
+			res.UsedCache, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts)
 			if res.Err == nil {
 				for _, node := range req.AncillaryNodes {
 					if node.Type == pkggraph.TypeBuild {
@@ -84,7 +85,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, buil
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
 	cfg := agent.Config()
 
 	baseSrpmName := filepath.Base(node.SrpmPath)
@@ -96,7 +97,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 		}
 	}
 
-	dependencies := getBuildDependencies(node, pkgGraph)
+	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Building %s", baseSrpmName)
 	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
@@ -104,7 +105,10 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, agent b
 }
 
 // getBuildDependencies returns a list of all dependencies that need to be installed before the node can be built.
-func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph) (dependencies []string) {
+func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex) (dependencies []string) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
 	// Use a map to avoid duplicate entries
 	dependencyLookup := make(map[string]bool)
 

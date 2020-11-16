@@ -4,6 +4,8 @@
 package schedulerutils
 
 import (
+	"sync"
+
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 	"microsoft.com/pkggen/internal/logger"
@@ -42,7 +44,10 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
 	search := traverse.BreadthFirst{}
 
 	search.Walk(pkgGraph, goalNode, func(n graph.Node, d int) (stopSearch bool) {
@@ -80,10 +85,13 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, buildSta
 }
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
-func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
 	if res.Err != nil {
 		return
 	}
+
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
 
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
