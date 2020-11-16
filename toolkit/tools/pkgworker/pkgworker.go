@@ -175,7 +175,7 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 	}
 
 	// Query and install the build requirements for this SRPM
-	err = installBuildRequires(defines)
+	err = installBuildRequires(defines, runCheck)
 	if err != nil {
 		return
 	}
@@ -236,10 +236,11 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 	return
 }
 
-func installBuildRequires(defines map[string]string) (err error) {
+func installBuildRequires(defines map[string]string, runCheck bool) (err error) {
 	// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
 	const (
 		emptyQueryFormat        = ""
+		caCertificatesPackage   = "ca-certificates"
 		unresolvedOutputPrefix  = "No package"
 		unresolvedOutputPostfix = "available"
 		alreadyInstalledPostfix = "is already installed."
@@ -264,7 +265,12 @@ func installBuildRequires(defines map[string]string) (err error) {
 		return
 	}
 
-	if len(buildRequires) > 0 {
+	if runCheck || len(buildRequires) > 0 {
+		var (
+			stderr string
+			stdout string
+		)
+
 		defaultArgs := []string{"install", "-y"}
 		installArgs := make([]string, 0, len(buildRequires)+len(defaultArgs))
 
@@ -282,10 +288,11 @@ func installBuildRequires(defines map[string]string) (err error) {
 			installArgs = append(installArgs, strings.TrimSpace(buildReq))
 		}
 
-		var (
-			stderr string
-			stdout string
-		)
+		if runCheck {
+			logger.Log.Warn("Adding the 'ca-certificates' package - needed for package tests (make argument 'RUN_CHECK' set to 'y').")
+
+			installArgs = append(installArgs, caCertificatesPackage)
+		}
 
 		stdout, stderr, err = shell.Execute("tdnf", installArgs...)
 		if err != nil {
