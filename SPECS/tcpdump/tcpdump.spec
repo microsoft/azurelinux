@@ -38,7 +38,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
-* Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-2
+* Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-3
 - Patch CVE-2020-8037
 - Lint to Mariner style
 
