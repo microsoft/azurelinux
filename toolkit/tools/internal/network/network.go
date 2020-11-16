@@ -17,14 +17,14 @@ import (
 
 // JoinURL concatenates baseURL with extraPaths
 func JoinURL(baseURL string, extraPaths ...string) string {
-	const urlPathSeparater = "/"
+	const urlPathSeparator = "/"
 
 	if len(extraPaths) == 0 {
 		return baseURL
 	}
 
-	appendToBase := strings.Join(extraPaths, urlPathSeparater)
-	return fmt.Sprintf("%s%s%s", baseURL, urlPathSeparater, appendToBase)
+	appendToBase := strings.Join(extraPaths, urlPathSeparator)
+	return fmt.Sprintf("%s%s%s", baseURL, urlPathSeparator, appendToBase)
 }
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil.
