@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,8 @@ Patch21:        CVE-2020-25742.patch
 Patch22:        CVE-2020-25743.patch
 Patch23:        CVE-2020-15469.patch
 Patch24:        CVE-2020-24352.patch
+# CVE-2020-12820 only affects powerpc and SuperH emulation (see .nopatch file for details). Resloved fully in qemu >=5.0.0
+Patch25:        CVE-2020-12829.nopatch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -149,6 +151,9 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Mon Nov 16 2020 Daniel McIlvaney <damcilva@microsoft.com> - 4.2.0-20
+- Noatch CVE-2020-12829, only affects SuperH and PowerPC emulation
+
 * Wed Nov 11 2020 Henry Li <lihl@microsoft.com> - 4.2.0-19
 - Patch CVE-2020-13361
 - Patch CVE-2020-11869
