@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Patch1:         CVE-2019-16905.patch
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2020-14145.nopatch
+Patch102:       CVE-2020-15778.nopatch
 
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
@@ -192,6 +193,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
+* Tue Nov 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0p1-12
+- Nopatching CVE-2020-15778.
+
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0p1-11
 - Nopatching CVE-2020-14145.
 
