@@ -95,4 +95,5 @@ func TestShouldSucceedConvertToPartedArgument_PartitionTableType(t *testing.T) {
 func TestShouldFailConvertToPartedArgument_PartitionTableType(t *testing.T) {
 	_, err := invalidPartitionTableType.ConvertToPartedArgument()
 	assert.Error(t, err)
+	assert.Equal(t, "invalid value for PartitionTableType (not_a_partition_type)", err.Error())
 }
