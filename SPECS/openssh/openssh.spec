@@ -12,24 +12,19 @@ Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}
 Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/blfs-systemd-units-%{systemd_units_rel}.tar.xz
 Source2:        sshd.service
 Source3:        sshd-keygen.service
-
 Patch0:         blfs_systemd_fixes.patch
 Patch1:         CVE-2019-16905.patch
-
 # Nopatches section
-
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2020-14145.nopatch
 Patch102:       CVE-2020-15778.nopatch
-
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
-
 Requires:       openssh-clients = %{version}-%{release}
 Requires:       openssh-server = %{version}-%{release}
 
@@ -146,6 +141,7 @@ fi
 
 %clean
 rm -rf %{buildroot}/*
+
 
 
 %files
