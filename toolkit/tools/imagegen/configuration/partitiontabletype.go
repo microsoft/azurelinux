@@ -52,12 +52,12 @@ func (p *PartitionTableType) IsValid() (err error) {
 	return fmt.Errorf("invalid value for PartitionTableType (%s)", p)
 }
 
-// ConvertToPartedArg returns the corresponding argument to parted
+// ConvertToPartedArgument returns the parted argument corresponding to the
+// partition table type
 func (p *PartitionTableType) ConvertToPartedArgument() (partedArgument string, err error) {
 	if err = p.IsValid(); err != nil {
 		return
 	}
-
 	partedArgument = partitionTableTypeToPartedArgument[*p]
 	return
 }
