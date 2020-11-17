@@ -20,9 +20,6 @@ var (
 	invalidPartitionTableType                 = PartitionTableType("not_a_partition_type")
 	validPartitionTableTypeJSON               = `"gpt"`
 	invalidPartitionTableTypeJSON             = `1234`
-	validMbrPartedArgument                    = `"msdos"`
-	validGptPartedArgument                    = `"gpt"`
-	invalidPartedArgument                     = `"foo"`
 	validPartitionTableTypesToPartedArguments = map[PartitionTableType]string{
 		PartitionTableType("gpt"): "gpt",
 		PartitionTableType("mbr"): "msdos",
@@ -93,4 +90,9 @@ func TestShouldSucceedConvertToPartedArgument_PartitionTableType(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, partedArgument, validPartitionTableTypesToPartedArguments[partitionType])
 	}
+}
+
+func TestShouldFailConvertToPartedArgument_PartitionTableType(t *testing.T) {
+	_, err := invalidPartitionTableType.ConvertToPartedArgument()
+	assert.Error(t, err)
 }
