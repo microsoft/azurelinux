@@ -53,12 +53,12 @@ func (p *PartitionTableType) IsValid() (err error) {
 }
 
 // ConvertToPartedArg returns the corresponding argument to parted
-func (p *PartitionTableType) ConvertToPartedArgument() (PartedArgument string, err error) {
+func (p *PartitionTableType) ConvertToPartedArgument() (partedArgument string, err error) {
 	if err = p.IsValid(); err != nil {
 		return
 	}
 
-	PartedArgument = partitionTableTypeToPartedArgument[*p]
+	partedArgument = partitionTableTypeToPartedArgument[*p]
 	return
 }
 
