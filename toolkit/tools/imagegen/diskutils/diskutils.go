@@ -244,10 +244,12 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 	// Create new partition table
 	partitionTableType := disk.PartitionTableType
-	if partitionTableType == "mbr" {
-		partitionTableType = "msdos"
+	partedArgument, err := partitionTableType.ConvertToPartedArgument()
+	if err != nil {
+		logger.Log.Warnf("Unable to convert partition table type to parted argument")
+		return
 	}
-	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partitionTableType.String())
+	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
 		return
