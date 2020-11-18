@@ -44,6 +44,7 @@ Requires:       chkconfig
 Requires:       libstdc++
 AutoReqProv:    no
 Obsoletes:      openjre <= %{version}
+Provides:       java = %{version}-%{release}
 Provides:       java-headless = %{version}-%{release}
 
 %description	-n openjre8
@@ -257,7 +258,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-12
-- Provide java-headless.
+- Provide java and java-headless.
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-11
 - Provide java-1.8.0-openjdk and java-devel.
