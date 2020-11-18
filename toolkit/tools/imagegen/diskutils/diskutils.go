@@ -247,7 +247,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
 	partedArgument, err := partitionTableType.ConvertToPartedArgument()
 	if err != nil {
-		logger.Log.Warnf("Unable to convert partition table type to parted argument")
+		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
 		return
 	}
 	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partedArgument)
