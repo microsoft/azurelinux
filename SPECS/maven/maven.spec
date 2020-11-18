@@ -25,18 +25,31 @@ Provides:       %{name}-lib = %{version}-%{release}
 Provides:       bundled(slf4j) = %{version}-%{release}
 Provides:       maven2 = %{version}-%{release}
 Obsoletes:      maven2 < %{version}-%{release}
+Provides:       %{name}-artifact = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-artifact) = %{version}-%{release}
+Provides:       %{name}-builder-support = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-builder-support) = %{version}-%{release}
+Provides:       %{name}-compat = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-compat) = %{version}-%{release}
+Provides:       %{name}-core = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-core) = %{version}-%{release}
+Provides:       %{name}-embedder = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-embedder) = %{version}-%{release}
+Provides:       %{name}-model = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-model) = %{version}-%{release}
+Provides:       %{name}-model-builder = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-model-builder) = %{version}-%{release}
+Provides:       %{name}-plugin-api = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-plugin-api) = %{version}-%{release}
+Provides:       %{name}-repository-metadata = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-repository-metadata) = %{version}-%{release}
+Provides:       %{name}-resolver-provider = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-resolver-provider) = %{version}-%{release}
+Provides:       %{name}-settings = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-settings) = %{version}-%{release}
+Provides:       %{name}-settings-builder = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-settings-builder) = %{version}-%{release}
+Provides:       %{name}-slf4j-provider = %{version}-%{release}
 Provides:       mvn(org.apache.maven:maven-slf4j-provider) = %{version}-%{release}
 
 %description
