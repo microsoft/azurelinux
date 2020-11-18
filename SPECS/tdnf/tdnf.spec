@@ -6,41 +6,18 @@ Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
 Release:        5%{?dist}
+License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License:        LGPLv2.1 and GPLv2
-URL:            https://github.com/vmware/tdnf/wiki
 Group:          Applications/RPM
-Requires:       rpm-libs
-Requires:       curl
-Requires:       tdnf-cli-libs = %{version}-%{release}
-Requires:       libsolv
-Requires:       openssl-libs
-BuildRequires:  popt-devel
-BuildRequires:  rpm-devel
-BuildRequires:  openssl-devel
-BuildRequires:  libsolv-devel
-BuildRequires:  curl-devel
-#plugin repogpgcheck
-BuildRequires:  gpgme-devel
-BuildRequires:  cmake
-BuildRequires:  python3-devel
-%if %{with_check}
-BuildRequires:  createrepo_c
-BuildRequires:  glib
-BuildRequires:  libxml2
-BuildRequires:  python3-requests
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-%endif
-Obsoletes:      yum
-Provides:       yum
+URL:            https://github.com/vmware/tdnf/wiki
 #Source0:       https://github.com/vmware/tdnf/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        cache-updateinfo
 Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
+
 Patch0:         tdnf-fix-distroverpkg-search.patch
 Patch1:         tdnf-ssl-support.patch
 Patch2:         tdnf-add-download-command.patch
@@ -50,23 +27,52 @@ Patch5:         tdnf-support-multiple-gpgkeys.patch
 Patch6:         tdnf-add-download-no-deps-command.patch
 Patch7:         tdnf-use-custom-keyring-for-gpg-checks.patch
 
+BuildRequires:  cmake
+BuildRequires:  curl-devel
+#plugin repogpgcheck
+BuildRequires:  gpgme-devel
+BuildRequires:  libsolv-devel
+BuildRequires:  openssl-devel
+BuildRequires:  popt-devel
+BuildRequires:  python3-devel
+BuildRequires:  rpm-devel
+
+Requires:       curl
+Requires:       libsolv
+Requires:       openssl-libs
+Requires:       rpm-libs
+Requires:       tdnf-cli-libs = %{version}-%{release}
+
+Obsoletes:      yum
+Provides:       yum
+
+%if %{with_check}
+BuildRequires:  createrepo_c
+BuildRequires:  glib
+BuildRequires:  libxml2
+BuildRequires:  python3-requests
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
+%endif
+
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
 
 %package    devel
-Summary:    A Library providing C API for tdnf
-Group:      Development/Libraries
-Requires:   tdnf = %{version}-%{release}
-Requires:   libsolv-devel
+Summary:        A Library providing C API for tdnf
+Group:          Development/Libraries
+
+Requires:       libsolv-devel
+Requires:       tdnf = %{version}-%{release}
 
 %description devel
 Development files for tdnf
 
 %package	cli-libs
-Summary:	Library providing cli libs for tdnf like clients
-Group:		Development/Libraries
+Summary:        Library providing cli libs for tdnf like clients
+Group:          Development/Libraries
 
 %description cli-libs
 Library providing cli libs for tdnf like clients.
@@ -74,6 +80,7 @@ Library providing cli libs for tdnf like clients.
 %package        plugin-repogpgcheck
 Summary:        tdnf plugin providing gpg verification for repository metadata
 Group:          Development/Libraries
+
 Requires:       gpgme
 
 %description plugin-repogpgcheck
@@ -82,7 +89,9 @@ tdnf plugin providing gpg verification for repository metadata
 %package        python
 Summary:        python bindings for tdnf
 Group:          Development/Libraries
+
 Requires:       python3
+
 %description python
 python bindings for tdnf
 
@@ -109,14 +118,14 @@ cd build && make %{?_smp_mflags} check
 %install
 cd build && make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.a' -delete
-mkdir -p %{buildroot}/var/cache/tdnf
+mkdir -p %{buildroot}%{_var}/cache/tdnf
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
 install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
 install -v -D -m 0644 %{SOURCE3} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
 install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-mv %{buildroot}/usr/lib/pkgconfig/tdnfcli.pc %{buildroot}/usr/lib/pkgconfig/tdnf-cli-libs.pc
+mv %{buildroot}%{_lib}/pkgconfig/tdnfcli.pc %{buildroot}%{_lib}/pkgconfig/tdnf-cli-libs.pc
 mkdir -p %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck
 mv %{buildroot}/%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
 
@@ -155,44 +164,44 @@ find %{buildroot} -name '*.pyc' -delete
 
 %files
 %license COPYING
-    %defattr(-,root,root,0755)
-    %{_bindir}/tdnf
-    %{_bindir}/tyum
-    %{_bindir}/yum
-    %{_bindir}/tdnf-cache-updateinfo
-    %{_libdir}/libtdnf.so.*
-    %config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
-    %config %{_libdir}/systemd/system/tdnf-cache-updateinfo.service
-    %config(noreplace) %{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
-    %dir /var/cache/tdnf
-    %{_datadir}/bash-completion/completions/tdnf
-    
+%defattr(-,root,root,0755)
+%{_bindir}/tdnf
+%{_bindir}/tyum
+%{_bindir}/yum
+%{_bindir}/tdnf-cache-updateinfo
+%{_libdir}/libtdnf.so.*
+%config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
+%config %{_libdir}/systemd/system/tdnf-cache-updateinfo.service
+%config(noreplace) %{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
+%dir %{_var}/cache/tdnf
+%{_datadir}/bash-completion/completions/tdnf
+
 %files devel
-    %defattr(-,root,root)
-    %{_includedir}/tdnf/*.h
-    %{_libdir}/libtdnf.so
-    %{_libdir}/libtdnfcli.so
-    %exclude %{_libdir}/debug
-    %{_libdir}/pkgconfig/tdnf.pc
-    %{_libdir}/pkgconfig/tdnf-cli-libs.pc
+%defattr(-,root,root)
+%{_includedir}/tdnf/*.h
+%{_libdir}/libtdnf.so
+%{_libdir}/libtdnfcli.so
+%exclude %{_libdir}/debug
+%{_libdir}/pkgconfig/tdnf.pc
+%{_libdir}/pkgconfig/tdnf-cli-libs.pc
 
 %files cli-libs
-    %defattr(-,root,root)
-    %{_libdir}/libtdnfcli.so.*
+%defattr(-,root,root)
+%{_libdir}/libtdnfcli.so.*
 
 %files plugin-repogpgcheck
-    %defattr(-,root,root)
-    %dir %{_sysconfdir}/tdnf/pluginconf.d
-    %config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-    %{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
+%defattr(-,root,root)
+%dir %{_sysconfdir}/tdnf/pluginconf.d
+%config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
+%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
 
 %files python
-    %defattr(-,root,root)
-    %{python3_sitelib}/*
-    
+%defattr(-,root,root)
+%{python3_sitelib}/*
+
 %changelog
 * Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-5
-- Adding 'BuildRequires' on 'pytest' to fix the package tests.
+- Extending 'BuildRequires' with "pytest's" dependencies to fix the package tests.
 
 * Fri Aug 14 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1.0-4
 - Add tdnf-use-custom-keyring-for-gpg-checks.patch
