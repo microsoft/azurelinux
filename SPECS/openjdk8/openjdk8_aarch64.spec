@@ -8,7 +8,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.181
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,8 @@ Requires:       chkconfig
 Requires:       libstdc++
 AutoReqProv:    no
 Obsoletes:      openjre <= %{version}
+Provides:       java = %{version}-%{release}
+Provides:       java-headless = %{version}-%{release}
 
 %description	-n openjre8
 It contains the libraries files for Java runtime environment
@@ -184,6 +186,7 @@ alternatives --remove java %{_libdir}/jvm/OpenJDK-%{version}/jre/bin/java
 rm -rf %{buildroot}/*
 
 
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -254,6 +257,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-12
+- Provide java and java-headless.
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-11
 - Provide java-1.8.0-openjdk and java-devel.
 

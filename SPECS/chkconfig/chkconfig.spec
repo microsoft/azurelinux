@@ -1,27 +1,30 @@
-Summary: A system tool for maintaining the /etc/rc*.d hierarchy
-Name: chkconfig
-Version: 1.11
-Release:        1%{?dist}
-License: GPLv2
-Group: System Environment/Base
-URL: https://github.com/fedora-sysv/chkconfig
+Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
+Name:           chkconfig
+Version:        1.11
+Release:        2%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Base
+URL:            https://github.com/fedora-sysv/chkconfig
 #Source0: https://github.com/fedora-sysv/%{name}/archive/%{version}.tar.gz
-Source0: %{name}-%{version}.tar.gz
-Patch0:chkconfig-shortopt.patch
-Patch1:ignore-priorities.patch
-Patch2:chkconfig-runlevel.patch
-Patch3:print-service-on-off.patch
-%define sha1 chkconfig=8489eeacacd0979180caba4919cb721824ca3735
-Requires: libselinux
-Requires: libsepol
-Requires: newt
-Requires: popt
-Requires: slang
-BuildRequires: newt-devel 
-BuildRequires: gettext 
-BuildRequires: popt-devel 
-BuildRequires: libselinux-devel
-Conflicts: initscripts <= 5.30-1
+Source0:        %{name}-%{version}.tar.gz
+Patch0:         chkconfig-shortopt.patch
+Patch1:         ignore-priorities.patch
+Patch2:         chkconfig-runlevel.patch
+Patch3:         print-service-on-off.patch
+BuildRequires:  gettext
+BuildRequires:  libselinux-devel
+BuildRequires:  newt-devel
+BuildRequires:  popt-devel
+Requires:       libselinux
+Requires:       libsepol
+Requires:       newt
+Requires:       popt
+Requires:       slang
+Conflicts:      initscripts <= 5.30-1
+Provides:       alternatives = %{version}-%{release}
+Provides:       update-alternatives = %{version}-%{release}
 
 %description
 Chkconfig is a basic system utility.  It updates and queries runlevel
@@ -30,9 +33,9 @@ symbolic links in /etc/rc.d, to relieve system administrators of some
 of the drudgery of manually editing the symbolic links.
 
 %package -n ntsysv
-Summary: A tool to set the stop/start of system services in a runlevel
-Group: System Environment/Base
-Requires: chkconfig
+Summary:        A tool to set the stop/start of system services in a runlevel
+Group:          System Environment/Base
+Requires:       chkconfig
 
 %description -n ntsysv
 Ntsysv provides a simple interface for setting which system services
@@ -47,12 +50,12 @@ page), ntsysv configures the current runlevel (5 if you're using X).
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+
 %build
 
-make RPM_OPT_FLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %{?_smp_mflags}
+make RPM_OPT_FLAGS="%{optflags}" LDFLAGS="$RPM_LD_FLAGS" %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make DESTDIR=%{buildroot} MANDIR=%{_mandir} SBINDIR=%{_sbindir} install
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
@@ -68,6 +71,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %clean
 rm -rf %{buildroot}
 
+
 %files -f %{name}.lang
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
@@ -82,11 +86,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/rc.d/init.d
 %{_sysconfdir}/rc[0-6].d
 %{_sysconfdir}/rc.d/rc[0-6].d
-%dir /var/lib/alternatives
+%dir %{_sharedstatedir}/alternatives
 %{_mandir}/*/chkconfig*
 %{_mandir}/*/update-alternatives*
 %{_mandir}/*/alternatives*
-%{_prefix}/lib/systemd/systemd-sysv-install
+%{_lib}/systemd/systemd-sysv-install
 
 %files -n ntsysv
 %defattr(-,root,root)
@@ -94,17 +98,26 @@ rm -rf %{buildroot}
 %{_mandir}/*/ntsysv.8*
 
 %changelog
+* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.11-2
+- Provide alternatives and update-alternatives.
+- Remove sha1 define.
+
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 1.11-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Upgrade to 1.11. License verified.
+
 * Fri Apr 07 2017 Anish Swaminathan <anishs@vmware.com> 1.9-1
 - Upgrade to 1.9
+
 * Mon Oct 31 2016 Anish Swaminathan <anishs@vmware.com> 1.5-7
 - Chkconfig patch to fix interaction with systemd
+
 * Tue Sep 13 2016 Anish Swaminathan <anishs@vmware.com> 1.5-6
 - Chkconfig patch to return runlevel 3 on Photon OS
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5-5
 - GA - Bump release of all rpms
+
 * Mon Dec 07 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Ability for chkconfig to ignore priorities.
 
@@ -264,7 +277,7 @@ rm -rf %{buildroot}
 - translation updates: as, bg, bn_IN, bs, ca, de, fr, hi, hu, id, ja,
   ka, ml, ms, nb, or, sk, sl
 - add resetpriorities to the man page (#197399)
-  
+
 * Tue Feb  6 2007 Bill Nottingham <notting@redhat.com> 1.3.33-1
 - various changes from review - support alternate %%{_sbindir}, fix
   summaries, add version to requires, assorted other bits
