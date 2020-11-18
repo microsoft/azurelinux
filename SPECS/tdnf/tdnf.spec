@@ -37,15 +37,6 @@ BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
 
-Requires:       curl
-Requires:       libsolv
-Requires:       openssl-libs
-Requires:       rpm-libs
-Requires:       tdnf-cli-libs = %{version}-%{release}
-
-Obsoletes:      yum
-Provides:       yum
-
 %if %{with_check}
 BuildRequires:  createrepo_c
 BuildRequires:  glib
@@ -54,6 +45,15 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %endif
+
+Requires:       curl
+Requires:       libsolv
+Requires:       openssl-libs
+Requires:       rpm-libs
+Requires:       tdnf-cli-libs = %{version}-%{release}
+
+Obsoletes:      yum
+Provides:       yum
 
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
