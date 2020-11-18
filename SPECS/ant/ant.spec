@@ -4,7 +4,7 @@
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source2:        https://dl.bintray.com/vmware/photon_sources/1.0/maven-ant-tasks
 BuildRequires:  openjdk8
 BuildRequires:  openjre8
 Requires:       openjre8
+Requires:       which
 Provides:       %{name}-lib = %{version}-%{release}
 Provides:       mvn(ant:ant) = %{version}-%{release}
 Provides:       mvn(ant:ant-launcher) = %{version}-%{release}
@@ -167,7 +168,10 @@ bootstrap/bin/ant -v run-tests
 %{_bindir}/runant.pl
 
 %changelog
-* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-1
+* Wed Nov 18 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-3
+- Add runtime requires on which. It is used to find the java executable when ant runs.
+
+* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-2
 - Add additional provides.
 
 *   Wed Oct 21 2020 Henry Li <lihl@microsoft.com> - 1.10.9-1
