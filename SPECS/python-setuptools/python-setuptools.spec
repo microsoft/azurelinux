@@ -3,7 +3,7 @@
 Summary:        Download, build, install, upgrade, and uninstall Python packages
 Name:           python-setuptools
 Version:        40.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Group:          Development/Languages
 Vendor:         Microsoft Corporation
@@ -17,6 +17,7 @@ BuildRequires: python2
 BuildRequires: python2-libs
 BuildRequires: unzip
 
+Requires: python-xml
 Requires: python2
 Requires: python2-libs
 
@@ -54,6 +55,9 @@ python2 setup.py test
 %{python2_sitelib}/*
 
 %changelog
+* Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 40.2.0-6
+- Adding explicit runtime dependency on 'python-xml'.
+
 * Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 40.2.0-5
 - Added %%license line automatically
 

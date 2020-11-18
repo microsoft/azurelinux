@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,6 +119,7 @@ The PyPA recommended tool for installing Python packages.
 %package        setuptools
 Summary:        Download, build, install, upgrade, and uninstall Python packages.
 Group:          Development/Tools
+Requires:       python3-xml
 Requires:       python3 = %{version}-%{release}
 BuildArch:      noarch
 
@@ -263,6 +264,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.9-3
+- Adding explicit runtime dependency on 'python3-xml' for the 'python3-setuptool' subpackage.
+
 * Fri Nov 06 2020 Thomas Crain <thcrain@microsoft.com> - 3.7.9-2
 - Patch CVE-2020-27619
 
