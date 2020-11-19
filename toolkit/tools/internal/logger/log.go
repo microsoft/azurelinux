@@ -145,8 +145,7 @@ func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.Wai
 			select {
 			case outputChan <- line:
 			default:
-				// In the event the buffer is full, just print to console
-				Log.Warnf("Output buffer full: dropping: \"%s\"", line)
+				// In the event the buffer is full, drop the line
 			}
 		}
 	}
