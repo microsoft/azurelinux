@@ -106,7 +106,7 @@ sudo -u test make check && userdel test -r -f
 %exclude %{_libdir}/perl5/*/*/perllocal.pod
 
 %changelog
-* Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-3
+* Wed Nov 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-3
 - Adding 'BuildRequires' on 'python', 'shadow-utils' and 'sudo' to fix the package tests.
 
 * Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.14.0-2
