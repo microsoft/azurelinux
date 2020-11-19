@@ -155,7 +155,14 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	// Resolve nodes to exact package names so they can be referenced in the graph.
 	resolvedPackage, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
-		logger.Log.Errorf("Failed to resolve '%s' to a package. Error: %s", node, err)
+		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
+		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
+		// If it does not become available scheduler will print an error at the end of the build.
+		if node.Implicit {
+			logger.Log.Debug(msg)
+		} else {
+			logger.Log.Error(msg)
+		}
 		return
 	}
 
@@ -176,5 +183,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	node.RpmPath = filepath.Join(outDir, rpmArch, rpmName)
 
 	node.State = pkggraph.StateCached
+
+	logger.Log.Infof("Fetched: %s", rpmName)
 	return
 }
