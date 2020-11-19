@@ -244,7 +244,13 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 	// Create new partition table
 	partitionTableType := disk.PartitionTableType
-	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partitionTableType.String())
+	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
+	partedArgument, err := partitionTableType.ConvertToPartedArgument()
+	if err != nil {
+		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
+		return
+	}
+	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
 		return
