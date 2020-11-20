@@ -1,0 +1,11 @@
+--- apache-ant-1.10.7/bootstrap.sh	2019-09-01 08:14:10.000000000 +0200
++++ apache-ant-1.10.7/bootstrap.sh	2019-10-12 12:34:23.892369973 +0200
+@@ -143,7 +143,7 @@
+   echo ... Compiling Ant Classes with ${JAVAC_RELEASE_VERSION}
+ fi
+ 
+-"${JAVAC}" $BOOTJAVAC_OPTS -d ${CLASSDIR} ${JAVAC_RELEASE_VERSION} \
++"${JAVAC}" $BOOTJAVAC_OPTS -d ${CLASSDIR} -sourcepath src/main ${JAVAC_RELEASE_VERSION} \
+            ${TOOLS}/bzip2/*.java ${TOOLS}/tar/*.java ${TOOLS}/zip/*.java \
+            ${TOOLS}/ant/util/regexp/RegexpMatcher.java \
+            ${TOOLS}/ant/util/regexp/RegexpMatcherFactory.java \
