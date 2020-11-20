@@ -3,7 +3,7 @@
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
 Version:        2.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
@@ -43,6 +43,7 @@ cd api1
 ninja
 
 %check
+export LC_CTYPE=C.utf8
 cd api1
 ninja test
 
@@ -69,6 +70,8 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/modulemd/*
 
 %changelog
+*   Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 2.5.0-4
+-   Fix check test.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.0-3
 -   Added %%license line automatically
 *   Tue Apr 07 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.5.0-2
