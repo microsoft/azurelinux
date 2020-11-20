@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        9.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 URL:            https://gcc.gnu.org/
 Group:          Development/Tools
@@ -182,7 +182,7 @@ make %{?_smp_mflags} check-gcc
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_lib}/libcc1.*
+%{_lib64dir}/libcc1.*
 
 %files -n libstdc++
 %defattr(-,root,root)
@@ -211,6 +211,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Fri Nov 20 2020 Thomas Crain <thcrain@microsoft.com> - 9.1.0-8
+- Change location of %{_lib}/libcc1.* to %%{_lib64dir}/libcc1.*
+
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 9.1.0-7
 - Ignore CVE-2019-15847, as it applies to an unsupported ISA
 
