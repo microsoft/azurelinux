@@ -64,7 +64,7 @@ sudo -u test  make check TESTS="-v"
 
 %changelog
 * Wed Nov 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.6-3
-- Adding 'BuildRequires' on 'shadow-utils' and 'sudo' to fix the package tests.
+- Adding 'BuildRequires' on 'shadow-utils' and 'sudo' to run the package tests.
 
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 2.6.6-2
 - Patch CVE-2020-25613
