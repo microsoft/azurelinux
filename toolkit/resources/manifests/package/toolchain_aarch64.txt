@@ -192,9 +192,9 @@ libmpc-debuginfo-1.1.0-5.cm1.aarch64.rpm
 libpipeline-1.5.0-3.cm1.aarch64.rpm
 libpipeline-debuginfo-1.5.0-3.cm1.aarch64.rpm
 libpipeline-devel-1.5.0-3.cm1.aarch64.rpm
-libpwquality-1.4.2-5.cm1.aarch64.rpm
-libpwquality-debuginfo-1.4.2-5.cm1.aarch64.rpm
-libpwquality-devel-1.4.2-5.cm1.aarch64.rpm
+libpwquality-1.4.2-6.cm1.aarch64.rpm
+libpwquality-debuginfo-1.4.2-6.cm1.aarch64.rpm
+libpwquality-devel-1.4.2-6.cm1.aarch64.rpm
 libselinux-2.9-3.cm1.aarch64.rpm
 libselinux-debuginfo-2.9-3.cm1.aarch64.rpm
 libselinux-devel-2.9-3.cm1.aarch64.rpm
@@ -325,7 +325,7 @@ python2-tools-2.7.18-5.cm1.aarch64.rpm
 python3-cracklib-2.9.7-2.cm1.aarch64.rpm
 python3-gpg-1.13.1-6.cm1.aarch64.rpm
 python3-libxml2-2.9.10-3.cm1.aarch64.rpm
-python3-pwquality-1.4.2-5.cm1.aarch64.rpm
+python3-pwquality-1.4.2-6.cm1.aarch64.rpm
 python3-rpm-4.14.2-10.cm1.aarch64.rpm
 python-curses-2.7.18-5.cm1.aarch64.rpm
 python-gpg-1.13.1-6.cm1.aarch64.rpm

@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -344,10 +344,13 @@ for dir in ${build_dirs}; do
     }
 done
 
+%post -p /sbin/ldconfig
 
-%ldconfig_scriptlets
+%postun -p /sbin/ldconfig
+
 %if %{with compat_pkg}
-%ldconfig_scriptlets compat
+%post -n compat -p /sbin/ldconfig
+%postun -n compat -p /sbin/ldconfig
 %endif
 
 
@@ -447,6 +450,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.17-3
+- Replace %%ldconfig_scriptlets with actual post/postun sections
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.4.17-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Remove dependency on fipscheck
