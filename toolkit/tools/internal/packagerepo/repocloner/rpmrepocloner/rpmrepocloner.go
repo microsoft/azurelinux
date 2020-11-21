@@ -41,10 +41,10 @@ var (
 	//		COOL_package2-extended++.aarch64	1.1b.8_X-22.cm1		fetcher-cloned-repo
 	//
 	// We'd get:
-	//   - package_name:	COOL_package2-extended++
-	//   - architecture: 	aarch64
-	//   - version:			1.1b.8_X-22
-	//   - dist: 			cm1
+	//   - package_name:    COOL_package2-extended++
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22
+	//   - dist:            cm1
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+-]+)\.([[:alnum:]_+-]+)`)
 )
 
