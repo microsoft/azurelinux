@@ -344,9 +344,24 @@ for dir in ${build_dirs}; do
     }
 done
 
+%if %{with override_glibc}
+# This posttrans section is a stopgap to allow installing
+# libxcrypt on a system that already has libcrypt from glibc.
+# In a future release these will be removed and libxcrypt will be default.
+%posttrans
+rm %{_libdir}/libcrypt.so.1
+ln -s %{_libdir}/libxcrypt.so.%{sov} %{_libdir}/libcrypt.so.1
+%endif
+
 %post -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun
+# See above comments about the %%posttrans section
+%if %{with override_glibc}
+rm %{_libdir}/libcrypt.so.1
+ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
+%endif
+/sbin/ldconfig
 
 %if %{with compat_pkg}
 %post -n compat -p /sbin/ldconfig
@@ -379,19 +394,6 @@ done
 %endif
 
 %{_mandir}/man5/crypt.5*
-
-%if %{with override_glibc}
-# These posttrans and postun sections are stopgaps to allow installing
-# libxcrypt on a system that already has libcrypt from glibc.
-# In a future release these will be removed and libxcrypt will be default.
-%posttrans
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libxcrypt.so.%{sov} %{_libdir}/libcrypt.so.1
-
-%postun
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
-%endif
 
 %if %{with compat_pkg}
 %files compat
