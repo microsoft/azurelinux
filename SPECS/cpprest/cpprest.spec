@@ -3,7 +3,7 @@
 
 Name:           cpprest
 Version:        2.10.14
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
@@ -73,7 +73,9 @@ cd Release/build.release
 cd Release/build.release/Binaries
 ./test_runner *_test.so ||:
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %doc CONTRIBUTORS.txt
@@ -89,6 +91,9 @@ cd Release/build.release/Binaries
 
 
 %changelog
+* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.10.14-5
+- Replace %%ldconfig_scriptlets with actual post/postun sections
+
 * Tue Mar 31 2020 Paul Monson <paulmon@microsoft.com> 2.10.14-4
 - Fix Source0 URL. License verified.
 

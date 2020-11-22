@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -344,10 +344,28 @@ for dir in ${build_dirs}; do
     }
 done
 
+%if %{with override_glibc}
+# This posttrans section is a stopgap to allow installing
+# libxcrypt on a system that already has libcrypt from glibc.
+# In a future release these will be removed and libxcrypt will be default.
+%posttrans
+rm %{_libdir}/libcrypt.so.1
+ln -s %{_libdir}/libxcrypt.so.%{sov} %{_libdir}/libcrypt.so.1
+%endif
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+
+%postun
+# See above comments about the %%posttrans section
+%if %{with override_glibc}
+rm %{_libdir}/libcrypt.so.1
+ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
+%endif
+/sbin/ldconfig
+
 %if %{with compat_pkg}
-%ldconfig_scriptlets compat
+%post -n compat -p /sbin/ldconfig
+%postun -n compat -p /sbin/ldconfig
 %endif
 
 
@@ -376,19 +394,6 @@ done
 %endif
 
 %{_mandir}/man5/crypt.5*
-
-%if %{with override_glibc}
-# These posttrans and postun sections are stopgaps to allow installing
-# libxcrypt on a system that already has libcrypt from glibc.
-# In a future release these will be removed and libxcrypt will be default.
-%posttrans
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libxcrypt.so.%{sov} %{_libdir}/libcrypt.so.1
-
-%postun
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
-%endif
 
 %if %{with compat_pkg}
 %files compat
@@ -447,6 +452,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.17-3
+- Replace %%ldconfig_scriptlets with actual post/postun sections
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.4.17-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Remove dependency on fipscheck
