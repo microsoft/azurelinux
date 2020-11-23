@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.4
+Version:        12.5
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -165,6 +165,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Mon Nov 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 12.5-1
+- Upgrading to 12.5 to fix CVE-2020-25695 and CVE-2020-25694.
+
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.4-1
 - Upgrading to 12.4 to fix CVE-2020-14349 and CVE-2020-14350.
 
