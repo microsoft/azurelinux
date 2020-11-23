@@ -81,7 +81,7 @@ type User struct {
 	UID                 string   `json:"UID"`
 	PasswordHashed      bool     `json:"PasswordHashed"`
 	Password            string   `json:"Password"`
-	PasswordExpiresDays uint64   `json:"PasswordExpiresDays"`
+	PasswordExpiresDays int64    `json:"PasswordExpiresDays"`
 	SSHPubKeyPaths      []string `json:"SSHPubKeyPaths"`
 	PrimaryGroup        string   `json:"PrimaryGroup"`
 	SecondaryGroups     []string `json:"SecondaryGroups"`
