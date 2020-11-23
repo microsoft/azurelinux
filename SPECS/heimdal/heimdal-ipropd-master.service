@@ -1,0 +1,12 @@
+[Unit]
+Description=Heimdal ipropd-master incremental propagation service
+Documentation=man:iprop(8) info:heimdal http://www.h5l.org/
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/libexec/ipropd-master --detach
+PIDFile=/var/run/ipropd-master.pid
+
+[Install]
+WantedBy=multi-user.target

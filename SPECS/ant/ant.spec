@@ -1,23 +1,23 @@
-Summary:        Apache Ant
-Name:           ant
-Version:        1.10.9
-Release:        1%{?dist}
-License:        ASL 2.0 and BSD and W3C
-URL:            https://ant.apache.org
-Group:          Applications/System
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildArch:      noarch
-Source0:        https://archive.apache.org/dist/ant/source/apache-%{name}-%{version}-src.tar.gz
-Source1:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hamcrest/hamcrest-1.3.tgz
-Source2:        https://dl.bintray.com/vmware/photon_sources/1.0/maven-ant-tasks-2.1.3.tar.gz
-
-Requires:      openjre8
-BuildRequires: openjre8
-BuildRequires: openjdk8
 %define _prefix /var/opt/apache-%{name}
 %define _bindir %{_prefix}/bin
 %define _libdir %{_prefix}/lib
+Summary:        Apache Ant
+Name:           ant
+Version:        1.10.9
+Release:        2%{?dist}
+License:        ASL 2.0 AND BSD AND W3C
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Applications/System
+URL:            https://ant.apache.org
+Source0:        https://archive.apache.org/dist/ant/source/apache-%{name}-%{version}-src.tar.gz
+Source1:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hamcrest/hamcrest-1.3.tgz
+Source2:        https://dl.bintray.com/vmware/photon_sources/1.0/maven-ant-tasks-2.1.3.tar.gz
+BuildRequires:  openjdk8
+BuildRequires:  openjre8
+Requires:       openjre8
+Requires:       which
+BuildArch:      noarch
 
 %description
 The Ant package contains binaries for a build system
@@ -118,6 +118,9 @@ bootstrap/bin/ant -v run-tests
 %{_bindir}/runant.pl
 
 %changelog
+* Wed Nov 18 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-2
+- Add runtime requires on which. It is used to find the java executable when ant runs.
+
 *   Wed Oct 21 2020 Henry Li <lihl@microsoft.com> - 1.10.9-1
 -   Updated to version 1.10.9 to resolve CVE-2020-11979
 *   Thu May 21 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.10.8-1

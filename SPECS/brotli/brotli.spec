@@ -1,20 +1,17 @@
 %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
 %define python3_version 3.7
 %define python3_version_nodots 37
-
+Summary:        Lossless compression algorithm
 Name:           brotli
 Version:        1.0.7
-Release:        8%{?dist}
-Summary:        Lossless compression algorithm
-Group: Applications/File
-
+Release:        9%{?dist}
 License:        MIT
-URL:            https://github.com/google/brotli
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-%define sha1 %{name}-%{version}=ee64a380152aa20fbc1098fe3799104884c570c1
-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/File
+URL:            https://github.com/google/brotli
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2020-8927.patch
 BuildRequires:  cmake
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -30,8 +27,8 @@ to the best currently available general-purpose compression methods.
 It is similar in speed with deflate but offers more dense compression.
 
 %package -n python3-%{name}
-Summary:        Lossless compression algorithm (python 3)
 %{?python_provide:%python_provide python3-%{name}}
+Summary:        Lossless compression algorithm (python 3)
 
 %description -n python3-%{name}
 Brotli is a generic-purpose lossless compression algorithm that compresses
@@ -41,10 +38,9 @@ to the best currently available general-purpose compression methods.
 It is similar in speed with deflate but offers more dense compression.
 This package installs a Python 3 module.
 
-
 %package devel
 Summary:        Lossless compression algorithm (development files)
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Brotli is a generic-purpose lossless compression algorithm that compresses
@@ -55,7 +51,8 @@ It is similar in speed with deflate but offers more dense compression.
 This package installs the development files
 
 %prep
-%setup
+%autosetup -p1
+
 # fix permissions for -debuginfo
 # rpmlint will complain if I create an extra %%files section for
 # -debuginfo for this so we'll put it here instead
@@ -96,7 +93,6 @@ done
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-
 %check
 cd build
 ctest -V
@@ -131,8 +127,12 @@ python3 setup.py test
 %{_mandir}/man3/encode.h.3brotli*
 %{_mandir}/man3/types.h.3brotli*
 
-
 %changelog
+* Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.7-9
+- Patch CVE-2020-8927
+- Remove sha1 hash
+- Lint to Mariner style
+
 * Tue Oct 20 2020 Andrew Phelps <anphel@microsoft.com> 1.0.7-8
 - Fix check test
 
