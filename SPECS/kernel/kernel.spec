@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.72
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source1:        config
 Source2:        config_aarch64
 # Arm64 HyperV support required patch
 Patch0:         ver5_4_72_arm64_hyperv_support.patch
+Patch1:         0001-Drivers-hv-vmbus-Allow-cleanup-of-VMBUS_CONNECT_CPU-.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -183,6 +184,8 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %ifarch aarch64
 %patch0 -p1
 %endif
+
+%patch1 -p1
 
 %build
 make mrproper
@@ -403,6 +406,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Mon Nov 23 2020 Chris Co <chrco@microsoft.com> - 5.4.72-4
+- Apply patch to fix kexec in HyperV
+
 * Mon Nov 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-3
 - Disable kernel config SLUB_DEBUG_ON due to tcp throughput perf impact
 
