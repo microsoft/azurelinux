@@ -1,7 +1,7 @@
 Summary:        A JSON implementation in C
 Name:           json-c
 Version:        0.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -42,7 +42,8 @@ make DESTDIR=%{buildroot} install -C build
 rm -r %{buildroot}%{_libdir}/cmake/%{name}
 
 %check
-make %{?_smp_mflags} check -C build
+cd build/tests
+make %{?_smp_mflags} test
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -59,6 +60,8 @@ make %{?_smp_mflags} check -C build
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+*   Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 0.14-3
+-   Fix check tests
 *   Tue Aug 04 2020 Henry Beberman <henry.beberman@microsoft.com> 0.14-2
 -   Add a patch to fix a bug introduced by CVE-2020-12762.patch
 *   Mon Jun 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.14-1

@@ -1,13 +1,14 @@
 Summary:        A 2D graphics library.
 Name:           cairo
 Version:        1.16.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2 or MPLv1.1
 URL:            http://cairographics.org
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://cairographics.org/releases/%{name}-%{version}.tar.xz
+Patch0:         CVE-2018-19876.patch
 BuildRequires:  pkg-config
 BuildRequires:  libpng-devel
 BuildRequires:  libxml2-devel
@@ -33,7 +34,7 @@ Requires:       pixman-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -72,9 +73,10 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.0-4
-- Added %%license line automatically
-
+*  Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.16.0-5
+-  Fix CVE-2018-19876
+*  Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.16.0-4
+-  Added %%license line automatically
 *  Mon Apr 20 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.16.0-3
 -  Rename freetype2-devel to freetype-devel.
 -  Remove sha1 macro.

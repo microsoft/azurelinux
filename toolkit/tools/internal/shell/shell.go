@@ -130,11 +130,16 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 		onStderr = logger.Log.Warn
 	}
 
-	return ExecuteLiveWithCallback(onStdout, onStderr, program, args...)
+	return ExecuteLiveWithCallback(onStdout, onStderr, false, program, args...)
 }
 
-// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks it in real-time on stdout and stderr.
-func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), program string, args ...string) (err error) {
+// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
+// If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
+// the buffer becomes full the oldest buffered output is discarded.
+func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
+	var outputChan chan string
+	const outputChanBufferSize = 1500
+
 	cmd := exec.Command(program, args...)
 
 	stdoutPipe, err := cmd.StdoutPipe()
@@ -161,12 +166,27 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), program st
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
 
-	go logger.StreamOutput(stdoutPipe, onStdout, wg)
-	go logger.StreamOutput(stderrPipe, onStderr, wg)
+	if printOutputOnError {
+		outputChan = make(chan string, outputChanBufferSize)
+	}
+	go logger.StreamOutput(stdoutPipe, onStdout, wg, outputChan)
+	go logger.StreamOutput(stderrPipe, onStderr, wg, outputChan)
 
 	wg.Wait()
+	err = cmd.Wait()
 
-	return cmd.Wait()
+	// Optionally dump the output in the event of an error
+	if outputChan != nil {
+		close(outputChan)
+	}
+	if err != nil && printOutputOnError {
+		logger.Log.Errorf("Call to %s returned error, last %d lines of output:", cmd.Args, outputChanBufferSize)
+		for line := range outputChan {
+			logger.Log.Warn(line)
+		}
+	}
+
+	return
 }
 
 // MustExecuteLive executes the shell command.

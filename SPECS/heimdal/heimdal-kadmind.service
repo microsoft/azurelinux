@@ -1,0 +1,12 @@
+[Unit]
+Description=Heimdal kadmind remote administration service
+Documentation=man:heimdal-kadmind(8) info:heimdal http://www.h5l.org/
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/heimdal-kadmind
+PIDFile=/var/run/heimdal-kadmind.pid
+
+[Install]
+WantedBy=multi-user.target

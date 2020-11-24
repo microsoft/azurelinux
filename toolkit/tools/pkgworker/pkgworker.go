@@ -135,7 +135,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	defer chroot.Close(noCleanup)
 
 	// Place extra files that will be needed to build into the chroot
-	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile)
+	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile, runCheck)
 	if err != nil {
 		return
 	}
@@ -175,7 +175,7 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 	}
 
 	// Query and install the build requirements for this SRPM
-	err = installBuildRequires(defines)
+	err = installBuildRequires(defines, runCheck)
 	if err != nil {
 		return
 	}
@@ -236,10 +236,11 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 	return
 }
 
-func installBuildRequires(defines map[string]string) (err error) {
+func installBuildRequires(defines map[string]string, runCheck bool) (err error) {
 	// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
 	const (
 		emptyQueryFormat        = ""
+		caCertificatesPackage   = "ca-certificates"
 		unresolvedOutputPrefix  = "No package"
 		unresolvedOutputPostfix = "available"
 		alreadyInstalledPostfix = "is already installed."
@@ -264,7 +265,12 @@ func installBuildRequires(defines map[string]string) (err error) {
 		return
 	}
 
-	if len(buildRequires) > 0 {
+	if runCheck || len(buildRequires) > 0 {
+		var (
+			stderr string
+			stdout string
+		)
+
 		defaultArgs := []string{"install", "-y"}
 		installArgs := make([]string, 0, len(buildRequires)+len(defaultArgs))
 
@@ -282,10 +288,11 @@ func installBuildRequires(defines map[string]string) (err error) {
 			installArgs = append(installArgs, strings.TrimSpace(buildReq))
 		}
 
-		var (
-			stderr string
-			stdout string
-		)
+		if runCheck {
+			logger.Log.Warn("Adding the 'ca-certificates' package - needed for package tests (make argument 'RUN_CHECK' set to 'y').")
+
+			installArgs = append(installArgs, caCertificatesPackage)
+		}
 
 		stdout, stderr, err = shell.Execute("tdnf", installArgs...)
 		if err != nil {
@@ -356,10 +363,11 @@ func removeLibArchivesFromSystem() (err error) {
 }
 
 // copyFilesIntoChroot copies several required build specific files into the chroot.
-func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string) (srpmFileInChroot string, err error) {
+func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string, runCheck bool) (srpmFileInChroot string, err error) {
 	const (
 		chrootRepoDestDir = "/etc/yum.repos.d"
 		chrootSrpmDestDir = "/root/SRPMS"
+		resolvFilePath    = "/etc/resolv.conf"
 		rpmmacrosDest     = "/usr/lib/rpm/macros.d/macros.override"
 	)
 
@@ -383,6 +391,16 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 			Dest: rpmmacrosDest,
 		}
 		filesToCopy = append(filesToCopy, rpmmacrosCopy)
+	}
+
+	if runCheck {
+		logger.Log.Warn("Enabling network access because we're running package tests (make argument 'RUN_CHECK' set to 'y').")
+
+		resolvFileCopy := safechroot.FileToCopy{
+			Src:  resolvFilePath,
+			Dest: resolvFilePath,
+		}
+		filesToCopy = append(filesToCopy, resolvFileCopy)
 	}
 
 	err = chroot.AddFiles(filesToCopy...)

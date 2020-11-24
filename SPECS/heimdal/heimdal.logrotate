@@ -1,0 +1,9 @@
+/var/log/heimdal/*.log {
+    compress
+    delaycompress
+    maxage 100
+    minsize 100M
+    missingok
+    notifempty
+}
+

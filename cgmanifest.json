@@ -104,6 +104,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "aspnetcore-runtime-3.1",
+          "version": "3.1.5",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atftp",
           "version": "0.7.2",
           "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
@@ -525,8 +535,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.101.2",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.101.2.tar.gz"
+          "version": "0.103.0",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.0.tar.gz"
         }
       }
     },
@@ -1555,6 +1565,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "heimdal",
+          "version": "7.7.0",
+          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.0/heimdal-7.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "httpd",
           "version": "2.4.46",
           "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
@@ -1576,8 +1596,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.51",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
+          "version": "5.4.72",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
         }
       }
     },
@@ -1708,6 +1728,16 @@
           "name": "iputils",
           "version": "20180629",
           "downloadUrl": "https://github.com/iputils/iputils/archive/s20180629.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ipv6calc",
+          "version": "2.2.0",
+          "downloadUrl": "ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/ipv6calc-2.2.0.tar.gz"
         }
       }
     },
@@ -1866,8 +1896,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.51",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
+          "version": "5.4.72",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
         }
       }
     },
@@ -1876,8 +1906,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.51",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
+          "version": "5.4.72",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
         }
       }
     },
@@ -1886,8 +1916,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.51",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.51.tar.gz"
+          "version": "5.4.72",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
         }
       }
     },
@@ -2755,6 +2785,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxcrypt",
+          "version": "4.4.17",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxml++",
           "version": "3.2.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
@@ -3226,8 +3266,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.20",
-          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.20.tar.gz"
+          "version": "8.0.22",
+          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.22.tar.gz"
         }
       }
     },
@@ -3276,8 +3316,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.8",
-          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.8/net-snmp-5.8.tar.gz"
+          "version": "5.9",
+          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
         }
       }
     },
@@ -3326,8 +3366,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.33.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.33.0/nghttp2-1.33.0.tar.xz"
+          "version": "1.41.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"
         }
       }
     },
@@ -3656,8 +3696,8 @@
         "type": "other",
         "other": {
           "name": "pcre",
-          "version": "8.42",
-          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.bz2"
+          "version": "8.44",
+          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.bz2"
         }
       }
     },
@@ -3768,6 +3808,16 @@
           "name": "perl-IO-Socket-SSL",
           "version": "2.066",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.066.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON",
+          "version": "4.02",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.02.tar.gz"
         }
       }
     },
@@ -4036,8 +4086,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.1",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.1/postgresql-12.1.tar.bz2"
+          "version": "12.5",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.5/postgresql-12.5.tar.bz2"
         }
       }
     },
@@ -5826,8 +5876,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.0388",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.0388.tar.gz"
+          "version": "8.1.1667",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
         }
       }
     },
