@@ -35,8 +35,17 @@ var (
 	// Every valid line will be of the form: <package>-<version>.<arch> : <Description>
 	packageLookupNameMatchRegex = regexp.MustCompile(`^\s*([^:]+(x86_64|aarch64|noarch))\s*:`)
 
-	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist>  fetcher-cloned-repo
-	listedPackageRegex = regexp.MustCompile(`^\s*(?P<Name>[a-zA-Z0-9_+-]+)\.(?P<Arch>[a-zA-Z0-9_+-]+)\s*(?P<Version>[a-zA-Z0-9._+-]+)\.(?P<Dist>[a-zA-Z0-9_+-]+)\s*fetcher-cloned-repo`)
+	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
+	// For:
+	//
+	//		COOL_package2-extended++.aarch64	1.1b.8_X-22~rc1.cm1		fetcher-cloned-repo
+	//
+	// We'd get:
+	//   - package_name:    COOL_package2-extended++
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22~rc1
+	//   - dist:            cm1
+	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
 )
 
 const (
