@@ -8,7 +8,7 @@ URL:            https://www.libarchive.org/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://www.libarchive.org/downloads/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  xz-libs
 BuildRequires:  xz-devel

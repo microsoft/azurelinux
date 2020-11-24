@@ -2057,7 +2057,7 @@
         "other": {
           "name": "libarchive",
           "version": "3.4.2",
-          "downloadUrl": "https://www.libarchive.org/downloads/libarchive-3.4.2.tar.gz"
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz"
         }
       }
     },
