@@ -70,7 +70,7 @@ func (p *User) UIDIsValid() (err error) {
 	return
 }
 
-// This function does not account for the Password key being intentially unspecified versus set to blank
+// This function does not account for the Password key being intentionally unspecified versus set to blank
 // PasswordIsValid returns an error if the User password is empty
 /* func (p *User) PasswordIsValid() (err error) {
 	if p.Password == "" {
