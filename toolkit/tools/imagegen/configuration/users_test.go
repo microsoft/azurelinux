@@ -35,7 +35,7 @@ var (
 	}
 )
 
-//TestMain found in configuration_test.go.
+// TestMain found in configuration_test.go.
 
 func TestShouldPassParsingTestConfig(t *testing.T) {
 	for _, b := range validUsers {
@@ -43,8 +43,8 @@ func TestShouldPassParsingTestConfig(t *testing.T) {
 	}
 }
 
-//TestShouldFailParsingInvalidName
-//validates that an empty user.name fails IsValid
+// TestShouldFailParsingInvalidName
+// validates that an empty user.name fails IsValid
 func TestShouldFailParsingInvalidName(t *testing.T) {
 	var test_user User
 	test_user.Name = ""
@@ -53,8 +53,8 @@ func TestShouldFailParsingInvalidName(t *testing.T) {
 	assert.Equal(t, "invalid value for name ()", err.Error())
 }
 
-//TestShouldFailParsingInvalidUID
-//validates that UID out of range fails IsValid
+// TestShouldFailParsingInvalidUID
+// validates that UID out of range fails IsValid
 func TestShouldFailParsingInvalidUID(t *testing.T) {
 	var test_user User
 	test_user.UID = "-2"
@@ -68,8 +68,8 @@ func TestShouldFailParsingInvalidUID(t *testing.T) {
 	assert.Equal(t, "invalid value for UID (60001)", err.Error())
 }
 
-//TestShouldFailParsingInvalidPassword
-//validates that an empty user.password fails IsValid
+// TestShouldFailParsingInvalidPassword
+// validates that an empty user.password fails IsValid
 /* func TestShouldFailParsingInvalidPassword(t *testing.T) {
 	var test_user User
 	test_user.Password = ""
@@ -78,8 +78,8 @@ func TestShouldFailParsingInvalidUID(t *testing.T) {
 	assert.Equal(t, "invalid value for Password ()", err.Error())
 } */
 
-//TestShouldFailParsingInvalidPasswordExpiresDays
-//validates that -2 and 100000 fail IsValid as they are outside bounds
+// TestShouldFailParsingInvalidPasswordExpiresDays
+// validates that -2 and 100000 fail IsValid as they are outside bounds
 func TestShouldFailParsingInvalidPasswordExpiresDays(t *testing.T) {
 	var test_user User
 	test_user.PasswordExpiresDays = -2

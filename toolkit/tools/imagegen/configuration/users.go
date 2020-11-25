@@ -23,9 +23,7 @@ type User struct {
 }
 
 // IsValid returns an error if the User struct is not valid
-// Would benefit from other checks being added
 func (p *User) IsValid() (err error) {
-	//logger.Log.Debugf("Reading user '%s'.", p.Name)
 	err = p.NameIsValid()
 	if err != nil {
 		return
@@ -54,7 +52,7 @@ func (p *User) NameIsValid() (err error) {
 }
 
 // UIDIsValid returns an error if the UID is outside bounds
-// bounds can be checked using
+// Bounds can be checked using
 // $grep -E '^UID_MIN|^UID_MAX' /etc/login.defs
 func (p *User) UIDIsValid() (err error) {
 	const (
@@ -70,7 +68,8 @@ func (p *User) UIDIsValid() (err error) {
 	return
 }
 
-// This function does not account for the Password key being intentionally unspecified versus set to blank
+// This function does not account for the Password key being intentionally
+// unspecified versus set to blank
 // PasswordIsValid returns an error if the User password is empty
 /* func (p *User) PasswordIsValid() (err error) {
 	if p.Password == "" {
