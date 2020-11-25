@@ -160,8 +160,10 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 
 ### Users
 
-The Users key is an array of user information.
-The image generated then has users matching the values specified in Users
+Users is an array of user information. The User information is a map of key value pairs. 
+
+The image generated has users matching the values specified in Users.
+
 The table below are the keys for the users. To see restrictions for these keys' values, such as no empty passwords, see [users_test.go](../../tools/imagegen/configuration/users_test.go).
 
 |Key                |Type
