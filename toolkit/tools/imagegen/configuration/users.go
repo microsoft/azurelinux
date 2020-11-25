@@ -34,10 +34,10 @@ func (p *User) IsValid() (err error) {
 	if err != nil {
 		return
 	}
-	err = p.PasswordIsValid()
+	/* err = p.PasswordIsValid()
 	if err != nil {
 		return
-	}
+	} */
 	err = p.PasswordExpiresDaysIsValid()
 	if err != nil {
 		return
@@ -70,13 +70,14 @@ func (p *User) UIDIsValid() (err error) {
 	return
 }
 
+// This function does not account for the Password key being intentially unspecified versus set to blank
 // PasswordIsValid returns an error if the User password is empty
-func (p *User) PasswordIsValid() (err error) {
-	if p.Name == "" {
+/* func (p *User) PasswordIsValid() (err error) {
+	if p.Password == "" {
 		return fmt.Errorf("invalid value for Password (%s)", p.Password)
 	}
 	return
-}
+} */
 
 // PasswordExpiresDaysISValid returns an error if the expire days is not
 // within bounds set by the chage -M command

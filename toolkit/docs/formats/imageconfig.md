@@ -178,7 +178,7 @@ The table below are the keys for the users. To see restrictions for these keys' 
 |SecondaryGroups    |[]string
 |StartupCommand     |string
 
-An example usage for user "root" would look like:
+An example usage for users "root" and "basic_user" would look like:
 
 ``` json
 "Users": [
@@ -186,6 +186,11 @@ An example usage for user "root" would look like:
         "Name": "root",
         "Password": "some_password"
     },
+    {
+        "Name": "basic_user",
+        "Password": "some_other_password",
+        "UID": 101
+    }
 ]
 ```
 
