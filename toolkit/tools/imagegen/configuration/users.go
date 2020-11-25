@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// Parser for the image builder's configuration schemas.
+// Parser for the image builder's Users configuration schema.
 
 package configuration
 
