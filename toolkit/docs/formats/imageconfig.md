@@ -158,6 +158,35 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 },
 ```
 
+### Users
+
+The Users key is an array of user information.
+The image generated then has users matching the values specified in Users
+The table below are the keys for the users. To see restrictions for these keys' values, such as no empty passwords, see [users_test.go](../../tools/imagegen/configuration/users_test.go).
+
+|Key                |Type
+--------------------|:---------
+|Name               |string
+|UID                |string
+|PasswordHashed     |bool
+|Password           |string
+|PasswordExpiresDays|int64
+|SSHPubKeyPaths     |[]string
+|PrimaryGroup       |string
+|SecondaryGroups    |[]string
+|StartupCommand     |string
+
+An example usage for user "root" would look like:
+
+``` json
+"Users": [
+    {
+        "Name": "root",
+        "Password": "some_password"
+    },
+]
+```
+
 # Sample image configuration
 
 A sample image configuration, producing a VHDX disk image:
