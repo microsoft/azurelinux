@@ -12,17 +12,17 @@ import (
 var (
 	validUsers = []User{
 		{
-			Name: "basicuser",
+			Name:     "basicuser",
 			Password: "abc",
 		},
 		{
-			Name: "advancedSecureCoolUser",
-			Password: "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
-			PasswordHashed: true,
+			Name:                "advancedSecureCoolUser",
+			Password:            "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
+			PasswordHashed:      true,
 			PasswordExpiresDays: -1,
-			UID: "105",
-			PrimaryGroup: "testgroup",
-			SecondaryGroups: []string {
+			UID:                 "105",
+			PrimaryGroup:        "testgroup",
+			SecondaryGroups: []string{
 				"groupa",
 				"groupb",
 			},
@@ -34,6 +34,7 @@ var (
 		},
 	}
 )
+
 //TestMain found in configuration_test.go.
 
 func TestShouldPassParsingTestConfig(t *testing.T) {
