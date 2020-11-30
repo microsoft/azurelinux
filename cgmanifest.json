@@ -5855,6 +5855,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "uuid",
+          "version": "1.6.2",
+          "downloadUrl": "http://www.ossp.org/pkg/lib/uuid/"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vala",
           "version": "0.34.6",
           "downloadUrl": "http://download.gnome.org/sources/vala/0.34/vala-0.34.6.tar.xz"
