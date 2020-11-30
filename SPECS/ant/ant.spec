@@ -2,7 +2,7 @@
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        0
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

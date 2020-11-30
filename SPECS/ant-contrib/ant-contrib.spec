@@ -1,7 +1,7 @@
 Summary:        Collection of tasks for Ant
 Name:           ant-contrib
 Version:        1.0b3
-Release:        19
+Release:        19%{?dist}
 License:        ASL 2.0 AND ASL 1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
