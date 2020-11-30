@@ -76,7 +76,7 @@ echo "call add_maven_depmap JPP.ant-%{name}.pom ant/%{name}.jar"
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0b3-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT) and OpenSuSE Tumbleweed (license: MIT).
+- Initial CBL-Mariner import from Fedora 32 (license: MIT) and OpenSUSE Tumbleweed (license: MIT).
 - Simplify buildrequires and runtime requires.
 - Remove junit integration.
 - Remove fdupes dependency.

@@ -122,7 +122,7 @@ ant
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.5.0-1
-- Initial CBL-Mariner import from OpenSuSE Tumbleweed (license: MIT).
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: MIT).
 - Disable JAWT to avoid X11 header dependencies.
 - Remove unneeded patches.
 

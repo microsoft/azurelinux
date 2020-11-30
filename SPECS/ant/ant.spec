@@ -242,7 +242,7 @@ popd
 
 %changelog
 * Thu Nov 19 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-5
-- Initial CBL-Mariner import from OpenSuSE Tumbleweed (license: MIT).
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: MIT).
 - Remove non-applicable patches.
 - Remove suse_version checks.
 - Rename apache-ant-1.8.ant.conf to ant.conf.
