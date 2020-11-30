@@ -39,7 +39,11 @@ var (
 
 func TestShouldPassParsingTestConfig(t *testing.T) {
 	for _, b := range validUsers {
+		var checkedUser User
 		assert.NoError(t, b.IsValid())
+		err := remarshalJSON(b, &checkedUser)
+		assert.NoError(t, err)
+		assert.Equal(t, b, checkedUser)
 	}
 }
 
@@ -56,7 +60,8 @@ func TestShouldFailParsingInvalidName(t *testing.T) {
 // TestShouldFailParsingInvalidUID
 // validates that UID out of range fails IsValid
 func TestShouldFailParsingInvalidUID(t *testing.T) {
-	var testUser User
+	var checkedUser User
+	testUser := validUsers[0]
 	testUser.UID = "-2"
 	err := testUser.UIDIsValid()
 	assert.Error(t, err)
@@ -66,6 +71,10 @@ func TestShouldFailParsingInvalidUID(t *testing.T) {
 	err = testUser.UIDIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for UID (60001)", err.Error())
+
+	err = remarshalJSON(testUser, &checkedUser)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [User]: invalid value for UID (60001)", err.Error())
 }
 
 // TestShouldFailParsingInvalidPassword
