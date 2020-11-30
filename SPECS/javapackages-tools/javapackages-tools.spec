@@ -1,53 +1,43 @@
 # Don't generate requires on jpackage-utils and java-headless for
 # provided pseudo-artifacts: com.sun:tools and sun.jdk:jconsole.
 %global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}/maven-metadata/javapackages-metadata.xml$
-
 # Disable automatic bytecode compilation for files in java-utils
 # https://fedoraproject.org/wiki/Packaging:Python_Appendix#Manual_byte_compilation
 %global _python_bytecompile_extra 0
-
 %global python_interpreter %{__python3}
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
-
+Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
 Release:        10%{?dist}
-
-Summary:        Macros and scripts for Java packaging support
-
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
 #Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
-Source0:       %{name}-%{version}.tar.gz
-
-BuildArch:      noarch
-
-BuildRequires:  java-devel
-BuildRequires:  coreutils
-BuildRequires:  which
-BuildRequires:  make
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  asciidoc
-BuildRequires:  xmlto
+BuildRequires:  coreutils
+BuildRequires:  java-devel
+BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
-
-Requires:       javapackages-filesystem = %{version}-%{release}
+BuildRequires:  which
+BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
-Requires:       which
 # default JRE
 Requires:       java-1.8.0-openjdk-headless
-
+Requires:       javapackages-filesystem = %{version}-%{release}
+Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
-
 # These could be generated automatically, but then we would need to
 # depend on javapackages-local for dependency generator.
 Provides:       mvn(com.sun:tools) = SYSTEM
 Provides:       mvn(sun.jdk:jconsole) = SYSTEM
+BuildArch:      noarch
 
 %description
 This package provides macros and scripts to support Java packaging.
@@ -84,8 +74,8 @@ packaging in Linux distributions
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
 Requires:       java-1.8.0-openjdk-devel
-Requires:       python3-javapackages = %{version}-%{release}
 Requires:       python3
+Requires:       python3-javapackages = %{version}-%{release}
 
 %description -n javapackages-local-bootstrap
 This package provides non-essential macros and scripts to support Java packaging.
@@ -95,7 +85,7 @@ It is a lightweight version with minimal runtime requirements.
 %setup -q -n javapackages-%{version}
 
 %build
-%define jdk_home $(find /usr/lib/jvm -name "OpenJDK*")
+%define jdk_home $(find %{_lib}/jvm -name "OpenJDK*")
 %define jre_home %{jdk_home}/jre
 
 %configure --pyinterpreter=%{python_interpreter} \
@@ -125,7 +115,6 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 
 %files -n python3-javapackages -f files-python
 %license LICENSE
-
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-10
