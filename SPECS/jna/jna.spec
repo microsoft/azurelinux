@@ -19,7 +19,7 @@ BuildRequires: openjdk8
 BuildRequires: ant
 BuildRequires: libffi
 BuildRequires: libffi-devel
-BuildRequires: javapackages-local-lite
+BuildRequires: javapackages-local-bootstrap
 BuildRequires:  dos2unix
 Requires:      openjre8
 

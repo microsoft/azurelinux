@@ -61,6 +61,15 @@ Provides:       eclipse-filesystem = %{version}-%{release}
 This package provides some basic directories into which Java packages
 install their content.
 
+%package -n ivy-local-bootstrap
+Summary:        Local mode for Apache Ivy
+Requires:       %{name} = %{version}-%{release}
+Requires:       javapackages-local-bootstrap = %{version}-%{release}
+
+%description -n ivy-local-bootstrap
+This package implements local mode for Apache Ivy, which allows
+artifact resolution using XMvn resolver.
+
 %package -n python3-javapackages
 Summary:        Module for handling various files for Java packaging
 Requires:       python3-lxml
@@ -71,14 +80,14 @@ Obsoletes:      python-javapackages < %{version}-%{release}
 Module for handling, querying and manipulating of various files for Java
 packaging in Linux distributions
 
-%package -n javapackages-local-lite
+%package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
 Requires:       java-1.8.0-openjdk-devel
 Requires:       python3-javapackages = %{version}-%{release}
 Requires:       python3
 
-%description -n javapackages-local-lite
+%description -n javapackages-local-bootstrap
 This package provides non-essential macros and scripts to support Java packaging.
 It is a lightweight version with minimal runtime requirements.
 
@@ -103,9 +112,6 @@ rm -rf %{buildroot}%{_bindir}/gradle-local
 rm -rf %{buildroot}%{_datadir}/gradle-local
 rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 
-rm -rf %{buildroot}%{_sysconfdir}/ivy
-rm -rf %{buildroot}%{_sysconfdir}/ant.d/ivy-local-classpath
-
 %check
 ./check
 
@@ -113,19 +119,21 @@ rm -rf %{buildroot}%{_sysconfdir}/ant.d/ivy-local-classpath
 
 %files -n javapackages-filesystem -f files-filesystem
 
-%files -n javapackages-local-lite -f files-local
+%files -n javapackages-local-bootstrap -f files-local
+
+%files -n ivy-local-bootstrap -f files-ivy
 
 %files -n python3-javapackages -f files-python
 %license LICENSE
+
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Dynamically calculate jdk and jre paths.
 - Remove meta packages.
-- Remove ivy support.
-- Simplify spec macro and bond usage.
-- Create a javapackages-local-lite package with minimal runtime requirements.
+- Simplify spec macro and bcond usage.
+- Create bootstrap packages for ivy-local and javapackages-local with minimal runtime requirements.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

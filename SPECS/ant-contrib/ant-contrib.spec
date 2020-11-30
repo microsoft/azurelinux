@@ -13,7 +13,7 @@ Source1:        http://mirrors.ibiblio.org/pub/mirrors/maven2/%{name}/%{name}/1.
 # Upstream bug at https://sourceforge.net/tracker/?func=detail&aid=3590371&group_id=36177&atid=416920
 Source2:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Patch0:         ant-contrib-pom.patch
-BuildRequires:  javapackages-local-lite
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  java-devel
 BuildRequires:  ant
 Requires:       java-headless

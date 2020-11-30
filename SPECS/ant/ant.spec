@@ -15,7 +15,7 @@ Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
 BuildRequires:  java-devel >= 1.8
 BuildRequires:  unzip
-BuildRequires:  javapackages-local-lite
+BuildRequires:  javapackages-local-bootstrap
 Requires:       java-devel >= 1.8
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
