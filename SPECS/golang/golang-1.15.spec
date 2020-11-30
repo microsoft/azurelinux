@@ -31,9 +31,7 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-%ifarch aarch64
 patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
-%endif
 mv -v go go-bootstrap
 
 %setup -q -n go
