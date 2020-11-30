@@ -12,7 +12,7 @@ import (
 var (
 	validUsers = []User{
 		{
-			Name:     "basicuser",
+			Name:     "basicUser",
 			Password: "abc",
 		},
 		{
@@ -46,9 +46,9 @@ func TestShouldPassParsingTestConfig(t *testing.T) {
 // TestShouldFailParsingInvalidName
 // validates that an empty user.name fails IsValid
 func TestShouldFailParsingInvalidName(t *testing.T) {
-	var test_user User
-	test_user.Name = ""
-	err := test_user.NameIsValid()
+	var testUser User
+	testUser.Name = ""
+	err := testUser.NameIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for name ()", err.Error())
 }
@@ -56,14 +56,14 @@ func TestShouldFailParsingInvalidName(t *testing.T) {
 // TestShouldFailParsingInvalidUID
 // validates that UID out of range fails IsValid
 func TestShouldFailParsingInvalidUID(t *testing.T) {
-	var test_user User
-	test_user.UID = "-2"
-	err := test_user.UIDIsValid()
+	var testUser User
+	testUser.UID = "-2"
+	err := testUser.UIDIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for UID (-2)", err.Error())
 
-	test_user.UID = "60001"
-	err = test_user.UIDIsValid()
+	testUser.UID = "60001"
+	err = testUser.UIDIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for UID (60001)", err.Error())
 }
@@ -71,9 +71,9 @@ func TestShouldFailParsingInvalidUID(t *testing.T) {
 // TestShouldFailParsingInvalidPassword
 // validates that an empty user.password fails IsValid
 /* func TestShouldFailParsingInvalidPassword(t *testing.T) {
-	var test_user User
-	test_user.Password = ""
-	err := test_user.PasswordIsValid()
+	var testUser User
+	testUser.Password = ""
+	err := testUser.PasswordIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for Password ()", err.Error())
 } */
@@ -81,14 +81,14 @@ func TestShouldFailParsingInvalidUID(t *testing.T) {
 // TestShouldFailParsingInvalidPasswordExpiresDays
 // validates that -2 and 100000 fail IsValid as they are outside bounds
 func TestShouldFailParsingInvalidPasswordExpiresDays(t *testing.T) {
-	var test_user User
-	test_user.PasswordExpiresDays = -2
-	err := test_user.PasswordExpiresDaysIsValid()
+	var testUser User
+	testUser.PasswordExpiresDays = -2
+	err := testUser.PasswordExpiresDaysIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for PasswordExpiresDays (-2)", err.Error())
 
-	test_user.PasswordExpiresDays = 100000
-	err = test_user.PasswordExpiresDaysIsValid()
+	testUser.PasswordExpiresDays = 100000
+	err = testUser.PasswordExpiresDaysIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for PasswordExpiresDays (100000)", err.Error())
 }

@@ -164,32 +164,32 @@ Users is an array of user information. The User information is a map of key valu
 
 The image generated has users matching the values specified in Users.
 
-The table below are the keys for the users. To see restrictions for these keys' values, such as no empty passwords, see [users_test.go](../../tools/imagegen/configuration/users_test.go).
+The table below are the keys for the users. 
 
-|Key                |Type
---------------------|:---------
-|Name               |string
-|UID                |string
-|PasswordHashed     |bool
-|Password           |string
-|PasswordExpiresDays|int64
-|SSHPubKeyPaths     |[]string
-|PrimaryGroup       |string
-|SecondaryGroups    |[]string
-|StartupCommand     |string
+|Key                |Type               |Restrictions
+--------------------|:------------------|:------------------------------------------------
+|Name               |string             |Cannot be empty
+|UID                |string             |Must be in range 0-60000
+|PasswordHashed     |bool               |
+|Password           |string             |
+|PasswordExpiresDays|number             |Must be in range 0-99999 or -1 for no expiration
+|SSHPubKeyPaths     |array of strings   |
+|PrimaryGroup       |string             |
+|SecondaryGroups    |array of strings   |
+|StartupCommand     |string             |
 
-An example usage for users "root" and "basic_user" would look like:
+An example usage for users "root" and "basicUser" would look like:
 
 ``` json
 "Users": [
     {
         "Name": "root",
-        "Password": "some_password"
+        "Password": "somePassword"
     },
     {
-        "Name": "basic_user",
-        "Password": "some_other_password",
-        "UID": 101
+        "Name": "basicUser",
+        "Password": "someOtherPassword",
+        "UID": 1001
     }
 ]
 ```

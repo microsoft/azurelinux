@@ -52,16 +52,17 @@ func (p *User) NameIsValid() (err error) {
 }
 
 // UIDIsValid returns an error if the UID is outside bounds
-// Bounds can be checked using
+// UIDs 1-999 are system users and 1000-60000 are normal users
+// Bounds can be checked using:
 // $grep -E '^UID_MIN|^UID_MAX' /etc/login.defs
 func (p *User) UIDIsValid() (err error) {
 	const (
-		UID_lowerbound = 0 //root user
-		UID_upperbound = 60000
+		uidLowerBound = 0 // root user
+		uidUpperBound = 60000
 	)
 	if p.UID != "" {
-		UID_i, _ := strconv.Atoi(p.UID)
-		if UID_i < UID_lowerbound || UID_i > UID_upperbound {
+		uidNum, err := strconv.Atoi(p.UID)
+		if err != nil || uidNum < uidLowerBound || uidNum > uidUpperBound {
 			return fmt.Errorf("invalid value for UID (%s)", p.UID)
 		}
 	}
@@ -82,10 +83,10 @@ func (p *User) UIDIsValid() (err error) {
 // within bounds set by the chage -M command
 func (p *User) PasswordExpiresDaysIsValid() (err error) {
 	const (
-		no_expiration    = -1 //no expiration
-		upperbound_chage = 99999
+		noExpiration    = -1 //no expiration
+		upperBoundChage = 99999
 	)
-	if p.PasswordExpiresDays < no_expiration || p.PasswordExpiresDays > upperbound_chage {
+	if p.PasswordExpiresDays < noExpiration || p.PasswordExpiresDays > upperBoundChage {
 		return fmt.Errorf("invalid value for PasswordExpiresDays (%d)", p.PasswordExpiresDays)
 	}
 	return
