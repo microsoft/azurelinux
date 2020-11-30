@@ -1,0 +1,9 @@
+# specify additional command line arguments for atd
+#
+# -l Specifies  a  limiting  load  factor,  over which batch jobs should not be run, instead of the compile-time
+#    choice of 0.8.  For an SMP system with n CPUs, you will probably want to set this higher than n-1.
+# 
+#  -b Specifiy the minimum interval in seconds between the start of two batch jobs (60 default).
+
+#example: 
+#OPTS="-l 4 -b 120"
