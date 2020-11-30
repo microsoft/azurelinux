@@ -2,7 +2,7 @@ Summary:        Collection of tasks for Ant
 Name:           ant-contrib
 Version:        1.0b3
 Release:        19
-License:        ASL 2.0 and ASL 1.1
+License:        ASL 2.0 AND ASL 1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://ant-contrib.sourceforge.net/
@@ -13,11 +13,11 @@ Source1:        http://mirrors.ibiblio.org/pub/mirrors/maven2/%{name}/%{name}/1.
 # Upstream bug at https://sourceforge.net/tracker/?func=detail&aid=3590371&group_id=36177&atid=416920
 Source2:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Patch0:         ant-contrib-pom.patch
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  java-devel
 BuildRequires:  ant
-Requires:       java-headless
+BuildRequires:  java-devel
+BuildRequires:  javapackages-local-bootstrap
 Requires:       ant
+Requires:       java-headless
 BuildArch:      noarch
 
 %description
@@ -38,7 +38,7 @@ Requires:       jpackage-utils
 Api documentation for %{name}.
 
 %prep
-%setup -q  -n %{name}
+%setup -q -n %{name}
 cp %{SOURCE1} %{name}-1.0b3.pom
 cp %{SOURCE2} LICENSE-2.0.txt
 
@@ -96,23 +96,30 @@ echo "call add_maven_depmap JPP.ant-%{name}.pom ant/%{name}.jar"
 - Build with source and target 8 to prepare for a possible removal
   of 1.6 compatibility
 - Run fdupes on the documentation
+
 * Wed Sep  6 2017 fstrba@suse.com
 - Added patch:
   * ant-contrib-sourcetarget.patch
   - build with java source and target 1.6
   - fixes the build with java 9
+
 * Fri May 19 2017 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Wed Mar 18 2015 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Thu Mar 12 2015 archie@dellroad.org
 - Add back patch enabling the <antcontrib:for> task (boo#922324)
   * ant-contrib-1.0b3-enable-for-task.patch
+
 * Mon Jul  7 2014 tchvatal@suse.com
 - Clean up a bit with spec-cleaner
+
 * Fri Nov 15 2013 mvyskocil@suse.com
 - don't require ant-junit for build, junit is sufficient
   * reducing of cycles
+
 * Wed Nov  6 2013 mvyskocil@suse.com
 - upgrade to 1.0b3
   * no upstream changelog available
@@ -131,28 +138,38 @@ echo "call add_maven_depmap JPP.ant-%{name}.pom ant/%{name}.jar"
   * local-ivy.patch
 - add pom file
 - add ant.d configuration
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Thu Aug 22 2013 mvyskocil@suse.com
 - disable javadoc build
+
 * Sat Sep 17 2011 jengelh@medozas.de
 - Remove redundant tags/sections from specfile
+
 * Fri Oct  8 2010 mvyskocil@suse.cz
 - fix bnc#644661 - ant-contrib does not export the antcontrib:for task
+
 * Thu Apr 30 2009 mrueckert@suse.de
 - rename ant_version to ant_minimal_version
 - use requires_eq for the ant package
+
 * Thu Apr 30 2009 ro@suse.de
 - bump ant-version to 1.7.1
+
 * Thu Sep 11 2008 mvyskocil@suse.cz
 - Use a gcc-java to build
+
 * Fri Aug  8 2008 mvyskocil@suse.cz
 - Make junit testing optional and disable it by default  to break a build cycle
   ant-antlr - bsf - jython - mysql-connector-java - ant-contrib ant-contrib
+
 * Thu Jul 10 2008 mvyskocil@suse.cz
 - Removed summary tags from description of subpackages.
 - Remove the ant-1.7.0 archive to reduce a size of source package and
   use only one necessary file BuildFileTest.java
+
 * Wed Jul  2 2008 mvyskocil@suse.cz
 - First release based on jpackage.org 1.7 (1.0.b2)
   - adjusted for ant 1.7.0

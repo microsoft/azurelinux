@@ -1,27 +1,24 @@
 #need to disable debuginfo till we bring in x11 deps
 %define debug_package %{nil}
-
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
 Release:        1%{?dist}
-License:        LGPLv2.1+ or ASL 2.0
-URL:            https://github.com/java-native-access/jna
-Group:          Applications/System
+License:        LGPLv2.1+ OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/java-native-access/jna
 Source0:        https://github.com/java-native-access/jna/archive/%{version}/%{name}-%{version}.tar.gz
-
 Patch0:         jna_remove_clover_and_win32_native_jar.patch
-
-BuildRequires: openjre8
-BuildRequires: openjdk8
-BuildRequires: ant
-BuildRequires: libffi
-BuildRequires: libffi-devel
-BuildRequires: javapackages-local-bootstrap
+BuildRequires:  ant
 BuildRequires:  dos2unix
-Requires:      openjre8
+BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  libffi
+BuildRequires:  libffi-devel
+BuildRequires:  openjdk8
+BuildRequires:  openjre8
+Requires:       openjre8
 
 %description
 JNA provides Java programs easy access to native shared libraries
@@ -59,6 +56,7 @@ sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
 
 %clean
 rm -rf %{buildroot}
+
 
 %build
 build-jar-repository -s -p lib ant
@@ -132,6 +130,7 @@ ant
   filename is passed (e.g. %%{suffix:filename.spec}); earlier
   versions returned "", meaning we can just strip it from the
   install command, as we rely on an empty return value.
+
 * Thu Jun  4 2020 Fridrich Strba <fstrba@suse.com>
 - Upgrade to 5.5.0
   * Features
@@ -160,6 +159,7 @@ ant
     + rediff to the changed context
     + disable warnings as errors
     + fix build on ppc64 and s390x
+
 * Thu Oct 10 2019 Fridrich Strba <fstrba@suse.com>
 - Rename package to jna, since the jna package must be anyway
   archful
@@ -187,21 +187,26 @@ ant
   * jna-java8compat.patch
     + Add casts to prevent using of java9+ only ByteBuffer
     methods
+
 * Wed Mar 13 2019 Fridrich Strba <fstrba@suse.com>
 - Decide whether to apply the jna-4.5.0-nojavah.patch according
   to what java-devel version is used for build
+
 * Wed Oct 24 2018 Fridrich Strba <fstrba@suse.com>
 - Install the provided pom*.xml files in order to make maven aware
   about the jna-platform too
+
 * Thu Jul 26 2018 msuchanek@suse.com
 - Fix dealing with different java environments
 - Fix license warning
+
 * Wed Jun 13 2018 msuchanek@suse.com
 - do not apply nojavah on Leap 42.3 - breaks build
 - quiet warnings
   + jna-msgsize.patch
   + jna-callback.patch
   + delete jna-no-werror.patch
+
 * Tue Jun 12 2018 fstrba@suse.com
 - Upstrem version 4.5.1
 - Modified patch:
@@ -212,16 +217,20 @@ ant
   * jna-no-werror.patch
     + Disable -Werror to enable build with two new warnings
 - Build with compatibility 1.8
+
 * Tue Jan  9 2018 fstrba@suse.com
 - Added patch:
   * jna-4.5.0-nojavah.patch
     + Fix build with jdk10
     + Generate relevant header files during javac run
+
 * Tue Jan  2 2018 fstrba@suse.com
 - Force build with jdk < 10
+
 * Mon Oct 30 2017 ecsos@opensuse.org
 - change version and name from jna-4.1.0.pom to jna-4.5.0.pom
 - fix require libjnidispatch-version in jna-package
+
 * Tue Sep 19 2017 fstrba@suse.com
 - Upstream version 4.5.0
 - Removed patch:
@@ -235,18 +244,23 @@ ant
 - Modified patch:
   * jna-build.patch
     + rediff to the new context
+
 * Tue Sep 19 2017 fstrba@suse.com
 - Build with source and target levels 1.6
 - Force building with java-devel < 1.9, since the code uses APIs
   removed in jdk9
+
 * Fri May 19 2017 dziolkowski@suse.com
 - New build dependency: javapackages-local
 - drop conditionals for unsupported SUSE versions
+
 * Fri Feb 24 2017 msuchanek@suse.com
 - Upstream version 4.2.2
   * adds some symbols needed by Arduino IDE.
+
 * Fri Mar 18 2016 bwiedemann@suse.com
 - Add reproducible.patch to fix build-compare
+
 * Sun Nov  8 2015 p.drouand@gmail.com
 - Update to version 4.2.1
   * Add support for linux-sparcv9.
@@ -258,8 +272,10 @@ ant
   * Added JNA functional overview.
   * Update linux-arm natives omitted in 4.2.
 - Update jna-4.1.0-build.patch > jna-build.patch
+
 * Wed Mar 18 2015 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Mon Nov  3 2014 cbosdonnat@suse.com
 - Updated to 4.1.0. See the changelog on:
   https://github.com/twall/jna/blob/master/CHANGES.md
@@ -272,27 +288,36 @@ ant
   * libffi-ppc64le.patch
 - Added rpmlint filters:
   * libjnidispatch-rpmlintrc
+
 * Tue Jul  8 2014 tchvatal@suse.com
 - Do not depend on ant-trax and run spec-cleaner.
+
 * Mon Dec  9 2013 dvaleev@suse.com
 - enable ppc64le
 - added patches:
   * libffi-ppc64le.patch
+
 * Wed Sep 11 2013 mvyskocil@suse.com
 - use add_maven_depmap from javapackages-tools
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Thu Apr 11 2013 schwab@suse.de
 - libffi-aarch64.patch: import aarch64 support for libffi
+
 * Wed Dec 12 2012 dvaleev@suse.com
 - enable ppc and ppc64 builds
+
 * Wed Nov 14 2012 mvyskocil@suse.com
 - fix a build for non-suse distros
+
 * Tue Jun 19 2012 mvyskocil@suse.cz
 - fix a build with jdk7
 - rename to libjnidispatch to follow packaging policy (provides jna-native)
 - jna and jna-javadoc are now noarch subpackages of it
 - don't strip a binary during a build
+
 * Thu Feb  9 2012 mvyskocil@suse.cz
 - Update to 3.4.0
   * moved object creation out into pure Java code reduce JNI crossing
@@ -306,6 +331,7 @@ ant
   * add to `platform.unix.x11`: `XGrabKey`, `XUngrabKey`, `XSetErrorHandler`.
   * and a lot of bugfixes (see /usr/share/packages/doc/jna/README.md)
 - fix bnc#745571 enable build of jna-native as well
+
 * Thu Apr  8 2010 mvyskocil@suse.cz
 - update to 3.1.0 (jna-3.1.0-2.jpp6.src.rpm)
   * raw JNI mapping of static Java methods increased performance
@@ -318,9 +344,11 @@ ant
   * allow NIO Buffer as Structure field (with limitations) (Issue 57)
   * add size_t size.
   * Bug Fixes
+
 * Mon Jun  1 2009 mvyskocil@suse.cz
 - fixed bnc#507734:  jna declared LGPL but contains GPL files and binaries
   * removed all jars from source archive
   * added gpl to docdir
+
 * Tue May 19 2009 mvyskocil@suse.cz
 - 'Initial SUSE packaging from jpackage.org 5.0'
