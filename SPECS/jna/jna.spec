@@ -1,3 +1,19 @@
+#
+# spec file for package jna
+#
+# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2000-2009, JPackage Project
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+#
+
 #need to disable debuginfo till we bring in x11 deps
 %define debug_package %{nil}
 Summary:        Java Native Access
@@ -120,7 +136,7 @@ ant
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.5.0-1
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: MIT).
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed.
 - Disable JAWT to avoid X11 header dependencies.
 - Remove unneeded patches.
 
