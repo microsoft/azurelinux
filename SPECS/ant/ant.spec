@@ -18,7 +18,7 @@
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -257,7 +257,7 @@ popd
 %{_bindir}/*.py*
 
 %changelog
-* Thu Nov 19 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-5
+* Thu Nov 19 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-4
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed.
 - Remove non-applicable patches.
 - Remove suse_version checks.
