@@ -1,7 +1,7 @@
 Name:           WALinuxAgent
 Summary:        The Windows Azure Linux Agent
 Version:        2.2.38
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Group:          System/Daemons
 Url:            https://github.com/Azure/WALinuxAgent
@@ -74,8 +74,8 @@ python2 setup.py check && python2 setup.py test
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
 %doc Changelog
-%attr(0755,root,root) %{_bindir}/waagent
-%attr(0755,root,root) %{_bindir}/waagent2.0
+%attr(0755,root,root) %{_sbindir}/waagent
+%attr(0755,root,root) %{_sbindir}/waagent2.0
 %config %{_sysconfdir}/waagent.conf
 %dir %{_localstatedir}/opt/waagent/log
 %{_localstatedir}/log/waagent.log
@@ -84,7 +84,10 @@ python2 setup.py check && python2 setup.py test
 /usr/lib/python2.7/site-packages/*
 
 %changelog
-* Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.2.38-3
+* Tue Dec 01 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.2.38-4
+- Move "waagent" and "waagent2.0" from bindir to sbindir
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.38-3
 - Added %%license line automatically
 
 * Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.2.38-2
