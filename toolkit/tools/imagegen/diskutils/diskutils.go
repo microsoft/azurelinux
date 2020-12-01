@@ -401,7 +401,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	var blockDevices blockDevicesOutput
 
-	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", "8,179,259", "-n", "--json", "--output", "NAME,SIZE,MODEL")
+	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", "8,179,252,253,254,259", "-n", "--json", "--output", "NAME,SIZE,MODEL")
 	if err != nil {
 		logger.Log.Warn(stderr)
 		return
