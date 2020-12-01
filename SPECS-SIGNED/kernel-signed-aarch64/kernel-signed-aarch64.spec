@@ -3,7 +3,7 @@
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.4.72
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +80,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Mon Nov 23 2020 Chris Co <chrco@microsoft.com> - 5.4.72-4
+- Update release number to match kernel spec
+
 * Mon Nov 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-3
 - Update release number
 
