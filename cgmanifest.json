@@ -46,7 +46,7 @@
         "other": {
           "name": "ant",
           "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
         }
       }
     },
@@ -56,7 +56,7 @@
         "other": {
           "name": "ant-contrib",
           "version": "1.0b3",
-          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.gz"
+          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.bz2"
         }
       }
     },
@@ -1845,9 +1845,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "javapackages-tools",
+          "version": "5.3.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jna",
-          "version": "4.5.2",
-          "downloadUrl": "https://github.com/java-native-access/jna/archive/4.5.2/jna-4.5.2.tar.gz"
+          "version": "5.5.0",
+          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
         }
       }
     },
