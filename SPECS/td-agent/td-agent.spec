@@ -208,4 +208,4 @@ sudo systemctl start td-agent
 
 %changelog
 * Tue Dec 01 2020 Henry Li <lihl@microsoft.com> - 4.0.1-1
-- Initial CBL-Mariner Version
+- Original version for CBL-Mariner
