@@ -3,7 +3,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python3-devel
 Provides:       pkgconfig(libxml-2.0) = %{version}-%{release}
+Provides:       %{name}-tools = %{version}-%{release}
+Provides:       libxml-tools = %{version}-%{release}
 
 %description
 The libxml2 package contains libraries and utilities used for parsing XML files.
@@ -77,6 +79,7 @@ make %{?_smp_mflags} check
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -104,6 +107,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-4
+- Provide libxml-tools and libxml2-tools.
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-3
 - Version pkgconfig(libxml-2.0) provide.
 
