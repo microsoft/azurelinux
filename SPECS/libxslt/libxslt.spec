@@ -67,7 +67,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-4
+* Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 1.1.34-3
 - Provide libxslt-tools.
 
 *   Wed Aug 19 2020 Henry Beberman <henry.beberman@microsoft.com> 1.1.34-2
