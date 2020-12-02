@@ -76,7 +76,7 @@ func (p *User) UIDIsValid() (err error) {
 	)
 	if p.UID != "" {
 		uidNum, err := strconv.Atoi(p.UID)
-		if err != nil{
+		if err != nil {
 			return fmt.Errorf("Failed to convert UID (%s) to a number", p.UID)
 		}
 		if uidNum < uidLowerBound || uidNum > uidUpperBound {
