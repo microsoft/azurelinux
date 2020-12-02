@@ -1,7 +1,7 @@
 Summary:        Libxslt is the XSLT C library developed for the GNOME project. XSLT is a an XML language to define transformation for XML.
 Name:           libxslt
 Version:        1.1.34
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            http://xmlsoft.org/libxslt/
 Group:          System Environment/General Libraries
@@ -12,6 +12,8 @@ Requires:       libxml2-devel
 Requires:       libgcrypt
 BuildRequires:  libxml2-devel
 BuildRequires:  libgcrypt-devel
+
+Provides:       %{name}-tools = %{version}-%{release}
 
 %description
 The libxslt package contains XSLT libraries used for extending libxml2 libraries to support XSLT files.
@@ -65,6 +67,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-4
+- Provide libxslt-tools.
+
 *   Wed Aug 19 2020 Henry Beberman <henry.beberman@microsoft.com> 1.1.34-2
 -   Add dependency on libgcrypt
 *   Mon Jun 08 2020 Joe Schmitt <joschmit@microsoft.com> 1.1.34-1
