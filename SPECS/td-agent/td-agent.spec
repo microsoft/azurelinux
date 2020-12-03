@@ -6,9 +6,10 @@ Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
 Release:        1%{?dist}
-License:        ASL 2.0 AND BSD AND MIT
+License:        ASL 2.0 AND BSD AND MIT AND Jason Evans Open Source
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
 URL:            https://github.com/fluent-plugins-nursery/td-agent-builder
 #Source0:      https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz
 Source0:        td-agent-builder-testing-uploading-artifacts3.tar.gz
