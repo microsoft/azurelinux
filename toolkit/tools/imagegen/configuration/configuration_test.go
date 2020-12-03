@@ -212,7 +212,7 @@ var expectedConfiguration Config = Config{
 					Name:                "advancedSecureCoolUser",
 					Password:            "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
 					PasswordHashed:      true,
-					PasswordExpiresDays: uint64(99999),
+					PasswordExpiresDays: int64(99999),
 					UID:                 "105",
 					PrimaryGroup:        "testgroup",
 					SecondaryGroups: []string{

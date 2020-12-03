@@ -121,6 +121,21 @@ func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
 	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [KernelCommandLine]: ExtraCommandLine contains character ` which is reserved for use by sed", err.Error())
 }
 
+func TestShouldFailParsingBadUserUID_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	badUserConfig := validSystemConfig
+	badUserConfig.Users[1].UID = "-2"
+
+	err := badUserConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
+
+	err = remarshalJSON(badUserConfig, &checkedSystemConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
+}
+
 func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 

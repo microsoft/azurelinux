@@ -76,6 +76,12 @@ func (s *SystemConfig) IsValid() (err error) {
 	//Validate PostInstallScripts
 	//Validate Groups
 	//Validate Users
+	for _, b := range s.Users {
+		if err = b.IsValid(); err != nil {
+			return fmt.Errorf("invalid [User]: %w", err)
+		}
+	}
+
 	//Validate Encryption
 
 	return
