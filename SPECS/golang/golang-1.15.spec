@@ -12,8 +12,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.13.15
-Release:        2%{?dist}
+Version:        1.15.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,6 @@ URL:            https://golang.org
 Source0:        https://dl.google.com/go/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Patch1:         CVE-2020-24553.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 
@@ -32,13 +31,10 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-%ifarch aarch64
 patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
-%endif
 mv -v go go-bootstrap
 
 %setup -q -n go
-%patch1 -p1
 
 %build
 # Build go 1.4 bootstrap
@@ -119,6 +115,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Nov 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.15.5-1
+- Updated to version 1.15.5
+
 * Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.15-2
 - Patch CVE-2020-24553
 
