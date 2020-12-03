@@ -1,25 +1,23 @@
+Summary:        Universally Unique Identifier library
 Name:           uuid
 Version:        1.6.2
 Release:        50%{?dist}
-Summary:        Universally Unique Identifier library
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://www.ossp.org/pkg/lib/uuid/
 Source0:        ftp://ftp.ossp.org/pkg/lib/uuid/uuid-%{version}.tar.gz
 Patch0:         uuid-1.6.1-ossp.patch
 Patch1:         uuid-1.6.1-mkdir.patch
 Patch2:         uuid-1.6.2-php54.patch
-
 # rhbz#829532
 Patch3:         uuid-1.6.2-hwaddr.patch
-
 # do not strip binaries
 Patch4:         uuid-1.6.2-nostrip.patch
 Patch5:         uuid-1.6.2-manfix.patch
 Patch6:         uuid-aarch64.patch
-
 BuildRequires:  gcc
 BuildRequires:  libtool
-
 Obsoletes:      %{name}-pgsql < 1.6.2-24
 
 %description
@@ -29,14 +27,14 @@ of DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 compliant Universally
 Unique Identifier (UUID). It supports DCE 1.1 variant UUIDs of version
 1 (time and node based), version 3 (name based, MD5), version 4
 (random number based) and version 5 (name based, SHA-1). Additional
-API bindings are provided for the languages ISO-C++:1998 and Perl:5 
+API bindings are provided for the languages ISO-C++:1998 and Perl:5
 Optional backward compatibility exists for the ISO-C DCE-1.1 and Perl
 Data::UUID APIs.
 
 %package devel
 Summary:        Development support for Universally Unique Identifier library
-Requires:       pkg-config
 Requires:       %{name} = %{version}-%{release}
+Requires:       pkg-config
 
 %description devel
 Development headers and libraries for OSSP uuid.
@@ -58,8 +56,8 @@ export DCE_NAME=libossp-uuid_dce.la
 export CXX_NAME=libossp-uuid++.la
 export PHP_NAME=$(pwd)/php/modules/ossp-uuid.so
 export PGSQL_NAME=$(pwd)/pgsql/libossp-uuid.so
-export CFLAGS="$RPM_OPT_FLAGS"
-export CXXFLAGS="$RPM_OPT_FLAGS"
+export CFLAGS="%{optflags}"
+export CXXFLAGS="%{optflags}"
 %configure \
     --disable-static \
     --without-perl \
@@ -68,20 +66,19 @@ export CXXFLAGS="$RPM_OPT_FLAGS"
     --without-cxx \
     --without-pgsql
 
-make LIBTOOL="/usr/bin/libtool --tag=CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" %{?_smp_mflags}
+make LIBTOOL="%{_bindir}/libtool --tag=CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
-make install DESTDIR=$RPM_BUILD_ROOT
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la $RPM_BUILD_ROOT%{_libdir}/*.a
-chmod 755 $RPM_BUILD_ROOT%{_libdir}/*.so.*.*.*
+make install DESTDIR=%{buildroot}
+rm -f %{buildroot}%{_libdir}/*.la %{buildroot}%{_libdir}/*.a
+chmod 755 %{buildroot}%{_libdir}/*.so.*.*.*
 
-find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -exec rm -f {} \;
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
+find %{buildroot} -type f -name '*.bs' -size 0 -exec rm -f {} \;
+find %{buildroot} -type f -name .packlist -exec rm -f {} \;
+find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
 
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{_fixperms} %{buildroot}/*
 
 %check
 make check
@@ -112,7 +109,7 @@ make check
 - Use pkg-config for devel package BR
 - Remove perl package
 - Remove c++ pacakges
-- Remove dce pacakges 
+- Remove dce pacakges
 - Remove Fedora/RHEL check for filter_setup
 - Add CC tag to libtool for make
 

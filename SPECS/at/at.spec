@@ -1,54 +1,52 @@
 %bcond_without pam
-
-Summary:	Job spooling tools
-Name:		at
-Version:	3.1.23
-Release:	6%{?dist}
+Summary:        Job spooling tools
+Name:           at
+Version:        3.1.23
+Release:        6%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
-License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
-URL:		http://ftp.debian.org/debian/pool/main/a/at
-
-Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
+License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://ftp.debian.org/debian/pool/main/a/at
+Source:         http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
-Source1:	pam_atd
-Source3:	atd.sysconf
-Source5:	atd.systemd
-
-Patch0:		at-aarch64.patch
-Patch1:		at-3.1.18-make.patch
-Patch2:		at-3.1.20-pam.patch
-Patch4:		at-3.1.14-opt_V.patch
-Patch5:		at-3.1.20-shell.patch
-Patch6:		at-3.1.18-nitpicks.patch
-Patch8:		at-3.1.14-fix_no_export.patch 
-Patch9:		at-3.1.14-mailwithhostname.patch
-Patch10:	at-3.1.14-usePOSIXtimers.patch
-Patch12:	at-3.1.20-aborted-jobs.patch
-Patch13:	at-3.1.18-noabort.patch
-Patch14:	at-3.1.16-fclose-error.patch
-Patch15:	at-3.1.16-clear-nonjobs.patch
-Patch16:	at-3.1.18-utc-dst.patch
-Patch17:	at-3.1.20-lock-locks.patch
-Patch18:	at-3.1.23-document-n.patch
-Patch19:	at-3.1.20-log-jobs.patch
-
-BuildRequires: gcc
-BuildRequires: flex flex-devel bison autoconf
-BuildRequires: libselinux-devel >= 1.27.9
-BuildRequires: perl
-
-%if %{with pam}
-BuildRequires: pam-devel
-%endif
-Conflicts: crontabs <= 1.5
-
+Source1:        pam_atd
+Source3:        atd.sysconf
+Source5:        atd.systemd
+Patch0:         at-aarch64.patch
+Patch1:         at-3.1.18-make.patch
+Patch2:         at-3.1.20-pam.patch
+Patch4:         at-3.1.14-opt_V.patch
+Patch5:         at-3.1.20-shell.patch
+Patch6:         at-3.1.18-nitpicks.patch
+Patch8:         at-3.1.14-fix_no_export.patch
+Patch9:         at-3.1.14-mailwithhostname.patch
+Patch10:        at-3.1.14-usePOSIXtimers.patch
+Patch12:        at-3.1.20-aborted-jobs.patch
+Patch13:        at-3.1.18-noabort.patch
+Patch14:        at-3.1.16-fclose-error.patch
+Patch15:        at-3.1.16-clear-nonjobs.patch
+Patch16:        at-3.1.18-utc-dst.patch
+Patch17:        at-3.1.20-lock-locks.patch
+Patch18:        at-3.1.23-document-n.patch
+Patch19:        at-3.1.20-log-jobs.patch
+BuildRequires:  autoconf
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  flex-devel
+BuildRequires:  gcc
+BuildRequires:  libselinux-devel >= 1.27.9
+BuildRequires:  perl
 Requires(post): systemd
-Requires(preun): systemd
 Requires(postun): systemd
-
+Requires(preun): systemd
+Conflicts:      crontabs <= 1.5
 # at-sysvinit subpackage dropped
-Obsoletes: at-sysvinit < 3.1.16-1
+Obsoletes:      at-sysvinit < 3.1.16-1
+%if %{with pam}
+BuildRequires:  pam-devel
+%endif
 
 %description
 At and batch read commands from standard input or from a specified
@@ -107,7 +105,7 @@ make install \
 	bindir=%{buildroot}%{_bindir}\
 	prefix=%{buildroot}%{_prefix}\
 	exec_prefix=%{buildroot}%{_prefix}\
-	docdir=%{buildroot}/usr/doc\
+	docdir=%{buildroot}%{_prefix}/doc\
 	mandir=%{buildroot}%{_mandir}\
 	etcdir=%{buildroot}%{_sysconfdir} \
 	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
@@ -122,8 +120,8 @@ cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
-mkdir -p %{buildroot}/etc/sysconfig
-install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/atd
 
 # install systemd initscript
 mkdir -p %{buildroot}/%{_unitdir}/
@@ -151,7 +149,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 # Save the current service runlevel info
 # User must manually run systemd-sysv-convert --apply atd
 # to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save atd
+%{_bindir}/systemd-sysv-convert --save atd
 
 # The package is allowed to autostart:
 /bin/systemctl enable atd.service >/dev/null 2>&1
@@ -163,20 +161,20 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %files
 %license Copyright COPYING
 %doc README timespec ChangeLog
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
-%attr(0700,root,root)		%dir %{_localstatedir}/spool/at
-%attr(0600,root,root)		%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
-%attr(0700,root,root)		%dir %{_localstatedir}/spool/at/spool
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/pam.d/atd
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/at.deny
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/atd
+%attr(0700,root,root) %dir %{_localstatedir}/spool/at
+%attr(0600,root,root) %verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
+%attr(0700,root,root) %dir %{_localstatedir}/spool/at/spool
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
-%attr(0755,root,root)		%{_sbindir}/atd
+%attr(0755,root,root) %{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
 %{_bindir}/atq
-%attr(4755,root,root)		%{_bindir}/at
-%attr(0644,root,root)		/%{_unitdir}/atd.service
+%attr(4755,root,root) %{_bindir}/at
+%attr(0644,root,root) /%{_unitdir}/atd.service
 
 %changelog
 * Mon Nov 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 3.1.23-6
@@ -810,4 +808,3 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 
 * Thu Jun 19 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-
