@@ -168,30 +168,27 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
-	// Skip fetching packages that have already been fetched.
-	if fetchedPackages[resolvedPackage] {
-		return
-	}
+	if !fetchedPackages[resolvedPackage] {
+		desiredPackage := &pkgjson.PackageVer{
+			Name: resolvedPackage,
+		}
 
-	desiredPackage := &pkgjson.PackageVer{
-		Name: resolvedPackage,
-	}
+		err = cloner.Clone(cloneDeps, desiredPackage)
+		if err != nil {
+			logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
+			return
+		}
+		fetchedPackages[resolvedPackage] = true
 
-	err = cloner.Clone(cloneDeps, desiredPackage)
-	if err != nil {
-		logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
-		return
+		logger.Log.Infof("Fetched: %s", resolvedPackage)
 	}
-	fetchedPackages[resolvedPackage] = true
 
 	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", resolvedPackage)
 	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
 	rpmArch := resolvedPackage[strings.LastIndex(resolvedPackage, ".")+1:]
 	node.RpmPath = filepath.Join(outDir, rpmArch, rpmName)
-
 	node.State = pkggraph.StateCached
 
-	logger.Log.Infof("Fetched: %s", rpmName)
 	return
 }
