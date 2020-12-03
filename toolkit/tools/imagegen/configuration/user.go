@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type User struct {
@@ -59,8 +60,8 @@ func (p *User) IsValid() (err error) {
 
 // NameIsValid returns an error if the User name is empty
 func (p *User) NameIsValid() (err error) {
-	if p.Name == "" {
-		return fmt.Errorf("invalid value for name (%s)", p.Name)
+	if strings.TrimSpace(p.Name) == "" {
+		return fmt.Errorf("invalid value for name (%s), name cannot be empty", p.Name)
 	}
 	return
 }
@@ -74,13 +75,13 @@ func (p *User) UIDIsValid() (err error) {
 		uidLowerBound = 0 // root user
 		uidUpperBound = 60000
 	)
-	if p.UID != "" {
+	if strings.TrimSpace(p.UID) != "" {
 		uidNum, err := strconv.Atoi(p.UID)
 		if err != nil {
-			return fmt.Errorf("Failed to convert UID (%s) to a number", p.UID)
+			return fmt.Errorf("failed to convert UID (%s) to a number", p.UID)
 		}
 		if uidNum < uidLowerBound || uidNum > uidUpperBound {
-			return fmt.Errorf("invalid value for UID (%s)", p.UID)
+			return fmt.Errorf("invalid value for UID (%s), not within [0, 60000]", p.UID)
 		}
 	}
 	return
@@ -94,7 +95,7 @@ func (p *User) PasswordExpiresDaysIsValid() (err error) {
 		upperBoundChage = 99999
 	)
 	if p.PasswordExpiresDays < noExpiration || p.PasswordExpiresDays > upperBoundChage {
-		return fmt.Errorf("invalid value for PasswordExpiresDays (%d)", p.PasswordExpiresDays)
+		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [-1, 99999]", p.PasswordExpiresDays)
 	}
 	return
 }

@@ -129,11 +129,11 @@ func TestShouldFailParsingBadUserUID_SystemConfig(t *testing.T) {
 
 	err := badUserConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [User]: invalid value for UID (-2)", err.Error())
+	assert.Equal(t, "invalid [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
 
 	err = remarshalJSON(badUserConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [User]: invalid value for UID (-2)", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
 }
 
 func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
