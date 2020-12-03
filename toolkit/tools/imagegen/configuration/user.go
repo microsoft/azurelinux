@@ -81,7 +81,7 @@ func (p *User) UIDIsValid() (err error) {
 			return fmt.Errorf("failed to convert UID (%s) to a number", p.UID)
 		}
 		if uidNum < uidLowerBound || uidNum > uidUpperBound {
-			return fmt.Errorf("invalid value for UID (%s), not within [0, 60000]", p.UID)
+			return fmt.Errorf("invalid value for UID (%s), not within [%d, %d]", p.UID, uidLowerBound, uidUpperBound)
 		}
 	}
 	return
@@ -95,7 +95,7 @@ func (p *User) PasswordExpiresDaysIsValid() (err error) {
 		upperBoundChage = 99999
 	)
 	if p.PasswordExpiresDays < noExpiration || p.PasswordExpiresDays > upperBoundChage {
-		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [-1, 99999]", p.PasswordExpiresDays)
+		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [%d, %d]", p.PasswordExpiresDays, noExpiration, upperBoundChage)
 	}
 	return
 }
