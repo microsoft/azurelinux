@@ -104,9 +104,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 
 	if strings.TrimSpace(inputSummaryFile) == "" {
 		// Cache an RPM for each unresolved node in the graph.
+		fetchedPackages := make(map[string]bool)
 		for _, n := range dependencyGraph.AllRunNodes() {
 			if n.State == pkggraph.StateUnresolved {
-				resolveErr := resolveSingleNode(cloner, n, *outDir)
+				resolveErr := resolveSingleNode(cloner, n, fetchedPackages, *outDir)
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
@@ -146,8 +147,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	return
 }
 
-// resolveSingleNode caches the RPM for a single node
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, outDir string) (err error) {
+// resolveSingleNode caches the RPM for a single node.
+// It will modify fetchedPackages on a successful package clone.
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, fetchedPackages map[string]bool, outDir string) (err error) {
 	const cloneDeps = true
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
@@ -166,6 +168,11 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
+	// Skip fetching packages that have already been fetched.
+	if fetchedPackages[resolvedPackage] {
+		return
+	}
+
 	desiredPackage := &pkgjson.PackageVer{
 		Name: resolvedPackage,
 	}
@@ -175,6 +182,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
 		return
 	}
+	fetchedPackages[resolvedPackage] = true
 
 	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", resolvedPackage)
