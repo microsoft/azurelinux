@@ -2,8 +2,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.72
-Release:        5%{?dist}
+Version:        5.4.81
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -408,6 +408,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+
 * Wed Nov 25 2020 Chris Co <chrco@microsoft.com> - 5.4.72-5
 - Add patch to publish efi tpm event log on ARM
 
