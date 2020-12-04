@@ -123,7 +123,7 @@ func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
 
 func TestShouldFailParsingBadUserUID_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
-	
+
 	badUserConfig := validSystemConfig
 	// Copy the current users (via append to get a copy), then mangle one
 	badUsers := append([]User{}, validSystemConfig.Users...)
