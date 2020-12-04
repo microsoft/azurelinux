@@ -14,8 +14,7 @@ Source1:        config
 Source2:        config_aarch64
 # Arm64 HyperV support required patch
 Patch0:         ver5_4_72_arm64_hyperv_support.patch
-Patch1:         0001-Drivers-hv-vmbus-Allow-cleanup-of-VMBUS_CONNECT_CPU-.patch
-Patch2:         0002-efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
+Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -206,7 +205,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %endif
 
 %patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -429,6 +427,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
 - Update source to 5.4.81
+- Remove patch for kexec in HyperV. Integrated in 5.4.81.
 - Address CVE-2020-25705, CVE-2020-15436, CVE-2020-28974, CVE-2020-29368,
   CVE-2020-29369, CVE-2020-29370, CVE-2020-29374, CVE-2020-29373, CVE-2020-28915,
   CVE-2020-28941, CVE-2020-27675, CVE-2020-15437, CVE-2020-29371, CVE-2020-29372,
