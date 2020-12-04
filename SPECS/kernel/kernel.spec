@@ -100,6 +100,25 @@ Patch1073:      CVE-1999-0656.nopatch
 Patch1074:      CVE-2010-4563.nopatch
 Patch1075:      CVE-2019-20794.nopatch
 Patch1076:      CVE-1999-0524.nopatch
+Patch1077:      CVE-2020-25705.nopatch
+Patch1078:      CVE-2020-15436.nopatch
+Patch1079:      CVE-2020-28974.nopatch
+Patch1080:      CVE-2020-29368.nopatch
+Patch1081:      CVE-2020-29369.nopatch
+Patch1082:      CVE-2020-29370.nopatch
+Patch1083:      CVE-2020-29374.nopatch
+Patch1084:      CVE-2020-29373.nopatch
+Patch1085:      CVE-2020-28915.nopatch
+Patch1086:      CVE-2020-28941.nopatch
+Patch1087:      CVE-2020-27675.nopatch
+Patch1088:      CVE-2020-15437.nopatch
+Patch1089:      CVE-2020-29371.nopatch
+# CVE-2020-29372 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1090:      CVE-2020-29372.nopatch
+# CVE-2020-27194 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1091:      CVE-2020-27194.nopatch
+# CVE-2020-27152 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1092:      CVE-2020-27152.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -410,6 +429,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
 - Update source to 5.4.81
+- Address CVE-2020-25705, CVE-2020-15436, CVE-2020-28974, CVE-2020-29368,
+  CVE-2020-29369, CVE-2020-29370, CVE-2020-29374, CVE-2020-29373, CVE-2020-28915,
+  CVE-2020-28941, CVE-2020-27675, CVE-2020-15437, CVE-2020-29371, CVE-2020-29372,
+  CVE-2020-27194, CVE-2020-27152
 
 * Wed Nov 25 2020 Chris Co <chrco@microsoft.com> - 5.4.72-5
 - Add patch to publish efi tpm event log on ARM
