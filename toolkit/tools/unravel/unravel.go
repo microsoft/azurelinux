@@ -69,6 +69,8 @@ func main() {
 		}
 
 		if *runCheck == "y" {
+			logger.Log.Warn("Running package tests (make argument 'RUN_CHECK' set to 'y'). Will add the 'ca-certificates' package and enable networking for package builds.")
+
 			checkSetting = " --run-check "
 		} else {
 			checkSetting = " "
