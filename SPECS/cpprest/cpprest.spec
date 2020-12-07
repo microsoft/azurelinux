@@ -3,7 +3,7 @@
 
 Name:           cpprest
 Version:        2.10.14
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
@@ -16,6 +16,8 @@ Patch1:         cpprest-2.10.9-disable-outside-and-failing-tests.patch
 Patch2:         cpprest-2.10.9-disable-tests-long-timeouts.patch
 # Disable test extract_floating_point, which fails on ppc64le and aarch64
 Patch3:         cpprest-2.10.9-disable-test-extract_floating_point.patch
+# Add support for oauth2 'client_credentials' grant type.
+Patch4:         cpprest-2.10.14-Add-support-for-oauth2-using-client-credentials.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  boost-devel >= 1.55
@@ -50,6 +52,7 @@ Development files.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 # Remove bundled sources of websocketpp
 rm -r Release/libs
 # Remove file ThirdPartyNotices.txt, which is associated to websocketpp
@@ -91,6 +94,9 @@ cd Release/build.release/Binaries
 
 
 %changelog
+* Mon Dec 14 2020 Andrew Beltrano <anbeltra@microsoft.com> - 2.10.14-7
+- Add cpprest-2.10.14-Add-support-for-oauth2-using-client-credentials.patch.
+
 * Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> - 2.10.14-6
 - Remove -DBUILD_TESTS=OFF to allow running tests
 
