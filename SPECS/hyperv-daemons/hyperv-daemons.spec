@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.4.72
-Release:        3%{?dist}
+Version:        5.4.81
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -218,6 +218,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+
 * Fri Nov 20 2020 Johnson George <johgeorg@microsoft.com> - 5.4.72-3
 - Added network configure script to support ip injection
 
