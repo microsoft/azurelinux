@@ -95,7 +95,7 @@ rm -rf $RPM_BUILD_ROOT
 -   Use meson test in check section.
 *   Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-5
 -   Fix compilation issue with LDFLAGS and switch build to call meson directly.
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.4.4-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.4.4-4
 -   Added %%license line automatically
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.4.4-3
 -   Add a patch to replace occurences of mesontest with "meson test" after meson deprecated mesontest binary.
