@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "apache-maven-3.5.4-bin.tar.gz": "ce50b1c91364cb77efe3776f756a6d92b76d9038b0a0782f7d53acf1e997a14d",
-  "apache-maven-3.5.4-licenses.tar.gz": "233c7d392a6267d586e81970ebd4d792b24e743d728e419fc8c4854b3a80e4da",
-  "apache-maven-3.5.4-m2.tar.gz": "da84471232c52c29edd7b2056de9be415f3605a01ebdc6f41529ec6eca82df95",
-  "apache-maven-3.5.4-src.tar.gz": "f3ba1f1b24bbd4c345174ac616d40e26e72dad6022d56317d3ff6f7dd003e2f5"
- }
-}
