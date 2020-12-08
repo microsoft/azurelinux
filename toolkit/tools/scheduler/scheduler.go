@@ -348,8 +348,10 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	if err != nil {
 		logger.Log.Errorf("Failed to add implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
 	} else if didInjectAny {
-		newGraph, newGoalNode, err = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
-		if err == nil {
+		// Failure to optimize the graph is non fatal as there may simply be unresolved dynamic dependencies
+		var subgraphErr error
+		newGraph, newGoalNode, subgraphErr = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
+		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true
 		}
