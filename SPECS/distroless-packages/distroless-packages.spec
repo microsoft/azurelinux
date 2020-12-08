@@ -11,6 +11,12 @@ Distribution:   Mariner
 %description
 Metapackage holding sets of core packages for different applications.
 
+%package minimal
+Summary: The smallest useful package list.
+Requires: filesystem
+Requires: ca-certificates-prebuilt
+Requires: mariner-release
+
 %package base
 Summary: Metapackage defining the basic set of packages (no kernel) used to create a "distroless" container.
 
@@ -37,6 +43,8 @@ Requires: %{name}-base = %{version}-%{release}
 %prep
 
 %build
+
+%files minimal
 
 %files base
 
