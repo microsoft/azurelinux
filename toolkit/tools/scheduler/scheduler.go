@@ -284,8 +284,18 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 				// If the graph has already been optimized and is now solvable without any additional information
 				// then skip processing any new implicit provides.
 				if !isGraphOptimized {
-					didOptimize, newGraph, newGoalNode := updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit)
-					if didOptimize {
+					var (
+						didOptimize bool
+						newGraph    *pkggraph.PkgGraph
+						newGoalNode *pkggraph.PkgNode
+					)
+					didOptimize, newGraph, newGoalNode, err = updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit)
+					if err != nil {
+						// Failures to manipulate the graph are fatal.
+						// There is no guarantee the graph is still a directed acyclic graph and is solvable.
+						stopBuilding = true
+						stopBuild(channels, buildState)
+					} else if didOptimize {
 						isGraphOptimized = true
 						// Replace the graph and goal node pointers.
 						// Any outstanding builds of nodes that are no longer in the graph will gracefully handle this.
@@ -329,17 +339,19 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
 // It will also attempt to subgraph the graph if it becomes solvable with the new implicit provides.
-func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode) {
+func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 
 	didInjectAny, err := schedulerutils.InjectMissingImplicitProvides(res, pkgGraph, useCachedImplicit)
 	if err != nil {
-		logger.Log.Warnf("Failed to inject any missing implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
+		logger.Log.Errorf("Failed to add implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
 	} else if didInjectAny {
-		newGraph, newGoalNode, err = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
-		if err == nil {
+		// Failure to optimize the graph is non fatal as there may simply be unresolved dynamic dependencies
+		var subgraphErr error
+		newGraph, newGoalNode, subgraphErr = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
+		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true
 		}

@@ -12,12 +12,14 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/encoding"
 	"gonum.org/v1/gonum/graph/encoding/dot"
 	"gonum.org/v1/gonum/graph/simple"
+	"gonum.org/v1/gonum/graph/topo"
 	"gonum.org/v1/gonum/graph/traverse"
 
 	"microsoft.com/pkggen/internal/logger"
@@ -1118,6 +1120,87 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 	}
 	deepCopy = NewPkgGraph()
 	err = ReadDOTGraph(deepCopy, &buf)
+	return
+}
+
+// MakeDAG ensures the graph is a directed acyclic graph (DAG).
+// If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
+func (g *PkgGraph) MakeDAG() (err error) {
+	cycles := topo.DirectedCyclesIn(g)
+
+	// Try to fix the cycles if we can before reporting them
+	// Keep track of which cycles we've failed to fix
+	unfixableCycleCount := 0
+	for len(cycles) > 0 {
+		cycle := cycles[0]
+		// Convert our list to pkggraph.PkgNodes
+		pkgCycle := make([]*PkgNode, 0, len(cycle))
+		for _, node := range cycle {
+			pkgCycle = append(pkgCycle, node.(*PkgNode).This)
+		}
+
+		err = g.fixCycle(pkgCycle)
+		if err != nil {
+			var cycleStringBuilder strings.Builder
+			fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
+			for _, node := range pkgCycle[1:] {
+				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+			}
+			logger.Log.Errorf("Unfixable circular dependency found %d:\t%s\terror: %s", unfixableCycleCount, cycleStringBuilder.String(), err)
+			unfixableCycleCount++
+		}
+
+		if unfixableCycleCount > 0 {
+			err = fmt.Errorf("cycles detected in dependency graph")
+			return err
+		}
+
+		// Recalculate the list of cycles
+		cycles = topo.DirectedCyclesIn(g)
+	}
+	return
+}
+
+// fixCycle attempts to fix a cycle. Cycles may be acceptable if all nodes are from the same spec file.
+// If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
+func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
+	srpmPath := cycle[0].SrpmPath
+	// Omit the first element of the cycle, since it is repeated as the last element
+	trimmedCycle := cycle[1:]
+	logger.Log.Debugf("Found cycle starting at %s", cycle[0].FriendlyName())
+
+	// For each node, remove any edges which point to other nodes in the cycle, and move any remaining dependencies to a new
+	// meta node, then have everything in the cycle depend on the new meta node.
+	groupedDependencies := make(map[int64]bool)
+	for _, currentNode := range trimmedCycle {
+		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
+		if currentNode.Type == TypeBuild {
+			return fmt.Errorf("cycle contains build dependencies, unresolvable")
+		}
+		// Remove all links to other members of the cycle
+		for _, nodeInCycle := range trimmedCycle {
+			g.RemoveEdge(currentNode.ID(), nodeInCycle.ID())
+		}
+
+		// Record any other dependencies the nodes have (ie, where can we get to from here), then remove them
+		fromNodes := graph.NodesOf(g.From(currentNode.ID()))
+		for _, from := range fromNodes {
+			groupedDependencies[from.ID()] = true
+			g.RemoveEdge(currentNode.ID(), from.ID())
+		}
+	}
+
+	// Convert the IDs back into actual nodes
+	dependencyNodes := make([]*PkgNode, 0, len(groupedDependencies))
+	for id := range groupedDependencies {
+		dependencyNodes = append(dependencyNodes, g.Node(id).(*PkgNode).This)
+	}
+
+	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
+
+	// Enable cycle detection between meta nodes within the same srpm file
+	metaNode.SrpmPath = srpmPath
+
 	return
 }
 
