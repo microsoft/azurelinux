@@ -94,7 +94,7 @@ cd Release/build.release/Binaries
 
 
 %changelog
-* Mon Dec 7 2020 Andrew Beltrano <anbeltra@microsoft.com> 2.10.14-6
+* Mon Dec 07 2020 Andrew Beltrano <anbeltra@microsoft.com> - 2.10.14-6
 - Add cpprest-2.10.14-Add-support-for-oauth2-using-client-credentials.patch.
 
 * Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.10.14-5
