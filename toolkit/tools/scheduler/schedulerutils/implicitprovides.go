@@ -43,6 +43,8 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 	}
 
+	// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
+	err = pkgGraph.MakeDAG()
 	return
 }
 
