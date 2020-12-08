@@ -354,16 +354,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "busybox",
-          "version": "1.31.1",
-          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.31.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
