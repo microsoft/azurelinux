@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        OpenSSL
 URL:            http://www.openssl.org/
 Group:          System Environment/Security
@@ -257,6 +257,9 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon Dec 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.1.1g-8
+- Remove binaries (such as bash) from requires list
+
 * Tue Nov 10 2020 Johnson George <johgeorg@microsoft.com> 1.1.1g-7
 - Updated the config option to enable package test
 

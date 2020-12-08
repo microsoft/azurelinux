@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -307,6 +307,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+
+* Mon Dec 07 2020 Mateusz Malisz <mamalisz@microsoft.com> - 2.28-15
+- Exclude binaries(such as bash) from requires list.
+
 * Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-14
 - Patch CVE-2019-19126
 
