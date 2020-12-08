@@ -857,7 +857,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		}
 
 		err = installChroot.UnsafeRun(func() error {
-			return chage("-1", "root")
+			return chage(-1, "root")
 		})
 	}
 	return
@@ -949,7 +949,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 
 		err = installChroot.UnsafeRun(func() error {
-			return chage(fmt.Sprintf("%d", user.PasswordExpiresDays), user.Name)
+			return chage(user.PasswordExpiresDays, user.Name)
 		})
 	}
 
@@ -958,19 +958,13 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 // chage works in the same way as invoking "chage -M passwordExpirationInDays username"
 // i.e. it sets the maximum password expiration date.
-func chage(passwordExpirationInDays string, username string) (err error) {
+func chage(passwordExpirationInDays int64, username string) (err error) {
 	var (
-		shadow             []string
-		passwordExpiration int64
-		usernameWithColon  = fmt.Sprintf("%s:", username)
+		shadow            []string
+		usernameWithColon = fmt.Sprintf("%s:", username)
 	)
 
 	shadow, err = file.ReadLines(shadowFile)
-	if err != nil {
-		return
-	}
-
-	passwordExpiration, err = strconv.ParseInt(passwordExpirationInDays, 10, 64)
 	if err != nil {
 		return
 	}
@@ -1002,20 +996,20 @@ func chage(passwordExpirationInDays string, username string) (err error) {
 				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": 9 fields expected, but %d found.`, fields, username, len(fields))
 			}
 
-			if passwordExpiration == -1 {
-				// If passwordExpiration is equal to -1, it means that password never expires.
+			if passwordExpirationInDays == -1 {
+				// If passwordExpirationInDays is equal to -1, it means that password never expires.
 				// This is expressed by leaving account expiration date field (and fields after it) empty.
 				for _, fieldToChange := range []int{maxPasswordAgeField, warnPeriodField, inactivityPeriodField, expirationField, reservedField} {
 					fields[fieldToChange] = ""
 				}
 				// Each user is unique, so we are done here; save the changes and exit.
 				done = true
-			} else if passwordExpiration < -1 {
+			} else if passwordExpirationInDays < -1 {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration: %d`, username, passwordExpiration)
+				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration: %d`, username, passwordExpirationInDays)
 			} else {
-				// If passwordExpiration has any other value, it's the maximum expiration date: set it accordingly
-				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpiration.
+				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
+				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.
 				var (
 					passwordAge     int64
 					passwordChanged = fields[passwordChangedField]
@@ -1029,7 +1023,7 @@ func chage(passwordExpirationInDays string, username string) (err error) {
 				if err != nil {
 					return
 				}
-				fields[expirationField] = fmt.Sprintf("%d", passwordAge+passwordExpiration)
+				fields[expirationField] = fmt.Sprintf("%d", passwordAge+passwordExpirationInDays)
 
 				//Each user is unique, so we are done here; save the changes and exit.
 				done = true
