@@ -17,7 +17,7 @@ Summary: Metapackage defining the basic set of packages (no kernel) used to crea
 Requires: filesystem
 Requires: tzdata
 Requires: iana-etc
-Requires: ca-certificates-static
+Requires: ca-certificates-prebuilt
 Requires: mariner-release
 Requires: openssl
 Requires: openssl-libs
