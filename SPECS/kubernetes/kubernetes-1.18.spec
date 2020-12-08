@@ -19,8 +19,13 @@ Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
 #               Download URL https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.8-hotfix.20200924/binaries/kubernetes-node-linux-amd64.tar.gz
-Source0:        kubernetes-node-linux-%{archname}-%{version}-hotfix.20200924.tar.gz
+#               Note that only amd64 tarball exist which is OK since kubernetes is built from source
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20200924.tar.gz
 Source1:        kubelet.service
+BuildRequires:  golang >= 1.13.15
+BuildRequires:  rsync
+BuildRequires:  which
+BuildRequires:  flex-devel
 BuildRequires:  systemd-devel
 Requires:       cni
 Requires:       cri-tools
@@ -35,7 +40,6 @@ Requires(postun): %{_sbindir}/groupdel
 Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
-ExclusiveArch:  x86_64
 
 %description
 Microsoft Kubernetes %{version}.
@@ -55,10 +59,45 @@ Requires:       moby-cli
 Bootstrap utilities for Microsoft Kubernetes %{version}.
 
 %prep
-%setup -q -D -T -b 0 -n kubernetes
+%setup -q -D -T -b 0 -n %{name}
 
+# note: kubernetes RPM can be build from binaries provided in source0 tarball
+#       by doing nothing in %build and %check sections
 %build
-echo "Nothing to build. Picking up binaries."
+# expand kubernetes source tarball (which is included source0 tarball)
+echo "+++ extract sources from tarball"
+mkdir -p %{_builddir}/%{name}/src
+cd %{_builddir}/%{name}/src
+tar -xof %{_builddir}/%{name}/kubernetes-src.tar.gz
+
+# build and update kubernetes components that are provided as binary
+# (other/unused kubernetes componenents will not be built)
+components_to_build=$(ls -1 %{_builddir}/%{name}/node/bin)
+for component in ${components_to_build}; do
+  echo "+++ building ${component}"
+  make WHAT=cmd/${component}
+  cp -f _output/local/bin/linux/%{archname}/${component} %{_builddir}/%{name}/node/bin
+done
+
+%check
+cd %{_builddir}/%{name}/src
+components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
+
+# perform unit tests
+# Note:
+#   - components are not unit tested the same way
+#   - not all components have unit
+for component in ${components_to_test}; do
+  if [[ ${component} == "kubelet" || ${component} == "kubectl" ]]; then
+    echo "+++ unit test pkg ${component}"
+    make test WHAT=./pkg/${component}
+  elif [[ ${component} == "kube-proxy" ]]; then
+    echo "+++ unit test pkg ${component}"
+    make test WHAT=./pkg/proxy
+  else
+    echo "+++ no unit test available for ${component}"
+  fi
+done
 
 %install
 # install binaries
@@ -67,7 +106,7 @@ cd %{_builddir}
 binaries=(kubelet kubectl kubeadm)
 for bin in "${binaries[@]}"; do
   echo "+++ INSTALLING ${bin}"
-  install -p -m 755 -t %{buildroot}%{_bindir} kubernetes/node/bin/${bin}
+  install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/${bin}
 done
 
 # install service files
@@ -89,7 +128,6 @@ EOF
 
 %clean
 rm -rf %{buildroot}/*
-
 
 %pre
 if [ $1 -eq 1 ]; then
