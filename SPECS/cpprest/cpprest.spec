@@ -1,13 +1,14 @@
 %define major 2
 %define minor 10
-
+Summary:        C++ REST library
 Name:           cpprest
 Version:        2.10.14
 Release:        5%{?dist}
-Summary:        C++ REST library
-Group:          Applications/File
 License:        MIT
-Url:            https://github.com/Microsoft/cpprestsdk
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Applications/File
+URL:            https://github.com/Microsoft/cpprestsdk
 #Source0:       https://github.com/Microsoft/cpprestsdk/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Disable outside, failing and sometimes failing tests
@@ -18,13 +19,11 @@ Patch2:         cpprest-2.10.9-disable-tests-long-timeouts.patch
 Patch3:         cpprest-2.10.9-disable-test-extract_floating_point.patch
 # Add support for oauth2 'client_credentials' grant type.
 Patch4:         cpprest-2.10.14-Add-support-for-oauth2-using-client-credentials.patch
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 BuildRequires:  boost-devel >= 1.55
-BuildRequires:  cmake >= 3.1
-BuildRequires:  websocketpp-devel
 BuildRequires:  brotli-devel
+BuildRequires:  cmake >= 3.1
 BuildRequires:  openssl >= 1.0
+BuildRequires:  websocketpp-devel
 BuildRequires:  zlib
 
 %description
@@ -48,7 +47,7 @@ project aims to help C++ developers connect to and interact with services.
 Development files.
 
 %prep
-%setup -n cpprestsdk-%{version}
+%setup -q -n cpprestsdk-%{version}
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -77,7 +76,6 @@ cd Release/build.release/Binaries
 ./test_runner *_test.so ||:
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
@@ -91,7 +89,6 @@ cd Release/build.release/Binaries
 %{_includedir}/pplx
 %{_libdir}/libcpprest.so
 %{_libdir}/cmake/cpprestsdk
-
 
 %changelog
 * Mon Dec 07 2020 Andrew Beltrano <anbeltra@microsoft.com> - 2.10.14-6
