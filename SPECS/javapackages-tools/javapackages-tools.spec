@@ -9,13 +9,14 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
 #Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         remove-epoch-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 BuildRequires:  java-devel
@@ -83,6 +84,7 @@ It is a lightweight version with minimal runtime requirements.
 
 %prep
 %setup -q -n javapackages-%{version}
+%patch0 -p1
 
 %build
 %define jdk_home $(find %{_lib}/jvm -name "OpenJDK*")
@@ -117,6 +119,9 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-11
+- Add remove-epoch-from-java-requires.patch to remove epoch from java versions during dependency generation.
+
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Dynamically calculate jdk and jre paths.
