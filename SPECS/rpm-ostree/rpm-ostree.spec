@@ -1,17 +1,14 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2019.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/projectatomic/rpm-ostree
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/projectatomic/rpm-ostree/releases/download/v%{version}/rpm-ostree-%{version}.tar.xz
-%define sha1    rpm-ostree=982c3b335debe04763c0b0b8769f7e43229beebc
 Source1:        libglnx-470af87.tar.gz
-%define sha1    libglnx=ed1ee84156ff0d9e70b551a7932fda79fb59e8d4
 Source2:        libdnf-d8e481b.tar.gz
-%define sha1    libdnf=dde7dd434d715c46c7e91c179caccb6eaff2bdd5
 ExclusiveArch:  x86_64
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
@@ -57,6 +54,10 @@ BuildRequires:  dbus
 BuildRequires:  rust
 BuildRequires:  libmodulemd-devel
 BuildRequires:  gpgme-devel
+
+%if %{with_check}
+BuildRequires:  python3-pygobject
+%endif
 
 Requires:       libcap
 Requires:       librepo
@@ -118,6 +119,15 @@ install -d %{buildroot}%{_bindir}/rpm-ostree-host
 install -d %{buildroot}%{_bindir}/rpm-ostree-server
 
 %check
+# Fixing tests:
+# 1. Switching tests to use Python 3, since CBL-Mariner doesn't support pygobject for Python 2.
+# 2. Using the 'uname -m' command instead of unsupported 'arch'.
+# 3. Disabling 'ucontainer' tests. Upstream removes them in never versions along with the feature
+#    related to the test as it is considered not ready: https://github.com/coreos/rpm-ostree/pull/2344.
+sed -i 's|/usr/bin/python2|/usr/bin/python3|g' tests/check/test-lib-introspection.sh
+sed -i 's|$(arch)|$(uname -m)|g' tests/check/test-lib-introspection.sh
+sed -i '/test-ucontainer.sh/d' Makefile-tests.am
+
 make check
 
 %files
@@ -147,16 +157,20 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Sat May 09 00:20:55 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019.3-6
+* Tue Dec 08 2020 Pawel Wingrodzki <pawelwi@microsoft.com> - 2019.3-7
+- Fixing 'lib-introspection' test.
+- Skipping 'ucontainer' test.
+- Removing 'sha1' macros.
+- License verified.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2019.3-6
 - Added %%license line automatically
-
-*   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.3-5
--   Renaming docbook-xsl to docbook-style-xsl
-*   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.3-4
--   Replace BuildArch with ExclusiveArch
-*   Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 2019.3-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 20 2019 Ankit Jain <ankitja@vmware.com> 2019.3-2
--   Added script to create repo data to act as ostree-server
-*   Tue May 14 2019 Ankit Jain <ankitja@vmware.com> 2019.3-1
--   Initial version of rpm-ostree
+* Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> - 2019.3-5
+- Renaming docbook-xsl to docbook-style-xsl
+* Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> - 2019.3-4
+- Replace BuildArch with ExclusiveArch
+* Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> - 2019.3-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Sep 20 2019 Ankit Jain <ankitja@vmware.com> - 2019.3-2
+- Added script to create repo data to act as ostree-server
+* Tue May 14 2019 Ankit Jain <ankitja@vmware.com> - 2019.3-1
+- Initial version of rpm-ostree
