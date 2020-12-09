@@ -82,7 +82,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_datadir}/autoconf-%{version}/
  
 %changelog
-*   Mon Dev 07 2020 Andrew Phelps <anphel@microsoft.com> 2.13-47
+*   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 2.13-47
 -   Fix check tests.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-46
 -   Added %%license line automatically
