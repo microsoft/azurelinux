@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source0:        http://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2020-8284.patch
 Patch1:         CVE-2020-8285.patch
+Patch2:         CVE-2020-8286.patch
 BuildRequires:  openssl-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
@@ -92,6 +93,7 @@ rm -rf %{buildroot}/*
 *   Wed Dec 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.68.0-3
 -   Patch CVE-2020-8284
 -   Patch CVE-2020-8285
+-   Patch CVE-2020-8286
 *   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-2
 -   Updating certificate bundle path to include full set of trust information.
 *   Tue Aug 11 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.68.0-1
