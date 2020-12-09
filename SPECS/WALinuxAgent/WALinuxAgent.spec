@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.2.38
-Release:        4%{?dist}
+Version:        2.2.51
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +80,10 @@ python2 setup.py check && python2 setup.py test
 %{_lib}/python2.7/site-packages/*
 
 %changelog
+* Tue Dec 08 2020 Henry Li <lihl@microsoft.com> - 2.2.51-1
+- Upgrade to version 2.2.51
+- Update add-distro.patch
+
 * Tue Dec 01 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.2.38-4
 - Move "waagent" and "waagent2.0" from bindir to sbindir
 
