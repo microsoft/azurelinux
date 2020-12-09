@@ -1,8 +1,6 @@
-diff --git a/azurelinuxagent/common/osutil/factory.py b/azurelinuxagent/common/osutil/factory.py
-index 69f8430..ccce572 100644
---- a/azurelinuxagent/common/osutil/factory.py
-+++ b/azurelinuxagent/common/osutil/factory.py
-@@ -24,6 +24,7 @@ from .alpine import AlpineOSUtil
+--- a/azurelinuxagent/common/osutil/factory.py	2020-09-29 11:31:13.000000000 -0700
++++ b/azurelinuxagent/common/osutil/factory.py	2020-12-08 14:54:58.878191794 -0800
+@@ -24,6 +24,7 @@
  from .arch import ArchUtil
  from .bigip import BigIpOSUtil
  from .clearlinux import ClearLinuxUtil
@@ -10,7 +8,7 @@ index 69f8430..ccce572 100644
  from .coreos import CoreOSUtil
  from .debian import DebianOSBaseUtil, DebianOSModernUtil
  from .default import DefaultOSUtil
-@@ -57,6 +58,9 @@ def _get_osutil(distro_name, distro_code_name, distro_version, distro_full_name)
+@@ -57,6 +58,9 @@
  
      if "Clear Linux" in distro_full_name:
          return ClearLinuxUtil()
@@ -20,12 +18,9 @@ index 69f8430..ccce572 100644
  
      if distro_name == "ubuntu":
          if Version(distro_version) in [Version("12.04"), Version("12.10")]:
-diff --git a/azurelinuxagent/common/osutil/mariner.py b/azurelinuxagent/common/osutil/mariner.py
-new file mode 100644
-index 0000000..da8fdad
---- /dev/null
-+++ b/azurelinuxagent/common/osutil/mariner.py
-@@ -0,0 +1,88 @@
+--- a/azurelinuxagent/common/osutil/mariner.py	2020-12-08 22:14:27.843117432 -0800
++++ b/azurelinuxagent/common/osutil/mariner.py	2020-12-08 22:52:05.926318033 -0800
+@@ -0,0 +1,89 @@
 +#
 +# Copyright 2017 Microsoft Corporation
 +#
@@ -65,6 +60,7 @@ index 0000000..da8fdad
 +    def __init__(self):
 +        super(MarinerOSUtil, self).__init__()
 +        self.agent_conf_file_path = '/etc/waagent.conf'
++        self.jit_enabled = True
 +
 +    def is_dhcp_enabled(self):
 +        return True
@@ -115,11 +111,9 @@ index 0000000..da8fdad
 +            raise OSUtilError("Failed to delete root password:{0}".format(e))
 +        pass
 \ No newline at end of file
-diff --git a/azurelinuxagent/common/version.py b/azurelinuxagent/common/version.py
-index 5a7f141..2cd3aaf 100644
---- a/azurelinuxagent/common/version.py
-+++ b/azurelinuxagent/common/version.py
-@@ -100,6 +100,9 @@ def get_distro():
+--- a/azurelinuxagent/common/version.py	2020-09-29 11:31:13.000000000 -0700
++++ b/azurelinuxagent/common/version.py	2020-12-08 14:58:51.840248635 -0800
+@@ -100,6 +100,9 @@
  
      if os.path.exists("/etc/euleros-release"):
          osinfo[0] = "euleros"
@@ -129,11 +123,8 @@ index 5a7f141..2cd3aaf 100644
  
      # The platform.py lib has issue with detecting BIG-IP linux distribution.
      # Merge the following patch provided by F5.
-diff --git a/config/mariner/waagent.conf b/config/mariner/waagent.conf
-new file mode 100644
-index 0000000..65da131
---- /dev/null
-+++ b/config/mariner/waagent.conf
+--- a/config/mariner/waagent.conf	2020-12-08 22:15:55.038466254 -0800
++++ b/config/mariner/waagent.conf	2020-12-08 15:06:48.272503589 -0800
 @@ -0,0 +1,80 @@
 +# Microsoft Azure Linux Agent Configuration
 +#
@@ -215,11 +206,8 @@ index 0000000..65da131
 +# handling until inVMArtifactsProfile.OnHold is false.
 +# Default is disabled
 +# EnableOverProvisioning=n
-diff --git a/init/mariner/waagent.service b/init/mariner/waagent.service
-new file mode 100644
-index 0000000..9204a53
---- /dev/null
-+++ b/init/mariner/waagent.service
+--- a/init/mariner/waagent.service	2020-12-08 22:16:40.614123434 -0800
++++ b/init/mariner/waagent.service	2020-12-08 15:06:44.940529116 -0800
 @@ -0,0 +1,16 @@
 +[Unit]
 +Description=Azure Linux Agent
@@ -237,11 +225,9 @@ index 0000000..9204a53
 +
 +[Install]
 +WantedBy=multi-user.target
-diff --git a/setup.py b/setup.py
-index 372807f..3e3b003 100755
---- a/setup.py
-+++ b/setup.py
-@@ -116,6 +116,12 @@ def get_data_files(name, version, fullname):
+--- a/setup.py	2020-09-29 11:31:13.000000000 -0700
++++ b/setup.py	2020-12-08 15:04:44.289458366 -0800
+@@ -116,6 +116,12 @@
                         src=["config/clearlinux/waagent.conf"])
          set_systemd_files(data_files, dest='/usr/lib/systemd/system',
                            src=["init/clearlinux/waagent.service"])
