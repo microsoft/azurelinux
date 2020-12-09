@@ -1,5 +1,4 @@
 diff --git a/depgenerators/maven.req b/depgenerators/maven.req
-index b3597f7..1179ffc 100755
 --- a/depgenerators/maven.req
 +++ b/depgenerators/maven.req
 @@ -295,9 +295,9 @@ class TagBuilder(object):
