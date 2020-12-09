@@ -1,0 +1,263 @@
+diff --git a/td-agent/Rakefile b/td-agent/Rakefile
+index 24f56f5..7b07b66 100755
+--- a/td-agent/Rakefile
++++ b/td-agent/Rakefile
+@@ -146,8 +146,10 @@ class DownloadTask
+     url_base = "https://github.com/jemalloc/jemalloc/releases/download/"
+     @file_jemalloc_source = File.join(DOWNLOADS_DIR, filename)
+     file @file_jemalloc_source do
+-      url = "#{url_base}/#{version}/#{filename}"
+-      download_file(url, filename)
++      ensure_directory(DOWNLOADS_DIR) do
++        cp("/usr/src/mariner/SOURCES/#{filename}", DOWNLOADS_DIR)
++        sh("tar", "xvf", "#{filename}")
++      end
+     end
+   end
+ 
+@@ -167,7 +169,10 @@ class DownloadTask
+     @file_ruby_source = File.join(DOWNLOADS_DIR, filename)
+ 
+     file @file_ruby_source do
+-      download_file(url, filename, sha256sum)
++      ensure_directory(DOWNLOADS_DIR) do
++        cp("/usr/src/mariner/SOURCES/#{filename}", DOWNLOADS_DIR)
++        sh("tar", "xzvf", "#{filename}")
++      end
+     end
+   end
+ 
+@@ -181,7 +186,9 @@ class DownloadTask
+     @file_ruby_installer_x64 = File.join(DOWNLOADS_DIR, filename)
+ 
+     file @file_ruby_installer_x64 do
+-      download_file(url, filename, sha256sum)
++      ensure_directory(DOWNLOADS_DIR) do
++        cp("/usr/src/mariner/SOURCES/#{filename}", DOWNLOADS_DIR)
++      end
+     end
+   end
+ 
+@@ -192,12 +199,8 @@ class DownloadTask
+         dirname = "fluentd-#{FLUENTD_REVISION}"
+         rm_rf("fluentd") if File.exists?("fluentd")
+         rm_rf(dirname) if File.exists?(dirname)
+-        sh("git", "clone", "https://github.com/fluent/fluentd.git")
+-        cd("fluentd") do
+-          sh("git", "checkout", FLUENTD_REVISION)
+-        end
+-        mv("fluentd", dirname)
+-        sh("tar", "cvfz", "#{dirname}.tar.gz", dirname)
++        cp("/usr/src/mariner/SOURCES/#{dirname}.tar.gz", DOWNLOADS_DIR)
++        sh("tar", "xzvf", "#{dirname}.tar.gz")
+       end
+     end
+   end
+@@ -264,12 +267,66 @@ class BuildTask
+ 
+       desc "Install core_gems"
+       task :core_gems => [:"download:core_gems", :ruby] do
+-        install_gems(@download_task.files_core_gems)
++        cd(DOWNLOADS_DIR) do
++          ensure_directory("core_gems") do
++            cp("/usr/src/mariner/SOURCES/gemfile.tar.gz", ".")
++            sh("tar", "xvf", "gemfile.tar.gz", "-C", ".")
++            core_gem_path = "#{DOWNLOADS_DIR}/core_gems"
++            core_gems_files = ["#{core_gem_path}/bundler-2.1.4.gem",
++                               "#{core_gem_path}/msgpack-1.3.3.gem",
++                               "#{core_gem_path}/cool.io-1.6.0.gem",
++                               "#{core_gem_path}/serverengine-2.2.1.gem",
++                               "#{core_gem_path}/oj-3.10.6.gem",
++                               "#{core_gem_path}/async-http-0.50.13.gem",
++                               "#{core_gem_path}/http_parser.rb-0.6.0.gem",
++                               "#{core_gem_path}/yajl-ruby-1.4.1.gem",
++                               "#{core_gem_path}/sigdump-0.2.4.gem",
++                               "#{core_gem_path}/tzinfo-2.0.2.gem",
++                               "#{core_gem_path}/tzinfo-data-1.2019.3.gem"]
++
++            install_gems(core_gems_files)
++          end
++        end
+       end
+ 
+       desc "Install plugin_gems"
+       task :plugin_gems => [:"download:plugin_gems", :fluentd] do
+-        install_gems(@download_task.files_plugin_gems)
++        cd(DOWNLOADS_DIR) do
++          ensure_directory("plugin_gems") do
++            cp("/usr/src/mariner/SOURCES/gemfile.tar.gz", ".")
++            sh("tar", "xvf", "gemfile.tar.gz", "-C", ".")
++            plugin_gem_path = "#{DOWNLOADS_DIR}/plugin_gems"
++            plugin_gems_files = ["#{plugin_gem_path}/httpclient-2.8.2.4.gem",
++                                 "#{plugin_gem_path}/td-client-1.0.7.gem",
++                                 "#{plugin_gem_path}/td-0.16.8.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-td-1.1.0.gem",
++                                 "#{plugin_gem_path}/jmespath-1.4.0.gem",
++                                 "#{plugin_gem_path}/aws-partitions-1.288.0.gem",
++                                 "#{plugin_gem_path}/aws-sigv4-1.1.1.gem",
++                                 "#{plugin_gem_path}/aws-sdk-core-3.92.0.gem",
++                                 "#{plugin_gem_path}/aws-sdk-kms-1.30.0.gem",
++                                 "#{plugin_gem_path}/aws-sdk-sqs-1.24.0.gem",
++                                 "#{plugin_gem_path}/aws-sdk-s3-1.61.1.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-s3-1.3.0.gem",
++                                 "#{plugin_gem_path}/webhdfs-0.9.0.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-webhdfs-1.2.4.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-rewrite-tag-filter-2.3.0.gem",
++                                 "#{plugin_gem_path}/ruby-kafka-1.0.0.gem",
++                                 "#{plugin_gem_path}/rdkafka-0.7.0.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-kafka-0.13.0.gem",
++                                 "#{plugin_gem_path}/elasticsearch-7.6.0.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-elasticsearch-4.0.7.gem",
++                                 "#{plugin_gem_path}/prometheus-client-0.9.0.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-prometheus-1.7.3.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-prometheus_pushgateway-0.0.2.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-record-modifier-2.1.0.gem",
++                                 "#{plugin_gem_path}/systemd-journal-1.3.3.gem",
++                                 "#{plugin_gem_path}/fluent-plugin-systemd-1.0.2.gem",
++                                 "#{plugin_gem_path}/nokogiri-1.11.0.rc2.gem"]
++            
++            install_gems(plugin_gems_files)
++          end
++        end
+       end
+ 
+       desc "Install fluentd"
+@@ -278,7 +335,9 @@ class BuildTask
+           archive_path = @download_task.file_fluentd_archive
+           fluentd_dir = archive_path.sub(/\.tar\.gz$/, '')
+           sh("tar", "xvf", archive_path) unless File.exists?(fluentd_dir)
++          cp("/usr/src/mariner/SOURCES/gemfile.tar.gz", "fluentd-#{FLUENTD_REVISION}")
+           cd("fluentd-#{FLUENTD_REVISION}") do
++            sh("tar", "xvf", "gemfile.tar.gz", "-C", ".")
+             sh("rake", "build")
+             gem_install("pkg/fluentd-*.gem")
+           end
+diff --git a/td-agent/core_gems.rb b/td-agent/core_gems.rb
+index b2592e4..7333401 100644
+--- a/td-agent/core_gems.rb
++++ b/td-agent/core_gems.rb
+@@ -1,24 +1,14 @@
+ dir 'core_gems'
+ 
+-download "bundler", "2.1.4"
+-download "msgpack", "1.3.3"
+-download "cool.io", "1.6.0"
+-download 'serverengine', '2.2.1'
+-download "oj", "3.10.6"
+-download "async-http", "0.50.13"
+-download "http_parser.rb", "0.6.0"
+-download "yajl-ruby", "1.4.1"
+-download "sigdump", "0.2.4"
+-download "tzinfo", "2.0.2"
+-download "tzinfo-data", "1.2019.3"
++"/usr/src/mariner/SOURCES/bundler-2.1.4.gem"
++"/usr/src/mariner/SOURCES/msgpack-1.3.3.gem"
++"/usr/src/mariner/SOURCES/cool.io-1.6.0.gem"
++"/usr/src/mariner/SOURCES/serverengine-2.2.1.gem"
++"/usr/src/mariner/SOURCES/oj-3.10.6.gem"
++"/usr/src/mariner/SOURCES/async-http-0.50.13.gem"
++"/usr/src/mariner/SOURCES/http_parser.rb-0.6.0.gem"
++"/usr/src/mariner/SOURCES/yajl-ruby-1.4.1.gem"
++"/usr/src/mariner/SOURCES/sigdump-0.2.4.gem"
++"/usr/src/mariner/SOURCES/tzinfo-2.0.2.gem"
++"/usr/src/mariner/SOURCES/tzinfo-data-1.2019.3.gem"
+ 
+-if windows?
+-  download 'ffi', '1.12.2'
+-  download 'ffi-win32-extensions', '1.0.3'
+-  download 'win32-ipc', '0.7.0'
+-  download 'win32-event', '0.6.3'
+-  download 'win32-service', '2.1.5'
+-  download 'win32-api', '1.8.0-universal-mingw32'
+-  download 'windows-pr', '1.2.6'
+-  download 'windows-api', '0.4.4'
+-end
+diff --git a/td-agent/plugin_gems.rb b/td-agent/plugin_gems.rb
+index 708147d..6ca7961 100644
+--- a/td-agent/plugin_gems.rb
++++ b/td-agent/plugin_gems.rb
+@@ -1,52 +1,42 @@
+ dir 'plugin_gems'
+ 
+-download "httpclient", "2.8.2.4"
+-download "td-client", "1.0.7"
+-download "td", "0.16.8"
+-download "fluent-plugin-td", "1.1.0"
+-
+-download "jmespath", "1.4.0"
+-download "aws-partitions", "1.288.0"
+-download "aws-sigv4", "1.1.1"
+-download "aws-sdk-core", "3.92.0"
+-download "aws-sdk-kms", "1.30.0"
+-download "aws-sdk-sqs", "1.24.0"
+-download "aws-sdk-s3", "1.61.1"
+-download "fluent-plugin-s3", "1.3.0"
+-
+-download "webhdfs", "0.9.0"
+-download "fluent-plugin-webhdfs", "1.2.4"
+-
+-download "fluent-plugin-rewrite-tag-filter", "2.3.0"
+-
+-download "ruby-kafka", "1.0.0"
++"/usr/src/mariner/SOURCES/httpclient-2.8.2.4.gem"
++"/usr/src/mariner/SOURCES/td-client-1.0.7.gem"
++"/usr/src/mariner/SOURCES/td-0.16.8.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-td-1.1.0.gem"
++
++"/usr/src/mariner/SOURCES/jmespath-1.4.0.gem"
++"/usr/src/mariner/SOURCES/aws-partitions-1.288.0.gem"
++"/usr/src/mariner/SOURCES/aws-sigv4-1.1.1.gem"
++"/usr/src/mariner/SOURCES/aws-sdk-core-3.92.0.gem"
++"/usr/src/mariner/SOURCES/aws-sdk-kms-1.30.0.gem"
++"/usr/src/mariner/SOURCES/aws-sdk-sqs-1.24.0.gem"
++"/usr/src/mariner/SOURCES/aws-sdk-s3-1.61.1.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-s3-1.3.0.gem"
++
++"/usr/src/mariner/SOURCES/webhdfs-0.9.0.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-webhdfs-1.2.4.gem"
++
++"/usr/src/mariner/SOURCES/fluent-plugin-rewrite-tag-filter-2.3.0.gem"
++
++"/usr/src/mariner/SOURCES/ruby-kafka-1.0.0.gem"
+ unless windows?
+-  download "rdkafka", "0.7.0"
++  "/usr/src/mariner/SOURCES/rdkafka-0.7.0.gem"
+ end
+-download "fluent-plugin-kafka", "0.13.0"
++"/usr/src/mariner/SOURCES/fluent-plugin-kafka-0.13.0.gem"
+ 
+-download "elasticsearch", "7.6.0"
+-download "fluent-plugin-elasticsearch", "4.0.7"
+-download "prometheus-client", "0.9.0"
+-download "fluent-plugin-prometheus", "1.7.3"
+-download "fluent-plugin-prometheus_pushgateway", "0.0.2"
++"/usr/src/mariner/SOURCES/elasticsearch-7.6.0.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-elasticsearch-4.0.7.gem"
++"/usr/src/mariner/SOURCES/prometheus-client-0.9.0.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-prometheus-1.7.3.gem"
++"/usr/src/mariner/SOURCES/fluent-plugin-prometheus_pushgateway-0.0.2.gem"
+ 
+-download "fluent-plugin-record-modifier", "2.1.0"
++"/usr/src/mariner/SOURCES/fluent-plugin-record-modifier-2.1.0.gem"
+ 
+ unless windows?
+-  download "systemd-journal", "1.3.3"
+-  download "fluent-plugin-systemd", "1.0.2"
++  "/usr/src/mariner/SOURCES/systemd-journal-1.3.3.gem"
++  "/usr/src/mariner/SOURCES/fluent-plugin-systemd-1.0.2.gem"
+ end
+ 
+ # temporal solution for ruby 2.7
+-if windows?
+-  download "nokogiri", "1.11.0.rc2-x64-mingw32"
+-else
+-  download "nokogiri", "1.11.0.rc2"
+-end
+-
+-if windows?
+-  download 'win32-eventlog', '0.6.7'
+-  download 'winevt_c', '0.7.4'
+-  download 'fluent-plugin-windows-eventlog', '0.5.4'
+-end
++"/usr/src/mariner/SOURCES/nokogiri-1.11.0.rc2.gem"
+\ No newline at end of file

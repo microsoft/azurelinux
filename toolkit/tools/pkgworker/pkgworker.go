@@ -289,7 +289,7 @@ func installBuildRequires(defines map[string]string, runCheck bool) (err error) 
 		}
 
 		if runCheck {
-			logger.Log.Warn("Adding the 'ca-certificates' package - needed for package tests (make argument 'RUN_CHECK' set to 'y').")
+			logger.Log.Debug("Adding the 'ca-certificates' package - needed for package tests.")
 
 			installArgs = append(installArgs, caCertificatesPackage)
 		}
@@ -394,7 +394,7 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 	}
 
 	if runCheck {
-		logger.Log.Warn("Enabling network access because we're running package tests (make argument 'RUN_CHECK' set to 'y').")
+		logger.Log.Debug("Enabling network access because we're running package tests.")
 
 		resolvFileCopy := safechroot.FileToCopy{
 			Src:  resolvFilePath,

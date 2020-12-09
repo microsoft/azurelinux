@@ -920,10 +920,15 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		return
 	}
 
+	err = user.PasswordExpiresDaysIsValid()
+	if err != nil {
+		return
+	}
+
 	// Update password expiration
 	if user.PasswordExpiresDays != 0 {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "chage", "-M", strconv.FormatUint(user.PasswordExpiresDays, passwordExpiresBase), user.Name)
+			return shell.ExecuteLive(squashErrors, "chage", "-M", strconv.FormatInt(user.PasswordExpiresDays, passwordExpiresBase), user.Name)
 		})
 	}
 

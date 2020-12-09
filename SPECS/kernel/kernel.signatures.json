@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "config": "b8a4aa3fd3e234ff28dc43e5f95c53456eebd9a02d28593553b7c1a0615562dc",
-  "config_aarch64": "b12f419ff792eb8bd491c53431bf2be9f8070d90ef2059057f9738573663eb2d",
-  "linux-msft-5.4.72.tar.gz": "3407ccf8505595ae3e7a7b30c206190a0762f3e202f21f9de88a8d59e182ddef"
+  "config": "688ec482b7012da61011b3d248e0631197e4ebc9a1b65defea69941e750e5334",
+  "config_aarch64": "ad1043afdffd1c61ca2d07564499dc2f1cf216fbb121b707878e3bcbac8be03e",
+  "linux-msft-5.4.81.tar.gz": "2d6af30b7472b7693c428900fcc90eb9cec9f54c8578d1867ebff02f675e7a1d"
  }
 }
