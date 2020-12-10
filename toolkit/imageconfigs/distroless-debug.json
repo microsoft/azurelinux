@@ -15,7 +15,8 @@
             "PackageLists": [
                 "packagelists/distroless-packages-container.json",
                 "packagelists/distroless-packages-debug.json"
-            ]
+            ],
+            "AutoRemoveRpmDb": "true"
         }
     ]
 }

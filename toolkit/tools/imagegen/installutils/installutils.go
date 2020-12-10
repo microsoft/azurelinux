@@ -278,7 +278,15 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	if err != nil {
 		return
 	}
-	defer cleanupRpmDatabase(installRoot, isRootFS, packagesToInstall)
+
+	if !isRootFS {
+		logger.Log.Debug("Processing a non-rootfs. Skipping RPM database cleanup.")
+	} else if !config.AutoRemoveRpmDb {
+		// User wants to avoid removing the RPM database.
+		logger.Log.Debug("AutoRemoveRpmDb is not turned on. Skipping RPM database cleanup.")
+	} else {
+		defer cleanupRpmDatabase(installRoot, packagesToInstall)
+	}
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
@@ -1391,14 +1399,9 @@ func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.
 
 // cleanupRpmDatabase removes RPM database if the image does not require a package manager.
 // rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
-// isRootFS should be set to true if the resulting image will be a rootfs (not a file)
 // packagesToInstall is a list of packages that will be installed on the image
-func cleanupRpmDatabase(rootPrefix string, isRootFS bool, packagesToInstall []string) {
-	if !isRootFS {
-		logger.Log.Debug("Processing a non-rootfs. Skipping RPM database cleanup.")
-		return
-	}
-
+func cleanupRpmDatabase(rootPrefix string, packagesToInstall []string) {
+	logger.Log.Info("Attempting RPM database cleanup...")
 	// If the image doesn't contain the package manager
 	// We can remove the RPM database files
 	rpmInChroot := false
@@ -1420,7 +1423,6 @@ func cleanupRpmDatabase(rootPrefix string, isRootFS bool, packagesToInstall []st
 		} else {
 			logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
 		}
-
 	}
 
 }

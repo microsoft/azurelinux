@@ -26,6 +26,7 @@ type SystemConfig struct {
 	Groups             []Group             `json:"Groups"`
 	Users              []User              `json:"Users"`
 	Encryption         RootEncryption      `json:"Encryption"`
+	AutoRemoveRpmDb    bool                `json:"AutoRemoveRpmDb`
 }
 
 // IsValid returns an error if the SystemConfig is not valid
