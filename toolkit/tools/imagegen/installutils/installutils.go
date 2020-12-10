@@ -979,34 +979,36 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 			// minimum password age, maximum password age, password warning period,
 			// password inactivity period, account expiration date, reserved field for future use
 			const (
-				loginNameField         = 0
-				encryptedPasswordField = 1
-				passwordChangedField   = 2
-				minPasswordAgeField    = 3
-				maxPasswordAgeField    = 4
-				warnPeriodField        = 5
-				inactivityPeriodField  = 6
-				expirationField        = 7
-				reservedField          = 8
+				passwordNeverExpiresValue = -1
+				loginNameField            = 0
+				encryptedPasswordField    = 1
+				passwordChangedField      = 2
+				minPasswordAgeField       = 3
+				maxPasswordAgeField       = 4
+				warnPeriodField           = 5
+				inactivityPeriodField     = 6
+				expirationField           = 7
+				reservedField             = 8
+				totalFieldsCount          = 9
 			)
 
 			fields := strings.Split(entry, ":")
-			// Any value other than 9 indicates error in parsing
-			if len(fields) != 9 {
-				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": 9 fields expected, but %d found.`, fields, username, len(fields))
+			// Any value other than totalFieldsCount indicates error in parsing
+			if len(fields) != totalFieldsCount {
+				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": %d fields expected, but %d found.`, fields, username, totalFieldsCount, len(fields))
 			}
 
-			if passwordExpirationInDays == -1 {
+			if passwordExpirationInDays == passwordNeverExpiresValue {
 				// If passwordExpirationInDays is equal to -1, it means that password never expires.
 				// This is expressed by leaving account expiration date field (and fields after it) empty.
 				for _, fieldToChange := range []int{maxPasswordAgeField, warnPeriodField, inactivityPeriodField, expirationField, reservedField} {
 					fields[fieldToChange] = ""
 				}
-				// Each user is unique, so we are done here; save the changes and exit.
+				// Each user appears only once, since we found one, we are finished; save the changes and exit.
 				done = true
-			} else if passwordExpirationInDays < -1 {
+			} else if passwordExpirationInDays < passwordNeverExpiresValue {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration: %d`, username, passwordExpirationInDays)
+				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration:(%d);should be greater than %d`, username, passwordExpirationInDays, passwordNeverExpiresValue)
 			} else {
 				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
 				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.
@@ -1025,10 +1027,11 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 				}
 				fields[expirationField] = fmt.Sprintf("%d", passwordAge+passwordExpirationInDays)
 
-				//Each user is unique, so we are done here; save the changes and exit.
+				// Each user appears only once, since we found one, we are finished; save the changes and exit.
 				done = true
 			}
 			if done {
+				// Create and save new shadow file including potential changes from above.
 				shadow[n] = strings.Join(fields, ":")
 				err = file.Write(strings.Join(shadow, "\n"), shadowFile)
 				return
