@@ -1,4 +1,4 @@
-Summary:        Metapackage with core sets of packages for distroless containers
+Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        0.1
 Release:        2%{?dist}
@@ -17,9 +17,13 @@ Requires:       ca-certificates-prebuilt
 Requires:       filesystem
 Requires:       mariner-release
 
+%description minimal
+%{summary}
+Created using a minimal set of packages.
+
 %package base
 Summary:        Metapackage defining the basic set of packages (no kernel) used to create a "distroless" container.
-Requires:       ca-certificates-prebuilt
+Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
@@ -33,11 +37,11 @@ Requires:       tzdata
 
 %package debug
 Summary:        Debug packages for distroless
-Requires:       %{name}-base = %{version}-%{release}
+Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       busybox
 
 %description debug
-%{summary}
+%{summary} This version features busybox for easier debugging.
 
 %prep
 
