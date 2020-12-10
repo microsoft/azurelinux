@@ -5655,16 +5655,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "td-agent",
-          "version": "4.0.1",
-          "downloadUrl": "https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "telegraf",
           "version": "1.14.5",
           "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.14.5.tar.gz"
