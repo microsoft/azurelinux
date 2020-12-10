@@ -1,30 +1,27 @@
 %global uclibc_name uClibc-ng
-
+# This package only contains a static library
+%global debug_package %{nil}
+Summary:        C library for embedded Linux
 Name:           uclibc-ng
 Version:        1.0.36
 Release:        1%{?dist}
+License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License:        LGPLv2
 URL:            https://www.uclibc.org/
 Source0:        https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
 Source1:        uClibc.config
+BuildRequires:  gcc
 
-BuildRequires: gcc
-
-# This package only contains a static library
-%global debug_package %{nil}
-
-Summary: C library for embedded Linux
 %description
 uClibc-ng is a C library for developing embedded Linux systems.
 It is much smaller than the GNU C Library, but nearly all applications
 supported by glibc also work perfectly with uClibc.
 
 %package devel
-Summary: Header files and libraries for uClibc library
-Provides: uclibc-static = %{version}-%{release}
-Provides: uclibc-devel = %{version}-%{release}
+Summary:        Header files and libraries for uClibc library
+Provides:       uclibc-static = %{version}-%{release}
+Provides:       uclibc-devel = %{version}-%{release}
 
 %description devel
 uClibc is a C library for developing embedded Linux systems.
@@ -42,9 +39,9 @@ mv README.pom README
 
 %build
 mkdir kernel-include
-cp -a /usr/include/asm kernel-include
-cp -a /usr/include/asm-generic kernel-include
-cp -a /usr/include/linux kernel-include
+cp -a %{_includedir}/asm kernel-include
+cp -a %{_includedir}/asm-generic kernel-include
+cp -a %{_includedir}/linux kernel-include
 
 arch=`uname -m | sed -e 's/i.86/i386/' -e 's/ppc/powerpc/' -e 's/armv7l/arm/' -e 's/armv5tel/arm/'`
 echo "TARGET_$arch=y" >.config
@@ -61,24 +58,25 @@ yes "" | make oldconfig %{?_smp_mflags}
 make V=1 %{?_smp_mflags}
 
 %install
-mkdir -p $RPM_BUILD_ROOT/lib
-make install PREFIX="$RPM_BUILD_ROOT/"
-make install_headers PREFIX="$RPM_BUILD_ROOT/" DEVEL_PREFIX=""
-cp -a kernel-include/* $RPM_BUILD_ROOT/include/
+mkdir -p %{buildroot}/lib
+make install PREFIX="%{buildroot}/"
+make install_headers PREFIX="%{buildroot}/" DEVEL_PREFIX=""
+cp -a kernel-include/* %{buildroot}/include/
 
 # move libraries to proper subdirectory
-mkdir -p $RPM_BUILD_ROOT/%{_libdir}/uClibc
-mv  $RPM_BUILD_ROOT/lib/*  $RPM_BUILD_ROOT/%{_libdir}/uClibc/
-rm -rf  $RPM_BUILD_ROOT/lib/
+mkdir -p %{buildroot}/%{_libdir}/uClibc
+mv  %{buildroot}/lib/*  %{buildroot}/%{_libdir}/uClibc/
+rm -rf  %{buildroot}/lib/
 
 # move the header files to /usr subdirectory
-mkdir -p $RPM_BUILD_ROOT/%{_includedir}/uClibc
-mv  $RPM_BUILD_ROOT/include/*  $RPM_BUILD_ROOT/%{_includedir}/uClibc
-rm -rf  $RPM_BUILD_ROOT/include/
+mkdir -p %{buildroot}/%{_includedir}/uClibc
+mv  %{buildroot}/include/*  %{buildroot}/%{_includedir}/uClibc
+rm -rf  %{buildroot}/include/
 
 %files devel
 %doc docs/Glibc_vs_uClibc_Differences.txt docs/uClibc_vs_SuSv3.txt docs/porting.txt
-%doc README MAINTAINERS COPYING.LIB
+%license COPYING.LIB
+%doc README MAINTAINERS
 %{_includedir}/uClibc
 %{_libdir}/uClibc
 

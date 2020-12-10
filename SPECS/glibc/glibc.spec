@@ -3,7 +3,6 @@
 %define debug_package %{nil}
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
-
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
@@ -307,7 +306,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
-
 * Mon Dec 07 2020 Mateusz Malisz <mamalisz@microsoft.com> - 2.28-15
 - Exclude binaries(such as bash) from requires list.
 

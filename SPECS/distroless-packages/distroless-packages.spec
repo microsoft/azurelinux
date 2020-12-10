@@ -1,41 +1,40 @@
-Name:           distroless-packages
 Summary:        Metapackage with core sets of packages for distroless containers
+Name:           distroless-packages
 Version:        0.1
 Release:        2%{?dist}
 License:        MIT
-Group:          System Environment/Base
-URL:            http://aka.ms/cbl-mariner
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
+URL:            https://aka.ms/cbl-mariner
 
 %description
 Metapackage holding sets of core packages for different applications.
 
 %package minimal
-Summary: The smallest useful package list.
-Requires: filesystem
-Requires: ca-certificates-prebuilt
-Requires: mariner-release
+Summary:        The smallest useful package list.
+Requires:       ca-certificates-prebuilt
+Requires:       filesystem
+Requires:       mariner-release
 
 %package base
-Summary: Metapackage defining the basic set of packages (no kernel) used to create a "distroless" container.
-
-Requires: filesystem
-Requires: tzdata
-Requires: iana-etc
-Requires: ca-certificates-prebuilt
-Requires: mariner-release
-Requires: openssl
-Requires: openssl-libs
-Requires: glibc-iconv
+Summary:        Metapackage defining the basic set of packages (no kernel) used to create a "distroless" container.
+Requires:       ca-certificates-prebuilt
+Requires:       filesystem
+Requires:       glibc-iconv
+Requires:       iana-etc
+Requires:       mariner-release
+Requires:       openssl
+Requires:       openssl-libs
+Requires:       tzdata
 
 %description base
 %{summary}
 
 %package debug
-Summary:  Debug packages for distroless
-Requires: busybox
-Requires: %{name}-base = %{version}-%{release}
+Summary:        Debug packages for distroless
+Requires:       %{name}-base = %{version}-%{release}
+Requires:       busybox
 
 %description debug
 %{summary}

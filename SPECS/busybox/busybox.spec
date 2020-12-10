@@ -3,32 +3,28 @@ Name:           busybox
 Version:        1.32.0
 Release:        1%{?dist}
 License:        GPLv2
-URL:            https://busybox.net/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Source:  http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-Source1: busybox-static.config
-Source2: busybox-petitboot.config
-
-Patch0:  busybox-1.31.1-stime-fix.patch
-
-BuildRequires: gcc
-BuildRequires: libselinux-devel >= 1.27.7-2
-BuildRequires: libsepol-devel
-BuildRequires: glibc-devel
+URL:            https://busybox.net/
+Source:         http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
+Source1:        busybox-static.config
+Source2:        busybox-petitboot.config
+Patch0:         busybox-1.31.1-stime-fix.patch
+BuildRequires:  gcc
+BuildRequires:  glibc-devel
+BuildRequires:  libselinux-devel >= 1.27.7-2
+BuildRequires:  libsepol-devel
+# libbb/hash_md5_sha.c
+# https://bugzilla.redhat.com/1024549
+Provides:       bundled(md5-drepper2)
 # This package used to include a bundled copy of uClibc, but we now
 # use the system copy.
 %ifnarch aarch64
-BuildRequires: uclibc-devel
+BuildRequires:  uclibc-devel
 %endif
 
-# libbb/hash_md5_sha.c
-# https://bugzilla.redhat.com/1024549
-Provides: bundled(md5-drepper2)
-
 %package petitboot
-Summary: Version of busybox configured for use with petitboot
+Summary:        Version of busybox configured for use with petitboot
 
 %description
 Busybox is a single binary which includes versions of a large number
@@ -85,7 +81,7 @@ else \
     echo "# CONFIG_FEATURE_INETD_RPC is not set" >>.config && \
     yes "" | make oldconfig && \
     cat .config && \
-    make V=1 CC="gcc $RPM_OPT_FLAGS"; \
+    make V=1 CC="gcc %{optflags}"; \
 fi
 cp busybox_unstripped busybox.static
 cp docs/busybox.1 docs/busybox.static.1
@@ -106,26 +102,28 @@ if test "$arch"; then \
         CFLAGS_busybox="-static -nostartfiles -L%{_libdir}/uClibc %{_libdir}/uClibc/crt1.o %{_libdir}/uClibc/crti.o %{_libdir}/uClibc/crtn.o"; \
 else \
     cat .config && \
-    make V=1 CC="%__cc $RPM_OPT_FLAGS"; \
+    make V=1 CC="gcc %{optflags}"; \
 fi
 cp busybox_unstripped busybox.petitboot
 cp docs/busybox.1 docs/busybox.petitboot.1
 
 %install
-mkdir -p $RPM_BUILD_ROOT/sbin
-install -m 755 busybox.static $RPM_BUILD_ROOT/sbin/busybox
-install -m 755 busybox.petitboot $RPM_BUILD_ROOT/sbin/busybox.petitboot
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m 644 docs/busybox.static.1 $RPM_BUILD_ROOT/%{_mandir}/man1/busybox.1
-install -m 644 docs/busybox.petitboot.1 $RPM_BUILD_ROOT/%{_mandir}/man1/busybox.petitboot.1
+mkdir -p %{buildroot}/sbin
+install -m 755 busybox.static %{buildroot}/sbin/busybox
+install -m 755 busybox.petitboot %{buildroot}/sbin/busybox.petitboot
+mkdir -p %{buildroot}/%{_mandir}/man1
+install -m 644 docs/busybox.static.1 %{buildroot}/%{_mandir}/man1/busybox.1
+install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.petitboot.1
 
 %files
-%doc LICENSE README
+%license LICENSE
+%doc README
 /sbin/busybox
 %{_mandir}/man1/busybox.1.gz
 
 %files petitboot
-%doc LICENSE README
+%license LICENSE
+%doc README
 /sbin/busybox.petitboot
 %{_mandir}/man1/busybox.petitboot.1.gz
 
