@@ -1,16 +1,15 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
-
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2+
-URL:            https://www.gnu.org/software/libc
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
@@ -30,12 +29,13 @@ Patch9:         CVE-2019-6488.nopatch
 Patch10:        CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
-Patch11:		CVE-2018-20796.nopatch
-ExcludeArch:    armv7 ppc i386 i686
+Patch11:        CVE-2018-20796.nopatch
+Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
-Requires:       filesystem
+ExcludeArch:    armv7 ppc i386 i686
+
 %description
 This library provides the basic routines for allocating memory,
 searching directories, opening and closing files, reading and
@@ -43,46 +43,53 @@ writing files, string handling, pattern matching, arithmetic,
 and so on.
 
 %package devel
-Summary: Header files for glibc
-Group: Applications/System
-Provides: %{name}-headers = %{version}-%{release}
-Provides: %{name}-static = %{version}-%{release}
-Requires: %{name} = %{version}-%{release}
+Summary:        Header files for glibc
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+Provides:       %{name}-headers = %{version}-%{release}
+Provides:       %{name}-static = %{version}-%{release}
+Provides:       %{name}-static%{?_isa} = %{version}-%{release}
+
 %description devel
 These are the header files of glibc.
 
 %package lang
-Summary: Additional language files for glibc
-Group: Applications/System
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional language files for glibc
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
 %description lang
 These are the additional language files of glibc.
 
 %package i18n
-Summary: Additional internationalization files for glibc
-Group: Applications/System
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional internationalization files for glibc
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
 %description i18n
 These are the additional internationalization files of glibc.
 
 %package iconv
-Summary: gconv modules for glibc
-Group: Applications/System
-Requires: %{name} = %{version}-%{release}
+Summary:        gconv modules for glibc
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
 %description iconv
 These are gconv modules for iconv().
 
 %package tools
-Summary: tools for glibc
-Group: Applications/System
-Requires: %{name} = %{version}-%{release}
+Summary:        tools for glibc
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
 %description tools
 Extra tools for glibc.
 
 %package nscd
-Summary: Name Service Cache Daemon
-Group: Applications/System
-Requires: %{name} = %{version}-%{release}
+Summary:        Name Service Cache Daemon
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
 %description nscd
 Name Service Cache Daemon
 
@@ -108,7 +115,7 @@ cat > find_provides.sh << _EOF
 if [ -d /tools ]; then
 /tools/lib/rpm/find-provides | grep -v GLIBC_PRIVATE
 else
-%{_prefix}/lib/rpm/find-provides | grep -v GLIBC_PRIVATE
+%{_lib}/rpm/find-provides | grep -v GLIBC_PRIVATE
 fi
 exit 0
 _EOF
@@ -119,7 +126,7 @@ cat > find_requires.sh << _EOF
 if [ -d /tools ]; then
 /tools/lib/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
 else
-%{_prefix}/lib/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
+%{_lib}/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
 fi
 _EOF
 chmod +x find_requires.sh
@@ -154,7 +161,7 @@ pushd %{_builddir}/glibc-build
 #       Create directories
 make install_root=%{buildroot} install
 install -vdm 755 %{buildroot}%{_sysconfdir}/ld.so.conf.d
-install -vdm 755 %{buildroot}/var/cache/nscd
+install -vdm 755 %{buildroot}%{_var}/cache/nscd
 install -vdm 755 %{buildroot}%{_libdir}/locale
 cp -v ../%{name}-%{version}/nscd/nscd.conf %{buildroot}%{_sysconfdir}/nscd.conf
 #       Install locale generation script and config file
@@ -185,21 +192,21 @@ cat > %{buildroot}%{_sysconfdir}/nsswitch.conf <<- "EOF"
 EOF
 cat > %{buildroot}%{_sysconfdir}/ld.so.conf <<- "EOF"
 #       Begin /etc/ld.so.conf
-	/usr/local/lib
+	%{_prefix}/local/lib
 	/opt/lib
-	include /etc/ld.so.conf.d/*.conf
+	include %{_sysconfdir}/ld.so.conf.d/*.conf
 EOF
 popd
 %find_lang %{name} --all-name
 pushd localedata
 # Generate out of locale-archive an (en_US.) UTF-8 locale
-mkdir -p %{buildroot}/usr/lib/locale
+mkdir -p %{buildroot}%{_lib}/locale
 I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
-mv %{buildroot}/usr/lib/locale/en_US.utf8 %{buildroot}/usr/lib/locale/en_US.UTF-8
+mv %{buildroot}%{_lib}/locale/en_US.utf8 %{buildroot}%{_lib}/locale/en_US.UTF-8
 popd
 # to do not depend on /bin/bash
-sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}/usr/bin/ldd
-sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}/usr/bin/tzselect
+sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
+sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
 %check
 cd %{_builddir}/glibc-build
@@ -225,7 +232,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 [ `grep ^FAIL tests.sum | wc -l` -ne $n ] && exit 1 ||:
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
@@ -246,9 +252,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_lib64dir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
-/usr/sbin/zdump
-/usr/sbin/zic
-/usr/sbin/iconvconfig
+%{_sbindir}/zdump
+%{_sbindir}/zic
+%{_sbindir}/iconvconfig
 %{_bindir}/*
 %{_libexecdir}/*
 %{_datadir}/i18n/charmaps/UTF-8.gz
@@ -256,9 +262,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_datadir}/i18n/locales/en_US
 %{_datarootdir}/locale/locale.alias
 %exclude %{_localstatedir}/lib/nss_db/Makefile
-%exclude /usr/bin/mtrace
-%exclude /usr/bin/pcprofiledump
-%exclude /usr/bin/xtrace
+%exclude %{_bindir}/mtrace
+%exclude %{_bindir}/pcprofiledump
+%exclude %{_bindir}/xtrace
 
 %files iconv
 %defattr(-,root,root)
@@ -266,9 +272,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files tools
 %defattr(-,root,root)
-/usr/bin/mtrace
-/usr/bin/pcprofiledump
-/usr/bin/xtrace
+%{_bindir}/mtrace
+%{_bindir}/pcprofiledump
+%{_bindir}/xtrace
 /sbin/sln
 %{_lib64dir}/audit/*
 /lib64/libpcprofile.so
@@ -276,7 +282,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files nscd
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/nscd.conf
-/usr/sbin/nscd
+%{_sbindir}/nscd
 %dir %{_localstatedir}/cache/nscd
 
 %files i18n
@@ -286,7 +292,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_datadir}/i18n/charmaps/UTF-8.gz
 %exclude %{_datadir}/i18n/charmaps/ISO-8859-1.gz
 %exclude %{_datadir}/i18n/locales/en_US
-
 
 %files devel
 %defattr(-,root,root)
@@ -299,8 +304,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
-
 %changelog
+* Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-14
+- Provide isa version of glibc-static.
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.28-13
 - Move some tools from glibc-tools and glibc-iconv to glibc and provide glibc-common
 - Provide glibc-static and glibc-headers under glibc-devel
