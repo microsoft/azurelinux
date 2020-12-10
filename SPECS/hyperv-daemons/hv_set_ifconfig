@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Script to configure the network interface based
+# on the setting passed by hypervkvpd daemon
+#
+# This script works based on the kvp values supplied by the host.
+# Network setting supplied by host is described in the below link.
+# https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/tools/hv/hv_set_ifconfig.sh
+#
+# Usage: hv_set_ifconfig <ifcfg-eth*>
+#
+
+BKDIR=$(mktemp -td .netconfig.XXXXXX)
+trap 'rm -rf ${BKDIR}' EXIT
+
+# Network configuration entries
+NETDIR="/etc/systemd/network"
+NETCONFFILE="" # populated during execution
+
+# Restart the network service
+restart_net_service() {
+    systemctl restart systemd-networkd
+}
+
+# Revert the network setting
+restore_net_settings() {
+    [[ -d ${BKDIR} ]] && {
+        find "${BKDIR}" -maxdepth 1 -type f -exec cp {} "${NETDIR}" \;
+    } || return 1
+
+    [[ -f "${NETCONFFILE}" ]] && rm -f "${NETCONFFILE}"
+    restart_net_service
+}
+
+# Backup the network setting to revert in case of failure
+backup_net_settings() {
+    find "${NETDIR}" -maxdepth 1 -type f -exec mv {} "${BKDIR}" >/dev/null 2>&1 \;
+}
+
+# Update IPv6 setting in network configuration
+update_ipv6_conf() {
+
+    local cfgfile="" ipaddr="" ipv6pfx="" gateway=""
+    cfgfile=${1}
+
+    # Update IPv6 address and netmask
+    ipaddr_cnt=$(grep -c IPV6ADDR "${cfgfile}")
+    for ((i=0; i<ipaddr_cnt; i++)); do
+        ipaddr=$(grep -w "IPV6ADDR$i" "${cfgfile}" | cut -d'=' -f2)
+        ipv6pfx=$(grep -w "IPV6NETMASK$i" "${cfgfile}" | cut -d'=' -f2)
+        [[ -z ${ipv6pfx} ]] && ipv6pfx=64
+        [[ ! -z ${ipaddr} ]] && {
+            echo "Address=${ipaddr}/${ipv6pfx}" >> "${NETCONFFILE}"
+        }
+    done
+
+    # Update GATEWAY
+    gateway=$(awk -F "=" '/IPV6_DEFAULTGW/ {print $2}' "${cfgfile}")
+    [[ ! -z "${gateway}" ]] && {
+        echo "Gateway=${gateway}" >> "${NETCONFFILE}"
+    }
+}
+
+# Update IPv4 setting in network configuration
+update_ipv4_conf() {
+
+    local cfgfile="" gateway="" ipaddr="" netmask=""
+    local ipaddr_cnt=0 gateway_cnt=0
+    cfgfile="${1}"
+
+    # Update IPv4 address and netmask
+    ipaddr_cnt=$(grep -c IPADDR "${cfgfile}")
+    for ((i=0; i<ipaddr_cnt; i++)); do
+        local pfx=24
+        ipaddr=$(grep -w "IPADDR$i" "${cfgfile}" | cut -d'=' -f2)
+        netmask=$(grep -w "NETMASK$i" "${cfgfile}" | cut -d'=' -f2)
+        [[ ! -z "${netmask}" ]] && {
+            pfx=0
+            for num in ${netmask//\./ }; do
+                local brep=0
+                [[ "${num}" -eq 0 ]] && continue
+                brep=$(bc <<< "obase=2; ${num}")
+                brep=${brep//0/}
+                pfx=$((pfx + ${#brep}))
+            done
+        }
+        [[ ! -z "${ipaddr}" ]] && {
+            echo "Address=${ipaddr}/${pfx}" >> "${NETCONFFILE}"
+        }
+    done
+
+    # Update GATEWAY
+    gateway_cnt=$(grep -c GATEWAY "${cfgfile}")
+    gateway=$(awk -F "=" '/GATEWAY/ {print $2}' "${cfgfile}")
+    [[ ! -z "${gateway}" ]] && {
+        echo "Gateway=${gateway}" >> "${NETCONFFILE}"
+    }
+
+    for ((i=1; i<gateway_cnt; i++)); do
+        gateway=$(grep -w "GATEWAY$i" "${cfgfile}" | cut -d'=' -f2)
+        [[ ! -z "${gateway}" ]] && {
+            echo "Gateway=${gateway}" >> "${NETCONFFILE}"
+        }
+    done
+
+    return 0
+}
+
+# Generate the config file for updating the new configuration
+generate_net_config() {
+
+    # Network configuration
+    #
+    local cfgfile="" netifc="" hwaddr="" bootproto="" dns=""
+    local dns_cnt=0
+
+    cfgfile=${1}
+    netifc=$(cut -d- -f2 <<< "${cfgfile}")
+    hwaddr=$(awk -F "=" '/HWADDR/ {print $2}' "${cfgfile}")
+
+    NETCONFFILE="${NETDIR}/98-static-${netifc}.network"
+
+    # Generate the network configuration file
+    {
+        echo "[Match]"
+        echo "Name=${netifc}"
+        echo "MACAddress=${hwaddr}"
+        echo ""
+        echo "[Network]"
+    } > "${NETCONFFILE}"
+
+    bootproto=$(awk -F "=" '/BOOTPROTO/ {print $2}' "${cfgfile}")
+    [[ ! -z "${bootproto}" && (${bootproto} == "DHCP") ]] && {
+        echo "DHCP=yes" >> "${NETCONFFILE}"
+    }
+
+    # Update IPv4 configuration
+    update_ipv4_conf "${cfgfile}"
+
+    # Update IPv6 configuration
+    update_ipv6_conf "${cfgfile}"
+
+    # Update DNS
+    dns_cnt=$(grep -c DNS "${cfgfile}")
+    for ((i=1; i<=dns_cnt; i++)); do
+        dns=$(grep "DNS$i" "${cfgfile}" | cut -d'=' -f2)
+        [[ ! -z ${dns} ]] && {
+            echo "DNS=${dns}" >> "${NETCONFFILE}"
+        }
+    done
+
+    echo "" >> "${NETCONFFILE}"
+
+    chmod 0644 "${NETCONFFILE}"
+    return 0
+}
+
+# Entry point
+
+# Check parameters
+[[ -z "$1" || ! -f "$1" ]] && {
+    echo "Usage: hv_set_ifconfig hv_config"
+    exit 1
+}
+
+# Backup current setting to recover in case of failure
+backup_net_settings
+
+# Generate net config based on hv_config settings
+generate_net_config "$1"
+
+# Restart network service
+restart_net_service || restore_net_settings
+
+exit 0

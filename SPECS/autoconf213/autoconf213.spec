@@ -1,7 +1,7 @@
 Summary:    A GNU tool for automatically configuring source code
 Name:       autoconf213
 Version:    2.13
-Release:    46%{?dist}
+Release:    47%{?dist}
 License:    GPLv2+
 URL:        http://www.gnu.org/software/autoconf/
 Source:     ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-%{version}.tar.gz
@@ -55,6 +55,12 @@ rm ${RPM_BUILD_ROOT}/%{_bindir}/autoscan-%{version}
 rm -f ${RPM_BUILD_ROOT}%{_infodir}/standards*
 
 %check
+# Skip AC_FUNC_GETLOADAVG which fails to find /dev/kmem due to CONFIG_DEVKMEM not being set
+sed -i 's/AC_DEFUN(AC_FUNC_GETLOADAVG,/AU_DEFUN(AC_FUNC_GETLOADAVG,/g' ./acspecific.m4
+# Skip Fortan 77 (F77) tests which are not supported with our version of gcc
+sed -i 's/AC_DEFUN(AC_PROG_F77,/AU_DEFUN(AC_PROG_F77,/g' ./acspecific.m4
+sed -i 's/AC_DEFUN(AC_PROG_F77_WORKS,/AU_DEFUN(AC_PROG_F77_WORKS,/g' ./acspecific.m4
+sed -i 's/AC_DEFUN(AC_F77_LIBRARY_LDFLAGS,/AU_DEFUN(AC_F77_LIBRARY_LDFLAGS,/g' ./acspecific.m4
 make check
  
 %post
@@ -76,9 +82,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_datadir}/autoconf-%{version}/
  
 %changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.13-46
-- Added %%license line automatically
-
+*   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 2.13-47
+-   Fix check tests.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-46
+-   Added %%license line automatically
 *   Wed Apr 15 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.13-45
 -   Initial CBL-Mariner import from Fedora 32 (license: MIT).
 -   License verified.

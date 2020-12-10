@@ -75,19 +75,6 @@ type Group struct {
 	GID  string `json:"GID"`
 }
 
-// User defines a single user to be created on the new system.
-type User struct {
-	Name                string   `json:"Name"`
-	UID                 string   `json:"UID"`
-	PasswordHashed      bool     `json:"PasswordHashed"`
-	Password            string   `json:"Password"`
-	PasswordExpiresDays uint64   `json:"PasswordExpiresDays"`
-	SSHPubKeyPaths      []string `json:"SSHPubKeyPaths"`
-	PrimaryGroup        string   `json:"PrimaryGroup"`
-	SecondaryGroups     []string `json:"SecondaryGroups"`
-	StartupCommand      string   `json:"StartupCommand"`
-}
-
 // RootEncryption enables encryption on the root partition
 type RootEncryption struct {
 	Enable   bool   `json:"Enable"`

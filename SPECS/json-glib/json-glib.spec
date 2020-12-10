@@ -1,11 +1,11 @@
-Summary:    	Library providing serialization and deserialization support for the JSON format
-Name:       	json-glib
-Version:    	1.4.4
-Release:        5%{?dist}
-License:    	LGPLv2+
-Group:      	Development/Libraries
-Source0:    	https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/%{name}-%{version}.tar.xz
-URL:        	https://wiki.gnome.org/Projects/JsonGlib
+Summary:        Library providing serialization and deserialization support for the JSON format
+Name:           json-glib
+Version:        1.4.4
+Release:        6%{?dist}
+License:        LGPLv2+
+Group:          Development/Libraries
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/%{name}-%{version}.tar.xz
+URL:            https://wiki.gnome.org/Projects/JsonGlib
 Patch0:         Remove-references-to-mesontest-binary.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,12 +16,12 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  glib-devel
 BuildRequires:  libtool
 BuildRequires:  which
-BuildRequires:	meson
-BuildRequires:	python2
-BuildRequires:	python2-libs
+BuildRequires:  meson
+BuildRequires:  python2
+BuildRequires:  python2-libs
 BuildRequires:  gtk-doc
-Requires:	glib
-Provides:	pkgconfig(json-glib-1.4)
+Requires:       glib
+Provides:       pkgconfig(json-glib-1.4)
 
 %description
 JSON-GLib is a library providing serialization and deserialization
@@ -59,8 +59,8 @@ cd ..
 %find_lang json-glib-1.0
 
 %check
-sed -i 's/mesontest/meson test/g' Makefile
-make  %{?_smp_mflags} check
+cd build
+meson test
 
 
 %clean
@@ -91,9 +91,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/installed-tests/*
 
 %changelog
+*   Fri Dec 04 2020 Andrew Phelps <anphel@microsoft.com> 1.4.4-6
+-   Use meson test in check section.
 *   Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-5
 -   Fix compilation issue with LDFLAGS and switch build to call meson directly.
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.4.4-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.4.4-4
 -   Added %%license line automatically
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.4.4-3
 -   Add a patch to replace occurences of mesontest with "meson test" after meson deprecated mesontest binary.
@@ -114,4 +116,4 @@ rm -rf $RPM_BUILD_ROOT
 *   Mon Jul 6 2015 Alexey Makhalov <amakhalov@vmware.com> 1.0.2-3
 -   Added more requirements for devel subpackage.
 *   Fri Jun 26 2015 Alexey Makhalov <amakhalov@vmware.com> 1.0.2-2
--   Added Provides:	pkgconfig(json-glib-1.0)
+-   Added Provides: pkgconfig(json-glib-1.0)

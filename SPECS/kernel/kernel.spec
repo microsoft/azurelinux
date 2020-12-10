@@ -2,8 +2,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.72
-Release:        3%{?dist}
+Version:        5.4.81
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source1:        config
 Source2:        config_aarch64
 # Arm64 HyperV support required patch
 Patch0:         ver5_4_72_arm64_hyperv_support.patch
+Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -98,6 +99,25 @@ Patch1073:      CVE-1999-0656.nopatch
 Patch1074:      CVE-2010-4563.nopatch
 Patch1075:      CVE-2019-20794.nopatch
 Patch1076:      CVE-1999-0524.nopatch
+Patch1077:      CVE-2020-25705.nopatch
+Patch1078:      CVE-2020-15436.nopatch
+Patch1079:      CVE-2020-28974.nopatch
+Patch1080:      CVE-2020-29368.nopatch
+Patch1081:      CVE-2020-29369.nopatch
+Patch1082:      CVE-2020-29370.nopatch
+Patch1083:      CVE-2020-29374.nopatch
+Patch1084:      CVE-2020-29373.nopatch
+Patch1085:      CVE-2020-28915.nopatch
+Patch1086:      CVE-2020-28941.nopatch
+Patch1087:      CVE-2020-27675.nopatch
+Patch1088:      CVE-2020-15437.nopatch
+Patch1089:      CVE-2020-29371.nopatch
+# CVE-2020-29372 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1090:      CVE-2020-29372.nopatch
+# CVE-2020-27194 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1091:      CVE-2020-27194.nopatch
+# CVE-2020-27152 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1092:      CVE-2020-27152.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -183,6 +203,8 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %ifarch aarch64
 %patch0 -p1
 %endif
+
+%patch1 -p1
 
 %build
 make mrproper
@@ -403,6 +425,20 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+- Remove patch for kexec in HyperV. Integrated in 5.4.81.
+- Address CVE-2020-25705, CVE-2020-15436, CVE-2020-28974, CVE-2020-29368,
+  CVE-2020-29369, CVE-2020-29370, CVE-2020-29374, CVE-2020-29373, CVE-2020-28915,
+  CVE-2020-28941, CVE-2020-27675, CVE-2020-15437, CVE-2020-29371, CVE-2020-29372,
+  CVE-2020-27194, CVE-2020-27152
+
+* Wed Nov 25 2020 Chris Co <chrco@microsoft.com> - 5.4.72-5
+- Add patch to publish efi tpm event log on ARM
+
+* Mon Nov 23 2020 Chris Co <chrco@microsoft.com> - 5.4.72-4
+- Apply patch to fix kexec in HyperV
+
 * Mon Nov 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-3
 - Disable kernel config SLUB_DEBUG_ON due to tcp throughput perf impact
 

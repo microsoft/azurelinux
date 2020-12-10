@@ -1596,8 +1596,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1896,8 +1896,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1906,8 +1906,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1916,8 +1916,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -2057,7 +2057,7 @@
         "other": {
           "name": "libarchive",
           "version": "3.4.2",
-          "downloadUrl": "https://www.libarchive.org/downloads/libarchive-3.4.2.tar.gz"
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz"
         }
       }
     },
@@ -5896,8 +5896,8 @@
         "type": "other",
         "other": {
           "name": "WALinuxAgent",
-          "version": "2.2.38",
-          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/v2.2.38.tar.gz"
+          "version": "2.2.52",
+          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/v2.2.52.tar.gz"
         }
       }
     },
