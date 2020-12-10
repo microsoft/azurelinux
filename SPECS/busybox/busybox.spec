@@ -1,9 +1,11 @@
-Summary: Statically linked binary providing simplified versions of system commands
-Name:    busybox
-Version: 1.32.0
-Release: 1%{?dist}
-License: GPLv2
-URL:     http://www.busybox.net
+Summary:        Statically linked binary providing simplified versions of system commands
+Name:           busybox
+Version:        1.32.0
+Release:        1%{?dist}
+License:        GPLv2
+URL:            https://busybox.net/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 Source:  http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1: busybox-static.config
@@ -130,7 +132,9 @@ install -m 644 docs/busybox.petitboot.1 $RPM_BUILD_ROOT/%{_mandir}/man1/busybox.
 %changelog
 * Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.32.0-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
+- License Verified
 - Add -fno-stack-protector for x86 builds
+- Changed version from 1.31.1 to 1.32.0
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.31.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

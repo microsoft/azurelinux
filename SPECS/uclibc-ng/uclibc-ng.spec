@@ -1,20 +1,21 @@
 %global uclibc_name uClibc-ng
 
-Name:    uclibc-ng
-Version: 1.0.36
-Release: 1%{?dist}
-Summary: C library for embedded Linux
-
-License: LGPLv2
-URL:     http://www.uclibc.org/
-Source0: https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
-Source1: uClibc.config
+Name:           uclibc-ng
+Version:        1.0.36
+Release:        1%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+License:        LGPLv2
+URL:            https://www.uclibc.org/
+Source0:        https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
+Source1:        uClibc.config
 
 BuildRequires: gcc
 
 # This package only contains a static library
 %global debug_package %{nil}
 
+Summary: C library for embedded Linux
 %description
 uClibc-ng is a C library for developing embedded Linux systems.
 It is much smaller than the GNU C Library, but nearly all applications
@@ -84,7 +85,9 @@ rm -rf  $RPM_BUILD_ROOT/include/
 %changelog
 * Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.0.36-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
-- Change uclibc to uclibc-ng
+- License Verified
+- Changed uclibc to uclibc-ng
+- Changed version from 0.9.33.2 to 1.0.36
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.33.2-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
