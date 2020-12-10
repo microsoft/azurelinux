@@ -9,7 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://download.savannah.gnu.org/releases/libpipeline/%{name}-%{version}.tar.gz
 
+%if %{with_check}
 BuildRequires:  check
+%endif
 
 %description
 Contains a library for manipulating pipelines of sub processes

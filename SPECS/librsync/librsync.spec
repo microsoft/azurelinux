@@ -11,7 +11,9 @@ Distribution:   Mariner
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
+%if %{with_check}
 BuildRequires:  which
+%endif
 
 %description
 librsync implements the "rsync" algorithm, which allows remote
@@ -59,9 +61,12 @@ make %{?_smp_mflags}
 %install
 cd build
 make DESTDIR=%{buildroot} install
+
+%if %{with_check}
 # install outside of DESTDIR to resolve test error:
 # /usr/src/mariner/BUILD/librsync-2.0.2/build/rdiff: error while loading shared libraries: librsync.so.2: cannot open shared object file: No such file or directory
 make install
+%endif
 
 %check
 cd build
