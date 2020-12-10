@@ -1,4 +1,4 @@
-Summary:        Prebuilt version of ca-certificates package
+Summary:        Prebuilt version of ca-certificates package.
 Name:           ca-certificates-prebuilt
 Version:        20200720
 Release:        1%{?dist}
@@ -7,13 +7,20 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://hg.mozilla.org
-BuildRequires:  ca-certificates-base
-Conflicts:      ca-certificates
-Conflicts:      ca-certificates-base
 BuildArch:      noarch
 
 %description
-Prebuilt version of the ca-certificates-base package with no runtime dependencies.
+Prebuilt versions of the ca-certificates package with no runtime dependencies.
+
+%package base
+Summary:        Prebuilt version of ca-certificates-base package.
+BuildRequires:  ca-certificates-base
+Conflicts:      ca-certificates
+Conflicts:      ca-certificates-base
+Conflicts:      ca-certificates-microsoft
+
+%description base
+%{summary}
 
 %prep -q
 
@@ -34,3 +41,5 @@ cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
 %{_sysconfdir}/pki/*
 
 %changelog
+* Wed Dec 2 2020 Mateusz Malisz <mamalisz@microsoft.com> - 20200720-1
+- Original version for CBL-Mariner
