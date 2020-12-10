@@ -1,7 +1,7 @@
 Summary:        Rsync libraries
 Name:           librsync
 Version:        2.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            https://librsync.github.io/
 License:        LGPLv2+ and CC0
 Group:          System Environment/Libraries
@@ -11,6 +11,7 @@ Distribution:   Mariner
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
+BuildRequires:  which
 
 %description
 librsync implements the "rsync" algorithm, which allows remote
@@ -58,6 +59,9 @@ make %{?_smp_mflags}
 %install
 cd build
 make DESTDIR=%{buildroot} install
+# install outside of DESTDIR to resolve test error:
+# /usr/src/mariner/BUILD/librsync-2.0.2/build/rdiff: error while loading shared libraries: librsync.so.2: cannot open shared object file: No such file or directory
+make install
 
 %check
 cd build
@@ -81,9 +85,10 @@ make test
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:20:55 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.2-3
-- Added %%license line automatically
-
+*   Wed Dec 09 2020 Andrew Phelps <anphel@microsoft.com> 2.0.2-4
+-   Fix check tests
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.0.2-3
+-   Added %%license line automatically
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 2.0.2-3
 -   Verified license. Removed sha1. Fixed Source0 URL comment.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.2-2
