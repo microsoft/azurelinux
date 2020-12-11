@@ -63,7 +63,7 @@ rm -rf %{buildroot}/*
 %changelog
 *   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.11.1-6
 -   Increment release to force republishing using golang 1.15.
-*   Sat May 09 00:20:38 PST 2020 Nick Samson <nisamson@microsoft.com> 1.11.1-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.1-5
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.11.1-4
 -   Renaming go to golang
