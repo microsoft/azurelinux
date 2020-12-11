@@ -1,7 +1,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 19.03.11+azure
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 
@@ -149,6 +149,9 @@ fi
 /usr/share/doc/%{name}-%{version}/*
 
 %changelog
+* Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 19.03.11+azure-4
+- Increment release to force republishing using golang 1.15.
+
 * Tue Jul 21 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.03.11+azure-3
 - Remove changes for CIS Docker Security Benchmark compliance.
 
