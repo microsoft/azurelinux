@@ -158,6 +158,42 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 },
 ```
 
+### Users
+
+Users is an array of user information. The User information is a map of key value pairs. 
+
+The image generated has users matching the values specified in Users.
+
+The table below are the keys for the users. 
+
+|Key                |Type               |Restrictions
+--------------------|:------------------|:------------------------------------------------
+|Name               |string             |Cannot be empty
+|UID                |string             |Must be in range 0-60000
+|PasswordHashed     |bool               |
+|Password           |string             |
+|PasswordExpiresDays|number             |Must be in range 0-99999 or -1 for no expiration
+|SSHPubKeyPaths     |array of strings   |
+|PrimaryGroup       |string             |
+|SecondaryGroups    |array of strings   |
+|StartupCommand     |string             |
+
+An example usage for users "root" and "basicUser" would look like:
+
+``` json
+"Users": [
+    {
+        "Name": "root",
+        "Password": "somePassword"
+    },
+    {
+        "Name": "basicUser",
+        "Password": "someOtherPassword",
+        "UID": 1001
+    }
+]
+```
+
 # Sample image configuration
 
 A sample image configuration, producing a VHDX disk image:

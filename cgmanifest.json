@@ -1386,8 +1386,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.13.15",
-          "downloadUrl": "https://dl.google.com/go/go1.13.15.src.tar.gz"
+          "version": "1.15.5",
+          "downloadUrl": "https://dl.google.com/go/go1.15.5.src.tar.gz"
         }
       }
     },
@@ -1606,8 +1606,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1906,8 +1906,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1916,8 +1916,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -1926,8 +1926,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.72",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.72.tar.gz"
+          "version": "5.4.81",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
         }
       }
     },
@@ -5658,6 +5658,16 @@
           "name": "tdnf",
           "version": "2.1.0",
           "downloadUrl": "https://github.com/vmware/tdnf/archive/v2.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "td-agent",
+          "version": "4.0.1",
+          "downloadUrl": "https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz"
         }
       }
     },
