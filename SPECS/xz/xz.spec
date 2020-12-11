@@ -1,41 +1,46 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
 Version:        5.2.4
-Release:        4%{?dist}
-URL:            http://tukaani.org/xz
-License:        GPLv2+ and GPLv3+ and LGPLv2+
-Group:          Applications/File
+Release:        5%{?dist}
+License:        GPLv2+ AND GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/File
+URL:            https://tukaani.org/xz
 Source0:        http://tukaani.org/xz/%{name}-%{version}.tar.xz
+Requires:       xz-libs = %{version}-%{release}
 Provides:       xz-lzma-compat = %{version}-%{release}
 Provides:       lzma = %{version}-%{release}
-Requires:       xz-libs = %{version}-%{release}
+
 %description
 The Xz package contains programs for compressing and
 decompressing files
 
 %package lang
-Summary: Additional language files for xz
-Group:      Applications/File
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional language files for xz
+Group:          Applications/File
+Requires:       %{name} = %{version}-%{release}
+
 %description lang
 These are the additional language files of xz.
 
 %package    devel
-Summary:    Header and development files for xz
-Requires:   %{name} = %{version}-%{release}
+Summary:        Header and development files for xz
+Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %package libs
-Summary: Libraries for xz
-Group:      System Environment/Libraries
+Summary:        Libraries for xz
+Group:          System Environment/Libraries
+
 %description libs
 This package contains minimal set of shared xz libraries.
 
 %prep
 %setup -q
+
 %build
 ./configure \
     --prefix=%{_prefix} \
@@ -43,13 +48,14 @@ This package contains minimal set of shared xz libraries.
     --disable-static \
     --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} pkgconfigdir=%{_libdir}/pkgconfig install
-install -vdm 755 %{buildroot}/{bin,%_lib}
-mv -v   %{buildroot}%{_bindir}/{lzma,unlzma,lzcat,xz,unxz,xzcat} %{buildroot}/bin
+install -vdm 755 %{buildroot}/{bin,%{_lib}}
 ln -svf "../..%{_lib}/$(readlink %{buildroot}%{_libdir}/liblzma.so)" %{buildroot}%{_libdir}/liblzma.so
-find %{buildroot}%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}
+
 %check
 make  %{?_smp_mflags}  check
 
@@ -59,12 +65,12 @@ make  %{?_smp_mflags}  check
 %files
 %defattr(-,root,root)
 %license COPYING
-/bin/xz
-/bin/lzcat
-/bin/lzma
-/bin/xzcat
-/bin/unlzma
-/bin/unxz
+%{_bindir}/xz
+%{_bindir}/lzcat
+%{_bindir}/lzma
+%{_bindir}/xzcat
+%{_bindir}/unlzma
+%{_bindir}/unxz
 %{_bindir}/xzless
 %{_bindir}/lzmadec
 %{_bindir}/xzcmp
@@ -98,27 +104,41 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
+* Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 5.2.4-5
+- Move binaries to /usr/bin
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.2.4-4
 -   Provide xz-lzma-compat and lzma
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com>  5.2.4-3
 -   Added %%license line automatically
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.2.4-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Thu Sep 13 2018 Siju Maliakkal <smaliakkal@vmware.com> 5.2.4-1
 -   Updated to latest version
+
 *   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 5.2.3-2
 -   Added -libs subpackage. Disable static.
+
 *   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 5.2.3-1
 -   Updated to version 5.2.3.
+
 *   Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 5.2.2-4
 -   Added -lang subpackage
+
 *   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 5.2.2-3
 -   Modified %check
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.2.2-2
 -   GA - Bump release of all rpms
+
 *   Wed Jan 20 2016 Anish Swaminathan <anishs@vmware.com> 5.2.2-1
 -   Upgrade version.
+
 *   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 5.0.5-2
 -   Update according to UsrMove.
+
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 5.0.5-1
 -   Initial build. First version
