@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.3.25
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/etcd-io/etcd/
 Group:          System Environment/Security
@@ -74,6 +74,8 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog
+*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 3.3.25-2
+-   Increment release to force republishing using golang 1.15.
 *   Thu Sep 03 2020 Joe Schmitt <joschmit@microsoft.com> 3.3.25-1
 -   Update to version 3.3.25 which fixes CVE-2020-15106, CVE-2020-15112, CVE-2020-15114, and CVE-2020-15115.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.3.11-2

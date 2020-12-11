@@ -10,7 +10,7 @@
 Summary:        Kubernetes cluster management
 Name:           kubernetes
 Version:        1.16.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes
 #Source0:       %{url}/kubernetes/archive/v%{version}.tar.gz
@@ -234,6 +234,8 @@ fi
 %endif
 
 %changelog
+*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.16.14-2
+-   Increment release to force republishing using golang 1.15.
 *   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.16.14-1
 -   Update to 1.16.14 to fix: CVE-2020-8557, CVE-2020-8558, CVE-2020-8559
 *   Tue Jun 16 2020 Andrew Phelps <anphel@microsoft.com> 1.16.10-1
