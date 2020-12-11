@@ -102,7 +102,7 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
-* Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.58.0-8
+* Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.58.0-9
 - Provide isa versions of glib2 provides.
 
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 2.58.0-8

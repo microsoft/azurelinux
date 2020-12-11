@@ -181,7 +181,6 @@ rm -rf %{buildroot}/*
 %files
 %defattr(-, root, root)
 %license LICENSE
-%license LICENSE
 %doc README.rst
 %{_bindir}/pydoc*
 %{_bindir}/pyvenv*

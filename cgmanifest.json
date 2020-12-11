@@ -4285,9 +4285,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "pygobject3",
-          "version": "3.36.1",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
+          "name": "pyasn1-modules",	
+          "version": "0.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
         }
       }
     },
