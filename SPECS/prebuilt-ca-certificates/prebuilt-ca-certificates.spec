@@ -1,5 +1,5 @@
 Summary:        Prebuilt version of ca-certificates package.
-Name:           ca-certificates-prebuilt
+Name:           prebuilt-ca-certificates
 Version:        20200720
 Release:        1%{?dist}
 License:        MIT
