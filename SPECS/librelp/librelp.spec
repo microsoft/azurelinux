@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.2.17
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 URL:            https://github.com/rsyslog/librelp
 #Source0:        https://github.com/rsyslog/librelp/archive/v%{version}.tar.gz
@@ -48,6 +48,11 @@ make DESTDIR=%{buildroot} install
 #and since tests are not using any valgrind functionality,
 #disabling valgrind.
 sed -ie 's/export valgrind=.*/export valgrind""/' tests/test-framework.sh
+
+# The tls-basic-brokencert test is marked unstable in upstream source, so disable it.
+# https://github.com/rsyslog/librelp/blob/c22cc7bf7bc42aa714a3ebf284140f5ee3238983/tests/Makefile.am#L43
+sed -i '/tls-basic-brokencert.sh \\/d' ./tests/Makefile.am
+
 make check
 
 %post	-p /sbin/ldconfig
@@ -63,10 +68,12 @@ make check
 %{_includedir}/*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
-- Added %%license line automatically
 
+%changelog
+*   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 1.2.17-7
+-   Fix check tests.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.2.17-6
+-   Added %%license line automatically
 *   Wed Mar 11 2020 Christopher Co <chrco@microsoft.com> 1.2.17-5
 -   Updated Source location
 *   Mon Mar 09 2020 Jon Slobodzian <joslobo@microsoft.com> 1.2.17-4

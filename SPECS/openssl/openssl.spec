@@ -1,7 +1,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        OpenSSL
 URL:            http://www.openssl.org/
 Group:          System Environment/Security
@@ -13,6 +13,8 @@ Patch0:         openssl-1.1.1-no-html.patch
 # CVE only applies when Apache HTTP Server version 2.4.37 or less.
 Patch1:         CVE-2019-0190.nopatch
 Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+Patch3:         CVE-2020-1971.patch
+
 Conflicts:      httpd <= 2.4.37
 
 BuildRequires:  perl-Test-Warnings
@@ -77,6 +79,7 @@ from other formats to the formats used by the OpenSSL toolkit.
 %setup -q
 %patch0 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -256,6 +259,9 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 1.1.1g-8
+- Patch CVE-2020-1971.
+
 * Tue Nov 10 2020 Johnson George <johgeorg@microsoft.com> 1.1.1g-7
 - Updated the config option to enable package test
 
