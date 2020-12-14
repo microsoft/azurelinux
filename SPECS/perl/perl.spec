@@ -9,7 +9,7 @@
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.30.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 URL:            https://www.perl.org/
 Group:          Development/Languages
@@ -20,9 +20,15 @@ Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
 Provides:       perl(s)
 Provides:       /bin/perl
+
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  gdbm-devel
+%if %{with_check}
+BuildRequires:  iana-etc
+BuildRequires:  which
+%endif
+
 Requires:       zlib
 Requires:       gdbm
 Requires:       glibc
@@ -52,15 +58,18 @@ sh Configure -des \
         -DPERL_RANDOM_DEVICE="/dev/erandom"
 
 make VERBOSE=1 %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 unset BUILD_ZLIB BUILD_BZIP2
+
 %check
 sed -i '/02zlib.t/d' MANIFEST
 sed -i '/cz-03zlib-v1.t/d' MANIFEST
 sed -i '/cz-06gzsetp.t/d' MANIFEST
 sed -i '/porting\/podcheck.t/d' MANIFEST
 make test TEST_SKIP_VERSION_CHECK=1
+
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 %files
@@ -73,6 +82,8 @@ make test TEST_SKIP_VERSION_CHECK=1
 %{_mandir}/*/*
 
 %changelog
+*   Fri Dec 11 2020 Andrew Phelps <anphel@microsoft.com> - 5.30.3-2
+-   Add "iana-etc" and "which" packages to fix check tests.
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.30.3-1
 -   Updating to newer version to fix CVE-2020-10878 and CVE-2020-12723.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.28.1-4
