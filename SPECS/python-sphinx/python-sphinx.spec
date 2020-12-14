@@ -1,10 +1,12 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
+%bcond_without python2
+
 Summary:       Python documentation generator
 Name:          python-sphinx
 Version:       1.7.9
-Release:       11%{?dist}
+Release:       12%{?dist}
 Group:         Development/Tools
 License:       BSD
 URL:           https://www.sphinx-doc.org
@@ -13,6 +15,7 @@ Distribution:  Mariner
 #Source0:      https://github.com/sphinx-doc/sphinx/archive/v%{version}.tar.gz
 Source0:       Sphinx-%{version}.tar.gz
 
+%if %{with python2}
 BuildRequires: python2
 BuildRequires: python2-libs
 BuildRequires: python2-devel
@@ -43,6 +46,7 @@ Requires:      python-requests
 Requires:      python-snowballstemmer
 Requires:      python-typing
 Requires:      python2-sphinxcontrib-websupport
+%endif
 
 BuildArch:      noarch
 
@@ -94,38 +98,49 @@ rm -rf ../p3dir
 cp -a . ../p3dir
 
 %build
+%if %{with python2}
 python2 setup.py build
+%endif
 pushd ../p3dir
 python3 setup.py build
 popd
 
 %install
+%if %{with python2}
+python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+mv %{buildroot}/%{_bindir}/sphinx-quickstart %{buildroot}/%{_bindir}/sphinx-quickstart-2
+mv %{buildroot}/%{_bindir}/sphinx-build %{buildroot}/%{_bindir}/sphinx-build-2
+mv %{buildroot}/%{_bindir}/sphinx-autogen %{buildroot}/%{_bindir}/sphinx-autogen-2
+mv %{buildroot}/%{_bindir}/sphinx-apidoc %{buildroot}/%{_bindir}/sphinx-apidoc-2
+%endif
 pushd ../p3dir
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-mv %{buildroot}/%{_bindir}/sphinx-quickstart %{buildroot}/%{_bindir}/sphinx-quickstart3
-mv %{buildroot}/%{_bindir}/sphinx-build %{buildroot}/%{_bindir}/sphinx-build3
-mv %{buildroot}/%{_bindir}/sphinx-autogen %{buildroot}/%{_bindir}/sphinx-autogen3
-mv %{buildroot}/%{_bindir}/sphinx-apidoc %{buildroot}/%{_bindir}/sphinx-apidoc3
-ln -sfv sphinx-quickstart3 %{buildroot}%{_bindir}/sphinx-quickstart-3
-ln -sfv sphinx-build3 %{buildroot}%{_bindir}/sphinx-build-3
-ln -sfv sphinx-autogen3 %{buildroot}%{_bindir}/sphinx-autogen-3
-ln -sfv sphinx-apidoc3 %{buildroot}%{_bindir}/sphinx-apidoc-3
+ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart-3
+ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart3
+ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build-3
+ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build3
+ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen-3
+ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen3
+ln -sfv sphinx-apidoc %{buildroot}%{_bindir}/sphinx-apidoc-3
+ln -sfv sphinx-apidoc %{buildroot}%{_bindir}/sphinx-apidoc3
 popd
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %clean
 
+%if %{with python2}
 %files
 %defattr(-,root,root)
 %license LICENSE
-%{_bindir}/sphinx-quickstart
-%{_bindir}/sphinx-build
-%{_bindir}/sphinx-autogen
-%{_bindir}/sphinx-apidoc
+%{_bindir}/sphinx-quickstart-2
+%{_bindir}/sphinx-build-2
+%{_bindir}/sphinx-autogen-2
+%{_bindir}/sphinx-apidoc-2
 %{python2_sitelib}/*
+%endif
 
 %files -n python3-sphinx
 %defattr(-,root,root)
@@ -137,9 +152,17 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/sphinx-build-3
 %{_bindir}/sphinx-autogen-3
 %{_bindir}/sphinx-apidoc-3
+%{_bindir}/sphinx-quickstart
+%{_bindir}/sphinx-build
+%{_bindir}/sphinx-autogen
+%{_bindir}/sphinx-apidoc
 %{python3_sitelib}/*
 
 %changelog
+*   Mon Dec 14 2020 Ruying Chen <v-ruyche@microsoft.com> 1.7.9-12
+-   Make python3- package default and python2- optional.
+-   Reserve unversioned sphinx-* binaries for python3.
+-   Rename python2 sphinx-* binaries to sphinx-*-2.
 *   Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.9-11
 -   Add sphinx-*-3 binary symlinks for Fedora compatibility
 -   Add Requires: python(2/3)-sphinxcontrib-websupport
