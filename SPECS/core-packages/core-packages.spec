@@ -1,7 +1,7 @@
 Name:           core-packages
 Summary:        Metapackage with core sets of packages
 Version:        0.1
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://aka.ms/mariner
@@ -84,6 +84,9 @@ Requires:   vim
 Requires:   wget
 Requires:   xz
 Requires:   zlib
+Requires:   gawk
+Requires:   initscripts
+Requires:   dos2unix
 
 %description container
 %{summary}
@@ -97,6 +100,8 @@ Requires:   zlib
 %files container
 
 %changelog
+*   Mon Dec 14 2020 Henry Li <lihl@microsoft.com> 0.1-21
+-   Add 'gawk', 'initscripts' and 'dos2unix' to the base-image.
 *   Wed Sep 02 2020 Mateusz Malisz <mamalisz@microsoft.com> 0.1-20
 -   Add chrony package to the base-image.
 *   Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-19
