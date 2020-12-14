@@ -124,10 +124,6 @@ popd
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %clean
-
-
-
-
 %if %{with python2}
 %files
 %defattr(-,root,root)
