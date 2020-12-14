@@ -24,7 +24,6 @@ import (
 	"microsoft.com/pkggen/internal/retry"
 	"microsoft.com/pkggen/internal/safechroot"
 	"microsoft.com/pkggen/internal/shell"
-	"microsoft.com/pkggen/internal/sliceutils"
 )
 
 const (
@@ -279,13 +278,18 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	if !isRootFS {
-		logger.Log.Debug("Processing a non-rootfs. Skipping RPM database cleanup.")
-	} else if !config.AutoRemoveRpmDb {
+	if !config.RemoveRpmDb {
 		// User wants to avoid removing the RPM database.
-		logger.Log.Debug("AutoRemoveRpmDb is not turned on. Skipping RPM database cleanup.")
+		logger.Log.Debug("RemoveRpmDb is not turned on. Skipping RPM database cleanup.")
 	} else {
-		defer cleanupRpmDatabase(installRoot, packagesToInstall)
+		defer func() {
+			// Signal an error if cleanup fails; don't overwrite the previous error though.
+			// Failure to clean up the RPM database constitutes a build break.
+			cleanupErr := cleanupRpmDatabase(installRoot)
+			if err == nil {
+				err = cleanupErr
+			}
+		}()
 	}
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
@@ -1399,32 +1403,17 @@ func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.
 
 // cleanupRpmDatabase removes RPM database if the image does not require a package manager.
 // rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
-// packagesToInstall is a list of packages that will be installed on the image
-func cleanupRpmDatabase(rootPrefix string, packagesToInstall []string) {
+func cleanupRpmDatabase(rootPrefix string) (err error) {
 	logger.Log.Info("Attempting RPM database cleanup...")
-	// If the image doesn't contain the package manager
-	// We can remove the RPM database files
-	rpmInChroot := false
-
-	for _, name := range []string{"rpm", "dnf", "tdnf", "yum"} {
-		if sliceutils.Find(packagesToInstall, name) != -1 {
-			logger.Log.Infof(`Package manager "%s" found in package list. Keeping the RPM database.`, name)
-			rpmInChroot = true
-			break
-		}
+	rpmDir := strings.Join([]string{rootPrefix, rpmDependenciesDirectory}, "")
+	err = os.RemoveAll(rpmDir)
+	if err != nil {
+		logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
+		err = fmt.Errorf("failed to remove RPM database (%s): %s", rpmDir, err)
+	} else {
+		logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
 	}
-
-	if !rpmInChroot {
-		logger.Log.Info("No package manager found in package list. Removing the RPM database.")
-		rpmDir := strings.Join([]string{rootPrefix, rpmDependenciesDirectory}, "")
-		err := os.RemoveAll(rpmDir)
-		if err != nil {
-			logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
-		} else {
-			logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
-		}
-	}
-
+	return
 }
 
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
