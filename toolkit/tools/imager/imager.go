@@ -410,7 +410,7 @@ func cleanupExtraFiles() (err error) {
 		logger.Log.Infof("Cleaning up directory %s", dir)
 		err = os.RemoveAll(dir)
 		if err != nil {
-			logger.Log.Errorf("Failed to cleanup directory (%s). Error: %s", dir, err)
+			logger.Log.Warnf("Failed to cleanup directory (%s). Error: %s", dir, err)
 			return
 		}
 	}

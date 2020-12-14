@@ -1405,7 +1405,7 @@ func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.
 // rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
 func cleanupRpmDatabase(rootPrefix string) (err error) {
 	logger.Log.Info("Attempting RPM database cleanup...")
-	rpmDir := strings.Join([]string{rootPrefix, rpmDependenciesDirectory}, "")
+	rpmDir := filepath.Join(rootPrefix, rpmDependenciesDirectory)
 	err = os.RemoveAll(rpmDir)
 	if err != nil {
 		logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
