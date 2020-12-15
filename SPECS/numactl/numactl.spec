@@ -69,7 +69,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.13-4
-- Provide numactl-libs and numactl-devel
+- Provide numactl-libs and numactl-devel.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.13-3
 - Added %%license line automatically
