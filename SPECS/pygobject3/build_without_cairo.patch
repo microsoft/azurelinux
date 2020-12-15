@@ -1,0 +1,175 @@
+--- a/setup.py	2018-10-01 17:55:11.130750445 +0530
++++ b/setup.py	2018-10-01 18:13:55.870799180 +0530
+@@ -45,6 +45,9 @@ GI_VERSION_REQUIRED = "1.46.0"
+ PYCAIRO_VERSION_REQUIRED = "1.11.1"
+ LIBFFI_VERSION_REQUIRED = "3.0"
+ 
++WITH_CAIRO = False
++"""Set to false if you don't want to build with cairo/pycairo support"""
++
+ 
+ def is_dev_version():
+     version = tuple(map(int, PYGOBJECT_VERISON.split(".")))
+@@ -455,7 +458,8 @@ class build_tests(Command):
+                 objects = compiler.compile(
+                     ext.sources,
+                     output_dir=self.build_temp,
+-                    include_dirs=ext.include_dirs)
++                    include_dirs=ext.include_dirs,
++                    macros=ext.define_macros)
+ 
+                 if os.name == "nt":
+                     postargs = ["-Wl,--out-implib=%s" %
+@@ -523,6 +527,10 @@ class build_tests(Command):
+                 "--output=%s" % typelib_path,
+             ])
+ 
++        regress_macros = []
++        if not WITH_CAIRO:
++            regress_macros.append(("_GI_DISABLE_CAIRO", "1"))
++
+         ext = Extension(
+             name='libregress',
+             sources=[
+@@ -536,21 +544,29 @@ class build_tests(Command):
+                 os.path.join(gi_tests_dir, "regress.h"),
+                 os.path.join(tests_dir, "regressextra.h"),
+             ],
++            define_macros=regress_macros,
+         )
+         add_ext_pkg_config_dep(ext, compiler.compiler_type, "glib-2.0")
+         add_ext_pkg_config_dep(ext, compiler.compiler_type, "gio-2.0")
+-        add_ext_pkg_config_dep(ext, compiler.compiler_type, "cairo")
+-        add_ext_pkg_config_dep(ext, compiler.compiler_type, "cairo-gobject")
++        if WITH_CAIRO:
++            add_ext_pkg_config_dep(ext, compiler.compiler_type, "cairo")
++            add_ext_pkg_config_dep(
++                ext, compiler.compiler_type, "cairo-gobject")
+         ext_paths = build_ext(ext)
+ 
+         gir_path = os.path.join(tests_dir, "Regress-1.0.gir")
+         typelib_path = os.path.join(tests_dir, "Regress-1.0.typelib")
+ 
++        if WITH_CAIRO:
++            gir_cairo_args = [
++                "--include=cairo-1.0", "--pkg=cairo", "--pkg=cairo-gobject"]
++        else:
++            gir_cairo_args = ["-D_GI_DISABLE_CAIRO"]
++
+         if self._newer_group(ext_paths, gir_path):
+             subprocess.check_call([
+                 g_ir_scanner,
+                 "--no-libtool",
+-                "--include=cairo-1.0",
+                 "--include=Gio-2.0",
+                 "--namespace=Regress",
+                 "--nsversion=1.0",
+@@ -560,10 +576,8 @@ class build_tests(Command):
+                 "--library=regress",
+                 "--pkg=glib-2.0",
+                 "--pkg=gio-2.0",
+-                "--pkg=cairo",
+-                "--pkg=cairo-gobject",
+                 "--output=%s" % gir_path,
+-            ] + ext.sources + ext.depends)
++            ] + gir_cairo_args + ext.sources + ext.depends)
+ 
+         if self._newer_group([gir_path], typelib_path):
+             subprocess.check_call([
+@@ -589,7 +603,6 @@ class build_tests(Command):
+         )
+         add_ext_pkg_config_dep(ext, compiler.compiler_type, "glib-2.0")
+         add_ext_pkg_config_dep(ext, compiler.compiler_type, "gio-2.0")
+-        add_ext_pkg_config_dep(ext, compiler.compiler_type, "cairo")
+         add_ext_compiler_flags(ext, compiler)
+ 
+         dist = Distribution({"ext_modules": [ext]})
+@@ -1009,15 +1022,16 @@ class build_ext(du_build_ext):
+         add_dependency(gi_ext, "libffi")
+         add_ext_compiler_flags(gi_ext, compiler)
+ 
+-        gi_cairo_ext = ext["gi._gi_cairo"]
+-        add_dependency(gi_cairo_ext, "glib-2.0")
+-        add_dependency(gi_cairo_ext, "gio-2.0")
+-        add_dependency(gi_cairo_ext, "gobject-introspection-1.0")
+-        add_dependency(gi_cairo_ext, "libffi")
+-        add_dependency(gi_cairo_ext, "cairo")
+-        add_dependency(gi_cairo_ext, "cairo-gobject")
+-        add_pycairo(gi_cairo_ext)
+-        add_ext_compiler_flags(gi_cairo_ext, compiler)
++        if WITH_CAIRO:
++            gi_cairo_ext = ext["gi._gi_cairo"]
++            add_dependency(gi_cairo_ext, "glib-2.0")
++            add_dependency(gi_cairo_ext, "gio-2.0")
++            add_dependency(gi_cairo_ext, "gobject-introspection-1.0")
++            add_dependency(gi_cairo_ext, "libffi")
++            add_dependency(gi_cairo_ext, "cairo")
++            add_dependency(gi_cairo_ext, "cairo-gobject")
++            add_pycairo(gi_cairo_ext)
++            add_ext_compiler_flags(gi_cairo_ext, compiler)
+ 
+     def run(self):
+         self._write_config_h()
+@@ -1119,6 +1133,9 @@ def main():
+     with io.open(readme, encoding="utf-8") as h:
+         long_description = h.read()
+ 
++    ext_modules = []
++    install_requires = []
++
+     gi_ext = Extension(
+         name='gi._gi',
+         sources=sources,
+@@ -1126,14 +1143,20 @@ def main():
+         depends=list_headers(script_dir) + list_headers(gi_dir),
+         define_macros=[("PY_SSIZE_T_CLEAN", None)],
+     )
++    ext_modules.append(gi_ext)
+ 
+-    gi_cairo_ext = Extension(
+-        name='gi._gi_cairo',
+-        sources=cairo_sources,
+-        include_dirs=[script_dir, gi_dir],
+-        depends=list_headers(script_dir) + list_headers(gi_dir),
+-        define_macros=[("PY_SSIZE_T_CLEAN", None)],
+-    )
++    if WITH_CAIRO:
++        gi_cairo_ext = Extension(
++            name='gi._gi_cairo',
++            sources=cairo_sources,
++            include_dirs=[script_dir, gi_dir],
++            depends=list_headers(script_dir) + list_headers(gi_dir),
++            define_macros=[("PY_SSIZE_T_CLEAN", None)],
++        )
++        ext_modules.append(gi_cairo_ext)
++        install_requires.append(
++            "pycairo>=%s" % get_version_requirement(
++                get_pycairo_pkg_config_name()))
+ 
+     version = pkginfo["Version"]
+     if is_dev_version():
+@@ -1160,10 +1183,8 @@ def main():
+             "gi.repository",
+             "gi.overrides",
+         ],
+-        ext_modules=[
+-            gi_ext,
+-            gi_cairo_ext,
+-        ],
++        ext_modules=ext_modules,
++        
+         cmdclass={
+             "build_ext": build_ext,
+             "distcheck": distcheck,
+@@ -1174,10 +1195,7 @@ def main():
+             "install": install,
+             "install_pkgconfig": install_pkgconfig,
+         },
+-        install_requires=[
+-            "pycairo>=%s" % get_version_requirement(
+-                get_pycairo_pkg_config_name()),
+-        ],
++        install_requires=install_requires,
+         data_files=[
+             ('include/pygobject-3.0', ['gi/pygobject.h']),
+         ],
