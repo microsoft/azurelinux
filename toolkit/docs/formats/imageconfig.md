@@ -114,7 +114,8 @@ A sample PackageLists entry pointing to three files containing package lists:
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.
-Removing RPM database can put system in an invalid state. This is only recommended for images that do not contain package manager, such as some containers.
+Removing the RPM database may break any package managers inside the image.
+
 
 ### KernelOptions
 
