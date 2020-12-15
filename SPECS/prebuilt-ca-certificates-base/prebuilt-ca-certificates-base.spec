@@ -27,7 +27,6 @@ mkdir -p %{buildroot}%{_datadir}/pki/ca-trust-legacy/
 mkdir -p %{buildroot}%{_sysconfdir}/pki/
 
 install -p -m 644 %{_datadir}/pki/ca-trust-legacy/* %{buildroot}%{_datadir}/pki/ca-trust-legacy/
-install -p -m 644 %{_datadir}/pki/ca-trust-source/* %{buildroot}%{_datadir}/pki/ca-trust-legacy/
 cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
 
 %files
