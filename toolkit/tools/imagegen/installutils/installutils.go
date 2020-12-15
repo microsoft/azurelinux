@@ -864,7 +864,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 
 		// Ignore updating if there is no shadow file to update
 		if exists, _ := file.PathExists(shadowFile); !exists {
-			logger.Log.Debugf("No shadow file to update. Skipping.")
+			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
 		}
 
@@ -1020,7 +1020,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 				done = true
 			} else if passwordExpirationInDays < passwordNeverExpiresValue {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration:(%d);should be greater than %d`, username, passwordExpirationInDays, passwordNeverExpiresValue)
+				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration:(%d); should be greater than %d`, username, passwordExpirationInDays, passwordNeverExpiresValue)
 			} else {
 				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
 				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.

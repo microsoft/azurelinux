@@ -110,7 +110,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-	isRootFS = isRootFs(systemConfig)
+	isRootFS = len(systemConfig.PartitionSettings) == 0
 	if isRootFS {
 		logger.Log.Infof("Creating rootfs")
 		additionalExtraMountPoints, additionalExtraDirectories, err := setupRootFS(outputDir, installRoot)
@@ -520,8 +520,4 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	return
-}
-
-func isRootFs(config configuration.SystemConfig) bool {
-	return len(config.PartitionSettings) == 0
 }

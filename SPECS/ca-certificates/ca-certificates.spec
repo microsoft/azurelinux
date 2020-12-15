@@ -63,7 +63,7 @@ Name:           ca-certificates
 # The files, certdata.txt and nssckbi.h, should be taken from a released version of NSS, as published
 # at https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/
 #
-# The versions that are used by the latest released version of 
+# The versions that are used by the latest released version of
 # Mozilla Firefox should be available from:
 # https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/nssckbi.h
 # https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt
@@ -73,6 +73,7 @@ Name:           ca-certificates
 # http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/certdata.txt
 # (but these files might have not yet been released).
 
+# WHEN UPDATING VERSION/RELEASE: remember to update prebuilt-ca-certificates as well.
 Version:        20200720
 Release:        10%{?dist}
 License:        MPLv2.0
@@ -483,7 +484,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 *Wed Jun 19 2019 Bob Relyea <rrelyea@redhat.com> 2019.2.32-1.0
  - Update to CKBI 2.32 from NSS 3.44
-   Removing: 
+   Removing:
     # Certificate "Visa eCommerce Root"
     # Certificate "AC Raiz Certicamara S.A."
     # Certificate "Certplus Root CA G1"
@@ -491,7 +492,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
     # Certificate "OpenTrust Root CA G1"
     # Certificate "OpenTrust Root CA G2"
     # Certificate "OpenTrust Root CA G3"
-   Adding: 
+   Adding:
     # Certificate "GTS Root R1"
     # Certificate "GTS Root R2"
     # Certificate "GTS Root R3"
@@ -694,7 +695,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 - Update to CKBI 1.95 from NSS 3.15.3.1
 
 * Fri Sep 06 2013 Kai Engert <kaie@redhat.com> - 2013.1.94-18
-- Update the Entrust root stapled extension for compatibility with 
+- Update the Entrust root stapled extension for compatibility with
   p11-kit version 0.19.2, patch by Stef Walter, rhbz#988745
 
 * Tue Sep 03 2013 Kai Engert <kaie@redhat.com> - 2013.1.94-17
@@ -727,7 +728,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 - adjust to changed and new functionality provided by p11-kit 0.17.3
 - updated READMEs to describe the new directory-specific treatment of files
 - ship a new file that contains certificates with neutral trust
-- ship a new file that contains distrust objects, and also staple a 
+- ship a new file that contains distrust objects, and also staple a
   basic constraint extension to one legacy root contained in the
   Mozilla CA list
 - adjust the build script to dynamically produce most of above files
@@ -741,7 +742,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
   other file format bundles.
 - Convert old file locations to symbolic links that point to dynamically
   generated files.
-- Old files, which might have been locally modified, will be saved in backup 
+- Old files, which might have been locally modified, will be saved in backup
   files with .rpmsave extension.
 - Added a update-ca-certificates script which can be used to regenerate
   the merged trusted output.
@@ -765,7 +766,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 * Wed Oct 24 2012 Paul Wouters <pwouters@redhat.com> - 2012.86-2
 - Updated blacklist with 20 entries (Diginotar, Trustwave, Comodo(?)
-- Fix to certdata2pem.py to also check for CKT_NSS_NOT_TRUSTED 
+- Fix to certdata2pem.py to also check for CKT_NSS_NOT_TRUSTED
 
 * Tue Oct 23 2012 Paul Wouters <pwouters@redhat.com> - 2012.86-1
 - update to r1.86

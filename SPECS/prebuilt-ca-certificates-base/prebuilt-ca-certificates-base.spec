@@ -1,5 +1,5 @@
-Summary:        Prebuilt version of ca-certificates package.
-Name:           prebuilt-ca-certificates
+Summary:        Prebuilt version of ca-certificates-base package.
+Name:           prebuilt-ca-certificates-base
 Version:        20200720
 Release:        1%{?dist}
 License:        MIT
@@ -10,17 +10,12 @@ URL:            https://hg.mozilla.org
 BuildArch:      noarch
 
 %description
-Prebuilt versions of the ca-certificates package with no runtime dependencies.
+Prebuilt version of the ca-certificates-base package with no runtime dependencies.
 
-%package base
-Summary:        Prebuilt version of ca-certificates-base package.
 BuildRequires:  ca-certificates-base
 Conflicts:      ca-certificates
 Conflicts:      ca-certificates-base
 Conflicts:      ca-certificates-microsoft
-
-%description base
-%{summary}
 
 %prep -q
 
@@ -37,8 +32,12 @@ cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
 
 %files
 # Base certs bundle file with trust
-%{_datadir}/pki/*
-%{_sysconfdir}/pki/*
+%{_sysconfdir}/pki/cert.pem
+%{_sysconfdir}/pki/certs/*
+%{_sysconfdir}/pki/ca-trust/extracted/*
+%{_sysconfdir}/pki/java/cacerts
+%{_datadir}/pki/ca-trust-legacy/*
+
 
 %changelog
 * Wed Dec 2 2020 Mateusz Malisz <mamalisz@microsoft.com> - 20200720-1

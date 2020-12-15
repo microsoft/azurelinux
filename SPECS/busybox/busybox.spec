@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://busybox.net/
-Source:         http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
+Source:         https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1:        busybox-static.config
 Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
