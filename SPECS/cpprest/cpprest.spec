@@ -4,8 +4,6 @@ Summary:        C++ REST library
 Name:           cpprest
 Version:        2.10.14
 Release:        7%{?dist}
-Summary:        C++ REST library
-Group:          Applications/File
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
