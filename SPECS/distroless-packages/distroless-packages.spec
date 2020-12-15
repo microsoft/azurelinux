@@ -13,7 +13,7 @@ Metapackage holding sets of core packages for different applications.
 
 %package minimal
 Summary:        The smallest useful package list.
-Requires:       ca-certificates-prebuilt
+Requires:       ca-certificates-prebuilt-base
 Requires:       filesystem
 Requires:       mariner-release
 
