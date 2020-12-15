@@ -863,11 +863,13 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
 
 		// Ignore updating if there is no shadow file to update
-		if exists, _ := file.PathExists(shadowFile); !exists {
+		if exists, ferr := file.PathExists(shadowFile); ferr != nil {
+			logger.Log.Error("Error accessing shadow file.")
+			return ferr
+		} else if !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
 		}
-
 		err = installChroot.UnsafeRun(func() error {
 			return chage(-1, "root")
 		})
@@ -924,8 +926,12 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Warnf("Ignoring UID for (%s) user, using default", rootUser)
 		}
 
-		if exists, _ := file.PathExists(shadowFile); !exists {
-			logger.Log.Debugf("No shadow file to update. Skipping.")
+		if exists, ferr := file.PathExists(shadowFile); ferr != nil {
+			logger.Log.Error("Error accessing shadow file.")
+			err = ferr
+			return
+		} else if !exists {
+			logger.Log.Debugf("No shadow file to update. Skipping updating user password..")
 		} else {
 			// Update shadow file
 			err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
@@ -955,8 +961,12 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	// Update password expiration
 	if user.PasswordExpiresDays != 0 {
 		// Ignore updating if there is no shadow file to update
-		if exists, _ := file.PathExists(shadowFile); !exists {
-			logger.Log.Debugf("No shadow file to update. Skipping.")
+		if exists, ferr := file.PathExists(shadowFile); ferr != nil {
+			logger.Log.Error("Error accessing shadow file.")
+			err = ferr
+			return
+		} else if !exists {
+			logger.Log.Debugf("No shadow file to update. Skipping updating password expiration.")
 			return
 		}
 

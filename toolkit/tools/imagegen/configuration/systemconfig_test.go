@@ -148,6 +148,6 @@ func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
 
 }
 
-func TestShouldSetRemoveRpmDbToTrue(t *testing.T) {
-	assert.Equal(t, validSystemConfig.RemoveRpmDb, true)
+func TestShouldSetRemoveRpmDbToFalse(t *testing.T) {
+	assert.Equal(t, validSystemConfig.RemoveRpmDb, false)
 }
