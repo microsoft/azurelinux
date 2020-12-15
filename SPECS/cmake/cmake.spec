@@ -30,8 +30,8 @@ Requires:       libarchive
 Requires:       ncurses
 Requires:       zlib
 Provides:       %{name}%{major_version} = %{version}-%{release}
-Provides:       %{name}-filesystem
-Provides:       %{name}-filesystem%{?_isa}
+Provides:       %{name}-filesystem = %{version}-%{release}
+Provides:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
 %description
 CMake is an extensible, open-source system that manages the build process in an
