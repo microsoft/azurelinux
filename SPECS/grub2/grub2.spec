@@ -266,9 +266,8 @@ popd
 #make sure all the files are same between two configure except the /usr/lib/grub
 %check
 %ifarch x86_64
-# Note: bin+sbin binaries are expected to differ due to different CFLAGS
-#diff -sr install-for-efi/sbin install-for-pc/sbin
-#diff -sr install-for-efi%{_bindir} install-for-pc%{_bindir}
+# Note: bin & sbin binaries are expected to differ due to different CFLAGS
+# Just compare files under _sysconfdir and _datarootdir
 diff -sr install-for-efi%{_sysconfdir} install-for-pc%{_sysconfdir}
 diff -sr install-for-efi%{_datarootdir} install-for-pc%{_datarootdir}
 %endif
