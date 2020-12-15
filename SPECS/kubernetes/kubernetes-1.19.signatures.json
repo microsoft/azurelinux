@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "kubelet.service": "22ea9e0b85aa9db9e1accfb6c21843683425fc1af9c0a2669523e42a455dc57e",
+  "kubernetes-node-linux-amd64-1.19.1-hotfix.20200923.tar.gz": "1dcc586240e202ac161dbd076e04d66f9e584017bd4d08b5a78b8ddc9d6b7df2"
+ }
+}
