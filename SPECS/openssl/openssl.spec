@@ -16,9 +16,6 @@ Patch0:         openssl-1.1.1-no-html.patch
 Patch1:         CVE-2019-0190.nopatch
 Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 Patch3:         CVE-2020-1971.patch
-
-Conflicts:      httpd <= 2.4.37
-
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -256,6 +253,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %clean
 rm -rf %{buildroot}
+
 
 
 
