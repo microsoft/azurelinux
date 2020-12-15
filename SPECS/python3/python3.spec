@@ -120,6 +120,7 @@ The PyPA recommended tool for installing Python packages.
 Summary:        Download, build, install, upgrade, and uninstall Python packages.
 Group:          Development/Tools
 Requires:       python3 = %{version}-%{release}
+Provides:       python3dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    setuptools
@@ -177,6 +178,7 @@ ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-, root, root)
@@ -275,7 +277,7 @@ rm -rf %{buildroot}/*
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 3.7.7-6
 - Ship pathfix.py.
 - pathfix.py spec changes imported from Fedora 32 (license: MIT)
-
+- Provide python3dist(setuptools).
 
 *   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 3.7.7-5
 -   Add OPENSSL_NO_COMP flag to configuration.
