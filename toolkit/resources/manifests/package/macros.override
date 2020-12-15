@@ -8,6 +8,7 @@
 # This list of skip_check_%{name} entries will cause %check to return immediately
 # on the specified spec.
 
+%skip_check_libsoup 1
 %skip_check_ant 1
 %skip_check_python_lxml 1
 %skip_check_socat 1
