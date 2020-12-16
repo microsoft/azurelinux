@@ -33,7 +33,7 @@ optimized_file    = $(PKGBUILD_DIR)/scrubbed_graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 workplan          = $(PKGBUILD_DIR)/workplan.mk
 
-logging_command = --log-file $(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level $(LOG_LEVEL)
+logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(LOGS_DIR)/pkggen/rpmbuilding)
 
