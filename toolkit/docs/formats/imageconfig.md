@@ -65,6 +65,15 @@ Sample partitions entry, specifying a boot partition and a root partition:
 ]
 ```
 
+#### Flags
+"Flags" key controls special handling for certain partitions.
+
+- `esp` indicates this is the UEFI esp partition
+- `grub` indicates this is a grub boot partition
+- `bios_grub` indicates this is a bios grub boot partition
+- `boot` indicates this is a boot partition
+- `dmroot` indicates this partition will be used for a device mapper root device (i.e. `Encryption` or `ReadOnlyVerityRoot`)
+
 ## SystemConfigs
 
 SystemConfigs is an array of SystemConfig entries.

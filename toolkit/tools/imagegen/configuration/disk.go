@@ -37,11 +37,11 @@ func (d *Disk) IsValid() (err error) {
 	// 		return
 	// 	}
 	// }
-	// for _, partition := range disk.Partitions {
-	// 	if err = partition.IsValid(); err != nil {
-	// 		return
-	// 	}
-	// }
+	for _, partition := range d.Partitions {
+		if err = partition.IsValid(); err != nil {
+			return
+		}
+	}
 	// for _, rawBinary := range disk.RawBinaries {
 	// 	if err = rawBinary.IsValid(); err != nil {
 	// 		return
