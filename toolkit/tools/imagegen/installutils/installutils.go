@@ -706,7 +706,7 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -723,6 +723,13 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 	err = setGrubCfgBootUUID(bootUUID, installGrubCfgFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+		return
+	}
+
+	// Add in bootPrefix
+	err = setGrubCfgBootPrefix(bootPrefix, installGrubCfgFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
 		return
 	}
 
@@ -1249,7 +1256,7 @@ func getPackagesFromJSON(file string) (pkgList PackageList, err error) {
 // - bootUUID is the UUID of the boot partition
 // Note: this boot partition could be different than the boot partition specified in the main grub config.
 // This boot partition specifically indicates where to find the main grub cfg
-func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootDevPath string) (err error) {
+func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix, bootDevPath string) (err error) {
 	const (
 		efiMountPoint  = "/boot/efi"
 		efiBootType    = "efi"
@@ -1267,7 +1274,7 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 		}
 	case efiBootType:
 		efiPath := filepath.Join(installChroot.RootDir(), efiMountPoint)
-		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID)
+		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix)
 		if err != nil {
 			return
 		}
@@ -1354,7 +1361,7 @@ func GetPartUUID(device string) (stdout string, err error) {
 // installRoot/boot/efi folder
 // It is expected that shim (bootx64.efi) and grub2 (grub2.efi) are installed
 // into the EFI directory via the package list installation mechanism.
-func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID string) (err error) {
+func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
@@ -1380,6 +1387,13 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID string) (er
 	err = setGrubCfgBootUUID(bootUUID, grubFinalPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+		return
+	}
+
+	// Set the boot prefix
+	err = setGrubCfgBootPrefix(bootPrefix, grubFinalPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
 		return
 	}
 
@@ -1473,7 +1487,7 @@ func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuratio
 		extraPattern = "{{.ExtraCommandLine}}"
 	)
 
-	logger.Log.Debugf("Adding ExtraCommandLine('%s') to %s", kernelCommandline.ExtraCommandLine, grubPath)
+	logger.Log.Debugf("Adding ExtraCommandLine('%s') to '%s'", kernelCommandline.ExtraCommandLine, grubPath)
 	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
@@ -1494,7 +1508,7 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 		ima += fmt.Sprintf("%v%v ", imaPrefix, policy)
 	}
 
-	logger.Log.Debugf("Adding ImaPolicy('%s') to %s", ima, grubPath)
+	logger.Log.Debugf("Adding ImaPolicy('%s') to '%s'", ima, grubPath)
 	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
@@ -1515,7 +1529,7 @@ func setGrubCfgLVM(grubPath, luksUUID string) (err error) {
 		lvm = fmt.Sprintf("%v%v", lvmPrefix, diskutils.GetEncryptedRootVolPath())
 	}
 
-	logger.Log.Debugf("Adding lvm('%s') to %s", lvm, grubPath)
+	logger.Log.Debugf("Adding lvm('%s') to '%s'", lvm, grubPath)
 	err = sed(lvmPattern, lvm, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's LVM setting: %v", err)
@@ -1537,7 +1551,7 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 		luksUUID = fmt.Sprintf("%v%v", luksUUIDPrefix, uuid)
 	}
 
-	logger.Log.Debugf("Adding luks('%s') to %s", luksUUID, grubPath)
+	logger.Log.Debugf("Adding luks('%s') to '%s'", luksUUID, grubPath)
 	err = sed(luksUUIDPattern, luksUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's luksUUID: %v", err)
@@ -1553,10 +1567,25 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	)
 	var cmdline configuration.KernelCommandLine
 
-	logger.Log.Debugf("Adding UUID('%s') to %s", bootUUID, grubPath)
+	logger.Log.Debugf("Adding UUID('%s') to '%s'", bootUUID, grubPath)
 	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
+		return
+	}
+	return
+}
+
+func setGrubCfgBootPrefix(bootPrefix, grubPath string) (err error) {
+	const (
+		bootPrefixPattern = "{{.BootPrefix}}"
+	)
+	var cmdline configuration.KernelCommandLine
+
+	logger.Log.Debugf("Adding BootPrefix('%s') to '%s'", bootPrefix, grubPath)
+	err = sed(bootPrefixPattern, bootPrefix, cmdline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's bootPrefix: %v", err)
 		return
 	}
 	return
@@ -1570,7 +1599,7 @@ func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 	var cmdline configuration.KernelCommandLine
 
 	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	logger.Log.Debugf("Adding EncryptedVolume('%s') to %s", encryptedVol, grubPath)
+	logger.Log.Debugf("Adding EncryptedVolume('%s') to '%s'", encryptedVol, grubPath)
 	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
@@ -1589,7 +1618,7 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 		rootDevice = diskutils.GetEncryptedRootVolMapping()
 	}
 
-	logger.Log.Debugf("Adding RootDevice('%s') to %s", rootDevice, grubPath)
+	logger.Log.Debugf("Adding RootDevice('%s') to '%s'", rootDevice, grubPath)
 	err = sed(rootDevicePattern, rootDevice, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's rootDevice: %v", err)

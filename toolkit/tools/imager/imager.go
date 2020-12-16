@@ -474,11 +474,19 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 
 func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
 	const rootMountPoint = "/"
+	const bootMountPoint = "/boot"
 
 	var rootDevice string
 
-	// Add bootloader
-	bootUUID, err := installutils.GetUUID(installMap[rootMountPoint])
+	// Add bootloader. Prefer a seperate boot partition if one exists.
+	bootDevice, ok := installMap[bootMountPoint]
+	bootPrefix := ""
+	if !ok {
+		bootDevice = installMap[rootMountPoint]
+		// If we do not have a seperate boot partition we will need to add a prefix to all paths used in the configs.
+		bootPrefix = "/boot"
+	}
+	bootUUID, err := installutils.GetUUID(bootDevice)
 	if err != nil {
 		err = fmt.Errorf("failed to get UUID: %s", err)
 		return
@@ -493,7 +501,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		}
 	}
 
-	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, diskDevPath)
+	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath)
 	if err != nil {
 		err = fmt.Errorf("failed to install bootloader: %s", err)
 		return
@@ -513,7 +521,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		rootDevice = fmt.Sprintf("PARTUUID=%v", partUUID)
 	}
 
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, encryptedRoot, systemConfig.KernelCommandLine)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
