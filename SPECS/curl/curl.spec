@@ -74,7 +74,6 @@ make %{?_smp_mflags} check
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license COPYING
