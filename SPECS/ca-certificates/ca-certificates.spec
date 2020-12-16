@@ -1,3 +1,5 @@
+#nospeccleaner
+
 %define pkidir %{_sysconfdir}/pki
 %define catrustdir %{_sysconfdir}/pki/ca-trust
 %define classic_tls_bundle ca-bundle.crt
