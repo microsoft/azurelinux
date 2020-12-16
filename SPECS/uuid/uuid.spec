@@ -39,6 +39,36 @@ Requires:       pkg-config
 %description devel
 Development headers and libraries for OSSP uuid.
 
+%package c++
+Summary:        C++ support for Universally Unique Identifier library
+Requires:       %{name} = %{version}-%{release}
+
+%description c++
+C++ libraries for OSSP uuid.
+
+%package c++-devel
+Summary:        C++ development support for Universally Unique Identifier library
+Requires:       %{name}-c++ = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
+
+%description c++-devel
+C++ development headers and libraries for OSSP uuid.
+
+%package dce
+Summary:        DCE support for Universally Unique Identifier library
+Requires:       %{name} = %{version}-%{release}
+
+%description dce
+DCE OSSP uuid library.
+
+%package dce-devel
+Summary:        DCE development support for Universally Unique Identifier library
+Requires:       %{name}-dce = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
+
+%description dce-devel
+DCE development headers and libraries for OSSP uuid.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -62,8 +92,8 @@ export CXXFLAGS="%{optflags}"
     --disable-static \
     --without-perl \
     --without-php \
-    --without-dce \
-    --without-cxx \
+    --with-dce \
+    --with-cxx \
     --without-pgsql
 
 make LIBTOOL="%{_bindir}/libtool --tag=CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" %{?_smp_mflags}
@@ -101,6 +131,21 @@ make check
 %{_mandir}/man3/ossp-uuid.3*
 %{_mandir}/man1/uuid-config.*
 
+%files c++
+%{_libdir}/libossp-uuid++.so.*
+
+%files c++-devel
+%{_includedir}/uuid++.hh
+%{_libdir}/libossp-uuid++.so
+%{_mandir}/man3/uuid++.3*
+
+%files dce
+%{_libdir}/libossp-uuid_dce.so.*
+
+%files dce-devel
+%{_includedir}/uuid_dce.h
+%{_libdir}/libossp-uuid_dce.so
+
 %changelog
 * Mon Nov 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 1.6.2-50
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
@@ -108,8 +153,6 @@ make check
 - Use gcc for BR
 - Use pkg-config for devel package BR
 - Remove perl package
-- Remove c++ pacakges
-- Remove dce pacakges
 - Remove Fedora/RHEL check for filter_setup
 - Add CC tag to libtool for make
 
