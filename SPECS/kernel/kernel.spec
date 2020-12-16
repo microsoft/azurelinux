@@ -123,6 +123,8 @@ Patch1094:      CVE-2020-14381.nopatch
 Patch1095:      CVE-2020-25656.nopatch
 Patch1096:      CVE-2020-25704.nopatch
 Patch1097:      CVE-2020-29534.nopatch
+Patch1098:      CVE-2020-29660.nopatch
+Patch1099:      CVE-2020-29661.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
