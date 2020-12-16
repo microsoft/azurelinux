@@ -29,6 +29,18 @@ type SystemConfig struct {
 	RemoveRpmDb        bool                `json:"RemoveRpmDb"`
 }
 
+// GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
+// will be mounted at "/", or nil if no partition is found
+func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
+	for i, p := range s.PartitionSettings {
+		if p.MountPoint == "/" {
+			// We want to refernce the actual object in the slice
+			return &s.PartitionSettings[i]
+		}
+	}
+	return nil
+}
+
 // IsValid returns an error if the SystemConfig is not valid
 func (s *SystemConfig) IsValid() (err error) {
 	// IsDefault must be validated by a parent struct
@@ -61,12 +73,24 @@ func (s *SystemConfig) IsValid() (err error) {
 				return fmt.Errorf("empty kernel entry found in the [KernelOptions] field (%s); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", name)
 			}
 		}
+	}
 
-		// for _, partitionSetting := range sysConfig.PartitionSettings {
-		// 	if err = partitionSetting.IsValid(); err != nil {
-		// 		return fmt.Errorf("invalid [PartitionSettings]: %w", err)
-		// 	}
-		// }
+	// Validate the partitions this system config will be including
+	mountPointUsed := make(map[string]bool)
+	for _, partitionSetting := range s.PartitionSettings {
+		if err = partitionSetting.IsValid(); err != nil {
+			return fmt.Errorf("invalid [PartitionSettings]: %w", err)
+		}
+		if mountPointUsed[partitionSetting.MountPoint] {
+			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at '%s'", partitionSetting.MountPoint)
+		}
+		mountPointUsed[partitionSetting.MountPoint] = true
+	}
+
+	if s.Encryption.Enable {
+		if !mountPointUsed["/"] {
+			return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
+		}
 	}
 
 	if err = s.KernelCommandLine.IsValid(); err != nil {

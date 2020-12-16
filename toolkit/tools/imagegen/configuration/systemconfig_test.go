@@ -100,6 +100,8 @@ func TestShouldSucceedParsingMissingDefaultKernelForRootfs_SystemConfig(t *testi
 	rootfsNoKernelConfig.KernelOptions = map[string]string{}
 	rootfsNoKernelConfig.PartitionSettings = []PartitionSetting{}
 
+	rootfsNoKernelConfig.Encryption = RootEncryption{}
+
 	assert.NoError(t, rootfsNoKernelConfig.IsValid())
 	err := remarshalJSON(rootfsNoKernelConfig, &checkedSystemConfig)
 	assert.NoError(t, err)
@@ -137,6 +139,43 @@ func TestShouldFailParsingBadUserUID_SystemConfig(t *testing.T) {
 	err = remarshalJSON(badUserConfig, &checkedSystemConfig)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
+}
+
+func TestShouldFailToParsingMultipleSameMounts_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	badPartitionSettingsConfig := validSystemConfig
+	badPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
+		{MountPoint: "/"},
+		{MountPoint: "/"},
+	}
+
+	err := badPartitionSettingsConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [PartitionSettings]: duplicate mount point found at '/'", err.Error())
+
+	err = remarshalJSON(badPartitionSettingsConfig, &checkedSystemConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [SystemConfig]: invalid [PartitionSettings]: duplicate mount point found at '/'", err.Error())
+}
+
+func TestShouldFailToFindMissingRootPartitionSetting_SystemConfig(t *testing.T) {
+	badPartitionSettingsConfig := validSystemConfig
+
+	// Remove all the partition settings
+	badPartitionSettingsConfig.PartitionSettings = []PartitionSetting{}
+
+	var partSetting *PartitionSetting = nil
+	partSetting = badPartitionSettingsConfig.GetRootPartitionSetting()
+	assert.Nil(t, partSetting)
+}
+
+func TestShouldSucceedFindingRootPartitionSetting_SystemConfig(t *testing.T) {
+	badPartitionSettingsConfig := validSystemConfig
+
+	partSetting := badPartitionSettingsConfig.GetRootPartitionSetting()
+	assert.NotNil(t, partSetting)
+	assert.Equal(t, "MyRootfs", partSetting.ID)
 }
 
 func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {

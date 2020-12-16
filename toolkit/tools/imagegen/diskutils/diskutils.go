@@ -229,10 +229,6 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, err error) {
-	const (
-		rootFsID = "rootfs"
-	)
-
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
 
@@ -271,8 +267,12 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
-		if rootEncryption.Enable && partition.ID == rootFsID {
+		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
+			if err != nil {
+				logger.Log.Warnf("Failed to initialize encrypted root")
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
+			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else {
 			partDevPathMap[partition.ID] = partDevPath
@@ -339,12 +339,14 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		args := []string{diskDevPath, "--script", "set", partitionNumberStr}
 		var flagToSet string
 		switch flag {
-		case "esp":
+		case configuration.PartitionFlagESP:
 			flagToSet = "esp"
-		case "grub", "bios-grub":
+		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub:
 			flagToSet = "bios_grub"
-		case "boot":
+		case configuration.PartitionFlagBoot:
 			flagToSet = "boot"
+		case configuration.PartitionFlagDeviceMapperRoot:
+			//Ignore, only used for internal tooling
 		default:
 			return partDevPath, fmt.Errorf("Partition %v - Unknown partition flag: %v", partitionNumber, flag)
 		}
@@ -454,14 +456,14 @@ func SystemBootType() (bootType string) {
 
 // BootPartitionConfig returns the partition flags and mount point that should be used
 // for a given boot type.
-func BootPartitionConfig(bootType string) (mountPoint, mountOptions string, flags []string, err error) {
+func BootPartitionConfig(bootType string) (mountPoint, mountOptions string, flags []configuration.PartitionFlag, err error) {
 	switch bootType {
 	case "efi":
-		flags = []string{"esp", "boot"}
+		flags = []configuration.PartitionFlag{configuration.PartitionFlagESP, configuration.PartitionFlagBoot}
 		mountPoint = "/boot/efi"
 		mountOptions = "umask=0077"
 	case "legacy":
-		flags = []string{"grub"}
+		flags = []configuration.PartitionFlag{configuration.PartitionFlagGrub}
 		mountPoint = ""
 		mountOptions = ""
 	default:
