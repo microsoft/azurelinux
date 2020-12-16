@@ -97,6 +97,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		diskDevPath        string
 		kernelPkg          string
 		encryptedRoot      diskutils.EncryptedRootDevice
+		readOnlyRoot       diskutils.VerityDevice
 		partIDToDevPathMap map[string]string
 		partIDToFsTypeMap  map[string]string
 		extraMountPoints   []*safechroot.MountPoint
@@ -124,7 +125,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	} else {
 		logger.Log.Info("Creating raw disk in build directory")
 		diskConfig := disks[defaultDiskIndex]
-		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption)
+		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
 		if err != nil {
 			return
 		}
@@ -134,6 +135,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			defer diskutils.DetachLoopbackDevice(diskDevPath)
 			defer diskutils.BlockOnDiskIO(diskDevPath)
 		}
+
+		if systemConfig.ReadOnlyVerityRoot.Enable {
+			defer readOnlyRoot.CleanupVerityDevice()
+		}
+
 		// Add additional system settings for root encryption
 		err = setupDiskEncryption(&systemConfig, &encryptedRoot, buildDir)
 		if err != nil {
@@ -181,7 +187,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
@@ -213,7 +219,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -279,26 +285,26 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 	return
 }
 
-func setupDisk(outputDir, diskName string, liveInstallFlag bool, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, err error) {
+func setupDisk(outputDir, diskName string, liveInstallFlag bool, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		realDiskType = "path"
 	)
 	if diskConfig.TargetDisk.Type == realDiskType {
 		if liveInstallFlag {
 			diskDevPath = diskConfig.TargetDisk.Value
-			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption)
+			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 		} else {
 			err = fmt.Errorf("target Disk Type is set but --live-install option is not set. Please check your config or enable the --live-install option")
 			return
 		}
 	} else {
-		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, err = setupLoopDeviceDisk(outputDir, diskName, diskConfig, rootEncryption)
+		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskName, diskConfig, rootEncryption, readOnlyRootConfig)
 		isLoopDevice = true
 	}
 	return
 }
 
-func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, err error) {
+func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	defer func() {
 		// Detach the loopback device on failure
 		if err != nil && diskDevPath != "" {
@@ -322,7 +328,7 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 		return
 	}
 
-	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption)
+	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
 		logger.Log.Errorf("Failed to setup loopback disk partitions (%s)", rawDisk)
 		return
@@ -331,14 +337,14 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 	return
 }
 
-func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, err error) {
+func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		defaultBlockSize = diskutils.MiB
 		noMaxSize        = 0
 	)
 
 	// Set up partitions
-	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption)
+	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
 		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPath)
 		return
@@ -425,9 +431,10 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
 	const (
 		installRoot       = "/installroot"
+		verityWorkingDir  = "verityworkingdir"
 		emptyWorkerTar    = ""
 		existingChrootDir = true
 		leaveChrootOnDisk = true
@@ -444,6 +451,19 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 			return
 		}
 		defer installutils.DestroyInstallRoot(installRoot, installMap)
+	}
+
+	if systemConfig.ReadOnlyVerityRoot.Enable {
+		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
+		// image setup environment (setuproot chroot or live installer).
+		verityPackages := []string{"device-mapper", "veritysetup"}
+		for _, pkg := range verityPackages {
+			_, err = installutils.TdnfInstall(pkg, "/")
+			if err != nil {
+				err = fmt.Errorf("failed to install read only support package '%s': %w", pkg, err)
+				return
+			}
+		}
 	}
 
 	// Create new chroot for the new image
@@ -464,15 +484,39 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 		return
 	}
 
-	// Only configure the bootloader for actual disks, a rootfs does not need one
+	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {
-		err = configureDiskBootloader(systemConfig, installChroot, diskDevPath, installMap, encryptedRoot)
+		err = configureDiskBootloader(systemConfig, installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot)
+		if err != nil {
+			err = fmt.Errorf("failed to configure boot loader: %w", err)
+			return
+		}
+
+		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
+		if systemConfig.ReadOnlyVerityRoot.Enable {
+			logger.Log.Info("Configuring root for read only with dm-verity")
+			var initramfsPathList []string
+			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
+			if err != nil {
+				err = fmt.Errorf("failed to switch root to read-only: %w", err)
+				return
+			}
+			initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+			if err != nil || len(initramfsPathList) != 1 {
+				return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
+			}
+			err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
+			if err != nil {
+				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
+				return
+			}
+		}
 	}
 
 	return
 }
 
-func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
 	const rootMountPoint = "/"
 	const bootMountPoint = "/boot"
 
@@ -510,6 +554,14 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	// Add grub config to image
 	if systemConfig.Encryption.Enable {
 		rootDevice = installMap[rootMountPoint]
+	} else if systemConfig.ReadOnlyVerityRoot.Enable {
+		var partUUID string
+		partUUID, err = installutils.GetPartUUID(readOnlyRoot.BackingDevice)
+		if err != nil {
+			err = fmt.Errorf("failed to get PARTUUID: %s", err)
+			return
+		}
+		rootDevice = fmt.Sprintf("verityroot:PARTUUID=%v", partUUID)
 	} else {
 		var partUUID string
 		partUUID, err = installutils.GetPartUUID(installMap[rootMountPoint])
@@ -521,7 +573,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		rootDevice = fmt.Sprintf("PARTUUID=%v", partUUID)
 	}
 
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return

@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"regexp"
+	"strconv"
 )
 
 // ReadOnlyVerityRoot controls DM-Verity read-only filesystems which will be mounted at startup
@@ -48,6 +50,7 @@ type ReadOnlyVerityRoot struct {
 	ValidateOnBoot               bool                `json:"ValidateOnBoot"`
 	VerityErrorBehavior          VerityErrorBehavior `json:"VerityErrorBehavior"`
 	TmpfsOverlays                []string            `json:"TmpfsOverlays"`
+	TmpfsOverlaySize             string              `json:"TmpfsOverlaySize"`
 	TmpfsOverlayDebugEnabled     bool                `json:"TmpfsOverlayDebugEnabled"`
 }
 
@@ -57,6 +60,7 @@ const (
 	defaultErrorCorrectionEncodingN = 2
 	maxErrorCorrectionEncodingRoots = 24
 	minErrorCorrectionEncodingRoots = 2
+	defaultOverlaySize              = "20%"
 )
 
 var (
@@ -65,7 +69,10 @@ var (
 		ErrorCorrectionEnable:        true,
 		VerityErrorBehavior:          VerityErrorBehaviorDefault,
 		ErrorCorrectionEncodingRoots: defaultErrorCorrectionEncodingN,
+		TmpfsOverlaySize:             defaultOverlaySize,
 	}
+	// The tmpfs overlay size must be of the form: 1234, 1234(k,m,g), or 20%
+	tmpfsOverlaySizeRegex = regexp.MustCompile(`^(\d+)([kmg%]?)$`)
 )
 
 // IsValid returns an error if the ReadOnlyVerityRoot is not valid
@@ -100,6 +107,23 @@ func (v *ReadOnlyVerityRoot) IsValid() (err error) {
 			}
 			if isNested {
 				return fmt.Errorf("failed to validate [TmpfsOverlays], overlays may not overlap each other (%s)(%s)", overlayA, overlayB)
+			}
+		}
+	}
+
+	if len(v.TmpfsOverlays) > 0 {
+		// Check tmpfs size
+		matches := tmpfsOverlaySizeRegex.FindStringSubmatch(v.TmpfsOverlaySize)
+		if len(matches) == 0 {
+			return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), must be of the form '1234, 1234<k,m,g>, 30%%", v.TmpfsOverlaySize)
+		}
+		if matches[2] == "%" {
+			percent, convertErr := strconv.Atoi(matches[1])
+			if convertErr != nil {
+				return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), could not convert percentage to integer: %w", v.TmpfsOverlaySize, convertErr)
+			}
+			if percent <= 0 || percent >= 100 {
+				return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), invalid percentage (%d), should be in the range 0 < percentage < 100", v.TmpfsOverlaySize, percent)
 			}
 		}
 	}
