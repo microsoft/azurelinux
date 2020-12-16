@@ -354,7 +354,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
 				logger.Log.Warnf("Failed to initialize encrypted root")
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else {

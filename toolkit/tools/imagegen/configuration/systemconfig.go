@@ -27,6 +27,7 @@ type SystemConfig struct {
 	Users              []User              `json:"Users"`
 	Encryption         RootEncryption      `json:"Encryption"`
 	RemoveRpmDb        bool                `json:"RemoveRpmDb"`
+	ReadOnlyVerityRoot ReadOnlyVerityRoot  `json:"ReadOnlyVerityRoot"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
@@ -89,10 +90,21 @@ func (s *SystemConfig) IsValid() (err error) {
 		mountPointUsed[partitionSetting.MountPoint] = true
 	}
 
-	if s.Encryption.Enable {
+	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {
 		if !mountPointUsed["/"] {
 			return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
 		}
+		if s.ReadOnlyVerityRoot.Enable && s.Encryption.Enable {
+			return fmt.Errorf("invalid [ReadOnlyVerityRoot] and [Encryption]: verity root currently does not support root encryption")
+		}
+	}
+
+	if s.ReadOnlyVerityRoot.Enable && !mountPointUsed["/boot"] {
+		return fmt.Errorf("invalid [ReadOnlyVerityRoot]: must have a separate partition mounted at '/boot'")
+	}
+
+	if err = s.ReadOnlyVerityRoot.IsValid(); err != nil {
+		return fmt.Errorf("invalid [ReadOnlyVerityRoot]: %w", err)
 	}
 
 	if err = s.KernelCommandLine.IsValid(); err != nil {
