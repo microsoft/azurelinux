@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
-Version:        5.4.81
+Version:        5.4.83
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -80,6 +80,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
+- Update source to 5.4.83
+
 * Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
 - Update source to 5.4.81
 

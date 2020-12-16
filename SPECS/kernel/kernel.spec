@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.81
+Version:        5.4.83
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -118,6 +118,13 @@ Patch1090:      CVE-2020-29372.nopatch
 Patch1091:      CVE-2020-27194.nopatch
 # CVE-2020-27152 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1092:      CVE-2020-27152.nopatch
+Patch1093:      CVE-2020-14351.nopatch
+Patch1094:      CVE-2020-14381.nopatch
+Patch1095:      CVE-2020-25656.nopatch
+Patch1096:      CVE-2020-25704.nopatch
+Patch1097:      CVE-2020-29534.nopatch
+Patch1098:      CVE-2020-29660.nopatch
+Patch1099:      CVE-2020-29661.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -425,6 +432,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
+- Update source to 5.4.83
+- Address CVE-2020-14351, CVE-2020-14381, CVE-2020-25656, CVE-2020-25704,
+  CVE-2020-29534, CVE-2020-29660, CVE-2020-29661
+
 * Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
 - Update source to 5.4.81
 - Remove patch for kexec in HyperV. Integrated in 5.4.81.
