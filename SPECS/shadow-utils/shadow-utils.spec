@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 URL:            https://github.com/shadow-maint/shadow/
 License:        BSD
 Group:          Applications/System
@@ -77,7 +77,7 @@ do
     sed -i "s/^${FUNCTION}/# &/" %{buildroot}/etc/login.defs
 done
 
-sed -i "s/^PASS_MAX_DAYS.*/PASS_MAX_DAYS    90/" %{buildroot}/etc/login.defs
+sed -i "s/^PASS_MAX_DAYS.*/PASS_MAX_DAYS    99999/" %{buildroot}/etc/login.defs
 
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
@@ -141,6 +141,9 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9
+- Update PASS_MAX_DAYS to 99999
+
 * Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
 - Added %%license line automatically
 
