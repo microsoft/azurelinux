@@ -21,7 +21,8 @@ var (
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
 
-	input = exe.InputStringFlag(app, "Path to the image config file.")
+	input       = exe.InputStringFlag(app, "Path to the image config file.")
+	baseDirPath = exe.InputDirFlag(app, "Base directory for relative file paths from the config.")
 )
 
 func main() {
@@ -33,9 +34,11 @@ func main() {
 
 	inPath, err := filepath.Abs(*input)
 	logger.PanicOnError(err, "Error when calculating input path")
+	baseDir, err := filepath.Abs(*baseDirPath)
+	logger.PanicOnError(err, "Error when calculating input directory")
 
 	logger.Log.Infof("Reading configuration file (%s)", inPath)
-	config, err := configuration.Load(inPath)
+	config, err := configuration.LoadWithAbsolutePaths(inPath, baseDir)
 	if err != nil {
 		logger.Log.Fatalf("Failed while loading image configuration '%s': %s", inPath, err)
 	}
@@ -54,5 +57,13 @@ func main() {
 // ValidateConfiguration will run sanity checks on a configuration structure
 func ValidateConfiguration(config configuration.Config) (err error) {
 	err = config.IsValid()
+	if err != nil {
+		return
+	}
+	err = validatePackages(config)
+	return
+}
+
+func validatePackages(config configuration.Config) (err error) {
 	return
 }

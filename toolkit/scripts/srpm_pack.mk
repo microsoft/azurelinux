@@ -67,6 +67,8 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
-		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING)
+		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
+		--log-file=$(LOGS_DIR)/pkggen/workplan/intermediate_srpms.log \
+		--log-level=$(LOG_LEVEL)
 	touch $@
 endif

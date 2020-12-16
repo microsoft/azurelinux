@@ -35,11 +35,20 @@ func TestShouldSucceedValidatingDefaultConfigs(t *testing.T) {
 
 			fmt.Println("Validating ", configPath)
 
-			config, err := configuration.Load(configPath)
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
 			assert.NoError(t, err)
+
+			if err != nil {
+				// It can be hard to figure out which config failed from the printed output, explicitly print
+				// an error message listed the failed configs.
+				fmt.Printf("Failed to validate %s\n", configPath)
+			}
 
 			err = ValidateConfiguration(config)
 			assert.NoError(t, err)
+			if err != nil {
+				fmt.Printf("Failed to validate %s\n", configPath)
+			}
 			checkedConfigs++
 		}
 	}
@@ -67,6 +76,7 @@ func TestShouldFailEmptySystemConfig(t *testing.T) {
 func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 	const (
 		configDirectory string = "../../imageconfigs/"
+		targetPackage          = "core-efi.json"
 	)
 	configFiles, err := ioutil.ReadDir(configDirectory)
 	assert.NoError(t, err)
@@ -74,12 +84,12 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 	// Pick the first config file and mess something up which is deeply
 	// nested inside the json
 	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), "core-efi.json") {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
 			configPath := filepath.Join(configDirectory, file.Name())
 
 			fmt.Println("Corrupting ", configPath)
 
-			config, err := configuration.Load(configPath)
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
 			assert.NoError(t, err)
 
 			config.Disks[0].PartitionTableType = configuration.PartitionTableType("not_a_real_partition_type")
@@ -90,5 +100,5 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 			return
 		}
 	}
-	assert.Fail(t, "Could not find 'core-efi.json' to test")
+	assert.Failf(t, "Could not find config", "Could not find image config file '%s' to test", filepath.Join(configDirectory, targetPackage))
 }
