@@ -102,3 +102,72 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 	}
 	assert.Failf(t, "Could not find config", "Could not find image config file '%s' to test", filepath.Join(configDirectory, targetPackage))
 }
+
+func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {
+	const (
+		configDirectory       string = "../../imageconfigs/"
+		targetPackage                = "read-only-root-efi.json"
+		roRootPackageListFile        = "read-only-root-packages.json"
+	)
+	configFiles, err := ioutil.ReadDir(configDirectory)
+	assert.NoError(t, err)
+
+	// Pick the read-only-root config file, but remove the dm-verity dracut package list
+	for _, file := range configFiles {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
+			configPath := filepath.Join(configDirectory, file.Name())
+
+			fmt.Println("Corrupting ", configPath)
+
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
+			assert.NoError(t, err)
+
+			newPackageList := []string{}
+			for _, pl := range config.SystemConfigs[0].PackageLists {
+				if !strings.Contains(pl, roRootPackageListFile) {
+					newPackageList = append(newPackageList, pl)
+				}
+			}
+
+			config.SystemConfigs[0].PackageLists = newPackageList
+
+			err = ValidateConfiguration(config)
+			assert.Error(t, err)
+			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] selected, but 'verity-read-only-root' package is not included in the package lists", err.Error())
+
+			return
+		}
+	}
+	assert.Fail(t, "Could not find "+targetPackage+" to test")
+}
+
+func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
+	const (
+		configDirectory string = "../../imageconfigs/"
+		targetPackage          = "read-only-root-efi.json"
+	)
+	configFiles, err := ioutil.ReadDir(configDirectory)
+	assert.NoError(t, err)
+
+	// Find the read-only root image config
+	for _, file := range configFiles {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
+			configPath := filepath.Join(configDirectory, file.Name())
+
+			fmt.Println("Corrupting ", configPath)
+
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
+			assert.NoError(t, err)
+
+			// Turn on the debug flag
+			config.SystemConfigs[0].ReadOnlyVerityRoot.TmpfsOverlayDebugEnabled = true
+
+			err = ValidateConfiguration(config)
+			assert.Error(t, err)
+			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but 'verity-read-only-root-debug-mount' package is not included in the package lists", err.Error())
+
+			return
+		}
+	}
+	assert.Fail(t, "Could not find "+targetPackage+" to test")
+}

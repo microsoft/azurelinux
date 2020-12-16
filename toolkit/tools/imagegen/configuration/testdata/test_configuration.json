@@ -181,7 +181,10 @@
                 "Enable":   true,
                 "Password": "EncryptPassphrase123"
             },
-            "RemoveRpmDb": false
+            "RemoveRpmDb": false,
+            "ReadOnlyVerityRoot": {
+                "Enable": false
+            }
         },
         {
             "Name": "BiggerDiskA",

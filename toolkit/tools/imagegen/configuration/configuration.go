@@ -86,7 +86,7 @@ func (c *Config) GetDiskPartByID(ID string) (disk *Partition) {
 func checkDeviceMapperFlags(config *Config) (err error) {
 	for _, sysConfig := range config.SystemConfigs {
 		var dmRoot *Partition
-		if sysConfig.Encryption.Enable {
+		if sysConfig.ReadOnlyVerityRoot.Enable || sysConfig.Encryption.Enable {
 			rootPartSetting := sysConfig.GetRootPartitionSetting()
 			if rootPartSetting == nil {
 				return fmt.Errorf("can't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]")
