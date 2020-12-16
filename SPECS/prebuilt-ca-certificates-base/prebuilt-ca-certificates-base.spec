@@ -1,3 +1,4 @@
+#nospeccleaner
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 Version:        20200720
