@@ -262,7 +262,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.83-1
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
 - Update source to 5.4.83
 
 * Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
