@@ -20,9 +20,10 @@ var (
 		VerityErrorBehavior:          "restart",
 	}
 	validReadOnlyVerityRootWithOverlays = ReadOnlyVerityRoot{
-		Enable:        true,
-		Name:          "test",
-		TmpfsOverlays: []string{"a/folder", "a/different_folder"},
+		Enable:           true,
+		Name:             "test",
+		TmpfsOverlays:    []string{"a/folder", "a/different_folder"},
+		TmpfsOverlaySize: "20%",
 	}
 	invalidReadOnlyVerityRootJSON     = `{"Enable": 1234}`
 	invalidReadONlyVerityBehaviorJSON = `{"VerityErrorBehavior": "not_a_behavior"}`
@@ -123,6 +124,70 @@ func TestShouldFailInvalidErrorBehavior_ReadOnlyVerityRoot(t *testing.T) {
 	err = remarshalJSON(invalidBehaviorVerityRoot, &checkedReadOnlyVerityRoot)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to parse [VerityErrorBehavior]: invalid value for VerityErrorBehavior (not_a_behavior)", err.Error())
+}
+
+func TestShouldFailInvalidOverlaySizes_ReadOnlyVerityRoot(t *testing.T) {
+	var checkedReadOnlyVerityRoot ReadOnlyVerityRoot
+	invalidReadOnlyVerityRoot := validReadOnlyVerityRootWithOverlays
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "abcd"
+	err := invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (abcd), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (abcd), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "1234t"
+	err = invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (1234t), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (1234t), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "k1234"
+	err = invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (k1234), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (k1234), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "1234kmb"
+	err = invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (1234kmb), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (1234kmb), must be of the form '1234, 1234<k,m,g>, 30%", err.Error())
+}
+
+func TestShouldFailInvalidOverlaySizePercents_ReadOnlyVerityRoot(t *testing.T) {
+	var checkedReadOnlyVerityRoot ReadOnlyVerityRoot
+	invalidReadOnlyVerityRoot := validReadOnlyVerityRootWithOverlays
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "100%"
+	err := invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (100%), invalid percentage (100), should be in the range 0 < percentage < 100", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (100%), invalid percentage (100), should be in the range 0 < percentage < 100", err.Error())
+
+	invalidReadOnlyVerityRoot.TmpfsOverlaySize = "0%"
+	err = invalidReadOnlyVerityRoot.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate [TmpfsOverlaySize] (0%), invalid percentage (0), should be in the range 0 < percentage < 100", err.Error())
+
+	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: failed to validate [TmpfsOverlaySize] (0%), invalid percentage (0), should be in the range 0 < percentage < 100", err.Error())
 }
 
 func TestShouldFailNestedVerityOverlays_ReadOnlyVerityRoot(t *testing.T) {

@@ -24,7 +24,7 @@ verityroot="$root"
 [ -z "${verityroothashfile}" ] && verityroothashfile=$(getarg rd.verityroot.roothashfile=)
 
 # Get the optional parameters
-[ -z "${verityroothashsig}" ] && verityroothashsig=$(getarg rd.verityroot.roothashsig=/path/to/file=)
+[ -z "${verityroothashsig}" ] && verityroothashsig=$(getarg rd.verityroot.roothashsig=)
 [ -z "${verityerrorhandling}" ] && verityerrorhandling=$(getarg rd.verityroot.verityerrorhandling=)
 [ -z "${validateonboot}" ] && validateonboot=$(getarg rd.verityroot.validateonboot=)
 [ -z "${verityfecdata}" ] && verityfecdata=$(getarg rd.verityroot.fecdata=)
