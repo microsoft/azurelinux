@@ -45,7 +45,7 @@ var (
 		Partitions: []Partition{
 			{
 				ID: "MyBoot",
-				Flags: []string{
+				Flags: []PartitionFlag{
 					"esp",
 					"boot",
 				},
@@ -70,6 +70,22 @@ func TestShouldSucceedParsingValidDisk_Disk(t *testing.T) {
 	err := remarshalJSON(validDisk, &checkedDisk)
 	assert.NoError(t, err)
 	assert.Equal(t, validDisk, checkedDisk)
+}
+
+func TestShouldFailParsingDiskWithBadPartition_Disk(t *testing.T) {
+	var checkedDisk Disk
+	invalidDisk := validDisk
+	invalidDisk.Partitions = append([]Partition{}, validPartition)
+	// Currently the only way a Partion can be invalid is by having an invalid flag
+	invalidDisk.Partitions[0].Flags = []PartitionFlag{invalidPartitionFlag}
+
+	err := invalidDisk.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for Flag (not_a_partition_flag)", err.Error())
+
+	err = remarshalJSON(invalidDisk, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: failed to parse [Partition]: failed to parse [Flag]: invalid value for Flag (not_a_partition_flag)", err.Error())
 }
 
 func TestShouldFailParsingInvalidDisk_Disk(t *testing.T) {
