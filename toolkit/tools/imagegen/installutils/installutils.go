@@ -72,56 +72,62 @@ func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]s
 	return
 }
 
+// sortMountPoints will return a slice of mount points sorted either forward (for mounting)
+// or backwards (for unmounting)
+// - mountPointMap is the map of mountpoint to partition device path
+// - sortForUnmount reverses the sorting order so mounts are unmounted most nested to least nested
+func sortMountPoints(mountPointMap *map[string]string, sortForUnmount bool) (remainingMounts []string) {
+	// Convert the installMap into a slice of mount points so it can be sorted
+	for mountPoint := range *mountPointMap {
+		// Skip empty mount points
+		if mountPoint == "" {
+			continue
+		}
+		remainingMounts = append(remainingMounts, mountPoint)
+	}
+
+	// We need to make sure we sort the mount points so we don't mount things in the wrong order
+	// e.g.: /dev is mounted before /dev/pts is.
+	if !sortForUnmount {
+		sort.Sort(sort.StringSlice(remainingMounts))
+	} else {
+		// Reverse the sorting so we unmount in the opposite order
+		sort.Sort(sort.Reverse(sort.StringSlice(remainingMounts)))
+	}
+
+	return
+}
+
 // CreateInstallRoot walks through the map of mountpoints and mounts the partitions into installroot
 // - installRoot is the destination path to mount these partitions
 // - mountPointMap is the map of mountpoint to partition device path
 func CreateInstallRoot(installRoot string, mountPointMap, mountPointToMountArgsMap map[string]string) (installMap map[string]string, err error) {
 	installMap = make(map[string]string)
-
-	// Always mount root first
-	err = mountSingleMountPoint(installRoot, rootMountPoint, mountPointMap[rootMountPoint], mountPointToMountArgsMap[rootMountPoint])
-	if err != nil {
-		return
-	}
-	installMap[rootMountPoint] = mountPointMap[rootMountPoint]
-
-	// Mount rest of the mountpoints
-	for mountPoint, device := range mountPointMap {
-		if mountPoint != "" && mountPoint != rootMountPoint {
-			err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToMountArgsMap[mountPoint])
-			if err != nil {
-				return
-			}
-			installMap[mountPoint] = device
+	for _, mountPoint := range sortMountPoints(&mountPointMap, false) {
+		device := mountPointMap[mountPoint]
+		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToMountArgsMap[mountPoint])
+		if err != nil {
+			return
 		}
+		installMap[mountPoint] = device
 	}
 	return
 }
 
 // DestroyInstallRoot unmounts each of the installroot mountpoints in order, ensuring that the root mountpoint is last
 // - installRoot is the path to the root where the mountpoints exist
-// - installMap is the map of mountpoints to partition device paths
-func DestroyInstallRoot(installRoot string, installMap map[string]string) (err error) {
+// - mountPointMap is the map of mountpoints to partition device paths
+func DestroyInstallRoot(installRoot string, mountPointMap map[string]string) (err error) {
 	logger.Log.Trace("Destroying InstallRoot")
-
-	// Convert the installMap into a slice of mount points so it can be sorted
-	var allMountsToUnmount []string
-	for mountPoint := range installMap {
-		// Skip empty mount points
-		if mountPoint == "" {
-			continue
+	// Reverse order for unmounting
+	for _, mountPoint := range sortMountPoints(&mountPointMap, true) {
+		err = diskutils.BlockOnDiskIO(mountPointMap[mountPoint])
+		if err != nil {
+			logger.Log.Errorf("DestroyInstallRoot flush IO Error: %s", err.Error())
 		}
-
-		allMountsToUnmount = append(allMountsToUnmount, mountPoint)
-	}
-
-	// Sort the mount points
-	// This way nested mounts will be handled correctly:
-	// e.g.: /dev/pts is unmounted and then /dev is.
-	sort.Sort(sort.Reverse(sort.StringSlice(allMountsToUnmount)))
-	for _, mountPoint := range allMountsToUnmount {
 		err = unmountSingleMountPoint(installRoot, mountPoint)
 		if err != nil {
+			logger.Log.Errorf("DestroyInstallRoot Error: %s", err.Error())
 			return
 		}
 	}
@@ -130,6 +136,7 @@ func DestroyInstallRoot(installRoot string, installMap map[string]string) (err e
 }
 
 func mountSingleMountPoint(installRoot, mountPoint, device, extraOptions string) (err error) {
+	logger.Log.Debugf("Mounting %s to %s", device, mountPoint)
 	mountPath := filepath.Join(installRoot, mountPoint)
 	err = os.MkdirAll(mountPath, os.ModePerm)
 	if err != nil {
