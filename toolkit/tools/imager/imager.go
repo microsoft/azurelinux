@@ -129,15 +129,15 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 
+		if isLoopDevice {
+			isOfflineInstall = true
+			defer diskutils.DetachLoopbackDevice(diskDevPath)
+			defer diskutils.BlockOnDiskIO(diskDevPath)
+		}
 		// Add additional system settings for root encryption
 		err = setupDiskEncryption(&systemConfig, &encryptedRoot, buildDir)
 		if err != nil {
 			return
-		}
-
-		if isLoopDevice {
-			isOfflineInstall = true
-			defer diskutils.DetachLoopbackDevice(diskDevPath)
 		}
 
 		// Select the best kernel package for this environment
