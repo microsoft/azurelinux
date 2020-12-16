@@ -56,6 +56,8 @@ func (s *SystemConfig) IsValid() (err error) {
 	if len(s.PackageLists) == 0 {
 		return fmt.Errorf("system configuration must provide at least one package list inside the [PackageLists] field")
 	}
+	// Additional package list validation must be done via the imageconfigvalidator tool since there is no guranatee that
+	// the paths are valid at this point.
 
 	// Enforce that any non-rootfs configuration has a default kernel.
 	if len(s.PartitionSettings) != 0 {
@@ -97,7 +99,6 @@ func (s *SystemConfig) IsValid() (err error) {
 		return fmt.Errorf("invalid [KernelCommandLine]: %w", err)
 	}
 
-	//Validate PartitionSettings
 	//Validate PostInstallScripts
 	//Validate Groups
 	//Validate Users
