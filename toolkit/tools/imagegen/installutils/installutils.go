@@ -4,7 +4,6 @@
 package installutils
 
 import (
-	"crypto/rand"
 	"fmt"
 	"os"
 	"path"
@@ -21,6 +20,7 @@ import (
 	"microsoft.com/pkggen/internal/jsonutils"
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkgjson"
+	"microsoft.com/pkggen/internal/randomization"
 	"microsoft.com/pkggen/internal/retry"
 	"microsoft.com/pkggen/internal/safechroot"
 	"microsoft.com/pkggen/internal/shell"
@@ -899,7 +899,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	if user.PasswordHashed {
 		hashedPassword = user.Password
 	} else {
-		salt, err = randomString(postfixLength, alphaNumeric)
+		salt, err = randomization.RandomString(postfixLength, alphaNumeric)
 		if err != nil {
 			return
 		}
@@ -1639,26 +1639,6 @@ func createRawArtifact(workDirPath, devPath, name string) (err error) {
 	}
 
 	return shell.ExecuteLive(squashErrors, "dd", ddArgs...)
-}
-
-// randomString generates a random string of the length specified
-// using the provided legalCharacters.  crypto.rand is more secure
-// than math.rand and does not need to be seeded.
-func randomString(length int, legalCharacters string) (output string, err error) {
-	b := make([]byte, length)
-	_, err = rand.Read(b)
-	if err != nil {
-		return
-	}
-
-	count := byte(len(legalCharacters))
-	for i := range b {
-		idx := b[i] % count
-		b[i] = legalCharacters[idx]
-	}
-
-	output = string(b)
-	return
 }
 
 // isRunningInHyperV checks if the program is running in a Hyper-V Virtual Machine.
