@@ -6,11 +6,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/imagegen/configuration"
+	"microsoft.com/pkggen/imagegen/installutils"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/logger"
 )
@@ -65,5 +67,37 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 }
 
 func validatePackages(config configuration.Config) (err error) {
+	const (
+		validateError      = "failed to validate package lists in config"
+		verityPkgName      = "verity-read-only-root"
+		verityDebugPkgName = "verity-read-only-root-debug-mount"
+	)
+	for _, systemConfig := range config.SystemConfigs {
+		packageList, err := installutils.PackageNamesFromSingleSystemConfig(systemConfig)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+		foundVerityInitramfsPackage := false
+		foundVerityInitramfsDebugPackage := false
+		for _, pkg := range packageList {
+			if pkg == "kernel" {
+				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
+			}
+			if pkg == verityPkgName {
+				foundVerityInitramfsPackage = true
+			}
+			if pkg == verityDebugPkgName {
+				foundVerityInitramfsDebugPackage = true
+			}
+		}
+		if systemConfig.ReadOnlyVerityRoot.Enable {
+			if !foundVerityInitramfsPackage {
+				return fmt.Errorf("%s: [ReadOnlyVerityRoot] selected, but '%s' package is not included in the package lists", validateError, verityPkgName)
+			}
+			if systemConfig.ReadOnlyVerityRoot.TmpfsOverlayDebugEnabled && !foundVerityInitramfsDebugPackage {
+				return fmt.Errorf("%s: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but '%s' package is not included in the package lists", validateError, verityDebugPkgName)
+			}
+		}
+	}
 	return
 }
