@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "busybox",
+          "version": "1.32.0",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.32.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bridge-utils",
           "version": "1.6",
           "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.6.tar.xz"
@@ -580,7 +590,6 @@
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -5798,6 +5807,16 @@
           "name": "tzdata",
           "version": "2019c",
           "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2019c.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uclibc-ng",
+          "version": "1.0.36",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.36/uClibc-ng-1.0.36.tar.xz"
         }
       }
     },

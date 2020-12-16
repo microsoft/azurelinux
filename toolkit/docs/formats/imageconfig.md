@@ -111,6 +111,12 @@ A sample PackageLists entry pointing to three files containing package lists:
     "packagelists/cloud-init-packages.json"
 ],
 ```
+### RemoveRpmDb
+
+RemoveRpmDb triggers RPM database removal after the packages have been installed.
+Removing the RPM database may break any package managers inside the image.
+
+
 ### KernelOptions
 
 KernelOptions key consists of a map of key-value pairs, where a key is an identifier and a value is a name of the package (kernel) used in a scenario described by the identifier. During the build time, all kernels provided in KernelOptions will be built.
@@ -160,11 +166,11 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 
 ### Users
 
-Users is an array of user information. The User information is a map of key value pairs. 
+Users is an array of user information. The User information is a map of key value pairs.
 
 The image generated has users matching the values specified in Users.
 
-The table below are the keys for the users. 
+The table below are the keys for the users.
 
 |Key                |Type               |Restrictions
 --------------------|:------------------|:------------------------------------------------

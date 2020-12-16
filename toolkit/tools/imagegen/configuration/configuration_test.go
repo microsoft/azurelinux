@@ -239,6 +239,7 @@ var expectedConfiguration Config = Config{
 				Enable:   true,
 				Password: "EncryptPassphrase123",
 			},
+			RemoveRpmDb: false,
 		},
 		{
 			Name: "BiggerDiskA",
