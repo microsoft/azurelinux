@@ -305,11 +305,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Keep a running total of how many packages have be installed through all the `tdnfInstall` invocations
+	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
 	// Install filesystem package first
-	packagesInstalled, err = tdnfInstall(filesystemPkg, installRoot, packagesInstalled, totalPackages)
+	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {
 		return
 	}
@@ -326,7 +326,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// Install packages one-by-one to avoid exhausting memory
 	// on low resource systems
 	for _, pkg := range packagesToInstall {
-		packagesInstalled, err = tdnfInstall(pkg, installRoot, packagesInstalled, totalPackages)
+		packagesInstalled, err = TdnfInstallWithProgress(pkg, installRoot, packagesInstalled, totalPackages, true)
 		if err != nil {
 			return
 		}
@@ -387,6 +387,55 @@ func initializeRpmDatabase(installRoot string) (err error) {
 	}
 
 	err = initializeTdnfConfiguration(installRoot)
+	return
+}
+
+// TdnfInstall installs a package into the current environment without calculating progress
+func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err error) {
+	packagesInstalled, err = TdnfInstallWithProgress(packageName, installRoot, 0, 0, false)
+	return
+}
+
+// TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
+func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesInstalled, totalPackages int, reportProgress bool) (packagesInstalled int, err error) {
+	packagesInstalled = currentPackagesInstalled
+
+	onStdout := func(args ...interface{}) {
+		const tdnfInstallPrefix = "Installing/Updating: "
+
+		// Only process lines that match tdnfInstallPrefix
+		if len(args) == 0 {
+			return
+		}
+
+		line := args[0].(string)
+		if !strings.HasPrefix(line, tdnfInstallPrefix) {
+			return
+		}
+
+		status := fmt.Sprintf("Installing: %s", strings.TrimPrefix(line, tdnfInstallPrefix))
+		if reportProgress {
+			ReportAction(status)
+		} else {
+			// ReportAction() logs at debug level
+			logger.Log.Debug(status)
+		}
+
+		packagesInstalled++
+
+		if reportProgress {
+			// Calculate and report what percentage of packages have been installed
+			percentOfPackagesInstalled := float32(packagesInstalled) / float32(totalPackages)
+			progress := int(percentOfPackagesInstalled * 100)
+			ReportPercentComplete(progress)
+		}
+	}
+
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
+	if err != nil {
+		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
+	}
+
 	return
 }
 
@@ -1196,41 +1245,6 @@ func updateUserPassword(installRoot, username, password string) (err error) {
 		logger.Log.Warnf("Failed to write hashed password to shadow file")
 		return
 	}
-	return
-}
-
-func tdnfInstall(packageName, installRoot string, currentPackagesInstalled, totalPackages int) (packagesInstalled int, err error) {
-	packagesInstalled = currentPackagesInstalled
-
-	onStdout := func(args ...interface{}) {
-		const tdnfInstallPrefix = "Installing/Updating: "
-
-		// Only process lines that match tdnfInstallPrefix
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
-		if !strings.HasPrefix(line, tdnfInstallPrefix) {
-			return
-		}
-
-		status := fmt.Sprintf("Installing: %s", strings.TrimPrefix(line, tdnfInstallPrefix))
-		ReportAction(status)
-
-		packagesInstalled++
-
-		// Calculate and report what percentage of packages have been installed
-		percentOfPackagesInstalled := float32(packagesInstalled) / float32(totalPackages)
-		progress := int(percentOfPackagesInstalled * 100)
-		ReportPercentComplete(progress)
-	}
-
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
-	if err != nil {
-		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
-	}
-
 	return
 }
 
