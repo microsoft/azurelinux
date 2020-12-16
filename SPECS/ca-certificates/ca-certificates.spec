@@ -1,3 +1,5 @@
+#nospeccleaner
+
 %define pkidir %{_sysconfdir}/pki
 %define catrustdir %{_sysconfdir}/pki/ca-trust
 %define classic_tls_bundle ca-bundle.crt
@@ -180,11 +182,11 @@ cp -p %{SOURCE20} .
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
 asciidoc.py -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
-xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
+xsltproc --nonet -o %{name}/update-ca-trust.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 cp %{SOURCE9} %{name}/ca-legacy.8.txt
 asciidoc.py -v -d manpage -b docbook %{name}/ca-legacy.8.txt
-xsltproc --nonet -o %{name}/ca-legacy.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/ca-legacy.8.xml
+xsltproc --nonet -o %{name}/ca-legacy.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{name}/ca-legacy.8.xml
 
 
 %install
