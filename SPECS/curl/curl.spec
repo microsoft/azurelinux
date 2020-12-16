@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.68.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            http://curl.haxx.se
 Group:          System Environment/NetworkingLibraries
@@ -11,6 +11,7 @@ Source0:        http://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2020-8284.patch
 Patch1:         CVE-2020-8285.patch
 Patch2:         CVE-2020-8286.patch
+Patch3:         CVE-2020-8177.patch
 BuildRequires:  openssl-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
@@ -90,6 +91,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+*   Tue Dec 15 2020 Ruying Chen <v-ruyche@microsoft.com> 7.68.0-4
+-   Patch CVE-2020-8177
 *   Wed Dec 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.68.0-3
 -   Patch CVE-2020-8284
 -   Patch CVE-2020-8285
