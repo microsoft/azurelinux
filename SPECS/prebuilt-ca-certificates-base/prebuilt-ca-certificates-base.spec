@@ -32,6 +32,11 @@ cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
 
 find %{buildroot} -name README -delete
 
+rm %{buildroot}%{_sysconfdir}/pki/ca-trust/ca-legacy.conf
+rm %{buildroot}%{_sysconfdir}/pki/ca-trust/source/ca-bundle.legacy.crt
+rm %{buildroot}%{_sysconfdir}/pki/tls/*.cnf
+rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
+
 %files
 # Base certs bundle file with trust
 %{_sysconfdir}/pki/tls/cert.pem
@@ -39,11 +44,6 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/ca-trust/extracted/*
 %{_sysconfdir}/pki/java/cacerts
 %{_datadir}/pki/ca-trust-legacy/*
-%exclude /etc/pki/rpm-gpg/*
-
-%exclude %{_sysconfdir}/pki/ca-trust/ca-legacy.conf
-%exclude %{_sysconfdir}/pki/ca-trust/source/ca-bundle.legacy.crt
-%exclude %{_sysconfdir}/pki/tls/*.cnf
 
 %changelog
 * Wed Dec 2 2020 Mateusz Malisz <mamalisz@microsoft.com> - 20200720-1
