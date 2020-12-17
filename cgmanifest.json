@@ -2035,6 +2035,16 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
+          "version": "1.17.13",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
           "version": "1.18.8",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.8-hotfix.20200924/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
@@ -2045,8 +2055,28 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
+          "version": "1.18.10",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
           "version": "1.19.1",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.1-hotfix.20200923/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.3",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },

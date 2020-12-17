@@ -5,12 +5,10 @@
 %ifarch aarch64
 %define archname arm64
 %endif
-%define kubeproxy_n_1 1.16.13
-%define coredns_n_1 1.6.2
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.17.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -173,6 +171,9 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-4
+- Rename spec file
+
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-3
 - Rename ms-kubernetes-1.17.11 into kubernetes and lint spec
 
