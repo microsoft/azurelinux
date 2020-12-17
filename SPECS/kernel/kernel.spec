@@ -207,7 +207,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %package imx8dtb
-Summary:        This package contains the imx8mq-evk.dtb 
+Summary:        This package contains the imx8mq-evk.dtb
 Group:          System Environment/Kernel
 
 %description imx8dtb
