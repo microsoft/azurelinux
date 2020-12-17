@@ -8,7 +8,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.19.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -171,5 +171,8 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-2
+- Rename spec file
+
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
 - Initial version of K8s 1.19.1.
