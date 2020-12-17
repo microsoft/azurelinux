@@ -5,10 +5,6 @@
 %ifarch aarch64
 %define archname arm64
 %endif
-%define kubeproxy_n_1 1.17.11
-%define coredns_n_1 1.6.5
-%define kubeproxy_n_2 1.16.13
-%define coredns_n_2 1.6.2
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.19.1
