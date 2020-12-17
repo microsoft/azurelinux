@@ -302,7 +302,8 @@ REPO_LIST ?=
 ```
 
 The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
-The CBL-Mariner base repo is implicitly provided, an optional update repo is available by setting `USE_UPDATE_REPO=y` and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`. If `$(DISABLE_UPSTREAM_REPOS)` is set to `y`, any repo that is accessed through the network is disabled.
+The CBL-Mariner base and update repos are implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
+To disable the update repo set `USE_UPDATE_REPO=n`. If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
 ### Authentication
 
