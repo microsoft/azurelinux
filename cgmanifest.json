@@ -2025,26 +2025,6 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.16.13",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.16.13-hotfix.20200917/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.16.15",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.16.15-hotfix.20200903/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
           "version": "1.17.11",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.11-hotfix.20200901/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
