@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"microsoft.com/pkggen/internal/logger"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
@@ -91,16 +93,19 @@ func (s *SystemConfig) IsValid() (err error) {
 	}
 
 	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {
-		if !mountPointUsed["/"] {
-			return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
+		if len(mountPointUsed) == 0 {
+			logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
+		} else {
+			if !mountPointUsed["/"] {
+				return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
+			}
+			if s.ReadOnlyVerityRoot.Enable && s.Encryption.Enable {
+				return fmt.Errorf("invalid [ReadOnlyVerityRoot] and [Encryption]: verity root currently does not support root encryption")
+			}
+			if s.ReadOnlyVerityRoot.Enable && !mountPointUsed["/boot"] {
+				return fmt.Errorf("invalid [ReadOnlyVerityRoot]: must have a separate partition mounted at '/boot'")
+			}
 		}
-		if s.ReadOnlyVerityRoot.Enable && s.Encryption.Enable {
-			return fmt.Errorf("invalid [ReadOnlyVerityRoot] and [Encryption]: verity root currently does not support root encryption")
-		}
-	}
-
-	if s.ReadOnlyVerityRoot.Enable && !mountPointUsed["/boot"] {
-		return fmt.Errorf("invalid [ReadOnlyVerityRoot]: must have a separate partition mounted at '/boot'")
 	}
 
 	if err = s.ReadOnlyVerityRoot.IsValid(); err != nil {

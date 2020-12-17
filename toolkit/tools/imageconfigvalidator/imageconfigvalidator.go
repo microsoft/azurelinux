@@ -70,7 +70,7 @@ func validatePackages(config configuration.Config) (err error) {
 	const (
 		validateError      = "failed to validate package lists in config"
 		verityPkgName      = "verity-read-only-root"
-		verityDebugPkgName = "verity-read-only-root-debug-mount"
+		verityDebugPkgName = "verity-read-only-root-debug-tools"
 	)
 	for _, systemConfig := range config.SystemConfigs {
 		packageList, err := installutils.PackageNamesFromSingleSystemConfig(systemConfig)
