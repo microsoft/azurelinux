@@ -144,7 +144,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 		hashtreePath,
 	}
 
-	logger.Log.Info("Generating a dm-verity read-only partition, this may take several minutes")
+	logger.Log.Info("Generating a dm-verity read-only partition")
 	verityOutput, stderr, err := shell.Execute("veritysetup", append(verityFecArgs, verityArgs...)...)
 	if err != nil {
 		err = fmt.Errorf("Unable to create verity disk '%s': %w", stderr, err)

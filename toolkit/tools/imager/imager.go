@@ -122,6 +122,15 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		extraDirectories = append(extraDirectories, additionalExtraDirectories...)
 		extraMountPoints = append(extraMountPoints, additionalExtraMountPoints...)
 		isOfflineInstall = true
+
+		// Select the best kernel package for this environment
+		kernelPkg, err = installutils.SelectKernelPackage(systemConfig, *liveInstallFlag)
+		if err != nil {
+			logger.Log.Errorf("Failed to select a suitable kernel to install in config (%s)", systemConfig.Name)
+			return err
+		}
+		logger.Log.Infof("Selected (%s) for the kernel", kernelPkg)
+		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 	} else {
 		logger.Log.Info("Creating raw disk in build directory")
 		diskConfig := disks[defaultDiskIndex]
@@ -494,13 +503,13 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 
 		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
 		if systemConfig.ReadOnlyVerityRoot.Enable {
-			logger.Log.Info("Configuring root for read only with dm-verity")
 			var initramfsPathList []string
 			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
 			if err != nil {
 				err = fmt.Errorf("failed to switch root to read-only: %w", err)
 				return
 			}
+			installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
 			initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
 			if err != nil || len(initramfsPathList) != 1 {
 				return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)

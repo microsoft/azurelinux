@@ -13,6 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"microsoft.com/pkggen/imagegen/configuration"
+	"microsoft.com/pkggen/imagegen/installutils"
+	"microsoft.com/pkggen/internal/jsonutils"
 	"microsoft.com/pkggen/internal/logger"
 )
 
@@ -143,11 +145,24 @@ func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {
 
 func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 	const (
-		configDirectory string = "../../imageconfigs/"
-		targetPackage          = "read-only-root-efi.json"
+		configDirectory     string = "../../imageconfigs/"
+		targetPackage              = "read-only-root-efi.json"
+		readOnlyPackageList        = "packagelists/read-only-root-packages.json"
 	)
 	configFiles, err := ioutil.ReadDir(configDirectory)
 	assert.NoError(t, err)
+
+	// Skip this test if the package list DOES include it, but print an error
+	var pkgList installutils.PackageList
+	pkgListPath := filepath.Join(configDirectory, readOnlyPackageList)
+	err = jsonutils.ReadJSONFile(pkgListPath, &pkgList)
+	assert.NoError(t, err)
+	for _, pkg := range pkgList.Packages {
+		if pkg == "verity-read-only-root-debug-tools" {
+			t.Skipf("read-only-root-packages.json is currently configured for debug, can't check for missing debug package")
+			return
+		}
+	}
 
 	// Find the read-only root image config
 	for _, file := range configFiles {
@@ -164,7 +179,7 @@ func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but 'verity-read-only-root-debug-mount' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but 'verity-read-only-root-debug-tools' package is not included in the package lists", err.Error())
 
 			return
 		}
