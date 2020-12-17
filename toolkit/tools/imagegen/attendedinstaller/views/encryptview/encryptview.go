@@ -34,7 +34,8 @@ type EncryptView struct {
 	centeredFlex         *tview.Flex
 	passwordValidator    *crunchy.Validator
 
-	encryption *configuration.RootEncryption
+	cfg       *configuration.Config
+	sysConfig *configuration.SystemConfig
 }
 
 // New creates and returns a new EncryptView.
@@ -47,7 +48,8 @@ func New() *EncryptView {
 // Initialize initializes the view.
 func (ev *EncryptView) Initialize(backButtonText string, sysConfig *configuration.SystemConfig, cfg *configuration.Config, app *tview.Application, nextPage, previousPage, quit, refreshTitle func()) (err error) {
 
-	ev.encryption = &sysConfig.Encryption
+	ev.sysConfig = sysConfig
+	ev.cfg = cfg
 
 	ev.passwordField = tview.NewInputField().
 		SetFieldWidth(passwordFieldWidth).
@@ -65,8 +67,8 @@ func (ev *EncryptView) Initialize(backButtonText string, sysConfig *configuratio
 			ev.onNextButton(nextPage, cfg)
 		}).
 		AddButton(uitext.SkipEncryption, func() {
-			ev.encryption.Enable = false
-			ev.encryption.Password = ""
+			ev.sysConfig.Encryption.Enable = false
+			ev.sysConfig.Encryption.Password = ""
 			nextPage()
 		}).
 		SetAlign(tview.AlignCenter).
@@ -118,8 +120,8 @@ func (ev *EncryptView) Reset() (err error) {
 	ev.navBar.ClearUserFeedback()
 	ev.navBar.SetSelectedButton(noSelection)
 
-	ev.encryption.Password = ""
-	ev.encryption.Enable = false
+	ev.sysConfig.Encryption.Password = ""
+	ev.sysConfig.Encryption.Enable = false
 
 	return
 }
@@ -151,13 +153,20 @@ func (ev *EncryptView) onNextButton(nextPage func(), cfg *configuration.Config) 
 		return
 	}
 
+	if ev.sysConfig.ReadOnlyVerityRoot.Enable {
+		ev.navBar.SetUserFeedback(uitext.EncryptionVerityIncompatible, tview.Styles.TertiaryTextColor)
+		return
+	}
+
 	err := ev.passwordValidator.Check(enteredPassword)
 	if err != nil {
 		ev.navBar.SetUserFeedback(uiutils.ErrorToUserFeedback(err), tview.Styles.TertiaryTextColor)
 		return
 	}
 
-	ev.encryption.Enable = true
-	ev.encryption.Password = enteredPassword
+	ev.sysConfig.Encryption.Enable = true
+	ev.sysConfig.Encryption.Password = enteredPassword
+	rootDiskPart := ev.cfg.GetDiskPartByID(ev.sysConfig.GetRootPartitionSetting().ID)
+	rootDiskPart.Flags = append(rootDiskPart.Flags, configuration.PartitionFlagDeviceMapperRoot)
 	nextPage()
 }
