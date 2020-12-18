@@ -1,7 +1,7 @@
 Summary:	Low-level libraries useful for providing data structure handling for C.
 Name:		glib
 Version:	2.58.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:	LGPLv2+
 URL:		https://developer.gnome.org/glib/
 Group:		Applications/System
@@ -11,6 +11,7 @@ Source0:	http://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar
 %define sha1 glib=c00e433c56e0ba3541abc5222aeca4136de10fb8
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
+Patch2:         glib-CVE-2020-35457.patch
 BuildRequires:	pcre-devel
 BuildRequires:	libffi-devel
 BuildRequires:	pkg-config
@@ -55,6 +56,7 @@ Gsettings schemas compiling tool
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 ./autogen.sh
@@ -96,9 +98,10 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
-* Sat May 09 00:21:11 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
-- Added %%license line automatically
-
+*   Fri Dec 18 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-7
+-   Added patch for CVE-2020-35457
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.58.0-5
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Tue Jul 09 2019 Ankit Jain <ankitja@vmware.com> 2.58.0-4
