@@ -111,6 +111,7 @@ BuildRequires:  systemd
 BuildRequires:  tar
 BuildRequires:  unzip
 BuildRequires:  zlib-devel
+BuildRequires:  jemalloc
 Requires:       libxcrypt
 
 %description

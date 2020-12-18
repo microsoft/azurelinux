@@ -1,14 +1,15 @@
 Summary:        Ruby
 Name:           ruby
-Version:        2.6.6
-Release:        3%{?dist}
+Version:        2.7.2
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
-Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
-Patch0:         CVE-2020-25613.patch
+#Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
+Source0:        %{name}-%{version}.tar.gz
+#Patch0:         CVE-2020-25613.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel

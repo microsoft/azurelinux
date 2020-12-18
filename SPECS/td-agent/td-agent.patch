@@ -1,7 +1,7 @@
-diff --git a/./td-agent/Rakefile b/../td-agent-builder-testing-uploading-artifacts3/td-agent/Rakefile
+diff --git a/td-agent/Rakefile b/td-agent/Rakefile
 index 24f56f5..ff7271a 100755
---- a/./td-agent/Rakefile
-+++ b/../td-agent-builder-testing-uploading-artifacts3/td-agent/Rakefile
+--- a/td-agent/Rakefile
++++ b/td-agent/Rakefile
 @@ -72,14 +72,13 @@ class DownloadTask
    include Rake::DSL
  
