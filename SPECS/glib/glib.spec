@@ -100,8 +100,8 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
-*   Fri Dec 18 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-7
--   Added patch for CVE-2020-35457
+* Fri Dec 18 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-7
+- Added patch for CVE-2020-35457
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
 -   Added %%license line automatically
