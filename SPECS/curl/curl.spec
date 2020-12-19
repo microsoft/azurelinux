@@ -75,7 +75,6 @@ make %{?_smp_mflags} check
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -95,7 +94,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Tue Dec 18 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-5
+* Fri Dec 18 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-5
 - Patch CVE-2020-8231
 
 * Tue Dec 15 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-4
