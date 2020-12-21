@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.68.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         CVE-2020-8284.patch
 Patch1:         CVE-2020-8285.patch
 Patch2:         CVE-2020-8286.patch
 Patch3:         CVE-2020-8177.patch
+Patch4:         CVE-2020-8231.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -93,6 +94,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Fri Dec 18 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-5
+- Patch CVE-2020-8231
+
 * Tue Dec 15 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-4
 - Patch CVE-2020-8177
 
