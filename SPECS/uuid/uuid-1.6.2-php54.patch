@@ -1,0 +1,226 @@
+diff -up uuid-1.6.2/php/uuid.c.php54 uuid-1.6.2/php/uuid.c
+--- uuid-1.6.2/php/uuid.c.php54	2007-01-01 19:35:57.000000000 +0100
++++ uuid-1.6.2/php/uuid.c	2012-11-06 16:05:03.354913764 +0100
+@@ -60,7 +60,7 @@ static int ctx_id;               /* inte
+ #define ctx_name "UUID context"  /* external name   */
+ 
+ /* module initialization */
+-PHP_MINIT_FUNCTION(uuid)
++ZEND_MINIT_FUNCTION(uuid)
+ {
+     /* register resource identifier */
+     ctx_id = zend_register_list_destructors_ex(
+@@ -91,13 +91,13 @@ PHP_MINIT_FUNCTION(uuid)
+ }
+ 
+ /* module shutdown */
+-PHP_MSHUTDOWN_FUNCTION(uuid)
++ZEND_MSHUTDOWN_FUNCTION(uuid)
+ {
+     return SUCCESS;
+ }
+ 
+ /* module information */
+-PHP_MINFO_FUNCTION(uuid)
++ZEND_MINFO_FUNCTION(uuid)
+ {
+     char version[32];
+ 
+@@ -115,7 +115,7 @@ PHP_MINFO_FUNCTION(uuid)
+    proto rc uuid_create(ctx)
+    $rc = uuid_create(&$uuid);
+    create UUID context */
+-PHP_FUNCTION(uuid_create)
++ZEND_FUNCTION(uuid_create)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -147,7 +147,7 @@ PHP_FUNCTION(uuid_create)
+    proto rc uuid_destroy(ctx)
+    $rc = uuid_destroy($uuid);
+    destroy UUID context */
+-PHP_FUNCTION(uuid_destroy)
++ZEND_FUNCTION(uuid_destroy)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -178,7 +178,7 @@ PHP_FUNCTION(uuid_destroy)
+    proto rc uuid_clone(ctx, &ctx2)
+    $rc = uuid_clone($uuid, &$uuid);
+    clone UUID context */
+-PHP_FUNCTION(uuid_clone)
++ZEND_FUNCTION(uuid_clone)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -217,7 +217,7 @@ PHP_FUNCTION(uuid_clone)
+    proto rc uuid_load(ctx, name)
+    $rc = uuid_name($uuid, $name);
+    load an existing UUID */
+-PHP_FUNCTION(uuid_load)
++ZEND_FUNCTION(uuid_load)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -249,7 +249,7 @@ PHP_FUNCTION(uuid_load)
+    proto rc uuid_make(ctx, mode[, ..., ...])
+    $rc = uuid_make($uuid, $mode[, ..., ...]);
+    make a new UUID */
+-PHP_FUNCTION(uuid_make)
++ZEND_FUNCTION(uuid_make)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -307,7 +307,7 @@ PHP_FUNCTION(uuid_make)
+    proto rc uuid_isnil(ctx, result)
+    $rc = uuid_isnil($uuid, &$result);
+    compare UUID for being Nil UUID */
+-PHP_FUNCTION(uuid_isnil)
++ZEND_FUNCTION(uuid_isnil)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -344,7 +344,7 @@ PHP_FUNCTION(uuid_isnil)
+    proto rc uuid_compare(ctx, ctx2, result)
+    $rc = uuid_compare($uuid, $uuid2, &$result);
+    compare two UUIDs */
+-PHP_FUNCTION(uuid_compare)
++ZEND_FUNCTION(uuid_compare)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -388,7 +388,7 @@ PHP_FUNCTION(uuid_compare)
+    proto rc uuid_import(ctx, fmt, data)
+    $rc = uuid_import($ctx, $fmt, $data);
+    import UUID from variable */
+-PHP_FUNCTION(uuid_import)
++ZEND_FUNCTION(uuid_import)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -424,7 +424,7 @@ PHP_FUNCTION(uuid_import)
+    proto rc uuid_export(ctx, fmt, data)
+    $rc = uuid_error($ctx, $fmt, &$data);
+    export UUID into variable */
+-PHP_FUNCTION(uuid_export)
++ZEND_FUNCTION(uuid_export)
+ {
+     zval *z_ctx;
+     ctx_t *ctx;
+@@ -472,7 +472,7 @@ PHP_FUNCTION(uuid_export)
+    proto rc uuid_error(ctx)
+    $error = uuid_error($rc);
+    return error string corresponding to error return code */
+-PHP_FUNCTION(uuid_error)
++ZEND_FUNCTION(uuid_error)
+ {
+     int z_rc;
+     uuid_rc_t rc;
+@@ -490,24 +490,79 @@ PHP_FUNCTION(uuid_error)
+    proto int uuid_version()
+    $version = uuid_version();
+    return library version number */
+-PHP_FUNCTION(uuid_version)
++ZEND_FUNCTION(uuid_version)
+ {
+     RETURN_LONG((long)uuid_version());
+ }
+ 
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_create, 0)
++    ZEND_ARG_INFO(1, ctx)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_destroy, 0)
++    ZEND_ARG_INFO(0, ctx)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_clone, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(1, ctx2)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_load, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(0, name)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO_EX(arginfo_uuid_make, 0, 0, 2)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(0, mode)
++    ZEND_ARG_INFO(0, ctxns)
++    ZEND_ARG_INFO(0, url)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_isnil, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(1, result)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_compare, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(0, ctx2)
++    ZEND_ARG_INFO(1, result)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_import, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(0, fmt)
++    ZEND_ARG_INFO(0, data)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_export, 0)
++    ZEND_ARG_INFO(0, ctx)
++    ZEND_ARG_INFO(0, fmt)
++    ZEND_ARG_INFO(1, data)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_error, 0)
++    ZEND_ARG_INFO(0, ctx)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO(arginfo_uuid_version, 0)
++ZEND_END_ARG_INFO()
++
+ /* module function table */
+-static function_entry uuid_functions[] = {
+-    PHP_FE(uuid_create,  NULL)
+-    PHP_FE(uuid_destroy, NULL)
+-    PHP_FE(uuid_clone,   NULL)
+-    PHP_FE(uuid_load,    NULL)
+-    PHP_FE(uuid_make,    NULL)
+-    PHP_FE(uuid_isnil,   NULL)
+-    PHP_FE(uuid_compare, NULL)
+-    PHP_FE(uuid_import,  NULL)
+-    PHP_FE(uuid_export,  NULL)
+-    PHP_FE(uuid_error,   NULL)
+-    PHP_FE(uuid_version, NULL)
++static zend_function_entry uuid_functions[] = {
++    ZEND_FE(uuid_create,  arginfo_uuid_create)
++    ZEND_FE(uuid_destroy, NULL)
++    ZEND_FE(uuid_clone,   arginfo_uuid_clone)
++    ZEND_FE(uuid_load,    NULL)
++    ZEND_FE(uuid_make,    NULL)
++    ZEND_FE(uuid_isnil,   arginfo_uuid_isnil)
++    ZEND_FE(uuid_compare, arginfo_uuid_compare)
++    ZEND_FE(uuid_import,  NULL)
++    ZEND_FE(uuid_export,  arginfo_uuid_export)
++    ZEND_FE(uuid_error,   NULL)
++    ZEND_FE(uuid_version, NULL)
+     { NULL, NULL, NULL }
+ };
+ 
+@@ -516,11 +571,11 @@ zend_module_entry uuid_module_entry = {
+     STANDARD_MODULE_HEADER,
+     "uuid",
+     uuid_functions,
+-    PHP_MINIT(uuid),
+-    PHP_MSHUTDOWN(uuid),
++    ZEND_MINIT(uuid),
++    ZEND_MSHUTDOWN(uuid),
+     NULL,
+     NULL,
+-    PHP_MINFO(uuid),
++    ZEND_MINFO(uuid),
+     NO_VERSION_YET,
+     STANDARD_MODULE_PROPERTIES
+ };

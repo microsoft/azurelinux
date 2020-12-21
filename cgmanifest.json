@@ -114,6 +114,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "at",
+          "version": "3.1.23",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atftp",
           "version": "0.7.2",
           "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
@@ -5917,6 +5927,16 @@
           "name": "util-linux",
           "version": "2.32.1",
           "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util-linux-2.32.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uuid",
+          "version": "1.6.2",
+          "downloadUrl": "ftp://ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz"
         }
       }
     },
