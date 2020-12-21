@@ -1,5 +1,5 @@
 # Building
-- [Overview](#Overview)
+- [Overview](#overview)
 - [Building in Stages](#building-in-stages)
    - [Install Prerequisites](#install-prerequisites)
    - [Clone and Sync To Stable Commit](#clone-and-sync-to-stable-commit)
@@ -11,7 +11,7 @@
      - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
    - [Image Stage](#image-stage)
      - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
-     - [ISO Images](#iso_images)
+     - [ISO Images](#iso-images)
 - [Further Reading](#further-reading)
  - [Packages](#packages)
    - [Working on Packages](#working-on-packages)
@@ -70,7 +70,7 @@
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner from end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)  
+The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)  
 
 However, to test-drive CBL-Mariner building an ISO, VHD or VHDX _**is** currently_ required.  The fastest way to achieve this is through the [Quick Start Instructions](../quick_start/quickstart.md). It also provides guidance on using those images. 
 
@@ -86,7 +86,7 @@ Each stage can be built completely from scratch, or in many cases may be seeded 
 
 ## **Building in Stages**
 
-The following section run through a build one step at a time, briefly explaining the purpose. `Make` will generally automate this flow if given an image target, however building in stages can be useful for debugging and assists in understanding the build process.
+The following sections run through a build one step at a time, briefly explaining the purpose. `Make` will generally automate this flow if given an image target, however building in stages can be useful for debugging and assists in understanding the build process.
 
 ## **Install Prerequisites**
 
@@ -105,7 +105,7 @@ cd CBL-Mariner/toolkit
 git checkout 1.0-stable
 ```
 
-**IMPORTANT:** The 1.0-stable tag always points to the latest known good build of CBL-Mariner. At this time, only the Mariner 1.0 branch is buildable.  This branch is continually updated with bug fixes, security vulnerability fixes or occassional feature enhancements.  Fixes may be applied to this branch at any time.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 1.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 1.0-stable tag is advanced.  
+**IMPORTANT:** The 1.0-stable tag always points to the latest known good build of CBL-Mariner. At this time, only the Mariner 1.0 branch is buildable.  This branch is continually updated with bug fixes, security vulnerability fixes or occassional feature enhancements.  Fixes may be applied to this branch at any time.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 1.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 1.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
 
 It is also possible to build an older version of CBL-Mariner from the 1.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 1.0-stable label above.
 
@@ -121,7 +121,12 @@ For expediency, the toolchain may be populated from upstream binaries, or may be
 
 ### **Populate Toolchain**
 
-A set of bootstrapped toolchain packages (gcc etc.) are used to build CBL-Mariner packages and images.  Rather than built the toolchain, the prebuilt binaries can be downloaded to your local machine.
+A set of bootstrapped toolchain packages (gcc etc.) are used to build CBL-Mariner packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
+
+```bash
+# Populate Toolchain from pre-existing binaries
+sudo make toolchain REBUILD_TOOLS=y
+```
 
 ### **Rebuild Toolchain**
 
@@ -134,11 +139,11 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y PACKAGE
 
 ## **Package Stage**
 
-After the toolchain is built or populated, package building is possible.The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
+After the toolchain is built or populated, package building is possible.  The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
 
 The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.  
 
-Large parts of the pacakge build stage is parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
+Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
 There are several more package build options.  For example it's possible to build a single package with all of its prerequisites.  For more details on package building options see [Packages](#packages).
 
@@ -174,7 +179,7 @@ Note that the image build commands in [Build Images](#build-images) will **autom
 
 Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each Package List file (in toolkit/imageconfigs/packagelists) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.  
 
-All images are generated in the `out/images` folder.  
+All images are generated in the `out/images` folder.
 
 ### Virtual Hard Disks and Containers
 
@@ -201,11 +206,11 @@ The following builds an ISO with an interactive UI and selectable image configur
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and with a CONFIG_FILE that only specifies a single SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y`and run with a `CONFIG_FILE` that only specifies a _single_ SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer
-sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json UNATTENDED_INSTALLER=y
+sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
 ```
 
 # Further Reading

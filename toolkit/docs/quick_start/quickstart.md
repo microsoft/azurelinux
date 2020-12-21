@@ -1,6 +1,6 @@
 # Quick Start Guide
   - [Install Prerequisites](#install-prerequisites)
-  - [Clone CBL-Mariner](#Clone-CBL-Mariner)
+  - [Clone CBL-Mariner](#clone-cbl-mariner)
   - [Build and Boot an Image](#build-and-boot-an-image)
     - [VHDX and VHD Images](#vhdx-and-vhd-images)
     - [ISO Image](#iso-image)
@@ -53,23 +53,30 @@ sudo make meta-user-data
 ```
 
 **Copy VHD(X) and ISO Images to Your VM Host Machine**
+Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
 **Create VHD(X) Virtual Machine with Hyper-V**
 
 1. From Hyper-V Select _Action->New->Virtual Machine_.
 1. Provide a name for your VM and press _Next >_.
-1. For VHD select _Generation 1_, For VHDX select _Generation 2_, then press _Next >_.
+1. For VHD select _Generation 1_. For VHDX select _Generation 2_, then press _Next >_.
 1. Change Memory size if desired, then press _Next >_.
 1. Select a virtual switch, then press _Next >_.
 1. Select _Use an existing virtual hard disk_, then browse and select your VHD(X) file.
 1. Press _Finish_.
 
+**[Gen2/VHDX Only] Fix Boot Options**
+1. Right click your virtual machine from Hyper-V Manager
+1. Select _Settings..._.
+1. Select Security and disable _Enable Secure Boot_.
+1. Select the SCSI Controller from the Hardware panel.
+
+
 **Mount the Meta-User-Data.Iso Image**
 
 1. Right click your virtual machine from Hyper-V Manager
 1. Select _Settings..._.
-1. For Gen2/VHDX Images only, select Security and disable _Enable Secure Boot_.
-1. For Gen2/VHDX Images only, select the SCSI Controller from the Hardware panel, choose DVD Drive and press Add.
+choose DVD Drive and press Add.
 1. Select the _DVD Drive_. For Gen1/VHD Images, this is nested under _IDE Controller 1_. For Gen2/VHDX Images, this is nested under _SCSI Controller_.
 1. Select _Image File:_ and browse to the meta-user-data.iso file.
 1. Select _Apply_ to apply all changes.
@@ -95,7 +102,8 @@ cd toolkit
 # Image is placed in ../out/images/full
 sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
 ```
-**Copy VISO Image to Your VM Host Machine**
+**Copy ISO Image to Your VM Host Machine**
+Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
 **Create VHD(X) Virtual Machine with Hyper-V**
 
@@ -108,9 +116,8 @@ sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full
 1. Select _Install an operating system from a bootable image file_ and browse to your CBL-Mariner ISO. 
 1. Press _Finish_.
 
-**[Gen2 Only] Fix Boot Options**
+**[Gen2/VHDX Only] Fix Boot Options**
 
-For Gen2/VHDX images only:
 1. Right click your virtual machine from Hyper-V Manager
 1. Select _Settings..._
 1. Select Security and disable _Enable Secure Boot_.
@@ -123,6 +130,3 @@ For Gen2/VHDX images only:
 1. Follow the Installer Prompts to Install your image
 1. When installation completes, select restart to reboot the machine. The installation ISO will be automatically ejected.
 1. When prompted sign in to your CBL-Mariner using the user name and password provisioned through the Installer.
-
-
-
