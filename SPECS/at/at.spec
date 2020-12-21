@@ -8,7 +8,7 @@ Release:        6%{?dist}
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://ftp.debian.org/debian/pool/main/a/at
+URL:            https://ftp.debian.org/debian/pool/main/a/at
 Source:         http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1:        pam_atd
