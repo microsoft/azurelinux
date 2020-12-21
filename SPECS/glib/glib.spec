@@ -1,4 +1,3 @@
-%define sha1 glib=c00e433c56e0ba3541abc5222aeca4136de10fb8
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
@@ -101,7 +100,7 @@ make DESTDIR=%{buildroot} install
 
 %changelog
 * Fri Dec 18 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-7
-- Added patch for CVE-2020-35457
+- Added patch for CVE-2020-35457, removed %%sha, license verified.
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
 -   Added %%license line automatically
