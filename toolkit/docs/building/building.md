@@ -134,7 +134,7 @@ Depending on hardware, rebuilding the toolchain can take several hours. The foll
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y 
 ```
 
 ## **Package Stage**
@@ -203,10 +203,10 @@ NOTE: ISOs require additional packaging and build steps (such as the creation of
 The following builds an ISO with an interactive UI and selectable image configurations.
 ```bash
 # To build a Mariner ISO Image (ISO folder: ../out/images/full)
-sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y`and run with a `CONFIG_FILE` that only specifies a _single_ SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a `CONFIG_FILE` that only specifies a _single_ SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer
