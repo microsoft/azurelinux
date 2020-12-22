@@ -755,8 +755,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.68.0",
-          "downloadUrl": "http://curl.haxx.se/download/curl-7.68.0.tar.gz"
+          "version": "7.74.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.74.0.tar.gz"
         }
       }
     },
