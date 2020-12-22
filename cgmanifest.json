@@ -4955,8 +4955,8 @@
         "type": "other",
         "other": {
           "name": "python-py",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/pytest-dev/py/archive/1.6.0.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://github.com/pytest-dev/py/archive/1.10.0.tar.gz"
         }
       }
     },
