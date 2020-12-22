@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.10.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:          System/Servers
 Vendor:         Microsoft Corporation
 License:        BSD
@@ -14,6 +14,7 @@ Source1:        %{name}.service
 # CVE-2020-12662.patch also fixes CVE-2020-12663
 Patch0:         CVE-2020-12662.patch
 Patch1:         CVE-2020-12663.nopatch
+Patch2:         CVE-2020-28935.patch
 
 BuildRequires:  systemd
 BuildRequires:  expat-devel
@@ -40,8 +41,7 @@ Group:      Documentation
 unbound dns server docs
 
 %prep
-%setup -q -n %{name}-release-%{version}
-%patch0 -p1
+%autosetup -p1 -n %{name}-release-%{version}
 
 %build
 ./configure \
@@ -92,6 +92,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+*  Mon Dec 21 2020 Rachel Menge <rachelmenge@microsoft.com> 1.10.0-4
+-  Fix CVE-2020-28935.
 *  Tue Oct 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.10.0-3
 -  Fix CVE-2020-12662 and CVE-2020-12663.
 *  Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.10.0-2
