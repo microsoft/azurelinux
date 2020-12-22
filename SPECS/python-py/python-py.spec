@@ -10,7 +10,7 @@ Group:          Development/Languages/Python
 Url:            https://github.com/pytest-dev/py
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/pytest-dev/py/archive/%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-%{version}.tar.gz
 
 BuildRequires:  python2
 BuildRequires:  python2-devel
@@ -79,7 +79,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %changelog
 * Tue Dec 22 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.0-1
 - Updated to version 1.10.0 to fix CVE-2020-29651.
-- Updated the source to use the release from the project's GitHub repository.
 - License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.0-4
