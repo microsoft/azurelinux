@@ -59,7 +59,7 @@ python setup.py test
 *   Tue Dec 22 2020 Rachel Menge <rachelmenge@microsoft.com> 19.2-1
 -   Update to version 19.2 to fix CVE-2019-20916
 
-*   Sat May 09 00:21:37 PST 2020 Nick Samson <nisamson@microsoft.com>
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 18.0-5
 -   Added %%license line automatically
 
 *   Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 18.0-4
