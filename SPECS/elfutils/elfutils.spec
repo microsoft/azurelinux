@@ -9,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:    	https://sourceware.org/elfutils
 Source0:	https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
-%define sha1 elfutils=6511203cae7225ae780501834a7ccd234b14889a
 
 Obsoletes:	libelf libelf-devel
 Requires:	elfutils-libelf = %{version}-%{release}
@@ -204,7 +203,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %changelog
 * Tue Dec 22 2020 Andrew Phelps <anphel@microsoft.com> 0.176-4
-- Skip 2 tests that are expected to fail.
+- Skip 2 tests that are expected to fail. License verified. Removed %%define sha1
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.176-3
 - Added %%license line automatically
 * Thu Feb 06 2020 Andrew Phelps <anphel@microsoft.com> 0.176-2
