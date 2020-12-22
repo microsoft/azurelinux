@@ -68,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 *   Mon Dec 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12
--   Updating version for November update
+-   Updating version for December update.
 *   Fri Nov 20 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0-11
 -   Updating version for November update
 *   Sat Oct 24 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.0-10
