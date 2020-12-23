@@ -3,7 +3,7 @@
 
 Name:           cpprest
 Version:        2.10.14
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
@@ -61,7 +61,7 @@ cd Release
 mkdir build.release
 cd build.release
 export CXXFLAGS="%{optflags} -Wl,--as-needed"
-%cmake .. -DBUILD_TESTS=OFF -DBUILD_SAMPLES=OFF -Wno-dev -DWERROR=OFF -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DCPPREST_EXPORT_DIR=cmake/cpprestsdk -DCPPREST_EXCLUDE_BROTLI=OFF
+%cmake .. -DBUILD_SAMPLES=OFF -Wno-dev -DWERROR=OFF -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DCPPREST_EXPORT_DIR=cmake/cpprestsdk -DCPPREST_EXCLUDE_BROTLI=OFF
 make %{?_smp_mflags}
 
 %install
@@ -91,6 +91,9 @@ cd Release/build.release/Binaries
 
 
 %changelog
+* Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> - 2.10.14-6
+- Remove -DBUILD_TESTS=OFF to allow running tests
+
 * Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.10.14-5
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 

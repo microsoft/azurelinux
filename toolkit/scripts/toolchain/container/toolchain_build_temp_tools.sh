@@ -113,14 +113,14 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.4.81 API Headers
-tar xf linux-msft-5.4.81.tar.gz
-pushd WSL2-Linux-Kernel-linux-msft-5.4.81
+echo Linux-5.4.83 API Headers
+tar xf linux-msft-5.4.83.tar.gz
+pushd WSL2-Linux-Kernel-linux-msft-5.4.83
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf WSL2-Linux-Kernel-linux-msft-5.4.81
+rm -rf WSL2-Linux-Kernel-linux-msft-5.4.83
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 

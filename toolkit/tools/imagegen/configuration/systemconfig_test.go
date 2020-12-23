@@ -147,3 +147,7 @@ func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
 	assert.Equal(t, "failed to parse [SystemConfig]: json: cannot unmarshal number into Go struct field IntermediateTypeSystemConfig.IsDefault of type bool", err.Error())
 
 }
+
+func TestShouldSetRemoveRpmDbToFalse(t *testing.T) {
+	assert.Equal(t, validSystemConfig.RemoveRpmDb, false)
+}
