@@ -13,6 +13,12 @@ BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
 
+%if %{with_check}
+BuildRequires:  python3
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
+
 Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
@@ -64,7 +70,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 %check
-make %{?_smp_mflags} check
+chmod g+w . -R
+useradd test -G root -m
+
+sudo -u test make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -94,6 +103,7 @@ rm -rf %{buildroot}/*
 * Tue Dec 22 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.74.0-1
 - Updating to 7.74.0 to fix CVE-2020-8169 and incorporate fixes for other CVEs as well.
 - Updating source URL to an HTTPS address.
+- Enabling more tests to run by running them as non-root and extending 'BuildRequires'.
 - License verified.
 
 * Fri Dec 18 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-5
