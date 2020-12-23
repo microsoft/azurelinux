@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
-Version:        5.4.81
+Version:        5.4.83
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
