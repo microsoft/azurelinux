@@ -6,7 +6,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 Version:        %{spec_version}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 URL:            https://runc.io/
 #Source0:       https://github.com/opencontainers/runc/archive/v%{url_version}.tar.gz
@@ -84,9 +84,11 @@ make install BINDIR=%{buildroot}%{_sbindir}
 %{_sbindir}/runc
 
 %changelog
+*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.0.0.rc8-7
+-   Increment release to force republishing using golang 1.15.
 *   Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.0.0.rc8-6
 -   Remove reliance on existing GOPATH environment variable.
-*   Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.0.rc8-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.0.rc8-5
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.0.rc8-4
 -   Renaming go to golang

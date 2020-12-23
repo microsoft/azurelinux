@@ -3,7 +3,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.02
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -266,9 +266,9 @@ popd
 #make sure all the files are same between two configure except the /usr/lib/grub
 %check
 %ifarch x86_64
-diff -sr install-for-efi/sbin install-for-pc/sbin && \
-diff -sr install-for-efi%{_bindir} install-for-pc%{_bindir} && \
-diff -sr install-for-efi%{_sysconfdir} install-for-pc%{_sysconfdir} && \
+# Note: bin & sbin binaries are expected to differ due to different CFLAGS
+# Just compare files under _sysconfdir and _datarootdir
+diff -sr install-for-efi%{_sysconfdir} install-for-pc%{_sysconfdir}
 diff -sr install-for-efi%{_datarootdir} install-for-pc%{_datarootdir}
 %endif
 
@@ -367,6 +367,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Dec 14 2020 Andrew Phelps <anphel@microsoft.com> - 2.02-26
+- Modify check test
+
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.02-25
 - Fix CVE-2020-15705 (BootHole cont.).
 

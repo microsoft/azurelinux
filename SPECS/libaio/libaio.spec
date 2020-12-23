@@ -1,14 +1,18 @@
-Summary:	Linux-native asynchronous I/O access library
-Name:		libaio
-Version:    0.3.112
-Release:    2%{?dist}
-License:	LGPLv2+
-Group:		System Environment/Libraries
+Summary:        Linux-native asynchronous I/O access library
+Name:           libaio
+Version:        0.3.112
+Release:        3%{?dist}
+License:        LGPLv2+
+Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:        https://pagure.io/libaio
-Source0:    https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
-Patch0:		libaio-install-to-destdir-slash-usr.patch
+URL:            https://pagure.io/libaio
+Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
+Patch0:         libaio-install-to-destdir-slash-usr.patch
+
+%if %{with_check}
+BuildRequires:  e2fsprogs-devel
+%endif
 
 %description
 The Linux-native asynchronous I/O facility ("async I/O", or "aio") has a
@@ -18,12 +22,12 @@ The POSIX async I/O facility requires this library in order to provide
 kernel-accelerated async I/O capabilities, as do applications which
 require the Linux-native async I/O API.
 
-%package	devel
-Summary:	Development files for Linux-native asynchronous I/O access
-Group:		Development/System
-Requires:	libaio
+%package    devel
+Summary:    Development files for Linux-native asynchronous I/O access
+Group:      Development/System
+Requires:   libaio
 
-%description	devel
+%description devel
 This package provides header files to include and libraries to link with
 for the Linux-native asynchronous I/O facility ("async I/O", or "aio").
 
@@ -67,14 +71,15 @@ make %{?_smp_mflags} -k check
 %attr(0755,root,root) %{_libdir}/libaio.a
 
 %changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.3.112-2
-- Added %%license line automatically
-
+*   Thu Dec 17 2020 Andrew Phelps <anphel@microsoft.com> 0.3-112-3
+-   Add e2fsprogs-devel to fix check test.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.3.112-2
+-   Added %%license line automatically
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 0.3.112-1
 -   Update to 0.3.112. Fix Source0 URL. Fix URL. Update Patch0. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.3.110-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.3.110-2
--	GA - Bump release of all rpms
-* Tue Mar 3 2015 Divya Thaluru <dthaluru@vmware.com> 0.3.110-1
-- Initial version
+*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.3.110-2
+-   GA - Bump release of all rpms
+*   Tue Mar 3 2015 Divya Thaluru <dthaluru@vmware.com> 0.3.110-1
+-   Initial version

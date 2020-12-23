@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        12.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,10 @@ BuildRequires:  perl
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
+
+%if %{with_check}
+BuildRequires:  sudo
+%endif
 
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       krb5
@@ -165,6 +169,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed Dec 09 2020 Andrew Phelps <anphel@microsoft.com> - 12.5-2
+- Add sudo package to resolve test issue.
+
 * Mon Nov 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 12.5-1
 - Upgrading to 12.5 to fix CVE-2020-25695 and CVE-2020-25694.
 
