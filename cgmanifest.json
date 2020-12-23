@@ -4845,8 +4845,8 @@
         "type": "other",
         "other": {
           "name": "python-pip",
-          "version": "18.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/69/81/52b68d0a4de760a2f1979b0931ba7889202f302072cc7a0d614211bc7579/pip-18.0.tar.gz"
+          "version": "19.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4e9a93319ae5bb371057786f1590b157341f7542d7d/pip-19.2.tar.gz"
         }
       }
     },
