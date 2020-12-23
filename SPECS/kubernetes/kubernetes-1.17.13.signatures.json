@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "kubelet.service": "22ea9e0b85aa9db9e1accfb6c21843683425fc1af9c0a2669523e42a455dc57e",
+  "kubernetes-node-linux-amd64-1.17.13.tar.gz": "ce4f8cb33e47423b1e70be248cb2b1c2edafbc338db9feb72c27f245f060ac5a"
+ }
+}

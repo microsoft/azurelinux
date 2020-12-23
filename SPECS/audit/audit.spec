@@ -4,7 +4,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
 Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
@@ -173,9 +173,11 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 3.0-5
+-   Increment release to force republishing using golang 1.15.
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.0-4
 -   Set "RefuseManualStop=no" in "auditd.service".
-*   Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.0-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.0-3
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-2
 -   Renaming go to golang

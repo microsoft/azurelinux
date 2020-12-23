@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "pip-18.0.tar.gz": "a0e11645ee37c90b40c46d607070c4fd583e2cd46231b1c06e389c5e814eed76",
-  "pip-tests-18.0.tar.gz": "7202de292c995abb378aa6f7b960f8757ec02b70ce117b4307050059e4f53b9a"
+  "pip-19.2.tar.gz": "aa6fdd80d13caac75d92b5eced06778712859b1606ba92d62389c11be12b2dad",
+  "pip-tests-19.2.tar.gz": "2aba47968d82cfccc46e8e3fd1eb37d0f283dc863e2f1e8c67ef9d1e5fef7e28"
  }
 }
