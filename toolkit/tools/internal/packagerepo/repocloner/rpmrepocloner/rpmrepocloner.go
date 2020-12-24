@@ -45,7 +45,18 @@ var (
 	//   - architecture:    aarch64
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm1
-	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
+	//
+	// WARNING: due to TDNF not leaving any spaces before the repository ID for longer "<version>.<dist>" strings,
+	//			we're assuming exactly two letters followed by at least one digit for the "<dist>" tag.
+	//
+	//			For:
+	//
+	//				 moby-cli-19.03.11+azure-3
+	//
+	//			TDNF prints:
+	//
+	//				moby-cli.x86_64				19.03.11+azure-3.cm1mariner-official-base
+	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]{2}\d+)`)
 )
 
 const (
