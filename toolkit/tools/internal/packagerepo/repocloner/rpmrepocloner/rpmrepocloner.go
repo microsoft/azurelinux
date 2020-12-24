@@ -53,7 +53,7 @@ var (
 	//
 	//				 moby-cli-19.03.11+azure-3
 	//
-	//			TDNF prints:
+	//			'tdnf list ALL' prints:
 	//
 	//				moby-cli.x86_64				19.03.11+azure-3.cm1mariner-official-base
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]{2}\d+)`)
