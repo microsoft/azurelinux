@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.83
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,6 +125,7 @@ Patch1096:      CVE-2020-25704.nopatch
 Patch1097:      CVE-2020-29534.nopatch
 Patch1098:      CVE-2020-29660.nopatch
 Patch1099:      CVE-2020-29661.nopatch
+Patch1100:      CVE-2020-27777.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -432,6 +433,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Address CVE-2020-27777
+
 * Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
 - Update source to 5.4.83
 - Address CVE-2020-14351, CVE-2020-14381, CVE-2020-25656, CVE-2020-25704,
