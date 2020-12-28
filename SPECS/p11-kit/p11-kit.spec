@@ -1,7 +1,7 @@
 %define _userunitdir /usr/lib/systemd/user
 
-Version:        0.23.16.1
-Release:        2%{?dist}
+Version:        0.23.22
+Release:        1%{?dist}
 Name:           p11-kit
 Summary:        Library for loading and sharing PKCS#11 modules
 Vendor:         Microsoft Corporation
@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 License:        BSD
 URL:            https://p11-glue.freedesktop.org/p11-kit.html
-Source0:        https://github.com/p11-glue/p11-kit/releases/download/%{version}/p11-kit-%{version}.tar.gz
+Source0:        https://github.com/p11-glue/p11-kit/releases/download/%{version}/p11-kit-%{version}.tar.xz
 Source1:        trust-extract-compat
 Source2:        p11-kit-client.service
 
@@ -144,6 +144,10 @@ fi
 
 
 %changelog
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 0.23.22-1
+- Upgrade to version 0.23.22 to fix CVE-2020-29361, CVE-2020-29362, and CVE-2020-29363
+- Update source URL
+
 * Wed May 27 2020 Paul Monson <paulmon@microsoft.com> - 0.23.16.1-2
 - Initial CBL-Mariner import from Fedora 29 (license:MIT).
 - License verified.
