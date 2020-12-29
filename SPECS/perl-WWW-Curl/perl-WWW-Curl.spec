@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Group:          Development/Libraries
 URL:            https://search.cpan.org/dist/WWW-Curl/
@@ -15,6 +15,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT/WWW-Curl-%{version}.tar.gz
 Patch0:         0001-Curl-macros-fix.patch
+Patch1:         WWW-Curl-4.17-Adapt-to-changes-in-cURL-7.69.0.patch
 
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Module-Install
@@ -29,8 +30,7 @@ Provides:       perl(WWW::Curl::Easy)
 WWW::Curl is a Perl extension interface for libcurl.
 
 %prep
-%setup -q -n WWW-Curl-%{version}
-%patch0 -p1
+%autosetup -p1 -n WWW-Curl-%{version}
 rm -rf inc && sed -i -e '/^inc\//d' MANIFEST
 sed -i 's/_LASTENTRY\\z/_LASTENTRY\\z|CURL_DID_MEMORY_FUNC_TYPEDEFS\\z/' Makefile.PL
 
@@ -69,6 +69,8 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+*   Tue Dec 29 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.17-10
+-   Adapting Fedora 32 patch (license: MIT) for "curl" versions >= 7.69.0.
 *   Tue Aug 11 2020 Andrew Phelps <anphel@microsoft.com> 4.17-9
 -   Add provides for perl(WWW::Curl::Easy)
 *   Tue May 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.17-8
