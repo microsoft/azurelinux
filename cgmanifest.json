@@ -35,8 +35,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.9",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.9.tar.gz"
+          "version": "2.9.12",
+          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.12.tar.gz"
         }
       }
     },

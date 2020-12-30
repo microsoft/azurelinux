@@ -2,7 +2,7 @@
 
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.9.9
+Version:        2.9.12
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.ansible.com
@@ -47,10 +47,15 @@ python2 setup.py test
 %{python2_sitelib}/*
 
 %changelog
+*   Wed Dec 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9.12-1
+-   Upgrade to version 2.9.12, which resolves CVE-2020-10744
+
 *   Tue Jun 02 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9.9-1
 -   Upgrade to version 2.9.9, which resolves CVE-2020-1733 and CVE-2020-1738.
-*   Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> 2.9.5-2
+
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9.5-2
 -   Added %%license line automatically
+
 *   Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 2.9.5-1
 -   Version update to 2.9.5. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7.6-2
