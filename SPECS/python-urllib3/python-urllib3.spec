@@ -99,7 +99,7 @@ ulimit -n $nofiles
 
 %changelog
 * Wed Dec 23 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.25.9-1
-- Updated to version 1.25.9 
+- Updated to version 1.25.9
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.24.2-2
 - Added %%license line automatically
