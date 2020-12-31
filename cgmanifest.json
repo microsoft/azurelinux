@@ -592,11 +592,11 @@
     },
     {
       "component": {
-      "type": "other",
-      "other": {
-        "name": "cloud-init-vmware-guestinfo",
-        "version": "1.3.1",
-        "downloadUrl": "https://github.com/vmware/cloud-init-vmware-guestinfo/archive/v1.3.1.tar.gz"
+        "type": "other",
+        "other": {
+          "name": "cloud-init-vmware-guestinfo",
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/vmware/cloud-init-vmware-guestinfo/archive/v1.3.1.tar.gz"
         }
       }
     },
@@ -3572,12 +3572,12 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
-	  "name": "omi",
-	  "version": "1.6.6",
-	  "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
-	}
+        "type": "other",
+        "other": {
+          "name": "omi",
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
+        }
       }
     },
     {
@@ -4975,8 +4975,8 @@
         "type": "other",
         "other": {
           "name": "python-requests",
-          "version": "2.20.0",
-          "downloadUrl": "http://github.com/requests/requests/archive/v2.20.0/requests-v2.20.0.tar.gz"
+          "version": "2.22.0",
+          "downloadUrl": "http://github.com/requests/requests/archive/v2.22.0/requests-v2.22.0.tar.gz"
         }
       }
     },
@@ -5085,8 +5085,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.24.2",
-          "downloadUrl": "https://github.com/shazow/urllib3/archive/1.24.2/urllib3-1.24.2.tar.gz"
+          "version": "1.25.9",
+          "downloadUrl": "https://github.com/shazow/urllib3/archive/1.25.9/urllib3-1.25.9.tar.gz"
         }
       }
     },

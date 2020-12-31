@@ -20,6 +20,7 @@ ignore_list=" \
   moby-buildx \
   moby-containerd \
   python-markupsafe \
+  python-requests \
   python-zope-interface \
   qt5-rpm-macros \
   runc \
