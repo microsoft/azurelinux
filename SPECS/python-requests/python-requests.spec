@@ -3,8 +3,8 @@
 
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
-Version:        2.20.0
-Release:        4%{?dist}
+Version:        2.22.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -128,6 +128,8 @@ py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Thu Dec 31 2020 Thomas Crain <thcrain@microsoft.com> - 2.22.0-1
+- Upgrade to version 2.22.0
 * Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
