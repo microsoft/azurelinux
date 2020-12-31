@@ -130,53 +130,53 @@ py.test3
 * Thu Dec 31 2020 Thomas Crain <thcrain@microsoft.com> - 2.22.0-1
 - Upgrade to version 2.22.0
 
-* Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.20.0-4
 - Added %%license line automatically
 
-* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.20.0-3
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.20.0-3
 - Renaming python-pytest to pytest
 
-* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.20.0-2
+* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.20.0-2
 - Renaming python-pyOpenSSL to pyOpenSSL
 
-* Thu Mar 19 2020 Paul Monson <paulmon@microsoft.com> 2.20.0-1
+* Thu Mar 19 2020 Paul Monson <paulmon@microsoft.com> - 2.20.0-1
 - Update to 2.20.0. Fix source0 URL. Fix license.
 
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.19.1-5
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.19.1-5
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Thu Mar 28 2019 Tapas Kundu <tkundu@vmware.com> 2.19.1-4
+* Thu Mar 28 2019 Tapas Kundu <tkundu@vmware.com> - 2.19.1-4
 - Fix for CVE-2018-18074
 
-* Thu Dec 06 2018 Ashwin H <ashwinh@vmware.com> 2.19.1-3
+* Thu Dec 06 2018 Ashwin H <ashwinh@vmware.com> - 2.19.1-3
 - Add %check
 
-* Thu Sep 27 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 2.19.1-2
+* Thu Sep 27 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 2.19.1-2
 - Add a few missing runtime dependencies (urllib3, chardet,
 - pyOpenSSL, certifi, idna).
 
-* Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 2.19.1-1
+* Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> - 2.19.1-1
 - Update to version 2.19.1
 
-* Mon Aug 07 2017 Xiaolin Li <xiaolinl@vmware.com> 2.13.0-3
+* Mon Aug 07 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.13.0-3
 - Disabled check section as tests are not available
 
-* Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 2.13.0-2
+* Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.13.0-2
 - Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
 
-* Thu Mar 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.13.0-1
+* Thu Mar 23 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.13.0-1
 - Updated to version 2.13.0.
 
-* Wed Mar 01 2017 Xiaolin Li <xiaolinl@vmware.com> 2.9.1-4
+* Wed Mar 01 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.9.1-4
 - Added python3 package.
 
-* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 2.9.1-3
+* Mon Oct 04 2016 ChangLee <changlee@vmware.com> - 2.9.1-3
 - Modified %check
 
-* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9.1-2
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.9.1-2
 - GA - Bump release of all rpms
 
-* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9.1-1
+* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 2.9.1-1
 - Updated to version 2.9.1
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
