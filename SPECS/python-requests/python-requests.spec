@@ -9,7 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            http://python-requests.org
-Source0:        http://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz
+#Source0:       https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz
+Source0:        requests-%{version}.tar.gz
 BuildRequires:  python-setuptools
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -129,6 +130,7 @@ py.test3
 %changelog
 * Thu Dec 31 2020 Thomas Crain <thcrain@microsoft.com> - 2.22.0-1
 - Upgrade to version 2.22.0
+- Fix Source0 URL
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.20.0-4
 - Added %%license line automatically
