@@ -159,7 +159,7 @@ index 0f36e0b..34f12e6 100644
      uint32_t dwCount = 0;
      PSolvPackageList pPkgList = NULL;
 -
-+    
++
      if(!pTdnf || !pTdnf->pSack|| !pTrans || !pPkgInfo)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
@@ -675,7 +675,7 @@ index b42b64a..0f1498c 100644
  //options - incomplete
  static struct option pstOptions[] =
  {
-+    {"alldeps",       no_argument, &_opt.nAllDeps, 1},     //--alldeps 
++    {"alldeps",       no_argument, &_opt.nAllDeps, 1},     //--alldeps
      {"allowerasing",  no_argument, &_opt.nAllowErasing, 1},//--allowerasing
      {"assumeno",      no_argument, &_opt.nAssumeNo, 1},    //--assumeno
      {"assumeyes",     no_argument, 0, 'y'},                //--assumeyes

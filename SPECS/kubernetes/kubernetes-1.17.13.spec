@@ -5,22 +5,18 @@
 %ifarch aarch64
 %define archname arm64
 %endif
-%define kubeproxy_n_1 1.17.11
-%define coredns_n_1 1.6.5
-%define kubeproxy_n_2 1.16.13
-%define coredns_n_2 1.6.2
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.18.8
-Release:        4%{?dist}
+Version:        1.17.13
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.8-hotfix.20200924/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20200924.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
 Source1:        kubelet.service
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
@@ -175,41 +171,5 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
-* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-4
-- Rename ms-kubernetes-1.81.8 into kubernetes and lint spec
-
-* Wed Nov 18 2020 George Mileka <gmileka@microsoft.com> 1.18.8-3
-- Added license file and macro.
-
-* Thu Oct 29 2020 Anirudh Gopal <angop@microsoft.com> 1.18.8-2
-- Update k8s to v1.18.8-hotfix.20200917 release
-
-* Fri Oct 2 2020 George Mileka <gmileka@microsoft.com> 1.18.8-1
-- Moved k8s to 1.18.8.
-
-* Mon Aug 17 2020 Jiri Appl <jiria@microsoft.com> 1.18.6-4
-- Clean up the spec.
-
-* Thu Aug 6 2020 George Mileka <gmileka@microsoft.com> 1.18.6-3
-- Create /etc/kubernetes/manifests.
-
-* Wed Jul 30 2020 Jiri Appl <jiria@microsoft.com> 1.18.6-2
-- Removed container images.
-
-* Fri Jul 24 2020 George Mileka <gmileka@microsoft.com> 1.18.6
-- Moved to 1.18.6.
-
-* Tue Jun 30 2020 George Mileka <gmileka@microsoft.com> 1.18.2
-- Adding the 1.16 knd 1.17 ubeproxy and coredns for downgrade scenarios.
-
-* Fri Jun 05 2020 George Mileka <gmileka@microsoft.com> 1.18.2
-- Switched to K8s 1.18.2.
-
-* Thu Jun 04 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.0-2
-- Renaming iproute2 to iproute.
-
-* Fri May 29 2020 George Mileka <gmileka@microsoft.com> 1.18.0
-- Switched to ecpacr.
-
-* Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.18.0
-- Initial version of K8s 1.18.0.
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-1
+- Initial version of K8s 1.17.13.

@@ -5,22 +5,18 @@
 %ifarch aarch64
 %define archname arm64
 %endif
-%define kubeproxy_n_1 1.17.11
-%define coredns_n_1 1.6.5
-%define kubeproxy_n_2 1.16.13
-%define coredns_n_2 1.6.2
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.19.1
+Version:        1.19.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.1-hotfix.20200923/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20200923.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
 Source1:        kubelet.service
 BuildRequires:  golang >= 1.15.5
 BuildRequires:  rsync
@@ -175,5 +171,5 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
-* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
-- Initial version of K8s 1.19.1.
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.3-1
+- Initial version of K8s 1.19.3.

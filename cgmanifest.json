@@ -35,8 +35,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.9",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.9.tar.gz"
+          "version": "2.9.12",
+          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.12.tar.gz"
         }
       }
     },
@@ -107,6 +107,16 @@
           "name": "aspnetcore-runtime-3.1",
           "version": "3.1.5",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "at",
+          "version": "3.1.23",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
         }
       }
     },
@@ -364,6 +374,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "busybox",
+          "version": "1.32.0",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.32.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bridge-utils",
           "version": "1.6",
           "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.6.tar.xz"
@@ -572,15 +592,14 @@
     },
     {
       "component": {
-      "type": "other",
-      "other": {
-        "name": "cloud-init-vmware-guestinfo",
-        "version": "1.3.1",
-        "downloadUrl": "https://github.com/vmware/cloud-init-vmware-guestinfo/archive/v1.3.1.tar.gz"
+        "type": "other",
+        "other": {
+          "name": "cloud-init-vmware-guestinfo",
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/vmware/cloud-init-vmware-guestinfo/archive/v1.3.1.tar.gz"
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -736,8 +755,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.68.0",
-          "downloadUrl": "http://curl.haxx.se/download/curl-7.68.0.tar.gz"
+          "version": "7.74.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.74.0.tar.gz"
         }
       }
     },
@@ -1596,8 +1615,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.81",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
+          "version": "5.4.83",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz"
         }
       }
     },
@@ -1896,8 +1915,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.81",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
+          "version": "5.4.83",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz"
         }
       }
     },
@@ -1906,8 +1925,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.81",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
+          "version": "5.4.83",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz"
         }
       }
     },
@@ -1916,8 +1935,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.81",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.81.tar.gz"
+          "version": "5.4.83",
+          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz"
         }
       }
     },
@@ -2026,6 +2045,16 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
+          "version": "1.17.13",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
           "version": "1.18.8",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.8-hotfix.20200924/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
@@ -2036,8 +2065,28 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
+          "version": "1.18.10",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
           "version": "1.19.1",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.1-hotfix.20200923/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.3",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -3523,12 +3572,12 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
-	  "name": "omi",
-	  "version": "1.6.6",
-	  "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
-	}
+        "type": "other",
+        "other": {
+          "name": "omi",
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
+        }
       }
     },
     {
@@ -3636,8 +3685,8 @@
         "type": "other",
         "other": {
           "name": "p11-kit",
-          "version": "0.23.16.1",
-          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.23.16.1/p11-kit-0.23.16.1.tar.gz"
+          "version": "0.23.22",
+          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.23.22/p11-kit-0.23.22.tar.xz"
         }
       }
     },
@@ -4796,8 +4845,8 @@
         "type": "other",
         "other": {
           "name": "python-pip",
-          "version": "18.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/69/81/52b68d0a4de760a2f1979b0931ba7889202f302072cc7a0d614211bc7579/pip-18.0.tar.gz"
+          "version": "19.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4e9a93319ae5bb371057786f1590b157341f7542d7d/pip-19.2.tar.gz"
         }
       }
     },
@@ -4906,8 +4955,8 @@
         "type": "other",
         "other": {
           "name": "python-py",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/pytest-dev/py/archive/1.6.0.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-1.10.0.tar.gz"
         }
       }
     },
@@ -4926,8 +4975,8 @@
         "type": "other",
         "other": {
           "name": "python-requests",
-          "version": "2.20.0",
-          "downloadUrl": "http://github.com/requests/requests/archive/v2.20.0/requests-v2.20.0.tar.gz"
+          "version": "2.22.0",
+          "downloadUrl": "http://github.com/requests/requests/archive/v2.22.0/requests-v2.22.0.tar.gz"
         }
       }
     },
@@ -5036,8 +5085,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.24.2",
-          "downloadUrl": "https://github.com/shazow/urllib3/archive/1.24.2/urllib3-1.24.2.tar.gz"
+          "version": "1.25.9",
+          "downloadUrl": "https://github.com/shazow/urllib3/archive/1.25.9/urllib3-1.25.9.tar.gz"
         }
       }
     },
@@ -5805,6 +5854,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "uclibc-ng",
+          "version": "1.0.36",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.36/uClibc-ng-1.0.36.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "unbound",
           "version": "1.10.0",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
@@ -5868,6 +5927,16 @@
           "name": "util-linux",
           "version": "2.32.1",
           "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util-linux-2.32.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uuid",
+          "version": "1.6.2",
+          "downloadUrl": "ftp://ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz"
         }
       }
     },

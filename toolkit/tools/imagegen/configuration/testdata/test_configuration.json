@@ -171,7 +171,8 @@
             "Encryption" : {
                 "Enable":   true,
                 "Password": "EncryptPassphrase123"
-            }
+            },
+            "RemoveRpmDb": false
         },
         {
             "Name": "BiggerDiskA",

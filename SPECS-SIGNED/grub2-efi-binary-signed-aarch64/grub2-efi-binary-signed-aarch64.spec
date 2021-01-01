@@ -2,7 +2,7 @@
 Summary:        Signed GRand Unified Bootloader for aarch64 systems
 Name:           grub2-efi-binary-signed-aarch64
 Version:        2.02
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,9 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/grubaa64.efi
 /boot/efi/EFI/BOOT/grubaa64.efi
 
 %changelog
+* Wed Dec 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.02-26
+- Updating release to be aligned with the unsigned bits.
+
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.02-25
 - Updating release to be aligned with the unsigned bits.
 

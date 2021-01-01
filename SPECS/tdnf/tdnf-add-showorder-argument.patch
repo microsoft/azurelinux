@@ -131,7 +131,7 @@ index 4b8434d..31cf454 100644
 +        case TR_REMOVED:
 +            fprintf(stdout, "Remove: ");
 +            break;
-+        
++
 +        default:
 +            fprintf(stdout, "Unknown action: %d", nElementType);
 +            continue;
