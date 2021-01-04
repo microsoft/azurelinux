@@ -399,9 +399,17 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 
 // SystemBlockDevices returns all block devices on the host system.
 func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
+	const (
+		scsiDiskMajorNumber      = "8"
+		mmcBlockMajorNumber      = "179"
+		virtualDiskMajorNumber   = "252,253,254"
+		blockExtendedMajorNumber = "259"
+	)
 	var blockDevices blockDevicesOutput
 
-	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", "8,179,259", "-n", "--json", "--output", "NAME,SIZE,MODEL")
+	blockDeviceMajorNumbers := []string{scsiDiskMajorNumber, mmcBlockMajorNumber, virtualDiskMajorNumber, blockExtendedMajorNumber}
+	includeFilter := strings.Join(blockDeviceMajorNumbers, ",")
+	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", includeFilter, "-n", "--json", "--output", "NAME,SIZE,MODEL")
 	if err != nil {
 		logger.Log.Warn(stderr)
 		return
