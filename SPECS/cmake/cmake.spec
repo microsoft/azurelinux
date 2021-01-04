@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.17.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,8 @@ Requires:       libarchive
 Requires:       ncurses
 Requires:       zlib
 Provides:       %{name}%{major_version} = %{version}-%{release}
+Provides:       %{name}-filesystem = %{version}-%{release}
+Provides:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
 %description
 CMake is an extensible, open-source system that manages the build process in an
@@ -67,6 +69,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 3.17.3-5
+- Provide cmake-filesystem and isa version.
+
 * Thu Nov 05 2020 Joe Schmitt <joschmit@microsoft.com> - 3.17.3-4
 - Define additional cmake macros.
 

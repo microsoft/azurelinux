@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,6 +26,7 @@ BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       pam
 Provides:       /sbin/nologin
+Provides:       passwd = %{version}-%{release}
 
 %description
 The Shadow package contains programs for handling passwords
@@ -142,6 +143,9 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-10
+- Provide passwd.
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-9
 - Provide /sbin/nologin.
 

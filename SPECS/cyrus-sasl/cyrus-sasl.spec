@@ -1,7 +1,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Custom
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,8 @@ Requires:       openssl
 Requires:       pam
 Requires:       systemd
 Provides:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-gssapi = %{version}-%{release}
+Provides:       %{name}-gssapi%{?_isa} = %{version}-%{release}
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -135,6 +137,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+* Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1.27-6
+- Provide cyrus-sasl-gssapi and isa version.
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1.27-5
 - Provide cyrus-sasl-devel.
 
