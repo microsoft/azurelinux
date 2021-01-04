@@ -160,6 +160,7 @@ ln -sf libpython3.7m.so %{buildroot}%{_libdir}/libpython3.7.so
 
 # Install pathfix.py to bindir
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix3.7.py
+ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
@@ -167,8 +168,6 @@ find %{buildroot}%{_libdir} -name '*.pyo' -delete
 find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
-
-ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
 # %check
 # make  %{?_smp_mflags} test
