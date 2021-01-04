@@ -1,7 +1,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.39.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0 and MIT
 URL:            https://www.rust-lang.org/
 Group:          Applications/System
@@ -23,6 +23,9 @@ BuildRequires:  cmake
 BuildRequires:  glibc
 BuildRequires:  binutils
 BuildRequires:  python2
+%if %{with_check}
+BuildRequires:  python-xml
+%endif
 BuildRequires:  curl-devel
 
 %description
@@ -102,6 +105,8 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Tue Dec 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
+- Add python-xml BR for package test
 *   Wed Aug 12 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.39.0-7
 -   Add patch for the build to not fail on file not found error.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 1.39.0-6
