@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-Source0:        http://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar.xz
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
