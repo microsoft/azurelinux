@@ -48,7 +48,7 @@ These are library files of util-linux.
 
 %prep
 %setup -q
-sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
+sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
 
 %build
 autoreconf -fi
