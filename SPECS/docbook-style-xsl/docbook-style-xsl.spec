@@ -1,7 +1,7 @@
 Summary:        Docbook-xsl-1.79.1
 Name:           docbook-style-xsl
 Version:        1.79.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.docbook.org
 Source0:        http://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2
 BuildRequires:  libxml2
 BuildRequires:  zip
+Requires:       docbook-dtd-xml
 Requires:       libxml2
 Provides:       docbook-xsl = %{version}-%{release}
 Provides:       docbook-xsl-stylesheets = %{version}-%{release}
@@ -29,15 +30,15 @@ zip -d tools/lib/jython.jar Lib/distutils/command/wininst-6.exe
 zip -d tools/lib/jython.jar Lib/distutils/command/wininst-7.1.exe
 
 %install
-install -v -m755 -d %{buildroot}/usr/share/xml/docbook/xsl-stylesheets-1.79.1 &&
+install -v -m755 -d %{buildroot}%{_datadir}/xml/docbook/xsl-stylesheets-%{version} &&
 
 cp -v -R VERSION common eclipse epub extensions fo highlighting html \
          htmlhelp images javahelp lib manpages params profiling \
          roundtrip slides template tests tools webhelp website \
          xhtml xhtml-1_1 \
-    %{buildroot}/usr/share/xml/docbook/xsl-stylesheets-1.79.1
+    %{buildroot}%{_datadir}/xml/docbook/xsl-stylesheets-%{version}
 
-pushd %{buildroot}/usr/share/xml/docbook/xsl-stylesheets-1.79.1
+pushd %{buildroot}%{_datadir}/xml/docbook/xsl-stylesheets-%{version}
 rm extensions/saxon65.jar
 rm tools/lib/saxon.jar
 rm tools/lib/saxon9-ant.jar
@@ -49,6 +50,10 @@ install -v -m644 -D README \
                     %{buildroot}%{_docdir}/docbook-xsl-%{version}/README.txt &&
 install -v -m644    RELEASE-NOTES* NEWS* \
                     %{buildroot}%{_docdir}/docbook-xsl-%{version}
+
+mkdir -p %{buildroot}%{_datadir}/sgml/docbook
+ln -s %{_datadir}/xml/docbook/xsl-stylesheets-%{version} \
+	%{buildroot}%{_datadir}/sgml/docbook/xsl-stylesheets
 
 #There is no source code for make check
 #%check
@@ -92,10 +97,15 @@ fi
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_datadir}/xml/docbook/*
+%{_datadir}/xml/docbook/xsl-stylesheets-%{version}
+%{_datadir}/sgml/docbook/xsl-stylesheets
 %{_docdir}/*
 
 %changelog
+* Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.79.1-13
+- Symlink versioned stylesheets to unversioned %%{_datadir}/sgml/docbook/xsl-stylesheets.
+- Add runtime requirement on docbook-dtd-xml since the xsl stylesheets reference the DTD schema.
+
 * Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 1.79.1-12
 - Provide docbook-xsl-stylesheets.
 
