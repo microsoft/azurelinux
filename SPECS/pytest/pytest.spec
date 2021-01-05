@@ -5,7 +5,7 @@
 
 Name:           pytest
 Version:        3.8.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 License:        MIT
 Group:          Development/Languages/Python
@@ -15,6 +15,8 @@ Distribution:   Mariner
 #Source0:        https://github.com/pytest-dev/pytest/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/5f/d2/7f77f406ac505abda02ab4afb50d06ebf304f6ea42fca34f8f37529106b2/pytest-%{version}.tar.gz
 
+Provides:       python2dist(pytest) = %{version}-%{release}
+Provides:       python2.7dist(pytest) = %{version}-%{release}
 BuildRequires:  python2
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
@@ -35,6 +37,7 @@ BuildRequires:  python3-setuptools_scm
 Requires:       python2
 Requires:       python2-libs
 Requires:       python-py
+AutoReqProv:    no
 
 BuildArch:      noarch
 
@@ -43,9 +46,12 @@ pytest framework makes it easy to write small tests, yet scales to support compl
 
 %package -n     python3-pytest
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
+Provides:       python3dist(pytest) = %{version}-%{release}
+Provides:       python3.7dist(pytest) = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
 Requires:       python3-py
+AutoReqProv:    no
 
 %description -n python3-pytest
 
@@ -100,6 +106,8 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.8.2-7
+- Disable auto dependency generator.
 * Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.8.2-6
 - Added %%license line automatically
 

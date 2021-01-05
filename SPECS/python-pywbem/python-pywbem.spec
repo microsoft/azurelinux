@@ -7,7 +7,7 @@
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
 Version:        1.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2
 URL:            https://github.com/pywbem/pywbem
 Vendor:         Microsoft
@@ -48,6 +48,9 @@ Requires:       python3-nocasedict
 Requires:       python3-PyYAML
 Requires:       python3-yamlloader
 Requires:       python3-ply
+Provides:       python3dist(pywbem) = %{version}-%{release}
+Provides:       python3.7dist(pyweb) = %{version}-%{release}
+AutoReqProv:    no
 
 %description -n python3-%{pkgname}
 A WBEM client allows issuing operations to a WBEM server, using the CIM
@@ -73,6 +76,9 @@ Requires:       python2-nocasedict
 Requires:       PyYAML
 Requires:       python2-yamlloader
 Requires:       python-ply
+Provides:       python2dist(pywbem) = %{version}-%{release}
+Provides:       python2.7dist(pyweb) = %{version}-%{release}
+AutoReqProv:    no
 
 %description -n python2-%{pkgname}
 A WBEM client allows issuing operations to a WBEM server, using the CIM
@@ -130,6 +136,9 @@ rm -rf %{buildroot}/usr/bin/*.bat
 %endif
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0.1-3
+- Disable auto dependency generator.
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

@@ -4,7 +4,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        19.2.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -14,6 +14,9 @@ Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{vers
 Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
 
+AutoReqProv:    no
+Provides:       python2dist(twisted) = %{version}-%{release}
+Provides:       python2.7dist(twisted) = %{version}-%{release}
 BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  python2-devel
@@ -46,6 +49,8 @@ Twisted also supports many common network protocols, including SMTP, POP3, IMAP,
 %package -n     python3-twisted
 Summary:        python3-twisted
 
+Provides:       python3dist(twisted) = %{version}-%{release}
+Provides:       python3.7dist(twisted) = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
 Requires:       python3-zope-interface
@@ -54,6 +59,7 @@ Requires:       python3-incremental
 Requires:       python3-constantly
 Requires:       python3-hyperlink
 Requires:       python3-attrs
+AutoReqProv:    no
 
 %description -n python3-twisted
 Python 3 version.
@@ -128,6 +134,9 @@ popd
 %{_bindir}/cftp3
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 19.2.1-6
+- Disable auto dependency generator
+
 * Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 19.2.1-5
 - Added %%license line automatically
 
