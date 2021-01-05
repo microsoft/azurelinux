@@ -24,6 +24,9 @@
 # Chmods /dev/null to 600 breaking many non-root applications.
 %skip_check_zstd 1
 
+# JNA requires X11 dependencies which are only available in toolchain build environment
+%skip_check_jna 1
+
 # Still fails package build when it fails
 %skip_check_gcc 1
 
