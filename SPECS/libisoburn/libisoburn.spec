@@ -1,19 +1,24 @@
 Summary:        Library to enable creation and expansion of ISO-9660 filesystems
 Name:           libisoburn
 Version:        1.4.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://libburnia-project.org/
-Source0:        http://files.libburnia-project.org/releases/%{name}-%{version}.tar.gz
+Source0:        https://files.libburnia-project.org/releases/%{name}-%{version}.tar.gz
 Patch0:         libisoburn-1.0.8-multilib.patch
+
 BuildRequires:  libacl-devel
 BuildRequires:  libburn-devel >= %{version}
 BuildRequires:  libisofs-devel >= %{version}
 BuildRequires:  readline-devel
 BuildRequires:  zlib-devel
+%if %{with_check}
+BuildRequires:  file
+BuildRequires:  which
+%endif
 
 %description
 Libisoburn is a front-end for libraries libburn and libisofs which
@@ -87,7 +92,6 @@ cd releng
 %clean
 rm -rf %{buildroot}
 
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -115,6 +119,8 @@ rm -rf %{buildroot}
 %{_infodir}/xorrisofs.info*
 
 %changelog
+* Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.8-3
+- Add BRs for check section
 
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.4.8-2
 - Initial CBL-Mariner import from Fedora 27 (license: MIT).
