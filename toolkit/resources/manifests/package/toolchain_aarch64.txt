@@ -60,7 +60,7 @@ device-mapper-libs-2.03.05-6.cm1.aarch64.rpm
 diffutils-3.6-4.cm1.aarch64.rpm
 diffutils-debuginfo-3.6-4.cm1.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm1.noarch.rpm
-docbook-style-xsl-1.79.1-12.cm1.noarch.rpm
+docbook-style-xsl-1.79.1-13.cm1.noarch.rpm
 dwz-0.13-4.cm1.aarch64.rpm
 dwz-debuginfo-0.13-4.cm1.aarch64.rpm
 e2fsprogs-1.44.6-3.cm1.aarch64.rpm
