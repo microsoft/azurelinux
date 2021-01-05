@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -111,6 +111,8 @@ Summary:        The PyPA recommended tool for installing Python packages.
 Group:          Development/Tools
 Requires:       python3 = %{version}-%{release}
 Requires:       python3-xml = %{version}-%{release}
+Provides:       python3dist(pip) = %{version}-%{release}
+Provides:       python3.7dist(pip) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    pip
@@ -121,6 +123,7 @@ Summary:        Download, build, install, upgrade, and uninstall Python packages
 Group:          Development/Tools
 Requires:       python3 = %{version}-%{release}
 Provides:       python3dist(setuptools) = %{version}-%{release}
+Provides:       python3.7dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    setuptools
@@ -273,6 +276,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Mon Jan 04 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.7.7-7
+- Add python3 dist provides.
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 3.7.7-6
 - Ship pathfix.py.
 - pathfix.py spec changes imported from Fedora 32 (license: MIT)
