@@ -11,7 +11,6 @@ Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.36/%{
 BuildRequires:  ncurses-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
-Obsoletes:      hardlink <= 1:1.3-9
 Provides:       hardlink = 1:1.3-9
 %if %{with_check}
 BuildRequires:  ncurses-term
