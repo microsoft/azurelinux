@@ -206,6 +206,7 @@ build_rpm_in_chroot_no_install mariner-rpm-macros
 copy_rpm_subpackage mariner-check-macros
 chroot_and_install_rpms mariner-rpm-macros
 chroot_and_install_rpms mariner-check-macros
+chroot_and_install_rpms mariner-python-macros
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
