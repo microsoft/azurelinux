@@ -27,7 +27,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
 %if %{with_check}
-BuildRequires:  %{_sbindir}/useradd
+BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
 Requires:       openssh-clients = %{version}-%{release}
