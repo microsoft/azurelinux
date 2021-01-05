@@ -53,7 +53,7 @@ sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/a
 %build
 autoreconf -fi
 ./configure \
-	--enable-hardlink \
+    --enable-hardlink \
     --disable-nologin \
     --disable-chfn-chsh \
     --disable-login \
