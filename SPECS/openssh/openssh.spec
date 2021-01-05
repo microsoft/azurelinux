@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source2:        sshd.service
 Source3:        sshd-keygen.service
 Patch0:         blfs_systemd_fixes.patch
 Patch1:         CVE-2019-16905.patch
+Patch2:         regress-test-future-cert-fix.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
@@ -25,6 +26,10 @@ BuildRequires:  krb5-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+%if %{with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 Requires:       openssh-clients = %{version}-%{release}
 Requires:       openssh-server = %{version}-%{release}
 
@@ -59,6 +64,7 @@ This provides the ssh server daemons, utilities, configuration and service files
 tar xf %{SOURCE1} --no-same-owner
 %patch0
 %patch1
+%patch2 -p1
 
 %build
 %configure \
@@ -142,8 +148,6 @@ fi
 %clean
 rm -rf %{buildroot}/*
 
-
-
 %files
 %license LICENCE
 
@@ -189,6 +193,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
+* Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
+- Add BRs for check section
+- Add patch fixing cert-hostkey and cert-userkey regression tests
+
 * Tue Nov 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0p1-12
 - Nopatching CVE-2020-15778.
 
