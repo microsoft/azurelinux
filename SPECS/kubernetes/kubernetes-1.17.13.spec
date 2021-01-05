@@ -8,7 +8,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.17.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,8 @@ URL:            https://mcr.microsoft.com/oss
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
 Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
 Source1:        kubelet.service
+# CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch0:         CVE-2020-8565.nopatch
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
 BuildRequires:  which
@@ -171,5 +173,8 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
+* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-2
+- CVE-2020-8565
+
 * Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-1
 - Initial version of K8s 1.17.13.
