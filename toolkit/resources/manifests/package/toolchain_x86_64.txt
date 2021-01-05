@@ -92,8 +92,8 @@ flex-devel-2.6.4-6.cm1.x86_64.rpm
 freetype-2.9.1-4.cm1.x86_64.rpm
 freetype-debuginfo-2.9.1-4.cm1.x86_64.rpm
 freetype-devel-2.9.1-4.cm1.x86_64.rpm
-gawk-4.2.1-3.cm1.x86_64.rpm
-gawk-debuginfo-4.2.1-3.cm1.x86_64.rpm
+gawk-4.2.1-4.cm1.x86_64.rpm
+gawk-debuginfo-4.2.1-4.cm1.x86_64.rpm
 gcc-9.1.0-7.cm1.x86_64.rpm
 gcc-debuginfo-9.1.0-7.cm1.x86_64.rpm
 gdbm-1.18-3.cm1.x86_64.rpm
@@ -127,9 +127,9 @@ gperf-debuginfo-3.1-3.cm1.x86_64.rpm
 gpgme-1.13.1-6.cm1.x86_64.rpm
 gpgme-debuginfo-1.13.1-6.cm1.x86_64.rpm
 gpgme-devel-1.13.1-6.cm1.x86_64.rpm
-grep-3.1-3.cm1.x86_64.rpm
-grep-debuginfo-3.1-3.cm1.x86_64.rpm
-grep-lang-3.1-3.cm1.x86_64.rpm
+grep-3.1-4.cm1.x86_64.rpm
+grep-debuginfo-3.1-4.cm1.x86_64.rpm
+grep-lang-3.1-4.cm1.x86_64.rpm
 gtest-1.8.1-5.cm1.x86_64.rpm
 gtest-debuginfo-1.8.1-5.cm1.x86_64.rpm
 gtest-devel-1.8.1-5.cm1.x86_64.rpm
