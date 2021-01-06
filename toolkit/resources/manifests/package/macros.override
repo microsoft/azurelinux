@@ -27,6 +27,9 @@
 # JNA requires X11 dependencies which are only available in toolchain build environment
 %skip_check_jna 1
 
+# We are missing many of the dependency packages for the Dracut tests
+%skip_check_dracut 1
+
 # Still fails package build when it fails
 %skip_check_gcc 1
 
