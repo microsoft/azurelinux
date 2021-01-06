@@ -4,7 +4,7 @@
 Summary:        Repodata downloading library
 Name:           librepo
 Version:        1.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,7 +78,13 @@ pushd build-py3
 popd
 
 %check
-make check
+pushd build-py2
+make test
+popd
+
+pushd build-py3
+make test
+popd
 
 %install
 pushd build-py2
@@ -109,6 +115,9 @@ popd
 %{_python3_sitearch}/%{name}/
 
 %changelog
+* Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-4
+- Enable package tests for both major python versions
+
 * Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 1.11.0-3
 - Patch CVE-2020-14352
 - Lint to Mariner style
