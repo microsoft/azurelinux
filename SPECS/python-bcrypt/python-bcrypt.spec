@@ -3,14 +3,14 @@
 
 Name:           python-bcrypt
 Version:        3.1.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Good password hashing for your software and your servers.
 License:        ASL 2.0
 Group:          Development/Languages/Python
-Url:            https://github.com/pyca/bcrypt/
+URL:            https://github.com/pyca/bcrypt/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://files.pythonhosted.org/packages/ce/3a/3d540b9f5ee8d92ce757eebacf167b9deedb8e30aedec69a2a072b2399bb/bcrypt-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/b/bcrypt/bcrypt-%{version}.tar.gz
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -18,11 +18,13 @@ BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  python-cffi
 BuildRequires:  python-xml
+BuildRequires:  python-six
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cffi
+BuildRequires:  python3-six
 BuildRequires:  python3-xml
 Requires:       python2
 Requires:       python2-libs
@@ -57,7 +59,9 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 
 %check
-python2 setup.py test
+pushd ../p3dir
+python3 setup.py test
+popd
 
 %files
 %defattr(-,root,root,-)
@@ -69,6 +73,10 @@ python2 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 05 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.6-5
+- Switch to testing with python3
+- Fix Source0 URL
+
 * Sat May 09 00:21:26 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.1.6-4
 - Added %%license line automatically
 
