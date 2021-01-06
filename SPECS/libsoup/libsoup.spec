@@ -2,7 +2,7 @@ Summary:          libsoup HTTP client/server library
 Name:             libsoup
 %define BaseVersion 2.64
 Version:         %{BaseVersion}.0
-Release:         5%{?dist}
+Release:         6%{?dist}
 License:         GPLv2
 URL:             https://wiki.gnome.org/LibSoup
 Group:           System Environment/Development
@@ -11,7 +11,7 @@ Distribution:    Mariner
 Source0:         https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
 Patch0:          libsoup-fix-make-check.patch
 BuildRequires:   glib-devel
-BuildRequires:   gobject-introspection
+BuildRequires:   gobject-introspection-devel
 BuildRequires:   libxml2-devel
 BuildRequires:   intltool
 BuildRequires:   python2
@@ -65,7 +65,7 @@ These are the additional language files of libsoup.
 %patch0 -p1
 
 %build
-%configure --disable-vala
+%configure --disable-vala --enable-introspection=yes
 make %{?_smp_mflags}
 
 %install
@@ -84,6 +84,7 @@ make  check
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/*.so.*
+%{_libdir}/girepository-1.0/*
 
 %files devel
 %defattr(-,root,root)
@@ -92,6 +93,7 @@ make  check
 %{_libdir}/*.la
 %exclude %{_libdir}/*.a
 %{_libdir}/pkgconfig/*
+%{_datadir}/gir-1.0/*
 
 %files doc
 %defattr(-,root,root)
@@ -101,6 +103,9 @@ make  check
 %defattr(-,root,root)
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> 2.64.0-6
+- Enable introspection
+
 * Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
