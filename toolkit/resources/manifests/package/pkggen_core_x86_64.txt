@@ -205,9 +205,9 @@ pcre-libs-8.42-4.cm1.x86_64.rpm
 krb5-1.17-3.cm1.x86_64.rpm
 lua-5.3.5-11.cm1.x86_64.rpm
 lua-libs-5.3.5-11.cm1.x86_64.rpm
-mariner-rpm-macros-1.0-9.cm1.noarch.rpm
-mariner-python-macros-1.0-9.cm1.noarch.rpm
-mariner-check-macros-1.0-9.cm1.noarch.rpm
+mariner-rpm-macros-1.0-10.cm1.noarch.rpm
+mariner-python-macros-1.0-10.cm1.noarch.rpm
+mariner-check-macros-1.0-10.cm1.noarch.rpm
 libassuan-2.5.1-5.cm1.x86_64.rpm
 libgpg-error-1.32-5.cm1.x86_64.rpm
 libgcrypt-1.8.3-4.cm1.x86_64.rpm
@@ -232,9 +232,9 @@ python2-2.7.18-3.cm1.x86_64.rpm
 python2-devel-2.7.18-3.cm1.x86_64.rpm
 python2-libs-2.7.18-3.cm1.x86_64.rpm
 python-xml-2.7.18-3.cm1.x86_64.rpm
-python3-3.7.7-6.cm1.x86_64.rpm
-python3-devel-3.7.7-6.cm1.x86_64.rpm
-python3-libs-3.7.7-6.cm1.x86_64.rpm
-python3-setuptools-3.7.7-6.cm1.noarch.rpm
-python3-xml-3.7.7-6.cm1.x86_64.rpm
+python3-3.7.7-7.cm1.x86_64.rpm
+python3-devel-3.7.7-7.cm1.x86_64.rpm
+python3-libs-3.7.7-7.cm1.x86_64.rpm
+python3-setuptools-3.7.7-7.cm1.noarch.rpm
+python3-xml-3.7.7-7.cm1.x86_64.rpm
 systemd-rpm-macros-239-34.cm1.noarch.rpm

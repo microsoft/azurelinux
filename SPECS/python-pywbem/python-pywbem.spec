@@ -1,22 +1,18 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
-%bcond_without python2
 %define pkgname pywbem
-
+%bcond_without python2
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
 Version:        1.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2
-URL:            https://github.com/pywbem/pywbem
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/pywbem/pywbem
 #Source0:       https://github.com/%{pkgname}/%{pkgname}/archive/%{version}.tar.gz
 Source0:        %{pkgname}-%{version}.tar.gz
-
 BuildArch:      noarch
-
 
 %description
 A Python library for making CIM (Common Information Model) operations over HTTP\
@@ -34,20 +30,23 @@ easiest way to write providers on the planet.
 
 %package -n python3-%{pkgname}
 Summary:        Python3 WBEM Client and Provider Interface
-BuildArch:      noarch
-BuildRequires:  python3-pip
 BuildRequires:  python3-PyYAML
-BuildRequires:  python3-ply
-BuildRequires:  python3-pbr
 BuildRequires:  python3-devel
+BuildRequires:  python3-pbr
+BuildRequires:  python3-pip
+BuildRequires:  python3-ply
 BuildRequires:  python3-setuptools
 Requires:       python3
-Requires:       python3-xml
-Requires:       python3-requests
-Requires:       python3-nocasedict
 Requires:       python3-PyYAML
-Requires:       python3-yamlloader
+Requires:       python3-nocasedict
 Requires:       python3-ply
+Requires:       python3-requests
+Requires:       python3-xml
+Requires:       python3-yamlloader
+AutoReqProv:    no
+Provides:       python3dist(pywbem) = %{version}-%{release}
+Provides:       python3.7dist(pyweb) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n python3-%{pkgname}
 A WBEM client allows issuing operations to a WBEM server, using the CIM
@@ -59,20 +58,23 @@ for more information about WBEM.
 %if %{with python2}
 %package -n python2-%{pkgname}
 Summary:        Python2 WBEM Client and Provider Interface
-BuildArch:      noarch
-BuildRequires:  python-pip
 BuildRequires:  PyYAML
-BuildRequires:  python-ply
 BuildRequires:  python-pbr
-BuildRequires:  python2-devel
+BuildRequires:  python-pip
+BuildRequires:  python-ply
 BuildRequires:  python-setuptools
-Requires:       python2
-Requires:       python-xml
-Requires:       python-requests
-Requires:       python2-nocasedict
+BuildRequires:  python2-devel
 Requires:       PyYAML
-Requires:       python2-yamlloader
 Requires:       python-ply
+Requires:       python-requests
+Requires:       python-xml
+Requires:       python2
+Requires:       python2-nocasedict
+Requires:       python2-yamlloader
+AutoReqProv:    no
+Provides:       python2dist(pywbem) = %{version}-%{release}
+Provides:       python2.7dist(pyweb) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n python2-%{pkgname}
 A WBEM client allows issuing operations to a WBEM server, using the CIM
@@ -98,20 +100,19 @@ popd
 PBR_VERSION="%{version}" CFLAGS="%{build_cflags}" python3 setup.py build
 
 %install
-rm -rf %{buildroot}
 %if %{with python2}
 pushd ../p2dir
 env PYTHONPATH=%{buildroot}/%{python2_sitelib} \
     PBR_VERSION="%{version}" \
     python2 setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
-rm -rf %{buildroot}/usr/bin/*.bat
+rm -rf %{buildroot}%{_bindir}/*.bat
 popd
 %endif
 
 env PYTHONPATH=%{buildroot}/%{python3_sitelib} \
     PBR_VERSION="%{version}" \
     python3 setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
-rm -rf %{buildroot}/usr/bin/*.bat
+rm -rf %{buildroot}%{_bindir}/*.bat
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt
@@ -130,6 +131,9 @@ rm -rf %{buildroot}/usr/bin/*.bat
 %endif
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0.1-3
+- Disable auto dependency generator.
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
@@ -339,8 +343,10 @@ rm -rf %{buildroot}/usr/bin/*.bat
 
 * Fri Jan 01 2010 David Nalley <david@gnsa.us> 0.7.0-3
 - refined requires for epel compat
+
 * Sun Jun 28 2009 David Nalley <david@gnsa.us> 0.7.0-2
 - Added some verbiage regarding what WBEM is and expanding WBEM and CIM acronyms
 - Added python-twisted as a dependency
+
 * Thu Jun 25 2009 David Nalley <david@gnsa.us> 0.7.0-1
 - Initial packaging
