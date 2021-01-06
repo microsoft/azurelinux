@@ -17,6 +17,7 @@ Source6:        https://static.rust-lang.org/dist/2019-09-26/rustc-1.38.0-aarch6
 Source7:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-aarch64-unknown-linux-gnu.tar.gz
 
 Patch0:         robust-build.patch
+Patch1:         ignore-linker-output-non-utf8-test.patch
 
 BuildRequires:  git
 BuildRequires:  cmake
@@ -40,6 +41,7 @@ popd
 %setup -q -n rustc-%{version}-src
 
 %patch0 -p1
+%patch1 -p1
 
 # Setup build/cache directory
 %define BUILD_CACHE_DIR build/cache/2019-09-26/
@@ -68,6 +70,9 @@ export SUDO_USER=root
 make %{?_smp_mflags}
 
 %check
+# src/test/run-make-fulldeps/linker-output-non-utf8 fails, but given that it was removed in
+# rustc 1.40.0 for "not pulling its weight" and "not properly testing this case", we ignore it.
+# See ignore-linker-output-non-utf8-test.patch for more details.
 make check
 
 %install
