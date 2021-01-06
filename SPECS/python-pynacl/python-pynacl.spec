@@ -3,7 +3,7 @@
 
 Name:           python-pynacl
 Version:        1.3.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        PyNaCl is a Python binding to libsodium
 License:        ASL 2.0
 Group:          Development/Languages/Python
@@ -20,11 +20,13 @@ BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  python-cffi
 BuildRequires:  python-xml
+BuildRequires:  python-six
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cffi
+BuildRequires:  python3-six
 BuildRequires:  python3-xml
 Requires:       python2
 Requires:       python2-libs
@@ -59,7 +61,10 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 
 %check
-python2 setup.py test
+# libsodium tests are ran as part of the build phase
+pushd ../p3dir
+python3 setup.py test
+popd
 
 %files
 %defattr(-,root,root,-)
@@ -71,6 +76,9 @@ python2 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Dec 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.0-6
+- Enable package tests
+
 * Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.0-5
 - Added %%license line automatically
 
