@@ -113,6 +113,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %changelog
 * Tue Dec 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
+- Add ignore-linker-output-non-utf8-test patch to skip faulty test 
 
 * Wed Aug 12 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.39.0-7
 - Add patch for the build to not fail on file not found error.
