@@ -3,10 +3,10 @@ Name:           rust
 Version:        1.39.0
 Release:        8%{?dist}
 License:        ASL 2.0 and MIT
-URL:            https://www.rust-lang.org/
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/2019-09-26/cargo-0.39.0-x86_64-unknown-linux-gnu.tar.gz
@@ -19,15 +19,16 @@ Source7:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-aar
 Patch0:         robust-build.patch
 Patch1:         ignore-linker-output-non-utf8-test.patch
 
-BuildRequires:  git
-BuildRequires:  cmake
-BuildRequires:  glibc
 BuildRequires:  binutils
+BuildRequires:  cmake
+BuildRequires:  curl-devel
+BuildRequires:  git
+BuildRequires:  glibc
 BuildRequires:  python2
 %if %{with_check}
 BuildRequires:  python-xml
 %endif
-BuildRequires:  curl-devel
+
 
 %description
 Rust Programming Language
@@ -112,23 +113,33 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %changelog
 * Tue Dec 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
-*   Wed Aug 12 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.39.0-7
--   Add patch for the build to not fail on file not found error.
-*   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 1.39.0-6
--   Temporarily disable generation of debug symbols.
-*   Thu May 28 2020 Chris Co <chrco@microsoft.com> - 1.39.0-5
--   Update source checkout and prep steps
-*   Sat May 09 00:20:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.39.0-4
--   Added %%license line automatically
-*   Mon May 4 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.39.0-3
--   Fix build issue when building from Docker
-*   Tue Apr 21 2020 Andrew Phelps <anphel@microsoft.com> 1.39.0-2
--   Support building offline.
-*   Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> 1.39.0-1
--   Update to 1.39.0. Fix URL. Fix Source0 URL. License verified.
-*   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 1.34.2-3
--   Set SUDO_USER and USER to allow rust to hydrate as root
-*   Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 1.34.2-2
--   Initial CBL-Mariner import from Photon (license: Apache2)
-*   Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 1.34.2-1
--   Initial build. First version
+
+* Wed Aug 12 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.39.0-7
+- Add patch for the build to not fail on file not found error.
+
+* Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.39.0-6
+- Temporarily disable generation of debug symbols.
+
+* Thu May 28 2020 Chris Co <chrco@microsoft.com> - 1.39.0-5
+- Update source checkout and prep steps
+
+* Sat May 09 00:20:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.39.0-4
+- Added %%license line automatically
+
+* Mon May 4 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.39.0-3
+- Fix build issue when building from Docker
+
+* Tue Apr 21 2020 Andrew Phelps <anphel@microsoft.com> - 1.39.0-2
+- Support building offline.
+
+* Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.39.0-1
+- Update to 1.39.0. Fix URL. Fix Source0 URL. License verified.
+
+* Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> - 1.34.2-3
+- Set SUDO_USER and USER to allow rust to hydrate as root
+
+* Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.34.2-2
+- Initial CBL-Mariner import from Photon (license: Apache2)
+
+* Wed May 15 2019 Ankit Jain <ankitja@vmware.com> - 1.34.2-1
+- Initial build. First version
