@@ -111,7 +111,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
-* Tue Dec 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
+* Wed Jan 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
 - Add ignore-linker-output-non-utf8-test patch to skip faulty test 
 
