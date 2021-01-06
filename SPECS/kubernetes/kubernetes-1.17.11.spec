@@ -23,6 +23,9 @@ Source2:        golang-1.15-k8s-1.17-test.patch
 Patch0:         CVE-2020-8564.nopatch
 Patch1:         CVE-2020-8565.nopatch
 Patch2:         CVE-2020-8566.nopatch
+# CVE-2020-8563 Only applies when using VSphere as cloud provider,
+#               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch3:         CVE-2020-8563.nopatch
 BuildRequires:  flex-devel
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
@@ -182,6 +185,7 @@ fi
 %changelog
 * Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-6
 - Fix test issue when building against golang 1.15
+- CVE-2020-8563
 
 * Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-5
 - CVE-2020-8564, CVE-2020-8565, CVE-2020-8566
