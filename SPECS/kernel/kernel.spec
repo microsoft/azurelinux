@@ -206,12 +206,12 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package imx8dtb
-Summary:        This package contains the imx8mq-evk.dtb
+%package dtb
+Summary:        This package contains common device tree blobs (dtb)
 Group:          System Environment/Kernel
 
-%description imx8dtb
-This package contains the imx8mq-evk.dtb
+%description dtb
+This package contains common device tree blobs (dtb)
 
 %prep
 %setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
@@ -443,12 +443,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %ifarch aarch64
-%files imx8dtb
+%files dtb
 /boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
 %changelog
-* Wed Dec 16 2020 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
+* Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
 - Add imx8mq support
 
 * Sat Jan 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.4.83-3
