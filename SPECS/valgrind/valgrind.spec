@@ -46,7 +46,7 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
-* Thu Jan 07 2020 Henry Beberman <joschmit@microsoft.com> - 3.15.0-4
+* Thu Jan 07 2020 Joe Schmitt <joschmit@microsoft.com> - 3.15.0-4
 - Provide valgrind-devel.
 
 * Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.15.0-3
