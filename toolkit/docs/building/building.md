@@ -1,4 +1,6 @@
 # Building
+
+- [Building](#building)
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
    - [Install Prerequisites](#install-prerequisites)
@@ -292,9 +294,18 @@ While `tdnf` uses a list of repo files:
 REPO_LIST ?=
 ```
 
-The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
+The `REPO_LIST` variable supports multiple, space-separated repo files, and they are prioritized in the order they appear in the list.
 The CBL-Mariner base and update repos are implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 To disable the update repo set `USE_UPDATE_REPO=n`. If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
+
+The tooling will use the first package it can find by looking through the repositories in the following order:
+
+1. the worker chroot environment;
+2. already built local RPMs in `out/RPMS/`;
+3. the core CBL-Mariner upstream **preview** repository if `USE_PREVIEW_REPO` is set to `y`;
+4. the core CBL-Mariner upstream **update** repository if `USE_UPDATE_REPO` is **not** set to `n`;
+5. the core CBL-Mariner upstream **base** repository;
+6. any remote repo in order listed by `REPO_LIST`.
 
 ### Authentication
 
