@@ -8,7 +8,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,13 +18,17 @@ URL:            https://mcr.microsoft.com/oss
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
 Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
 Source1:        kubelet.service
+Source2:        golang-1.15-k8s-1.18-test.patch
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
+# CVE-2020-8563 Only applies when using VSphere as cloud provider,
+#               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch1:         CVE-2020-8563.nopatch
+BuildRequires:  flex-devel
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
-BuildRequires:  which
-BuildRequires:  flex-devel
 BuildRequires:  systemd-devel
+BuildRequires:  which
 Requires:       cni
 Requires:       cri-tools
 Requires:       ebtables
@@ -78,13 +82,17 @@ for component in ${components_to_build}; do
 done
 
 %check
-cd %{_builddir}/%{name}/src
-components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
+# patch test script so it supports golang 1.15 which is now used to build kubernetes
+cd %{_builddir}/%{name}/src/hack/make-rules
+patch -p1 test.sh < %{SOURCE2}
 
 # perform unit tests
 # Note:
 #   - components are not unit tested the same way
 #   - not all components have unit
+cd %{_builddir}/%{name}/src
+components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
+
 for component in ${components_to_test}; do
   if [[ ${component} == "kubelet" || ${component} == "kubectl" ]]; then
     echo "+++ unit test pkg ${component}"
@@ -173,6 +181,10 @@ fi
 %{_bindir}/kubeadm
 
 %changelog
+* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-3
+- Fix test issue when building against golang 1.15
+- CVE-2020-8563
+
 * Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-2
 - CVE-2020-8565
 

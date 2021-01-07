@@ -1,0 +1,20 @@
+--- test.sh	2020-10-14 17:58:31.000000000 -0700
++++ test-golang-1.15.sh	2021-01-05 10:55:19.515412980 -0800
+@@ -267,6 +267,17 @@
+ 
+   verifyPathsToPackagesUnderTest "$@"
+ 
++  # vet tool which is by default invoked by 'go test' command will fail 
++  # because of a verification that is specific to golang 1.15 (stringintconv)
++  # => exclude that verification from the vet check list (see golang doc for more)
++  #
++  # this version of kubernetes was initially built against golang 1.13 which vet tool does not
++  # has the problematic check. CBL-Mariner moved to golang 1.15 and consequenlty build this version of kubernetes
++  # against golang 1.15
++  #
++  go_vet_tests=asmdecl,assign,atomic,bools,buildtag,cgocall,composites,copylocks,errorsas,httpresponse,ifaceassert,loopclosure,lostcancel,nilfunc,printf,shift,stdmethods,structtag,tests,unmarshal,unreachable,unsafeptr,unusedresult
++  goflags+=(-vet $go_vet_tests)
++
+   # If we're not collecting coverage, run all requested tests with one 'go test'
+   # command, which is much faster.
+   if [[ ! ${KUBE_COVER} =~ ^[yY]$ ]]; then
