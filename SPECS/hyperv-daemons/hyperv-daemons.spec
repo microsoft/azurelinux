@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.4.83
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -218,6 +218,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Update to kernel release 5.4.83-2
+
 * Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
 - Update source to 5.4.83
 
