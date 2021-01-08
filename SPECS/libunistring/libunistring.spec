@@ -55,7 +55,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Thu Jan 07 2021 Andrew Phelps <anphel@microsoft.com> 0.9.10-4
-- Fix test-thread_create testcase by undefining _ld_as_needed
+- Fix test-thread_create testcase by undefining _ld_as_needed. License verified.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.9.10-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.9.10-2
