@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssl.org/
-Source0:        https://www.openssl.org/source/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}-hobbled.tar.xz
 Source1:        hobble-openssl
 Source2:        ec_curve.c
 Source3:        ectest.c
