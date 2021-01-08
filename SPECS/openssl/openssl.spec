@@ -4,13 +4,16 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssl.org/
 Source0:        https://www.openssl.org/source/%{name}-%{version}.tar.gz
+Source1:        hobble-openssl
+Source2:        ec_curve.c
+Source3:        ectest.c
 Patch0:         openssl-1.1.1-no-html.patch
 # CVE only applies when Apache HTTP Server version 2.4.37 or less.
 Patch1:         CVE-2019-0190.nopatch
@@ -73,6 +76,14 @@ from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
 %setup -q
+
+# The hobble_openssl is called here redundantly, just to be sure.
+# The tarball has already the sources removed.
+%{SOURCE1} > /dev/null
+
+cp %{SOURCE2} crypto/ec/
+cp %{SOURCE3} test/
+
 %patch0 -p1
 %patch2 -p1
 %patch3 -p1
@@ -114,6 +125,7 @@ export HASHBANGPERL=%{_bindir}/perl
     enable-dh \
     enable-dsa \
     no-dtls1 \
+    no-ec2m \
     enable-ec_nistp_64_gcc_128 \
     enable-ecdh \
     enable-ecdsa \
@@ -254,10 +266,10 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %clean
 rm -rf %{buildroot}
 
-
-
-
 %changelog
+* Fri Jan 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-10
+- Remove source code and support for EC2M.
+
 * Thu Dec 10 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.1.1g-9
 - Remove binaries (such as bash) from requires list
 
