@@ -30,6 +30,9 @@
 # We are missing many of the dependency packages for the Dracut tests
 %skip_check_dracut 1
 
+# Strongswan's rsa testsuite occasionally hangs
+%skip_check_strongswan
+
 # Still fails package build when it fails
 %skip_check_gcc 1
 
