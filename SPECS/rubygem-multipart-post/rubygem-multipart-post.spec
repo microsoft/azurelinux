@@ -1,21 +1,20 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name multipart-post
-
+Summary:        Adds multipart POST capability to net/http
 Name:           rubygem-multipart-post
 Version:        2.1.1
 Release:        1%{?dist}
-Summary:        Adds multipart POST capability to net/http 
-Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
 
 %description
-Adds a streamy multipart form post capability to Net::HTTP. 
+Adds a streamy multipart form post capability to Net::HTTP.
 Also supports other methods besides POST.
 
 %prep
@@ -32,6 +31,3 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 %{gemdir}
 
 %changelog
-*   Wed Jan 06 2021 Henry Li <lihl@microsoft.com> 2.1.1-1
--   Original version for CBL-Mariner.
--   License verified.

@@ -5385,8 +5385,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bundler",
-          "version": "1.16.4",
-          "downloadUrl": "https://rubygems.org/downloads/bundler-1.16.4.gem"
+          "version": "2.1.4",
+          "downloadUrl": "https://rubygems.org/downloads/bundler-2.1.4.gem"
         }
       }
     },

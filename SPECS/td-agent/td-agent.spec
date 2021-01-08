@@ -2,7 +2,6 @@
 %define control_service() (systemctl %{1} %{2})
 %define disable_service() (systemctl %{1} %{2})
 %define enable_service() (systemctl %{1} %{2})
-
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
@@ -15,30 +14,10 @@ URL:            https://github.com/fluent-plugins-nursery/td-agent-builder
 #Source0:      https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz
 Source0:        td-agent-builder-testing-uploading-artifacts3.tar.gz
 Patch0:         td-agent.patch
-BuildRequires:  rubygem-httpclient, rubygem-td-client, rubygem-td
-BuildRequires:  rubygem-fluent-plugin-td, rubygem-jmespath, rubygem-aws-partitions
-BuildRequires:  rubygem-aws-sigv4, rubygem-aws-sdk-core, rubygem-aws-sdk-kms, rubygem-aws-sdk-sqs
-BuildRequires:  rubygem-aws-sdk-s3, rubygem-fluent-plugin-s3, rubygem-webhdfs, rubygem-fluent-plugin-webhdfs
-BuildRequires:  rubygem-fluent-plugin-rewrite-tag-filter, rubygem-ruby-kafka, rubygem-fluent-plugin-kafka
-BuildRequires:  rubygem-elasticsearch, rubygem-fluent-plugin-elasticsearch, rubygem-prometheus-client
-BuildRequires:  rubygem-fluent-plugin-prometheus, rubygem-fluent-plugin-prometheus_pushgateway, rubygem-fluent-plugin-record-modifier
-BuildRequires:  rubygem-systemd-journal, rubygem-fluent-plugin-systemd, rubygem-nokogiri, rubygem-msgpack
-BuildRequires:  rubygem-cool.io, rubygem-serverengine, rubygem-oj, rubygem-async-http, rubygem-http_parser.rb
-BuildRequires:  rubygem-yajl-ruby, rubygem-sigdump, rubygem-tzinfo, rubygem-tzinfo-data, rubygem-strptime
-BuildRequires:  rubygem-concurrent-ruby, rubygem-rake, rubygem-mini_portile2, rubygem-rdkafka
-BuildRequires:  rubygem-ltsv, rubygem-protocol-http2, rubygem-protocol-http1, rubygem-protocol-http
-BuildRequires:  rubygem-async-pool, rubygem-async-io, rubygem-async
-BuildRequires:  rubygem-protocol-hpack, rubygem-timers, rubygem-nio4r
-BuildRequires:  rubygem-console, rubygem-fiber-local, rubygem-ruby-progressbar
-BuildRequires:  rubygem-zip-zip, rubygem-rubyzip, rubygem-td-logger
-BuildRequires:  rubygem-parallel, rubygem-hirb, rubygem-fluent-logger
-BuildRequires:  rubygem-aws-eventstream, rubygem-addressable, rubygem-public_suffix
-BuildRequires:  rubygem-fluent-config-regexp-type, rubygem-digest-crc
-BuildRequires:  rubygem-ffi, rubygem-elasticsearch-api, rubygem-elasticsearch-transport
-BuildRequires:  rubygem-multi_json, rubygem-faraday, rubygem-ruby2_keywords
-BuildRequires:  rubygem-multipart-post, rubygem-excon, rubygem-quantile
 BuildRequires:  build-essential
 BuildRequires:  git
+BuildRequires:  jemalloc
+BuildRequires:  jemalloc-devel
 BuildRequires:  libedit-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  make
@@ -46,41 +25,167 @@ BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
 BuildRequires:  ruby
+BuildRequires:  rubygem-addressable
+BuildRequires:  rubygem-async
+BuildRequires:  rubygem-async-http
+BuildRequires:  rubygem-async-io
+BuildRequires:  rubygem-async-pool
+BuildRequires:  rubygem-aws-eventstream
+BuildRequires:  rubygem-aws-partitions
+BuildRequires:  rubygem-aws-sdk-core
+BuildRequires:  rubygem-aws-sdk-kms
+BuildRequires:  rubygem-aws-sdk-s3
+BuildRequires:  rubygem-aws-sdk-sqs
+BuildRequires:  rubygem-aws-sigv4
+BuildRequires:  rubygem-bundler
+BuildRequires:  rubygem-concurrent-ruby
+BuildRequires:  rubygem-console
+BuildRequires:  rubygem-cool.io
+BuildRequires:  rubygem-digest-crc
+BuildRequires:  rubygem-elasticsearch
+BuildRequires:  rubygem-elasticsearch-api
+BuildRequires:  rubygem-elasticsearch-transport
+BuildRequires:  rubygem-excon
+BuildRequires:  rubygem-faraday
+BuildRequires:  rubygem-ffi
+BuildRequires:  rubygem-fiber-local
+BuildRequires:  rubygem-fluent-config-regexp-type
+BuildRequires:  rubygem-fluent-logger
+BuildRequires:  rubygem-fluent-plugin-elasticsearch
+BuildRequires:  rubygem-fluent-plugin-kafka
+BuildRequires:  rubygem-fluent-plugin-prometheus
+BuildRequires:  rubygem-fluent-plugin-prometheus_pushgateway
+BuildRequires:  rubygem-fluent-plugin-record-modifier
+BuildRequires:  rubygem-fluent-plugin-rewrite-tag-filter
+BuildRequires:  rubygem-fluent-plugin-s3
+BuildRequires:  rubygem-fluent-plugin-systemd
+BuildRequires:  rubygem-fluent-plugin-td
+BuildRequires:  rubygem-fluent-plugin-webhdfs
+BuildRequires:  rubygem-fluentd
+BuildRequires:  rubygem-hirb
+BuildRequires:  rubygem-http_parser.rb
+BuildRequires:  rubygem-httpclient
+BuildRequires:  rubygem-jmespath
+BuildRequires:  rubygem-ltsv
+BuildRequires:  rubygem-mini_portile2
+BuildRequires:  rubygem-msgpack
+BuildRequires:  rubygem-multi_json
+BuildRequires:  rubygem-multipart-post
+BuildRequires:  rubygem-nio4r
+BuildRequires:  rubygem-nokogiri
+BuildRequires:  rubygem-oj
+BuildRequires:  rubygem-parallel
+BuildRequires:  rubygem-prometheus-client
+BuildRequires:  rubygem-protocol-hpack
+BuildRequires:  rubygem-protocol-http
+BuildRequires:  rubygem-protocol-http1
+BuildRequires:  rubygem-protocol-http2
+BuildRequires:  rubygem-public_suffix
+BuildRequires:  rubygem-quantile
+BuildRequires:  rubygem-rake
+BuildRequires:  rubygem-rdkafka
+BuildRequires:  rubygem-ruby-kafka
+BuildRequires:  rubygem-ruby-progressbar
+BuildRequires:  rubygem-ruby2_keywords
+BuildRequires:  rubygem-rubyzip
+BuildRequires:  rubygem-serverengine
+BuildRequires:  rubygem-sigdump
+BuildRequires:  rubygem-strptime
+BuildRequires:  rubygem-systemd-journal
+BuildRequires:  rubygem-td
+BuildRequires:  rubygem-td-client
+BuildRequires:  rubygem-td-logger
+BuildRequires:  rubygem-timers
+BuildRequires:  rubygem-tzinfo
+BuildRequires:  rubygem-tzinfo-data
+BuildRequires:  rubygem-webhdfs
+BuildRequires:  rubygem-yajl-ruby
+BuildRequires:  rubygem-zip-zip
 BuildRequires:  sudo
 BuildRequires:  systemd
 BuildRequires:  tar
 BuildRequires:  unzip
 BuildRequires:  zlib-devel
-BuildRequires:  jemalloc
-BuildRequires:  jemalloc-devel
-BuildRequires:  rubygem-bundler, rubygem-fluentd
-Requires:       libxcrypt
-Requires:       rubygem-httpclient, rubygem-td-client, rubygem-td
-Requires:       rubygem-fluent-plugin-td, rubygem-jmespath, rubygem-aws-partitions
-Requires:       rubygem-aws-sigv4, rubygem-aws-sdk-core, rubygem-aws-sdk-kms, rubygem-aws-sdk-sqs
-Requires:       rubygem-aws-sdk-s3, rubygem-fluent-plugin-s3, rubygem-webhdfs, rubygem-fluent-plugin-webhdfs
-Requires:       rubygem-fluent-plugin-rewrite-tag-filter, rubygem-ruby-kafka, rubygem-fluent-plugin-kafka
-Requires:       rubygem-elasticsearch, rubygem-fluent-plugin-elasticsearch, rubygem-prometheus-client
-Requires:       rubygem-fluent-plugin-prometheus, rubygem-fluent-plugin-prometheus_pushgateway, rubygem-fluent-plugin-record-modifier
-Requires:       rubygem-systemd-journal, rubygem-fluent-plugin-systemd, rubygem-nokogiri, rubygem-msgpack
-Requires:       rubygem-cool.io, rubygem-serverengine, rubygem-oj, rubygem-async-http, rubygem-http_parser.rb
-Requires:       rubygem-yajl-ruby, rubygem-sigdump, rubygem-tzinfo, rubygem-tzinfo-data, rubygem-strptime
-Requires:       rubygem-concurrent-ruby, rubygem-rake, rubygem-mini_portile2, rubygem-rdkafka
-Requires:       rubygem-ltsv, rubygem-protocol-http2, rubygem-protocol-http1, rubygem-protocol-http
-Requires:       rubygem-async-pool, rubygem-async-io, rubygem-async
-Requires:       rubygem-protocol-hpack, rubygem-timers, rubygem-nio4r
-Requires:       rubygem-console, rubygem-fiber-local, rubygem-ruby-progressbar
-Requires:       rubygem-zip-zip, rubygem-rubyzip, rubygem-td-logger
-Requires:       rubygem-parallel, rubygem-hirb, rubygem-fluent-logger
-Requires:       rubygem-aws-eventstream, rubygem-addressable, rubygem-public_suffix
-Requires:       rubygem-fluent-config-regexp-type, rubygem-digest-crc
-Requires:       rubygem-ffi, rubygem-elasticsearch-api, rubygem-elasticsearch-transport
-Requires:       rubygem-multi_json, rubygem-faraday, rubygem-ruby2_keywords
-Requires:       rubygem-multipart-post, rubygem-excon, rubygem-quantile
-Requires:       rubygem-bundler, rubygem-fluentd
-Requires:       ruby
 Requires:       jemalloc
 Requires:       jemalloc-devel
+Requires:       libxcrypt
+Requires:       ruby
+Requires:       rubygem-addressable
+Requires:       rubygem-async
+Requires:       rubygem-async-http
+Requires:       rubygem-async-io
+Requires:       rubygem-async-pool
+Requires:       rubygem-aws-eventstream
+Requires:       rubygem-aws-partitions
+Requires:       rubygem-aws-sdk-core
+Requires:       rubygem-aws-sdk-kms
+Requires:       rubygem-aws-sdk-s3
+Requires:       rubygem-aws-sdk-sqs
+Requires:       rubygem-aws-sigv4
+Requires:       rubygem-bundler
+Requires:       rubygem-concurrent-ruby
+Requires:       rubygem-console
+Requires:       rubygem-cool.io
+Requires:       rubygem-digest-crc
+Requires:       rubygem-elasticsearch
+Requires:       rubygem-elasticsearch-api
+Requires:       rubygem-elasticsearch-transport
+Requires:       rubygem-excon
+Requires:       rubygem-faraday
+Requires:       rubygem-ffi
+Requires:       rubygem-fiber-local
+Requires:       rubygem-fluent-config-regexp-type
+Requires:       rubygem-fluent-logger
+Requires:       rubygem-fluent-plugin-elasticsearch
+Requires:       rubygem-fluent-plugin-kafka
+Requires:       rubygem-fluent-plugin-prometheus
+Requires:       rubygem-fluent-plugin-prometheus_pushgateway
+Requires:       rubygem-fluent-plugin-record-modifier
+Requires:       rubygem-fluent-plugin-rewrite-tag-filter
+Requires:       rubygem-fluent-plugin-s3
+Requires:       rubygem-fluent-plugin-systemd
+Requires:       rubygem-fluent-plugin-td
+Requires:       rubygem-fluent-plugin-webhdfs
+Requires:       rubygem-fluentd
+Requires:       rubygem-hirb
+Requires:       rubygem-http_parser.rb
+Requires:       rubygem-httpclient
+Requires:       rubygem-jmespath
+Requires:       rubygem-ltsv
+Requires:       rubygem-mini_portile2
+Requires:       rubygem-msgpack
+Requires:       rubygem-multi_json
+Requires:       rubygem-multipart-post
+Requires:       rubygem-nio4r
+Requires:       rubygem-nokogiri
+Requires:       rubygem-oj
+Requires:       rubygem-parallel
+Requires:       rubygem-prometheus-client
+Requires:       rubygem-protocol-hpack
+Requires:       rubygem-protocol-http
+Requires:       rubygem-protocol-http1
+Requires:       rubygem-protocol-http2
+Requires:       rubygem-public_suffix
+Requires:       rubygem-quantile
+Requires:       rubygem-rake
+Requires:       rubygem-rdkafka
+Requires:       rubygem-ruby-kafka
+Requires:       rubygem-ruby-progressbar
+Requires:       rubygem-ruby2_keywords
+Requires:       rubygem-rubyzip
+Requires:       rubygem-serverengine
+Requires:       rubygem-sigdump
+Requires:       rubygem-strptime
+Requires:       rubygem-systemd-journal
+Requires:       rubygem-td
+Requires:       rubygem-td-client
+Requires:       rubygem-td-logger
+Requires:       rubygem-timers
+Requires:       rubygem-tzinfo
+Requires:       rubygem-tzinfo-data
+Requires:       rubygem-webhdfs
+Requires:       rubygem-yajl-ruby
+Requires:       rubygem-zip-zip
 
 %description
 The stable distribution of Fluentd
@@ -169,7 +274,7 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
-* Mon Jan 04 2020 Henry Li <lihl@microsoft.com> - 4.0.1-1
+* Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Initial CBL-Mariner import from Treasure Data (license: Apache2).
 
 * Fri May 22 2020 Masahiro Nakagawa <repeatedly@gmail.com> - 4.0.0.rc1-1

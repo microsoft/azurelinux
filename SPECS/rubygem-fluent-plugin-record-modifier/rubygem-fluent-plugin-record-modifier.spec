@@ -1,15 +1,14 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name fluent-plugin-record-modifier
-
+Summary:        Filter plugin for modifying event record
 Name:           rubygem-fluent-plugin-record-modifier
 Version:        2.1.0
 Release:        1%{?dist}
-Summary:        Filter plugin for modifying event record
-Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
@@ -31,6 +30,3 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 %{gemdir}
 
 %changelog
-*   Mon Jan 04 2021 Henry Li <lihl@microsoft.com> 2.1.0-1
--   Original version for CBL-Mariner.
--   License verified.
