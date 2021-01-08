@@ -272,6 +272,7 @@ rm -rf %{buildroot}
 * Fri Jan 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-10
 - Remove source code and support for EC2M.
 - Remove source code for IDEA.
+- Use "hobbled" tarball
 
 * Thu Dec 10 2020 Mateusz Malisz <mamalisz@microsoft.com> - 1.1.1g-9
 - Remove binaries (such as bash) from requires list
