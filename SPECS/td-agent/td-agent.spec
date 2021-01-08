@@ -7,7 +7,7 @@ Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
 Release:        1%{?dist}
-License:        ASL 2.0 AND BSD AND MIT AND Jason Evans Open Source
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -166,9 +166,20 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir %{_localstatedir}/log/td-agent/buffer
 %attr(0755,td-agent,td-agent) %dir %{_sysconfdir}/td-agent
 %attr(0755,td-agent,td-agent) %dir %{_sysconfdir}/td-agent/plugin
-# NOTE: %{_tmpfilesdir} is available since CentOS 7
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
-* Tue Dec 01 2020 Henry Li <lihl@microsoft.com> - 4.0.1-1
-- Original version for CBL-Mariner
+* Mon Jan 04 2020 Henry Li <lihl@microsoft.com> - 4.0.1-1
+- Initial CBL-Mariner import from Treasure Data (license: Apache2).
+
+* Fri May 22 2020 Masahiro Nakagawa <repeatedly@gmail.com> - 4.0.0.rc1-1
+- New upstream release.
+
+* Wed May 06 2020 Takuro Ashie <ashie@clear-code.com> - 3.7.1-1
+- New upstream release.
+
+* Tue Apr 07 2020 Hiroshi Hatake <hatake@clear-code.com> - 3.7.0-1
+- New upstream release.
+
+* Tue Feb 25 2020 Takuro Ashie <ashie@clear-code.com> - 3.6.0-1
+- New upstream release.
