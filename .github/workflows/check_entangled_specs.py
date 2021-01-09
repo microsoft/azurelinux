@@ -42,7 +42,7 @@ def check_spec_attributes(base_path: str, attributes: List[str], groups: List[Fr
                 variants[attribute].add(getattr(
                     parsed_spec, attribute))
 
-        for attribute in variants:
+        for attribute in attributes:
             if len(variants[attribute]) > 1:
                 err_groups.add(group)
     return err_groups
