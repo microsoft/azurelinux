@@ -55,7 +55,6 @@ rmdir %{gembuilddir}/bin
 %clean
 rm -rf %{buildroot}
 
-
 %files
 %defattr(-, root, root)
 %{_bindir}/fluent-binlog-reader
@@ -73,3 +72,6 @@ rm -rf %{buildroot}
 %{gemdir}/specifications/fluentd-1.11.0.gemspec
 
 %changelog
+* Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.11.0-1
+- License verified
+- Original version for CBL-Mariner

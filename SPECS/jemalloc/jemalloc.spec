@@ -39,7 +39,6 @@ find %{buildroot}%{_libdir}/ -name '*.a' -exec rm -vf {} ';'
 %clean
 rm -rf %{buildroot}
 
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 

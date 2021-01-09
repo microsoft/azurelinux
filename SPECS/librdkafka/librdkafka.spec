@@ -61,7 +61,6 @@ DESTDIR=%{buildroot} make install
 %clean
 rm -rf %{buildroot}
 
-
 %post   -n %{name}%{soname} -p /sbin/ldconfig
 %postun -n %{name}%{soname} -p /sbin/ldconfig
 
