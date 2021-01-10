@@ -31,7 +31,7 @@
 %skip_check_dracut 1
 
 # Strongswan's rsa testsuite occasionally hangs
-%skip_check_strongswan
+%skip_check_strongswan 1
 
 # Still fails package build when it fails
 %skip_check_gcc 1
