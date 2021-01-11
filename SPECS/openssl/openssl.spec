@@ -271,6 +271,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %clean
 rm -rf %{buildroot}
 
+
 %changelog
 * Fri Jan 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-10
 - Remove source code and support for EC2M.
