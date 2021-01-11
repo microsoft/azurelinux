@@ -10,6 +10,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssl.org/
+# We have to remove certain patented algorithms from the openssl source
+# tarball with the hobble-openssl script which is included below.
+# The original openssl upstream tarball cannot be shipped in the .src.rpm.
 Source0:        %{name}-%{version}-hobbled.tar.xz
 Source1:        hobble-openssl
 Source2:        ec_curve.c
