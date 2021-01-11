@@ -1,13 +1,13 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.32
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
-URL:            http://www.gnu.org/software/binutils
+URL:            https://www.gnu.org/software/binutils
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 Patch0:         CVE-2019-9070.nopatch
 Patch1:         CVE-2019-9075.patch
 Patch2:         CVE-2019-9077.patch
@@ -23,6 +23,13 @@ Patch9:         CVE-2019-9074.patch
 Patch10:        CVE-2019-9076.nopatch
 Patch11:        CVE-2019-17450.patch
 Patch12:        CVE-2019-17451.patch
+Patch13:        CVE-2020-35593.patch
+Patch14:        CVE-2020-35494.patch
+Patch15:        CVE-2020-35495.patch
+# Fix is included in CVE-2020-35495.patch.
+Patch16:        CVE-2020-35496.nopatch
+# Fix is included in CVE-2020-35495.patch.
+Patch17:        CVE-2020-35507.nopatch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -121,6 +128,13 @@ make %{?_smp_mflags} check
 %{_libdir}/libopcodes.so
 
 %changelog
+*   Mon Jan 11 2021 Emre Girgin <mrgirgin@microsoft.com> 2.32-5
+-   Update URL and Source0 to use https.
+-   Fix CVE-2020-35493.
+-   Fix CVE-2020-35494.
+-   Fix CVE-2020-35495.
+-   Fix CVE-2020-35496.
+-   Fix CVE-2020-35507.
 *   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.32-4
 -   Use autosetup
 -   Fix CVE-2019-12972.
