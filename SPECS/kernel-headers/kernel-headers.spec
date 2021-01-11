@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        5.4.51
-Release:        3%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -28,6 +28,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %defattr(-,root,root)
 %{_includedir}/*
 %changelog
+*   Mon Jan 11 2021 Thomas Crain <thcrain@microsoft.com> - 5.4.51-12
+-   Update Release tag to match that of the kernel package
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.4.51-3
 -   Add explicit provide for glibc-kernheaders
 *   Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
