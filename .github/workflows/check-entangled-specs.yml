@@ -1,6 +1,6 @@
-# This action checks that certain groups of specs have matching attributes.
-# The main use case is to ensure that signed specs have the same version and
-#   release as their unsigned counterparts
+# This action checks that certain groups of specs have matching tags.
+# The main use case is to ensure that signed specs have the same Version and
+#   Release tags as their unsigned counterparts
 name: Spec Entanglement Mismatch Check
 
 on:
