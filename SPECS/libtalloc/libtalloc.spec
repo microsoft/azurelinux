@@ -2,8 +2,8 @@
 
 Summary:       Talloc is a hierarchical, reference counted memory pool system
 Name:          libtalloc
-Version:       2.1.16
-Release:       4%{?dist}
+Version:       2.3.1
+Release:       1%{?dist}
 # Some files are GPL, others LGPL. Info in source.
 License:       GPLv3+ and LGPLv3+
 URL:           https://talloc.samba.org
@@ -33,14 +33,16 @@ The libtalloc-devel package contains libraries and header files for libtalloc
 Group: Development/Libraries
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
+Provides: python3-talloc = %{version}-%{release}
 
 %description -n python-talloc
-Python 2 libraries for creating bindings using talloc
+Python 3 libraries for creating bindings using talloc
 
 %package -n python-talloc-devel
 Group: Development/Libraries
 Summary: Development libraries for python-talloc
 Requires: python-talloc = %{version}-%{release}
+Provides: python3-talloc-devel = %{version}-%{release}
 
 %description -n python-talloc-devel
 Development libraries for python-talloc
@@ -85,6 +87,10 @@ make check
 %{_libdir}/libpytalloc-util.cpython*.so
 
 %changelog
+*  Mon Jan 11 2021 Joe Schmitt <joschmit@microsoft.com> 2.3.1-1
+-  Upgrade to v2.3.1.
+-  Provide python3-talloc and python3-talloc-devel.
+
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 2.1.16-4
 -   Added %%license macro.
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 2.1.16-3

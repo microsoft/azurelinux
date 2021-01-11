@@ -627,7 +627,7 @@
         "other": {
           "name": "coreutils",
           "version": "8.30",
-          "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
         }
       }
     },
@@ -1497,7 +1497,7 @@
         "other": {
           "name": "grep",
           "version": "3.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz"
         }
       }
     },
@@ -1507,7 +1507,7 @@
         "other": {
           "name": "groff",
           "version": "1.22.3",
-          "downloadUrl": "http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz"
         }
       }
     },
@@ -2736,8 +2736,8 @@
         "type": "other",
         "other": {
           "name": "libtalloc",
-          "version": "2.1.16",
-          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.1.16.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.1.tar.gz"
         }
       }
     },
@@ -5607,7 +5607,7 @@
         "other": {
           "name": "sed",
           "version": "4.5",
-          "downloadUrl": "http://ftp.gnu.org/gnu/sed/sed-4.5.tar.xz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.5.tar.xz"
         }
       }
     },
