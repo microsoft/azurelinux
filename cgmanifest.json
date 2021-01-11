@@ -627,7 +627,7 @@
         "other": {
           "name": "coreutils",
           "version": "8.30",
-          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
+          "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
         }
       }
     },
