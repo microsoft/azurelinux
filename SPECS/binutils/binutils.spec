@@ -23,7 +23,7 @@ Patch9:         CVE-2019-9074.patch
 Patch10:        CVE-2019-9076.nopatch
 Patch11:        CVE-2019-17450.patch
 Patch12:        CVE-2019-17451.patch
-Patch13:        CVE-2020-35593.patch
+Patch13:        CVE-2020-35493.patch
 Patch14:        CVE-2020-35494.patch
 Patch15:        CVE-2020-35495.patch
 # Fix is included in CVE-2020-35495.patch.
