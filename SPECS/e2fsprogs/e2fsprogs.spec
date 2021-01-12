@@ -1,13 +1,18 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.44.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 and LGPLv2 and BSD and MIT
 URL:            http://e2fsprogs.sourceforge.net
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
+# Patch taken from https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git/patch/?id=8dbe7b475ec5e91ed767239f0e85880f416fc384
+# Resolved in version 1.45.6
+Patch0:         libsupport-add-checks-to-prevent-buffer-overrun-bugs-CVE-2019-5094.patch
+# Fixed in 1.45.5
+Patch1:         CVE-2019-5188.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -33,7 +38,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of e2fsprogs
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i -e 's|^LD_LIBRARY_PATH.*|&:/tools/lib|' tests/test_config
 
 %build
@@ -127,6 +132,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Tue Jan 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.44.6-4
+- Address CVE-2019-5094
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.44.6-3
 - Don't stomp on CFLAGS.
 * Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.44.6-2
