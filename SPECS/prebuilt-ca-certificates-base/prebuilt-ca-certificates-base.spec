@@ -1,8 +1,8 @@
-#nospeccleaner
+# When updating, "Version" AND "Release" tags must be updated in the "ca-certificates" package as well.
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 Version:        20200720
-Release:        1%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildArch:      noarch
 Prebuilt version of the ca-certificates-base package with no runtime dependencies.
 
 BuildRequires:  ca-certificates-base
+
 Conflicts:      ca-certificates
 Conflicts:      ca-certificates-base
 Conflicts:      ca-certificates-microsoft
@@ -46,5 +47,8 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_datadir}/pki/ca-trust-legacy/*
 
 %changelog
+* Tue Jan 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-10
+- Making 'Release' match with 'ca-certificates'.
+
 * Wed Dec 2 2020 Mateusz Malisz <mamalisz@microsoft.com> - 20200720-1
 - Original version for CBL-Mariner
