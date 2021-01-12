@@ -8,7 +8,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://hg.mozilla.org
-
 BuildArch:      noarch
 
 %description
