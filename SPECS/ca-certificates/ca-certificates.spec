@@ -1,5 +1,3 @@
-#nospeccleaner
-
 %define pkidir %{_sysconfdir}/pki
 %define catrustdir %{_sysconfdir}/pki/ca-trust
 %define classic_tls_bundle ca-bundle.crt
@@ -16,13 +14,16 @@
 %define p11_format_microsoft_bundle ca-bundle.trust.microsoft.p11-kit
 %define legacy_default_microsoft_bundle ca-bundle.legacy.default.microsoft.crt
 %define legacy_disable_microsoft_bundle ca-bundle.legacy.disable.microsoft.crt
+
 # List of packages triggering legacy certs generation if 'ca-certificates-legacy'
 # is installed.
 %global watched_pkgs %{name}, %{name}-base, %{name}-microsoft
+
 # Rebuilding cert bundles with source certificates.
 %global refresh_bundles \
 %{_bindir}/ca-legacy install\
 %{_bindir}/update-ca-trust
+
 # Converts certdata.txt files to p11-kit format bundles and legacy crt files.
 # Arguments:
 # %1 - the source certdata.txt file;
@@ -37,6 +38,7 @@ pushd $WORKDIR/certs \
  python3 %{SOURCE4} >c2p.log 2>c2p.err \
 popd \
 %{SOURCE19} $WORKDIR %{SOURCE1} %{openssl_format_trust_bundle} %{legacy_default_bundle} %{legacy_disable_bundle} %{SOURCE3}
+
 # Installs bundle files to the right directories.
 # Arguments:
 # %1 - the source certdata.txt file;
@@ -51,6 +53,7 @@ install -p -m 644 $WORKDIR/%{legacy_disable_bundle} %{buildroot}%{_datadir}/pki/
 touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
 touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
 touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4}
+
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
 # The files, certdata.txt and nssckbi.h, should be taken from a released version of NSS, as published
@@ -65,7 +68,8 @@ Name:           ca-certificates
 # http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/nssckbi.h
 # http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/certdata.txt
 # (but these files might have not yet been released).
-# WHEN UPDATING VERSION/RELEASE: remember to update prebuilt-ca-certificates as well.
+
+# When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
 Release:        10%{?dist}
 License:        MPLv2.0
@@ -96,6 +100,7 @@ Source20:       LICENSE
 Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
 Source23:       certdata.microsoft.txt
+
 BuildRequires:  /bin/ln
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
@@ -105,11 +110,14 @@ BuildRequires:  libxslt
 BuildRequires:  openssl
 BuildRequires:  perl
 BuildRequires:  python3
+
 Requires:       %{name}-shared = %{version}-%{release}
 Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
+
 Provides:       ca-certificates-mozilla
+
 BuildArch:      noarch
 
 %description
@@ -131,6 +139,7 @@ Group:          System Environment/Security
 %package base
 Summary:        Basic set of trusted CAs required to authenticate the packages repository.
 Group:          System Environment/Security
+
 Requires:       %{name}-shared = %{version}-%{release}
 Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
@@ -142,6 +151,7 @@ Requires(postun): %{name}-tools = %{version}-%{release}
 %package microsoft
 Summary:        A list of CAs trusted through the Microsoft Trusted Root Program.
 Group:          System Environment/Security
+
 Requires:       %{name}-shared = %{version}-%{release}
 Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
@@ -153,6 +163,7 @@ Requires(postun): %{name}-tools = %{version}-%{release}
 %package tools
 Summary:        Cert generation tools.
 Group:          System Environment/Security
+
 Requires:       p11-kit >= 0.23.10
 Requires:       p11-kit-trust >= 0.23.10
 
@@ -162,6 +173,7 @@ Set of scripts to generate certificates out of a certdata.txt file.
 %package legacy
 Summary:        Support for legacy certificates configuration.
 Group:          System Environment/Security
+
 Requires:       %{name}-shared = %{version}-%{release}
 
 %description legacy
