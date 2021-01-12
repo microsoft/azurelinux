@@ -1044,6 +1044,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "espeak-ng",
+          "version": "1.50",
+          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/releases/download/1.50/espeak-ng-1.50.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "espeakup",
+          "version": "0.80",
+          "downloadUrl": "https://github.com/williamh/espeakup/archive/v0.80.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "etcd",
           "version": "3.3.25",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.3.25.tar.gz"
@@ -3737,6 +3757,16 @@
           "name": "patch",
           "version": "2.7.6",
           "downloadUrl": "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pcaudiolib",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
         }
       }
     },
