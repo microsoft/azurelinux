@@ -34,19 +34,19 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 2.1.4-1
 - Upgrade to version 2.1.4
 
-*   Thu May 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-4
--   Removed "sha1" macro.
--   Removed redundant "Provides" tag.
--   License verified.
+* Thu May 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-4
+- Removed "sha1" macro.
+- Removed redundant "Provides" tag.
+- License verified.
 
-*   Wed May 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-3
--   Adding the "%%license" macro.
+* Wed May 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-3
+- Adding the "%%license" macro.
 
-*   Tue May 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue May 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.16.4-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Sep 11 2018 srinidhira0 <srinidhir@vmware.com> 1.16.4-1
--   Update to version 1.16.4
+* Tue Sep 11 2018 srinidhira0 <srinidhir@vmware.com> 1.16.4-1
+- Update to version 1.16.4
 
-*   Mon Aug 13 2018 Srinidhi Rao <srinidhir@vmware.com> 1.16.3-1
--   Initial build
+* Mon Aug 13 2018 Srinidhi Rao <srinidhir@vmware.com> 1.16.3-1
+- Initial build

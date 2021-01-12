@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
 Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
-#Source0:        %{name}-%{version}.tar.gz
 Patch0:         CVE-2020-25613.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline

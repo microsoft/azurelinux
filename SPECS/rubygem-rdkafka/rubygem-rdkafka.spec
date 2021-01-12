@@ -30,9 +30,10 @@ cp %{SOURCE0} .
 gem unpack %{SOURCE0}
 cd %{gem_name}-%{version}
 patch -p1 < %{PATCH0}
-gem build ./rdkafka.gemspec
 
 %build
+cd %{gem_name}-%{version}
+gem build ./rdkafka.gemspec
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} ./%{gem_name}-%{version}/%{gem_name}-%{version}.gem

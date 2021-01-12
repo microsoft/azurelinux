@@ -1,7 +1,7 @@
-diff --git a/./td-agent/Rakefile b/../td-agent-builder-testing-uploading-artifacts3/td-agent/Rakefile
+diff --git a/td-agent/Rakefile b/td-agent/Rakefile
 index 24f56f5..4a5bb85 100755
---- a/./td-agent/Rakefile
-+++ b/../td-agent-builder-testing-uploading-artifacts3/td-agent/Rakefile
+--- a/td-agent/Rakefile
++++ b/td-agent/Rakefile
 @@ -146,8 +146,8 @@ class DownloadTask
      url_base = "https://github.com/jemalloc/jemalloc/releases/download/"
      @file_jemalloc_source = File.join(DOWNLOADS_DIR, filename)
@@ -275,10 +275,10 @@ index 24f56f5..4a5bb85 100755
      Dir.glob("#{gem_staging_dir}/gems/*").each do |gem_dir|
        cd(gem_dir) do
          rm_rf(["test", "spec"])
-diff --git a/./td-agent/config.rb b/../td-agent-builder-testing-uploading-artifacts3/td-agent/config.rb
+diff --git a/td-agent/config.rb b/td-agent/config.rb
 index dc53f99..8fd1bd9 100644
---- a/./td-agent/config.rb
-+++ b/../td-agent-builder-testing-uploading-artifacts3/td-agent/config.rb
+--- a/td-agent/config.rb
++++ b/td-agent/config.rb
 @@ -13,7 +13,8 @@ JEMALLOC_VERSION = "5.2.1"
  #BUNDLED_RUBY_SOURCE_SHA256SUM = "6c0bdf07876c69811a9e7dc237c43d40b1cb6369f68e0e17953d7279b524ad9a"
  #BUNDLED_RUBY_VERSION = "2.6.6"
@@ -289,10 +289,10 @@ index dc53f99..8fd1bd9 100644
  BUNDLED_RUBY_SOURCE_SHA256SUM = "d418483bdd0000576c1370571121a6eb24582116db0b7bb2005e90e250eae418"
  
  BUNDLED_RUBY_PATCHES = [
-diff --git a/./td-agent/core_gems.rb b/../td-agent-builder-testing-uploading-artifacts3/td-agent/core_gems.rb
+diff --git a/td-agent/core_gems.rb b/td-agent/core_gems.rb
 index b2592e4..4ed9e45 100644
---- a/./td-agent/core_gems.rb
-+++ b/../td-agent-builder-testing-uploading-artifacts3/td-agent/core_gems.rb
+--- a/td-agent/core_gems.rb
++++ b/td-agent/core_gems.rb
 @@ -1,24 +1,2 @@
  dir 'core_gems'
  

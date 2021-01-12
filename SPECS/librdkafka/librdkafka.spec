@@ -6,12 +6,13 @@ Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        1.4.0
 Release:        1%{?dist}
-License:        BSD-2-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/C and C++
 URL:            https://github.com/edenhill/librdkafka
-Source0:        librdkafka-%{version}.tar.gz
+#Source0:        https://github.com/edenhill/%{name}/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cyrus-sasl
 BuildRequires:  gcc >= 4.1
 BuildRequires:  libstdc++-devel
@@ -95,16 +96,16 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.2.0-1
-- Initial CBL-Mariner import (license: BSD-2-Clause).
+- Initial CBL-Mariner import from Magnus Edenhill Open Source (license: BSD-2-Clause).
 
-*   Thu Apr 09 2015 Eduard Iskandarov <e.iskandarov@corp.mail.ru> 0.8.6-0
--   0.8.6 simplify build process
+* Thu Apr 09 2015 Eduard Iskandarov <e.iskandarov@corp.mail.ru> 0.8.6-0
+- 0.8.6 simplify build process
 
-*   Fri Oct 24 2014 Magnus Edenhill <rdkafka@edenhill.se> 0.8.5-0
--   0.8.5 release
+* Fri Oct 24 2014 Magnus Edenhill <rdkafka@edenhill.se> 0.8.5-0
+- 0.8.5 release
 
-*   Mon Aug 18 2014 Magnus Edenhill <rdkafka@edenhill.se> 0.8.4-0
--   0.8.4 release
+* Mon Aug 18 2014 Magnus Edenhill <rdkafka@edenhill.se> 0.8.4-0
+- 0.8.4 release
 
-*   Mon Mar 17 2014 Magnus Edenhill <vk@edenhill.se> 0.8.3-0
--   Initial RPM package
+* Mon Mar 17 2014 Magnus Edenhill <vk@edenhill.se> 0.8.3-0
+- Initial RPM package
