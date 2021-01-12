@@ -18,6 +18,10 @@ version_release_matching_groups = [
         "SPECS-SIGNED/grub2-efi-binary-signed-x64/grub2-efi-binary-signed-x64.spec",
         "SPECS-SIGNED/grub2-efi-binary-signed-aarch64/grub2-efi-binary-signed-aarch64.spec",
         "SPECS/grub2/grub2.spec"
+    ]),
+    frozenset([
+        "SPECS/ca-certificates/ca-certificates.spec",
+        "SPECS/prebuilt-ca-certificates-base/prebuilt-ca-certificates-base.spec"
     ])
 ]
 
