@@ -165,7 +165,6 @@ popd
 %clean
 rm -rf %{buildroot}
 
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -279,6 +278,7 @@ rm -rf %{buildroot}
 %changelog
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-12
 - Provide rpm-sign.
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.14.2-11
 - Provide rpm-python3 and rpm-python.
 
