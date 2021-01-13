@@ -1,7 +1,7 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
 Version:        1.2.26
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -11,9 +11,15 @@ Source0:        %{url}/download/older-releases/%{name}-%{version}.tar.gz
 
 BuildRequires: libxml2-devel
 BuildRequires: libltdl-devel
+BuildRequires: gnutls-devel
+BuildRequires: libgcrypt-devel
 
 Requires:      libxml2
 Requires:      libltdl
+Provides:      %{name}-gcrypt = %{release}-%{version}
+Provides:      %{name}-gnutls = %{release}-%{version}
+Provides:      %{name}-openssl = %{release}-%{version}
+Provides:      %{name}-nss = %{release}-%{version}
 
 %description
 XML Security Library is a C library based on LibXML2  and OpenSSL.
@@ -26,6 +32,12 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: libxml2-devel
 Requires: libltdl-devel
+Requires: libgcrypt-devel
+Requires: gnutls-devel
+Provides: %{name}-gcrypt-devel = %{release}-%{version}
+Provides: %{name}-gnutls-devel = %{release}-%{version}
+Provides: %{name}-openssl-devel = %{release}-%{version}
+Provides: %{name}-nss-devel = %{release}-%{version}
 
 %description devel
 Libraries, includes, etc. you can use to develop applications with XML Digital
@@ -61,6 +73,8 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/lib/libxmlsec1-openssl.so.1
 %{_prefix}/lib/libxmlsec1-openssl.so.1.2.26
 %{_prefix}/lib/libxmlsec1-openssl.so
+%{_libdir}/libxmlsec1-gnutls*
+%{_libdir}/libxmlsec1-gcrypt*
 %{_prefix}/bin/xmlsec1
 
 %files devel
@@ -71,12 +85,16 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/include/xmlsec1/xmlsec/private/*.h
 %{_prefix}/include/xmlsec1/xmlsec/nss/*.h
 %{_prefix}/include/xmlsec1/xmlsec/openssl/*.h
+%{_includedir}/xmlsec1/xmlsec/gcrypt/*
+%{_includedir}/xmlsec1/xmlsec/gnutls/*
 %{_prefix}/lib/libxmlsec1.*a
 %{_prefix}/lib/libxmlsec1-nss.*a
 %{_prefix}/lib/libxmlsec1-openssl.*a
 %{_prefix}/lib/pkgconfig/xmlsec1.pc
 %{_prefix}/lib/pkgconfig/xmlsec1-nss.pc
 %{_prefix}/lib/pkgconfig/xmlsec1-openssl.pc
+%{_libdir}/pkgconfig/xmlsec1-gcrypt.pc
+%{_libdir}/pkgconfig/xmlsec1-gnutls.pc
 %{_prefix}/lib/xmlsec1Conf.sh
 %{_prefix}/share/doc/xmlsec1/*
 %{_prefix}/share/aclocal/xmlsec1.m4
@@ -84,6 +102,8 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_prefix}/share/man/man1/xmlsec1-config.1.gz
 
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.2.26-6
+- Enable gcrypt and gnutls support and add explicit provides.
 * Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.26-5
 - Added %%license line automatically
 

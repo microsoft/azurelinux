@@ -1,7 +1,13 @@
+	
+%{!?luaver: %global luaver %(lua -e "print(string.sub(_VERSION, 5))")}
+%global lualibdir %{_libdir}/lua/%{luaver}
+%global luapkgdir %{_datadir}/lua/%{luaver}
+
+
 Summary:        Round Robin Database Tool to store and display time-series data
 Name:           rrdtool
 Version:        1.7.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2 or GPLv2 with FLOSS License Exception
 URL:            https://oss.oetiker.ch/rrdtool/
 Group:          System Environment/Libraries
@@ -29,26 +35,82 @@ Summary:	Header and development files
 Requires:	%{name} = %{version}-%{release}
 %description	devel
 It contains the libraries and header files to create applications
+	
+%package -n python3-rrdtool
+%{?python_provide:%python_provide python3-rrdtool}
+Summary: Python RRDtool bindings
+BuildRequires: python3-devel, python3-setuptools, python-setuptools
+%{?__python3:Requires: %{__python3}}
+Requires: %{name} = %{version}-%{release}
+ 
+%description -n python3-rrdtool
+Python RRDtool bindings.
+
+%package ruby
+Summary: Ruby RRDtool bindings
+BuildRequires: ruby, ruby-devel
+Requires: %{name} = %{version}-%{release}
+ 
+%description ruby
+The %{name}-ruby package includes RRDtool bindings for Ruby.
+
+%package tcl
+Summary: Tcl RRDtool bindings
+BuildRequires: tcl-devel >= 8.0
+Requires: tcl >= 8.0
+Requires: %{name} = %{version}-%{release}
+Obsoletes: tcl-%{name} < %{version}-%{release}
+Provides: tcl-%{name} = %{version}-%{release}
+ 
+%description tcl
+The %{name}-tcl package includes RRDtool bindings for Tcl.
+
+%package lua
+Summary: Lua RRDtool bindings
+BuildRequires: lua, lua-devel
+%if "%{luaver}" != ""
+Requires: lua(abi) = %{luaver}
+%endif
+Requires: %{name} = %{version}-%{release}
+ 
+%description lua
+The %{name}-lua package includes RRDtool bindings for Lua.
+
 
 %prep
 %setup -q
 %build
 ./configure \
 	--prefix=%{_prefix}	\
-	--disable-tcl		\
-	--disable-python 	\
+	--enable-tcl-site \
+    --with-tcllib=%{_libdir} \
+	--enable-python 	\
+	--enable-ruby \
 	--disable-perl		\
-	--disable-lua		\
 	--disable-examples	\
         --with-systemdsystemunitdir=%{_unitdir} \
         --disable-docs 		\
 	--disable-static
+	
+perl -pi.orig -e 's|-Wl,--rpath -Wl,\$\(EPREFIX\)/lib||g' \
+    bindings/ruby/extconf.rb
+sed -i 's|extconf.rb \\|extconf.rb --vendor \\|' bindings/Makefile
+
 make %{?_smp_mflags}
+
+pushd bindings/python
+%py3_build
+popd
 
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 
+pushd bindings/python
+%py3_install
+popd
+
+rm -rf %{buildroot}%{_libdir}/python2.7
 #%check
 #make %{?_smp_mflags} -k check
 
@@ -77,8 +139,29 @@ find %{buildroot} -name '*.la' -delete
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+	
+%files -n python3-rrdtool
+%doc bindings/python/COPYING bindings/python/README.md
+%{python3_sitearch}/rrdtool*.so
+%{python3_sitearch}/rrdtool-*.egg-info
+
+%files tcl
+%doc bindings/tcl/README
+%{_libdir}/tclrrd*.so
+%{_libdir}/rrdtool/*.tcl
+
+%files lua
+%doc bindings/lua/README
+%{lualibdir}/*
+
+%files ruby
+%doc bindings/ruby/README
+%{_libdir}/ruby
 
 %changelog
+* Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.7.0-6
+- Build with lua, python3, and ruby support.
+
 * Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-5
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -22,6 +22,8 @@ BuildRequires:  popt-devel
 BuildRequires:  python2-devel
 Requires:       curl
 Requires:       popt
+Provides:       %{name}-engine-sce = %{version}-%{release}
+Provides:       %{name}-utils = %{version}-%{release}
 %description
 SCAP is a multi-purpose framework of specifications that supports automated configuration, vulnerability and patch checking, technical control compliance activities, and security measurement.
 OpenSCAP has received a NIST certification for its support of SCAP 1.2.
@@ -105,6 +107,8 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
+*   Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> 1.3.1-6
+-   Provide openscap-engine-sce and openscap-utils.
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-5
 -   Use new perl package names.
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-4

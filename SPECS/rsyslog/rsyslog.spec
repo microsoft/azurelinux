@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+ and ASL 2.0
 URL:            http://www.rsyslog.com/
 Source0:        http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
@@ -20,6 +20,11 @@ BuildRequires:  librelp-devel
 BuildRequires:  autogen
 BuildRequires:  gnutls-devel
 BuildRequires:  curl-devel
+BuildRequires:  krb5-devel
+BuildRequires:  librelp-devel
+Provides:       %{name}-gnutls = %{version}-%{release}
+Provides:       %{name}-gssapi = %{version}-%{release}
+Provides:       %{name}-relp = %{version}-%{release}
 Requires:       gnutls
 Requires:       systemd
 Requires:       libestr
@@ -38,10 +43,12 @@ sed -i 's/libsystemd-journal/libsystemd/' configure
     --prefix=%{_prefix} \
     --enable-relp \
     --enable-gnutls\
+    --enable-gssapi-krb5 \
     --enable-imfile \
     --enable-imjournal \
     --enable-impstats \
-    --enable-imptcp
+    --enable-imptcp \
+    --enable-relp
 
 make %{?_smp_mflags}
 
@@ -80,6 +87,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 8.37.0-5
+- Build with gssapi, relp support and add explicit provides.
+
 * Sat May 09 00:21:21 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.37.0-4
 - Added %%license line automatically
 

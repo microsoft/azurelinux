@@ -1,7 +1,7 @@
 Summary:	Utilities for block layer IO tracing
 Name:		blktrace
 Version:	1.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPLv2
 URL:		http://git.kernel.org/cgit/linux/kernel/git/axboe/blktrace.git/tree/README
 Group:		Development/Tools/Other
@@ -12,6 +12,7 @@ Source0:	https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snap
 Patch0:         blktrace-fix-CVE-2018-10689.patch
 BuildRequires: libaio-devel
 Requires:	libaio
+Provides:   iowatcher = %{version}-%{release}
 
 %description
  blktrace is a block layer IO tracing mechanism which provides detailed
@@ -37,6 +38,8 @@ rm -rf %{buildroot}/*
 %{_mandir}
 
 %changelog
+* Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.2.0-6
+- Provide iowatcher.
 * Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.0-5
 - Added %%license line automatically
 
