@@ -11,14 +11,13 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.0.0
+BuildRequires:  ruby
 Requires:       rubygem-public_suffix < 5.0
-Requires:       rubygem-public_suffix >= 2.0.2
 
 %description
 Addressable is an alternative implementation to the URI implementation that is
-part of Ruby's standard library. It is flexible, offers heuristic parsing,
-and additionally provides extensive support for IRIs and URI templates.
+part of Ruby's standard library. It offers heuristic parsing, and additionally 
+provides extensive support for IRIs and URI templates.
 
 %prep
 %setup -q -c -T

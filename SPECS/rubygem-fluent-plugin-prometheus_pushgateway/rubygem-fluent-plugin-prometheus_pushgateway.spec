@@ -11,9 +11,8 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.3.0
+BuildRequires:  ruby
 Requires:       rubygem-fluent-plugin-prometheus < 2.0.0
-Requires:       rubygem-fluent-plugin-prometheus >= 1.7.0
 
 %description
 This is Fluentd's plugin for sending data collected by

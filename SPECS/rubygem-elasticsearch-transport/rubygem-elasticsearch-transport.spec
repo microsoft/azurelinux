@@ -11,12 +11,13 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.4.0
+BuildRequires:  ruby
 Requires:       rubygem-faraday
 Requires:       rubygem-multi_json
 
 %description
-The elasticsearch-api library provides a Ruby implementation of the Elasticsearch REST API.
+The elasticsearch-api library provides a Ruby implementation of 
+the Elasticsearch REST API.
 
 %prep
 %setup -q -c -T

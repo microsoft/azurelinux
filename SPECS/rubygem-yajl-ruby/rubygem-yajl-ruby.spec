@@ -11,10 +11,10 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 1.8.6
+BuildRequires:  ruby
 
 %description
-a C binding to the excellent YAJL JSON parsing and generation library.
+a C binding to the YAJL JSON parsing and generation library.
 
 %prep
 %setup -q -c -T

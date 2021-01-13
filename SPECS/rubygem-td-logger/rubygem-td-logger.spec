@@ -13,11 +13,8 @@ URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
 Requires:       rubygem-fluent-logger < 2.0
-Requires:       rubygem-fluent-logger >= 0.5.0
 Requires:       rubygem-msgpack < 2.0
-Requires:       rubygem-msgpack >= 0.5.6
 Requires:       rubygem-td-client < 2.0
-Requires:       rubygem-td-client >= 0.8.66
 
 %description
 This gem is a logging library for Treasure Data. The events

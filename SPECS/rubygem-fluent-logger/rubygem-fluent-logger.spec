@@ -13,7 +13,6 @@ URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
 Requires:       rubygem-msgpack < 2
-Requires:       rubygem-msgpack >= 1.0.0
 
 %description
 A structured event logger.

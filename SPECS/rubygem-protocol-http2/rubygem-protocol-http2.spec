@@ -11,7 +11,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.5.0
+BuildRequires:  ruby
 Requires:       rubygem-protocol-hpack
 Requires:       rubygem-protocol-http
 

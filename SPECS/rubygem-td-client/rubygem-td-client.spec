@@ -11,10 +11,9 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.1.0
-Requires:       rubygem-httpclient >= 2.7
+BuildRequires:  ruby
+Requires:       rubygem-httpclient
 Requires:       rubygem-msgpack < 2
-Requires:       rubygem-msgpack >= 0.5.6
 
 %description
 Ruby Client Library for Treasure Data.

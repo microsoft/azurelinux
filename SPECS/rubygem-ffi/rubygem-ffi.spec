@@ -5,19 +5,18 @@ Summary:        Ruby FFI
 Name:           rubygem-ffi
 Version:        1.13.1
 Release:        1%{?dist}
-License:        BSD-3-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.3.0
+BuildRequires:  ruby
 
 %description
 Ruby-FFI is a gem for programmatically loading dynamically-linked native libraries,
 binding functions within them, and calling those functions from Ruby code. Moreover,
 a Ruby-FFI extension works without changes on CRuby (MRI), JRuby, Rubinius and TruffleRuby.
-Discover why you should write your next extension using Ruby-FFI.
 
 %prep
 %setup -q -c -T

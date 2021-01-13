@@ -14,7 +14,8 @@ Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
 
 %description
-gives something like the functionality of libwww-perl (LWP) in Ruby.
+'httpclient' gives something similar to the functionality of 
+libwww-perl (LWP) in Ruby.
 
 %prep
 %setup -q -c -T

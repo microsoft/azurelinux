@@ -11,7 +11,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 1.9.2
+BuildRequires:  ruby
 
 %description
 This project is a minimalistic implementation of a port/recipe system for developers.

@@ -11,9 +11,9 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby > 2.1.0
+BuildRequires:  ruby
 Requires:       rubygem-fluentd
-Requires:       rubygem-webhdfs >= 0.6.0
+Requires:       rubygem-webhdfs
 
 %description
 Fluentd output plugin to write data into Hadoop HDFS over WebHDFS/HttpFs.

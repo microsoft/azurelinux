@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name fluent-config-regexp-type
-Summary:        The compatibility monkey patch to use regexp type
+Summary:        The compatibility patch to use regexp type
 Name:           rubygem-fluent-config-regexp-type
 Version:        1.0.0
 Release:        1%{?dist}

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name zip-zip
-Summary:        a simple adapter to let all your dependencies use RubyZip v1.0.0
+Summary:        a simple adapter to let all your dependencies use RubyZip
 Name:           rubygem-zip-zip
 Version:        0.3
 Release:        1%{?dist}
@@ -12,11 +12,11 @@ Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
-Requires:       rubygem-rubyzip >= 1.0.0
+Requires:       rubygem-rubyzip
 
 %description
-In Gem hell migrating to RubyZip v1.0.0? Include zip-zip in your
-Gemfile and everything's coming up roses!
+zip-zip provides a simple adapter to let all your dependencies 
+use RubyZip.
 
 %prep
 %setup -q -c -T

@@ -11,8 +11,8 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 1.8.7
-Requires:       rubygem-tzinfo >= 1.0.0
+BuildRequires:  ruby
+Requires:       rubygem-tzinfo
 
 %description
 a fast strptime/strftime engine which uses VM.

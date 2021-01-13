@@ -12,28 +12,18 @@ Distribution:   Mariner
 Group:          Development/Ruby
 URL:            https://www.fluentd.org/
 Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.4.0
+BuildRequires:  ruby
 Requires:       rubygem-async-http
 Requires:       rubygem-cool.io < 2.0.0
-Requires:       rubygem-cool.io >= 1.4.5
 Requires:       rubygem-http_parser.rb < 0.7.0
-Requires:       rubygem-http_parser.rb >= 0.5.1
 Requires:       rubygem-msgpack < 2.0.0
-Requires:       rubygem-msgpack >= 1.3.1
 Requires:       rubygem-rake < 14
-Requires:       rubygem-rake >= 13.0
 Requires:       rubygem-serverengine < 3.0.0
-Requires:       rubygem-serverengine >= 2.0.4
 Requires:       rubygem-sigdump < 0.3
-Requires:       rubygem-sigdump >= 0.2.2
 Requires:       rubygem-strptime < 1.0.0
-Requires:       rubygem-strptime >= 0.2.2
 Requires:       rubygem-tzinfo < 3.0
-Requires:       rubygem-tzinfo >= 1.0
 Requires:       rubygem-tzinfo-data < 2
-Requires:       rubygem-tzinfo-data >= 1.0
 Requires:       rubygem-yajl-ruby < 2
-Requires:       rubygem-yajl-ruby >= 1.0
 
 %description
 Fluentd is an open source data collector designed to scale and simplify log

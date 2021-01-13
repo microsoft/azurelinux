@@ -11,7 +11,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 1.9.2
+BuildRequires:  ruby
 
 %description
 Rubyzip is a ruby library for reading and writing zip files.

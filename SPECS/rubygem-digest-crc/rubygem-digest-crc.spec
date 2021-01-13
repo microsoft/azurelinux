@@ -13,7 +13,6 @@ URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 BuildRequires:  ruby
 Requires:       rubygem-rake < 14.0.0
-Requires:       rubygem-rake >= 12.0.0
 
 %description
 Adds support for calculating Cyclic Redundancy Check (CRC) to the Digest module.

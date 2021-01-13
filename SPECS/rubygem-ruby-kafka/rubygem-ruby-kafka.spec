@@ -11,13 +11,13 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.1.0
+BuildRequires:  ruby
 Requires:       rubygem-digest-crc
 
 %description
 A Ruby client library for Apache Kafka, a distributed log and message
 bus. The focus of this library will be operational simplicity,
-with good logging and metrics that can make debugging issues easier.
+with logging and metrics that can make debugging issues easier.
 
 %prep
 %setup -q -c -T

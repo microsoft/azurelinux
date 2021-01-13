@@ -11,9 +11,8 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
-BuildRequires:  ruby >= 2.4.0
+BuildRequires:  ruby
 Requires:       rubygem-multipart-post < 3
-Requires:       rubygem-multipart-post >= 1.2
 Requires:       rubygem-ruby2_keywords
 
 %description

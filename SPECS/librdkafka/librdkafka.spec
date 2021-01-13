@@ -77,10 +77,6 @@ rm -rf %{buildroot}
 %license %{_docdir}/librdkafka/LICENSE
 %doc %{_docdir}/librdkafka/LICENSES.txt
 
-%defattr(-,root,root)
-#%{_bindir}/rdkafka_example
-#%{_bindir}/rdkafka_performance
-
 %files -n %{name}-devel
 %defattr(-,root,root)
 %{_includedir}/librdkafka

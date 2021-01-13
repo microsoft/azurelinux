@@ -5,7 +5,7 @@ Summary:        Shim library for Module#ruby2_keywords
 Name:           rubygem-ruby2_keywords
 Version:        0.0.2
 Release:        1%{?dist}
-License:        BSD-2-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages

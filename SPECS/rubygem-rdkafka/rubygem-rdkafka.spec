@@ -15,7 +15,7 @@ Patch0:         librdkafka.patch
 BuildRequires:  git
 BuildRequires:  librdkafka-devel
 BuildRequires:  librdkafka1
-BuildRequires:  ruby > 2.1.0
+BuildRequires:  ruby
 BuildRequires:  rubygem-mini_portile2
 Requires:       rubygem-mini_portile2
 Requires:       rubygem-rake
