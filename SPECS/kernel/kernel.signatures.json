@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "config": "830ceb15eefa5b8676bce08631f935c2bff299e24a3750c6d959fa5132c48eb5",
-  "config_aarch64": "4234aef7c4cfe29fd40fc93b8599ff48fcb7026fb1888b995af329ce9616849c",
+  "config_aarch64": "1d87624d7435b67bcba2d17eba458e43520acf912c547fca4579c1c79d3ef0d8",
   "linux-msft-5.4.83.tar.gz": "aee2d028c87565ae41b6c8d9de0770e80e614fdeb8cfafe42ae64e280b8f10be"
  }
 }
