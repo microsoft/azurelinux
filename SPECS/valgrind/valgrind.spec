@@ -10,7 +10,7 @@ Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires:  pkg-config
-Provides:       valgrind-devel = %{version}-%{release}
+Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 Valgrind is a GPL'd system for debugging and profiling Linux programs. With
@@ -46,7 +46,7 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
-* Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.15.0-4
+* Thu Jan 07 2021 Joe Schmitt <joschmit@microsoft.com> - 3.15.0-4
 - Provide valgrind-devel.
 
 * Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.15.0-3
