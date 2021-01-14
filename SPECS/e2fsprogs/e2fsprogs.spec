@@ -70,6 +70,7 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license NOTICE
+%config %{_sysconfdir}/e2scrub.conf
 %config %{_sysconfdir}/mke2fs.conf
 %{_bindir}/compile_et
 %{_bindir}/mk_cmds
