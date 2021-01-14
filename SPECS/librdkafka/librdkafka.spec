@@ -93,6 +93,7 @@ rm -rf %{buildroot}
 %changelog
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.2.0-1
 - Initial CBL-Mariner import from Magnus Edenhill Open Source (license: BSD-2-Clause).
+- License verified.
 
 * Thu Apr 09 2015 Eduard Iskandarov <e.iskandarov@corp.mail.ru> 0.8.6-0
 - 0.8.6 simplify build process

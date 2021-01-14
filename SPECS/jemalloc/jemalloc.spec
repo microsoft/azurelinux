@@ -3,7 +3,7 @@ Summary:        A General Purpose Malloc Implementation
 Name:           jemalloc
 Version:        5.2.1
 Release:        1%{?dist}
-License:        BSD
+License:        Jason Evans Open Source
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
@@ -59,7 +59,8 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Dec 14 2020 Henry Li <lihl@microsoft.com> - 5.2.1-1
-- Initial CBL-Mariner import from Fedora 31 (license: BSD).
+- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+- License verified.
 	
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.2.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
