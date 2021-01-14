@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,8 @@ Patch0:         openssl-1.1.1-no-html.patch
 Patch1:         CVE-2019-0190.nopatch
 Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 Patch3:         CVE-2020-1971.patch
+Patch4:         openssl-1.1.1-ec-curves.patch
+Patch5:         openssl-1.1.1-no-brainpool.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -92,6 +94,8 @@ cp %{SOURCE4} test/
 %patch0 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -273,6 +277,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jan 13 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-11
+- Add ec-curves and no-brainpool patches from Fedora to fix ecdsa and ssl_new tests.
+
 * Fri Jan 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-10
 - Remove source code and support for EC2M.
 - Remove source code for IDEA.
