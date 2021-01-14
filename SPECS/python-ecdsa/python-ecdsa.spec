@@ -4,7 +4,7 @@
 Summary:        ECDSA cryptographic signature library (pure python)
 Name:           python-ecdsa
 Version:        0.13.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
@@ -13,8 +13,11 @@ URL:            https://pypi.python.org/pypi/ecdsa
 
 Source0:        https://pypi.python.org/packages/source/e/ecdsa/ecdsa-%{version}.tar.gz
 
+Patch0:         disable_nist192_test.patch
+
 BuildArch:      noarch
 
+BuildRequires:  openssl
 BuildRequires:  python-setuptools
 BuildRequires:  python2-devel
 
@@ -40,6 +43,7 @@ Python 3 version.
 
 %prep
 %setup -qn ecdsa-%{version}
+%patch0 -p1
 
 %build
 python2 setup.py build
@@ -72,6 +76,10 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Jan 13 2021 Nicolas Ontiveros <niontive@microsoft.com> 0.13.3-4
+-   Add openssl to BR
+-   Disable OpenSSL NIST192 tests since OpenSSL no longer supports NIST192 EC.
+
 * Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.13.3-3
 - Added %%license line automatically
 
