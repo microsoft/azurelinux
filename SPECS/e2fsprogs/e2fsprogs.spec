@@ -1,7 +1,7 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
-Version:        1.44.6
-Release:        3%{?dist}
+Version:        1.45.6
+Release:        1%{?dist}
 License:        GPLv2 and LGPLv2 and BSD and MIT
 URL:            http://e2fsprogs.sourceforge.net
 Group:          System Environment/Base
@@ -127,40 +127,59 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Jan 13 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.45.6-1
+- Upgrade to version 1.45.6
+
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.44.6-3
 - Don't stomp on CFLAGS.
+
 * Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.44.6-2
 - Added %%license line automatically
 
-*   Thu Mar 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.44.6-1
--   Update version to 1.44.6. License verified.
-*   Tue Oct 01 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.44.3-4
--   Fix libs file list removing static libraries.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.44.3-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> 1.44.3-2
--   Add conflicts toybox.
-*   Mon Sep 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.44.3-1
--   Version update to fix compilation issue againts glibc-2.28.
-*   Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 1.43.4-2
--   Add lang package.
-*   Mon Apr 03 2017 Chang Lee <changlee@vmware.com> 1.43.4-1
--   Updated to version 1.43.4.
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.42.13-5
--   Moved man3 to devel subpackage.
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.42.13-4
--   Create libs subpackage for krb5.
-*   Tue Sep 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.42.13-3
--   Use symlinks - save a diskspace.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.42.13-2
--   GA - Bump release of all rpms.
-*   Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 1.42.13-1
--   Updated to version 1.42.13.
-*   Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 1.42.9-4
--   Edit post script.
-*   Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 1.42.9-3
--   Handled locale files with macro find_lang.
-*   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 1.42.9-2
--   Update according to UsrMove.
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.42.9-1
--   Initial build First version.
+* Thu Mar 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.44.6-1
+- Update version to 1.44.6. License verified.
+
+* Tue Oct 01 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.44.3-4
+- Fix libs file list removing static libraries.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.44.3-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> 1.44.3-2
+- Add conflicts toybox.
+
+* Mon Sep 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.44.3-1
+- Version update to fix compilation issue againts glibc-2.28.
+
+* Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 1.43.4-2
+- Add lang package.
+
+* Mon Apr 03 2017 Chang Lee <changlee@vmware.com> 1.43.4-1
+- Updated to version 1.43.4.
+
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.42.13-5
+- Moved man3 to devel subpackage.
+
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.42.13-4
+- Create libs subpackage for krb5.
+
+* Tue Sep 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.42.13-3
+- Use symlinks - save a diskspace.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.42.13-2
+- GA - Bump release of all rpms.
+
+* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 1.42.13-1
+- Updated to version 1.42.13.
+
+* Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 1.42.9-4
+- Edit post script.
+
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 1.42.9-3
+- Handled locale files with macro find_lang.
+
+* Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 1.42.9-2
+- Update according to UsrMove.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.42.9-1
+- Initial build First version.
