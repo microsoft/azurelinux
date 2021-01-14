@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Requires:       libffi
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
+Provides:       glib2-static = %{version}-%{release}
 
 %description
 The GLib package contains a low-level libraries useful for providing data structure handling for C, portability wrappers and interfaces for such runtime functionality as an event loop, threads, dynamic loading and an object system. Development libs and headers are in glib-devel.
@@ -63,7 +64,8 @@ Gsettings schemas compiling tool
 
 %build
 ./autogen.sh
-%configure --with-pcre=system
+%configure --with-pcre=system \
+            --enable-static
 make %{?_smp_mflags}
 
 %install
@@ -84,6 +86,7 @@ make DESTDIR=%{buildroot} install
 %files devel
 %defattr(-, root, root)
 %{_bindir}/*
+%{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/*.la
 %{_libdir}/pkgconfig/*
@@ -102,6 +105,9 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.58.0-10
+- Build static library and provide glib2-static.
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.58.0-9
 - Provide isa versions of glib2 provides.
 

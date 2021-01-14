@@ -1,54 +1,63 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
-URL:            https://www.open-scap.org
-Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
-Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  cmake
-BuildRequires:  swig libxml2-devel libxslt-devel perl-XML-Parser
-BuildRequires:  rpm-devel
-BuildRequires:  libgcrypt-devel
-BuildRequires:  pcre-devel
-BuildRequires:  libacl-devel
-BuildRequires:  libselinux-devel libcap-devel
-BuildRequires:  util-linux-devel
+Group:          System Environment/Libraries
+URL:            https://www.open-scap.org
+Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  bzip2-devel
+BuildRequires:  cmake
 BuildRequires:  curl-devel
+BuildRequires:  libacl-devel
+BuildRequires:  libcap-devel
+BuildRequires:  libgcrypt-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  libxslt-devel
+BuildRequires:  pcre-devel
+BuildRequires:  perl-XML-Parser
 BuildRequires:  popt-devel
 BuildRequires:  python2-devel
+BuildRequires:  rpm-devel
+BuildRequires:  swig
+BuildRequires:  util-linux-devel
 Requires:       curl
 Requires:       popt
+Provides:       %{name}-engine-sce = %{version}-%{release}
+Provides:       %{name}-utils = %{version}-%{release}
+
 %description
 SCAP is a multi-purpose framework of specifications that supports automated configuration, vulnerability and patch checking, technical control compliance activities, and security measurement.
 OpenSCAP has received a NIST certification for its support of SCAP 1.2.
 
 %package devel
-Summary: Development Libraries for openscap
-Group: Development/Libraries
-Requires: openscap = %{version}-%{release}
-Requires: libxml2-devel
+Summary:        Development Libraries for openscap
+Group:          Development/Libraries
+Requires:       libxml2-devel
+Requires:       openscap = %{version}-%{release}
+
 %description devel
 Header files for doing development with openscap.
 
 %package perl
-Summary: openscap perl scripts
-Requires: perl-interpreter
-Requires: openscap = %{version}-%{release}
+Summary:        openscap perl scripts
+Requires:       openscap = %{version}-%{release}
+Requires:       perl-interpreter
+
 %description perl
 Perl scripts.
 
 %package python
-Summary: openscap python
-Group: Development/Libraries
-Requires: openscap = %{version}-%{release}
+Summary:        openscap python
+Group:          Development/Libraries
 BuildRequires:  python2-devel
+Requires:       openscap = %{version}-%{release}
+
 %description python
 Python bindings.
-
 
 %prep
 %setup -q
@@ -58,9 +67,9 @@ mkdir build
 cd build
 %cmake -DENABLE_PERL=ON \
        -DENABLE_SCE=ON \
-       -DPYTHON_EXECUTABLE:STRING=%{__python2} \
-       -DPYTHON_VERSION_MAJOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.major)") \
-       -DPYTHON_VERSION_MINOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.minor)") \
+       -DPYTHON_EXECUTABLE:STRING=python2 \
+       -DPYTHON_VERSION_MAJOR:STRING=$(python2 -c "import sys; print(sys.version_info.major)") \
+       -DPYTHON_VERSION_MINOR:STRING=$(python2 -c "import sys; print(sys.version_info.minor)") \
        ..
 make %{?_smp_flags}
 
@@ -68,7 +77,7 @@ make %{?_smp_flags}
 cd build
 %make_install
 #make DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 #%check
 #make check need BuildRequires per-XML-XPATH and bzip2
@@ -79,7 +88,7 @@ find %{buildroot} -name '*.la' -delete
 %defattr(-,root,root)
 %license COPYING
 %{_sysconfdir}/*
-%exclude /usr/src/debug
+%exclude %{_prefix}/src/debug
 %exclude %{_libdir}/debug
 %{_bindir}/*
 #%{_libexecdir}/*
@@ -105,27 +114,41 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.3.1-6
+- Provide openscap-engine-sce and openscap-utils.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-5
 -   Use new perl package names.
+
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-4
 -   Explicitly set python verison.
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3
 -   Added %%license line automatically
+
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.3.1-2
 -   Renaming XML-Parser to perl-XML-Parser
+
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.3.1-1
 -   Update to 1.3.1. Remove probe directory. License fixed.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.17-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 1.2.17-1
 -   Update to 1.2.17
+
 *   Thu Aug 10 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.14-3
 -   Disable make check which need per-XML-XPATH for bug 1900358
+
 *   Fri May 5 2017 Alexey Makhalov <amakhalov@vmware.com> 1.2.14-2
 -   Remove BuildRequires XML-XPath.
+
 *   Mon Mar 27 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.14-1
 -   Update to latest version.
+
 *   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.10-2
 -   BuildRequires curl-devel.
+
 *   Tue Sep 6 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.10-1
 -   Initial build. First version

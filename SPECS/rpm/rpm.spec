@@ -3,7 +3,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -76,6 +76,7 @@ Requires:       gzip
 Requires:       tar
 Requires:       unzip
 Requires:       xz
+Provides:       %{name}-sign = %{version}-%{release}
 
 %description build
 %{summary}
@@ -163,7 +164,6 @@ popd
 
 %clean
 rm -rf %{buildroot}
-
 
 %files
 %defattr(-,root,root)
@@ -276,6 +276,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-12
+- Provide rpm-sign.
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.14.2-11
 - Provide rpm-python3 and rpm-python.
 
