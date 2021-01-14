@@ -2,11 +2,11 @@ Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.45.6
 Release:        1%{?dist}
-License:        GPLv2 and LGPLv2 and BSD and MIT
-URL:            http://e2fsprogs.sourceforge.net
-Group:          System Environment/Base
+License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
+URL:            http://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
@@ -15,20 +15,23 @@ Conflicts:      toybox
 The E2fsprogs package contains the utilities for handling the ext2 file system.
 
 %package    libs
-Summary:    contains libraries used by other packages
+Summary:        contains libraries used by other packages
+
 %description    libs
 It contains the libraries: libss and libcom_err
 
 %package    devel
-Summary:    Header and development files for e2fsprogs
-Requires:   %{name} = %{version}
+Summary:        Header and development files for e2fsprogs
+Requires:       %{name} = %{version}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %package lang
-Summary: Additional language files for e2fsprogs
-Group:   System Environment/Base
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional language files for e2fsprogs
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
 %description lang
 These are the additional language files of e2fsprogs
 
@@ -61,11 +64,8 @@ rm -rf %{buildroot}%{_infodir}
 %check
 make %{?_smp_mflags} check
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
