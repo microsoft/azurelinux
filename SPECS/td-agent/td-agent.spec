@@ -203,6 +203,7 @@ sudo systemctl start td-agent
 %changelog
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Initial CBL-Mariner import from Treasure Data (license: Apache2).
+- License verified.
 
 * Fri May 22 2020 Masahiro Nakagawa <repeatedly@gmail.com> - 4.0.0.rc1-1
 - New upstream release.

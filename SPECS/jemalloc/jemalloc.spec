@@ -3,7 +3,11 @@ Summary:        A General Purpose Malloc Implementation
 Name:           jemalloc
 Version:        5.2.1
 Release:        1%{?dist}
-License:        Jason Evans Open Source
+# build-aux/config.guess is under GPLv3+
+# build-aux/install-sh is under MIT
+# msvc/test_threads/test_threads.cpp is under Public Domain
+# m4/ax_cxx_compile_stdcxx.m4 is under FSFAP
+License:        BSD AND GPLv3+ AND MIT AND Public Domain AND FSFAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries

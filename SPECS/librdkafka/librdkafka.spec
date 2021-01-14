@@ -6,7 +6,11 @@ Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        1.4.0
 Release:        1%{?dist}
-License:        BSD
+# files like src/crc32c.c are under zlib license
+# files like win32/wingetopt.c are under ISC
+# files like src/rdfnv1a.c are under Public Domain
+# files like src/rdhdrhistogram.c are under MIT
+License:        BSD AND zlib AND ISC AND Public Domain AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/C and C++
@@ -92,7 +96,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.2.0-1
-- Initial CBL-Mariner import from Magnus Edenhill Open Source (license: BSD-2-Clause).
+- Initial CBL-Mariner import from Magnus Edenhill Open Source (license: BSD).
 - License verified.
 
 * Thu Apr 09 2015 Eduard Iskandarov <e.iskandarov@corp.mail.ru> 0.8.6-0
