@@ -64,7 +64,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
-mkdir -p %{buildroot}%{_fileattrsdir} 
+mkdir -p %{buildroot}%{_fileattrsdir}
 install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 
 %files
