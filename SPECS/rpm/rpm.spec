@@ -3,7 +3,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
+Patch1:         python-dist-deps-version-parse.patch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
@@ -276,6 +277,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-13
+- Apply patch to correctly parse versions for python dist dependencies.
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-12
 - Provide rpm-sign.
 
