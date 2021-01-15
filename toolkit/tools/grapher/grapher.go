@@ -333,11 +333,14 @@ func validateGraph(g *pkggraph.PkgGraph) (err error) {
 			err = fixCycle(g, pkgCycle)
 			if err != nil {
 				var cycleStringBuilder strings.Builder
+
+				logger.Log.Errorf("Error found while resolving package dependency cycles: %v.", err)
+
 				fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
 				for _, node := range pkgCycle[1:] {
 					fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 				}
-				logger.Log.Errorf("Unfixable circular dependency found %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
+				logger.Log.Errorf("Unfixable circular dependency of length %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
 				unfixableCycleCount++
 			}
 		}
