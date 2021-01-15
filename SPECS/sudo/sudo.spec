@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.8.31p1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -30,7 +30,7 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-all-insults \
     --with-env-editor \
     --with-pam \
-    --with-passprompt="[sudo] password for %p"
+    --with-passprompt="[sudo] password for %p: "
 
 make %{?_smp_mflags}
 
@@ -91,9 +91,10 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.31p1-4
-- Added %%license line automatically
-
+*   Fri Jan 15 2021 Leandro Pereira <leperei@microsoft.com> - 1.8.31p1-5
+-   Tweak password prompt to add a ": " at the end
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.31p1-4
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-3
 -   Renaming Linux-PAM to pam
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-2
