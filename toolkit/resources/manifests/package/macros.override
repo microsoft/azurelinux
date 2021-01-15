@@ -33,6 +33,12 @@
 # Strongswan's rsa testsuite occasionally hangs
 %skip_check_strongswan 1
 
+# asciidoc tests require the "source-highlight" package which is not available
+%skip_check_asciidoc 1
+
+# ipv6calc tests require "perl(URI::Escape)" which is not in the 1.0 branches
+%skip_check_ipv6calc 1
+
 # Still fails package build when it fails
 %skip_check_gcc 1
 
