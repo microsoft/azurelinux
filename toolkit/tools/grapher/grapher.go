@@ -334,7 +334,7 @@ func validateGraph(g *pkggraph.PkgGraph) (err error) {
 			if err != nil {
 				var cycleStringBuilder strings.Builder
 
-				logger.Log.Errorf("Error found while resolving package dependency cycles: %v.", err)
+				logger.Log.Errorf("Error found while resolving package dependency cycles: %v", err)
 
 				fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
 				for _, node := range pkgCycle[1:] {
