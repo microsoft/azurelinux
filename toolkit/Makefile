@@ -17,7 +17,6 @@ CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
 PACKAGE_IGNORE_LIST    ?=
-SSH_KEY_FILE           ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
@@ -81,7 +80,7 @@ IMAGES_DIR      ?= $(OUT_DIR)/images
 ifeq ($(REBUILD_TOOLCHAIN),y)
 toolchain_rpms_dir := $(RPMS_DIR)
 else
-toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache/
+toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
 endif
 
 # External source server
