@@ -111,6 +111,7 @@ Python3 rpm.
 %prep
 %setup -q -n rpm-%{name}-%{version}-release
 %patch0 -p1
+%patch1 -p1
 
 %build
 sed -i '/define _GNU_SOURCE/a #include "../config.h"' tools/sepdebugcrcfix.c
