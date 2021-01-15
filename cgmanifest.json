@@ -5384,16 +5384,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-bundler",
-          "version": "2.1.4",
-          "downloadUrl": "https://rubygems.org/downloads/bundler-2.1.4.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-addressable",
           "version":"2.7.0",
           "downloadUrl": "https://rubygems.org/downloads/addressable-2.7.0.gem"
@@ -5507,6 +5497,16 @@
           "name": "rubygem-aws-sigv4",
           "version":"1.1.1",
           "downloadUrl": "https://rubygems.org/downloads/aws-sigv4-1.1.1.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-bundler",
+          "version": "2.1.4",
+          "downloadUrl": "https://rubygems.org/downloads/bundler-2.1.4.gem"
         }
       }
     },
