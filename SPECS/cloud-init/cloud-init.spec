@@ -2,7 +2,7 @@
 
 Name:           cloud-init
 Version:        19.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Cloud instance init scripts
 Group:          System Environment/Base
 License:        GPLv3
@@ -36,7 +36,12 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-six
 # %if %{with_check}
+BuildRequires:  dnf
+BuildRequires:  python3-configobj
+BuildRequires:  python3-pip
 BuildRequires:  python3-requests
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
 # %endif
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-urllib3
@@ -91,10 +96,16 @@ cp -p %{SOURCE1} %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/cloud/cloud.cfg.d/
 
 %check
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-ln -s /usr/bin/pip3 /usr/bin/pip
-$easy_install_3 tox
-tox -e py36
+pip3 install atomicwrites
+pip3 install attrs
+pip3 install httpretty
+pip3 install jsonpatch
+pip3 install more-itertools
+pip3 install mock
+pip3 install nose
+pip3 install unittest2
+useradd test -G root -m
+LANG=en_US.UTF-8 sudo -u test nosetests cloudinit
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -139,6 +150,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/cloud
 
 %changelog
+*   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 19.1-6
+-   Fix check tests
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.1-5
 -   Use autosetup
 -   Fix CVE-2020-8631
