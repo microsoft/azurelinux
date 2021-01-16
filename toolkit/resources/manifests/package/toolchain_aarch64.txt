@@ -241,7 +241,7 @@ mariner-release-1.0-12.cm1.noarch.rpm
 mariner-repos-1.0-11.cm1.noarch.rpm
 mariner-repos-preview-1.0-11.cm1.noarch.rpm
 mariner-rpm-macros-1.0-3.cm1.noarch.rpm
-meson-0.49.2-1.cm1.noarch.rpm
+meson-0.56.0-1.cm1.noarch.rpm
 mpfr-4.0.1-3.cm1.aarch64.rpm
 mpfr-debuginfo-4.0.1-3.cm1.aarch64.rpm
 mpfr-devel-4.0.1-3.cm1.aarch64.rpm
