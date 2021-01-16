@@ -1,0 +1,8 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Use the cbl-mariner distroless container image as a parent image
+FROM cbl-mariner-distroless:1.0
+
+# copy files
+COPY /folder-to-install/* /
