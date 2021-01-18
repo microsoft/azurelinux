@@ -177,7 +177,6 @@ function create_container_image_base {
 function create_container_image_distroless {
     # $1: kubernetes component name
     # $2: rpm file name
-    # $3: use distroless image (true/false)
     K8S_COMPONENT=$1
     RPM_FILE=$2
 
