@@ -5,7 +5,7 @@
 
 Name:           dracut
 Version:        049
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          System Environment/Base
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
@@ -39,6 +39,16 @@ into the initramfs. dracut contains various modules which are driven by the
 event-based udev. Having root on MD, DM, LVM2, LUKS is supported as well as
 NFS, iSCSI, NBD, FCoE with the dracut-network package.
 
+%package fips
+Summary: dracut modules to build a dracut initramfs with an integrity check
+Requires: %{name} = %{version}-%{release}
+Requires: libkcapi-hmaccalc
+Requires: nss
+
+%description fips
+This package requires everything which is needed to build an
+initramfs with dracut, which does an integrity check.
+
 %package tools
 Summary: dracut tools to build the local initramfs
 Requires: %{name} = %{version}-%{release}
@@ -66,9 +76,6 @@ make %{?_smp_mflags} install \
 
 echo "DRACUT_VERSION=%{version}-%{release}" > $RPM_BUILD_ROOT/%{dracutlibdir}/dracut-version.sh
 
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/01fips
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/02fips-aesni
-
 rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/00bootchart
 
 # we do not support dash in the initramfs
@@ -90,6 +97,9 @@ ln -sfv %{_localstatedir}/opt/dracut/log/dracut.log $RPM_BUILD_ROOT%{_localstate
 mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/initramfs
 
 rm -f $RPM_BUILD_ROOT%{_mandir}/man?/*suse*
+
+install -m 0644 dracut.conf.d/fips.conf.example $RPM_BUILD_ROOT%{dracutlibdir}/dracut.conf.d/40-fips.conf
+> $RPM_BUILD_ROOT/etc/system-fips
 
 # create compat symlink
 mkdir -p $RPM_BUILD_ROOT%{_sbindir}
@@ -147,6 +157,12 @@ rm -rf -- $RPM_BUILD_ROOT
 %{_unitdir}/initrd.target.wants/dracut-pre-pivot.service
 %{_unitdir}/initrd.target.wants/dracut-pre-trigger.service
 %{_unitdir}/initrd.target.wants/dracut-pre-udev.service
+	
+%files fips
+%defattr(-,root,root,0755)
+%{dracutlibdir}/modules.d/01fips
+%{dracutlibdir}/dracut.conf.d/40-fips.conf
+%config(missingok) /etc/system-fips
 
 %files tools
 %defattr(-,root,root,0755)
@@ -157,6 +173,8 @@ rm -rf -- $RPM_BUILD_ROOT
 %dir /var/lib/dracut/overlay
 
 %changelog
+*   Mon Jan 18 2021 Nicolas Ontiveros <niontive@microsoft.com> 049-3
+-   Add dracut-fips and package
 *   Wed Apr 08 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-2
 -   Remove toybox from requires.
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
