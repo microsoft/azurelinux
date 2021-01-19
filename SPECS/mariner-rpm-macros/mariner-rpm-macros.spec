@@ -2,7 +2,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,6 +88,9 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 %{_fileattrsdir}/pythondist.attr
 
 %changelog
+* Tue Jan 19 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
+- Disable python requirement generator.
+
 * Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0-11
 - Remove pythondistdeps.py.
 
