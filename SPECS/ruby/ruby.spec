@@ -13,14 +13,12 @@ BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
-
+Requires:       gmp
+Requires:       openssl
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
-
-Requires:       gmp
-Requires:       openssl
 
 %description
 The Ruby package contains the Ruby development environment.
