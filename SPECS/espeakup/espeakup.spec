@@ -8,6 +8,8 @@ Distribution:   Mariner
 URL:            https://github.com/williamh/espeakup
 #Source0:       https://github.com/williamh/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Source1:        %{name}.conf
+Source2:        %{name}.service
 BuildRequires:  espeak-ng-devel
 BuildRequires:  gcc
 BuildRequires:  make
@@ -24,6 +26,8 @@ make
 
 %install
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
+install -m755 %{SOURCE1} %{buildroot}%{_libdir}/modules-load.d/%{name}.conf
+install -m755 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/%{name}.service
 
 # %check
 # This package has no check section as of version 0.80
@@ -33,6 +37,8 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 %license COPYING
 %doc ChangeLog README
 %{_bindir}/%{name}
+%{_libdir}/systemd/system/%{name}.service
+%{_libdir}/modules-load.d/%{name}.conf
 %{_mandir}/man8/*
 
 %changelog

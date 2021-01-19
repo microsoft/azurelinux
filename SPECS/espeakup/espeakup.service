@@ -1,0 +1,14 @@
+[Unit]
+Description=Connector between espeak-ng userspace synthesizer and speakup kernel module
+Wants=
+After=systemd-modules-load.service
+
+[Service]
+type=forking
+PIDFile=/var/run/espeakup.pid
+ExecStart=/usr/bin/espeakup --default-voice=en+m3
+ExecReload=/bin/kill $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=sound.target
