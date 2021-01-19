@@ -133,7 +133,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Tue Jan 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.44.6-4
-- Address CVE-2019-5094
+- Address CVE-2019-5094 and CVE-2019-5188
 
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.44.6-3
 - Don't stomp on CFLAGS.
