@@ -5095,7 +5095,113 @@ CONFIG_XEN_HAVE_VPMU=y
 # end of Xen driver support
 
 # CONFIG_GREYBUS is not set
-# CONFIG_STAGING is not set
+CONFIG_STAGING=y
+# CONFIG_PRISM2_USB is not set
+# CONFIG_COMEDI is not set
+# CONFIG_RTL8192U is not set
+# CONFIG_RTLLIB is not set
+# CONFIG_RTL8723BS is not set
+# CONFIG_R8712U is not set
+# CONFIG_R8188EU is not set
+# CONFIG_RTS5208 is not set
+# CONFIG_VT6655 is not set
+# CONFIG_VT6656 is not set
+
+#
+# IIO staging drivers
+#
+
+#
+# Accelerometers
+#
+# end of Accelerometers
+
+#
+# Analog to digital converters
+#
+# end of Analog to digital converters
+
+#
+# Analog digital bi-direction converters
+#
+# CONFIG_ADT7316 is not set
+# end of Analog digital bi-direction converters
+
+#
+# Capacitance to digital converters
+#
+# CONFIG_AD7150 is not set
+# CONFIG_AD7746 is not set
+# end of Capacitance to digital converters
+
+#
+# Direct Digital Synthesis
+#
+# end of Direct Digital Synthesis
+
+#
+# Network Analyzer, Impedance Converters
+#
+# CONFIG_AD5933 is not set
+# end of Network Analyzer, Impedance Converters
+
+#
+# Active energy metering IC
+#
+# CONFIG_ADE7854 is not set
+# end of Active energy metering IC
+
+#
+# Resolver to digital converters
+#
+# end of Resolver to digital converters
+# end of IIO staging drivers
+
+# CONFIG_FB_SM750 is not set
+
+#
+# Speakup console speech
+#
+CONFIG_SPEAKUP=m
+# CONFIG_SPEAKUP_SYNTH_ACNTSA is not set
+# CONFIG_SPEAKUP_SYNTH_APOLLO is not set
+# CONFIG_SPEAKUP_SYNTH_AUDPTR is not set
+# CONFIG_SPEAKUP_SYNTH_BNS is not set
+# CONFIG_SPEAKUP_SYNTH_DECTLK is not set
+# CONFIG_SPEAKUP_SYNTH_DECEXT is not set
+# CONFIG_SPEAKUP_SYNTH_LTLK is not set
+CONFIG_SPEAKUP_SYNTH_SOFT=m
+# CONFIG_SPEAKUP_SYNTH_SPKOUT is not set
+# CONFIG_SPEAKUP_SYNTH_TXPRT is not set
+# CONFIG_SPEAKUP_SYNTH_DUMMY is not set
+# end of Speakup console speech
+
+# CONFIG_STAGING_MEDIA is not set
+
+#
+# Android
+#
+# end of Android
+
+# CONFIG_LTE_GDM724X is not set
+# CONFIG_GS_FPGABOOT is not set
+# CONFIG_UNISYSSPAR is not set
+# CONFIG_WILC1000_SDIO is not set
+# CONFIG_MOST is not set
+# CONFIG_KS7010 is not set
+
+#
+# Gasket devices
+#
+# CONFIG_STAGING_GASKET_FRAMEWORK is not set
+# end of Gasket devices
+
+# CONFIG_FIELDBUS_DEV is not set
+# CONFIG_KPC2000 is not set
+# CONFIG_USB_WUSB_CBAF is not set
+# CONFIG_UWB is not set
+# CONFIG_EXFAT_FS is not set
+# CONFIG_QLGE is not set
 CONFIG_X86_PLATFORM_DEVICES=y
 # CONFIG_ACER_WMI is not set
 # CONFIG_ACER_WIRELESS is not set

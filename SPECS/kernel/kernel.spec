@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.83
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -178,6 +178,14 @@ Requires:       %{name} = %{version}-%{release}
 
 %description drivers-sound
 This package contains the Linux kernel sound support
+
+%package drivers-accessibility
+Summary:        Kernel Sound modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-accessibility
+This package contains the Linux kernel screen reader accesibility support
 
 %package docs
 Summary:        Kernel docs
@@ -418,6 +426,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
 
+%files drivers-accessibility
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/staging/speakup
+
 %ifarch x86_64
 %files oprofile
 %defattr(-,root,root)
@@ -448,6 +460,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Wed Jan 13 2021 Thomas Crain <thcrain@microsoft.com> - 5.4.83-5
+- Add drivers-accessibility subpackage for accessibility modules
+- Update config to build speakup and speakup-soft modules
+
 * Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
 - Add imx8mq support
 
