@@ -24,12 +24,13 @@ Patch10:        CVE-2019-9076.nopatch
 Patch11:        CVE-2019-17450.patch
 Patch12:        CVE-2019-17451.patch
 Patch13:        CVE-2020-35493.patch
-Patch14:        CVE-2020-35494.patch
-Patch15:        CVE-2020-35495.patch
+Patch14:        CVE-2020-35494-helper.patch
+Patch15:        CVE-2020-35494.patch
+Patch16:        CVE-2020-35495.patch
 # Fix is included in CVE-2020-35495.patch.
-Patch16:        CVE-2020-35496.nopatch
+Patch17:        CVE-2020-35496.nopatch
 # Fix is included in CVE-2020-35495.patch.
-Patch17:        CVE-2020-35507.nopatch
+Patch18:        CVE-2020-35507.nopatch
 
 %description
 The Binutils package contains a linker, an assembler,
