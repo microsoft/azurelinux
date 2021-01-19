@@ -9,15 +9,18 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://downloads.sourceforge.net/libpng/%{name}-%{version}.tar.xz
-Provides:       pkgconfig(libpng)
-Provides:       pkgconfig(libpng16)
+
 %description
 The libpng package contains libraries used by other programs for reading and writing PNG files. The PNG format was designed as a replacement for GIF and, to a lesser extent, TIFF, with many improvements and extensions and lack of patent problems.
 
-%package	devel
-Summary:	Header and development files
-Requires:	%{name} = %{version}-%{release}
-%description	devel
+%package    devel
+Summary:    Header and development files
+Requires:   %{name} = %{version}-%{release}
+
+Provides:       pkgconfig(libpng) = %{version}-%{release}
+Provides:       pkgconfig(libpng16) = %{version}-%{release}
+
+%description    devel
 It contains the libraries and header files to create applications
 
 %prep
@@ -57,6 +60,8 @@ make %{?_smp_mflags} -k check
 %{_datadir}/man/man3/*
 
 %changelog
+* Tue Jan 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.37-3
+- Moved "Provides" for "pkgconfig(*)" to the correct (-devel) subpackage.
 *   Sat May 09 00:20:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.37-2
 -   Added %%license line automatically
 *   Fri May 08 2020 Nick Samson <nisamson@microsoft.com> 1.6.37-1
@@ -67,8 +72,8 @@ make %{?_smp_mflags} -k check
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *       Mon Sep 10 2018 Bo Gan <ganb@vmware.com> 1.6.35-1
 -       Update to 1.6.35
-*	Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.6.29-1
--	Updated to version 1.6.29
+*    Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.6.29-1
+-    Updated to version 1.6.29
 *       Thu Feb 23 2017 Divya Thaluru <dthaluru@vmware.com> 1.6.27-1
 -       Updated to version 1.6.27
 *       Mon Sep 12 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.6.23-2
