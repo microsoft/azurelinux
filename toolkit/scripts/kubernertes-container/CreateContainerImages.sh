@@ -197,7 +197,7 @@ function create_container_image_distroless {
     # expand RPM so folders it contains can be copied into the container
     echo "+++ extract $RPM_FILE into $TEMPDIR/$FOLDERS_TO_INSTALL_DIR"
     pushd $TEMPDIR/$FOLDERS_TO_INSTALL_DIR
-    rpm2cpio *.rpm | cpio -idmv
+    rpm2cpio *.rpm | cpio -idm
     rm *.rpm
     popd
 
