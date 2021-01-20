@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.8.31p1
-Release:        4%{?dist}
+Version:        1.9.5p1
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -77,23 +77,26 @@ rm -rf %{buildroot}/*
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers
 %attr(0750,root,root) %dir %{_sysconfdir}/sudoers.d/
 %config(noreplace) %{_sysconfdir}/pam.d/sudo
+%config(noreplace) %{_sysconfdir}/sudo_logsrvd.conf
+%config(noreplace) %{_sysconfdir}/sudo.conf
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/sudo/*.so
 %{_libdir}/sudo/*.so.*
 %{_sbindir}/*
+%{_datarootdir}/locale/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_docdir}/%{name}-%{version}/*
-%{_datarootdir}/locale/*
 %attr(0644,root,root) %{_libdir}/tmpfiles.d/sudo.conf
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.31p1-4
-- Added %%license line automatically
-
+*   Fri Jan 15 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p1-1
+-   Update to version 1.9.5.p1 to fix CVE-2021-23240.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.31p1-4
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-3
 -   Renaming Linux-PAM to pam
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-2
