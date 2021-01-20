@@ -102,8 +102,8 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_fileattrsdir}/pythondist.attr
 
 %changelog
-* Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
-- Include forge macros and scripts.
+* Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-13
+- Add forge macros and scripts.
 
 * Tue Jan 19 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
 - Disable python requirement generator.
