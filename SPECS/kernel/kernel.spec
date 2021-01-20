@@ -127,6 +127,9 @@ Patch1097:      CVE-2020-29534.nopatch
 Patch1098:      CVE-2020-29660.nopatch
 Patch1099:      CVE-2020-29661.nopatch
 Patch1100:      CVE-2020-27777.nopatch
+Patch1101:      CVE-2020-29569.nopatch
+Patch1102:      CVE-2020-28374.nopatch
+Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -450,6 +453,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
 - Update source to 5.4.91
+- Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
 
 * Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
 - Add imx8mq support
