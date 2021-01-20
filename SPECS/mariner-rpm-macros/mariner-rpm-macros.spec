@@ -1,8 +1,9 @@
 %global rcdir %{_lib}/rpm/mariner
+%global rcluadir %{_lib}/rpm/lua/mariner
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        10%{?dist}
+Release:        16%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +26,9 @@ Source14:       macros.perl-srpm
 Source15:       gpgverify
 Source16:       pythondist.attr
 Source17:       pythondistdeps.py
+Source18:       macros.forge
+Source19:       common.lua
+Source20:       forge.lua
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -65,9 +69,13 @@ install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
-mkdir -p %{buildroot}%{_fileattrsdir} 
+mkdir -p %{buildroot}%{_fileattrsdir}
 install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 install -p -m 755 -t %{buildroot}%{_rpmconfigdir} pythondistdeps.py
+
+mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
+install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
+install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 
 %files
 %defattr(-,root,root)
@@ -81,6 +89,12 @@ install -p -m 755 -t %{buildroot}%{_rpmconfigdir} pythondistdeps.py
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
+%{_rpmconfigdir}/macros.d/macros.forge
+%dir %{rcluadir}
+%dir %{rcluadir}/srpm
+%dir %{rcluadir}/rpm
+%{rcluadir}/*.lua
+%{rcluadir}/srpm/*lua
 
 %files -n mariner-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
