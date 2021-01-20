@@ -10,15 +10,15 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.19.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210118.tar.gz
 Source1:        kubelet.service
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
@@ -266,6 +266,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Tue Jan 19 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.3-4
+- Update to version 1.19.3-hotfix.20210118
+
 * Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.3-3
 - Packages for container images
 

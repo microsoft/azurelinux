@@ -160,11 +160,13 @@ function create_container_image_base {
     cp $ROOT_FOLDER/toolkit/resources/manifests/package/local.repo $TEMPDIR
 
     pushd $TEMPDIR
-    docker run -t \
+    docker run \
       --name $K8S_CONTAINER_NAME \
       -v $RPMS_FOLDER:/upstream-cached-rpms \
       -v $TEMPDIR:/temp \
-      -i $BASE_IMAGE_FULL_NAME /temp/InstallComponentsBase.sh -c $RPM_NAME-$RPM_VERSION -r /temp/local.repo
+      -di $BASE_IMAGE_FULL_NAME /temp/InstallComponentsBase.sh -c $RPM_NAME-$RPM_VERSION -r /temp/local.repo
+    docker wait $K8S_CONTAINER_NAME
+    docker logs $K8S_CONTAINER_NAME
 
     echo "+++ export container $K8S_CONTAINER_NAME -> $K8S_IMAGE_NAME"
     docker export -o "$OUTPUT_FOLDER/$K8S_IMAGE_NAME.tar.gz" $K8S_CONTAINER_NAME
@@ -195,7 +197,7 @@ function create_container_image_distroless {
     # expand RPM so folders it contains can be copied into the container
     echo "+++ extract $RPM_FILE into $TEMPDIR/$FOLDERS_TO_INSTALL_DIR"
     pushd $TEMPDIR/$FOLDERS_TO_INSTALL_DIR
-    rpm2cpio *.rpm | cpio -idmv
+    rpm2cpio *.rpm | cpio -idm
     rm *.rpm
     popd
 
