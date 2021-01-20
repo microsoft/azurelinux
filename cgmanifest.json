@@ -1016,8 +1016,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.44.6",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.44.6.tar.gz"
+          "version": "1.45.6",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz"
         }
       }
     },

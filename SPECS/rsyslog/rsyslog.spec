@@ -1,47 +1,56 @@
+%define sha1    rsyslog=7541e3cf6facbab19792ff8d9d7f4cd3fbb1c634
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        4%{?dist}
-License:        GPLv3+ and ASL 2.0
-URL:            http://www.rsyslog.com/
+Release:        5%{?dist}
+License:        GPLv3+ AND ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Base
+URL:            https://www.rsyslog.com/
 Source0:        http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
-%define sha1    rsyslog=7541e3cf6facbab19792ff8d9d7f4cd3fbb1c634
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
-Group:          System Environment/Base
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildRequires:  systemd-devel
+BuildRequires:  autogen
+BuildRequires:  curl-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  krb5-devel
 BuildRequires:  libestr-devel
 BuildRequires:  libfastjson-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  librelp-devel
-BuildRequires:  autogen
-BuildRequires:  gnutls-devel
-BuildRequires:  curl-devel
+BuildRequires:  systemd-devel
 Requires:       gnutls
-Requires:       systemd
 Requires:       libestr
 Requires:       libfastjson
 Requires:       libgcrypt
 Requires:       librelp
+Requires:       systemd
+Provides:       %{name}-gnutls = %{version}-%{release}
+Provides:       %{name}-gssapi = %{version}-%{release}
+Provides:       %{name}-relp = %{version}-%{release}
+
 %description
 RSYSLOG is the rocket-fast system for log processing.
 It offers high-performance, great security features and a modular design. While it started as a regular syslogd, rsyslog has evolved into a kind of swiss army knife of logging, being able to accept inputs from a wide variety of sources, transform them, and output to the results to diverse destinations.
+
 %prep
 %setup -q
 autoreconf -fvi
+
 %build
 sed -i 's/libsystemd-journal/libsystemd/' configure
 ./configure \
     --prefix=%{_prefix} \
     --enable-relp \
     --enable-gnutls\
+    --enable-gssapi-krb5 \
     --enable-imfile \
     --enable-imjournal \
     --enable-impstats \
-    --enable-imptcp
+    --enable-imptcp \
+    --enable-relp
 
 make %{?_smp_mflags}
 
@@ -53,7 +62,7 @@ rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -80,38 +89,56 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %changelog
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 8.37.0-5
+- Build with gssapi, relp support and add explicit provides.
+
 * Sat May 09 00:21:21 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.37.0-4
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.37.0-3
 -   Remove liblogging from requires.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.37.0-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 8.37.0-1
 -   Updated to version 8.37.0
+
 *   Thu Apr 12 2018 Xiaolin Li <xiaolinl@vmware.com> 8.26.0-5
 -   Add $IncludeConfig /etc/rsyslog.d/ to rsyslog.conf
+
 *   Fri Dec 15 2017 Anish Swaminathan <anishs@vmware.com>  8.26.0-4
 -   Remove kill SIGHUP from service file
+
 *   Mon Nov 13 2017 Xiaolin Li <xiaolinl@vmware.com> 8.26.0-3
 -   Add a default rsyslog.conf.
+
 *   Tue Aug 15 2017 Dheeraj Shetty <dheerajs@vmware.com>  8.26.0-2
 -   Fix CVE-2017-12588
+
 *   Mon  Apr 24 2017 Siju Maliakkal <smaliakkal@vmware.com>  8.26.0-1
 -   Update to latest
+
 *   Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  8.15.0-7
 -   Change systemd dependency
+
 *   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 8.15.0-6
 -   Modified %check
+
 *   Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com>  8.15.0-5
 -   Fixed logic to restart the active services after upgrade
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 8.15.0-4
 -   GA - Bump release of all rpms
+
 *   Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com>  8.15.0-3
 -   Use systemd macros for post, preun and postun to respect upgrades
+
 *   Wed Feb 17 2016 Anish Swaminathan <anishs@vmware.com>  8.15.0-2
 -   Add journald conf and new service file.
+
 *   Mon Jan 11  2016 Xiaolin Li <xiaolinl@vmware.com> 8.15.0-1
 -   Update rsyslog to 8.15.0
+
 *   Wed Jun 17 2015 Divya Thaluru <dthaluru@vmware.com> 8.10.0-1
 -   Initial build. First version

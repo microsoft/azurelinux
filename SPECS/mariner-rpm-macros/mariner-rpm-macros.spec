@@ -3,7 +3,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        16%{?dist}
+Release:        13%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,10 +25,9 @@ Source13:       macros.ocaml-srpm
 Source14:       macros.perl-srpm
 Source15:       gpgverify
 Source16:       pythondist.attr
-Source17:       pythondistdeps.py
-Source18:       macros.forge
-Source19:       common.lua
-Source20:       forge.lua
+Source17:       macros.forge
+Source18:       common.lua
+Source19:       forge.lua
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -71,7 +70,6 @@ mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
 install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
-install -p -m 755 -t %{buildroot}%{_rpmconfigdir} pythondistdeps.py
 
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
@@ -102,9 +100,17 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %files -n mariner-python-macros
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
-%{_rpmconfigdir}/pythondistdeps.py
 
 %changelog
+* Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
+- Include forge macros and scripts.
+
+* Tue Jan 19 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
+- Disable python requirement generator.
+
+* Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0-11
+- Remove pythondistdeps.py.
+
 * Mon Jan 04 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0-10
 - Enable python dependency generator for dist provides.
 

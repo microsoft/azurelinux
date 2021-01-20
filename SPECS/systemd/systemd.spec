@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,8 @@ Requires:       xz
 Obsoletes:      systemd-bootstrap
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
+Provides:       systemd-udev = %{version}-%{release}
+Provides:       udev = %{version}-%{release}
 
 %description
 Systemd is an init replacement with better process control and security
@@ -87,6 +89,8 @@ Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
 Provides:       systemd-libs = %{version}-%{release}
+Provides:       libudev-devel = %{version}-%{release}
+Provides:       libudev-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 Development headers for developing applications linking to libsystemd
@@ -201,7 +205,6 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license LICENSE.GPL2
@@ -293,6 +296,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 239-35
+- Provide systemd-udev and libudev-devel.
+
 * Tue Nov 10 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-34
 - Configure to support merged /usr.
 

@@ -13,6 +13,7 @@ Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
+Patch1:         python-dist-deps-version-parse.patch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
@@ -76,6 +77,7 @@ Requires:       gzip
 Requires:       tar
 Requires:       unzip
 Requires:       xz
+Provides:       %{name}-sign = %{version}-%{release}
 
 %description build
 %{summary}
@@ -109,6 +111,7 @@ Python3 rpm.
 %prep
 %setup -q -n rpm-%{name}-%{version}-release
 %patch0 -p1
+%patch1 -p1
 
 %build
 sed -i '/define _GNU_SOURCE/a #include "../config.h"' tools/sepdebugcrcfix.c
@@ -163,7 +166,6 @@ popd
 
 %clean
 rm -rf %{buildroot}
-
 
 %files
 %defattr(-,root,root)
@@ -276,8 +278,14 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Thu Jan 14 2021 Joe Schmitt <joschmit@microsoft.com> - 4.14.2.1-1
+* Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 4.14.2.1-1
 - Upgrade to v4.14.2.1 to fix broken Lua library path.
+
+* Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-13
+- Apply patch to correctly parse versions for python dist dependencies.
+
+* Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-12
+- Provide rpm-sign.
 
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.14.2-11
 - Provide rpm-python3 and rpm-python.
