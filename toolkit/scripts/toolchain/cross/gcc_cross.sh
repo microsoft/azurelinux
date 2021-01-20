@@ -1,3 +1,8 @@
+# Docs used to create this script:
+# https://preshing.com/20141119/how-to-build-a-gcc-cross-compiler/
+# https://mdeva2.home.blog/2019/07/08/building-gcc-as-a-cross-compiler-for-raspberry-pi/
+# http://jiadongsun.cc/2019/09/03/Cross_Compile_Gcc/#6-build-glibc
+
 installDir="/opt/cross"
 buildDir="$HOME/cross"
 scriptDir=$(dirname "$0")
@@ -10,6 +15,7 @@ sudo rm -rf ${buildDir}
 mkdir ${buildDir}
 cd ${buildDir}
 
+# Download source tarballs
 wget http://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.xz
 wget https://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.xz
 wget https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz
@@ -18,8 +24,10 @@ wget http://www.mpfr.org/mpfr-4.0.1/mpfr-4.0.1.tar.gz
 wget http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
 wget https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
 
+# Install gawk
 sudo apt-get install gawk
 
+# Unzip source tarballs
 for f in *.tar*; do tar xf $f; done
 
 cd gcc-9.1.0
@@ -56,7 +64,6 @@ cd ..
 mkdir -p build-glibc
 cd build-glibc
 ../glibc-2.28/configure --prefix="${installDir}/aarch64-linux" --build=$MACHTYPE --host=aarch64-linux --target=aarch64-linux --with-headers="${installDir}/aarch64-linux/include" --disable-multilib libc_cv_forced_unwind=yes  --disable-werror
-
 make install-bootstrap-headers=yes install-headers
 make -j$(nproc) csu/subdir_lib
 install csu/crt1.o csu/crti.o csu/crtn.o "${installDir}/aarch64-linux/lib"
