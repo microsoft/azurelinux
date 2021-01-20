@@ -3,7 +3,7 @@
         {
             "Artifacts": [
                 {
-                    "Name": "core",
+                    "Name": "distroless-minimal",
                     "Compression": "tar.gz"
                 }
             ]
