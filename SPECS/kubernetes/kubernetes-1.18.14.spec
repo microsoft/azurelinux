@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.18.8
-Release:        8%{?dist}
+Version:        1.18.14
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,13 +21,11 @@ URL:            https://mcr.microsoft.com/oss
 Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20200924.tar.gz
 Source1:        kubelet.service
 Source2:        golang-1.15-k8s-1.18-test.patch
-# CVE-2020-8564, CVE-2020-8565, CVE-2020-8566 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
-Patch0:         CVE-2020-8564.nopatch
-Patch1:         CVE-2020-8565.nopatch
-Patch2:         CVE-2020-8566.nopatch
+# CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch0:         CVE-2020-8565.nopatch
 # CVE-2020-8563 Only applies when using VSphere as cloud provider,
 #               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
-Patch3:         CVE-2020-8563.nopatch
+Patch1:         CVE-2020-8563.nopatch
 BuildRequires:  flex-devel
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
@@ -272,6 +270,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.14-1
+- Move to version 1.18.14
+
 * Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-8
 - Packages for container images
 
