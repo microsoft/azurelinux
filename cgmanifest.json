@@ -2045,16 +2045,6 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.17.11",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.11-hotfix.20200901/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
           "version": "1.17.13",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
@@ -2065,8 +2055,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.18.8",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.8-hotfix.20200924/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "version": "1.17.16",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2085,8 +2075,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.19.1",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.1-hotfix.20200923/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "version": "1.18.14",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2097,6 +2087,16 @@
           "name": "kubernetes",
           "version": "1.19.3",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.6",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.6-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },

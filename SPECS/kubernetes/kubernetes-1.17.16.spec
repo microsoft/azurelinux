@@ -9,26 +9,25 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.19.1
-Release:        5%{?dist}
+Version:        1.17.16
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.1-hotfix.20200923/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20200923.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210118.tar.gz
 Source1:        kubelet.service
-# CVE-2020-8564, CVE-2020-8565, CVE-2020-8566 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
-Patch0:         CVE-2020-8564.nopatch
-Patch1:         CVE-2020-8565.nopatch
-Patch2:         CVE-2020-8566.nopatch
+Source2:        golang-1.15-k8s-1.17-test.patch
+# CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch0:         CVE-2020-8565.nopatch
 # CVE-2020-8563 Only applies when using VSphere as cloud provider,
 #               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
-Patch3:         CVE-2020-8563.nopatch
+Patch1:         CVE-2020-8563.nopatch
 BuildRequires:  flex-devel
-BuildRequires:  golang >= 1.15.5
+BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -271,17 +270,51 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-5
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.16-1
+- Move to version 1.17.16
+
+* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-7
 - Packages for container images
 
-* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-4
+* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-6
+- Fix test issue when building against golang 1.15
 - CVE-2020-8563
 
-* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-3
+* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-5
 - CVE-2020-8564, CVE-2020-8565, CVE-2020-8566
 
-* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-2
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-4
 - Rename spec file
 
-* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
-- Initial version of K8s 1.19.1.
+* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-3
+- Rename ms-kubernetes-1.17.11 into kubernetes and lint spec
+
+* Wed Nov 18 2020 George Mileka <gmileka@microsoft.com> 1.17.11-2
+- Added license file and macro.
+
+* Fri Oct 2 2020 George Mileka <gmileka@microsoft.com 1.17.11-1
+- Moved k8s to 1.17.11.
+
+* Mon Aug 17 2020 Jiri Appl <jiria@microsoft.com> 1.17.7-4
+- Clean up the spec.
+
+* Thu Aug 6 2020 George Mileka <gmileka@microsoft.com> 1.17.7-3
+- Create /etc/kubernetes/manifests.
+
+* Wed Jul 30 2020 Jiri Appl <jiria@microsoft.com> 1.17.7-2
+- Removed container images.
+
+* Fri Jul 24 2020 George Mileka <gmileka@microsoft.com> 1.17.7
+- Moved to 1.17.7.
+
+* Tue Jun 30 2020 George Mileka <gmileka@microsoft.com> 1.17.3-2
+- Adding the 1.16 kubeproxy and coredns for downgrade scenarios.
+
+* Thu Jun 03 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.17.3-2
+- Renaming iproute2 to iproute.
+
+* Fri May 29 2020 George Mileka <gmileka@microsoft.com> 1.17.3.
+- Switched to ecpacr.
+
+* Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.17.3-hotfix.20200408
+- Initial version of K8s 1.17.3-hotfix.20200408.
