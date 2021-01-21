@@ -49,10 +49,10 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/co
 # Build the cloud-init configuration image 
 # The output image is ../out/images/meta-user-data.iso
 sudo make meta-user-data
-
 ```
 
 **Copy VHD(X) and ISO Images to Your VM Host Machine**
+
 Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
 **Create VHD(X) Virtual Machine with Hyper-V**
@@ -70,7 +70,7 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select _Settings..._.
 1. Select Security and disable _Enable Secure Boot_.
 1. Select the SCSI Controller from the Hardware panel.
-
+1. Select DVD Drive and press Add.
 
 **Mount the Meta-User-Data.Iso Image**
 
@@ -103,6 +103,7 @@ cd toolkit
 sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
 ```
 **Copy ISO Image to Your VM Host Machine**
+
 Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
 **Create VHD(X) Virtual Machine with Hyper-V**
