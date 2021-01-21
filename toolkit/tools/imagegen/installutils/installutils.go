@@ -768,7 +768,7 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -785,6 +785,13 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID string, encryptedRoot disk
 	err = setGrubCfgBootUUID(bootUUID, installGrubCfgFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+		return
+	}
+
+	// Add in bootPrefix
+	err = setGrubCfgBootPrefix(bootPrefix, installGrubCfgFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
 		return
 	}
 
