@@ -3,7 +3,7 @@ Name:           bc
 Version:        1.07.1
 Release:        4%{?dist}
 License:        GPLv2+
-URL:            https://ftp.gnu.org/gnu/bc/
+URL:            https://www.gnu.org/software/bc/
 Group:          System Environment/base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,7 +47,7 @@ popd
 
 %changelog
 * Fri Jan 22 2021 Andrew Phelps <anphel@microsoft.com> 1.07.1-4
-- Fix check test. Remove sha1.
+- Fix check test. Remove sha1. Change URL to GNU bc homepage.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.07.1-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.07.1-2
