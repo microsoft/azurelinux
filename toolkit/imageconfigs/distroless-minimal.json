@@ -3,7 +3,7 @@
         {
             "Artifacts": [
                 {
-                    "Name": "distroless-base",
+                    "Name": "distroless-minimal",
                     "Compression": "tar.gz"
                 }
             ]
@@ -13,7 +13,7 @@
         {
             "Name": "Standard",
             "PackageLists": [
-                "packagelists/distroless-packages-container.json"
+                "packagelists/distroless-packages-container-minimal.json"
             ],
             "RemoveRpmDb": true
         }
