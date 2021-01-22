@@ -72,7 +72,7 @@ sed -i 's/PET/-05/g' tests/misc/date-debug.sh
 sed -i 's/2>err\/merge-/2>\&1 > err\/merge-/g' tests/misc/sort-merge-fdlimit.sh
 sed -i 's/)\" = \"10x0/| head -n 1)\" = \"10x0/g' tests/split/r-chunk.sh
 sed  -i '/mb.sh/d' Makefile
-# remove capabiltiy test which incorrectly determines xattr support and then fails
+# remove capability test which incorrectly determines xattr support and then fails
 sed -i '/tests\/cp\/capability.sh/d' Makefile
 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 
