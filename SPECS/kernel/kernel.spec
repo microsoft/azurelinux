@@ -2,8 +2,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.83
-Release:        4%{?dist}
+Version:        5.4.91
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ Source2:        config_aarch64
 # Arm64 HyperV support required patch
 Patch0:         ver5_4_72_arm64_hyperv_support.patch
 Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
-Patch2:         fix-gui-installer-mmap.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -127,6 +126,9 @@ Patch1097:      CVE-2020-29534.nopatch
 Patch1098:      CVE-2020-29660.nopatch
 Patch1099:      CVE-2020-29661.nopatch
 Patch1100:      CVE-2020-27777.nopatch
+Patch1101:      CVE-2020-29569.nopatch
+Patch1102:      CVE-2020-28374.nopatch
+Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -221,7 +223,6 @@ This package contains common device tree blobs (dtb)
 %endif
 
 %patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -448,6 +449,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+- Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
+- Remove patch to fix GUI installer crash. Fixed in updated source.
+
 * Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
 - Add imx8mq support
 

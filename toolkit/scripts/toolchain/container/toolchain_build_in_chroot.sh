@@ -57,14 +57,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.4.83 API Headers
-tar xf linux-msft-5.4.83.tar.gz
-pushd WSL2-Linux-Kernel-linux-msft-5.4.83
+echo Linux-5.4.91 API Headers
+tar xf linux-msft-5.4.91.tar.gz
+pushd WSL2-Linux-Kernel-linux-msft-5.4.91
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf WSL2-Linux-Kernel-linux-msft-5.4.83
+rm -rf WSL2-Linux-Kernel-linux-msft-5.4.91
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
