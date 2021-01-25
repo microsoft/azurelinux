@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        3.5.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,12 @@ BuildRequires:  libedit-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  nettle-devel
 BuildRequires:  systemd
+
+%if %{with_check}
+BuildRequires:  net-tools
+BuildRequires:  tzdata
+BuildRequires:  which
+%endif
 
 Requires(pre):  shadow-utils
 %{?systemd_requires}
@@ -195,6 +201,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> - 3.5.1-3
+- Add build requirements needed for check tests
+
 * Thu Oct 01 2020 Thomas Crain <thcrain@microsoft.com> - 3.5.1-2
 - Remove chrony-wait service as a boot dependency
 

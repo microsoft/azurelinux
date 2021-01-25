@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
-Version:        5.4.83
+Version:        5.4.91
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -80,6 +80,18 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+
+* Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
+- Update release number to match kernel spec
+
+* Sat Jan 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.4.83-3
+- Update to kernel release 5.4.83-3
+
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Update to kernel release 5.4.83-2
+
 * Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
 - Update source to 5.4.83
 

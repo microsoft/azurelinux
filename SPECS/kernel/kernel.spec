@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.83
+Version:        5.4.91
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -125,6 +125,10 @@ Patch1096:      CVE-2020-25704.nopatch
 Patch1097:      CVE-2020-29534.nopatch
 Patch1098:      CVE-2020-29660.nopatch
 Patch1099:      CVE-2020-29661.nopatch
+Patch1100:      CVE-2020-27777.nopatch
+Patch1101:      CVE-2020-29569.nopatch
+Patch1102:      CVE-2020-28374.nopatch
+Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
@@ -203,6 +207,13 @@ Requires:       audit
 
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
+
+%package dtb
+Summary:        This package contains common device tree blobs (dtb)
+Group:          System Environment/Kernel
+
+%description dtb
+This package contains common device tree blobs (dtb)
 
 %prep
 %setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
@@ -293,6 +304,7 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
+install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -431,7 +443,26 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
 
+%ifarch aarch64
+%files dtb
+/boot/dtb/fsl-imx8mq-evk.dtb
+%endif
+
 %changelog
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+- Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
+- Remove patch to fix GUI installer crash. Fixed in updated source.
+
+* Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
+- Add imx8mq support
+
+* Sat Jan 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.4.83-3
+- Add patch to fix GUI installer crash
+
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Address CVE-2020-27777
+
 * Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
 - Update source to 5.4.83
 - Address CVE-2020-14351, CVE-2020-14381, CVE-2020-25656, CVE-2020-25704,

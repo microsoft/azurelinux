@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -12,6 +12,8 @@ Source1:        MICROSOFT-METADATA-GPG-KEY
 Source2:        mariner-official-base.repo
 Source3:        mariner-official-update.repo
 Source4:        mariner-preview.repo
+Source5:        mariner-ui.repo
+Source6:        mariner-ui-preview.repo
 
 Requires(post): gpgme
 Requires(post): rpm
@@ -30,12 +32,30 @@ Requires:   %{name} = %{version}-%{release}
 %description preview
 %{summary}
 
+%package ui
+Summary:    CBL-Mariner UI repo file.
+Group:      System Environment/Base
+Requires:   %{name} = %{version}-%{release}
+
+%description ui
+%{summary}
+
+%package ui-preview
+Summary:    CBL-Mariner UI preview repo file.
+Group:      System Environment/Base
+Requires:   %{name}-ui = %{version}-%{release}
+
+%description ui-preview
+%{summary}
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
 install -m 644 %{SOURCE2} $RPM_BUILD_ROOT/etc/yum.repos.d
 install -m 644 %{SOURCE3} $RPM_BUILD_ROOT/etc/yum.repos.d
 install -m 644 %{SOURCE4} $RPM_BUILD_ROOT/etc/yum.repos.d
+install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/etc/yum.repos.d
+install -m 644 %{SOURCE6} $RPM_BUILD_ROOT/etc/yum.repos.d
 
 install -d -m 755 $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 install -m 644 %{SOURCE0} $RPM_BUILD_ROOT/etc/pki/rpm-gpg
@@ -66,8 +86,18 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-preview.repo
 
+%files ui
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-ui.repo
+
+%files ui-preview
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-ui-preview.repo
+
 %changelog
-*   Thu Oct 01 2020 Emre Girgin <sarsoma@microsoft.com> - 1.0-11
+*   Fri Jan 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12
+-   Adding a set of repos with the UI components.
+*   Thu Oct 01 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0-11
 -   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
 *   Mon Sep 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-10
 -   Adding configuration to access the preview repository.

@@ -4,14 +4,16 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        2.3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Url:            https://pypi.python.org/pypi/cryptography
 License:        ASL 2.0
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
-%define sha1    cryptography=c550f9ba5a46ad33a0568edc2b9d0f4af3e4adab
+
+Patch0:         CVE-2020-25659.patch
+
 BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  python2-devel
@@ -58,7 +60,7 @@ Requires:       python3-asn1crypto
 Python 3 version.
 
 %prep
-%setup -q -n cryptography-%{version}
+%autosetup -p1 -n cryptography-%{version}
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -99,9 +101,11 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.3.1-3
-- Added %%license line automatically
-
+*   Wed Jan 20 2021 Henry Beberman <henry.beberman@microsoft.com> 2.3.1-4
+-   Patch CVE-2020-25659
+-   License verified
+*   Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> 2.3.1-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.3.1-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 2.3.1-1

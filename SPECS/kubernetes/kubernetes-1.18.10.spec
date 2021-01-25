@@ -5,24 +5,32 @@
 %ifarch aarch64
 %define archname arm64
 %endif
+%define host_components 'kubelet kubectl kubeadm'
+%define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.10
-Release:        1%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210118.tar.gz
 Source1:        kubelet.service
+Source2:        golang-1.15-k8s-1.18-test.patch
+# CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch0:         CVE-2020-8565.nopatch
+# CVE-2020-8563 Only applies when using VSphere as cloud provider,
+#               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
+Patch1:         CVE-2020-8563.nopatch
+BuildRequires:  flex-devel
 BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
-BuildRequires:  which
-BuildRequires:  flex-devel
 BuildRequires:  systemd-devel
+BuildRequires:  which
 Requires:       cni
 Requires:       cri-tools
 Requires:       ebtables
@@ -42,6 +50,7 @@ Microsoft Kubernetes %{version}.
 
 %package        client
 Summary:        Client utilities
+Requires:       %{name} = %{version}
 
 %description    client
 Client utilities for Microsoft Kubernetes %{version}.
@@ -54,11 +63,43 @@ Requires:       moby-cli
 %description    kubeadm
 Bootstrap utilities for Microsoft Kubernetes %{version}.
 
+%package        kube-proxy
+Summary:        Kubernetes proxy
+Requires:       ebtables-legacy
+Requires:       ethtool
+Requires:       iproute
+Requires:       iptables
+
+%description    kube-proxy
+Network proxy for Microsoft Kubernetes %{version}.
+
+%package        kube-apiserver
+Summary:        Kubernetes API server
+
+%description    kube-apiserver
+API server for Microsoft Kubernetes %{version}.
+
+%package        kube-controller-manager
+Summary:        Kubernetes controller manager
+
+%description    kube-controller-manager
+Controller manager for Microsoft Kubernetes %{version}.
+
+%package        kube-scheduler
+Summary:        Kubernetes scheduler
+
+%description    kube-scheduler
+Scheduler for Microsoft Kubernetes %{version}.
+
+%package        pause
+Summary:        Kubernetes pause
+
+%description    pause
+Pause component for Microsoft Kubernetes %{version}.
+
 %prep
 %setup -q -D -T -b 0 -n %{name}
 
-# note: kubernetes RPM can be build from binaries provided in source0 tarball
-#       by doing nothing in %build and %check sections
 %build
 # expand kubernetes source tarball (which is included source0 tarball)
 echo "+++ extract sources from tarball"
@@ -66,23 +107,39 @@ mkdir -p %{_builddir}/%{name}/src
 cd %{_builddir}/%{name}/src
 tar -xof %{_builddir}/%{name}/kubernetes-src.tar.gz
 
-# build and update kubernetes components that are provided as binary
-# (other/unused kubernetes componenents will not be built)
-components_to_build=$(ls -1 %{_builddir}/%{name}/node/bin)
+# build host and container image related components
+components_to_build=%{host_components}
 for component in ${components_to_build}; do
-  echo "+++ building ${component}"
+  echo "+++ host - building ${component}"
   make WHAT=cmd/${component}
   cp -f _output/local/bin/linux/%{archname}/${component} %{_builddir}/%{name}/node/bin
 done
 
+components_to_build=%{container_image_components}
+for component in ${components_to_build}; do
+  echo "+++ container image - building ${component}"
+  make WHAT=cmd/${component}
+  cp -f _output/local/bin/linux/%{archname}/${component} %{_builddir}/%{name}/node/bin
+done
+
+# build pause
+pushd build/pause
+gcc -Os -Wall -Werror -static -o %{_builddir}/%{name}/node/bin/pause pause.c
+strip %{_builddir}/%{name}/node/bin/pause
+popd
+
 %check
-cd %{_builddir}/%{name}/src
-components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
+# patch test script so it supports golang 1.15 which is now used to build kubernetes
+cd %{_builddir}/%{name}/src/hack/make-rules
+patch -p1 test.sh < %{SOURCE2}
 
 # perform unit tests
 # Note:
 #   - components are not unit tested the same way
 #   - not all components have unit
+cd %{_builddir}/%{name}/src
+components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
+
 for component in ${components_to_test}; do
   if [[ ${component} == "kubelet" || ${component} == "kubectl" ]]; then
     echo "+++ unit test pkg ${component}"
@@ -90,6 +147,15 @@ for component in ${components_to_test}; do
   elif [[ ${component} == "kube-proxy" ]]; then
     echo "+++ unit test pkg ${component}"
     make test WHAT=./pkg/proxy
+  elif [[ ${component} == "kube-scheduler" ]]; then
+    echo "+++ unit test pkg ${component}"
+    make test WHAT=./pkg/scheduler
+  elif [[ ${component} == "kube-apiserver" ]]; then
+    echo "+++ unit test pkg ${component}"
+    make test WHAT=./pkg/kubeapiserver
+  elif [[ ${component} == "kube-controller-manager" ]]; then
+    echo "+++ unit test pkg ${component}"
+    make test WHAT=./pkg/controller
   else
     echo "+++ no unit test available for ${component}"
   fi
@@ -99,11 +165,19 @@ done
 # install binaries
 install -m 755 -d %{buildroot}%{_bindir}
 cd %{_builddir}
-binaries=(kubelet kubectl kubeadm)
-for bin in "${binaries[@]}"; do
+binaries=%{host_components}
+for bin in ${binaries}; do
   echo "+++ INSTALLING ${bin}"
   install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/${bin}
 done
+
+binaries=%{container_image_components}
+for bin in ${binaries}; do
+  echo "+++ INSTALLING ${bin}"
+  install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/${bin}
+done
+
+install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/pause
 
 # install service files
 install -d -m 0755 %{buildroot}/%{_lib}/systemd/system
@@ -170,6 +244,44 @@ fi
 %defattr(-,root,root)
 %{_bindir}/kubeadm
 
+%files kube-proxy
+%defattr(-,root,root)
+%license LICENSES
+%{_bindir}/kube-proxy
+
+%files kube-apiserver
+%defattr(-,root,root)
+%license LICENSES
+%{_bindir}/kube-apiserver
+
+%files kube-controller-manager
+%defattr(-,root,root)
+%license LICENSES
+%{_bindir}/kube-controller-manager
+
+%files kube-scheduler
+%defattr(-,root,root)
+%license LICENSES
+%{_bindir}/kube-scheduler
+
+%files pause
+%defattr(-,root,root)
+%license LICENSES
+%{_bindir}/pause
+
 %changelog
+* Tue Jan 19 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-5
+- Update to version 1.18.10-hotfix.20210118
+
+* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-4
+- Packages for container images
+
+* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-3
+- Fix test issue when building against golang 1.15
+- CVE-2020-8563
+
+* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-2
+- CVE-2020-8565
+
 * Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.10-1
 - Initial version of K8s 1.18.10.

@@ -1,21 +1,24 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.68.0
-Release:        5%{?dist}
+Version:        7.74.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
-Source0:        http://curl.haxx.se/download/%{name}-%{version}.tar.gz
-Patch0:         CVE-2020-8284.patch
-Patch1:         CVE-2020-8285.patch
-Patch2:         CVE-2020-8286.patch
-Patch3:         CVE-2020-8177.patch
-Patch4:         CVE-2020-8231.patch
+Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
+
+%if %{with_check}
+BuildRequires:  python3
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
+
 Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
@@ -67,7 +70,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 %check
-make %{?_smp_mflags} check
+chmod g+w . -R
+useradd test -G root -m
+
+sudo -u test make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -94,6 +100,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue Dec 22 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.74.0-1
+- Updating to 7.74.0 to fix CVE-2020-8169 and incorporate fixes for other CVEs as well.
+- Updating source URL to an HTTPS address.
+- Enabling more tests to run by running them as non-root and extending 'BuildRequires'.
+- License verified.
+
 * Fri Dec 18 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.68.0-5
 - Patch CVE-2020-8231
 
