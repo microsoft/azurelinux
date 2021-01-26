@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.5p1
+Version:        1.9.5p2
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -30,7 +30,7 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-all-insults \
     --with-env-editor \
     --with-pam \
-    --with-passprompt="[sudo] password for %p"
+    --with-passprompt="[sudo] password for %p: "
 
 make %{?_smp_mflags}
 
@@ -40,9 +40,9 @@ make install DESTDIR=%{buildroot}
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 find %{buildroot}/%{_libdir} -name '*.so~' -delete
-sed -i '/#includedir.*/i \
-%wheel ALL=(ALL) ALL \
-%sudo   ALL=(ALL) ALL' %{buildroot}/etc/sudoers
+# Add default user to sudoers group
+echo '%wheel ALL=(ALL) ALL' >> %{buildroot}/etc/sudoers
+echo '%sudo  ALL=(ALL) ALL' >> %{buildroot}/etc/sudoers
 install -vdm755 %{buildroot}/etc/pam.d
 cat > %{buildroot}/etc/pam.d/sudo << EOF
 #%%PAM-1.0
@@ -93,6 +93,10 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
+*   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1
+-   Update to version 1.9.5.p2 to fix CVE-2021-3156.
+-   Change the password prompt to include ": " at the end.
+-   Unconditionally add wheel/sudo groups.
 *   Fri Jan 15 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p1-1
 -   Update to version 1.9.5.p1 to fix CVE-2021-23240.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.31p1-4
