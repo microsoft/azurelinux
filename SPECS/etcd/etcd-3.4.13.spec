@@ -27,11 +27,11 @@ A highly-available key value store for shared configuration and service discover
 export GO111MODULE=off
 
 %define OUR_GOPATH %{_topdir}/.gopath
-mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos"
+mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io"
 export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
 
 ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
-ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos/etcd"
+ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
 
 ./build
 
