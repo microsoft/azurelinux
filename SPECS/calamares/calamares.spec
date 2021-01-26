@@ -8,7 +8,7 @@
 
 Name:           calamares
 Version:        3.2.11
-Release:        36%{?dist}
+Release:        37%{?dist}
 Summary:        Installer from a live CD/DVD/USB to disk
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,8 +20,8 @@ Source0:        https://github.com/calamares/calamares/releases/download/v%{vers
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
 Source1: calamares-users-1.1.0.tar.gz
 Source2: calamares-finished-1.1.0.tar.gz
-Source3: calamares-welcome-1.1.0.tar.gz
-Source4: calamares-partition-1.1.1.tar.gz
+Source3: calamares-welcome-1.1.1.tar.gz
+Source4: calamares-partition-1.1.2.tar.gz
 Source5: calamares-license-1.1.0.tar.gz
 
 # Source20..39 - configuration files
@@ -234,6 +234,10 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Mon Jan 25 2021 Nicolas Ontiveros <niontive@microsoft.com> 3.2.11-37
+- Add "dmroot" flag to encrypted partition
+- Hide verity root read only skus
+
 * Fri Sep 04 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.2.11-36
 - Add dictionary check for root encryption passphrase.
 
