@@ -1,19 +1,25 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+
 BuildRequires:  nettle-devel
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  openssl-devel
 BuildRequires:  guile-devel
 BuildRequires:  gc-devel
+%if %{with_check}
+BuildRequires:  net-tools
+BuildRequires:  which
+%endif
+
 Requires:       nettle
 Requires:       autogen-libopts
 Requires:       libtasn1
@@ -47,7 +53,7 @@ developing applications that use gnutls.
     --disable-openssl-compatibility \
     --with-included-unistring \
     --with-system-priority-file=%{_sysconfdir}/gnutls/default-priorities \
-    --with-default-trust-store-file=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
+    --with-default-trust-store-file=%{_sysconfdir}/ssl/certs/ca-bundle.crt \
     --with-default-trust-store-dir=%{_sysconfdir}/ssl/certs
 make %{?_smp_mflags}
 
@@ -62,6 +68,9 @@ SYSTEM=NONE:!VERS-SSL3.0:!VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2:+AES-128-CBC:+RS
 EOF
 
 %check
+# Disable test-ciphers-openssl.sh test, which relies on ciphers our openssl.spec has disabled.
+#     Observed error: "cipher_test:50: EVP_get_cipherbyname failed for chacha20-poly1305"
+sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 make %{?_smp_mflags} check
 
 %post
@@ -91,6 +100,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.6.14-4
+-   Fix check tests.
 *   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
 -   Apply patch for CVE-2020-24659 from upstream.
 -   Switch setup to autosetup.
