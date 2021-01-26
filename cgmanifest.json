@@ -634,6 +634,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "coredns",
+          "version": "1.6.5",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
+          "version": "1.6.7",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "coreutils",
           "version": "8.30",
           "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
@@ -1045,8 +1075,18 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.3.25",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.3.25.tar.gz"
+          "version": "3.4.3",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.4.13",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.13.tar.gz"
         }
       }
     },
@@ -1127,6 +1167,16 @@
           "name": "finger",
           "version": "0.17",
           "downloadUrl": "http://ftp.linux.org.uk/pub/linux/Networking/netkit/bsd-finger-0.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "flannel",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
         }
       }
     },
