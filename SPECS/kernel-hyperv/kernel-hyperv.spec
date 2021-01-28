@@ -262,6 +262,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-2
+- Add configs for userspace crypto support
+
 * Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
 - Update source to 5.4.91
 

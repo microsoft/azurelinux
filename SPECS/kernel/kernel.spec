@@ -3,7 +3,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.91
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -449,6 +449,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-2
+- Add configs for userspace crypto support
+
 * Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
 - Update source to 5.4.91
 - Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
