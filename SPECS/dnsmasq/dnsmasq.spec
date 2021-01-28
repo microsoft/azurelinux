@@ -1,7 +1,7 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
-Version:        2.79
-Release:        11%{?dist}
+Version:        2.84
+Release:        1%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
 URL:            http://www.thekelleys.org.uk/dnsmasq/
@@ -9,7 +9,6 @@ Source0:        http://www.thekelleys.org.uk/%{name}/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Patch0:         fix-missing-ioctl-SIOCGSTAMP-add-sockios-header-linux-5.2.patch
-Patch1:         CVE-2019-14834.patch
 
 BuildRequires:  kernel-headers
 
@@ -17,9 +16,7 @@ BuildRequires:  kernel-headers
 Dnsmasq a lightweight, caching DNS proxy with integrated DHCP server.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 make %{?_smp_mflags}
@@ -72,6 +69,11 @@ rm -rf %{buildroot}
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+*   Thu Jan 28 2021 Henry Li <lihl@microsoft.com> 2.83-1
+-   Upgrade to version 2.84
+-   Fix CVE-2020-25683, CVE-2020-25686, CVE-2020-25687
+-   Remove Patch CVE-2019-14834
+-   Use autosetup
 *   Thu Jun 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.79-11
 -   Removing runtime dependency on a specific kernel package.
 *   Thu Jun 11 2020 Christopher Co <chrco@microsoft.com> - 2.79-10

@@ -875,8 +875,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.79",
-          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.79.tar.xz"
+          "version": "2.84",
+          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.84.tar.xz"
         }
       }
     },
