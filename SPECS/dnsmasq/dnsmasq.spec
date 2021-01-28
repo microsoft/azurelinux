@@ -69,7 +69,7 @@ rm -rf %{buildroot}
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
-*   Thu Jan 28 2021 Henry Li <lihl@microsoft.com> 2.83-1
+*   Thu Jan 28 2021 Henry Li <lihl@microsoft.com> 2.84-1
 -   Upgrade to version 2.84
 -   Fix CVE-2020-25683, CVE-2020-25686, CVE-2020-25687
 -   Remove Patch CVE-2019-14834
