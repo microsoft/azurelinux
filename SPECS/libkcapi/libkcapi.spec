@@ -2,20 +2,8 @@
 %global vmajor            1
 %global vminor            2
 %global vpatch            0
-
-# Do we build the replacements packages?
-%bcond_with replace_coreutils
-
-%bcond_without replace_fipscheck
-
-%bcond_without replace_hmaccalc
-
-%bcond_without test_package
-
-
 # This package needs at least Linux Kernel v4.10.0.
 %global min_kernel_ver    4.10.0
-
 # Do we need to tweak sysctl.d? In newer versions of the Linux
 # Kernel the default ancillary buffer size is set high enough.
 # TODO: Adapt this when the patch for net/core/sock.c is merged.
@@ -24,44 +12,13 @@
 %else
 %global with_sysctl_tweak 0
 %endif
-
-%if %{with_sysctl_tweak}
-# Priority for the sysctl.d preset.
-%global sysctl_prio       50
-
-# Value used for the sysctl.d preset.
-%global sysctl_optmem_max 81920
-
-# Extension for the README.distro file.
-%global distroname_ext    %{?fedora:fedora}%{?rhel:redhat}
-%endif
-
 # Lowest limit to run the testsuite.  If we cannot obtain this
 # value, we asume the testsuite cannot be run.
-%global test_optmem_max   %(%{__cat} /proc/sys/net/core/optmem_max || echo 0)
-
+%global test_optmem_max   %(cat /proc/sys/net/core/optmem_max || echo 0)
 # For picking patches from upstream commits or pull requests.
 %global giturl            https://github.com/smuellerDD/%{name}
-
-# Do we replace some coreutils?
-%if %{with replace_coreutils}
-# TODO: Adapt this when replacing some coreutils initially.
-%global coreutils_evr     8.29-1%{?dist}
-%endif
-
-# Do we replace fipscheck?
-%if %{with replace_fipscheck}
-%global fipscheck_evr     1.5.0-9
-%endif
-
-# Do we replace hmaccalc?
-%if %{with replace_hmaccalc}
-%global hmaccalc_evr      0.9.14-10%{?dist}
-%endif
-
 %global apps_hmaccalc sha1hmac sha224hmac sha256hmac sha384hmac sha512hmac
 %global apps_fipscheck sha1sum sha224sum sha256sum sha384sum sha512sum md5sum fipscheck fipshmac
-
 # On old kernels use mock hashers implemented via openssl
 %if %{lua:print(rpm.vercmp(posix.uname('%r'), '3.19'));} >= 0
 %global sha512hmac bin/kcapi-hasher -n sha512hmac
@@ -70,43 +27,66 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global fipshmac   bash %{_sourcedir}/fipshmac-openssl.sh
 %endif
-
 # Add generation of HMAC checksums of the final stripped
 # binaries.  %%define with lazy globbing is used here
 # intentionally, because using %%global does not work.
 %define __spec_install_post                                      \
 %{?__debug_package:%{__debug_install_post}}                      \
 %{__arch_install_post}                                           \
-%{__os_install_post}                                             \
+%__os_install_post                                             \
 bin_path=%{buildroot}%{_bindir}                                  \
 lib_path=%{buildroot}/%{_lib}                                    \
 for app in %{apps_hmaccalc}; do                                  \
   test -e "$bin_path"/$app || continue                           \
-  { %sha512hmac "$bin_path"/$app || exit 1; }                    \\\
+  { %{sha512hmac} "$bin_path"/$app || exit 1; }                    \\\
     | cut -f 1 -d ' ' >"$lib_path"/hmaccalc/$app.hmac            \
 done                                                             \
 for app in %{apps_fipscheck}; do                                 \
   test -e "$bin_path"/$app || continue                           \
-  %fipshmac -d "$lib_path"/fipscheck "$bin_path"/$app || exit 1  \
+  %{fipshmac} -d "$lib_path"/fipscheck "$bin_path"/$app || exit 1  \
 done                                                             \
-%fipshmac -d "$lib_path"/fipscheck                               \\\
+%{fipshmac} -d "$lib_path"/fipscheck                               \\\
   "$lib_path"/libkcapi.so.%{version} || exit 1                   \
-%{__ln_s} libkcapi.so.%{version}.hmac                            \\\
+ln -s libkcapi.so.%{version}.hmac                            \\\
   "$lib_path"/fipscheck/libkcapi.so.%{vmajor}.hmac               \
 %{nil}
-
-
+# Do we build the replacements packages?
+%bcond_with replace_coreutils
+%bcond_without replace_fipscheck
+%bcond_without replace_hmaccalc
+%bcond_without test_package
+%if %{with_sysctl_tweak}
+# Priority for the sysctl.d preset.
+%global sysctl_prio       50
+# Value used for the sysctl.d preset.
+%global sysctl_optmem_max 81920
+# Extension for the README.distro file.
+%global distroname_ext    %{?fedora:fedora}%{?rhel:redhat}
+%endif
+# Do we replace some coreutils?
+%if %{with replace_coreutils}
+# TODO: Adapt this when replacing some coreutils initially.
+%global coreutils_evr     8.29-1%{?dist}
+%endif
+# Do we replace fipscheck?
+%if %{with replace_fipscheck}
+%global fipscheck_evr     1.5.0-9
+%endif
+# Do we replace hmaccalc?
+%if %{with replace_hmaccalc}
+%global hmaccalc_evr      0.9.14-10%{?dist}
+%endif
+Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
 Release:        4%{?dist}
-Summary:        User space interface to the Linux Kernel Crypto API
-
-License:        BSD or GPLv2
+License:        BSD OR GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://www.chronox.de/%{name}.html
 Source0:        http://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
 Source1:        sha512hmac-openssl.sh
 Source2:        fipshmac-openssl.sh
-
 BuildRequires:  bash
 BuildRequires:  clang
 BuildRequires:  coreutils
@@ -118,10 +98,8 @@ BuildRequires:  openssl
 BuildRequires:  perl
 BuildRequires:  systemd
 BuildRequires:  xmlto
-
 # For ownership of %%{_sysctldir}.
 Requires:       systemd
-
 Obsoletes:      %{name}-replacements <= %{version}-%{release}
 
 %description
@@ -138,23 +116,19 @@ kernel crypto API are returned to the consumer via the library API.
 The kernel interface and therefore this library can be used by
 unprivileged processes.
 
-
 %package        devel
 Summary:        Development files for the %{name} package
-Requires:       %{name}%{?_isa} == %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Header files for applications that use %{name}.
 
-
 %if %{with replace_coreutils}
 %package        checksum
 Summary:        Drop-in replacement for *sum utils provided by the %{name} package
-Requires:       %{name}%{?_isa}    == %{version}-%{release}
-
-Requires:       coreutils%{?_isa}  >= %{coreutils_evr}
-
-Conflicts:      coreutils          < %{coreutils_evr}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       coreutils%{?_isa} >= %{coreutils_evr}
+Conflicts:      coreutils < %{coreutils_evr}
 Conflicts:      coreutils-single
 
 %description    checksum
@@ -166,12 +140,10 @@ coreutils) using %{name}.
 %if %{with replace_fipscheck}
 %package        fipscheck
 Summary:        Drop-in replacements for fipscheck/fipshmac provided by the %{name} package
-Requires:       %{name}%{?_isa}   == %{version}-%{release}
-
-Obsoletes:      fipscheck         <= %{fipscheck_evr}
-
-Provides:       fipscheck         == %{fipscheck_evr}.1
-Provides:       fipscheck%{?_isa} == %{fipscheck_evr}.1
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      fipscheck <= %{fipscheck_evr}
+Provides:       fipscheck = %{fipscheck_evr}.1
+Provides:       fipscheck%{?_isa} = %{fipscheck_evr}.1
 
 %description    fipscheck
 Provides drop-in replacements for fipscheck and fipshmac tools (from
@@ -182,12 +154,10 @@ package fipscheck) using %{name}.
 %if %{with replace_hmaccalc}
 %package        hmaccalc
 Summary:        Drop-in replacements for hmaccalc provided by the %{name} package
-Requires:       %{name}%{?_isa}   == %{version}-%{release}
-
-Obsoletes:      hmaccalc          <= %{hmaccalc_evr}
-
-Provides:       hmaccalc          == %{hmaccalc_evr}.1
-Provides:       hmaccalc%{?_isa}  == %{hmaccalc_evr}.1
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      hmaccalc <= %{hmaccalc_evr}
+Provides:       hmaccalc = %{hmaccalc_evr}.1
+Provides:       hmaccalc%{?_isa} = %{hmaccalc_evr}.1
 
 %description    hmaccalc
 Provides drop-in replacements for sha*hmac tools (from package
@@ -197,38 +167,36 @@ hmaccalc) using %{name}.
 
 %package        static
 Summary:        Static library for -static linking with %{name}
-Requires:       %{name}-devel%{?_isa} == %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description    static
 This package contains the %{name} static libraries for -static
 linking.  You don't need this, unless you link statically, which
 is highly discouraged.
 
-
 %package        tools
 Summary:        Utility applications for the %{name} package
-Requires:       %{name}%{?_isa} == %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    tools
 Utility applications that are provided with %{name}.  This includes
 tools to use message digests, symmetric ciphers and random number
 generators implemented in the Linux kernel from command line.
 
-
 %if %{with test_package}
 %package        tests
 Summary:        Testing scripts for the %{name} package
-Requires:       %{name}%{?_isa}       == %{version}-%{release}
-Requires:       %{name}-tools%{?_isa} == %{version}-%{release}
-%if %{with replace_hmaccalc}
-Requires:       %{name}-hmaccalc%{?_isa} == %{version}-%{release}
-%endif
-%if %{with replace_coreutils}
-Requires:       %{name}-checksum%{?_isa} == %{version}-%{release}
-%endif
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-tools%{?_isa} = %{version}-%{release}
 Requires:       coreutils
 Requires:       openssl
 Requires:       perl-interpreter
+%if %{with replace_hmaccalc}
+Requires:       %{name}-hmaccalc%{?_isa} = %{version}-%{release}
+%endif
+%if %{with replace_coreutils}
+Requires:       %{name}-checksum%{?_isa} = %{version}-%{release}
+%endif
 
 %description    tests
 Auxiliary scripts for testing %{name}.
@@ -240,7 +208,7 @@ Auxiliary scripts for testing %{name}.
 
 %if %{with_sysctl_tweak}
 
-%{__cat} << EOF > %{sysctl_prio}-%{name}-optmem_max.conf
+cat << EOF > %{sysctl_prio}-%{name}-optmem_max.conf
 # See the 'README.%{distroname_ext}' file shipped in %%doc
 # with the %{name} package.
 #
@@ -276,28 +244,28 @@ EOF
 %make_install
 
 # Install sysctl.d preset.
-%{__mkdir_p} %{buildroot}%{_sysctldir}
-%{__install} -Dpm 0644 -t %{buildroot}%{_sysctldir} \
+mkdir -p %{buildroot}%{_sysctldir}
+install -Dpm 0644 -t %{buildroot}%{_sysctldir} \
   %{sysctl_prio}-%{name}-optmem_max.conf
 
 
 # Install replacement tools, if enabled.
 %if !%{with replace_coreutils}
-%{__rm} -f                            \
+rm -f                            \
   %{buildroot}%{_bindir}/md5sum       \
   %{buildroot}%{_bindir}/sha*sum
 %endif
 
 %if !%{with replace_fipscheck}
-%{__rm} -f %{buildroot}%{_bindir}/fips*
+rm -f %{buildroot}%{_bindir}/fips*
 %endif
 
 %if !%{with replace_hmaccalc}
-%{__rm} -f %{buildroot}%{_bindir}/sha*hmac
+rm -f %{buildroot}%{_bindir}/sha*hmac
 %endif
 
 # We don't ship autocrap dumplings.
-%{_bindir}/find %{buildroot} -type f -name '*.la' -print -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # HMAC checksums are generated during __spec_install_post.
 %{_bindir}/find %{buildroot} -type f -name '*.hmac' -print -delete
@@ -337,49 +305,46 @@ popd
 %{_sysctldir}/%{sysctl_prio}-%{name}-optmem_max.conf
 %endif
 
-
-%files          devel
+%files devel
 %{_includedir}/kcapi.h
 %{_mandir}/man3/kcapi_*.3.*
 /%{_lib}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
-
 %if %{with replace_coreutils}
-%files          checksum
+%files checksum
 %{_bindir}/md5sum
 %{_bindir}/sha*sum
 /%{_lib}/fipscheck/md5sum.hmac
 /%{_lib}/fipscheck/sha*sum.hmac
-%endifhttps://src.fedoraproject.org/rpms/libkcapi.gitreplace_hmaccalc}
-%files          hmaccalc
+%{endifhttps}://src.fedoraproject.org/rpms/libkcapi.gitreplace_hmaccalc}
+
+%files hmaccalc
 %{_bindir}/sha*hmac
 /%{_lib}/hmaccalc/sha*hmac.hmac
 %endif
 
 %if %{with replace_fipscheck}
-%files          fipscheck
+%files fipscheck
 %{_bindir}/fips*
 /%{_lib}/fipscheck/fips*.hmac
 %endif
-	
+
 %if %{with replace_hmaccalc}
-%files          hmaccalc
+%files hmaccalc
 %{_bindir}/sha*hmac
 /%{_lib}/hmaccalc/sha*hmac.hmac
 %endif
 
-%files          static
+%files static
 /%{_lib}/%{name}.a
 
-
-%files          tools
+%files tools
 %{_bindir}/kcapi*
 %{_mandir}/man1/kcapi*.1.*
 
-
 %if %{with test_package}
-%files          tests
+%files tests
 %{_libexecdir}/%{name}/*
 %endif
 
