@@ -1,7 +1,20 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Docs used to create this script:
 # https://preshing.com/20141119/how-to-build-a-gcc-cross-compiler/
 # https://mdeva2.home.blog/2019/07/08/building-gcc-as-a-cross-compiler-for-raspberry-pi/
 # http://jiadongsun.cc/2019/09/03/Cross_Compile_Gcc/#6-build-glibc
+
+# ====== Prerequisites ======
+# The following packages need to be installed before running this script
+# For Ubuntu/Mariner:
+# gawk rsync bison
+
+# For Mariner, these additional packages need to be installed:
+# make patch texinfo diffutils
+# ====================
+
 
 installDir="/opt/cross"
 buildDir="$HOME/cross"
@@ -21,9 +34,6 @@ wget https://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.xz
 wget https://ftp.gnu.org/gnu/mpfr/mpfr-4.0.1.tar.gz
 wget http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
 wget https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
-
-# Install dependencies
-sudo apt-get install -y gawk rsync bison
 
 # Unzip source tarballs
 for f in *.tar*; do tar xf $f; done
