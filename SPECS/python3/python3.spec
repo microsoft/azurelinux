@@ -120,8 +120,8 @@ The PyPA recommended tool for installing Python packages.
 %package        setuptools
 Summary:        Download, build, install, upgrade, and uninstall Python packages.
 Group:          Development/Tools
-Requires:       python3-xml
 Requires:       python3 = %{version}-%{release}
+Requires:       python3-xml
 BuildArch:      noarch
 
 %description    setuptools
@@ -170,6 +170,7 @@ make  %{?_smp_mflags} test
 
 %clean
 rm -rf %{buildroot}/*
+
 
 
 %files
@@ -261,7 +262,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Fri Jan 29 2021 Nick Samson <nisamson@microsoft.com> 3.7.9-4
+* Fri Jan 29 2021 Nick Samson <nisamson@microsoft.com> - 3.7.9-4
 - Patched CVE-2021-3177 with backported patch. Moved to autosetup.
 
 * Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.9-3
