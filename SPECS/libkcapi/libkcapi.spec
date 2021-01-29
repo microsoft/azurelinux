@@ -83,8 +83,8 @@ Release:        4%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.chronox.de/%{name}.html
-Source0:        http://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
+URL:            https://www.chronox.de/%{name}.html
+Source0:        https://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
 Source1:        sha512hmac-openssl.sh
 Source2:        fipshmac-openssl.sh
 BuildRequires:  bash
