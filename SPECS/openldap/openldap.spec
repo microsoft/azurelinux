@@ -1,8 +1,8 @@
 %global _default_patch_fuzz 2
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
-Version:        2.4.50
-Release:        3%{?dist}
+Version:        2.4.57
+Release:        1%{?dist}
 License:        OpenLDAP
 URL:            https://www.openldap.org/
 Group:          System Environment/Security
@@ -14,7 +14,6 @@ Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-r
 Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
-Patch3:         CVE-2020-25692.patch
 Requires:       openssl >= 1.0.1, cyrus-sasl >= 2.1
 BuildRequires:  cyrus-sasl >= 2.1
 BuildRequires:  openssl-devel >= 1.0.1
@@ -77,9 +76,13 @@ rm -rf %{buildroot}/*
 /etc/openldap/*
 
 %changelog
-* Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 2.4.50-3
-- Patch CVE-2020-25692.
-
+*   Fri Jan 29 2021 Henry Li <lihl@microsoft.com> - 2.4.57-1
+-   Upgrade to version 2.4.57
+-   Resolve CVE-2020-36221, CVE-2020-36222, CVE-2020-36223, CVE-2020-36224, CVE-2020-36225
+-   Update openldap-2.4.44-consolidated-2.patch
+-   Remove patch CVE-2020-25962 because the change is included in the newer version
+*   Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 2.4.50-3
+-   Patch CVE-2020-25692.
 *   Mon Oct 26 2020 Henry Li <lihl@microsoft.com> 2.4.50-2
 -   Used autosetup.
 -   Added patch to resolve CVE-2015-3276.
