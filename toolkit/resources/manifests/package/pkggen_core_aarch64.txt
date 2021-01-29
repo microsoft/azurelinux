@@ -196,13 +196,13 @@ tdnf-cli-libs-2.1.0-4.cm1.aarch64.rpm
 tdnf-devel-2.1.0-4.cm1.aarch64.rpm
 tdnf-plugin-repogpgcheck-2.1.0-4.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
-libxml2-2.9.10-4.cm1.aarch64.rpm
-libxml2-devel-2.9.10-4.cm1.aarch64.rpm
+libxml2-2.9.10-5.cm1.aarch64.rpm
+libxml2-devel-2.9.10-5.cm1.aarch64.rpm
 glib-2.58.0-10.cm1.aarch64.rpm
 libltdl-2.4.6-6.cm1.aarch64.rpm
 libltdl-devel-2.4.6-6.cm1.aarch64.rpm
 pcre-libs-8.42-4.cm1.aarch64.rpm
-krb5-1.17-3.cm1.aarch64.rpm
+krb5-1.17-4.cm1.aarch64.rpm
 lua-5.3.5-11.cm1.aarch64.rpm
 lua-libs-5.3.5-11.cm1.aarch64.rpm
 mariner-rpm-macros-1.0-12.cm1.noarch.rpm
