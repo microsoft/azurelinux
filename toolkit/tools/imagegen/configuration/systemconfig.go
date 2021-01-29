@@ -68,6 +68,9 @@ func (s *SystemConfig) IsValid() (err error) {
 		if _, ok := s.KernelOptions["default"]; !ok {
 			return fmt.Errorf("system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]")
 		}
+	}
+	// A rootfs MAY include a kernel (ISO), so run the full checks even if this is a rootfs
+	if len(s.KernelOptions) != 0 {
 		// Ensure that non-comment options are not blank
 		for name, kernelName := range s.KernelOptions {
 			// Skip comments

@@ -123,14 +123,15 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		extraMountPoints = append(extraMountPoints, additionalExtraMountPoints...)
 		isOfflineInstall = true
 
-		// Select the best kernel package for this environment
+		// Select the best kernel package for this environment.
 		kernelPkg, err = installutils.SelectKernelPackage(systemConfig, *liveInstallFlag)
+		// Rootfs images will usually not set a kernel, ignore errors
 		if err != nil {
-			logger.Log.Errorf("Failed to select a suitable kernel to install in config (%s)", systemConfig.Name)
-			return err
+			logger.Log.Debugf("Rootfs did not find a kernel, this is normal: '%s'", err.Error())
+		} else {
+			logger.Log.Infof("Rootfs is including a kernel (%s)", kernelPkg)
+			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 		}
-		logger.Log.Infof("Selected (%s) for the kernel", kernelPkg)
-		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 	} else {
 		logger.Log.Info("Creating raw disk in build directory")
 		diskConfig := disks[defaultDiskIndex]

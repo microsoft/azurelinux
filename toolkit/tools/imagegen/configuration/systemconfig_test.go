@@ -108,6 +108,24 @@ func TestShouldSucceedParsingMissingDefaultKernelForRootfs_SystemConfig(t *testi
 	assert.Equal(t, rootfsNoKernelConfig, checkedSystemConfig)
 }
 
+func TestShouldFailParsingInvalidKernelForRootfs_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	rootfsInvalidKernelConfig := validSystemConfig
+	rootfsInvalidKernelConfig.KernelOptions = map[string]string{"_comment": "trick the check", "extra": ""}
+	rootfsInvalidKernelConfig.PartitionSettings = []PartitionSetting{}
+
+	rootfsInvalidKernelConfig.Encryption = RootEncryption{}
+
+	err := rootfsInvalidKernelConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+
+	err = remarshalJSON(rootfsInvalidKernelConfig, &checkedSystemConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+}
+
 func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 

@@ -130,7 +130,9 @@ Removing the RPM database may break any package managers inside the image.
 
 KernelOptions key consists of a map of key-value pairs, where a key is an identifier and a value is a name of the package (kernel) used in a scenario described by the identifier. During the build time, all kernels provided in KernelOptions will be built.
 
-KernelOptions is mandatory for all image types except for rootfs.
+KernelOptions is mandatory for all non-`rootfs` image types.
+
+KernelOptions may be included in `rootfs` images which expect a kernel, such as the initrd for an ISO, if desired.
 
 Currently there are only two keys with an assigned meaning:
 - `default` key needs to be always provided. It designates a kernel that is used when no other scenario is applicable (i.e. by default).
