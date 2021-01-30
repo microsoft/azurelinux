@@ -440,11 +440,12 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		default:
 			return partDevPath, fmt.Errorf("Partition %v - Unknown partition flag: %v", partitionNumber, flag)
 		}
-
-		args = append(args, flagToSet, "on")
-		_, stderr, err := shell.Execute("parted", args...)
-		if err != nil {
-			logger.Log.Warnf("Failed to set flag (%s) using parted: %v", flagToSet, stderr)
+		if flagToSet != "" {
+			args = append(args, flagToSet, "on")
+			_, stderr, err := shell.Execute("parted", args...)
+			if err != nil {
+				logger.Log.Warnf("Failed to set flag (%s) using parted: %v", flagToSet, stderr)
+			}
 		}
 	}
 
