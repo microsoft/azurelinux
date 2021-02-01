@@ -35,7 +35,7 @@ var (
 	}
 	invalidUserNoPassword = []User{
 		{
-			Name:     "badUser",
+			Name: "badUser",
 		},
 	}
 )
