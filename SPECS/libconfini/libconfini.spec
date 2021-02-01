@@ -4,7 +4,7 @@ Version:        1.16.0
 Release:        1%{?dist}
 License:        GPLv3
 URL:            https://madmurphy.github.io/libconfini/html/index.html
-#Source0:       https://github.com/madmurphy/libconfini/archive/%{name}-%{version}.tar.gz
+#Source0:       https://github.com/madmurphy/libconfini/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
