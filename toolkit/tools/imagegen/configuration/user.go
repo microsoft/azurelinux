@@ -51,6 +51,10 @@ func (p *User) IsValid() (err error) {
 	if err != nil {
 		return
 	}
+	err = p.PasswordIsValid()
+	if err != nil {
+		return
+	}
 	err = p.PasswordExpiresDaysIsValid()
 	if err != nil {
 		return
@@ -83,6 +87,16 @@ func (p *User) UIDIsValid() (err error) {
 		if uidNum < uidLowerBound || uidNum > uidUpperBound {
 			return fmt.Errorf("invalid value for UID (%s), not within [%d, %d]", p.UID, uidLowerBound, uidUpperBound)
 		}
+	}
+	return
+}
+
+// This function does not account for the Password key being intentionally
+// unspecified versus set to blank
+// PasswordIsValid returns an error if the User password is empty
+func (p *User) PasswordIsValid() (err error) {
+	if p.Password == "" && p.Name != "root"{
+		return fmt.Errorf("invalid value for Password (%s)", p.Password)
 	}
 	return
 }

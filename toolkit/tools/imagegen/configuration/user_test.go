@@ -101,6 +101,39 @@ func TestShouldFailParsingInvalidUIDUpperBound_User(t *testing.T) {
 	assert.Equal(t, "failed to parse [User]: invalid value for UID (60001), not within [0, 60000]", err.Error())
 }
 
+// TestShouldFailParsingInvalidPassword
+// validates that empty password fails if not root
+func TestShouldFailParsingInvalidPassword(t *testing.T) {
+	var checkedUser User
+	testUser := validUsers[1]
+	testUser.Password = ""
+	err := testUser.PasswordIsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for Password ()", err.Error())
+
+	err = testUser.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for Password ()", err.Error())
+
+	err = remarshalJSON(testUser, &checkedUser)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [User]: invalid value for Password ()", err.Error())
+}
+
+// TestShouldFailParsingInvalidPassword
+// validates that empty password fails if not root
+func TestShouldPassParsingRootPassword(t *testing.T) {
+	var checkedUser User
+	testUser := validUsers[1]
+	testUser.Name = "root"
+	testUser.Password = ""
+	err := testUser.PasswordIsValid()
+    assert.NoError(t, err)
+
+	err = remarshalJSON(testUser, &checkedUser)
+	assert.NoError(t, err)
+}
+
 // TestShouldFailParsingInvalidPasswordExpiresDays
 // validates that -2 fails IsValid as it is outside bounds
 func TestShouldFailParsingInvalidPasswordExpiresDaysLowerBound_User(t *testing.T) {
