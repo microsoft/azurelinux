@@ -173,8 +173,9 @@ rm -rf -- $RPM_BUILD_ROOT
 %dir /var/lib/dracut/overlay
 
 %changelog
-*   Mon Jan 18 2021 Nicolas Ontiveros <niontive@microsoft.com> 049-3
--   Add dracut-fips and package
+*   Mon Feb 01 2021 Nicolas Ontiveros <niontive@microsoft.com> 049-3
+-   Add dracut-fips package.
+-   Disable kernel crypto testing in dracut-fips.
 *   Wed Apr 08 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-2
 -   Remove toybox from requires.
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1

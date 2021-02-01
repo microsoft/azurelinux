@@ -1,0 +1,25 @@
+--- a/modules.d/01fips/module-setup.sh
++++ b/modules.d/01fips/module-setup.sh
+@@ -36,7 +36,7 @@
+         _fipsmodules+="ansi_cprng "
+
+         # Misc:
+-        _fipsmodules+="aead cryptomgr tcrypt crypto_user "
++        _fipsmodules+="aead cryptomgr crypto_user "
+     fi
+
+     mkdir -m 0755 -p "${initdir}/etc/modprobe.d"
+
+--- a/modules.d/01fips/fips.sh
++++ b/modules.d/01fips/fips.sh
+@@ -99,10 +99,6 @@
+     done
+     mv /etc/modprobe.d/fips.conf.bak /etc/modprobe.d/fips.conf
+
+-    info "Self testing crypto algorithms"
+-    modprobe tcrypt || return 1
+-    rmmod tcrypt
+-
+     info "Checking integrity of kernel"
+     if [ -e "/run/initramfs/live/vmlinuz0" ]; then
+         do_rhevh_check /run/initramfs/live/vmlinuz0 || return 1
