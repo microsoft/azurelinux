@@ -128,7 +128,7 @@ func TestShouldPassParsingRootPassword(t *testing.T) {
 	testUser.Name = "root"
 	testUser.Password = ""
 	err := testUser.PasswordIsValid()
-    assert.NoError(t, err)
+	assert.NoError(t, err)
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.NoError(t, err)

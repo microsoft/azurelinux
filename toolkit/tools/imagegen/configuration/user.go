@@ -95,7 +95,7 @@ func (p *User) UIDIsValid() (err error) {
 // unspecified versus set to blank
 // PasswordIsValid returns an error if the User password is empty
 func (p *User) PasswordIsValid() (err error) {
-	if p.Password == "" && p.Name != "root"{
+	if p.Password == "" && p.Name != "root" {
 		return fmt.Errorf("invalid value for Password (%s)", p.Password)
 	}
 	return
