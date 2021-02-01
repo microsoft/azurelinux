@@ -92,9 +92,7 @@ func (p *User) UIDIsValid() (err error) {
 }
 
 // PasswordIsValid returns an error if the User password is empty
-// Root password being blank is acceptable
-// This function does not account for the Password key being intentionally
-// unspecified versus set to blank
+// Root password being blank is acceptable to disable the root login.
 func (p *User) PasswordIsValid() (err error) {
 	if p.Password == "" && p.Name != "root" {
 		return fmt.Errorf("invalid value for Password (empty)")
