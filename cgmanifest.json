@@ -2896,8 +2896,8 @@
         "type": "other",
         "other": {
           "name": "libyaml",
-          "version": "0.2.1",
-          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.1.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
         }
       }
     },

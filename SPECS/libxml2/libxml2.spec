@@ -3,7 +3,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ Summary:        Python 3 bindings for libxml2.
 Group:          Development/Libraries
 Requires:       %{name} = %{version}
 Requires:       python3
+Provides:       %{name}-python3 = %{version}-%{release}
 
 %description -n python3-libxml2
 Python3 libxml2.
@@ -107,6 +108,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-5
+- Provide libxml2-python3.
+
 * Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-4
 - Provide libxml-tools and libxml2-tools.
 
