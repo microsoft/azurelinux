@@ -50,11 +50,6 @@ done                                                             \
 ln -s libkcapi.so.%{version}.hmac                            \\\
   "$lib_path"/fipscheck/libkcapi.so.%{vmajor}.hmac               \
 %{nil}
-# Do we build the replacements packages?
-%bcond_with replace_coreutils
-%bcond_without replace_fipscheck
-%bcond_without replace_hmaccalc
-%bcond_without test_package
 %if %{with_sysctl_tweak}
 # Priority for the sysctl.d preset.
 %global sysctl_prio       50
@@ -63,19 +58,8 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 # Extension for the README.distro file.
 %global distroname_ext    %{?fedora:fedora}%{?rhel:redhat}
 %endif
-# Do we replace some coreutils?
-%if %{with replace_coreutils}
-# TODO: Adapt this when replacing some coreutils initially.
-%global coreutils_evr     8.29-1%{?dist}
-%endif
-# Do we replace fipscheck?
-%if %{with replace_fipscheck}
 %global fipscheck_evr     1.5.0-9
-%endif
-# Do we replace hmaccalc?
-%if %{with replace_hmaccalc}
 %global hmaccalc_evr      0.9.14-10%{?dist}
-%endif
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
@@ -123,21 +107,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 Header files for applications that use %{name}.
 
-%if %{with replace_coreutils}
-%package        checksum
-Summary:        Drop-in replacement for *sum utils provided by the %{name} package
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       coreutils%{?_isa} >= %{coreutils_evr}
-Conflicts:      coreutils < %{coreutils_evr}
-Conflicts:      coreutils-single
 
-%description    checksum
-Provides drop-in replacements for sha*sum tools (from package
-coreutils) using %{name}.
-%endif
-
-
-%if %{with replace_fipscheck}
 %package        fipscheck
 Summary:        Drop-in replacements for fipscheck/fipshmac provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -148,10 +118,8 @@ Provides:       fipscheck%{?_isa} = %{fipscheck_evr}.1
 %description    fipscheck
 Provides drop-in replacements for fipscheck and fipshmac tools (from
 package fipscheck) using %{name}.
-%endif
 
 
-%if %{with replace_hmaccalc}
 %package        hmaccalc
 Summary:        Drop-in replacements for hmaccalc provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -162,7 +130,6 @@ Provides:       hmaccalc%{?_isa} = %{hmaccalc_evr}.1
 %description    hmaccalc
 Provides drop-in replacements for sha*hmac tools (from package
 hmaccalc) using %{name}.
-%endif
 
 
 %package        static
@@ -183,7 +150,6 @@ Utility applications that are provided with %{name}.  This includes
 tools to use message digests, symmetric ciphers and random number
 generators implemented in the Linux kernel from command line.
 
-%if %{with test_package}
 %package        tests
 Summary:        Testing scripts for the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -191,16 +157,10 @@ Requires:       %{name}-tools%{?_isa} = %{version}-%{release}
 Requires:       coreutils
 Requires:       openssl
 Requires:       perl-interpreter
-%if %{with replace_hmaccalc}
 Requires:       %{name}-hmaccalc%{?_isa} = %{version}-%{release}
-%endif
-%if %{with replace_coreutils}
-Requires:       %{name}-checksum%{?_isa} = %{version}-%{release}
-%endif
 
 %description    tests
 Auxiliary scripts for testing %{name}.
-%endif
 
 
 %prep
@@ -249,20 +209,9 @@ install -Dpm 0644 -t %{buildroot}%{_sysctldir} \
   %{sysctl_prio}-%{name}-optmem_max.conf
 
 
-# Install replacement tools, if enabled.
-%if !%{with replace_coreutils}
 rm -f                            \
   %{buildroot}%{_bindir}/md5sum       \
   %{buildroot}%{_bindir}/sha*sum
-%endif
-
-%if !%{with replace_fipscheck}
-rm -f %{buildroot}%{_bindir}/fips*
-%endif
-
-%if !%{with replace_hmaccalc}
-rm -f %{buildroot}%{_bindir}/sha*hmac
-%endif
 
 # We don't ship autocrap dumplings.
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -292,7 +241,8 @@ popd
 %endif
 
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 
 %files
@@ -311,30 +261,17 @@ popd
 /%{_lib}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
-%if %{with replace_coreutils}
-%files checksum
-%{_bindir}/md5sum
-%{_bindir}/sha*sum
-/%{_lib}/fipscheck/md5sum.hmac
-/%{_lib}/fipscheck/sha*sum.hmac
-%{endifhttps}://src.fedoraproject.org/rpms/libkcapi.gitreplace_hmaccalc}
-
 %files hmaccalc
 %{_bindir}/sha*hmac
 /%{_lib}/hmaccalc/sha*hmac.hmac
-%endif
 
-%if %{with replace_fipscheck}
 %files fipscheck
 %{_bindir}/fips*
 /%{_lib}/fipscheck/fips*.hmac
-%endif
 
-%if %{with replace_hmaccalc}
 %files hmaccalc
 %{_bindir}/sha*hmac
 /%{_lib}/hmaccalc/sha*hmac.hmac
-%endif
 
 %files static
 /%{_lib}/%{name}.a
@@ -343,15 +280,14 @@ popd
 %{_bindir}/kcapi*
 %{_mandir}/man1/kcapi*.1.*
 
-%if %{with test_package}
 %files tests
 %{_libexecdir}/%{name}/*
-%endif
 
 
 %changelog
 * Tue Jan 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-4
-- Initiali CBL-Mariner import from Fedora 33.
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- License verified.
 
 * Fri Aug 14 2020 Ondrej Mosnáček <omosnace@redhat.com> - 1.2.0-3
 - Require perl-interpreter instead of full perl
