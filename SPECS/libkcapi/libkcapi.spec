@@ -50,6 +50,8 @@ done                                                             \
 ln -s libkcapi.so.%{version}.hmac                            \\\
   "$lib_path"/fipscheck/libkcapi.so.%{vmajor}.hmac               \
 %{nil}
+%global fipscheck_evr     1.5.0-9
+%global hmaccalc_evr      0.9.14-10%{?dist}
 %if %{with_sysctl_tweak}
 # Priority for the sysctl.d preset.
 %global sysctl_prio       50
@@ -58,8 +60,6 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 # Extension for the README.distro file.
 %global distroname_ext    %{?fedora:fedora}%{?rhel:redhat}
 %endif
-%global fipscheck_evr     1.5.0-9
-%global hmaccalc_evr      0.9.14-10%{?dist}
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
@@ -107,7 +107,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 Header files for applications that use %{name}.
 
-
 %package        fipscheck
 Summary:        Drop-in replacements for fipscheck/fipshmac provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -119,7 +118,6 @@ Provides:       fipscheck%{?_isa} = %{fipscheck_evr}.1
 Provides drop-in replacements for fipscheck and fipshmac tools (from
 package fipscheck) using %{name}.
 
-
 %package        hmaccalc
 Summary:        Drop-in replacements for hmaccalc provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -130,7 +128,6 @@ Provides:       hmaccalc%{?_isa} = %{hmaccalc_evr}.1
 %description    hmaccalc
 Provides drop-in replacements for sha*hmac tools (from package
 hmaccalc) using %{name}.
-
 
 %package        static
 Summary:        Static library for -static linking with %{name}
@@ -153,15 +150,14 @@ generators implemented in the Linux kernel from command line.
 %package        tests
 Summary:        Testing scripts for the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-hmaccalc%{?_isa} = %{version}-%{release}
 Requires:       %{name}-tools%{?_isa} = %{version}-%{release}
 Requires:       coreutils
 Requires:       openssl
 Requires:       perl-interpreter
-Requires:       %{name}-hmaccalc%{?_isa} = %{version}-%{release}
 
 %description    tests
 Auxiliary scripts for testing %{name}.
-
 
 %prep
 %autosetup -p 1 -S git
@@ -244,7 +240,6 @@ popd
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-
 %files
 %license COPYING*
 /%{_lib}/%{name}.so.%{vmajor}
@@ -282,7 +277,6 @@ popd
 
 %files tests
 %{_libexecdir}/%{name}/*
-
 
 %changelog
 * Tue Jan 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-4
