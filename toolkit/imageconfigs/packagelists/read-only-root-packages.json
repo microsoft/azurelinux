@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "verity-read-only-root"
+    ],
+    "_comment": "Add 'verity-read-only-root-debug-tools' for additional debugging options"
+}
