@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.3.25
-Release:        2%{?dist}
+Version:        3.4.3
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/etcd-io/etcd/
 Group:          System Environment/Security
@@ -27,11 +27,11 @@ A highly-available key value store for shared configuration and service discover
 export GO111MODULE=off
 
 %define OUR_GOPATH %{_topdir}/.gopath
-mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos"
+mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io"
 export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
 
 ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
-ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/github.com/coreos/etcd"
+ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
 
 ./build
 
@@ -55,7 +55,7 @@ install -vdm755 %{buildroot}/lib/systemd/system-preset
 echo "disable etcd.service" > %{buildroot}/lib/systemd/system-preset/50-etcd.preset
 
 cp %{SOURCE1} %{buildroot}/lib/systemd/system
-install -vdm755 %{buildroot}/var/lib/etcd
+install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %post   -p /sbin/ldconfig
 
@@ -70,10 +70,12 @@ rm -rf %{buildroot}/*
 /%{_docdir}/%{name}-%{version}/*
 /lib/systemd/system/etcd.service
 /lib/systemd/system-preset/50-etcd.preset
-%dir /var/lib/etcd
+%dir %{_sharedstatedir}/etcd
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog
+*   Mon Jan 25 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.3-1
+-   Update to version 3.4.3.
 *   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 3.3.25-2
 -   Increment release to force republishing using golang 1.15.
 *   Thu Sep 03 2020 Joe Schmitt <joschmit@microsoft.com> 3.3.25-1

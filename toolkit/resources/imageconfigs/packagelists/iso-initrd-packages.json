@@ -2,6 +2,7 @@
     "packages": [
         "pam",
         "attr",
+        "awk",
         "bash",
         "bzip2",
         "calamares",
@@ -37,7 +38,6 @@
         "libgcc",
         "libstdc++",
         "lvm2",
-        "kernel",
         "lua",
         "ncurses",
         "ncurses-term",
@@ -60,6 +60,7 @@
         "tdnf",
         "usbutils",
         "util-linux",
+        "veritysetup",
         "vim",
         "words",
         "xz",
