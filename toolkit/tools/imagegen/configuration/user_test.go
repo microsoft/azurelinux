@@ -109,15 +109,15 @@ func TestShouldFailParsingInvalidPassword(t *testing.T) {
 	testUser.Password = ""
 	err := testUser.PasswordIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for Password ()", err.Error())
+	assert.Equal(t, "invalid value for Password (empty)", err.Error())
 
 	err = testUser.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for Password ()", err.Error())
+	assert.Equal(t, "invalid value for Password (empty)", err.Error())
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [User]: invalid value for Password ()", err.Error())
+	assert.Equal(t, "failed to parse [User]: invalid value for Password (empty)", err.Error())
 }
 
 // TestShouldFailParsingInvalidPassword

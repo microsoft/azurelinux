@@ -172,12 +172,12 @@ The image generated has users matching the values specified in Users.
 
 The table below are the keys for the users.
 
-|Key                |Type               |Restrictions
+Key                 |Type               |Restrictions
 --------------------|:------------------|:------------------------------------------------
 |Name               |string             |Cannot be empty
 |UID                |string             |Must be in range 0-60000
 |PasswordHashed     |bool               |
-|Password           |string             |
+|Password           |string             |Cannot be empty unless root
 |PasswordExpiresDays|number             |Must be in range 0-99999 or -1 for no expiration
 |SSHPubKeyPaths     |array of strings   |
 |PrimaryGroup       |string             |
