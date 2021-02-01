@@ -55,7 +55,7 @@ install -vdm755 %{buildroot}/lib/systemd/system-preset
 echo "disable etcd.service" > %{buildroot}/lib/systemd/system-preset/50-etcd.preset
 
 cp %{SOURCE1} %{buildroot}/lib/systemd/system
-install -vdm755 %{buildroot}/var/lib/etcd
+install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %post   -p /sbin/ldconfig
 
@@ -70,7 +70,7 @@ rm -rf %{buildroot}/*
 /%{_docdir}/%{name}-%{version}/*
 /lib/systemd/system/etcd.service
 /lib/systemd/system-preset/50-etcd.preset
-%dir /var/lib/etcd
+%dir %{_sharedstatedir}/etcd
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog

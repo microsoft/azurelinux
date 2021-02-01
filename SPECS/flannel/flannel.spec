@@ -21,8 +21,7 @@ BuildRequires:  golang >= 1.10.3
 Flannel is a simple and easy way to configure a layer 3 network fabric designed for Kubernetes.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 # move sources where make expect them to be (see flannel building.md)
