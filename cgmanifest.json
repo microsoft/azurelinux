@@ -1685,8 +1685,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.12.1",
+          "downloadUrl": "https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.4.91.tar.gz"
         }
       }
     },
@@ -1995,8 +1995,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.12.1",
+          "downloadUrl": "https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.4.91.tar.gz"
         }
       }
     },
@@ -2005,8 +2005,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.12.1",
+          "downloadUrl": "https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.4.91.tar.gz"
         }
       }
     },
@@ -2015,8 +2015,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.12.1",
+          "downloadUrl": "https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.4.91.tar.gz"
         }
       }
     },

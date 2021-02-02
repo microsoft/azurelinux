@@ -57,14 +57,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.4.91 API Headers
-tar xf linux-msft-5.4.91.tar.gz
-pushd WSL2-Linux-Kernel-linux-msft-5.4.91
+echo Linux-5.10.12.1 API Headers
+tar xf 5.10.12.1.tar.gz
+pushd mariner-linux-kernel-rolling-lts-mariner-5.10.12.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf WSL2-Linux-Kernel-linux-msft-5.4.91
+rm -rf mariner-linux-kernel-rolling-lts-mariner-5.10.12.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02

@@ -2,14 +2,14 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.91
-Release:        3%{?dist}
+Version:        5.10.12.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/mariner-linux-kernel
+Source0:        https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 # Arm64 HyperV support required patch
@@ -217,7 +217,7 @@ Group:          System Environment/Kernel
 This package contains common device tree blobs (dtb)
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n mariner-linux-kernel-rolling-lts-mariner-%{version}
 
 %ifarch aarch64
 %patch0 -p1
@@ -456,6 +456,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
+- Update source to 5.10.12.1
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add configs for userspace crypto support
 - HMAC calc the kernel for FIPS

@@ -2,13 +2,13 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
-Version:        5.4.91
-Release:        3%{?dist}
+Version:        5.10.12.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
+URL:            https://github.com/microsoft/mariner-linux-kernel
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.
 # An important consequence is that when making a change to this package, the
@@ -82,6 +82,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
+- Update source to 5.10.12.1
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add hmac files for FIPS
 
