@@ -59,4 +59,4 @@ rm -rf %{gopath_flannel_folder}/*
 
 %changelog
 * Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 0.12.0-1
-- Initial version
+- Original version for CBL-Mariner.
