@@ -317,4 +317,4 @@ fi
 - Switched to ecpacr.
 
 * Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.17.3-hotfix.20200408
-- Initial version of K8s 1.17.3-hotfix.20200408.
+- Original version for CBL-Mariner of K8s 1.17.3-hotfix.20200408.

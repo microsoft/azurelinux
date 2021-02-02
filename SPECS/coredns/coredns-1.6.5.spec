@@ -46,4 +46,4 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.5-1
-- Initial version
+- Original version for CBL-Mariner.
