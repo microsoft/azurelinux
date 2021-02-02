@@ -12,9 +12,6 @@ URL:            https://github.com/microsoft/mariner-linux-kernel
 Source0:        https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-# Arm64 HyperV support required patch
-Patch0:         ver5_4_72_arm64_hyperv_support.patch
-Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -218,12 +215,6 @@ This package contains common device tree blobs (dtb)
 
 %prep
 %setup -q -n mariner-linux-kernel-rolling-lts-mariner-%{version}
-
-%ifarch aarch64
-%patch0 -p1
-%endif
-
-%patch1 -p1
 
 %build
 make mrproper
@@ -458,6 +449,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
 - Update source to 5.10.12.1
+- Remove patch to publish efi tpm event log on ARM. Present in updated source.
+- Remove patch for arm64 hyperv support. Present in updated source.
 
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add configs for userspace crypto support
