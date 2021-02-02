@@ -4174,6 +4174,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pigz",
+          "version": "2.5",
+          "downloadUrl": "https://www.zlib.net/pigz/pigz-2.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pinentry",
           "version": "1.1.0",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.1.0.tar.bz2"
