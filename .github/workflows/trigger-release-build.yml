@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == 'true' }}
+    if: ${{ (github.event_name == 'pull_request') && (github.event.pull_request.merged == 'true') && startsWith(github.event.pull_request.title, 'Automated Mariner Release') }}
     steps:
       - name: Azure Pipelines Action
         uses: Azure/pipelines@v1
