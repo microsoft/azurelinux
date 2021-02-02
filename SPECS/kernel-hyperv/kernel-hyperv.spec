@@ -1,5 +1,5 @@
 %global security_hardening none
-%define uname_r %{version}-%{release}
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.12.1
@@ -23,6 +23,7 @@ BuildRequires:  libmspack-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
