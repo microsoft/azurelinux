@@ -208,6 +208,17 @@ for i in libcrypto.pc libssl.pc openssl.pc ; do
   sed -i '/^Libs.private:/{s/-L[^ ]* //;s/-Wl[^ ]* //}' $i
 done
 
+# Add generation of HMAC checksum of the final stripped library
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    crypto/fips/fips_standalone_hmac $RPM_BUILD_ROOT%{_libdir}/libcrypto.so.%{version} >$RPM_BUILD_ROOT%{_libdir}/.libcrypto.so.%{version}.hmac \
+    ln -sf .libcrypto.so.%{version}.hmac $RPM_BUILD_ROOT%{_libdir}/.libcrypto.so.%{soversion}.hmac \
+    crypto/fips/fips_standalone_hmac $RPM_BUILD_ROOT%{_libdir}/libssl.so.%{version} >$RPM_BUILD_ROOT%{_libdir}/.libssl.so.%{version}.hmac \
+    ln -sf .libssl.so.%{version}.hmac $RPM_BUILD_ROOT%{_libdir}/.libssl.so.%{soversion}.hmac \
+%{nil}
+
 %check
 make test
 
@@ -279,6 +290,8 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
 %attr(0755,root,root) %{_libdir}/*.so*
 %attr(0755,root,root) %{_libdir}/engines-%{soversion}
+%attr(0644,root,root) %{_libdir}/.libcrypto.so.*.hmac
+%attr(0644,root,root) %{_libdir}/.libssl.so.*.hmac
 
 %files devel
 %doc CHANGES doc/dir-locals.example.el doc/openssl-c-indent.el
