@@ -354,6 +354,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blobfuse",
+          "version": "1.3.6",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bond",
           "version": "8.0.1",
           "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
@@ -627,6 +637,16 @@
           "name": "cni",
           "version": "0.7.5",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "conntrack-tools",
+          "version": "1.4.5",
+          "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
         }
       }
     },
@@ -3544,6 +3564,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nmap",
+          "version": "7.90",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.90.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs",
           "version": "8.11.4",
           "downloadUrl": "https://nodejs.org/download/release/v8.11.4/node-v8.11.4.tar.xz"
@@ -4167,6 +4197,16 @@
           "name": "pgbouncer",
           "version": "1.11.0",
           "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.11.0/pgbouncer-1.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pigz",
+          "version": "2.5",
+          "downloadUrl": "https://www.zlib.net/pigz/pigz-2.5.tar.gz"
         }
       }
     },
