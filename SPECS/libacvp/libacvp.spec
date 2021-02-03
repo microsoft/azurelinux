@@ -29,7 +29,6 @@ A library that implements the client-side of the ACVP protocol.
 %build
 ./configure \
     --prefix=%{_prefix} \
-    --with-ssl-dir=/usr \
     --enable-offline \
     CFLAGS="-pthread" \
     LIBS="-ldl"
