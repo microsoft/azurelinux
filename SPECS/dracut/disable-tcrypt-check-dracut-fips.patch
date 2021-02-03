@@ -41,3 +41,4 @@ index 03da6861..958e07ed 100755
      info "Checking integrity of kernel"
      if [ -e "/run/initramfs/live/vmlinuz0" ]; then
          do_rhevh_check /run/initramfs/live/vmlinuz0 || return 1
+ 
