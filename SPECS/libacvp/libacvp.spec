@@ -16,8 +16,9 @@ BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
-BuildRequires:  openssl-libs
+BuildRequires:  openssl-static
 
+Requires:       openssl-devel
 Requires:       openssl-libs
 
 %description
@@ -29,10 +30,12 @@ A library that implements the client-side of the ACVP protocol.
 %build
 ./configure \
     --prefix=%{_prefix} \
-    --disable-app \
-    --enable-offline
+    --with-ssl-dir=/usr \
+    --enable-offline \
+    CFLAGS="-pthread" \
+    LIBS="-ldl"
 make clean
-make
+make CC=gcc
 
 %install
 make install DESTDIR=%{buildroot}
@@ -46,6 +49,7 @@ rm -rf %{buildroot}/*
 %{_datadir}/README.md
 %{_libdir}/libacvp.a
 %{_includedir}/acvp/*
+%{_bindir}/acvp_app
 
 %changelog
 * Fri Jan 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
