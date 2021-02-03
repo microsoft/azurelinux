@@ -1,14 +1,14 @@
-Summary:	initramfs
-Name:		initramfs
-Version:	2.0
-Release:        6%{?dist}
-Source0:	fscks.conf
-License:	Apache License
-Group:		System Environment/Base
+Summary:        initramfs
+Name:           initramfs
+Version:        2.0
+Release:        7%{?dist}
+License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Provides:	initramfs
-Requires:	dracut
+Group:          System Environment/Base
+Source0:        fscks.conf
+Requires:       dracut
+Provides:       initramfs
 
 %description
 This package provides the configuration files for initrd generation.
@@ -19,7 +19,7 @@ install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -127,32 +127,48 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
-*   Thu Oct 01 2020 Chris Co <chrco@microsoft.com> 2.0-6
--   Update file-triggered initrd generation to workaround kdump initrd limitations
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Aug 27 2018 Dheeraj Shetty <dheerajs@vmware.com> 2.0-4
--   Remove watching ostree
-*   Thu Jul 27 2017 Bo Gan <ganb@vmware.com> 2.0-3
--   Move all states to one directory
-*   Fri May 26 2017 Bo Gan <ganb@vmware.com> 2.0-2
--   Discard stdin before dracut
-*   Wed Apr 12 2017 Bo Gan <ganb@vmware.com> 2.0-1
--   Made initrd generation dynamic, triggers for systemd, e2fs-progs
-*   Wed Nov 30 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-7
--   Expand uname -r to have release number
-*   Wed Nov 23 2016 Anish Swaminathan <anishs@vmware.com>  1.0-6
--   Dracut module change to include systemd initrd target
-*   Tue Sep 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-5
--   Added fsck tools
--   Use kernel version and release number in initrd file name
-*   Mon Aug 1 2016 Divya Thaluru <dthaluru@vmware.com> 1.0-4
--   Added kernel macros
-*   Thu Jun 30 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0-4
--   Exapand setup macro and remove the source file.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0-3
--   GA - Bump release of all rpms
-*   Thu Apr 28 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-2
--   Update to linux-4.4.8
-*   Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0-1
--   Initial version.
+* Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-7
+- Add verity-read-only-root to package watch list, since it will add a dracut module
+
+* Thu Oct 01 2020 Chris Co <chrco@microsoft.com> 2.0-6
+- Update file-triggered initrd generation to workaround kdump initrd limitations
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Aug 27 2018 Dheeraj Shetty <dheerajs@vmware.com> 2.0-4
+- Remove watching ostree
+
+* Thu Jul 27 2017 Bo Gan <ganb@vmware.com> 2.0-3
+- Move all states to one directory
+
+* Fri May 26 2017 Bo Gan <ganb@vmware.com> 2.0-2
+- Discard stdin before dracut
+
+* Wed Apr 12 2017 Bo Gan <ganb@vmware.com> 2.0-1
+- Made initrd generation dynamic, triggers for systemd, e2fs-progs
+
+* Wed Nov 30 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-7
+- Expand uname -r to have release number
+
+* Wed Nov 23 2016 Anish Swaminathan <anishs@vmware.com> 1.0-6
+- Dracut module change to include systemd initrd target
+
+* Tue Sep 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-5
+- Added fsck tools
+- Use kernel version and release number in initrd file name
+
+* Mon Aug 1 2016 Divya Thaluru <dthaluru@vmware.com> 1.0-4
+- Added kernel macros
+
+* Thu Jun 30 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0-4
+- Exapand setup macro and remove the source file.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0-3
+- GA - Bump release of all rpms
+
+* Thu Apr 28 2016 Alexey Makhalov <amakhalov@vmware.com> 1.0-2
+- Update to linux-4.4.8
+
+* Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0-1
+- Initial version.

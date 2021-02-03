@@ -276,4 +276,4 @@ fi
 - CVE-2020-8565
 
 * Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.3-1
-- Initial version of K8s 1.19.3.
+- Original version for CBL-Mariner of K8s 1.19.3.

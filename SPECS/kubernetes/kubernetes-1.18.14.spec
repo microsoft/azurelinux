@@ -323,4 +323,4 @@ fi
 - Switched to ecpacr.
 
 * Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.18.0
-- Initial version of K8s 1.18.0.
+- Original version for CBL-Mariner of K8s 1.18.0.
