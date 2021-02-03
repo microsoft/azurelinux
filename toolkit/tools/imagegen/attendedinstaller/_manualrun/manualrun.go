@@ -23,13 +23,21 @@ func main() {
 
 	logger.InitStderrLog()
 
+	// The JSON parser if responsible for filling defaults, since we are
+	// using a Go struct need to manually use the defaults.
+	verityConfig := configuration.GetDefaultReadOnlyVerityRoot()
+	verityConfig.Enable = true
+
 	baseCfg := configuration.Config{
 		SystemConfigs: []configuration.SystemConfig{
 			configuration.SystemConfig{
 				Name: "Core",
 				PackageLists: []string{
-					"core-packages-image.json",
-					"hyperv.json",
+					"packagelists/core-packages-image.json",
+					"packagelists/hyperv-packages.json",
+				},
+				KernelOptions: map[string]string{
+					"default": "kernel",
 				},
 				AdditionalFiles: map[string]string{
 					"/etc/resolv.conf": "/etc/resolv.conf",
@@ -52,10 +60,38 @@ func main() {
 					"developer-packages.json",
 					"hyperv.json",
 				},
+				KernelOptions: map[string]string{
+					"default": "kernel",
+				},
 				AdditionalFiles: map[string]string{
 					"/etc/resolv.conf": "/etc/resolv.conf",
 					"/root/.bashrc":    "/root/.bashrc",
 				},
+				PostInstallScripts: []configuration.PostInstallScript{
+					configuration.PostInstallScript{
+						Path: "arglessScript.sh",
+					},
+					configuration.PostInstallScript{
+						Path: "thisOneNeedsArguments.sh",
+						Args: "--input abc --output cba",
+					},
+				},
+			},
+			configuration.SystemConfig{
+				Name: "Read-Only",
+				PackageLists: []string{
+					"packagelists/core-packages-image.json",
+					"packagelists/hyperv-packages.json",
+					"packagelists/read-only-root-packages.json",
+				},
+				KernelOptions: map[string]string{
+					"default": "kernel",
+				},
+				AdditionalFiles: map[string]string{
+					"/etc/resolv.conf": "/etc/resolv.conf",
+					"/root/.bashrc":    "/root/.bashrc",
+				},
+				ReadOnlyVerityRoot: verityConfig,
 				PostInstallScripts: []configuration.PostInstallScript{
 					configuration.PostInstallScript{
 						Path: "arglessScript.sh",

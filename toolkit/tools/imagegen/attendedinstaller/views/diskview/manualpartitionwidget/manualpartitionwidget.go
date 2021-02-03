@@ -589,6 +589,15 @@ func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 	mp.sysConfig.PartitionSettings = partitionSettings
 	mp.cfg.Disks = []configuration.Disk{disk}
 
+	// Flag the root for use with device mapper
+	if mp.sysConfig.ReadOnlyVerityRoot.Enable {
+		rootDiskPart := mp.cfg.GetDiskPartByID(mp.sysConfig.GetRootPartitionSetting().ID)
+		if rootDiskPart == nil {
+			return fmt.Errorf(uitext.InvalidRootDeviceMapperError)
+		}
+		rootDiskPart.Flags = append(rootDiskPart.Flags, configuration.PartitionFlagDeviceMapperRoot)
+	}
+
 	return
 }
 
