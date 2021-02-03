@@ -86,11 +86,9 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
 func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
-	cfg := agent.Config()
-
 	baseSrpmName := filepath.Base(node.SrpmPath)
 	if canUseCache {
-		usedCache, builtFiles = isSRPMPrebuilt(node.SpecPath, cfg.RpmDir, node.SourceDir, cfg.DistTag)
+		usedCache, builtFiles = isSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 		if usedCache {
 			logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 			return
