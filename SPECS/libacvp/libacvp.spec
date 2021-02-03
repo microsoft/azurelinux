@@ -1,4 +1,3 @@
-%global debug_package %{nil}
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
 Version:        1.2.0
