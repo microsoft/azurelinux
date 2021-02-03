@@ -154,7 +154,7 @@ Requires:       %{name}-hmaccalc%{?_isa} = %{version}-%{release}
 Requires:       %{name}-tools%{?_isa} = %{version}-%{release}
 Requires:       coreutils
 Requires:       openssl
-Requires:       perl-interpreter
+Requires:       perl
 
 %description    tests
 Auxiliary scripts for testing %{name}.
@@ -183,7 +183,7 @@ EOF
 %configure               \
   --libdir=/%{_lib}      \
   --disable-silent-rules \
-  --enable-kcapi-encapp  \
+  --disable-kcapi-encapp \
   --enable-kcapi-dgstapp \
   --enable-kcapi-hasher  \
   --enable-kcapi-rngapp  \
