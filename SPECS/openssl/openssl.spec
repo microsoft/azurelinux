@@ -33,14 +33,15 @@ Patch10:        openssl-1.1.1-evp-kdf.patch
 Patch11:        openssl-1.1.1-ssh-kdf.patch
 Patch12:        openssl-1.1.1-krb5-kdf.patch
 Patch13:        openssl-1.1.1-edk2-build.patch
-Patch14:        openssl-1.1.1-fips-curves.patch
-Patch15:        openssl-1.1.1-fips-crng-test.patch
-Patch16:        openssl-1.1.1-fips-drbg-selftest.patch
-Patch17:        openssl-1.1.1-fips-dh.patch
+Patch14:        openssl-1.1.1-fips-crng-test.patch
+Patch15:        openssl-1.1.1-fips-drbg-selftest.patch
+Patch16:        openssl-1.1.1-fips-dh.patch
+Patch17:        openssl-1.1.1-s390x-ecc.patch
 Patch18:        openssl-1.1.1-kdf-selftest.patch
 Patch19:        openssl-1.1.1-rewire-fips-drbg.patch
 Patch20:        openssl-1.1.1-explicit-params.patch
-Patch21:        CVE-2020-1971.patch
+Patch21:        openssl-1.1.1-fips-curves.patch
+Patch22:        CVE-2020-1971.patch
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
@@ -129,6 +130,7 @@ cp %{SOURCE4} test/
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
