@@ -42,7 +42,6 @@ Patch19:        openssl-1.1.1-rewire-fips-drbg.patch
 Patch20:        openssl-1.1.1-explicit-params.patch
 Patch21:        openssl-1.1.1-fips-curves.patch
 Patch22:        CVE-2020-1971.patch
-
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -214,11 +213,11 @@ done
 %define __spec_install_post \
     %{?__debug_package:%{__debug_install_post}} \
     %{__arch_install_post} \
-    %{__os_install_post} \
-    crypto/fips/fips_standalone_hmac $RPM_BUILD_ROOT%{_libdir}/libcrypto.so.%{version} >$RPM_BUILD_ROOT%{_libdir}/.libcrypto.so.%{version}.hmac \
-    ln -sf .libcrypto.so.%{version}.hmac $RPM_BUILD_ROOT%{_libdir}/.libcrypto.so.%{soversion}.hmac \
-    crypto/fips/fips_standalone_hmac $RPM_BUILD_ROOT%{_libdir}/libssl.so.%{version} >$RPM_BUILD_ROOT%{_libdir}/.libssl.so.%{version}.hmac \
-    ln -sf .libssl.so.%{version}.hmac $RPM_BUILD_ROOT%{_libdir}/.libssl.so.%{soversion}.hmac \
+    %__os_install_post \
+    crypto/fips/fips_standalone_hmac %{buildroot}%{_libdir}/libcrypto.so.%{version} >%{buildroot}%{_libdir}/.libcrypto.so.%{version}.hmac \
+    ln -sf .libcrypto.so.%{version}.hmac %{buildroot}%{_libdir}/.libcrypto.so.%{soversion}.hmac \
+    crypto/fips/fips_standalone_hmac %{buildroot}%{_libdir}/libssl.so.%{version} >%{buildroot}%{_libdir}/.libssl.so.%{version}.hmac \
+    ln -sf .libssl.so.%{version}.hmac %{buildroot}%{_libdir}/.libssl.so.%{soversion}.hmac \
 %{nil}
 
 %check
