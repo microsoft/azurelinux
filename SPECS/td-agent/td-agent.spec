@@ -139,7 +139,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/td-agent/plugin
 mkdir -p %{buildroot}/tmp/td-agent
 
 %pre
-sudo ln -S %{_sbindir}/useradd %{_sbindir}/adduser
+sudo ln -s %{_sbindir}/useradd %{_sbindir}/adduser
 if ! getent group td-agent >/dev/null; then
     %{_sbindir}/groupadd -r td-agent
 fi
