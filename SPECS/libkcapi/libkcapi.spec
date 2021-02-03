@@ -219,24 +219,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/find %{buildroot} -type f -size 0 -print -delete
 
 
-%check
-
-# On some arches `/proc/sys/net/core/optmem_max` is lower than 20480,
-# which is the lowest limit needed to run the testsuite.  If that limit
-# is not met, we do not run it.
-%if %{test_optmem_max} >= 20480
-# Skip the testsuite on old kernels.
-%if %{lua:print(rpm.vercmp(posix.uname('%r'), '5.1'));} >= 0
-# Real testsuite.
-pushd test
-ENABLE_FUZZ_TEST=1 \
-NO_32BIT_TEST=1    \
-  ./test-invocation.sh
-popd
-%endif
-%endif
-
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -282,6 +264,7 @@ popd
 * Tue Jan 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.
+- Disable %%check section for now.
 
 * Fri Aug 14 2020 Ondrej Mosnáček <omosnace@redhat.com> - 1.2.0-3
 - Require perl-interpreter instead of full perl
