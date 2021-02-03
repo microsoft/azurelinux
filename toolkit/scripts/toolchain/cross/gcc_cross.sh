@@ -48,6 +48,7 @@ patch -p1 < "${scriptDir}/pathmax.patch"
 cd ..
 
 sudo mkdir -p ${installDir}
+sudo chown henry ${installDir}
 export PATH="${installDir}/bin":$PATH
 
 mkdir build-binutils
