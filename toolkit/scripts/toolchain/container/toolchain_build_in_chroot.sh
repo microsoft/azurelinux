@@ -58,7 +58,7 @@ set -e
 cd /sources
 
 echo Linux-5.10.12.1 API Headers
-tar xf 5.10.12.1.tar.gz
+tar xf kernel-5.10.12.1.tar.gz
 pushd mariner-linux-kernel-rolling-lts-mariner-5.10.12.1
 make mrproper
 make headers

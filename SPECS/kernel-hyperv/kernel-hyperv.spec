@@ -9,7 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/mariner-linux-kernel
-Source0:        https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+#Source0:        https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bc
