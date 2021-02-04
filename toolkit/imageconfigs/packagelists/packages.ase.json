@@ -1,0 +1,12 @@
+{
+    "packages": [
+        "dhcp-client",
+        "moby-buildx",
+        "moby-cli",
+        "moby-containerd",
+        "moby-engine",
+        "moby-runc",
+        "WALinuxAgent",
+        "az-config"
+    ]
+}

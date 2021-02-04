@@ -1,0 +1,11 @@
+[Unit]
+Description=Service to run post-boot script.
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/etc/rc.d/init.d/post-boot.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target

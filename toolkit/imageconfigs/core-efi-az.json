@@ -1,0 +1,68 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 4096,
+            "Artifacts": [
+                {
+                    "Name": "core-efi-az-vhd",
+                    "Type": "vhd"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "boot",
+                    "Flags": [
+                        "grub"
+                    ],
+                    "Start": 1,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 9,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "core-efi-az-vhd",
+            "BootType": "legacy",
+            "PartitionSettings": [
+                {
+                    "ID": "boot",
+                    "MountPoint": ""
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/packages.ase.json"
+            ],
+            "AdditionalFiles": {
+                "additionalfiles/configs/66-azure-storage.rules": "/etc/udev/rules.d/66-azure-storage.rules",
+                "additionalfiles/configs/99-azure-product-uuid.rules": "/etc/udev/rules.d/99-azure-product-uuid.rules",
+                "additionalfiles/scripts/post-boot.sh": "/etc/rc.d/init.d/post-boot.sh",
+                "additionalfiles/services/post-boot.service": "/etc/systemd/system/post-boot.service"
+            },
+            "PostInstallScripts": [
+		{
+                    "Path": "additionalfiles/scripts/configure-image.sh"
+		}
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            },
+            "Hostname": "core-efi-az-machine"
+        }
+    ]
+}
