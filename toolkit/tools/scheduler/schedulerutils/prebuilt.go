@@ -4,46 +4,42 @@
 package schedulerutils
 
 import (
-	"fmt"
-	"path/filepath"
+	"sync"
 
 	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/rpm"
+	"microsoft.com/pkggen/internal/pkggraph"
 )
 
 // isSRPMPrebuilt checks if an SRPM is prebuilt, returning true if so along with a slice of corresponding prebuilt RPMs.
-func isSRPMPrebuilt(specFile, rpmDir, sourceDir, distTag string) (isPrebuilt bool, builtFiles []string) {
-	builtFiles, err := rpmsProvidesBySpec(specFile, sourceDir, rpmDir, distTag)
-	if err != nil {
-		logger.Log.Warnf("Error processing SPEC (%s). Error: %v", specFile, err)
-		return
-	}
-
-	isPrebuilt = findAllRPMS(builtFiles)
+func isSRPMPrebuilt(srpmPath string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, rpmFiles []string) {
+	rpmFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	isPrebuilt = findAllRPMS(rpmFiles)
 	return
 }
 
-// rpmsProvidesBySpec returns all RPMs produced from a SPEC file.
-func rpmsProvidesBySpec(specFile, sourceDir, rpmDir, distTag string) (rpmsProvided []string, err error) {
-	const (
-		// %{nvra} is the default query format, returns %{NAME}-%{VERSION}-%{REVISION}-%{ARCH}
-		queryFormat = "%{ARCH}/%{nvra}\n"
-	)
+// rpmsProvidedBySRPM returns all RPMs produced from a SRPM file.
+func rpmsProvidedBySRPM(srpmPath string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (rpmFiles []string) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
 
-	defines := rpm.DefaultDefines()
-	if distTag != "" {
-		defines[rpm.DistTagDefine] = distTag
+	rpmsMap := make(map[string]bool)
+	runNodes := pkgGraph.AllRunNodes()
+	for _, node := range runNodes {
+		if node.SrpmPath != srpmPath {
+			continue
+		}
+
+		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
+			continue
+		}
+
+		rpmsMap[node.RpmPath] = true
 	}
 
-	result, err := rpm.QuerySPECForBuiltRPMs(specFile, sourceDir, queryFormat, defines)
-	if err != nil {
-		return
-	}
-
-	for _, pkg := range result {
-		rpmFile := filepath.Join(rpmDir, fmt.Sprintf("%s.rpm", pkg))
-		rpmsProvided = append(rpmsProvided, rpmFile)
+	rpmFiles = make([]string, 0, len(rpmsMap))
+	for rpm := range rpmsMap {
+		rpmFiles = append(rpmFiles, rpm)
 	}
 
 	return

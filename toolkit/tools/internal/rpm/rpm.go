@@ -19,6 +19,9 @@ const (
 	// QueryHeaderArgument specifies the srpm argument to be used with rpm tools
 	QueryHeaderArgument = "--srpm"
 
+	// QueryBuiltRPMHeadersArgument specifies that only rpm packages that would be built from a given spec should be queried.
+	QueryBuiltRPMHeadersArgument = "--builtrpms"
+
 	// DistTagDefine specifies the dist tag option for rpm tool commands
 	DistTagDefine = "dist"
 
