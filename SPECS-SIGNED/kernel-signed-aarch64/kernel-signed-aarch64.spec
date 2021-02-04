@@ -3,7 +3,7 @@
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.4.91
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -76,10 +76,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %files
 /boot/*
+/boot/.vmlinuz-%{uname_r}.hmac
 /lib/modules/%{uname_r}/*
+/lib/modules/%{uname_r}/.vmlinuz.hmac
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
+- Add hmac files for FIPS
+
 * Wed Jan 27 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.91-2
 - Update release number to match kernel spec
 
