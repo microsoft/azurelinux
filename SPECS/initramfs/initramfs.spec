@@ -127,7 +127,7 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
-* Thu Feb 04 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
+* Thu Feb 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
 - Add dracut-fips to package watch list, since it will add a dracut module
 
 * Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-7
