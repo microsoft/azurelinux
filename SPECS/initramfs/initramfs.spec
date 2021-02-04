@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,7 @@ install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -127,6 +127,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Thu Feb 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
+- Add dracut-fips to package watch list, since it will add a dracut module
+
 * Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-7
 - Add verity-read-only-root to package watch list, since it will add a dracut module
 
