@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.15.5
+Version:        1.15.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -115,6 +115,9 @@ fi
 %{_bindir}/*
 
 %changelog
+- Wed Feb 03 2021 Andrew Phelps <anphel@microsoft.com> - 1.15.7-1
+- Updated to version 1.15.7 to fix CVE-2021-3114
+
 * Mon Nov 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.15.5-1
 - Updated to version 1.15.5
 
