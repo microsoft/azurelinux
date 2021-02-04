@@ -1,0 +1,15 @@
+{
+ "Signatures": {
+  ".profile": "fc6366a65c6e2049a86db35dcc43725ed4209d0d64bb8d7eee9e80933feaf4ee",
+  "01-cloud-init.cfg": "fca9e6ef4d4a5eff406565fc5e16e7af6f7576251363bae9692a6933e4414661",
+  "10-security-hardening.conf": "3c3c5f7a8e0d24f13dcab780a1d9c6b7dca9bdc6552030b0e334d88936eca5d1",
+  "66-azure-storage.rules": "941ca1d337bb682b66c3156577cc8d1b9f0aa940f4d9686fb02509f36988db2b",
+  "99-azure-product-uuid.rules": "29a8669c1e3cce96e9578785469fb7e1b66537aa6add7880e449622fdb0e2857",
+  "LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+  "br_netfilter.conf": "46d2af8132f079a9ce358e7e03993cc78523d5592e9b08f6d697009dbc5845aa",
+  "iptables": "af4f83488a222f7cb2c613cde8c0a05ac8d0490811e105317863040485ea8859",
+  "overlay.conf": "b4b33d2441645d4dd0a0694b5989a0a14a5cc22fe9865e6b7b7eae966e0de36c",
+  "sshd_config": "badb76e91315d6000a7de2dd6d00ad5356608bacc01a484a9bd7a8bdfe592f81",
+  "system.conf": "32b4037874cfd9f415cf607100a5970b731ee6d0e39aec643a1a7c118032bae8"
+ }
+}

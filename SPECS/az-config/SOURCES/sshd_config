@@ -1,0 +1,9 @@
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+MaxAuthTries 2
+AllowAgentForwarding no
+PermitRootLogin no
+UsePAM yes
+TCPKeepAlive yes
+ClientAliveInterval 180
