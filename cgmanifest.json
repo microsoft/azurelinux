@@ -1465,8 +1465,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.5",
-          "downloadUrl": "https://dl.google.com/go/go1.15.5.src.tar.gz"
+          "version": "1.15.7",
+          "downloadUrl": "https://dl.google.com/go/go1.15.7.src.tar.gz"
         }
       }
     },
