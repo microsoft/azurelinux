@@ -18,13 +18,14 @@ BuildRequires:  systemd
 Requires:       systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       %{name}-utils = %{version}-%{release}
+
 %description
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 
 %package devel
-Summary: The includes and static libraries from the Net-SNMP package.
-Group: Development/Libraries
-Requires: net-snmp = %{version}
+Summary:        The includes and static libraries from the Net-SNMP package.
+Group:          Development/Libraries
+Requires:       net-snmp = %{version}
 
 %description devel
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
