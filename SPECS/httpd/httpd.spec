@@ -1,13 +1,31 @@
+%global mpm event
+%define docroot /var/www
+%define suexec_caller apache
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
+Source1:        README.confd
+Source2:        README.confmod
+Source3:        00-base.conf 
+Source4:        00-mpm.conf 
+Source5:        00-lua.conf 
+Source6:        01-cgi.conf 
+Source7:        00-dav.conf
+Source8:        00-proxy.conf 
+Source9:        00-ssl.conf 
+Source10:       01-ldap.conf 
+Source11:       00-proxyhtml.conf
+Source12:       01-ldap.conf 
+Source13:       00-systemd.conf 
+Source14:       01-session.conf 
+Source15:       00-optional.conf
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
@@ -33,6 +51,7 @@ Requires:       apr-util
 Requires:       openssl
 Requires:       openldap
 Requires:       lua
+Requires:       %{name}-filesystem = %{version}-%{release}
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 
@@ -56,6 +75,16 @@ Group: Applications/System
 Requires: httpd
 %description docs
 These are the help files of httpd.
+	
+%package filesystem
+Summary: The basic directory layout for the Apache HTTP Server
+BuildArch: noarch
+Requires(pre): /usr/sbin/useradd
+	
+%description filesystem
+The httpd-filesystem package contains the basic directory layout
+for the Apache HTTP Server including the correct permissions
+for the directories.
 
 %package tools
 Group: System Environment/Daemons
@@ -80,7 +109,15 @@ The httpd-tools of httpd.
             --enable-mods-shared="all cgi"         \
             --enable-mpms-shared=all               \
             --with-apr=%{_prefix}                  \
-            --with-apr-util=%{_prefix}
+            --with-apr-util=%{_prefix}             \
+            --enable-suexec --with-suexec          \
+	        --enable-suexec-capabilities           \
+            --with-suexec-caller=%{suexec_caller}  \
+	        --with-suexec-docroot=%{docroot}       \
+            --without-suexec-logfile               \
+	        --with-suexec-syslog                   \
+	        --with-suexec-bin=%{_sbindir}/suexec   \
+	        --with-suexec-uidmin=1000 --with-suexec-gidmin=1000
 
 make %{?_smp_mflags}
 
@@ -88,6 +125,31 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 install -vdm755 %{buildroot}/usr/lib/systemd/system
 install -vdm755 %{buildroot}/etc/httpd/logs
+
+# install conf file/directory
+mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d \
+      %{buildroot}%{_sysconfdir}/httpd/conf.modules.d
+	
+install -m 644 %{SOURCE1} \
+    %{buildroot}%{_sysconfdir}/httpd/conf.d/README
+
+install -m 644 %{SOURCE2} \
+    %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/README
+	
+for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
+         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
+         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
+	
+  install -m 644 -p %{_sourcedir}/$f \
+        %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/$f
+	
+done
+	
+sed -i '/^#LoadModule mpm_%{mpm}_module /s/^#//' \
+     %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+	
+touch -r %{SOURCE4} \
+     %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
 
 cat << EOF >> %{buildroot}/usr/lib/systemd/system/httpd.service
 [Unit]
@@ -111,6 +173,13 @@ echo "disable httpd.service" > %{buildroot}/usr/lib/systemd/system-preset/50-htt
 
 ln -s /usr/sbin/httpd %{buildroot}/usr/sbin/apache2
 ln -s /etc/httpd/conf/httpd.conf %{buildroot}/etc/httpd/httpd.conf
+
+%pre filesystem
+getent group apache >/dev/null || groupadd -g 48 -r apache
+getent passwd apache >/dev/null || \
+  useradd -r -u 48 -g apache -s /sbin/nologin \
+    -d %{contentdir} -c "Apache" apache
+exit 0
 
 %post
 /sbin/ldconfig
@@ -185,6 +254,18 @@ fi
 %dir %{_sysconfdir}/httpd/logs
 %{_libdir}/systemd/system/httpd.service
 %{_libdir}/systemd/system-preset/50-httpd.preset
+
+%files filesystem
+%defattr(-,root,root)
+%dir %{_sysconfdir}/httpd
+%dir %{_sysconfdir}/httpd/conf.d
+%{_sysconfdir}/httpd/conf.d/README
+%dir %{docroot}
+%dir %{docroot}/cgi-bin
+%dir %{docroot}/html
+%dir %{_sysconfdir}/httpd/icons
+%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
+%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files tools
 %defattr(-,root,root)
