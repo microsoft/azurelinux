@@ -19,14 +19,9 @@
 %global giturl            https://github.com/smuellerDD/%{name}
 %global apps_hmaccalc sha1hmac sha224hmac sha256hmac sha384hmac sha512hmac
 %global apps_fipscheck sha1sum sha224sum sha256sum sha384sum sha512sum md5sum fipscheck fipshmac
-# On old kernels use mock hashers implemented via openssl
-%if %{lua:print(rpm.vercmp(posix.uname('%r'), '3.19'));} >= 0
-%global sha512hmac bin/kcapi-hasher -n sha512hmac
-%global fipshmac   bin/kcapi-hasher -n fipshmac
-%else
+# Use OpenSSL to perform hmac calculations
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global fipshmac   bash %{_sourcedir}/fipshmac-openssl.sh
-%endif
 # Add generation of HMAC checksums of the final stripped
 # binaries.  %%define with lazy globbing is used here
 # intentionally, because using %%global does not work.
@@ -63,7 +58,7 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -261,6 +256,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Fri Feb 05 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-5
+- Use OpenSSL to perform hmac calculations
+
 * Tue Jan 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.
