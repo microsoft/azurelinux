@@ -1,6 +1,6 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.10.12.1
+Version:        5.10.13.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -35,8 +35,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
-- Update source to 5.10.12.1
+* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
 
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Update to kernel release 5.4.91-3

@@ -2,7 +2,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
-Version:        5.10.12.1
+Version:        5.10.13.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -82,8 +82,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
-* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
-- Update source to 5.10.12.1
+* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
 
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add hmac files for FIPS

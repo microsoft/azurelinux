@@ -2,7 +2,7 @@
 %define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.12.1
+Version:        5.10.13.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -449,8 +449,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.12.1-1
-- Update source to 5.10.12.1
+* Tue Feb 02 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
 - Remove patch to publish efi tpm event log on ARM. Present in updated source.
 - Remove patch for arm64 hyperv support. Present in updated source.
 

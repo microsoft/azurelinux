@@ -66,7 +66,7 @@ COPY [ "./toolchain-md5sums", \
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.10.12.1.tar.gz -O kernel-5.10.12.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/mariner-linux-kernel/archive/rolling-lts/mariner/5.10.13.1.tar.gz -O kernel-5.10.13.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN /tools/toolchain-jdk8-wget.sh; exit 0
 RUN md5sum -c $LFS/tools/toolchain-md5sums && \
