@@ -2,7 +2,7 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD (like)
 URL:            http://net-snmp.sourceforge.net/
 Group:          Productivity/Networking/Other
@@ -17,6 +17,7 @@ BuildRequires:  perl
 BuildRequires:  systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       systemd
+Provides:       net-snmp-utils = %{version}-%{release}
 %description
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 
@@ -96,6 +97,8 @@ rm -rf %{buildroot}/*
 %exclude /usr/lib/perl5/perllocal.pod
 
 %changelog
+*   Thu Feb 04 2021 Henry Li <lihl@microsoft.com> 5.8-6
+-   Add provides for net-snmp-utils.
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.8-5
 -   Use new perl package names.
 -   Change perl library path to perl_vendorarch directory for packaging.
