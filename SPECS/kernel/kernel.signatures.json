@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "kernel-5.10.13.1.tar.gz": "98cde35fef0fe7b747031db1fc99e3a9c91eed98dc9c7bf678d0c04d6082ae9f",
-  "config": "7d0fe2948da7d845f3c4b8405740bd7901306433a7d314897f554c5df04b5d27",
-  "config_aarch64": "101123a8a7c00eb3b700e6a9417ab6dbb1b7d0bca5835ae9ee74111005b66c25"
+  "config": "d7664ff4a5d41dd1b8b56fcddee05cc9990dd82976d83a7cd6921822a36e4c03",
+  "config_aarch64": "a673b1a397c24f8957e059f3371dab3dd98315d30b886258bfb21557cea105eb",
+  "kernel-5.10.13.1.tar.gz": "98cde35fef0fe7b747031db1fc99e3a9c91eed98dc9c7bf678d0c04d6082ae9f"
  }
 }
