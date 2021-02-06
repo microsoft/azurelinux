@@ -1094,6 +1094,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "espeak-ng",
+          "version": "1.50",
+          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/releases/download/1.50/espeak-ng-1.50.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "etcd",
           "version": "3.4.3",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.3.tar.gz"
