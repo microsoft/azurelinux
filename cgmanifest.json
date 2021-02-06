@@ -3864,6 +3864,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pcaudiolib",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pciutils",
           "version": "3.6.2",
           "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.6.2.tar.gz"
