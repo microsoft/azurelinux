@@ -31,21 +31,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Libraries and header files for %{name}
 
-%package data
-Summary:        Data files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description data
-Data files for %{name}
-
-%package vim
-Summary:        Vim files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description vim
-Vim files for %{name}
-
-
 %prep
 %autosetup -n %{name} -p1
 
