@@ -45,7 +45,10 @@
                     "ID": "MyRootfs",
                     "Start": 9,
                     "End": 1024,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 }
             ]
         },
@@ -69,7 +72,10 @@
                     "ID": "MyRootfsA",
                     "Start": 9,
                     "End": 1024,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 },
                 {
                     "ID": "MyBootB",
@@ -83,7 +89,10 @@
                     "ID": "MyRootfsB",
                     "Start": 1033,
                     "End": 2048,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 },
                 {
                     "ID": "SharedData",
@@ -172,7 +181,10 @@
                 "Enable":   true,
                 "Password": "EncryptPassphrase123"
             },
-            "RemoveRpmDb": false
+            "RemoveRpmDb": false,
+            "ReadOnlyVerityRoot": {
+                "Enable": false
+            }
         },
         {
             "Name": "BiggerDiskA",

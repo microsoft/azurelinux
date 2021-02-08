@@ -1,108 +1,90 @@
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
-
+Summary:        Installer from a live CD/DVD/USB to disk
 # do not use QtWebEngine because it no longer works with QtWebEngine >= 5.11
 # (it now refuses to run as root unless "export QTWEBENGINE_DISABLE_SANDBOX=1")
 # https://github.com/calamares/calamares/issues/1051
-
 Name:           calamares
 Version:        3.2.11
-Release:        36%{?dist}
-Summary:        Installer from a live CD/DVD/USB to disk
+Release:        37%{?dist}
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-License:        GPLv3+
 URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
-Source1: calamares-users-1.1.0.tar.gz
-Source2: calamares-finished-1.1.0.tar.gz
-Source3: calamares-welcome-1.1.0.tar.gz
-Source4: calamares-partition-1.1.1.tar.gz
-Source5: calamares-license-1.1.0.tar.gz
-
+Source1:        calamares-users-1.1.0.tar.gz
+Source2:        calamares-finished-1.1.0.tar.gz
+Source3:        calamares-welcome-1.1.1.tar.gz
+Source4:        calamares-partition-1.1.2.tar.gz
+Source5:        calamares-license-1.1.0.tar.gz
 # Source20..39 - configuration files
-Source20: license.conf
-Source21: settings.conf
-Source22: show.qml
-Source23: branding.desc
-Source24: users.conf
-Source25: stylesheet.qss
-
+Source20:       license.conf
+Source21:       settings.conf
+Source22:       show.qml
+Source23:       branding.desc
+Source24:       users.conf
+Source25:       stylesheet.qss
 # Source40..100 - Assets
-Source40: mariner-logo.png
+Source40:       mariner-logo.png
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_fr.ts
 # then translate the template in linguist-qt5.
-Source41: calamares-auto_fr.ts
+Source41:       calamares-auto_fr.ts
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_de.ts
 # then translate the template in linguist-qt5.
-Source42: calamares-auto_de.ts
+Source42:       calamares-auto_de.ts
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_it.ts
 # then translate the template in linguist-qt5.
-Source43: calamares-auto_it.ts
-Source52: mariner-welcome.png
-Source53: mariner-eula
-
+Source43:       calamares-auto_it.ts
+Source52:       mariner-welcome.png
+Source53:       mariner-eula
 # adjust some default settings (default shipped .conf files)
-Patch0: calamares-3.2.11-default-settings.patch
-Patch1: use-single-job-for-progress-bar-value.patch
-Patch2: navigation-buttons-autodefault.patch
-
-ExclusiveArch:  x86_64
-
-# Macros
-BuildRequires:  kf5-rpm-macros
-
-# Fonts
-Requires:  freefont
-
+Patch0:         calamares-3.2.11-default-settings.patch
+Patch1:         use-single-job-for-progress-bar-value.patch
+Patch2:         navigation-buttons-autodefault.patch
 # Compilation tools
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules
 BuildRequires:  gcc
-BuildRequires:  pkg-config
-
-
 # Other build-time tools
 BuildRequires:  gettext
-
-# Qt 5
-BuildRequires:  qt5-linguist >= 5.10
-BuildRequires:  qt5-qtbase-devel >= 5.10
-BuildRequires:  qt5-qtdeclarative-devel >= 5.10
-BuildRequires:  qt5-qtsvg-devel >= 5.10
-
 # KF5
 BuildRequires:  kf5-kconfig-devel
 BuildRequires:  kf5-kcoreaddons-devel
 BuildRequires:  kf5-ki18n-devel
 BuildRequires:  kf5-kwidgetsaddons-devel
-
+# Macros
+BuildRequires:  kf5-rpm-macros
 # KPMCORE
 BuildRequires:  kpmcore-devel >= 3.3
 BuildRequires:  libatasmart-devel
-BuildRequires:  util-linux-devel
-
-# Python 3
-BuildRequires:  python3-devel >= 3.3
-
 # Other libraries
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libpwquality-devel
 BuildRequires:  parted
+BuildRequires:  pkg-config
+# Python 3
+BuildRequires:  python3-devel >= 3.3
+# Qt 5
+BuildRequires:  qt5-linguist >= 5.10
+BuildRequires:  qt5-qtbase-devel >= 5.10
+BuildRequires:  qt5-qtdeclarative-devel >= 5.10
+BuildRequires:  qt5-qtsvg-devel >= 5.10
+BuildRequires:  util-linux-devel
 BuildRequires:  yaml-cpp-devel >= 0.5.1
-
-Requires:       coreutils
-Requires:       grub2
-Requires:       efibootmgr
-Requires:       systemd
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       coreutils
+Requires:       efibootmgr
+# Fonts
+Requires:       freefont
+Requires:       grub2
+Requires:       systemd
+ExclusiveArch:  x86_64
 
 %description
 Calamares is a distribution-independent installer framework, designed to install
@@ -117,7 +99,6 @@ Requires:       %{name} = %{version}-%{release}
 
 %description    libs
 %{summary}.
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -157,7 +138,7 @@ rm -f src/modules/*/*.conf.default-settings
 %build
 mkdir -p %{_target_platform}
 pushd %{_target_platform}
-%{cmake_kf5} -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
+%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
 popd
 
 make %{?_smp_mflags} -C %{_target_platform}
@@ -200,7 +181,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 
 %files -f calamares-python.lang
 %license LICENSE
-%doc LICENSE AUTHORS
+%doc AUTHORS
 %{_bindir}/calamares
 %dir %{_datadir}/calamares/
 %{_datadir}/calamares/settings.conf
@@ -234,6 +215,10 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Mon Jan 25 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.2.11-37
+- Add "dmroot" flag to encrypted partition
+- Hide verity root read only skus
+
 * Fri Sep 04 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.2.11-36
 - Add dictionary check for root encryption passphrase.
 

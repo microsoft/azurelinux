@@ -334,7 +334,7 @@ diff -Naur openldap-2.4.44.orig/servers/slapd/slapd.ldif openldap-2.4.44/servers
  #
  # Do not enable referrals until AFTER you have a working directory
  # service AND an understanding of referrals.
-@@ -26,10 +26,11 @@
+@@ -26,11 +26,11 @@
  #
  # Load dynamic backend modules:
  #
@@ -342,6 +342,7 @@ diff -Naur openldap-2.4.44.orig/servers/slapd/slapd.ldif openldap-2.4.44/servers
 -#objectClass: olcModuleList
 -#cn: module
 -#olcModulepath:	%MODULEDIR%
+-#olcModuleload:	back_mdb.la
 +dn: cn=module,cn=config
 +objectClass: olcModuleList
 +cn: module
@@ -350,7 +351,7 @@ diff -Naur openldap-2.4.44.orig/servers/slapd/slapd.ldif openldap-2.4.44/servers
  #olcModuleload:	back_bdb.la
  #olcModuleload:	back_hdb.la
  #olcModuleload:	back_ldap.la
-@@ -90,6 +91,6 @@
+@@ -91,6 +91,6 @@
  # The database directory MUST exist prior to running slapd AND 
  # should only be accessible by the slapd and slap tools.
  # Mode 700 recommended.
