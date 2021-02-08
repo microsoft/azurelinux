@@ -15,7 +15,6 @@ BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
-BuildRequires:  openssl-static
 
 Requires:       openssl-devel
 Requires:       openssl-libs
