@@ -1,7 +1,7 @@
 Summary:	C++ port of Junit test framework
 Name:		cppunit
 Version:	1.12.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	LGPLv2
 URL:		https://sourceforge.net/projects/cppunit/
 Source0:	https://sourceforge.net/projects/cppunit/files/%{name}/%{version}/%{name}-%{version}.tar.gz
@@ -24,6 +24,7 @@ supervised tests
 %package devel
 Summary:        cppunit devel
 Group:          Development/Tools
+Requires:       %{name} = %{version}-%{release}
 %description devel
 This contains headers and libs for development with cppunit.
 
@@ -55,6 +56,9 @@ find %{buildroot} -name '*.la' -delete
 /usr/share/*
 
 %changelog
+*   Mon Feb 08 2021 Henry Li <lihl@microsoft.com> - 1.12.1-6
+-   Add cppunit as Requires for cppunit-devel
+-   Disable link as-needed to fix compilation errors updated ldflags.
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.12.1-5
 -   Disable link as-needed to fix compilation errors updated ldflags.
 *   Sat May 09 00:21:26 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
