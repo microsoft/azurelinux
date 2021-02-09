@@ -217,7 +217,7 @@ func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: 'fips=1' is set, but 'dracut-fips' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists", err.Error())
 
 			return
 		}

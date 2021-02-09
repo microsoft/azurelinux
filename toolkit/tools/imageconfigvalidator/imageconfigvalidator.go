@@ -108,7 +108,7 @@ func validatePackages(config configuration.Config) (err error) {
 		}
 		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) {
 			if !foundDracutFipsPackage {
-				return fmt.Errorf("%s: fips=1 provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
+				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
 			}
 		}
 	}
