@@ -2194,6 +2194,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libacvp",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/cisco/libacvp/archive/v1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libaio",
           "version": "0.3.112",
           "downloadUrl": "https://releases.pagure.org/libaio/libaio-0.3.112.tar.gz"
