@@ -3,13 +3,12 @@ Name:           libacvp
 Version:        1.2.0
 Release:        1%{?dist}
 License:        Apache License 2.0
-URL:            https://github.com/cisco/libacvp
-Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Libraries
+URL:            https://github.com/cisco/libacvp
 # Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -42,10 +41,11 @@ make CC=gcc
 
 %install
 make install DESTDIR=%{buildroot}
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %license LICENSE
@@ -57,5 +57,5 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
-* Fri Jan 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
+* Mon Feb 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
 - First version. License verified.
