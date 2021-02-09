@@ -14,12 +14,19 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  openssl-devel
-
-Requires:       openssl-libs
 
 %description
 A library that implements the client-side of the ACVP protocol.
+
+%package app
+Summary:        Libacvp application for OpenSSL
+Group:          Applications/System
+BuildRequires:  openssl-devel
+Requires:       openssl-libs
+
+%description app
+This app provides the glue between the OpenSSL module under test
+and the library itself.
 
 %prep
 %autosetup
@@ -45,6 +52,8 @@ rm -rf %{buildroot}/*
 %{_datadir}/README.md
 %{_libdir}/libacvp.a
 %{_includedir}/acvp/*
+
+%files app
 %{_bindir}/acvp_app
 
 %changelog
