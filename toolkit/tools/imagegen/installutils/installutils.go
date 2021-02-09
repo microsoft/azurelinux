@@ -4,7 +4,6 @@
 package installutils
 
 import (
-	"crypto/rand"
 	"fmt"
 	"os"
 	"path"
@@ -30,6 +29,7 @@ import (
 const (
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice     = "/dev/null"
+	overlay        = "overlay"
 	rootMountPoint = "/"
 	rootUser       = "root"
 
@@ -61,7 +61,6 @@ func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]s
 	mountPointDevPathMap = make(map[string]string)
 	mountPointToFsTypeMap = make(map[string]string)
 	mountPointToMountArgsMap = make(map[string]string)
-	diffDiskBuild = false
 
 	// Go through each PartitionSetting
 	for _, partitionSetting := range config.PartitionSettings {
@@ -152,7 +151,7 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 	// These args are passed to the mount command using -o
 	mountPointDevPathMap[partitionSetting.MountPoint] = NullDevice
 	mountPointToMountArgsMap[partitionSetting.MountPoint] = overlayMount.getMountArgs()
-	mountPointToFsTypeMap[partitionSetting.MountPoint] = "overlay"
+	mountPointToFsTypeMap[partitionSetting.MountPoint] = overlay
 	return
 }
 
@@ -408,7 +407,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	hostname := config.Hostname
-	if !isRootFS && mountPointToFsTypeMap[rootMountPoint] != "overlay" {
+	if !isRootFS && mountPointToFsTypeMap[rootMountPoint] != overlay {
 		// Add /etc/hostname
 		err = updateHostname(installChroot.RootDir(), hostname)
 		if err != nil {
@@ -472,8 +471,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
 	if !diffDiskBuild {
-		stdout := ""
-		stderr := ""
+		var (
+			stdout string
+			stderr string
+		)
+
 		stdout, stderr, err = shell.Execute("rpm", "--root", installRoot, "--initdb")
 		if err != nil {
 			logger.Log.Warnf("Failed to create rpm database: %v", err)
@@ -1926,26 +1928,6 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 	}
 
 	return shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
-}
-
-// randomString generates a random string of the length specified
-// using the provided legalCharacters.  crypto.rand is more secure
-// than math.rand and does not need to be seeded.
-func randomString(length int, legalCharacters string) (output string, err error) {
-	b := make([]byte, length)
-	_, err = rand.Read(b)
-	if err != nil {
-		return
-	}
-
-	count := byte(len(legalCharacters))
-	for i := range b {
-		idx := b[i] % count
-		b[i] = legalCharacters[idx]
-	}
-
-	output = string(b)
-	return
 }
 
 // isRunningInHyperV checks if the program is running in a Hyper-V Virtual Machine.
