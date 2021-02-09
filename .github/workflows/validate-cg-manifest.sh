@@ -52,7 +52,7 @@ do
   if echo $ignore_list | grep -w "$name" > /dev/null
   then
     echo "    $name is being ignored, skipping"
-    #continue
+    continue
   fi
 
   version=$(rpmspec --srpm  --define "with_check 0" --qf "%{VERSION}" -q $spec 2>/dev/null )
