@@ -235,8 +235,6 @@ for KUBERNETES_COMPONENT in $KUBERNETES_COMPONENTS ; do
     done
 done
 
-echo
-
 # create container based on cbl-mariner distroless
 echo "======================================================================"
 KUBERNETES_COMPONENTS="$DISTROLESS_COMPONENTS"
