@@ -4,6 +4,7 @@
 package installutils
 
 import (
+	"crypto/rand"
 	"fmt"
 	"os"
 	"path"
@@ -102,6 +103,8 @@ func sortMountPoints(mountPointMap *map[string]string, sortForUnmount bool) (rem
 		// Reverse the sorting so we unmount in the opposite order
 		sort.Sort(sort.Reverse(sort.StringSlice(remainingMounts)))
 	}
+	return
+}
 
 // UpdatePartitionMapWithOverlays Creates Overlay map and updates the partition map with required parameters.
 // - partDevPathMap is a map of partition IDs to partition device paths
@@ -136,6 +139,7 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 
 	if err != nil {
 		logger.Log.Errorf("Could not setup loop back device for mount (%s)", partitionSetting.OverlayBaseImage)
+
 		return
 	}
 
@@ -162,7 +166,7 @@ func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap,
 	installMap = make(map[string]string)
 	for _, mountPoint := range sortMountPoints(&mountPointMap, false) {
 		device := mountPointMap[mountPoint]
-		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
+		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
 		if err != nil {
 			return
 		}

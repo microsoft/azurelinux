@@ -208,7 +208,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, diffDiskBuild)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
@@ -240,7 +240,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, diffDiskBuild)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -451,7 +451,7 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	})
 	return
 }
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild bool) (err error) {
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
 	const (
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
@@ -555,7 +555,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		// In case of overlay device being mounted at root, no need to change the bootloader.
 		return
 	}
-	bootUUID, err := installutils.GetUUID(installMap[rootMountPoint])
+	bootUUID, err := installutils.GetUUID(bootDevice)
 	if err != nil {
 		err = fmt.Errorf("failed to get UUID: %s", err)
 		return
