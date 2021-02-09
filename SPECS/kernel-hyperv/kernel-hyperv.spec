@@ -12,6 +12,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
+Source2:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
 BuildRequires:  bc
 BuildRequires:  diffutils
