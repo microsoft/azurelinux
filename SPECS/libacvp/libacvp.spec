@@ -4,7 +4,7 @@ Version:        1.2.0
 Release:        1%{?dist}
 License:        Apache License 2.0
 URL:            https://github.com/cisco/libacvp
-Group:          System Environment/Security
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
