@@ -36,6 +36,7 @@ Patch12:        CVE-2019-7309.patch
 # CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
 Patch13:        CVE-2019-19126.patch
 Patch14:        CVE-2019-25013.patch
+Patch15:		CVE-2021-3326.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -146,7 +147,7 @@ cd %{_builddir}/%{name}-build
         --disable-silent-rules
 
 # Sometimes we have false "out of memory" make error
-# just rerun/continue make to workaroung it.
+# just rerun/continue make to work around it.
 make %{?_smp_mflags} || make %{?_smp_mflags} || make %{?_smp_mflags}
 
 %install
@@ -307,6 +308,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
+- Patch CVE-2021-3326
+
 * Fri Jan 08 2021 Nicolas guibourge <nicolasg@microsoft.com> - 2.28-16
 - Patch CVE-2019-25013
 
