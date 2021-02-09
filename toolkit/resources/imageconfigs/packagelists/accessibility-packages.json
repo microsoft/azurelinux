@@ -1,0 +1,9 @@
+{
+    "packages": [
+        "espeak-ng",
+        "espeakup",
+        "kernel-drivers-accessibility",
+        "kernel-drivers-sound",
+        "pcaudiolib"
+    ]
+}
