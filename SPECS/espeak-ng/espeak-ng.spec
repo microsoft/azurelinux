@@ -4,7 +4,7 @@ Version:        1.50
 Release:        1%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
-License:        GPLv3 and Unicode
+License:        GPLv3 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/espeak-ng
@@ -75,3 +75,4 @@ make check
 %changelog
 * Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-1
 - Original version for CBL-Mariner (license: MIT)
+- License verified
