@@ -345,10 +345,6 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-%ifarch aarch64
-cp arch/arm64/kernel/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/arch/arm64/kernel/
-%endif
-
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
 # Linux version that was affected is 4.4.26
@@ -453,6 +449,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Update source to 5.10.13.1
 - Remove patch to publish efi tpm event log on ARM. Present in updated source.
 - Remove patch for arm64 hyperv support. Present in updated source.
+- Remove aarch64 module.lds. module lnker script is now preprocessed by default
 
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add configs for userspace crypto support
