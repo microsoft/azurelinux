@@ -58,7 +58,7 @@ do
   version=$(rpmspec --srpm  --define "with_check 0" --qf "%{VERSION}" -q $spec 2>/dev/null )
 
   # Some source files have been renamed, look for a comment and also try that (while manually substituting the name/version)
-  source0alt=$(grep "^#[[:blank:]]*Source0:" $spec | awk '{print $NF}' | sed "s/%{name}/$name/g" | sed "s/%{version}/$version/g" )
+  source0alt=$(grep "^#[[:blank:]]*Source0:" $spec | awk '{print $NF}' | sed "s/%\?%{name}/$name/g" | sed "s/%\?%{version}/$version/g" )
   # Some packages define a %url as well
   # Use ' ' as delimiter to avoid conflict with URL characters
   specurl=$(rpmspec --srpm  --define "with_check 0" --qf "%{URL}" -q $spec 2>/dev/null )
