@@ -4285,8 +4285,8 @@
         "type": "other",
         "other": {
           "name": "pigz",
-          "version": "2.5",
-          "downloadUrl": "https://www.zlib.net/pigz/pigz-2.5.tar.gz"
+          "version": "2.6",
+          "downloadUrl": "https://github.com/madler/pigz/archive/v2.6.tar.gz"
         }
       }
     },
