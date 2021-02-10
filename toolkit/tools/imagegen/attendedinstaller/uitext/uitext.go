@@ -78,7 +78,7 @@ const (
 
 // EncryptView text.
 const (
-	EncryptTitle                = "Enter Disk Encryption Password"
+	EncryptTitle                = "Enter Disk Encryption Password."
 	SkipEncryption              = "[Skip Disk Encryption[]"
 	EncryptPasswordLabel        = "Disk Encryption Password"
 	ConfirmEncryptPasswordLabel = "Confirm Disk Encryption Password"
@@ -86,19 +86,19 @@ const (
 
 // InstallerView text.
 const (
-	InstallerExperienceTitle = "Select Installation Experience"
+	InstallerExperienceTitle = "Select Installation Experience."
 	InstallerTerminalOption  = "Terminal Installer"
 	InstallerGraphicalOption = "Graphical Installer"
 )
 
 // EulaView text.
 const (
-	EulaTitle = "Welcome to the CBL-Mariner Installer"
+	EulaTitle = "Welcome to the CBL-Mariner Installer."
 )
 
 // HostNameView text.
 const (
-	HostNameTitle      = "Choose the Hostname for Your System"
+	HostNameTitle      = "Choose the Hostname for Your System."
 	HostNameInputLabel = "HostName:"
 
 	HostNameSegment   = "hostname"
@@ -113,12 +113,12 @@ const (
 
 // InstallationView text.
 const (
-	InstallationTitle = "Select Installation Type"
+	InstallationTitle = "Select Installation Type. "
 )
 
 // UserView text.
 const (
-	SetupUserTitle = "Setup User Account"
+	SetupUserTitle = "Setup User Account."
 
 	PasswordInputLabel        = "Password"
 	ConfirmPasswordInputLabel = "Confirm Password"
@@ -136,13 +136,13 @@ const (
 
 // ProgressView text.
 const (
-	ProgressTitle      = "Installing CBL-Mariner OS"
+	ProgressTitle      = "Installing CBL-Mariner OS."
 	ProgressSpinnerFmt = "Installing CBL-Mariner, please wait %v"
 )
 
 // FinishView text.
 const (
-	FinishTitle   = "CBL-Mariner Installation Complete"
+	FinishTitle   = "CBL-Mariner Installation Complete."
 	FinishTextFmt = "Total installation time: %v seconds."
 )
 
