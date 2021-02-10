@@ -159,7 +159,7 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
-* Mon Feb 8 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.2.0-25
+* Mon Feb 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.2.0-25
 - Update CVE-2020-17380
 
 * Wed Jan 13 2021 Henry Li <niontive@microsoft.com> - 4.2.0-24
