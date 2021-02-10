@@ -27,7 +27,7 @@ sudo rm -rf ${sysroot}
 
 mkdir -p ${buildDir}
 mkdir -p ${installDir}
-mkdir -p ${sysroot}
+mkdir -p "${sysroot}/lib"
 
 cd ${buildDir}
 
@@ -49,7 +49,6 @@ ln -s ../gmp-6.1.2 gmp
 ln -s ../mpc-1.1.0 mpc
 cd ..
 
-sudo mkdir -p "${installDir}/aarch64-linux-gnu"
 export PATH="${installDir}/bin":$PATH
 
 cd WSL2-Linux-Kernel-linux-msft-5.4.83
@@ -77,7 +76,7 @@ mkdir -p build-glibc
 cd build-glibc
 ../glibc-2.28/configure --prefix=/ --build=$MACHTYPE --host=aarch64-linux-gnu --target=aarch64-linux-gnu --with-sysroot=${sysroot} --with-headers="${sysroot}/include" --disable-multilib libc_cv_forced_unwind=yes  --disable-werror
 make DESTDIR=${sysroot} install-bootstrap-headers=yes install-headers 
-make -j$(nproc) csu/subdir_lib "install_root=${installDir}/aarch64-linux-gnu/sysroot"
+make -j$(nproc) csu/subdir_lib
 install csu/crt1.o csu/crti.o csu/crtn.o "${sysroot}/lib" 
 aarch64-linux-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o "${sysroot}/lib/libc.so"
 touch "${sysroot}/include/gnu/stubs.h"
