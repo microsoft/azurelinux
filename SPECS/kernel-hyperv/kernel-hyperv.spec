@@ -14,6 +14,7 @@ Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msf
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel

@@ -132,6 +132,7 @@ Patch1101:      CVE-2020-29569.nopatch
 Patch1102:      CVE-2020-28374.nopatch
 Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
