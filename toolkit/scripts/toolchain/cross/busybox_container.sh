@@ -59,9 +59,8 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
 echo "Creating base container"
 mkdir ${dockerBuildDir}
-cp ${scriptDir}/Dockerfile              ${dockerBuildDir}/
-cp -r ${installDir}/targetfs            ${dockerBuildDir}/
-cp -r ${installDir}/aarch64-linux-gnu   ${dockerBuildDir}/
+cp ${scriptDir}/Dockerfile                      ${dockerBuildDir}/
+cp -r ${installDir}/aarch64-linux-gnu/sysroot   ${dockerBuildDir}/
 
 docker build -t ${cross_image_name}:${cross_image_tag} ${dockerBuildDir}
 

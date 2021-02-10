@@ -17,7 +17,7 @@
 
 
 installDir="/opt/cross"
-sysroot="${installDir}/aarch64-linux-gnu"
+sysroot="${installDir}/aarch64-linux-gnu/sysroot"
 buildDir="$HOME/cross"
 scriptDir="$( cd "$( dirname "$0" )" && pwd )"
 
