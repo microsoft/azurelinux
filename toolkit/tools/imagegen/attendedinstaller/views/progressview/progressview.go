@@ -5,12 +5,15 @@ package progressview
 
 import (
 	"sync"
+	"time"
 
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/progressbar"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
 	"microsoft.com/pkggen/imagegen/configuration"
 	"microsoft.com/pkggen/internal/logger"
+
+	"github.com/bendahl/uinput"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -168,6 +171,13 @@ func (pv *ProgressView) startInstallation() {
 	pv.performInstallation(progress, status)
 
 	wg.Wait()
+
+	// We need some custom input to clear the screen
+	vk, _ := uinput.CreateKeyboard("/dev/uinput", []byte("MarinerKeyboard"))
+	defer vk.Close()
+	_ = vk.KeyPress(uinput.KeyKpenter)
+	time.Sleep(1 * time.Second)
+	_ = vk.KeyPress(uinput.KeyKpenter)
 
 	pv.nextPage()
 }

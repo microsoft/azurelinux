@@ -7,20 +7,22 @@ package uitext
 
 // Navigation text.
 const (
-	ButtonAccept  = "[Accept[]"
-	ButtonCancel  = "[Cancel[]"
-	ButtonConfirm = "[Confirm[]"
-	ButtonGoBack  = "[Go Back[]"
-	ButtonNext    = "[Next[]"
-	ButtonYes     = "[Yes[]"
-	ButtonQuit    = "[Quit[]"
-	ButtonRestart = "[Restart[]"
+	ButtonAccept     = "[Accept[]"
+	ButtonCancel     = "[Cancel[]"
+	BoldButtonCancel = "[::b]" + ButtonCancel
+	ButtonConfirm    = "[Confirm[]"
+	ButtonGoBack     = "[Go Back[]"
+	ButtonNext       = "[Next[]"
+	ButtonYes        = "[Yes[]"
+	ButtonQuit       = "[Quit[]"
+	BoldButtonQuit   = "[::b]" + ButtonQuit
+	ButtonRestart    = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.
 const (
 	NavigationHelp = "Arrow keys make selections. Enter activates."
-	ExitModalTitle = "Do you want to quit setup?"
+	ExitModalTitle = "[::b]Do you want to quit setup?"
 )
 
 // ConfirmView text.
@@ -40,7 +42,7 @@ const (
 
 	// Auto partition
 	DiskHelp  = "Please select a disk to install CBL-Mariner on."
-	DiskTitle = "Select a Disk"
+	DiskTitle = "Select a Disk."
 
 	// Custom Partition
 	DiskAdvanceTitleFmt   = "Partitions for: %v"

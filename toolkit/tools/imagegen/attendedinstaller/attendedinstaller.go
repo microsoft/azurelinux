@@ -303,11 +303,11 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	ai.exitModal = tview.NewModal().
 		SetText(uitext.ExitModalTitle).
-		AddButtons([]string{uitext.ButtonQuit, uitext.ButtonCancel}).
+		AddButtons([]string{uitext.BoldButtonQuit, uitext.BoldButtonCancel}).
 		SetBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetButtonBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if buttonLabel == uitext.ButtonQuit {
+			if buttonLabel == uitext.BoldButtonQuit {
 				ai.userQuitInstallation = true
 				ai.app.Stop()
 			} else {
