@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Use a custom termcap for the Mariner installer in an ISO environment
-# for a high contrast cursor.
+# for a high contrast cursor. This is based on the "linux" termcap.
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
@@ -28,44 +28,14 @@ else
     done
 fi
 
+# FIXME(thcrain-msft)
+# This is a loop of silence to keep the default audio device alive
+# This is a temporary workaround that is needed for VirtualBox,
+# which is currently the most convenient platform to test on which
+# has sound driver support.
 speaker-test -l0 -t wav -w ../../../../root/silence.wav -r 22050 >/dev/null 2>&1 &
 
-cat << EOF >> /root/.asoundrc
-pcm.!default {
-    type plug
-    slave.pcm "dmixer"
-}
-pcm.dsp0 {
-    type plug
-    slave.pcm "dmixer"
-}
-pcm.default {
-    type plug
-    slave.pcm "dmixer"
-}
-pcm.dmixer {
-    type dmix
-    ipc_key 1024
-    ipc_key_add_uid false
-    ipc_perm 0666
-    slave {
-        pcm "hw:0,0"
-        period_time 0
-        period_size 1024
-        buffer_size 8192
-        rate 48000
-    }
-    bindings {
-        0 0
-        1 1
-    }
-}
-ctl.mixer0 {
-    type hw
-    card 0
-}
-EOF
-
+# Set better defaults for speakup punctuation level/speed
 echo 2 > /sys/accessibility/speakup/punc_level
 echo 2 > /sys/accessibility/speakup/reading_punc
 echo 2 > /sys/accessibility/speakup/soft/rate
