@@ -7,6 +7,8 @@
 # http://jiadongsun.cc/2019/09/03/Cross_Compile_Gcc/#6-build-glibc
 
 # ====== Prerequisites ======
+# You may need to run "chmod +x <path to this script>" prior to running it to give it execute permissions
+#
 # The following packages need to be installed before running this script
 # For Ubuntu/Mariner:
 # gawk rsync bison
