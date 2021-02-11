@@ -37,7 +37,7 @@
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
-Name:           binutils-%{_cross_name}
+Name:           %{_cross_name}-binutils
 Version:        2.32
 Release:        4%{?dist}
 License:        GPLv2+
