@@ -3,7 +3,7 @@
 %global _host_arch      x86_64
 %global _target_arch    aarch64
 %global _tuple          %{_target_arch}-linux-gnu
-%global _cross_name     %{_target_arch}-linux-glibc
+%global _cross_name     %{_target_arch}-linux-gnu
 
 # Folders which should be in our macro file
 %global _opt                /opt/
