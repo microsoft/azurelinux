@@ -1,6 +1,8 @@
 %global mpm event
 %define docroot /var/www
 %define suexec_caller apache
+%define mmn 20120211
+%define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
@@ -12,20 +14,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        README.confd
-Source2:        README.confmod
-Source3:        00-base.conf 
-Source4:        00-mpm.conf 
-Source5:        00-lua.conf 
-Source6:        01-cgi.conf 
-Source7:        00-dav.conf
-Source8:        00-proxy.conf 
-Source9:        00-ssl.conf 
-Source10:       01-ldap.conf 
-Source11:       00-proxyhtml.conf
-Source12:       01-ldap.conf 
-Source13:       00-systemd.conf 
-Source14:       01-session.conf 
-Source15:       00-optional.conf
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
@@ -56,6 +44,7 @@ Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 
 Provides:       apache2
+Provides:       %{name}-mmn = %{version}-%{release}
 
 %define _confdir %{_sysconfdir}
 
@@ -80,6 +69,7 @@ These are the help files of httpd.
 Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
+Requires:  %{name} = %{version}-%{release}
 	
 %description filesystem
 The httpd-filesystem package contains the basic directory layout
@@ -98,26 +88,27 @@ The httpd-tools of httpd.
 %patch0 -p1
 %patch1 -p1
 
+# Safety check: prevent build if defined MMN does not equal upstream MMN.
+vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
+if test "x${vmmn}" != "x%{mmn}"; then
+   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}
+   : Update the mmn macro and rebuild.
+   exit 1
+fi
+
 %build
 %configure \
             --prefix=%{_sysconfdir}/httpd          \
             --exec-prefix=%{_prefix}               \
             --sysconfdir=%{_confdir}/httpd/conf    \
+            --includedir=%{_includedir}/httpd      \
             --libexecdir=%{_libdir}/httpd/modules  \
             --datadir=%{_sysconfdir}/httpd         \
             --enable-authnz-fcgi                   \
             --enable-mods-shared="all cgi"         \
             --enable-mpms-shared=all               \
             --with-apr=%{_prefix}                  \
-            --with-apr-util=%{_prefix}             \
-            --enable-suexec --with-suexec          \
-	        --enable-suexec-capabilities           \
-            --with-suexec-caller=%{suexec_caller}  \
-	        --with-suexec-docroot=%{docroot}       \
-            --without-suexec-logfile               \
-	        --with-suexec-syslog                   \
-	        --with-suexec-bin=%{_sbindir}/suexec   \
-	        --with-suexec-uidmin=1000 --with-suexec-gidmin=1000
+            --with-apr-util=%{_prefix}             
 
 make %{?_smp_mflags}
 
@@ -127,29 +118,8 @@ install -vdm755 %{buildroot}/usr/lib/systemd/system
 install -vdm755 %{buildroot}/etc/httpd/logs
 
 # install conf file/directory
-mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d \
-      %{buildroot}%{_sysconfdir}/httpd/conf.modules.d
-	
-install -m 644 %{SOURCE1} \
-    %{buildroot}%{_sysconfdir}/httpd/conf.d/README
-
-install -m 644 %{SOURCE2} \
-    %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/README
-	
-for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
-	
-  install -m 644 -p %{_sourcedir}/$f \
-        %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/$f
-	
-done
-	
-sed -i '/^#LoadModule mpm_%{mpm}_module /s/^#//' \
-     %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
-	
-touch -r %{SOURCE4} \
-     %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/httpd/conf.d/README
 
 cat << EOF >> %{buildroot}/usr/lib/systemd/system/httpd.service
 [Unit]
@@ -260,12 +230,8 @@ fi
 %dir %{_sysconfdir}/httpd
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
-%dir %{docroot}
-%dir %{docroot}/cgi-bin
-%dir %{docroot}/html
-%dir %{_sysconfdir}/httpd/icons
-%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
-%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
+%{_sysconfdir}/httpd/cgi-bin
+%{_sysconfdir}/httpd/icons
 
 %files tools
 %defattr(-,root,root)
@@ -273,6 +239,10 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+* Tue Feb 09 2021 Henry Li <lihl@microsoft.com> 2.4.46-4
+- Provides httpd-mmn from httpd
+- Add subpackage httpd-filesystem
+- Add --includedir=%{_includedir}/httpd to configuration
 *   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
 -   Mark CVE-2007-0086 as nopatch
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.46-2

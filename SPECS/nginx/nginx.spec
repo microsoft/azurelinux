@@ -1,7 +1,8 @@
+%global nginx_user  nginx
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 Version:        1.16.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD 2-Clause
 URL:            http://nginx.org/
 Group:          Applications/System
@@ -14,8 +15,21 @@ Source2:        nginx-njs-0.2.1.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
+Requires:       nginx-filesystem = %{version}-%{release}
+
 %description
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
+
+%package filesystem
+Summary:           The basic directory layout for the Nginx server
+BuildArch:         noarch
+Requires(pre):     shadow-utils
+Requires:          %{name} = %{version}-%{release}
+	
+%description filesystem
+The nginx-filesystem package contains the basic directory layout
+for the Nginx server including the correct permissions for the
+directories.
 
 %prep
 %setup -q
@@ -51,6 +65,25 @@ install -vdm755 %{buildroot}%{_var}/opt/nginx/log
 ln -sfv %{_var}/opt/nginx/log %{buildroot}%{_var}/log/nginx
 install -p -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/nginx.service
 
+	
+install -p -d -m 0755 %{buildroot}%{_sysconfdir}/systemd/system/nginx.service.d
+install -p -d -m 0755 %{buildroot}%{_unitdir}/nginx.service.d
+
+install -p -d -m 0755 %{buildroot}%{_sysconfdir}/nginx/conf.d
+install -p -d -m 0755 %{buildroot}%{_sysconfdir}/nginx/default.d
+
+install -p -d -m 0755 %{buildroot}%{_datadir}/nginx/html
+install -p -d -m 0755 %{buildroot}%{_datadir}/nginx/modules
+
+rm -f %{buildroot}%{_datadir}/nginx/html/index.html
+	
+%pre filesystem
+getent group %{nginx_user} > /dev/null || groupadd -r %{nginx_user}
+getent passwd %{nginx_user} > /dev/null || \
+    useradd -r -d %{_localstatedir}/lib/nginx -g %{nginx_user} \
+    -s /sbin/nologin -c "Nginx web server" %{nginx_user}
+exit 0
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -75,9 +108,22 @@ install -p -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/nginx.service
 %dir %{_var}/opt/nginx/log
 %{_var}/log/nginx
 
+%files filesystem
+%defattr(-,root,root)
+%dir %{_datadir}/nginx
+%dir %{_datadir}/nginx/html
+%dir %{_sysconfdir}/nginx
+%dir %{_sysconfdir}/nginx/conf.d
+%dir %{_sysconfdir}/nginx/default.d
+%dir %{_sysconfdir}/systemd/system/nginx.service.d
+%dir %{_unitdir}/nginx.service.d
+
 %changelog
-* Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
-- Added %%license line automatically
+* Wed Feb 10 2021 Henry Li <lihl@microsoft.com> - 1.16.1-3
+- Added nginx-filesystem package
+
+*   Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
+-   Added %%license line automatically
 
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.16.1-1
 -   Update to version 1.16.1. License verified.
