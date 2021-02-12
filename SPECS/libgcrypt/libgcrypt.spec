@@ -54,11 +54,13 @@ make %{?_smp_mflags} check
 %{_datadir}/aclocal/*
 %{_libdir}/*.la
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
 * Mon Feb 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-1
 - Update to 1.8.7 to fix CVE-2019-13627
 - Remove cross-compile patch
+- Add pkgconfig file to devel subpackage
 - Update Source0 and URL tags, remove SHA-1 tag
 - Lint spec to Mariner style
 
