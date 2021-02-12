@@ -1,8 +1,4 @@
-%global mpm event
-%define docroot /var/www
-%define suexec_caller apache
 %define mmn 20120211
-%define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
@@ -250,6 +246,8 @@ fi
 - Provides httpd-mmn from httpd
 - Add subpackage httpd-filesystem
 - Add --includedir=%{_includedir}/httpd to configuration
+- Fix files section for httpd-devel and httpd-tools
+
 *   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
 -   Mark CVE-2007-0086 as nopatch
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.46-2
