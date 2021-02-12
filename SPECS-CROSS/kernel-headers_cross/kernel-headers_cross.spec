@@ -52,7 +52,7 @@
 Summary:        Linux API header files
 Name:           %{_cross_name}-kernel-headers
 Version:        5.4.51
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Group:          System Environment/Kernel
@@ -79,17 +79,12 @@ rm usr/include/Makefile
 mkdir -p                /%{buildroot}%{_cross_sysroot}%{_includedir}
 cp -rv usr/include/*    /%{buildroot}%{_cross_sysroot}%{_includedir}
 
-echo "fubar"
-ls /%{buildroot}%{_cross_sysroot}
-ls /%{buildroot}%{_cross_sysroot}%{_includedir}
-echo "/%{buildroot}%{_cross_sysroot}%"
-echo "/%{buildroot}%{_cross_sysroot}%{_includedir}"
-echo "%{_cross_sysroot}%{_includedir}/*"
-
 %files
 %defattr(-,root,root)
 %{_cross_sysroot}%{_includedir}/*
 %changelog
+*   Thu Feb 11 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.51-13
+-   Fork normal kernel-headers package into cross compile aware version
 *   Mon Jan 11 2021 Thomas Crain <thcrain@microsoft.com> - 5.4.51-12
 -   Update Release tag to match that of the kernel package
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.4.51-3
