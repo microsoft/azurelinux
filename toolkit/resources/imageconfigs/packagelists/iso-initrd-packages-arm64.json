@@ -36,6 +36,7 @@
         "libstdc++",
         "lvm2",
         "lua",
+        "lz4",
         "ncurses",
         "ncurses-term",
         "nspr",

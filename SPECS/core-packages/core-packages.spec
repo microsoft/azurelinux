@@ -1,7 +1,7 @@
 Name:           core-packages
 Summary:        Metapackage with core sets of packages
 Version:        0.1
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://aka.ms/mariner
@@ -61,6 +61,7 @@ Requires:   findutils
 Requires:   grep
 Requires:   gzip
 Requires:   libtool
+Requires:   lz4
 Requires:   mariner-release
 Requires:   mariner-repos
 Requires:   mariner-rpm-macros
@@ -97,6 +98,8 @@ Requires:   zlib
 %files container
 
 %changelog
+*   Tue Feb 16 2021 Henry Beberman <henry.beberman@microsoft.com> 0.1-21
+-   Explicitly add lz4 to container subpackage for systemd dependency.
 *   Wed Sep 02 2020 Mateusz Malisz <mamalisz@microsoft.com> 0.1-20
 -   Add chrony package to the base-image.
 *   Thu Jul 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1-19
