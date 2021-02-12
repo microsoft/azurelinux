@@ -1919,7 +1919,7 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 		return
 	}
 
-	signatureFileFullPath := filepath.join(workDirPath, signatureFileName)
+	signatureFileFullPath := filepath.Join(workDirPath, signatureFileName)
 	defer os.Remove(signatureFileFullPath)
 
 	rdiffArgs = []string{
