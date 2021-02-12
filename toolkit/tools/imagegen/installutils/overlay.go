@@ -15,62 +15,69 @@ import (
 // Overlay Struct representing an overlay mount
 type Overlay struct {
 	DevicePath string
+	lowerDir   string
+	upperDir   string
+	workDir    string
 }
 
 func (o Overlay) getMountArgs() string {
 
-	_, deviceName := filepath.Split(o.DevicePath)
-	lowerDir := "/lowerdir" + deviceName
-	upperDir := "/upperdir" + deviceName
-	workDir := "/workdir" + deviceName
-	return fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", lowerDir, upperDir, workDir)
+	return fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", o.lowerDir, o.upperDir, o.workDir)
 }
 
 func (o Overlay) setupFolders() (err error) {
-	_, deviceName := filepath.Split(o.DevicePath)
-	lowerDir := "/lowerdir" + deviceName
-	upperDir := "/upperdir" + deviceName
-	workDir := "/workdir" + deviceName
-	err = os.MkdirAll(lowerDir, os.ModePerm)
+	err = os.MkdirAll(o.lowerDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", lowerDir)
+		logger.Log.Errorf("Could not create directory (%s)", o.lowerDir)
 		return
 	}
-	err = os.MkdirAll(upperDir, os.ModePerm)
+	err = os.MkdirAll(o.upperDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", upperDir)
+		logger.Log.Errorf("Could not create directory (%s)", o.upperDir)
 		return
 	}
-	err = os.MkdirAll(workDir, os.ModePerm)
+	err = os.MkdirAll(o.workDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", workDir)
+		logger.Log.Errorf("Could not create directory (%s)", o.workDir)
 		return
 	}
-	err = mount(lowerDir, o.DevicePath, "", "")
+	err = mount(o.lowerDir, o.DevicePath, "", "")
 	if err != nil {
-		logger.Log.Errorf("Could not mount %s to %s", o.DevicePath, lowerDir)
+		logger.Log.Errorf("Could not mount %s to %s", o.DevicePath, o.lowerDir)
 	}
 	return
 }
 
 func (o Overlay) getUpperDir() (upperDir string) {
-
-	_, deviceName := filepath.Split(o.DevicePath)
-	upperDir = "/upperdir" + deviceName
-	return
+	return o.upperDir
 }
 
 func (o Overlay) unmount() (err error) {
-	_, deviceName := filepath.Split(o.DevicePath)
-	lowerDir := "/lowerdir" + deviceName
-	err = umount(lowerDir)
+	err = umount(o.lowerDir)
 	if err != nil {
-		logger.Log.Warnf("Unmount of loopback(%s) failed. Still continuing", lowerDir)
+		logger.Log.Warnf("Unmount of loopback(%s) failed. Still continuing", o.lowerDir)
 	}
 
 	err = diskutils.DetachLoopbackDevice(o.DevicePath)
 	if err != nil {
-		logger.Log.Warnf("Losetup of loopback(%s) failed. Still continuing", lowerDir)
+		logger.Log.Warnf("Losetup of loopback(%s) failed. Still continuing", o.lowerDir)
 	}
 	return
+}
+
+// NewOverlay Creates the overlay struct
+func NewOverlay(devicePath string) Overlay {
+	_, deviceName := filepath.Split(devicePath)
+	lowerDir := "/lowerdir" + deviceName
+	upperDir := "/upperdir" + deviceName
+	workDir := "/workdir" + deviceName
+
+	o := Overlay{
+		devicePath,
+		lowerDir,
+		upperDir,
+		workDir,
+	}
+
+	return o
 }

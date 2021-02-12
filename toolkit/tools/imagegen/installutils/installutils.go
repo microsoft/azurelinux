@@ -142,9 +142,8 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 		return
 	}
 
-	overlayMount := Overlay{
-		DevicePath: devicePath,
-	}
+	overlayMount := NewOverlay(devicePath)
+
 	mountPointToOverlayMap[partitionSetting.MountPoint] = &overlayMount
 
 	// For overlays the device to be mounted is /dev/null. The actual device is synthesized from the lower and upper dir args
