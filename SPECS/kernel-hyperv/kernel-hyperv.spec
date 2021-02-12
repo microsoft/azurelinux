@@ -14,6 +14,7 @@ Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msf
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
@@ -169,7 +170,7 @@ EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
 # hmac sign the kernel for FIPS
-sha512hmac %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Register myself to initramfs

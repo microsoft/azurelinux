@@ -5,7 +5,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        3%{?dist}
+Release:        4%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -99,7 +99,7 @@ mkdir -p %{buildroot}%{_sharedstatedir}/initramfs
 
 rm -f %{buildroot}%{_mandir}/man?/*suse*
 
-install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{dracutlibdir}/dracut.conf.d/40-fips.conf
+install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
 
 # create compat symlink
@@ -164,7 +164,7 @@ rm -rf -- %{buildroot}
 %files fips
 %defattr(-,root,root,0755)
 %{dracutlibdir}/modules.d/01fips
-%{dracutlibdir}/dracut.conf.d/40-fips.conf
+%{_sysconfdir}/dracut.conf.d/40-fips.conf
 %config(missingok) %{_sysconfdir}/system-fips
 
 %files tools
@@ -176,6 +176,9 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Wed Feb 10 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-4
+- Move 40-fips.conf to /etc/dracut.conf.d/
+
 * Mon Feb 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-3
 - Add dracut-fips package.
 - Disable kernel crypto testing in dracut-fips.
