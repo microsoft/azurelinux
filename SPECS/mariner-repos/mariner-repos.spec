@@ -56,6 +56,14 @@ Requires: %{name} = %{version}-%{release}
 %description extras
 %{summary}
 
+%package extras-preview
+Summary:  CBL-Mariner extras repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description extras
+%{summary}
+
 %install
 rm -rf $RPM_BUILD_ROOT
 export REPO_DIRECTORY="$RPM_BUILD_ROOT/etc/yum.repos.d"
@@ -66,6 +74,7 @@ install -m 644 %{SOURCE4} $REPO_DIRECTORY
 install -m 644 %{SOURCE5} $REPO_DIRECTORY
 install -m 644 %{SOURCE6} $REPO_DIRECTORY
 install -m 644 %{SOURCE7} $REPO_DIRECTORY
+install -m 644 %{SOURCE8} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="$RPM_BUILD_ROOT/etc/pki/rpm-gpg"
 
@@ -98,7 +107,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-preview.repo
 
-
 %files ui
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-ui.repo
@@ -111,12 +119,14 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-extras.repo
 
-%changelog
-=======
+%files extras-preview
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-extras-preview.repo
 
 %changelog
 *   Fri Feb 19 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-13
--   Add extras repo
+-   Add extras repo.
+-   Add extras-preview repo.
 *   Fri Jan 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12
 -   Adding a set of repos with the UI components.
 *   Thu Oct 01 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0-11
