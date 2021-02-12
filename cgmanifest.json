@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bmon",
+          "version": "4.0",
+          "downloadUrl": "https://github.com/tgraf/bmon/archive/v4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bond",
           "version": "8.0.1",
           "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
@@ -377,6 +387,16 @@
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bpftrace",
+          "version": "0.11.4",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/v0.11.4.tar.gz"
         }
       }
     },
@@ -2194,6 +2214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libacvp",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/cisco/libacvp/archive/v1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libaio",
           "version": "0.3.112",
           "downloadUrl": "https://releases.pagure.org/libaio/libaio-0.3.112.tar.gz"
@@ -2307,6 +2337,16 @@
           "name": "libconfini",
           "version": "1.16.0",
           "downloadUrl": "https://github.com/madmurphy/libconfini/archive/1.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libconfuse",
+          "version": "3.3",
+          "downloadUrl": "https://github.com/libconfuse/libconfuse/releases/download/v3.3/confuse-3.3.tar.gz"
         }
       }
     },
@@ -2517,6 +2557,16 @@
           "name": "liblogging",
           "version": "1.0.6",
           "downloadUrl": "http://download.rsyslog.com/liblogging/liblogging-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libmaxminddb",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.5.0/libmaxminddb-1.5.0.tar.gz"
         }
       }
     },
@@ -3494,6 +3544,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nDPI",
+          "version": "3.4",
+          "downloadUrl": "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "net-snmp",
           "version": "5.9",
           "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
@@ -3647,6 +3707,16 @@
           "name": "nss",
           "version": "3.44",
           "downloadUrl": "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ntopng",
+          "version": "4.2",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
         }
       }
     },
@@ -4225,8 +4295,8 @@
         "type": "other",
         "other": {
           "name": "pigz",
-          "version": "2.5",
-          "downloadUrl": "https://www.zlib.net/pigz/pigz-2.5.tar.gz"
+          "version": "2.6",
+          "downloadUrl": "https://github.com/madler/pigz/archive/v2.6.tar.gz"
         }
       }
     },
@@ -6857,6 +6927,16 @@
           "name": "vim",
           "version": "8.1.1667",
           "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "vnstat",
+          "version": "2.6",
+          "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.6.tar.gz"
         }
       }
     },

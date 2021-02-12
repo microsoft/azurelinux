@@ -1,7 +1,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        8.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/cfe-%{version}.src.tar.xz
@@ -44,6 +44,7 @@ mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr   \
       -DCMAKE_BUILD_TYPE=Release    \
+      -DLLVM_ENABLE_RTTI=ON         \
       -Wno-dev ..
 
 make %{?_smp_mflags}
@@ -80,6 +81,8 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+*   Tue Feb 09 2021 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-4
+-   Enable RTTI (runtime type information) so other packages can depend on it.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
 -   Temporarily disable generation of debug symbols.
 *   Sat May 09 00:21:24 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2

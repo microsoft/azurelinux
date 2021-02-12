@@ -1,9 +1,10 @@
 %global security_hardening none
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.91
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +13,7 @@ URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
+Source3:        sha512hmac-openssl.sh
 # Arm64 HyperV support required patch
 Patch0:         ver5_4_72_arm64_hyperv_support.patch
 Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
@@ -130,14 +132,15 @@ Patch1101:      CVE-2020-29569.nopatch
 Patch1102:      CVE-2020-28374.nopatch
 Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
-BuildRequires:  libkcapi-hmaccalc
 BuildRequires:  libmspack-devel
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
@@ -325,7 +328,7 @@ EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
 # hmac sign the kernel for FIPS
-sha512hmac %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Register myself to initramfs
@@ -456,6 +459,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Use OpenSSL to perform HMAC calc
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add configs for userspace crypto support
 - HMAC calc the kernel for FIPS
