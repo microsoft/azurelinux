@@ -1907,6 +1907,7 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 
 	fullPath := filepath.Join(workDirPath, name)
 
+	// rdiff expectes the signature file path to be relative.
 	rdiffArgs := []string{
 		"signature",
 		rDiffBaseImage,
@@ -1917,7 +1918,9 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 	if err != nil {
 		return
 	}
-	defer os.Remove(signatureFileName)
+
+	signatureFileFullPath := filepath.join(workDirPath, signatureFileName)
+	defer os.Remove(signatureFileFullPath)
 
 	rdiffArgs = []string{
 		"delta",
