@@ -1,4 +1,3 @@
-%global nginx_user  nginx
 %define sha1    nginx-njs=fd8c3f2d219f175be958796e3beaa17f3b465126
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
@@ -15,7 +14,6 @@ Source2:        nginx-njs-0.2.1.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
-Requires:       %{name}-filesystem = %{version}-%{release}
 Provides:       %{name}-filesystem = %{version}-%{release}
 
 %description
@@ -82,7 +80,7 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 
 %changelog
 * Wed Feb 10 2021 Henry Li <lihl@microsoft.com> - 1.16.1-3
-- Added nginx-filesystem package
+- Add Provides for nginx-filesystem from nginx
 
 *   Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
 -   Added %%license line automatically

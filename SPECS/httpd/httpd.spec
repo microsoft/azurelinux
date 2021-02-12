@@ -10,7 +10,6 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
-Source1:        README.confd
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
@@ -92,7 +91,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm755 %{buildroot}%{_lib}/systemd/system
+install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_sysconfdir}/httpd/logs
 
 cat << EOF >> %{buildroot}%{_libdir}/systemd/system/httpd.service
@@ -206,9 +205,7 @@ fi
 
 %changelog
 * Tue Feb 09 2021 Henry Li <lihl@microsoft.com> - 2.4.46-4
-- Provides httpd-mmn from httpd
-- Add subpackage httpd-filesystem
-- Add --includedir=%{_includedir}/httpd to configuration
+- Add Provides for httpd-mmn and httpd-filesystem from httpd
 - Fix files section for httpd-devel and httpd-tools
 
 *   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
