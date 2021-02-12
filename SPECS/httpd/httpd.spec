@@ -40,6 +40,7 @@ Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       apache2
 Provides:       %{name}-mmn = %{version}-%{release}
+Provides:       %{name}-filesystem = %{version}-%{release}
 
 %description
 The Apache HTTP Server.
@@ -62,17 +63,6 @@ Requires:       httpd
 %description docs
 These are the help files of httpd.
 
-%package filesystem
-Summary:        The basic directory layout for the Apache HTTP Server
-Requires:       %{name} = %{version}-%{release}
-Requires(pre):  %{_sbindir}/useradd
-BuildArch:      noarch
-
-%description filesystem
-The httpd-filesystem package contains the basic directory layout
-for the Apache HTTP Server including the correct permissions
-for the directories.
-
 %package tools
 Summary:        Tools for httpd
 Group:          System Environment/Daemons
@@ -85,20 +75,11 @@ The httpd-tools of httpd.
 %patch0 -p1
 %patch1 -p1
 
-# Safety check: prevent build if defined MMN does not equal upstream MMN.
-vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
-if test "x${vmmn}" != "x%{mmn}"; then
-   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}
-   : Update the mmn macro and rebuild.
-   exit 1
-fi
-
 %build
 %configure \
             --prefix=%{_sysconfdir}/httpd          \
             --exec-prefix=%{_prefix}               \
             --sysconfdir=%{_confdir}/httpd/conf    \
-            --includedir=%{_includedir}/httpd      \
             --libexecdir=%{_libdir}/httpd/modules  \
             --datadir=%{_sysconfdir}/httpd         \
             --enable-authnz-fcgi                   \
@@ -114,11 +95,7 @@ make DESTDIR=%{buildroot} install
 install -vdm755 %{buildroot}%{_lib}/systemd/system
 install -vdm755 %{buildroot}%{_sysconfdir}/httpd/logs
 
-# install conf file/directory
-mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/httpd/conf.d/README
-
-cat << EOF >> %{buildroot}%{_lib}/systemd/system/httpd.service
+cat << EOF >> %{buildroot}%{_libdir}/systemd/system/httpd.service
 [Unit]
 Description=The Apache HTTP Server
 After=network.target remote-fs.target nss-lookup.target
@@ -135,18 +112,11 @@ WantedBy=multi-user.target
 
 EOF
 
-install -vdm755 %{buildroot}%{_lib}/systemd/system-preset
-echo "disable httpd.service" > %{buildroot}%{_lib}/systemd/system-preset/50-httpd.preset
+install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
+echo "disable httpd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-httpd.preset
 
 ln -s %{_sbindir}/httpd %{buildroot}%{_sbindir}/apache2
 ln -s %{_sysconfdir}/httpd/conf/httpd.conf %{buildroot}%{_sysconfdir}/httpd/httpd.conf
-
-%pre filesystem
-getent group apache >/dev/null || groupadd -g 48 -r apache
-getent passwd apache >/dev/null || \
-  useradd -r -u 48 -g apache -s /sbin/nologin \
-    -d %{contentdir} -c "Apache" apache
-exit 0
 
 %post
 /sbin/ldconfig
@@ -224,14 +194,6 @@ fi
 %dir %{_sysconfdir}/httpd/logs
 %{_libdir}/systemd/system/httpd.service
 %{_libdir}/systemd/system-preset/50-httpd.preset
-
-%files filesystem
-%defattr(-,root,root)
-%dir %{_sysconfdir}/httpd
-%dir %{_sysconfdir}/httpd/conf.d
-%{_sysconfdir}/httpd/conf.d/README
-%{_sysconfdir}/httpd/cgi-bin
-%{_sysconfdir}/httpd/icons
 
 %files tools
 %defattr(-,root,root)

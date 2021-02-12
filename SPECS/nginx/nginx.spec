@@ -15,21 +15,11 @@ Source2:        nginx-njs-0.2.1.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
-Requires:       nginx-filesystem = %{version}-%{release}
+Requires:       %{name}-filesystem = %{version}-%{release}
+Provides:       %{name}-filesystem = %{version}-%{release}
 
 %description
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
-
-%package filesystem
-Summary:        The basic directory layout for the Nginx server
-Requires:       %{name} = %{version}-%{release}
-Requires(pre):  shadow-utils
-BuildArch:      noarch
-
-%description filesystem
-The nginx-filesystem package contains the basic directory layout
-for the Nginx server including the correct permissions for the
-directories.
 
 %prep
 %setup -q
@@ -60,30 +50,11 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm755 %{buildroot}%{_lib}/systemd/system
+install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_var}/log
 install -vdm755 %{buildroot}%{_var}/opt/nginx/log
 ln -sfv %{_var}/opt/nginx/log %{buildroot}%{_var}/log/nginx
-install -p -m 0644 %{SOURCE1} %{buildroot}%{_lib}/systemd/system/nginx.service
-
-
-install -p -d -m 0755 %{buildroot}%{_sysconfdir}/systemd/system/nginx.service.d
-install -p -d -m 0755 %{buildroot}%{_unitdir}/nginx.service.d
-
-install -p -d -m 0755 %{buildroot}%{_sysconfdir}/nginx/conf.d
-install -p -d -m 0755 %{buildroot}%{_sysconfdir}/nginx/default.d
-
-install -p -d -m 0755 %{buildroot}%{_datadir}/nginx/html
-install -p -d -m 0755 %{buildroot}%{_datadir}/nginx/modules
-
-rm -f %{buildroot}%{_datadir}/nginx/html/index.html
-
-%pre filesystem
-getent group %{nginx_user} > /dev/null || groupadd -r %{nginx_user}
-getent passwd %{nginx_user} > /dev/null || \
-    useradd -r -d %{_localstatedir}/lib/nginx -g %{nginx_user} \
-    -s /sbin/nologin -c "Nginx web server" %{nginx_user}
-exit 0
+install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.service
 
 %files
 %defattr(-,root,root)
@@ -108,16 +79,6 @@ exit 0
 %{_libdir}/systemd/system/nginx.service
 %dir %{_var}/opt/nginx/log
 %{_var}/log/nginx
-
-%files filesystem
-%defattr(-,root,root)
-%dir %{_datadir}/nginx
-%dir %{_datadir}/nginx/html
-%dir %{_sysconfdir}/nginx
-%dir %{_sysconfdir}/nginx/conf.d
-%dir %{_sysconfdir}/nginx/default.d
-%dir %{_sysconfdir}/systemd/system/nginx.service.d
-%dir %{_unitdir}/nginx.service.d
 
 %changelog
 * Wed Feb 10 2021 Henry Li <lihl@microsoft.com> - 1.16.1-3
