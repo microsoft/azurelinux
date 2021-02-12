@@ -15,6 +15,7 @@ Source4:        mariner-preview.repo
 Source5:        mariner-ui.repo
 Source6:        mariner-ui-preview.repo
 Source7:        mariner-extras.repo
+Source8:        mariner-extras-preview.repo
 
 Requires(post):  gpgme
 Requires(post):  rpm
@@ -61,7 +62,7 @@ Summary:  CBL-Mariner extras repository.
 Group:    System Envrionment/Base
 Requires: %{name} = %{version}-%{release}
 
-%description extras
+%description extras-preview
 %{summary}
 
 %install
