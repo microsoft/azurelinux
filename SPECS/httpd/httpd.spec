@@ -55,6 +55,7 @@ The Apache HTTP Server.
 Summary: Header files for httpd
 Group: Applications/System
 Requires: httpd
+Requires: apr-devel, apr-util-devel
 %description devel
 These are the header files of httpd.
 
@@ -195,6 +196,9 @@ fi
 %files devel
 %defattr(-,root,root)
 %license LICENSE
+%{_bindir}/apxs
+%{_bindir}/dbmmanage
+%{_mandir}/man1/apxs.1*
 %{_includedir}/*
 
 %files docs
@@ -235,8 +239,11 @@ fi
 
 %files tools
 %defattr(-,root,root)
-%{_bindir}/apxs
-%{_bindir}/dbmmanage
+%{_bindir}/*
+%{_mandir}/man1/*
+%doc LICENSE NOTICE
+%exclude %{_bindir}/apxs
+%exclude %{_mandir}/man1/apxs.1*
 
 %changelog
 * Tue Feb 09 2021 Henry Li <lihl@microsoft.com> 2.4.46-4
