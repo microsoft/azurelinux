@@ -27,7 +27,6 @@ BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
-Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       apr-util
 Requires:       lua
 Requires:       openldap
