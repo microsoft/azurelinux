@@ -100,7 +100,8 @@ python3 setup.py test
 
 %changelog
 *   Wed Feb 10 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.3.2-1
--   Update to version 3.3.2, fixing CVE 2020-36242
+-   Update to version 3.3.2, fixing CVE-2020-36242
+-   Remove Patch for CVE-2020-25659.
 *   Wed Jan 20 2021 Henry Beberman <henry.beberman@microsoft.com> 2.3.1-4
 -   Patch CVE-2020-25659
 -   License verified
