@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.22
-Release:        2%{?dist}
+Version:        8.0.23
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -76,6 +76,9 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+*   Thu Feb 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 8.0.23-1
+-   Upgrade to 8.0.23. Fixes CVE-2020-15358.
+
 *   Thu Nov 05 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-2
 -   Added no patch for CVE-2012-5627
 
