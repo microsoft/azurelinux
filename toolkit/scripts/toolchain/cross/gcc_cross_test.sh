@@ -1,3 +1,5 @@
+# This script assumes that gcc_cross.sh has been run with the gcc extracted sources at $HOME/cross/gcc-9.1.0 and the gcc cross compilation binaries at /opt/cross/bin
+
 cd $HOME/cross/gcc-9.1.0
 
 # version 2021a installed via apt-get
