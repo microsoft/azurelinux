@@ -2,8 +2,8 @@
 # These should be set programatically in the future.
 %global _host_arch      x86_64
 %global _target_arch    aarch64
-%global _tuple          %{_target_arch}-linux-gnu
-%global _cross_name     %{_target_arch}-linux-gnu
+%global _tuple          %{_target_arch}-%{_vendor}-linux-gnu
+%global _cross_name     %{_target_arch}-%{_vendor}-linux-gnu
 
 # Folders which should be in our macro file
 %global _opt                /opt/
@@ -12,7 +12,22 @@
 # Generally we include '/usr' in most paths.
 # Can we also use '/usr' for our paths? This will bring us in line with the
 # %%configure macro which sets these.
-%global _bindir             /bin/
+%global _bindir            /bin
+%global _sbindir           /sbin
+%global _libdir            /lib
+%global _lib64dir          /lib64
+%global _libexecdir        /libexec
+%global _datadir           /share
+%global _docdir            /share/doc
+%global _includedir        /include
+%global _infodir           /share/info
+%global _mandir            /share/man
+%global _oldincludedir     /include
+
+
+# Why is this wrong? We get "x86_64-pc-linux-gnu" when eval'd, but our 
+# tools select "aarch64-linux-gnu"
+%global _host_vendor        %{nil}
 
 # If we want our cross compile aware packges to also support native, we
 # need logic to switch modes something like this:
@@ -23,17 +38,15 @@
 %global _cross_infodir      %{_crossdir}%{_tuple}/share/info
 %global _cross_bindir       %{_tuple}/bin
 %global _cross_libdir       %{_tuple}/lib
-%global _cross_mandir       /share/man
 %global _tuple_name         %{_tuple}-
 %else
 %global _cross_prefix       %{nil}
 %global _cross_sysroot      %{nil}
-%global _tuple_name         %{nil}
 %global _cross_includedir   %{_includedir}
 %global _cross_infodir      %{_infodir}
 %global _cross_bindir       %{_bindir}
 %global _cross_libdir       %{_libdir}
-%global _cross_mandir       %{_mandir}
+%global _tuple_name         %{nil}
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
@@ -116,24 +129,24 @@ rm -rf %{buildroot}/%{_cross_infodir}
 
 %{_cross_prefix}%{_cross_libdir}/ldscripts/*
 
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}readelf.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}windmc.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}ranlib.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}gprof.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}strip.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}c++filt.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}as.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}objcopy.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}elfedit.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}strings.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}nm.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}ar.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}ld.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}dlltool.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}addr2line.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}windres.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}size.1
-%{_cross_prefix}%{_cross_mandir}/man1/%{_tuple_name}objdump.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}readelf.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}windmc.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}ranlib.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gprof.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}strip.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}c++filt.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}as.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}objcopy.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}elfedit.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}strings.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}nm.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}ar.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}ld.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}dlltool.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}addr2line.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}windres.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}size.1
+%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}objdump.1
 
 # These are the -devel files, we are not generating them.
 #%%{_cross_prefix}%%{_libdir}/libbfd-%%{version}.so
