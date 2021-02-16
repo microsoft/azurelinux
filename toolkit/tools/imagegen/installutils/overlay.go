@@ -58,9 +58,10 @@ func (o Overlay) unmount() (err error) {
 		logger.Log.Warnf("Unmount of loopback(%s) failed. Still continuing", o.lowerDir)
 	}
 
-	err = diskutils.DetachLoopbackDevice(o.DevicePath)
-	if err != nil {
+	temperr := diskutils.DetachLoopbackDevice(o.DevicePath)
+	if temperr != nil {
 		logger.Log.Warnf("Losetup of loopback(%s) failed. Still continuing", o.lowerDir)
+		err = temperr
 	}
 	return
 }
