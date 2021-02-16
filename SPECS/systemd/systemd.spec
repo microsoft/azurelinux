@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        35%{?dist}
+Release:        37%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,6 +73,8 @@ Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
 Provides:       systemd-udev = %{version}-%{release}
 Provides:       udev = %{version}-%{release}
+Provides:       nss-myhostname = 0.4
+Provides:       nss-myhostname%{_isa} = 0.4
 
 %description
 Systemd is an init replacement with better process control and security
@@ -179,9 +181,9 @@ for tool in runlevel reboot shutdown poweroff halt telinit; do
      ln -sfv ../bin/systemctl %{buildroot}/sbin/${tool}
 done
 ln -sfv ../lib/systemd/systemd %{buildroot}/sbin/init
-sed -i '/srv/d' %{buildroot}%{_lib}/tmpfiles.d/home.conf
-sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_lib}/tmpfiles.d/legacy.conf
-sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_lib}/systemd/network/99-default.link
+sed -i '/srv/d' %{buildroot}%{_libdir}/tmpfiles.d/home.conf
+sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_libdir}/tmpfiles.d/legacy.conf
+sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_libdir}/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}%{_sysconfdir}/systemd/resolved.conf
 sed -i "s:#NTP=:NTP=time.windows.com:g" %{buildroot}%{_sysconfdir}/systemd/timesyncd.conf
 rm -f %{buildroot}%{_var}/log/README
@@ -193,8 +195,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
 install -dm 0700 %{buildroot}/boot/
 install -m 0600 %{SOURCE2} %{buildroot}/boot/
-rm %{buildroot}%{_lib}/systemd/system/default.target
-ln -sfv multi-user.target %{buildroot}%{_lib}/systemd/system/default.target
+rm %{buildroot}%{_libdir}/systemd/system/default.target
+ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
@@ -296,6 +298,12 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 239-36
+- Provide nss-myhostname.
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 239-35
 - Provide systemd-udev and libudev-devel.
 

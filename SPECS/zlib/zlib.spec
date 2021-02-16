@@ -1,7 +1,7 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.11
-Release:        4%{?dist}
+Release:        5%{?dist}
 URL:            http://www.zlib.net/
 License:        zlib
 Group:          Applications/System
@@ -25,7 +25,7 @@ for handling compiled objects.
 make V=1 %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/%{_lib}
+install -vdm 755 %{buildroot}/%{_libdir}
 ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libz.so) %{buildroot}%{_libdir}/libz.so
 
 %check
@@ -47,6 +47,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.11-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.2.11-4
 -   Add explicit provide for zlib-static
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.2.11-3

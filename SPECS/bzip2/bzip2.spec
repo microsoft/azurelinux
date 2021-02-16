@@ -1,7 +1,7 @@
 Summary:        Contains programs for compressing and decompressing files
 Name:           bzip2
 Version:        1.0.6
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/bzip2/
 Group:          System Environment/Base
@@ -24,6 +24,8 @@ compression percentage than with the traditional gzip.
 %package        devel
 Summary:        Header and development files for bzip2
 Requires:       bzip2
+Provides:       %{name}-devel%{?_isa} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
@@ -49,12 +51,12 @@ make VERBOSE=1 %{?_smp_mflags}
 
 %install
 make PREFIX=%{buildroot}/usr install
-install -vdm 0755 %{buildroot}/%{_lib}
+install -vdm 0755 %{buildroot}/%{_libdir}
 install -vdm 0755 %{buildroot}/bin
-cp -av libbz2.so* %{buildroot}/%{_lib}
+cp -av libbz2.so* %{buildroot}/%{_libdir}
 install -vdm 755 %{buildroot}%{_libdir}
-ln -sv libbz2.so.%{version} %{buildroot}%{_lib}/libbz2.so
-ln -sv libbz2.so.%{version} %{buildroot}%{_lib}/libbz2.so.1
+ln -sv libbz2.so.%{version} %{buildroot}%{_libdir}/libbz2.so
+ln -sv libbz2.so.%{version} %{buildroot}%{_libdir}/libbz2.so.1
 rm -v %{buildroot}%{_bindir}/{bunzip2,bzcat}
 ln -sv bzip2 %{buildroot}/usr/bin/bunzip2
 ln -sv bzip2 %{buildroot}/usr/bin/bzcat
@@ -95,9 +97,13 @@ make %{?_smp_mflags} check
 %{_docdir}/*
 
 %files libs
-%{_lib}/libbz2.so.*
+%{_libdir}/libbz2.so.*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.6-16
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+- Provide bzip2-devel%%{?_isa}
+
 *   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 1.0.6-15
 -   Don't stomp on CFLAGS.
 *   Tue May 26 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.6-14

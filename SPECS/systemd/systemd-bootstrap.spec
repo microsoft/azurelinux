@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,7 @@ Requires:       libcap
 Requires:       libgcrypt
 Requires:       pam
 Requires:       xz
+AutoReqProv:    no
 
 %description
 Systemd is an init replacement with better process control and security
@@ -66,6 +67,7 @@ Systemd is an init replacement with better process control and security
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
+AutoReqProv:    no
 
 %description devel
 Development headers for developing applications linking to libsystemd
@@ -136,9 +138,9 @@ for tool in runlevel reboot shutdown poweroff halt telinit; do
      ln -sfv ../bin/systemctl %{buildroot}/sbin/${tool}
 done
 ln -sfv ../lib/systemd/systemd %{buildroot}/sbin/init
-sed -i '/srv/d' %{buildroot}%{_lib}/tmpfiles.d/home.conf
-sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_lib}/tmpfiles.d/legacy.conf
-sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_lib}/systemd/network/99-default.link
+sed -i '/srv/d' %{buildroot}%{_libdir}/tmpfiles.d/home.conf
+sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_libdir}/tmpfiles.d/legacy.conf
+sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_libdir}/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}%{_sysconfdir}/systemd/resolved.conf
 rm -f %{buildroot}%{_var}/log/README
 mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
@@ -149,8 +151,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
 install -dm 0755 %{buildroot}/boot/
 install -m 0644 %{SOURCE2} %{buildroot}/boot/
-rm %{buildroot}%{_lib}/systemd/system/default.target
-ln -sfv multi-user.target %{buildroot}%{_lib}/systemd/system/default.target
+rm %{buildroot}%{_libdir}/systemd/system/default.target
+ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 
@@ -247,6 +249,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-31
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+- Turn off dependency generators
+
 * Mon Nov 02 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-30
 - Configure to support merged /usr.
 

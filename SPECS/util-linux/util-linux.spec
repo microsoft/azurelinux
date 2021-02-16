@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.36.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Requires:       %{name} = %{version}-%{release}
 Provides:       libmount-devel = %{version}-%{release}
 Provides:       libblkid-devel = %{version}-%{release}
 Provides:       libuuid-devel = %{version}-%{release}
+Provides:       libuuid-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 These are the header and library files of util-linux.
@@ -112,6 +113,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.36.1-2
+- Provide libuuid-devel%%{?_isa}
+
 * Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.36.1-1
 - Upgrade to version 2.36.1.
 - Provide hardlink.

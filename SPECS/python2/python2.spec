@@ -1,9 +1,9 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
-
+%global __brp_python_bytecompile %{nil}
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -241,6 +241,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.7.18-4
+- Turn off byte compilation since it requires this package to already be built and present.
+
 * Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-3
 - Ignore CVE-2017-17522 because it is widely agreed upon to not be a security vulnerability
 - Ignore CVE-2013-1753 because NVD erroneously lists this version as being vulnerable

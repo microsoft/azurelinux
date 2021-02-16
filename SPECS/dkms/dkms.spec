@@ -1,7 +1,7 @@
 Summary:        Dynamic Kernel Module Support
 Name:           dkms
 Version:        2.8.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,11 +28,11 @@ make install-redhat-systemd DESTDIR=%{buildroot} \
     MAN=%{buildroot}%{_mandir}/man8 \
     ETC=%{buildroot}%{_sysconfdir}/%{name} \
     BASHDIR=%{buildroot}%{_sysconfdir}/bash_completion.d \
-    LIBDIR=%{buildroot}%{_lib}/%{name} \
+    LIBDIR=%{buildroot}%{_libdir}/%{name} \
     SYSTEMD=%{buildroot}%{_unitdir}
 
-install -vdm755 %{buildroot}%{_lib}/systemd/system-preset
-echo "disable dkms.service" > %{buildroot}%{_lib}/systemd/system-preset/50-dkms.preset
+install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
+echo "disable dkms.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-dkms.preset
 
 %post
 %systemd_post dkms.service
@@ -60,6 +60,9 @@ echo "disable dkms.service" > %{buildroot}%{_lib}/systemd/system-preset/50-dkms.
 %{_localstatedir}/lib/dkms/dkms_dbversion
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.8.1-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.8.1-4
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 

@@ -4,11 +4,11 @@
 %define _jdk_build 13
 %define _repo_ver aarch64-jdk8u%{_jdk_update}-b%{_jdk_build}
 %define _url_src https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/
-%define bootstrapjdk %{_lib}/jvm/OpenJDK-1.8.0.181-bootstrap
+%define bootstrapjdk %{_libdir}/jvm/OpenJDK-1.8.0.181-bootstrap
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.181
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -100,7 +100,7 @@ sh configure \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
 	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
-	--with-freetype-lib=%{_lib} \
+	--with-freetype-lib=%{_libdir} \
 	--with-stdc++lib=dynamic
 
 make \
@@ -257,6 +257,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-12
 - Provide java and java-headless.
 

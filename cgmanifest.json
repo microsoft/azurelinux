@@ -426,7 +426,7 @@
         "other": {
           "name": "cairo",
           "version": "1.16.0",
-          "downloadUrl": "http://cairographics.org/releases/cairo-1.16.0.tar.xz"
+          "downloadUrl": "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
         }
       }
     },
@@ -4285,9 +4285,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pycairo",
+          "version": "1.18.2",
+          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.18.2/pycairo-1.18.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pygobject3",
-          "version": "3.30.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/00/17/198a9d0eb0e89b5c7d2a9b4437eb40d62702ab771030cd79fc7141cb0d30/PyGObject-3.30.1.tar.gz"
+          "version": "3.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
         }
       }
     },
@@ -4956,8 +4966,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/GehirnInc/python-jwt/archive/v1.0.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWT-1.7.1.tar.gz"
         }
       }
     },
@@ -5357,7 +5367,7 @@
         "other": {
           "name": "PyYAML",
           "version": "3.13",
-          "downloadUrl": "http://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
+          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
         }
       }
     },

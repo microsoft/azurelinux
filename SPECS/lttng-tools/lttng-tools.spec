@@ -1,7 +1,7 @@
 Summary:        LTTng is an open source tracing framework for Linux.
 Name:           lttng-tools
 Version:        2.11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 and LGPLv2+
 URL:            https://lttng.org/
 Source0:        https://lttng.org/files/lttng-tools/%{name}-%{version}.tar.bz2
@@ -42,11 +42,14 @@ find %{buildroot} -name '*.la' -delete
 %license LICENSE
 %{_bindir}/*
 %{_includedir}/*
-%{_lib}/*
+%{_libdir}/*
 %{_datadir}/*
 %exclude %{_libdir}/debug
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.11.2-2
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Thu May 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.11.2-1
 -   Updating to version 2.11.2.
 -   Adding explicit dependency on "lttng-ust".

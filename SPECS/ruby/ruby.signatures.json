@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "macros.ruby": "6ae8d1690df01b6fe4e573a5852916ae80f78386b05e81d084abedcdf62ab51e",
   "ruby-2.6.6.tar.xz": "5db187882b7ac34016cd48d7032e197f07e4968f406b0690e20193b9b424841f"
  }
 }

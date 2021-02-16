@@ -1,7 +1,7 @@
 Summary:        Linux Key Management Utilities
 Name:           keyutils
 Version:        1.5.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ It contains the libraries and header files to create applications
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=%{buildroot} LIBDIR=/%{_lib} USRLIBDIR=%{_libdir}
+make install DESTDIR=%{buildroot} LIBDIR=/%{_libdir} USRLIBDIR=%{_libdir}
 find %{buildroot} -name '*.a'  -delete
 
 %clean
@@ -67,6 +67,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.10-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.10-4
 - Provide keyutils-libs and keyutils-libs-devel.
 

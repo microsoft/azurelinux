@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
 Version:        0.10.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 URL:            https://liburcu.org
 #Source0:       https://github.com/urcu/userspace-rcu/archive/v%{version}.tar.gz
@@ -45,7 +45,7 @@ find %{buildroot} -name '*.la' -delete
 make %{?_smp_mflags} check
 
 %files
-%{_lib}/*.so.*
+%{_libdir}/*.so.*
 %{_includedir}/*
 %{_datadir}/*
 
@@ -58,6 +58,9 @@ make %{?_smp_mflags} check
 
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 0.10.1-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.10.1-4
 - Added %%license line automatically
 

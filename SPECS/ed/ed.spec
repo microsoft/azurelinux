@@ -1,7 +1,7 @@
 Summary:        Ed - A line-oriented text editor
 Name:           ed
 Version:        1.14.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 URL:            https://www.gnu.org/software/ed/
 License:        GPLv3
 Group:          Applications/System
@@ -27,7 +27,7 @@ make V=1 %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}%{_lib}
+install -vdm 755 %{buildroot}%{_libdir}
 
 rm -rf %{buildroot}%{_infodir}/dir
 
@@ -46,6 +46,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.14.2-9
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Wed Oct 14 2020 Henry Beberman <henry.beberman@microsoft.com> 1.14.2-8
 -   Nopatch CVE-2015-2987. Applies to a different program named ed.
 -   Switch setup to autosetup

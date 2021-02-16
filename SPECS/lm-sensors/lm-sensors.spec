@@ -1,7 +1,7 @@
 Summary:        The lm_sensors package provides user-space support for the hardware monitoring drivers in the Linux kernel.
 Name:           lm-sensors
 Version:        3.5.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,7 +51,7 @@ Documentation for lm-sensors.
 make all %{?_smp_mflags}
 
 %install
-mkdir -p %{buildroot}%{_lib}
+mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_datadir}
 make PREFIX=%{buildroot}%{_prefix}        \
      BUILD_STATIC_LIB=0 \
@@ -92,6 +92,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-8
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-7
 - Provide lm_sensors and lm_sensors-devel.
 

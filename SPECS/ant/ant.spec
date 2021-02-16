@@ -18,7 +18,7 @@
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -109,7 +109,7 @@ mv LICENSE.utf8 LICENSE
 export OPT_JAR_LIST=:
 
 export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
-export JAVA_HOME=$(find %{_lib}/jvm -name "OpenJDK*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
 sh -x ./build.sh --noconfig jars
 
 %install
@@ -257,6 +257,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Nov 19 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-4
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed.
 - Remove non-applicable patches.

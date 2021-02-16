@@ -1,7 +1,7 @@
 Summary:        Shared libraries, portable interface
 Name:           libtool
 Version:        2.4.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
@@ -24,6 +24,7 @@ Shared library files for libtool DLL library from the libtool package.
 Summary:       Development files for %{name}
 Group:         Development/Libraries
 Provides:      %{name}-ltdl-devel = %{version}-%{release}
+Provides:      %{name}-ltdl-devel%{?_isa} = %{version}-%{release}
 Requires:      libltdl = %{version}
 %description -n libltdl-devel
 The libtool package contains the GNU libtool, a set of shell scripts which automatically configure UNIX and UNIX-like architectures to generically build shared libraries.
@@ -81,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libltdl.so.7.3.1
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.4.6-6
+- Provide libtool-ltdl-devel%%{?_isa}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.6-6
 -   Add explicit provides for libtool-ltdl, libtool-ltdl-devel
 *   Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5

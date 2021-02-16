@@ -1,10 +1,10 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-
+%define _python_bytecompile_errors_terminate_build 0
 Name:           python-jinja2
 Version:        2.10.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Url:            https://jinja.pocoo.org/
 Summary:        A fast and easy to use template engine written in pure Python
 License:        BSD
@@ -78,6 +78,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.10.1-2
+- Make python byte compilation errors non-fatal due to python2 errors.
+
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 2.10.1-1
 -   Update to 2.10.1. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.10-2

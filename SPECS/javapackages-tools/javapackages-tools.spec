@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,7 +87,7 @@ It is a lightweight version with minimal runtime requirements.
 %patch0 -p1
 
 %build
-%define jdk_home $(find %{_lib}/jvm -name "OpenJDK*")
+%define jdk_home $(find %{_libdir}/jvm -name "OpenJDK*")
 %define jre_home %{jdk_home}/jre
 
 %configure --pyinterpreter=%{python_interpreter} \
@@ -119,6 +119,9 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-11
 - Add remove-epoch-from-java-requires.patch to remove epoch from java versions during dependency generation.
 

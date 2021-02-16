@@ -10,7 +10,7 @@
 Summary:        Kubernetes cluster management
 Name:           kubernetes
 Version:        1.16.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes
 #Source0:       %{url}/kubernetes/archive/v%{version}.tar.gz
@@ -138,8 +138,8 @@ install -m 0644 -t %{buildroot}/usr/lib/systemd/system contrib-0.7.0/init/system
 install -dm755 %{buildroot}/var/lib/kubelet
 install -dm755 %{buildroot}/var/run/kubernetes
 
-mkdir -p %{buildroot}/%{_lib}/tmpfiles.d
-cat << EOF >> %{buildroot}/%{_lib}/tmpfiles.d/kubernetes.conf
+mkdir -p %{buildroot}/%{_libdir}/tmpfiles.d
+cat << EOF >> %{buildroot}/%{_libdir}/tmpfiles.d/kubernetes.conf
 d /var/run/kubernetes 0755 kube kube -
 EOF
 
@@ -198,12 +198,12 @@ fi
 %{_bindir}/kube-proxy
 %{_bindir}/kube-scheduler
 %{_bindir}/kubectl
-%{_lib}/systemd/system/kube-apiserver.service
-%{_lib}/systemd/system/kubelet.service
-%{_lib}/systemd/system/kube-scheduler.service
-%{_lib}/systemd/system/kube-controller-manager.service
-%{_lib}/systemd/system/kube-proxy.service
-%{_lib}/tmpfiles.d/kubernetes.conf
+%{_libdir}/systemd/system/kube-apiserver.service
+%{_libdir}/systemd/system/kubelet.service
+%{_libdir}/systemd/system/kube-scheduler.service
+%{_libdir}/systemd/system/kube-controller-manager.service
+%{_libdir}/systemd/system/kube-proxy.service
+%{_libdir}/tmpfiles.d/kubernetes.conf
 %dir %{_sysconfdir}/%{name}
 %dir /var/lib/kubelet
 %dir /var/run/kubernetes
@@ -234,6 +234,9 @@ fi
 %endif
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.16.14-2
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.16.14-1
 -   Update to 1.16.14 to fix: CVE-2020-8557, CVE-2020-8558, CVE-2020-8559
 *   Tue Jun 16 2020 Andrew Phelps <anphel@microsoft.com> 1.16.10-1
