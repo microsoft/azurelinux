@@ -61,6 +61,14 @@ Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 BuildArch:      noarch
 Provides:       %{_cross_name}-glibc-kernheaders = %{version}-%{release}
+%ifarch x86_64
+%define arch x86_64
+%endif
+
+%ifarch aarch64
+%define arch arm64
+%endif
+
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
@@ -69,11 +77,11 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %build
 make mrproper
-make headers_check
+make ARCH=%{arch} headers_check
 
 %install
 cd %{_builddir}/WSL2-Linux-Kernel-linux-msft-%{version}
-make headers
+make ARCH=%{arch} headers
 find usr/include -name '.*' -delete
 rm usr/include/Makefile
 mkdir -p                /%{buildroot}%{_cross_sysroot}%{_includedir}
