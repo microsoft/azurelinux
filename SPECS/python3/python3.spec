@@ -262,7 +262,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 3.7.7-5
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 3.7.9-5
 - Remove coreutils dependency to remove circular dependency with libselinux
 
 * Fri Jan 29 2021 Nick Samson <nisamson@microsoft.com> - 3.7.9-4
