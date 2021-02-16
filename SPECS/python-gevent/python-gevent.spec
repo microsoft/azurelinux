@@ -1,10 +1,11 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%define _python_bytecompile_errors_terminate_build 0
 
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        1.3.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -94,7 +95,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:06 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.3.6-6
+- Make python byte compilation errors non-fatal due to python2 errors.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.6-5
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.6-4

@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.3.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD and GPLv2+
 URL:            http://www.linux-pam.org/
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -78,7 +78,7 @@ rm -rf %{buildroot}/*
 %license COPYING
 %{_sysconfdir}/*
 /sbin/*
-%{_lib}/security/*
+%{_libdir}/security/*
 %{_libdir}/*.so*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
@@ -93,6 +93,9 @@ rm -rf %{buildroot}/*
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.3.1-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Fri Jun 12 2020 Chris Co <chrco@microsoft.com> 1.3.1-4
 -   Set default PATH in /etc/environment
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3

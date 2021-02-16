@@ -1,7 +1,7 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
 Version:        1.2.26
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,15 +61,15 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-, root, root)
 %license COPYING
 
-%{_lib}/libxmlsec1.so.1
-%{_lib}/libxmlsec1.so.1.2.26
-%{_lib}/libxmlsec1.so
-%{_lib}/libxmlsec1-nss.so.1
-%{_lib}/libxmlsec1-nss.so.1.2.26
-%{_lib}/libxmlsec1-nss.so
-%{_lib}/libxmlsec1-openssl.so.1
-%{_lib}/libxmlsec1-openssl.so.1.2.26
-%{_lib}/libxmlsec1-openssl.so
+%{_libdir}/libxmlsec1.so.1
+%{_libdir}/libxmlsec1.so.1.2.26
+%{_libdir}/libxmlsec1.so
+%{_libdir}/libxmlsec1-nss.so.1
+%{_libdir}/libxmlsec1-nss.so.1.2.26
+%{_libdir}/libxmlsec1-nss.so
+%{_libdir}/libxmlsec1-openssl.so.1
+%{_libdir}/libxmlsec1-openssl.so.1.2.26
+%{_libdir}/libxmlsec1-openssl.so
 %{_libdir}/libxmlsec1-gnutls*
 %{_libdir}/libxmlsec1-gcrypt*
 %{_bindir}/xmlsec1
@@ -84,21 +84,24 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_includedir}/xmlsec1/xmlsec/openssl/*.h
 %{_includedir}/xmlsec1/xmlsec/gcrypt/*
 %{_includedir}/xmlsec1/xmlsec/gnutls/*
-%{_lib}/libxmlsec1.*a
-%{_lib}/libxmlsec1-nss.*a
-%{_lib}/libxmlsec1-openssl.*a
-%{_lib}/pkgconfig/xmlsec1.pc
-%{_lib}/pkgconfig/xmlsec1-nss.pc
-%{_lib}/pkgconfig/xmlsec1-openssl.pc
+%{_libdir}/libxmlsec1.*a
+%{_libdir}/libxmlsec1-nss.*a
+%{_libdir}/libxmlsec1-openssl.*a
+%{_libdir}/pkgconfig/xmlsec1.pc
+%{_libdir}/pkgconfig/xmlsec1-nss.pc
+%{_libdir}/pkgconfig/xmlsec1-openssl.pc
 %{_libdir}/pkgconfig/xmlsec1-gcrypt.pc
 %{_libdir}/pkgconfig/xmlsec1-gnutls.pc
-%{_lib}/xmlsec1Conf.sh
+%{_libdir}/xmlsec1Conf.sh
 %{_docdir}/xmlsec1/*
 %{_datadir}/aclocal/xmlsec1.m4
 %{_mandir}/man1/xmlsec1.1.gz
 %{_mandir}/man1/xmlsec1-config.1.gz
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.26-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.2.26-6
 - Enable gcrypt and gnutls support and add explicit provides.
 

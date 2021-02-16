@@ -4,7 +4,7 @@
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        1.7.9
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,7 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart-3
 ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart3
 ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build-3
+ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build-%{python3_version}
 ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build3
 ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen-3
 ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen3
@@ -143,6 +144,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/sphinx-apidoc3
 %{_bindir}/sphinx-quickstart-3
 %{_bindir}/sphinx-build-3
+%{_bindir}/sphinx-build-%{python3_version}
 %{_bindir}/sphinx-autogen-3
 %{_bindir}/sphinx-apidoc-3
 %{_bindir}/sphinx-quickstart
@@ -152,6 +154,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.7.9-13
+- Ship sphinx-build-3.7 symlink.
+
 * Mon Dec 14 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.7.9-12
 - Make python3- package default and python2- optional.
 - Reserve unversioned sphinx-* binaries for python3.
