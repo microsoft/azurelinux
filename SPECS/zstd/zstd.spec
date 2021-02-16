@@ -1,7 +1,7 @@
 Summary:        Tools for zstd compression and decompression
 Name:           zstd
 Version:        1.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://facebook.github.io/zstd/
 License:        BSD and GPLv2
 Group:          Applications/File
@@ -17,12 +17,14 @@ The zstd package contains programs for compressing and decompressing files
 %package devel
 Summary:        Header and development files for zstd
 Requires:       %{name} = %{version}-%{release}
+Provides:       lib%{name}-devel = %{version}-%{release}
 %description    devel
 Header and development files for zstd compression
 
 %package libs
 Summary:        Libraries for zstd
 Group:          System Environment/Libraries
+Provides:       lib%{name} = %{version}-%{release}
 %description libs
 This package contains minimal set of shared zstd libraries.
 
@@ -73,5 +75,8 @@ make check %{?_smp_mflags}
 %{_mandir}/man1/*
 
 %changelog
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.4.4-2
+- Provide libzstd and libzstd-devel
+
 *   Sat May 2 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-1
 -   Original version for CBL-Mariner.

@@ -3,7 +3,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        2.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
@@ -86,9 +86,9 @@ make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=/usr/bin/python2 pywrap
 make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=/usr/bin/python3 pywrap
 
 %install
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python2 install install-pywrap
+make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python2 install install-pywrap
 
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python3 install install-pywrap
+make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python3 install install-pywrap
 
 mkdir -p %{buildroot}/%{_prefix}/lib/tmpfiles.d
 mkdir -p %{buildroot}/var/run/setrans
@@ -134,6 +134,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-4
 -   Provide python3-libselinux for -python3 subpackage
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9-3

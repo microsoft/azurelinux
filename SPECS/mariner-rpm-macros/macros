@@ -6,14 +6,14 @@
 #   Some standard locations
 #
 %_sysconfdir        /etc
-%_lib               /usr/lib
-%_lib64             /usr/lib64
+%_lib               lib
+%_lib64             lib64
 %_prefix            /usr
 %_exec_prefix       /usr
 %_bindir            /usr/bin
 %_sbindir           /usr/sbin
-%_libdir            /usr/lib
-%_lib64dir          /usr/lib64
+%_libdir            /usr/%{_lib}
+%_lib64dir          /usr/%{_lib64}
 %_libexecdir        /usr/libexec
 %_datadir           /usr/share
 %_docdir            /usr/share/doc
@@ -41,6 +41,18 @@
 %{set_build_flags}\
 %{nil}
 
+#
+## Automatically compile python files
+%py_auto_byte_compile 1
+
+#
+## Should python bytecompilation errors terminate a build?
+%_python_bytecompile_errors_terminate_build 1
+## Should python bytecompilation compile outside python specific directories?
+%_python_bytecompile_extra 0
+
+%__brp_python_bytecompile /usr/lib/rpm/mariner/brp-python-bytecompile "%{__python3}" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
+
 %_enable_debug_packages 1
 %_include_minidebuginfo 1
 %_use_internal_dependency_generator 1
@@ -53,6 +65,7 @@
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
+    %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
 %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\

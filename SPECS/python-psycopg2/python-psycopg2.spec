@@ -1,10 +1,11 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%define _python_bytecompile_errors_terminate_build 0
 
 Summary:        Python-PostgreSQL Database Adapter
 Name:           python-psycopg2
 Version:        2.7.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Url:            https://pypi.python.org/pypi/psycopg2
 License:        LGPL with exceptions or ZPL
 Group:          Development/Languages/Python
@@ -95,7 +96,10 @@ rm -r /home/postgres/data &>/dev/null ||:
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:14 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.7.5-4
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.7.5-5
+- Make python byte compilation errors non-fatal due to python2 errors.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7.5-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7.5-3

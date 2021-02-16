@@ -1,13 +1,14 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        15.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT
 URL:            https://ceph.io/
 Vendor:         Microsoft
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 
+%global _python_bytecompile_extra 1
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -1167,6 +1168,7 @@ fi
 %{_bindir}/ceph-mgr
 %dir %{_datadir}/ceph/mgr
 %{_datadir}/ceph/mgr/mgr_module.*
+%{_datadir}/ceph/mgr/__pycache__/mgr*.py*
 %{_datadir}/ceph/mgr/mgr_util.*
 %{_unitdir}/ceph-mgr@.service
 %{_unitdir}/ceph-mgr.target
@@ -1619,10 +1621,13 @@ fi
 %{python3_sitearch}/cephfs.cpython*.so
 %{python3_sitearch}/cephfs-*.egg-info
 %{python3_sitelib}/ceph_volume_client.py
+%{python3_sitelib}/__pycache__/ceph_volume_client.cpython*.py*
 
 %files -n python%{python3_pkgversion}-ceph-argparse
 %{python3_sitelib}/ceph_argparse.py
+%{python3_sitelib}/__pycache__/ceph_argparse.cpython*.py*
 %{python3_sitelib}/ceph_daemon.py
+%{python3_sitelib}/__pycache__/ceph_daemon.cpython*.py*
 
 %files -n python%{python3_pkgversion}-ceph-common
 %{python3_sitelib}/ceph
@@ -1779,5 +1784,8 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 15.2.4-2
+- Include python bytecompiled files in the resulting package.
+
 *   Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 15.2.4-1
 -   Initial CBL-Mariner import from Ceph source (license: LGPLv2.1)

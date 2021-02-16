@@ -1,13 +1,14 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.6.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
 Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
+Source1:        macros.ruby
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -34,6 +35,12 @@ make %{?_smp_mflags} COPY="cp -p"
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
 
+# Move macros file into proper place and replace the %%{name} macro, since it
+# would be wrongly evaluated during build of other packages.
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/macros.ruby
+sed -i "s/%%{name}/%{name}/" %{buildroot}%{_rpmconfigdir}/macros.d/macros.ruby
+
 %check
 chmod g+w . -R
 useradd test -G root -m
@@ -58,8 +65,12 @@ rm -rf %{buildroot}/*
 %{_docdir}/%{name}-%{version}
 %{_mandir}/man1/*
 %{_mandir}/man5/*
+%{_rpmconfigdir}/macros.d/macros.ruby
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.6.6-3
+- Add macros file, imported from Fedora 32 (license: MIT)
+
 * Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.6.6-2
 - Provide ruby-devel.
 

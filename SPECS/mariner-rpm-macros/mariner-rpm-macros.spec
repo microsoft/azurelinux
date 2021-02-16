@@ -1,8 +1,11 @@
-%global rcdir %{_lib}/rpm/mariner
+%global rcdir %{_libdir}/rpm/mariner
+# Turn off auto byte compilation since when building this spec in the toolchain the needed scripts are not installed yet.
+# __brp_python_bytecompile
+%global __brp_python_bytecompile %{nil}
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,10 +27,18 @@ Source13:       macros.ocaml-srpm
 Source14:       macros.perl-srpm
 Source15:       gpgverify
 Source16:       pythondist.attr
+Source17:       brp-python-bytecompile
+Source18:       macros.pybytecompile
+# Use an enhanced copy of Python's compileall module for Python >= 3.4
+Source19:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compileall2.py
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
 Provides:       perl-srpm-macros
+Provides:       python-srpm-macros
+Provides:       python-rpm-macros
+Provides:       python2-rpm-macros
+Provides:       python3-rpm-macros
 BuildArch:      noarch
 
 %description
@@ -40,17 +51,6 @@ Group:          Development/System
 %description -n mariner-check-macros
 Mariner specific rpm macros to override default %%check behavior
 
-%package -n mariner-python-macros
-Summary:        Mariner python macros
-Group:          Development/System
-Provides:       python-srpm-macros
-Provides:       python-rpm-macros
-Provides:       python2-rpm-macros
-Provides:       python3-rpm-macros
-
-%description -n mariner-python-macros
-Mariner python macros
-
 %prep
 %setup -q -c -T
 cp -p %{sources} .
@@ -61,6 +61,8 @@ install -p -m 644 -t %{buildroot}%{rcdir} macros rpmrc
 install -p -m 444 -t %{buildroot}%{rcdir} default-hardened-*
 install -p -m 444 -t %{buildroot}%{rcdir} default-annobin-*
 install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
+install -p -m 755 -t %{buildroot}%{rcdir} compileall2.py
+install -p -m 755 -t %{buildroot}%{rcdir} brp-*
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
@@ -74,20 +76,27 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 %{rcdir}/default-hardened-*
 %{rcdir}/default-annobin-*
 %{rcdir}/gpgverify
+%{rcdir}/brp-*
+%{rcdir}/compileall2.py
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
+%{_rpmconfigdir}/macros.d/macros.pybytecompile
+%{_rpmconfigdir}/macros.d/macros.python*
+%{_fileattrsdir}/pythondist.attr
 
 %files -n mariner-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
-%files -n mariner-python-macros
-%{_rpmconfigdir}/macros.d/macros.python*
-%{_fileattrsdir}/pythondist.attr
-
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com>
+- Import brp-python-bytecompile, compileall2.py, macros.pybytecompile, and python byte compilation in macros from Fedora 32 (license: MIT).
+- Fix %%{_lib} and %%{_lib64} macros to reference the folder names instead of paths.
+- Combine mariner-python-macros into the main package for byte compilation support.
+- Make python3 the default python interpreter for byte compilation.
+
 * Tue Jan 19 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-12
 - Disable python requirement generator.
 

@@ -1,7 +1,7 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2, BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,7 +153,7 @@ the device-mapper event library.
 %define _default_dm_run_dir /run
 %define _default_run_dir /run/lvm
 %define _default_locking_dir /run/lock/lvm
-%define _udevdir %{_lib}/udev/rules.d
+%define _udevdir %{_libdir}/udev/rules.d
 
 %configure \
     --prefix=%{_prefix} \
@@ -187,7 +187,7 @@ make install_system_dirs DESTDIR=%{buildroot}
 make install_systemd_units DESTDIR=%{buildroot}
 make install_systemd_generators DESTDIR=%{buildroot}
 make install_tmpfiles_configuration DESTDIR=%{buildroot}
-cp %{SOURCE1} %{buildroot}%{_lib}/systemd/system/lvm2-activate.service
+cp %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/lvm2-activate.service
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable lvm2-activate.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
@@ -298,6 +298,9 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.03.05-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.03.05-6
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 

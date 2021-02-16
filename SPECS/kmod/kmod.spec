@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        25
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2.1+ and GPLv2+
 URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
 Group:          Applications/System
@@ -29,7 +29,7 @@ It contains the libraries and header files to create applications.
     --prefix=%{_prefix} \
     --bindir=/bin \
     --sysconfdir=%{_sysconfdir} \
-    --with-rootlibdir=%{_lib} \
+    --with-rootlibdir=%{_libdir} \
     --disable-manpages \
     --with-xz \
     --with-zlib \
@@ -61,6 +61,9 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/*.so
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 25-6
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 25-5
 -   Provide /sbin/modprobe and module-init-tools for base package
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 25-4

@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
@@ -21,7 +21,7 @@ Requires:       openssl
 Requires:       gmp
 Requires:       guile
 Requires:       gc
-
+Provides:       %{name}-utils = %{version}-%{release}
 Patch0:         CVE-2020-24659.patch
 
 %description
@@ -91,6 +91,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.6.14-4
+- Provide gnutls-utils.
+
 *   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
 -   Apply patch for CVE-2020-24659 from upstream.
 -   Switch setup to autosetup.

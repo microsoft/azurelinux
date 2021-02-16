@@ -1,7 +1,7 @@
 Summary:	Command-line editing and history capabilities
 Name:		readline
 Version:	7.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	GPLv3+
 URL:		http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
 Group:		Applications/System
@@ -30,9 +30,9 @@ sed -i '/{OLDSUFF}/c:' support/shlib-install
 make SHLIB_LIBS=-lncurses
 %install
 make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}%{_lib}
-ln -sfv ../..%{_lib}/$(readlink %{buildroot}%{_libdir}/libreadline.so) %{buildroot}%{_libdir}/libreadline.so
-ln -sfv ../..%{_lib}/$(readlink %{buildroot}%{_libdir}/libhistory.so ) %{buildroot}%{_libdir}/libhistory.so
+install -vdm 755 %{buildroot}%{_libdir}
+ln -sfv ../..%{_libdir}/$(readlink %{buildroot}%{_libdir}/libreadline.so) %{buildroot}%{_libdir}/libreadline.so
+ln -sfv ../..%{_libdir}/$(readlink %{buildroot}%{_libdir}/libhistory.so ) %{buildroot}%{_libdir}/libhistory.so
 install -vdm 755 %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 install -v -m644 doc/*.{ps,pdf,html,dvi} %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 rm -rf %{buildroot}%{_infodir}
@@ -96,8 +96,12 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/rluserman.pdf
 %{_mandir}/man3/history.3.gz
 %{_mandir}/man3/readline.3.gz
+
 %changelog
-* Sat May 09 00:20:46 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.0-4
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 7.0-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.0-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.0-3

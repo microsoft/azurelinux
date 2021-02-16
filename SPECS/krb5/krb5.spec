@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.17
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,9 +70,9 @@ for LIBRARY in gssapi_krb5 gssrpc k5crypto kadm5clnt kadm5srv \
     chmod -v 755 %{buildroot}/%{_libdir}/lib$LIBRARY.so
 done
 
-ln -v -sf %{buildroot}/%{_libdir}/libkrb5.so.3.3        %{_lib}/libkrb5.so
-ln -v -sf %{buildroot}/%{_libdir}/libk5crypto.so.3.1    %{_lib}/libk5crypto.so
-ln -v -sf %{buildroot}/%{_libdir}/libkrb5support.so.0.1 %{_lib}/libkrb5support.so
+ln -v -sf %{buildroot}/%{_libdir}/libkrb5.so.3.3        %{_libdir}/libkrb5.so
+ln -v -sf %{buildroot}/%{_libdir}/libk5crypto.so.3.1    %{_libdir}/libk5crypto.so
+ln -v -sf %{buildroot}/%{_libdir}/libkrb5support.so.0.1 %{_libdir}/libkrb5support.so
 
 mv -v %{buildroot}/%{_bindir}/ksu /bin
 chmod -v 755 /bin/ksu
@@ -122,6 +122,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.17-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 1.17-4
 - Add missing requires on e2fsprogs-devel in devel subpackage.
 

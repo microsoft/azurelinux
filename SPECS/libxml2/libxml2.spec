@@ -3,7 +3,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ Python3 libxml2.
 %package devel
 Summary:        Libraries and header files for libxml
 Requires:       %{name} = %{version}
+Provides:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 Static libraries and header files for the support library for libxml
@@ -108,6 +109,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-6
+- Provide libxml2-devel%%{?_isa}
+
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-5
 - Provide libxml2-python3.
 
