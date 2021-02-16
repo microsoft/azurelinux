@@ -232,9 +232,9 @@ lvm2-2.03.05-5.cm1.aarch64.rpm
 lvm2-debuginfo-2.03.05-5.cm1.aarch64.rpm
 lvm2-devel-2.03.05-5.cm1.aarch64.rpm
 lvm2-libs-2.03.05-5.cm1.aarch64.rpm
-lz4-1.9.2-2.cm1.x86_64.rpm
-lz4-debuginfo-1.9.2-2.cm1.x86_64.rpm
-lz4-devel-1.9.2-2.cm1.x86_64.rpm
+lz4-1.9.2-2.cm1.aarch64.rpm
+lz4-debuginfo-1.9.2-2.cm1.aarch64.rpm
+lz4-devel-1.9.2-2.cm1.aarch64.rpm
 m4-1.4.18-4.cm1.aarch64.rpm
 m4-debuginfo-1.4.18-4.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
