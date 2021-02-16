@@ -195,7 +195,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
-* Tue Sep 22 2020 Daniel Burgener <daburgen@microsoft.com> 8.0p1-14
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 8.0p1-14
 - Add SELinux support
 
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13

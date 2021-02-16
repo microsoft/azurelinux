@@ -143,7 +143,7 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 4.6-10
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 4.6-10
 - Add SELinux support
 
 * Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9

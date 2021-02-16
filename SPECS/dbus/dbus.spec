@@ -79,7 +79,7 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> - 1.13.6-5
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> - 1.13.6-5
 - Enable SELinux support
 
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4

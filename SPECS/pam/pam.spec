@@ -95,7 +95,7 @@ rm -rf %{buildroot}/*
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
-*   Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 1.3.1-5
+*   Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-5
 -   Add SELinux support
 *   Fri Jun 12 2020 Chris Co <chrco@microsoft.com> 1.3.1-4
 -   Set default PATH in /etc/environment

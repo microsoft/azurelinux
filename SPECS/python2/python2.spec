@@ -246,7 +246,7 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
-* Mon Sep 14 2020 Daniel Burgener <daburgen@microsoft.com> 2.7.18-4
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 2.7.18-6
 - Remove coreutils dependency to remove circular dependency with libselinux
 
 * Tue Nov 03 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-5

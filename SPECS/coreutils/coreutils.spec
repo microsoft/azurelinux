@@ -94,7 +94,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
-* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 8.30-9
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 8.30-9
 - Enable SELinux support
 
 * Fri Jan 22 2021 Andrew Phelps <anphel@microsoft.com> 8.30-8

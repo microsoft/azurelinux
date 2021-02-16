@@ -243,7 +243,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 239-30
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 239-30
 - Remove build dependency on shadow-utils to break circular dependency
 
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31

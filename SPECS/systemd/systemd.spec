@@ -269,7 +269,7 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
-* Fri Aug 28 2020 Daniel Burgener <daburgen@microsoft.com> 239-35
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 239-35
 - Enable SELinux support
 - Remove unused BuildRequires shadow-utils
 
