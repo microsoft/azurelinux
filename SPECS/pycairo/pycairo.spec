@@ -2,7 +2,8 @@ Name: pycairo
 Version: 1.18.2
 Release: 5%{?dist}
 Summary: Python bindings for the cairo library
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 License: MPLv1.1 or LGPLv2
 URL: https://cairographics.org/pycairo
 Source0: https://github.com/pygobject/pycairo/releases/download/v%{version}/pycairo-%{version}.tar.gz

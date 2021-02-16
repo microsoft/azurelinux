@@ -4285,7 +4285,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "pycario",
+          "name": "pycairo",
           "version": "1.18.2",
           "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.18.2/pycairo-1.18.2.tar.gz"
         }
