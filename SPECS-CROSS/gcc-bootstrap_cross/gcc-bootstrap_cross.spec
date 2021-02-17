@@ -293,7 +293,7 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 %changelog
 * Fri Feb 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 9.1.0-11
-- Fork normal gcc package into cross compile aware boot strap ckage
+- Fork normal gcc package into cross compile aware boot strap package
 
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 9.1.0-10
 - Provide libquadmath and libquadmath-devel.
