@@ -40,7 +40,6 @@ Patch22:        CVE-2020-13776.patch
 # This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
-<<<<<<< HEAD
 Patch23:        CVE-2018-21029.nopatch
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch

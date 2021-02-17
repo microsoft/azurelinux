@@ -44,7 +44,6 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
 
 %build
-<<<<<<< HEAD
 %configure --sysconfdir=%{_sysconfdir} --with-libpam \
            --with-libcrack --with-group-name-max-length=32 \
            --with-selinux
