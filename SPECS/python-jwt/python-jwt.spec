@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # what it's called on pypi
 %global srcname PyJWT
 # what it's imported as
