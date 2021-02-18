@@ -3,15 +3,14 @@
 
 Summary:        Interface for Python to call C code
 Name:           python-cffi
-Version:        1.11.5
-Release:        4%{?dist}
+Version:        1.14.5
+Release:        1%{?dist}
 Url:            https://pypi.python.org/pypi/cffi
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.python.org/packages/source/c/cffi/cffi-%{version}.tar.gz
-%define sha1    cffi=1686e6689a691414d3d22626c837adeee3996dd9
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -82,9 +81,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:43 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Thu Feb 11 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.14.5-1
+-   Update to 1.14.5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.5-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.11.5-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Thu Nov 15 2018 Tapas Kundu <tkundu@vmware.com> 1.11.5-2
