@@ -5,7 +5,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -17,7 +17,6 @@ Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-%{versi
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
-Patch2:         disable-tcrypt-check-dracut-fips.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
 BuildRequires:  git
@@ -62,7 +61,6 @@ This package contains tools to assemble the local initrd and host configuration.
 cp %{SOURCE1} .
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 %configure --systemdsystemunitdir=%{_unitdir} --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
@@ -176,6 +174,9 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Fri Feb 12 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-5
+- Enable kernel crypto testing in dracut-fips
+
 * Wed Feb 10 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-4
 - Move 40-fips.conf to /etc/dracut.conf.d/
 

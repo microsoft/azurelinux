@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.4.91
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -272,6 +272,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Add configs to enable tcrypt in FIPS mode
+
 * Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Use OpenSSL to perform HMAC calc
 
