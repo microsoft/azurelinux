@@ -97,11 +97,12 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*.3.*
 %{_libdir}/*.so
 %{_datadir}
-%exclude %{_lib}/perl5/perllocal.pod
+%exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
 * Thu Feb 04 2021 Henry Li <lihl@microsoft.com> - 5.8-6
 - Provides net-snmp-utils from net-snmp.
+- Replace incorrect %%{_lib} usage with %%{_libdir}
 
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.8-5
 -   Use new perl package names.
