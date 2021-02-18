@@ -93,6 +93,8 @@ func main() {
 }
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {
+	const defaultSystemConfig = 0
+
 	err = os.MkdirAll(tmpDir, os.ModePerm)
 	if err != nil {
 		return
@@ -133,7 +135,8 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 
 		for j, partition := range disk.Partitions {
 			for _, artifact := range partition.Artifacts {
-				inputName, isFile := partitionArtifactInput(i, j)
+				// Currently only process 1 system config
+				inputName, isFile := partitionArtifactInput(i, j, retrievePartitionSettings(&config.SystemConfigs[defaultSystemConfig], partition.ID))
 				convertRequests <- &convertRequest{
 					inputPath:   filepath.Join(inDir, inputName),
 					isInputFile: isFile,
@@ -159,6 +162,17 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 		err = fmt.Errorf("failed to generate the following artifacts: %v", failedArtifacts)
 	}
 
+	return
+}
+
+func retrievePartitionSettings(systemConfig *configuration.SystemConfig, searchedID string) (foundSetting *configuration.PartitionSetting) {
+	for i := range systemConfig.PartitionSettings {
+		if systemConfig.PartitionSettings[i].ID == searchedID {
+			foundSetting = &systemConfig.PartitionSettings[i]
+			return
+		}
+	}
+	logger.Log.Warningf("Couldn't find partition setting '%s' under system config '%s'", searchedID, systemConfig.Name)
 	return
 }
 
@@ -259,6 +273,10 @@ func converterFactory(formatType string) (converter formats.Converter, err error
 		converter = formats.NewRaw()
 	case formats.Ext4Type:
 		converter = formats.NewExt4()
+	case formats.DiffType:
+		converter = formats.NewDiff()
+	case formats.RdiffType:
+		converter = formats.NewRdiff()
 	case formats.GzipType:
 		converter = formats.NewGzip()
 	case formats.TarGzipType:
@@ -298,9 +316,15 @@ func diskArtifactInput(diskIndex int, disk configuration.Disk) (input string, is
 	return
 }
 
-func partitionArtifactInput(diskIndex, partitionIndex int) (input string, isFile bool) {
+func partitionArtifactInput(diskIndex, partitionIndex int, partitionSetting *configuration.PartitionSetting) (input string, isFile bool) {
 	// Currently all file artifacts have a raw file for input
-	input = fmt.Sprintf("disk%d.partition%d.raw", diskIndex, partitionIndex)
+	if partitionSetting.OverlayBaseImage != "" {
+		input = fmt.Sprintf("disk%d.partition%d.diff", diskIndex, partitionIndex)
+	} else if partitionSetting.RdiffBaseImage != "" {
+		input = fmt.Sprintf("disk%d.partition%d.rdiff", diskIndex, partitionIndex)
+	} else {
+		input = fmt.Sprintf("disk%d.partition%d.raw", diskIndex, partitionIndex)
+	}
 	isFile = true
 	return
 }

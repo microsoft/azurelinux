@@ -12,10 +12,12 @@ import (
 
 // PartitionSetting holds the mounting information for each partition.
 type PartitionSetting struct {
-	RemoveDocs   bool   `json:"RemoveDocs"`
-	ID           string `json:"ID"`
-	MountOptions string `json:"MountOptions"`
-	MountPoint   string `json:"MountPoint"`
+	RemoveDocs       bool   `json:"RemoveDocs"`
+	ID               string `json:"ID"`
+	MountOptions     string `json:"MountOptions"`
+	MountPoint       string `json:"MountPoint"`
+	OverlayBaseImage string `json:"OverlayBaseImage"`
+	RdiffBaseImage   string `json:"RdiffBaseImage"`
 }
 
 // IsValid returns an error if the PartitionSetting is not valid
