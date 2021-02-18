@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxslt
+BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -72,6 +73,7 @@ Requires:       glib
 Requires:       kmod
 Requires:       libcap
 Requires:       libgcrypt
+Requires:       lz4
 Requires:       pam
 Requires:       xz
 Obsoletes:      systemd-bootstrap
@@ -128,6 +130,7 @@ meson  --prefix %{_prefix}                                            \
        -Dpolkit=true                                                  \
        -Dlibcryptsetup=true                                           \
        -Dgcrypt=true                                                  \
+       -Dlz4=true                                                     \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -267,6 +270,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-35
+- Enable LZ4 so journalctl can read logs from the container host.
+
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-34
 - Fix CVE-2019-6454 patch. Add upstream patch info.
 - Fix CVE-2020-1712 patch. Add upstream patch info.

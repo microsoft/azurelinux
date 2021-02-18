@@ -102,6 +102,36 @@ A sample PartitionSettings entry, designating an EFI and a root partitions:
 ],
 ```
 
+It is possible to use `PartitionSettings` to configure diff disk image creation. Two types of diffs are possible.
+`rdiff` and `overlay` diff.
+
+For small and deterministic images `rdiff` is a better algorithm.
+For large images based on `ext4` `overlay` diff is a better algorithm.
+
+A sample `ParitionSettings` entry using `rdiff` algorithm:
+
+``` json
+{
+    "ID": "boot",
+    "MountPoint": "/boot/efi",
+    "MountOptions" : "umask=0077",
+    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
+},
+ ```
+
+A sample `ParitionSettings` entry using `overlay` algorithm:
+
+``` json
+{
+   "ID": "rootfs",
+   "MountPoint": "/",
+   "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
+}
+
+```
+`RdiffBaseImage` represents the base image when `rdiff` algorithm is used.
+`OverlayBaseImage` represents the base image when `overlay` algorithm is used.
+
 ### PackageLists
 
 PackageLists key consists of an array of relative paths to the package lists (JSON files).
@@ -301,11 +331,13 @@ A sample image configuration, producing a VHDX disk image:
                 {
                     "ID": "boot",
                     "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
+                    "MountOptions" : "umask=0077",
+                    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 },
                 {
                     "ID": "rootfs",
-                    "MountPoint": "/"
+                    "MountPoint": "/",
+                     "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
                 }
             ],
             "PackageLists": [
