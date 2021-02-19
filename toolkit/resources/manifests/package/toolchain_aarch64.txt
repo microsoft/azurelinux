@@ -7,7 +7,7 @@ audit-debuginfo-3.0-5.cm1.aarch64.rpm
 audit-devel-3.0-5.cm1.aarch64.rpm
 audit-libs-3.0-5.cm1.aarch64.rpm
 audit-python-3.0-5.cm1.aarch64.rpm
-autoconf-2.69-11.cm1.noarch.rpm
+autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
 bash-4.4.18-6.cm1.aarch64.rpm
 bash-debuginfo-4.4.18-6.cm1.aarch64.rpm
@@ -132,7 +132,7 @@ gmp-debuginfo-6.1.2-5.cm1.aarch64.rpm
 gmp-devel-6.1.2-5.cm1.aarch64.rpm
 gnupg2-2.2.20-3.cm1.aarch64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
-golang-1.13.15-1.cm1.aarch64.rpm
+golang-1.15.5-1.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
 gperf-debuginfo-3.1-3.cm1.aarch64.rpm
 gtest-1.8.1-5.cm1.aarch64.rpm
@@ -287,8 +287,8 @@ openjdk8-doc-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-sample-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-src-1.8.0.181-8.cm1.aarch64.rpm
 openjre8-1.8.0.181-8.cm1.aarch64.rpm
-openldap-2.4.50-1.cm1.aarch64.rpm
-openldap-debuginfo-2.4.50-1.cm1.aarch64.rpm
+openldap-2.4.57-1.cm1.aarch64.rpm
+openldap-debuginfo-2.4.57-1.cm1.aarch64.rpm
 openssl-1.1.1g-12.cm1.aarch64.rpm
 openssl-debuginfo-1.1.1g-12.cm1.aarch64.rpm
 openssl-devel-1.1.1g-12.cm1.aarch64.rpm
