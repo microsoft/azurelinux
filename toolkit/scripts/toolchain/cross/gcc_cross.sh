@@ -19,7 +19,7 @@
 
 
 installDir="/opt/cross"
-sysroot="${installDir}/aarch64-linux-gnu/sysroot"
+sysroot="${installDir}/aarch64-mariner-linux-gnu/sysroot"
 buildDir="$HOME/cross"
 scriptDir="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -61,7 +61,7 @@ cd ..
 
 mkdir build-binutils
 cd build-binutils
-../binutils-2.32/configure --prefix=${installDir} --target=aarch64-linux-gnu --disable-multilib --with-sysroot=${sysroot}
+../binutils-2.32/configure --prefix=${installDir} --target=aarch64-mariner-linux-gnu --disable-multilib --with-sysroot=${sysroot}
 make -j$(nproc)
 make install
 cd ..
@@ -69,31 +69,31 @@ cd ..
 
 mkdir -p build-gcc
 cd build-gcc
-../gcc-9.1.0/configure --prefix=${installDir} --target=aarch64-linux-gnu --disable-multilib --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu --enable-languages=c,c++,fortran --disable-bootstrap --enable-linker-build-id  --enable-plugin --enable-default-pie --with-sysroot=${sysroot} --with-native-system-header-dir=/include
+../gcc-9.1.0/configure --prefix=${installDir} --target=aarch64-mariner-linux-gnu --disable-multilib --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu --enable-languages=c,c++,fortran --disable-bootstrap --enable-linker-build-id  --enable-plugin --enable-default-pie --with-sysroot=${sysroot} --with-native-system-header-dir=/include
 make -j$(nproc) all-gcc
 make install-gcc
 cd ..
 
 mkdir -p build-glibc
 cd build-glibc
-../glibc-2.28/configure --prefix=/ --build=$MACHTYPE --host=aarch64-linux-gnu --target=aarch64-linux-gnu --with-sysroot=${sysroot} --with-headers="${sysroot}/include" --disable-multilib libc_cv_forced_unwind=yes  --disable-werror
-make DESTDIR=${sysroot} install-bootstrap-headers=yes install-headers 
+../glibc-2.28/configure --prefix=/ --build=$MACHTYPE --host=aarch64-mariner-linux-gnu --target=aarch64-mariner-linux-gnu --with-sysroot=${sysroot} --with-headers="${sysroot}/include" --disable-multilib libc_cv_forced_unwind=yes  --disable-werror
+make DESTDIR=${sysroot} install-bootstrap-headers=yes install-headers
 make -j$(nproc) csu/subdir_lib
-install csu/crt1.o csu/crti.o csu/crtn.o "${sysroot}/lib" 
-aarch64-linux-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o "${sysroot}/lib/libc.so"
+install csu/crt1.o csu/crti.o csu/crtn.o "${sysroot}/lib"
+aarch64-mariner-linux-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o "${sysroot}/lib/libc.so"
 touch "${sysroot}/include/gnu/stubs.h"
 cd ..
 
 mkdir -p "${sysroot}/usr"
 ln -s ../include "${sysroot}/usr"
 cd build-gcc
-../gcc-9.1.0/configure --prefix=${installDir} --target=aarch64-linux-gnu --disable-multilib --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu --enable-languages=c,c++,fortran --disable-bootstrap --enable-linker-build-id  --enable-plugin --enable-default-pie --with-sysroot=${sysroot} --with-build-sysroot=${sysroot}
+../gcc-9.1.0/configure --prefix=${installDir} --target=aarch64-mariner-linux-gnu --disable-multilib --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu --enable-languages=c,c++,fortran --disable-bootstrap --enable-linker-build-id  --enable-plugin --enable-default-pie --with-sysroot=${sysroot} --with-build-sysroot=${sysroot}
 make -j$(nproc) all-target-libgcc
 make install-target-libgcc
 cd ..
 
 cd build-glibc
-make DESTDIR=${sysroot} -j$(nproc) 
+make DESTDIR=${sysroot} -j$(nproc)
 make DESTDIR=${sysroot} install
 cd ..
 
