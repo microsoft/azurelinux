@@ -24,7 +24,7 @@ func TestDFSFindCycle(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cycle)
 	assert.Equal(t, 7, len(cycle))
-	assert.Equal(t, cycle[0], cycle[6])
+	assert.Equal(t, cycle[0], cycle[len(cycle)-1])
 }
 
 func TestDFSNoCycle(t *testing.T) {
