@@ -6,7 +6,7 @@
 Summary:        Linux Firmware
 Name:           linux-firmware
 Version:        20200316
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ and GPLv2+ and MIT and Redistributable, no modification permitted
 URL:            https://www.kernel.org/
 Group:          System Environment/Kernel
@@ -26,6 +26,8 @@ This package includes firmware files required for some devices to operate.
 
 %install
 mkdir -p %{buildroot}%{_firmwarepath}
+cp -r bnx2x %{buildroot}%{_firmwarepath}
+cp -r qed %{buildroot}%{_firmwarepath}
 cp -r brcm %{buildroot}%{_firmwarepath}
 cp -r rsi %{buildroot}%{_firmwarepath}
 cp rsi_91x.fw %{buildroot}%{_firmwarepath}
@@ -40,7 +42,11 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %{_firmwarepath}/*
 
 %changelog
-* Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> - 20200316-2
+* Fri Feb 19 2021 Chris Co <chrco@microsoft.com> - 20200316-3
+- Add bnx2x and qed firmware
+- Add WHENCE and relevant LICENSE files
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20200316-2
 - Added %%license line automatically
 
 *   Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> 20200316-1
