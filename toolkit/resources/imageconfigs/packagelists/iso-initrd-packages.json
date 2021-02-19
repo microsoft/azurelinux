@@ -33,6 +33,7 @@
         "grub2-pc",
         "gzip",
         "haveged",
+        "iputils",
         "less",
         "libcap",
         "libgcc",

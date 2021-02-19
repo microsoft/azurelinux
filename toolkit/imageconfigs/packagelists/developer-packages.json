@@ -15,6 +15,11 @@
         "curl-devel",
         "cmake",
         "flex",
-        "ninja-build"
+        "ninja-build",
+        "pciutils",
+        "usbutils",
+        "net-tools",
+        "iputils",
+        "linux-firmware"
     ]
 }
