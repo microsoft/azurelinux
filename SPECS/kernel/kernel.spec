@@ -348,8 +348,8 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-%ifarch aarch64	
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds	
+%ifarch aarch64
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
 # disable (JOBS=1) parallel build to fix this issue:
@@ -458,6 +458,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Remove patch for arm64 hyperv support. Present in updated source.
 - Account for new module.lds location on aarch64
 - Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+- Add CONFIG_SCSI_SMARTPQI=y
 
 * Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
 - Add configs to enable tcrypt in FIPS mode
