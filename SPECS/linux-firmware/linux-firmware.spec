@@ -2,18 +2,16 @@
 %global __os_install_post %{nil}
 %global _firmwarepath    /lib/firmware
 %define _binaries_in_noarch_packages_terminate_build   0
-
 Summary:        Linux Firmware
 Name:           linux-firmware
 Version:        20200316
 Release:        3%{?dist}
-License:        GPL+ and GPLv2+ and MIT and Redistributable, no modification permitted
-URL:            https://www.kernel.org/
-Group:          System Environment/Kernel
+License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Kernel
+URL:            https://www.kernel.org/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/%{name}.git/snapshot/%{name}-%{version}.tar.gz
-
 BuildArch:      noarch
 
 %description
