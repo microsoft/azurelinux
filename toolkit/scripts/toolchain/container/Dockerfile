@@ -63,6 +63,8 @@ COPY [ "./toolchain-md5sums", \
 
 # Download source, then create lfs user and group.
 # Append "; exit 0" after wget commands to ignore download errors that might be expected. The md5sum command will verify all downloads.
+# Note: Fetch the kernel sources differently to ensure we rename the source tarball appropriately. The rename is needed to comply with
+# the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
