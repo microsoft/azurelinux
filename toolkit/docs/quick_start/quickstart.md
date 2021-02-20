@@ -14,7 +14,7 @@ From a bash terminal window, clone the CBL-Mariner Repository and check-out a st
 
 ```bash
 # Clone the CBL-Mariner repo
-git clone git@github.com:microsoft/CBL-Mariner.git
+git clone https://github.com/microsoft/CBL-Mariner.git
 cd CBL-Mariner
 
 # Sync to the latest stable build 
