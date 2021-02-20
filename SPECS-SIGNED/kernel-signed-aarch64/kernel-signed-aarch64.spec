@@ -1,14 +1,14 @@
 %global debug_package %{nil}
-%define uname_r %{version}-%{release}
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
-Version:        5.4.91
-Release:        5%{?dist}
+Version:        5.10.13.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.
 # An important consequence is that when making a change to this package, the
@@ -82,6 +82,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+
 * Tue Feb 16 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
 - Update to kernel release 5.4.91-5.
 

@@ -1,16 +1,17 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-%{release}
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.4.91
-Release:        4%{?dist}
+Version:        5.10.13.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
@@ -26,6 +27,7 @@ BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -85,7 +87,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
@@ -272,6 +274,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+
 * Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
 - Add configs to enable tcrypt in FIPS mode
 
