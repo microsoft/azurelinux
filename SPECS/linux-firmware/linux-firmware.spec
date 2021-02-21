@@ -38,11 +38,11 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %defattr(-,root,root)
 %license WHENCE
 %license GPL*
-%license LICENCE.broadcom_bcm43xx
+%license LICENCE.broadcom_bcm43xx LICENCE.cypress
 %license LICENSE.QualcommAtheros_ath10k
 %license LICENSE.i915
 %license LICENSE.ipu3_firmware LICENCE.ibt_firmware LICENCE.fw_sst_0f28
-%license LICENCE.IntcSST2 LICENCE.adsp_sst LICENSE.ice LICENSE.ice_enhanced
+%license LICENCE.IntcSST2 LICENCE.adsp_sst LICENSE.ice
 %license LICENCE.iwlwifi_firmware
 %{_firmwarepath}/*
 
