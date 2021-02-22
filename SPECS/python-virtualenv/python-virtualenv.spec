@@ -3,7 +3,7 @@
 
 Name:           python-virtualenv
 Version:        16.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Virtual Python Environment builder
 License:        MIT
 Group:          Development/Languages/Python
@@ -19,6 +19,7 @@ BuildRequires:  pytest
 Requires:       python2
 Requires:       python2-libs
 BuildRequires:  python-setuptools
+Provides:       %{name}-doc = %{version}-%{release}
 
 BuildArch:      noarch
 
@@ -74,6 +75,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 16.0.0-6
+- Provides python-sqlalchemy-doc
+
 * Sat May 09 00:20:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 16.0.0-5
 - Added %%license line automatically
 

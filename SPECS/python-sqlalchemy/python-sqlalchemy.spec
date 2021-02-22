@@ -3,7 +3,7 @@
 Summary:        The Python SQL Toolkit and Object Relational Mapper
 Name:           python-sqlalchemy
 Version:        1.3.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Url:            https://www.sqlalchemy.org
 License:        MIT
 Group:          Development/Languages/Python
@@ -15,6 +15,7 @@ BuildRequires:  python2-libs
 BuildRequires:  python-setuptools
 Requires:       python2
 Requires:       python2-libs
+Provides:       %{name}-doc = %{version}-%{release}
 
 %description
 SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL. SQLAlchemy provides a full suite of well known enterprise-level persistence patterns, designed for efficient and high-performing database access, adapted into a simple and Pythonic domain language.
@@ -42,6 +43,9 @@ python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 %{python2_sitelib}/*
 
 %changelog
+* Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 1.3.2-3
+- Provides python-sqlalchemy-doc
+
 * Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.2-2
 - Added %%license line automatically
 
