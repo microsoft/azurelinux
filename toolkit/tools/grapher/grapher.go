@@ -45,6 +45,7 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
+	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
 	err = depGraph.MakeDAG()
 	if err != nil {
 		logger.Log.Panic(err)
