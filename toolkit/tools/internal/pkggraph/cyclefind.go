@@ -24,19 +24,43 @@ type dfsData struct {
 	cycle  []int64
 }
 
-// updateCycle records the cycle between startID and endID in metaData.cycle.
-func createCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
-	// Construct a cycle that starts and ends with the same node id by backtracking
-	// from startID to endID
-	// 	a -> b -> ... -> a
-	logger.Log.Debug("Found cycle")
-	metaData.cycle = []int64{endID}
-	for startID != endID {
-		metaData.cycle = append(metaData.cycle, startID)
-		logger.Log.Tracef("%s needed by %s", g.Node(startID).(*PkgNode).FriendlyName(), g.Node(metaData.parent[startID]).(*PkgNode).FriendlyName())
-		startID = metaData.parent[startID]
+// FindAnyDirectedCycle returns any single cycle in the graph, if one exists.
+func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
+	const goalNodeName = "_dfs_root_"
+
+	metadata := dfsData{
+		make(map[int64]int),
+		make(map[int64]int64),
+		make([]int64, 0),
 	}
-	metaData.cycle = append(metaData.cycle, endID)
+
+	// Create a temporary root node, by using a constant goalNodeName, it will act as a mutex against concurrent
+	// cycle searches on a given graph as this below call will fail if there is already a goal node with the same value.
+	rootNode, err := g.AddGoalNode(goalNodeName, nil, false)
+	if err != nil {
+		return
+	}
+
+	// This call will also remove all edges connected to the temporary root node.
+	defer g.RemoveNode(rootNode.ID())
+
+	// Seed the initial metadata state
+	metadata.parent[rootNode.ID()] = -1
+	metadata.state[rootNode.ID()] = unvisited
+
+	foundCycle, err := cycleDFS(g, rootNode.ID(), &metadata)
+	if err != nil {
+		return
+	}
+
+	if foundCycle {
+		// Convert the slice of node IDs to references to the actual nodes.
+		for _, id := range metadata.cycle {
+			nodes = append(nodes, g.Node(id).(*PkgNode).This)
+		}
+	}
+
+	return
 }
 
 // cycleDFS implements a custom DFS that updates metaData.cycle with the first cycle it finds in a given graph.
@@ -105,41 +129,17 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 	return
 }
 
-// FindAnyDirectedCycle returns any single cycle in the graph, if one exists.
-func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
-	const goalNodeName = "_dfs_root_"
-
-	metadata := dfsData{
-		make(map[int64]int),
-		make(map[int64]int64),
-		make([]int64, 0),
+// updateCycle records the cycle between startID and endID in metaData.cycle.
+func createCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
+	// Construct a cycle that starts and ends with the same node id by backtracking
+	// from startID to endID
+	// 	a -> b -> ... -> a
+	logger.Log.Debug("Found cycle")
+	metaData.cycle = []int64{endID}
+	for startID != endID {
+		metaData.cycle = append(metaData.cycle, startID)
+		logger.Log.Tracef("%s needed by %s", g.Node(startID).(*PkgNode).FriendlyName(), g.Node(metaData.parent[startID]).(*PkgNode).FriendlyName())
+		startID = metaData.parent[startID]
 	}
-
-	// Create a temporary root node, by using a constant goalNodeName, it will act as a mutex against concurrent
-	// cycle searches on a given graph as this below call will fail if there is already a goal node with the same value.
-	rootNode, err := g.AddGoalNode(goalNodeName, nil, false)
-	if err != nil {
-		return
-	}
-
-	// This call will also remove all edges connected to the temporary root node.
-	defer g.RemoveNode(rootNode.ID())
-
-	// Seed the initial metadata state
-	metadata.parent[rootNode.ID()] = -1
-	metadata.state[rootNode.ID()] = unvisited
-
-	foundCycle, err := cycleDFS(g, rootNode.ID(), &metadata)
-	if err != nil {
-		return
-	}
-
-	if foundCycle {
-		// Convert the slice of node IDs to references to the actual nodes.
-		for _, id := range metadata.cycle {
-			nodes = append(nodes, g.Node(id).(*PkgNode).This)
-		}
-	}
-
-	return
+	metaData.cycle = append(metaData.cycle, endID)
 }
