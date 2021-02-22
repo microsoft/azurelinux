@@ -25,6 +25,7 @@ type dfsData struct {
 }
 
 // FindAnyDirectedCycle returns any single cycle in the graph, if one exists.
+// Multiple instances of this routine should not be run at the same time on a given graph.
 func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
 	const goalNodeName = "_dfs_root_"
 
@@ -116,7 +117,7 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 				return
 			}
 		case inProgress:
-			createCycle(g, metaData, rootID, v)
+			updateMetadataWithCycle(g, metaData, rootID, v)
 			foundCycle = true
 			return
 		default:
@@ -129,8 +130,8 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 	return
 }
 
-// updateCycle records the cycle between startID and endID in metaData.cycle.
-func createCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
+// updateMetadataWithCycle records the cycle between startID and endID in metaData.cycle.
+func updateMetadataWithCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
 	// Construct a cycle that starts and ends with the same node id by backtracking
 	// from startID to endID
 	// 	a -> b -> ... -> a
