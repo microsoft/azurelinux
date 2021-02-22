@@ -129,7 +129,7 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 	return
 }
 
-// updateCycle records the cycle between startID and endID in metaData.cycle.
+// createCycle records the cycle between startID and endID in metaData.cycle.
 func createCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
 	// Construct a cycle that starts and ends with the same node id by backtracking
 	// from startID to endID
