@@ -24,27 +24,59 @@ type dfsData struct {
 	cycle  []int64
 }
 
-func createCycle(g *PkgGraph, metaData *dfsData, start, end int64) {
-	metaData.cycle = append(metaData.cycle, end)
-	logger.Log.Tracef("%s needed by %s", g.Node(end).(*PkgNode).FriendlyName(), g.Node(start).(*PkgNode).FriendlyName())
-	for end != start {
-		metaData.cycle = append(metaData.cycle, start)
-		logger.Log.Tracef("%s needed by %s", g.Node(start).(*PkgNode).FriendlyName(), g.Node(metaData.parent[start]).(*PkgNode).FriendlyName())
-		start = metaData.parent[start]
+// updateCycle records the cycle between startID and endID in metaData.cycle.
+func createCycle(g *PkgGraph, metaData *dfsData, startID, endID int64) {
+	// Construct a cycle that starts and ends with the same node id by backtracking
+	// from startID to endID
+	// 	a -> b -> ... -> a
+	logger.Log.Debug("Found cycle")
+	metaData.cycle = []int64{endID}
+	for startID != endID {
+		metaData.cycle = append(metaData.cycle, startID)
+		logger.Log.Tracef("%s needed by %s", g.Node(startID).(*PkgNode).FriendlyName(), g.Node(metaData.parent[startID]).(*PkgNode).FriendlyName())
+		startID = metaData.parent[startID]
 	}
-	metaData.cycle = append(metaData.cycle, end)
+	metaData.cycle = append(metaData.cycle, endID)
 }
 
-func dfs(g *PkgGraph, u int64, metaData *dfsData) (foundCycle bool, err error) {
-	if metaData.state[u] != unvisited {
-		err = fmt.Errorf("Node %d is in a bad state (%d)", u, metaData.state[u])
+// cycleDFS implements a custom DFS that updates metaData.cycle with the first cycle it finds in a given graph.
+func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, err error) {
+	// Recursing on a node that has already been visited indicates a fatal error with the search.
+	if metaData.state[rootID] != unvisited {
+		err = fmt.Errorf("node %d is in a bad state (%d)", rootID, metaData.state[rootID])
 		return
 	}
 
-	metaData.state[u] = inProgress
+	// Mark that rootID is actively being searched ("inProgress").
+	//
+	// If all of its neighbors have been recursively exhausted then rootID will be marked as "done"
+	// to indicate that no cycle was found in all walks containing rootID.
+	//
+	// However, if any neighbors of rootID are currently marked as "inProgress" this indicates that
+	// the current walk has encountered a cycle.
+	//
+	// Example:
+	//    a → c → a
+	//    ↓   ↓
+	//    b   b
+	//
+	// 1) visit(a)
+	//   - mark a as "inProgress"
+	//   - neighbor b is "unvisited", visit.
+	// 2) visit(b)
+	//   - mark b as "inProgress"
+	//   - no neighbors
+	//   - mark b as "done"
+	// 3) Resume visit(a)
+	//   - neighbor c is "unvisited", visit.
+	// 4) visit(c)
+	//   - mark as "inProgress"
+	//   - neighbor b is "done", skip.
+	//   - neighbor a is "inProgress", cycle between (c) and (a) found.
 
-	foundCycle = false
-	for _, neighbor := range graph.NodesOf(g.From(u)) {
+	metaData.state[rootID] = inProgress
+
+	for _, neighbor := range graph.NodesOf(g.From(rootID)) {
 		v := neighbor.ID()
 		if _, exists := metaData.state[v]; !exists {
 			metaData.state[v] = unvisited
@@ -54,28 +86,27 @@ func dfs(g *PkgGraph, u int64, metaData *dfsData) (foundCycle bool, err error) {
 		case done:
 			continue
 		case unvisited:
-			metaData.parent[v] = u
-			foundCycle, err = dfs(g, v, metaData)
+			metaData.parent[v] = rootID
+			foundCycle, err = cycleDFS(g, v, metaData)
 			if err != nil || foundCycle {
 				return
 			}
 		case inProgress:
-			logger.Log.Debug("Found cycle!")
-			createCycle(g, metaData, u, v)
+			createCycle(g, metaData, rootID, v)
 			foundCycle = true
 			return
 		default:
-			err = fmt.Errorf("Node %d is in a bad state (%d)", v, metaData.state[v])
+			err = fmt.Errorf("node %d is in a bad state (%d)", v, metaData.state[v])
 			return
 		}
 	}
 
-	metaData.state[u] = done
+	metaData.state[rootID] = done
 	return
 }
 
 // FindAnyDirectedCycle returns any single cycle in the graph, if one exists.
-func (g *PkgGraph) FindAnyDirectedCycle() (nodes []PkgNode, err error) {
+func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
 	const goalNodeName = "_dfs_root_"
 
 	metadata := dfsData{
@@ -94,17 +125,19 @@ func (g *PkgGraph) FindAnyDirectedCycle() (nodes []PkgNode, err error) {
 	// This call will also remove all edges connected to the temporary root node.
 	defer g.RemoveNode(rootNode.ID())
 
+	// Seed the initial metadata state
 	metadata.parent[rootNode.ID()] = -1
 	metadata.state[rootNode.ID()] = unvisited
 
-	foundCycle, err := dfs(g, rootNode.ID(), &metadata)
+	foundCycle, err := cycleDFS(g, rootNode.ID(), &metadata)
 	if err != nil {
 		return
 	}
 
 	if foundCycle {
+		// Convert the slice of node IDs to references to the actual nodes.
 		for _, id := range metadata.cycle {
-			nodes = append(nodes, *g.Node(id).(*PkgNode))
+			nodes = append(nodes, g.Node(id).(*PkgNode).This)
 		}
 	}
 

@@ -1131,17 +1131,11 @@ func (g *PkgGraph) MakeDAG() (err error) {
 	}
 
 	for len(cycle) > 0 {
-		// Convert our list to pkggraph.PkgNodes
-		pkgCycle := make([]*PkgNode, 0, len(cycle))
-		for _, node := range cycle {
-			pkgCycle = append(pkgCycle, node.This)
-		}
-
-		err = g.fixCycle(pkgCycle)
+		err = g.fixCycle(cycle)
 		if err != nil {
 			var cycleStringBuilder strings.Builder
-			fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
-			for _, node := range pkgCycle[1:] {
+			fmt.Fprintf(&cycleStringBuilder, "{%s}", cycle[0].FriendlyName())
+			for _, node := range cycle[1:] {
 				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 			}
 			logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
