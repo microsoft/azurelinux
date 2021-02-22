@@ -85,18 +85,18 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 	//    b   b
 	//
 	// 1) visit(a)
-	//   - mark a as "inProgress"
-	//   - neighbor b is "unvisited", visit.
+	//   - mark "a" as "inProgress"
+	//   - neighbor "b" is "unvisited", visit.
 	// 2) visit(b)
-	//   - mark b as "inProgress"
+	//   - mark "b" as "inProgress"
 	//   - no neighbors
-	//   - mark b as "done"
+	//   - mark "b" as "done"
 	// 3) Resume visit(a)
-	//   - neighbor c is "unvisited", visit.
+	//   - neighbor "c" is "unvisited", visit.
 	// 4) visit(c)
-	//   - mark as "inProgress"
-	//   - neighbor b is "done", skip.
-	//   - neighbor a is "inProgress", cycle between (c) and (a) found.
+	//   - mark "c" as "inProgress"
+	//   - neighbor "b" is "done", skip.
+	//   - neighbor "a" is "inProgress", thus a cycle between "c" and "a" is found.
 
 	metaData.state[rootID] = inProgress
 
