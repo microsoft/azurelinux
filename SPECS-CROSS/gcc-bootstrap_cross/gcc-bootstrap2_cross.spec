@@ -181,6 +181,10 @@ ln -s gmp-6.1.2 gcc-%{version}/gmp
 tar -xf %{SOURCE3}
 ln -s mpc-1.1.0 gcc-%{version}/mpc
 
+cp mpfr-4.0.1/COPYING gcc-%{version}/COPYING-mpfr
+cp gmp-6.1.2/COPYING gcc-%{version}/COPYING-gmp
+cp mpc-1.1.0/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
+
 %build
 # What flags do we want here? Clearing with '%%global set_build_flags %%{nil}' at start of file.
 #CFLAGS="`echo " %%{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
@@ -238,6 +242,9 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 %files
 %defattr(-,root,root)
 %license COPYING
+%license COPYING-mpfr
+%license COPYING-gmp
+%license COPYING.LESSER-mpc
 %{_sysconfdir}/ld.so.conf.d/%{name}.conf
 #%%{_lib}/cpp
 # Executables
