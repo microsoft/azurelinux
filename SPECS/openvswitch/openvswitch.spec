@@ -3,7 +3,7 @@
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
 Version:        2.12.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 and LGPLv2+
 URL:            http://www.openvswitch.org/
 Group:          System Environment/Daemons
@@ -11,6 +11,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+# https://github.com/openvswitch/ovs/commit/53c1b8b166f3dd217bc391d707885f789e9ecc49.patch
+Patch0:         CVE-2020-35498.patch
 
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng
@@ -116,7 +118,7 @@ Requires:       ovn-common = %{version}-%{release}
 It contains the documentation and manpages for OVN.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --enable-ssl --enable-shared
@@ -273,9 +275,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/ovn-trace.8.gz
 
 %changelog
-* Sat May 09 00:21:27 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
-- Added %%license line automatically
-
+*   Mon Feb 22 2021 Emre Girgin <mrgirgin@microsoft.com> 2.12.0-3
+-   Fix CVE-2020-35498.
+*   Sat May 09 00:21:27 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
+-   Added %%license line automatically
 *   Tue Mar 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2.12.0-1
 -   Update to 2.12.0. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.2-4
