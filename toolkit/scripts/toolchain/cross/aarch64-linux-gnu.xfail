@@ -1,0 +1,27 @@
+FAIL: gcc.target/aarch64/fuse_adrp_add_1.c scan-assembler adrp\tx.*, fixed_regs\n\tadd\tx.*, x.*fixed_regs
+FAIL: gcc.target/aarch64/insv_1.c scan-assembler bfi\tx[0-9]+, x[0-9]+, 0, 8
+FAIL: gcc.target/aarch64/insv_1.c scan-assembler bfi\tx[0-9]+, x[0-9]+, 16, 5
+FAIL: gcc.target/aarch64/insv_1.c scan-assembler movk\tx[0-9]+, 0x1d6b, lsl 32
+FAIL: gcc.target/aarch64/ldp_stp_6.c scan-assembler stp\td[0-9]+, d[0-9]+, \\[x[0-9]+\\]
+FAIL: gcc.target/aarch64/lsl_asr_sbfiz.c scan-assembler sbfiz\tw
+FAIL: gcc.target/aarch64/pr63304_1.c (test for excess errors)
+FAIL: gcc.target/aarch64/pr63304_1.c scan-assembler-times adrp 6
+FAIL: gcc.target/aarch64/pr70120-2.c (test for excess errors)
+FAIL: gcc.target/aarch64/pr78733.c (test for excess errors)
+UNRESOLVED: gcc.target/aarch64/pr78733.c scan-assembler adr
+UNRESOLVED: gcc.target/aarch64/pr78733.c scan-assembler-not adrp
+FAIL: gcc.target/aarch64/pr79041-2.c (test for excess errors)
+UNRESOLVED: gcc.target/aarch64/pr79041-2.c scan-assembler adr
+UNRESOLVED: gcc.target/aarch64/pr79041-2.c scan-assembler-not adrp
+FAIL: gcc.target/aarch64/reload-valid-spoff.c (test for excess errors)
+FAIL: gcc.target/aarch64/vec_init_1.c scan-assembler-times ins\\t 2
+FAIL: gcc.target/aarch64/vect-add-sub-cond.c scan-assembler-not \tld[^\t]*\t[wx]
+FAIL: g++.dg/other/anon5.C -std=gnu++14 (test for excess errors)
+FAIL: g++.dg/other/anon5.C -std=gnu++17 (test for excess errors)
+FAIL: g++.dg/other/anon5.C -std=gnu++98 (test for excess errors)
+XPASS: gfortran.dg/ieee/ieee_8.f90 -O0  execution test
+XPASS: gfortran.dg/ieee/ieee_8.f90 -O1  execution test
+XPASS: gfortran.dg/ieee/ieee_8.f90 -O2  execution test
+XPASS: gfortran.dg/ieee/ieee_8.f90 -O3 -fomit-frame-pointer -funroll-loops -fpeel-loops -ftracer -finline-functions  execution test
+XPASS: gfortran.dg/ieee/ieee_8.f90 -O3 -g  execution test
+XPASS: gfortran.dg/ieee/ieee_8.f90 -Os  execution test
