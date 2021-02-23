@@ -2,7 +2,7 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        2.13
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GNU LGPL v2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,13 +153,13 @@ This package contains the AppArmor module for perl.
 %patch2 -p1
 
 %build
-export PYTHONPATH=%{_lib}/python3.7/site-packages
+export PYTHONPATH=%{_libdir}/python3.7/site-packages
 export PYTHON=%{_bindir}/python3
 export PYTHON_VERSION=3.7
 export PYTHON_VERSIONS=python3
 #Building libapparmor
 cd ./libraries/libapparmor
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_lib}/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
 /sbin/ldconfig
 sh ./autogen.sh
 %configure \
@@ -171,8 +171,8 @@ cd ../../binutils/
 make %{?_smp_mflags}
 #Building parser
 cd ../parser
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_lib}/"
-export LIBRARY_PATH="$LIBRARY_PATH:%{_lib}"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
+export LIBRARY_PATH="$LIBRARY_PATH:%{_libdir}"
 echo $LD_LIBRARY_PATH
 echo $LIBRARY_PATH
 make %{?_smp_mflags}
@@ -192,11 +192,11 @@ make %{?_smp_mflags}
 %check
 easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
 $easy_install_3 pyflakes
-export PYTHONPATH=%{_lib}/python3.7/site-packages
+export PYTHONPATH=%{_libdir}/python3.7/site-packages
 export PYTHON=%{_bindir}/python3
 export PYTHON_VERSION=3.7
 export PYTHON_VERSIONS=python3
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_lib}/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
 cd ./libraries/libapparmor
 make check
 cd ../../binutils/
@@ -205,11 +205,11 @@ cd ../utils
 make check
 
 %install
-export PYTHONPATH=%{_lib}/python3.7/site-packages
+export PYTHONPATH=%{_libdir}/python3.7/site-packages
 export PYTHON=%{_bindir}/python3
 export PYTHON_VERSION=3.7
 export PYTHON_VERSIONS=python3
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_lib}/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
 cd libraries/libapparmor
 make DESTDIR=%{buildroot} install
 cd ../../binutils/
@@ -343,6 +343,9 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.13-13
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.13-12
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 

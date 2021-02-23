@@ -104,9 +104,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 
 	if strings.TrimSpace(inputSummaryFile) == "" {
 		// Cache an RPM for each unresolved node in the graph.
+		fetchedPackages := make(map[string]bool)
 		for _, n := range dependencyGraph.AllRunNodes() {
 			if n.State == pkggraph.StateUnresolved {
-				resolveErr := resolveSingleNode(cloner, n, *outDir)
+				resolveErr := resolveSingleNode(cloner, n, fetchedPackages, *outDir)
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
@@ -146,8 +147,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	return
 }
 
-// resolveSingleNode caches the RPM for a single node
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, outDir string) (err error) {
+// resolveSingleNode caches the RPM for a single node.
+// It will modify fetchedPackages on a successful package clone.
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, fetchedPackages map[string]bool, outDir string) (err error) {
 	const cloneDeps = true
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
@@ -155,18 +157,30 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	// Resolve nodes to exact package names so they can be referenced in the graph.
 	resolvedPackage, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
-		logger.Log.Errorf("Failed to resolve '%s' to a package. Error: %s", node, err)
+		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
+		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
+		// If it does not become available scheduler will print an error at the end of the build.
+		if node.Implicit {
+			logger.Log.Debug(msg)
+		} else {
+			logger.Log.Error(msg)
+		}
 		return
 	}
 
-	desiredPackage := &pkgjson.PackageVer{
-		Name: resolvedPackage,
-	}
+	if !fetchedPackages[resolvedPackage] {
+		desiredPackage := &pkgjson.PackageVer{
+			Name: resolvedPackage,
+		}
 
-	err = cloner.Clone(cloneDeps, desiredPackage)
-	if err != nil {
-		logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
-		return
+		err = cloner.Clone(cloneDeps, desiredPackage)
+		if err != nil {
+			logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
+			return
+		}
+		fetchedPackages[resolvedPackage] = true
+
+		logger.Log.Infof("Fetched: %s", resolvedPackage)
 	}
 
 	// Construct the rpm path of the cloned package.
@@ -174,7 +188,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
 	rpmArch := resolvedPackage[strings.LastIndex(resolvedPackage, ".")+1:]
 	node.RpmPath = filepath.Join(outDir, rpmArch, rpmName)
-
 	node.State = pkggraph.StateCached
+
 	return
 }

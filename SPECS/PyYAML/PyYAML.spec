@@ -3,15 +3,14 @@
 
 Name:           PyYAML
 Version:        3.13
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        YAML parser and emitter for Python
 Group:          Development/Libraries
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://pyyaml.org/
-Source0:        http://pyyaml.org/download/pyyaml/%{name}-%{version}.tar.gz
-%define sha1 PyYAML=22f95fe2f5ef29ab17110f92c7186e2cfde6b419
+URL:            https://pyyaml.org/
+Source0:        https://pyyaml.org/download/pyyaml/%{name}-%{version}.tar.gz
 Patch0:         PyYAML-CVE-2017-18342.patch
 Patch1:         ConstructorError_fix.patch
 Patch2:         change_default_loader.patch
@@ -48,6 +47,7 @@ Summary:        python3-PyYAML
 Requires:       python3
 Requires:       python3-libs
 Requires:       libyaml
+Provides:       python3-yaml = %{version}-%{release}
 
 %description -n python3-PyYAML
 Python 3 version.
@@ -101,7 +101,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.13-5
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.13-6
+- Provide python3-yaml
+- Update URLs to https
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.13-5
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.13-4

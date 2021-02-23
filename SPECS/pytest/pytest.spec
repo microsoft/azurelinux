@@ -2,40 +2,40 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python2_version: %define python2_version %(python2 -c "import sys; sys.stdout.write(sys.version[:3])")}
 %{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-
+Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        3.8.2
-Release:        6%{?dist}
-Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
+Release:        7%{?dist}
 License:        MIT
-Group:          Development/Languages/Python
-URL:            https://docs.pytest.org
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages/Python
+URL:            https://docs.pytest.org
 #Source0:        https://github.com/pytest-dev/pytest/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/5f/d2/7f77f406ac505abda02ab4afb50d06ebf304f6ea42fca34f8f37529106b2/pytest-%{version}.tar.gz
-
+BuildRequires:  python-hypothesis
+BuildRequires:  python-py
+BuildRequires:  python-setuptools
+BuildRequires:  python-setuptools_scm
+BuildRequires:  python-twisted
+BuildRequires:  python-xml
 BuildRequires:  python2
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
-BuildRequires:  python-setuptools
-BuildRequires:  python-py
-BuildRequires:  python-xml
-BuildRequires:  python-hypothesis
-BuildRequires:  python-twisted
-BuildRequires:  python-setuptools_scm
 BuildRequires:  python3
 BuildRequires:  python3-devel
-BuildRequires:  python3-py
 BuildRequires:  python3-hypothesis
-BuildRequires:  python3-twisted
+BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-twisted
+BuildRequires:  python3-xml
+Requires:       python-py
 Requires:       python2
 Requires:       python2-libs
-Requires:       python-py
-
+AutoReqProv:    no
+Provides:       python2dist(pytest) = %{version}-%{release}
+Provides:       python2.7dist(pytest) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
@@ -46,6 +46,9 @@ Summary:        pytest is a mature full-featured Python testing tool that helps 
 Requires:       python3
 Requires:       python3-libs
 Requires:       python3-py
+AutoReqProv:    no
+Provides:       python3dist(pytest) = %{version}-%{release}
+Provides:       python3.7dist(pytest) = %{version}-%{release}
 
 %description -n python3-pytest
 
@@ -100,23 +103,33 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.8.2-7
+- Disable auto dependency generator.
+
 * Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.8.2-6
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-5
 -   Renaming python-pytest to pytest
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-4
 -   Renaming python-Twisted to python-twisted
+
 *   Mon Apr 20 2020 Eric Li <eli@microsoft.com> 3.8.2-3
 -   Update Source0:, add #Source0, and delete sha1. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.8.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue Oct 09 2018 Tapas Kundu <tkundu@vmware.com> 3.8.2-1
 -   Updated to release 3.8.2
 -   Removed buildrequires from subpackage.
+
 *   Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 3.0.7-3
 -   Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+
 *   Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-2
 -   Use python2 instead of python and rename the scripts in bin directory
+
 *   Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-1
 -   Initial

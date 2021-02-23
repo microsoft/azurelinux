@@ -19,6 +19,9 @@ const (
 	// QueryHeaderArgument specifies the srpm argument to be used with rpm tools
 	QueryHeaderArgument = "--srpm"
 
+	// QueryBuiltRPMHeadersArgument specifies that only rpm packages that would be built from a given spec should be queried.
+	QueryBuiltRPMHeadersArgument = "--builtrpms"
+
 	// DistTagDefine specifies the dist tag option for rpm tool commands
 	DistTagDefine = "dist"
 
@@ -85,8 +88,8 @@ func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
 }
 
 // formatCommand will generate an RPM command to execute.
-func formatCommandArgs(extrArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
-	commandArgs = append(commandArgs, extrArgs...)
+func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
+	commandArgs = append(commandArgs, extraArgs...)
 	commandArgs = append(commandArgs, file)
 
 	if queryFormat != "" {

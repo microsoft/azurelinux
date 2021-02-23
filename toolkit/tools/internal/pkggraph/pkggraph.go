@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 
 	"gonum.org/v1/gonum/graph"
@@ -962,13 +963,13 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 
 	goalSet := make(map[*pkgjson.PackageVer]bool)
 	if len(packages) > 0 {
-		logger.Log.Infof("Adding \"%s\" goal", goalName)
+		logger.Log.Debugf("Adding \"%s\" goal", goalName)
 		for _, pkg := range packages {
 			logger.Log.Tracef("\t%s-%s", pkg.Name, pkg.Version)
 			goalSet[pkg] = true
 		}
 	} else {
-		logger.Log.Infof("Adding \"%s\" goal for all nodes", goalName)
+		logger.Log.Debugf("Adding \"%s\" goal for all nodes", goalName)
 		for _, node := range g.AllRunNodes() {
 			logger.Log.Tracef("\t%s-%s %d", node.VersionedPkg.Name, node.VersionedPkg.Version, node.ID())
 			goalSet[node.VersionedPkg] = true
@@ -1011,7 +1012,7 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		}
 
 		if existingNode != nil {
-			logger.Log.Debugf("Found %s to satisfy %s", existingNode.RunNode, pkg)
+			logger.Log.Tracef("Found %s to satisfy %s", existingNode.RunNode, pkg)
 			goalEdge := g.NewEdge(goalNode, existingNode.RunNode)
 			g.SetEdge(goalEdge)
 			goalSet[pkg] = false
@@ -1118,6 +1119,78 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 	}
 	deepCopy = NewPkgGraph()
 	err = ReadDOTGraph(deepCopy, &buf)
+	return
+}
+
+// MakeDAG ensures the graph is a directed acyclic graph (DAG).
+// If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
+func (g *PkgGraph) MakeDAG() (err error) {
+	cycle, err := g.FindAnyDirectedCycle()
+	if err != nil {
+		return
+	}
+
+	for len(cycle) > 0 {
+		err = g.fixCycle(cycle)
+		if err != nil {
+			var cycleStringBuilder strings.Builder
+			fmt.Fprintf(&cycleStringBuilder, "{%s}", cycle[0].FriendlyName())
+			for _, node := range cycle[1:] {
+				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+			}
+			logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
+			err = fmt.Errorf("cycles detected in dependency graph")
+			return err
+		}
+
+		cycle, err = g.FindAnyDirectedCycle()
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+// fixCycle attempts to fix a cycle. Cycles may be acceptable if all nodes are from the same spec file.
+// If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
+func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
+	srpmPath := cycle[0].SrpmPath
+	// Omit the first element of the cycle, since it is repeated as the last element
+	trimmedCycle := cycle[1:]
+	logger.Log.Debugf("Found cycle: %v", cycle)
+
+	// For each node, remove any edges which point to other nodes in the cycle, and move any remaining dependencies to a new
+	// meta node, then have everything in the cycle depend on the new meta node.
+	groupedDependencies := make(map[int64]bool)
+	for _, currentNode := range trimmedCycle {
+		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
+		if currentNode.Type == TypeBuild {
+			return fmt.Errorf("cycle contains build dependencies, unresolvable")
+		}
+		// Remove all links to other members of the cycle
+		for _, nodeInCycle := range trimmedCycle {
+			g.RemoveEdge(currentNode.ID(), nodeInCycle.ID())
+		}
+
+		// Record any other dependencies the nodes have (ie, where can we get to from here), then remove them
+		fromNodes := graph.NodesOf(g.From(currentNode.ID()))
+		for _, from := range fromNodes {
+			groupedDependencies[from.ID()] = true
+			g.RemoveEdge(currentNode.ID(), from.ID())
+		}
+	}
+
+	// Convert the IDs back into actual nodes
+	dependencyNodes := make([]*PkgNode, 0, len(groupedDependencies))
+	for id := range groupedDependencies {
+		dependencyNodes = append(dependencyNodes, g.Node(id).(*PkgNode).This)
+	}
+
+	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
+
+	// Enable cycle detection between meta nodes within the same srpm file
+	metaNode.SrpmPath = srpmPath
+
 	return
 }
 

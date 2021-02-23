@@ -59,7 +59,7 @@ var (
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
 	buildAttempts        = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	runCheck             = app.Flag("run-check", "Run the check during package builds.").Bool()
-	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the choot folder after the build is done").Bool()
+	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
 
@@ -180,11 +180,11 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
 
-	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, graphMutex)
+	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, graphMutex, goalNode, channels)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -201,7 +201,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 // startWorkerPool starts the worker pool and returns the communication channels between the workers and the scheduler.
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
-func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex sync.RWMutex) (channels *schedulerChannels) {
+func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
 		Requests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
 		Results:  make(chan *schedulerutils.BuildResult, channelBufferSize),
@@ -233,12 +233,12 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
-		// useCachedImplicit tracks if cached implicit provides can be used to satsify unresolved dynamic dependencies.
-		// Local packages are preferred over cached remotes ones to satsify these unresolved dependencies, however
+		// useCachedImplicit tracks if cached implicit provides can be used to satisfy unresolved dynamic dependencies.
+		// Local packages are preferred over cached remotes ones to satisfy these unresolved dependencies, however
 		// the scheduler does not know what packages provide which implicit provides until the packages have been built.
 		// Therefore the scheduler will attempt to build all possible packages without consuming any cached dynamic dependencies first.
 		useCachedImplicit bool
@@ -260,7 +260,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running try enabling cached packages for unresolve dynamic dependencies to unblocked more nodes.
+		// If there are no active builds running try enabling cached packages for unresolved dynamic dependencies to unblocked more nodes.
 		// Otherwise there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {
@@ -284,8 +284,18 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 				// If the graph has already been optimized and is now solvable without any additional information
 				// then skip processing any new implicit provides.
 				if !isGraphOptimized {
-					didOptimize, newGraph, newGoalNode := updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit)
-					if didOptimize {
+					var (
+						didOptimize bool
+						newGraph    *pkggraph.PkgGraph
+						newGoalNode *pkggraph.PkgNode
+					)
+					didOptimize, newGraph, newGoalNode, err = updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit)
+					if err != nil {
+						// Failures to manipulate the graph are fatal.
+						// There is no guarantee the graph is still a directed acyclic graph and is solvable.
+						stopBuilding = true
+						stopBuild(channels, buildState)
+					} else if didOptimize {
 						isGraphOptimized = true
 						// Replace the graph and goal node pointers.
 						// Any outstanding builds of nodes that are no longer in the graph will gracefully handle this.
@@ -329,17 +339,19 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
 // It will also attempt to subgraph the graph if it becomes solvable with the new implicit provides.
-func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode) {
+func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 
 	didInjectAny, err := schedulerutils.InjectMissingImplicitProvides(res, pkgGraph, useCachedImplicit)
 	if err != nil {
-		logger.Log.Warnf("Failed to inject any missing implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
+		logger.Log.Errorf("Failed to add implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
 	} else if didInjectAny {
-		newGraph, newGoalNode, err = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
-		if err == nil {
+		// Failure to optimize the graph is non fatal as there may simply be unresolved dynamic dependencies
+		var subgraphErr error
+		newGraph, newGoalNode, subgraphErr = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
+		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true
 		}

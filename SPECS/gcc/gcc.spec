@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        9.1.0
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,9 @@ Requires:       libmpc
 Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       cpp = %{version}-%{release}
 Provides:       gcc-plugin-devel = %{version}-%{release}
+Provides:       libquadmath = %{version}-%{release}
+Provides:       libquadmath-devel = %{version}-%{release}
+Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 #%if %{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
@@ -142,11 +145,11 @@ make %{?_smp_mflags}
 
 %install
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/%{_lib}
-ln -sv %{_bindir}/cpp %{buildroot}/%{_lib}
+install -vdm 755 %{buildroot}/%{_libdir}
+ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
 ln -sv gcc %{buildroot}%{_bindir}/cc
-install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
-mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
+install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
+mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
@@ -169,7 +172,7 @@ make %{?_smp_mflags} check-gcc
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
-%{_lib}/cpp
+%{_libdir}/cpp
 # Executables
 %exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
@@ -214,7 +217,7 @@ make %{?_smp_mflags} check-gcc
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_lib}/libcc1.*
+%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
@@ -251,6 +254,12 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-11
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 9.1.0-10
+- Provide libquadmath and libquadmath-devel.
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-9
 - Provide gcc-plugin-devel.
 

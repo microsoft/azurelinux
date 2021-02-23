@@ -65,7 +65,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.
 	@touch $@
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker)
-	$(go-srpmpacker) \
+	GODEBUG=x509ignoreCN=0 $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \
@@ -81,7 +81,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 	touch $@
 
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
-	$(go-srpmpacker) \
+	GODEBUG=x509ignoreCN=0 $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \

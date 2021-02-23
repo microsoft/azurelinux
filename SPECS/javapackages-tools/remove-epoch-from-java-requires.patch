@@ -1,0 +1,15 @@
+diff --git a/depgenerators/maven.req b/depgenerators/maven.req
+--- a/depgenerators/maven.req
++++ b/depgenerators/maven.req
+@@ -295,9 +295,9 @@ class TagBuilder(object):
+     def _get_java_requires(self, reqs):
+         major, minor = max([self._parse_java_requires(x) for x in reqs])
+         if minor:
+-            return "1:{0}.{1}".format(major, minor)
++            return "{0}.{1}".format(major, minor)
+         else:
+-            return "1:{0}".format(major)
++            return "{0}".format(major)
+ 
+     def _parse_java_requires(self, req):
+         match = re.match(r'^(\d+)(?:\.(\d+))?$', req)

@@ -151,7 +151,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 	}
 
-	// Create Parition to Mountpoint map
+	// Create Partition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
 
 	if isOfflineInstall {

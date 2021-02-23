@@ -1,27 +1,33 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.10.4
-Release:        2%{?dist}
-URL:            https://www.freedesktop.org/wiki/Software/ModemManager/
-Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
+Release:        3%{?dist}
 License:        GPLv2
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  libqmi-devel
+Group:          Applications/System
+URL:            https://www.freedesktop.org/wiki/Software/ModemManager/
+Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  gobject-introspection-devel
-Requires:       libqmi
+BuildRequires:  libqmi-devel
+Requires:       glib
 Requires:       gobject-introspection
+Requires:       libqmi
+Provides:       %{name}-glib = %{version}-%{release}
+
 %description
 ModemManager provides a unified high level API for communicating
 with mobile broadband modems, regardless of the protocol used to
 communicate with the actual device.
 
 %package    devel
-Summary:    Header and development files for ModemManager
-Requires:   %{name} = %{version}
-Requires:   libqmi-devel
-Requires:   gobject-introspection-devel
+Summary:        Header and development files for ModemManager
+Requires:       %{name} = %{version}
+Requires:       glib-devel
+Requires:       gobject-introspection-devel
+Requires:       libqmi-devel
+Provides:       %{name}-glib-devel = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files for ModemManager
 
@@ -69,12 +75,17 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
-* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.10.4-2
+* Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.4-3
+- Provide ModemManager-glib and ModemManager-glib-devel.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.10.4-2
 - Added %%license line automatically
 
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.10.4-1
 -   Update to 1.10.4. Fix URL. Fix Source0 URL. Licence verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.8.2-1
 -   Initial build. First version

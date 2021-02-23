@@ -1,7 +1,7 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2019.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -109,7 +109,7 @@ make check
 %install
 make DESTDIR=%{buildroot} INSTALL="install -p -c" install
 find %{buildroot} -type f -name "*.la" -delete -print
-install -D -m 0644 %{SOURCE1} %{buildroot}%{_lib}/systemd/system-preset/91-ostree.preset
+install -D -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system-preset/91-ostree.preset
 install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 
 %post
@@ -164,6 +164,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2019.2-11
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 2019.2-10
 - Systemd supports merged /usr. Update installation and unit file directory macro.
 

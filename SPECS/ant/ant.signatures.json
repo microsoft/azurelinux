@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "apache-ant-1.10.9-src.tar.gz": "3f00fe29988ff1af83cb100089bfcbaf5d3e533d42fba3ea4861a982c920e874",
-  "hamcrest-1.3.tgz": "c6428e40d069fff3f99780efaae96c35ebdbf7cbfd475504254ebffcc19620c2",
-  "maven-ant-tasks-2.1.3.tar.gz": "ae5b6548dbb3f0d71865e1be9bffd13ca7bb65a3cb5d89eaee97ea7e70e1f0ba"
+  "ant-bootstrap.pom.in": "85d35aedfb5ccc60ba1642b4c7624d092f34b253662d3c6c8f2bc1982dcad580",
+  "ant.conf": "8a0bace4a527bd0ff35ad0b0a31c1f7bf30fa186e98cd9dc5142a97098f36ddf",
+  "apache-ant-1.10.9-src.tar.xz": "4b2008cc60fefd424b05567e9d43a071302865d5fd8b01a807e15e381b557ec2"
  }
 }

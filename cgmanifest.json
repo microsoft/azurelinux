@@ -46,7 +46,7 @@
         "other": {
           "name": "ant",
           "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
         }
       }
     },
@@ -56,7 +56,7 @@
         "other": {
           "name": "ant-contrib",
           "version": "1.0b3",
-          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.gz"
+          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.bz2"
         }
       }
     },
@@ -426,7 +426,7 @@
         "other": {
           "name": "cairo",
           "version": "1.16.0",
-          "downloadUrl": "http://cairographics.org/releases/cairo-1.16.0.tar.xz"
+          "downloadUrl": "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
         }
       }
     },
@@ -1016,8 +1016,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.44.6",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.44.6.tar.gz"
+          "version": "1.45.6",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz"
         }
       }
     },
@@ -1436,8 +1436,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.13.15",
-          "downloadUrl": "https://dl.google.com/go/go1.13.15.src.tar.gz"
+          "version": "1.15.5",
+          "downloadUrl": "https://dl.google.com/go/go1.15.5.src.tar.gz"
         }
       }
     },
@@ -1845,9 +1845,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "javapackages-tools",
+          "version": "5.3.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jna",
-          "version": "4.5.2",
-          "downloadUrl": "https://github.com/java-native-access/jna/archive/4.5.2/jna-4.5.2.tar.gz"
+          "version": "5.5.0",
+          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
         }
       }
     },
@@ -2726,8 +2736,8 @@
         "type": "other",
         "other": {
           "name": "libtalloc",
-          "version": "2.1.16",
-          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.1.16.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.1.tar.gz"
         }
       }
     },
@@ -2886,8 +2896,8 @@
         "type": "other",
         "other": {
           "name": "libyaml",
-          "version": "0.2.1",
-          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.1.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
         }
       }
     },
@@ -3158,16 +3168,6 @@
           "name": "mariadb",
           "version": "10.3.17",
           "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.17.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "maven",
-          "version": "3.5.4",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.5.4/source/apache-maven-3.5.4-src.tar.gz"
         }
       }
     },
@@ -4285,9 +4285,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pycairo",
+          "version": "1.18.2",
+          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.18.2/pycairo-1.18.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pygobject3",
-          "version": "3.30.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/00/17/198a9d0eb0e89b5c7d2a9b4437eb40d62702ab771030cd79fc7141cb0d30/PyGObject-3.30.1.tar.gz"
+          "version": "3.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
         }
       }
     },
@@ -4956,8 +4966,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/GehirnInc/python-jwt/archive/v1.0.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWT-1.7.1.tar.gz"
         }
       }
     },
@@ -5357,7 +5367,7 @@
         "other": {
           "name": "PyYAML",
           "version": "3.13",
-          "downloadUrl": "http://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
+          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
         }
       }
     },
@@ -6126,8 +6136,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.32.1",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util-linux-2.32.1.tar.xz"
+          "version": "2.36.1",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.1.tar.xz"
         }
       }
     },

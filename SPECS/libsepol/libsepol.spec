@@ -1,7 +1,7 @@
 Summary:	    SELinux binary policy manipulation library
 Name:		    libsepol
 Version:	    2.9
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:	    LGPLv2+
 Group:		    System Environment/Libraries
 URL:		    http://www.selinuxproject.org
@@ -53,7 +53,7 @@ mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_mandir}/man3
 mkdir -p %{buildroot}%{_mandir}/man8
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" install
+make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" install
 rm -f %{buildroot}%{_bindir}/genpolbools
 rm -f %{buildroot}%{_bindir}/genpolusers
 rm -f %{buildroot}%{_bindir}/chkcon
@@ -92,9 +92,12 @@ exit 0
 
 %files
 %defattr(-,root,root)
-%{_lib}/libsepol.so.1
+%{_libdir}/libsepol.so.1
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-6
 -   Add explicit provide for libsepol-static
 *   Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9-5

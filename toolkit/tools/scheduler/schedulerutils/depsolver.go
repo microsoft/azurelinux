@@ -44,7 +44,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -85,7 +85,7 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, goalNode *p
 }
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
-func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
 	if res.Err != nil {
 		return
 	}
@@ -96,13 +96,13 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
 	// Filter the nodes to ensure no duplicates.
-	var unfiltedUnblockedNodes []*pkggraph.PkgNode
+	var unfilteredUnblockedNodes []*pkggraph.PkgNode
 	unblockedNodesMap := make(map[*pkggraph.PkgNode]bool)
 	for _, node := range res.AncillaryNodes {
-		unfiltedUnblockedNodes = append(unfiltedUnblockedNodes, findUnblockedNodesFromNode(pkgGraph, buildState, node)...)
+		unfilteredUnblockedNodes = append(unfilteredUnblockedNodes, findUnblockedNodesFromNode(pkgGraph, buildState, node)...)
 	}
 
-	for _, node := range unfiltedUnblockedNodes {
+	for _, node := range unfilteredUnblockedNodes {
 		_, found := unblockedNodesMap[node]
 		if !found {
 			unblockedNodesMap[node] = true
