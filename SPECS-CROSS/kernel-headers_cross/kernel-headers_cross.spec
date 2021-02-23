@@ -61,11 +61,11 @@ Distribution:   Mariner
 Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
 BuildArch:      noarch
 Provides:       %{_cross_name}-glibc-kernheaders = %{version}-%{release}
-%ifarch x86_64
+%if "%{_target_arch}" == "x86_64"
 %define arch x86_64
 %endif
 
-%ifarch aarch64
+%if "%{_target_arch}" == "aarch64"
 %define arch arm64
 %endif
 
