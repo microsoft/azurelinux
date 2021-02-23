@@ -48,8 +48,8 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 
 %changelog
 * Fri Feb 19 2021 Chris Co <chrco@microsoft.com> - 20200316-3
-- Add bnx2x and qed firmware
-- Add WHENCE and relevant LICENSE files
+- Add bnx2x and qed firmware.
+- Add WHENCE and relevant LICENSE files.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20200316-2
 - Added %%license line automatically
