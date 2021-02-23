@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
