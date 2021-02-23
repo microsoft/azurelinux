@@ -1,7 +1,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Group:          Applications/System
@@ -66,11 +66,10 @@ install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
 install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 
 %check
-cd nss/tests
-chmod g+w . -R
-useradd test -G root -m
-HOST=localhost DOMSUF=localdomain BUILD_OPT=1
-sudo -u test ./all.sh && userdel test -r -f
+pushd nss/tests
+export USE_64=1
+HOST=localhost DOMSUF=localdomain BUILD_OPT=1 ./all.sh
+popd
 
 %post   -p /sbin/ldconfig
 
@@ -97,9 +96,10 @@ sudo -u test ./all.sh && userdel test -r -f
 %{_libdir}/libsoftokn3.so
 
 %changelog
-* Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.44-2
-- Added %%license line automatically
-
+*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.44-3
+-   Fix check tests
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.44-2
+-   Added %%license line automatically
 *   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 3.44-1
 -   Update version to 3.44. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.39-2

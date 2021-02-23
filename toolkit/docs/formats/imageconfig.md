@@ -65,6 +65,15 @@ Sample partitions entry, specifying a boot partition and a root partition:
 ]
 ```
 
+#### Flags
+"Flags" key controls special handling for certain partitions.
+
+- `esp` indicates this is the UEFI esp partition
+- `grub` indicates this is a grub boot partition
+- `bios_grub` indicates this is a bios grub boot partition
+- `boot` indicates this is a boot partition
+- `dmroot` indicates this partition will be used for a device mapper root device (i.e. `Encryption` or `ReadOnlyVerityRoot`)
+
 ## SystemConfigs
 
 SystemConfigs is an array of SystemConfig entries.
@@ -92,6 +101,36 @@ A sample PartitionSettings entry, designating an EFI and a root partitions:
     }
 ],
 ```
+
+It is possible to use `PartitionSettings` to configure diff disk image creation. Two types of diffs are possible.
+`rdiff` and `overlay` diff.
+
+For small and deterministic images `rdiff` is a better algorithm.
+For large images based on `ext4` `overlay` diff is a better algorithm.
+
+A sample `ParitionSettings` entry using `rdiff` algorithm:
+
+``` json
+{
+    "ID": "boot",
+    "MountPoint": "/boot/efi",
+    "MountOptions" : "umask=0077",
+    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
+},
+ ```
+
+A sample `ParitionSettings` entry using `overlay` algorithm:
+
+``` json
+{
+   "ID": "rootfs",
+   "MountPoint": "/",
+   "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
+}
+
+```
+`RdiffBaseImage` represents the base image when `rdiff` algorithm is used.
+`OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### PackageLists
 
@@ -121,7 +160,9 @@ Removing the RPM database may break any package managers inside the image.
 
 KernelOptions key consists of a map of key-value pairs, where a key is an identifier and a value is a name of the package (kernel) used in a scenario described by the identifier. During the build time, all kernels provided in KernelOptions will be built.
 
-KernelOptions is mandatory for all image types except for rootfs.
+KernelOptions is mandatory for all non-`rootfs` image types.
+
+KernelOptions may be included in `rootfs` images which expect a kernel, such as the initrd for an ISO, if desired.
 
 Currently there are only two keys with an assigned meaning:
 - `default` key needs to be always provided. It designates a kernel that is used when no other scenario is applicable (i.e. by default).
@@ -144,6 +185,52 @@ A sample KernelOptions specifying a default kernel and a specialized kernel for 
 "KernelOptions": {
     "default": "kernel",
     "hyperv": "kernel-hyperv"
+},
+```
+
+### ReadOnlyVerityRoot
+"ReadOnlyVerityRoot" key controls making the root filesystem read-only using dm-verity.
+It will create a verity disk from the partition mounted at "/". The verity data is stored as
+part of the image's initramfs. More details can be found in [Misc: Read Only Roots](../how_it_works/5_misc.md#dm-verity-read-only-roots)
+
+#### Considerations
+Having a read-only root filesystem will change the behavior of the image in some fundamental ways. There are several areas that should be considered before enabling a read-only root:
+
+##### Writable Data
+Any writable data which needs to be preserved will need to be stored into a separate writable partition. The `TmpfsOverlays` key will create throw-away writable partitions which are reset on every boot. The example configs create an overlay on `/var`, but the more refined the overlays are, the more secure they will be.
+
+##### GPL Licensing
+If using a read-only root in conjunction with a verified boot flow that uses a signed initramfs, carefully consider the implications on GPLv3 code. The read-only nature of the filesystem means a user cannot replace GPLv3 components without re-signing a new initramfs.
+
+##### Users
+Since users are controlled by files in `/etc`, these files are read-only when this is set. It is recommended to either use SSH key based login or pre-hash the password to avoid storing passwords in plain text in the config files (See [Users](#users)).
+
+##### Separate `/boot` Partition
+Since the root partition's hash tree is stored as part of the initramfs, the initramfs cannot be stored on the same root partition (it would invalidate the measurements). To avoid this a separate `/boot` partition is needed to house the hash tree (via the initramfs).
+
+##### ISO
+The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"CBL-Mariner Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
+
+The GUI installer does not currently support read-only roots.
+- `Enable`: Enable dm-verity on the root filesystem
+- `Name`: Custom name for the mounted root (default is `"verity_root_fs"`)
+- `ErrorCorrectionEnable`: Enable automatic error correction of modified blocks (default is `true`)
+- `ErrorCorrectionEncodingRoots`: Increase overhead to increase resiliency of the forward error correction (default is `2` bytes of code per 255 bytes of data)
+- `RootHashSignatureEnable`: Validate the root hash against a key stored in the kernel's system keyring. The signature file should be called `<Name>.p7` and must be stored in the initramfs. This signature WILL NOT BE included automatically in the initramfs. It must be included via an out of band build step.
+- `ValidateOnBoot`: Run a validation of the full disk at boot time, normally blocks are validated only as needed. This can take several minutes if the disk is corrupted.
+- `VerityErrorBehavior`: Indicate additional special system behavior when encountering an unrecoverable verity corruption. One of `"ignore"`, `"restart"`, `"panic"`. Normal behavior is to return an IO error when reading corrupt blocks.
+- `TmpfsOverlays`: Mount these paths as writable overlays backed by a tmpfs in memory.
+- `TmpfsOverlaySize`: Maximum amount of memory the overlays may use. Maybe be one of three forms: `"1234"`, `"1234[k,m,g]"`, `"20%"` (default is `"20%"`) 
+- `TmpfsOverlayDebugEnabled`: Make the tmpfs overlay mounts easily accessible for debugging purposes. They can be found in /mnt/verity_overlay_debug_tmpfs. Include the
+    `verity-read-only-root-debug-tools` package to create the required mount points.
+
+A sample ReadOnlyVerityRoot specifying a basic read-only root using default error correction. This configuration may be used for both normal images and ISO configurations:
+``` json
+"ReadOnlyVerityRoot": {
+    "Enable": true,
+    "TmpfsOverlays": [
+        "/var"
+    ],
 },
 ```
 
@@ -244,11 +331,13 @@ A sample image configuration, producing a VHDX disk image:
                 {
                     "ID": "boot",
                     "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
+                    "MountOptions" : "umask=0077",
+                    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 },
                 {
                     "ID": "rootfs",
-                    "MountPoint": "/"
+                    "MountPoint": "/",
+                     "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
                 }
             ],
             "PackageLists": [

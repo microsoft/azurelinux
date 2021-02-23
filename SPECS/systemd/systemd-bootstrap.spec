@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        31%{?dist}
+Release:        32%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxslt
+BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -63,6 +64,7 @@ Requires:       glib
 Requires:       kmod
 Requires:       libcap
 Requires:       libgcrypt
+Requires:       lz4
 Requires:       pam
 Requires:       xz
 
@@ -109,6 +111,7 @@ meson  --prefix %{_prefix}                                            \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
+       -Dlz4=true                                                     \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -244,6 +247,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-32
+- Enable LZ4 so journalctl can read logs from the container host.
+
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31
 - Fix CVE-2019-6454 patch. Add upstream patch info.
 - Fix CVE-2020-1712 patch. Add upstream patch info.

@@ -4,20 +4,19 @@
   - [Build and Boot an Image](#build-and-boot-an-image)
     - [VHDX and VHD Images](#vhdx-and-vhd-images)
     - [ISO Image](#iso-image)
-  
+
 ## **Install Prerequisites**
 Install prerequisites [here](../building/prerequisites.md).
 
- 
 ## **Clone CBL-Mariner**
 From a bash terminal window, clone the CBL-Mariner Repository and check-out a stable build.
 
 ```bash
 # Clone the CBL-Mariner repo
-git clone git@github.com:microsoft/CBL-Mariner.git
+git clone https://github.com/microsoft/CBL-Mariner.git
 cd CBL-Mariner
 
-# Sync to the latest stable build 
+# Sync to the latest stable build
 git checkout 1.0-stable
 
 ```
@@ -28,11 +27,11 @@ git checkout 1.0-stable
 
 The following builds a bootable, VHDX or VHD CBL-Mariner image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/1.0/prod/.
 
-No user account is provisioned by default.  To sign-in to these images, the sample meta-user-data.iso image must also be built and installed in your VM's CD drive.  The cloud-init service will detect the iso and provision a user account and password.  
+No user account is provisioned by default.  To sign-in to these images, the sample meta-user-data.iso image must also be built and installed in your VM's CD drive.  The cloud-init service will detect the iso and provision a user account and password.
 
 **Build a VHD or VHDX Image**
 ```bash
-# Switch to the toolkit folder 
+# Switch to the toolkit folder
 cd toolkit
 
 # Build VHDX Image
@@ -46,7 +45,7 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/co
 
 **Build the cloud-init configuration image**
 ```Bash
-# Build the cloud-init configuration image 
+# Build the cloud-init configuration image
 # The output image is ../out/images/meta-user-data.iso
 sudo make meta-user-data
 ```
@@ -96,7 +95,7 @@ choose DVD Drive and press Add.
 The following builds a bootable ISO image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/1.0/prod/.
 
 ```bash
-# Switch to the toolkit folder 
+# Switch to the toolkit folder
 cd toolkit
 
 # Image is placed in ../out/images/full
@@ -114,7 +113,7 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Change Memory size if desired, then press _Next >_.
 1. Select a virtual switch, then press _Next >_.
 1. Select _Create a virtual hard disk_, choose a location for your VHD(X) and set your desired disk Size.  Then press _Next >_.
-1. Select _Install an operating system from a bootable image file_ and browse to your CBL-Mariner ISO. 
+1. Select _Install an operating system from a bootable image file_ and browse to your CBL-Mariner ISO.
 1. Press _Finish_.
 
 **[Gen2/VHDX Only] Fix Boot Options**

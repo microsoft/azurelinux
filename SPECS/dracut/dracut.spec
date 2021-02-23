@@ -1,36 +1,36 @@
 # Copied this spec file from inside of dracut-041.tar.xz and edited later.
 
-%define dracutlibdir %{_prefix}/lib/dracut
-%define _unitdir /usr/lib/systemd/system
-
+%define dracutlibdir %{_lib}/dracut
+%define _unitdir %{_lib}/systemd/system
+Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        2%{?dist}
-Group:          System Environment/Base
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
-License:        GPLv2+ and LGPLv2+
+License:        GPLv2+ AND LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
 Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-%{version}.tar.xz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
-Patch1:         disable-xattr.patch
-Patch2:         fix-initrd-naming-for-mariner.patch
-Summary:        dracut to create initramfs
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildRequires:  bash git
-BuildRequires:  pkg-config
-BuildRequires:  kmod-devel
+Patch0:         disable-xattr.patch
+Patch1:         fix-initrd-naming-for-mariner.patch
 BuildRequires:  asciidoc
+BuildRequires:  bash
+BuildRequires:  git
+BuildRequires:  kmod-devel
+BuildRequires:  pkg-config
+Requires:       /bin/grep
+Requires:       /bin/sed
 Requires:       bash >= 4
 Requires:       coreutils
-Requires:       kmod
-Requires:       util-linux
-Requires:       systemd
-Requires:       /bin/sed
-Requires:       /bin/grep
-Requires:       findutils
 Requires:       cpio
+Requires:       findutils
+Requires:       kmod
+Requires:       systemd
+Requires:       util-linux
 
 %description
 dracut contains tools to create a bootable initramfs for 2.6 Linux kernels.
@@ -39,66 +39,77 @@ into the initramfs. dracut contains various modules which are driven by the
 event-based udev. Having root on MD, DM, LVM2, LUKS is supported as well as
 NFS, iSCSI, NBD, FCoE with the dracut-network package.
 
+%package fips
+Summary:        dracut modules to build a dracut initramfs with an integrity check
+Requires:       %{name} = %{version}-%{release}
+Requires:       libkcapi-hmaccalc
+Requires:       nss
+
+%description fips
+This package requires everything which is needed to build an
+initramfs with dracut, which does an integrity check.
+
 %package tools
-Summary: dracut tools to build the local initramfs
-Requires: %{name} = %{version}-%{release}
+Summary:        dracut tools to build the local initramfs
+Requires:       %{name} = %{version}-%{release}
 
 %description tools
 This package contains tools to assemble the local initrd and host configuration.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 cp %{SOURCE1} .
+%patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 %configure --systemdsystemunitdir=%{_unitdir} --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
-           --libdir=%{_prefix}/lib   --disable-documentation
+           --libdir=%{_lib}   --disable-documentation
 
 make %{?_smp_mflags}
 
 %install
-rm -rf -- $RPM_BUILD_ROOT
 make %{?_smp_mflags} install \
-     DESTDIR=$RPM_BUILD_ROOT \
-     libdir=%{_prefix}/lib
+     DESTDIR=%{buildroot} \
+     libdir=%{_lib}
 
-echo "DRACUT_VERSION=%{version}-%{release}" > $RPM_BUILD_ROOT/%{dracutlibdir}/dracut-version.sh
+echo "DRACUT_VERSION=%{version}-%{release}" > %{buildroot}/%{dracutlibdir}/dracut-version.sh
 
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/01fips
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/02fips-aesni
-
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/00bootchart
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/00bootchart
 
 # we do not support dash in the initramfs
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/00dash
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/00dash
 
 # remove gentoo specific modules
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/50gensplash
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/50gensplash
 
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/96securityfs
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/97masterkey
-rm -fr -- $RPM_BUILD_ROOT/%{dracutlibdir}/modules.d/98integrity
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/96securityfs
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/97masterkey
+rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/98integrity
 
-mkdir -p $RPM_BUILD_ROOT/boot/dracut
-mkdir -p $RPM_BUILD_ROOT/var/lib/dracut/overlay
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/opt/dracut/log
-touch $RPM_BUILD_ROOT%{_localstatedir}/opt/dracut/log/dracut.log
-ln -sfv %{_localstatedir}/opt/dracut/log/dracut.log $RPM_BUILD_ROOT%{_localstatedir}/log/
-mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/initramfs
+mkdir -p %{buildroot}/boot/dracut
+mkdir -p %{buildroot}%{_sharedstatedir}/dracut/overlay
+mkdir -p %{buildroot}%{_localstatedir}/log
+mkdir -p %{buildroot}%{_localstatedir}/opt/dracut/log
+touch %{buildroot}%{_localstatedir}/opt/dracut/log/dracut.log
+ln -sfv %{_localstatedir}/opt/dracut/log/dracut.log %{buildroot}%{_localstatedir}/log/
+mkdir -p %{buildroot}%{_sharedstatedir}/initramfs
 
-rm -f $RPM_BUILD_ROOT%{_mandir}/man?/*suse*
+rm -f %{buildroot}%{_mandir}/man?/*suse*
+
+install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
+> %{buildroot}%{_sysconfdir}/system-fips
 
 # create compat symlink
-mkdir -p $RPM_BUILD_ROOT%{_sbindir}
-ln -sr $RPM_BUILD_ROOT%{_bindir}/dracut $RPM_BUILD_ROOT%{_sbindir}/dracut
+mkdir -p %{buildroot}%{_sbindir}
+ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 
 %check
 make %{?_smp_mflags} -k clean  check
+
 %clean
-rm -rf -- $RPM_BUILD_ROOT
+rm -rf -- %{buildroot}
+
 
 %files
 %defattr(-,root,root,0755)
@@ -115,8 +126,8 @@ rm -rf -- $RPM_BUILD_ROOT
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
-/usr/lib/dracut/dracut-init.sh
-/usr/share/pkgconfig/dracut.pc
+%{_lib}/dracut/dracut-init.sh
+%{_datadir}/pkgconfig/dracut.pc
 %{dracutlibdir}/dracut-functions.sh
 %{dracutlibdir}/dracut-functions
 %{dracutlibdir}/dracut-version.sh
@@ -148,45 +159,76 @@ rm -rf -- $RPM_BUILD_ROOT
 %{_unitdir}/initrd.target.wants/dracut-pre-trigger.service
 %{_unitdir}/initrd.target.wants/dracut-pre-udev.service
 
+%files fips
+%defattr(-,root,root,0755)
+%{dracutlibdir}/modules.d/01fips
+%{_sysconfdir}/dracut.conf.d/40-fips.conf
+%config(missingok) %{_sysconfdir}/system-fips
+
 %files tools
 %defattr(-,root,root,0755)
 
 %{_bindir}/dracut-catimages
 %dir /boot/dracut
-%dir /var/lib/dracut
-%dir /var/lib/dracut/overlay
+%dir %{_sharedstatedir}/dracut
+%dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Fri Feb 12 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-5
+- Enable kernel crypto testing in dracut-fips
+
+* Wed Feb 10 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-4
+- Move 40-fips.conf to /etc/dracut.conf.d/
+
+* Mon Feb 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-3
+- Add dracut-fips package.
+- Disable kernel crypto testing in dracut-fips.
+
 *   Wed Apr 08 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-2
 -   Remove toybox from requires.
+
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
 -   Update version to 49. License verified. 
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 048-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Oct 01 2018 Alexey Makhalov <amakhalov@vmware.com> 048-1
 -   Version update
+
 *   Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  045-6
 -   Fixed the log file directory structure
+
 *   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 045-5
 -   Requires coreutils/util-linux/findutils or toybox,
     /bin/grep, /bin/sed
+
 *   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 045-4
 -   Add kmod-devel to BuildRequires
+
 *   Fri May 26 2017 Bo Gan <ganb@vmware.com> 045-3
 -   Fix dependency
+
 *   Thu Apr 27 2017 Bo Gan <ganb@vmware.com> 045-2
 -   Disable xattr for cp
+
 *   Wed Apr 12 2017 Chang Lee <changlee@vmware.com> 045-1
 -   Updated to 045
+
 *   Wed Jan 25 2017 Harish Udaiya Kumar <hudaiyakumr@vmware.com> 044-6
 -   Added the patch for bash 4.4 support.
+
 *   Wed Nov 23 2016 Anish Swaminathan <anishs@vmware.com>  044-5
 -   Add systemd initrd root device target to list of modules
+
 *   Fri Oct 07 2016 ChangLee <changlee@vmware.com> 044-4
 -   Modified %check
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 044-3
 -   GA - Bump release of all rpms
+
 *   Thu Apr 25 2016 Gengsheng Liu <gengshengl@vmware.com> 044-2
 -   Fix incorrect systemd directory.
+
 *   Thu Feb 25 2016 Kumar Kaushik <kaushikk@vmware.com> 044-1
 -   Updating Version.

@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.2.52
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,10 +48,8 @@ python2 setup.py build -b py2
 python2 -tt setup.py build -b py2 install --prefix=%{_prefix} --lnx-distro='mariner' --root=%{buildroot} --force
 mkdir -p  %{buildroot}/%{_localstatedir}/log
 mkdir -p -m 0700 %{buildroot}/%{_sharedstatedir}/waagent
-mkdir -p %{buildroot}/%{_localstatedir}/opt/waagent/log
-mkdir -p %{buildroot}/%{_localstatedir}/log/
-touch %{buildroot}/%{_localstatedir}/opt/waagent/log/waagent.log
-ln -sfv /opt/waagent/log/waagent.log %{buildroot}%{_localstatedir}/log/waagent.log
+mkdir -p %{buildroot}/%{_localstatedir}/log
+touch %{buildroot}/%{_localstatedir}/log/waagent.log
 
 %check
 python2 setup.py check && python2 setup.py test
@@ -73,13 +71,14 @@ python2 setup.py check && python2 setup.py test
 %attr(0755,root,root) %{_sbindir}/waagent
 %attr(0755,root,root) %{_sbindir}/waagent2.0
 %config %{_sysconfdir}/waagent.conf
-%dir %{_localstatedir}/opt/waagent/log
-%{_localstatedir}/log/waagent.log
-%ghost %{_localstatedir}/opt/waagent/log/waagent.log
+%ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
 %{_lib}/python2.7/site-packages/*
 
 %changelog
+* Mon Jan 25 2021 Henry Beberman <henry.beberman@microsoft.com> 2.2.52-2
+- Remove log symlink and use /var/log/waagent.log directly
+
 * Tue Dec 08 2020 Henry Li <lihl@microsoft.com> - 2.2.52-1
 - Upgrade to version 2.2.52
 - Update add-distro.patch

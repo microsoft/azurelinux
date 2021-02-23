@@ -222,15 +222,15 @@ echo "+++ import container image $DISTROLESS_IMAGE_FULL_NAME"
 cat $DISTROLESS_IMAGE_TARBALL | docker import - $DISTROLESS_IMAGE_FULL_NAME
 
 cd $RPMS_FOLDER
-DISTROLESS_COMPONENTS="kube-apiserver kube-controller-manager kube-scheduler pause"
-BASE_ONLY_COMPONENTS="kube-proxy"
+DISTROLESS_COMPONENTS="kubernetes-kube-apiserver kubernetes-kube-controller-manager kubernetes-kube-scheduler kubernetes-pause etcd coredns flannel"
+BASE_ONLY_COMPONENTS="kubernetes-kube-proxy"
 
 # create container based on cbl-mariner base
 echo "======================================================================"
 KUBERNETES_COMPONENTS="$DISTROLESS_COMPONENTS $BASE_ONLY_COMPONENTS"
 echo "+++ create containers based on $BASE_IMAGE_FULL_NAME for $KUBERNETES_COMPONENTS"
 for KUBERNETES_COMPONENT in $KUBERNETES_COMPONENTS ; do
-    for KUBERNETES_COMPONENT_RPM in $(find -name "kubernetes-$KUBERNETES_COMPONENT-*") ; do
+    for KUBERNETES_COMPONENT_RPM in $(find -name "$KUBERNETES_COMPONENT-[0-9]*") ; do
         create_container_image_base $KUBERNETES_COMPONENT $KUBERNETES_COMPONENT_RPM
     done
 done
@@ -242,7 +242,7 @@ echo "======================================================================"
 KUBERNETES_COMPONENTS="$DISTROLESS_COMPONENTS"
 echo "+++ create containers based on $DISTROLESS_IMAGE_FULL_NAME for $KUBERNETES_COMPONENTS"
 for KUBERNETES_COMPONENT in $KUBERNETES_COMPONENTS ; do
-    for KUBERNETES_COMPONENT_RPM in $(find -name "kubernetes-$KUBERNETES_COMPONENT-*") ; do
+    for KUBERNETES_COMPONENT_RPM in $(find -name "$KUBERNETES_COMPONENT-[0-9]*") ; do
         create_container_image_distroless $KUBERNETES_COMPONENT $KUBERNETES_COMPONENT_RPM
     done
 done

@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,9 +22,26 @@ Patch0:         openssl-1.1.1-no-html.patch
 # CVE only applies when Apache HTTP Server version 2.4.37 or less.
 Patch1:         CVE-2019-0190.nopatch
 Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
-Patch3:         CVE-2020-1971.patch
-Patch4:         openssl-1.1.1-ec-curves.patch
-Patch5:         openssl-1.1.1-no-brainpool.patch
+Patch3:         openssl-1.1.1-ec-curves.patch
+Patch4:         openssl-1.1.1-no-brainpool.patch
+Patch5:         openssl-1.1.0-issuer-hash.patch
+Patch6:         openssl-1.1.1-fips.patch
+Patch7:         openssl-1.1.1-version-override.patch
+Patch8:         openssl-1.1.1-seclevel.patch
+Patch9:         openssl-1.1.1-fips-post-rand.patch
+Patch10:        openssl-1.1.1-evp-kdf.patch
+Patch11:        openssl-1.1.1-ssh-kdf.patch
+Patch12:        openssl-1.1.1-krb5-kdf.patch
+Patch13:        openssl-1.1.1-edk2-build.patch
+Patch14:        openssl-1.1.1-fips-crng-test.patch
+Patch15:        openssl-1.1.1-fips-drbg-selftest.patch
+Patch16:        openssl-1.1.1-fips-dh.patch
+Patch17:        openssl-1.1.1-s390x-ecc.patch
+Patch18:        openssl-1.1.1-kdf-selftest.patch
+Patch19:        openssl-1.1.1-rewire-fips-drbg.patch
+Patch20:        openssl-1.1.1-explicit-params.patch
+Patch21:        openssl-1.1.1-fips-curves.patch
+Patch22:        CVE-2020-1971.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -91,11 +108,28 @@ cp %{SOURCE2} crypto/ec/
 cp %{SOURCE3} test/
 cp %{SOURCE4} test/
 
-%patch0 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch0  -p1
+%patch2  -p1
+%patch3  -p1
+%patch4  -p1
+%patch5  -p1
+%patch6  -p1
+%patch7  -p1
+%patch8  -p1
+%patch9  -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -122,7 +156,7 @@ export HASHBANGPERL=%{_bindir}/perl
     no-aria \
     enable-bf \
     no-blake2 \
-    no-camellia \
+    enable-camellia \
     no-capieng \
     enable-cast \
     no-chacha \
@@ -174,6 +208,17 @@ make all
 for i in libcrypto.pc libssl.pc openssl.pc ; do
   sed -i '/^Libs.private:/{s/-L[^ ]* //;s/-Wl[^ ]* //}' $i
 done
+
+# Add generation of HMAC checksum of the final stripped library
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %__os_install_post \
+    crypto/fips/fips_standalone_hmac %{buildroot}%{_libdir}/libcrypto.so.%{version} >%{buildroot}%{_libdir}/.libcrypto.so.%{version}.hmac \
+    ln -sf .libcrypto.so.%{version}.hmac %{buildroot}%{_libdir}/.libcrypto.so.%{soversion}.hmac \
+    crypto/fips/fips_standalone_hmac %{buildroot}%{_libdir}/libssl.so.%{version} >%{buildroot}%{_libdir}/.libssl.so.%{version}.hmac \
+    ln -sf .libssl.so.%{version}.hmac %{buildroot}%{_libdir}/.libssl.so.%{soversion}.hmac \
+%{nil}
 
 %check
 make test
@@ -246,6 +291,8 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
 %attr(0755,root,root) %{_libdir}/*.so*
 %attr(0755,root,root) %{_libdir}/engines-%{soversion}
+%attr(0644,root,root) %{_libdir}/.libcrypto.so.*.hmac
+%attr(0644,root,root) %{_libdir}/.libssl.so.*.hmac
 
 %files devel
 %doc CHANGES doc/dir-locals.example.el doc/openssl-c-indent.el
@@ -277,6 +324,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Feb 03 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-12
+- Apply FIPS patches from CentOS 8.
+
 * Wed Jan 13 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-11
 - Add ec-curves and no-brainpool patches from Fedora to fix ecdsa and ssl_new tests.
 

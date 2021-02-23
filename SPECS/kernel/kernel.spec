@@ -1,20 +1,20 @@
 %global security_hardening none
-%define uname_r %{version}-%{release}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.91
+Version:        5.10.13.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-# Arm64 HyperV support required patch
-Patch0:         ver5_4_72_arm64_hyperv_support.patch
-Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
+Source3:        sha512hmac-openssl.sh
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -130,6 +130,7 @@ Patch1101:      CVE-2020-29569.nopatch
 Patch1102:      CVE-2020-28374.nopatch
 Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
@@ -137,9 +138,11 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -216,13 +219,7 @@ Group:          System Environment/Kernel
 This package contains common device tree blobs (dtb)
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
-
-%ifarch aarch64
-%patch0 -p1
-%endif
-
-%patch1 -p1
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
@@ -323,6 +320,10 @@ mariner_initrd=initrd.img-%{uname_r}
 EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
+# hmac sign the kernel for FIPS
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
+
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
@@ -348,7 +349,7 @@ ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{una
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %ifarch aarch64
-cp arch/arm64/kernel/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/arch/arm64/kernel/
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
 # disable (JOBS=1) parallel build to fix this issue:
@@ -395,10 +396,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+/boot/.vmlinuz-%{uname_r}.hmac
 %config(noreplace) /boot/linux-%{uname_r}.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
+/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
@@ -449,6 +452,27 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+- Remove patch to publish efi tpm event log on ARM. Present in updated source.
+- Remove patch for arm64 hyperv support. Present in updated source.
+- Account for new module.lds location on aarch64
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+- Add CONFIG_SCSI_SMARTPQI=y
+
+* Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
+- Add configs to enable tcrypt in FIPS mode
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Use OpenSSL to perform HMAC calc
+
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
+- Add configs for userspace crypto support
+- HMAC calc the kernel for FIPS
+
+* Wed Jan 27 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.91-2
+- Enable dm-verity boot support with FEC
+
 * Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
 - Update source to 5.4.91
 - Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
