@@ -1,5 +1,6 @@
 %global security_hardening nofortify
-%define _use_internal_dependency_generator 0
+%global debug_package %{nil}
+%global set_build_flags %{nil}
 
 # Globals which should be in a macro file.
 # These should be set programatically in the future.
@@ -58,9 +59,15 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/gcc-%{version}.tar.xz
+Source1:        https://ftp.gnu.org/gnu/mpfr/mpfr-4.0.1.tar.gz
+Source2:        http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
+Source3:        https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
+Patch0:         090_all_pr55930-dependency-tracking.patch
+# Only applies to the Power9 ISA
+Patch1:         CVE-2019-15847.nopatch
 BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
-Conflicts:      %{_cross_name}-gcc-bootstrap2
+AutoReqProv:    no
 Conflicts:      %{_cross_name}-gcc
 #%%if %%{with_check}
 #BuildRequires:  autogen
@@ -77,8 +84,8 @@ which includes the C and C++ compilers.
 # %%package -n     gfortran
 # Summary:        GNU Fortran compiler.
 # Group:          Development/Tools
-# Requires:       %%{_cross_name}-gcc = %{version}-%%{release}
-# Provides:       %%{_cross_name}-gcc-gfortran = %{version}-%{release}
+# Requires:       %%{_cross_name}-gcc = %%{version}-%%{release}
+# Provides:       %%{_cross_name}-gcc-gfortran = %%{version}-%%{release}
 
 # %%description -n gfortran
 # The gfortran package contains GNU Fortran compiler.
@@ -93,8 +100,8 @@ which includes the C and C++ compilers.
 # %%package -n     libgcc-atomic
 # Summary:        GNU C Library for atomic counter updates
 # Group:          System Environment/Libraries
-# Requires:       %%{_cross_name}-libgcc = %{version}-%{release}
-# Provides:       %%{_cross_name}-libatomic = %{version}-%{release}
+# Requires:       %%{_cross_name}-libgcc = %%{version}-%%{release}
+# Provides:       %%{_cross_name}-libatomic = %%{version}-%%{release}
 
 # %%description -n libgcc-atomic
 # The libgcc package contains GCC shared libraries for atomic counter updates.
@@ -102,7 +109,7 @@ which includes the C and C++ compilers.
 # %%package -n     libgcc-devel
 # Summary:        GNU C Library
 # Group:          Development/Libraries
-# Requires:       %%{_cross_name}-libgcc = %{version}-%{release}
+# Requires:       %%{_cross_name}-libgcc = %%{version}-%%{release}
 
 # %%description -n libgcc-devel
 # The libgcc package contains GCC shared libraries for gcc .
@@ -111,10 +118,10 @@ which includes the C and C++ compilers.
 # %%package        c++
 # Summary:        C++ support for GCC
 # Group:          System Environment/Libraries
-# Requires:       %%{_cross_name}-gcc = %{version}-%{release}
-# Requires:       %%{_cross_name}-libstdc++-devel = %{version}-%{release}
-# Provides:       %%{_cross_name}-gcc-g++ = %{version}-%{release}
-# Provides:       %%{_cross_name}-g++ = %{version}-%{release}
+# Requires:       %%{_cross_name}-gcc = %%{version}-%%{release}
+# Requires:       %%{_cross_name}-libstdc++-devel = %%{version}-%%{release}
+# Provides:       %%{_cross_name}-gcc-g++ = %%{version}-%%{release}
+# Provides:       %%{_cross_name}-g++ = %%{version}-%%{release}
 
 # %%description    c++
 # This package adds C++ support to the GNU Compiler Collection.
@@ -124,7 +131,7 @@ which includes the C and C++ compilers.
 # %%package -n     libstdc++
 # Summary:        GNU C Library
 # Group:          System Environment/Libraries
-# Requires:       %%{_cross_name}-libgcc = %{version}-%{release}
+# Requires:       %%{_cross_name}-libgcc = %%{version}-%%{release}
 
 # %%description -n libstdc++
 # This package contains the GCC Standard C++ Library v3, an ongoing project to implement the ISO/IEC 14882:1998 Standard C++ library.
@@ -132,8 +139,8 @@ which includes the C and C++ compilers.
 # %%package -n     libstdc++-devel
 # Summary:        GNU C Library
 # Group:          Development/Libraries
-# Requires:       %%{_cross_name}-libstdc++ = %{version}-%{release}
-# Provides:       %%{_cross_name}-libstdc++-static = %{version}-%{release}
+# Requires:       %%{_cross_name}-libstdc++ = %%{version}-%%{release}
+# Provides:       %%{_cross_name}-libstdc++-static = %%{version}-%%{release}
 
 # %%description -n libstdc++-devel
 # This is the GNU implementation of the standard C++ libraries.
@@ -149,7 +156,7 @@ which includes the C and C++ compilers.
 # %%package -n     libgomp-devel
 # Summary:        Development headers and static library for libgomp
 # Group:          Development/Libraries
-# Requires:       %%{_cross_name}-libgomp = %{version}-%{release}
+# Requires:       %%{_cross_name}-libgomp = %%{version}-%%{release}
 
 # %%description -n libgomp-devel
 # An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU Compiler Collection.
@@ -157,19 +164,31 @@ which includes the C and C++ compilers.
 
 %prep
 %setup -q -n gcc-%{version}
+%patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
+install -vdm 755 %{_builddir}/%{name}-build
+
+install -vdm 755 %{_builddir}/%{name}-build
+cd %{_builddir}
+tar -xf %{SOURCE1}
+ln -s mpfr-4.0.1 gcc-%{version}/mpfr
+tar -xf %{SOURCE2}
+ln -s gmp-6.1.2 gcc-%{version}/gmp
+tar -xf %{SOURCE3}
+ln -s mpc-1.1.0 gcc-%{version}/mpc
 
 %build
-CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
-CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
-export CFLAGS
-export CXXFLAGS
+# What flags do we want here? Clearing with '%%global set_build_flags %%{nil}' at start of file.
+#CFLAGS="`echo " %%{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
+#CXXFLAGS="`echo " %%{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 
-export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
-SED=sed \
+# export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
+# SED=sed \
+
 # Ideally we would like to model this after the %%configure macro in the future.
-./configure \
+cd %{_builddir}/%{name}-build
+../gcc-%{version}/configure \
             --prefix=%{_cross_prefix} \
             --target=%{_tuple} \
             --disable-multilib \
@@ -187,9 +206,11 @@ SED=sed \
 make %{?_smp_mflags} all-gcc
 
 %install
+cd %{_builddir}/%{name}-build
 make %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
 
 rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
+cd ../gcc-%{version}
 %find_lang %{name} --all-name
 
 # Add the /opt/cross libs to the ldcache
@@ -249,12 +270,12 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 # %%files -n libgcc-atomic
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libatomic.so*
+# %%{_cross_prefix}%%{_lib64dir}/libatomic.so*
 
 # %%files -n libgcc-devel
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libgcc_s.so
-# %%{_cross_prefix}%{_lib}/libcc1.*
+# %%{_cross_prefix}%%{_lib64dir}/libgcc_s.so
+# %%{_cross_prefix}%%{_lib}/libcc1.*
 
 # %%files c++
 # %%defattr(-,root,root)
@@ -264,32 +285,32 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 # %%files -n libstdc++
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libstdc++.so.*
+# %%{_cross_prefix}%%{_lib64dir}/libstdc++.so.*
 # # Switched these from _datarootdir to _datadir
-# %%dir %{_cross_prefix}%{_datadir}/gcc-%{version}/python/libstdcxx
-# %%{_cross_prefix}%{_datadir}/gcc-%{version}/python/libstdcxx/*
+# %%dir %%{_cross_prefix}%%{_datadir}/gcc-%%{version}/python/libstdcxx
+# %%{_cross_prefix}%%{_datadir}/gcc-%%{version}/python/libstdcxx/*
 
 # %%files -n libstdc++-devel
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libstdc++.so
-# %%{_cross_prefix}%{_lib64dir}/libstdc++.la
-# %%{_cross_prefix}%{_lib64dir}/libstdc++.a
-# %%{_cross_prefix}%{_lib64dir}/libstdc++fs.a
-# %%{_cross_prefix}%{_lib64dir}/libsupc++.a
-# %%{_cross_prefix}%{_lib64dir}/libsupc++.la
+# %%{_cross_prefix}%%{_lib64dir}/libstdc++.so
+# %%{_cross_prefix}%%{_lib64dir}/libstdc++.la
+# %%{_cross_prefix}%%{_lib64dir}/libstdc++.a
+# %%{_cross_prefix}%%{_lib64dir}/libstdc++fs.a
+# %%{_cross_prefix}%%{_lib64dir}/libsupc++.a
+# %%{_cross_prefix}%%{_lib64dir}/libsupc++.la
 
-# %%{_cross_prefix}%{_includedir}/c++/*
+# %%{_cross_prefix}%%{_includedir}/c++/*
 
 # %%files -n libgomp
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libgomp*.so.*
+# %%{_cross_prefix}%%{_lib64dir}/libgomp*.so.*
 
 # %%files -n libgomp-devel
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%{_lib64dir}/libgomp.a
-# %%{_cross_prefix}%{_lib64dir}/libgomp.la
-# %%{_cross_prefix}%{_lib64dir}/libgomp.so
-# %%{_cross_prefix}%{_lib64dir}/libgomp.spec
+# %%{_cross_prefix}%%{_lib64dir}/libgomp.a
+# %%{_cross_prefix}%%{_lib64dir}/libgomp.la
+# %%{_cross_prefix}%%{_lib64dir}/libgomp.so
+# %%{_cross_prefix}%%{_lib64dir}/libgomp.spec
 
 %changelog
 * Fri Feb 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 9.1.0-11
