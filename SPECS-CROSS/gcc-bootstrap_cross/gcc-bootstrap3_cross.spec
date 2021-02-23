@@ -73,7 +73,7 @@ BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap2
 AutoReqProv:    no
 Conflicts:      %{_cross_name}-gcc
-Conflicts:      %{_cross_name}-gcc-bootstrap1
+Conflicts:      %{_cross_name}-gcc-bootstrap
 Conflicts:      %{_cross_name}-gcc-bootstrap2
 #%%if %%{with_check}
 #BuildRequires:  autogen
