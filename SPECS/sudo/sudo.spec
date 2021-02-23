@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.5p2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -40,9 +40,8 @@ make install DESTDIR=%{buildroot}
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 find %{buildroot}/%{_libdir} -name '*.so~' -delete
-# Add default user to sudoers group
-echo '%wheel ALL=(ALL) ALL' >> %{buildroot}/etc/sudoers
-echo '%sudo  ALL=(ALL) ALL' >> %{buildroot}/etc/sudoers
+# Add default user to sudoers group BEFORE the @includedir
+sed -i -E '/## Read drop-in files.+/i %wheel ALL=(ALL) ALL\n%sudo  ALL=(ALL) ALL' %{buildroot}/etc/sudoers
 install -vdm755 %{buildroot}/etc/pam.d
 cat > %{buildroot}/etc/pam.d/sudo << EOF
 #%%PAM-1.0
@@ -93,6 +92,8 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
+*   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
+-   Move sudo/wheel groups before @includedir to not override user's settings.
 *   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1
 -   Update to version 1.9.5.p2 to fix CVE-2021-3156.
 -   Change the password prompt to include ": " at the end.
