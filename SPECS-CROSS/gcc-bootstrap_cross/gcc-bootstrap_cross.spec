@@ -167,7 +167,6 @@ which includes the C and C++ compilers.
 %patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
-install -vdm 755 %{_builddir}/%{name}-build
 
 install -vdm 755 %{_builddir}/%{name}-build
 cd %{_builddir}
