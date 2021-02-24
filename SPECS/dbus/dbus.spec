@@ -1,7 +1,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        7%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,8 +14,7 @@ BuildRequires:  xz-devel
 Requires:       expat
 Requires:       systemd
 Requires:       xz
-Provides:       %{name}-libs = %{version}-%{release}
-Provides:       %{name}-tools = %{version}-%{release}
+Provides:       dbus-libs = %{version}-%{release}
 
 %description
 The dbus package contains dbus.
@@ -79,9 +78,6 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Thu Feb 16 2021 Henry Li <lihl@microsoft.com> - 1.13.6-7
-- Provides dbus-tools
-
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

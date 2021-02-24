@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -35,7 +35,6 @@ Provides:       python-sqlite
 Provides:       python(abi)
 Provides:       /bin/python
 Provides:       /bin/python2
-Provides:       %{name}-sqlite = %{version}-%{release}
 
 %description
 The Python 2 package contains the Python development environment. It
@@ -242,9 +241,6 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
-* Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 2.7.18-5
-- Provides python2-sqlite.
-
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.7.18-4
 - Turn off byte compilation since it requires this package to already be built and present.
 
