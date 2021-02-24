@@ -45,7 +45,6 @@ Requires:       python2-libs
 Requires:       python2-sphinxcontrib-websupport
 Provides:       %{name}-locale = %{version}-%{release}
 Provides:       %{name}-doc = %{version}-%{release}
-Provides:       %{name}-theme-openlmi = %{version}-%{release}
 %endif
 
 %description
@@ -158,7 +157,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %changelog
 * Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 1.7.9-14
-- Provides python-sphinx-locale, python-sphinx-doc, python-sphinx-theme-openlmi.
+- Provides python-sphinx-locale, python-sphinx-doc.
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.7.9-13
 - Ship sphinx-build-3.7 symlink.
