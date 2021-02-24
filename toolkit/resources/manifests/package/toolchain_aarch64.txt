@@ -109,7 +109,7 @@ gdbm-lang-1.18-4.cm1.aarch64.rpm
 gettext-0.21-1.cm1.aarch64.rpm
 gettext-debuginfo-0.21-1.cm1.aarch64.rpm
 gfortran-9.1.0-11.cm1.aarch64.rpm
-glib-2.58.0-10.cm1.aarch64.rpm
+glib-2.58.0-11.cm1.aarch64.rpm
 glibc-2.28-15.cm1.aarch64.rpm
 glibc-devel-2.28-15.cm1.aarch64.rpm
 glibc-i18n-2.28-15.cm1.aarch64.rpm
@@ -117,9 +117,9 @@ glibc-iconv-2.28-15.cm1.aarch64.rpm
 glibc-lang-2.28-15.cm1.aarch64.rpm
 glibc-nscd-2.28-15.cm1.aarch64.rpm
 glibc-tools-2.28-15.cm1.aarch64.rpm
-glib-debuginfo-2.58.0-10.cm1.aarch64.rpm
-glib-devel-2.58.0-10.cm1.aarch64.rpm
-glib-schemas-2.58.0-10.cm1.aarch64.rpm
+glib-debuginfo-2.58.0-11.cm1.aarch64.rpm
+glib-devel-2.58.0-11.cm1.aarch64.rpm
+glib-schemas-2.58.0-11.cm1.aarch64.rpm
 gmock-1.8.1-5.cm1.aarch64.rpm
 gmock-devel-1.8.1-5.cm1.aarch64.rpm
 gmock-static-1.8.1-5.cm1.aarch64.rpm
@@ -210,9 +210,9 @@ libselinux-devel-2.9-5.cm1.aarch64.rpm
 libselinux-python-2.9-5.cm1.aarch64.rpm
 libselinux-python3-2.9-5.cm1.aarch64.rpm
 libselinux-utils-2.9-5.cm1.aarch64.rpm
-libsepol-2.9-7.cm1.aarch64.rpm
-libsepol-debuginfo-2.9-7.cm1.aarch64.rpm
-libsepol-devel-2.9-7.cm1.aarch64.rpm
+libsepol-3.1-1.cm1.aarch64.rpm
+libsepol-debuginfo-3.1-1.cm1.aarch64.rpm
+libsepol-devel-3.1-1.cm1.aarch64.rpm
 libsolv-0.7.7-4.cm1.aarch64.rpm
 libsolv-debuginfo-0.7.7-4.cm1.aarch64.rpm
 libsolv-devel-0.7.7-4.cm1.aarch64.rpm
