@@ -105,7 +105,7 @@ Obsoletes: diskdumputils netdump kexec-tools-eppic
 #
 # Patches 601 onward are generic patches
 #
-Patch601:  ./makedumpfile-printk-fix.patch
+Patch601: makedumpfile-printk-fix.patch
 
 %description
 kexec-tools provides /sbin/kexec binary that facilitates a new
@@ -323,7 +323,7 @@ done
 
 %changelog
 * Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-1
-- Update version to 2.0.21-1
+- Update version to 2.0.21
 - Add patches for makedumpfile to support new printk in 5.10 kernel
 * Sun Aug 09 2020 Mateusz Malisz <mamalisz@microsoft.com> 2.0.20-16
 - Update configuration to fit CBL-Mariner naming and kernel configuration
