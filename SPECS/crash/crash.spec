@@ -1,6 +1,6 @@
 Name:          crash
-Version:       7.2.8
-Release:       2%{?dist}
+Version:       7.2.9
+Release:       1%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -9,6 +9,7 @@ URL:           https://github.com/crash-utility/crash
 # Source0:     https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz
 Source0:       %{name}-%{version}.tar.gz
 Source1:       https://ftp.gnu.org/gnu/gdb/gdb-7.6.tar.gz
+Patch0:        crash-printk-fix.patch
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
@@ -33,6 +34,7 @@ This package contains libraries and header files need for development.
 %prep
 %setup -q -n %{name}-%{version}
 cp %{SOURCE1} .
+%patch0 -p1
 
 %build
 make RPMPKG=%{version}-%{release}
@@ -62,6 +64,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+*   Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> 7.2.9-1
+-   Update version to 7.2.9.
+-   Add patches to support new printk in 5.10 kernel
 *   Sat Jun 20 2020 Andrew Phelps <anphel@microsoft.com> 7.2.8-2
 -   Add Source1 with gdb source tarball to support offline build.
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 7.2.8-1
