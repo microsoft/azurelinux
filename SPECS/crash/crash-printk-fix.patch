@@ -1,3 +1,8 @@
+This patch is a combination of the following commits:
+
+https://github.com/crash-utility/crash/commit/a5531b24750e7949c35640d996ea14c0587938bc
+https://github.com/crash-utility/crash/commit/71e159c64000467e94e08aefc144f5e1cdaa4aa0
+
 diff -urN a/defs.h b/defs.h
 --- a/defs.h	2020-11-19 15:32:33.000000000 -0800
 +++ b/defs.h	2021-02-23 21:33:30.503355697 -0800

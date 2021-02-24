@@ -1,3 +1,8 @@
+This patch is a combination of the following commits:
+
+https://github.com/makedumpfile/makedumpfile/commit/c617ec63339222f3a44d73e36677a9acc8954ccd
+https://github.com/makedumpfile/makedumpfile/commit/44b073b7ec467aee0d7de381d455b8ace1199184
+
 diff -urN a/makedumpfile-1.6.8/dwarf_info.c b/makedumpfile-1.6.8/dwarf_info.c
 --- a/makedumpfile-1.6.8/dwarf_info.c	2020-11-15 16:29:37.000000000 -0800
 +++ b/makedumpfile-1.6.8/dwarf_info.c	2021-02-23 22:05:06.633885710 -0800
