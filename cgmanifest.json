@@ -755,7 +755,7 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "7.2.8",
+          "version": "7.2.9",
           "downloadUrl": "https://github.com/crash-utility/crash/archive/7.2.9.tar.gz"
         }
       }
