@@ -84,7 +84,6 @@ Requires:       python3-six
 Requires:       python3-snowballstemmer
 Requires:       python3-sphinx-theme-alabaster
 Requires:       python3-sphinxcontrib-websupport
-Provides:       python3-sphinx_rtd_theme = %{version}-%{release}
 
 %description -n python3-sphinx
 
@@ -159,8 +158,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %changelog
 * Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 1.7.9-14
-- Provides python-sphinx-locale, python-sphinx-doc, python-sphinx-theme-openlmi
-  and python3-sphinx_rtd_theme.
+- Provides python-sphinx-locale, python-sphinx-doc, python-sphinx-theme-openlmi.
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.7.9-13
 - Ship sphinx-build-3.7 symlink.
