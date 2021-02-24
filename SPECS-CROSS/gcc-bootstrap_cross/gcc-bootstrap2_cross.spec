@@ -72,7 +72,7 @@ BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap
 AutoReqProv:    no
-Conflicts:      %{_cross_name}-gcc
+Conflicts:      %{_cross_name}-cross-gcc
 #%%if %%{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu

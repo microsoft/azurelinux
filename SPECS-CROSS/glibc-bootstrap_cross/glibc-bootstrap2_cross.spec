@@ -89,6 +89,7 @@ BuildRequires:  %{_cross_name}-gcc-bootstrap2
 AutoReqProv:    no
 Conflicts:      %{_cross_name}-glibc
 Conflicts:      %{_cross_name}-glibc-bootstrap2
+Conflicts:      %{_cross_name}-cross-gcc
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
