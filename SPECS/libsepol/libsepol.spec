@@ -102,9 +102,6 @@ exit 0
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-7
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-6
 -   Add explicit provide for libsepol-static
 
