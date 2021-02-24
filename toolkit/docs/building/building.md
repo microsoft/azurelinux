@@ -625,6 +625,9 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
+| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
+| USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
+| NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 
 ---
 

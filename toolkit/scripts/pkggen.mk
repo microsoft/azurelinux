@@ -55,6 +55,7 @@ analyze-built-graph: $(go-graphanalytics)
 	if [ -f $(build_file) ]; then \
 		$(go-graphanalytics) \
 			--input=$(built_file) \
+			--max-results=$(NUM_OF_ANALYTICS_RESULTS) \
 			$(logging_command); \
 	else \
 		echo "No built graph to analyze"; \
@@ -182,6 +183,8 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-schedu
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
+		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
+		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(logging_command) && \
 	touch $@
 
