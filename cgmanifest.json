@@ -2676,8 +2676,8 @@
         "type": "other",
         "other": {
           "name": "libsepol",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsepol-2.9.tar.gz"
+          "version": "3.1",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20200710/libsepol-3.1.tar.gz"
         }
       }
     },

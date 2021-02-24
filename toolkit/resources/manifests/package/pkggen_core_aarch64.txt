@@ -198,7 +198,7 @@ tdnf-plugin-repogpgcheck-2.1.0-4.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 libxml2-2.9.10-6.cm1.aarch64.rpm
 libxml2-devel-2.9.10-6.cm1.aarch64.rpm
-glib-2.58.0-10.cm1.aarch64.rpm
+glib-2.58.0-11.cm1.aarch64.rpm
 libltdl-2.4.6-7.cm1.aarch64.rpm
 libltdl-devel-2.4.6-7.cm1.aarch64.rpm
 pcre-libs-8.42-4.cm1.aarch64.rpm
