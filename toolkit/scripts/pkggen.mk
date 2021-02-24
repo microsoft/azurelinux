@@ -183,8 +183,8 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-schedu
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
-		$(if $(filter n,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
-		$(if $(filter n,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
+		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
+		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(logging_command) && \
 	touch $@
 
