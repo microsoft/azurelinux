@@ -3,7 +3,7 @@
 
 # Currently assumes you have already run busybox_cross.sh and kernel_cross.sh
 
-toolchainTuple="aarch64-linux-gnu"
+toolchainTuple="aarch64-mariner-linux-gnu"
 installDir="/opt/cross"
 sysrootDir="/opt/cross/${toolchainTuple}/sysroot"
 scriptDir="$( cd "$( dirname "$0" )" && pwd )"
