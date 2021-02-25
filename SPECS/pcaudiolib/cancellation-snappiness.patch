@@ -1,0 +1,80 @@
+From a41d46e816d2cbcd93564c42b65a87af547bcb2d Mon Sep 17 00:00:00 2001
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sun, 11 Oct 2020 17:34:57 +0200
+Subject: [PATCH] Fix cancellation snappiness
+
+Screen reader users report getting late cancellation, or even mixtures
+of speech. This is because the default buffering parameters of alsa or
+pulseaudio are relatively large.
+
+This change sets alsa and pulseaudio buffer sizes to 10ms worth of audio,
+which is the human snappiness perception limit.
+---
+ src/alsa.c       | 3 +++
+ src/audio_priv.h | 4 ++++
+ src/pulseaudio.c | 9 ++++++++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/src/alsa.c b/src/alsa.c
+index 64d5a90..c856788 100644
+--- a/src/alsa.c
++++ b/src/alsa.c
+@@ -99,6 +99,7 @@ alsa_object_open(struct audio_object *object,
+ 
+ 	snd_pcm_hw_params_t *params = NULL;
+ 	snd_pcm_hw_params_malloc(&params);
++	snd_pcm_uframes_t bufsize = (rate * channels * LATENCY) / 1000;
+ 
+ 	int err = 0;
+ 	if ((err = snd_pcm_open(&self->handle, self->device ? self->device : "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0)
+@@ -113,6 +114,8 @@ alsa_object_open(struct audio_object *object,
+ 		goto error;
+ 	if ((err = snd_pcm_hw_params_set_channels(self->handle, params, channels)) < 0)
+ 		goto error;
++	if ((err = snd_pcm_hw_params_set_buffer_size_near(self->handle, params, &bufsize)) < 0)
++		goto error;
+ 	if ((err = snd_pcm_hw_params(self->handle, params)) < 0)
+ 		goto error;
+ 	if ((err = snd_pcm_prepare(self->handle)) < 0)
+diff --git a/src/audio_priv.h b/src/audio_priv.h
+index 9526138..669a037 100644
+--- a/src/audio_priv.h
++++ b/src/audio_priv.h
+@@ -52,6 +52,10 @@ struct audio_object
+ 	                         int error);
+ };
+ 
++/* We try to aim for 10ms cancelation latency, which will be perceived as
++ * "snappy" by users */
++#define LATENCY 10
++
+ #if defined(_WIN32) || defined(_WIN64)
+ 
+ #include <windows.h>
+diff --git a/src/pulseaudio.c b/src/pulseaudio.c
+index d23366d..2f80c62 100644
+--- a/src/pulseaudio.c
++++ b/src/pulseaudio.c
+@@ -74,6 +74,13 @@ pulseaudio_object_open(struct audio_object *object,
+ 	}
+ 
+ 	int error = 0;
++	pa_buffer_attr battr;
++
++	battr.fragsize = (uint32_t) -1;
++	battr.maxlength = (uint32_t) -1;
++	battr.minreq = (uint32_t) -1;
++	battr.prebuf = (uint32_t) -1;
++	battr.tlength = pa_bytes_per_second(&self->ss) * LATENCY / 1000;
+ 	self->s = pa_simple_new(NULL,
+ 	                        self->application_name,
+ 	                        PA_STREAM_PLAYBACK,
+@@ -81,7 +88,7 @@ pulseaudio_object_open(struct audio_object *object,
+ 	                        self->description,
+ 	                        &self->ss,
+ 	                        NULL,
+-	                        NULL,
++	                        &battr,
+ 	                        &error);
+ 	return error;
+ }

@@ -1,0 +1,149 @@
+From 5339da3144f394eb6e6dd3df116b854d78476565 Mon Sep 17 00:00:00 2001
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sat, 30 Jun 2018 15:41:20 +0200
+Subject: [PATCH] Support audio pauses
+
+When the Linux console is e.g. switched to a graphical VT, the kernel
+emits \x01P to notify that it is not able to read the screen any more,
+and the software synthesis can thus release the audio card, for other
+screen readers to take over.
+
+This implements it by adding a paused_espeak variable that tracks
+whether we have suspended espeak.  When more text comes, we can simply
+reinitialize espeak.
+
+This fixes #10.
+---
+ espeak.c    | 40 ++++++++++++++++++++++++++++++++++++++++
+ espeakup.c  |  3 ++-
+ espeakup.h  |  2 ++
+ softsynth.c |  3 +++
+ 4 files changed, 47 insertions(+), 1 deletion(-)
+
+diff --git a/espeak.c b/espeak.c
+index f1f8064..5fd9342 100644
+--- a/espeak.c
++++ b/espeak.c
+@@ -40,6 +40,7 @@ const int rateOffset = 80;
+ const int volumeMultiplier = 22;
+ 
+ volatile int stop_requested = 0;
++int paused_espeak = 1;
+ 
+ static int acsint_callback(short *wav, int numsamples, espeak_EVENT * events)
+ {
+@@ -211,6 +212,32 @@ static void synth_queue_clear()
+ 	}
+ }
+ 
++static void reinitialize_espeak(struct synth_t *s)
++{
++	int rate;
++
++	/* Re-initialize espeak */
++	rate = espeak_Initialize(AUDIO_OUTPUT_PLAYBACK, 50, NULL, 0);
++	if (rate < 0) {
++		fprintf(stderr, "Unable to initialize espeak.\n");
++		return;
++	}
++
++	/* We need a callback in acsint mode, but not in speakup mode. */
++	if (espeakup_mode == ESPEAKUP_MODE_ACSINT)
++		espeak_SetSynthCallback(acsint_callback);
++
++	/* Set parameters again */
++	espeak_SetVoiceByName(s->voice);
++	espeak_SetParameter(espeakRANGE, s->frequency * frequencyMultiplier, 0);
++	espeak_SetParameter(espeakPITCH, s->pitch * pitchMultiplier, 0);
++	espeak_SetParameter(espeakRATE, s->rate * rateMultiplier + rateOffset, 0);
++	espeak_SetParameter(espeakVOLUME, (s->volume + 1) * volumeMultiplier, 0);
++	espeak_SetParameter(espeakCAPITALS, 0, 0);
++	paused_espeak = 0;
++	return;
++}
++
+ static void queue_process_entry(struct synth_t *s)
+ {
+ 	espeak_ERROR error;
+@@ -222,6 +249,11 @@ static void queue_process_entry(struct synth_t *s)
+ 		current = (struct espeak_entry_t *) queue_remove(synth_queue);
+ 	}
+ 	pthread_mutex_unlock(&queue_guard);
++
++	if (current->cmd != CMD_PAUSE && paused_espeak) {
++		reinitialize_espeak(s);
++	}
++
+ 	switch (current->cmd) {
+ 	case CMD_SET_FREQUENCY:
+ 		error = set_frequency(s, current->value, current->adjust);
+@@ -246,6 +278,13 @@ static void queue_process_entry(struct synth_t *s)
+ 		s->len = current->len;
+ 		error = speak_text(s);
+ 		break;
++	case CMD_PAUSE:
++		if (!paused_espeak) {
++			espeak_Cancel();
++			espeak_Terminate();
++			paused_espeak = 1;
++		}
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -282,6 +321,7 @@ int initialize_espeak(struct synth_t *s)
+ 	set_rate(s, defaultRate, ADJ_SET);
+ 	set_volume(s, defaultVolume, ADJ_SET);
+ 	espeak_SetParameter(espeakCAPITALS, 0, 0);
++	paused_espeak = 0;
+ 	return 0;
+ }
+ 
+diff --git a/espeakup.c b/espeakup.c
+index 1981430..eda3e9c 100644
+--- a/espeakup.c
++++ b/espeakup.c
+@@ -231,7 +231,8 @@ int main(int argc, char **argv)
+ 	pthread_join(softsynth_thread_id, NULL);
+ 	pthread_join(espeak_thread_id, NULL);
+ 
+-	espeak_Terminate();
++	if (!paused_espeak)
++		espeak_Terminate();
+ 	close_softsynth();
+ 
+ out:
+diff --git a/espeakup.h b/espeakup.h
+index 8fc0ee2..e8e89a7 100644
+--- a/espeakup.h
++++ b/espeakup.h
+@@ -45,6 +45,7 @@ enum command_t {
+ 	CMD_SET_VOLUME,
+ 	CMD_SPEAK_TEXT,
+ 	CMD_FLUSH,
++	CMD_PAUSE,
+ 	CMD_UNKNOWN,
+ };
+ 
+@@ -86,6 +87,7 @@ extern void close_softsynth(void);
+ extern void *softsynth_thread(void *arg);
+ extern volatile int should_run;
+ extern volatile int stop_requested;
++extern int paused_espeak;
+ extern int self_pipe_fds[2];
+ #define PIPE_READ_FD (self_pipe_fds[0])
+ #define PIPE_WRITE_FD (self_pipe_fds[1])
+diff --git a/softsynth.c b/softsynth.c
+index efa2351..ca9c5c3 100644
+--- a/softsynth.c
++++ b/softsynth.c
+@@ -133,6 +133,9 @@ static int process_command(struct synth_t *s, char *buf, int start)
+ 		case 'v':
+ 			cmd = CMD_SET_VOLUME;
+ 			break;
++		case 'P':
++			cmd = CMD_PAUSE;
++			break;
+ 		default:
+ 			cmd = CMD_UNKNOWN;
+ 			break;
