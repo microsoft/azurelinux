@@ -21,7 +21,7 @@ Prebuilt aarch64-none-linux-gnu cross compiling toolchain from Linaro/ARM
 
 %install
 install -d %{buildroot}/opt/cross
-cp -r gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/* %{buildroot}/opt/cross
+cp -r * %{buildroot}/opt/cross
 
 %files
 %defattr(-,root,root)
