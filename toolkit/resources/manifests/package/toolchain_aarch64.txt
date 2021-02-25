@@ -301,7 +301,7 @@ p11-kit-devel-0.23.22-1.cm1.aarch64.rpm
 p11-kit-server-0.23.22-1.cm1.aarch64.rpm
 p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
 pam-1.3.1-5.cm1.aarch64.rpm
-pam-debuginfo-1.3.1-5j.cm1.aarch64.rpm
+pam-debuginfo-1.3.1-5.cm1.aarch64.rpm
 pam-devel-1.3.1-5.cm1.aarch64.rpm
 pam-lang-1.3.1-5.cm1.aarch64.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
