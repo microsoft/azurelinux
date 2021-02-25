@@ -72,7 +72,7 @@ type AttendedInstaller struct {
 	allViews         []views.View
 	backdropStyle    tview.Theme
 	titleText        *tview.TextView
-	keyboard		 uinput.Keyboard
+	keyboard         uinput.Keyboard
 
 	installationFunc     func(configuration.Config, chan int, chan string) error
 	calamaresInstallFunc func() error
@@ -101,8 +101,6 @@ func New(cfg configuration.Config, installationFunc func(configuration.Config, c
 		installationFunc:     installationFunc,
 		calamaresInstallFunc: calamaresInstallFunc,
 	}
-
-
 
 	err = attendedInstaller.initializeUI()
 	return

@@ -12,16 +12,16 @@ const (
 
 // Navigation text.
 const (
-	ButtonAccept  = "[Accept[]"
-	ButtonCancel  = "[Cancel[]"
+	ButtonAccept     = "[Accept[]"
+	ButtonCancel     = "[Cancel[]"
 	ButtonCancelBold = BoldPrefix + ButtonCancel
-	ButtonConfirm = "[Confirm[]"
-	ButtonGoBack  = "[Go Back[]"
-	ButtonNext    = "[Next[]"
-	ButtonYes     = "[Yes[]"
-	ButtonQuit    = "[Quit[]"
-	ButtonQuitBold = BoldPrefix + ButtonQuit
-	ButtonRestart = "[Restart[]"
+	ButtonConfirm    = "[Confirm[]"
+	ButtonGoBack     = "[Go Back[]"
+	ButtonNext       = "[Next[]"
+	ButtonYes        = "[Yes[]"
+	ButtonQuit       = "[Quit[]"
+	ButtonQuitBold   = BoldPrefix + ButtonQuit
+	ButtonRestart    = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.

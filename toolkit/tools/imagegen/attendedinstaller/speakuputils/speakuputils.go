@@ -17,9 +17,9 @@ func ClearSpeakupBuffer(k uinput.Keyboard) (err error) {
 		return
 	}
 	err = k.KeyPress(uinput.KeyKpenter)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
 	err = k.KeyPress(uinput.KeyKpenter)
 	return
-} 
+}
