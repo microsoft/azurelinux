@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -175,6 +175,14 @@ Obsoletes:      linux-dev
 
 %description devel
 This package contains the Linux kernel dev files
+
+%package drivers-accessibility
+Summary:        Kernel accessibility modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-accessibility
+This package contains the Linux kernel accessibility support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -382,6 +390,9 @@ fi
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
+%post drivers-accessibility
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -418,6 +429,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
+%files drivers-accessibility
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/accessibility
+
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
@@ -452,6 +467,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+- Add configs for speakup and uinput drivers
+- Add kernel-drivers-accessibility subpackage
+
 * Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
 - Update source to 5.10.13.1
 - Remove patch to publish efi tpm event log on ARM. Present in updated source.
