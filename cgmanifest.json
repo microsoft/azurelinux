@@ -755,8 +755,8 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "7.2.8",
-          "downloadUrl": "https://github.com/crash-utility/crash/archive/7.2.8.tar.gz"
+          "version": "7.2.9",
+          "downloadUrl": "https://github.com/crash-utility/crash/archive/7.2.9.tar.gz"
         }
       }
     },
@@ -2065,8 +2065,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.20",
-          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.20.tar.xz"
+          "version": "2.0.21",
+          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.21.tar.xz"
         }
       }
     },
@@ -3297,6 +3297,16 @@
           "name": "make",
           "version": "4.2.1",
           "downloadUrl": "http://ftp.gnu.org/gnu/make/make-4.2.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "makedumpfile",
+          "version": "1.6.8",
+          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.6.8/makedumpfile-1.6.8.tar.gz"
         }
       }
     },
