@@ -191,6 +191,7 @@ func (ai *AttendedInstaller) showView(newView int) (err error) {
 	err = speakuputils.ClearSpeakupBuffer(ai.keyboard)
 	if err != nil {
 		logger.Log.Warnf("Error clearing speakup buffer")
+		err = nil
 	}
 
 	ai.grid.AddItem(view.Primitive(), primaryContentRow, primaryContentColumn, primaryContentRowSpan, primaryContentColumnSpan, primaryContentMinSize, primaryContentMinSize, true)
@@ -236,8 +237,12 @@ func (ai *AttendedInstaller) globalInputCapture(event *tcell.EventKey) *tcell.Ev
 func (ai *AttendedInstaller) initializeUI() (err error) {
 	ai.keyboard, err = speakuputils.CreateVirtualKeyboard()
 	if err != nil {
+		// Non-fatal - results in a slightlydegraded experience due to the lack of a
+		// text-to-speech buffer clear between views, but not bad enough to exit outright
 		logger.Log.Warnf("Failed to initialize virtual keyboard via uinput")
+		err = nil
 	}
+
 	const osReleaseFile = "/etc/os-release"
 
 	ai.backdropStyle = tview.Theme{
