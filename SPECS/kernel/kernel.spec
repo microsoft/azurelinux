@@ -469,6 +469,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
 - Add configs for speakup and uinput drivers
+- Add kernel-drivers-accessibility subpackage
 
 * Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
 - Update source to 5.10.13.1
