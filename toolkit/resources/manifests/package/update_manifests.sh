@@ -15,7 +15,8 @@ if [ -z "$1" ] || [ -z "$2" ]; then
 fi
 
 if [[ "$1" == "x86_64" ]] || [[ "$1" == "aarch64" ]]; then
-    Arch=$1
+    ToolchainManifest=toolchain_"$1".txt
+    PkggenManifest=pkggen_core_"$1".txt
 else
     echo "Invalid architecture: '$1'"
     print_usage
@@ -33,9 +34,9 @@ echo Updating files...
 generate_toolchain () {
     # First generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
     # This file is a sorted list of all toolchain packages in the tarball.
-    tar -ztf $TOOLCHAIN_ARCHIVE | sed 's+built_rpms_all/++g' | sed '/^$/d' > toolchain_$Arch.txt
+    tar -ztf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
     # Now sort the file in place
-    sort -o toolchain_$Arch.txt toolchain_$Arch.txt
+    sort -o "$ToolchainManifest" "$ToolchainManifest"
 }
 
 # Remove specific packages that are not needed in pkggen_core
@@ -77,6 +78,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
+    sed -ri '/mariner-repos-(extras|ui)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-[0-9]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
@@ -99,90 +101,92 @@ remove_packages_for_pkggen_core () {
 # create pkggen_core file in correct order
 generate_pkggen_core () {
     # $1 = (pkggen_core_x86_64.txt or pkggen_core_aarch64.txt)
-    cat $TmpPkgGen | grep "^filesystem-" > $1
-    cat $TmpPkgGen | grep "^kernel-headers-" >> $1
-    cat $TmpPkgGen | grep "^glibc-" >> $1
-    cat $TmpPkgGen | grep "^zlib-" >> $1
-    cat $TmpPkgGen | grep "^file-" >> $1
-    cat $TmpPkgGen | grep "^binutils-" >> $1
-    cat $TmpPkgGen | grep "^gmp-" >> $1
-    cat $TmpPkgGen | grep "^mpfr-" >> $1
-    cat $TmpPkgGen | grep "^libmpc-" >> $1
-    cat $TmpPkgGen | grep "^libgcc-" >> $1
-    cat $TmpPkgGen | grep "^libstdc++-" >> $1
-    cat $TmpPkgGen | grep "^libgomp-" >> $1
-    cat $TmpPkgGen | grep "^gcc-" >> $1
-    cat $TmpPkgGen | grep "^pkg-config-" >> $1
-    cat $TmpPkgGen | grep "^ncurses-" >> $1
-    cat $TmpPkgGen | grep "^readline-" >> $1
-    cat $TmpPkgGen | grep "^coreutils-" >> $1
-    cat $TmpPkgGen | grep "^bash-" >> $1
-    cat $TmpPkgGen | grep "^bzip2-" >> $1
-    cat $TmpPkgGen | grep "^sed-" >> $1
-    cat $TmpPkgGen | grep "^procps-ng-" >> $1
-    cat $TmpPkgGen | grep "^m4-" >> $1
-    cat $TmpPkgGen | grep "^grep-" >> $1
-    cat $TmpPkgGen | grep "^diffutils-" >> $1
-    cat $TmpPkgGen | grep "^gawk-" >> $1
-    cat $TmpPkgGen | grep "^findutils-" >> $1
-    cat $TmpPkgGen | grep "^gettext-" >> $1
-    cat $TmpPkgGen | grep "^gzip-" >> $1
-    cat $TmpPkgGen | grep "^make-" >> $1
-    cat $TmpPkgGen | grep "^mariner-release-" >> $1
-    cat $TmpPkgGen | grep "^patch-" >> $1
-    cat $TmpPkgGen | grep "^util-linux-" >> $1
-    cat $TmpPkgGen | grep "^tar-" >> $1
-    cat $TmpPkgGen | grep "^xz-" >> $1
-    cat $TmpPkgGen | grep "^zstd-" >> $1
-    cat $TmpPkgGen | grep "^libtool-" >> $1
-    cat $TmpPkgGen | grep "^flex-" >> $1
-    cat $TmpPkgGen | grep "^bison-" >> $1
-    cat $TmpPkgGen | grep "^popt-" >> $1
-    cat $TmpPkgGen | grep "^nspr-" >> $1
-    cat $TmpPkgGen | grep "^sqlite-" >> $1
-    cat $TmpPkgGen | grep "^nss-" >> $1
-    cat $TmpPkgGen | grep "^elfutils-" >> $1
-    cat $TmpPkgGen | grep "^expat-" >> $1
-    cat $TmpPkgGen | grep "^libpipeline-" >> $1
-    cat $TmpPkgGen | grep "^gdbm-" >> $1
-    cat $TmpPkgGen | grep "^perl-" >> $1
-    cat $TmpPkgGen | grep "^texinfo-" >> $1
-    cat $TmpPkgGen | grep "^autoconf-" >> $1
-    cat $TmpPkgGen | grep "^automake-" >> $1
-    cat $TmpPkgGen | grep "^openssl-" >> $1
-    cat $TmpPkgGen | grep "^libcap-" >> $1
-    cat $TmpPkgGen | grep "^libdb-" >> $1
-    cat $TmpPkgGen | grep "^rpm-" >> $1
-    cat $TmpPkgGen | grep "^cpio-" >> $1
-    cat $TmpPkgGen | grep "^e2fsprogs-" >> $1
-    cat $TmpPkgGen | grep "^libsolv-" >> $1
-    cat $TmpPkgGen | grep "^libssh2-" >> $1
-    cat $TmpPkgGen | grep "^curl-" >> $1
-    cat $TmpPkgGen | grep "^tdnf-" >> $1
-    cat $TmpPkgGen | grep "^createrepo_c-" >> $1
-    cat $TmpPkgGen | grep "^libxml2-" >> $1
-    cat $TmpPkgGen | grep "^glib-" >> $1
-    cat $TmpPkgGen | grep "^libltdl-" >> $1
-    cat $TmpPkgGen | grep "^pcre-" >> $1
-    cat $TmpPkgGen | grep "^krb5-" >> $1
-    cat $TmpPkgGen | grep "^lua-" >> $1
-    cat $TmpPkgGen | grep "^mariner-rpm-macros-" >> $1
-    cat $TmpPkgGen | grep "^mariner-check-" >> $1
-    cat $TmpPkgGen | grep "^libassuan-" >> $1
-    cat $TmpPkgGen | grep "^libgpg-error-" >> $1
-    cat $TmpPkgGen | grep "^libgcrypt-" >> $1
-    cat $TmpPkgGen | grep "^libksba-" >> $1
-    cat $TmpPkgGen | grep "^npth-" >> $1
-    cat $TmpPkgGen | grep "^pinentry-" >> $1
-    cat $TmpPkgGen | grep "^gnupg2-" >> $1
-    cat $TmpPkgGen | grep "^gpgme-" >> $1
-    cat $TmpPkgGen | grep "^mariner-repos-" | grep -v "mariner-repos-extras">> $1
-    cat $TmpPkgGen | grep "^libffi-" >> $1
-    cat $TmpPkgGen | grep "^libtasn1-" >> $1
-    cat $TmpPkgGen | grep "^p11-kit-" >> $1
-    cat $TmpPkgGen | grep "^ca-certificates-shared-" >> $1
-    cat $TmpPkgGen | grep "^ca-certificates-tools-" >> $1
-    cat $TmpPkgGen | grep "^ca-certificates-base-" >> $1
+    {
+        grep "^filesystem-" $TmpPkgGen
+        grep "^kernel-headers-" $TmpPkgGen
+        grep "^glibc-" $TmpPkgGen
+        grep "^zlib-" $TmpPkgGen
+        grep "^file-" $TmpPkgGen
+        grep "^binutils-" $TmpPkgGen
+        grep "^gmp-" $TmpPkgGen
+        grep "^mpfr-" $TmpPkgGen
+        grep "^libmpc-" $TmpPkgGen
+        grep "^libgcc-" $TmpPkgGen
+        grep "^libstdc++-" $TmpPkgGen
+        grep "^libgomp-" $TmpPkgGen
+        grep "^gcc-" $TmpPkgGen
+        grep "^pkg-config-" $TmpPkgGen
+        grep "^ncurses-" $TmpPkgGen
+        grep "^readline-" $TmpPkgGen
+        grep "^coreutils-" $TmpPkgGen
+        grep "^bash-" $TmpPkgGen
+        grep "^bzip2-" $TmpPkgGen
+        grep "^sed-" $TmpPkgGen
+        grep "^procps-ng-" $TmpPkgGen
+        grep "^m4-" $TmpPkgGen
+        grep "^grep-" $TmpPkgGen
+        grep "^diffutils-" $TmpPkgGen
+        grep "^gawk-" $TmpPkgGen
+        grep "^findutils-" $TmpPkgGen
+        grep "^gettext-" $TmpPkgGen
+        grep "^gzip-" $TmpPkgGen
+        grep "^make-" $TmpPkgGen
+        grep "^mariner-release-" $TmpPkgGen
+        grep "^patch-" $TmpPkgGen
+        grep "^util-linux-" $TmpPkgGen
+        grep "^tar-" $TmpPkgGen
+        grep "^xz-" $TmpPkgGen
+        grep "^zstd-" $TmpPkgGen
+        grep "^libtool-" $TmpPkgGen
+        grep "^flex-" $TmpPkgGen
+        grep "^bison-" $TmpPkgGen
+        grep "^popt-" $TmpPkgGen
+        grep "^nspr-" $TmpPkgGen
+        grep "^sqlite-" $TmpPkgGen
+        grep "^nss-" $TmpPkgGen
+        grep "^elfutils-" $TmpPkgGen
+        grep "^expat-" $TmpPkgGen
+        grep "^libpipeline-" $TmpPkgGen
+        grep "^gdbm-" $TmpPkgGen
+        grep "^perl-" $TmpPkgGen
+        grep "^texinfo-" $TmpPkgGen
+        grep "^autoconf-" $TmpPkgGen
+        grep "^automake-" $TmpPkgGen
+        grep "^openssl-" $TmpPkgGen
+        grep "^libcap-" $TmpPkgGen
+        grep "^libdb-" $TmpPkgGen
+        grep "^rpm-" $TmpPkgGen
+        grep "^cpio-" $TmpPkgGen
+        grep "^e2fsprogs-" $TmpPkgGen
+        grep "^libsolv-" $TmpPkgGen
+        grep "^libssh2-" $TmpPkgGen
+        grep "^curl-" $TmpPkgGen
+        grep "^tdnf-" $TmpPkgGen
+        grep "^createrepo_c-" $TmpPkgGen
+        grep "^libxml2-" $TmpPkgGen
+        grep "^glib-" $TmpPkgGen
+        grep "^libltdl-" $TmpPkgGen
+        grep "^pcre-" $TmpPkgGen
+        grep "^krb5-" $TmpPkgGen
+        grep "^lua-" $TmpPkgGen
+        grep "^mariner-rpm-macros-" $TmpPkgGen
+        grep "^mariner-check-" $TmpPkgGen
+        grep "^libassuan-" $TmpPkgGen
+        grep "^libgpg-error-" $TmpPkgGen
+        grep "^libgcrypt-" $TmpPkgGen
+        grep "^libksba-" $TmpPkgGen
+        grep "^npth-" $TmpPkgGen
+        grep "^pinentry-" $TmpPkgGen
+        grep "^gnupg2-" $TmpPkgGen
+        grep "^gpgme-" $TmpPkgGen
+        grep "^mariner-repos-" $TmpPkgGen
+        grep "^libffi-" $TmpPkgGen
+        grep "^libtasn1-" $TmpPkgGen
+        grep "^p11-kit-" $TmpPkgGen
+        grep "^ca-certificates-shared-" $TmpPkgGen
+        grep "^ca-certificates-tools-" $TmpPkgGen
+        grep "^ca-certificates-base-" $TmpPkgGen
+    } > "$1"
 }
 
 # Generate toolchain_*.txt based on the toolchain_built_rpms_all.tar.gz file contents
@@ -191,19 +195,19 @@ generate_toolchain
 # Next, generate pkggen_core_*.txt
 # Note that toolchain_*.txt is a superset of pkggen_core_*.txt
 # Create a temp file that can be edited to remove the unnecessary files
-cp toolchain_$Arch.txt $TmpPkgGen
+cp "$ToolchainManifest" $TmpPkgGen
 
 # Remove all *-debuginfo except openssl
-R=$(cat toolchain_$Arch.txt | grep openssl-debuginfo)
+R=$(grep openssl-debuginfo "$ToolchainManifest")
 sed -i '/debuginfo/d' $TmpPkgGen
 # Add the openssl-debuginfo file back
-echo $R >> $TmpPkgGen
+echo "$R" >> $TmpPkgGen
 
 # Modify the temp file by removing other unneeded packages
 remove_packages_for_pkggen_core
 
 # Now create pkggen_core_*.txt file in correct order
 # The packages are listed in the order they will be installed into the chroot
-generate_pkggen_core pkggen_core_$Arch.txt
+generate_pkggen_core "$PkggenManifest"
 
 rm $TmpPkgGen
