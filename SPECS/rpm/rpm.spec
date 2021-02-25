@@ -278,7 +278,7 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 4.14.2.1-1
+* Thu Feb 25 2021 Joe Schmitt <joschmit@microsoft.com> - 4.14.2.1-1
 - Upgrade to v4.14.2.1 to fix broken Lua library path.
 
 * Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-13
