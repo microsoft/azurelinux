@@ -96,7 +96,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %dir %{rcluadir}/srpm
 %dir %{rcluadir}/rpm
 %{rcluadir}/*.lua
-%{rcluadir}/srpm/*lua
+%{rcluadir}/srpm/*.lua
 %{_rpmconfigdir}/macros.d/macros.pybytecompile
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
