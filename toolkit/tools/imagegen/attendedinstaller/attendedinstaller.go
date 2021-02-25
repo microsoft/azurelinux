@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"microsoft.com/pkggen/imagegen/attendedinstaller/speakuputils"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 	"microsoft.com/pkggen/imagegen/configuration"
 	"microsoft.com/pkggen/internal/logger"
@@ -27,6 +28,7 @@ import (
 	"microsoft.com/pkggen/imagegen/attendedinstaller/views/progressview"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/views/userview"
 
+	"github.com/bendahl/uinput"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -70,6 +72,7 @@ type AttendedInstaller struct {
 	allViews         []views.View
 	backdropStyle    tview.Theme
 	titleText        *tview.TextView
+	keyboard         uinput.Keyboard
 
 	installationFunc     func(configuration.Config, chan int, chan string) error
 	calamaresInstallFunc func() error
@@ -111,6 +114,11 @@ func (ai *AttendedInstaller) Run() (config configuration.Config, installationQui
 			err = fmt.Errorf("unexpected failure: %v", r)
 		}
 	}()
+
+	// Close virtual keyboard when installer exits, if we have a keyboard
+	if ai.keyboard != nil {
+		defer ai.keyboard.Close()
+	}
 
 	// Backup the original stderr writer and replace it will a null writer.
 	// If the logger prints to the console while the UI is shown, it will conflict
@@ -179,6 +187,13 @@ func (ai *AttendedInstaller) showView(newView int) (err error) {
 		return
 	}
 
+	// Clear the text-to-speech buffer when we change pages
+	err = speakuputils.ClearSpeakupBuffer(ai.keyboard)
+	if err != nil {
+		logger.Log.Warnf("Error clearing speakup buffer")
+		err = nil
+	}
+
 	ai.grid.AddItem(view.Primitive(), primaryContentRow, primaryContentColumn, primaryContentRowSpan, primaryContentColumnSpan, primaryContentMinSize, primaryContentMinSize, true)
 	ai.app.SetFocus(ai.grid)
 	ai.currentView = newView
@@ -220,6 +235,14 @@ func (ai *AttendedInstaller) globalInputCapture(event *tcell.EventKey) *tcell.Ev
 }
 
 func (ai *AttendedInstaller) initializeUI() (err error) {
+	ai.keyboard, err = speakuputils.CreateVirtualKeyboard()
+	if err != nil {
+		// Non-fatal - results in a slightlydegraded experience due to the lack of a
+		// text-to-speech buffer clear between views, but not bad enough to exit outright
+		logger.Log.Warnf("Failed to initialize virtual keyboard via uinput")
+		err = nil
+	}
+
 	const osReleaseFile = "/etc/os-release"
 
 	ai.backdropStyle = tview.Theme{
@@ -303,11 +326,11 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	ai.exitModal = tview.NewModal().
 		SetText(uitext.ExitModalTitle).
-		AddButtons([]string{uitext.ButtonQuit, uitext.ButtonCancel}).
+		AddButtons([]string{uitext.ButtonQuitBold, uitext.ButtonCancelBold}).
 		SetBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetButtonBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if buttonLabel == uitext.ButtonQuit {
+			if buttonLabel == uitext.ButtonQuitBold {
 				ai.userQuitInstallation = true
 				ai.app.Stop()
 			} else {
