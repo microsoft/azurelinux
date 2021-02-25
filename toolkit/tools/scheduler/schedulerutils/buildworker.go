@@ -43,7 +43,7 @@ type BuildResult struct {
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex sync.RWMutex, buildAttempts int) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int) {
 	for req := range channels.Requests {
 		select {
 		case <-channels.Cancel:
@@ -85,12 +85,10 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
-	cfg := agent.Config()
-
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
 	baseSrpmName := filepath.Base(node.SrpmPath)
 	if canUseCache {
-		usedCache, builtFiles = isSRPMPrebuilt(node.SpecPath, cfg.RpmDir, node.SourceDir, cfg.DistTag)
+		usedCache, builtFiles = isSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 		if usedCache {
 			logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 			return
@@ -105,7 +103,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 }
 
 // getBuildDependencies returns a list of all dependencies that need to be installed before the node can be built.
-func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex) (dependencies []string) {
+func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (dependencies []string) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 

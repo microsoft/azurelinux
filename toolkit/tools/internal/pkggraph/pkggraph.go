@@ -19,7 +19,6 @@ import (
 	"gonum.org/v1/gonum/graph/encoding"
 	"gonum.org/v1/gonum/graph/encoding/dot"
 	"gonum.org/v1/gonum/graph/simple"
-	"gonum.org/v1/gonum/graph/topo"
 	"gonum.org/v1/gonum/graph/traverse"
 
 	"microsoft.com/pkggen/internal/logger"
@@ -964,13 +963,13 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 
 	goalSet := make(map[*pkgjson.PackageVer]bool)
 	if len(packages) > 0 {
-		logger.Log.Infof("Adding \"%s\" goal", goalName)
+		logger.Log.Debugf("Adding \"%s\" goal", goalName)
 		for _, pkg := range packages {
 			logger.Log.Tracef("\t%s-%s", pkg.Name, pkg.Version)
 			goalSet[pkg] = true
 		}
 	} else {
-		logger.Log.Infof("Adding \"%s\" goal for all nodes", goalName)
+		logger.Log.Debugf("Adding \"%s\" goal for all nodes", goalName)
 		for _, node := range g.AllRunNodes() {
 			logger.Log.Tracef("\t%s-%s %d", node.VersionedPkg.Name, node.VersionedPkg.Version, node.ID())
 			goalSet[node.VersionedPkg] = true
@@ -1013,7 +1012,7 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		}
 
 		if existingNode != nil {
-			logger.Log.Debugf("Found %s to satisfy %s", existingNode.RunNode, pkg)
+			logger.Log.Tracef("Found %s to satisfy %s", existingNode.RunNode, pkg)
 			goalEdge := g.NewEdge(goalNode, existingNode.RunNode)
 			g.SetEdge(goalEdge)
 			goalSet[pkg] = false
@@ -1126,37 +1125,28 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
 func (g *PkgGraph) MakeDAG() (err error) {
-	cycles := topo.DirectedCyclesIn(g)
+	cycle, err := g.FindAnyDirectedCycle()
+	if err != nil {
+		return
+	}
 
-	// Try to fix the cycles if we can before reporting them
-	// Keep track of which cycles we've failed to fix
-	unfixableCycleCount := 0
-	for len(cycles) > 0 {
-		cycle := cycles[0]
-		// Convert our list to pkggraph.PkgNodes
-		pkgCycle := make([]*PkgNode, 0, len(cycle))
-		for _, node := range cycle {
-			pkgCycle = append(pkgCycle, node.(*PkgNode).This)
-		}
-
-		err = g.fixCycle(pkgCycle)
+	for len(cycle) > 0 {
+		err = g.fixCycle(cycle)
 		if err != nil {
 			var cycleStringBuilder strings.Builder
-			fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
-			for _, node := range pkgCycle[1:] {
+			fmt.Fprintf(&cycleStringBuilder, "{%s}", cycle[0].FriendlyName())
+			for _, node := range cycle[1:] {
 				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 			}
-			logger.Log.Errorf("Unfixable circular dependency found %d:\t%s\terror: %s", unfixableCycleCount, cycleStringBuilder.String(), err)
-			unfixableCycleCount++
-		}
-
-		if unfixableCycleCount > 0 {
+			logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 			err = fmt.Errorf("cycles detected in dependency graph")
 			return err
 		}
 
-		// Recalculate the list of cycles
-		cycles = topo.DirectedCyclesIn(g)
+		cycle, err = g.FindAnyDirectedCycle()
+		if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -1167,7 +1157,7 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
 	srpmPath := cycle[0].SrpmPath
 	// Omit the first element of the cycle, since it is repeated as the last element
 	trimmedCycle := cycle[1:]
-	logger.Log.Debugf("Found cycle starting at %s", cycle[0].FriendlyName())
+	logger.Log.Debugf("Found cycle: %v", cycle)
 
 	// For each node, remove any edges which point to other nodes in the cycle, and move any remaining dependencies to a new
 	// meta node, then have everything in the cycle depend on the new meta node.

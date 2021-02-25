@@ -31,7 +31,7 @@ func PrintBuildResult(res *BuildResult) {
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
-func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex sync.RWMutex, buildState *GraphBuildState) {
+func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 

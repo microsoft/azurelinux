@@ -1,7 +1,7 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
 Version:        1.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -90,7 +90,7 @@ rm -rf %{buildroot}
 %{_mandir}/*/chkconfig*
 %{_mandir}/*/update-alternatives*
 %{_mandir}/*/alternatives*
-%{_lib}/systemd/systemd-sysv-install
+%{_libdir}/systemd/systemd-sysv-install
 
 %files -n ntsysv
 %defattr(-,root,root)
@@ -98,6 +98,9 @@ rm -rf %{buildroot}
 %{_mandir}/*/ntsysv.8*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.11-3
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.11-2
 - Provide alternatives and update-alternatives.
 - Remove sha1 define.

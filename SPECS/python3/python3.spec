@@ -1,8 +1,9 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
+%global __brp_python_bytecompile %{nil}
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -276,6 +277,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.7.7-8
+- Turn off byte compilation since it requires this package to already be built and present.
+
 * Mon Jan 04 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.7.7-7
 - Add python3 dist provides.
 

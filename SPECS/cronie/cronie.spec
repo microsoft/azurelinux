@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ and MIT and BSD and ISC
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
@@ -85,7 +85,7 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_lib}/systemd/system/cron.service
+%{_libdir}/systemd/system/cron.service
 %{_libdir}/systemd/system/crond.service
 
 %config(noreplace) %{_sysconfdir}/pam.d/crond
@@ -120,6 +120,9 @@ make %{?_smp_mflags} check
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.2-4
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
 - Added %%license line automatically
 

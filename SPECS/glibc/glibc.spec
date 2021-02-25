@@ -4,7 +4,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,7 +115,7 @@ cat > find_provides.sh << _EOF
 if [ -d /tools ]; then
 /tools/lib/rpm/find-provides | grep -v GLIBC_PRIVATE
 else
-%{_lib}/rpm/find-provides | grep -v GLIBC_PRIVATE
+%{_libdir}/rpm/find-provides | grep -v GLIBC_PRIVATE
 fi
 exit 0
 _EOF
@@ -126,7 +126,7 @@ cat > find_requires.sh << _EOF
 if [ -d /tools ]; then
 /tools/lib/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
 else
-%{_lib}/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
+%{_libdir}/rpm/find-requires %{buildroot} %{glibc_target_cpu} | grep -v GLIBC_PRIVATE
 fi
 _EOF
 chmod +x find_requires.sh
@@ -200,9 +200,9 @@ popd
 %find_lang %{name} --all-name
 pushd localedata
 # Generate out of locale-archive an (en_US.) UTF-8 locale
-mkdir -p %{buildroot}%{_lib}/locale
+mkdir -p %{buildroot}%{_libdir}/locale
 I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
-mv %{buildroot}%{_lib}/locale/en_US.utf8 %{buildroot}%{_lib}/locale/en_US.UTF-8
+mv %{buildroot}%{_libdir}/locale/en_US.utf8 %{buildroot}%{_libdir}/locale/en_US.UTF-8
 popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
@@ -305,6 +305,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.28-15
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-14
 - Provide isa version of glibc-static.
 

@@ -11,14 +11,14 @@
 #	Some standard locations
 #
 %_sysconfdir		/etc
-%_lib			/usr/lib
-%_lib64			/usr/lib64
+%_lib			lib
+%_lib64			lib64
 %_prefix		/usr
 %_exec_prefix		/usr
 %_bindir		/usr/bin
 %_sbindir		/usr/sbin
-%_libdir		/usr/lib
-%_lib64dir		/usr/lib64
+%_libdir		/usr/%{_lib}
+%_lib64dir		/usr/%{_lib64}
 %_libexecdir		/usr/libexec
 %_datadir		/usr/share
 %_docdir		/usr/share/doc

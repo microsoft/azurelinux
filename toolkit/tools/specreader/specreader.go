@@ -295,7 +295,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		}
 
 		// Find every package that the spec provides
-		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, defines)
+		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, defines, rpm.QueryBuiltRPMHeadersArgument)
 		if err == nil && len(queryResults) != 0 {
 			providerList, err = parseProvides(rpmsDir, srpmPath, queryResults)
 			if err != nil {

@@ -1,13 +1,13 @@
 Summary:        A 2D graphics library.
 Name:           cairo
 Version:        1.16.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2 or MPLv1.1
-URL:            http://cairographics.org
+URL:            https://cairographics.org
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://cairographics.org/releases/%{name}-%{version}.tar.xz
+Source0:        https://cairographics.org/releases/%{name}-%{version}.tar.xz
 BuildRequires:  pkg-config
 BuildRequires:  libpng-devel
 BuildRequires:  libxml2-devel
@@ -23,11 +23,36 @@ Requires:       expat
 %description
 Cairo is a 2D graphics library with support for multiple output devices.
 
+%package gobject
+Summary: GObject bindings for cairo
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description gobject
+Cairo is a 2D graphics library designed to provide high-quality display
+and print output.
+
+This package contains functionality to make cairo graphics library
+integrate well with the GObject object system used by GNOME.
+
+%package gobject-devel
+Summary: Development files for cairo-gobject
+Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+Requires: %{name}-gobject%{?_isa} = %{version}-%{release}
+
+%description gobject-devel
+Cairo is a 2D graphics library designed to provide high-quality display
+and print output.
+
+This package contains libraries, header files and developer documentation
+needed for developing software which uses the cairo Gobject library.
+
 %package        devel
 Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
 Requires:       freetype-devel
 Requires:       pixman-devel
+Requires:       libpng-devel
+Requires:       fontconfig-devel
 
 %description    devel
 It contains the libraries and header files to create applications
@@ -42,6 +67,7 @@ It contains the libraries and header files to create applications
         --enable-tee      \
         --enable-xlib=no     \
         --enable-xlib-xrender=no \
+        --enable-gobject \
         CFLAGS="-O3 -fPIC" \
         --disable-static
 make %{?_smp_mflags}
@@ -64,6 +90,14 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/cairo/*.so*
 %{_datadir}/*
 
+%files gobject
+%{_libdir}/libcairo-gobject.so.*
+
+%files gobject-devel
+%{_includedir}/cairo/cairo-gobject.h
+%{_libdir}/libcairo-gobject.so
+%{_libdir}/pkgconfig/cairo-gobject.pc
+
 %files devel
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}
@@ -72,7 +106,12 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.0-4
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.16.0-5
+- Import gobject support from Fedora 32 spec (license: MIT)
+- Update URLs to https
+- Add missing dependencies on libpng-devel and fontconfig-devel to devel subpackage.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16.0-4
 - Added %%license line automatically
 
 *  Mon Apr 20 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.16.0-3

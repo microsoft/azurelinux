@@ -27,7 +27,7 @@ type blockDevicesOutput struct {
 
 type blockDeviceInfo struct {
 	Name  string `json:"name"`  // Example: sda
-	Size  string `json:"size"`  // Number of bytes.
+	Size  uint64 `json:"size"`  // Number of bytes.
 	Model string `json:"model"` // Example: 'Virtual Disk'
 }
 
@@ -411,12 +411,7 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 
 	for i, disk := range blockDevices.Devices {
 		systemDevices[i].DevicePath = fmt.Sprintf("/dev/%s", disk.Name)
-
-		systemDevices[i].RawDiskSize, err = strconv.ParseUint(disk.Size, 10, 64)
-		if err != nil {
-			return
-		}
-
+		systemDevices[i].RawDiskSize = disk.Size
 		systemDevices[i].Model = strings.TrimSpace(disk.Model)
 	}
 

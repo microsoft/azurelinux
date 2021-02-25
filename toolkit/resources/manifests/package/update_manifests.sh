@@ -275,7 +275,6 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^krb5-" >> $1
     cat $TmpPkgGen | grep "^lua-" >> $1
     cat $TmpPkgGen | grep "^mariner-rpm-macros-" >> $1
-    cat $TmpPkgGen | grep "^mariner-python-macros-" >> $1
     cat $TmpPkgGen | grep "^mariner-check-" >> $1
     cat $TmpPkgGen | grep "^libassuan-" >> $1
     cat $TmpPkgGen | grep "^libgpg-error-" >> $1

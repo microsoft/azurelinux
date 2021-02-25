@@ -1,7 +1,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,7 +42,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm755 %{buildroot}%{_lib}
+install -vdm755 %{buildroot}%{_libdir}
 #ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libdbus-1.so) %{buildroot}%{_libdir}/libdbus-1.so
 #rm -f %{buildroot}%{_sharedstatedir}/dbus/machine-id
 #ln -sv %{buildroot}%{_sysconfdir}/machine-id %{buildroot}%{_sharedstatedir}/dbus
@@ -78,6 +78,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-6
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.13.6-5
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 

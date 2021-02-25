@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,9 +94,9 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/glib-*/*
 %{_includedir}/*
 %{_datadir}/*
-%exclude %{_bindir}/glib-compile-schemas
-%exclude %{_bindir}/gsettings
-%exclude %{_datadir}/glib-2.0/schemas/*
+%{_bindir}/glib-compile-schemas
+%{_bindir}/gsettings
+%{_datadir}/glib-2.0/schemas/*
 
 %files schemas
 %defattr(-, root, root)
@@ -105,6 +105,9 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
+* Tue Feb 23 2021 Henry Li <lihl@microsoft.com> - 2.58.0-11
+- Fix file section for glib-devel.
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.58.0-10
 - Build static library and provide glib2-static.
 

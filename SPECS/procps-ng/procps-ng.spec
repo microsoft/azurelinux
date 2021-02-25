@@ -1,7 +1,7 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
 Version:        3.3.15
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 URL:            http://procps.sourceforge.net/
 Group:          Applications/System
@@ -43,8 +43,8 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
-install -vdm 755 %{buildroot}/%{_lib}
-ln -sfv ../..%{_lib}/$(readlink %{buildroot}/%{_libdir}/libprocps.so) %{buildroot}/%{_libdir}/libprocps.so
+install -vdm 755 %{buildroot}/%{_libdir}
+ln -sfv ../..%{_libdir}/$(readlink %{buildroot}/%{_libdir}/libprocps.so) %{buildroot}/%{_libdir}/libprocps.so
 install -vdm 755 %{buildroot}/%{_sbindir}
 ln -s %{_bindir}/pidof %{buildroot}%{_sbindir}/pidof
 find %{buildroot} -name '*.la' -delete
@@ -102,6 +102,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.3.15-5
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.3.15-4
 -   Provide procps and /bin/ps
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.3.15-3

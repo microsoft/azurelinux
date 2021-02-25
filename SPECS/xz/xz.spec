@@ -47,7 +47,7 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} pkgconfigdir=%{_libdir}/pkgconfig install
 install -vdm 755 %{buildroot}/{bin,%_lib}
 mv -v   %{buildroot}%{_bindir}/{lzma,unlzma,lzcat,xz,unxz,xzcat} %{buildroot}/bin
-ln -svf "../..%{_lib}/$(readlink %{buildroot}%{_libdir}/liblzma.so)" %{buildroot}%{_libdir}/liblzma.so
+ln -svf "../..%{_libdir}/$(readlink %{buildroot}%{_libdir}/liblzma.so)" %{buildroot}%{_libdir}/liblzma.so
 find %{buildroot}%{_libdir} -name '*.la' -delete
 %find_lang %{name}
 %check
