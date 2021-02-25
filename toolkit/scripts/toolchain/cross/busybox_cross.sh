@@ -5,7 +5,7 @@
 # http://clfs.org/view/clfs-embedded/x86/final-system/busybox.html
 
 installDir="/opt/cross"
-busyboxInstallDir="/opt/cross/aarch64-linux-gnu/sysroot"
+busyboxInstallDir="/opt/cross/aarch64-mariner-linux-gnu/sysroot"
 buildDir="$HOME/cross"
 scriptDir="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -29,5 +29,5 @@ cd busybox-1.32.0
 # Use the default busybox configuration
 make ARCH=arm64 defconfig
 
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CONFIG_PREFIX=${busyboxInstallDir} install
+make ARCH=arm64 CROSS_COMPILE=aarch64-mariner-linux-gnu-
+make ARCH=arm64 CROSS_COMPILE=aarch64-mariner-linux-gnu- CONFIG_PREFIX=${busyboxInstallDir} install

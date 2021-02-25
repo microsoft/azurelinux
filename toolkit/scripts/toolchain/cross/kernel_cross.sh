@@ -3,7 +3,7 @@
 
 kernelVersion="5.4.83"
 kernelTargetArch="arm64"
-toolchainTuple="aarch64-linux-gnu"
+toolchainTuple="aarch64-mariner-linux-gnu"
 
 installDir="/opt/cross"
 sysrootDir="/opt/cross/${toolchainTuple}/sysroot"
