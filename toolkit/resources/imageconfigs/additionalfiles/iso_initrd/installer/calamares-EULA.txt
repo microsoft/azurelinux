@@ -1,1 +1,1 @@
-Sample EULA
+Sample GUI Installer EULA
