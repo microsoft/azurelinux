@@ -61,10 +61,10 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
-* Fri Feb 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2-2
+* Fri Feb 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-2
 - Updating source URLs.
 
-* Fri Feb 05 2021 Henry Beberman <henry.beberman@microsoft.com> 4.2-1
+* Fri Feb 05 2021 Henry Beberman <henry.beberman@microsoft.com> - 4.2-1
 - Add ntopng spec
 - License verified
 - Original version for CBL-Mariner
