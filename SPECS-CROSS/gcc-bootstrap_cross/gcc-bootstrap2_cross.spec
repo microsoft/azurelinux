@@ -39,6 +39,9 @@
 %global _cross_bindir       %{_tuple}/bin
 %global _cross_libdir       %{_tuple}/lib
 %global _tuple_name         %{_tuple}-
+
+%global __strip %{_cross_prefix}%{_bindir}/%{_tuple_name}strip
+%global __objdump %{_cross_prefix}%{_bindir}/%{_tuple_name}objdump
 %else
 %global _cross_prefix       %{nil}
 %global _cross_sysroot      %{nil}
@@ -50,7 +53,7 @@
 %endif
 
 Summary:        Contains the GNU compiler collection
-Name:           %{_cross_name}-gcc-bootstrap
+Name:           %{_cross_name}-gcc-bootstrap2
 Version:        9.1.0
 Release:        11%{?dist}
 License:        GPLv2+
@@ -67,6 +70,7 @@ Patch0:         090_all_pr55930-dependency-tracking.patch
 Patch1:         CVE-2019-15847.nopatch
 BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
+BuildRequires:  %{_cross_name}-glibc-bootstrap
 AutoReqProv:    no
 Conflicts:      %{_cross_name}-gcc
 #%%if %%{with_check}
@@ -189,6 +193,12 @@ cp mpc-1.1.0/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
 # export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
 # SED=sed \
 
+TEMP_SYSROOT="%{_builddir}/temp_sysroot/"
+cp -r "%{_cross_sysroot}" "$TEMP_SYSROOT"
+# This should reference our %%{_includedir} probably? Why the missmatch between /include and /usr/include?
+mkdir -p "$TEMP_SYSROOT/usr"
+ln -s "../include" "$TEMP_SYSROOT/usr/include"
+
 # Ideally we would like to model this after the %%configure macro in the future.
 cd %{_builddir}/%{name}-build
 ../gcc-%{version}/configure \
@@ -205,34 +215,31 @@ cd %{_builddir}/%{name}-build
             --enable-plugin \
             --enable-default-pie \
             --with-sysroot=%{_cross_sysroot} \
-            --with-native-system-header-dir=%{_includedir}
-make %{?_smp_mflags} all-gcc
+            --with-build-sysroot="$TEMP_SYSROOT"
+
+make %{?_smp_mflags} all-target-libgcc
 
 %install
 cd %{_builddir}/%{name}-build
-make %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
+make %{?_smp_mflags} DESTDIR=%{buildroot} install-target-libgcc
 
 rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
-cd ../gcc-%{version}
-%find_lang %{name} --all-name
+# Only creates a few libraries, no translations etc.
+# cd ../gcc-%{version}
+# %find_lang %{name} --all-name
 
 # Add the /opt/cross libs to the ldcache
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 cat > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf <<EOF
-%{_cross_prefix}%{_libdir}
-%{_cross_prefix}%{_lib64dir}
-%{_cross_prefix}%{_libexecdir}
+%{_cross_prefix}%{_tuple}%{_lib64dir}
 EOF
 cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-
-
-
-%files -f %{name}.lang
+%files
 %defattr(-,root,root)
 %license COPYING
 %license COPYING-mpfr
@@ -241,25 +248,25 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 %{_sysconfdir}/ld.so.conf.d/%{name}.conf
 #%%{_lib}/cpp
 # Executables
-%exclude %{_cross_prefix}%{_bindir}/*gfortran
-%exclude %{_cross_prefix}%{_bindir}/*c++
-%exclude %{_cross_prefix}%{_bindir}/*g++
-%{_cross_prefix}%{_bindir}/*
+#%%exclude %%{_cross_prefix}%%{_bindir}/*gfortran
+#%%exclude %%{_cross_prefix}%%{_bindir}/*c++
+#%%exclude %%{_cross_prefix}%%{_bindir}/*g++
+#%%{_cross_prefix}%%{_bindir}/*
 # Libraries
 #%%{_cross_prefix}%%{_lib64dir}/*
-%exclude %{_cross_prefix}%{_libexecdir}/gcc/%{_tuple}/%{version}/f951
-%exclude %{_cross_prefix}%{_libexecdir}/gcc/%{_tuple}/%{version}/cc1plus
+#%%exclude %%{_cross_prefix}%%{_libexecdir}/gcc/%%{_tuple}/%%{version}/f951
+#%%exclude %%{_cross_prefix}%%{_libexecdir}/gcc/%%{_tuple}/%%{version}/cc1plus
 %{_cross_prefix}%{_libdir}/gcc/*
 # Library executables
-%{_cross_prefix}%{_libexecdir}/gcc/*
+#%%{_cross_prefix}%%{_libexecdir}/gcc/*
 # Man pages
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gcov.1
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gcov-dump.1
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gcov-tool.1
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gcc.1
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}g++.1
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}cpp.1
-%{_cross_prefix}%{_mandir}/man7/*
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}gcov.1
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}gcov-dump.1
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}gcov-tool.1
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}gcc.1
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}g++.1
+# %%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}cpp.1
+# %%{_cross_prefix}%%{_mandir}/man7/*
 #%%{_cross_prefix}%%{_datadir}/gdb/*
 
 #%%exclude %%{_cross_prefix}%%{_lib64dir}/libgcc*
@@ -269,13 +276,13 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 # %%files -n gfortran
 # %%defattr(-,root,root)
-%{_cross_prefix}%{_bindir}/*gfortran
-%{_cross_prefix}%{_mandir}/man1/%{_tuple_name}gfortran.1
-%{_cross_prefix}%{_libexecdir}/gcc/%{_tuple}/%{version}/f951
+#%%{_cross_prefix}%%{_bindir}/*gfortran
+#%%{_cross_prefix}%%{_mandir}/man1/%%{_tuple_name}gfortran.1
+#%%{_cross_prefix}%%{_libexecdir}/gcc/%%{_tuple}/%%{version}/f951
 
 # %%files -n libgcc
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%%{_lib64dir}/libgcc_s.so.*
+%{_cross_prefix}%{_tuple}%{_lib64dir}/libgcc_s.so.*
 
 # %%files -n libgcc-atomic
 # %%defattr(-,root,root)
@@ -283,14 +290,14 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 
 # %%files -n libgcc-devel
 # %%defattr(-,root,root)
-# %%{_cross_prefix}%%{_lib64dir}/libgcc_s.so
+%{_cross_prefix}%{_tuple}%{_lib64dir}/libgcc_s.so
 # %%{_cross_prefix}%%{_lib}/libcc1.*
 
 # %%files c++
 # %%defattr(-,root,root)
-%{_cross_prefix}%{_bindir}/*c++
-%{_cross_prefix}%{_bindir}/*g++
-%{_cross_prefix}%{_libexecdir}/gcc/%{_tuple}/%{version}/cc1plus
+#%%{_cross_prefix}%%{_bindir}/*c++
+#%%{_cross_prefix}%%{_bindir}/*g++
+#%%{_cross_prefix}%%{_libexecdir}/gcc/%%{_tuple}/%%{version}/cc1plus
 
 # %%files -n libstdc++
 # %%defattr(-,root,root)
