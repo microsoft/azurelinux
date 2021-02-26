@@ -1,6 +1,7 @@
 {
  "Signatures": {
   "brp-python-bytecompile": "fe27619422f2cca1a803b5b77f83e3f2257bf123908329834d995537393ac4d3",
+  "common.lua": "b7fae33cabffe268b152a70ed9796cbc14d5b3e00710617ed0b3b9c8ee6d41a6",
   "compileall2.py": "b91f5c190d11eb4f0d94f39134c5c24d44a683738db068bf7d1418c2a5cfa135",
   "default-annobin-cc1": "2315f86ffa724b9121b5a94d752883c11cbce581ac5e691717269ccbdac66625",
   "default-hardened-cc1": "2102bdfbb06934d95ceb3c81f789c59c9f77f91b0f996fd39588e0aa052d6f77",
