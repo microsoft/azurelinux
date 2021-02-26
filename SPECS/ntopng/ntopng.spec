@@ -2,14 +2,16 @@
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.ntop.org/
-Source0:        https://github.com/ntop/ntopng/archive/%{name}-%{version}.tar.gz
-Source1:        https://github.com/ntop/nDPI/archive/nDPI-%{nDPIver}.tar.gz
+#Source0:       https://github.com/ntop/ntopng/archive/%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+#Source1:       https://github.com/ntop/nDPI/archive/%{nDPIver}.tar.gz
+Source1:        nDPI-%{nDPIver}.tar.gz
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
@@ -59,7 +61,10 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
-* Fri Feb 05 2021 Henry Beberman <henry.beberman@microsoft.com> 4.2-1
+* Fri Feb 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-2
+- Updating source URLs.
+
+* Fri Feb 05 2021 Henry Beberman <henry.beberman@microsoft.com> - 4.2-1
 - Add ntopng spec
 - License verified
 - Original version for CBL-Mariner
