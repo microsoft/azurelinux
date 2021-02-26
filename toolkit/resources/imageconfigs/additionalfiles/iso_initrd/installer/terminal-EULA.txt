@@ -1,1 +1,1 @@
-Sample EULA
+Sample Terminal Installer EULA
