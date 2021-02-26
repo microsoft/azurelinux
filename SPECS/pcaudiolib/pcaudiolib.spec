@@ -31,7 +31,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Libraries and header files for %{name}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 ./autogen.sh
