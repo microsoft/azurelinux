@@ -1,6 +1,6 @@
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.50.0
+Version:        1.47.0
 Release:        1%{?dist}
 License:        ASL 2.0 and MIT
 Vendor:         Microsoft Corporation
@@ -9,12 +9,12 @@ Group:          Applications/System
 URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/2020-12-31/cargo-1.49.0-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/2020-12-31/rustc-1.49.0-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/2020-12-31/rust-std-1.49.0-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/2020-12-31/cargo-1.49.0-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/2020-12-31/rustc-1.49.0-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/2020-12-31/rust-std-1.49.0-aarch64-unknown-linux-gnu.tar.gz
+Source2:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-x86_64-unknown-linux-gnu.tar.gz
+Source3:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-x86_64-unknown-linux-gnu.tar.gz
+Source4:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-x86_64-unknown-linux-gnu.tar.gz
+Source5:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-aarch64-unknown-linux-gnu.tar.gz
+Source6:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-aarch64-unknown-linux-gnu.tar.gz
+Source7:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-aarch64-unknown-linux-gnu.tar.gz
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -42,7 +42,7 @@ popd
 %setup -q -n rustc-%{version}-src
 
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/2020-12-31/
+%define BUILD_CACHE_DIR build/cache/2020-08-27/
 mkdir -pv %{BUILD_CACHE_DIR}
 %ifarch x86_64
 mv %{SOURCE2} %{BUILD_CACHE_DIR}
@@ -109,8 +109,8 @@ rm %{buildroot}/usr/libexec/*
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
-* Wed Feb 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.50.0-1
-- Update version to 1.50.0
+* Wed Feb 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.47.0-1
+- Update version to 1.47.0
 
 * Wed Jan 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
