@@ -1,8 +1,10 @@
+# Prevent librustc_driver from inadvertently being listed as a requirement
+%global __requires_exclude ^librustc_driver-
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
 Release:        1%{?dist}
-License:        ASL 2.0 and MIT
+License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -22,13 +24,9 @@ BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  python2
-BuildRequires:  ninja-build
 %if %{with_check}
 BuildRequires:  python-xml
 %endif
-
-# Prevent librustc_driver from inadvertently being listed as a requirement
-%global __requires_exclude ^librustc_driver-
 
 %description
 Rust Programming Language
@@ -68,9 +66,6 @@ export SUDO_USER=root
 make %{?_smp_mflags}
 
 %check
-# Skip following test which appears to be failing due to test issue
-rm -vf src/test/ui-fulldeps/session-derive-errors.rs
-rm -vf src/test/ui-fulldeps/session-derive-errors.stderr
 make check
 
 %install
@@ -79,7 +74,6 @@ export SUDO_USER=root
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
-rm %{buildroot}/usr/libexec/*
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
