@@ -130,21 +130,22 @@ for source_file in $(cat %{_cross_name}-file_manifest_with_dirs.txt | sort --uni
 done
 install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cross_name}-file_manifest.txt
 
+# Turning off so we don't get ldconfig errors for crossarch packages
 # Add the /opt/cross libs to the ldcache
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
-echo %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
-cat > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf <<EOF
-%{_cross_prefix}%{_tuple}%{_lib64dir}
-EOF
-cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+# mkdir -p %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/
+# echo %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
+# cat > %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf <<EOF
+# %%{_cross_prefix}%%{_tuple}%%{_lib64dir}
+# EOF
+# cat %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+# %%post   -p /sbin/ldconfig
+# %%postun -p /sbin/ldconfig
 
 %files -f %{_cross_name}-file_manifest.txt
 %defattr(-,root,root)
 %license licenses/*
-%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+#%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 %{_cross_prefix}/%{_cross_name}-file_manifest.txt
 
 %changelog
