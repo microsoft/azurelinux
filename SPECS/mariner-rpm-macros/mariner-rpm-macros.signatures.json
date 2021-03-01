@@ -1,13 +1,16 @@
 {
  "Signatures": {
   "brp-python-bytecompile": "fe27619422f2cca1a803b5b77f83e3f2257bf123908329834d995537393ac4d3",
+  "common.lua": "b7fae33cabffe268b152a70ed9796cbc14d5b3e00710617ed0b3b9c8ee6d41a6",
   "compileall2.py": "b91f5c190d11eb4f0d94f39134c5c24d44a683738db068bf7d1418c2a5cfa135",
   "default-annobin-cc1": "2315f86ffa724b9121b5a94d752883c11cbce581ac5e691717269ccbdac66625",
   "default-hardened-cc1": "2102bdfbb06934d95ceb3c81f789c59c9f77f91b0f996fd39588e0aa052d6f77",
   "default-hardened-ld": "4dbb822a27eed292759bc4e9cabb4b84f34fc6701535fcac2fdddac33328678b",
+  "forge.lua": "7390af6e81d8d61bc6957127fe9ebdbf5223e96d3810855641bdecc2a03800b4",
   "gpgverify": "db0e050f56b694497d70603a6f5c17dd60ddbcf7cee670616851cd389f6767c4",
   "macros": "337497b709c72250b1c217e4ebae929192207a6494ba403c16704a0c60f6394e",
   "macros.check": "79367176c3c7d10c0158b6e5d881e0fc3c8fd50c5957dad2f097c2d4a37833e7",
+  "macros.forge": "8785fe3de4570d6b78dc40aa2f0a4124ce1ddb6282fe3060fb0ae2001178abe6",
   "macros.mono-srpm": "a9201ae36fc482e966134e38f42412378e955faf296b214cb6dd63981af8bc49",
   "macros.nodejs-srpm": "b2515cc7fad3f14849cff8593b10543a3f73edccff4c3c6d0d2764dae19c38e8",
   "macros.ocaml-srpm": "cd34e1d89cf45b1a76a8803a7fe3aefa6e5e6380e983a85d8dae4912ba360b3f",

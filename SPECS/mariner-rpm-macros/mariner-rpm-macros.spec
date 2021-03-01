@@ -1,11 +1,12 @@
 %global rcdir %{_libdir}/rpm/mariner
+%global rcluadir %{_libdir}/rpm/lua/mariner
 # Turn off auto byte compilation since when building this spec in the toolchain the needed scripts are not installed yet.
 # __brp_python_bytecompile
 %global __brp_python_bytecompile %{nil}
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +32,9 @@ Source17:       brp-python-bytecompile
 Source18:       macros.pybytecompile
 # Use an enhanced copy of Python's compileall module for Python >= 3.4
 Source19:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compileall2.py
+Source20:       macros.forge
+Source21:       common.lua
+Source22:       forge.lua
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -69,6 +73,10 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
 install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 
+mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
+install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
+install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
+
 %files
 %defattr(-,root,root)
 %{rcdir}/macros
@@ -83,6 +91,12 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
+%{_rpmconfigdir}/macros.d/macros.forge
+%dir %{rcluadir}
+%dir %{rcluadir}/srpm
+%dir %{rcluadir}/rpm
+%{rcluadir}/*.lua
+%{rcluadir}/srpm/*.lua
 %{_rpmconfigdir}/macros.d/macros.pybytecompile
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
@@ -91,7 +105,10 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com>
+* Thu Feb 25 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-14
+- Add forge macros and scripts.
+
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0-13
 - Import brp-python-bytecompile, compileall2.py, macros.pybytecompile, and python byte compilation in macros from Fedora 32 (license: MIT).
 - Fix %%{_lib} and %%{_lib64} macros to reference the folder names instead of paths.
 - Combine mariner-python-macros into the main package for byte compilation support.

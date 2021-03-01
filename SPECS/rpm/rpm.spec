@@ -2,8 +2,8 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Package manager
 Name:           rpm
-Version:        4.14.2
-Release:        13%{?dist}
+Version:        4.14.2.1
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -278,6 +278,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 25 2021 Joe Schmitt <joschmit@microsoft.com> - 4.14.2.1-1
+- Upgrade to v4.14.2.1 to fix broken Lua library path.
+
 * Thu Jan 14 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.14.2-13
 - Apply patch to correctly parse versions for python dist dependencies.
 
