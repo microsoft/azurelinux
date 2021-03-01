@@ -185,3 +185,15 @@ end
 
 # directory (doesn't need to exist) where all generated build files will be placed
 %_vpath_builddir %_target_platform
+
+# Maximum number of CPU's to use when building, 0 for unlimited.
+%_smp_ncpus_max 0
+
+%_smp_build_ncpus %([ -z "$RPM_BUILD_NCPUS" ] \\\
+	&& RPM_BUILD_NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
+        ncpus_max=%{?_smp_ncpus_max}; \\\
+        if [ -n "$ncpus_max" ] && [ "$ncpus_max" -gt 0 ] && [ "$RPM_BUILD_NCPUS" -gt "$ncpus_max" ]; then RPM_BUILD_NCPUS="$ncpus_max"; fi; \\\
+        if [ "$RPM_BUILD_NCPUS" -gt 1 ]; then echo "$RPM_BUILD_NCPUS"; fi)
+        echo "$RPM_BUILD_NCPUS";)
+
+%_smp_mflags "-j%{_smp_build_ncpus}"

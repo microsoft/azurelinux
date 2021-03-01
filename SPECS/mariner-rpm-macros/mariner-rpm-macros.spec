@@ -5,7 +5,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -91,6 +91,9 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Feb 25 2021 Henry Li <lihl@microsoft.com> - 1.0-13
+- Add _smp_build_cpus and relevant macros.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com>
 - Import brp-python-bytecompile, compileall2.py, macros.pybytecompile, and python byte compilation in macros from Fedora 32 (license: MIT).
 - Fix %%{_lib} and %%{_lib64} macros to reference the folder names instead of paths.

@@ -2,13 +2,13 @@
 
 Name:           meson
 Summary:        Extremely fast and user friendly build system
-Version:        0.49.2
+Version:        0.57.1
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://mesonbuild.com/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/mesonbuild/meson/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/mesonbuild/meson/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
@@ -55,11 +55,17 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Thu Feb 25 2021 Henry Li <lihl@microsoft.com> 0.57.1-1
+- Update to 0.57.1.
+
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 0.49.2-1
 -   Update to 0.49.2.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.47.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 0.47.2-1
 -   Update to version 0.47.2
+
 *   Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 0.44.0-1
 -   Initial packaging
