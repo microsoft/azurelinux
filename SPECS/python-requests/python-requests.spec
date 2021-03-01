@@ -3,7 +3,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,9 @@ Group:          Development/Languages/Python
 URL:            http://python-requests.org
 #Source0:       https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz
 Source0:        requests-%{version}.tar.gz
+Patch0:         test_requests_typeerror_testfix.patch
+Patch1:         test_requests_support_pytest_4.patch
+
 BuildRequires:  python-setuptools
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -35,6 +38,7 @@ BuildRequires:  python-attrs
 BuildRequires:  python-certifi
 BuildRequires:  python-chardet
 BuildRequires:  python-idna
+BuildRequires:  python-pip
 BuildRequires:  python-urllib3
 %endif
 %if %{with_check}
@@ -43,6 +47,7 @@ BuildRequires:  python3-attrs
 BuildRequires:  python3-certifi
 BuildRequires:  python3-chardet
 BuildRequires:  python3-idna
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-urllib3
 %endif
@@ -86,6 +91,8 @@ Python 3 version.
 
 %prep
 %setup -q -n requests-%{version}
+%patch0 -p1
+%patch1 -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -102,17 +109,13 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 
 %check
-easy_install_2=$(ls %{_bindir} |grep easy_install |grep 2)
-$easy_install_2 pathlib2 funcsigs pluggy more_itertools pysocks
-$easy_install_2 pytest-mock pytest-httpbin
-LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python2_sitelib} \
-py.test2
+pip install tox
+LANG=en_US.UTF-8 tox -e py27
 
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pathlib2 funcsigs pluggy more_itertools pysocks
-$easy_install_3 pytest-mock pytest-httpbin
-LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
-py.test3
+pushd ../p3dir
+pip3 install tox
+LANG=en_US.UTF-8 tox -e py37
+popd
 
 %files
 %defattr(-,root,root)
@@ -128,6 +131,9 @@ py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 01 2021 Andrew Phelps <anphel@microsoft.com> - 2.22.0-2
+- Add patches for test issues and run tests with tox
+
 * Thu Dec 31 2020 Thomas Crain <thcrain@microsoft.com> - 2.22.0-1
 - Upgrade to version 2.22.0
 - Fix Source0 URL
