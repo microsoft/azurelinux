@@ -26,10 +26,10 @@ type blockDevicesOutput struct {
 }
 
 type blockDeviceInfo struct {
-	Name   string `json:"name"`    // Example: sda
-	MajMin string `json:"maj:min"` // Example: 1:2
-	Size   string `json:"size"`    // Number of bytes.
-	Model  string `json:"model"`   // Example: 'Virtual Disk'
+	Name   string      `json:"name"`    // Example: sda
+	MajMin string      `json:"maj:min"` // Example: 1:2
+	Size   json.Number `json:"size"`    // Number of bytes. Can be a quoted string or a JSON number, depending on the util-linux version
+	Model  string      `json:"model"`   // Example: 'Virtual Disk'
 }
 
 // SystemBlockDevice defines a block device on the host computer
@@ -519,7 +519,7 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	for i, disk := range blockDevices.Devices {
 		systemDevices[i].DevicePath = fmt.Sprintf("/dev/%s", disk.Name)
 
-		systemDevices[i].RawDiskSize, err = strconv.ParseUint(disk.Size, 10, 64)
+		systemDevices[i].RawDiskSize, err = strconv.ParseUint(disk.Size.String(), 10, 64)
 		if err != nil {
 			return
 		}
