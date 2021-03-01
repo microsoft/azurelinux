@@ -32,6 +32,7 @@ Patch11:        CVE-2019-18348.nopatch
 # CVE-2020-27619 patch backported from 3.6
 Patch12:        CVE-2020-27619.patch
 # CVE-2021-23336 patch backported from 3.6 courtesy of Gentoo
+# https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=f2a53a94f3b6b6395ef4541051a02d80c61442d0
 Patch13:        CVE-2021-23336.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
