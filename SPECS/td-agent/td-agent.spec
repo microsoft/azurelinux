@@ -64,7 +64,6 @@ BuildRequires:  rubygem-tzinfo
 BuildRequires:  rubygem-tzinfo-data
 BuildRequires:  rubygem-webhdfs
 BuildRequires:  rubygem-yajl-ruby
-BuildRequires:  shadow-utils
 BuildRequires:  sudo
 BuildRequires:  systemd
 BuildRequires:  tar
@@ -113,6 +112,7 @@ Requires:       rubygem-tzinfo
 Requires:       rubygem-tzinfo-data
 Requires:       rubygem-webhdfs
 Requires:       rubygem-yajl-ruby
+Requires(pre):  shadow-utils
 
 %description
 The stable distribution of Fluentd
