@@ -4736,7 +4736,7 @@
         "other": {
           "name": "python-distro",
           "version": "1.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ca/e3/78443d739d7efeea86cbbe0216511d29b2f5ca8dbf51a6f2898432738987/distro-1.4.0.tar.gz"
+          "downloadUrl": "https://github.com/nir0s/distro/archive/v1.4.0.tar.gz"
         }
       }
     },
