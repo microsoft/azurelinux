@@ -5,7 +5,7 @@
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ URL:            https://github.com/fluent-plugins-nursery/td-agent-builder
 #Source0:      https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz
 Source0:        td-agent-builder-testing-uploading-artifacts3.tar.gz
 Patch0:         td-agent.patch
+BuildRequires:  shadow-utils
 BuildRequires:  build-essential
 BuildRequires:  git
 BuildRequires:  jemalloc
@@ -139,7 +140,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/td-agent/plugin
 mkdir -p %{buildroot}/tmp/td-agent
 
 %pre
-sudo ln -s %{_sbindir}/useradd %{_sbindir}/adduser
 if ! getent group td-agent >/dev/null; then
     %{_sbindir}/groupadd -r td-agent
 fi
@@ -201,6 +201,9 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
+* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.0.1-2
+- Add shaow-utils as BuildRequires and remove creating the sym link for adduser
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Initial CBL-Mariner import from Treasure Data (license: Apache2).
 - License verified.
