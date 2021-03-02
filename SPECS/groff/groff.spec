@@ -32,7 +32,8 @@ and formatting text.
 %build
 PAGE=letter ./configure \
     --prefix=%{_prefix} \
-    --with-grofferdir=%{_datadir}/%{name}/%{version}/groffer
+    --with-grofferdir=%{_datadir}/%{name}/%{version}/groffer \
+    --without-x
 make
 
 %install
@@ -49,16 +50,13 @@ rm -rf %{buildroot}%{_infodir}
 %license LICENSES
 %{_bindir}/*
 %{_libdir}/groff/*
-%{_libdir}/X11/app-defaults/GXditview
-%{_libdir}/X11/app-defaults/GXditview-color
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_datarootdir}/%{name}/*
 %{_mandir}/*/*
 
 %changelog
 *   Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> 1.22.3-6
--   Add installed but unpackaged files to %files list
--   Clean up formatting
+-   Ensure build without X11 support
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
