@@ -72,7 +72,7 @@ BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap
 AutoReqProv:    no
-Conflicts:      %{_cross_name}-gcc
+Conflicts:      %{_cross_name}-cross-gcc
 #%%if %%{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
@@ -223,21 +223,23 @@ make %{?_smp_mflags} all-target-libgcc
 cd %{_builddir}/%{name}-build
 make %{?_smp_mflags} DESTDIR=%{buildroot} install-target-libgcc
 
+find %{buildroot} -name '*.la' -delete
 rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 # Only creates a few libraries, no translations etc.
 # cd ../gcc-%{version}
 # %find_lang %{name} --all-name
 
+# Turning off so we don't get ldconfig errors for crossarch packages
 # Add the /opt/cross libs to the ldcache
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
-echo %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
-cat > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf <<EOF
-%{_cross_prefix}%{_tuple}%{_lib64dir}
-EOF
-cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+# mkdir -p %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/
+# echo %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
+# cat > %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf <<EOF
+# %%{_cross_prefix}%%{_tuple}%%{_lib64dir}
+# EOF
+# cat %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+# %%post   -p /sbin/ldconfig
+# %%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -245,7 +247,7 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 %license COPYING-mpfr
 %license COPYING-gmp
 %license COPYING.LESSER-mpc
-%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+#%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 #%%{_lib}/cpp
 # Executables
 #%%exclude %%{_cross_prefix}%%{_bindir}/*gfortran

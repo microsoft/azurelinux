@@ -86,9 +86,11 @@ BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-gcc-bootstrap
 BuildRequires:  %{_cross_name}-gcc-bootstrap2
+BuildRequires:  perl(File::Find)
 AutoReqProv:    no
 Conflicts:      %{_cross_name}-glibc
 Conflicts:      %{_cross_name}-glibc-bootstrap2
+Conflicts:      %{_cross_name}-cross-gcc
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -246,6 +248,7 @@ make %{?_smp_mflags} DESTDIR="%{buildroot}%{_cross_sysroot}" install
 # cp -v %%{SOURCE1} %%{buildroot}/sbin
 
 #       Remove unwanted cruft
+find %{buildroot} -name '*.la' -delete
 rm -rf %{buildroot}%{_cross_sysroot}%{_infodir}
 #       Install configuration files
 
@@ -325,8 +328,9 @@ cd ../glibc-%{version}
 # # check for exact 'n' failures
 # [ `grep ^FAIL tests.sum | wc -l` -ne $n ] && exit 1 ||:
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+# Turning off so we don't get ldconfig errors for crossarch packages
+# %%post -p /sbin/ldconfig
+# %%postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(-,root,root)

@@ -68,7 +68,7 @@ Patch1:         CVE-2019-15847.nopatch
 BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 AutoReqProv:    no
-Conflicts:      %{_cross_name}-gcc
+Conflicts:      %{_cross_name}-cross-gcc
 #%%if %%{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
@@ -212,25 +212,24 @@ make %{?_smp_mflags} all-gcc
 cd %{_builddir}/%{name}-build
 make %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
 
+find %{buildroot} -name '*.la' -delete
 rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 cd ../gcc-%{version}
 %find_lang %{name} --all-name
 
+# Turning off so we don't get ldconfig errors for crossarch packages
 # Add the /opt/cross libs to the ldcache
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
-echo %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
-cat > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf <<EOF
-%{_cross_prefix}%{_libdir}
-%{_cross_prefix}%{_lib64dir}
-%{_cross_prefix}%{_libexecdir}
-EOF
-cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+# mkdir -p %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/
+# echo %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
+# cat > %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf <<EOF
+# %%{_cross_prefix}%%{_libdir}
+# %%{_cross_prefix}%%{_lib64dir}
+# %%{_cross_prefix}%%{_libexecdir}
+# EOF
+# cat %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
-
-
+# %%post   -p /sbin/ldconfig
+# %%postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -238,7 +237,7 @@ cat %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 %license COPYING-mpfr
 %license COPYING-gmp
 %license COPYING.LESSER-mpc
-%{_sysconfdir}/ld.so.conf.d/%{name}.conf
+#%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 #%%{_lib}/cpp
 # Executables
 %exclude %{_cross_prefix}%{_bindir}/*gfortran
