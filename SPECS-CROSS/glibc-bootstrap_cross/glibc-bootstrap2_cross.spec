@@ -88,6 +88,7 @@ BuildRequires:  %{_cross_name}-gcc-bootstrap
 BuildRequires:  %{_cross_name}-gcc-bootstrap2
 BuildRequires:  perl(File::Find)
 AutoReqProv:    no
+ExclusiveArch:  x86_64
 Conflicts:      %{_cross_name}-glibc
 Conflicts:      %{_cross_name}-glibc-bootstrap2
 Conflicts:      %{_cross_name}-cross-gcc
