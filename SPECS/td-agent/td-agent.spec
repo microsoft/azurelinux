@@ -201,7 +201,7 @@ sudo systemctl start td-agent
 
 %changelog
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.0.1-2
-- Add shaow-utils as BuildRequires and remove creating the sym link for adduser
+- Add shadow-utils as BuildRequires and remove creating the sym link for adduser
 
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Initial CBL-Mariner import from Treasure Data (license: Apache2).
