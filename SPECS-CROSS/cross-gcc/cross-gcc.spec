@@ -149,5 +149,5 @@ install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cro
 %{_cross_prefix}/%{_cross_name}-file_manifest.txt
 
 %changelog
-* Tue Feb 23 2021 Daniel McIlvaney <damcilva@microsoft.com> - 0.1-1
+* Tue Feb 23 2021 Daniel McIlvaney <damcilva@microsoft.com> - 0.1.0-1
 - Initial version for Mariner
