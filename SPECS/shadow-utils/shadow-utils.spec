@@ -36,7 +36,7 @@ in a secure way.
 sed -i 's/groups$(EXEEXT) //' src/Makefile.in
 find man -name Makefile.in -exec sed -i 's/groups\.1 / /' {} \;
 sed -i -e 's@#ENCRYPT_METHOD DES@ENCRYPT_METHOD SHA512@' \
-    -e 's@/var/spool/mail@/var/mail@' etc/login.defs
+    -e 's@%{_var}/spool/mail@%{_var}/mail@' etc/login.defs
 
 sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
