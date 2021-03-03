@@ -22,6 +22,8 @@ Requires:       perl-DBIx-Simple
 Requires:       perl-DBD-SQLite
 Requires:       perl-File-HomeDir
 
+AutoReq:        no
+
 %description
 The Groff package contains programs for processing
 and formatting text.
@@ -57,6 +59,7 @@ rm -rf %{buildroot}%{_infodir}
 %changelog
 *   Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> 1.22.3-6
 -   Ensure build without X11 support
+-   Don't automatically add requirements when built in the toolchain
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
