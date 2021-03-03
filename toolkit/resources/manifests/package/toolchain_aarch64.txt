@@ -266,10 +266,10 @@ npth-devel-1.6-3.cm1.aarch64.rpm
 nspr-4.21-2.cm1.aarch64.rpm
 nspr-debuginfo-4.21-2.cm1.aarch64.rpm
 nspr-devel-4.21-2.cm1.aarch64.rpm
-nss-3.44-3.cm1.aarch64.rpm
-nss-debuginfo-3.44-3.cm1.aarch64.rpm
-nss-devel-3.44-3.cm1.aarch64.rpm
-nss-libs-3.44-3.cm1.aarch64.rpm
+nss-3.44-4.cm1.aarch64.rpm
+nss-debuginfo-3.44-4.cm1.aarch64.rpm
+nss-devel-3.44-4.cm1.aarch64.rpm
+nss-libs-3.44-4.cm1.aarch64.rpm
 openjdk8-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-debuginfo-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-doc-1.8.0.181-8.cm1.aarch64.rpm
