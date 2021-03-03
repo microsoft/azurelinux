@@ -177,6 +177,22 @@ func TestShouldFailToParsingMultipleSameMounts_SystemConfig(t *testing.T) {
 	assert.Equal(t, "failed to parse [SystemConfig]: invalid [PartitionSettings]: duplicate mount point found at '/'", err.Error())
 }
 
+func TestShouldSucceedParsingMultipleSameEmptyMounts_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	badPartitionSettingsConfig := validSystemConfig
+	badPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
+		{MountPoint: ""},
+		{MountPoint: ""},
+	}
+
+	err := badPartitionSettingsConfig.IsValid()
+	assert.NoError(t, err)
+
+	err = remarshalJSON(badPartitionSettingsConfig, &checkedSystemConfig)
+	assert.NoError(t, err)
+}
+
 func TestShouldFailParsingBothVerityAndEncryption_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 
