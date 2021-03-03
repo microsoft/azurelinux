@@ -42,6 +42,9 @@
 # Still fails package build when it fails
 %skip_check_gcc 1
 
+# WALinuxAgent test suite leaves machine in bad state; unable to unmount /dev from chroot
+%skip_check_WALinuxAgent 1
+
 # Uncommenting "%select_check 1" will force %check to only run in specs
 #  that have  select_check_%{name} defined below.
 #%select_check 1
