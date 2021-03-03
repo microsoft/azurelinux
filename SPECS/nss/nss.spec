@@ -8,7 +8,7 @@
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libsoftokn3.so \
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libfreeblpriv3.so \
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libfreebl3.so \
-    %{buildroot}/%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libnssdbm3.so \
+    %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libnssdbm3.so \
 %{nil}
 
 Summary:        Security client
