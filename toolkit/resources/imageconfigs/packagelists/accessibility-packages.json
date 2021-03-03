@@ -1,5 +1,7 @@
 {
     "packages": [
+        "alsa-lib",
+        "alsa-utils",
         "espeak-ng",
         "espeakup",
         "kernel-drivers-accessibility",
