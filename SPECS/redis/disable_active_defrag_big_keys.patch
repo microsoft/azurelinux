@@ -1,0 +1,28 @@
+Disable test "Active defrag big keys"
+This test is occasionally failing on slower build machines with the following:
+
+"!!! WARNING The following tests failed:"
+"*** [err]: Active defrag big keys in tests/unit/memefficiency.tcl"
+"Expected condition '$max_latency <= 120' to be true (126 <= 120)"
+"Expected condition '$max_latency <= 120' to be true (134 <= 120)"
+
+Reading through comments on the following, this appears to be a test issue and not a real product issue.
+https://github.com/redis/redis/issues/2126
+
+diff -ruN a/tests/unit/memefficiency.tcl b/tests/unit/memefficiency.tcl
+--- a/tests/unit/memefficiency.tcl	2021-03-03 09:39:16.028741917 -0800
++++ b/tests/unit/memefficiency.tcl	2021-03-03 09:45:37.207401387 -0800
+@@ -87,6 +87,7 @@
+             }
+         } {}
+ 
++    if {0} {
+         test "Active defrag big keys" {
+             r flushdb
+             r config resetstat
+@@ -210,4 +211,5 @@
+             r save ;# saving an rdb iterates over all the data / pointers
+         } {OK}
+     }
++    }
+ }
