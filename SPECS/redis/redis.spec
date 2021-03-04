@@ -85,7 +85,7 @@ exit 0
 
 %changelog
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 5.0.5-5
-- Add patch to remove an unreliable test
+- Add patch to remove an unreliable test. License verified.
 * Fri Oct 23 2020 Henry Li <lihl@microsoft.com> 5.0.5-4
 - Add patch to resolve CVE-2020-14147
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.0.5-3
