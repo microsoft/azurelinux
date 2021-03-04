@@ -1,7 +1,7 @@
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
-Version:        1.1.1
-Release:        3%{?dist}
+Version:        1.1.9
+Release:        1%{?dist}
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 License:        GPLv2+

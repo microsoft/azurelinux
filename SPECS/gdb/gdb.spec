@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        8.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/gdb/%{name}-%{version}.tar.xz
@@ -18,6 +18,8 @@ BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  xz-devel
+BuildRequires:  gcc-c++, gcc-gfortran
+Provides:       %{name}-headless = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
@@ -80,6 +82,10 @@ make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpecte
 %{_mandir}/*/*
 
 %changelog
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com>
+- Add gcc-c++ and gcc-gfortran as dependencies
+- Provides gdb-headless
+
 * Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
 Version:        2.0.25
-Release:        5%{?dist}
+Release:        6%{?dist}
 URL:            https://sourceforge.net/projects/openipmi/
 License:        LGPLv2+ and GPLv2+ or BSD
 Group:          System Environment/Base
@@ -45,6 +45,7 @@ A Perl interface for OpenIPMI.
 Summary:        Python interface for OpenIPMI
 Group:          Utilities
 Requires:       OpenIPMI = %{version}-%{release}, python2
+Provides:       python3-openipmi = %{version}-%{release}
 
 %description    python
 A Python interface for OpenIPMI.
@@ -177,6 +178,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 2.0.25-6
+- Provides python3-openipmi from OpenIPMI-python
+
 * Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
 - Added %%license line automatically
 

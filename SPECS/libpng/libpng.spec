@@ -1,7 +1,7 @@
 Summary:        contains libraries for reading and writing PNG files.
 Name:           libpng
 Version:        1.6.37
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        zlib
 # The site does NOT have an HTTPS cert available.
 URL:            http://www.libpng.org/
@@ -11,6 +11,7 @@ Distribution:   Mariner
 Source0:        https://downloads.sourceforge.net/libpng/%{name}-%{version}.tar.xz
 Provides:       pkgconfig(libpng)
 Provides:       pkgconfig(libpng16)
+Provides:       libpng16
 %description
 The libpng package contains libraries used by other programs for reading and writing PNG files. The PNG format was designed as a replacement for GIF and, to a lesser extent, TIFF, with many improvements and extensions and lack of patent problems.
 
