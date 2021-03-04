@@ -180,17 +180,18 @@ func TestShouldFailToParsingMultipleSameMounts_SystemConfig(t *testing.T) {
 func TestShouldSucceedParsingMultipleSameEmptyMounts_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 
-	badPartitionSettingsConfig := validSystemConfig
-	badPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
+	emptyPartitionSettingsConfig := validSystemConfig
+	emptyPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
 		{MountPoint: ""},
 		{MountPoint: ""},
 	}
 
-	err := badPartitionSettingsConfig.IsValid()
+	err := emptyPartitionSettingsConfig.IsValid()
 	assert.NoError(t, err)
 
-	err = remarshalJSON(badPartitionSettingsConfig, &checkedSystemConfig)
+	err = remarshalJSON(emptyPartitionSettingsConfig, &checkedSystemConfig)
 	assert.NoError(t, err)
+	assert.Equal(t, emptyPartitionSettingsConfig, checkedSystemConfig)
 }
 
 func TestShouldFailParsingBothVerityAndEncryption_SystemConfig(t *testing.T) {
