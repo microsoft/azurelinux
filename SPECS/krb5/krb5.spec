@@ -96,6 +96,7 @@ make check
 rm -rf %{buildroot}/*
 
 
+
 %files
 %defattr(-,root,root)
 %license doc/copyright.rst
