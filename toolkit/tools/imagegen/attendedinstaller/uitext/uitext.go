@@ -92,7 +92,7 @@ const (
 // InstallerView text.
 const (
 	InstallerExperienceTitle = "Select Installation Experience"
-	InstallerTerminalOption  = "Terminal Installer"
+	InstallerTerminalOption  = "Terminal Installer (Speech Enabled)"
 	InstallerGraphicalOption = "Graphical Installer"
 )
 
@@ -103,17 +103,17 @@ const (
 
 // HostNameView text.
 const (
-	HostNameTitle      = "Choose the Hostname for Your System"
-	HostNameInputLabel = "HostName:"
+	HostNameTitle      = "Choose the Host Name for Your System"
+	HostNameInputLabel = "Host Name:"
 
-	HostNameSegment   = "hostname"
+	HostNameSegment   = "host name"
 	DomainNameSegment = "domain name"
 
 	FQDNEmptyErrorFmt         = "empty %s is not allowed"
 	FQDNEndsInDashErrorFmt    = "%s should not end with '-'"
 	FQDNInvalidRuneErrorFmt   = "%s should only contain alpha-numeric, '.' and '-' characters"
 	FQDNInvalidStartErrorFmt  = "%s should start with an alpha character"
-	FQDNInvalidLengthErrorFmt = "hostname must be <= %d characters"
+	FQDNInvalidLengthErrorFmt = "host name must be <= %d characters"
 )
 
 // InstallationView text.
@@ -123,7 +123,7 @@ const (
 
 // UserView text.
 const (
-	SetupUserTitle = "Setup User Account"
+	SetupUserTitle = "Set Up User Account"
 
 	PasswordInputLabel        = "Password"
 	ConfirmPasswordInputLabel = "Confirm Password"

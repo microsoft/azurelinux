@@ -182,16 +182,16 @@ func (ai *AttendedInstaller) showView(newView int) (err error) {
 
 	logger.Log.Debugf("Showing view: %s", view.Name())
 
-	err = view.Reset()
-	if err != nil {
-		return
-	}
-
 	// Clear the text-to-speech buffer when we change pages
 	err = speakuputils.ClearSpeakupBuffer(ai.keyboard)
 	if err != nil {
 		logger.Log.Warnf("Error clearing speakup buffer")
 		err = nil
+	}
+
+	err = view.Reset()
+	if err != nil {
+		return
 	}
 
 	ai.grid.AddItem(view.Primitive(), primaryContentRow, primaryContentColumn, primaryContentRowSpan, primaryContentColumnSpan, primaryContentMinSize, primaryContentMinSize, true)
@@ -240,6 +240,11 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		// Non-fatal - results in a slightlydegraded experience due to the lack of a
 		// text-to-speech buffer clear between views, but not bad enough to exit outright
 		logger.Log.Warnf("Failed to initialize virtual keyboard via uinput")
+		err = nil
+	}
+	err = speakuputils.SetHighlightTrackingMode(ai.keyboard)
+	if err != nil {
+		logger.Log.Warnf("Error setting highlight tracking mode for speakup")
 		err = nil
 	}
 
