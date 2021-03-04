@@ -406,12 +406,28 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
-	// Detect whether disk dev path is /dev/sdN<y> style or /dev/loopNp<x> style
-	if strings.HasPrefix(diskDevPath, "/dev/sd") {
-		partDevPath = diskDevPath + partitionNumberStr
-	} else {
-		partDevPath = diskDevPath + "p" + partitionNumberStr
+	// There are two primary partition naming conventions:
+	// /dev/sdN<y> style or /dev/loopNp<x> style
+	// Detect the exact one we are using.
+	testPartDevPath := diskDevPath + partitionNumberStr
+	exists, err := file.PathExists(testPartDevPath)
+	if err != nil {
+		return
 	}
+	if !exists {
+		logger.Log.Warnf("could not find partition in /dev (%s), checking other naming convention", testPartDevPath)
+		testPartDevPath = diskDevPath + "p" + partitionNumberStr
+		exists, err = file.PathExists(testPartDevPath)
+		if err != nil {
+			return
+		}
+		if !exists {
+			logger.Log.Warnf("could not find partition in /dev (%s)", testPartDevPath)
+			return
+		}
+	}
+
+	partDevPath = testPartDevPath
 	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
 
 	// Set partition friendly name (only for gpt)
