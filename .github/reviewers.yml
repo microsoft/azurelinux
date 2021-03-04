@@ -1,0 +1,4 @@
+---
+# We want all PRs issued by the CBL-Mariner service account to be reviewerd by the CBL-Mariner developers group.
+CBL-Mariner-Bot:
+  - cbl-mariner-devs
