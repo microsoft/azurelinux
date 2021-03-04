@@ -45,6 +45,9 @@
 # WALinuxAgent test suite leaves machine in bad state; unable to unmount /dev from chroot
 %skip_check_WALinuxAgent 1
 
+# Python-psutil test suite causes OOM issues on build machines
+%skip_check_python_psutil 1
+
 # Uncommenting "%select_check 1" will force %check to only run in specs
 #  that have  select_check_%{name} defined below.
 #%select_check 1
