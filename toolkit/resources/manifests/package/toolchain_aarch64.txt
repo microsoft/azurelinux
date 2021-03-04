@@ -218,10 +218,10 @@ libtasn1-debuginfo-4.14-2.cm1.aarch64.rpm
 libtasn1-devel-4.14-2.cm1.aarch64.rpm
 libtool-2.4.6-5.cm1.aarch64.rpm
 libtool-debuginfo-2.4.6-5.cm1.aarch64.rpm
-libxml2-2.9.10-3.cm1.aarch64.rpm
-libxml2-debuginfo-2.9.10-3.cm1.aarch64.rpm
-libxml2-devel-2.9.10-3.cm1.aarch64.rpm
-libxml2-python-2.9.10-3.cm1.aarch64.rpm
+libxml2-2.9.10-4.cm1.aarch64.rpm
+libxml2-debuginfo-2.9.10-4.cm1.aarch64.rpm
+libxml2-devel-2.9.10-4.cm1.aarch64.rpm
+libxml2-python-2.9.10-4.cm1.aarch64.rpm
 libxslt-1.1.34-2.cm1.aarch64.rpm
 libxslt-debuginfo-1.1.34-2.cm1.aarch64.rpm
 libxslt-devel-1.1.34-2.cm1.aarch64.rpm
@@ -331,7 +331,7 @@ python2-test-2.7.18-5.cm1.aarch64.rpm
 python2-tools-2.7.18-5.cm1.aarch64.rpm
 python3-cracklib-2.9.7-2.cm1.aarch64.rpm
 python3-gpg-1.13.1-6.cm1.aarch64.rpm
-python3-libxml2-2.9.10-3.cm1.aarch64.rpm
+python3-libxml2-2.9.10-4.cm1.aarch64.rpm
 python3-pwquality-1.4.2-6.cm1.aarch64.rpm
 python3-rpm-4.14.2-10.cm1.aarch64.rpm
 python-curses-2.7.18-5.cm1.aarch64.rpm
