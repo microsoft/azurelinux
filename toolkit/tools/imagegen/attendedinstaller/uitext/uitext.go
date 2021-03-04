@@ -92,7 +92,7 @@ const (
 // InstallerView text.
 const (
 	InstallerExperienceTitle = "Select Installation Experience"
-	InstallerTerminalOption  = "Terminal Installer"
+	InstallerTerminalOption  = "Terminal Installer (Speech Enabled)"
 	InstallerGraphicalOption = "Graphical Installer"
 )
 

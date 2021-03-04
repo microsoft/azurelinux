@@ -4,8 +4,6 @@
 package progressbar
 
 import (
-	"fmt"
-
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -101,12 +99,6 @@ func (p *ProgressBar) Draw(screen tcell.Screen) {
 	filledInWidth := int(float32(width) * (float32(p.progress) / 100))
 	filledInX := x + filledInWidth
 
-	// Round progress down to nearest 10 for printing
-	truncatedProgress := (p.progress / 10) * 10
-
-	percentageText := fmt.Sprintf(" %d%%", truncatedProgress)
-	percentageStart := (endX - len(percentageText)) / 2
-
 	for i := x; i < endX; i++ {
 		var toPrint string
 		if i < filledInX {
@@ -117,6 +109,4 @@ func (p *ProgressBar) Draw(screen tcell.Screen) {
 
 		tview.Print(screen, toPrint, i, y, len(toPrint), textAlign, p.fillColor)
 	}
-
-	tview.Print(screen, percentageText, percentageStart, y, len(percentageText), textAlign, p.labelColor)
 }
