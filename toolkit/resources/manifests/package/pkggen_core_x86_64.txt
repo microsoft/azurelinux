@@ -83,9 +83,9 @@ nspr-devel-4.21-2.cm1.x86_64.rpm
 sqlite-3.32.3-2.cm1.x86_64.rpm
 sqlite-devel-3.32.3-2.cm1.x86_64.rpm
 sqlite-libs-3.32.3-2.cm1.x86_64.rpm
-nss-3.44-3.cm1.x86_64.rpm
-nss-devel-3.44-3.cm1.x86_64.rpm
-nss-libs-3.44-3.cm1.x86_64.rpm
+nss-3.44-4.cm1.x86_64.rpm
+nss-devel-3.44-4.cm1.x86_64.rpm
+nss-libs-3.44-4.cm1.x86_64.rpm
 elfutils-0.176-4.cm1.x86_64.rpm
 elfutils-devel-0.176-4.cm1.x86_64.rpm
 elfutils-devel-static-0.176-4.cm1.x86_64.rpm
