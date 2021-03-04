@@ -85,7 +85,7 @@ make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpecte
 %{_mandir}/*/*
 
 %changelog
-* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> 8.3-3
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 8.3-3
 - Add gcc-c++ and gcc-gfortran as dependencies
 - Provides gdb-headless
 

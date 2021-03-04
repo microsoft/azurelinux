@@ -58,7 +58,7 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
-* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> 1.6.37-3
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.6.37-3
 - Provides libpng16 from libpng
 
 *   Sat May 09 00:20:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.37-2

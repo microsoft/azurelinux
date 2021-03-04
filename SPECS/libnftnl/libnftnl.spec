@@ -57,7 +57,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/%{name}
 
 %changelog
-* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> 1.1.9-1
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.1.9-1
 - Update to version 1.1.9
 
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.1-3
