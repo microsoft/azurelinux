@@ -409,25 +409,32 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	// There are two primary partition naming conventions:
 	// /dev/sdN<y> style or /dev/loopNp<x> style
 	// Detect the exact one we are using.
-	testPartDevPath := diskDevPath + partitionNumberStr
-	exists, err := file.PathExists(testPartDevPath)
-	if err != nil {
-		return
+	testPartDevPaths := []string{
+		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
+		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
 	}
-	if !exists {
-		logger.Log.Warnf("could not find partition in /dev (%s), checking other naming convention", testPartDevPath)
-		testPartDevPath = diskDevPath + "p" + partitionNumberStr
+
+	var exists bool
+	for _, testPartDevPath := range testPartDevPaths {
 		exists, err = file.PathExists(testPartDevPath)
 		if err != nil {
+			logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
 			return
 		}
-		if !exists {
-			logger.Log.Warnf("could not find partition in /dev (%s)", testPartDevPath)
-			return
+		if exists {
+			partDevPath = testPartDevPath
+			break
+		} else {
+			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
 	}
 
-	partDevPath = testPartDevPath
+	if !exists {
+		err = fmt.Errorf("could not find partition to initialize in /dev")
+		logger.Log.Errorf("%s", err)
+		return
+	}
+
 	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
 
 	// Set partition friendly name (only for gpt)
