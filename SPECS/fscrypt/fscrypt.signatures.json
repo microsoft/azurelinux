@@ -1,0 +1,15 @@
+{
+ "Signatures": {
+  "cli-1.20.0.tar.gz": "c5ba59f5742c99618b5ba34211699287cd3e80c41488bb267035ce0163e3bade",
+  "errors-0.8.0.tar.gz": "bacf6c58e490911398cee61742ddc6a90c560733e4c9dcb3d867b17a894c9dd5",
+  "fscrypt-0.2.9.tar.gz": "36f1166d9886548b0d72beeeffb9ca8fb5b28b63a42b369923bc3f0bea78bb3d",
+  "go-tools-2019.2.3.tar.gz": "1af419b7d11e5cee6b58ecab6f46122a14766282f8296307165d49915d63f3ab",
+  "gocovmerge.tar.gz": "178004146c7d9463d5816fc2498d5db79d444c741d52b34953b6ded0202e60c0",
+  "golang-crypto-cbcb750295291b33242907a04be40e80801d0cfc.tar.gz": "68ea57fa2e63fc1527675cdcb92ad664371adfe835603ddfbcf1b1ab859237ae",
+  "golang-lint-16217165b5de779cb6a5e4fc81fa9c1166fda457.tar.gz": "4cb0f3f0f9fcf07da5b03e63e63a31a9914a33b02dfdd5b3d350ab183ff42beb",
+  "golang-sys-63cb32ae39b28d6bb8e7e215c1fc39dd80dcdb02.tar.gz": "6d01d597f91e480d4c36f45ce03e7200d71669057d9ab16e7fdcb5947524ad06",
+  "golang-tools-2077df36852e9a22c3b78f535833d3e54e9fcc8a.tar.gz": "ebcbea539dcc50b402da647eb3c8a6d584be81c59a77c275f7afb0fee3ac5dc6",
+  "misspell-0.3.4.tar.gz": "4bbb94da9bf4500fef21f83359c61c92429a13b47b064bd62fedb68c62b66001",
+  "protobuf-1.2.0.tar.gz": "157a148ae4e132eb169ec794b6cb43f1002780eeacaea8b0694811d1948fb1ec"
+ }
+}
