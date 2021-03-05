@@ -1,24 +1,24 @@
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
-Version:        1.1.1
-Release:        3%{?dist}
-Group:          System Environment/Libraries
-Vendor:         Microsoft Corporation
+Version:        1.1.9
+Release:        1%{?dist}
 License:        GPLv2+
-URL:            http://netfilter.org/projects/libnftnl/
-Source0:        https://netfilter.org/projects/libnftnl/files/%{name}-%{version}.tar.bz2
-%define sha1 %{name}-%{version}=d2be642a54e0f105cb5564471ae4aaaed8b97ca6
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  libmnl-devel
+Group:          System Environment/Libraries
+URL:            https://netfilter.org/projects/libnftnl/
+Source0:        https://netfilter.org/projects/libnftnl/files/%{name}-%{version}.tar.bz2
 BuildRequires:  jansson-devel
+BuildRequires:  libmnl-devel
 
 %description
 libnftnl is a userspace library providing a low-level netlink programming interface (API) to the in-kernel nf_tables subsystem.
 
 %package devel
-Summary:    Development files for %{name}
-Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Summary:        Development files for %{name}
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 Development files for %{name}
 
@@ -38,16 +38,15 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
 %license COPYING
-%doc COPYING
+%license COPYING
 %{_libdir}/*.so.*
 
 %files devel
@@ -57,10 +56,15 @@ find %{buildroot} -name '*.la' -delete
 %{_includedir}/%{name}
 
 %changelog
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.1.9-1
+- Update to version 1.1.9
+- Remove sha1 macro
+
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.1-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.1-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 1.1.1-1
 - Initial version

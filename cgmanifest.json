@@ -2536,8 +2536,8 @@
         "type": "other",
         "other": {
           "name": "libnftnl",
-          "version": "1.1.1",
-          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.1.tar.bz2"
+          "version": "1.1.9",
+          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
         }
       }
     },

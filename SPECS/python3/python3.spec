@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ Provides:       python(abi)
 Provides:       %{_bindir}/python
 Provides:       /bin/python
 Provides:       /bin/python3
+Provides:       %{name}-docs = %{version}-%{release}
 # %if %{with_check}
 # BuildRequires:  iana-etc
 # BuildRequires:  tzdata
@@ -170,7 +171,6 @@ ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
 find %{buildroot}%{_libdir} -name '*.pyo' -delete
 find %{buildroot}%{_libdir} -name '*.o' -delete
-rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
 # %check
@@ -181,6 +181,8 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %clean
 rm -rf %{buildroot}/*
+
+
 
 
 %files
@@ -248,9 +250,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/python3.7m-config
 %{_bindir}/pathfix.py
 %{_bindir}/pathfix3.7.py
-
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
-%exclude %{_bindir}/2to3*
+%{_bindir}/2to3-3.7
+%{_bindir}/2to3
 %exclude %{_bindir}/idle*
 
 %files tools
@@ -277,6 +279,10 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 3.7.7-9
+- Fix python3-devel file section to include 2to3-3.7 and 2to3
+- Provides python3-docs
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.7.7-8
 - Turn off byte compilation since it requires this package to already be built and present.
 

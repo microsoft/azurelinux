@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.17
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       pkgconfig(mit-krb5)
 Provides:       pkgconfig(mit-krb5-gssapi)
+Provides:       %{name}-libs = %{version}-%{release}
 
 %description
 Kerberos V5 is a trusted-third-party network authentication system,
@@ -95,6 +96,8 @@ make check
 rm -rf %{buildroot}/*
 
 
+
+
 %files
 %defattr(-,root,root)
 %license doc/copyright.rst
@@ -122,6 +125,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.17-6
+- Provides krb5-libs from krb5
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.17-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

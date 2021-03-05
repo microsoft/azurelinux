@@ -1,22 +1,22 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
 Version:        2.0.25
-Release:        5%{?dist}
-URL:            https://sourceforge.net/projects/openipmi/
-License:        LGPLv2+ and GPLv2+ or BSD
-Group:          System Environment/Base
+Release:        6%{?dist}
+License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
+URL:            https://sourceforge.net/projects/openipmi/
 Source0:        https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-%{version}.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
-BuildRequires:  systemd
-BuildRequires:  perl
-BuildRequires:  popt-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  swig
+BuildRequires:  perl
+BuildRequires:  popt-devel
 BuildRequires:  python2-devel
+BuildRequires:  swig
+BuildRequires:  systemd
 Requires:       systemd
 
 %description
@@ -36,7 +36,8 @@ and/or middleware that depends on libOpenIPMI
 %package        perl
 Summary:        Perl interface for OpenIPMI
 Group:          Utilities
-Requires:       OpenIPMI = %{version}-%{release}, perl >= 5
+Requires:       OpenIPMI = %{version}-%{release}
+Requires:       perl >= 5
 
 %description    perl
 A Perl interface for OpenIPMI.
@@ -44,7 +45,9 @@ A Perl interface for OpenIPMI.
 %package        python
 Summary:        Python interface for OpenIPMI
 Group:          Utilities
-Requires:       OpenIPMI = %{version}-%{release}, python2
+Requires:       OpenIPMI = %{version}-%{release}
+Requires:       python2
+Provides:       python3-openipmi = %{version}-%{release}
 
 %description    python
 A Python interface for OpenIPMI.
@@ -83,11 +86,11 @@ make
 
 %install
 make DESTDIR=%{buildroot} install
-install -d %{buildroot}/etc/init.d
-install -d %{buildroot}/etc/sysconfig
-install ipmi.init %{buildroot}/etc/init.d/ipmi
-install ipmi.sysconf %{buildroot}/etc/sysconfig/ipmi
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+install -d %{buildroot}%{_sysconfdir}/init.d
+install -d %{buildroot}%{_sysconfdir}/sysconfig
+install ipmi.init %{buildroot}%{_sysconfdir}/init.d/ipmi
+install ipmi.sysconf %{buildroot}%{_sysconfdir}/sysconfig/ipmi
+find %{buildroot} -type f -name "*.la" -delete -print
 mkdir -p %{buildroot}/lib/systemd/system
 mkdir -p %{buildroot}/%{_libexecdir}
 cp %{SOURCE1} %{buildroot}/%{_libexecdir}/.
@@ -102,9 +105,11 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 
 %preun
 %systemd_preun ipmi.service
+
 %post
 /sbin/ldconfig
 %systemd_post ipmi.service
+
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart ipmi.service
@@ -117,9 +122,11 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_libdir}/libOpenIPMIpthread.so.*
 %{_libdir}/libOpenIPMI.so.*
 %{_libdir}/libOpenIPMIutils.so.*
-%doc COPYING COPYING.LIB FAQ INSTALL README README.Force
-%doc README.MotorolaMXP CONFIGURING_FOR_LAN COPYING.BSD
-%exclude /etc/init.d/ipmi
+%license COPYING COPYING.LIB
+%doc FAQ INSTALL README README.Force
+%license COPYING.BSD
+%doc README.MotorolaMXP CONFIGURING_FOR_LAN
+%exclude %{_sysconfdir}/init.d/ipmi
 %config(noreplace) %{_sysconfdir}/sysconfig/ipmi
 %{_libexecdir}/*
 /lib/systemd/system/ipmi.service
@@ -177,19 +184,27 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 2.0.25-6
+- Provides python3-openipmi from OpenIPMI-python
+
 * Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.25-4
 -   Rename openipmi to OpenIPMI.
 -   Remove sha1 macro.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.25-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.0.25-2
 -   Added BuildRequires python2-devel
+
 *   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 2.0.25-1
 -   Upgrade to 2.0.25
+
 *   Fri Sep 15 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-2
 -   openipmi-devel requires ncurses-devel
+
 *   Mon Sep 11 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-1
 -   Initial build.  First version
