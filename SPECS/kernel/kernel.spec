@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.13.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -467,6 +467,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
+- Add configs for CONFIG_BNXT bnxt_en and MSR drivers
+
 * Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
 - Add configs for speakup and uinput drivers
 - Add kernel-drivers-accessibility subpackage
