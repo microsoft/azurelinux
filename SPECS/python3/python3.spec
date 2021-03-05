@@ -280,7 +280,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 3.7.7-9
-- Fix python3-devel file section to include 2tp3-3.7 and 2to3
+- Fix python3-devel file section to include 2to3-3.7 and 2to3
 - Provides python3-docs
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.7.7-8

@@ -1,4 +1,3 @@
-%define sha1 %{name}-%{version}=d2be642a54e0f105cb5564471ae4aaaed8b97ca6
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
 Version:        1.1.9
@@ -59,6 +58,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.1.9-1
 - Update to version 1.1.9
+- Remove sha1 macro
 
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.1-3
 - Added %%license line automatically
