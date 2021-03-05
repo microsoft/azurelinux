@@ -2465,8 +2465,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.8.3",
-          "downloadUrl": "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.8.3.tar.bz2"
+          "version": "1.8.7",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
         }
       }
     },

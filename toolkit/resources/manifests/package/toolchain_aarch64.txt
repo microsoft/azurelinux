@@ -174,9 +174,9 @@ libffi-devel-3.2.1-12.cm1.aarch64.rpm
 libgcc-9.1.0-7.cm1.aarch64.rpm
 libgcc-atomic-9.1.0-7.cm1.aarch64.rpm
 libgcc-devel-9.1.0-7.cm1.aarch64.rpm
-libgcrypt-1.8.3-4.cm1.aarch64.rpm
-libgcrypt-debuginfo-1.8.3-4.cm1.aarch64.rpm
-libgcrypt-devel-1.8.3-4.cm1.aarch64.rpm
+libgcrypt-1.8.7-1.cm1.aarch64.rpm
+libgcrypt-debuginfo-1.8.7-1.cm1.aarch64.rpm
+libgcrypt-devel-1.8.7-1.cm1.aarch64.rpm
 libgomp-9.1.0-7.cm1.aarch64.rpm
 libgomp-devel-9.1.0-7.cm1.aarch64.rpm
 libgpg-error-1.32-4.cm1.aarch64.rpm
