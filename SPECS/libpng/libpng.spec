@@ -16,9 +16,7 @@ The libpng package contains libraries used by other programs for reading and wri
 
 %package    devel
 Summary:        Header and development files
-
 Requires:       %{name} = %{version}-%{release}
-
 Provides:       pkgconfig(libpng) = %{version}-%{release}
 Provides:       pkgconfig(libpng16) = %{version}-%{release}
 
