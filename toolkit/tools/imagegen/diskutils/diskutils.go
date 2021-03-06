@@ -424,9 +424,8 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		if exists {
 			partDevPath = testPartDevPath
 			break
-		} else {
-			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
+		logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 	}
 
 	if !exists {
