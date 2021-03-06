@@ -2,8 +2,7 @@ Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
 Release:        4%{?dist}
-# License is a BSD with advertising variant 
-License:        Custom
+License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
@@ -11,6 +10,7 @@ URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-19906.patch
 # CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
+# https://bugzilla.suse.com/show_bug.cgi?id=1180669
 Patch1:         CVE-2020-8032.nopatch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
