@@ -507,6 +507,11 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 		logger.Log.Warn(stderr)
 		return
 	}
+	if len(rawDiskOutput) == 0 {
+		err = fmt.Errorf("no supported disks found")
+		logger.Log.Errorf("%s", err)
+		return
+	}
 
 	bytes := []byte(rawDiskOutput)
 	err = json.Unmarshal(bytes, &blockDevices)
