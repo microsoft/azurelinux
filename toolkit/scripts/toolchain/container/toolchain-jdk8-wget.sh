@@ -5,6 +5,7 @@ set -e
 set -x
 
 function download_with_retry {
+  local result
   local retryCount=10
   local sourceTarball="$1"
   local targetTarball="$2"
@@ -13,11 +14,17 @@ function download_with_retry {
     return
   fi
 
-  for ((i=0; i<retryCount; i++)); do
-    if wget -nv --no-clobber --timeout=30 --continue "$sourceTarball" -O "$targetTarball"; then
+  for ((i=1; i<=retryCount; i++)); do
+    result=0
+    if wget -nv --timeout=30 --continue "$sourceTarball" -O "$targetTarball"; then
       break;
+    else
+      result=$?
+      echo "Download attempt $i/$retryCount failed." 1>&2
     fi
   done
+
+  return $result
 }
 
 if [[ -z "$LFS" ]]; then
