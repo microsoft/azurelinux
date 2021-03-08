@@ -65,6 +65,7 @@ BuildRequires:  %{_cross_name}-glibc-bootstrap2
 BuildRequires:  %{_cross_name}-gcc-bootstrap3
 BuildRequires:  grep
 AutoReqProv:    no
+ExclusiveArch:  x86_64
 Conflicts:      %{_cross_name}-gcc-bootstrap
 Conflicts:      %{_cross_name}-gcc-bootstrap2
 Conflicts:      %{_cross_name}-gcc-bootstrap3

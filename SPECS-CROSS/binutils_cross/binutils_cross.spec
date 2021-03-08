@@ -58,6 +58,7 @@ URL:            http://www.gnu.org/software/binutils
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+ExclusiveArch:  x86_64
 Source0:        http://ftp.gnu.org/gnu/binutils/binutils-%{version}.tar.xz
 
 
