@@ -6,7 +6,13 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/legacy-bootloaders.json"
+            ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/core-legacy/postinstall-cleanup-packages.sh"
+                }
             ],
             "KernelOptions": {
                 "default": "kernel"
@@ -17,7 +23,13 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/legacy-bootloaders.json"
+            ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/core-legacy/postinstall-cleanup-packages.sh"
+                }
             ],
             "KernelOptions": {
                 "default": "kernel"
@@ -27,7 +39,13 @@
             "Name": "CBL-Mariner Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/legacy-bootloaders.json"
+            ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/core-legacy/postinstall-cleanup-packages.sh"
+                }
             ],
             "KernelOptions": {
                 "default": "kernel"

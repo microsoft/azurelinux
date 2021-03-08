@@ -11,6 +11,7 @@ URL:            https://aka.ms/mariner
 %description
 Metapackage holding sets of core packages for different applications.
 
+%package        base-image
 Summary:        Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
 Requires:       %{name}-container = %{version}-%{release}
 Requires:       bc
@@ -35,10 +36,10 @@ Requires:       rpm
 Requires:       tzdata
 Requires:       which
 
-%description base-image
+%description    base-image
 %{summary}
 
-%package container
+%package        container
 Summary:        Metapackage to install the basic set of packages used all image types.
 Requires:       bash
 Requires:       bzip2
@@ -77,7 +78,7 @@ Requires:       wget
 Requires:       xz
 Requires:       zlib
 
-%description container
+%description    container
 %{summary}
 
 %prep
