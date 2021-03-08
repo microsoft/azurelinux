@@ -75,7 +75,7 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 
 %changelog
 * Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-3
-- Require devel subpackage from base package for Fedora compatibility
+- Require devel subpackage from base package for compatibility with other distros
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7-2
 - Added %%license line automatically
