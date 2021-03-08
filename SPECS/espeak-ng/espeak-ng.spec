@@ -1,7 +1,7 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
 Version:        1.50
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
 License:        GPLv3 AND Unicode
@@ -9,7 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/espeak-ng
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tgz
-Patch0:         tests-newline-fixes.patch
+Patch0:         tests-fix-greek-letter-variants.patch
+Patch1:         tests-newline-fixes.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -73,6 +74,10 @@ make check
 %{_libdir}/*.so
 
 %changelog
+* Fri Mar 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-2
+- Add tests-fix-greek-letter-variants.patch to address failing test
+- Adjust tests-newline-fixes.patch to account for new patch
+
 * Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified
