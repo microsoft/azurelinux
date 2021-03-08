@@ -11,72 +11,71 @@ URL:            http://aka.ms/mariner
 %description
 Metapackage holding sets of core packages for different applications.
 
-%package base-image
-Summary:    Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
-Requires:   %{name}-container = %{version}-%{release}
-Requires:   bc
-Requires:   bridge-utils
-Requires:   cpio
-Requires:   cracklib-dicts
-Requires:   cryptsetup
-Requires:   dbus
-Requires:   dnf
-Requires:   file
-Requires:   gdbm
-Requires:   iana-etc
-Requires:   iproute
-Requires:   iptables
-Requires:   iputils
-Requires:   irqbalance
-Requires:   lvm2
-Requires:   openssh-clients
-Requires:   procps-ng
-Requires:   rpm
-Requires:   tzdata
-Requires:   which
-Requires:   chrony
+Summary:        Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
+Requires:       %{name}-container = %{version}-%{release}
+Requires:       bc
+Requires:       bridge-utils
+Requires:       chrony
+Requires:       cpio
+Requires:       cracklib-dicts
+Requires:       cryptsetup
+Requires:       dbus
+Requires:       dnf
+Requires:       file
+Requires:       gdbm
+Requires:       iana-etc
+Requires:       iproute
+Requires:       iptables
+Requires:       iputils
+Requires:       irqbalance
+Requires:       lvm2
+Requires:       openssh-clients
+Requires:       procps-ng
+Requires:       rpm
+Requires:       tzdata
+Requires:       which
 
 %description base-image
 %{summary}
 
 %package container
-Summary:    Metapackage to install the basic set of packages used all image types.
-Requires:   bash
-Requires:   bzip2
-Requires:   ca-certificates-base
-Requires:   curl
-Requires:   e2fsprogs
-Requires:   elfutils-libelf
-Requires:   expat
-Requires:   filesystem
-Requires:   findutils
-Requires:   grep
-Requires:   gzip
-Requires:   libtool
-Requires:   lz4
-Requires:   mariner-release
-Requires:   mariner-repos
-Requires:   mariner-rpm-macros
-Requires:   ncurses-libs
-Requires:   net-tools
-Requires:   nspr
-Requires:   nss-libs
-Requires:   openssl
-Requires:   pkg-config
-Requires:   readline
-Requires:   rpm-libs
-Requires:   sed
-Requires:   sqlite-libs
-Requires:   sudo
-Requires:   systemd
-Requires:   tar
-Requires:   tdnf
-Requires:   tdnf-plugin-repogpgcheck
-Requires:   util-linux
-Requires:   vim
-Requires:   wget
-Requires:   xz
-Requires:   zlib
+Summary:        Metapackage to install the basic set of packages used all image types.
+Requires:       bash
+Requires:       bzip2
+Requires:       ca-certificates-base
+Requires:       curl
+Requires:       e2fsprogs
+Requires:       elfutils-libelf
+Requires:       expat
+Requires:       filesystem
+Requires:       findutils
+Requires:       grep
+Requires:       gzip
+Requires:       libtool
+Requires:       lz4
+Requires:       mariner-release
+Requires:       mariner-repos
+Requires:       mariner-rpm-macros
+Requires:       ncurses-libs
+Requires:       net-tools
+Requires:       nspr
+Requires:       nss-libs
+Requires:       openssl
+Requires:       pkg-config
+Requires:       readline
+Requires:       rpm-libs
+Requires:       sed
+Requires:       sqlite-libs
+Requires:       sudo
+Requires:       systemd
+Requires:       tar
+Requires:       tdnf
+Requires:       tdnf-plugin-repogpgcheck
+Requires:       util-linux
+Requires:       vim
+Requires:       wget
+Requires:       xz
+Requires:       zlib
 
 %description container
 %{summary}
