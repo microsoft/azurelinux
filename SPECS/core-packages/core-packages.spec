@@ -1,7 +1,7 @@
 Name:           core-packages
 Summary:        Metapackage with core sets of packages
 Version:        0.1
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://aka.ms/mariner
@@ -15,11 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:    Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
 
 Requires:   %{name}-container = %{version}-%{release}
-
-%ifarch x86_64
-Requires:   grub2-efi
-Requires:   grub2-pc
-%endif
 
 Requires:   bc
 Requires:   bridge-utils
@@ -98,6 +93,8 @@ Requires:   zlib
 %files container
 
 %changelog
+*   Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.1-22
+-   Remove bootloader packages to reduce disk footprint in core images.
 *   Tue Feb 16 2021 Henry Beberman <henry.beberman@microsoft.com> 0.1-21
 -   Explicitly add lz4 to container subpackage for systemd dependency.
 *   Wed Sep 02 2020 Mateusz Malisz <mamalisz@microsoft.com> 0.1-20

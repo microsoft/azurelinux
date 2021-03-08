@@ -46,7 +46,13 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/fips-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json"
+                "packagelists/cloud-init-packages.json",
+                "packagelists/legacy-bootloaders.json"
+            ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/core-legacy/postinstall-cleanup-packages.sh"
+                }
             ],
             "KernelOptions": {
                 "default": "kernel"

@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "grub2"
+    ],
+    "_comment": "Grub2 (grub2-install) is required to build core legacy images. It will be removed at post install step."
+}
