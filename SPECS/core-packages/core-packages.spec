@@ -6,7 +6,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
-URL:            http://aka.ms/mariner
+URL:            https://aka.ms/mariner
 
 %description
 Metapackage holding sets of core packages for different applications.
