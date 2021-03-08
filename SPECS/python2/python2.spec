@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -31,6 +31,9 @@ Patch10:        CVE-2007-4559.nopatch
 Patch11:        CVE-2019-18348.nopatch
 # CVE-2020-27619 patch backported from 3.6
 Patch12:        CVE-2020-27619.patch
+# CVE-2021-23336 patch backported from 3.6 courtesy of Gentoo
+# https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=f2a53a94f3b6b6395ef4541051a02d80c61442d0
+Patch13:        CVE-2021-23336.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -161,8 +164,6 @@ find %{buildroot}%{_libdir} -name '*.pyo' -delete
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-%clean
-rm -rf %{buildroot}/*
 
 %check
 make test
@@ -247,6 +248,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Mon Mar 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.18-6
+- Add backported patch for CVE-2021-23336
+
 * Tue Nov 03 2020 Thomas Crain <thcrain@microsoft.com> - 2.7.18-5
 - Patch CVE-2020-27619
 
