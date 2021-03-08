@@ -9,7 +9,8 @@ Group:          Applications/Communications
 URL:            https://w1.fi
 Source0:        https://w1.fi/releases/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-16275.patch
-Patch1:         CVE-2021-27803.patch
+Patch1:         CVE-2021-0326.patch
+Patch2:         CVE-2021-27803.patch
 BuildRequires:  libnl3-devel
 BuildRequires:  openssl-devel
 Requires:       libnl3
@@ -98,7 +99,7 @@ EOF
 
 %changelog
 * Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-3
-- Add patch for CVE-2021-27803
+- Add patch for CVE-2021-0326 and CVE-2021-27803
 
 * Mon Nov 16 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9-2
 - Change name of CVE-2019-16275 patch.
