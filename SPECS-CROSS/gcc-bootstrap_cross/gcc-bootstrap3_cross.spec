@@ -72,6 +72,7 @@ BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap2
 AutoReqProv:    no
+ExclusiveArch:  x86_64
 Conflicts:      %{_cross_name}-cross-gcc
 Conflicts:      %{_cross_name}-gcc-bootstrap
 Conflicts:      %{_cross_name}-gcc-bootstrap2
