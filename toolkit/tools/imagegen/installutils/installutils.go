@@ -1495,7 +1495,6 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
-		efiAssetDir        = "/installer/efi/x86_64"
 		grubAssetDir       = "/installer/efi/grub"
 		efiFinalDir        = "EFI/BOOT"
 		grubFinalDir       = "boot/grub2"
