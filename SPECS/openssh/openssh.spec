@@ -133,6 +133,18 @@ if [ $1 -eq 1 ] ; then
 fi
 %systemd_post sshd.service sshd-keygen.service
 
+%post
+sudo touch /etc/systemd/scripts/ipsave-custom
+sudo bash -c 'cat > /etc/systemd/scripts/ipsave-custom << EOF
+iptables -t mangle -N SSHBRUTEFORCE
+iptables -t mangle -A SSHBRUTEFORCE -m limit --limit 60/min -j LOG --log-prefix "Dropped SSH Packets: " --log-level 4
+iptables -t mangle -A SSHBRUTEFORCE -j DROP
+iptables -t mangle -A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
+iptables -t mangle -A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
+EOF'
+sudo bash -c 'echo "iptables-restore < /etc/systemd/scripts/ipsave-custom" >> /etc/systemd/scripts/iptables'
+sudo bash /etc/systemd/scripts/ipsave-custom 
+
 %postun server
 /sbin/ldconfig
 %systemd_postun_with_restart sshd.service sshd-keygen.service
@@ -144,6 +156,14 @@ if [ $1 -eq 0 ] ; then
         groupdel sshd
     fi
 fi
+
+%postun
+sudo iptables -t mangle -D  PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
+sudo iptables -t mangle -D  PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
+sudo iptables -t mangle --flush SSHBRUTEFORCE
+sudo iptables -t mangle -X SSHBRUTEFORCE
+sudo sed '/ipsave-custom/d' /etc/systemd/scripts/iptables
+sudo rm /etc/systemd/scripts/ipsave-custom
 
 %clean
 rm -rf %{buildroot}/*
