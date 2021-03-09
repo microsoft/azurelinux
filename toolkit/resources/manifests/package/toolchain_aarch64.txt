@@ -135,6 +135,14 @@ gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
 golang-1.15.5-1.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
 gperf-debuginfo-3.1-3.cm1.aarch64.rpm
+gpgme-1.13.1-6.cm1.aarch64.rpm
+gpgme-debuginfo-1.13.1-6.cm1.aarch64.rpm
+gpgme-devel-1.13.1-6.cm1.aarch64.rpm
+grep-3.1-4.cm1.aarch64.rpm
+grep-debuginfo-3.1-4.cm1.aarch64.rpm
+grep-lang-3.1-4.cm1.aarch64.rpm
+groff-1.22.3-6.cm1.aarch64.rpm
+groff-debuginfo-1.22.3-6.cm1.aarch64.rpm
 gtest-1.8.1-5.cm1.aarch64.rpm
 gtest-debuginfo-1.8.1-5.cm1.aarch64.rpm
 gtest-devel-1.8.1-5.cm1.aarch64.rpm
@@ -258,6 +266,8 @@ mariner-check-macros-1.0-3.cm1.noarch.rpm
 mariner-release-1.0-13.cm1.noarch.rpm
 mariner-repos-1.0-12.cm1.noarch.rpm
 mariner-repos-preview-1.0-12.cm1.noarch.rpm
+mariner-repos-ui-1.0-12.cm1.noarch.rpm
+mariner-repos-ui-preview-1.0-12.cm1.noarch.rpm
 mariner-rpm-macros-1.0-3.cm1.noarch.rpm
 meson-0.56.0-1.cm1.noarch.rpm
 mpfr-4.0.1-3.cm1.aarch64.rpm
@@ -339,8 +349,8 @@ procps-ng-lang-3.3.15-3.cm1.aarch64.rpm
 python2-2.7.18-6.cm1.aarch64.rpm
 python2-debuginfo-2.7.18-6.cm1.aarch64.rpm
 python2-devel-2.7.18-6.cm1.aarch64.rpm
-python2-libs-2.7.18-6.cm1.aarch64.rpm
 python2-libcap-ng-0.7.9-3.cm1.aarch64.rpm
+python2-libs-2.7.18-6.cm1.aarch64.rpm
 python2-test-2.7.18-6.cm1.aarch64.rpm
 python2-tools-2.7.18-6.cm1.aarch64.rpm
 python3-audit-3.0-5.cm1.aarch64.rpm

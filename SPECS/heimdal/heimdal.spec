@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.7.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +56,7 @@ BuildRequires:  libedit-devel
 BuildRequires:  libtool
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-#BuildRequires:  openldap-devel
+BuildRequires:  openldap-devel
 #Required for tests/ldap
 #BuildRequires:  openldap-servers
 BuildRequires:  pam-devel
@@ -488,6 +488,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Thu Mar 04 2021 Daniel Burgener <Daniel.Burgener@microsoft.com> - 7.7.0-6
+- List required openldap package
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
