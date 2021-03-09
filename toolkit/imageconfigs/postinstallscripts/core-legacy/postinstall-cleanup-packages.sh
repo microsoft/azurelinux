@@ -6,5 +6,6 @@
 # uncomment below two commands
 
 echo "Running post install cleanup packages."
+# tdnf remove grub2-pc -y
 # tdnf remove grub2 -y
 echo "Completed post install cleanup packages."
