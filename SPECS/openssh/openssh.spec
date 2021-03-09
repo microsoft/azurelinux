@@ -170,7 +170,7 @@ sudo iptables -t mangle -D  PREROUTING -p tcp --dport ssh -m conntrack --ctstate
 sudo iptables -t mangle -D  PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
 sudo iptables -t mangle --flush SSHBRUTEFORCE
 sudo iptables -t mangle -X SSHBRUTEFORCE
-#sudo sed '/ipsave-custom/d' /etc/systemd/scripts/iptables
+sudo sed '/ipsave-custom/d' /etc/systemd/scripts/iptables
 sudo rm /etc/systemd/scripts/ipsave-custom
 
 %clean
