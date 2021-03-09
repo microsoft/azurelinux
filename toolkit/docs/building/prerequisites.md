@@ -25,4 +25,4 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 ```
 
-**You will need to log out and lock back in** for user changes to take effect.
+**You will need to log out and log back in** for user changes to take effect.
