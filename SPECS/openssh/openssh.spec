@@ -136,15 +136,21 @@ fi
 %post
 sudo touch /etc/systemd/scripts/ipsave-custom
 sudo bash -c 'cat > /etc/systemd/scripts/ipsave-custom << EOF
-iptables -t mangle -N SSHBRUTEFORCE
-iptables -t mangle -A SSHBRUTEFORCE -m limit --limit 60/min -j LOG --log-prefix "Dropped SSH Packets: " --log-level 4
-iptables -t mangle -A SSHBRUTEFORCE -j DROP
-iptables -t mangle -A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
-iptables -t mangle -A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
+*mangle
+:PREROUTING ACCEPT
+:INPUT ACCEPT
+:FORWARD ACCEPT
+:OUTPUT ACCEPT
+:POSTROUTING ACCEPT
+:SSHBRUTEFORCE - [0:0]
+-A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
+-A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
+-A SSHBRUTEFORCE -m limit --limit 1/sec -j LOG --log-prefix "Dropped SSH Packets: "
+-A SSHBRUTEFORCE -j DROP
+COMMIT
 EOF'
-#sudo sed '/# End/d' /etc/systemd/scripts/iptables
-#sudo bash -c 'echo "iptables-restore < /etc/systemd/scripts/ipsave-custom" >> /etc/systemd/scripts/iptables'
-#sudo bash -c 'echo "# End /etc/systemd/scripts/iptables" >> /etc/systemd/scripts/iptables'
+sudo sed '/# End/d' /etc/systemd/scripts/iptables
+sudo bash -c 'echo "iptables-restore -n < /etc/systemd/scripts/ipsave-custom" >> /etc/systemd/scripts/iptables'#sudo bash -c 'echo "# End /etc/systemd/scripts/iptables" >> /etc/systemd/scripts/iptables'
 sudo bash /etc/systemd/scripts/ipsave-custom 
 
 %postun server
