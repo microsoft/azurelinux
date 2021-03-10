@@ -1,118 +1,34 @@
 %define debug_package %{nil}
 %define __os_install_post %{nil}
+
+# Gnulib does not produce source tarball releases, and grub's bootstrap script
+# bakes in a specific commit id to pull (GNULIB_REVISION). Use this commit id below.
+%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
+
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.02
-Release:        26%{?dist}
+Version:        2.06
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
-Source0:        ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz
-
-Patch0:         release-to-master.patch
-Patch1:         0001-Add-support-for-Linux-EFI-stub-loading.patch
-Patch2:         0002-Rework-linux-command.patch
-Patch3:         0003-Rework-linux16-command.patch
-Patch4:         0004-Add-secureboot-support-on-efi-chainloader.patch
-Patch5:         0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
-Patch6:         0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
-# CVE-2015-8370
-Patch7:         0067-Fix-security-issue-when-reading-username-and-passwor.patch
-Patch8:         0127-Core-TPM-support.patch
-Patch9:         0128-Measure-kernel-initrd.patch
-Patch10:        0131-Measure-the-kernel-commandline.patch
-Patch11:        0132-Measure-commands.patch
-Patch12:        0133-Measure-multiboot-images-and-modules.patch
-Patch13:        0135-Rework-TPM-measurements.patch
-Patch14:        0136-Fix-event-log-prefix.patch
-Patch15:        0139-Make-TPM-errors-less-fatal.patch
-Patch16:        0156-TPM-Fix-hash_log_extend_event-function-prototype.patch
-Patch17:        0157-TPM-Fix-compiler-warnings.patch
-Patch18:        0216-Disable-multiboot-multiboot2-and-linux16-modules-on-.patch
-Patch19:        0224-Rework-how-the-fdt-command-builds.patch
-# These patches are not required but help to apply the BootHole patches and are
-# low risk to take on (mostly just additional security or bug fixes)
-Patch20:        0001-chainloader-Fix-gcc9-error-Waddress-of-packed-member.patch
-Patch21:        0001-efi-Fix-gcc9-error-Waddress-of-packed-member.patch
-Patch22:        0001-hfsplus-Fix-gcc9-error-with-Waddress-of-packed-membe.patch
-Patch23:        0001-btrfs-Move-the-error-logging-from-find_device-to-its.patch
-Patch24:        0001-btrfs-Avoid-a-rescan-for-a-device-which-was-already-.patch
-Patch25:        0001-multiboot2-Set-min-address-for-mbi-allocation-to-0x1.patch
-Patch26:        0001-Add-missing-strtoull_test.c.patch
-Patch27:        0001-misc-Make-grub_strtol-end-pointers-have-safer-const-.patch
-
-# Start of BootHole security patches
-# CVE-2020-10713 - 0001-yylex-Make-lexer-fatal-errors-actually-be-fatal.patch
-Patch28:        CVE-2020-10713.patch
-Patch29:        0002-safemath-Add-some-arithmetic-primitives-that-check-f.patch
-Patch30:        0003-calloc-Make-sure-we-always-have-an-overflow-checking.patch
-# CVE-2020-14308 - 0004-calloc-Use-calloc-at-most-places.patch
-Patch31:        CVE-2020-14308.patch
-# CVE-2020-14309 - 0005-malloc-Use-overflow-checking-primitives-where-we-do-.patch
-# CVE-2020-14310 - 0005-malloc-Use-overflow-checking-primitives-where-we-do-.patch
-# CVE-2020-14311 - 0005-malloc-Use-overflow-checking-primitives-where-we-do-.patch
-Patch32:        CVE-2020-14309.patch
-Patch33:        CVE-2020-14310.nopatch
-Patch34:        CVE-2020-14311.nopatch
-Patch35:        0006-iso9660-Don-t-leak-memory-on-realloc-failures.patch
-Patch36:        0007-font-Do-not-load-more-than-one-NAME-section.patch
-Patch37:        0008-gfxmenu-Fix-double-free-in-load_image.patch
-Patch38:        0009-xnu-Fix-double-free-in-grub_xnu_devprop_add_property.patch
-# Ignore the json double-free patch. Grub added a json library well after 2.02.
-# Revisit this if we want to enable LUKS2 encryption.
-# 0010-json-Avoid-a-double-free-when-parsing-fails.patch
-Patch39:        0011-lzma-Make-sure-we-don-t-dereference-past-array.patch
-Patch40:        0012-term-Fix-overflow-on-user-inputs.patch
-Patch41:        0013-udf-Fix-memory-leak.patch
-# Ignore the multiboot memleak patch. The patch is to fix a memleak that was
-# introduced with Grub's verifiers feature, which landed after 2.02.
-# Revisit this if we want to enable the verifiers feature.
-# 0014-multiboot2-Fix-memory-leak-if-grub_create_loader_cmd.patch
-Patch42:        0015-tftp-Do-not-use-priority-queue.patch
-Patch43:        0016-relocator-Protect-grub_relocator_alloc_chunk_addr-in.patch
-Patch44:        0017-relocator-Protect-grub_relocator_alloc_chunk_align-m.patch
-Patch45:        0018-script-Remove-unused-fields-from-grub_script_functio.patch
-# CVE-2020-15706 - 0019-script-Avoid-a-use-after-free-when-redefining-a-func.patch
-Patch46:        CVE-2020-15706.patch
-Patch47:        0020-relocator-Fix-grub_relocator_alloc_chunk_align-top-m.patch
-Patch48:        0021-hfsplus-Fix-two-more-overflows.patch
-Patch49:        0022-lvm-Fix-two-more-potential-data-dependent-alloc-over.patch
-Patch50:        0023-emu-Make-grub_free-NULL-safe.patch
-Patch51:        0024-efi-Fix-some-malformed-device-path-arithmetic-errors.patch
-Patch52:        0025-efi-chainloader-Propagate-errors-from-copy_file_path.patch
-Patch53:        0026-efi-Fix-use-after-free-in-halt-reboot-path.patch
-Patch54:        0027-loader-linux-Avoid-overflow-on-initrd-size-calculati.patch
-# CVE-2020-15707 - 0028-linux-Fix-integer-overflows-in-initrd-size-handling.patch
-Patch55:        CVE-2020-15707.patch
-# CVE-2020-15705 - 0029-linuxefi-fail-kernel-validation-without-shim-protocol.patch
-# Patch adjusted to CBL-Mariner's git code. See comments inside the patch for more info.
-# Original version: https://bugzilla.suse.com/attachment.cgi?id=839944 (https://bugzilla.suse.com/show_bug.cgi?id=1174421).
-Patch56:        CVE-2020-15705.patch
-
-# End of BootHole security patches
-
-Patch100:       0001-efinet-do-not-start-EFI-networking-at-module-init-ti.patch
+#Source0:        ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz
+Source0:        grub-8fcfd1e0fc72d58766ce3dc09cf883c032f063f6.tar.gz
+Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
+Source2:        sbat.csv.in
 
 BuildRequires:  device-mapper-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
+BuildRequires:  autoconf
 
 Requires:       device-mapper
 Requires:       xz
 
 %description
 The GRUB package contains the GRand Unified Bootloader.
-
-%package lang
-Summary:        Additional language files for grub
-Group:          System Environment/Programming
-
-Requires:       %{name} = %{version}
-
-%description lang
-These are the additional language files of grub.
 
 %ifarch x86_64
 %package pc
@@ -149,69 +65,13 @@ Group:          System Environment/Base
 GRUB UEFI bootloader binaries
 
 %prep
-%setup -q -n grub-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%ifarch aarch64
-%patch100 -p1
-%endif
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-# Nopatch 33 and 34
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
-%patch43 -p1
-%patch44 -p1
-%patch45 -p1
-%patch46 -p1
-%patch47 -p1
-%patch48 -p1
-%patch49 -p1
-%patch50 -p1
-%patch51 -p1
-%patch52 -p1
-%patch53 -p1
-%patch54 -p1
-%patch55 -p1
-%patch56 -p1
+%setup -q -n grub-8fcfd1e0fc72d58766ce3dc09cf883c032f063f6
+cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
+tar -zxf gnulib-%{gnulibversion}.tar.gz
+mv gnulib-%{gnulibversion} gnulib
 
 %build
-./autogen.sh
+./bootstrap --no-git --gnulib-srcdir=./gnulib
 %ifarch x86_64
 mkdir build-for-pc
 pushd build-for-pc
@@ -287,13 +147,17 @@ touch %{buildroot}/boot/%{name}/grub.cfg
 chmod 600 %{buildroot}/boot/%{name}/grub.cfg
 rm -rf %{buildroot}%{_infodir}
 
+# Add SBAT
+sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE2} > ./sbat.csv
+cat ./sbat.csv
+
 # Generate grub efi image
 install -d %{buildroot}%{_datadir}/grub2-efi
 %ifarch x86_64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512
 %endif
 %ifarch aarch64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512
 %endif
 
 # Install to efi directory
@@ -328,6 +192,7 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %config() %{_sysconfdir}/grub.d/10_linux
 %config() %{_sysconfdir}/grub.d/20_linux_xen
 %config() %{_sysconfdir}/grub.d/30_os-prober
+%config() %{_sysconfdir}/grub.d/30_uefi-firmware
 %config(noreplace) %{_sysconfdir}/grub.d/40_custom
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 %{_sysconfdir}/grub.d/README
@@ -362,11 +227,12 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %{_libdir}/grub/*
 %endif
 
-%files lang
-%defattr(-,root,root)
-%{_datarootdir}/locale/*
-
 %changelog
+* Wed Mar 10 2021 Chris Co <chrco@microsoft.com> - 2.06-1
+- Update to 2.06
+- Incorporate SBAT data
+- Remove grub2-lang (locale) subpackage
+
 * Mon Dec 14 2020 Andrew Phelps <anphel@microsoft.com> - 2.02-26
 - Modify check test
 
