@@ -15,12 +15,14 @@ Source3:        sshd-keygen.service
 Patch0:         blfs_systemd_fixes.patch
 Patch1:         CVE-2019-16905.patch
 Patch2:         regress-test-future-cert-fix.patch
+Patch3:         CVE-2021-28041.patch
+
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2020-14145.nopatch
 Patch102:       CVE-2020-15778.nopatch
-Patch103: CVE-2021-28041.patch
+
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -66,6 +68,7 @@ tar xf %{SOURCE1} --no-same-owner
 %patch0
 %patch1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %configure \
