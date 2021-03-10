@@ -16,25 +16,23 @@ Patch0:         blfs_systemd_fixes.patch
 Patch1:         CVE-2019-16905.patch
 Patch2:         regress-test-future-cert-fix.patch
 Patch3:         CVE-2021-28041.patch
-
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2020-14145.nopatch
 Patch102:       CVE-2020-15778.nopatch
-
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+Requires:       openssh-clients = %{version}-%{release}
+Requires:       openssh-server = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
-Requires:       openssh-clients = %{version}-%{release}
-Requires:       openssh-server = %{version}-%{release}
 
 %description
 The OpenSSH package contains ssh clients and the sshd daemon. This is
@@ -152,6 +150,7 @@ fi
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %license LICENCE
 
@@ -197,9 +196,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
-*   Wed Mar 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.0p1-14
--   Added patch files /home/vsts/work/1/cve-
--   patches/CVE-2021-28041/CVE-2021-28041.patch
+* Wed Mar 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.0p1-14
+- Added patch files /home/vsts/work/1/cve-
+- patches/CVE-2021-28041/CVE-2021-28041.patch
+
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
 - Add patch fixing cert-hostkey and cert-userkey regression tests
