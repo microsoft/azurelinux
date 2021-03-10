@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.0p1
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Patch2:         regress-test-future-cert-fix.patch
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2020-14145.nopatch
 Patch102:       CVE-2020-15778.nopatch
+Patch103: CVE-2021-28041.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -193,6 +194,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
 
 %changelog
+*   Wed Mar 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.0p1-14
+-   Added patch files /home/vsts/work/1/cve-
+-   patches/CVE-2021-28041/CVE-2021-28041.patch
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
 - Add patch fixing cert-hostkey and cert-userkey regression tests
