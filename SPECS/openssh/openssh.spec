@@ -197,8 +197,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Mar 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.0p1-14
-- Added patch files /home/vsts/work/1/cve-
-- patches/CVE-2021-28041/CVE-2021-28041.patch
+- Added patch file CVE-2021-28041.patch
 
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
