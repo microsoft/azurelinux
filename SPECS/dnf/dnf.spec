@@ -4,7 +4,7 @@
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
 Version:        4.2.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,7 +86,7 @@ ctest -VV
 
 %files -f %{name}.lang
 %{_bindir}/%{name}
-%{_sysconfdir}/bash_completion.d/dnf
+%{_datadir}/bash-completion/completions/dnf
 %{_unitdir}/%{name}-makecache.service
 %{_unitdir}/%{name}-makecache.timer
 
@@ -138,6 +138,9 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.18-4
+- Use modern bash-completion directory, now that dnf can auto-detect it based on bash-completion.pc
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.2.18-3
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 

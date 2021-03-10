@@ -5,7 +5,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.8.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/libstorage/libstoragemgmt
 Vendor:         Microsoft
@@ -221,9 +221,6 @@ install -m 644 tools/udev/90-scsi-ua.rules \
     %{buildroot}/%{_udevrulesdir}/90-scsi-ua.rules
 install -m 755 tools/udev/scan-scsi-target \
     %{buildroot}/%{_udevrulesdir}/../scan-scsi-target
-
-mkdir -p %{buildroot}/%{_datadir}/bash-completion/completions/
-mv %{buildroot}/etc/bash_completion.d/lsmcli %{buildroot}/%{_datadir}/bash-completion/completions/
 
 %if 0%{with test}
 %check
@@ -539,6 +536,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-7
+- Remove manual placement of bash-completion file, now that this package has bash-completion.pc available to it
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
 
