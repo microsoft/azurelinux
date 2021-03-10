@@ -171,6 +171,7 @@ ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
 find %{buildroot}%{_libdir} -name '*.pyo' -delete
 find %{buildroot}%{_libdir} -name '*.o' -delete
+rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
 # %check
@@ -256,7 +257,6 @@ rm -rf %{buildroot}/*
 %doc Tools/README
 %{_libdir}/python3.7/lib2to3
 %{_bindir}/2to3-3.7
-%{_bindir}/2to3
 %exclude %{_bindir}/idle*
 
 %files pip
