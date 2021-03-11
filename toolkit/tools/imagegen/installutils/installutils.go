@@ -1437,19 +1437,15 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 // as part of a general "root" partition is assumed to have been done already.
 func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string) (err error) {
 	const (
-		squashErrors     = false
-		bootDir          = "/boot"
-		bootDirArg       = "--boot-directory"
-		targetArg        = "--target"
-		legacyTargetArch = "i386-pc"
-		grub2BootDir     = "/boot/grub2"
+		squashErrors = false
+		bootDir      = "/boot"
+		bootDirArg   = "--boot-directory"
+		grub2BootDir = "/boot/grub2"
 	)
 
-	grub2InstallTargetArg := fmt.Sprintf("%s=%s", targetArg, legacyTargetArch)
 	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
 	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
-
-	err = shell.ExecuteLive(squashErrors, "grub2-install", grub2InstallTargetArg, grub2InstallBootDirArg, bootDevPath)
+	err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
 	if err != nil {
 		return
 	}
