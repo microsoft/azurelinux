@@ -1,7 +1,7 @@
-diff --git a/openssl-OpenSSL_1_1_1g/crypto/dh/dh_check.c b/openssl-OpenSSL_1_1_1g/crypto/dh/dh_check.c
+diff --git a/crypto/dh/dh_check.c b/crypto/dh/dh_check.c
 index aeaa44a..fcd5f75 100644
---- a/openssl-OpenSSL_1_1_1g/crypto/dh/dh_check.c
-+++ b/openssl-OpenSSL_1_1_1g/crypto/dh/dh_check.c
+--- a/crypto/dh/dh_check.c
++++ b/crypto/dh/dh_check.c
 @@ -43,6 +43,10 @@ int DH_check_params(const DH *dh, int *ret)
      BN_CTX *ctx = NULL;
  
@@ -13,10 +13,10 @@ index aeaa44a..fcd5f75 100644
          int nid = dh->nid == NID_undef ? DH_get_nid(dh) : dh->nid;
  
          return nid != NID_undef;
-diff --git a/openssl-OpenSSL_1_1_1g/crypto/ec/ec_check.c b/openssl-OpenSSL_1_1_1g/crypto/ec/ec_check.c
-index d0706d2..584ff29 100644
---- a/openssl-OpenSSL_1_1_1g/crypto/ec/ec_check.c
-+++ b/openssl-OpenSSL_1_1_1g/crypto/ec/ec_check.c
+diff --git a/crypto/ec/ec_check.c b/crypto/ec/ec_check.c
+index d0706d2..c33e2f7 100644
+--- a/crypto/ec/ec_check.c
++++ b/crypto/ec/ec_check.c
 @@ -10,8 +10,42 @@
  #include "ec_local.h"
  #include <openssl/err.h>
@@ -28,14 +28,14 @@ index d0706d2..584ff29 100644
 +    BN_CTX *new_ctx = NULL;
 +
 +    if (group == NULL) {
-+        ERR_raise(ERR_LIB_EC, ERR_R_PASSED_NULL_PARAMETER);
++        ECerr(EC_F_EC_GROUP_CHECK, ERR_R_PASSED_NULL_PARAMETER);
 +        return NID_undef;
 +    }
 +
 +    if (ctx == NULL) {
-+        ctx = new_ctx = BN_CTX_new_ex(NULL);
++        ctx = new_ctx = BN_CTX_new();
 +        if (ctx == NULL) {
-+            ERR_raise(ERR_LIB_EC, ERR_R_MALLOC_FAILURE);
++            ECerr(EC_F_EC_GROUP_CHECK, ERR_R_MALLOC_FAILURE);
 +            return NID_undef;
 +        }
 +    }
@@ -66,10 +66,10 @@ index d0706d2..584ff29 100644
      return ret;
 +#endif /* FIPS_MODULE */
  }
-diff --git a/openssl-OpenSSL_1_1_1g/crypto/ec/ec_key.c b/openssl-OpenSSL_1_1_1g/crypto/ec/ec_key.c
+diff --git a/crypto/ec/ec_key.c b/crypto/ec/ec_key.c
 index ac3a10a..f68759a 100644
---- a/openssl-OpenSSL_1_1_1g/crypto/ec/ec_key.c
-+++ b/openssl-OpenSSL_1_1_1g/crypto/ec/ec_key.c
+--- a/crypto/ec/ec_key.c
++++ b/crypto/ec/ec_key.c
 @@ -243,44 +243,65 @@ int ossl_ec_key_gen(EC_KEY *eckey)
      return eckey->group->meth->keygen(eckey);
  }
@@ -303,12 +303,12 @@ index ac3a10a..f68759a 100644
 +int ec_key_private_check(const EC_KEY *eckey)
 +{
 +    if (eckey == NULL || eckey->group == NULL || eckey->priv_key == NULL) {
-+        ERR_raise(ERR_LIB_EC, ERR_R_PASSED_NULL_PARAMETER);
++        ECerr(0, ERR_R_PASSED_NULL_PARAMETER);
 +        return 0;
 +    }
 +    if (BN_cmp(eckey->priv_key, BN_value_one()) < 0
 +        || BN_cmp(eckey->priv_key, eckey->group->order) >= 0) {
-+        ERR_raise(ERR_LIB_EC, EC_R_INVALID_PRIVATE_KEY);
++        ECerr(0, EC_R_INVALID_PRIVATE_KEY);
 +        return 0;
 +    }
 +    return 1;
@@ -328,7 +328,7 @@ index ac3a10a..f68759a 100644
 +       || eckey->group == NULL
 +       || eckey->pub_key == NULL
 +       || eckey->priv_key == NULL) {
-+        ERR_raise(ERR_LIB_EC, ERR_R_PASSED_NULL_PARAMETER);
++        ECerr(0, ERR_R_PASSED_NULL_PARAMETER);
 +        return 0;
 +    }
 +
@@ -338,11 +338,11 @@ index ac3a10a..f68759a 100644
 +
 +
 +    if (!EC_POINT_mul(eckey->group, point, eckey->priv_key, NULL, NULL, ctx)) {
-+        ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
++        ECerr(0, ERR_R_EC_LIB);
 +        goto err;
 +    }
 +    if (EC_POINT_cmp(eckey->group, point, eckey->pub_key, ctx) != 0) {
-+        ERR_raise(ERR_LIB_EC, EC_R_INVALID_PRIVATE_KEY);
++        ECerr(0, EC_R_INVALID_PRIVATE_KEY);
 +        goto err;
 +    }
 +    ret = 1;
@@ -388,10 +388,10 @@ index ac3a10a..f68759a 100644
      return ok;
  }
  
-diff --git a/openssl-OpenSSL_1_1_1g/crypto/ec/ecdh_ossl.c b/openssl-OpenSSL_1_1_1g/crypto/ec/ecdh_ossl.c
+diff --git a/crypto/ec/ecdh_ossl.c b/crypto/ec/ecdh_ossl.c
 index caccde1..c5f8c23 100644
---- a/openssl-OpenSSL_1_1_1g/crypto/ec/ecdh_ossl.c
-+++ b/openssl-OpenSSL_1_1_1g/crypto/ec/ecdh_ossl.c
+--- a/crypto/ec/ecdh_ossl.c
++++ b/crypto/ec/ecdh_ossl.c
 @@ -45,6 +45,10 @@ int ossl_ecdh_compute_key(unsigned char **psec, size_t *pseclen,
   * This implementation is based on the following primitives in the IEEE 1363 standard:
   *  - ECKAS-DH1
@@ -444,10 +444,10 @@ index caccde1..c5f8c23 100644
      EC_POINT_clear_free(tmp);
      BN_CTX_end(ctx);
      BN_CTX_free(ctx);
-diff --git a/openssl-OpenSSL_1_1_1g/include/crypto/ec.h b/openssl-OpenSSL_1_1_1g/include/crypto/ec.h
+diff --git a/include/crypto/ec.h b/include/crypto/ec.h
 index fe52ae7..f225c50 100644
---- a/openssl-OpenSSL_1_1_1g/include/crypto/ec.h
-+++ b/openssl-OpenSSL_1_1_1g/include/crypto/ec.h
+--- a/include/crypto/ec.h
++++ b/include/crypto/ec.h
 @@ -49,5 +49,9 @@ int ecdh_KDF_X9_63(unsigned char *out, size_t outlen,
                     const unsigned char *sinfo, size_t sinfolen,
                     const EVP_MD *md);
@@ -458,10 +458,10 @@ index fe52ae7..f225c50 100644
 +
  # endif /* OPENSSL_NO_EC */
  #endif
-diff --git a/openssl-OpenSSL_1_1_1g/include/openssl/ec.h b/openssl-OpenSSL_1_1_1g/include/openssl/ec.h
+diff --git a/include/openssl/ec.h b/include/openssl/ec.h
 index ca86ec1..f34017e 100644
---- a/openssl-OpenSSL_1_1_1g/include/openssl/ec.h
-+++ b/openssl-OpenSSL_1_1_1g/include/openssl/ec.h
+--- a/include/openssl/ec.h
++++ b/include/openssl/ec.h
 @@ -416,6 +416,8 @@ size_t EC_get_builtin_curves(EC_builtin_curve *r, size_t nitems);
  
  const char *EC_curve_nid2nist(int nid);
@@ -471,3 +471,13 @@ index ca86ec1..f34017e 100644
  
  /********************************************************************/
  /*                    EC_POINT functions                            */
+diff --git a/util/libcrypto.num b/util/libcrypto.num
+index 758e1f0..3fd5d64 100644
+--- a/util/libcrypto.num
++++ b/util/libcrypto.num
+@@ -4631,3 +4631,4 @@ EVP_KDF_vctrl                           6594	1_1_1b	EXIST::FUNCTION:
+ EVP_KDF_ctrl_str                        6595	1_1_1b	EXIST::FUNCTION:
+ EVP_KDF_size                            6596	1_1_1b	EXIST::FUNCTION:
+ EVP_KDF_derive                          6597	1_1_1b	EXIST::FUNCTION:
++EC_GROUP_check_named_curve              1563	1_1_1g	EXIST::FUNCTION:EC
+\ No newline at end of file
