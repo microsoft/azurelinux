@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.13.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -467,6 +467,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Enable kernel lockdown config
+
 * Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
 - Add configs for CONFIG_BNXT bnxt_en and MSR drivers
 

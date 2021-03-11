@@ -3,7 +3,7 @@
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
 Version:        5.10.13.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        kernel-%{version}-%{release}.x86_64.rpm
-Source1:        vmlinuz-%{version}-%{release}
+Source1:        vmlinuz-%{uname_r}
 BuildRequires:  cpio
 Requires:       filesystem
 Requires:       kmod
@@ -47,7 +47,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cp -rp ./boot/* %{buildroot}/boot
 cp -rp ./lib/* %{buildroot}/lib
 cp -rp ./var/* %{buildroot}/%{_localstatedir}
-cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{version}-%{release}
+cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -82,6 +82,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Update release number to match kernel spec
+- Use uname_r macro instead of version-release for kernel version
+
 * Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
 - Update to kernel release 5.10.13.1-3
 
