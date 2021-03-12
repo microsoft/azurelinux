@@ -1,8 +1,8 @@
 %define systemd_units_rel 20191026
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
-Version:        8.0p1
-Release:        13%{?dist}
+Version:        8.5p1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,13 +13,9 @@ Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/bl
 Source2:        sshd.service
 Source3:        sshd-keygen.service
 Patch0:         blfs_systemd_fixes.patch
-Patch1:         CVE-2019-16905.patch
-Patch2:         regress-test-future-cert-fix.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
-Patch101:       CVE-2020-14145.nopatch
-Patch102:       CVE-2020-15778.nopatch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -63,8 +59,6 @@ This provides the ssh server daemons, utilities, configuration and service files
 %setup -q
 tar xf %{SOURCE1} --no-same-owner
 %patch0
-%patch1
-%patch2 -p1
 
 %build
 %configure \
@@ -117,7 +111,7 @@ fi
 cp %{buildroot}%{_bindir}/scp %{_bindir}
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test -s /bin/bash -c "PATH=$PATH make tests"
+sudo -u test -s /bin/bash -c "PATH=$PATH TEST_SSH_UNSAFE_PERMISSIONS=1 make tests"
 
 %pre server
 getent group sshd >/dev/null || groupadd -g 50 sshd
@@ -180,6 +174,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/ssh-copy-id
 %{_libexecdir}/ssh-keysign
 %{_libexecdir}/ssh-pkcs11-helper
+%{_libexecdir}/ssh-sk-helper
 %{_mandir}/man1/scp.1.gz
 %{_mandir}/man1/ssh-agent.1.gz
 %{_mandir}/man1/ssh-keygen.1.gz
@@ -191,8 +186,16 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/sftp.1.gz
 %{_mandir}/man8/ssh-keysign.8.gz
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
+%{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
+- Updating to 8.5p1 to patch CVE-2021-28041.
+- Added "TEST_SSH_UNSAFE_PERMISSIONS=1" to enable running more tests.
+- Removing patch for CVE-2019-16905, since it's already part of this version.
+- Removing nopatch for CVE-2020-14145 and CVE-2020-15778, since the fixes are included in this version.
+- Removing regressions test fixes - already part of this version.
+
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
 - Add patch fixing cert-hostkey and cert-userkey regression tests

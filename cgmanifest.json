@@ -3805,8 +3805,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.0p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.0p1.tar.gz"
+          "version": "8.5p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.5p1.tar.gz"
         }
       }
     },
