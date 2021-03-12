@@ -111,7 +111,7 @@ fi
 cp %{buildroot}%{_bindir}/scp %{_bindir}
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test -s /bin/bash -c "PATH=$PATH make tests"
+sudo -u test -s /bin/bash -c "PATH=$PATH TEST_SSH_UNSAFE_PERMISSIONS=1 make tests"
 
 %pre server
 getent group sshd >/dev/null || groupadd -g 50 sshd
@@ -189,6 +189,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
 - Updating to 8.5p1 to patch CVE-2021-28041.
+- Added "TEST_SSH_UNSAFE_PERMISSIONS=1" to enable running more tests.
 - Removing patch for CVE-2019-16905, since it's already part of this version.
 - Removing nopatch for CVE-2020-14145 and CVE-2020-15778, since the fixes are included in this version.
 - Removing regressions test fixes - already part of this version.
