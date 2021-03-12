@@ -174,6 +174,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/ssh-copy-id
 %{_libexecdir}/ssh-keysign
 %{_libexecdir}/ssh-pkcs11-helper
+%{_libexecdir}/ssh-sk-helper
 %{_mandir}/man1/scp.1.gz
 %{_mandir}/man1/ssh-agent.1.gz
 %{_mandir}/man1/ssh-keygen.1.gz
@@ -185,6 +186,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/sftp.1.gz
 %{_mandir}/man8/ssh-keysign.8.gz
 %{_mandir}/man8/ssh-pkcs11-helper.8.gz
+%{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
 * Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
