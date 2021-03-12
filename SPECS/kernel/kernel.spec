@@ -453,7 +453,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Fri Mar 05 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.13.1-2
-- Update source to 5.10.13.1
+- Add CONFIG_FS_ENCRYPTION=y
+- Add CONFIG_FS_ENCRYPTION_ALGS=y
 
 * Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
 - Update source to 5.10.13.1
