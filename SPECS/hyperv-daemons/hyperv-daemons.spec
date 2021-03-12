@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.10.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -219,8 +219,8 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
-* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
-- Update source to 5.10.13.1
+* Fri Mar 05 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.13.1-2
+- Update to kernel release 5.10.13.1-2, which adds fscrypt support
 
 * Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
 - Update source to 5.4.91
