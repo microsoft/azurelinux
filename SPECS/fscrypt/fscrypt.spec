@@ -1,5 +1,5 @@
-%global debug_package %{nil}
-%define OUR_GOPATH %{_topdir}/.gopath
+%define         debug_package %{nil}
+%define         OUR_GOPATH %{_topdir}/.gopath
 Summary:        High-level tool for Linux filesystem encryption management
 Name:           fscrypt
 Version:        0.2.9
