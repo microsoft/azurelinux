@@ -67,7 +67,7 @@ index d0706d2..c33e2f7 100644
 +#endif /* FIPS_MODULE */
  }
 diff --git a/crypto/ec/ec_key.c b/crypto/ec/ec_key.c
-index ac3a10a..f68759a 100644
+index ac3a10a..db4b564 100644
 --- a/crypto/ec/ec_key.c
 +++ b/crypto/ec/ec_key.c
 @@ -243,44 +243,65 @@ int ossl_ec_key_gen(EC_KEY *eckey)
@@ -144,7 +144,7 @@ index ac3a10a..f68759a 100644
  
      if (FIPS_mode()) {
          eckey->priv_key = NULL;
-@@ -291,15 +312,20 @@ int ec_key_simple_generate_key(EC_KEY *eckey)
+@@ -291,21 +312,31 @@ int ec_key_simple_generate_key(EC_KEY *eckey)
      }
  
      eckey->priv_key = priv_key;
@@ -170,7 +170,18 @@ index ac3a10a..f68759a 100644
      return ok;
  }
  
-@@ -339,45 +365,97 @@ int EC_KEY_check_key(const EC_KEY *eckey)
+ int ec_key_simple_generate_public_key(EC_KEY *eckey)
+ {
+     BIGNUM *priv_key;
++
++    /*
++     * See SP800-56AR3 5.6.1.2.2: Step (8)
++     * pub_key = priv_key * G (where G is a point on the curve)
++     */
+     int ret = EC_POINT_mul(eckey->group, eckey->pub_key, eckey->priv_key, NULL,
+                         NULL, NULL);
+ 
+@@ -339,45 +370,97 @@ int EC_KEY_check_key(const EC_KEY *eckey)
      return eckey->group->meth->keycheck(eckey);
  }
  
@@ -284,7 +295,7 @@ index ac3a10a..f68759a 100644
          goto err;
      }
      /*
-@@ -399,10 +477,102 @@ int ec_key_simple_check_key(const EC_KEY *eckey)
+@@ -399,10 +482,102 @@ int ec_key_simple_check_key(const EC_KEY *eckey)
              goto err;
          }
      }
