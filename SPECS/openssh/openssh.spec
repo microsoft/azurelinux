@@ -13,7 +13,6 @@ Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/bl
 Source2:        sshd.service
 Source3:        sshd-keygen.service
 Patch0:         blfs_systemd_fixes.patch
-Patch1:         regress-test-future-cert-fix.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
@@ -60,7 +59,6 @@ This provides the ssh server daemons, utilities, configuration and service files
 %setup -q
 tar xf %{SOURCE1} --no-same-owner
 %patch0
-%patch1 -p1
 
 %build
 %configure \
@@ -191,8 +189,9 @@ rm -rf %{buildroot}/*
 %changelog
 * Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
 - Updating to 8.5p1 to patch CVE-2021-28041.
-- Removed patch for CVE-2019-16905, since it's already part of this version.
-- Removed nopatch for CVE-2020-14145 and CVE-2020-15778, since the fixes are included in this version.
+- Removing patch for CVE-2019-16905, since it's already part of this version.
+- Removing nopatch for CVE-2020-14145 and CVE-2020-15778, since the fixes are included in this version.
+- Removing regressions test fixes - already part of this version.
 
 * Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
