@@ -146,7 +146,7 @@ func main() {
 
 	// Setup remote source configuration
 	templateSrcConfig.sourceURL = *sourceURL
-	templateSrcConfig.caCerts = x509.NewCertPool()
+	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	if *caCertFile != "" {
 		newCACert, err := ioutil.ReadFile(*caCertFile)
 		if err != nil {
