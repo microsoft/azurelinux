@@ -1,0 +1,288 @@
+From 4fc1be3af3f58621bb751c9e63c208b15c0e8d16 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 31 Mar 2015 16:21:04 +0200
+Subject: [PATCH 1/4] Use ruby_version_dir_name for versioned directories.
+
+This disallows changing the ruby_version constant by --with-ruby-version
+configuration options. The two places version numbers are disallowed as
+well, since there are a lot of places which cannot handle this format
+properly.
+
+ruby_version_dir_name now specifies custom version string for versioned
+directories, e.g. instead of default X.Y.Z, you can specify whatever
+string.
+---
+ configure.ac        | 64 ++++++++++++++++++++++++---------------------
+ template/ruby.pc.in |  1 +
+ 2 files changed, 35 insertions(+), 30 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 80b137e380..63cd3b4f8b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3694,9 +3694,6 @@ AS_CASE(["$target_os"],
+     rubyw_install_name='$(RUBYW_INSTALL_NAME)'
+     ])
+ 
+-rubylibdir='${rubylibprefix}/${ruby_version}'
+-rubyarchdir=${multiarch+'${rubyarchprefix}/${ruby_version}'}${multiarch-'${rubylibdir}/${arch}'}
+-
+ rubyarchprefix=${multiarch+'${archlibdir}/${RUBY_BASE_NAME}'}${multiarch-'${rubylibprefix}/${arch}'}
+ AC_ARG_WITH(rubyarchprefix,
+ 	    AS_HELP_STRING([--with-rubyarchprefix=DIR],
+@@ -3719,56 +3716,62 @@ AC_ARG_WITH(ridir,
+ AC_SUBST(ridir)
+ AC_SUBST(RI_BASE_NAME)
+ 
+-AC_ARG_WITH(ruby-version,
+-	    AS_HELP_STRING([--with-ruby-version=STR], [ruby version string for version specific directories [[full]] (full|minor|STR)]),
+-            [ruby_version=$withval],
+-            [ruby_version=full])
+ unset RUBY_LIB_VERSION
+-unset RUBY_LIB_VERSION_STYLE
+-AS_CASE(["$ruby_version"],
+-  [full],  [RUBY_LIB_VERSION_STYLE='3	/* full */'],
+-  [minor], [RUBY_LIB_VERSION_STYLE='2	/* minor */'])
+-AS_IF([test ${RUBY_LIB_VERSION_STYLE+set}], [
+-    {
+-    echo "#define RUBY_LIB_VERSION_STYLE $RUBY_LIB_VERSION_STYLE"
+-    echo '#define STRINGIZE(x) x'
+-    test -f revision.h -o -f "${srcdir}/revision.h" || echo '#define RUBY_REVISION 0'
+-    echo '#include "version.h"'
+-    echo 'ruby_version=RUBY_LIB_VERSION'
+-    } > conftest.c
+-    ruby_version="`$CPP -I. -I"${srcdir}" -I"${srcdir}/include" conftest.c | sed '/^ruby_version=/!d;s/ //g'`"
+-    eval $ruby_version
+-], [test -z "${ruby_version}"], [
+-    AC_MSG_ERROR([No ruby version, No place for bundled libraries])
+-], [
+-    RUBY_LIB_VERSION="${ruby_version}"
+-])
++RUBY_LIB_VERSION_STYLE='3	/* full */'
++{
++echo "#define RUBY_LIB_VERSION_STYLE $RUBY_LIB_VERSION_STYLE"
++echo '#define STRINGIZE(x) x'
++test -f revision.h -o -f "${srcdir}/revision.h" || echo '#define RUBY_REVISION 0'
++echo '#include "version.h"'
++echo 'ruby_version=RUBY_LIB_VERSION'
++} > conftest.c
++ruby_version="`$CPP -I. -I"${srcdir}" -I"${srcdir}/include" conftest.c | sed '/^ruby_version=/!d;s/ //g'`"
++eval $ruby_version
++
++RUBY_LIB_VERSION="${ruby_version}"
++
+ AC_SUBST(RUBY_LIB_VERSION_STYLE)
+ AC_SUBST(RUBY_LIB_VERSION)
+ 
++AC_ARG_WITH(ruby-version,
++	    AS_HELP_STRING([--with-ruby-version=STR], [ruby version string for version specific directories [[full]] (full|STR)]),
++            [ruby_version_dir_name=$withval],
++            [ruby_version_dir_name=full])
++AS_CASE(["$ruby_version_dir_name"],
++  [full], [ruby_version_dir_name='${ruby_version}'])
++
++ruby_version_dir=/'${ruby_version_dir_name}'
++
++if test -z "${ruby_version_dir_name}"; then
++    AC_MSG_ERROR([No ruby version, No place for bundled libraries])
++fi
++
++rubylibdir='${rubylibprefix}'${ruby_version_dir}
++rubyarchdir=${multiarch+'${rubyarchprefix}'${ruby_version_dir}}${multiarch-'${rubylibdir}/${arch}'}
++
+ AC_ARG_WITH(sitedir,
+ 	    AS_HELP_STRING([--with-sitedir=DIR], [site libraries in DIR [[RUBY_LIB_PREFIX/site_ruby]], "no" to disable site directory]),
+             [sitedir=$withval],
+             [sitedir='${rubylibprefix}/site_ruby'])
+-sitelibdir='${sitedir}/${ruby_version}'
++sitelibdir='${sitedir}'${ruby_version_dir}
+ 
+ AC_ARG_WITH(sitearchdir,
+ 	    AS_HELP_STRING([--with-sitearchdir=DIR],
+ 			   [architecture dependent site libraries in DIR [[SITEDIR/SITEARCH]], "no" to disable site directory]),
+             [sitearchdir=$withval],
+-            [sitearchdir=${multiarch+'${rubysitearchprefix}/site_ruby/${ruby_version}'}${multiarch-'${sitelibdir}/${sitearch}'}])
++            [sitearchdir=${multiarch+'${rubysitearchprefix}/site_ruby'${ruby_version_dir}}${multiarch-'${sitelibdir}/${sitearch}'}])
+ 
+ AC_ARG_WITH(vendordir,
+ 	    AS_HELP_STRING([--with-vendordir=DIR], [vendor libraries in DIR [[RUBY_LIB_PREFIX/vendor_ruby]], "no" to disable vendor directory]),
+             [vendordir=$withval],
+             [vendordir='${rubylibprefix}/vendor_ruby'])
+-vendorlibdir='${vendordir}/${ruby_version}'
++vendorlibdir='${vendordir}'${ruby_version_dir}
+ 
+ AC_ARG_WITH(vendorarchdir,
+ 	    AS_HELP_STRING([--with-vendorarchdir=DIR],
+ 			   [architecture dependent vendor libraries in DIR [[VENDORDIR/SITEARCH]], "no" to disable vendor directory]),
+             [vendorarchdir=$withval],
+-            [vendorarchdir=${multiarch+'${rubysitearchprefix}/vendor_ruby/${ruby_version}'}${multiarch-'${vendorlibdir}/${sitearch}'}])
++            [vendorarchdir=${multiarch+'${rubysitearchprefix}/vendor_ruby'${ruby_version_dir}}${multiarch-'${vendorlibdir}/${sitearch}'}])
+ 
+ AS_IF([test "${LOAD_RELATIVE+set}"], [
+     AC_DEFINE_UNQUOTED(LOAD_RELATIVE, $LOAD_RELATIVE)
+@@ -3785,6 +3788,7 @@ AC_SUBST(sitearchincludedir)dnl
+ AC_SUBST(arch)dnl
+ AC_SUBST(sitearch)dnl
+ AC_SUBST(ruby_version)dnl
++AC_SUBST(ruby_version_dir_name)dnl
+ AC_SUBST(rubylibdir)dnl
+ AC_SUBST(rubyarchdir)dnl
+ AC_SUBST(sitedir)dnl
+diff --git a/template/ruby.pc.in b/template/ruby.pc.in
+index 8a2c066..c81b211 100644
+--- a/template/ruby.pc.in
++++ b/template/ruby.pc.in
+@@ -9,6 +9,7 @@ MAJOR=@MAJOR@
+ MINOR=@MINOR@
+ TEENY=@TEENY@
+ ruby_version=@ruby_version@
++ruby_version_dir_name=@ruby_version_dir_name@
+ RUBY_API_VERSION=@RUBY_API_VERSION@
+ RUBY_PROGRAM_VERSION=@RUBY_PROGRAM_VERSION@
+ RUBY_BASE_NAME=@RUBY_BASE_NAME@
+-- 
+2.1.0
+
+
+From 518850aba6eee76de7715aae8d37330e34b01983 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 31 Mar 2015 16:37:26 +0200
+Subject: [PATCH 2/4] Add ruby_version_dir_name support for RDoc.
+
+---
+ lib/rdoc/ri/paths.rb | 2 +-
+ tool/rbinstall.rb    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/rdoc/ri/paths.rb b/lib/rdoc/ri/paths.rb
+index 970cb91..5bf8230 100644
+--- a/lib/rdoc/ri/paths.rb
++++ b/lib/rdoc/ri/paths.rb
+@@ -10,7 +10,7 @@ module RDoc::RI::Paths
+   #:stopdoc:
+   require 'rbconfig'
+ 
+-  version = RbConfig::CONFIG['ruby_version']
++  version = RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+ 
+   BASE    = if RbConfig::CONFIG.key? 'ridir' then
+               File.join RbConfig::CONFIG['ridir'], version
+diff --git a/tool/rbinstall.rb b/tool/rbinstall.rb
+index d4c110e..d39c9a6 100755
+--- a/tool/rbinstall.rb
++++ b/tool/rbinstall.rb
+@@ -433,7 +433,7 @@ def CONFIG.[](name, mandatory = false)
+ 
+ install?(:doc, :rdoc) do
+   if $rdocdir
+-    ridatadir = File.join(CONFIG['ridir'], CONFIG['ruby_version'], "system")
++    ridatadir = File.join(CONFIG['ridir'], CONFIG['ruby_version_dir_name'] || CONFIG['ruby_version'], "system")
+     prepare "rdoc", ridatadir
+     install_recursive($rdocdir, ridatadir, :no_install => rdoc_noinst, :mode => $data_mode)
+   end
+-- 
+2.23.0
+
+
+From 9f0ec0233f618cbb862629816b22491c3df79578 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 31 Mar 2015 16:37:44 +0200
+Subject: [PATCH 3/4] Add ruby_version_dir_name support for RubyGems.
+
+---
+ lib/rubygems/defaults.rb  | 9 +++++----
+ test/rubygems/test_gem.rb | 5 +++--
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/lib/rubygems/defaults.rb b/lib/rubygems/defaults.rb
+index d4ff4a262c..3f9a5bf590 100644
+--- a/lib/rubygems/defaults.rb
++++ b/lib/rubygems/defaults.rb
+@@ -32,13 +32,13 @@ def self.default_dir
+              [
+                File.dirname(RbConfig::CONFIG['sitedir']),
+                'Gems',
+-               RbConfig::CONFIG['ruby_version']
++               RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+              ]
+            else
+              [
+                RbConfig::CONFIG['rubylibprefix'],
+                'gems',
+-               RbConfig::CONFIG['ruby_version']
++               RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+              ]
+            end
+ 
+@@ -75,7 +75,8 @@ def self.default_specifications_dir
+ 
+   def self.user_dir
+     parts = [Gem.user_home, '.gem', ruby_engine]
+-    parts << RbConfig::CONFIG['ruby_version'] unless RbConfig::CONFIG['ruby_version'].empty?
++    ruby_version_dir_name = RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
++    parts << ruby_version_dir_name unless ruby_version_dir_name.empty?
+     File.join parts
+   end
+ 
+@@ -158,7 +159,7 @@ def self.vendor_dir # :nodoc:
+     return nil unless RbConfig::CONFIG.key? 'vendordir'
+ 
+     File.join RbConfig::CONFIG['vendordir'], 'gems',
+-              RbConfig::CONFIG['ruby_version']
++              RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+   end
+ 
+   ##
+diff --git a/test/rubygems/test_gem.rb b/test/rubygems/test_gem.rb
+index b25068405d..e9fef4a311 100644
+--- a/test/rubygems/test_gem.rb
++++ b/test/rubygems/test_gem.rb
+@@ -1378,7 +1378,8 @@ def test_self_use_paths
+ 
+   def test_self_user_dir
+     parts = [@userhome, '.gem', Gem.ruby_engine]
+-    parts << RbConfig::CONFIG['ruby_version'] unless RbConfig::CONFIG['ruby_version'].empty?
++    ruby_version_dir_name = RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
++    parts << ruby_version_dir_name unless ruby_version_dir_name.empty?
+ 
+     assert_equal File.join(parts), Gem.user_dir
+   end
+@@ -1454,7 +1455,7 @@ def test_self_vendor_dir
+     vendordir(File.join(@tempdir, 'vendor')) do
+       expected =
+         File.join RbConfig::CONFIG['vendordir'], 'gems',
+-                  RbConfig::CONFIG['ruby_version']
++                  RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+ 
+       assert_equal expected, Gem.vendor_dir
+     end
+-- 
+2.1.0
+
+
+From 88c38a030c22dbf9422ece847bdfbf87d6659313 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Wed, 1 Apr 2015 14:55:37 +0200
+Subject: [PATCH 4/4] Let headers directories follow the configured version
+ name.
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a00f2b6776..999e2d6d5d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -98,7 +98,7 @@ RUBY_BASE_NAME=`echo ruby | sed "$program_transform_name"`
+ RUBYW_BASE_NAME=`echo rubyw | sed "$program_transform_name"`
+ AC_SUBST(RUBY_BASE_NAME)
+ AC_SUBST(RUBYW_BASE_NAME)
+-AC_SUBST(RUBY_VERSION_NAME, '${RUBY_BASE_NAME}-${ruby_version}')
++AC_SUBST(RUBY_VERSION_NAME, '${RUBY_BASE_NAME}-${ruby_version_dir_name}')
+ 
+ AC_CANONICAL_TARGET
+ test x"$target_alias" = x &&
+-- 
+2.1.0
+
