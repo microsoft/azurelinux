@@ -6,7 +6,6 @@
 %global psych_version      3.1.0
 %global irb_version        1.2.6
 %global gem_dir %{_libdir}/ruby/gems
-
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.2
@@ -26,16 +25,16 @@ Source6:        rubygems.req
 Source7:        macros.rubygems
 # Fix ruby_version abuse.
 # https://bugs.ruby-lang.org/issues/11002
-Patch0: ruby-2.3.0-ruby_version.patch
+Patch0:         ruby-2.3.0-ruby_version.patch
 # http://bugs.ruby-lang.org/issues/7807
-Patch1: ruby-2.1.0-Prevent-duplicated-paths-when-empty-version-string-i.patch
+Patch1:         ruby-2.1.0-Prevent-duplicated-paths-when-empty-version-string-i.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 Requires:       gmp
 Requires:       openssl
-Provides:       /usr/local/bin/ruby
+Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
@@ -148,6 +147,7 @@ sudo -u test  make check TESTS="-v"
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-,root,root)
