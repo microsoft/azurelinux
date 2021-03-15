@@ -1,14 +1,14 @@
-Summary:	Connects C/C++/Objective C to some high-level programming languages
-Name:		swig
-Version:	4.0.2
-Release:    1%{?dist}
-License:	GPLv3+
-URL:		http://swig.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
+Summary:        Connects C/C++/Objective C to some high-level programming languages
+Name:           swig
+Version:        4.0.2
+Release:        1%{?dist}
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:	pcre-devel
-Requires:	pcre
+URL:            http://swig.sourceforge.net/
+Source0:        http://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
+BuildRequires:  pcre-devel
+Requires:       pcre
 
 %description
 Simplified Wrapper and Interface Generator (SWIG) is a software
@@ -60,15 +60,21 @@ make %{?_smp_mflags} check
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.0.12-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *       Tue May 02 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.0.12-2
 -       Correct the license.
+
 *       Wed Apr 12 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.0.12-1
 -       Update to version 3.0.12
+
 *       Tue Oct 04 2016 ChangLee <changlee@vmware.com> 3.0.8-3
 -       Modified %check
+
 *	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0.8-2
 -	GA - Bump release of all rpms
+
 * 	Tue Feb 23 2016 Anish Swaminathan <anishs@vmware.com>  3.0.8-1
 - 	Upgrade to 3.0.8
+
 * 	Thu Feb 26 2015 Divya Thaluru <dthaluru@vmware.com> 3.0.5-1
 - 	Initial version
