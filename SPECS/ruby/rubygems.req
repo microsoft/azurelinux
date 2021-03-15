@@ -1,0 +1,88 @@
+#!/usr/bin/ruby
+
+require 'rubygems/package'
+
+module RubyGemsReq
+  module Helpers
+    # Expands '~>' and '!=' gem requirements.
+    def self.expand_requirement(requirements)
+      requirements.inject([]) do |output, r|
+        output.concat case r.first
+        when '~>'
+          expand_pessimistic_requirement(r)
+        when '!='
+          # If there is only the conflict requirement, we still need to depend
+          # on the specified gem.
+          if requirements.size == 1
+            Gem::Requirement.default.requirements
+          else
+            []
+          end
+        else
+          [r]
+        end
+      end.reject {|r| r.empty? }
+    end
+
+    # Expands the pessimistic version operator '~>' into equivalent '>=' and
+    # '<' pair.
+    def self.expand_pessimistic_requirement(requirement)
+      next_version = Gem::Version.create(requirement.last).bump
+      return ['>=', requirement.last], ['<', next_version]
+    end
+
+    # Converts Gem::Requirement into array of requirements strings compatible
+    # with RPM .spec file.
+    def self.requirement_versions_to_rpm(requirement)
+      self.expand_requirement(requirement.requirements).map do |op, version|
+        version == Gem::Version.new(0) ? "" : " #{op} #{version}"
+      end
+    end
+
+    # Compose dependency together with its requirements in RPM rich dependency
+    # string.
+    def self.compose_dependency_string(name, requirements)
+      dependency_strings = requirements.map { |requirement| name + requirement }
+      dependency_string = dependency_strings.join(' with ')
+      dependency_string.prepend('(').concat(')') if dependency_strings.length > 1
+      dependency_string
+    end
+  end
+
+  # Report RubyGems dependency, versioned if required.
+  def self.rubygems_dependency(specification)
+    dependency_name = "ruby(rubygems)"
+    requirements = Helpers::requirement_versions_to_rpm(specification.required_rubygems_version)
+
+    puts Helpers::compose_dependency_string(dependency_name, requirements)
+  end
+
+  # Report all gem dependencies including their version.
+  def self.gem_depenencies(specification)
+    specification.runtime_dependencies.each do |dependency|
+      dependency_name = "rubygem(#{dependency.name})"
+      requirements = Helpers::requirement_versions_to_rpm(dependency.requirement)
+
+      puts Helpers::compose_dependency_string(dependency_name, requirements)
+    end
+  end
+
+  # Reports all requirements specified by all provided .gemspec files.
+  def self.requires
+    while filename = gets
+      filename.strip!
+      begin
+        specification = Gem::Specification.load filename
+
+        rubygems_dependency(specification)
+        gem_depenencies(specification)
+      rescue => e
+        # Ignore all errors.
+      end
+    end
+  end
+end
+
+if __FILE__ == $0
+  RubyGemsReq::requires
+end

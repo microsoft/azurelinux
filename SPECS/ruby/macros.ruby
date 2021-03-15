@@ -1,4 +1,4 @@
-%ruby_libdir %{_datadir}/%{name}
+%ruby_libdir %{_libdir}/%{name}
 %ruby_libarchdir %{_libdir}/%{name}
 
 # This is the local lib/arch and should not be used for packaging.

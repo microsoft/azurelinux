@@ -1,0 +1,6 @@
+%__rubygems_requires	%{_rpmconfigdir}/rubygems.req
+%__rubygems_provides	%{_rpmconfigdir}/rubygems.prov
+%__rubygems_conflicts	%{_rpmconfigdir}/rubygems.con
+# In non-gem packages, the %%{gem_name} macro is not available and the macro
+# stays unexpanded which leads to "invalid regex" error (rhbz#1154067).
+%__rubygems_path	^%{?gem_name:%{gem_spec}}%{!?gem_name:this_should_never_match_anything}$
