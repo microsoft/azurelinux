@@ -59,7 +59,7 @@ func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
 		requiredPackageNames = append(requiredPackageNames, "grub2-pc")
 	}
 
-	var packageList []*pkgjson.PackageVer
+	packageList := []*pkgjson.PackageVer{}
 
 	for _, requiredPackage := range requiredPackageNames {
 		packageList = append(packageList, &pkgjson.PackageVer{Name: requiredPackage})
