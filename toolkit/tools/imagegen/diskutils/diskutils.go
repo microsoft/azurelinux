@@ -208,7 +208,7 @@ func ZeroDisk(diskPath string, blockSize, size uint64) (err error) {
 
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
 func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
-	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", diskFilePath)
+	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
 	if err != nil {
 		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
 		return
