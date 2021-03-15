@@ -2,7 +2,7 @@ Summary:        Connects C/C++/Objective C to some high-level programming langua
 Name:           swig
 Version:        4.0.2
 Release:        1%{?dist}
-License:        GPLv3+
+License:        GPLv3+ and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://swig.sourceforge.net/
@@ -45,14 +45,15 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 make %{?_smp_mflags} check
 
 %files
-%license LICENSE
+%license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES
 %{_bindir}/*
 %{_datadir}/swig
 %{_libdir}/ccache
 
 %changelog
 * Mon Mar 15 2021 Henry Li <lihl@microsoft.com> - 4.0.2-1
-- Upgrade to version 4.0.2
+- Upgrade to version 4.0.2. License Verified.
+- Correct licensing.
 - Remove sha1 define
 
 * Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.0.12-4
