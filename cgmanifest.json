@@ -635,8 +635,8 @@
         "type": "other",
         "other": {
           "name": "cloud-utils-growpart",
-          "version": "0.30",
-          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.3/+download/cloud-utils-0.30.tar.gz"
+          "version": "0.32",
+          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.32/+download/cloud-utils-0.32.tar.gz"
         }
       }
     },
