@@ -2,11 +2,11 @@ Summary:        Connects C/C++/Objective C to some high-level programming langua
 Name:           swig
 Version:        4.0.2
 Release:        1%{?dist}
-License:        GPLv3+ and BSD
+License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://swig.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
+URL:            https://swig.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
 BuildRequires:  pcre-devel
 Requires:       pcre
 

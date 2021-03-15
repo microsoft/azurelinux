@@ -5787,7 +5787,7 @@
         "other": {
           "name": "swig",
           "version": "4.0.2",
-          "downloadUrl": "http://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz"
         }
       }
     },
