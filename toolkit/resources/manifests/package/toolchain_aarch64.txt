@@ -562,8 +562,8 @@ sqlite-3.32.3-2.cm1.aarch64.rpm
 sqlite-debuginfo-3.32.3-2.cm1.aarch64.rpm
 sqlite-devel-3.32.3-2.cm1.aarch64.rpm
 sqlite-libs-3.32.3-2.cm1.aarch64.rpm
-swig-3.0.12-4.cm1.aarch64.rpm
-swig-debuginfo-3.0.12-4.cm1.aarch64.rpm
+swig-4.0.2-1.cm1.aarch64.rpm
+swig-debuginfo-4.0.2-1.cm1.aarch64.rpm
 systemd-239-37.cm1.aarch64.rpm
 systemd-bootstrap-239-31.cm1.aarch64.rpm
 systemd-bootstrap-debuginfo-239-31.cm1.aarch64.rpm
