@@ -1,0 +1,109 @@
+From c992857618db99776917f10bf4f2345a5fdc78b0 Mon Sep 17 00:00:00 2001
+From: Yossi Gottlieb <yossigo@gmail.com>
+Date: Mon, 22 Feb 2021 15:41:32 +0200
+Subject: [PATCH] Fix integer overflow (CVE-2021-21309). (#8522)
+
+On 32-bit systems, setting the proto-max-bulk-len config parameter to a high value may result with integer overflow and a subsequent heap overflow when parsing an input bulk (CVE-2021-21309).
+
+This fix has two parts:
+
+Set a reasonable limit to the config parameter.
+Add additional checks to prevent the problem in other potential but unknown code paths.
+
+(cherry picked from commit d32f2e9999ce003bad0bd2c3bca29f64dcce4433)
+---
+ src/config.c  |  2 +-
+ src/sds.c     |  3 +++
+ src/zmalloc.c | 10 ++++++++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/src/config.c b/src/config.c
+index e04e63ed804..15ab7e8a43d 100644
+--- a/src/config.c
++++ b/src/config.c
+@@ -2374,7 +2374,7 @@ standardConfig configs[] = {
+     createLongLongConfig("cluster-node-timeout", NULL, MODIFIABLE_CONFIG, 0, LLONG_MAX, server.cluster_node_timeout, 15000, INTEGER_CONFIG, NULL, NULL),
+     createLongLongConfig("slowlog-log-slower-than", NULL, MODIFIABLE_CONFIG, -1, LLONG_MAX, server.slowlog_log_slower_than, 10000, INTEGER_CONFIG, NULL, NULL),
+     createLongLongConfig("latency-monitor-threshold", NULL, MODIFIABLE_CONFIG, 0, LLONG_MAX, server.latency_monitor_threshold, 0, INTEGER_CONFIG, NULL, NULL),
+-    createLongLongConfig("proto-max-bulk-len", NULL, MODIFIABLE_CONFIG, 1024*1024, LLONG_MAX, server.proto_max_bulk_len, 512ll*1024*1024, MEMORY_CONFIG, NULL, NULL), /* Bulk request max size */
++    createLongLongConfig("proto-max-bulk-len", NULL, MODIFIABLE_CONFIG, 1024*1024, LONG_MAX, server.proto_max_bulk_len, 512ll*1024*1024, MEMORY_CONFIG, NULL, NULL), /* Bulk request max size */
+     createLongLongConfig("stream-node-max-entries", NULL, MODIFIABLE_CONFIG, 0, LLONG_MAX, server.stream_node_max_entries, 100, INTEGER_CONFIG, NULL, NULL),
+     createLongLongConfig("repl-backlog-size", NULL, MODIFIABLE_CONFIG, 1, LLONG_MAX, server.repl_backlog_size, 1024*1024, MEMORY_CONFIG, NULL, updateReplBacklogSize), /* Default: 1mb */
+ 
+diff --git a/src/sds.c b/src/sds.c
+index dc664ca9bc4..4dbb41d2b70 100644
+--- a/src/sds.c
++++ b/src/sds.c
+@@ -96,6 +96,7 @@ sds sdsnewlen(const void *init, size_t initlen) {
+     int hdrlen = sdsHdrSize(type);
+     unsigned char *fp; /* flags pointer. */
+ 
++    assert(initlen + hdrlen + 1 > initlen); /* Catch size_t overflow */
+     sh = s_malloc(hdrlen+initlen+1);
+     if (sh == NULL) return NULL;
+     if (init==SDS_NOINIT)
+@@ -214,6 +215,7 @@ sds sdsMakeRoomFor(sds s, size_t addlen) {
+     len = sdslen(s);
+     sh = (char*)s-sdsHdrSize(oldtype);
+     newlen = (len+addlen);
++    assert(newlen > len);   /* Catch size_t overflow */
+     if (newlen < SDS_MAX_PREALLOC)
+         newlen *= 2;
+     else
+@@ -227,6 +229,7 @@ sds sdsMakeRoomFor(sds s, size_t addlen) {
+     if (type == SDS_TYPE_5) type = SDS_TYPE_8;
+ 
+     hdrlen = sdsHdrSize(type);
++    assert(hdrlen + newlen + 1 > len);  /* Catch size_t overflow */
+     if (oldtype==type) {
+         newsh = s_realloc(sh, hdrlen+newlen+1);
+         if (newsh == NULL) return NULL;
+diff --git a/src/zmalloc.c b/src/zmalloc.c
+index d693aac1cc1..0dd7918beca 100644
+--- a/src/zmalloc.c
++++ b/src/zmalloc.c
+@@ -56,6 +56,12 @@ void zlibc_free(void *ptr) {
+ #endif
+ #endif
+ 
++#if PREFIX_SIZE > 0
++#define ASSERT_NO_SIZE_OVERFLOW(sz) assert((sz) + PREFIX_SIZE > (sz))
++#else
++#define ASSERT_NO_SIZE_OVERFLOW(sz)
++#endif
++
+ /* Explicitly override malloc/free etc when using tcmalloc. */
+ #if defined(USE_TCMALLOC)
+ #define malloc(size) tc_malloc(size)
+@@ -96,6 +102,7 @@ static void zmalloc_default_oom(size_t size) {
+ static void (*zmalloc_oom_handler)(size_t) = zmalloc_default_oom;
+ 
+ void *zmalloc(size_t size) {
++    ASSERT_NO_SIZE_OVERFLOW(size);
+     void *ptr = malloc(size+PREFIX_SIZE);
+ 
+     if (!ptr) zmalloc_oom_handler(size);
+@@ -114,6 +121,7 @@ void *zmalloc(size_t size) {
+  * Currently implemented only for jemalloc. Used for online defragmentation. */
+ #ifdef HAVE_DEFRAG
+ void *zmalloc_no_tcache(size_t size) {
++    ASSERT_NO_SIZE_OVERFLOW(size);
+     void *ptr = mallocx(size+PREFIX_SIZE, MALLOCX_TCACHE_NONE);
+     if (!ptr) zmalloc_oom_handler(size);
+     update_zmalloc_stat_alloc(zmalloc_size(ptr));
+@@ -128,6 +136,7 @@ void zfree_no_tcache(void *ptr) {
+ #endif
+ 
+ void *zcalloc(size_t size) {
++    ASSERT_NO_SIZE_OVERFLOW(size);
+     void *ptr = calloc(1, size+PREFIX_SIZE);
+ 
+     if (!ptr) zmalloc_oom_handler(size);
+@@ -142,6 +151,7 @@ void *zcalloc(size_t size) {
+ }
+ 
+ void *zrealloc(void *ptr, size_t size) {
++    ASSERT_NO_SIZE_OVERFLOW(size);
+ #ifndef HAVE_MALLOC_SIZE
+     void *realptr;
+ #endif

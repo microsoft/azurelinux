@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        5.0.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://redis.io/
 Group:          Applications/Databases
@@ -11,6 +11,7 @@ Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         CVE-2020-14147.patch
 Patch2:         disable_active_defrag_big_keys.patch
+Patch3: CVE-2021-21309.patch
 BuildRequires:  gcc
 BuildRequires:  systemd
 BuildRequires:  make
@@ -84,6 +85,8 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+*   Tue Mar 16 2021 Mariner Autopatcher <cblmargh@microsoft.com> 5.0.5-6
+-   Added patch file(s) CVE-2021-21309.patch
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 5.0.5-5
 - Add patch to remove an unreliable test. License verified.
 * Fri Oct 23 2020 Henry Li <lihl@microsoft.com> 5.0.5-4
