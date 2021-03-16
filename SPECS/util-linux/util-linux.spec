@@ -53,7 +53,7 @@ These are library files of util-linux.
 
 %prep
 %setup -q
-sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
+sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
 
 %build
 autoreconf -fi
@@ -112,7 +112,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %files devel
 %defattr(-,root,root)
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
-%doc libblkid/COPYING
+%license libblkid/COPYING
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
 /lib/libblkid.so.*

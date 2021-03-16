@@ -11,6 +11,7 @@ Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{vers
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
+BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
@@ -18,7 +19,6 @@ BuildRequires:  python-xml
 BuildRequires:  python2 >= 2.7
 BuildRequires:  python2-libs >= 2.7
 BuildRequires:  which
-BuildRequires:  gtk-doc
 Requires:       libffi
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
@@ -61,10 +61,10 @@ Gsettings schemas compiling tool
 %package doc
 Summary:        A library of handy utility functions
 Requires:       %{name} = %{version}-%{release}
+Provides:       glib2-doc = %{version}-%{release}
 BuildArch:      noarch
-Provides:       glib2-doc = %{version}-%{release}      
 
-%description doc	
+%description doc
 The glib2-doc package includes documentation for the GLib library.
 
 %prep
@@ -119,7 +119,7 @@ make DESTDIR=%{buildroot} install
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
+* Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
 - Add gtk-doc as build requirement
 - Add --enable-gtk-doc during configuration
 - Add glib-doc subpackage and provides glib2-doc from glib-doc
