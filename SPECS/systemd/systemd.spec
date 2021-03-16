@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        35%{?dist}
+Release:        36%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -270,6 +270,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-36
+- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+
 * Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-35
 - Enable LZ4 so journalctl can read logs from the container host.
 
