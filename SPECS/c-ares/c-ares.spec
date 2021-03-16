@@ -1,14 +1,13 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.14.0
-Release:        4%{?dist}
+Version:        1.17.1
+Release:        1%{?dist}
 License:        MIT
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://c-ares.haxx.se/
-Source0:        http://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
-Patch0:         CVE-2020-8277.patch
+URL:            https://c-ares.haxx.se/
+Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -70,7 +69,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/ares_*
 
 %changelog
-*   Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.14.0-4
+*   Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.17.1-1
+-   Removed %%sha line. Upgraded to 1.17.1 to address CVE-2020-8277.
+-   License confirmed as MIT. Changed URLs to use HTTPS.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.0-2
