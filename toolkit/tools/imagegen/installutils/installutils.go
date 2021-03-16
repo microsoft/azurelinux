@@ -51,19 +51,14 @@ type PackageList struct {
 // GetRequiredPackagesForInstall returns the list of packages required for
 // the tooling to install an image
 func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
-	requiredPackageNames := []string{}
+	packageList := []*pkgjson.PackageVer{}
 
 	// grub2-pc package is needed for the install tools to build/install the legacy grub bootloader
 	// Note: only required on x86_64 installs
 	if runtime.GOARCH == "amd64" {
-		requiredPackageNames = append(requiredPackageNames, "grub2-pc")
+		packageList = append(packageList, &pkgjson.PackageVer{Name: "grub2-pc"})
 	}
 
-	packageList := []*pkgjson.PackageVer{}
-
-	for _, requiredPackage := range requiredPackageNames {
-		packageList = append(packageList, &pkgjson.PackageVer{Name: requiredPackage})
-	}
 	return packageList
 }
 

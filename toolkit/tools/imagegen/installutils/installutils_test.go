@@ -11,7 +11,7 @@ import (
 	"microsoft.com/pkggen/internal/pkgjson"
 )
 
-func TestShouldSucceedRequiredPackages(t *testing.T) {
+func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {
 	arm64RequiredPackages := []*pkgjson.PackageVer{}
 	amd64RequiredPackages := []*pkgjson.PackageVer{{Name: "grub2-pc"}}
 
