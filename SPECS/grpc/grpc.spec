@@ -1,4 +1,4 @@
-Summary:        Open source remote procedure call (RPC) framework 
+Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
 Release:        1%{?dist}
@@ -6,10 +6,9 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
+URL:            https://www.grpc.io
 #Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-URL:            https://www.grpc.io
-
 # A buildable grpc environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
 #  git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
@@ -18,7 +17,6 @@ URL:            https://www.grpc.io
 #  popd
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
-
 BuildRequires:  git
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -64,6 +62,10 @@ find %{buildroot} -name '*.cmake' -delete
 %{_mandir}/man3/*.3*
 %{_datadir}/grpc/roots.pem
 %exclude %{_datadir}/pkgconfig/zlib.pc
+%exclude %{_bindir}/acountry
+%exclude %{_bindir}/ahost
+%exclude %{_bindir}/adig
+%exclude %{_bindir}/protoc*
 
 %files devel
 %{_includedir}/*
@@ -75,11 +77,7 @@ find %{buildroot} -name '*.cmake' -delete
 %files plugins
 %license LICENSE
 %{_bindir}/grpc_*_plugin
-%exclude %{_bindir}/acountry
-%exclude %{_bindir}/ahost
-%exclude %{_bindir}/adig
-%exclude %{_bindir}/protoc*
 
 %changelog
 * Mon Mar 08 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-1
-- Original version for CBL-Mariner. License Verified
+- Original CBL-Mariner version. License Verified.

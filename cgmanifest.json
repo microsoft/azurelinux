@@ -1580,7 +1580,8 @@
         }
       }
     },
-    {"component": {
+    {
+      "component": {
         "type": "other",
         "other": {
           "name": "grpc",
