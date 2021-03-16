@@ -75,12 +75,8 @@ mv gnulib-%{gnulibversion} gnulib
 mkdir build-for-pc
 pushd build-for-pc
 # Modify the default CFLAGS to support the i386 build
-CFLAGS="`echo " %{build_cflags} "          | \
-        sed 's/-fcf-protection//'          | \
-        sed 's/-fstack-protector-strong//' | \
-        sed 's/-m64//'                     | \
-        sed 's/-specs.*cc1//'              | \
-        sed 's/-mtune=generic//'`"
+# TODO: Identify which CFLAGS are causing HyperV Gen1 build to fail to boot
+CFLAGS=""
 export CFLAGS
 
 ../configure \
