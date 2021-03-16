@@ -3,7 +3,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.1.0388
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Vim
 URL:            https://www.vim.org
 Group:          Applications/Editors
@@ -17,6 +17,8 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         CVE-2019-12735.patch
 
 BuildRequires:  ncurses-devel
+Provides:       vi = %{release}-%{version}
+Provides:       %{name}-minimal = %{version}-%{release}
 
 %description
 The Vim package contains a powerful text editor.
@@ -189,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Mon Mar 15 2021 Henry Li <lihl@microsoft.com> 8.1.0388-8
+- Provides vi and vim-minimal from vim.
+
 *   Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 8.1.0388-7
 -   Fix CVE-2019-12735.
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.1.0388-6

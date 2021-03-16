@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ BuildRequires:  python-xml
 BuildRequires:  python2 >= 2.7
 BuildRequires:  python2-libs >= 2.7
 BuildRequires:  which
+BuildRequires:  gtk-doc
 Requires:       libffi
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
@@ -57,6 +58,15 @@ Provides:       glib2-schemas = %{version}-%{release}
 %description schemas
 Gsettings schemas compiling tool
 
+%package doc
+Summary:        A library of handy utility functions
+Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
+Provides:       glib2-doc = %{version}-%{release}      
+
+%description doc	
+The glib2-doc package includes documentation for the GLib library.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -65,7 +75,8 @@ Gsettings schemas compiling tool
 %build
 ./autogen.sh
 %configure --with-pcre=system \
-            --enable-static
+            --enable-static \
+            --enable-gtk-doc
 make %{?_smp_mflags}
 
 %install
@@ -104,7 +115,15 @@ make DESTDIR=%{buildroot} install
 %{_bindir}/gsettings
 %{_datadir}/glib-2.0/schemas/*
 
+%files doc
+%doc %{_datadir}/gtk-doc/html/*
+
 %changelog
+* Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
+- Add gtk-doc as build requirement
+- Add --enable-gtk-doc during configuration
+- Add glib-doc subpackage and provides glib2-doc from glib-doc
+
 * Tue Feb 23 2021 Henry Li <lihl@microsoft.com> - 2.58.0-11
 - Fix file section for glib-devel.
 
