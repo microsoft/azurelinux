@@ -2,8 +2,8 @@
 %define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
-Version:        5.10.13.1
-Release:        4%{?dist}
+Version:        5.10.21.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+
 * Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
 - Update release number to match kernel spec
 - Use uname_r macro instead of version-release for kernel version

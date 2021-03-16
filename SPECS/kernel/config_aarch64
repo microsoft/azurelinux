@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.13.1-rolling-lts-mariner Kernel Configuration
+# Linux/arm64 5.10.21.1-rolling-lts-mariner Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 9.1.0"
 CONFIG_CC_IS_GCC=y
@@ -221,6 +221,7 @@ CONFIG_BPF_JIT_DEFAULT_ON=y
 # CONFIG_BPF_PRELOAD is not set
 CONFIG_USERFAULTFD=y
 CONFIG_ARCH_HAS_MEMBARRIER_SYNC_CORE=y
+CONFIG_KCMP=y
 CONFIG_RSEQ=y
 # CONFIG_DEBUG_RSEQ is not set
 # CONFIG_EMBEDDED is not set
@@ -8157,7 +8158,6 @@ CONFIG_COMMON_RESET_HI6220=y
 CONFIG_GENERIC_PHY=y
 CONFIG_GENERIC_PHY_MIPI_DPHY=y
 # CONFIG_PHY_XGENE is not set
-# CONFIG_USB_LGM_PHY is not set
 # CONFIG_PHY_SUN4I_USB is not set
 CONFIG_PHY_SUN6I_MIPI_DPHY=m
 # CONFIG_PHY_SUN9I_USB is not set
