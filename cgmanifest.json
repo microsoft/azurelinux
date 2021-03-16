@@ -1580,6 +1580,15 @@
         }
       }
     },
+    {"component": {
+        "type": "other",
+        "other": {
+          "name": "grpc",
+          "version": "1.35.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.35.0/grpc-1.35.0.tar.gz"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",
