@@ -1,14 +1,14 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.14.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://c-ares.haxx.se/
 Source0:        http://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
-%define sha1    c-ares=5b4989208c936d6445d4d73487634fe0b07e8ea7
+Patch0:         CVE-2020-8277.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -29,7 +29,7 @@ This package contains the header files and libraries needed to
 compile applications or shared objects that use c-ares.
 
 %prep
-%setup -q
+%autosetup
 f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 
 %build
@@ -70,9 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/ares_*
 
 %changelog
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
-- Added %%license line automatically
-
+*   Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.14.0-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.0-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Sujay G <gsujay@vmware.com> 1.14.0-1
