@@ -13,7 +13,10 @@ Vendor:         Microsoft
 Distribution:   Mariner
 Source0:        https://github.com/rhboot/shim/archive/shim-15.3-rc2.tar.gz
 Source1:        https://github.com/rhboot/gnu-efi/archive/%{gnuefiversion}.tar.gz
+Source2:        sbat.csv.in
 Source100:      cbl-mariner-ca.der
+
+BuildRequires:  dos2unix
 ExclusiveArch:  x86_64
 
 %description
@@ -34,10 +37,13 @@ ls gnu-efi
 rmdir gnu-efi
 mv gnu-efi-%{gnuefiversion} gnu-efi
 ls gnu-efi
+# shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
+sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE2} > ./data/sbat.mariner.csv
+cat ./data/sbat.mariner.csv
 
 %build
 cp %{SOURCE100} cert.der
-make shimx64.efi VENDOR_CERT_FILE=cert.der EFI_PATH=/usr/lib/gnuefi
+make shimx64.efi VENDOR_CERT_FILE=cert.der
 
 %install
 install -vdm 755 %{buildroot}/usr/share/%{name}
