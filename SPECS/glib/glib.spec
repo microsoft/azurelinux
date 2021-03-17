@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{vers
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
+BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
@@ -57,6 +58,15 @@ Provides:       glib2-schemas = %{version}-%{release}
 %description schemas
 Gsettings schemas compiling tool
 
+%package doc
+Summary:        A library of handy utility functions
+Requires:       %{name} = %{version}-%{release}
+Provides:       glib2-doc = %{version}-%{release}
+BuildArch:      noarch
+
+%description doc
+The glib2-doc package includes documentation for the GLib library.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -65,7 +75,8 @@ Gsettings schemas compiling tool
 %build
 ./autogen.sh
 %configure --with-pcre=system \
-            --enable-static
+            --enable-static \
+            --enable-gtk-doc
 make %{?_smp_mflags}
 
 %install
@@ -104,7 +115,15 @@ make DESTDIR=%{buildroot} install
 %{_bindir}/gsettings
 %{_datadir}/glib-2.0/schemas/*
 
+%files doc
+%doc %{_datadir}/gtk-doc/html/*
+
 %changelog
+* Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
+- Add gtk-doc as build requirement
+- Add --enable-gtk-doc during configuration
+- Add glib-doc subpackage and provides glib2-doc from glib-doc
+
 * Tue Feb 23 2021 Henry Li <lihl@microsoft.com> - 2.58.0-11
 - Fix file section for glib-devel.
 

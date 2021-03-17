@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.36.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ BuildRequires:  ncurses-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 Provides:       hardlink = 1:1.3-9
+Provides:       %{name}-ng = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  ncurses-term
 %endif
@@ -33,9 +34,12 @@ Summary:        Header and library files for util-linux
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Provides:       libmount-devel = %{version}-%{release}
+Provides:       libblkid = %{version}-%{release}
 Provides:       libblkid-devel = %{version}-%{release}
 Provides:       libuuid-devel = %{version}-%{release}
 Provides:       libuuid-devel%{?_isa} = %{version}-%{release}
+Provides:       libsmartcols = %{version}-%{release}
+Provides:       libsmartcols-devel = %{version}-%{release}
 
 %description devel
 These are the header and library files of util-linux.
@@ -49,7 +53,7 @@ These are library files of util-linux.
 
 %prep
 %setup -q
-sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
+sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
 
 %build
 autoreconf -fi
@@ -107,12 +111,21 @@ rm -rf %{buildroot}/lib/systemd/system
 
 %files devel
 %defattr(-,root,root)
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
+%license libblkid/COPYING
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
+/lib/libblkid.so.*
+/lib/libsmartcols.so.*
 %{_includedir}/*
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 15 2021 Henry Li <lihl@microsoft.com> - 2.36.1-3
+- Provide util-linux-ng
+- Add files to util-linux-devel
+- Provides libblkid, libsmartcols and libsmartcols-devel from util-linux-devel
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.36.1-2
 - Provide libuuid-devel%%{?_isa}
 
