@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.21.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -471,6 +471,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+- Disable QAT kernel configs
+
 * Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
 - Update source to 5.10.21.1
 - Add virtio drivers to be installed into initrd
