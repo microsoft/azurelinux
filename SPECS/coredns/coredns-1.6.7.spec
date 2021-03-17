@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/coredns/coredns
-#Source0:       https://github.com/coredns/coredns/archive/v1.6.7.tar.gz
+#Source0:       https://github.com/coredns/coredns/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # use go modules from tarball because they cannot be downloaded at build time
 # (build system prevents that)
