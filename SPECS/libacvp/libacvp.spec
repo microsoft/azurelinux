@@ -9,6 +9,7 @@ Group:          Development/Libraries
 URL:            https://github.com/cisco/libacvp
 # Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         fipssyms.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -28,13 +29,13 @@ This app provides the glue between the OpenSSL module under test
 and the library itself.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 ./configure \
     --prefix=%{_prefix} \
     --enable-offline \
-    CFLAGS="-pthread" \
+    CFLAGS="-pthread -DACVP_NO_RUNTIME" \
     LIBS="-ldl"
 make clean
 make CC=gcc
