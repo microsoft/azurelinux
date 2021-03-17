@@ -149,8 +149,10 @@ func main() {
 	}
 
 	// Setup remote source configuration
+	var err error
 	templateSrcConfig.sourceURL = *sourceURL
-	templateSrcConfig.caCerts = x509.NewCertPool()
+	templateSrcConfig.caCerts, err = x509.SystemCertPool()
+	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
 	if *caCertFile != "" {
 		newCACert, err := ioutil.ReadFile(*caCertFile)
 		if err != nil {
