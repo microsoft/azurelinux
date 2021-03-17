@@ -11,12 +11,13 @@ URL:            https://github.com/rhboot/shim
 License:        BSD
 Vendor:         Microsoft
 Distribution:   Mariner
-Source0:        https://github.com/rhboot/shim/archive/shim-15.3-rc2.tar.gz
+Source0:        https://github.com/rhboot/shim/archive/shim-%{version}-rc2.tar.gz
 Source1:        https://github.com/rhboot/gnu-efi/archive/%{gnuefiversion}.tar.gz
 Source2:        sbat.csv.in
 Source100:      cbl-mariner-ca.der
 
 BuildRequires:  dos2unix
+BuildRequires:  vim-extra
 ExclusiveArch:  x86_64
 
 %description
@@ -27,16 +28,12 @@ shim will extend various PCRs with the digests of the targets it is
 loading.
 
 %prep
-%autosetup -n shim-shim-15.3-rc2 -p1
+%autosetup -n shim-shim-%{version}-rc2 -p1
 # Manually set up gnu-efi submodule
 cp %{SOURCE1} gnu-efi-%{gnuefiversion}.tar.gz
 tar -zxf gnu-efi-%{gnuefiversion}.tar.gz
-pwd
-ls
-ls gnu-efi
 rmdir gnu-efi
 mv gnu-efi-%{gnuefiversion} gnu-efi
-ls gnu-efi
 # shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
 sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE2} > ./data/sbat.mariner.csv
 cat ./data/sbat.mariner.csv
@@ -48,6 +45,9 @@ make shimx64.efi VENDOR_CERT_FILE=cert.der
 %install
 install -vdm 755 %{buildroot}/usr/share/%{name}
 install -vm 644 shimx64.efi %{buildroot}/usr/share/%{name}/shimx64.efi
+
+%check
+make VENDOR_CERT_FILE=cert.der test
 
 %files
 %defattr(-,root,root)
