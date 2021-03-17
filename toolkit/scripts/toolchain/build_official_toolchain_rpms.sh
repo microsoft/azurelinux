@@ -405,11 +405,20 @@ build_rpm_in_chroot_no_install gtest
 
 build_rpm_in_chroot_no_install libsolv
 
-# glib needs perl-XML-Parser, python-xml
+# glib needs perl-XML-Parser, python-xml, gtk-doc
 chroot_and_install_rpms perl-XML-Parser
 
 # python-xml is built by building python2
 chroot_and_install_rpms python-xml
+
+build_rpm_in_chroot_no_install itstool
+
+# gtk-doc needs itstool
+chroot_and_install_rpms itstool
+build_rpm_in_chroot_no_install gtk-doc
+
+# p11-kit, libtasn1 and glib need gtk-doc
+chroot_and_install_rpms gtk-doc
 
 build_rpm_in_chroot_no_install glib
 build_rpm_in_chroot_no_install libassuan
@@ -448,15 +457,6 @@ build_rpm_in_chroot_no_install createrepo_c
 chroot_and_install_rpms docbook-dtd-xml
 chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
-build_rpm_in_chroot_no_install itstool
-
-# gtk-doc needs itstool
-chroot_and_install_rpms itstool
-build_rpm_in_chroot_no_install gtk-doc
-
-# p11-kit and libtasn1 needs gtk-doc
-chroot_and_install_rpms gtk-doc
-build_rpm_in_chroot_no_install libtasn1
 
 # ninja-build requires gtest
 chroot_and_install_rpms gtest
@@ -507,6 +507,7 @@ build_rpm_in_chroot_no_install cryptsetup
 chroot_and_install_rpms intltool
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
+build_rpm_in_chroot_no_install libtasn1
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1
