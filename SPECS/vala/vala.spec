@@ -3,7 +3,7 @@
 Summary:        Compiler for the Vala programming language
 Name:           vala
 Version:        0.34.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://wiki.gnome.org/Projects/Vala
 Group:          Development/Languages
 License:        LGPL
@@ -55,6 +55,23 @@ make DESTDIR=%{buildroot} install
 %doc AUTHORS COPYING THANKS
 %{_datadir}/vala-%{majver}/*
 %{_libdir}/libvala-*.so.*
+%{_bindir}/vala
+%{_bindir}/vala-%{majver}
+%{_bindir}/vala-gen-introspect
+%{_bindir}/vala-gen-introspect-%{majver}
+%{_bindir}/valac
+%{_bindir}/valac-%{majver}
+%{_bindir}/vapigen*
+%{_libdir}/pkgconfig/libvala-*.pc
+%{_libdir}/pkgconfig/vapigen-%{majver}.pc
+%{_libdir}/pkgconfig/vapigen.pc
+%{_libdir}/vala-*
+%{_mandir}/man1/vala-gen-introspect*
+%{_mandir}/man1/valac*
+%{_mandir}/man1/vapigen*
+%{_datadir}/aclocal/vala.m4
+%{_datadir}/aclocal/vapigen.m4
+%{_datadir}/vala/
 
 %files devel
 %defattr(-,root,root)
@@ -86,6 +103,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man1/vapigen*
 
 %changelog
+*   Tue Mar 16 2021 Henry Li <lihl@microsoft.com> 0.34.6-3
+-   Add necessary files to vala package
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.34.6-2
 -   Added %%license line automatically
 
