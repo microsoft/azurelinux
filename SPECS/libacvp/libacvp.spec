@@ -1,6 +1,6 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
-Version:        1.2.0
+Version:        1.3.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -57,5 +57,8 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
+- Update to version 1.3.0
+
 * Mon Feb 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
 - Original version for CBL-Mariner. License verified.
