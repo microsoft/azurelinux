@@ -1,27 +1,28 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.4.72
+Version:        5.10.13.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
 make headers_check
 
 %install
-cd %{_builddir}/WSL2-Linux-Kernel-linux-msft-%{version}
+cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 make headers
 find usr/include -name '.*' -delete
 rm usr/include/Makefile
@@ -34,6 +35,39 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+
+* Tue Feb 16 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
+- Update to kernel release 5.4.91-5
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Update to kernel release 5.4.91-4
+
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
+- Update to kernel release 5.4.91-3
+
+* Thu Jan 28 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.91-2
+- Update release number to match kernel spec
+
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+
+* Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
+- Update release number to match kernel spec
+
+* Sat Jan 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.4.83-3
+- Update to kernel release 5.4.83-3
+
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Update to kernel release 5.4.83-2
+
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
+- Update source to 5.4.83
+
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+
 * Mon Oct 26 2020 Chris Co <chrco@microsoft.com> - 5.4.72-1
 - Update source to 5.4.72
 - Add license file

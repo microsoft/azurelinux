@@ -1,27 +1,26 @@
---- a/azurelinuxagent/common/osutil/factory.py	2019-02-12 18:32:02.014403649 +0530
-+++ b/azurelinuxagent/common/osutil/factory.py	2019-02-12 18:33:10.586401816 +0530
-@@ -21,6 +21,7 @@ from azurelinuxagent.common.version impo
- from .default import DefaultOSUtil
+--- a/azurelinuxagent/common/osutil/factory.py	2020-09-29 11:31:13.000000000 -0700
++++ b/azurelinuxagent/common/osutil/factory.py	2020-12-08 14:54:58.878191794 -0800
+@@ -24,6 +24,7 @@
  from .arch import ArchUtil
+ from .bigip import BigIpOSUtil
  from .clearlinux import ClearLinuxUtil
 +from .mariner import MarinerOSUtil
  from .coreos import CoreOSUtil
- from .debian import DebianOSUtil
- from .freebsd import FreeBSDOSUtil
-@@ -49,6 +50,10 @@ def get_osutil(distro_name=DISTRO_NAME,
+ from .debian import DebianOSBaseUtil, DebianOSModernUtil
+ from .default import DefaultOSUtil
+@@ -57,6 +58,9 @@
+ 
      if "Clear Linux" in distro_full_name:
          return ClearLinuxUtil()
- 
++    
 +    if distro_name == "mariner":
 +        return MarinerOSUtil()
-+
-+
+ 
      if distro_name == "ubuntu":
          if Version(distro_version) in [Version("12.04"), Version("12.10")]:
-             return Ubuntu12OSUtil()
---- a/azurelinuxagent/common/osutil/mariner.py	2019-02-12 18:42:54.290386210 +0530
-+++ b/azurelinuxagent/common/osutil/mariner.py	2019-02-12 18:34:43.254399338 +0530
-@@ -0,0 +1,88 @@
+--- a/azurelinuxagent/common/osutil/mariner.py	2020-12-08 22:14:27.843117432 -0800
++++ b/azurelinuxagent/common/osutil/mariner.py	2020-12-08 22:52:05.926318033 -0800
+@@ -0,0 +1,89 @@
 +#
 +# Copyright 2017 Microsoft Corporation
 +#
@@ -37,7 +36,7 @@
 +# See the License for the specific language governing permissions and
 +# limitations under the License.
 +#
-+# Requires Python 2.4+ and Openssl 1.0+
++# Requires Python 2.4 and Openssl 1.0
 +#
 +
 +import os
@@ -61,6 +60,7 @@
 +    def __init__(self):
 +        super(MarinerOSUtil, self).__init__()
 +        self.agent_conf_file_path = '/etc/waagent.conf'
++        self.jit_enabled = True
 +
 +    def is_dhcp_enabled(self):
 +        return True
@@ -110,19 +110,21 @@
 +        except IOError as e:
 +            raise OSUtilError("Failed to delete root password:{0}".format(e))
 +        pass
---- a/azurelinuxagent/common/version.py	2019-02-12 18:34:57.642398953 +0530
-+++ b/azurelinuxagent/common/version.py	2019-02-12 18:35:33.638397991 +0530
-@@ -100,6 +100,8 @@ def get_distro():
+\ No newline at end of file
+--- a/azurelinuxagent/common/version.py	2020-09-29 11:31:13.000000000 -0700
++++ b/azurelinuxagent/common/version.py	2020-12-08 14:58:51.840248635 -0800
+@@ -100,6 +100,9 @@
  
      if os.path.exists("/etc/euleros-release"):
          osinfo[0] = "euleros"
++    
 +    if os.path.exists("/etc/mariner-release"):
 +        osinfo[0] = "mariner"
  
      # The platform.py lib has issue with detecting BIG-IP linux distribution.
      # Merge the following patch provided by F5.
---- a/config/mariner/waagent.conf	2019-02-12 18:42:31.402386821 +0530
-+++ b/config/mariner/waagent.conf	2019-02-12 18:39:32.082391616 +0530
+--- a/config/mariner/waagent.conf	2020-12-08 22:15:55.038466254 -0800
++++ b/config/mariner/waagent.conf	2020-12-08 15:06:48.272503589 -0800
 @@ -0,0 +1,80 @@
 +# Microsoft Azure Linux Agent Configuration
 +#
@@ -204,8 +206,8 @@
 +# handling until inVMArtifactsProfile.OnHold is false.
 +# Default is disabled
 +# EnableOverProvisioning=n
---- a/init/mariner/waagent.service	2019-02-12 18:42:08.370387437 +0530
-+++ b/init/mariner/waagent.service	2019-02-12 18:40:31.090390038 +0530
+--- a/init/mariner/waagent.service	2020-12-08 22:16:40.614123434 -0800
++++ b/init/mariner/waagent.service	2020-12-08 15:06:44.940529116 -0800
 @@ -0,0 +1,16 @@
 +[Unit]
 +Description=Azure Linux Agent
@@ -223,9 +225,9 @@
 +
 +[Install]
 +WantedBy=multi-user.target
---- a/setup.py	2019-02-12 18:40:46.066389638 +0530
-+++ b/setup.py	2019-02-12 18:41:47.910387984 +0530
-@@ -113,6 +113,12 @@ def get_data_files(name, version, fullna
+--- a/setup.py	2020-09-29 11:31:13.000000000 -0700
++++ b/setup.py	2020-12-08 15:04:44.289458366 -0800
+@@ -116,6 +116,12 @@
                         src=["config/clearlinux/waagent.conf"])
          set_systemd_files(data_files, dest='/usr/lib/systemd/system',
                            src=["init/clearlinux/waagent.service"])

@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.8.31p1
-Release:        4%{?dist}
+Version:        1.9.5p2
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -30,7 +30,7 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-all-insults \
     --with-env-editor \
     --with-pam \
-    --with-passprompt="[sudo] password for %p"
+    --with-passprompt="[sudo] password for %p: "
 
 make %{?_smp_mflags}
 
@@ -40,9 +40,8 @@ make install DESTDIR=%{buildroot}
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 find %{buildroot}/%{_libdir} -name '*.so~' -delete
-sed -i '/#includedir.*/i \
-%wheel ALL=(ALL) ALL \
-%sudo   ALL=(ALL) ALL' %{buildroot}/etc/sudoers
+# Add default user to sudoers group BEFORE the @includedir
+sed -i -E '/## Read drop-in files.+/i %wheel ALL=(ALL) ALL\n%sudo  ALL=(ALL) ALL' %{buildroot}/etc/sudoers
 install -vdm755 %{buildroot}/etc/pam.d
 cat > %{buildroot}/etc/pam.d/sudo << EOF
 #%%PAM-1.0
@@ -77,23 +76,32 @@ rm -rf %{buildroot}/*
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers
 %attr(0750,root,root) %dir %{_sysconfdir}/sudoers.d/
 %config(noreplace) %{_sysconfdir}/pam.d/sudo
+%config(noreplace) %{_sysconfdir}/sudo_logsrvd.conf
+%config(noreplace) %{_sysconfdir}/sudo.conf
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/sudo/*.so
 %{_libdir}/sudo/*.so.*
 %{_sbindir}/*
+%{_datarootdir}/locale/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_docdir}/%{name}-%{version}/*
-%{_datarootdir}/locale/*
 %attr(0644,root,root) %{_libdir}/tmpfiles.d/sudo.conf
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.31p1-4
-- Added %%license line automatically
-
+*   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
+-   Move sudo/wheel groups before @includedir to not override user's settings.
+*   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1
+-   Update to version 1.9.5.p2 to fix CVE-2021-3156.
+-   Change the password prompt to include ": " at the end.
+-   Unconditionally add wheel/sudo groups.
+*   Fri Jan 15 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p1-1
+-   Update to version 1.9.5.p1 to fix CVE-2021-23240.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.31p1-4
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-3
 -   Renaming Linux-PAM to pam
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-2

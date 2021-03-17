@@ -33,7 +33,7 @@ optimized_file    = $(PKGBUILD_DIR)/scrubbed_graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 workplan          = $(PKGBUILD_DIR)/workplan.mk
 
-logging_command = --log-file $(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level $(LOG_LEVEL)
+logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(LOGS_DIR)/pkggen/rpmbuilding)
 
@@ -173,6 +173,9 @@ $(RPMS_DIR):
 endif
 
 $(STATUS_FLAGS_DIR)/build-rpms.flag: $(workplan) $(chroot_worker) $(go-pkgworker)
+ifeq ($(RUN_CHECK),y)
+	$(warning Make argument 'RUN_CHECK' set to 'y', running package tests. Will add the 'ca-certificates' package and enable networking for package builds.)
+endif
 	rm -f $(LOGS_DIR)/pkggen/failures.txt && \
 	$(MAKE) --silent -f $(workplan) go-pkgworker=$(go-pkgworker) CHROOT_DIR=$(CHROOT_DIR) chroot_worker=$(chroot_worker) SRPMS_DIR=$(SRPMS_DIR) RPMS_DIR=$(RPMS_DIR) pkggen_local_repo=$(pkggen_local_repo) LOGS_DIR=$(LOGS_DIR) TOOLCHAIN_MANIFESTS_DIR=$(TOOLCHAIN_MANIFESTS_DIR) GOAL_PackagesToBuild && \
 	{ [ ! -f $(LOGS_DIR)/pkggen/failures.txt ] || \

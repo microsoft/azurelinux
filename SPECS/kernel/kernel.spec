@@ -1,21 +1,20 @@
 %global security_hardening none
-%define uname_r %{version}-%{release}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.72
-Release:        5%{?dist}
+Version:        5.10.13.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-# Arm64 HyperV support required patch
-Patch0:         ver5_4_72_arm64_hyperv_support.patch
-Patch1:         0001-Drivers-hv-vmbus-Allow-cleanup-of-VMBUS_CONNECT_CPU-.patch
-Patch2:         0002-efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
+Source3:        sha512hmac-openssl.sh
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -100,7 +99,38 @@ Patch1073:      CVE-1999-0656.nopatch
 Patch1074:      CVE-2010-4563.nopatch
 Patch1075:      CVE-2019-20794.nopatch
 Patch1076:      CVE-1999-0524.nopatch
+Patch1077:      CVE-2020-25705.nopatch
+Patch1078:      CVE-2020-15436.nopatch
+Patch1079:      CVE-2020-28974.nopatch
+Patch1080:      CVE-2020-29368.nopatch
+Patch1081:      CVE-2020-29369.nopatch
+Patch1082:      CVE-2020-29370.nopatch
+Patch1083:      CVE-2020-29374.nopatch
+Patch1084:      CVE-2020-29373.nopatch
+Patch1085:      CVE-2020-28915.nopatch
+Patch1086:      CVE-2020-28941.nopatch
+Patch1087:      CVE-2020-27675.nopatch
+Patch1088:      CVE-2020-15437.nopatch
+Patch1089:      CVE-2020-29371.nopatch
+# CVE-2020-29372 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1090:      CVE-2020-29372.nopatch
+# CVE-2020-27194 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1091:      CVE-2020-27194.nopatch
+# CVE-2020-27152 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1092:      CVE-2020-27152.nopatch
+Patch1093:      CVE-2020-14351.nopatch
+Patch1094:      CVE-2020-14381.nopatch
+Patch1095:      CVE-2020-25656.nopatch
+Patch1096:      CVE-2020-25704.nopatch
+Patch1097:      CVE-2020-29534.nopatch
+Patch1098:      CVE-2020-29660.nopatch
+Patch1099:      CVE-2020-29661.nopatch
+Patch1100:      CVE-2020-27777.nopatch
+Patch1101:      CVE-2020-29569.nopatch
+Patch1102:      CVE-2020-28374.nopatch
+Patch1103:      CVE-2020-36158.nopatch
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
@@ -108,9 +138,11 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -179,15 +211,15 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
+%package dtb
+Summary:        This package contains common device tree blobs (dtb)
+Group:          System Environment/Kernel
+
+%description dtb
+This package contains common device tree blobs (dtb)
+
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
-
-%ifarch aarch64
-%patch0 -p1
-%endif
-
-%patch1 -p1
-%patch2 -p1
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
@@ -269,6 +301,7 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
+install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -286,6 +319,10 @@ mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
+
+# hmac sign the kernel for FIPS
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
@@ -312,7 +349,7 @@ ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{una
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %ifarch aarch64
-cp arch/arm64/kernel/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/arch/arm64/kernel/
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
 # disable (JOBS=1) parallel build to fix this issue:
@@ -359,10 +396,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+/boot/.vmlinuz-%{uname_r}.hmac
 %config(noreplace) /boot/linux-%{uname_r}.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
+/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
@@ -407,7 +446,60 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
 
+%ifarch aarch64
+%files dtb
+/boot/dtb/fsl-imx8mq-evk.dtb
+%endif
+
 %changelog
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+- Remove patch to publish efi tpm event log on ARM. Present in updated source.
+- Remove patch for arm64 hyperv support. Present in updated source.
+- Account for new module.lds location on aarch64
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+- Add CONFIG_SCSI_SMARTPQI=y
+
+* Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
+- Add configs to enable tcrypt in FIPS mode
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Use OpenSSL to perform HMAC calc
+
+* Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
+- Add configs for userspace crypto support
+- HMAC calc the kernel for FIPS
+
+* Wed Jan 27 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.91-2
+- Enable dm-verity boot support with FEC
+
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+- Address CVE-2020-29569, CVE-2020-28374, CVE-2020-36158
+- Remove patch to fix GUI installer crash. Fixed in updated source.
+
+* Tue Jan 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.4.83-4
+- Add imx8mq support
+
+* Sat Jan 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.4.83-3
+- Add patch to fix GUI installer crash
+
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Address CVE-2020-27777
+
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
+- Update source to 5.4.83
+- Address CVE-2020-14351, CVE-2020-14381, CVE-2020-25656, CVE-2020-25704,
+  CVE-2020-29534, CVE-2020-29660, CVE-2020-29661
+
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+- Remove patch for kexec in HyperV. Integrated in 5.4.81.
+- Address CVE-2020-25705, CVE-2020-15436, CVE-2020-28974, CVE-2020-29368,
+  CVE-2020-29369, CVE-2020-29370, CVE-2020-29374, CVE-2020-29373, CVE-2020-28915,
+  CVE-2020-28941, CVE-2020-27675, CVE-2020-15437, CVE-2020-29371, CVE-2020-29372,
+  CVE-2020-27194, CVE-2020-27152
+
 * Wed Nov 25 2020 Chris Co <chrco@microsoft.com> - 5.4.72-5
 - Add patch to publish efi tpm event log on ARM
 

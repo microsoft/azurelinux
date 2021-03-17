@@ -3,13 +3,15 @@
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
 Version:        2.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+
+Patch1:         test_v1_import_headers_timeout.patch
 
 BuildRequires:  meson
 BuildRequires:  clang-devel
@@ -35,6 +37,7 @@ It contains the libraries and header files.
 
 %prep
 %setup -q -n modulemd-%{version}
+%patch1 -p1
 
 %build
 meson -Dprefix=%{_prefix} -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=false \
@@ -70,6 +73,8 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/modulemd/*
 
 %changelog
+*   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 2.5.0-5
+-   Improve test reliability by increasing timeout.
 *   Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 2.5.0-4
 -   Fix check test.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.0-3

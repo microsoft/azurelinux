@@ -285,9 +285,6 @@ func fixCycle(g *pkggraph.PkgGraph, cycle []*pkggraph.PkgNode) (err error) {
 	groupedDependencies := make(map[int64]bool)
 	for _, currentNode := range trimmedCycle {
 		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
-		if currentNode.SrpmPath != specFile {
-			return fmt.Errorf("cycle contains packages from multiple SPEC files, unresolvable")
-		}
 		if currentNode.Type == pkggraph.TypeBuild {
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
@@ -336,11 +333,14 @@ func validateGraph(g *pkggraph.PkgGraph) (err error) {
 			err = fixCycle(g, pkgCycle)
 			if err != nil {
 				var cycleStringBuilder strings.Builder
+
+				logger.Log.Errorf("Error found while resolving package dependency cycles: %v", err)
+
 				fmt.Fprintf(&cycleStringBuilder, "{%s}", pkgCycle[0].FriendlyName())
 				for _, node := range pkgCycle[1:] {
 					fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 				}
-				logger.Log.Errorf("Unfixable circular dependency found %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
+				logger.Log.Errorf("Unfixable circular dependency of length %d:\t%s", unfixableCycleCount, cycleStringBuilder.String())
 				unfixableCycleCount++
 			}
 		}

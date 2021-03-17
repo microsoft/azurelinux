@@ -1,10 +1,12 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        14%{?dist}
+Release:        17%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +35,8 @@ Patch11:        CVE-2018-20796.nopatch
 Patch12:        CVE-2019-7309.patch
 # CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
 Patch13:        CVE-2019-19126.patch
+Patch14:        CVE-2019-25013.patch
+Patch15:        CVE-2021-3326.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -97,8 +101,9 @@ Name Service Cache Daemon
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
-%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
-%define __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
+
+%global __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
+%global __find_requires %{_builddir}/%{name}-%{version}/find_requires.sh
 
 # create find-provides and find-requires script in order to ignore GLIBC_PRIVATE errors
 cat > find_provides.sh << _EOF
@@ -121,7 +126,6 @@ else
 fi
 _EOF
 chmod +x find_requires.sh
-#___EOF
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`"
@@ -143,7 +147,7 @@ cd %{_builddir}/%{name}-build
         --disable-silent-rules
 
 # Sometimes we have false "out of memory" make error
-# just rerun/continue make to workaroung it.
+# just rerun/continue make to work around it.
 make %{?_smp_mflags} || make %{?_smp_mflags} || make %{?_smp_mflags}
 
 %install
@@ -239,8 +243,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %ifarch aarch64
 %exclude /lib
 %endif
-%exclude /lib64/libpcprofile.so
 %{_lib64dir}/*.so
+%{_lib64dir}/audit/*
 /sbin/ldconfig
 /sbin/locale-gen.sh
 %{_bindir}/*
@@ -277,8 +281,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_sbindir}/zdump
 %{_sbindir}/zic
 /sbin/sln
-%{_lib64dir}/audit/*
-/lib64/libpcprofile.so
 
 %files nscd
 %defattr(-,root,root)
@@ -306,6 +308,15 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
+- Patch CVE-2021-3326
+
+* Fri Jan 08 2021 Nicolas guibourge <nicolasg@microsoft.com> - 2.28-16
+- Patch CVE-2019-25013
+
+* Mon Dec 07 2020 Mateusz Malisz <mamalisz@microsoft.com> - 2.28-15
+- Exclude binaries(such as bash) from requires list.
+
 * Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-14
 - Patch CVE-2019-19126
 

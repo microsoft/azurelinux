@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.3.17
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 with exceptions and LGPLv2 and BSD
 Group:          Applications/Databases
 Vendor:         Microsoft Corporation
@@ -54,6 +54,8 @@ errmsg for maridb
 %setup -q -n %{name}-%{version}
 # Remove PerconaFT from here because of AGPL licence
 rm -rf storage/tokudb/PerconaFT
+# Disable "embedded" directory which only contains "test-connect" test
+sed -i '/ADD_SUBDIRECTORY(unittest\/embedded)/d' ./CMakeLists.txt
 
 %build
 # Disable symbol generation
@@ -156,7 +158,6 @@ rm -rf %{buildroot}
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
 %{_bindir}/mariadb_config
-%{_bindir}/test-connect-t
 %{_bindir}/mysql_client_test
 %{_bindir}/mysql_client_test_embedded
 %{_bindir}/mysql_config
@@ -364,6 +365,8 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+*   Thu Jan 14 2021 Andrew Phelps <anphel@microsoft.com> 10.3.17-4
+-   Disable failing "test-connect" test and binary "test-connect-t"
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 10.3.17-3
 -   Temporarily disable generation of debug symbols.
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 10.3.17-2

@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        21%{?dist}
+Release:        25%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,9 @@ Patch24:        CVE-2020-24352.patch
 # CVE-2020-12820 only affects powerpc and SuperH emulation (see .nopatch file for details). Resloved fully in qemu >=5.0.0
 Patch25:        CVE-2020-12829.nopatch
 Patch26:        CVE-2018-12617.patch
+Patch27:        CVE-2020-25723.patch
+Patch28:        CVE-2020-27821.patch
+Patch29:        CVE-2020-17380.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -93,6 +96,9 @@ This package provides a command line tool for manipulating disk images.
 %patch23 -p1
 %patch24 -p1
 %patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
 
 %build
 
@@ -153,6 +159,18 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Mon Feb 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.2.0-25
+- Update CVE-2020-17380
+
+* Wed Jan 13 2021 Henry Li <niontive@microsoft.com> - 4.2.0-24
+- Update CVE-2020-15469
+
+* Fri Dec 11 2020 Nicolas Ontiveros <niontive@microsoft.com> - 4.2.0-23
+- Patch CVE-2020-27821
+
+* Tue Dec 08 2020 Nicolas Ontiveros <niontive@microsoft.com> - 4.2.0-22
+- Patch CVE-2020-25723
+
 * Tue Nov 17 2020 Daniel McIlvaney <damcilva@microsoft.com> - 4.2.0-21
 - Backport fix for CVE-2018-12617 from 5.0.0
 

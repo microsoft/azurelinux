@@ -5,15 +5,12 @@
 %define legacy_default_bundle ca-bundle.legacy.default.crt
 %define legacy_disable_bundle ca-bundle.legacy.disable.crt
 %define java_bundle java/cacerts
-
 %define p11_format_mozilla_bundle ca-bundle.trust.mozilla.p11-kit
 %define legacy_default_mozilla_bundle ca-bundle.legacy.default.mozilla.crt
 %define legacy_disable_mozilla_bundle ca-bundle.legacy.disable.mozilla.crt
-
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
 %define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
 %define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
-
 %define p11_format_microsoft_bundle ca-bundle.trust.microsoft.p11-kit
 %define legacy_default_microsoft_bundle ca-bundle.legacy.default.microsoft.crt
 %define legacy_disable_microsoft_bundle ca-bundle.legacy.disable.microsoft.crt
@@ -31,13 +28,13 @@
 # Arguments:
 # %1 - the source certdata.txt file;
 %define convert_certdata() \
-WORKDIR=$(basename %1.d) \
+WORKDIR=$(basename %{1}.d) \
 mkdir -p $WORKDIR/certs/legacy-default \
 mkdir $WORKDIR/certs/legacy-disable \
 mkdir $WORKDIR/java \
 pushd $WORKDIR/certs \
  pwd $WORKDIR \
- cp %1 certdata.txt \
+ cp %{1} certdata.txt \
  python3 %{SOURCE4} >c2p.log 2>c2p.err \
 popd \
 %{SOURCE19} $WORKDIR %{SOURCE1} %{openssl_format_trust_bundle} %{legacy_default_bundle} %{legacy_disable_bundle} %{SOURCE3}
@@ -49,21 +46,20 @@ popd \
 # %3 - output legacy default bundle name;
 # %4 - output legacy disabled bundle name;
 %define install_bundles() \
-WORKDIR=$(basename %1.d) \
-install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%2 \
-install -p -m 644 $WORKDIR/%{legacy_default_bundle} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-legacy/%3 \
-install -p -m 644 $WORKDIR/%{legacy_disable_bundle} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-legacy/%4 \
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%2 \
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-legacy/%3 \
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-legacy/%4
+WORKDIR=$(basename %{1}.d) \
+install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
+install -p -m 644 $WORKDIR/%{legacy_default_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
+install -p -m 644 $WORKDIR/%{legacy_disable_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4} \
+touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
+touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
+touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4}
 
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
-
 # The files, certdata.txt and nssckbi.h, should be taken from a released version of NSS, as published
 # at https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/
 #
-# The versions that are used by the latest released version of 
+# The versions that are used by the latest released version of
 # Mozilla Firefox should be available from:
 # https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/nssckbi.h
 # https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt
@@ -73,13 +69,14 @@ Name:           ca-certificates
 # http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/certdata.txt
 # (but these files might have not yet been released).
 
+# When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MPLv2.0
-URL:            https://hg.mozilla.org
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://hg.mozilla.org
 # Please always update both certdata.txt and nssckbi.h
 Source0:        https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt
 Source1:        nssckbi.h
@@ -104,26 +101,24 @@ Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
 Source23:       certdata.microsoft.txt
 
+BuildRequires:  /bin/ln
+BuildRequires:  asciidoc
+BuildRequires:  coreutils
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  libxslt
+BuildRequires:  openssl
+BuildRequires:  perl
+BuildRequires:  python3
+
+Requires:       %{name}-shared = %{version}-%{release}
+Requires(post): %{name}-tools = %{version}-%{release}
+Requires(post): coreutils
+Requires(postun): %{name}-tools = %{version}-%{release}
+
+Provides:       ca-certificates-mozilla = %{version}-%{release}
+
 BuildArch:      noarch
-
-BuildRequires:      /bin/ln
-BuildRequires:      asciidoc
-BuildRequires:      coreutils
-BuildRequires:      docbook-dtd-xml
-BuildRequires:      docbook-style-xsl
-BuildRequires:      libxslt
-BuildRequires:      openssl
-BuildRequires:      perl
-BuildRequires:      python3
-
-Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     coreutils
-
-Requires(postun):   %{name}-tools = %{version}-%{release}
-
-Requires:           %{name}-shared = %{version}-%{release}
-
-Provides:           ca-certificates-mozilla
 
 %description
 The Public Key Inrastructure is used for many security issues in a
@@ -135,59 +130,55 @@ OpenSSL-1.0.1e. The certificates can also be used by other applications
 either directly of indirectly through openssl.
 
 %package shared
-Summary:    A set of directories and files required by all certificate packages.
-Group:      System Environment/Security
+Summary:        A set of directories and files required by all certificate packages.
+Group:          System Environment/Security
 
 %description shared
 %{summary}
 
 %package base
-Summary:    Basic set of trusted CAs required to authenticate the packages repository.
-Group:      System Environment/Security
+Summary:        Basic set of trusted CAs required to authenticate the packages repository.
+Group:          System Environment/Security
 
-Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     coreutils
-
-Requires(postun):   %{name}-tools = %{version}-%{release}
-
-Requires:           %{name}-shared = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
+Requires(post): %{name}-tools = %{version}-%{release}
+Requires(post): coreutils
+Requires(postun): %{name}-tools = %{version}-%{release}
 
 %description base
 %{summary}
 
 %package microsoft
-Summary:    A list of CAs trusted through the Microsoft Trusted Root Program.
-Group:      System Environment/Security
+Summary:        A list of CAs trusted through the Microsoft Trusted Root Program.
+Group:          System Environment/Security
 
-Requires(post):     %{name}-tools = %{version}-%{release}
-Requires(post):     coreutils
-
-Requires(postun):   %{name}-tools = %{version}-%{release}
-
-Requires:           %{name}-shared = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
+Requires(post): %{name}-tools = %{version}-%{release}
+Requires(post): coreutils
+Requires(postun): %{name}-tools = %{version}-%{release}
 
 %description microsoft
 %{summary}
 
 %package tools
-Summary:  Cert generation tools.
-Group:    System Environment/Security
+Summary:        Cert generation tools.
+Group:          System Environment/Security
 
-Requires: p11-kit-trust >= 0.23.10
-Requires: p11-kit >= 0.23.10
+Requires:       p11-kit >= 0.23.10
+Requires:       p11-kit-trust >= 0.23.10
 
 %description tools
 Set of scripts to generate certificates out of a certdata.txt file.
 
 %package legacy
-Summary:  Support for legacy certificates configuration.
-Group:    System Environment/Security
+Summary:        Support for legacy certificates configuration.
+Group:          System Environment/Security
 
-Requires: %{name}-shared = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description legacy
 Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
-pairs under /etc/pki/tls/certs.
+pairs under %{_sysconfdir}/pki/tls/certs.
 
 %prep -q
 rm -rf %{name}
@@ -211,37 +202,36 @@ xsltproc --nonet -o %{name}/ca-legacy.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p -m 755 $RPM_BUILD_ROOT%{pkidir}/tls/certs
-mkdir -p -m 755 $RPM_BUILD_ROOT%{pkidir}/java
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/ssl
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source/anchors
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source/blacklist
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/extracted
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/extracted/pem
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/extracted/openssl
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/extracted/java
-mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/extracted/edk2
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/anchors
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/blacklist
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-legacy
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_bindir}
-mkdir -p -m 755 $RPM_BUILD_ROOT%{_mandir}/man8
+mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
+mkdir -p -m 755 %{buildroot}%{pkidir}/java
+mkdir -p -m 755 %{buildroot}%{_sysconfdir}/ssl
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source/anchors
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blacklist
+mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted
+mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/pem
+mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/openssl
+mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/java
+mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-legacy
+mkdir -p -m 755 %{buildroot}%{_bindir}
+mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
-install -p -m 644 %{name}/update-ca-trust.8 $RPM_BUILD_ROOT%{_mandir}/man8
-install -p -m 644 %{name}/ca-legacy.8 $RPM_BUILD_ROOT%{_mandir}/man8
-install -p -m 644 %{SOURCE11} $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/README
-install -p -m 644 %{SOURCE12} $RPM_BUILD_ROOT%{catrustdir}/README
-install -p -m 644 %{SOURCE13} $RPM_BUILD_ROOT%{catrustdir}/extracted/README
-install -p -m 644 %{SOURCE14} $RPM_BUILD_ROOT%{catrustdir}/extracted/java/README
-install -p -m 644 %{SOURCE15} $RPM_BUILD_ROOT%{catrustdir}/extracted/openssl/README
-install -p -m 644 %{SOURCE16} $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/README
-install -p -m 644 %{SOURCE17} $RPM_BUILD_ROOT%{catrustdir}/extracted/edk2/README
-install -p -m 644 %{SOURCE18} $RPM_BUILD_ROOT%{catrustdir}/source/README
+install -p -m 644 %{name}/update-ca-trust.8 %{buildroot}%{_mandir}/man8
+install -p -m 644 %{name}/ca-legacy.8 %{buildroot}%{_mandir}/man8
+install -p -m 644 %{SOURCE11} %{buildroot}%{_datadir}/pki/ca-trust-source/README
+install -p -m 644 %{SOURCE12} %{buildroot}%{catrustdir}/README
+install -p -m 644 %{SOURCE13} %{buildroot}%{catrustdir}/extracted/README
+install -p -m 644 %{SOURCE14} %{buildroot}%{catrustdir}/extracted/java/README
+install -p -m 644 %{SOURCE15} %{buildroot}%{catrustdir}/extracted/openssl/README
+install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
+install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
+install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
-install -p -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{catrustdir}/ca-legacy.conf
+install -p -m 644 %{SOURCE5} %{buildroot}%{catrustdir}/ca-legacy.conf
 
 # Mozilla certs
 %install_bundles %{SOURCE0} %{p11_format_mozilla_bundle} %{legacy_default_mozilla_bundle} %{legacy_disable_mozilla_bundle}
@@ -254,65 +244,64 @@ install -p -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{catrustdir}/ca-legacy.conf
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
-install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/update-ca-trust
+install -p -m 755 %{SOURCE2} %{buildroot}%{_bindir}/update-ca-trust
 
-install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/ca-legacy
+install -p -m 755 %{SOURCE6} %{buildroot}%{_bindir}/ca-legacy
 
-install -p -m 755 %{SOURCE22} $RPM_BUILD_ROOT%{_bindir}/bundle2pem.sh
+install -p -m 755 %{SOURCE22} %{buildroot}%{_bindir}/bundle2pem.sh
 
 # touch ghosted files that will be extracted dynamically
 # Set chmod 444 to use identical permission
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/tls-ca-bundle.pem
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/tls-ca-bundle.pem
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/email-ca-bundle.pem
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/email-ca-bundle.pem
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/objsign-ca-bundle.pem
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/objsign-ca-bundle.pem
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle}
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle}
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/%{java_bundle}
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/%{java_bundle}
-touch $RPM_BUILD_ROOT%{catrustdir}/extracted/edk2/cacerts.bin
-chmod 444 $RPM_BUILD_ROOT%{catrustdir}/extracted/edk2/cacerts.bin
-touch $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-chmod 444 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-touch $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
-chmod 444 $RPM_BUILD_ROOT%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
+touch %{buildroot}%{catrustdir}/extracted/pem/tls-ca-bundle.pem
+chmod 444 %{buildroot}%{catrustdir}/extracted/pem/tls-ca-bundle.pem
+touch %{buildroot}%{catrustdir}/extracted/pem/email-ca-bundle.pem
+chmod 444 %{buildroot}%{catrustdir}/extracted/pem/email-ca-bundle.pem
+touch %{buildroot}%{catrustdir}/extracted/pem/objsign-ca-bundle.pem
+chmod 444 %{buildroot}%{catrustdir}/extracted/pem/objsign-ca-bundle.pem
+touch %{buildroot}%{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle}
+chmod 444 %{buildroot}%{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle}
+touch %{buildroot}%{catrustdir}/extracted/%{java_bundle}
+chmod 444 %{buildroot}%{catrustdir}/extracted/%{java_bundle}
+touch %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
+chmod 444 %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
+touch %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
+chmod 444 %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
+touch %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
+chmod 444 %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
 
 # /etc/ssl/certs symlink for 3rd-party tools
 ln -s ../pki/tls/certs \
-    $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs
+    %{buildroot}%{_sysconfdir}/ssl/certs
 # legacy filenames
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    $RPM_BUILD_ROOT%{pkidir}/tls/cert.pem
+    %{buildroot}%{pkidir}/tls/cert.pem
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    $RPM_BUILD_ROOT%{pkidir}/tls/certs/%{classic_tls_bundle}
+    %{buildroot}%{pkidir}/tls/certs/%{classic_tls_bundle}
 ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
-    $RPM_BUILD_ROOT%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
+    %{buildroot}%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 ln -s %{catrustdir}/extracted/%{java_bundle} \
-    $RPM_BUILD_ROOT%{pkidir}/%{java_bundle}
+    %{buildroot}%{pkidir}/%{java_bundle}
 
 %post
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
-%refresh_bundles
+%{refresh_bundles}
 
 %post base
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-%refresh_bundles
+%{refresh_bundles}
 
 %post microsoft
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
-%refresh_bundles
+%{refresh_bundles}
 
 %postun
-%refresh_bundles
+%{refresh_bundles}
 
 %postun base
-%refresh_bundles
-
+%{refresh_bundles}
 
 %postun legacy
 # During build time it is unknown what files will get created by the
@@ -322,7 +311,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 # If the 'legacy' subpackage is installed, we need to always refresh the
 # single PEM-encoded certificates every time a certificate bundle gets modified.
-# The cert bundle gets modified whenever one of the packages from %{watched_pkgs}
+# The cert bundle gets modified whenever one of the packages from %%{watched_pkgs}
 # get installed, removed, or updated.
 %triggerin -n %{name}-legacy -- %{watched_pkgs}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
@@ -331,9 +320,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
 %postun microsoft
-%refresh_bundles
+%{refresh_bundles}
 
 %clean
+
 
 %files
 # Mozilla certs bundle file with trust
@@ -425,6 +415,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Feb 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-11
+- Removing the deprecated "Microsoft IT TLS CA 2" CA from the list of trusted anchors.
+- Added explicit version info for the "Provides".
+
 * Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-10
 - Updating Microsoft trusted root CAs.
 
@@ -483,7 +477,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 *Wed Jun 19 2019 Bob Relyea <rrelyea@redhat.com> 2019.2.32-1.0
  - Update to CKBI 2.32 from NSS 3.44
-   Removing: 
+   Removing:
     # Certificate "Visa eCommerce Root"
     # Certificate "AC Raiz Certicamara S.A."
     # Certificate "Certplus Root CA G1"
@@ -491,7 +485,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
     # Certificate "OpenTrust Root CA G1"
     # Certificate "OpenTrust Root CA G2"
     # Certificate "OpenTrust Root CA G3"
-   Adding: 
+   Adding:
     # Certificate "GTS Root R1"
     # Certificate "GTS Root R2"
     # Certificate "GTS Root R3"
@@ -694,7 +688,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 - Update to CKBI 1.95 from NSS 3.15.3.1
 
 * Fri Sep 06 2013 Kai Engert <kaie@redhat.com> - 2013.1.94-18
-- Update the Entrust root stapled extension for compatibility with 
+- Update the Entrust root stapled extension for compatibility with
   p11-kit version 0.19.2, patch by Stef Walter, rhbz#988745
 
 * Tue Sep 03 2013 Kai Engert <kaie@redhat.com> - 2013.1.94-17
@@ -727,7 +721,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 - adjust to changed and new functionality provided by p11-kit 0.17.3
 - updated READMEs to describe the new directory-specific treatment of files
 - ship a new file that contains certificates with neutral trust
-- ship a new file that contains distrust objects, and also staple a 
+- ship a new file that contains distrust objects, and also staple a
   basic constraint extension to one legacy root contained in the
   Mozilla CA list
 - adjust the build script to dynamically produce most of above files
@@ -741,7 +735,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
   other file format bundles.
 - Convert old file locations to symbolic links that point to dynamically
   generated files.
-- Old files, which might have been locally modified, will be saved in backup 
+- Old files, which might have been locally modified, will be saved in backup
   files with .rpmsave extension.
 - Added a update-ca-certificates script which can be used to regenerate
   the merged trusted output.
@@ -765,7 +759,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 * Wed Oct 24 2012 Paul Wouters <pwouters@redhat.com> - 2012.86-2
 - Updated blacklist with 20 entries (Diginotar, Trustwave, Comodo(?)
-- Fix to certdata2pem.py to also check for CKT_NSS_NOT_TRUSTED 
+- Fix to certdata2pem.py to also check for CKT_NSS_NOT_TRUSTED
 
 * Tue Oct 23 2012 Paul Wouters <pwouters@redhat.com> - 2012.86-1
 - update to r1.86
