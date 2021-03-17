@@ -471,7 +471,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Tue Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
 - Disable QAT kernel configs
 
 * Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
