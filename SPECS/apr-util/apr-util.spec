@@ -1,7 +1,7 @@
 Summary:    The Apache Portable Runtime Utility Library
 Name:       apr-util
 Version:    1.6.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:    Apache License 2.0
 URL:        https://apr.apache.org/
 Group:      System Environment/Libraries
@@ -16,6 +16,7 @@ BuildRequires:   sqlite-devel
 BuildRequires:   openssl-devel
 BuildRequires:   nss-devel
 BuildRequires:   expat-devel
+BuildRequires:   openldap
 Requires:   apr
 Requires:   openssl
 Requires:   expat
@@ -122,9 +123,10 @@ rm -rf %{buildroot}
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
-- Added %%license line automatically
-
+*   Thu Mar 18 2021 Daniel Burgener <daburgen@microsoft.com> - 1.6.1-5
+-   Include unlisted openldap requirement
+*   Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.6.1-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.6.1-2

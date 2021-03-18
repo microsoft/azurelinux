@@ -56,7 +56,7 @@ BuildRequires:  libedit-devel
 BuildRequires:  libtool
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-#BuildRequires:  openldap-devel
+BuildRequires:  openldap
 #Required for tests/ldap
 #BuildRequires:  openldap-servers
 BuildRequires:  pam-devel
@@ -77,8 +77,6 @@ BuildRequires:  db4-devel
 %else
 BuildRequires:  libdb-devel
 %endif
-
-AutoReq:        no
 
 %description
 Kerberos 5 is a network authentication and single sign-on system.
@@ -491,7 +489,8 @@ fi
 
 %changelog
 * Wed Mar 10 2021 Daniel Burgener <Daniel.Burgener@microsoft.com> - 7.7.0-6
-- Don't automatically add requirements
+- Include openldap BuildRequires
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
