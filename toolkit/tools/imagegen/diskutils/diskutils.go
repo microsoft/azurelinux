@@ -376,9 +376,9 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 // CreateSinglePartition creates a single partition based on the partition config
 func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
 	const (
-		fillToEndOption = "100%"
-		mibFmt          = "%dMiB"
-		timeout         = "5"
+		fillToEndOption  = "100%"
+		mibFmt           = "%dMiB"
+		timeoutInSeconds = "5"
 	)
 	start := partition.Start
 	end := partition.End
@@ -412,7 +412,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	// with other cooperating processes. The important part is it will block
 	// if the fd is busy, and then execute the command. Adding a timeout
 	// to prevent us from possibly waiting forever.
-	stdout, stderr, err := shell.Execute("flock", "--timeout", timeout, diskDevPath, "partprobe", "-s", diskDevPath)
+	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
 		return "", err
