@@ -376,8 +376,9 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 // CreateSinglePartition creates a single partition based on the partition config
 func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
 	const (
-		fillToEndOption = "100%"
-		mibFmt          = "%dMiB"
+		fillToEndOption  = "100%"
+		mibFmt           = "%dMiB"
+		timeoutInSeconds = "5"
 	)
 	start := partition.Start
 	end := partition.End
@@ -398,7 +399,25 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 			return "", err
 		}
 	}
-
+	// Update kernel partition table information
+	//
+	// There can be a timing issue where partition creation finishes but the
+	// devtmpfs files are not populated in time for partition initialization.
+	// So to deal with this, we call partprobe here to query and flush the
+	// partition table information, which should enforce that the devtmpfs
+	// files are created when partprobe returns control.
+	//
+	// Added flock because "partprobe -s" apparently doesn't always block.
+	// flock is part of the util-linux package and helps to synchronize access
+	// with other cooperating processes. The important part is it will block
+	// if the fd is busy, and then execute the command. Adding a timeout
+	// to prevent us from possibly waiting forever.
+	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
+		return "", err
+	}
+	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 

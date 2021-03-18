@@ -30,7 +30,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz parted
 
     - name: Download SRPMS
       run: |
@@ -58,7 +58,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz parted
 
     - name: ISO Quick Start
       run: |
@@ -85,7 +85,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz parted
 
     - name: VHDX Quick Start
       run: |
