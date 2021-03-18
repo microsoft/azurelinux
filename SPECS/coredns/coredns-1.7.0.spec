@@ -35,7 +35,7 @@ CoreDNS is a fast and flexible DNS server.
 tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
-export GITCOMMIT="f59c03d"
+export GITCOMMIT="f59c03d09c3a3a12f571ad1087b979325f3dae30"
 make
 
 %install
@@ -51,5 +51,8 @@ rm -rf %{buildroot}/*
 %{_bindir}/%{name}
 
 %changelog
-* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.0-1
+* Wed Mar 17 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.7.0-1
+- Update to version  "1.7.0".
+
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.7-1
 - Original version for CBL-Mariner.

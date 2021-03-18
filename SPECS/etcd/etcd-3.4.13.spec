@@ -74,8 +74,11 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog
-*   Mon Jan 25 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.13-1
--   Update to version 3.4.13.
+*   Wed Mar 17 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 3.4.13-1
+-   Update to version  "3.4.13".
+
+*   Mon Jan 25 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.3-1
+-   Update to version 3.4.3.
 *   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 3.3.25-2
 -   Increment release to force republishing using golang 1.15.
 *   Thu Sep 03 2020 Joe Schmitt <joschmit@microsoft.com> 3.3.25-1
