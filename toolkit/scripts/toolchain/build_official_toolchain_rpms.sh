@@ -415,6 +415,12 @@ build_rpm_in_chroot_no_install itstool
 
 # gtk-doc needs itstool
 chroot_and_install_rpms itstool
+
+# gtk-doc and ca-certificates require libxslt
+chroot_and_install_rpms docbook-dtd-xml
+chroot_and_install_rpms docbook-style-xsl
+chroot_and_install_rpms libxslt
+chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gtk-doc
 
 # p11-kit, libtasn1 and glib need gtk-doc
@@ -436,7 +442,6 @@ build_rpm_in_chroot_no_install swig
 # gpgme needs swig, gnupg2 and python3
 chroot_and_install_rpms swig
 chroot_and_install_rpms gnupg2
-chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gpgme
 
 # tdnf needs python3, gpgme, curl and libsolv
@@ -452,11 +457,6 @@ build_rpm_in_chroot_no_install tdnf
 # createrepo_c needs glib
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
-
-# ca-certificates requires libxslt
-chroot_and_install_rpms docbook-dtd-xml
-chroot_and_install_rpms docbook-style-xsl
-chroot_and_install_rpms libxslt
 
 # ninja-build requires gtest
 chroot_and_install_rpms gtest
