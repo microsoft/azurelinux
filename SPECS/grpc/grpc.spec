@@ -7,12 +7,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
-Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
+#Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 # A buildable grpc environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
-#  git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
+#  git clone -b RELEASE_TAG_HERE --depth 1 https://github.com/grpc/grpc
 #  pushd grpc
-#  git submodule update --init
+#  git submodule update --depth 1 --init
 #  popd
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
@@ -34,7 +35,7 @@ needed to develop programs that use grpc.
 %package plugins
 Summary:        Plugins files for grpc
 Requires:       %{name} = %{version}-%{release}
-Requires:       libprotoc
+Requires:       protobuf
 
 %description plugins
 The grpc-plugins package contains the grpc plugins.
