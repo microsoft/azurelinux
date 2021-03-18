@@ -417,7 +417,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
 		return "", err
 	}
-	logger.Log.Debugf(stdout)
+	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 
