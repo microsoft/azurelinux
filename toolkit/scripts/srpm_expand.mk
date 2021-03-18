@@ -9,6 +9,7 @@ $(call create_folder,$(BUILD_SPECS_DIR))
 ######## SRPM EXPANDING ########
 
 srpms = $(shell find $(BUILD_SRPMS_DIR)/ -type f -name '*.src.rpm')
+srpms_basename = $(foreach srpm,$(srpms),$(notdir $(srpm)))
 
 .PHONY: expand-specs clean-expand-specs
 expand-specs: $(BUILD_SPECS_DIR)
@@ -26,8 +27,8 @@ $(BUILD_SPECS_DIR): $(STATUS_FLAGS_DIR)/build_specs.flag
 
 $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 	# For each SRPM, if it is newer than the spec extract a new copy of the .spec file
-	for srpm in $(srpms); do \
-		srpm_file=$${srpm} && \
+	for srpm in $(srpms_basename); do \
+		srpm_file=$(BUILD_SRPMS_DIR)/$${srpm} && \
 		spec_destination=$(BUILD_SPECS_DIR)/$$(rpm -qp $${srpm_file} --define='with_check 1' --queryformat %{NAME}-%{VERSION}-%{RELEASE}/%{NAME}.spec) && \
 		spec_dir=$$(dirname $${spec_destination}) && \
 		if [ $${srpm_file} -nt $@ -o ! -f $@ ]; then \
