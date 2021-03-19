@@ -177,7 +177,7 @@ rm -rf %{buildroot}/*
 %{rubygems_dir}/rubygems
 
 %changelog
-* Thu Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
+* Fri Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
 - Add bindir path to gem installation to install executable at
   system bin directory instead of bin directory under gem home directory
 - Add Provides for rubygem-bigdecimal, rubygem-irb, rubygem-io-console, rubygem-did_you_mean
