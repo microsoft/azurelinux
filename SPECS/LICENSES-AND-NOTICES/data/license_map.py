@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 import argparse
 import json
 from pathlib import Path
@@ -55,7 +58,7 @@ def main(input_filename, output_filename, spec_directories):
     specs_not_in_json, specs_not_in_dir = get_missing_specs(spec_directories, license_collection)
 
     with open(output_filename, 'r') as output_file:
-        old_content = output_filename.read()
+        old_content = output_file.read()
     new_content = generate_markdown(license_collection)
     with open(output_filename, 'w') as output_file:
         output_file.write(new_content)
