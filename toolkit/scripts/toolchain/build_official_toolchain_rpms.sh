@@ -306,9 +306,6 @@ build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
 # Python2 needs to be installed for RPM and openjdk's dependencies to build
-build_rpm_in_chroot_no_install python2
-rm -vf $FINISHED_RPM_DIR/python2*debuginfo*.rpm
-chroot_and_install_rpms python2
 
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3

@@ -15,13 +15,11 @@ BuildRequires:  python-xml
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
-BuildRequires:  python2
 Requires:       python3
 Requires:       python-xml
 Requires:       libxslt
 Requires:       docbook-style-xsl
 Requires:       docbook-dtd-xml
-Requires:       python2
 
 %description
 AsciiDoc is a human readable text document format that can be easily converted to other document formats.
