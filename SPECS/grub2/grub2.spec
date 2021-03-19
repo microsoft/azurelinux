@@ -494,7 +494,10 @@ CFLAGS="`echo " %{build_cflags} "          | \
         sed 's/-fstack-protector-strong//' | \
         sed 's/-m64//'                     | \
         sed 's/-specs.*cc1//'              | \
-        sed 's/-mtune=generic//'`"
+        sed 's/-mtune=generic//'           | \
+        sed 's/-O. //'                     | \
+        sed 's/-fexceptions//'             | \
+        sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`"
 export CFLAGS
 
 # The patches introduce HOST and TARGET versions of
