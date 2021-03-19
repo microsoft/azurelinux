@@ -9,7 +9,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,11 @@ Provides:       rubygem(io-console) = %{version}-%{release}
 Provides:       rubygem(psych) = %{version}-%{release}
 Provides:       rubygem(did_you_mean) = %{version}-%{release}
 Provides:       rubygem(irb) = %{version}-%{release}
+Provides:       rubygem-bigdecimal = %{version}-%{release}
+Provides:       rubygem-io-console = %{version}-%{release}
+Provides:       rubygem-psych = %{version}-%{release}
+Provides:       rubygem-irb = %{version}-%{release}
+Provides:       rubygem-did_you_mean = %{version}-%{release}
 
 %description
 The Ruby package contains the Ruby development environment.
