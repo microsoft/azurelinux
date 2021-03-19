@@ -489,20 +489,23 @@ sed -i 's,-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1,,g' gnulib/gnulib-tool
 mkdir build-for-pc
 pushd build-for-pc
 # Modify the default CFLAGS to support the i386 build
-# TODO: Identify which CFLAGS are causing HyperV Gen1 build to fail to boot
-CFLAGS=""
+CFLAGS="`echo " %{build_cflags} "          | \
+        sed 's/-fcf-protection//'          | \
+        sed 's/-fstack-protector-strong//' | \
+        sed 's/-m64//'                     | \
+        sed 's/-specs.*cc1//'              | \
+        sed 's/-mtune=generic//'`"
 export CFLAGS
-HOST_CFLAGS=""
+
+# The patches introduce HOST and TARGET versions of
+# the standard CFLAGS/LDFLAGS overrides
+HOST_CFLAGS=$CFLAGS
 export HOST_CFLAGS
-HOST_CPPFLAGS=""
-export HOST_CPPFLAGS
-HOST_LDFLAGS=""
+HOST_LDFLAGS=$LDFLAGS
 export HOST_LDFLAGS
-TARGET_CFLAGS=""
+TARGET_CFLAGS=$CFLAGS
 export TARGET_CFLAGS
-TARGET_CPPFLAGS=""
-export TARGET_CPPFLAGS
-TARGET_LDFLAGS=""
+TARGET_LDFLAGS=$LDFLAGS
 export TARGET_LDFLAGS
 
 ../configure \
@@ -527,6 +530,17 @@ CFLAGS="`echo " %{build_cflags} "              | \
          sed 's/-specs.*cc1//'                 | \
          sed 's/-fstack-protector-strong//'`"
 export CFLAGS
+
+# The patches introduce HOST and TARGET versions of
+# the standard CFLAGS/LDFLAGS overrides
+HOST_CFLAGS=$CFLAGS
+export HOST_CFLAGS
+HOST_LDFLAGS=$LDFLAGS
+export HOST_LDFLAGS
+TARGET_CFLAGS=$CFLAGS
+export TARGET_CFLAGS
+TARGET_LDFLAGS=$LDFLAGS
+export TARGET_LDFLAGS
 
 mkdir build-for-efi
 pushd build-for-efi
