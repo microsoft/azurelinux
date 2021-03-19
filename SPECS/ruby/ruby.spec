@@ -177,7 +177,13 @@ rm -rf %{buildroot}/*
 %{rubygems_dir}/rubygems
 
 %changelog
-* Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 2.6.6-4
+* Thu Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
+- Add bindir path to gem installation to install executable at
+  system bin directory instead of bin directory under gem home directory
+- Add Provides for rubygem-bigdecimal, rubygem-irb, rubygem-io-console, rubygem-did_you_mean
+  and rubygem-psych
+
+* Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 2.7.2-1
 - Upgrade to version 2.7.2
 - Add files like macros.rubygems, imported from Fedora 32 (license: MIT)
 - Add patches to prevent ruby vesion abuse
