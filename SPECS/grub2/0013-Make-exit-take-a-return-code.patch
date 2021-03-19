@@ -1,0 +1,267 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 26 Feb 2014 21:49:12 -0500
+Subject: [PATCH] Make "exit" take a return code.
+
+This adds "exit" with a return code.  With this patch, any "exit"
+command /may/ include a return code, and on platforms that support
+returning with an exit status, we will do so.  By default we return the
+same exit status we did before this patch.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/commands/minicmd.c         | 20 ++++++++++++++++----
+ grub-core/kern/efi/efi.c             |  9 +++++++--
+ grub-core/kern/emu/main.c            |  2 +-
+ grub-core/kern/emu/misc.c            |  5 +++--
+ grub-core/kern/i386/coreboot/init.c  |  2 +-
+ grub-core/kern/i386/qemu/init.c      |  2 +-
+ grub-core/kern/ieee1275/init.c       |  2 +-
+ grub-core/kern/mips/arc/init.c       |  2 +-
+ grub-core/kern/mips/loongson/init.c  |  2 +-
+ grub-core/kern/mips/qemu_mips/init.c |  2 +-
+ grub-core/kern/misc.c                | 11 ++++++++++-
+ grub-core/kern/uboot/init.c          |  6 +++---
+ grub-core/kern/xen/init.c            |  2 +-
+ include/grub/misc.h                  |  2 +-
+ 14 files changed, 48 insertions(+), 21 deletions(-)
+
+diff --git a/grub-core/commands/minicmd.c b/grub-core/commands/minicmd.c
+index fa498931ed2..2bd3ac76f2d 100644
+--- a/grub-core/commands/minicmd.c
++++ b/grub-core/commands/minicmd.c
+@@ -182,12 +182,24 @@ grub_mini_cmd_lsmod (struct grub_command *cmd __attribute__ ((unused)),
+ }
+ 
+ /* exit */
+-static grub_err_t __attribute__ ((noreturn))
++static grub_err_t
+ grub_mini_cmd_exit (struct grub_command *cmd __attribute__ ((unused)),
+-		    int argc __attribute__ ((unused)),
+-		    char *argv[] __attribute__ ((unused)))
++		    int argc, char *argv[])
+ {
+-  grub_exit ();
++  int retval = -1;
++  unsigned long n;
++
++  if (argc < 0 || argc > 1)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("one argument expected"));
++
++  if (argc == 1)
++    {
++      n = grub_strtoul (argv[0], 0, 10);
++      if (n != ~0UL)
++	retval = n;
++    }
++
++  grub_exit (retval);
+   /* Not reached.  */
+ }
+ 
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index 8cff7be0289..05d8237a9b2 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -165,11 +165,16 @@ grub_reboot (void)
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int retval)
+ {
++  int rc = GRUB_EFI_LOAD_ERROR;
++
++  if (retval == 0)
++    rc = GRUB_EFI_SUCCESS;
++
+   grub_machine_fini (GRUB_LOADER_FLAG_NORETURN);
+   efi_call_4 (grub_efi_system_table->boot_services->exit,
+-              grub_efi_image_handle, GRUB_EFI_SUCCESS, 0, 0);
++              grub_efi_image_handle, rc, 0, 0);
+   for (;;) ;
+ }
+ 
+diff --git a/grub-core/kern/emu/main.c b/grub-core/kern/emu/main.c
+index 425bb960347..55ea5a11ccd 100644
+--- a/grub-core/kern/emu/main.c
++++ b/grub-core/kern/emu/main.c
+@@ -67,7 +67,7 @@ grub_reboot (void)
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int retval __attribute__((unused)))
+ {
+   grub_reboot ();
+ }
+diff --git a/grub-core/kern/emu/misc.c b/grub-core/kern/emu/misc.c
+index dfd8a8ec488..0ff13bcaf8c 100644
+--- a/grub-core/kern/emu/misc.c
++++ b/grub-core/kern/emu/misc.c
+@@ -151,9 +151,10 @@ xasprintf (const char *fmt, ...)
+ 
+ #if !defined (GRUB_MACHINE_EMU) || defined (GRUB_UTIL)
+ void
+-grub_exit (void)
++__attribute__ ((noreturn))
++grub_exit (int rc)
+ {
+-  exit (1);
++  exit (rc < 0 ? 1 : rc);
+ }
+ #endif
+ 
+diff --git a/grub-core/kern/i386/coreboot/init.c b/grub-core/kern/i386/coreboot/init.c
+index 3314f027fec..36f9134b7b7 100644
+--- a/grub-core/kern/i386/coreboot/init.c
++++ b/grub-core/kern/i386/coreboot/init.c
+@@ -41,7 +41,7 @@ extern grub_uint8_t _end[];
+ extern grub_uint8_t _edata[];
+ 
+ void  __attribute__ ((noreturn))
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   /* We can't use grub_fatal() in this function.  This would create an infinite
+      loop, since grub_fatal() calls grub_abort() which in turn calls grub_exit().  */
+diff --git a/grub-core/kern/i386/qemu/init.c b/grub-core/kern/i386/qemu/init.c
+index 271b6fbfabd..9fafe98f015 100644
+--- a/grub-core/kern/i386/qemu/init.c
++++ b/grub-core/kern/i386/qemu/init.c
+@@ -42,7 +42,7 @@ extern grub_uint8_t _end[];
+ extern grub_uint8_t _edata[];
+ 
+ void  __attribute__ ((noreturn))
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   /* We can't use grub_fatal() in this function.  This would create an infinite
+      loop, since grub_fatal() calls grub_abort() which in turn calls grub_exit().  */
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index d483e35eed2..e71d1584164 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -71,7 +71,7 @@ grub_addr_t grub_ieee1275_original_stack;
+ #endif
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   grub_ieee1275_exit ();
+ }
+diff --git a/grub-core/kern/mips/arc/init.c b/grub-core/kern/mips/arc/init.c
+index 2ed3ff3191e..5c40c34078d 100644
+--- a/grub-core/kern/mips/arc/init.c
++++ b/grub-core/kern/mips/arc/init.c
+@@ -276,7 +276,7 @@ grub_halt (void)
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   GRUB_ARC_FIRMWARE_VECTOR->exit ();
+ 
+diff --git a/grub-core/kern/mips/loongson/init.c b/grub-core/kern/mips/loongson/init.c
+index 7b96531b983..dff598ca7b0 100644
+--- a/grub-core/kern/mips/loongson/init.c
++++ b/grub-core/kern/mips/loongson/init.c
+@@ -304,7 +304,7 @@ grub_halt (void)
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   grub_halt ();
+ }
+diff --git a/grub-core/kern/mips/qemu_mips/init.c b/grub-core/kern/mips/qemu_mips/init.c
+index be88b77d22d..8b6c55ffc01 100644
+--- a/grub-core/kern/mips/qemu_mips/init.c
++++ b/grub-core/kern/mips/qemu_mips/init.c
+@@ -75,7 +75,7 @@ grub_machine_fini (int flags __attribute__ ((unused)))
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   grub_halt ();
+ }
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index 3af336ee227..63b586d09cb 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -1209,9 +1209,18 @@ grub_abort (void)
+       grub_getkey ();
+     }
+ 
+-  grub_exit ();
++  grub_exit (1);
+ }
+ 
++#if defined (__clang__) && !defined (GRUB_UTIL)
++/* clang emits references to abort().  */
++void __attribute__ ((noreturn))
++abort (void)
++{
++  grub_abort ();
++}
++#endif
++
+ void
+ grub_fatal (const char *fmt, ...)
+ {
+diff --git a/grub-core/kern/uboot/init.c b/grub-core/kern/uboot/init.c
+index 3e338645c57..be2a5be1d07 100644
+--- a/grub-core/kern/uboot/init.c
++++ b/grub-core/kern/uboot/init.c
+@@ -39,9 +39,9 @@ extern grub_size_t grub_total_module_size;
+ static unsigned long timer_start;
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc)
+ {
+-  grub_uboot_return (0);
++  grub_uboot_return (rc < 0 ? 1 : rc);
+ }
+ 
+ static grub_uint64_t
+@@ -78,7 +78,7 @@ grub_machine_init (void)
+   if (!ver)
+     {
+       /* Don't even have a console to log errors to... */
+-      grub_exit ();
++      grub_exit (-1);
+     }
+   else if (ver > API_SIG_VERSION)
+     {
+diff --git a/grub-core/kern/xen/init.c b/grub-core/kern/xen/init.c
+index 782ca72952a..708b060f324 100644
+--- a/grub-core/kern/xen/init.c
++++ b/grub-core/kern/xen/init.c
+@@ -584,7 +584,7 @@ grub_machine_init (void)
+ }
+ 
+ void
+-grub_exit (void)
++grub_exit (int rc __attribute__((unused)))
+ {
+   struct sched_shutdown arg;
+ 
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 7d2b5519690..fd18e6320b8 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -353,7 +353,7 @@ int EXPORT_FUNC(grub_vsnprintf) (char *str, grub_size_t n, const char *fmt,
+ char *EXPORT_FUNC(grub_xasprintf) (const char *fmt, ...)
+      __attribute__ ((format (GNU_PRINTF, 1, 2))) WARN_UNUSED_RESULT;
+ char *EXPORT_FUNC(grub_xvasprintf) (const char *fmt, va_list args) WARN_UNUSED_RESULT;
+-void EXPORT_FUNC(grub_exit) (void) __attribute__ ((noreturn));
++void EXPORT_FUNC(grub_exit) (int rc) __attribute__ ((noreturn));
+ grub_uint64_t EXPORT_FUNC(grub_divmod64) (grub_uint64_t n,
+ 					  grub_uint64_t d,
+ 					  grub_uint64_t *r);

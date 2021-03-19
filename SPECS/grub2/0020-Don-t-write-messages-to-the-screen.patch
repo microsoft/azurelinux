@@ -1,0 +1,159 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Wed, 15 May 2013 13:30:20 -0400
+Subject: [PATCH] Don't write messages to the screen
+
+Writing messages to the screen before the menus or boot splash
+happens so quickly it looks like something is wrong and isn't
+very appealing.
+---
+ grub-core/gettext/gettext.c       | 25 +++++--------------------
+ grub-core/boot/i386/pc/boot.S     |  3 ---
+ grub-core/boot/i386/pc/diskboot.S |  5 -----
+ util/grub.d/10_linux.in           |  7 -------
+ 4 files changed, 5 insertions(+), 35 deletions(-)
+
+diff --git a/grub-core/gettext/gettext.c b/grub-core/gettext/gettext.c
+index 4d02e62c109..84d520cd494 100644
+--- a/grub-core/gettext/gettext.c
++++ b/grub-core/gettext/gettext.c
+@@ -434,16 +434,12 @@ static char *
+ grub_gettext_env_write_lang (struct grub_env_var *var
+ 			     __attribute__ ((unused)), const char *val)
+ {
+-  grub_err_t err;
++  grub_err_t __attribute__((__unused__)) err;
+   err = grub_gettext_init_ext (&main_context, val, grub_env_get ("locale_dir"),
+ 			       grub_env_get ("prefix"));
+-  if (err)
+-    grub_print_error ();
+ 
+   err = grub_gettext_init_ext (&secondary_context, val,
+ 			       grub_env_get ("secondary_locale_dir"), 0);
+-  if (err)
+-    grub_print_error ();
+ 
+   return grub_strdup (val);
+ }
+@@ -451,23 +447,19 @@ grub_gettext_env_write_lang (struct grub_env_var *var
+ void
+ grub_gettext_reread_prefix (const char *val)
+ {
+-  grub_err_t err;
++  grub_err_t __attribute__((__unused__)) err;
+   err = grub_gettext_init_ext (&main_context, grub_env_get ("lang"), 
+ 			       grub_env_get ("locale_dir"),
+ 			       val);
+-  if (err)
+-    grub_print_error ();
+ }
+ 
+ static char *
+ read_main (struct grub_env_var *var
+ 	   __attribute__ ((unused)), const char *val)
+ {
+-  grub_err_t err;
++  grub_err_t __attribute__((__unused__)) err;
+   err = grub_gettext_init_ext (&main_context, grub_env_get ("lang"), val,
+ 			       grub_env_get ("prefix"));
+-  if (err)
+-    grub_print_error ();
+   return grub_strdup (val);
+ }
+ 
+@@ -475,12 +467,9 @@ static char *
+ read_secondary (struct grub_env_var *var
+ 		__attribute__ ((unused)), const char *val)
+ {
+-  grub_err_t err;
++  grub_err_t __attribute__((__unused__)) err;
+   err = grub_gettext_init_ext (&secondary_context, grub_env_get ("lang"), val,
+ 			       0);
+-  if (err)
+-    grub_print_error ();
+-
+   return grub_strdup (val);
+ }
+ 
+@@ -500,18 +489,14 @@ grub_cmd_translate (grub_command_t cmd __attribute__ ((unused)),
+ GRUB_MOD_INIT (gettext)
+ {
+   const char *lang;
+-  grub_err_t err;
++  grub_err_t __attribute__((__unused__)) err;
+ 
+   lang = grub_env_get ("lang");
+ 
+   err = grub_gettext_init_ext (&main_context, lang, grub_env_get ("locale_dir"),
+ 			       grub_env_get ("prefix"));
+-  if (err)
+-    grub_print_error ();
+   err = grub_gettext_init_ext (&secondary_context, lang,
+ 			       grub_env_get ("secondary_locale_dir"), 0);
+-  if (err)
+-    grub_print_error ();
+ 
+   grub_register_variable_hook ("locale_dir", NULL, read_main);
+   grub_register_variable_hook ("secondary_locale_dir", NULL, read_secondary);
+diff --git a/grub-core/boot/i386/pc/boot.S b/grub-core/boot/i386/pc/boot.S
+index 2bd0b2d2866..ea167fe1206 100644
+--- a/grub-core/boot/i386/pc/boot.S
++++ b/grub-core/boot/i386/pc/boot.S
+@@ -249,9 +249,6 @@ real_start:
+ 	/* save drive reference first thing! */
+ 	pushw	%dx
+ 
+-	/* print a notification message on the screen */
+-	MSG(notification_string)
+-
+ 	/* set %si to the disk address packet */
+ 	movw	$disk_address_packet, %si
+ 
+diff --git a/grub-core/boot/i386/pc/diskboot.S b/grub-core/boot/i386/pc/diskboot.S
+index c1addc0df29..68d31de0c4c 100644
+--- a/grub-core/boot/i386/pc/diskboot.S
++++ b/grub-core/boot/i386/pc/diskboot.S
+@@ -50,11 +50,6 @@ _start:
+ 	/* save drive reference first thing! */
+ 	pushw	%dx
+ 
+-	/* print a notification message on the screen */
+-	pushw	%si
+-	MSG(notification_string)
+-	popw	%si
+-
+ 	/* this sets up for the first run through "bootloop" */
+ 	movw	$LOCAL(firstlist), %di
+ 
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index dc75a1c30bf..ad2ac4b078d 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -138,27 +138,20 @@ linux_entry ()
+     fi
+     printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
+   fi
+-  message="$(gettext_printf "Loading Linux %s ..." ${version})"
+   sed "s/^/$submenu_indentation/" << EOF
+-	echo	'$(echo "$message" | grub_quote)'
+ 	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
+ EOF
+   if test -n "${initrd}" ; then
+-    # TRANSLATORS: ramdisk isn't identifier. Should be translated.
+-    message="$(gettext_printf "Loading initial ramdisk ...")"
+     initrd_path=
+     for i in ${initrd}; do
+       initrd_path="${initrd_path} ${rel_dirname}/${i}"
+     done
+     sed "s/^/$submenu_indentation/" << EOF
+-	echo	'$(echo "$message" | grub_quote)'
+ 	initrd	$(echo $initrd_path)
+ EOF
+   fi
+   if test -n "${fdt}" ; then
+-    message="$(gettext_printf "Loading fdt ...")"
+     sed "s/^/$submenu_indentation/" << EOF
+-	echo	'$(echo "$message" | grub_quote)'
+ 	devicetree	${rel_dirname}/${fdt}
+ EOF
+   fi

@@ -1,0 +1,114 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Thu, 5 Mar 2020 16:21:58 +0100
+Subject: [PATCH] efi/http: Enclose literal IPv6 addresses in square brackets
+
+According to RFC 2732 (https://www.ietf.org/rfc/rfc2732.txt), literal IPv6
+addresses must be enclosed in square brackets. But GRUB currently does not
+do this and is causing HTTP servers to send Bad Request (400) responses.
+
+For example, the following is the HTTP stream when fetching a config file:
+
+HEAD /EFI/BOOT/grub.cfg HTTP/1.1
+Host: 2000:dead:beef:a::1
+Accept: */*
+User-Agent: UefiHttpBoot/1.0
+
+HTTP/1.1 400 Bad Request
+Date: Thu, 05 Mar 2020 14:46:02 GMT
+Server: Apache/2.4.41 (Fedora) OpenSSL/1.1.1d
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+
+and after enclosing the IPv6 address the HTTP request is successful:
+
+HEAD /EFI/BOOT/grub.cfg HTTP/1.1
+Host: [2000:dead:beef:a::1]
+Accept: */*
+User-Agent: UefiHttpBoot/1.0
+
+HTTP/1.1 200 OK
+Date: Thu, 05 Mar 2020 14:48:04 GMT
+Server: Apache/2.4.41 (Fedora) OpenSSL/1.1.1d
+Last-Modified: Thu, 27 Feb 2020 17:45:58 GMT
+ETag: "206-59f924b24b1da"
+Accept-Ranges: bytes
+Content-Length: 518
+
+Resolves: rhbz#1732765
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/net/efi/http.c | 37 ++++++++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 9 deletions(-)
+
+diff --git a/grub-core/net/efi/http.c b/grub-core/net/efi/http.c
+index 755b7a6d054..fc8cb25ae0a 100644
+--- a/grub-core/net/efi/http.c
++++ b/grub-core/net/efi/http.c
+@@ -158,13 +158,7 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+   grub_efi_status_t status;
+   grub_efi_boot_services_t *b = grub_efi_system_table->boot_services;
+   char *url = NULL;
+-
+-  request_headers[0].field_name = (grub_efi_char8_t *)"Host";
+-  request_headers[0].field_value = (grub_efi_char8_t *)server;
+-  request_headers[1].field_name = (grub_efi_char8_t *)"Accept";
+-  request_headers[1].field_value = (grub_efi_char8_t *)"*/*";
+-  request_headers[2].field_name = (grub_efi_char8_t *)"User-Agent";
+-  request_headers[2].field_value = (grub_efi_char8_t *)"UefiHttpBoot/1.0";
++  char *hostname = NULL;
+ 
+   {
+     grub_efi_ipv6_address_t address;
+@@ -174,9 +168,24 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+     const char *protocol = (use_https == 1) ? "https" : "http";
+ 
+     if (grub_efi_string_to_ip6_address (server, &address, &rest) && *rest == 0)
+-      url = grub_xasprintf ("%s://[%s]%s", protocol, server, name);
++      {
++        hostname = grub_xasprintf ("[%s]", server);
++        if (!hostname)
++          return GRUB_ERR_OUT_OF_MEMORY;
++
++        server = hostname;
++
++        url = grub_xasprintf ("%s://%s%s", protocol, server, name);
++        if (!url)
++          {
++            grub_free (hostname);
++            return GRUB_ERR_OUT_OF_MEMORY;
++          }
++      }
+     else
+-      url = grub_xasprintf ("%s://%s%s", protocol, server, name);
++      {
++        url = grub_xasprintf ("%s://%s%s", protocol, server, name);
++      }
+ 
+     if (!url)
+       {
+@@ -199,6 +208,13 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+     request_data.url = ucs2_url;
+   }
+ 
++  request_headers[0].field_name = (grub_efi_char8_t *)"Host";
++  request_headers[0].field_value = (grub_efi_char8_t *)server;
++  request_headers[1].field_name = (grub_efi_char8_t *)"Accept";
++  request_headers[1].field_value = (grub_efi_char8_t *)"*/*";
++  request_headers[2].field_name = (grub_efi_char8_t *)"User-Agent";
++  request_headers[2].field_value = (grub_efi_char8_t *)"UefiHttpBoot/1.0";
++
+   request_data.method = (headeronly > 0) ? GRUB_EFI_HTTPMETHODHEAD : GRUB_EFI_HTTPMETHODGET;
+ 
+   request_message.data.request = &request_data;
+@@ -228,6 +244,9 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+ 
+   status = efi_call_2 (http->request, http, &request_token);
+ 
++  if (hostname)
++    grub_free (hostname);
++
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       efi_call_1 (b->close_event, request_token.event);

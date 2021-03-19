@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 10 Mar 2020 11:23:49 +0100
+Subject: [PATCH] efi/net: Print a debug message if parsing the address fails
+
+Currently if parsing the address fails an error message is printed. But in
+most cases this isn't a fatal error since the grub_efi_net_parse_address()
+function is only used to match an address with a network interface to use.
+
+And if this fails, the default interface is used which is good enough for
+most cases. So instead of printing an error that would pollute the console
+just print a debug message if the address is not parsed correctly.
+
+A user can enable debug messages for the efinet driver to have information
+about the failure and the fact that the default interface is being used.
+
+Related: rhbz#1732765
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/net/efi/net.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index 84573937b18..a3f0535d43c 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -778,9 +778,9 @@ grub_efi_net_parse_address (const char *address,
+ 	}
+     }
+ 
+-  return grub_error (GRUB_ERR_NET_BAD_ADDRESS,
+-		   N_("unrecognised network address `%s'"),
+-		   address);
++  grub_dprintf ("efinet", "unrecognised network address '%s'\n", address);
++
++  return GRUB_ERR_NET_BAD_ADDRESS;
+ }
+ 
+ static grub_efi_net_interface_t *
+@@ -795,10 +795,7 @@ match_route (const char *server)
+   err = grub_efi_net_parse_address (server, &ip4, &ip6, &is_ip6, 0);
+ 
+   if (err)
+-    {
+-      grub_print_error ();
+       return NULL;
+-    }
+ 
+   if (is_ip6)
+     {
+@@ -1233,8 +1230,15 @@ grub_net_open_real (const char *name __attribute__ ((unused)))
+   /*FIXME: Use DNS translate name to address */
+   net_interface = match_route (server);
+ 
++  if (!net_interface && net_default_interface)
++    {
++      net_interface = net_default_interface;
++      grub_dprintf ("efinet", "interface lookup failed, using default '%s'\n",
++                    net_interface->name);
++    }
++
+   /*XXX: should we check device with default gateway ? */
+-  if (!net_interface && !(net_interface = net_default_interface))
++  if (!net_interface)
+     {
+       grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("disk `%s' no route found"),
+ 		  name);

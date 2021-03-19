@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Abdurachmanov <david.abdurachmanov@sifive.com>
+Date: Sat, 9 Nov 2019 19:51:57 +0000
+Subject: [PATCH] Add start symbol for RISC-V
+
+All other architectures have start symbol.
+
+Hopefully this resolves:
+
+    BUILDSTDERR: ././grub-mkimage: error: undefined symbol start.
+
+Signed-off-by: David Abdurachmanov <david.abdurachmanov@sifive.com>
+---
+ grub-core/kern/riscv/efi/startup.S | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/kern/riscv/efi/startup.S b/grub-core/kern/riscv/efi/startup.S
+index f2a7b2b1ede..781773136e8 100644
+--- a/grub-core/kern/riscv/efi/startup.S
++++ b/grub-core/kern/riscv/efi/startup.S
+@@ -29,6 +29,7 @@
+ 
+ 	.file 	"startup.S"
+ 	.text
++FUNCTION(start)
+ FUNCTION(_start)
+ 	/*
+ 	 *  EFI_SYSTEM_TABLE and EFI_HANDLE are passed in a1/a0.

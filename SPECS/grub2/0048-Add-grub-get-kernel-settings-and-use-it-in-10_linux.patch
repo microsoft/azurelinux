@@ -1,0 +1,296 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 23 Jun 2016 11:01:39 -0400
+Subject: [PATCH] Add grub-get-kernel-settings and use it in 10_linux
+
+This patch adds grub-get-kernel-settings, which reads the system kernel
+installation configuration from /etc/sysconfig/kernel, and outputs
+${GRUB_...} variables suitable for evaluation by grub-mkconfig.  Those
+variables are then used by 10_linux to choose whether or not to create
+debug stanzas.
+
+Resolves: rhbz#1226325
+---
+ configure.ac                                   |  2 +
+ Makefile.util.def                              |  7 ++
+ util/bash-completion.d/grub-completion.bash.in | 22 +++++++
+ util/grub-get-kernel-settings.3                | 20 ++++++
+ util/grub-get-kernel-settings.in               | 88 ++++++++++++++++++++++++++
+ util/grub-mkconfig.in                          |  3 +
+ util/grub.d/10_linux.in                        | 23 +++++--
+ 7 files changed, 160 insertions(+), 5 deletions(-)
+ create mode 100644 util/grub-get-kernel-settings.3
+ create mode 100644 util/grub-get-kernel-settings.in
+
+diff --git a/configure.ac b/configure.ac
+index 9ecd3540bd6..281201f671e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,6 +65,7 @@ grub_TRANSFORM([grub-install])
+ grub_TRANSFORM([grub-mkconfig])
+ grub_TRANSFORM([grub-mkfont])
+ grub_TRANSFORM([grub-mkimage])
++grub_TRANSFORM([grub-get-kernel-settings])
+ grub_TRANSFORM([grub-glue-efi])
+ grub_TRANSFORM([grub-mklayout])
+ grub_TRANSFORM([grub-mkpasswd-pbkdf2])
+@@ -82,6 +83,7 @@ grub_TRANSFORM([grub-file])
+ grub_TRANSFORM([grub-bios-setup.3])
+ grub_TRANSFORM([grub-editenv.1])
+ grub_TRANSFORM([grub-fstest.3])
++grub_TRANSFORM([grub-get-kernel-settings.3])
+ grub_TRANSFORM([grub-glue-efi.3])
+ grub_TRANSFORM([grub-install.1])
+ grub_TRANSFORM([grub-kbdcomp.3])
+diff --git a/Makefile.util.def b/Makefile.util.def
+index 1a7dd433e33..cdd2f51fe4b 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -732,6 +732,13 @@ script = {
+   installdir = sbin;
+ };
+ 
++script = {
++  name = grub-get-kernel-settings;
++  common = util/grub-get-kernel-settings.in;
++  mansection = 3;
++  installdir = sbin;
++};
++
+ script = {
+   name = grub-set-default;
+   common = util/grub-set-default.in;
+diff --git a/util/bash-completion.d/grub-completion.bash.in b/util/bash-completion.d/grub-completion.bash.in
+index 44bf135b9f8..5c4acd496d4 100644
+--- a/util/bash-completion.d/grub-completion.bash.in
++++ b/util/bash-completion.d/grub-completion.bash.in
+@@ -264,6 +264,28 @@ have ${__grub_sparc64_setup_program} && \
+ unset __grub_sparc64_setup_program
+ 
+ 
++#
++# grub-get-kernel-settings
++#
++_grub_get_kernel_settings () {
++    local cur
++
++    COMPREPLY=()
++    cur=`_get_cword`
++
++    if [[ "$cur" == -* ]]; then
++        __grubcomp "$(__grub_get_options_from_help)"
++    else
++        # Default complete with a filename
++        _filedir
++    fi
++}
++__grub_get_kernel_settings_program="@grub_get_kernel_settings@"
++have ${__grub_get_kernel_settings_program} && \
++ complete -F _grub_get_kernel_settings -o filenames ${__grub_get_kernel_settings_program}
++unset __grub_get_kernel_settings_program
++
++
+ #
+ # grub-install
+ #
+diff --git a/util/grub-get-kernel-settings.3 b/util/grub-get-kernel-settings.3
+new file mode 100644
+index 00000000000..ba33330e28d
+--- /dev/null
++++ b/util/grub-get-kernel-settings.3
+@@ -0,0 +1,20 @@
++.TH GRUB-GET-KERNEL-SETTINGS 3 "Thu Jun 25 2015"
++.SH NAME
++\fBgrub-get-kernel-settings\fR \(em Evaluate the system's kernel installation settings for use while making a grub configuration file.
++
++.SH SYNOPSIS
++\fBgrub-get-kernel-settings\fR [OPTION]
++
++.SH DESCRIPTION
++\fBgrub-get-kernel-settings\fR reads the kernel installation settings on the host system, and emits a set of grub settings suitable for use when creating a grub configuration file.
++
++.SH OPTIONS
++.TP
++-h, --help
++Display program usage and exit.
++.TP
++-v, --version
++Display the current version.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-get-kernel-settings.in b/util/grub-get-kernel-settings.in
+new file mode 100644
+index 00000000000..7e87dfccc0e
+--- /dev/null
++++ b/util/grub-get-kernel-settings.in
+@@ -0,0 +1,88 @@
++#!/bin/sh
++set -e
++
++# Evaluate new-kernel-pkg's configuration file.
++# Copyright (C) 2016 Free Software Foundation, Inc.
++#
++# GRUB is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# GRUB is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++
++PACKAGE_NAME=@PACKAGE_NAME@
++PACKAGE_VERSION=@PACKAGE_VERSION@
++datadir="@datadir@"
++if [ "x$pkgdatadir" = x ]; then
++    pkgdatadir="${datadir}/@PACKAGE@"
++fi
++
++self=`basename $0`
++
++export TEXTDOMAIN=@PACKAGE@
++export TEXTDOMAINDIR="@localedir@"
++
++. "${pkgdatadir}/grub-mkconfig_lib"
++
++# Usage: usage
++# Print the usage.
++usage () {
++    gettext_printf "Usage: %s [OPTION]\n" "$self"
++    gettext "Evaluate new-kernel-pkg configuration"; echo
++    echo
++    print_option_help "-h, --help" "$(gettext "print this message and exit")"
++    print_option_help "-v, --version" "$(gettext "print the version information and exit")"
++    echo
++}
++
++# Check the arguments.
++while test $# -gt 0
++do
++    option=$1
++    shift
++
++    case "$option" in
++    -h | --help)
++	usage
++	exit 0 ;;
++    -v | --version)
++	echo "$self (${PACKAGE_NAME}) ${PACKAGE_VERSION}"
++	exit 0 ;;
++    -*)
++	gettext_printf "Unrecognized option \`%s'\n" "$option" 1>&2
++	usage
++	exit 1
++	;;
++    # Explicitly ignore non-option arguments, for compatibility.
++    esac
++done
++
++if test -f /etc/sysconfig/kernel ; then
++    . /etc/sysconfig/kernel
++fi
++
++if [ "$MAKEDEBUG" = "yes" ]; then
++    echo GRUB_LINUX_MAKE_DEBUG=true
++    echo export GRUB_LINUX_MAKE_DEBUG
++    echo GRUB_CMDLINE_LINUX_DEBUG=\"systemd.log_level=debug systemd.log_target=kmsg\"
++    echo export GRUB_CMDLINE_LINUX_DEBUG
++    echo GRUB_LINUX_DEBUG_TITLE_POSTFIX=\" with debugging\"
++    echo export GRUB_LINUX_DEBUG_TITLE_POSTFIX
++fi
++if [ "$DEFAULTDEBUG" = "yes" ]; then
++    echo GRUB_DEFAULT_TO_DEBUG=true
++else
++    echo GRUB_DEFAULT_TO_DEBUG=false
++fi
++echo export GRUB_DEFAULT_TO_DEBUG
++if [ "$UPDATEDEFAULT" = "yes" ]; then
++    echo GRUB_UPDATE_DEFAULT_KERNEL=true
++    echo export GRUB_UPDATE_DEFAULT_KERNEL
++fi
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index 3e4c6c5240b..60beaaa6962 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -45,6 +45,7 @@ grub_probe="${sbindir}/@grub_probe@"
+ grub_file="${bindir}/@grub_file@"
+ grub_editenv="${bindir}/@grub_editenv@"
+ grub_script_check="${bindir}/@grub_script_check@"
++grub_get_kernel_settings="${sbindir}/@grub_get_kernel_settings@"
+ 
+ export TEXTDOMAIN=@PACKAGE@
+ export TEXTDOMAINDIR="@localedir@"
+@@ -161,6 +162,8 @@ if test -f ${sysconfdir}/default/grub ; then
+   . ${sysconfdir}/default/grub
+ fi
+ 
++eval "$("${grub_get_kernel_settings}")" || true
++
+ if [ "x${GRUB_DISABLE_UUID}" = "xtrue" ]; then
+   if [ -z "${GRUB_DISABLE_LINUX_UUID}" ]; then
+     GRUB_DISABLE_LINUX_UUID="true"
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 2e59f3b4197..0f3c19e30cc 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -111,7 +111,8 @@ linux_entry ()
+   os="$1"
+   version="$2"
+   type="$3"
+-  args="$4"
++  isdebug="$4"
++  args="$5"
+ 
+   if [ -z "$boot_device_id" ]; then
+       boot_device_id="$(grub_get_device_id "${GRUB_DEVICE}")"
+@@ -123,6 +124,9 @@ linux_entry ()
+ 	  quoted="$(echo "$GRUB_ACTUAL_DEFAULT" | grub_quote)"
+ 	  title_correction_code="${title_correction_code}if [ \"x\$default\" = '$quoted' ]; then default='$(echo "$replacement_title" | grub_quote)'; fi;"
+       fi
++      if [ x$isdebug = xdebug ]; then
++	  title="$title${GRUB_LINUX_DEBUG_TITLE_POSTFIX}"
++      fi
+       echo "menuentry '$(echo "$title" | grub_quote)' ${CLASS} \$menuentry_id_option 'gnulinux-$version-$type-$boot_device_id' {" | sed "s/^/$submenu_indentation/"
+   else
+       echo "menuentry '$(echo "$os" | grub_quote)' ${CLASS} \$menuentry_id_option 'gnulinux-simple-$boot_device_id' {" | sed "s/^/$submenu_indentation/"
+@@ -299,11 +303,15 @@ while [ "x$list" != "x" ] ; do
+   fi
+ 
+   if [ "x$is_top_level" = xtrue ] && [ "x${GRUB_DISABLE_SUBMENU}" != xtrue ]; then
+-    linux_entry "${OS}" "${version}" simple \
++    linux_entry "${OS}" "${version}" simple standard \
+     "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++    if [ "x$GRUB_LINUX_MAKE_DEBUG" = "xtrue" ]; then
++      linux_entry "${OS}" "${version}" simple debug \
++        "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT} ${GRUB_CMDLINE_LINUX_DEBUG}"
++    fi
+ 
+     submenu_indentation="$grub_tab"
+-    
++
+     if [ -z "$boot_device_id" ]; then
+ 	boot_device_id="$(grub_get_device_id "${GRUB_DEVICE}")"
+     fi
+@@ -312,10 +320,15 @@ while [ "x$list" != "x" ] ; do
+     is_top_level=false
+   fi
+ 
+-  linux_entry "${OS}" "${version}" advanced \
++  linux_entry "${OS}" "${version}" advanced standard \
+               "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++  if [ "x$GRUB_LINUX_MAKE_DEBUG" = "xtrue" ]; then
++    linux_entry "${OS}" "${version}" advanced debug \
++                "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT} ${GRUB_CMDLINE_LINUX_DEBUG}"
++  fi
++
+   if [ "x${GRUB_DISABLE_RECOVERY}" != "xtrue" ]; then
+-    linux_entry "${OS}" "${version}" recovery \
++    linux_entry "${OS}" "${version}" recovery standard \
+                 "single ${GRUB_CMDLINE_LINUX}"
+   fi
+ 

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fedora Ninjas <grub2-owner@fedoraproject.org>
+Date: Mon, 13 Jan 2014 21:50:59 -0500
+Subject: [PATCH] Add .eh_frame to list of relocations stripped
+
+---
+ conf/Makefile.common | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index 2a1a886f6d5..191b1a70c6b 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -38,7 +38,7 @@ CFLAGS_KERNEL = $(CFLAGS_PLATFORM) -ffreestanding
+ LDFLAGS_KERNEL = $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC)
+ CPPFLAGS_KERNEL = $(CPPFLAGS_CPU) $(CPPFLAGS_PLATFORM) -DGRUB_KERNEL=1
+ CCASFLAGS_KERNEL = $(CCASFLAGS_CPU) $(CCASFLAGS_PLATFORM)
+-STRIPFLAGS_KERNEL = -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx
++STRIPFLAGS_KERNEL = -R .eh_frame -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx
+ 
+ CFLAGS_MODULE = $(CFLAGS_PLATFORM) -ffreestanding
+ LDFLAGS_MODULE = $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC) -Wl,-r,-d

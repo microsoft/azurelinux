@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 9 Apr 2019 12:30:38 +0200
+Subject: [PATCH] Fix systemctl kexec exit status check
+
+There's always an error printed even when the systemctl kexec command does
+succeed. That's because systemctl executes it asynchronously, but the emu
+loader seems to expect it to be synchronous and that should never return.
+
+Also, it's wrong to test if kexecute == 1 since we already know that's the
+case or otherwise the function wouldn't had called grub_fatal() earlier.
+
+Finally, systemctl kexec failing shouldn't be a fatal error since the emu
+loader fallbacks to executing the kexec command in case of a failure.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/loader/emu/linux.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/loader/emu/linux.c b/grub-core/loader/emu/linux.c
+index fda9e00d24c..5b85b225eed 100644
+--- a/grub-core/loader/emu/linux.c
++++ b/grub-core/loader/emu/linux.c
+@@ -71,8 +71,10 @@ grub_linux_boot (void)
+ 		(kexecute==1) ? "do-or-die" : "just-in-case");
+   rc = grub_util_exec (systemctl);
+ 
+-  if (kexecute == 1)
+-    grub_fatal (N_("Error trying to perform 'systemctl kexec'"));
++  if (rc == GRUB_ERR_NONE)
++    return rc;
++
++  grub_error (rc, N_("Error trying to perform 'systemctl kexec'"));
+ 
+   /* need to check read-only root before resetting hard!? */
+   grub_printf("Performing 'kexec -e'");

@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 11 Jul 2019 18:20:37 +0200
+Subject: [PATCH] Don't use -Wno-sign-compare -Wno-conversion -Wno-error, do
+ use -Wextra.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ configure.ac         | 14 +++++++++++---
+ conf/Makefile.common |  2 +-
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index dabcbafc985..f691767a2c0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1480,11 +1480,11 @@ fi
+ # Set them to their new values for the tests below.
+ CC="$TARGET_CC"
+ if test x"$platform" = xemu ; then
+-CFLAGS="$TARGET_CFLAGS -Wno-error"
++CFLAGS="$TARGET_CFLAGS"
+ elif test "x$TARGET_APPLE_LINKER" = x1 ; then
+-CFLAGS="$TARGET_CFLAGS -nostdlib -static -Wno-error"
++CFLAGS="$TARGET_CFLAGS -nostdlib -static"
+ else
+-CFLAGS="$TARGET_CFLAGS -nostdlib -Wno-error"
++CFLAGS="$TARGET_CFLAGS -nostdlib"
+ fi
+ CPPFLAGS="$TARGET_CPPFLAGS"
+ 
+@@ -2054,6 +2054,14 @@ if test x"$enable_werror" != xno ; then
+   HOST_CFLAGS="$HOST_CFLAGS -Werror"
+ fi
+ 
++AC_ARG_ENABLE([wextra],
++	      [AS_HELP_STRING([--disable-wextra],
++                             [do not use -Wextra when building GRUB])])
++if test x"$enable_wextra" != xno ; then
++  TARGET_CFLAGS="$TARGET_CFLAGS -Wextra"
++  HOST_CFLAGS="$HOST_CFLAGS -Wextra"
++fi
++
+ TARGET_CPP="$TARGET_CC -E"
+ TARGET_CCAS=$TARGET_CC
+ 
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index 2ff9b39357c..35e14ff017e 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -66,7 +66,7 @@ grubconfdir = $(sysconfdir)/grub.d
+ platformdir = $(pkglibdir)/$(target_cpu)-$(platform)
+ starfielddir = $(pkgdatadir)/themes/starfield
+ 
+-CFLAGS_GNULIB = -Wno-undef -Wno-sign-compare -Wno-unused -Wno-unused-parameter -Wno-redundant-decls -Wno-unreachable-code -Wno-conversion
++CFLAGS_GNULIB = -Wno-undef -Wno-unused -Wno-unused-parameter -Wno-redundant-decls -Wno-unreachable-code
+ CPPFLAGS_GNULIB = -I$(top_builddir)/grub-core/lib/gnulib -I$(top_srcdir)/grub-core/lib/gnulib
+ 
+ CFLAGS_POSIX = -fno-builtin

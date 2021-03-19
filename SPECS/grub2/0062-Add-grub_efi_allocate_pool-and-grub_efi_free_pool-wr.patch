@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 1 Jun 2017 09:59:56 -0400
+Subject: [PATCH] Add grub_efi_allocate_pool() and grub_efi_free_pool()
+ wrappers.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ include/grub/efi/efi.h | 36 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 585fa6662b6..03f9a9d0118 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -24,6 +24,10 @@
+ #include <grub/dl.h>
+ #include <grub/efi/api.h>
+ 
++/* Variables.  */
++extern grub_efi_system_table_t *EXPORT_VAR(grub_efi_system_table);
++extern grub_efi_handle_t EXPORT_VAR(grub_efi_image_handle);
++
+ /* Functions.  */
+ void *EXPORT_FUNC(grub_efi_locate_protocol) (grub_efi_guid_t *protocol,
+ 					     void *registration);
+@@ -60,6 +64,33 @@ EXPORT_FUNC(grub_efi_get_memory_map) (grub_efi_uintn_t *memory_map_size,
+ 				      grub_efi_uintn_t *descriptor_size,
+ 				      grub_efi_uint32_t *descriptor_version);
+ void grub_efi_memory_fini (void);
++
++static inline grub_efi_status_t
++__attribute__((__unused__))
++grub_efi_allocate_pool (grub_efi_memory_type_t pool_type,
++			grub_efi_uintn_t buffer_size,
++			void **buffer)
++{
++  grub_efi_boot_services_t *b;
++  grub_efi_status_t status;
++
++  b = grub_efi_system_table->boot_services;
++  status = efi_call_3 (b->allocate_pool, pool_type, buffer_size, buffer);
++  return status;
++}
++
++static inline grub_efi_status_t
++__attribute__((__unused__))
++grub_efi_free_pool (void *buffer)
++{
++  grub_efi_boot_services_t *b;
++  grub_efi_status_t status;
++
++  b = grub_efi_system_table->boot_services;
++  status = efi_call_1 (b->free_pool, buffer);
++  return status;
++}
++
+ grub_efi_loaded_image_t *EXPORT_FUNC(grub_efi_get_loaded_image) (grub_efi_handle_t image_handle);
+ void EXPORT_FUNC(grub_efi_print_device_path) (grub_efi_device_path_t *dp);
+ char *EXPORT_FUNC(grub_efi_get_filename) (grub_efi_device_path_t *dp);
+@@ -115,10 +146,7 @@ void grub_efi_init (void);
+ void grub_efi_fini (void);
+ void grub_efi_set_prefix (void);
+ 
+-/* Variables.  */
+-extern grub_efi_system_table_t *EXPORT_VAR(grub_efi_system_table);
+-extern grub_efi_handle_t EXPORT_VAR(grub_efi_image_handle);
+-
++/* More variables.  */
+ extern int EXPORT_VAR(grub_efi_is_finished);
+ 
+ struct grub_net_card;

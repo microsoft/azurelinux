@@ -1,0 +1,129 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 21 Aug 2014 03:39:11 +0000
+Subject: [PATCH] grub2-btrfs-05-grub2-mkconfig
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+---
+ util/grub-mkconfig.in       |  3 ++-
+ util/grub-mkconfig_lib.in   |  4 ++++
+ util/grub.d/00_header.in    | 25 ++++++++++++++++++++++++-
+ util/grub.d/10_linux.in     |  4 ++++
+ util/grub.d/20_linux_xen.in |  4 ++++
+ 5 files changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index 60beaaa6962..e671ce68aec 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -255,7 +255,8 @@ export GRUB_DEFAULT \
+   GRUB_BADRAM \
+   GRUB_OS_PROBER_SKIP_LIST \
+   GRUB_DISABLE_SUBMENU \
+-  GRUB_DEFAULT_DTB
++  GRUB_DEFAULT_DTB \
++  SUSE_BTRFS_SNAPSHOT_BOOTING
+ 
+ if test "x${grub_cfg}" != "x"; then
+   rm -f "${grub_cfg}.new"
+diff --git a/util/grub-mkconfig_lib.in b/util/grub-mkconfig_lib.in
+index 42c2ea9ba50..fafeac95061 100644
+--- a/util/grub-mkconfig_lib.in
++++ b/util/grub-mkconfig_lib.in
+@@ -52,7 +52,11 @@ grub_warn ()
+ 
+ make_system_path_relative_to_its_root ()
+ {
++  if [ "x${SUSE_BTRFS_SNAPSHOT_BOOTING}" = "xtrue" ] ; then
++  "${grub_mkrelpath}" -r "$1"
++  else
+   "${grub_mkrelpath}" "$1"
++  fi
+ }
+ 
+ is_path_readable_by_grub ()
+diff --git a/util/grub.d/00_header.in b/util/grub.d/00_header.in
+index 858b526c925..de727e6ee6b 100644
+--- a/util/grub.d/00_header.in
++++ b/util/grub.d/00_header.in
+@@ -27,6 +27,14 @@ export TEXTDOMAINDIR="@localedir@"
+ 
+ . "$pkgdatadir/grub-mkconfig_lib"
+ 
++if [ "x${SUSE_BTRFS_SNAPSHOT_BOOTING}" = "xtrue" ] &&
++   [ "x${GRUB_FS}" = "xbtrfs" ] ; then
++    cat <<EOF
++set btrfs_relative_path="y"
++export btrfs_relative_path
++EOF
++fi
++
+ # Do this as early as possible, since other commands might depend on it.
+ # (e.g. the `loadfont' command might need lvm or raid modules)
+ for i in ${GRUB_PRELOAD_MODULES} ; do
+@@ -45,7 +53,9 @@ if [ "x${GRUB_TIMEOUT_BUTTON}" = "x" ] ; then GRUB_TIMEOUT_BUTTON="$GRUB_TIMEOUT
+ cat << EOF
+ set pager=1
+ 
+-if [ -s \$prefix/grubenv ]; then
++if [ -f \${config_directory}/grubenv ]; then
++  load_env -f \${config_directory}/grubenv
++elif [ -s \$prefix/grubenv ]; then
+   load_env
+ fi
+ EOF
+@@ -356,3 +366,16 @@ fi
+ if [ "x${GRUB_BADRAM}" != "x" ] ; then
+   echo "badram ${GRUB_BADRAM}"
+ fi
++
++if [ "x${SUSE_BTRFS_SNAPSHOT_BOOTING}" = "xtrue" ] &&
++   [ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ] &&
++   [ "x${GRUB_FS}" = "xbtrfs" ] ; then
++    # Note: No $snapshot_num on *read-only* rollback!  (bsc#901487)
++    cat <<EOF
++if [ -n "\$extra_cmdline" ]; then
++  submenu "Bootable snapshot #\$snapshot_num" {
++    menuentry "If OK, run 'snapper rollback' and reboot." { true; }
++  }
++fi
++EOF
++fi
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 0f3c19e30cc..cbfaca34cc7 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -66,10 +66,14 @@ fi
+ 
+ case x"$GRUB_FS" in
+     xbtrfs)
++	if [ "x${SUSE_BTRFS_SNAPSHOT_BOOTING}" = "xtrue" ]; then
++	GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} \${extra_cmdline}"
++	else
+ 	rootsubvol="`make_system_path_relative_to_its_root /`"
+ 	rootsubvol="${rootsubvol#/}"
+ 	if [ "x${rootsubvol}" != x ]; then
+ 	    GRUB_CMDLINE_LINUX="rootflags=subvol=${rootsubvol} ${GRUB_CMDLINE_LINUX}"
++	fi
+ 	fi;;
+     xzfs)
+ 	rpool=`${grub_probe} --device ${GRUB_DEVICE} --target=fs_label 2>/dev/null || true`
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index ada20775a14..e9e73b815fb 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -73,10 +73,14 @@ fi
+ 
+ case x"$GRUB_FS" in
+     xbtrfs)
++	if [ "x${SUSE_BTRFS_SNAPSHOT_BOOTING}" = "xtrue" ]; then
++	GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} \${extra_cmdline}"
++	else
+ 	rootsubvol="`make_system_path_relative_to_its_root /`"
+ 	rootsubvol="${rootsubvol#/}"
+ 	if [ "x${rootsubvol}" != x ]; then
+ 	    GRUB_CMDLINE_LINUX="rootflags=subvol=${rootsubvol} ${GRUB_CMDLINE_LINUX}"
++	fi
+ 	fi;;
+     xzfs)
+ 	rpool=`${grub_probe} --device ${GRUB_DEVICE} --target=fs_label 2>/dev/null || true`

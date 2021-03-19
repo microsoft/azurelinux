@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Sat, 23 Nov 2019 16:23:54 +0100
+Subject: [PATCH] Don't clear screen when debugging is enabled
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+---
+ grub-core/normal/main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index e349303c29b..155bf366da2 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -210,7 +210,8 @@ void
+ grub_normal_init_page (struct grub_term_output *term,
+ 		       int y __attribute__((__unused__)))
+ {
+-  grub_term_cls (term);
++  if (! grub_debug_is_enabled ())
++    grub_term_cls (term);
+ 
+ #if 0
+   grub_ssize_t msg_len;

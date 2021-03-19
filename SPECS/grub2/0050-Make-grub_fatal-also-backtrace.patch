@@ -1,0 +1,172 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 27 Jan 2016 09:22:42 -0500
+Subject: [PATCH] Make grub_fatal() also backtrace.
+
+---
+ grub-core/Makefile.core.def     |  3 ++
+ grub-core/kern/misc.c           |  8 +++++-
+ grub-core/lib/arm64/backtrace.c | 62 +++++++++++++++++++++++++++++++++++++++++
+ grub-core/lib/backtrace.c       |  2 ++
+ grub-core/lib/i386/backtrace.c  | 14 +++++++++-
+ 5 files changed, 87 insertions(+), 2 deletions(-)
+ create mode 100644 grub-core/lib/arm64/backtrace.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index c15e91943b9..058c88ac3af 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -188,6 +188,9 @@ kernel = {
+ 
+   softdiv = lib/division.c;
+ 
++  x86 = lib/i386/backtrace.c;
++  x86 = lib/backtrace.c;
++
+   i386 = kern/i386/dl.c;
+   i386_xen = kern/i386/dl.c;
+   i386_xen_pvh = kern/i386/dl.c;
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index 63b586d09cb..a3e215155bd 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -24,6 +24,7 @@
+ #include <grub/term.h>
+ #include <grub/env.h>
+ #include <grub/i18n.h>
++#include <grub/backtrace.h>
+ 
+ union printf_arg
+ {
+@@ -1199,8 +1200,13 @@ grub_printf_fmt_check (const char *fmt, const char *fmt_expected)
+ static void __attribute__ ((noreturn))
+ grub_abort (void)
+ {
++#ifndef GRUB_UTIL
++#if defined(__i386__) || defined(__x86_64__)
++  grub_backtrace();
++#endif
++#endif
+   grub_printf ("\nAborted.");
+-  
++
+ #ifndef GRUB_UTIL
+   if (grub_term_inputs)
+ #endif
+diff --git a/grub-core/lib/arm64/backtrace.c b/grub-core/lib/arm64/backtrace.c
+new file mode 100644
+index 00000000000..1079b5380e1
+--- /dev/null
++++ b/grub-core/lib/arm64/backtrace.c
+@@ -0,0 +1,62 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2009  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/misc.h>
++#include <grub/command.h>
++#include <grub/err.h>
++#include <grub/dl.h>
++#include <grub/mm.h>
++#include <grub/term.h>
++#include <grub/backtrace.h>
++
++#define MAX_STACK_FRAME 102400
++
++void
++grub_backtrace_pointer (int frame)
++{
++  while (1)
++    {
++      void *lp = __builtin_return_address (frame);
++      if (!lp)
++	break;
++
++      lp = __builtin_extract_return_addr (lp);
++
++      grub_printf ("%p: ", lp);
++      grub_backtrace_print_address (lp);
++      grub_printf (" (");
++      for (i = 0; i < 2; i++)
++	grub_printf ("%p,", ((void **)ptr) [i + 2]);
++      grub_printf ("%p)\n", ((void **)ptr) [i + 2]);
++      nptr = *(void **)ptr;
++      if (nptr < ptr || (void **) nptr - (void **) ptr > MAX_STACK_FRAME
++	  || nptr == ptr)
++	{
++	  grub_printf ("Invalid stack frame at %p (%p)\n", ptr, nptr);
++	  break;
++	}
++      ptr = nptr;
++    }
++}
++
++void
++grub_backtrace (void)
++{
++  grub_backtrace_pointer (1);
++}
++
+diff --git a/grub-core/lib/backtrace.c b/grub-core/lib/backtrace.c
+index 825a8800e25..c0ad6ab8be1 100644
+--- a/grub-core/lib/backtrace.c
++++ b/grub-core/lib/backtrace.c
+@@ -29,6 +29,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ void
+ grub_backtrace_print_address (void *addr)
+ {
++#ifndef GRUB_UTIL
+   grub_dl_t mod;
+ 
+   FOR_DL_MODULES (mod)
+@@ -44,6 +45,7 @@ grub_backtrace_print_address (void *addr)
+ 	}
+   }
+ 
++#endif
+   grub_printf ("%p", addr);
+ }
+ 
+diff --git a/grub-core/lib/i386/backtrace.c b/grub-core/lib/i386/backtrace.c
+index c3e03c7275c..c67273db3ae 100644
+--- a/grub-core/lib/i386/backtrace.c
++++ b/grub-core/lib/i386/backtrace.c
+@@ -15,11 +15,23 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+  */
++#include <config.h>
++#ifdef GRUB_UTIL
++#define REALLY_GRUB_UTIL GRUB_UTIL
++#undef GRUB_UTIL
++#endif
++
++#include <grub/symbol.h>
++#include <grub/dl.h>
++
++#ifdef REALLY_GRUB_UTIL
++#define GRUB_UTIL REALLY_GRUB_UTIL
++#undef REALLY_GRUB_UTIL
++#endif
+ 
+ #include <grub/misc.h>
+ #include <grub/command.h>
+ #include <grub/err.h>
+-#include <grub/dl.h>
+ #include <grub/mm.h>
+ #include <grub/term.h>
+ #include <grub/backtrace.h>

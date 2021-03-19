@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 28 Oct 2013 10:09:27 -0400
+Subject: [PATCH] Enable pager by default. (#985860)
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub.d/00_header.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/util/grub.d/00_header.in b/util/grub.d/00_header.in
+index 93a90233ead..858b526c925 100644
+--- a/util/grub.d/00_header.in
++++ b/util/grub.d/00_header.in
+@@ -43,6 +43,8 @@ if [ "x${GRUB_DEFAULT_BUTTON}" = "xsaved" ] ; then GRUB_DEFAULT_BUTTON='${saved_
+ if [ "x${GRUB_TIMEOUT_BUTTON}" = "x" ] ; then GRUB_TIMEOUT_BUTTON="$GRUB_TIMEOUT" ; fi
+ 
+ cat << EOF
++set pager=1
++
+ if [ -s \$prefix/grubenv ]; then
+   load_env
+ fi

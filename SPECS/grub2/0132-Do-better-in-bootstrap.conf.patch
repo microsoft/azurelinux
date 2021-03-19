@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 29 Jul 2019 10:58:52 -0400
+Subject: [PATCH] Do better in bootstrap.conf
+
+---
+ bootstrap.conf | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/bootstrap.conf b/bootstrap.conf
+index 186be9c48ce..9259526e891 100644
+--- a/bootstrap.conf
++++ b/bootstrap.conf
+@@ -16,7 +16,13 @@
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ 
+ 
+-GNULIB_REVISION=d271f868a8df9bbec29049d01e056481b7a1a263
++# GNULIB_REVISION=d271f868a8df9bbec29049d01e056481b7a1a263
++if [[ -z "${GNULIB_REVISION}" ]] ;then
++  GNULIB_REVISION=fixes
++fi
++if [[ -z "${GNULIB_URL}" ]] ;then
++  GNULIB_URL=https://github.com/rhboot/gnulib.git
++fi
+ 
+ # gnulib modules used by this package.
+ # mbswidth is used by gnulib-fix-width.diff's changes to argp rather than

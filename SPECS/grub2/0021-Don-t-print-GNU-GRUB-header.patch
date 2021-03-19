@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Wed, 15 May 2013 13:53:48 -0400
+Subject: [PATCH] Don't print GNU GRUB header
+
+No one cares.
+---
+ grub-core/normal/main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 7ca2e5400b1..5d5f7b539f5 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -208,15 +208,16 @@ read_config_file (const char *config)
+ /* Initialize the screen.  */
+ void
+ grub_normal_init_page (struct grub_term_output *term,
+-		       int y)
++		       int y __attribute__((__unused__)))
+ {
++  grub_term_cls (term);
++
++#if 0
+   grub_ssize_t msg_len;
+   int posx;
+   char *msg_formatted;
+   grub_uint32_t *unicode_msg;
+   grub_uint32_t *last_position;
+- 
+-  grub_term_cls (term);
+ 
+   msg_formatted = grub_xasprintf (_("GNU GRUB  version %s"), PACKAGE_VERSION);
+   if (!msg_formatted)
+@@ -241,6 +242,7 @@ grub_normal_init_page (struct grub_term_output *term,
+   grub_putcode ('\n', term);
+   grub_putcode ('\n', term);
+   grub_free (unicode_msg);
++#endif
+ }
+ 
+ static void

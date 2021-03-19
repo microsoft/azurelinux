@@ -1,0 +1,631 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 29 Jul 2019 11:21:27 -0400
+Subject: [PATCH] Use git to apply gnulib patches.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ bootstrap.conf                                     |   6 -
+ conf/Makefile.extra-dist                           |  10 -
+ grub-core/lib/gnulib-patches/fix-base64.patch      |  21 --
+ grub-core/lib/gnulib-patches/fix-null-deref.patch  |  13 --
+ .../lib/gnulib-patches/fix-null-state-deref.patch  |  12 --
+ .../gnulib-patches/fix-regcomp-uninit-token.patch  |  15 --
+ .../gnulib-patches/fix-regexec-null-deref.patch    |  12 --
+ .../gnulib-patches/fix-sign-compare-errors.patch   | 161 ---------------
+ .../lib/gnulib-patches/fix-uninit-structure.patch  |  11 --
+ .../lib/gnulib-patches/fix-unused-value.patch      |  14 --
+ grub-core/lib/gnulib-patches/fix-width.patch       | 217 ---------------------
+ grub-core/lib/gnulib-patches/no-abort.patch        |  26 ---
+ 12 files changed, 518 deletions(-)
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-base64.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-null-deref.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-null-state-deref.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-regcomp-uninit-token.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-sign-compare-errors.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-uninit-structure.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-unused-value.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/fix-width.patch
+ delete mode 100644 grub-core/lib/gnulib-patches/no-abort.patch
+
+diff --git a/bootstrap.conf b/bootstrap.conf
+index 9259526e891..452f4d79b0d 100644
+--- a/bootstrap.conf
++++ b/bootstrap.conf
+@@ -85,12 +85,6 @@ cp -a INSTALL INSTALL.grub
+ 
+ bootstrap_post_import_hook () {
+   set -e
+-  for patchname in fix-base64 fix-null-deref fix-null-state-deref fix-regcomp-uninit-token \
+-      fix-regexec-null-deref fix-uninit-structure fix-unused-value fix-width no-abort \
+-      fix-sign-compare-errors; do
+-    patch -d grub-core/lib/gnulib -p2 \
+-      < "grub-core/lib/gnulib-patches/$patchname.patch"
+-  done
+   for patchname in \
+       0001-Support-POTFILES-shell \
+       0002-Handle-gettext_printf-shell-function \
+diff --git a/conf/Makefile.extra-dist b/conf/Makefile.extra-dist
+index ea58362b555..8ddf22e6c99 100644
+--- a/conf/Makefile.extra-dist
++++ b/conf/Makefile.extra-dist
+@@ -30,16 +30,6 @@ EXTRA_DIST += grub-core/gensymlist.sh
+ EXTRA_DIST += grub-core/genemuinit.sh
+ EXTRA_DIST += grub-core/genemuinitheader.sh
+ 
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-base64.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-null-deref.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-null-state-deref.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-regcomp-uninit-token.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-uninit-structure.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-unused-value.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/fix-width.patch
+-EXTRA_DIST += grub-core/lib/gnulib-patches/no-abort.patch
+-
+ EXTRA_DIST += grub-core/lib/libgcrypt
+ EXTRA_DIST += grub-core/lib/libgcrypt-grub/mpi/generic
+ EXTRA_DIST += $(shell find $(top_srcdir)/include -name '*.h')
+diff --git a/grub-core/lib/gnulib-patches/fix-base64.patch b/grub-core/lib/gnulib-patches/fix-base64.patch
+deleted file mode 100644
+index 985db127971..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-base64.patch
++++ /dev/null
+@@ -1,21 +0,0 @@
+-diff --git a/lib/base64.h b/lib/base64.h
+-index 9cd0183b8..185a2afa1 100644
+---- a/lib/base64.h
+-+++ b/lib/base64.h
+-@@ -21,8 +21,14 @@
+- /* Get size_t. */
+- # include <stddef.h>
+- 
+--/* Get bool. */
+--# include <stdbool.h>
+-+#ifndef GRUB_POSIX_BOOL_DEFINED
+-+typedef enum { false = 0, true = 1 } bool;
+-+#define GRUB_POSIX_BOOL_DEFINED 1
+-+#endif
+-+
+-+#ifndef _GL_ATTRIBUTE_CONST
+-+# define _GL_ATTRIBUTE_CONST /* empty */
+-+#endif
+- 
+- # ifdef __cplusplus
+- extern "C" {
+diff --git a/grub-core/lib/gnulib-patches/fix-null-deref.patch b/grub-core/lib/gnulib-patches/fix-null-deref.patch
+deleted file mode 100644
+index 8fafa153a47..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-null-deref.patch
++++ /dev/null
+@@ -1,13 +0,0 @@
+-diff --git a/lib/argp-parse.c b/lib/argp-parse.c
+-index 6dec57310..900adad54 100644
+---- a/lib/argp-parse.c
+-+++ b/lib/argp-parse.c
+-@@ -940,7 +940,7 @@ weak_alias (__argp_parse, argp_parse)
+- void *
+- __argp_input (const struct argp *argp, const struct argp_state *state)
+- {
+--  if (state)
+-+  if (state && state->pstate)
+-     {
+-       struct group *group;
+-       struct parser *parser = state->pstate;
+diff --git a/grub-core/lib/gnulib-patches/fix-null-state-deref.patch b/grub-core/lib/gnulib-patches/fix-null-state-deref.patch
+deleted file mode 100644
+index 813ec09c8a1..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-null-state-deref.patch
++++ /dev/null
+@@ -1,12 +0,0 @@
+---- a/lib/argp-help.c	2020-10-28 14:32:19.189215988 +0000
+-+++ b/lib/argp-help.c	2020-10-28 14:38:21.204673940 +0000
+-@@ -145,7 +145,8 @@
+-       if (*(int *)((char *)upptr + up->uparams_offs) >= upptr->rmargin)
+-         {
+-           __argp_failure (state, 0, 0,
+--                          dgettext (state->root_argp->argp_domain,
+-+                          dgettext (state == NULL ? NULL
+-+                                    : state->root_argp->argp_domain,
+-                                     "\
+- ARGP_HELP_FMT: %s value is less than or equal to %s"),
+-                           "rmargin", up->name);
+diff --git a/grub-core/lib/gnulib-patches/fix-regcomp-uninit-token.patch b/grub-core/lib/gnulib-patches/fix-regcomp-uninit-token.patch
+deleted file mode 100644
+index 02e06315dff..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-regcomp-uninit-token.patch
++++ /dev/null
+@@ -1,15 +0,0 @@
+---- a/lib/regcomp.c	2020-11-24 17:06:08.159223858 +0000
+-+++ b/lib/regcomp.c	2020-11-24 17:06:15.630253923 +0000
+-@@ -3808,11 +3808,7 @@
+- create_tree (re_dfa_t *dfa, bin_tree_t *left, bin_tree_t *right,
+- 	     re_token_type_t type)
+- {
+--  re_token_t t;
+--#if defined GCC_LINT || defined lint
+--  memset (&t, 0, sizeof t);
+--#endif
+--  t.type = type;
+-+  re_token_t t = { .type = type };
+-   return create_token_tree (dfa, left, right, &t);
+- }
+- 
+diff --git a/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch b/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
+deleted file mode 100644
+index db6dac9c9e3..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-regexec-null-deref.patch
++++ /dev/null
+@@ -1,12 +0,0 @@
+---- a/lib/regexec.c	2020-10-21 14:25:35.310195912 +0000
+-+++ b/lib/regexec.c	2020-11-05 10:55:09.621542984 +0000
+-@@ -1692,6 +1692,9 @@
+- {
+-   Idx top = mctx->state_log_top;
+-
+-+  if (mctx->state_log == NULL)
+-+    return REG_NOERROR;
+-+
+-   if ((next_state_log_idx >= mctx->input.bufs_len
+-        && mctx->input.bufs_len < mctx->input.len)
+-       || (next_state_log_idx >= mctx->input.valid_len
+diff --git a/grub-core/lib/gnulib-patches/fix-sign-compare-errors.patch b/grub-core/lib/gnulib-patches/fix-sign-compare-errors.patch
+deleted file mode 100644
+index 479029c0565..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-sign-compare-errors.patch
++++ /dev/null
+@@ -1,161 +0,0 @@
+-diff --git a/lib/regcomp.c b/lib/regcomp.c
+-index cc85f35ac58..361079d82d6 100644
+---- a/lib/regcomp.c
+-+++ b/lib/regcomp.c
+-@@ -322,7 +322,7 @@ re_compile_fastmap_iter (regex_t *bufp, const re_dfastate_t *init_state,
+- 		*p++ = dfa->nodes[node].opr.c;
+- 	      memset (&state, '\0', sizeof (state));
+- 	      if (__mbrtowc (&wc, (const char *) buf, p - buf,
+--			     &state) == p - buf
+-+			     &state) == (size_t)(p - buf)
+- 		  && (__wcrtomb ((char *) buf, __towlower (wc), &state)
+- 		      != (size_t) -1))
+- 		re_set_fastmap (fastmap, false, buf[0]);
+-@@ -3778,7 +3778,7 @@ fetch_number (re_string_t *input, re_token_t *token, reg_syntax_t syntax)
+-       num = ((token->type != CHARACTER || c < '0' || '9' < c || num == -2)
+- 	     ? -2
+- 	     : num == -1
+--	     ? c - '0'
+-+	     ? (Idx)(c - '0')
+- 	     : MIN (RE_DUP_MAX + 1, num * 10 + c - '0'));
+-     }
+-   return num;
+-diff --git a/lib/regex_internal.c b/lib/regex_internal.c
+-index 9004ce809eb..193a1e3d332 100644
+---- a/lib/regex_internal.c
+-+++ b/lib/regex_internal.c
+-@@ -233,7 +233,7 @@ build_wcs_buffer (re_string_t *pstr)
+-       /* Apply the translation if we need.  */
+-       if (__glibc_unlikely (pstr->trans != NULL))
+- 	{
+--	  int i, ch;
+-+	  unsigned int i, ch;
+- 
+- 	  for (i = 0; i < pstr->mb_cur_max && i < remain_len; ++i)
+- 	    {
+-@@ -376,7 +376,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
+- 	prev_st = pstr->cur_state;
+- 	if (__glibc_unlikely (pstr->trans != NULL))
+- 	  {
+--	    int i, ch;
+-+	    unsigned int i, ch;
+- 
+- 	    for (i = 0; i < pstr->mb_cur_max && i < remain_len; ++i)
+- 	      {
+-@@ -754,7 +754,7 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
+- 			  memset (&cur_state, 0, sizeof (cur_state));
+- 			  mbclen = __mbrtowc (&wc2, (const char *) pp, mlen,
+- 					      &cur_state);
+--			  if (raw + offset - p <= mbclen
+-+			  if ((size_t)(raw + offset - p) <= mbclen
+- 			      && mbclen < (size_t) -2)
+- 			    {
+- 			      memset (&pstr->cur_state, '\0',
+-diff --git a/lib/regex_internal.h b/lib/regex_internal.h
+-index 5462419b787..e0f8292395d 100644
+---- a/lib/regex_internal.h
+-+++ b/lib/regex_internal.h
+-@@ -425,7 +425,7 @@ struct re_string_t
+-   unsigned char offsets_needed;
+-   unsigned char newline_anchor;
+-   unsigned char word_ops_used;
+--  int mb_cur_max;
+-+  unsigned int mb_cur_max;
+- };
+- typedef struct re_string_t re_string_t;
+- 
+-@@ -702,7 +702,7 @@ struct re_dfa_t
+-   unsigned int is_utf8 : 1;
+-   unsigned int map_notascii : 1;
+-   unsigned int word_ops_used : 1;
+--  int mb_cur_max;
+-+  unsigned int mb_cur_max;
+-   bitset_t word_char;
+-   reg_syntax_t syntax;
+-   Idx *subexp_map;
+-diff --git a/lib/regexec.c b/lib/regexec.c
+-index 0a7a27b772e..b57d4f9141d 100644
+---- a/lib/regexec.c
+-+++ b/lib/regexec.c
+-@@ -443,7 +443,7 @@ re_search_stub (struct re_pattern_buffer *bufp, const char *string, Idx length,
+-     {
+-       if (ret_len)
+- 	{
+--	  assert (pmatch[0].rm_so == start);
+-+	  assert (pmatch[0].rm_so == (long)start);
+- 	  rval = pmatch[0].rm_eo - start;
+- 	}
+-       else
+-@@ -877,11 +877,11 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
+- 	    if (__glibc_unlikely (mctx.input.offsets_needed != 0))
+- 	      {
+- 		pmatch[reg_idx].rm_so =
+--		  (pmatch[reg_idx].rm_so == mctx.input.valid_len
+-+		  (pmatch[reg_idx].rm_so == (long)mctx.input.valid_len
+- 		   ? mctx.input.valid_raw_len
+- 		   : mctx.input.offsets[pmatch[reg_idx].rm_so]);
+- 		pmatch[reg_idx].rm_eo =
+--		  (pmatch[reg_idx].rm_eo == mctx.input.valid_len
+-+		  (pmatch[reg_idx].rm_eo == (long)mctx.input.valid_len
+- 		   ? mctx.input.valid_raw_len
+- 		   : mctx.input.offsets[pmatch[reg_idx].rm_eo]);
+- 	      }
+-@@ -1418,11 +1418,11 @@ set_regs (const regex_t *preg, const re_match_context_t *mctx, size_t nmatch,
+-     }
+-   memcpy (prev_idx_match, pmatch, sizeof (regmatch_t) * nmatch);
+- 
+--  for (idx = pmatch[0].rm_so; idx <= pmatch[0].rm_eo ;)
+-+  for (idx = pmatch[0].rm_so; idx <= (long)pmatch[0].rm_eo ;)
+-     {
+-       update_regs (dfa, pmatch, prev_idx_match, cur_node, idx, nmatch);
+- 
+--      if (idx == pmatch[0].rm_eo && cur_node == mctx->last_node)
+-+      if (idx == (long)pmatch[0].rm_eo && cur_node == mctx->last_node)
+- 	{
+- 	  Idx reg_idx;
+- 	  if (fs)
+-@@ -1519,7 +1519,7 @@ update_regs (const re_dfa_t *dfa, regmatch_t *pmatch,
+-       if (reg_num < nmatch)
+- 	{
+- 	  /* We are at the last node of this sub expression.  */
+--	  if (pmatch[reg_num].rm_so < cur_idx)
+-+	  if (pmatch[reg_num].rm_so < (long)cur_idx)
+- 	    {
+- 	      pmatch[reg_num].rm_eo = cur_idx;
+- 	      /* This is a non-empty match or we are not inside an optional
+-@@ -2938,7 +2938,7 @@ check_arrival (re_match_context_t *mctx, state_array_t *path, Idx top_node,
+-       mctx->state_log[str_idx] = cur_state;
+-     }
+- 
+--  for (null_cnt = 0; str_idx < last_str && null_cnt <= mctx->max_mb_elem_len;)
+-+  for (null_cnt = 0; str_idx < last_str && null_cnt <= (long)mctx->max_mb_elem_len;)
+-     {
+-       re_node_set_empty (&next_nodes);
+-       if (mctx->state_log[str_idx + 1])
+-@@ -3718,7 +3718,7 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
+- 			 const re_string_t *input, Idx str_idx)
+- {
+-   const re_token_t *node = dfa->nodes + node_idx;
+--  int char_len, elem_len;
+-+  unsigned int char_len, elem_len;
+-   Idx i;
+- 
+-   if (__glibc_unlikely (node->type == OP_UTF8_PERIOD))
+-@@ -4066,7 +4066,7 @@ extend_buffers (re_match_context_t *mctx, int min_len)
+-   /* Double the lengths of the buffers, but allocate at least MIN_LEN.  */
+-   ret = re_string_realloc_buffers (pstr,
+- 				   MAX (min_len,
+--					MIN (pstr->len, pstr->bufs_len * 2)));
+-+					MIN ((long)pstr->len, pstr->bufs_len * 2)));
+-   if (__glibc_unlikely (ret != REG_NOERROR))
+-     return ret;
+- 
+-@@ -4236,7 +4236,7 @@ match_ctx_add_entry (re_match_context_t *mctx, Idx node, Idx str_idx, Idx from,
+-     = (from == to ? -1 : 0);
+- 
+-   mctx->bkref_ents[mctx->nbkref_ents++].more = 0;
+--  if (mctx->max_mb_elem_len < to - from)
+-+  if (mctx->max_mb_elem_len < (long)(to - from))
+-     mctx->max_mb_elem_len = to - from;
+-   return REG_NOERROR;
+- }
+diff --git a/grub-core/lib/gnulib-patches/fix-uninit-structure.patch b/grub-core/lib/gnulib-patches/fix-uninit-structure.patch
+deleted file mode 100644
+index 7b4d9f67af4..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-uninit-structure.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- a/lib/regcomp.c	2020-10-22 13:49:06.770168928 +0000
+-+++ b/lib/regcomp.c	2020-10-22 13:50:37.026528298 +0000
+-@@ -3662,7 +3662,7 @@
+-   Idx alloc = 0;
+- #endif /* not RE_ENABLE_I18N */
+-   reg_errcode_t ret;
+--  re_token_t br_token;
+-+  re_token_t br_token = {0};
+-   bin_tree_t *tree;
+- 
+-   sbcset = (re_bitset_ptr_t) calloc (sizeof (bitset_t), 1);
+diff --git a/grub-core/lib/gnulib-patches/fix-unused-value.patch b/grub-core/lib/gnulib-patches/fix-unused-value.patch
+deleted file mode 100644
+index ba51f1bf223..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-unused-value.patch
++++ /dev/null
+@@ -1,14 +0,0 @@
+---- a/lib/regexec.c	2020-10-21 14:25:35.310195912 +0000
+-+++ b/lib/regexec.c	2020-10-21 14:32:07.961765604 +0000
+-@@ -828,7 +828,11 @@
+- 		    break;
+- 		  if (__glibc_unlikely (err != REG_NOMATCH))
+- 		    goto free_return;
+-+#ifdef DEBUG
+-+		  /* Only used for assertion below when DEBUG is set, otherwise
+-+		     it will be over-written when we loop around.  */
+- 		  match_last = -1;
+-+#endif
+- 		}
+- 	      else
+- 		break; /* We found a match.  */
+diff --git a/grub-core/lib/gnulib-patches/fix-width.patch b/grub-core/lib/gnulib-patches/fix-width.patch
+deleted file mode 100644
+index 0a208ad08b5..00000000000
+--- a/grub-core/lib/gnulib-patches/fix-width.patch
++++ /dev/null
+@@ -1,217 +0,0 @@
+-diff --git a/lib/argp-fmtstream.c b/lib/argp-fmtstream.c
+-index ba6a407f7..d0685b3d4 100644
+---- a/lib/argp-fmtstream.c
+-+++ b/lib/argp-fmtstream.c
+-@@ -28,9 +28,11 @@
+- #include <errno.h>
+- #include <stdarg.h>
+- #include <ctype.h>
+-+#include <wchar.h>
+- 
+- #include "argp-fmtstream.h"
+- #include "argp-namefrob.h"
+-+#include "mbswidth.h"
+- 
+- #ifndef ARGP_FMTSTREAM_USE_LINEWRAP
+- 
+-@@ -115,6 +117,51 @@ weak_alias (__argp_fmtstream_free, argp_fmtstream_free)
+- #endif
+- #endif
+- 
+-+
+-+/* Return the pointer to the first character that doesn't fit in l columns.  */
+-+static inline const ptrdiff_t
+-+add_width (const char *ptr, const char *end, size_t l)
+-+{
+-+  mbstate_t ps;
+-+  const char *ptr0 = ptr;
+-+
+-+  memset (&ps, 0, sizeof (ps));
+-+
+-+  while (ptr < end)
+-+    {
+-+      wchar_t wc;
+-+      size_t s, k;
+-+
+-+      s = mbrtowc (&wc, ptr, end - ptr, &ps);
+-+      if (s == (size_t) -1)
+-+	break;
+-+      if (s == (size_t) -2)
+-+	{
+-+	  if (1 >= l)
+-+	    break;
+-+	  l--;
+-+	  ptr++;
+-+	  continue;
+-+	}
+-+
+-+      if (wc == '\e' && ptr + 3 < end
+-+	  && ptr[1] == '[' && (ptr[2] == '0' || ptr[2] == '1')
+-+	  && ptr[3] == 'm')
+-+	{
+-+	  ptr += 4;
+-+	  continue;
+-+	}
+-+
+-+      k = wcwidth (wc);
+-+
+-+      if (k >= l)
+-+	break;
+-+      l -= k;
+-+      ptr += s;
+-+    }
+-+  return ptr - ptr0;
+-+}
+-+
+- /* Process FS's buffer so that line wrapping is done from POINT_OFFS to the
+-    end of its buffer.  This code is mostly from glibc stdio/linewrap.c.  */
+- void
+-@@ -168,13 +215,15 @@ __argp_fmtstream_update (argp_fmtstream_t fs)
+-       if (!nl)
+-         {
+-           /* The buffer ends in a partial line.  */
+-+          size_t display_width = mbsnwidth (buf, fs->p - buf,
+-+                                            MBSW_STOP_AT_NUL);
+- 
+--          if (fs->point_col + len < fs->rmargin)
+-+          if (fs->point_col + display_width < fs->rmargin)
+-             {
+-               /* The remaining buffer text is a partial line and fits
+-                  within the maximum line width.  Advance point for the
+-                  characters to be written and stop scanning.  */
+--              fs->point_col += len;
+-+              fs->point_col += display_width;
+-               break;
+-             }
+-           else
+-@@ -182,14 +231,18 @@ __argp_fmtstream_update (argp_fmtstream_t fs)
+-                the end of the buffer.  */
+-             nl = fs->p;
+-         }
+--      else if (fs->point_col + (nl - buf) < (ssize_t) fs->rmargin)
+--        {
+--          /* The buffer contains a full line that fits within the maximum
+--             line width.  Reset point and scan the next line.  */
+--          fs->point_col = 0;
+--          buf = nl + 1;
+--          continue;
+--        }
+-+      else
+-+	{
+-+	  size_t display_width = mbsnwidth (buf, nl - buf, MBSW_STOP_AT_NUL);
+-+	  if (display_width < (ssize_t) fs->rmargin)
+-+	    {
+-+	      /* The buffer contains a full line that fits within the maximum
+-+		 line width.  Reset point and scan the next line.  */
+-+	      fs->point_col = 0;
+-+	      buf = nl + 1;
+-+	      continue;
+-+	    }
+-+	}
+- 
+-       /* This line is too long.  */
+-       r = fs->rmargin - 1;
+-@@ -225,7 +278,7 @@ __argp_fmtstream_update (argp_fmtstream_t fs)
+-           char *p, *nextline;
+-           int i;
+- 
+--          p = buf + (r + 1 - fs->point_col);
+-+          p = buf + add_width (buf, fs->p, (r + 1 - fs->point_col));
+-           while (p >= buf && !isblank ((unsigned char) *p))
+-             --p;
+-           nextline = p + 1;     /* This will begin the next line.  */
+-@@ -243,7 +296,7 @@ __argp_fmtstream_update (argp_fmtstream_t fs)
+-             {
+-               /* A single word that is greater than the maximum line width.
+-                  Oh well.  Put it on an overlong line by itself.  */
+--              p = buf + (r + 1 - fs->point_col);
+-+              p = buf + add_width (buf, fs->p, (r + 1 - fs->point_col));
+-               /* Find the end of the long word.  */
+-               if (p < nl)
+-                 do
+-@@ -277,7 +330,8 @@ __argp_fmtstream_update (argp_fmtstream_t fs)
+-               && fs->p > nextline)
+-             {
+-               /* The margin needs more blanks than we removed.  */
+--              if (fs->end - fs->p > fs->wmargin + 1)
+-+              if (mbsnwidth (fs->p, fs->end - fs->p, MBSW_STOP_AT_NUL)
+-+                  > fs->wmargin + 1)
+-                 /* Make some space for them.  */
+-                 {
+-                   size_t mv = fs->p - nextline;
+-diff --git a/lib/argp-help.c b/lib/argp-help.c
+-index e5375a0f0..5d8f451ec 100644
+---- a/lib/argp-help.c
+-+++ b/lib/argp-help.c
+-@@ -51,6 +51,7 @@
+- #include "argp.h"
+- #include "argp-fmtstream.h"
+- #include "argp-namefrob.h"
+-+#include "mbswidth.h"
+- 
+- #ifndef SIZE_MAX
+- # define SIZE_MAX ((size_t) -1)
+-@@ -1432,7 +1433,7 @@ argp_args_usage (const struct argp *argp, const struct argp_state *state,
+- 
+-       /* Manually do line wrapping so that it (probably) won't get wrapped at
+-          any embedded spaces.  */
+--      space (stream, 1 + nl - cp);
+-+      space (stream, 1 + mbsnwidth (cp, nl - cp, MBSW_STOP_AT_NUL));
+- 
+-       __argp_fmtstream_write (stream, cp, nl - cp);
+-     }
+-diff --git a/lib/mbswidth.c b/lib/mbswidth.c
+-index 408a15e34..b3fb7f83a 100644
+---- a/lib/mbswidth.c
+-+++ b/lib/mbswidth.c
+-@@ -38,6 +38,14 @@
+- /* Get INT_MAX.  */
+- #include <limits.h>
+- 
+-+#ifndef FALLTHROUGH
+-+# if __GNUC__ < 7
+-+#  define FALLTHROUGH ((void) 0)
+-+# else
+-+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+-+# endif
+-+#endif
+-+
+- /* Returns the number of columns needed to represent the multibyte
+-    character string pointed to by STRING.  If a non-printable character
+-    occurs, and MBSW_REJECT_UNPRINTABLE is specified, -1 is returned.
+-@@ -90,6 +98,10 @@ mbsnwidth (const char *string, size_t nbytes, int flags)
+-               p++;
+-               width++;
+-               break;
+-+            case '\0':
+-+              if (flags & MBSW_STOP_AT_NUL)
+-+                return width;
+-+              FALLTHROUGH;
+-             default:
+-               /* If we have a multibyte sequence, scan it up to its end.  */
+-               {
+-@@ -168,6 +180,9 @@ mbsnwidth (const char *string, size_t nbytes, int flags)
+-     {
+-       unsigned char c = (unsigned char) *p++;
+- 
+-+      if (c == 0 && (flags & MBSW_STOP_AT_NUL))
+-+        return width;
+-+
+-       if (isprint (c))
+-         {
+-           if (width == INT_MAX)
+-diff --git a/lib/mbswidth.h b/lib/mbswidth.h
+-index 2b5c53c37..45a123e63 100644
+---- a/lib/mbswidth.h
+-+++ b/lib/mbswidth.h
+-@@ -45,6 +45,10 @@ extern "C" {
+-    control characters and 1 otherwise.  */
+- #define MBSW_REJECT_UNPRINTABLE 2
+- 
+-+/* If this bit is set \0 is treated as the end of string.
+-+   Otherwise it's treated as a normal one column width character.  */
+-+#define MBSW_STOP_AT_NUL 4
+-+
+- 
+- /* Returns the number of screen columns needed for STRING.  */
+- #define mbswidth gnu_mbswidth  /* avoid clash with UnixWare 7.1.1 function */
+diff --git a/grub-core/lib/gnulib-patches/no-abort.patch b/grub-core/lib/gnulib-patches/no-abort.patch
+deleted file mode 100644
+index e469c4762eb..00000000000
+--- a/grub-core/lib/gnulib-patches/no-abort.patch
++++ /dev/null
+@@ -1,26 +0,0 @@
+-diff --git a/lib/regcomp.c b/lib/regcomp.c
+-index cc85f35ac..de45ebb5c 100644
+---- a/lib/regcomp.c
+-+++ b/lib/regcomp.c
+-@@ -528,9 +528,9 @@ regerror (int errcode, const regex_t *__restrict preg, char *__restrict errbuf,
+-        to this routine.  If we are given anything else, or if other regex
+-        code generates an invalid error code, then the program has a bug.
+-        Dump core so we can fix it.  */
+--    abort ();
+--
+--  msg = gettext (__re_error_msgid + __re_error_msgid_idx[errcode]);
+-+    msg = gettext ("unknown regexp error");
+-+  else
+-+    msg = gettext (__re_error_msgid + __re_error_msgid_idx[errcode]);
+- 
+-   msg_size = strlen (msg) + 1; /* Includes the null.  */
+- 
+-@@ -1136,7 +1136,7 @@ optimize_utf8 (re_dfa_t *dfa)
+- 	}
+- 	break;
+-       default:
+--	abort ();
+-+	break;
+-       }
+- 
+-   if (mb_chars || has_period)

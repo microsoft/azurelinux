@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 6 Feb 2018 11:16:28 +0100
+Subject: [PATCH] Don't attempt to backtrace on grub_abort() for grub-emu
+
+The emu platform doesn't have a grub_backtrace() implementation, so this
+causes a build error. Don't attempt to call this when building grub-emu.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/kern/misc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index a3e215155bd..c60601b699d 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -1201,7 +1201,7 @@ static void __attribute__ ((noreturn))
+ grub_abort (void)
+ {
+ #ifndef GRUB_UTIL
+-#if defined(__i386__) || defined(__x86_64__)
++#if (defined(__i386__) || defined(__x86_64__)) && !defined(GRUB_MACHINE_EMU)
+   grub_backtrace();
+ #endif
+ #endif

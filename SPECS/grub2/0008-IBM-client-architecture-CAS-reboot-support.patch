@@ -1,0 +1,172 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>
+Date: Thu, 20 Sep 2012 18:07:39 -0300
+Subject: [PATCH] IBM client architecture (CAS) reboot support
+
+This is an implementation of IBM client architecture (CAS) reboot for GRUB.
+
+There are cases where the POWER firmware must reboot in order to support
+specific features requested by a kernel. The kernel calls
+ibm,client-architecture-support and it may either return or reboot with the new
+feature set. eg:
+
+Calling ibm,client-architecture-support.../
+Elapsed time since release of system processors: 70959 mins 50 secs
+Welcome to GRUB!
+
+Instead of return to the GRUB menu, it will check if the flag for CAS reboot is
+set. If so, grub will automatically boot the last booted kernel using the same
+parameters
+---
+ grub-core/kern/ieee1275/openfw.c | 63 ++++++++++++++++++++++++++++++++++++++++
+ grub-core/normal/main.c          | 19 ++++++++++++
+ grub-core/script/execute.c       |  7 +++++
+ include/grub/ieee1275/ieee1275.h |  2 ++
+ 4 files changed, 91 insertions(+)
+
+diff --git a/grub-core/kern/ieee1275/openfw.c b/grub-core/kern/ieee1275/openfw.c
+index 4d493ab7661..3a6689abb11 100644
+--- a/grub-core/kern/ieee1275/openfw.c
++++ b/grub-core/kern/ieee1275/openfw.c
+@@ -591,3 +591,66 @@ grub_ieee1275_get_boot_dev (void)
+ 
+   return bootpath;
+ }
++
++/* Check if it's a CAS reboot. If so, set the script to be executed.  */
++int
++grub_ieee1275_cas_reboot (char *script)
++{
++  grub_uint32_t ibm_ca_support_reboot;
++  grub_uint32_t ibm_fw_nbr_reboots;
++  char property_value[10];
++  grub_ssize_t actual;
++  grub_ieee1275_ihandle_t options;
++
++  if (grub_ieee1275_finddevice ("/options", &options) < 0)
++    return -1;
++
++  /* Check two properties, one is enough to get cas reboot value */
++  ibm_ca_support_reboot = 0;
++  if (grub_ieee1275_get_integer_property (grub_ieee1275_chosen,
++                                          "ibm,client-architecture-support-reboot",
++                                          &ibm_ca_support_reboot,
++                                          sizeof (ibm_ca_support_reboot),
++                                          &actual) >= 0)
++    grub_dprintf("ieee1275", "ibm,client-architecture-support-reboot: %u\n",
++                 ibm_ca_support_reboot);
++
++  ibm_fw_nbr_reboots = 0;
++  if (grub_ieee1275_get_property (options, "ibm,fw-nbr-reboots",
++                                  property_value, sizeof (property_value),
++                                  &actual) >= 0)
++    {
++      property_value[sizeof (property_value) - 1] = 0;
++      ibm_fw_nbr_reboots = (grub_uint8_t) grub_strtoul (property_value, 0, 10);
++      grub_dprintf("ieee1275", "ibm,fw-nbr-reboots: %u\n", ibm_fw_nbr_reboots);
++    }
++
++  if (ibm_ca_support_reboot || ibm_fw_nbr_reboots)
++    {
++      if (! grub_ieee1275_get_property_length (options, "boot-last-label", &actual))
++        {
++          if (actual > 1024)
++            script = grub_realloc (script, actual + 1);
++          grub_ieee1275_get_property (options, "boot-last-label", script, actual,
++                                      &actual);
++          return 0;
++        }
++    }
++
++  grub_ieee1275_set_boot_last_label ("");
++
++  return -1;
++}
++
++int grub_ieee1275_set_boot_last_label (const char *text)
++{
++  grub_ieee1275_ihandle_t options;
++  grub_ssize_t actual;
++
++  grub_dprintf("ieee1275", "set boot_last_label (size: %u)\n", grub_strlen(text));
++  if (! grub_ieee1275_finddevice ("/options", &options) &&
++      options != (grub_ieee1275_ihandle_t) -1)
++    grub_ieee1275_set_property (options, "boot-last-label", text,
++                                grub_strlen (text), &actual);
++  return 0;
++}
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index c4ebe9e22ad..70614de1565 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -34,6 +34,9 @@
+ #include <grub/charset.h>
+ #include <grub/script_sh.h>
+ #include <grub/bufio.h>
++#ifdef GRUB_MACHINE_IEEE1275
++#include <grub/ieee1275/ieee1275.h>
++#endif
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -276,6 +279,22 @@ grub_normal_execute (const char *config, int nested, int batch)
+     {
+       menu = read_config_file (config);
+ 
++#ifdef GRUB_MACHINE_IEEE1275
++      int boot;
++      boot = 0;
++      char *script;
++      script = grub_malloc (1024);
++      if (! grub_ieee1275_cas_reboot (script))
++        {
++          char *dummy[1] = { NULL };
++          if (! grub_script_execute_sourcecode (script))
++            boot = 1;
++        }
++      grub_free (script);
++      if (boot)
++        grub_command_execute ("boot", 0, 0);
++#endif
++
+       /* Ignore any error.  */
+       grub_errno = GRUB_ERR_NONE;
+     }
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index 25158407dd8..ad80399246a 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -28,6 +28,9 @@
+ #include <grub/extcmd.h>
+ #include <grub/i18n.h>
+ #include <grub/verify.h>
++#ifdef GRUB_MACHINE_IEEE1275
++#include <grub/ieee1275/ieee1275.h>
++#endif
+ 
+ /* Max digits for a char is 3 (0xFF is 255), similarly for an int it
+    is sizeof (int) * 3, and one extra for a possible -ve sign.  */
+@@ -883,6 +886,10 @@ grub_script_execute_sourcecode (const char *source)
+   grub_err_t ret = 0;
+   struct grub_script *parsed_script;
+ 
++#ifdef GRUB_MACHINE_IEEE1275
++  grub_ieee1275_set_boot_last_label (source);
++#endif
++
+   while (source)
+     {
+       char *line;
+diff --git a/include/grub/ieee1275/ieee1275.h b/include/grub/ieee1275/ieee1275.h
+index 73e2f464475..0a599607f31 100644
+--- a/include/grub/ieee1275/ieee1275.h
++++ b/include/grub/ieee1275/ieee1275.h
+@@ -254,6 +254,8 @@ int EXPORT_FUNC(grub_ieee1275_devalias_next) (struct grub_ieee1275_devalias *ali
+ void EXPORT_FUNC(grub_ieee1275_children_peer) (struct grub_ieee1275_devalias *alias);
+ void EXPORT_FUNC(grub_ieee1275_children_first) (const char *devpath,
+ 						struct grub_ieee1275_devalias *alias);
++int EXPORT_FUNC(grub_ieee1275_cas_reboot) (char *script);
++int EXPORT_FUNC(grub_ieee1275_set_boot_last_label) (const char *text);
+ 
+ char *EXPORT_FUNC(grub_ieee1275_get_boot_dev) (void);
+ 

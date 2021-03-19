@@ -1,0 +1,108 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Wed, 10 Jul 2019 23:58:28 +0200
+Subject: [PATCH] bootp: Add processing DHCPACK packet from HTTP Boot
+
+The vendor class identifier with the string "HTTPClient" is used to denote the
+packet as responding to HTTP boot request. In DHCP4 config, the filename for
+HTTP boot is the URL of the boot file while for PXE boot it is the path to the
+boot file. As a consequence, the next-server becomes obseleted because the HTTP
+URL already contains the server address for the boot file. For DHCP6 config,
+there's no difference definition in existing config as dhcp6.bootfile-url can
+be used to specify URL for both HTTP and PXE boot file.
+
+This patch adds processing for "HTTPClient" vendor class identifier in DHCPACK
+packet by treating it as HTTP format, not as the PXE format.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Signed-off-by: Ken Lin <ken.lin@hpe.com>
+---
+ grub-core/net/bootp.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/grub/net.h    |  1 +
+ 2 files changed, 56 insertions(+)
+
+diff --git a/grub-core/net/bootp.c b/grub-core/net/bootp.c
+index 68c4df681b5..0b430489329 100644
+--- a/grub-core/net/bootp.c
++++ b/grub-core/net/bootp.c
+@@ -20,6 +20,7 @@
+ #include <grub/env.h>
+ #include <grub/i18n.h>
+ #include <grub/command.h>
++#include <grub/net.h>
+ #include <grub/net/ip.h>
+ #include <grub/net/netbuff.h>
+ #include <grub/net/udp.h>
+@@ -500,6 +501,60 @@ grub_net_configure_by_dhcp_ack (const char *name,
+   if (opt && opt_len)
+     grub_env_set_net_property (name, "rootpath", (const char *) opt, opt_len);
+ 
++  opt = find_dhcp_option (bp, size, GRUB_NET_BOOTP_VENDOR_CLASS_IDENTIFIER, &opt_len);
++  if (opt && opt_len)
++    {
++      grub_env_set_net_property (name, "vendor_class_identifier", (const char *) opt, opt_len);
++      if (opt && grub_strcmp (opt, "HTTPClient") == 0)
++        {
++          char *proto, *ip, *pa;
++
++          if (!dissect_url (bp->boot_file, &proto, &ip, &pa))
++            return inter;
++
++          grub_env_set_net_property (name, "boot_file", pa, grub_strlen (pa));
++          if (is_def)
++            {
++              grub_net_default_server = grub_strdup (ip);
++              grub_env_set ("net_default_interface", name);
++             grub_env_export ("net_default_interface");
++            }
++          if (device && !*device)
++            {
++              *device = grub_xasprintf ("%s,%s", proto, ip);
++              grub_print_error ();
++            }
++          if (path)
++            {
++              *path = grub_strdup (pa);
++              grub_print_error ();
++              if (*path)
++                {
++                  char *slash;
++                  slash = grub_strrchr (*path, '/');
++                  if (slash)
++                    *slash = 0;
++                  else
++                    **path = 0;
++                }
++            }
++          grub_net_add_ipv4_local (inter, mask);
++          inter->dhcp_ack = grub_malloc (size);
++          if (inter->dhcp_ack)
++            {
++              grub_memcpy (inter->dhcp_ack, bp, size);
++              inter->dhcp_acklen = size;
++            }
++          else
++            grub_errno = GRUB_ERR_NONE;
++
++          grub_free (proto);
++          grub_free (ip);
++          grub_free (pa);
++          return inter;
++        }
++    }
++
+   opt = find_dhcp_option (bp, size, GRUB_NET_BOOTP_EXTENSIONS_PATH, &opt_len);
+   if (opt && opt_len)
+     grub_env_set_net_property (name, "extensionspath", (const char *) opt, opt_len);
+diff --git a/include/grub/net.h b/include/grub/net.h
+index 543251f7273..42af7de250a 100644
+--- a/include/grub/net.h
++++ b/include/grub/net.h
+@@ -531,6 +531,7 @@ enum
+     GRUB_NET_DHCP_MESSAGE_TYPE = 53,
+     GRUB_NET_DHCP_SERVER_IDENTIFIER = 54,
+     GRUB_NET_DHCP_PARAMETER_REQUEST_LIST = 55,
++    GRUB_NET_BOOTP_VENDOR_CLASS_IDENTIFIER = 60,
+     GRUB_NET_BOOTP_CLIENT_ID = 61,
+     GRUB_NET_DHCP_TFTP_SERVER_NAME = 66,
+     GRUB_NET_DHCP_BOOTFILE_NAME = 67,

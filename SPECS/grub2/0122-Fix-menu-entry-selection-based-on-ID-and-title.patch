@@ -1,0 +1,233 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 19 Oct 2018 10:57:52 -0400
+Subject: [PATCH] Fix menu entry selection based on ID and title
+
+Currently if grub_strtoul(saved_entry_value, NULL, 0) does not return an
+error, we assume the value it has produced is a correct index into our
+menu entry list, and do not try to interpret the value as the "id" or
+"title" .  In cases where "id" or "title" start with a numeral, this
+makes them impossible to use as selection criteria.
+
+This patch splits the search into three phases - matching id, matching
+title, and only once those have been exhausted, trying to interpret the
+ID as a numeral.  In that case, we also require that the entire string
+is numeric, not merely a string with leading numeric characters.
+
+Resolves: rhbz#1640979
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+[javierm: fix menu entry selection based on title]
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/normal/menu.c | 141 ++++++++++++++++++++++++------------------------
+ 1 file changed, 71 insertions(+), 70 deletions(-)
+
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index 37d753d8081..ea714d27176 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -164,12 +164,12 @@ grub_menu_set_timeout (int timeout)
+ }
+ 
+ static int
+-menuentry_eq (const char *id, const char *spec)
++menuentry_eq (const char *id, const char *spec, int limit)
+ {
+   const char *ptr1, *ptr2;
+   ptr1 = id;
+   ptr2 = spec;
+-  while (1)
++  while (limit == -1 || ptr1 - id <= limit)
+     {
+       if (*ptr2 == '>' && ptr2[1] != '>' && *ptr1 == 0)
+ 	return ptr2 - spec;
+@@ -178,7 +178,11 @@ menuentry_eq (const char *id, const char *spec)
+       if (*ptr2 == '>')
+ 	ptr2++;
+       if (*ptr1 != *ptr2)
+-	return 0;
++	{
++	  if (limit > -1 && ptr1 - id == limit && !*ptr1 && grub_isspace(*ptr2))
++	    return ptr1 -id -1;
++	  return 0;
++	}
+       if (*ptr1 == 0)
+ 	return ptr1 - id;
+       ptr1++;
+@@ -187,6 +191,58 @@ menuentry_eq (const char *id, const char *spec)
+   return 0;
+ }
+ 
++static int
++get_entry_number_helper(grub_menu_t menu,
++			const char * const val, const char ** const tail)
++{
++  /* See if the variable matches the title of a menu entry.  */
++  int entry = -1;
++  grub_menu_entry_t e;
++  int i;
++
++  for (i = 0, e = menu->entry_list; e; i++)
++    {
++      int l = 0;
++      while (val[l] && !grub_isspace(val[l]))
++	l++;
++
++      if (menuentry_eq (e->id, val, l))
++	{
++	  if (tail)
++	    *tail = val + l;
++	  return i;
++	}
++      e = e->next;
++    }
++
++  for (i = 0, e = menu->entry_list; e; i++)
++    {
++
++      if (menuentry_eq (e->title, val, -1))
++	{
++	  if (tail)
++	    *tail = NULL;
++	  return i;
++	}
++      e = e->next;
++    }
++
++  if (tail)
++    *tail = NULL;
++
++  entry = (int) grub_strtoul (val, tail, 0);
++  if (grub_errno == GRUB_ERR_BAD_NUMBER ||
++      (*tail && **tail && !grub_isspace(**tail)))
++    {
++      entry = -1;
++      if (tail)
++	*tail = NULL;
++      grub_errno = GRUB_ERR_NONE;
++    }
++
++  return entry;
++}
++
+ /* Get the first entry number from the value of the environment variable NAME,
+    which is a space-separated list of non-negative integers.  The entry number
+    which is returned is stripped from the value of NAME.  If no entry number
+@@ -196,7 +252,6 @@ get_and_remove_first_entry_number (grub_menu_t menu, const char *name)
+ {
+   const char *val, *tail;
+   int entry;
+-  int sz = 0;
+ 
+   val = grub_env_get (name);
+   if (! val)
+@@ -204,50 +259,24 @@ get_and_remove_first_entry_number (grub_menu_t menu, const char *name)
+ 
+   grub_error_push ();
+ 
+-  entry = (int) grub_strtoul (val, &tail, 0);
++  entry = get_entry_number_helper(menu, val, &tail);
++  if (!(*tail == 0 || grub_isspace(*tail)))
++    entry = -1;
+ 
+-  if (grub_errno == GRUB_ERR_BAD_NUMBER)
++  if (entry >= 0)
+     {
+-      /* See if the variable matches the title of a menu entry.  */
+-      grub_menu_entry_t e = menu->entry_list;
+-      int i;
+-
+-      for (i = 0; e; i++)
+-	{
+-	  sz = menuentry_eq (e->title, val);
+-	  if (sz < 1)
+-	    sz = menuentry_eq (e->id, val);
+-
+-	  if (sz >= 1)
+-	    {
+-	      entry = i;
+-	      break;
+-	    }
+-	  e = e->next;
+-	}
+-
+-      if (sz > 0)
+-	grub_errno = GRUB_ERR_NONE;
+-
+-      if (! e)
+-	entry = -1;
+-    }
+-
+-  if (grub_errno == GRUB_ERR_NONE)
+-    {
+-      if (sz > 0)
+-	tail += sz;
+-
+       /* Skip whitespace to find the next entry.  */
+       while (*tail && grub_isspace (*tail))
+ 	tail++;
+-      grub_env_set (name, tail);
++      if (*tail)
++	grub_env_set (name, tail);
++      else
++	grub_env_unset (name);
+     }
+   else
+     {
+       grub_env_unset (name);
+       grub_errno = GRUB_ERR_NONE;
+-      entry = -1;
+     }
+ 
+   grub_error_pop ();
+@@ -524,6 +553,7 @@ static int
+ get_entry_number (grub_menu_t menu, const char *name)
+ {
+   const char *val;
++  const char *tail;
+   int entry;
+ 
+   val = grub_env_get (name);
+@@ -531,38 +561,9 @@ get_entry_number (grub_menu_t menu, const char *name)
+     return -1;
+ 
+   grub_error_push ();
+-
+-  entry = (int) grub_strtoul (val, 0, 0);
+-
+-  if (grub_errno == GRUB_ERR_BAD_NUMBER)
+-    {
+-      /* See if the variable matches the title of a menu entry.  */
+-      grub_menu_entry_t e = menu->entry_list;
+-      int i;
+-
+-      grub_errno = GRUB_ERR_NONE;
+-
+-      for (i = 0; e; i++)
+-	{
+-	  if (menuentry_eq (e->title, val)
+-	      || menuentry_eq (e->id, val))
+-	    {
+-	      entry = i;
+-	      break;
+-	    }
+-	  e = e->next;
+-	}
+-
+-      if (! e)
+-	entry = -1;
+-    }
+-
+-  if (grub_errno != GRUB_ERR_NONE)
+-    {
+-      grub_errno = GRUB_ERR_NONE;
+-      entry = -1;
+-    }
+-
++  entry = get_entry_number_helper(menu, val, &tail);
++  if (tail && *tail != '\0')
++    entry = -1;
+   grub_error_pop ();
+ 
+   return entry;

@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Sun, 19 Jul 2020 17:11:06 -0400
+Subject: [PATCH] efi+dhcp: fix some allocation error checking.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/dhcp.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/net/efi/dhcp.c b/grub-core/net/efi/dhcp.c
+index dbef63d8c08..e5c79b748b0 100644
+--- a/grub-core/net/efi/dhcp.c
++++ b/grub-core/net/efi/dhcp.c
+@@ -80,7 +80,7 @@ grub_efi_dhcp4_parse_dns (grub_efi_dhcp4_protocol_t *dhcp4, grub_efi_dhcp4_packe
+   if (status != GRUB_EFI_BUFFER_TOO_SMALL)
+     return NULL;
+ 
+-  option_list = grub_malloc (option_count * sizeof(*option_list));
++  option_list = grub_calloc (option_count, sizeof(*option_list));
+   if (!option_list)
+     return NULL;
+ 
+@@ -360,8 +360,11 @@ grub_cmd_efi_bootp6 (struct grub_command *cmd __attribute__ ((unused)),
+ 
+ 	if (status == GRUB_EFI_BUFFER_TOO_SMALL && count)
+ 	  {
+-	    options = grub_malloc (count * sizeof(*options));
+-	    status = efi_call_4 (dev->dhcp6->parse, dev->dhcp6, mode.ia->reply_packet, &count, options);
++	    options = grub_calloc (count, sizeof(*options));
++	    if (options)
++	      status = efi_call_4 (dev->dhcp6->parse, dev->dhcp6, mode.ia->reply_packet, &count, options);
++	    else
++	      status = GRUB_EFI_OUT_OF_RESOURCES;
+ 	  }
+ 
+ 	if (status != GRUB_EFI_SUCCESS)

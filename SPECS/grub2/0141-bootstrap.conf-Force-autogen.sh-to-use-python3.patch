@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Wed, 15 Jan 2020 12:47:46 +0100
+Subject: [PATCH] bootstrap.conf: Force autogen.sh to use python3
+
+The python-unversioned-command package is not installed in the buildroot,
+but the bootstrap script expects the python command to be present if one
+is not defined. So building the package leads to the following error:
+
+./autogen.sh: line 20: python: command not found
+
+This is harmless since gnulib is included as a source anyways, because the
+builders can't download. But still the issue should be fixed by forcing to
+use python3 that's the default in Fedora now.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ bootstrap.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bootstrap.conf b/bootstrap.conf
+index 452f4d79b0d..03f10930230 100644
+--- a/bootstrap.conf
++++ b/bootstrap.conf
+@@ -93,7 +93,7 @@ bootstrap_post_import_hook () {
+     patch -d po -p3 \
+       < "po/gettext-patches/$patchname.patch"
+   done
+-  FROM_BOOTSTRAP=1 ./autogen.sh
++  PYTHON=python3 FROM_BOOTSTRAP=1 ./autogen.sh
+   set +e  # bootstrap expects this
+ }
+ 

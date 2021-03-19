@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 28 Oct 2013 10:13:27 -0400
+Subject: [PATCH] F10 doesn't work on serial, so don't tell the user to hit it
+ (#987443)
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/normal/menu_text.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 26e9e82042a..4895ffe7d1d 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -157,7 +157,7 @@ print_message (int nested, int edit, struct grub_term_output *term, int dry_run)
+ 
+   if (edit)
+     {
+-      ret += grub_print_message_indented_real (_("Press Ctrl-x or F10 to start, Ctrl-c or F2 for a \
++      ret += grub_print_message_indented_real (_("Press Ctrl-x to start, Ctrl-c for a \
+ command prompt or Escape to discard edits and return to the menu. Pressing Tab lists possible completions."),
+ 					       STANDARD_MARGIN, STANDARD_MARGIN,
+ 					       term, dry_run);

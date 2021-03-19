@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 30 Jul 2018 16:39:57 -0400
+Subject: [PATCH] efi/http: Make root_url reflect the protocol+hostname of our
+ boot url.
+
+This lets you write config files that don't know urls.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/http.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/grub-core/net/efi/http.c b/grub-core/net/efi/http.c
+index 3f61fd2fa5b..243acbaa35b 100644
+--- a/grub-core/net/efi/http.c
++++ b/grub-core/net/efi/http.c
+@@ -4,6 +4,7 @@
+ #include <grub/misc.h>
+ #include <grub/net/efi.h>
+ #include <grub/charset.h>
++#include <grub/env.h>
+ 
+ static void
+ http_configure (struct grub_efi_net_device *dev, int prefer_ip6)
+@@ -351,6 +352,24 @@ grub_efihttp_open (struct grub_efi_net_device *dev,
+   grub_err_t err;
+   grub_off_t size;
+   char *buf;
++  char *root_url;
++  grub_efi_ipv6_address_t address;
++  const char *rest;
++
++  if (grub_efi_string_to_ip6_address (file->device->net->server, &address, &rest) && *rest == 0)
++    root_url = grub_xasprintf ("%s://[%s]", type ? "https" : "http", file->device->net->server);
++  else
++    root_url = grub_xasprintf ("%s://%s", type ? "https" : "http", file->device->net->server);
++  if (root_url)
++    {
++      grub_env_unset ("root_url");
++      grub_env_set ("root_url", root_url);
++      grub_free (root_url);
++    }
++  else
++    {
++      return grub_errno;
++    }
+ 
+   err = efihttp_request (dev->http, file->device->net->server, file->device->net->name, type, 1, 0);
+   if (err != GRUB_ERR_NONE)

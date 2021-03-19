@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 27 Aug 2019 10:34:24 +0200
+Subject: [PATCH] Fix build error with the fdt module on risc-v
+
+The risc-v architecture also uses Device Trees, but the symbols in the
+fdt header aren't defined for this arch which lead to following error:
+
+BUILDSTDERR: ../../grub-core/loader/efi/fdt.c: In function 'grub_fdt_load':
+BUILDSTDERR: ../../grub-core/loader/efi/fdt.c:48:39: warning: implicit declaration of function 'grub_fdt_get_totalsize' [-Wimplicit-function-declaration]
+BUILDSTDERR:    48 |       size = GRUB_EFI_BYTES_TO_PAGES (grub_fdt_get_totalsize (fdt));
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ include/grub/fdt.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/include/grub/fdt.h b/include/grub/fdt.h
+index 2041341fd68..3514aa4a5b6 100644
+--- a/include/grub/fdt.h
++++ b/include/grub/fdt.h
+@@ -19,7 +19,8 @@
+ #ifndef GRUB_FDT_HEADER
+ #define GRUB_FDT_HEADER	1
+ 
+-#if !defined(GRUB_MACHINE_EMU) && (defined(__arm__) || defined(__aarch64__))
++#if !defined(GRUB_MACHINE_EMU) && \
++    (defined(__arm__) || defined(__aarch64__) || defined(__riscv))
+ 
+ #include <grub/types.h>
+ #include <grub/symbol.h>
+@@ -146,6 +147,7 @@ int EXPORT_FUNC(grub_fdt_set_prop) (void *fdt, unsigned int nodeoffset, const ch
+   grub_fdt_set_prop ((fdt), (nodeoffset), "reg", reg_64, 16);  \
+ })
+ 
+-#endif /* defined(__arm__) || defined(__aarch64__) */
++#endif /* !defined(GRUB_MACHINE_EMU) && \
++          (defined(__arm__) || defined(__aarch64__) || defined(__riscv)) */
+ 
+ #endif	/* ! GRUB_FDT_HEADER */

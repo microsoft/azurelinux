@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 28 Sep 2018 15:42:19 -0400
+Subject: [PATCH] Fix getroot.c's trampolines.
+
+This makes the stack executable on most of the grub utilities, which is
+bad, and rpmdiff complains about it.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/osdep/linux/getroot.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/grub-core/osdep/linux/getroot.c b/grub-core/osdep/linux/getroot.c
+index 9f730b35189..f0c503f43d3 100644
+--- a/grub-core/osdep/linux/getroot.c
++++ b/grub-core/osdep/linux/getroot.c
+@@ -1264,22 +1264,20 @@ grub_util_get_grub_dev_os (const char *os_dev)
+   return grub_dev;
+ }
+ 
++static void *mp = NULL;
++static void
++btrfs_mount_path_hook(const char *m)
++{
++  mp = strdup (m);
++}
+ 
+ char *
+ grub_util_get_btrfs_subvol (const char *path, char **mount_path)
+ {
+-  char *mp = NULL;
+-
+   if (mount_path)
+     *mount_path = NULL;
+ 
+-  auto void
+-  mount_path_hook (const char *m)
+-  {
+-    mp = strdup (m);
+-  }
+-
+-  grub_find_root_btrfs_mount_path_hook = mount_path_hook;
++  grub_find_root_btrfs_mount_path_hook = btrfs_mount_path_hook;
+   grub_free (grub_find_root_devices_from_mountinfo (path, NULL));
+   grub_find_root_btrfs_mount_path_hook = NULL;
+ 

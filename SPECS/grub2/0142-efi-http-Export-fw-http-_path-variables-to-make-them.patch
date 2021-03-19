@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Thu, 5 Mar 2020 16:21:47 +0100
+Subject: [PATCH] efi/http: Export {fw,http}_path variables to make them global
+
+The fw_path environment variable is used by http_configure() function to
+determine the HTTP path that should be used as prefix when using relative
+HTTP paths. And this is stored in the http_path environment variable.
+
+Later, that variable is looked up by grub_efihttp_open() to generate the
+complete path to be used in the HTTP request.
+
+But these variables are not exported, which means that are not global and
+so are only found in the initial context.
+
+This can cause commands like configfile that create a new context to fail
+because the fw_path and http_path variables will not be found.
+
+Resolves: rhbz#1616395
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/kern/main.c    | 1 +
+ grub-core/net/efi/http.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 1c540fc8c26..b573be6650d 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -143,6 +143,7 @@ grub_set_prefix_and_root (void)
+       if (fw_path)
+ 	{
+ 	  grub_env_set ("fw_path", fw_path);
++	  grub_env_export ("fw_path");
+ 	  grub_dprintf ("fw_path", "fw_path:\"%s\"\n", fw_path);
+ 	  grub_free (fw_path);
+ 	}
+diff --git a/grub-core/net/efi/http.c b/grub-core/net/efi/http.c
+index de351b2cd03..755b7a6d054 100644
+--- a/grub-core/net/efi/http.c
++++ b/grub-core/net/efi/http.c
+@@ -39,6 +39,7 @@ http_configure (struct grub_efi_net_device *dev, int prefer_ip6)
+ 	  http_path++;
+ 	  grub_env_unset ("http_path");
+ 	  grub_env_set ("http_path", http_path);
++	  grub_env_export ("http_path");
+ 	}
+     }
+ 

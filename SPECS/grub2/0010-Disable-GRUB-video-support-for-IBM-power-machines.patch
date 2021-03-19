@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>
+Date: Tue, 11 Jun 2013 15:14:05 -0300
+Subject: [PATCH] Disable GRUB video support for IBM power machines
+
+Should fix the problem in bugzilla:
+https://bugzilla.redhat.com/show_bug.cgi?id=973205
+---
+ grub-core/kern/ieee1275/cmain.c  | 5 ++++-
+ grub-core/video/ieee1275.c       | 9 ++++++---
+ include/grub/ieee1275/ieee1275.h | 2 ++
+ 3 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/kern/ieee1275/cmain.c b/grub-core/kern/ieee1275/cmain.c
+index 20cbbd761ec..04df9d2c667 100644
+--- a/grub-core/kern/ieee1275/cmain.c
++++ b/grub-core/kern/ieee1275/cmain.c
+@@ -90,7 +90,10 @@ grub_ieee1275_find_options (void)
+   }
+ 
+   if (rc >= 0 && grub_strncmp (tmp, "IBM", 3) == 0)
+-    grub_ieee1275_set_flag (GRUB_IEEE1275_FLAG_NO_TREE_SCANNING_FOR_DISKS);
++    {
++      grub_ieee1275_set_flag (GRUB_IEEE1275_FLAG_NO_TREE_SCANNING_FOR_DISKS);
++      grub_ieee1275_set_flag (GRUB_IEEE1275_FLAG_DISABLE_VIDEO_SUPPORT);
++    }
+ 
+   /* Old Macs have no key repeat, newer ones have fully working one.
+      The ones inbetween when repeated key generates an escaoe sequence
+diff --git a/grub-core/video/ieee1275.c b/grub-core/video/ieee1275.c
+index 17a3dbbb575..b8e4b3feb32 100644
+--- a/grub-core/video/ieee1275.c
++++ b/grub-core/video/ieee1275.c
+@@ -352,9 +352,12 @@ static struct grub_video_adapter grub_video_ieee1275_adapter =
+ 
+ GRUB_MOD_INIT(ieee1275_fb)
+ {
+-  find_display ();
+-  if (display)
+-    grub_video_register (&grub_video_ieee1275_adapter);
++  if (! grub_ieee1275_test_flag (GRUB_IEEE1275_FLAG_DISABLE_VIDEO_SUPPORT))
++    {
++      find_display ();
++      if (display)
++        grub_video_register (&grub_video_ieee1275_adapter);
++    }
+ }
+ 
+ GRUB_MOD_FINI(ieee1275_fb)
+diff --git a/include/grub/ieee1275/ieee1275.h b/include/grub/ieee1275/ieee1275.h
+index 0a599607f31..b5a1d49bbc3 100644
+--- a/include/grub/ieee1275/ieee1275.h
++++ b/include/grub/ieee1275/ieee1275.h
+@@ -148,6 +148,8 @@ enum grub_ieee1275_flag
+   GRUB_IEEE1275_FLAG_CURSORONOFF_ANSI_BROKEN,
+ 
+   GRUB_IEEE1275_FLAG_RAW_DEVNAMES,
++  
++  GRUB_IEEE1275_FLAG_DISABLE_VIDEO_SUPPORT
+ };
+ 
+ extern int EXPORT_FUNC(grub_ieee1275_test_flag) (enum grub_ieee1275_flag flag);

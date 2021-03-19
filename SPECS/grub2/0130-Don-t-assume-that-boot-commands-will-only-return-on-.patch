@@ -1,0 +1,97 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 9 Apr 2019 13:12:40 +0200
+Subject: [PATCH] Don't assume that boot commands will only return on fail
+
+While it's true that for most loaders the boot command never returns, it
+may be the case that it does. For example the GRUB emulator boot command
+calls to systemctl kexec which in turn does an asynchonous call to kexec.
+
+So in this case GRUB will wrongly assume that the boot command fails and
+print a "Failed to boot both default and fallback entries" even when the
+kexec call later succeeds.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/normal/menu.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index d4832f17699..14ceb9bb060 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -285,7 +285,7 @@ get_and_remove_first_entry_number (grub_menu_t menu, const char *name)
+ }
+ 
+ /* Run a menu entry.  */
+-static void
++static grub_err_t
+ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+ {
+   grub_err_t err = GRUB_ERR_NONE;
+@@ -302,7 +302,7 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+     {
+       grub_print_error ();
+       grub_errno = GRUB_ERR_NONE;
+-      return;
++      return grub_errno;
+     }
+ 
+   errs_before = grub_err_printed_errors;
+@@ -315,7 +315,7 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+       grub_env_context_open ();
+       menu = grub_zalloc (sizeof (*menu));
+       if (! menu)
+-	return;
++	return grub_errno;
+       grub_env_set_menu (menu);
+       if (auto_boot)
+ 	grub_env_set ("timeout", "0");
+@@ -385,7 +385,7 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+ 
+   if (grub_errno == GRUB_ERR_NONE && grub_loader_is_loaded ())
+     /* Implicit execution of boot, only if something is loaded.  */
+-    grub_command_execute ("boot", 0, 0);
++    err = grub_command_execute ("boot", 0, 0);
+ 
+   if (errs_before != grub_err_printed_errors)
+     grub_wait_after_message ();
+@@ -408,6 +408,8 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+   else
+     grub_env_unset ("default");
+   grub_env_unset ("timeout");
++
++  return err;
+ }
+ 
+ /* Execute ENTRY from the menu MENU, falling back to entries specified
+@@ -422,10 +424,13 @@ grub_menu_execute_with_fallback (grub_menu_t menu,
+ 				 void *callback_data)
+ {
+   int fallback_entry;
++  grub_err_t err;
+ 
+   callback->notify_booting (entry, callback_data);
+ 
+-  grub_menu_execute_entry (entry, 1);
++  err = grub_menu_execute_entry (entry, 1);
++  if (err == GRUB_ERR_NONE)
++    return;
+ 
+   /* Deal with fallback entries.  */
+   while ((fallback_entry = get_and_remove_first_entry_number (menu, "fallback"))
+@@ -436,11 +441,9 @@ grub_menu_execute_with_fallback (grub_menu_t menu,
+ 
+       entry = grub_menu_get_entry (menu, fallback_entry);
+       callback->notify_fallback (entry, callback_data);
+-      grub_menu_execute_entry (entry, 1);
+-      /* If the function call to execute the entry returns at all, then this is
+-	 taken to indicate a boot failure.  For menu entries that do something
+-	 other than actually boot an operating system, this could assume
+-	 incorrectly that something failed.  */
++      err = grub_menu_execute_entry (entry, 1);
++      if (err == GRUB_ERR_NONE)
++        return;
+     }
+ 
+   if (!autobooted)

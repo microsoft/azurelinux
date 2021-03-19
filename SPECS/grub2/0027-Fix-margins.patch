@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Fri, 7 Jun 2013 14:59:36 -0400
+Subject: [PATCH] Fix margins
+
+---
+ grub-core/normal/menu_text.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 6a57376fa80..cbd62f714cb 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -333,17 +333,15 @@ grub_menu_init_page (int nested, int edit,
+   int version_msg = 1;
+ 
+   geo->border = 0;
+-  geo->first_entry_x = 0 /* margin */ + 0 /* border */;
+-  geo->entry_width = grub_term_width (term) - 5;
++  geo->first_entry_x = 0; /* no margin */
++  geo->entry_width = grub_term_width (term) - 1;
+ 
+-  geo->first_entry_y = 2 /* two empty lines*/
+-    + 0 /* GNU GRUB version text  */ + 1 /* top border */;
++  geo->first_entry_y = 3; /* three empty lines*/
+ 
+   geo->timeout_lines = 2;
+ 
+   /* 3 lines for timeout message and bottom margin.  2 lines for the border.  */
+   geo->num_entries = grub_term_height (term) - geo->first_entry_y
+-    - 1 /* bottom border */
+     - 1 /* empty line before info message*/
+     - geo->timeout_lines /* timeout */
+     - 1 /* empty final line  */;

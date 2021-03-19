@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Wed, 1 May 2019 00:36:19 +0200
+Subject: [PATCH] Fix undefined references for fdt when building with platform
+ emu
+
+The fdt module isn't build for this platform, so adding the declarations
+with platform emu will lead to the following undefined reference errors:
+
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x500): undefined reference to `grub_fdt_add_subnode'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x518): undefined reference to `grub_fdt_check_header'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x530): undefined reference to `grub_fdt_check_header_nosize'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x548): undefined reference to `grub_fdt_create_empty_tree'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x560): undefined reference to `grub_fdt_find_subnode'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x578): undefined reference to `grub_fdt_first_node'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x590): undefined reference to `grub_fdt_get_nodename'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x5a8): undefined reference to `grub_fdt_get_prop'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x5c0): undefined reference to `grub_fdt_next_node'
+BUILDSTDERR: /usr/bin/ld: grub_emu_lite-symlist.o:(.data+0x5d8): undefined reference to `grub_fdt_set_prop'
+BUILDSTDERR: collect2: error: ld returned 1 exit status
+BUILDSTDERR: make[1]: *** [Makefile:27093: grub-emu-lite] Error 1
+BUILDSTDERR: make[1]: *** Waiting for unfinished jobs....
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ include/grub/fdt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/grub/fdt.h b/include/grub/fdt.h
+index 22b7c5463fc..2041341fd68 100644
+--- a/include/grub/fdt.h
++++ b/include/grub/fdt.h
+@@ -19,7 +19,7 @@
+ #ifndef GRUB_FDT_HEADER
+ #define GRUB_FDT_HEADER	1
+ 
+-#if defined(__arm__) || defined(__aarch64__)
++#if !defined(GRUB_MACHINE_EMU) && (defined(__arm__) || defined(__aarch64__))
+ 
+ #include <grub/types.h>
+ #include <grub/symbol.h>

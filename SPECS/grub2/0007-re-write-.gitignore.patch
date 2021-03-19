@@ -1,0 +1,248 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jul 2019 12:55:29 +0200
+Subject: [PATCH] re-write .gitignore
+
+---
+ .gitignore                        | 152 ++++++++++++++++++++++++++++++++++++++
+ docs/.gitignore                   |   5 ++
+ grub-core/.gitignore              |  16 ++++
+ grub-core/lib/.gitignore          |   1 +
+ include/grub/gcrypt/.gitignore    |   2 +
+ po/.gitignore                     |   5 ++
+ util/bash-completion.d/.gitignore |   2 +
+ 7 files changed, 183 insertions(+)
+ create mode 100644 docs/.gitignore
+ create mode 100644 grub-core/.gitignore
+ create mode 100644 grub-core/lib/.gitignore
+ create mode 100644 include/grub/gcrypt/.gitignore
+ create mode 100644 po/.gitignore
+ create mode 100644 util/bash-completion.d/.gitignore
+
+diff --git a/.gitignore b/.gitignore
+index f6a1bd05175..594d0134d33 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -275,3 +275,155 @@ widthspec.bin
+ /xfs_test
+ /xzcompress_test
+ /zfs_test
++=======
++# things ./autogen.sh will create
++/Makefile.utilgcry.def
++/ABOUT-NLS
++/aclocal.m4
++/autom4te.cache
++/build-aux
++/configure
++/gnulib
++/grub-core/lib/gnulib/
++/Makefile
++
++# things very common editors create that we never want
++*~
++.*.sw?
++*.patch
++
++# stuff you're likely to make while building test trees
++grub.cfg
++/build*/
++
++# built objects across the whole tree
++Makefile.in
++*.a
++*.am
++*.efi
++*.exec
++*.image
++*.img
++*.info
++*.lst
++*.marker
++/m4
++*.mod
++*.module
++*.o
++*.pf2
++*.yy.[ch]
++.deps/
++.deps-core/
++.deps-util/
++.dirstamp
++
++# next are things you get if you do ./configure in the topdir (for e.g.
++# "make dist" invocation.
++/config-util.h
++/config.h
++/include/grub/cpu
++/include/grub/machine
++/INSTALL
++/INSTALL.grub
++/po/Makefile.in.in
++/po/Makevars
++/po/Makevars.template
++/po/POTFILES
++/po/Rules-quot
++/stamp-h
++/stamp-h1
++bootstrap.log
++config.log
++config.status
++
++# stuff "make dist" creates
++ChangeLog
++grub-*.tar
++grub-*.tar.*
++
++# stuff "make" creates
++/[[:digit:]][[:digit:]]_?*
++/ascii.h
++/build-grub-gen-asciih
++/build-grub-gen-widthspec
++/build-grub-mkfont
++/config-util.h.in
++/garbage-gen
++/grub*-bios-setup
++/grub*-bios-setup.8
++/grub*-editenv
++/grub*-editenv.1
++/grub*-file
++/grub*-file.1
++/grub*-fs-tester
++/grub*-fstest
++/grub*-fstest.1
++/grub*-get-kernel-settings
++/grub*-get-kernel-settings.3
++/grub*-glue-efi
++/grub*-glue-efi.1
++/grub*-install
++/grub*-install.8
++/grub*-kbdcomp
++/grub*-kbdcomp.1
++/grub*-macbless
++/grub*-macbless.8
++/grub*-menulst2cfg
++/grub*-menulst2cfg.1
++/grub*-mount
++/grub*-mount.1
++/grub*-mkconfig
++/grub*-mkconfig.8
++/grub*-mkconfig_lib
++/grub*-mkfont
++/grub*-mkfont.1
++/grub*-mkimage
++/grub*-mkimage.1
++/grub*-mklayout
++/grub*-mklayout.1
++/grub*-mknetdir
++/grub*-mknetdir.1
++/grub*-mkpasswd-pbkdf2
++/grub*-mkpasswd-pbkdf2.1
++/grub*-mkrelpath
++/grub*-mkrelpath.1
++/grub*-mkrescue
++/grub*-mkrescue.1
++/grub*-mkstandalone
++/grub*-mkstandalone.1
++/grub*-ofpathname
++/grub*-ofpathname.8
++/grub*-probe
++/grub*-probe.8
++/grub*-reboot
++/grub*-reboot.8
++/grub*-render-label
++/grub*-render-label.1
++/grub*-rpm-sort
++/grub*-rpm-sort.8
++/grub*-script-check
++/grub*-script-check.1
++/grub*-set-bootflag
++/grub*-set-bootflag.1
++/grub*-set-default
++/grub*-set-default.8
++/grub*-set-password
++/grub*-set-password.8
++/grub*-shell
++/grub*-shell-tester
++/grub*-sparc64-setup
++/grub*-sparc64-setup.8
++/grub*-syslinux2cfg
++/grub*-syslinux2cfg.1
++/grub*-switch-to-blscfg
++/grub*-switch-to-blscfg.8
++/grub_fstest.pp
++/grub_fstest_init.c
++/grub_fstest_init.lst
++/grub_script.tab.[ch]
++/libgrub.pp
++/libgrub_a_init.c
++/libgrub_a_init.lst
++/stamp-h.in
++/widthspec.h
+diff --git a/docs/.gitignore b/docs/.gitignore
+new file mode 100644
+index 00000000000..e1d849ef95b
+--- /dev/null
++++ b/docs/.gitignore
+@@ -0,0 +1,5 @@
++/*.in
++/Makefile
++/stamp-1
++/stamp-vti
++/version*.texi
+diff --git a/grub-core/.gitignore b/grub-core/.gitignore
+new file mode 100644
+index 00000000000..2acce281159
+--- /dev/null
++++ b/grub-core/.gitignore
+@@ -0,0 +1,16 @@
++/*.lst
++/Makefile
++/Makefile.gcry.def
++/unidata.c
++/build-grub-module-verifier
++/gdb_grub
++/genmod.sh
++/gensyminfo.sh
++/gentrigtables
++/gmodule.pl
++/grub_script.tab.[ch]
++/modinfo.sh
++/rs_decoder.h
++/symlist.c
++/symlist.h
++/trigtables.c
+diff --git a/grub-core/lib/.gitignore b/grub-core/lib/.gitignore
+new file mode 100644
+index 00000000000..68154591404
+--- /dev/null
++++ b/grub-core/lib/.gitignore
+@@ -0,0 +1 @@
++/libgcrypt-grub/
+diff --git a/include/grub/gcrypt/.gitignore b/include/grub/gcrypt/.gitignore
+new file mode 100644
+index 00000000000..8fbf5646246
+--- /dev/null
++++ b/include/grub/gcrypt/.gitignore
+@@ -0,0 +1,2 @@
++g10lib.h
++gcrypt.h
+diff --git a/po/.gitignore b/po/.gitignore
+new file mode 100644
+index 00000000000..f507e7741e3
+--- /dev/null
++++ b/po/.gitignore
+@@ -0,0 +1,5 @@
++/Makefile
++/POTFILES*.in
++/grub.pot
++/remove-potcdate.sed
++/stamp-po
+diff --git a/util/bash-completion.d/.gitignore b/util/bash-completion.d/.gitignore
+new file mode 100644
+index 00000000000..6813a527ad3
+--- /dev/null
++++ b/util/bash-completion.d/.gitignore
+@@ -0,0 +1,2 @@
++Makefile
++grub

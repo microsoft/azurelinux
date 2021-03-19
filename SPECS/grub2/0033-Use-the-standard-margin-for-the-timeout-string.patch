@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Fri, 7 Jun 2013 10:52:32 -0400
+Subject: [PATCH] Use the standard margin for the timeout string
+
+So that it aligns with the other messages
+---
+ grub-core/normal/menu_text.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index e72ed438ba3..ca135624356 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -372,7 +372,7 @@ grub_menu_init_page (int nested, int edit,
+   if (bottom_message)
+     {
+       grub_term_gotoxy (term,
+-			(struct grub_term_coordinate) { GRUB_TERM_MARGIN,
++			(struct grub_term_coordinate) { STANDARD_MARGIN,
+ 			    geo->timeout_y });
+ 
+       print_message (nested, edit, term, 0);
+@@ -407,14 +407,14 @@ menu_text_print_timeout (int timeout, void *dataptr)
+   if (data->timeout_msg == TIMEOUT_UNKNOWN)
+     {
+       data->timeout_msg = grub_print_message_indented_real (msg_translated,
+-							    3, 1, data->term, 1)
++							    STANDARD_MARGIN, 1, data->term, 1)
+ 	<= data->geo.timeout_lines ? TIMEOUT_NORMAL : TIMEOUT_TERSE;
+       if (data->timeout_msg == TIMEOUT_TERSE)
+ 	{
+ 	  grub_free (msg_translated);
+ 	  msg_translated = grub_xasprintf (_("%ds"), timeout);
+ 	  if (grub_term_width (data->term) < 10)
+-	    data->timeout_msg = TIMEOUT_TERSE_NO_MARGIN;
++	    data->timeout_msg = STANDARD_MARGIN;
+ 	}
+     }
+ 

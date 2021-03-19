@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Sat, 15 Aug 2020 02:00:57 +1000
+Subject: [PATCH] docs/grub: Document signing grub under UEFI
+
+Before adding information about how grub is signed with an appended
+signature scheme, it's worth adding some information about how it
+can currently be signed for UEFI.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ docs/grub.texi | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 75b22231f35..ca36ad0b6b7 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -5814,6 +5814,7 @@ environment variables and commands are listed in the same order.
+ * Secure Boot Advanced Targeting::   Embedded information for generation number based revocation
+ * Measured Boot::                    Measuring boot components
+ * Lockdown::                         Lockdown when booting on a secure setup
++* Signing GRUB itself::              Ensuring the integrity of the GRUB core image
+ @end menu
+ 
+ @node Authentication and authorisation
+@@ -5892,7 +5893,7 @@ commands.
+ 
+ GRUB's @file{core.img} can optionally provide enforcement that all files
+ subsequently read from disk are covered by a valid digital signature.
+-This document does @strong{not} cover how to ensure that your
++This section does @strong{not} cover how to ensure that your
+ platform's firmware (e.g., Coreboot) validates @file{core.img}.
+ 
+ If environment variable @code{check_signatures}
+@@ -6064,6 +6065,25 @@ be restricted and some operations/commands cannot be executed.
+ The @samp{lockdown} variable is set to @samp{y} when the GRUB is locked down.
+ Otherwise it does not exit.
+ 
++@node Signing GRUB itself
++@section Signing GRUB itself
++
++To ensure a complete secure-boot chain, there must be a way for the code that
++loads GRUB to verify the integrity of the core image.
++
++This is ultimately platform-specific and individual platforms can define their
++own mechanisms. However, there are general-purpose mechanisms that can be used
++with GRUB.
++
++@section Signing GRUB for UEFI secure boot
++
++On UEFI platforms, @file{core.img} is a PE binary. Therefore, it can be signed
++with a tool such as @command{pesign} or @command{sbsign}. Refer to the
++suggestions in @pxref{UEFI secure boot and shim} to ensure that the final
++image works under UEFI secure boot and can maintain the secure-boot chain. It
++will also be necessary to enrol the public key used into a relevant firmware
++key database.
++
+ @node Platform limitations
+ @chapter Platform limitations
+ 

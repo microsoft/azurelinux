@@ -1,0 +1,336 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 14 Jul 2016 17:48:45 +0800
+Subject: [PATCH] efinet: Setting DNS server from UEFI protocol
+
+In the URI device path node, any name rahter than address can be used for
+looking up the resources so that DNS service become needed to get answer of the
+name's address. Unfortunately the DNS is not defined in any of the device path
+nodes so that we use the EFI_IP4_CONFIG2_PROTOCOL and EFI_IP6_CONFIG_PROTOCOL
+to obtain it.
+
+These two protcols are defined the sections of UEFI specification.
+
+ 27.5 EFI IPv4 Configuration II Protocol
+ 27.7 EFI IPv6 Configuration Protocol
+
+include/grub/efi/api.h:
+Add new structure and protocol UUID of EFI_IP4_CONFIG2_PROTOCOL and
+EFI_IP6_CONFIG_PROTOCOL.
+
+grub-core/net/drivers/efi/efinet.c:
+Use the EFI_IP4_CONFIG2_PROTOCOL and EFI_IP6_CONFIG_PROTOCOL to obtain the list
+of DNS server address for IPv4 and IPv6 respectively. The address of DNS
+servers is structured into DHCPACK packet and feed into the same DHCP packet
+processing functions to ensure the network interface is setting up the same way
+it used to be.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Signed-off-by: Ken Lin <ken.lin@hpe.com>
+---
+ grub-core/net/drivers/efi/efinet.c | 163 +++++++++++++++++++++++++++++++++++++
+ include/grub/efi/api.h             |  75 +++++++++++++++++
+ 2 files changed, 238 insertions(+)
+
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 8171ecaa5e4..715a6168d77 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -33,6 +33,8 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ /* GUID.  */
+ static grub_efi_guid_t net_io_guid = GRUB_EFI_SIMPLE_NETWORK_GUID;
+ static grub_efi_guid_t pxe_io_guid = GRUB_EFI_PXE_GUID;
++static grub_efi_guid_t ip4_config_guid = GRUB_EFI_IP4_CONFIG2_PROTOCOL_GUID;
++static grub_efi_guid_t ip6_config_guid = GRUB_EFI_IP6_CONFIG_PROTOCOL_GUID;
+ 
+ static grub_err_t
+ send_card_buffer (struct grub_net_card *dev,
+@@ -332,6 +334,125 @@ grub_efinet_findcards (void)
+   grub_free (handles);
+ }
+ 
++static grub_efi_handle_t
++grub_efi_locate_device_path (grub_efi_guid_t *protocol, grub_efi_device_path_t *device_path,
++			    grub_efi_device_path_t **r_device_path)
++{
++  grub_efi_handle_t handle;
++  grub_efi_status_t status;
++
++  status = efi_call_3 (grub_efi_system_table->boot_services->locate_device_path,
++		      protocol, &device_path, &handle);
++
++  if (status != GRUB_EFI_SUCCESS)
++    return 0;
++
++  if (r_device_path)
++    *r_device_path = device_path;
++
++  return handle;
++}
++
++static grub_efi_ipv4_address_t *
++grub_dns_server_ip4_address (grub_efi_device_path_t *dp, grub_efi_uintn_t *num_dns)
++{
++  grub_efi_handle_t hnd;
++  grub_efi_status_t status;
++  grub_efi_ip4_config2_protocol_t *conf;
++  grub_efi_ipv4_address_t *addrs;
++  grub_efi_uintn_t data_size = 1 * sizeof (grub_efi_ipv4_address_t);
++
++  hnd = grub_efi_locate_device_path (&ip4_config_guid, dp, NULL);
++
++  if (!hnd)
++    return 0;
++
++  conf = grub_efi_open_protocol (hnd, &ip4_config_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!conf)
++    return 0;
++
++  addrs  = grub_malloc (data_size);
++  if (!addrs)
++    return 0;
++
++  status = efi_call_4 (conf->get_data, conf,
++		      GRUB_EFI_IP4_CONFIG2_DATA_TYPE_DNSSERVER,
++		      &data_size, addrs);
++
++  if (status == GRUB_EFI_BUFFER_TOO_SMALL)
++    {
++      grub_free (addrs);
++      addrs  = grub_malloc (data_size);
++      if (!addrs)
++	return 0;
++
++      status = efi_call_4 (conf->get_data,  conf,
++			  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_DNSSERVER,
++			  &data_size, addrs);
++    }
++
++  if (status != GRUB_EFI_SUCCESS)
++    {
++      grub_free (addrs);
++      return 0;
++    }
++
++  *num_dns = data_size / sizeof (grub_efi_ipv4_address_t);
++  return addrs;
++}
++
++static grub_efi_ipv6_address_t *
++grub_dns_server_ip6_address (grub_efi_device_path_t *dp, grub_efi_uintn_t *num_dns)
++{
++  grub_efi_handle_t hnd;
++  grub_efi_status_t status;
++  grub_efi_ip6_config_protocol_t *conf;
++  grub_efi_ipv6_address_t *addrs;
++  grub_efi_uintn_t data_size = 1 * sizeof (grub_efi_ipv6_address_t);
++
++  hnd = grub_efi_locate_device_path (&ip6_config_guid, dp, NULL);
++
++  if (!hnd)
++    return 0;
++
++  conf = grub_efi_open_protocol (hnd, &ip6_config_guid,
++				GRUB_EFI_OPEN_PROTOCOL_GET_PROTOCOL);
++
++  if (!conf)
++    return 0;
++
++  addrs  = grub_malloc (data_size);
++  if (!addrs)
++    return 0;
++
++  status = efi_call_4 (conf->get_data, conf,
++		      GRUB_EFI_IP6_CONFIG_DATA_TYPE_DNSSERVER,
++		      &data_size, addrs);
++
++  if (status == GRUB_EFI_BUFFER_TOO_SMALL)
++    {
++      grub_free (addrs);
++      addrs  = grub_malloc (data_size);
++      if (!addrs)
++	return 0;
++
++      status = efi_call_4 (conf->get_data,  conf,
++			  GRUB_EFI_IP6_CONFIG_DATA_TYPE_DNSSERVER,
++			  &data_size, addrs);
++    }
++
++  if (status != GRUB_EFI_SUCCESS)
++    {
++      grub_free (addrs);
++      return 0;
++    }
++
++  *num_dns = data_size / sizeof (grub_efi_ipv6_address_t);
++  return addrs;
++}
++
+ static struct grub_net_buff *
+ grub_efinet_create_dhcp_ack_from_device_path (grub_efi_device_path_t *dp, int *use_ipv6)
+ {
+@@ -390,6 +511,8 @@ grub_efinet_create_dhcp_ack_from_device_path (grub_efi_device_path_t *dp, int *u
+       grub_efi_ipv4_device_path_t *ipv4 = (grub_efi_ipv4_device_path_t *) ldp;
+       struct grub_net_bootp_packet *bp;
+       grub_uint8_t *ptr;
++      grub_efi_ipv4_address_t *dns;
++      grub_efi_uintn_t num_dns;
+ 
+       bp = (struct grub_net_bootp_packet *) nb->tail;
+       err = grub_netbuff_put (nb, sizeof (*bp) + 4);
+@@ -451,6 +574,25 @@ grub_efinet_create_dhcp_ack_from_device_path (grub_efi_device_path_t *dp, int *u
+       *ptr++ = sizeof ("HTTPClient") - 1;
+       grub_memcpy (ptr, "HTTPClient", sizeof ("HTTPClient") - 1);
+ 
++      dns = grub_dns_server_ip4_address (dp, &num_dns);
++      if (dns)
++	{
++	  grub_efi_uintn_t size_dns = sizeof (*dns) * num_dns;
++
++	  ptr = nb->tail;
++	  err = grub_netbuff_put (nb, size_dns + 2);
++	  if (err)
++	    {
++	      grub_free (ddp);
++	      grub_netbuff_free (nb);
++	      return NULL;
++	    }
++	  *ptr++ = GRUB_NET_BOOTP_DNS;
++	  *ptr++ = size_dns;
++	  grub_memcpy (ptr, dns, size_dns);
++	  grub_free (dns);
++	}
++
+       ptr = nb->tail;
+       err = grub_netbuff_put (nb, 1);
+       if (err)
+@@ -483,6 +625,8 @@ grub_efinet_create_dhcp_ack_from_device_path (grub_efi_device_path_t *dp, int *u
+       struct grub_net_dhcp6_option *opt;
+       struct grub_net_dhcp6_option_iana *iana;
+       struct grub_net_dhcp6_option_iaaddr *iaaddr;
++      grub_efi_ipv6_address_t *dns;
++      grub_efi_uintn_t num_dns;
+ 
+       d6p = (struct grub_net_dhcp6_packet *)nb->tail;
+       err = grub_netbuff_put (nb, sizeof(*d6p));
+@@ -546,6 +690,25 @@ grub_efinet_create_dhcp_ack_from_device_path (grub_efi_device_path_t *dp, int *u
+       opt->len = grub_cpu_to_be16 (uri_len);
+       grub_memcpy (opt->data, uri_dp->uri, uri_len);
+ 
++      dns = grub_dns_server_ip6_address (dp, &num_dns);
++      if (dns)
++	{
++	  grub_efi_uintn_t size_dns = sizeof (*dns) * num_dns;
++
++	  opt = (struct grub_net_dhcp6_option *)nb->tail;
++	  err = grub_netbuff_put (nb, sizeof(*opt) + size_dns);
++	  if (err)
++	  {
++	    grub_free (ddp);
++	    grub_netbuff_free (nb);
++	    return NULL;
++	  }
++	  opt->code = grub_cpu_to_be16_compile_time (GRUB_NET_DHCP6_OPTION_DNS_SERVERS);
++	  opt->len = grub_cpu_to_be16 (size_dns);
++	  grub_memcpy (opt->data, dns, size_dns);
++	  grub_free (dns);
++	}
++
+       *use_ipv6 = 1;
+     }
+ 
+diff --git a/include/grub/efi/api.h b/include/grub/efi/api.h
+index 4a51667adb1..0b490195ad9 100644
+--- a/include/grub/efi/api.h
++++ b/include/grub/efi/api.h
+@@ -352,6 +352,15 @@
+ #define GRUB_EFI_RNG_PROTOCOL_GUID \
+   { 0x3152bca5, 0xeade, 0x433d, \
+     { 0x86, 0x2e, 0xc0, 0x1c, 0xdc, 0x29, 0x1f, 0x44 } \
++
++#define GRUB_EFI_IP4_CONFIG2_PROTOCOL_GUID \
++  { 0x5b446ed1, 0xe30b, 0x4faa, \
++      { 0x87, 0x1a, 0x36, 0x54, 0xec, 0xa3, 0x60, 0x80 } \
++  }
++
++#define GRUB_EFI_IP6_CONFIG_PROTOCOL_GUID \
++  { 0x937fe521, 0x95ae, 0x4d1a, \
++      { 0x89, 0x29, 0x48, 0xbc, 0xd9, 0x0a, 0xd3, 0x1a } \
+   }
+ 
+ struct grub_efi_sal_system_table
+@@ -1883,6 +1892,72 @@ struct grub_efi_rng_protocol
+ };
+ typedef struct grub_efi_rng_protocol grub_efi_rng_protocol_t;
+ 
++enum grub_efi_ip4_config2_data_type {
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_INTERFACEINFO,
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_POLICY,
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_MANUAL_ADDRESS,
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_GATEWAY,
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_DNSSERVER,
++  GRUB_EFI_IP4_CONFIG2_DATA_TYPE_MAXIMUM
++};
++typedef enum grub_efi_ip4_config2_data_type grub_efi_ip4_config2_data_type_t;
++
++struct grub_efi_ip4_config2_protocol
++{
++  grub_efi_status_t (*set_data) (struct grub_efi_ip4_config2_protocol *this,
++				 grub_efi_ip4_config2_data_type_t data_type,
++				 grub_efi_uintn_t data_size,
++				 void *data);
++
++  grub_efi_status_t (*get_data) (struct grub_efi_ip4_config2_protocol *this,
++				 grub_efi_ip4_config2_data_type_t data_type,
++				 grub_efi_uintn_t *data_size,
++				 void *data);
++
++  grub_efi_status_t (*register_data_notify) (struct grub_efi_ip4_config2_protocol *this,
++					     grub_efi_ip4_config2_data_type_t data_type,
++					     grub_efi_event_t event);
++
++  grub_efi_status_t (*unregister_datanotify) (struct grub_efi_ip4_config2_protocol *this,
++					     grub_efi_ip4_config2_data_type_t data_type,
++					     grub_efi_event_t event);
++};
++typedef struct grub_efi_ip4_config2_protocol grub_efi_ip4_config2_protocol_t;
++
++enum grub_efi_ip6_config_data_type {
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_INTERFACEINFO,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_ALT_INTERFACEID,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_POLICY,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_DUP_ADDR_DETECT_TRANSMITS,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_MANUAL_ADDRESS,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_GATEWAY,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_DNSSERVER,
++  GRUB_EFI_IP6_CONFIG_DATA_TYPE_MAXIMUM
++};
++typedef enum grub_efi_ip6_config_data_type grub_efi_ip6_config_data_type_t;
++
++struct grub_efi_ip6_config_protocol
++{
++  grub_efi_status_t (*set_data) (struct grub_efi_ip6_config_protocol *this,
++				 grub_efi_ip6_config_data_type_t data_type,
++				 grub_efi_uintn_t data_size,
++				 void *data);
++
++  grub_efi_status_t (*get_data) (struct grub_efi_ip6_config_protocol *this,
++				 grub_efi_ip6_config_data_type_t data_type,
++				 grub_efi_uintn_t *data_size,
++				 void *data);
++
++  grub_efi_status_t (*register_data_notify) (struct grub_efi_ip6_config_protocol *this,
++					     grub_efi_ip6_config_data_type_t data_type,
++					     grub_efi_event_t event);
++
++  grub_efi_status_t (*unregister_datanotify) (struct grub_efi_ip6_config_protocol *this,
++					     grub_efi_ip6_config_data_type_t data_type,
++					     grub_efi_event_t event);
++};
++typedef struct grub_efi_ip6_config_protocol grub_efi_ip6_config_protocol_t;
++
+ #if (GRUB_TARGET_SIZEOF_VOID_P == 4) || defined (__ia64__) \
+   || defined (__aarch64__) || defined (__MINGW64__) || defined (__CYGWIN__) \
+   || defined(__riscv)

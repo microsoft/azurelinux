@@ -1,0 +1,270 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Aaron Miller <aaronmiller@fb.com>
+Date: Fri, 29 Jul 2016 17:41:38 +0800
+Subject: [PATCH] net: read bracketed ipv6 addrs and port numbers
+
+Allow specifying port numbers for http and tftp paths, and allow ipv6 addresses
+to be recognized with brackets around them, which is required to specify a port
+number
+
+Signed-off-by: Aaron Miller <aaronmiller@fb.com>
+[pjones: various bug fixes]
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/http.c | 25 ++++++++++++---
+ grub-core/net/net.c  | 87 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ grub-core/net/tftp.c |  8 +++--
+ include/grub/net.h   |  1 +
+ 4 files changed, 109 insertions(+), 12 deletions(-)
+
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index b616cf40b1e..12a2632ea55 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -289,7 +289,9 @@ http_receive (grub_net_tcp_socket_t sock __attribute__ ((unused)),
+ 	  nb2 = grub_netbuff_alloc (data->chunk_rem);
+ 	  if (!nb2)
+ 	    return grub_errno;
+-	  grub_netbuff_put (nb2, data->chunk_rem);
++	  err = grub_netbuff_put (nb2, data->chunk_rem);
++	  if (err)
++	    return grub_errno;
+ 	  grub_memcpy (nb2->data, nb->data, data->chunk_rem);
+ 	  if (file->device->net->packs.count >= 20)
+ 	    {
+@@ -312,12 +314,14 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+   int i;
+   struct grub_net_buff *nb;
+   grub_err_t err;
++  char* server = file->device->net->server;
++  int port = file->device->net->port;
+ 
+   nb = grub_netbuff_alloc (GRUB_NET_TCP_RESERVE_SIZE
+ 			   + sizeof ("GET ") - 1
+ 			   + grub_strlen (data->filename)
+ 			   + sizeof (" HTTP/1.1\r\nHost: ") - 1
+-			   + grub_strlen (file->device->net->server)
++			   + grub_strlen (server) + sizeof (":XXXXXXXXXX")
+ 			   + sizeof ("\r\nUser-Agent: " PACKAGE_STRING
+ 				     "\r\n") - 1
+ 			   + sizeof ("Range: bytes=XXXXXXXXXXXXXXXXXXXX"
+@@ -356,7 +360,7 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+ 	       sizeof (" HTTP/1.1\r\nHost: ") - 1);
+ 
+   ptr = nb->tail;
+-  err = grub_netbuff_put (nb, grub_strlen (file->device->net->server));
++  err = grub_netbuff_put (nb, grub_strlen (server));
+   if (err)
+     {
+       grub_netbuff_free (nb);
+@@ -365,6 +369,15 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+   grub_memcpy (ptr, file->device->net->server,
+ 	       grub_strlen (file->device->net->server));
+ 
++  if (port)
++    {
++      ptr = nb->tail;
++      grub_snprintf ((char *) ptr,
++	  sizeof (":XXXXXXXXXX"),
++	  ":%d",
++	  port);
++    }
++
+   ptr = nb->tail;
+   err = grub_netbuff_put (nb, 
+ 			  sizeof ("\r\nUser-Agent: " PACKAGE_STRING "\r\n")
+@@ -390,8 +403,10 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+   grub_netbuff_put (nb, 2);
+   grub_memcpy (ptr, "\r\n", 2);
+ 
+-  data->sock = grub_net_tcp_open (file->device->net->server,
+-				  HTTP_PORT, http_receive,
++  grub_dprintf ("http", "opening path %s on host %s TCP port %d\n",
++		data->filename, server, port ? port : HTTP_PORT);
++  data->sock = grub_net_tcp_open (server,
++				  port ? port : HTTP_PORT, http_receive,
+ 				  http_err, NULL,
+ 				  file);
+   if (!data->sock)
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index a46f82362ed..0ce5e675ed7 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -444,6 +444,13 @@ parse_ip6 (const char *val, grub_uint64_t *ip, const char **rest)
+   grub_uint16_t newip[8];
+   const char *ptr = val;
+   int word, quaddot = -1;
++  int bracketed = 0;
++
++  if (ptr[0] == '[')
++    {
++      bracketed = 1;
++      ptr++;
++    }
+ 
+   if (ptr[0] == ':' && ptr[1] != ':')
+     return 0;
+@@ -482,6 +489,8 @@ parse_ip6 (const char *val, grub_uint64_t *ip, const char **rest)
+       grub_memset (&newip[quaddot], 0, (7 - word) * sizeof (newip[0]));
+     }
+   grub_memcpy (ip, newip, 16);
++  if (bracketed && *ptr == ']')
++    ptr++;
+   if (rest)
+     *rest = ptr;
+   return 1;
+@@ -1343,8 +1352,10 @@ grub_net_open_real (const char *name)
+ {
+   grub_net_app_level_t proto;
+   const char *protname, *server;
++  char *host;
+   grub_size_t protnamelen;
+   int try;
++  int port = 0;
+ 
+   if (grub_strncmp (name, "pxe:", sizeof ("pxe:") - 1) == 0)
+     {
+@@ -1382,6 +1393,72 @@ grub_net_open_real (const char *name)
+       return NULL;
+     }  
+ 
++  char* port_start;
++  /* ipv6 or port specified? */
++  if ((port_start = grub_strchr (server, ':')))
++    {
++      char* ipv6_begin;
++      if((ipv6_begin = grub_strchr (server, '[')))
++	{
++	  char* ipv6_end = grub_strchr (server, ']');
++	  if(!ipv6_end)
++	    {
++	      grub_error (GRUB_ERR_NET_BAD_ADDRESS,
++		      N_("mismatched [ in address"));
++	      return NULL;
++	    }
++	  /* port number after bracketed ipv6 addr */
++	  if(ipv6_end[1] == ':')
++	    {
++	      port = grub_strtoul (ipv6_end + 2, NULL, 10);
++	      if(port > 65535)
++		{
++		  grub_error (GRUB_ERR_NET_BAD_ADDRESS,
++			  N_("bad port number"));
++		  return NULL;
++		}
++	    }
++	  host = grub_strndup (ipv6_begin, (ipv6_end - ipv6_begin) + 1);
++	}
++      else
++	{
++	  if (grub_strchr (port_start + 1, ':'))
++	    {
++	      int iplen = grub_strlen (server);
++	      /* bracket bare ipv6 addrs */
++	      host = grub_malloc (iplen + 3);
++	      if(!host)
++		{
++		  return NULL;
++		}
++	      host[0] = '[';
++	      grub_memcpy (host + 1, server, iplen);
++	      host[iplen + 1] = ']';
++	      host[iplen + 2] = '\0';
++	    }
++	  else
++	    {
++	      /* hostname:port or ipv4:port */
++	      port = grub_strtol (port_start + 1, NULL, 10);
++	      if(port > 65535)
++		{
++		  grub_error (GRUB_ERR_NET_BAD_ADDRESS,
++			  N_("bad port number"));
++		  return NULL;
++		}
++	      host = grub_strndup (server, port_start - server);
++	    }
++	}
++    }
++  else
++    {
++      host = grub_strdup (server);
++    }
++  if (!host)
++    {
++      return NULL;
++    }
++
+   for (try = 0; try < 2; try++)
+     {
+       FOR_NET_APP_LEVEL (proto)
+@@ -1391,14 +1468,13 @@ grub_net_open_real (const char *name)
+ 	  {
+ 	    grub_net_t ret = grub_zalloc (sizeof (*ret));
+ 	    if (!ret)
+-	      return NULL;
+-	    ret->protocol = proto;
+-	    ret->server = grub_strdup (server);
+-	    if (!ret->server)
+ 	      {
+-		grub_free (ret);
++		grub_free (host);
+ 		return NULL;
+ 	      }
++	    ret->protocol = proto;
++	    ret->port = port;
++	    ret->server = host;
+ 	    ret->fs = &grub_net_fs;
+ 	    return ret;
+ 	  }
+@@ -1473,6 +1549,7 @@ grub_net_open_real (const char *name)
+   grub_error (GRUB_ERR_UNKNOWN_DEVICE, N_("disk `%s' not found"),
+ 	      name);
+ 
++  grub_free (host);
+   return NULL;
+ }
+ 
+diff --git a/grub-core/net/tftp.c b/grub-core/net/tftp.c
+index 4ab2f5c7357..d54b13f09ff 100644
+--- a/grub-core/net/tftp.c
++++ b/grub-core/net/tftp.c
+@@ -295,6 +295,7 @@ tftp_open (struct grub_file *file, const char *filename)
+   grub_err_t err;
+   grub_uint8_t *nbd;
+   grub_net_network_level_address_t addr;
++  int port = file->device->net->port;
+ 
+   data = grub_zalloc (sizeof (*data));
+   if (!data)
+@@ -362,14 +363,17 @@ tftp_open (struct grub_file *file, const char *filename)
+   err = grub_net_resolve_address (file->device->net->server, &addr);
+   if (err)
+     {
+-      grub_dprintf("tftp", "Address resolution failed: %d\n", err);
++      grub_dprintf ("tftp", "Address resolution failed: %d\n", err);
++      grub_dprintf ("tftp", "file_size is %llu, block_size is %llu\n",
++		    (unsigned long long)data->file_size,
++		    (unsigned long long)data->block_size);
+       grub_free (data);
+       return err;
+     }
+ 
+   grub_dprintf("tftp", "opening connection\n");
+   data->sock = grub_net_udp_open (addr,
+-				  TFTP_SERVER_PORT, tftp_receive,
++				  port ? port : TFTP_SERVER_PORT, tftp_receive,
+ 				  file);
+   if (!data->sock)
+     {
+diff --git a/include/grub/net.h b/include/grub/net.h
+index af0404db7e3..d55d505a03a 100644
+--- a/include/grub/net.h
++++ b/include/grub/net.h
+@@ -273,6 +273,7 @@ typedef struct grub_net
+ {
+   char *server;
+   char *name;
++  int port;
+   grub_net_app_level_t protocol;
+   grub_net_packets_t packs;
+   grub_off_t offset;

@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 27 Feb 2018 13:55:35 -0500
+Subject: [PATCH] align struct efi_variable better...
+
+---
+ include/grub/efiemu/runtime.h | 2 +-
+ include/grub/types.h          | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/grub/efiemu/runtime.h b/include/grub/efiemu/runtime.h
+index 36d2dedf47e..9d93ba88bac 100644
+--- a/include/grub/efiemu/runtime.h
++++ b/include/grub/efiemu/runtime.h
+@@ -33,5 +33,5 @@ struct efi_variable
+   grub_uint32_t namelen;
+   grub_uint32_t size;
+   grub_efi_uint32_t attributes;
+-} GRUB_PACKED;
++} GRUB_PACKED GRUB_ALIGNED(8);
+ #endif /* ! GRUB_EFI_EMU_RUNTIME_HEADER */
+diff --git a/include/grub/types.h b/include/grub/types.h
+index b36b26a79d4..30e57254889 100644
+--- a/include/grub/types.h
++++ b/include/grub/types.h
+@@ -29,6 +29,7 @@
+ #else
+ #define GRUB_PACKED __attribute__ ((packed))
+ #endif
++#define GRUB_ALIGNED(x) __attribute__((aligned (x)))
+ 
+ #ifdef GRUB_BUILD
+ # define GRUB_CPU_SIZEOF_VOID_P	BUILD_SIZEOF_VOID_P

@@ -1,0 +1,126 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Wed, 15 Apr 2015 14:48:30 +0800
+Subject: [PATCH] efinet: UEFI IPv6 PXE support
+
+When grub2 image is booted from UEFI IPv6 PXE, the DHCPv6 Reply packet is
+cached in firmware buffer which can be obtained by PXE Base Code protocol. The
+network interface can be setup through the parameters in that obtained packet.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Signed-off-by: Ken Lin <ken.lin@hpe.com>
+---
+ grub-core/net/drivers/efi/efinet.c |  2 ++
+ include/grub/efi/api.h             | 71 +++++++++++++++++++++++---------------
+ 2 files changed, 46 insertions(+), 27 deletions(-)
+
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 8e25680db0c..014e5bf9802 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -409,6 +409,8 @@ grub_efi_net_config_real (grub_efi_handle_t hnd, char **device,
+ 	  grub_print_error ();
+ 	if (device && path)
+ 	  grub_dprintf ("efinet", "device: `%s' path: `%s'\n", *device, *path);
++	if (grub_errno)
++	  grub_print_error ();
+       }
+     else
+       {
+diff --git a/include/grub/efi/api.h b/include/grub/efi/api.h
+index 7614b58dca8..91ab528e4d0 100644
+--- a/include/grub/efi/api.h
++++ b/include/grub/efi/api.h
+@@ -1524,31 +1524,6 @@ typedef union
+   grub_efi_pxe_dhcpv6_packet_t dhcpv6;
+ } grub_efi_pxe_packet_t;
+ 
+-#define GRUB_EFI_PXE_MAX_IPCNT 8
+-#define GRUB_EFI_PXE_MAX_ARP_ENTRIES 8
+-#define GRUB_EFI_PXE_MAX_ROUTE_ENTRIES 8
+-
+-typedef struct grub_efi_pxe_ip_filter
+-{
+-  grub_efi_uint8_t filters;
+-  grub_efi_uint8_t ip_count;
+-  grub_efi_uint16_t reserved;
+-  grub_efi_ip_address_t ip_list[GRUB_EFI_PXE_MAX_IPCNT];
+-} grub_efi_pxe_ip_filter_t;
+-
+-typedef struct grub_efi_pxe_arp_entry
+-{
+-  grub_efi_ip_address_t ip_addr;
+-  grub_efi_mac_address_t mac_addr;
+-} grub_efi_pxe_arp_entry_t;
+-
+-typedef struct grub_efi_pxe_route_entry
+-{
+-  grub_efi_ip_address_t ip_addr;
+-  grub_efi_ip_address_t subnet_mask;
+-  grub_efi_ip_address_t gateway_addr;
+-} grub_efi_pxe_route_entry_t;
+-
+ typedef struct grub_efi_pxe_icmp_error
+ {
+   grub_efi_uint8_t type;
+@@ -1574,6 +1549,48 @@ typedef struct grub_efi_pxe_tftp_error
+   grub_efi_char8_t error_string[127];
+ } grub_efi_pxe_tftp_error_t;
+ 
++typedef struct {
++  grub_uint8_t addr[4];
++} grub_efi_pxe_ipv4_address_t;
++
++typedef struct {
++  grub_uint8_t addr[16];
++} grub_efi_pxe_ipv6_address_t;
++
++typedef struct {
++  grub_uint8_t addr[32];
++} grub_efi_pxe_mac_address_t;
++
++typedef union {
++  grub_uint32_t addr[4];
++  grub_efi_pxe_ipv4_address_t v4;
++  grub_efi_pxe_ipv6_address_t v6;
++} grub_efi_pxe_ip_address_t;
++
++#define GRUB_EFI_PXE_BASE_CODE_MAX_IPCNT 8
++typedef struct grub_efi_pxe_ip_filter
++{
++  grub_efi_uint8_t filters;
++  grub_efi_uint8_t ip_count;
++  grub_efi_uint16_t reserved;
++  grub_efi_ip_address_t ip_list[GRUB_EFI_PXE_BASE_CODE_MAX_IPCNT];
++} grub_efi_pxe_ip_filter_t;
++
++typedef struct {
++  grub_efi_pxe_ip_address_t ip_addr;
++  grub_efi_pxe_mac_address_t mac_addr;
++} grub_efi_pxe_arp_entry_t;
++
++typedef struct {
++  grub_efi_pxe_ip_address_t ip_addr;
++  grub_efi_pxe_ip_address_t subnet_mask;
++  grub_efi_pxe_ip_address_t gw_addr;
++} grub_efi_pxe_route_entry_t;
++
++
++#define GRUB_EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES 8
++#define GRUB_EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES 8
++
+ typedef struct grub_efi_pxe_mode
+ {
+   grub_efi_boolean_t started;
+@@ -1605,9 +1622,9 @@ typedef struct grub_efi_pxe_mode
+   grub_efi_pxe_packet_t pxe_bis_reply;
+   grub_efi_pxe_ip_filter_t ip_filter;
+   grub_efi_uint32_t arp_cache_entries;
+-  grub_efi_pxe_arp_entry_t arp_cache[GRUB_EFI_PXE_MAX_ARP_ENTRIES];
++  grub_efi_pxe_arp_entry_t arp_cache[GRUB_EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES];
+   grub_efi_uint32_t route_table_entries;
+-  grub_efi_pxe_route_entry_t route_table[GRUB_EFI_PXE_MAX_ROUTE_ENTRIES];
++  grub_efi_pxe_route_entry_t route_table[GRUB_EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES];
+   grub_efi_pxe_icmp_error_t icmp_error;
+   grub_efi_pxe_tftp_error_t tftp_error;
+ } grub_efi_pxe_mode_t;

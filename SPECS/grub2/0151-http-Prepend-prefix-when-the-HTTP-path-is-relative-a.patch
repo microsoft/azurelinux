@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 2 Jun 2020 13:25:01 +0200
+Subject: [PATCH] http: Prepend prefix when the HTTP path is relative as done
+ in efi/http
+
+There are two different HTTP drivers that can be used when requesting an
+HTTP resource: the efi/http that uses the EFI_HTTP_PROTOCOL and the http
+that uses GRUB's HTTP and TCP/IP implementation.
+
+The efi/http driver appends a prefix that is defined in the variable
+http_path, but the http driver doesn't.
+
+So using this driver and attempting to fetch a resource using a relative
+path fails.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/net/http.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index b52b558d631..7f878b56157 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -501,13 +501,20 @@ http_open (struct grub_file *file, const char *filename)
+ {
+   grub_err_t err;
+   struct http_data *data;
++  const char *http_path;
+ 
+   data = grub_zalloc (sizeof (*data));
+   if (!data)
+     return grub_errno;
+   file->size = GRUB_FILE_SIZE_UNKNOWN;
+ 
+-  data->filename = grub_strdup (filename);
++  /* If path is relative, prepend http_path */
++  http_path = grub_env_get ("http_path");
++  if (http_path && filename[0] != '/')
++    data->filename = grub_xasprintf ("%s/%s", http_path, filename);
++  else
++    data->filename = grub_strdup (filename);
++
+   if (!data->filename)
+     {
+       grub_free (data);

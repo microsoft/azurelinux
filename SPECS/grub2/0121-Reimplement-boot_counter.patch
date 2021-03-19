@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 4 Oct 2018 14:22:09 -0400
+Subject: [PATCH] Reimplement boot_counter
+
+This adds "increment" and "decrement" commands, and uses them to maintain our
+variables in 01_fallback_counter.  It also simplifies the counter logic, so
+that there are no nested tests that conflict with each other.
+
+Apparently, this *really* wasn't tested well enough.
+
+Resolves: rhbz#1614637
+Signed-off-by: Peter Jones <pjones@redhat.com>
+[lorbus: add comments and revert logic changes in 01_fallback_counting]
+Signed-off-by: Christian Glombek <lorbus@fedoraproject.org>
+---
+ Makefile.util.def                   |   6 +++
+ grub-core/Makefile.core.def         |   5 ++
+ grub-core/commands/increment.c      | 105 ++++++++++++++++++++++++++++++++++++
+ util/grub.d/01_fallback_counting.in |  22 ++++++++
+ 4 files changed, 138 insertions(+)
+ create mode 100644 grub-core/commands/increment.c
+ create mode 100644 util/grub.d/01_fallback_counting.in
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index c6375933faa..2e5e05b25f1 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -458,6 +458,12 @@ script = {
+   installdir = grubconf;
+ };
+ 
++script = {
++  name = '01_fallback_counting';
++  common = util/grub.d/01_fallback_counting.in;
++  installdir = grubconf;
++};
++
+ script = {
+   name = '01_menu_auto_hide';
+   common = util/grub.d/01_menu_auto_hide.in;
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 498ca11762a..1e15345107e 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -398,6 +398,11 @@ kernel = {
+   extra_dist = kern/mips/cache_flush.S;
+ };
+ 
++module = {
++  name = increment;
++  common = commands/increment.c;
++};
++
+ program = {
+   name = grub-emu;
+   mansection = 1;
+diff --git a/grub-core/commands/increment.c b/grub-core/commands/increment.c
+new file mode 100644
+index 00000000000..79cf137656c
+--- /dev/null
++++ b/grub-core/commands/increment.c
+@@ -0,0 +1,105 @@
++/* increment.c - Commands to increment and decrement variables. */
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2006,2007,2008  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/dl.h>
++#include <grub/term.h>
++#include <grub/time.h>
++#include <grub/types.h>
++#include <grub/misc.h>
++#include <grub/extcmd.h>
++#include <grub/i18n.h>
++#include <grub/env.h>
++
++GRUB_MOD_LICENSE ("GPLv3+");
++
++typedef enum {
++    INCREMENT,
++    DECREMENT,
++} operation;
++
++static grub_err_t
++incr_decr(operation op, int argc, char **args)
++{
++  const char *old;
++  char *new;
++  long value;
++
++  if (argc < 1)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_ ("no variable specified"));
++  if (argc > 1)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_ ("too many arguments"));
++
++  old = grub_env_get (*args);
++  if (!old)
++    return grub_error (GRUB_ERR_FILE_NOT_FOUND, N_("No such variable \"%s\""),
++		       *args);
++
++  value = grub_strtol (old, NULL, 0);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
++
++  switch (op)
++    {
++    case INCREMENT:
++      value += 1;
++      break;
++    case DECREMENT:
++      value -= 1;
++      break;
++    }
++
++  new = grub_xasprintf ("%ld", value);
++  if (!new)
++    return grub_errno;
++
++  grub_env_set (*args, new);
++  grub_free (new);
++
++  return GRUB_ERR_NONE;
++}
++
++static grub_err_t
++grub_cmd_incr(struct grub_command *cmd UNUSED,
++              int argc, char **args)
++{
++  return incr_decr(INCREMENT, argc, args);
++}
++
++static grub_err_t
++grub_cmd_decr(struct grub_command *cmd UNUSED,
++              int argc, char **args)
++{
++  return incr_decr(DECREMENT, argc, args);
++}
++
++static grub_command_t cmd_incr, cmd_decr;
++
++GRUB_MOD_INIT(increment)
++{
++  cmd_incr = grub_register_command ("increment", grub_cmd_incr, N_("VARIABLE"),
++                                    N_("increment VARIABLE"));
++  cmd_decr = grub_register_command ("decrement", grub_cmd_decr, N_("VARIABLE"),
++                                    N_("decrement VARIABLE"));
++}
++
++GRUB_MOD_FINI(increment)
++{
++  grub_unregister_command (cmd_incr);
++  grub_unregister_command (cmd_decr);
++}
+diff --git a/util/grub.d/01_fallback_counting.in b/util/grub.d/01_fallback_counting.in
+new file mode 100644
+index 00000000000..be0e770ea82
+--- /dev/null
++++ b/util/grub.d/01_fallback_counting.in
+@@ -0,0 +1,22 @@
++#! /bin/sh -e
++
++# Boot Counting
++# The boot_counter env var can be used to count down boot attempts after an
++# OSTree upgrade and choose the rollback deployment when 0 is reached.  Both
++# boot_counter and boot_success need to be (re-)set from userspace.
++cat << EOF
++insmod increment
++# Check if boot_counter exists and boot_success=0 to activate this behaviour.
++if [ -n "\${boot_counter}" -a "\${boot_success}" = "0" ]; then
++  # if countdown has ended, choose to boot rollback deployment (default=1 on
++  # OSTree-based systems)
++  if  [ "\${boot_counter}" = "0" -o "\${boot_counter}" = "-1" ]; then
++    set default=1
++    set boot_counter=-1
++  # otherwise decrement boot_counter
++  else
++    decrement boot_counter
++  fi
++  save_env boot_counter
++fi
++EOF

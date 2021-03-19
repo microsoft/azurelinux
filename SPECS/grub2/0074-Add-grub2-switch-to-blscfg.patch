@@ -1,0 +1,410 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 15 Mar 2018 14:12:40 -0400
+Subject: [PATCH] Add grub2-switch-to-blscfg
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+[jhlavac: Use ${etcdefaultgrub} instead of /etc/default/grub]
+Signed-off-by: Jan Hlavac <jhlavac@redhat.com>
+---
+ Makefile.util.def             |   7 +
+ util/grub-set-password.in     |   2 +-
+ util/grub-switch-to-blscfg.8  |  33 +++++
+ util/grub-switch-to-blscfg.in | 317 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 358 insertions(+), 1 deletion(-)
+ create mode 100644 util/grub-switch-to-blscfg.8
+ create mode 100644 util/grub-switch-to-blscfg.in
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index cdd2f51fe4b..afc4d7b0c3e 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -1364,6 +1364,13 @@ program = {
+   ldadd = '$(LIBINTL) $(LIBDEVMAPPER) $(LIBZFS) $(LIBNVPAIR) $(LIBGEOM)';
+ };
+ 
++script = {
++  name = grub-switch-to-blscfg;
++  common = util/grub-switch-to-blscfg.in;
++  mansection = 8;
++  installdir = sbin;
++};
++
+ program = {
+   name = grub-glue-efi;
+   mansection = 1;
+diff --git a/util/grub-set-password.in b/util/grub-set-password.in
+index 5ebf50576d6..c0b5ebbfdc5 100644
+--- a/util/grub-set-password.in
++++ b/util/grub-set-password.in
+@@ -1,6 +1,6 @@
+ #!/bin/sh -e
+ 
+-EFIDIR=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/')
++EFIDIR=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/' -e 's/\"//g')
+ if [ -d /sys/firmware/efi/efivars/ ]; then
+     grubdir=`echo "/@bootdirname@/efi/EFI/${EFIDIR}/" | sed 's,//*,/,g'`
+ else
+diff --git a/util/grub-switch-to-blscfg.8 b/util/grub-switch-to-blscfg.8
+new file mode 100644
+index 00000000000..9a886282976
+--- /dev/null
++++ b/util/grub-switch-to-blscfg.8
+@@ -0,0 +1,33 @@
++.TH GRUB-SWITCH-TO-BLSCFG 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-switch-to-blscfg\fR \(em Switch to using BLS config files.
++
++.SH SYNOPSIS
++\fBgrub-switch-to-blscfg\fR [--grub-directory=\fIDIR\fR] [--config-file=\fIFILE\fR] [--grub-defaults=\fIFILE\fR]
++
++.SH DESCRIPTION
++\fBgrub-switch-to-blscfg\fR reconfigures grub-mkconfig to use BLS-style config files, and then regenerates the GRUB configuration.
++
++.SH OPTIONS
++.TP
++--grub-directory=\fIDIR\fR
++Search for grub.cfg under \fIDIR\fR.  The default value is \fI/boot/efi/EFI/\fBVENDOR\fR on UEFI machines and \fI/boot/grub2\fR elsewhere.
++
++.TP
++--config-file=\fIFILE\fR
++The grub config file to use.  The default value is \fI/etc/grub2-efi.cfg\fR on UEFI machines and \fI/etc/grub2.cfg\fR elsewhere.  Symbolic links will be followed.
++
++.TP
++--grub-defaults=\fIFILE\fR
++The defaults file for grub-mkconfig.  The default value is \fI/etc/default/grub\fR.
++
++.TP
++--bls-directory=\fIDIR\fR
++Create BootLoaderSpec fragments in \fIDIR\fR.  The default value is \fI/boot/loader/entries\fR.
++
++.TP
++--backup-suffix=\fSUFFIX\fR
++The suffix to use for saved backup files.  The default value is \fI.bak\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-switch-to-blscfg.in b/util/grub-switch-to-blscfg.in
+new file mode 100644
+index 00000000000..a851424beb2
+--- /dev/null
++++ b/util/grub-switch-to-blscfg.in
+@@ -0,0 +1,317 @@
++#! /bin/sh
++#
++# Set a default boot entry for GRUB.
++# Copyright (C) 2004,2009  Free Software Foundation, Inc.
++#
++# GRUB is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# GRUB is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++
++#set -eu
++
++# Initialize some variables.
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++sbindir=@sbindir@
++bindir=@bindir@
++sysconfdir="@sysconfdir@"
++PACKAGE_NAME=@PACKAGE_NAME@
++PACKAGE_VERSION=@PACKAGE_VERSION@
++datarootdir="@datarootdir@"
++datadir="@datadir@"
++if [ ! -v pkgdatadir ]; then
++    pkgdatadir="${datadir}/@PACKAGE@"
++fi
++
++self=`basename $0`
++
++grub_get_kernel_settings="${sbindir}/@grub_get_kernel_settings@"
++grub_editenv=${bindir}/@grub_editenv@
++etcdefaultgrub=/etc/default/grub
++
++eval "$("${grub_get_kernel_settings}")" || true
++
++EFIDIR=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/' -e 's/\"//g')
++if [ -d /sys/firmware/efi/efivars/ ]; then
++    startlink=/etc/grub2-efi.cfg
++    grubdir=`echo "/@bootdirname@/efi/EFI/${EFIDIR}/" | sed 's,//*,/,g'`
++else
++    startlink=/etc/grub2.cfg
++    grubdir=`echo "/@bootdirname@/@grubdirname@" | sed 's,//*,/,g'`
++fi
++
++blsdir=`echo "/@bootdirname@/loader/entries" | sed 's,//*,/,g'`
++
++backupsuffix=.bak
++
++arch="$(uname -m)"
++
++export TEXTDOMAIN=@PACKAGE@
++export TEXTDOMAINDIR="@localedir@"
++
++. "${pkgdatadir}/grub-mkconfig_lib"
++
++# Usage: usage
++# Print the usage.
++usage () {
++    gettext_printf "Usage: %s\n" "$self"
++    gettext "Switch to BLS config files.\n"; echo
++    echo
++    print_option_help "-h, --help" "$(gettext "print this message and exit")"
++    print_option_help "-V, --version" "$(gettext "print the version information and exit")"
++    echo
++    print_option_help "--backup-suffix=$(gettext "SUFFIX")" "$backupsuffix"
++    print_option_help "--bls-directory=$(gettext "DIR")" "$blsdir"
++    print_option_help "--config-file=$(gettext "FILE")" "$startlink"
++    print_option_help "--grub-defaults=$(gettext "FILE")" "$etcdefaultgrub"
++    print_option_help "--grub-directory=$(gettext "DIR")" "$grubdir"
++    # echo
++    # gettext "Report bugs to <bug-grub@gnu.org>."; echo
++}
++
++argument () {
++    opt=$1
++    shift
++
++    if test $# -eq 0; then
++        gettext_printf "%s: option requires an argument -- \`%s'\n" "$self" "$opt" 1>&2
++        exit 1
++    fi
++    echo $1
++}
++
++# Check the arguments.
++while test $# -gt 0
++do
++    option=$1
++    shift
++
++    case "$option" in
++    -h | --help)
++        usage
++        exit 0 ;;
++    -V | --version)
++        echo "$self (${PACKAGE_NAME}) ${PACKAGE_VERSION}"
++        exit 0 ;;
++
++    --backup-suffix)
++        backupsuffix=`argument $option "$@"`
++        shift
++        ;;
++    --backup-suffix=*)
++        backupsuffix=`echo "$option" | sed 's/--backup-suffix=//'`
++        ;;
++
++    --bls-directory)
++        blsdir=`argument $option "$@"`
++        shift
++        ;;
++    --bls-directory=*)
++        blsdir=`echo "$option" | sed 's/--bls-directory=//'`
++        ;;
++
++    --config-file)
++        startlink=`argument $option "$@"`
++        shift
++        ;;
++    --config-file=*)
++        startlink=`echo "$option" | sed 's/--config-file=//'`
++        ;;
++
++    --grub-defaults)
++        etcdefaultgrub=`argument $option "$@"`
++        shift
++        ;;
++    --grub-defaults=*)
++        etcdefaultgrub=`echo "$option" | sed 's/--grub-defaults=//'`
++        ;;
++
++    --grub-directory)
++        grubdir=`argument $option "$@"`
++        shift
++        ;;
++    --grub-directory=*)
++        grubdir=`echo "$option" | sed 's/--grub-directory=//'`
++        ;;
++
++    *)
++        gettext_printf "Unrecognized option \`%s'\n" "$option" 1>&2
++        usage
++        exit 1
++        ;;
++    esac
++done
++
++find_grub_cfg() {
++    local candidate=""
++    while [ -e "${candidate}" -o $# -gt 0 ]
++    do
++        if [ ! -e "${candidate}" ] ; then
++            candidate="$1"
++            shift
++        fi
++
++        if [ -L "${candidate}" ]; then
++            candidate="$(realpath "${candidate}")"
++        fi
++
++        if [ -f "${candidate}" ]; then
++            export GRUB_CONFIG_FILE="${candidate}"
++            return 0
++        fi
++    done
++    return 1
++}
++
++if ! find_grub_cfg ${startlink} ${grubdir}/grub.cfg ; then
++  gettext_printf "Couldn't find config file\n" 1>&2
++  exit 1
++fi
++
++if [ ! -d "${blsdir}" ]; then
++    install -m 700 -d "${blsdir}"
++fi
++
++if [ -f /etc/machine-id ]; then
++    MACHINE_ID=$(cat /etc/machine-id)
++else
++    MACHINE_ID=$(dmesg | sha256sum)
++fi
++
++mkbls() {
++    local kernelver=$1 && shift
++    local datetime=$1 && shift
++    local kernelopts=$1 && shift
++
++    local debugname=""
++    local debugid=""
++    local flavor=""
++
++    if [ "$kernelver" == *\+* ] ; then
++        local flavor=-"${kernelver##*+}"
++        if [ "${flavor}" == "-debug" ]; then
++            local debugname=" with debugging"
++            local debugid="-debug"
++        fi
++    fi
++    (
++        source /etc/os-release
++
++        cat <<EOF
++title ${NAME} (${kernelver}) ${VERSION}${debugname}
++version ${kernelver}${debugid}
++linux /vmlinuz-${kernelver}
++initrd /initramfs-${kernelver}.img
++options ${kernelopts}
++grub_users \$grub_users
++grub_arg --unrestricted
++grub_class kernel${flavor}
++EOF
++    ) | cat
++}
++
++copy_bls() {
++    for kernelver in $(cd /lib/modules/ ; ls -1) "" ; do
++	bls_target="${blsdir}/${MACHINE_ID}-${kernelver}.conf"
++	linux="/vmlinuz-${kernelver}"
++	linux_path="/boot${linux}"
++	kernel_dir="/lib/modules/${kernelver}"
++
++	if [ ! -d "${kernel_dir}" ] ; then
++            continue
++	fi
++	if [ ! -f "${linux_path}" ]; then
++            continue
++	fi
++
++	linux_relpath="$("${grub_mkrelpath}" "${linux_path}")"
++	bootprefix="${linux_relpath%%"${linux}"}"
++	cmdline="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++
++	mkbls "${kernelver}" \
++	      "$(date -u +%Y%m%d%H%M%S -d "$(stat -c '%y' "${kernel_dir}")")" \
++	      "${bootprefix}" "${cmdline}" >"${bls_target}"
++
++	if [ "x$GRUB_LINUX_MAKE_DEBUG" = "xtrue" ]; then
++            bls_debug="$(echo ${bls_target} | sed -e "s/${kernelver}/${kernelver}~debug/")"
++            cp -aT  "${bls_target}" "${bls_debug}"
++            title="$(grep '^title[ \t]' "${bls_debug}" | sed -e 's/^title[ \t]*//')"
++            options="$(echo "${cmdline} ${GRUB_CMDLINE_LINUX_DEBUG}" | sed -e 's/\//\\\//g')"
++            sed -i -e "s/^title.*/title ${title}${GRUB_LINUX_DEBUG_TITLE_POSTFIX}/" "${bls_debug}"
++            sed -i -e "s/^options.*/options ${options}/" "${bls_debug}"
++	fi
++    done
++
++    if [ -f "/boot/vmlinuz-0-rescue-${MACHINE_ID}" ]; then
++	mkbls "0-rescue-${MACHINE_ID}" "0" "${bootprefix}" >"${blsdir}/${MACHINE_ID}-0-rescue.conf"
++    fi
++}
++
++# The grub2 EFI binary is not copied to the ESP as a part of an ostree
++# transaction. Make sure a grub2 version with BLS support is installed
++# but only do this if the blsdir is not set, to make sure that the BLS
++# parsing module will search for the BLS snippets in the default path.
++if test -f /run/ostree-booted && test -d /sys/firmware/efi/efivars && \
++   ! ${grub_editenv} - list | grep -q blsdir && \
++   mountpoint -q /boot; then
++    grub_binary="$(find /usr/lib/ostree-boot/efi/EFI/${EFIDIR}/ -name grub*.efi)"
++    install -m 700 ${grub_binary} ${grubdir} || exit 1
++    # Create a hidden file to indicate that grub2 now has BLS support.
++    touch /boot/grub2/.grub2-blscfg-supported
++fi
++
++GENERATE=0
++if grep '^GRUB_ENABLE_BLSCFG=.*' "${etcdefaultgrub}" \
++        | grep -vq '^GRUB_ENABLE_BLSCFG="*true"*\s*$' ; then
++    if ! sed -i"${backupsuffix}" \
++            -e 's,^GRUB_ENABLE_BLSCFG=.*,GRUB_ENABLE_BLSCFG=true,' \
++            "${etcdefaultgrub}" ; then
++        gettext_printf "Updating %s failed\n" "${etcdefaultgrub}"
++        exit 1
++    fi
++    GENERATE=1
++elif ! grep -q '^GRUB_ENABLE_BLSCFG=.*' "${etcdefaultgrub}" ; then
++    if ! echo 'GRUB_ENABLE_BLSCFG=true' >> "${etcdefaultgrub}" ; then
++        gettext_printf "Updating %s failed\n" "${etcdefaultgrub}"
++        exit 1
++    fi
++    GENERATE=1
++fi
++
++if [ "${GENERATE}" -eq 1 ] ; then
++    copy_bls
++
++    if [ $arch = "x86_64" ] && [ ! -d /sys/firmware/efi ]; then
++	mod_dir="i386-pc"
++    elif [ $arch = "ppc64" -o $arch = "ppc64le" ] && [ ! -d /sys/firmware/opal ]; then
++	mod_dir="powerpc-ieee1275"
++    fi
++
++    if [ -n "${mod_dir}" ]; then
++	for mod in blscfg increment; do
++	    install -m 700 ${prefix}/lib/grub/${mod_dir}/${mod}.mod ${grubdir}/$mod_dir/ || exit 1
++	done
++    fi
++
++    cp -af "${GRUB_CONFIG_FILE}" "${GRUB_CONFIG_FILE}${backupsuffix}"
++    if ! grub2-mkconfig -o "${GRUB_CONFIG_FILE}" ; then
++        install -m 700 "${GRUB_CONFIG_FILE}${backupsuffix}" "${GRUB_CONFIG_FILE}"
++        sed -i"${backupsuffix}" \
++            -e 's,^GRUB_ENABLE_BLSCFG=.*,GRUB_ENABLE_BLSCFG=false,' \
++            "${etcdefaultgrub}"
++        gettext_printf "Updating %s failed\n" "${GRUB_CONFIG_FILE}"
++        exit 1
++    fi
++fi
++
++# Bye.
++exit 0

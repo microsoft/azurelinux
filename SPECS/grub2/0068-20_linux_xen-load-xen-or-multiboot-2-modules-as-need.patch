@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jul 2019 14:31:19 +0200
+Subject: [PATCH] 20_linux_xen: load xen or multiboot{,2} modules as needed.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub.d/20_linux_xen.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index e9e73b815fb..f8897479fe6 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -153,6 +153,8 @@ linux_entry_xsm ()
+         else
+             xen_rm_opts="no-real-mode edd=off"
+         fi
++	insmod ${module_loader}
++	insmod ${xen_loader}
+ 	${xen_loader}	${rel_xen_dirname}/${xen_basename} placeholder ${xen_args} \${xen_rm_opts}
+ 	echo	'$(echo "$lmessage" | grub_quote)'
+ 	${module_loader}	${rel_dirname}/${basename} placeholder root=${linux_root_device_thisversion} ro ${args}
+@@ -166,6 +168,7 @@ EOF
+     done
+     sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$(echo "$message" | grub_quote)'
++	insmod ${module_loader}
+ 	${module_loader}	--nounzip   $(echo $initrd_path)
+ EOF
+   fi

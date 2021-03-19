@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 20 Jul 2020 12:24:02 -0400
+Subject: [PATCH] Fix const char ** pointers in grub-core/net/efi/ip6_config.c
+
+This will need to get folded back in the right place on the next rebase,
+but it's before "Make grub_strtol() "end" pointers have safer const
+qualifiers" currently, so for now I'm leaving it here instead of merging
+it back with the original patch.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/ip6_config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/net/efi/ip6_config.c b/grub-core/net/efi/ip6_config.c
+index a46f6f9b685..1c5415d7185 100644
+--- a/grub-core/net/efi/ip6_config.c
++++ b/grub-core/net/efi/ip6_config.c
+@@ -85,7 +85,7 @@ grub_efi_string_to_ip6_address (const char *val, grub_efi_ipv6_address_t *addres
+ 	  ptr++;
+ 	  continue;
+ 	}
+-      t = grub_strtoul (ptr, (char **) &ptr, 16);
++      t = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;

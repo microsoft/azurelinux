@@ -1,0 +1,291 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 12 Jun 2018 13:25:16 +0200
+Subject: [PATCH] Add grub-set-bootflag utility
+
+This commit adds a new grub-set-bootflag utility, which can be used
+to set known bootflags in the grubenv: boot_success or menu_show_once.
+
+grub-set-bootflag is different from grub-editenv in 2 ways:
+
+1) It is intended to be executed by regular users so must be installed
+as suid root. As such it is written to not use any existing grubenv
+related code for easy auditing.
+
+It can't be executed through pkexec because we want to call it under gdm
+and pkexec does not work under gdm due the gdm user having /sbin/nologin
+as shell.
+
+2) Since it can be executed by regular users it only allows setting
+(assigning a value of 1 to) bootflags which it knows about. Currently
+those are just boot_success and menu_show_once.
+
+This commit also adds a couple of example systemd and files which show
+how this can be used to set boot_success from a user-session:
+
+docs/grub-boot-success.service
+docs/grub-boot-success.timer
+
+The 2 grub-boot-success.systemd files should be placed in /lib/systemd/user
+and a symlink to grub-boot-success.timer should be added to
+/lib/systemd/user/timers.target.wants.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ Makefile.util.def              |   7 ++
+ util/grub-set-bootflag.c       | 160 +++++++++++++++++++++++++++++++++++++++++
+ conf/Makefile.extra-dist       |   3 +
+ docs/grub-boot-success.service |   6 ++
+ docs/grub-boot-success.timer   |   6 ++
+ util/grub-set-bootflag.1       |  20 ++++++
+ 6 files changed, 202 insertions(+)
+ create mode 100644 util/grub-set-bootflag.c
+ create mode 100644 docs/grub-boot-success.service
+ create mode 100644 docs/grub-boot-success.timer
+ create mode 100644 util/grub-set-bootflag.1
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index 04551e095bd..c6375933faa 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -1445,3 +1445,10 @@ program = {
+   ldadd = grub-core/lib/gnulib/libgnu.a;
+   ldadd = '$(LIBINTL) $(LIBDEVMAPPER) $(LIBZFS) $(LIBNVPAIR) $(LIBGEOM)';
+ };
++
++program = {
++  name = grub-set-bootflag;
++  installdir = sbin;
++  mansection = 1;
++  common = util/grub-set-bootflag.c;
++};
+diff --git a/util/grub-set-bootflag.c b/util/grub-set-bootflag.c
+new file mode 100644
+index 00000000000..bb198f02351
+--- /dev/null
++++ b/util/grub-set-bootflag.c
+@@ -0,0 +1,160 @@
++/* grub-set-bootflag.c - tool to set boot-flags in the grubenv. */
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2018 Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++/*
++ * NOTE this gets run by users as root (through pkexec), so this does not
++ * use any grub library / util functions to allow for easy auditing.
++ * The grub headers are only included to get certain defines.
++ */
++
++#include <config-util.h>     /* For *_DIR_NAME defines */
++#include <grub/types.h>
++#include <grub/lib/envblk.h> /* For GRUB_ENVBLK_DEFCFG define */
++#include <errno.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#define GRUBENV "/" GRUB_BOOT_DIR_NAME "/" GRUB_DIR_NAME "/" GRUB_ENVBLK_DEFCFG
++#define GRUBENV_SIZE 1024
++
++const char *bootflags[] = {
++  "boot_success",
++  "menu_show_once",
++  NULL
++};
++
++static void usage(void)
++{
++  int i;
++
++  fprintf (stderr, "Usage: 'grub-set-bootflag <bootflag>', where <bootflag> is one of:\n");
++  for (i = 0; bootflags[i]; i++)
++    fprintf (stderr, "  %s\n", bootflags[i]);
++}
++
++int main(int argc, char *argv[])
++{
++  /* NOTE buf must be at least the longest bootflag length + 4 bytes */
++  char env[GRUBENV_SIZE + 1], buf[64], *s;
++  const char *bootflag;
++  int i, len, ret;
++  FILE *f;
++
++  if (argc != 2)
++    {
++      usage();
++      return 1;
++    }
++
++  for (i = 0; bootflags[i]; i++)
++    if (!strcmp (argv[1], bootflags[i]))
++      break;
++  if (!bootflags[i])
++    {
++      fprintf (stderr, "Invalid bootflag: '%s'\n", argv[1]);
++      usage();
++      return 1;
++    }
++
++  bootflag = bootflags[i];
++  len = strlen (bootflag);
++
++  f = fopen (GRUBENV, "r");
++  if (!f)
++    {
++      perror ("Error opening " GRUBENV " for reading");
++      return 1;     
++    }
++
++  ret = fread (env, 1, GRUBENV_SIZE, f);
++  fclose (f);
++  if (ret != GRUBENV_SIZE)
++    {
++      errno = EINVAL;
++      perror ("Error reading from " GRUBENV);
++      return 1;     
++    }
++
++  /* 0 terminate env */
++  env[GRUBENV_SIZE] = 0;
++
++  if (strncmp (env, GRUB_ENVBLK_SIGNATURE, strlen (GRUB_ENVBLK_SIGNATURE)))
++    {
++      fprintf (stderr, "Error invalid environment block\n");
++      return 1;
++    }
++
++  /* Find a pre-existing definition of the bootflag */
++  s = strstr (env, bootflag);
++  while (s && s[len] != '=')
++    s = strstr (s + len, bootflag);
++
++  if (s && ((s[len + 1] != '0' && s[len + 1] != '1') || s[len + 2] != '\n'))
++    {
++      fprintf (stderr, "Pre-existing bootflag '%s' has unexpected value\n", bootflag);
++      return 1;     
++    }
++
++  /* No pre-existing bootflag? -> find free space */
++  if (!s)
++    {
++      for (i = 0; i < (len + 3); i++)
++        buf[i] = '#';
++      buf[i] = 0;
++      s = strstr (env, buf);
++    }
++
++  if (!s)
++    {
++      fprintf (stderr, "No space in grubenv to store bootflag '%s'\n", bootflag);
++      return 1;     
++    }
++
++  /* The grubenv is not 0 terminated, so memcpy the name + '=' , '1', '\n' */
++  snprintf(buf, sizeof(buf), "%s=1\n", bootflag);
++  memcpy(s, buf, len + 3);
++
++  /* "r+", don't truncate so that the diskspace stays reserved */
++  f = fopen (GRUBENV, "r+");
++  if (!f)
++    {
++      perror ("Error opening " GRUBENV " for writing");
++      return 1;     
++    }
++
++  ret = fwrite (env, 1, GRUBENV_SIZE, f);
++  if (ret != GRUBENV_SIZE)
++    {
++      perror ("Error writing to " GRUBENV);
++      return 1;     
++    }
++
++  ret = fflush (f);
++  if (ret)
++    {
++      perror ("Error flushing " GRUBENV);
++      return 1;     
++    }
++
++  fsync (fileno (f));
++  fclose (f);
++
++  return 0;
++}
+diff --git a/conf/Makefile.extra-dist b/conf/Makefile.extra-dist
+index b909f2c073a..ea58362b555 100644
+--- a/conf/Makefile.extra-dist
++++ b/conf/Makefile.extra-dist
+@@ -14,6 +14,9 @@ EXTRA_DIST += util/import_unicode.py
+ EXTRA_DIST += docs/autoiso.cfg
+ EXTRA_DIST += docs/grub.cfg
+ EXTRA_DIST += docs/osdetect.cfg
++EXTRA_DIST += docs/org.gnu.grub.policy
++EXTRA_DIST += docs/grub-boot-success.service
++EXTRA_DIST += docs/grub-boot-success.timer
+ 
+ EXTRA_DIST += conf/i386-cygwin-img-ld.sc
+ 
+diff --git a/docs/grub-boot-success.service b/docs/grub-boot-success.service
+new file mode 100644
+index 00000000000..80e79584c91
+--- /dev/null
++++ b/docs/grub-boot-success.service
+@@ -0,0 +1,6 @@
++[Unit]
++Description=Mark boot as successful
++
++[Service]
++Type=oneshot
++ExecStart=/usr/sbin/grub2-set-bootflag boot_success
+diff --git a/docs/grub-boot-success.timer b/docs/grub-boot-success.timer
+new file mode 100644
+index 00000000000..5d8fcba21aa
+--- /dev/null
++++ b/docs/grub-boot-success.timer
+@@ -0,0 +1,6 @@
++[Unit]
++Description=Mark boot as successful after the user session has run 2 minutes
++ConditionUser=!@system
++
++[Timer]
++OnActiveSec=2min
+diff --git a/util/grub-set-bootflag.1 b/util/grub-set-bootflag.1
+new file mode 100644
+index 00000000000..57801da22a0
+--- /dev/null
++++ b/util/grub-set-bootflag.1
+@@ -0,0 +1,20 @@
++.TH GRUB-SET-BOOTFLAG 1 "Tue Jun 12 2018"
++.SH NAME
++\fBgrub-set-bootflag\fR \(em Set a bootflag in the GRUB environment block.
++
++.SH SYNOPSIS
++\fBgrub-set-bootflag\fR <\fIBOOTFLAG\fR>
++
++.SH DESCRIPTION
++\fBgrub-set-bootflag\fR is a command line to set bootflags in GRUB's
++stored environment.
++
++.SH COMMANDS
++.TP
++\fBBOOTFLAG\fR
++.RS 7
++Bootflag to set, one of \fIboot_success\fR or \fIshow_menu_once\fR.
++.RE
++
++.SH SEE ALSO
++.BR "info grub"

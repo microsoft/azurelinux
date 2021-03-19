@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sebastian Krahmer <krahmer@suse.com>
+Date: Tue, 28 Nov 2017 17:24:38 +0800
+Subject: [PATCH] AUDIT-0: http boot tracker bug
+
+Fixing a memory leak in case of error, and a integer overflow, leading to a
+heap overflow due to overly large chunk sizes.
+
+We need to check against some maximum value, otherwise values like 0xffffffff
+will eventually lead in the allocation functions to small sized buffers, since
+the len is rounded up to the next reasonable alignment. The following memcpy
+will then smash the heap, leading to RCE.
+
+This is no big issue for pure http boot, since its going to execute an
+untrusted kernel anyway, but it will break trusted boot scenarios, where only
+signed code is allowed to be executed.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+---
+ grub-core/net/efi/net.c | 4 +++-
+ grub-core/net/http.c    | 5 ++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index 86bce6535d3..4bb308026ce 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -645,8 +645,10 @@ grub_efihttp_chunk_read (grub_file_t file, char *buf,
+ 
+       rd = efi_net_interface (read, file, chunk, sz);
+ 
+-      if (rd <= 0)
++      if (rd <= 0) {
++	grub_free (chunk);
+ 	return rd;
++      }
+ 
+       if (buf)
+ 	{
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index 12a2632ea55..b52b558d631 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -31,7 +31,8 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ enum
+   {
+-    HTTP_PORT = 80
++    HTTP_PORT = 80,
++    HTTP_MAX_CHUNK_SIZE = 0x80000000
+   };
+ 
+ 
+@@ -78,6 +79,8 @@ parse_line (grub_file_t file, http_data_t data, char *ptr, grub_size_t len)
+   if (data->in_chunk_len == 2)
+     {
+       data->chunk_rem = grub_strtoul (ptr, 0, 16);
++      if (data->chunk_rem > HTTP_MAX_CHUNK_SIZE)
++	  return GRUB_ERR_NET_PACKET_TOO_BIG;
+       grub_errno = GRUB_ERR_NONE;
+       if (data->chunk_rem == 0)
+ 	{

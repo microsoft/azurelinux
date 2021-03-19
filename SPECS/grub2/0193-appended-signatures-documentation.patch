@@ -1,0 +1,341 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Thu, 1 Oct 2020 13:02:09 +1000
+Subject: [PATCH] appended signatures: documentation
+
+This explains how appended signatures can be used to form part of
+a secure boot chain, and documents the commands and variables
+introduced.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ docs/grub.texi | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 182 insertions(+), 17 deletions(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 691ffaa1861..7b5d7800418 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -3216,6 +3216,7 @@ These variables have special meaning to GRUB.
+ 
+ @menu
+ * biosnum::
++* check_appended_signatures::
+ * check_signatures::
+ * chosen::
+ * cmdpath::
+@@ -3275,11 +3276,18 @@ For an alternative approach which also changes BIOS drive mappings for the
+ chain-loaded system, @pxref{drivemap}.
+ 
+ 
++@node check_appended_signatures
++@subsection check_appended_signatures
++
++This variable controls whether GRUB enforces appended signature validation on
++certain loaded files. @xref{Using appended signatures}.
++
++
+ @node check_signatures
+ @subsection check_signatures
+ 
+-This variable controls whether GRUB enforces digital signature
+-validation on loaded files. @xref{Using digital signatures}.
++This variable controls whether GRUB enforces GPG-style digital signature
++validation on loaded files. @xref{Using GPG-style digital signatures}.
+ 
+ @node chosen
+ @subsection chosen
+@@ -3994,6 +4002,7 @@ you forget a command, you can run the command @command{help}
+ * date::                        Display or set current date and time
+ * devicetree::                  Load a device tree blob
+ * distrust::                    Remove a pubkey from trusted keys
++* distrust_certificate::        Remove a certificate from the list of trusted certificates
+ * drivemap::                    Map a drive to another
+ * echo::                        Display a line of text
+ * eval::                        Evaluate agruments as GRUB commands
+@@ -4010,6 +4019,7 @@ you forget a command, you can run the command @command{help}
+ * keystatus::                   Check key modifier status
+ * linux::                       Load a Linux kernel
+ * linux16::                     Load a Linux kernel (16-bit mode)
++* list_certificates::           List trusted certificates
+ * list_env::                    List variables in environment block
+ * list_trusted::                List trusted public keys
+ * load_env::                    Load variables from environment block
+@@ -4047,8 +4057,10 @@ you forget a command, you can run the command @command{help}
+ * test::                        Check file types and compare values
+ * true::                        Do nothing, successfully
+ * trust::                       Add public key to list of trusted keys
++* trust_certificate::           Add an x509 certificate to the list of trusted certificates
+ * unset::                       Unset an environment variable
+ @comment * vbeinfo::                     List available video modes
++* verify_appended::             Verify appended digital signature
+ * verify_detached::             Verify detached digital signature
+ * videoinfo::                   List available video modes
+ @comment * xen_*::              Xen boot commands for AArch64
+@@ -4373,9 +4385,28 @@ These keys are used to validate signatures when environment variable
+ @code{check_signatures} is set to @code{enforce}
+ (@pxref{check_signatures}), and by some invocations of
+ @command{verify_detached} (@pxref{verify_detached}).  @xref{Using
+-digital signatures}, for more information.
++GPG-style digital signatures}, for more information.
+ @end deffn
+ 
++
++@node distrust_certificate
++@subsection distrust_certificate
++
++@deffn Command distrust_certificate cert_number
++Remove the x509 certificate numbered @var{cert_number} from GRUB's keyring of
++trusted x509 certificates for verifying appended signatures.
++
++@var{cert_number} is the certificate number as listed by
++@command{list_certificates} (@pxref{list_certificates}).
++
++These certificates are used to validate appended signatures when environment
++variable @code{check_appended_signatures} is set to @code{enforce} or
++@code{forced} (@pxref{check_appended_signatures}), and by
++@command{verify_appended} (@pxref{verify_appended}). See
++@xref{Using appended signatures} for more information.
++@end deffn
++
++
+ @node drivemap
+ @subsection drivemap
+ 
+@@ -4633,6 +4664,21 @@ This command is only available on x86 systems.
+ @end deffn
+ 
+ 
++@node list_certificates
++@subsection list_certificates
++
++@deffn Command list_certificates
++List all x509 certificates trusted by GRUB for validating appended signatures.
++The output is a numbered list of certificates, showing the certificate's serial
++number and Common Name.
++
++The certificate number can be used as an argument to
++@command{distrust_certificate} (@pxref{distrust_certificate}).
++
++See @xref{Using appended signatures} for more information.
++@end deffn
++
++
+ @node list_env
+ @subsection list_env
+ 
+@@ -4652,7 +4698,7 @@ The output is in GPG's v4 key fingerprint format (i.e., the output of
+ @code{gpg --fingerprint}).  The least significant four bytes (last
+ eight hexadecimal digits) can be used as an argument to
+ @command{distrust} (@pxref{distrust}).
+-@xref{Using digital signatures}, for more information about uses for
++@xref{Using GPG-style digital signatures}, for more information about uses for
+ these keys.
+ @end deffn
+ 
+@@ -4687,8 +4733,13 @@ When used with care, @option{--skip-sig} and the whitelist enable an
+ administrator to configure a system to boot only signed
+ configurations, but to allow the user to select from among multiple
+ configurations, and to enable ``one-shot'' boot attempts and
+-``savedefault'' behavior.  @xref{Using digital signatures}, for more
++``savedefault'' behavior.  @xref{Using GPG-style digital signatures}, for more
+ information.
++
++Extra care should be taken when combining this command with appended signatures
++(@pxref{Using appended signatures}), as this file is not validated by an
++appended signature and could set @code{check_appended_signatures=no} if GRUB is
++not in @pxref{Lockdown} mode.
+ @end deffn
+ 
+ 
+@@ -4984,7 +5035,7 @@ read.  It is possible to modify a digitally signed environment block
+ file from within GRUB using this command, such that its signature will
+ no longer be valid on subsequent boots.  Care should be taken in such
+ advanced configurations to avoid rendering the system
+-unbootable. @xref{Using digital signatures}, for more information.
++unbootable. @xref{Using GPG-style digital signatures}, for more information.
+ @end deffn
+ 
+ 
+@@ -5384,11 +5435,32 @@ signatures when environment variable @code{check_signatures} is set to
+ must itself be properly signed.  The @option{--skip-sig} option can be
+ used to disable signature-checking when reading @var{pubkey_file}
+ itself. It is expected that @option{--skip-sig} is useful for testing
+-and manual booting. @xref{Using digital signatures}, for more
++and manual booting. @xref{Using GPG-style digital signatures}, for more
+ information.
+ @end deffn
+ 
+ 
++@node trust_certificate
++@subsection trust_certificate
++
++@deffn Command trust_certificate x509_certificate
++Read an DER-formatted x509 certificate from the file @var{x509_certificate}
++and add it to GRUB's internal list of trusted x509 certificates. These
++certificates are used to validate appended signatures when the environment
++variable @code{check_appended_signatures} is set to @code{enforce} or
++@code{forced}.
++
++Note that if @code{check_appended_signatures} is set to @code{enforce} or
++@code{forced} when @command{trust_certificate} is executed, then
++@var{x509_certificate} must itself bear an appended signature. (It is not
++sufficient that @var{x509_certificate} be signed by a trusted certificate
++according to the x509 rules: grub does not include support for validating
++signatures within x509 certificates themselves.)
++
++See @xref{Using appended signatures} for more information.
++@end deffn
++
++
+ @node unset
+ @subsection unset
+ 
+@@ -5407,6 +5479,18 @@ only on PC BIOS platforms.
+ @end deffn
+ @end ignore
+ 
++@node verify_appended
++@subsection verify_appended
++
++@deffn Command verify_appended file
++Verifies an appended signature on @var{file} against the trusted certificates
++known to GRUB (See @pxref{list_certificates}, @pxref{trust_certificate}, and
++@pxref{distrust_certificate}).
++
++Exit code @code{$?} is set to 0 if the signature validates
++successfully.  If validation fails, it is set to a non-zero value.
++See @xref{Using appended signatures}, for more information.
++@end deffn
+ 
+ @node verify_detached
+ @subsection verify_detached
+@@ -5425,7 +5509,7 @@ tried.
+ 
+ Exit code @code{$?} is set to 0 if the signature validates
+ successfully.  If validation fails, it is set to a non-zero value.
+-@xref{Using digital signatures}, for more information.
++@xref{Using GPG-style digital signatures}, for more information.
+ @end deffn
+ 
+ @node videoinfo
+@@ -5808,13 +5892,14 @@ environment variables and commands are listed in the same order.
+ @chapter Security
+ 
+ @menu
+-* Authentication and authorisation:: Users and access control
+-* Using digital signatures::         Booting digitally signed code
+-* UEFI secure boot and shim::        Booting digitally signed PE files
+-* Secure Boot Advanced Targeting::   Embedded information for generation number based revocation
+-* Measured Boot::                    Measuring boot components
+-* Lockdown::                         Lockdown when booting on a secure setup
+-* Signing GRUB itself::              Ensuring the integrity of the GRUB core image
++* Authentication and authorisation::   Users and access control
++* Using GPG-style digital signatures:: Booting digitally signed code
++* Using appended signatures::          An alternative approach to booting digitally signed code
++* UEFI secure boot and shim::          Booting digitally signed PE files
++* Secure Boot Advanced Targeting::     Embedded information for generation number based revocation
++* Measured Boot::                      Measuring boot components
++* Lockdown::                           Lockdown when booting on a secure setup
++* Signing GRUB itself::                Ensuring the integrity of the GRUB core image
+ @end menu
+ 
+ @node Authentication and authorisation
+@@ -5888,8 +5973,8 @@ generating configuration files with authentication.  You can use
+ adding @kbd{set superusers=} and @kbd{password} or @kbd{password_pbkdf2}
+ commands.
+ 
+-@node Using digital signatures
+-@section Using digital signatures in GRUB
++@node Using GPG-style digital signatures
++@section Using GPG-style digital signatures in GRUB
+ 
+ GRUB's @file{core.img} can optionally provide enforcement that all files
+ subsequently read from disk are covered by a valid digital signature.
+@@ -5982,6 +6067,86 @@ or BIOS) configuration to cause the machine to boot from a different
+ (attacker-controlled) device.  GRUB is at best only one link in a
+ secure boot chain.
+ 
++@node Using appended signatures
++@section Using appended signatures in GRUB
++
++GRUB supports verifying Linux-style 'appended signatures' for secure boot.
++Appended signatures are PKCS#7 messages containing a signature over the
++contents of a file, plus some metadata, appended to the end of a file. A file
++with an appended signature ends with the magic string:
++
++@example
++~Module signature appended~\n
++@end example
++
++where @code{\n} represents the line-feed character, @code{0x0a}.
++
++Certificates can be managed at boot time using the @pxref{trust_certificate},
++@pxref{distrust_certificate} and @pxref{list_certificates} commands.
++Certificates can also be built in to the core image using the @code{--x509}
++parameter to @command{grub-install} or @command{grub-mkimage}.
++
++A file can be explictly verified using the @pxref{verify_appended} command.
++
++Only signatures made with the SHA-256 or SHA-512 hash algorithm are supported,
++and only RSA signatures are supported.
++
++A file can be signed with the @command{sign-file} utility supplied with the
++Linux kernel source. For example, if you have @code{signing.key} as the private
++key and @code{certificate.der} as the x509 certificate containing the public key:
++
++@example
++sign-file SHA256 signing.key certificate.der vmlinux vmlinux.signed
++@end example
++
++Enforcement of signature verification is controlled by the
++@code{check_appended_signatures} variable.
++
++@itemize
++@item @samp{no}: no verification is performed. This is the default when GRUB
++      is not in @pxref{Lockdown} mode.
++@item @samp{enforce}: verification is performed. Verification can be disabled
++      by setting the variable back to @samp{no}.
++@item @samp{forced}: verification is performed and cannot be disabled. This is
++      set when GRUB is in Lockdown when the appendedsig module is loaded.
++@end itemize
++
++Unlike GPG-style signatures, not all files loaded by GRUB are required to be
++signed. Once verification is turned on, the following file types will have
++appended signatures verified:
++
++@itemize
++@item Linux kernels
++@item GRUB modules, except those built into the core image
++@item Any new certificate files to be trusted
++@end itemize
++
++ACPI tables and Device Tree images will not be checked for appended signatures
++but must be verified by another mechanism such as GPG-style signatures before
++they will be loaded.
++
++Unless lockdown mode is enabled, signature checking does @strong{not}
++stop an attacker with console access from dropping manually to the GRUB
++console and executing:
++
++@example
++set check_appended_signatures=no
++@end example
++
++Refer to the section on password-protecting GRUB (@pxref{Authentication
++and authorisation}) for more information on preventing this.
++
++Additionally, unless lockdown mode is enabled:
++
++@itemize
++@item Special care must be taken around the @command{loadenv} command, which
++      can be used to turn off @code{check_appended_signature}.
++
++@item If the grub configuration file is loaded from the disk, anyone who can
++      modify the file on disk can turn off @code{check_appended_signature}.
++      Consider embedding the configuration into the core grub image.
++@end itemize
++
+ @node UEFI secure boot and shim
+ @section UEFI secure boot and shim support
+ 

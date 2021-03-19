@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Masahiro Matsuya <mmatsuya@redhat.com>
+Date: Sat, 29 Oct 2016 08:35:26 +0900
+Subject: [PATCH] bz1374141 fix incorrect mask for ppc64
+
+The netmask configured in firmware is not respected on ppc64 (big endian).
+When 255.255.252.0 is set as netmask in firmware, the following is the value of bootpath string in grub_ieee1275_parse_bootpath().
+
+ /vdevice/l-lan@30000002:speed=auto,duplex=auto,192.168.88.10,,192.168.89.113,192.168.88.1,5,5,255.255.252.0,512
+
+The netmask in this bootpath is no problem, since it's a value specified in firmware. But,
+The value of 'subnet_mask.ipv4' was set with 0xfffffc00, and __builtin_ctz (~grub_le_to_cpu32 (subnet_mask.ipv4)) returned 16 (not 22).
+As a result, 16 was used for netmask wrongly.
+
+1111 1111 1111 1111 1111 1100 0000 0000 # subnet_mask.ipv4 (=0xfffffc00)
+0000 0000 1111 1100 1111 1111 1111 1111 # grub_le_to_cpu32 (subnet_mask.ipv4)
+1111 1111 0000 0011 0000 0000 0000 0000 # ~grub_le_to_cpu32 (subnet_mask.ipv4)
+
+And, the count of zero with __builtin_ctz can be 16.
+This patch changes it as below.
+
+1111 1111 1111 1111 1111 1100 0000 0000 # subnet_mask.ipv4 (=0xfffffc00)
+0000 0000 1111 1100 1111 1111 1111 1111 # grub_le_to_cpu32 (subnet_mask.ipv4)
+1111 1111 1111 1111 1111 1100 0000 0000 # grub_swap_bytes32(grub_le_to_cpu32 (subnet_mask.ipv4))
+0000 0000 0000 0000 0000 0011 1111 1111 # ~grub_swap_bytes32(grub_le_to_cpu32 (subnet_mask.ipv4))
+
+The count of zero with __builtin_clz can be 22. (clz counts the number of one bits preceding the most significant zero bit)
+---
+ grub-core/net/drivers/ieee1275/ofnet.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/grub-core/net/drivers/ieee1275/ofnet.c b/grub-core/net/drivers/ieee1275/ofnet.c
+index ac4e62a95c9..3860b6f78d8 100644
+--- a/grub-core/net/drivers/ieee1275/ofnet.c
++++ b/grub-core/net/drivers/ieee1275/ofnet.c
+@@ -220,8 +220,7 @@ grub_ieee1275_parse_bootpath (const char *devpath, char *bootpath,
+                                  flags);
+       inter->vlantag = vlantag;
+       grub_net_add_ipv4_local (inter,
+-                          __builtin_ctz (~grub_le_to_cpu32 (subnet_mask.ipv4)));
+-
++                          __builtin_clz (~grub_swap_bytes32(grub_le_to_cpu32 (subnet_mask.ipv4))));
+     }
+ 
+   if (gateway_addr.ipv4 != 0)

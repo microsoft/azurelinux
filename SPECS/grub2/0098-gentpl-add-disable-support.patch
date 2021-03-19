@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 11 Jul 2018 13:43:15 -0400
+Subject: [PATCH] gentpl: add 'disable = ' support
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ gentpl.py | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/gentpl.py b/gentpl.py
+index 2cba0bbbd6f..628e8bec1d7 100644
+--- a/gentpl.py
++++ b/gentpl.py
+@@ -592,11 +592,21 @@ def platform_conditional(platform, closure):
+ #  };
+ #
+ def foreach_enabled_platform(defn, closure):
++    enabled = False
++    disabled = False
+     if 'enable' in defn:
++        enabled = True
+         for platform in GRUB_PLATFORMS:
+             if platform_tagged(defn, platform, "enable"):
+                platform_conditional(platform, closure)
+-    else:
++
++    if 'disable' in defn:
++        disabled = True
++        for platform in GRUB_PLATFORMS:
++            if not platform_tagged(defn, platform, "disable"):
++                platform_conditional(platform, closure)
++
++    if not enabled and not disabled:
+         for platform in GRUB_PLATFORMS:
+             platform_conditional(platform, closure)
+ 
+@@ -655,6 +665,8 @@ def first_time(defn, snippet):
+ def is_platform_independent(defn):
+     if 'enable' in defn:
+         return False
++    if 'disable' in defn:
++        return False
+     for suffix in [ "", "_nodist" ]:
+         template = platform_values(defn, GRUB_PLATFORMS[0], suffix)
+         for platform in GRUB_PLATFORMS[1:]:

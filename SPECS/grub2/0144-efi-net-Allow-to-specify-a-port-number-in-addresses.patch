@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Mon, 9 Mar 2020 15:29:45 +0100
+Subject: [PATCH] efi/net: Allow to specify a port number in addresses
+
+The grub_efi_net_parse_address() function is not covering the case where a
+port number is specified in an IPv4 or IPv6 address, so will fail to parse
+the network address.
+
+For most cases the issue is harmless, because the function is only used to
+match an address with a network interface and if fails the default is used.
+
+But still is a bug that has to be fixed and it causes error messages to be
+printed like the following:
+
+error: net/efi/net.c:782:unrecognised network address '192.168.122.1:8080'
+
+error: net/efi/net.c:781:unrecognised network address '[2000:dead:beef:a::1]:8080'
+
+Resolves: rhbz#1732765
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/net/efi/net.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index 6603cd83edc..84573937b18 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -742,7 +742,7 @@ grub_efi_net_parse_address (const char *address,
+ 	      return GRUB_ERR_NONE;
+ 	    }
+ 	}
+-      else if (*rest == 0)
++      else if (*rest == 0 || *rest == ':')
+ 	{
+ 	  grub_uint32_t subnet_mask = 0xffffffffU;
+ 	  grub_memcpy (ip4->subnet_mask, &subnet_mask, sizeof (ip4->subnet_mask));
+@@ -768,7 +768,7 @@ grub_efi_net_parse_address (const char *address,
+ 	      return GRUB_ERR_NONE;
+ 	    }
+ 	}
+-      else if (*rest == 0)
++      else if (*rest == 0 || *rest == ':')
+ 	{
+ 	  ip6->prefix_length = 128;
+ 	  ip6->is_anycast = 0;

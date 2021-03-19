@@ -1,0 +1,165 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Christian Glombek <lorbus@fedoraproject.org>
+Date: Tue, 2 Apr 2019 16:22:21 +0200
+Subject: [PATCH] grub.d: Split out boot success reset from menu auto hide
+ script
+
+Also rename fallback and menu auto hide script to be executed
+before and after boot success reset script.
+In menu auto hide script, rename last_boot_ok var to menu_hide_ok
+---
+ Makefile.util.def                                  | 14 ++++++++----
+ ...allback_counting.in => 08_fallback_counting.in} | 14 ++++++------
+ util/grub.d/10_reset_boot_success.in               | 25 ++++++++++++++++++++++
+ .../{01_menu_auto_hide.in => 12_menu_auto_hide.in} | 23 +++++---------------
+ 4 files changed, 48 insertions(+), 28 deletions(-)
+ rename util/grub.d/{01_fallback_counting.in => 08_fallback_counting.in} (65%)
+ create mode 100644 util/grub.d/10_reset_boot_success.in
+ rename util/grub.d/{01_menu_auto_hide.in => 12_menu_auto_hide.in} (58%)
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index 2e5e05b25f1..11ab2d6fad1 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -459,14 +459,14 @@ script = {
+ };
+ 
+ script = {
+-  name = '01_fallback_counting';
+-  common = util/grub.d/01_fallback_counting.in;
++  name = '08_fallback_counting';
++  common = util/grub.d/08_fallback_counting.in;
+   installdir = grubconf;
+ };
+ 
+ script = {
+-  name = '01_menu_auto_hide';
+-  common = util/grub.d/01_menu_auto_hide.in;
++  name = '12_menu_auto_hide';
++  common = util/grub.d/12_menu_auto_hide.in;
+   installdir = grubconf;
+ };
+ 
+@@ -518,6 +518,12 @@ script = {
+   condition = COND_HOST_LINUX;
+ };
+ 
++script = {
++  name = '10_reset_boot_success';
++  common = util/grub.d/10_reset_boot_success.in;
++  installdir = grubconf;
++};
++
+ script = {
+   name = '10_xnu';
+   common = util/grub.d/10_xnu.in;
+diff --git a/util/grub.d/01_fallback_counting.in b/util/grub.d/08_fallback_counting.in
+similarity index 65%
+rename from util/grub.d/01_fallback_counting.in
+rename to util/grub.d/08_fallback_counting.in
+index be0e770ea82..2e2c3ff7d31 100644
+--- a/util/grub.d/01_fallback_counting.in
++++ b/util/grub.d/08_fallback_counting.in
+@@ -1,15 +1,17 @@
+ #! /bin/sh -e
+-
+-# Boot Counting
++# Fallback Countdown
++#
++# This snippet depends on 10_reset_boot_success and needs to be kept in sync.
++#
+ # The boot_counter env var can be used to count down boot attempts after an
+-# OSTree upgrade and choose the rollback deployment when 0 is reached.  Both
+-# boot_counter and boot_success need to be (re-)set from userspace.
++# OSTree upgrade and choose the rollback deployment when 0 is reached.
++# Both boot_counter=X and boot_success=1 need to be set from userspace.
+ cat << EOF
+ insmod increment
+ # Check if boot_counter exists and boot_success=0 to activate this behaviour.
+ if [ -n "\${boot_counter}" -a "\${boot_success}" = "0" ]; then
+-  # if countdown has ended, choose to boot rollback deployment (default=1 on
+-  # OSTree-based systems)
++  # if countdown has ended, choose to boot rollback deployment,
++  # i.e. default=1 on OSTree-based systems.
+   if  [ "\${boot_counter}" = "0" -o "\${boot_counter}" = "-1" ]; then
+     set default=1
+     set boot_counter=-1
+diff --git a/util/grub.d/10_reset_boot_success.in b/util/grub.d/10_reset_boot_success.in
+new file mode 100644
+index 00000000000..6c88d933dde
+--- /dev/null
++++ b/util/grub.d/10_reset_boot_success.in
+@@ -0,0 +1,25 @@
++#! /bin/sh -e
++# Reset Boot Success
++#
++# The 08_fallback_counting and 12_menu_auto_hide snippets rely on this one
++# and need to be kept in sync.
++#
++# The boot_success var needs to be set to 1 from userspace to mark a boot successful.
++cat << EOF
++insmod increment
++# Hiding the menu is ok if last boot was ok or if this is a first boot attempt to boot the entry
++if [ "\${boot_success}" = "1" -o "\${boot_indeterminate}" = "1" ]; then
++  set menu_hide_ok=1
++else
++  set menu_hide_ok=0 
++fi
++# Reset boot_indeterminate after a successful boot, increment otherwise
++if [ "\${boot_success}" = "1" ] ; then
++  set boot_indeterminate=0
++else
++  increment boot_indeterminate
++fi
++# Reset boot_success for current boot 
++set boot_success=0
++save_env boot_success boot_indeterminate
++EOF
+diff --git a/util/grub.d/01_menu_auto_hide.in b/util/grub.d/12_menu_auto_hide.in
+similarity index 58%
+rename from util/grub.d/01_menu_auto_hide.in
+rename to util/grub.d/12_menu_auto_hide.in
+index ad175870a54..6a7c0fa0d43 100644
+--- a/util/grub.d/01_menu_auto_hide.in
++++ b/util/grub.d/12_menu_auto_hide.in
+@@ -1,5 +1,8 @@
+ #! /bin/sh
+-
++# Menu Auto Hide
++#
++# This snippet depends on 10_reset_boot_success and needs to be kept in sync.
++#
+ # Disable / skip generating menu-auto-hide config parts on serial terminals
+ for x in ${GRUB_TERMINAL_INPUT} ${GRUB_TERMINAL_OUTPUT}; do
+   case "$x" in
+@@ -10,29 +13,13 @@ for x in ${GRUB_TERMINAL_INPUT} ${GRUB_TERMINAL_OUTPUT}; do
+ done
+ 
+ cat << EOF
+-if [ "\${boot_success}" = "1" -o "\${boot_indeterminate}" = "1" ]; then
+-  set last_boot_ok=1
+-else
+-  set last_boot_ok=0
+-fi
+-
+-# Reset boot_indeterminate after a successful boot
+-if [ "\${boot_success}" = "1" ] ; then
+-  set boot_indeterminate=0
+-# Avoid boot_indeterminate causing the menu to be hidden more then once
+-elif [ "\${boot_indeterminate}" = "1" ]; then
+-  set boot_indeterminate=2
+-fi
+-set boot_success=0
+-save_env boot_success boot_indeterminate
+-
+ if [ x\$feature_timeout_style = xy ] ; then
+   if [ "\${menu_show_once}" ]; then
+     unset menu_show_once
+     save_env menu_show_once
+     set timeout_style=menu
+     set timeout=60
+-  elif [ "\${menu_auto_hide}" -a "\${last_boot_ok}" = "1" ]; then
++  elif [ "\${menu_auto_hide}" -a "\${menu_hide_ok}" = "1" ]; then
+     set orig_timeout_style=\${timeout_style}
+     set orig_timeout=\${timeout}
+     if [ "\${fastboot}" = "1" ]; then

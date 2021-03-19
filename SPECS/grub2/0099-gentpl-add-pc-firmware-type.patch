@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 11 Jul 2019 11:04:24 +0200
+Subject: [PATCH] gentpl: add 'pc' firmware type
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ gentpl.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gentpl.py b/gentpl.py
+index 628e8bec1d7..34a4eba2b42 100644
+--- a/gentpl.py
++++ b/gentpl.py
+@@ -51,6 +51,7 @@ GROUPS["riscv32"]  = [ "riscv32_efi" ]
+ GROUPS["riscv64"]  = [ "riscv64_efi" ]
+ 
+ # Groups based on firmware
++GROUPS["pc"] = [ "i386_pc" ]
+ GROUPS["efi"]  = [ "i386_efi", "x86_64_efi", "ia64_efi", "arm_efi", "arm64_efi",
+ 		   "riscv32_efi", "riscv64_efi" ]
+ GROUPS["ieee1275"]   = [ "i386_ieee1275", "sparc64_ieee1275", "powerpc_ieee1275" ]

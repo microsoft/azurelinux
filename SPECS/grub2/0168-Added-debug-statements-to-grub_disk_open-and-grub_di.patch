@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Sat, 23 Nov 2019 15:22:16 +0100
+Subject: [PATCH] Added debug statements to grub_disk_open() and
+ grub_disk_close() on success
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+---
+ grub-core/kern/disk.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/disk.c b/grub-core/kern/disk.c
+index e1b0e073e09..05a28ab1429 100644
+--- a/grub-core/kern/disk.c
++++ b/grub-core/kern/disk.c
+@@ -285,6 +285,8 @@ grub_disk_open (const char *name)
+       return 0;
+     }
+ 
++  grub_dprintf ("disk", "Opening `%s' succeeded.\n", name);
++
+   return disk;
+ }
+ 
+@@ -292,7 +294,7 @@ void
+ grub_disk_close (grub_disk_t disk)
+ {
+   grub_partition_t part;
+-  grub_dprintf ("disk", "Closing `%s'.\n", disk->name);
++  grub_dprintf ("disk", "Closing `%s'...\n", disk->name);
+ 
+   if (disk->dev && disk->dev->disk_close)
+     (disk->dev->disk_close) (disk);
+@@ -306,8 +308,10 @@ grub_disk_close (grub_disk_t disk)
+       grub_free (disk->partition);
+       disk->partition = part;
+     }
++  grub_dprintf ("disk", "Closing `%s' succeeded.\n", disk->name);
+   grub_free ((void *) disk->name);
+   grub_free (disk);
++
+ }
+ 
+ /* Small read (less than cache size and not pass across cache unit boundaries).

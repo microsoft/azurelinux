@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 14 Mar 2011 14:27:42 -0400
+Subject: [PATCH] Don't say "GNU/Linux" in generated menus.
+
+---
+ util/grub.d/10_linux.in     | 4 ++--
+ util/grub.d/20_linux_xen.in | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index ad2ac4b078d..4fc58c83304 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -29,9 +29,9 @@ export TEXTDOMAINDIR="@localedir@"
+ CLASS="--class gnu-linux --class gnu --class os"
+ 
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+-  OS=GNU/Linux
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
+ else
+-  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
++  OS="${GRUB_DISTRIBUTOR}"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+ fi
+ 
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index 3b1f4704921..ada20775a14 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -29,9 +29,9 @@ export TEXTDOMAINDIR="@localedir@"
+ CLASS="--class gnu-linux --class gnu --class os --class xen"
+ 
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+-  OS=GNU/Linux
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
+ else
+-  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
++  OS="${GRUB_DISTRIBUTOR}"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+ fi
+ 

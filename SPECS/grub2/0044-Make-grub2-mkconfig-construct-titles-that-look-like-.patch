@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 28 Apr 2015 11:15:03 -0400
+Subject: [PATCH] Make grub2-mkconfig construct titles that look like the ones
+ we want elsewhere.
+
+Resolves: rhbz#1215839
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub.d/10_linux.in | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index fed73271478..2e59f3b4197 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -78,6 +78,32 @@ case x"$GRUB_FS" in
+ 	;;
+ esac
+ 
++mktitle ()
++{
++  local title_type
++  local version
++  local OS_NAME
++  local OS_VERS
++
++  title_type=$1 && shift
++  version=$1 && shift
++
++  OS_NAME="$(eval $(grep ^NAME= /etc/os-release) ; echo ${NAME})"
++  OS_VERS="$(eval $(grep ^VERSION= /etc/os-release) ; echo ${VERSION})"
++
++  case $title_type in
++    recovery)
++      title=$(printf '%s (%s) %s (recovery mode)' \
++                     "${OS_NAME}" "${version}" "${OS_VERS}")
++      ;;
++    *)
++      title=$(printf '%s (%s) %s' \
++                     "${OS_NAME}" "${version}" "${OS_VERS}")
++      ;;
++  esac
++  echo -n ${title}
++}
++
+ title_correction_code=
+ 
+ linux_entry ()
+@@ -91,17 +117,11 @@ linux_entry ()
+       boot_device_id="$(grub_get_device_id "${GRUB_DEVICE}")"
+   fi
+   if [ x$type != xsimple ] ; then
+-      case $type in
+-	  recovery)
+-	      title="$(gettext_printf "%s, with Linux %s (recovery mode)" "${os}" "${version}")" ;;
+-	  *)
+-	      title="$(gettext_printf "%s, with Linux %s" "${os}" "${version}")" ;;
+-      esac
++      title=$(mktitle "$type" "$version")
+       if [ x"$title" = x"$GRUB_ACTUAL_DEFAULT" ] || [ x"Previous Linux versions>$title" = x"$GRUB_ACTUAL_DEFAULT" ]; then
+ 	  replacement_title="$(echo "Advanced options for ${OS}" | sed 's,>,>>,g')>$(echo "$title" | sed 's,>,>>,g')"
+ 	  quoted="$(echo "$GRUB_ACTUAL_DEFAULT" | grub_quote)"
+ 	  title_correction_code="${title_correction_code}if [ \"x\$default\" = '$quoted' ]; then default='$(echo "$replacement_title" | grub_quote)'; fi;"
+-	  grub_warn "$(gettext_printf "Please don't use old title \`%s' for GRUB_DEFAULT, use \`%s' (for versions before 2.00) or \`%s' (for 2.00 or later)" "$GRUB_ACTUAL_DEFAULT" "$replacement_title" "gnulinux-advanced-$boot_device_id>gnulinux-$version-$type-$boot_device_id")"
+       fi
+       echo "menuentry '$(echo "$title" | grub_quote)' ${CLASS} \$menuentry_id_option 'gnulinux-$version-$type-$boot_device_id' {" | sed "s/^/$submenu_indentation/"
+   else

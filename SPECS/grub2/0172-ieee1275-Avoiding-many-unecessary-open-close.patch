@@ -1,0 +1,136 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Diego Domingos <diegodo@br.ibm.com>
+Date: Mon, 14 Dec 2020 17:42:45 +0100
+Subject: [PATCH] ieee1275: Avoiding many unecessary open/close
+
+Signed-off-by: Diego Domingos <diegodo@br.ibm.com>
+---
+ grub-core/disk/ieee1275/ofdisk.c | 64 ++++++++++++++++++++++------------------
+ 1 file changed, 35 insertions(+), 29 deletions(-)
+
+diff --git a/grub-core/disk/ieee1275/ofdisk.c b/grub-core/disk/ieee1275/ofdisk.c
+index 03674cb477e..ea7f78ac7d8 100644
+--- a/grub-core/disk/ieee1275/ofdisk.c
++++ b/grub-core/disk/ieee1275/ofdisk.c
+@@ -44,7 +44,7 @@ struct ofdisk_hash_ent
+ };
+ 
+ static grub_err_t
+-grub_ofdisk_get_block_size (const char *device, grub_uint32_t *block_size,
++grub_ofdisk_get_block_size (grub_uint32_t *block_size,
+ 			    struct ofdisk_hash_ent *op);
+ 
+ #define OFDISK_HASH_SZ	8
+@@ -461,6 +461,7 @@ grub_ofdisk_open (const char *name, grub_disk_t disk)
+   grub_ssize_t actual;
+   grub_uint32_t block_size = 0;
+   grub_err_t err;
++  struct ofdisk_hash_ent *op;
+ 
+   if (grub_strncmp (name, "ieee1275/", sizeof ("ieee1275/") - 1) != 0)
+       return grub_error (GRUB_ERR_UNKNOWN_DEVICE,
+@@ -471,6 +472,35 @@ grub_ofdisk_open (const char *name, grub_disk_t disk)
+ 
+   grub_dprintf ("disk", "Opening `%s'.\n", devpath);
+ 
++  op = ofdisk_hash_find (devpath);
++  if (!op)
++    op = ofdisk_hash_add (devpath, NULL);
++  if (!op)
++    {
++      grub_free (devpath);
++      return grub_errno;
++    }
++
++  /* Check if the call to open is the same to the last disk already opened */
++  if (last_devpath && !grub_strcmp(op->open_path,last_devpath))
++  {
++      goto finish;
++  }
++
++ /* If not, we need to close the previous disk and open the new one */
++  else {
++    if (last_ihandle){
++        grub_ieee1275_close (last_ihandle);
++    }
++    last_ihandle = 0;
++    last_devpath = NULL;
++
++    grub_ieee1275_open (op->open_path, &last_ihandle);
++    if (! last_ihandle)
++      return grub_error (GRUB_ERR_UNKNOWN_DEVICE, "can't open device");
++    last_devpath = op->open_path;
++  }
++
+   if (grub_ieee1275_finddevice (devpath, &dev))
+     {
+       grub_free (devpath);
+@@ -491,25 +521,18 @@ grub_ofdisk_open (const char *name, grub_disk_t disk)
+       return grub_error (GRUB_ERR_UNKNOWN_DEVICE, "not a block device");
+     }
+ 
++
++  finish:
+   /* XXX: There is no property to read the number of blocks.  There
+      should be a property `#blocks', but it is not there.  Perhaps it
+      is possible to use seek for this.  */
+   disk->total_sectors = GRUB_DISK_SIZE_UNKNOWN;
+ 
+   {
+-    struct ofdisk_hash_ent *op;
+-    op = ofdisk_hash_find (devpath);
+-    if (!op)
+-      op = ofdisk_hash_add (devpath, NULL);
+-    if (!op)
+-      {
+-        grub_free (devpath);
+-        return grub_errno;
+-      }
+     disk->id = (unsigned long) op;
+     disk->data = op->open_path;
+ 
+-    err = grub_ofdisk_get_block_size (devpath, &block_size, op);
++    err = grub_ofdisk_get_block_size (&block_size, op);
+     if (err)
+       {
+         grub_free (devpath);
+@@ -532,13 +555,6 @@ grub_ofdisk_open (const char *name, grub_disk_t disk)
+ static void
+ grub_ofdisk_close (grub_disk_t disk)
+ {
+-  if (disk->data == last_devpath)
+-    {
+-      if (last_ihandle)
+-	grub_ieee1275_close (last_ihandle);
+-      last_ihandle = 0;
+-      last_devpath = NULL;
+-    }
+   disk->data = 0;
+ }
+ 
+@@ -685,7 +701,7 @@ grub_ofdisk_init (void)
+ }
+ 
+ static grub_err_t
+-grub_ofdisk_get_block_size (const char *device, grub_uint32_t *block_size,
++grub_ofdisk_get_block_size (grub_uint32_t *block_size,
+ 			    struct ofdisk_hash_ent *op)
+ {
+   struct size_args_ieee1275
+@@ -698,16 +714,6 @@ grub_ofdisk_get_block_size (const char *device, grub_uint32_t *block_size,
+       grub_ieee1275_cell_t size2;
+     } args_ieee1275;
+ 
+-  if (last_ihandle)
+-    grub_ieee1275_close (last_ihandle);
+-
+-  last_ihandle = 0;
+-  last_devpath = NULL;
+-
+-  grub_ieee1275_open (device, &last_ihandle);
+-  if (! last_ihandle)
+-    return grub_error (GRUB_ERR_UNKNOWN_DEVICE, "can't open device");
+-
+   *block_size = 0;
+ 
+   if (op->block_size_fails >= 2)

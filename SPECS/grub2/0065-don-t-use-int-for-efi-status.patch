@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 26 Jun 2017 12:44:59 -0400
+Subject: [PATCH] don't use int for efi status
+
+---
+ grub-core/kern/efi/efi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index 05d8237a9b2..ae9885edb84 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -167,7 +167,7 @@ grub_reboot (void)
+ void
+ grub_exit (int retval)
+ {
+-  int rc = GRUB_EFI_LOAD_ERROR;
++  grub_efi_status_t rc = GRUB_EFI_LOAD_ERROR;
+ 
+   if (retval == 0)
+     rc = GRUB_EFI_SUCCESS;

@@ -1,0 +1,152 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 13 Nov 2019 13:02:01 +0100
+Subject: [PATCH] grub-set-bootflag: Write new env to tmpfile and then rename
+
+Make the grubenv writing code in grub-set-bootflag more robust by
+writing the modified grubenv to a tmpfile first and then renaming the
+tmpfile over the old grubenv (following symlinks).
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ util/grub-set-bootflag.c | 87 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 78 insertions(+), 9 deletions(-)
+
+diff --git a/util/grub-set-bootflag.c b/util/grub-set-bootflag.c
+index 65d74ce010f..d1c5e28862b 100644
+--- a/util/grub-set-bootflag.c
++++ b/util/grub-set-bootflag.c
+@@ -28,7 +28,9 @@
+ #include <grub/err.h>
+ #include <grub/lib/envblk.h> /* For GRUB_ENVBLK_DEFCFG define */
+ #include <errno.h>
++#include <limits.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+@@ -54,8 +56,10 @@ int main(int argc, char *argv[])
+ {
+   /* NOTE buf must be at least the longest bootflag length + 4 bytes */
+   char env[GRUBENV_SIZE + 1], buf[64], *s;
++  /* +1 for 0 termination, +6 for "XXXXXX" in tmp filename */
++  char env_filename[PATH_MAX + 1], tmp_filename[PATH_MAX + 6 + 1];
+   const char *bootflag;
+-  int i, len, ret;
++  int i, fd, len, ret;
+   FILE *f;
+ 
+   if (argc != 2)
+@@ -77,7 +81,32 @@ int main(int argc, char *argv[])
+   bootflag = bootflags[i];
+   len = strlen (bootflag);
+ 
+-  f = fopen (GRUBENV, "r");
++  /*
++   * Really become root. setuid avoids an user killing us, possibly leaking
++   * the tmpfile. setgid avoids the new grubenv's gid being that of the user.
++   */
++  ret = setuid(0);
++  if (ret)
++    {
++      perror ("Error setuid(0) failed");
++      return 1;
++    }
++
++  ret = setgid(0);
++  if (ret)
++    {
++      perror ("Error setgid(0) failed");
++      return 1;
++    }
++
++  /* Canonicalize GRUBENV filename, resolving symlinks, etc. */
++  if (!realpath(GRUBENV, env_filename))
++    {
++      perror ("Error canonicalizing " GRUBENV " filename");
++      return 1;
++    }
++
++  f = fopen (env_filename, "r");
+   if (!f)
+     {
+       perror ("Error opening " GRUBENV " for reading");
+@@ -132,30 +161,70 @@ int main(int argc, char *argv[])
+   snprintf(buf, sizeof(buf), "%s=1\n", bootflag);
+   memcpy(s, buf, len + 3);
+ 
+-  /* "r+", don't truncate so that the diskspace stays reserved */
+-  f = fopen (GRUBENV, "r+");
++
++  /*
++   * Create a tempfile for writing the new env.  Use the canonicalized filename
++   * for the template so that the tmpfile is in the same dir / on same fs.
++   */
++  snprintf(tmp_filename, sizeof(tmp_filename), "%sXXXXXX", env_filename);
++  fd = mkstemp(tmp_filename);
++  if (fd == -1)
++    {
++      perror ("Creating tmpfile failed");
++      return 1;
++    }
++
++  f = fdopen (fd, "w");
+   if (!f)
+     {
+-      perror ("Error opening " GRUBENV " for writing");
++      perror ("Error fdopen of tmpfile failed");
++      unlink(tmp_filename);
+       return 1;     
+     }
+ 
+   ret = fwrite (env, 1, GRUBENV_SIZE, f);
+   if (ret != GRUBENV_SIZE)
+     {
+-      perror ("Error writing to " GRUBENV);
++      perror ("Error writing tmpfile");
++      unlink(tmp_filename);
+       return 1;     
+     }
+ 
+   ret = fflush (f);
+   if (ret)
+     {
+-      perror ("Error flushing " GRUBENV);
++      perror ("Error flushing tmpfile");
++      unlink(tmp_filename);
+       return 1;     
+     }
+ 
+-  fsync (fileno (f));
+-  fclose (f);
++  ret = fsync (fileno (f));
++  if (ret)
++    {
++      perror ("Error syncing tmpfile");
++      unlink(tmp_filename);
++      return 1;
++    }
++
++  ret = fclose (f);
++  if (ret)
++    {
++      perror ("Error closing tmpfile");
++      unlink(tmp_filename);
++      return 1;
++    }
++
++  /*
++   * And finally rename the tmpfile with the new env over the old env, the
++   * linux kernel guarantees that this is atomic (from a syscall pov).
++   */
++  ret = rename(tmp_filename, env_filename);
++  if (ret)
++    {
++      perror ("Error renaming tmpfile to " GRUBENV " failed");
++      unlink(tmp_filename);
++      return 1;
++    }
+ 
+   return 0;
+ }

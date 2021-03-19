@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Mon, 25 Nov 2019 09:29:53 +0100
+Subject: [PATCH] Introduce function grub_debug_is_enabled(void) returning 1 if
+ 'debug' is in the environment and not empty
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+---
+ grub-core/kern/misc.c | 13 +++++++++++++
+ include/grub/misc.h   |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index 9f54b6b7d2d..a186ad3dd41 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -163,6 +163,19 @@ int grub_err_printf (const char *fmt, ...)
+ __attribute__ ((alias("grub_printf")));
+ #endif
+ 
++/* Return 1 if 'debug' is set and not empty */
++int
++grub_debug_is_enabled (void)
++{
++  const char *debug;
++
++  debug = grub_env_get ("debug");
++  if (!debug || debug[0] == '\0')
++    return 0;
++
++  return 1;
++}
++
+ int
+ grub_debug_enabled (const char * condition)
+ {
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 3adc4036e3b..6c4aa85ac50 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -340,6 +340,7 @@ grub_puts (const char *s)
+ }
+ 
+ int EXPORT_FUNC(grub_puts_) (const char *s);
++int EXPORT_FUNC(grub_debug_is_enabled) (void);
+ int EXPORT_FUNC(grub_debug_enabled) (const char *condition);
+ void EXPORT_FUNC(grub_real_dprintf) (const char *file,
+                                      const int line,

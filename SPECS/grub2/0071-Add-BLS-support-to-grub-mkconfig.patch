@@ -1,0 +1,393 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 9 Dec 2016 15:40:29 -0500
+Subject: [PATCH] Add BLS support to grub-mkconfig
+
+GRUB now has BootLoaderSpec support, the user can choose to use this by
+setting GRUB_ENABLE_BLSCFG to true in /etc/default/grub. On this setup,
+the boot menu entries are not added to the grub.cfg, instead BLS config
+files are parsed by blscfg command and the entries created dynamically.
+
+A 10_linux_bls grub.d snippet to generate menu entries from BLS files
+is also added that can be used on platforms where the bootloader doesn't
+have BLS support and only can parse a normal grub configuration file.
+
+Portions of the 10_linux_bls were taken from the ostree-grub-generator
+script that's included in the OSTree project.
+
+Fixes to support multi-devices and generate a BLS section even if no
+kernels are found in the boot directory were proposed by Yclept Nemo
+and Tom Gundersen respectively.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ util/grub-mkconfig.8      |   4 +
+ util/grub-mkconfig.in     |   9 +-
+ util/grub-mkconfig_lib.in |  20 ++++-
+ util/grub.d/10_linux.in   | 223 +++++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 251 insertions(+), 5 deletions(-)
+
+diff --git a/util/grub-mkconfig.8 b/util/grub-mkconfig.8
+index a2d1f577b9b..434fa4deda4 100644
+--- a/util/grub-mkconfig.8
++++ b/util/grub-mkconfig.8
+@@ -13,5 +13,9 @@
+ \fB--output\fR=\fIFILE\fR
+ Write generated output to \fIFILE\fR.
+ 
++.TP
++\fB--no-grubenv-update\fR
++Do not update variables in the grubenv file.
++
+ .SH SEE ALSO
+ .BR "info grub"
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index e671ce68aec..1a70b7ea056 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -50,6 +50,8 @@ grub_get_kernel_settings="${sbindir}/@grub_get_kernel_settings@"
+ export TEXTDOMAIN=@PACKAGE@
+ export TEXTDOMAINDIR="@localedir@"
+ 
++export GRUB_GRUBENV_UPDATE="yes"
++
+ . "${pkgdatadir}/grub-mkconfig_lib"
+ 
+ # Usage: usage
+@@ -59,6 +61,7 @@ usage () {
+     gettext "Generate a grub config file"; echo
+     echo
+     print_option_help "-o, --output=$(gettext FILE)" "$(gettext "output generated config to FILE [default=stdout]")"
++    print_option_help "--no-grubenv-update" "$(gettext "do not update variables in the grubenv file")"
+     print_option_help "-h, --help" "$(gettext "print this message and exit")"
+     print_option_help "-V, --version" "$(gettext "print the version information and exit")"
+     echo
+@@ -94,6 +97,9 @@ do
+     --output=*)
+ 	grub_cfg=`echo "$option" | sed 's/--output=//'`
+ 	;;
++    --no-grubenv-update)
++	GRUB_GRUBENV_UPDATE="no"
++	;;
+     -*)
+ 	gettext_printf "Unrecognized option \`%s'\n" "$option" 1>&2
+ 	usage
+@@ -256,7 +262,8 @@ export GRUB_DEFAULT \
+   GRUB_OS_PROBER_SKIP_LIST \
+   GRUB_DISABLE_SUBMENU \
+   GRUB_DEFAULT_DTB \
+-  SUSE_BTRFS_SNAPSHOT_BOOTING
++  SUSE_BTRFS_SNAPSHOT_BOOTING \
++  GRUB_ENABLE_BLSCFG
+ 
+ if test "x${grub_cfg}" != "x"; then
+   rm -f "${grub_cfg}.new"
+diff --git a/util/grub-mkconfig_lib.in b/util/grub-mkconfig_lib.in
+index fafeac95061..4e6534a41f6 100644
+--- a/util/grub-mkconfig_lib.in
++++ b/util/grub-mkconfig_lib.in
+@@ -30,6 +30,9 @@ fi
+ if test "x$grub_file" = x; then
+   grub_file="${bindir}/@grub_file@"
+ fi
++if test "x$grub_editenv" = x; then
++  grub_editenv="${bindir}/@grub_editenv@"
++fi
+ if test "x$grub_mkrelpath" = x; then
+   grub_mkrelpath="${bindir}/@grub_mkrelpath@"
+ fi
+@@ -125,8 +128,19 @@ EOF
+   fi
+ }
+ 
++prepare_grub_to_access_device_with_variable ()
++{
++  device_variable="$1"
++  shift
++  prepare_grub_to_access_device "$@"
++  unset "device_variable"
++}
++
+ prepare_grub_to_access_device ()
+ {
++  if [ -z "$device_variable" ]; then
++    device_variable="root"
++  fi
+   old_ifs="$IFS"
+   IFS='
+ '
+@@ -161,15 +175,15 @@ prepare_grub_to_access_device ()
+   # otherwise set root as per value in device.map.
+   fs_hint="`"${grub_probe}" --device $@ --target=compatibility_hint`"
+   if [ "x$fs_hint" != x ]; then
+-    echo "set root='$fs_hint'"
++    echo "set ${device_variable}='$fs_hint'"
+   fi
+   if [ "x${GRUB_DISABLE_UUID}" != "xtrue" ] && fs_uuid="`"${grub_probe}" --device $@ --target=fs_uuid 2> /dev/null`" ; then
+     hints="`"${grub_probe}" --device $@ --target=hints_string 2> /dev/null`" || hints=
+     if [ "x$hints" != x ]; then
+       echo "if [ x\$feature_platform_search_hint = xy ]; then"
+-      echo "  search --no-floppy --fs-uuid --set=root ${hints} ${fs_uuid}"
++      echo "  search --no-floppy --fs-uuid --set=${device_variable} ${hints} ${fs_uuid}"
+       echo "else"
+-      echo "  search --no-floppy --fs-uuid --set=root ${fs_uuid}"
++      echo "  search --no-floppy --fs-uuid --set=${device_variable} ${fs_uuid}"
+       echo "fi"
+     else
+       echo "search --no-floppy --fs-uuid --set=root ${fs_uuid}"
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index cbfaca34cc7..68adb55d893 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -82,6 +82,223 @@ case x"$GRUB_FS" in
+ 	;;
+ esac
+ 
++populate_header_warn()
++{
++if [ "x${BLS_POPULATE_MENU}" = "xtrue" ]; then
++  bls_parser="10_linux script"
++else
++  bls_parser="blscfg command"
++fi
++cat <<EOF
++
++# This section was generated by a script. Do not modify the generated file - all changes
++# will be lost the next time file is regenerated. Instead edit the BootLoaderSpec files.
++#
++# The $bls_parser parses the BootLoaderSpec files stored in /boot/loader/entries and
++# populates the boot menu. Please refer to the Boot Loader Specification documentation
++# for the files format: https://www.freedesktop.org/wiki/Specifications/BootLoaderSpec/.
++
++EOF
++}
++
++read_config()
++{
++    config_file=${1}
++    title=""
++    initrd=""
++    options=""
++    linux=""
++    grub_arg=""
++
++    while read -r line
++    do
++        record=$(echo ${line} | cut -f 1 -d ' ')
++        value=$(echo ${line} | cut -s -f2- -d ' ')
++        case "${record}" in
++            "title")
++                title=${value}
++                ;;
++            "initrd")
++                initrd=${value}
++                ;;
++            "linux")
++                linux=${value}
++                ;;
++            "options")
++                options=${value}
++                ;;
++            "grub_arg")
++                grub_arg=${value}
++                ;;
++        esac
++    done < ${config_file}
++}
++
++blsdir="/boot/loader/entries"
++
++get_sorted_bls()
++{
++    if ! [ -d "${blsdir}" ] || ! [ -e /etc/machine-id ]; then
++        return
++    fi
++
++    read machine_id < /etc/machine-id
++    if [ -z "${machine_id}" ]; then
++        return
++    fi
++
++    local IFS=$'\n'
++
++    files=($(for bls in ${blsdir}/${machine_id}-*.conf; do
++        if ! [[ -e "${bls}" ]] ; then
++            continue
++        fi
++        bls="${bls%.conf}"
++        bls="${bls##*/}"
++        echo "${bls}"
++    done | ${kernel_sort} 2>/dev/null | tac)) || :
++
++    echo "${files[@]}"
++}
++
++update_bls_cmdline()
++{
++    local cmdline="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++    local -a files=($(get_sorted_bls))
++
++    for bls in "${files[@]}"; do
++        local options="${cmdline}"
++        if [ -z "${bls##*debug*}" ]; then
++            options="${options} ${GRUB_CMDLINE_LINUX_DEBUG}"
++        fi
++        options="$(echo "${options}" | sed -e 's/\//\\\//g')"
++        sed -i -e "s/^options.*/options ${options}/" "${blsdir}/${bls}.conf"
++    done
++}
++
++populate_menu()
++{
++    local -a files=($(get_sorted_bls))
++
++    gettext_printf "Generating boot entries from BLS files...\n" >&2
++
++    for bls in "${files[@]}"; do
++        read_config "${blsdir}/${bls}.conf"
++
++        menu="${menu}menuentry '${title}' ${grub_arg} --id=${bls} {\n"
++        menu="${menu}\t linux ${linux} ${options}\n"
++        if [ -n "${initrd}" ] ; then
++            menu="${menu}\t initrd ${boot_prefix}${initrd}\n"
++        fi
++        menu="${menu}}\n\n"
++    done
++    # The printf command seems to be more reliable across shells for special character (\n, \t) evaluation
++    printf "$menu"
++}
++
++# Make BLS the default if GRUB_ENABLE_BLSCFG was not set and grubby is not installed.
++if [ -z "${GRUB_ENABLE_BLSCFG}" ] && [ -z "$(which new-kernel-pkg 2> /dev/null)" ]; then
++	  GRUB_ENABLE_BLSCFG="true"
++fi
++
++if [ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]; then
++  if [ x$dirname = x/ ]; then
++    if [ -z "${prepare_root_cache}" ]; then
++      prepare_grub_to_access_device ${GRUB_DEVICE}
++    fi
++  else
++    if [ -z "${prepare_boot_cache}" ]; then
++      prepare_grub_to_access_device ${GRUB_DEVICE_BOOT}
++    fi
++  fi
++
++  if [ -d /sys/firmware/efi ]; then
++      bootefi_device="`${grub_probe} --target=device /boot/efi/`"
++      prepare_grub_to_access_device_with_variable boot ${bootefi_device}
++  else
++      boot_device="`${grub_probe} --target=device /boot/`"
++      prepare_grub_to_access_device_with_variable boot ${boot_device}
++  fi
++
++  arch="$(uname -m)"
++  if [ "x${arch}" = "xppc64le" ] && [ -d /sys/firmware/opal ]; then
++
++      BLS_POPULATE_MENU="true"
++      petitboot_path="/sys/firmware/devicetree/base/ibm,firmware-versions/petitboot"
++
++      if test -e ${petitboot_path}; then
++          read -r -d '' petitboot_version < ${petitboot_path}
++          petitboot_version="$(echo ${petitboot_version//v})"
++
++	  if test -n ${petitboot_version}; then
++              major_version="$(echo ${petitboot_version} | cut -d . -f1)"
++              minor_version="$(echo ${petitboot_version} | cut -d . -f2)"
++
++              re='^[0-9]+$'
++              if [[ $major_version =~ $re ]] && [[ $minor_version =~ $re ]] &&
++                 ([[ ${major_version} -gt 1 ]] ||
++                  [[ ${major_version} -eq 1 &&
++                     ${minor_version} -ge 8  ]]); then
++                  BLS_POPULATE_MENU="false"
++              fi
++          fi
++      fi
++  fi
++
++  populate_header_warn
++
++  cat << EOF
++# The kernelopts variable should be defined in the grubenv file. But to ensure that menu
++# entries populated from BootLoaderSpec files that use this variable work correctly even
++# without a grubenv file, define a fallback kernelopts variable if this has not been set.
++#
++# The kernelopts variable in the grubenv file can be modified using the grubby tool or by
++# executing the grub2-mkconfig tool. For the latter, the values of the GRUB_CMDLINE_LINUX
++# and GRUB_CMDLINE_LINUX_DEFAULT options from /etc/default/grub file are used to set both
++# the kernelopts variable in the grubenv file and the fallback kernelopts variable.
++if [ -z "\${kernelopts}" ]; then
++  set kernelopts="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++fi
++EOF
++
++  update_bls_cmdline
++
++  if [ "x${BLS_POPULATE_MENU}" = "xtrue" ]; then
++      populate_menu
++  else
++      cat << EOF
++
++insmod blscfg
++blscfg
++EOF
++  fi
++
++  if [ "x${GRUB_GRUBENV_UPDATE}" = "xyes" ]; then
++      blsdir="/boot/loader/entries"
++      [ -d "${blsdir}" ] && GRUB_BLS_FS="$(${grub_probe} --target=fs ${blsdir})"
++      if [ "x${GRUB_BLS_FS}" = "xbtrfs" ] || [ "x${GRUB_BLS_FS}" = "xzfs" ]; then
++          blsdir=$(make_system_path_relative_to_its_root "${blsdir}")
++          if [ "x${blsdir}" != "x/loader/entries" ] && [ "x${blsdir}" != "x/boot/loader/entries" ]; then
++              ${grub_editenv} - set blsdir="${blsdir}"
++          fi
++      fi
++
++      if [ -n "${GRUB_EARLY_INITRD_LINUX_CUSTOM}" ]; then
++          ${grub_editenv} - set early_initrd="${GRUB_EARLY_INITRD_LINUX_CUSTOM}"
++      fi
++
++      if [ -n "${GRUB_DEFAULT_DTB}" ]; then
++          ${grub_editenv} - set devicetree="${GRUB_DEFAULT_DTB}"
++      fi
++
++      if [ -n "${GRUB_SAVEDEFAULT}" ]; then
++           ${grub_editenv} - set save_default="${GRUB_SAVEDEFAULT}"
++      fi
++  fi
++
++  exit 0
++fi
++
+ mktitle ()
+ {
+   local title_type
+@@ -121,6 +338,7 @@ linux_entry ()
+   if [ -z "$boot_device_id" ]; then
+       boot_device_id="$(grub_get_device_id "${GRUB_DEVICE}")"
+   fi
++
+   if [ x$type != xsimple ] ; then
+       title=$(mktitle "$type" "$version")
+       if [ x"$title" = x"$GRUB_ACTUAL_DEFAULT" ] || [ x"Previous Linux versions>$title" = x"$GRUB_ACTUAL_DEFAULT" ]; then
+@@ -224,6 +442,7 @@ is_top_level=true
+ while [ "x$list" != "x" ] ; do
+   linux=`version_find_latest $list`
+   gettext_printf "Found linux image: %s\n" "$linux" >&2
++
+   basename=`basename $linux`
+   dirname=`dirname $linux`
+   rel_dirname=`make_system_path_relative_to_its_root $dirname`
+@@ -262,7 +481,9 @@ while [ "x$list" != "x" ] ; do
+     for i in ${initrd}; do
+       initrd_display="${initrd_display} ${dirname}/${i}"
+     done
+-    gettext_printf "Found initrd image: %s\n" "$(echo $initrd_display)" >&2
++    if [ "x${GRUB_ENABLE_BLSCFG}" != "xtrue" ]; then
++      gettext_printf "Found initrd image: %s\n" "$(echo $initrd_display)" >&2
++    fi
+   fi
+ 
+   fdt=

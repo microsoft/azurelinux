@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 22 Jan 2019 15:40:25 +0100
+Subject: [PATCH] Export all variables from the initial context when creating a
+ submenu
+
+When a submenu is created, only the exported variables are copied to the
+new menu context. But we want the variables to be global, so export lets
+export all variables to the new created submenu.
+
+Also, don't unset the default variable when a new submenu is created.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/normal/context.c | 2 +-
+ grub-core/normal/menu.c    | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/grub-core/normal/context.c b/grub-core/normal/context.c
+index ee53d4a68e5..87edd254c44 100644
+--- a/grub-core/normal/context.c
++++ b/grub-core/normal/context.c
+@@ -99,7 +99,7 @@ grub_env_new_context (int export_all)
+ grub_err_t
+ grub_env_context_open (void)
+ {
+-  return grub_env_new_context (0);
++  return grub_env_new_context (1);
+ }
+ 
+ int grub_extractor_level = 0;
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index ea714d27176..d4832f17699 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -375,8 +375,6 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+ 
+   if (ptr && ptr[0] && ptr[1])
+     grub_env_set ("default", ptr + 1);
+-  else
+-    grub_env_unset ("default");
+ 
+   grub_script_execute_new_scope (entry->sourcecode, entry->argc, entry->args);
+ 

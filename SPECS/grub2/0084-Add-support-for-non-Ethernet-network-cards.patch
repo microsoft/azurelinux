@@ -1,0 +1,766 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Andrzej Kacprowski <andrzej.kacprowski@intel.com>
+Date: Wed, 10 Jul 2019 15:22:29 +0200
+Subject: [PATCH] Add support for non-Ethernet network cards
+
+This patch replaces fixed 6-byte link layer address with
+up to 32-byte variable sized address.
+This allows supporting Infiniband and Omni-Path fabric
+which use 20-byte address, but other network card types
+can also take advantage of this change.
+The network card driver is responsible for replacing L2
+header provided by grub2 if needed.
+This approach is compatible with UEFI network stack which
+also allows up to 32-byte variable size link address.
+
+The BOOTP/DHCP packet format is limited to 16 byte client
+hardware address, if link address is more that 16-bytes
+then chaddr field in BOOTP it will be set to 0 as per rfc4390.
+
+Resolves: rhbz#1370642
+
+Signed-off-by: Andrzej Kacprowski <andrzej.kacprowski@intel.com>
+[msalter: Fix max string calculation in grub_net_hwaddr_to_str]
+Signed-off-by: Mark Salter <msalter@redhat.com>
+---
+ grub-core/net/arp.c                    | 155 ++++++++++++++++++++++-----------
+ grub-core/net/bootp.c                  |  15 ++--
+ grub-core/net/drivers/efi/efinet.c     |   8 +-
+ grub-core/net/drivers/emu/emunet.c     |   1 +
+ grub-core/net/drivers/i386/pc/pxe.c    |  13 +--
+ grub-core/net/drivers/ieee1275/ofnet.c |   2 +
+ grub-core/net/drivers/uboot/ubootnet.c |   1 +
+ grub-core/net/ethernet.c               |  88 +++++++++----------
+ grub-core/net/icmp6.c                  |  15 ++--
+ grub-core/net/ip.c                     |   4 +-
+ grub-core/net/net.c                    |  50 ++++++-----
+ include/grub/net.h                     |  19 ++--
+ 12 files changed, 219 insertions(+), 152 deletions(-)
+
+diff --git a/grub-core/net/arp.c b/grub-core/net/arp.c
+index 54306e3b16d..67b409a8acc 100644
+--- a/grub-core/net/arp.c
++++ b/grub-core/net/arp.c
+@@ -31,22 +31,12 @@ enum
+     ARP_REPLY = 2
+   };
+ 
+-enum
+-  {
+-    /* IANA ARP constant to define hardware type as ethernet. */
+-    GRUB_NET_ARPHRD_ETHERNET = 1
+-  };
+-
+-struct arppkt {
++struct arphdr {
+   grub_uint16_t hrd;
+   grub_uint16_t pro;
+   grub_uint8_t hln;
+   grub_uint8_t pln;
+   grub_uint16_t op;
+-  grub_uint8_t sender_mac[6];
+-  grub_uint32_t sender_ip;
+-  grub_uint8_t recv_mac[6];
+-  grub_uint32_t recv_ip;
+ } GRUB_PACKED;
+ 
+ static int have_pending;
+@@ -57,12 +47,16 @@ grub_net_arp_send_request (struct grub_net_network_level_interface *inf,
+ 			   const grub_net_network_level_address_t *proto_addr)
+ {
+   struct grub_net_buff nb;
+-  struct arppkt *arp_packet;
++  struct arphdr *arp_header;
+   grub_net_link_level_address_t target_mac_addr;
+   grub_err_t err;
+   int i;
+   grub_uint8_t *nbd;
+   grub_uint8_t arp_data[128];
++  grub_uint8_t hln;
++  grub_uint8_t pln;
++  grub_uint8_t arp_packet_len;
++  grub_uint8_t *tmp_ptr;
+ 
+   if (proto_addr->type != GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV4)
+     return grub_error (GRUB_ERR_BUG, "unsupported address family");
+@@ -73,23 +67,39 @@ grub_net_arp_send_request (struct grub_net_network_level_interface *inf,
+   grub_netbuff_clear (&nb);
+   grub_netbuff_reserve (&nb, 128);
+ 
+-  err = grub_netbuff_push (&nb, sizeof (*arp_packet));
++  hln = inf->card->default_address.len;
++  pln = sizeof (proto_addr->ipv4);
++  arp_packet_len = sizeof (*arp_header) + 2 * (hln + pln);
++
++  err = grub_netbuff_push (&nb, arp_packet_len);
+   if (err)
+     return err;
+ 
+-  arp_packet = (struct arppkt *) nb.data;
+-  arp_packet->hrd = grub_cpu_to_be16_compile_time (GRUB_NET_ARPHRD_ETHERNET);
+-  arp_packet->hln = 6;
+-  arp_packet->pro = grub_cpu_to_be16_compile_time (GRUB_NET_ETHERTYPE_IP);
+-  arp_packet->pln = 4;
+-  arp_packet->op = grub_cpu_to_be16_compile_time (ARP_REQUEST);
+-  /* Sender hardware address.  */
+-  grub_memcpy (arp_packet->sender_mac, &inf->hwaddress.mac, 6);
+-  arp_packet->sender_ip = inf->address.ipv4;
+-  grub_memset (arp_packet->recv_mac, 0, 6);
+-  arp_packet->recv_ip = proto_addr->ipv4;
+-  /* Target protocol address */
+-  grub_memset (&target_mac_addr.mac, 0xff, 6);
++  arp_header = (struct arphdr *) nb.data;
++  arp_header->hrd = grub_cpu_to_be16 (inf->card->default_address.type);
++  arp_header->hln = hln;
++  arp_header->pro = grub_cpu_to_be16_compile_time (GRUB_NET_ETHERTYPE_IP);
++  arp_header->pln = pln;
++  arp_header->op = grub_cpu_to_be16_compile_time (ARP_REQUEST);
++  tmp_ptr = nb.data + sizeof (*arp_header);
++
++  /* The source hardware address. */
++  grub_memcpy (tmp_ptr, inf->hwaddress.mac, hln);
++  tmp_ptr += hln;
++
++  /* The source protocol address. */
++  grub_memcpy (tmp_ptr, &inf->address.ipv4, pln);
++  tmp_ptr += pln;
++
++  /* The target hardware address. */
++  grub_memset (tmp_ptr, 0, hln);
++  tmp_ptr += hln;
++
++  /* The target protocol address */
++  grub_memcpy (tmp_ptr, &proto_addr->ipv4, pln);
++  tmp_ptr += pln;
++
++  grub_memset (&target_mac_addr.mac, 0xff, hln);
+ 
+   nbd = nb.data;
+   send_ethernet_packet (inf, &nb, target_mac_addr, GRUB_NET_ETHERTYPE_ARP);
+@@ -114,28 +124,53 @@ grub_err_t
+ grub_net_arp_receive (struct grub_net_buff *nb, struct grub_net_card *card,
+                       grub_uint16_t *vlantag)
+ {
+-  struct arppkt *arp_packet = (struct arppkt *) nb->data;
++  struct arphdr *arp_header = (struct arphdr *) nb->data;
+   grub_net_network_level_address_t sender_addr, target_addr;
+   grub_net_link_level_address_t sender_mac_addr;
+   struct grub_net_network_level_interface *inf;
++  grub_uint16_t hw_type;
++  grub_uint8_t hln;
++  grub_uint8_t pln;
++  grub_uint8_t arp_packet_len;
++  grub_uint8_t *tmp_ptr;
+ 
+-  if (arp_packet->pro != grub_cpu_to_be16_compile_time (GRUB_NET_ETHERTYPE_IP)
+-      || arp_packet->pln != 4 || arp_packet->hln != 6
+-      || nb->tail - nb->data < (int) sizeof (*arp_packet))
++  hw_type = card->default_address.type;
++  hln = card->default_address.len;
++  pln = sizeof(sender_addr.ipv4);
++  arp_packet_len = sizeof (*arp_header) + 2 * (pln + hln);
++
++  if (arp_header->pro != grub_cpu_to_be16_compile_time (GRUB_NET_ETHERTYPE_IP)
++      || arp_header->hrd != grub_cpu_to_be16 (hw_type)
++      || arp_header->hln != hln || arp_header->pln != pln
++      || nb->tail - nb->data < (int) arp_packet_len) {
+     return GRUB_ERR_NONE;
++  }
+ 
++  tmp_ptr =  nb->data + sizeof (*arp_header);
++
++  /* The source hardware address. */
++  sender_mac_addr.type = hw_type;
++  sender_mac_addr.len = hln;
++  grub_memcpy (sender_mac_addr.mac, tmp_ptr, hln);
++  tmp_ptr += hln;
++
++  /* The source protocol address. */
+   sender_addr.type = GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV4;
++  grub_memcpy(&sender_addr.ipv4, tmp_ptr, pln);
++  tmp_ptr += pln;
++
++  grub_net_link_layer_add_address (card, &sender_addr, &sender_mac_addr, 1);
++
++  /* The target hardware address. */
++  tmp_ptr += hln;
++
++  /* The target protocol address. */
+   target_addr.type = GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV4;
+-  sender_addr.ipv4 = arp_packet->sender_ip;
+-  target_addr.ipv4 = arp_packet->recv_ip;
+-  if (arp_packet->sender_ip == pending_req)
++  grub_memcpy(&target_addr.ipv4, tmp_ptr, pln);
++
++  if (sender_addr.ipv4 == pending_req)
+     have_pending = 1;
+ 
+-  sender_mac_addr.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-  grub_memcpy (sender_mac_addr.mac, arp_packet->sender_mac,
+-	       sizeof (sender_mac_addr.mac));
+-  grub_net_link_layer_add_address (card, &sender_addr, &sender_mac_addr, 1);
+-
+   FOR_NET_NETWORK_LEVEL_INTERFACES (inf)
+   {
+     /* Verify vlantag id */
+@@ -148,11 +183,11 @@ grub_net_arp_receive (struct grub_net_buff *nb, struct grub_net_card *card,
+ 
+     /* Am I the protocol address target? */
+     if (grub_net_addr_cmp (&inf->address, &target_addr) == 0
+-	&& arp_packet->op == grub_cpu_to_be16_compile_time (ARP_REQUEST))
++	&& arp_header->op == grub_cpu_to_be16_compile_time (ARP_REQUEST))
+       {
+ 	grub_net_link_level_address_t target;
+ 	struct grub_net_buff nb_reply;
+-	struct arppkt *arp_reply;
++	struct arphdr *arp_reply;
+ 	grub_uint8_t arp_data[128];
+ 	grub_err_t err;
+ 
+@@ -161,25 +196,39 @@ grub_net_arp_receive (struct grub_net_buff *nb, struct grub_net_card *card,
+ 	grub_netbuff_clear (&nb_reply);
+ 	grub_netbuff_reserve (&nb_reply, 128);
+ 
+-	err = grub_netbuff_push (&nb_reply, sizeof (*arp_packet));
++	err = grub_netbuff_push (&nb_reply, arp_packet_len);
+ 	if (err)
+ 	  return err;
+ 
+-	arp_reply = (struct arppkt *) nb_reply.data;
++	arp_reply = (struct arphdr *) nb_reply.data;
+ 
+-	arp_reply->hrd = grub_cpu_to_be16_compile_time (GRUB_NET_ARPHRD_ETHERNET);
++	arp_reply->hrd = grub_cpu_to_be16 (hw_type);
+ 	arp_reply->pro = grub_cpu_to_be16_compile_time (GRUB_NET_ETHERTYPE_IP);
+-	arp_reply->pln = 4;
+-	arp_reply->hln = 6;
++	arp_reply->pln = pln;
++	arp_reply->hln = hln;
+ 	arp_reply->op = grub_cpu_to_be16_compile_time (ARP_REPLY);
+-	arp_reply->sender_ip = arp_packet->recv_ip;
+-	arp_reply->recv_ip = arp_packet->sender_ip;
+-	arp_reply->hln = 6;
+-
+-	target.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-	grub_memcpy (target.mac, arp_packet->sender_mac, 6);
+-	grub_memcpy (arp_reply->sender_mac, inf->hwaddress.mac, 6);
+-	grub_memcpy (arp_reply->recv_mac, arp_packet->sender_mac, 6);
++
++	tmp_ptr = nb_reply.data + sizeof (*arp_reply);
++
++	/* The source hardware address. */
++	grub_memcpy (tmp_ptr, inf->hwaddress.mac, hln);
++	tmp_ptr += hln;
++
++	/* The source protocol address. */
++	grub_memcpy (tmp_ptr, &target_addr.ipv4, pln);
++	tmp_ptr += pln;
++
++	/* The target hardware address. */
++	grub_memcpy (tmp_ptr, sender_mac_addr.mac, hln);
++	tmp_ptr += hln;
++
++	/* The target protocol address */
++	grub_memcpy (tmp_ptr, &sender_addr.ipv4, pln);
++	tmp_ptr += pln;
++
++	target.type = hw_type;
++	target.len = hln;
++	grub_memcpy (target.mac, sender_mac_addr.mac, hln);
+ 
+ 	/* Change operation to REPLY and send packet */
+ 	send_ethernet_packet (inf, &nb_reply, target, GRUB_NET_ETHERTYPE_ARP);
+diff --git a/grub-core/net/bootp.c b/grub-core/net/bootp.c
+index 8d9edaac447..dd5c8d04da9 100644
+--- a/grub-core/net/bootp.c
++++ b/grub-core/net/bootp.c
+@@ -233,7 +233,6 @@ grub_net_configure_by_dhcp_ack (const char *name,
+ 				int is_def, char **device, char **path)
+ {
+   grub_net_network_level_address_t addr;
+-  grub_net_link_level_address_t hwaddr;
+   struct grub_net_network_level_interface *inter;
+   int mask = -1;
+   char server_ip[sizeof ("xxx.xxx.xxx.xxx")];
+@@ -250,12 +249,8 @@ grub_net_configure_by_dhcp_ack (const char *name,
+   if (path)
+     *path = 0;
+ 
+-  grub_memcpy (hwaddr.mac, bp->mac_addr,
+-	       bp->hw_len < sizeof (hwaddr.mac) ? bp->hw_len
+-	       : sizeof (hwaddr.mac));
+-  hwaddr.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-
+-  inter = grub_net_add_addr (name, card, &addr, &hwaddr, flags);
++  grub_dprintf("dhcp", "configuring dhcp for %s\n", name);
++  inter = grub_net_add_addr (name, card, &addr, &card->default_address, flags);
+   if (!inter)
+     return 0;
+ 
+@@ -567,7 +562,9 @@ send_dhcp_packet (struct grub_net_network_level_interface *iface)
+   grub_memset (pack, 0, sizeof (*pack));
+   pack->opcode = 1;
+   pack->hw_type = 1;
+-  pack->hw_len = 6;
++  pack->hw_len = iface->hwaddress.len > 16 ? 0
++                                              : iface->hwaddress.len;
++
+   err = grub_get_datetime (&date);
+   if (err || !grub_datetime2unixtime (&date, &t))
+     {
+@@ -580,7 +577,7 @@ send_dhcp_packet (struct grub_net_network_level_interface *iface)
+   else
+     pack->ident = iface->xid;
+ 
+-  grub_memcpy (&pack->mac_addr, &iface->hwaddress.mac, 6);
++  grub_memcpy (&pack->mac_addr, &iface->hwaddress.mac, pack->hw_len);
+ 
+   grub_netbuff_push (nb, sizeof (*udph));
+ 
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 173fb63153c..a673bea807a 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -279,6 +279,9 @@ grub_efinet_findcards (void)
+ 	/* This should not happen... Why?  */
+ 	continue;
+ 
++      if (net->mode->hwaddr_size > GRUB_NET_MAX_LINK_ADDRESS_SIZE)
++	continue;
++
+       if (net->mode->state == GRUB_EFI_NETWORK_STOPPED
+ 	  && efi_call_1 (net->start, net) != GRUB_EFI_SUCCESS)
+ 	continue;
+@@ -315,10 +318,11 @@ grub_efinet_findcards (void)
+       card->name = grub_xasprintf ("efinet%d", i++);
+       card->driver = &efidriver;
+       card->flags = 0;
+-      card->default_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
++      card->default_address.type = net->mode->if_type;
++      card->default_address.len = net->mode->hwaddr_size;
+       grub_memcpy (card->default_address.mac,
+ 		   net->mode->current_address,
+-		   sizeof (card->default_address.mac));
++		   net->mode->hwaddr_size);
+       card->efi_net = net;
+       card->efi_handle = *handle;
+ 
+diff --git a/grub-core/net/drivers/emu/emunet.c b/grub-core/net/drivers/emu/emunet.c
+index b194920861f..5b6c5e16a6d 100644
+--- a/grub-core/net/drivers/emu/emunet.c
++++ b/grub-core/net/drivers/emu/emunet.c
+@@ -46,6 +46,7 @@ static struct grub_net_card emucard =
+     .mtu = 1500,
+     .default_address = {
+ 			 .type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET,
++			 . len = 6,
+ 			 {.mac = {0, 1, 2, 3, 4, 5}}
+ 		       },
+     .flags = 0
+diff --git a/grub-core/net/drivers/i386/pc/pxe.c b/grub-core/net/drivers/i386/pc/pxe.c
+index 3f4152d036c..9f8fb4b6d2b 100644
+--- a/grub-core/net/drivers/i386/pc/pxe.c
++++ b/grub-core/net/drivers/i386/pc/pxe.c
+@@ -386,20 +386,21 @@ GRUB_MOD_INIT(pxe)
+   grub_memset (ui, 0, sizeof (*ui));
+   grub_pxe_call (GRUB_PXENV_UNDI_GET_INFORMATION, ui, pxe_rm_entry);
+ 
++  grub_pxe_card.default_address.len = 6;
+   grub_memcpy (grub_pxe_card.default_address.mac, ui->current_addr,
+-	       sizeof (grub_pxe_card.default_address.mac));
+-  for (i = 0; i < sizeof (grub_pxe_card.default_address.mac); i++)
++	       grub_pxe_card.default_address.len);
++  for (i = 0; i < grub_pxe_card.default_address.len; i++)
+     if (grub_pxe_card.default_address.mac[i] != 0)
+       break;
+-  if (i != sizeof (grub_pxe_card.default_address.mac))
++  if (i != grub_pxe_card.default_address.len)
+     {
+-      for (i = 0; i < sizeof (grub_pxe_card.default_address.mac); i++)
++      for (i = 0; i < grub_pxe_card.default_address.len; i++)
+ 	if (grub_pxe_card.default_address.mac[i] != 0xff)
+ 	  break;
+     }
+-  if (i == sizeof (grub_pxe_card.default_address.mac))
++  if (i == grub_pxe_card.default_address.len)
+     grub_memcpy (grub_pxe_card.default_address.mac, ui->permanent_addr,
+-		 sizeof (grub_pxe_card.default_address.mac));
++		 grub_pxe_card.default_address.len);
+   grub_pxe_card.mtu = ui->mtu;
+ 
+   grub_pxe_card.default_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+diff --git a/grub-core/net/drivers/ieee1275/ofnet.c b/grub-core/net/drivers/ieee1275/ofnet.c
+index 3860b6f78d8..bcb3f9ea02d 100644
+--- a/grub-core/net/drivers/ieee1275/ofnet.c
++++ b/grub-core/net/drivers/ieee1275/ofnet.c
+@@ -160,6 +160,7 @@ grub_ieee1275_parse_bootpath (const char *devpath, char *bootpath,
+   grub_uint16_t vlantag = 0;
+ 
+   hw_addr.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
++  hw_addr.len = 6;
+ 
+   args = bootpath + grub_strlen (devpath) + 1;
+   do
+@@ -503,6 +504,7 @@ search_net_devices (struct grub_ieee1275_devalias *alias)
+     grub_memcpy (&lla.mac, pprop, 6);
+ 
+   lla.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
++  lla.len = 6;
+   card->default_address = lla;
+ 
+   card->txbufsize = ALIGN_UP (card->mtu, 64) + 256;
+diff --git a/grub-core/net/drivers/uboot/ubootnet.c b/grub-core/net/drivers/uboot/ubootnet.c
+index 056052e40d5..22ebcbf211e 100644
+--- a/grub-core/net/drivers/uboot/ubootnet.c
++++ b/grub-core/net/drivers/uboot/ubootnet.c
+@@ -131,6 +131,7 @@ GRUB_MOD_INIT (ubootnet)
+ 
+       grub_memcpy (&(card->default_address.mac), &devinfo->di_net.hwaddr, 6);
+       card->default_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
++      card->default_address.len = 6;
+ 
+       card->txbufsize = ALIGN_UP (card->mtu, 64) + 256;
+       card->txbuf = grub_zalloc (card->txbufsize);
+diff --git a/grub-core/net/ethernet.c b/grub-core/net/ethernet.c
+index 4d7ceed6f93..9aae83a5eb4 100644
+--- a/grub-core/net/ethernet.c
++++ b/grub-core/net/ethernet.c
+@@ -29,13 +29,6 @@
+ 
+ #define LLCADDRMASK 0x7f
+ 
+-struct etherhdr
+-{
+-  grub_uint8_t dst[6];
+-  grub_uint8_t src[6];
+-  grub_uint16_t type;
+-} GRUB_PACKED;
+-
+ struct llchdr
+ {
+   grub_uint8_t dsap;
+@@ -55,13 +48,15 @@ send_ethernet_packet (struct grub_net_network_level_interface *inf,
+ 		      grub_net_link_level_address_t target_addr,
+ 		      grub_net_ethertype_t ethertype)
+ {
+-  struct etherhdr *eth;
++  grub_uint8_t *eth;
+   grub_err_t err;
+-  grub_uint8_t etherhdr_size;
+-  grub_uint16_t vlantag_id = VLANTAG_IDENTIFIER;
++  grub_uint32_t vlantag = 0;
++  grub_uint8_t hw_addr_len = inf->card->default_address.len;
++  grub_uint8_t etherhdr_size = 2 * hw_addr_len + 2;
+ 
+-  etherhdr_size = sizeof (*eth);
+-  COMPILE_TIME_ASSERT (sizeof (*eth) + 4 < GRUB_NET_MAX_LINK_HEADER_SIZE);
++  /* Source and destination link addresses + ethertype + vlan tag */
++  COMPILE_TIME_ASSERT ((GRUB_NET_MAX_LINK_ADDRESS_SIZE * 2 + 2 + 4) <
++		       GRUB_NET_MAX_LINK_HEADER_SIZE);
+ 
+   /* Increase ethernet header in case of vlantag */
+   if (inf->vlantag != 0)
+@@ -70,11 +65,22 @@ send_ethernet_packet (struct grub_net_network_level_interface *inf,
+   err = grub_netbuff_push (nb, etherhdr_size);
+   if (err)
+     return err;
+-  eth = (struct etherhdr *) nb->data;
+-  grub_memcpy (eth->dst, target_addr.mac, 6);
+-  grub_memcpy (eth->src, inf->hwaddress.mac, 6);
++  eth = nb->data;
++  grub_memcpy (eth, target_addr.mac, hw_addr_len);
++  eth += hw_addr_len;
++  grub_memcpy (eth, inf->hwaddress.mac, hw_addr_len);
++  eth += hw_addr_len;
++
++  /* Check if a vlan-tag is present. */
++  if (vlantag != 0)
++    {
++      *((grub_uint32_t *)eth) = grub_cpu_to_be32 (vlantag);
++      eth += sizeof (vlantag);
++    }
++
++  /* Write ethertype */
++  *((grub_uint16_t*) eth) = grub_cpu_to_be16 (ethertype);
+ 
+-  eth->type = grub_cpu_to_be16 (ethertype);
+   if (!inf->card->opened)
+     {
+       err = GRUB_ERR_NONE;
+@@ -85,18 +91,6 @@ send_ethernet_packet (struct grub_net_network_level_interface *inf,
+       inf->card->opened = 1;
+     }
+ 
+-  /* Check and add a vlan-tag if needed. */
+-  if (inf->vlantag != 0)
+-    {
+-      /* Move eth type to the right */
+-      grub_memcpy ((char *) nb->data + etherhdr_size - 2,
+-                   (char *) nb->data + etherhdr_size - 6, 2);
+-
+-      /* Add the tag in the middle */
+-      grub_memcpy ((char *) nb->data + etherhdr_size - 6, &vlantag_id, 2);
+-      grub_memcpy ((char *) nb->data + etherhdr_size - 4, (char *) &(inf->vlantag), 2);
+-    }
+-
+   return inf->card->driver->send (inf->card, nb);
+ }
+ 
+@@ -104,31 +98,40 @@ grub_err_t
+ grub_net_recv_ethernet_packet (struct grub_net_buff *nb,
+ 			       struct grub_net_card *card)
+ {
+-  struct etherhdr *eth;
++  grub_uint8_t *eth;
+   struct llchdr *llch;
+   struct snaphdr *snaph;
+   grub_net_ethertype_t type;
+   grub_net_link_level_address_t hwaddress;
+   grub_net_link_level_address_t src_hwaddress;
+   grub_err_t err;
+-  grub_uint8_t etherhdr_size = sizeof (*eth);
++  grub_uint8_t hw_addr_len = card->default_address.len;
++  grub_uint8_t etherhdr_size = 2 * hw_addr_len + 2;
+   grub_uint16_t vlantag = 0;
+ 
++  eth = nb->data;
+ 
+-  /* Check if a vlan-tag is present. If so, the ethernet header is 4 bytes */
+-  /* longer than the original one. The vlantag id is extracted and the header */
+-  /* is reseted to the original size. */
+-  if (grub_get_unaligned16 (nb->data + etherhdr_size - 2) == VLANTAG_IDENTIFIER)
++  hwaddress.type = card->default_address.type;
++  hwaddress.len = hw_addr_len;
++  grub_memcpy (hwaddress.mac, eth, hw_addr_len);
++  eth += hw_addr_len;
++
++  src_hwaddress.type = card->default_address.type;
++  src_hwaddress.len = hw_addr_len;
++  grub_memcpy (src_hwaddress.mac, eth, hw_addr_len);
++  eth += hw_addr_len;
++
++  type = grub_be_to_cpu16 (*(grub_uint16_t*)(eth));
++  if (type == VLANTAG_IDENTIFIER)
+     {
+-      vlantag = grub_get_unaligned16 (nb->data + etherhdr_size);
++      /* Skip vlan tag */
++      eth += 2;
++      vlantag = grub_be_to_cpu16 (*(grub_uint16_t*)(eth));
+       etherhdr_size += 4;
+-      /* Move eth type to the original position */
+-      grub_memcpy((char *) nb->data + etherhdr_size - 6,
+-                  (char *) nb->data + etherhdr_size - 2, 2);
++      eth += 2;
++      type = grub_be_to_cpu16 (*(grub_uint16_t*)(eth));
+     }
+ 
+-  eth = (struct etherhdr *) nb->data;
+-  type = grub_be_to_cpu16 (eth->type);
+   err = grub_netbuff_pull (nb, etherhdr_size);
+   if (err)
+     return err;
+@@ -148,11 +151,6 @@ grub_net_recv_ethernet_packet (struct grub_net_buff *nb,
+ 	}
+     }
+ 
+-  hwaddress.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-  grub_memcpy (hwaddress.mac, eth->dst, sizeof (hwaddress.mac));
+-  src_hwaddress.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-  grub_memcpy (src_hwaddress.mac, eth->src, sizeof (src_hwaddress.mac));
+-
+   switch (type)
+     {
+       /* ARP packet. */
+diff --git a/grub-core/net/icmp6.c b/grub-core/net/icmp6.c
+index 2cbd95dce25..56a3ec5c8e8 100644
+--- a/grub-core/net/icmp6.c
++++ b/grub-core/net/icmp6.c
+@@ -231,8 +231,9 @@ grub_net_recv_icmp6_packet (struct grub_net_buff *nb,
+ 		&& ohdr->len == 1)
+ 	      {
+ 		grub_net_link_level_address_t ll_address;
+-		ll_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-		grub_memcpy (ll_address.mac, ohdr + 1, sizeof (ll_address.mac));
++		ll_address.type = card->default_address.type;
++		ll_address.len = card->default_address.len;
++		grub_memcpy (ll_address.mac, ohdr + 1, ll_address.len);
+ 		grub_net_link_layer_add_address (card, source, &ll_address, 0);
+ 	      }
+ 	  }
+@@ -335,8 +336,9 @@ grub_net_recv_icmp6_packet (struct grub_net_buff *nb,
+ 		&& ohdr->len == 1)
+ 	      {
+ 		grub_net_link_level_address_t ll_address;
+-		ll_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-		grub_memcpy (ll_address.mac, ohdr + 1, sizeof (ll_address.mac));
++		ll_address.type = card->default_address.type;
++		ll_address.len = card->default_address.len;
++		grub_memcpy (ll_address.mac, ohdr + 1, ll_address.len);
+ 		grub_net_link_layer_add_address (card, source, &ll_address, 0);
+ 	      }
+ 	  }
+@@ -384,8 +386,9 @@ grub_net_recv_icmp6_packet (struct grub_net_buff *nb,
+ 		&& ohdr->len == 1)
+ 	      {
+ 		grub_net_link_level_address_t ll_address;
+-		ll_address.type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-		grub_memcpy (ll_address.mac, ohdr + 1, sizeof (ll_address.mac));
++		ll_address.type = card->default_address.type;
++		ll_address.len = card->default_address.len;
++		grub_memcpy (ll_address.mac, ohdr + 1, ll_address.len);
+ 		grub_net_link_layer_add_address (card, source, &ll_address, 0);
+ 	      }
+ 	    if (ohdr->type == OPTION_PREFIX && ohdr->len == 4)
+diff --git a/grub-core/net/ip.c b/grub-core/net/ip.c
+index ea5edf8f1f6..a5896f6dc26 100644
+--- a/grub-core/net/ip.c
++++ b/grub-core/net/ip.c
+@@ -276,8 +276,8 @@ handle_dgram (struct grub_net_buff *nb,
+ 	  if (inf->card == card
+ 	      && inf->address.type == GRUB_NET_NETWORK_LEVEL_PROTOCOL_DHCP_RECV
+ 	      && inf->hwaddress.type == GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET
+-	      && grub_memcmp (inf->hwaddress.mac, &bootp->mac_addr,
+-			      sizeof (inf->hwaddress.mac)) == 0)
++	      && (grub_memcmp (inf->hwaddress.mac, &bootp->mac_addr,
++			       bootp->hw_len) == 0 || bootp->hw_len == 0))
+ 	    {
+ 	      grub_net_process_dhcp (nb, inf);
+ 	      grub_netbuff_free (nb);
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 22f2689aaeb..a46f82362ed 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -133,8 +133,9 @@ grub_net_link_layer_resolve (struct grub_net_network_level_interface *inf,
+ 								   << 48)
+ 	  && proto_addr->ipv6[1] == (grub_be_to_cpu64_compile_time (1))))
+     {
+-      hw_addr->type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
+-      grub_memset (hw_addr->mac, -1, 6);
++      hw_addr->type = inf->card->default_address.type;
++      hw_addr->len = inf->card->default_address.len;
++      grub_memset (hw_addr->mac, -1, hw_addr->len);
+       return GRUB_ERR_NONE;
+     }
+ 
+@@ -142,6 +143,7 @@ grub_net_link_layer_resolve (struct grub_net_network_level_interface *inf,
+       && ((grub_be_to_cpu64 (proto_addr->ipv6[0]) >> 56) == 0xff))
+     {
+       hw_addr->type = GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET;
++      hw_addr->len = inf->card->default_address.len;
+       hw_addr->mac[0] = 0x33;
+       hw_addr->mac[1] = 0x33;
+       hw_addr->mac[2] = ((grub_be_to_cpu64 (proto_addr->ipv6[1]) >> 24) & 0xff);
+@@ -762,23 +764,23 @@ grub_net_addr_to_str (const grub_net_network_level_address_t *target, char *buf)
+ void
+ grub_net_hwaddr_to_str (const grub_net_link_level_address_t *addr, char *str)
+ {
+-  str[0] = 0;
+-  switch (addr->type)
++  char *ptr;
++  unsigned i;
++  int maxstr;
++
++  if (addr->len > GRUB_NET_MAX_LINK_ADDRESS_SIZE)
+     {
+-    case GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET:
+-      {
+-	char *ptr;
+-	unsigned i;
+-	for (ptr = str, i = 0; i < ARRAY_SIZE (addr->mac); i++)
+-	  {
+-	    grub_snprintf (ptr, GRUB_NET_MAX_STR_HWADDR_LEN - (ptr - str),
+-			   "%02x:", addr->mac[i] & 0xff);
+-	    ptr += (sizeof ("XX:") - 1);
+-	  }
+-      return;
+-      }
++       str[0] = 0;
++       grub_printf (_("Unsupported hw address type %d len %d\n"),
++		    addr->type, addr->len);
++       return;
++    }
++  maxstr = addr->len * grub_strlen ("XX:");
++  for (ptr = str, i = 0; i < addr->len; i++)
++    {
++      ptr += grub_snprintf (ptr, maxstr - (ptr - str),
++		     "%02x:", addr->mac[i] & 0xff);
+     }
+-  grub_printf (_("Unsupported hw address type %d\n"), addr->type);
+ }
+ 
+ int
+@@ -789,13 +791,17 @@ grub_net_hwaddr_cmp (const grub_net_link_level_address_t *a,
+     return -1;
+   if (a->type > b->type)
+     return +1;
+-  switch (a->type)
++  if (a->len < b->len)
++    return -1;
++  if (a->len > b->len)
++    return +1;
++  if (a->len > GRUB_NET_MAX_LINK_ADDRESS_SIZE)
+     {
+-    case GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET:
+-      return grub_memcmp (a->mac, b->mac, sizeof (a->mac));
++      grub_printf (_("Unsupported hw address type %d len %d\n"),
++		   a->type, a->len);
++      return + 1;
+     }
+-  grub_printf (_("Unsupported hw address type %d\n"), a->type);
+-  return 1;
++  return grub_memcmp (a->mac, b->mac, a->len);
+ }
+ 
+ int
+diff --git a/include/grub/net.h b/include/grub/net.h
+index 8a05ec4fe7a..af0404db7e3 100644
+--- a/include/grub/net.h
++++ b/include/grub/net.h
+@@ -29,7 +29,8 @@
+ 
+ enum
+   {
+-    GRUB_NET_MAX_LINK_HEADER_SIZE = 64,
++    GRUB_NET_MAX_LINK_HEADER_SIZE = 96,
++    GRUB_NET_MAX_LINK_ADDRESS_SIZE = 32,
+     GRUB_NET_UDP_HEADER_SIZE = 8,
+     GRUB_NET_TCP_HEADER_SIZE = 20,
+     GRUB_NET_OUR_IPV4_HEADER_SIZE = 20,
+@@ -42,15 +43,17 @@ enum
+ 
+ typedef enum grub_link_level_protocol_id 
+ {
+-  GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET
++  /* IANA ARP constant to define hardware type. */
++  GRUB_NET_LINK_LEVEL_PROTOCOL_ETHERNET = 1,
+ } grub_link_level_protocol_id_t;
+ 
+ typedef struct grub_net_link_level_address
+ {
+   grub_link_level_protocol_id_t type;
++  grub_uint8_t len;
+   union
+   {
+-    grub_uint8_t mac[6];
++    grub_uint8_t mac[GRUB_NET_MAX_LINK_ADDRESS_SIZE];
+   };
+ } grub_net_link_level_address_t;
+ 
+@@ -566,11 +569,13 @@ grub_net_addr_cmp (const grub_net_network_level_address_t *a,
+ #define GRUB_NET_MAX_STR_ADDR_LEN sizeof ("XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX")
+ 
+ /*
+-  Currently suppoerted adresses:
+-  ethernet:   XX:XX:XX:XX:XX:XX
++  Up to 32 byte hardware address supported, see GRUB_NET_MAX_LINK_ADDRESS_SIZE
+  */
+-
+-#define GRUB_NET_MAX_STR_HWADDR_LEN (sizeof ("XX:XX:XX:XX:XX:XX"))
++#define GRUB_NET_MAX_STR_HWADDR_LEN (sizeof (\
++	"XX:XX:XX:XX:XX:XX:XX:XX:"\
++	"XX:XX:XX:XX:XX:XX:XX:XX:"\
++	"XX:XX:XX:XX:XX:XX:XX:XX:"\
++	"XX:XX:XX:XX:XX:XX:XX:XX"))
+ 
+ void
+ grub_net_addr_to_str (const grub_net_network_level_address_t *target,

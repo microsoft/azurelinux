@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Mon, 26 Nov 2018 10:06:42 +0100
+Subject: [PATCH] Make the menu entry users option argument to be optional
+
+The --users option is used to restrict the access to specific menu entries
+only to a set of users. But the option requires an argument to either be a
+constant or a variable that has been set. So for example the following:
+
+  menuentry "May be run by superusers or users in $users" --users $users {
+  	    linux /vmlinuz
+  }
+
+Would fail if $users is not defined and grub would discard the menu entry.
+Instead, allow the --users option to have an optional argument and ignore
+the option if the argument was not set.
+
+Related: rhbz#1652434
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/commands/menuentry.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/commands/menuentry.c b/grub-core/commands/menuentry.c
+index b194123eb67..b175a1b43b7 100644
+--- a/grub-core/commands/menuentry.c
++++ b/grub-core/commands/menuentry.c
+@@ -29,7 +29,7 @@ static const struct grub_arg_option options[] =
+   {
+     {"class", 1, GRUB_ARG_OPTION_REPEATABLE,
+      N_("Menu entry type."), N_("STRING"), ARG_TYPE_STRING},
+-    {"users", 2, 0,
++    {"users", 2, GRUB_ARG_OPTION_OPTIONAL,
+      N_("List of users allowed to boot this entry."), N_("USERNAME[,USERNAME]"),
+      ARG_TYPE_STRING},
+     {"hotkey", 3, 0,
+@@ -281,7 +281,7 @@ grub_cmd_menuentry (grub_extcmd_context_t ctxt, int argc, char **args)
+   if (! ctxt->state[3].set && ! ctxt->script)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, "no menuentry definition");
+ 
+-  if (ctxt->state[1].set)
++  if (ctxt->state[1].set && ctxt->state[1].arg)
+     users = ctxt->state[1].arg;
+   else if (ctxt->state[5].set)
+     users = NULL;

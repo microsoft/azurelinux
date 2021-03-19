@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>
+Date: Wed, 19 Sep 2012 21:22:55 -0300
+Subject: [PATCH] Add fw_path variable (revised)
+
+This patch makes grub look for its config file on efi where the app was
+found. It was originally written by Matthew Garrett, and adapted to fix the
+"No modules are loaded on grub2 network boot" issue:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=857936
+---
+ grub-core/kern/main.c   | 13 ++++++-------
+ grub-core/normal/main.c | 25 ++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 73967e2f5b0..d1de9fa6873 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -128,16 +128,15 @@ grub_set_prefix_and_root (void)
+ 
+   grub_machine_get_bootlocation (&fwdevice, &fwpath);
+ 
+-  if (fwdevice)
++  if (fwdevice && fwpath)
+     {
+-      char *cmdpath;
++      char *fw_path;
+ 
+-      cmdpath = grub_xasprintf ("(%s)%s", fwdevice, fwpath ? : "");
+-      if (cmdpath)
++      fw_path = grub_xasprintf ("(%s)/%s", fwdevice, fwpath);
++      if (fw_path)
+ 	{
+-	  grub_env_set ("cmdpath", cmdpath);
+-	  grub_env_export ("cmdpath");
+-	  grub_free (cmdpath);
++	  grub_env_set ("fw_path", fw_path);
++	  grub_free (fw_path);
+ 	}
+     }
+ 
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 70614de1565..62571e6dfcc 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -339,7 +339,30 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+       /* Guess the config filename. It is necessary to make CONFIG static,
+ 	 so that it won't get broken by longjmp.  */
+       char *config;
+-      const char *prefix;
++      const char *prefix, *fw_path;
++
++      fw_path = grub_env_get ("fw_path");
++      if (fw_path)
++	{
++	  config = grub_xasprintf ("%s/grub.cfg", fw_path);
++	  if (config)
++	    {
++	      grub_file_t file;
++
++	      file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
++	      if (file)
++		{
++		  grub_file_close (file);
++		  grub_enter_normal_mode (config);
++		}
++              else
++                {
++                  /*  Ignore all errors.  */
++                  grub_errno = 0;
++                }
++	      grub_free (config);
++	    }
++	}
+ 
+       prefix = grub_env_get ("prefix");
+       if (prefix)

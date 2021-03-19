@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 20 Jul 2020 12:24:02 -0400
+Subject: [PATCH] Fix const char ** pointers in grub-core/net/bootp.c
+
+This will need to get folded back in the right place on the next rebase,
+but it's before "Make grub_strtol() "end" pointers have safer const
+qualifiers" currently, so for now I'm leaving it here instead of merging
+it back with the original patch.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/bootp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/bootp.c b/grub-core/net/bootp.c
+index 0b430489329..8f2f55c0079 100644
+--- a/grub-core/net/bootp.c
++++ b/grub-core/net/bootp.c
+@@ -329,7 +329,7 @@ grub_net_configure_by_dhcp_ack (const char *name,
+   struct grub_net_network_level_interface *inter;
+   int mask = -1;
+   char server_ip[sizeof ("xxx.xxx.xxx.xxx")];
+-  const grub_uint8_t *opt;
++  const char *opt;
+   grub_uint8_t opt_len, overload = 0;
+   const char *boot_file = 0, *server_name = 0;
+   grub_size_t boot_file_len, server_name_len;
+@@ -505,7 +505,7 @@ grub_net_configure_by_dhcp_ack (const char *name,
+   if (opt && opt_len)
+     {
+       grub_env_set_net_property (name, "vendor_class_identifier", (const char *) opt, opt_len);
+-      if (opt && grub_strcmp (opt, "HTTPClient") == 0)
++      if (opt && grub_strcmp ((char *)opt, "HTTPClient") == 0)
+         {
+           char *proto, *ip, *pa;
+ 

@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fedora Ninjas <grub2-owner@fedoraproject.org>
+Date: Wed, 19 Feb 2014 15:58:43 -0500
+Subject: [PATCH] use fw_path prefix when fallback searching for grub config
+
+When PXE booting via UEFI firmware, grub was searching for grub.cfg
+in the fw_path directory where the grub application was found. If
+that didn't exist, a fallback search would look for config file names
+based on MAC and IP address. However, the search would look in the
+prefix directory which may not be the same fw_path. This patch
+changes that behavior to use the fw_path directory for the fallback
+search. Only if fw_path is NULL will the prefix directory be searched.
+
+Signed-off-by: Mark Salter <msalter@redhat.com>
+---
+ grub-core/normal/main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index ec1cd257397..d85f7598d23 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -349,7 +349,7 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+       char *config;
+       const char *prefix, *fw_path;
+ 
+-      fw_path = grub_env_get ("fw_path");
++      prefix = fw_path = grub_env_get ("fw_path");
+       if (fw_path)
+ 	{
+ 	  config = grub_xasprintf ("%s/grub.cfg", fw_path);
+@@ -372,7 +372,8 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+ 	    }
+ 	}
+ 
+-      prefix = grub_env_get ("prefix");
++      if (! prefix)
++	      prefix = grub_env_get ("prefix");
+       if (prefix)
+         {
+           grub_size_t config_len;

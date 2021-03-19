@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Sun, 28 Jun 2015 13:09:58 -0400
+Subject: [PATCH] Add grub_qdprintf() - grub_dprintf() without the file+line
+ number.
+
+This just makes copy+paste of our debug loading info easier.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/misc.c | 18 ++++++++++++++++++
+ include/grub/misc.h   |  2 ++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index a432a6be54a..9a2fae6398e 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -191,6 +191,24 @@ grub_real_dprintf (const char *file, const int line, const char *condition,
+     }
+ }
+ 
++void
++grub_qdprintf (const char *condition, const char *fmt, ...)
++{
++  va_list args;
++  const char *debug = grub_env_get ("debug");
++
++  if (! debug)
++    return;
++
++  if (grub_strword (debug, "all") || grub_strword (debug, condition))
++    {
++      va_start (args, fmt);
++      grub_vprintf (fmt, args);
++      va_end (args);
++      grub_refresh ();
++    }
++}
++
+ #define PREALLOC_SIZE 255
+ 
+ int
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index fd18e6320b8..3adc4036e3b 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -345,6 +345,8 @@ void EXPORT_FUNC(grub_real_dprintf) (const char *file,
+                                      const int line,
+                                      const char *condition,
+                                      const char *fmt, ...) __attribute__ ((format (GNU_PRINTF, 4, 5)));
++void EXPORT_FUNC(grub_qdprintf) (const char *condition,
++				 const char *fmt, ...) __attribute__ ((format (GNU_PRINTF, 2, 3)));
+ int EXPORT_FUNC(grub_vprintf) (const char *fmt, va_list args);
+ int EXPORT_FUNC(grub_snprintf) (char *str, grub_size_t n, const char *fmt, ...)
+      __attribute__ ((format (GNU_PRINTF, 3, 4)));

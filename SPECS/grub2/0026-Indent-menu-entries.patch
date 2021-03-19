@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Fri, 7 Jun 2013 14:30:55 -0400
+Subject: [PATCH] Indent menu entries
+
+---
+ grub-core/normal/menu_text.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index b49835a9af7..6a57376fa80 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -239,7 +239,8 @@ print_entry (int y, int highlight, grub_menu_entry_t entry,
+       unicode_title[i] = ' ';
+ 
+   if (data->geo.num_entries > 1)
+-    grub_putcode (' ', data->term);
++    for (i = 0; i < STANDARD_MARGIN; i++)
++      grub_putcode (' ', data->term);
+ 
+   grub_print_ucs4_menu (unicode_title,
+ 			unicode_title + len,

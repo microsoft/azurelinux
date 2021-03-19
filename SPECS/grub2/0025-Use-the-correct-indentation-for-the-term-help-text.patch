@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Fri, 7 Jun 2013 14:08:49 -0400
+Subject: [PATCH] Use the correct indentation for the term help text
+
+That is consistent with the menu help text
+---
+ grub-core/normal/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 5d5f7b539f5..ec1cd257397 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -440,8 +440,8 @@ grub_normal_reader_init (int nested)
+     grub_normal_init_page (term, 1);
+     grub_term_setcursor (term, 1);
+ 
+-    if (grub_term_width (term) > 3 + STANDARD_MARGIN + 20)
+-      grub_print_message_indented (msg_formatted, 3, STANDARD_MARGIN, term);
++    if (grub_term_width (term) > 2 * STANDARD_MARGIN + 20)
++      grub_print_message_indented (msg_formatted, STANDARD_MARGIN, STANDARD_MARGIN, term);
+     else
+       grub_print_message_indented (msg_formatted, 0, 0, term);
+     grub_putcode ('\n', term);

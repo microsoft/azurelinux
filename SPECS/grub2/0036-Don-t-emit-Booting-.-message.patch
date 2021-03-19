@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 18 Feb 2014 09:37:49 -0500
+Subject: [PATCH] Don't emit "Booting ..." message.
+
+UI team still hates this stuff, so we're disabling it for RHEL 7.
+
+Resolves: rhbz#1023142
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/normal/menu.c       | 4 +++-
+ grub-core/normal/menu_entry.c | 3 ---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index d7a222e681b..37d753d8081 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -838,12 +838,14 @@ run_menu (grub_menu_t menu, int nested, int *auto_boot)
+ 
+ /* Callback invoked immediately before a menu entry is executed.  */
+ static void
+-notify_booting (grub_menu_entry_t entry,
++notify_booting (grub_menu_entry_t __attribute__((unused)) entry,
+ 		void *userdata __attribute__((unused)))
+ {
++#if 0
+   grub_printf ("  ");
+   grub_printf_ (N_("Booting `%s'"), entry->title);
+   grub_printf ("\n\n");
++#endif
+ }
+ 
+ /* Callback invoked when a default menu entry executed because of a timeout
+diff --git a/grub-core/normal/menu_entry.c b/grub-core/normal/menu_entry.c
+index 50eef918cf6..de64a367c4e 100644
+--- a/grub-core/normal/menu_entry.c
++++ b/grub-core/normal/menu_entry.c
+@@ -1176,9 +1176,6 @@ run (struct screen *screen)
+   char *dummy[1] = { NULL };
+ 
+   grub_cls ();
+-  grub_printf ("  ");
+-  grub_printf_ (N_("Booting a command list"));
+-  grub_printf ("\n\n");
+ 
+   errs_before = grub_err_printed_errors;
+ 

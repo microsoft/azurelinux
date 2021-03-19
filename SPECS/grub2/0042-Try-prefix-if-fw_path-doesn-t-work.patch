@@ -1,0 +1,222 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jul 2019 10:35:16 +0200
+Subject: [PATCH] Try $prefix if $fw_path doesn't work.
+
+Related: rhbz#1148652
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/ieee1275/init.c |  28 +++++----
+ grub-core/net/net.c            |   2 +-
+ grub-core/normal/main.c        | 134 ++++++++++++++++++++---------------------
+ 3 files changed, 82 insertions(+), 82 deletions(-)
+
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index e71d1584164..0cd2a627231 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -127,23 +127,25 @@ grub_machine_get_bootlocation (char **device, char **path)
+       grub_free (canon);
+     }
+   else
+-    *device = grub_ieee1275_encode_devname (bootpath);
+-  grub_free (type);
+-
+-  filename = grub_ieee1275_get_filename (bootpath);
+-  if (filename)
+     {
+-      char *lastslash = grub_strrchr (filename, '\\');
+-
+-      /* Truncate at last directory.  */
+-      if (lastslash)
++      filename = grub_ieee1275_get_filename (bootpath);
++      if (filename)
+         {
+-	  *lastslash = '\0';
+-	  grub_translate_ieee1275_path (filename);
++          char *lastslash = grub_strrchr (filename, '\\');
+ 
+-	  *path = filename;
+-	}
++          /* Truncate at last directory.  */
++          if (lastslash)
++            {
++              *lastslash = '\0';
++              grub_translate_ieee1275_path (filename);
++
++              *path = filename;
++            }
++        }
++      *device = grub_ieee1275_encode_devname (bootpath);
+     }
++
++  grub_free (type);
+   grub_free (bootpath);
+ }
+ 
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 4d3eb5c1a52..0ef148f4adc 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -1869,7 +1869,7 @@ grub_net_search_config_file (char *config)
+   /* Remove the remaining minus sign at the end. */
+   config[config_len] = '\0';
+ 
+-  return GRUB_ERR_NONE;
++  return GRUB_ERR_FILE_NOT_FOUND;
+ }
+ 
+ static struct grub_preboot *fini_hnd;
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 1e509fceb91..d5968797f4f 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -337,81 +337,79 @@ grub_enter_normal_mode (const char *config)
+   grub_boot_time ("Exiting normal mode");
+ }
+ 
++static grub_err_t
++grub_try_normal (const char *variable)
++{
++    char *config;
++    const char *prefix;
++    grub_err_t err = GRUB_ERR_FILE_NOT_FOUND;
++    const char *net_search_cfg;
++    int disable_net_search = 0;
++
++    prefix = grub_env_get (variable);
++    if (!prefix)
++      return GRUB_ERR_FILE_NOT_FOUND;
++
++    net_search_cfg = grub_env_get ("feature_net_search_cfg");
++    if (net_search_cfg && net_search_cfg[0] == 'n')
++      disable_net_search = 1;
++
++    if (grub_strncmp (prefix + 1, "tftp", sizeof ("tftp") - 1) == 0 &&
++        !disable_net_search)
++      {
++       grub_size_t config_len;
++       config_len = grub_strlen (prefix) +
++         sizeof ("/grub.cfg-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX");
++       config = grub_malloc (config_len);
++
++       if (! config)
++         return GRUB_ERR_FILE_NOT_FOUND;
++
++       grub_snprintf (config, config_len, "%s/grub.cfg", prefix);
++       err = grub_net_search_config_file (config);
++      }
++
++    if (err != GRUB_ERR_NONE)
++      {
++       config = grub_xasprintf ("%s/grub.cfg", prefix);
++       if (config)
++         {
++           grub_file_t file;
++           file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
++           if (file)
++             {
++               grub_file_close (file);
++               err = GRUB_ERR_NONE;
++             }
++         }
++      }
++
++    if (err == GRUB_ERR_NONE)
++      grub_enter_normal_mode (config);
++
++    grub_errno = 0;
++    grub_free (config);
++    return err;
++}
++
+ /* Enter normal mode from rescue mode.  */
+ static grub_err_t
+ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+ 		 int argc, char *argv[])
+ {
+-  if (argc == 0)
+-    {
+-      /* Guess the config filename. It is necessary to make CONFIG static,
+-	 so that it won't get broken by longjmp.  */
+-      char *config;
+-      const char *prefix;
+-      const char *net_search_cfg;
+-      int disable_net_search = 0;
+-
+-      prefix = grub_env_get ("fw_path");
+-      if (! prefix)
+-	      prefix = grub_env_get ("prefix");
+-
+-      net_search_cfg = grub_env_get ("feature_net_search_cfg");
+-      if (net_search_cfg && net_search_cfg[0] == 'n')
+-	      disable_net_search = 1;
+-
+-      if (prefix)
+-        {
+-          if (grub_strncmp (prefix + 1, "tftp", sizeof ("tftp") - 1) == 0 &&
+-              !disable_net_search)
+-            {
+-              grub_size_t config_len;
+-              config_len = grub_strlen (prefix) +
+-                sizeof ("/grub.cfg-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX");
+-              config = grub_malloc (config_len);
+-
+-              if (! config)
+-                goto quit;
+-
+-              grub_snprintf (config, config_len, "%s/grub.cfg", prefix);
+-
+-              grub_net_search_configfile (config);
+-
+-              grub_enter_normal_mode (config);
+-              grub_free (config);
+-              config = NULL;
+-            }
+-
+-          if (!config)
+-            {
+-              config = grub_xasprintf ("%s/grub.cfg", prefix);
+-              if (config)
+-                {
+-                  grub_file_t file;
+-
+-                  file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
+-                  if (file)
+-                    {
+-                      grub_file_close (file);
+-                      grub_enter_normal_mode (config);
+-                    }
+-                  else
+-                    {
+-                      /*  Ignore all errors.  */
+-                      grub_errno = 0;
+-                    }
+-                  grub_free (config);
+-                }
+-            }
+-        }
+-      else
+-        {
+-          grub_enter_normal_mode (0);
+-        }
+-    }
+-  else
++  if (argc)
+     grub_enter_normal_mode (argv[0]);
++  else
++    {
++      /* Guess the config filename. */
++      grub_err_t err;
++      err = grub_try_normal ("fw_path");
++      if (err == GRUB_ERR_FILE_NOT_FOUND)
++        err = grub_try_normal ("prefix");
++      if (err == GRUB_ERR_FILE_NOT_FOUND)
++        grub_enter_normal_mode (0);
++    }
+ 
+-quit:
+   return 0;
+ }
+ 

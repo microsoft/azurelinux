@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 26 Nov 2019 09:51:41 +0100
+Subject: [PATCH] grub.d: Fix boot_indeterminate getting set on boot_success=0
+ boot
+
+The "grub.d: Split out boot success reset from menu auto hide script"
+not only moved the code to clear boot_success and boot_indeterminate
+but for some reason also mixed in some broken changes to the
+boot_indeterminate handling.
+
+The boot_indeterminate var is meant to suppress the boot menu after
+a reboot from either a selinux-relabel or offline-updates. These
+2 special boot scenarios do not set boot_success since there is no
+successfull interaction with the user. Instead they increment
+boot_indeterminate, and if it is 1 and only when it is 1, so the
+first reboot after a "special" boot we suppress the menu.
+
+To ensure that we do show the menu if we somehow get stuck in a
+"special" boot loop where we do special-boots without them
+incrementing boot_indeterminate, the code before the
+"grub.d: Split out boot success reset from menu auto hide script"
+commit would increment boot_indeterminate once when it is 1, so that
+even if the "special" boot reboot-loop immediately we would show the
+menu on the next boot.
+
+That commit broke this however, because it not only moves the code,
+it also changes it from only "incrementing" boot_indeterminate once to
+always incrementing it, except when boot_success == 1 (and we reset it).
+
+This broken behavior causes the following problem:
+
+1. Boot a broken kernel, system hangs, power-cycle
+2. boot_success now != 1, so we increment boot_indeterminate from 0
+   (unset!) to 1. User either simply tries again, or makes some changes
+   but the end-result still is a system hang, power-cycle
+3. Now boot_indeterminate==1 so we do not show the menu even though the
+   previous boot failed -> BAD
+
+This commit fixes this by restoring the behavior of setting
+boot_indeterminate to 2 when it was 1 before.
+
+Fixes: "grub.d: Split out boot success reset from menu auto hide script"
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ util/grub.d/10_reset_boot_success.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/util/grub.d/10_reset_boot_success.in b/util/grub.d/10_reset_boot_success.in
+index 6c88d933dde..737e1ae5b68 100644
+--- a/util/grub.d/10_reset_boot_success.in
++++ b/util/grub.d/10_reset_boot_success.in
+@@ -6,18 +6,18 @@
+ #
+ # The boot_success var needs to be set to 1 from userspace to mark a boot successful.
+ cat << EOF
+-insmod increment
+ # Hiding the menu is ok if last boot was ok or if this is a first boot attempt to boot the entry
+ if [ "\${boot_success}" = "1" -o "\${boot_indeterminate}" = "1" ]; then
+   set menu_hide_ok=1
+ else
+   set menu_hide_ok=0 
+ fi
+-# Reset boot_indeterminate after a successful boot, increment otherwise
++# Reset boot_indeterminate after a successful boot
+ if [ "\${boot_success}" = "1" ] ; then
+   set boot_indeterminate=0
+-else
+-  increment boot_indeterminate
++# Avoid boot_indeterminate causing the menu to be hidden more then once
++elif [ "\${boot_indeterminate}" = "1" ]; then
++  set boot_indeterminate=2
+ fi
+ # Reset boot_success for current boot 
+ set boot_success=0

@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Sat, 12 May 2018 11:29:07 +0200
+Subject: [PATCH] Don't attempt to export the start and _start symbols for
+ grub-emu
+
+Commit 318ee04aadc ("make better backtraces") reworked the backtrace logic
+but the changes lead to the following build error on the grub-emu platform:
+
+grub_emu_lite-symlist.o:(.data+0xf08): undefined reference to `start'
+collect2: error: ld returned 1 exit status
+make[3]: *** [Makefile:25959: grub-emu-lite] Error 1
+make[3]: *** Waiting for unfinished jobs....
+cat kernel_syms.input | grep -v '^#' | sed -n \
+  -e '/EXPORT_FUNC *([a-zA-Z0-9_]*)/{s/.*EXPORT_FUNC *(\([a-zA-Z0-9_]*\)).*/defined kernel '""'\1/;p;}' \
+  -e '/EXPORT_VAR *([a-zA-Z0-9_]*)/{s/.*EXPORT_VAR *(\([a-zA-Z0-9_]*\)).*/defined kernel '""'\1/;p;}' \
+  | sort -u >kernel_syms.lst
+
+The problem is that start and _start symbols are exported unconditionally,
+but these aren't defined for grub-emu since is an emultaed platform so it
+doesn't have a startup logic. Don't attempt to export those for grub-emu.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ include/grub/kernel.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/grub/kernel.h b/include/grub/kernel.h
+index 300a9766cda..55849777eaa 100644
+--- a/include/grub/kernel.h
++++ b/include/grub/kernel.h
+@@ -111,8 +111,10 @@ grub_addr_t grub_modules_get_end (void);
+ 
+ #endif
+ 
++#if !defined(GRUB_MACHINE_EMU)
+ void EXPORT_FUNC(start) (void);
+ void EXPORT_FUNC(_start) (void);
++#endif
+ 
+ /* The start point of the C code.  */
+ void grub_main (void) __attribute__ ((noreturn));

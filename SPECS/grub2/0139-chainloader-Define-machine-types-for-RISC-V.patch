@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Abdurachmanov <david.abdurachmanov@sifive.com>
+Date: Sat, 9 Nov 2019 18:06:32 +0000
+Subject: [PATCH] chainloader: Define machine types for RISC-V
+
+The commit "Add secureboot support on efi chainloader" didn't add machine
+types for RISC-V, so this patch adds them.
+
+Note, that grub-core/loader/riscv/linux.c is skipped because Linux is not
+supported yet. This patch might need a new revision once that's the case.
+
+Signed-off-by: David Abdurachmanov <david.abdurachmanov@sifive.com>
+---
+ grub-core/loader/efi/chainloader.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 47f5aa14817..ac8dfd40c61 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -333,6 +333,10 @@ static const grub_uint16_t machine_type __attribute__((__unused__)) =
+   GRUB_PE32_MACHINE_I386;
+ #elif defined(__ia64__)
+   GRUB_PE32_MACHINE_IA64;
++#elif defined(__riscv) && (__riscv_xlen == 32)
++  GRUB_PE32_MACHINE_RISCV32;
++#elif defined(__riscv) && (__riscv_xlen == 64)
++  GRUB_PE32_MACHINE_RISCV64;
+ #else
+ #error this architecture is not supported by grub2
+ #endif

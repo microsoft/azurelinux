@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 9 Nov 2017 15:58:52 -0500
+Subject: [PATCH] normal: don't draw our startup message if debug is set
+
+---
+ grub-core/normal/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index d5968797f4f..e349303c29b 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -432,6 +432,9 @@ grub_normal_reader_init (int nested)
+   const char *msg_esc = _("ESC at any time exits.");
+   char *msg_formatted;
+ 
++  if (grub_env_get ("debug") != NULL)
++    return 0;
++
+   msg_formatted = grub_xasprintf (_("Minimal BASH-like line editing is supported. For "
+ 				    "the first word, TAB lists possible command completions. Anywhere "
+ 				    "else TAB lists possible device or file completions. %s"),

@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Abdurachmanov <david.abdurachmanov@sifive.com>
+Date: Thu, 16 Jan 2020 13:10:10 +0100
+Subject: [PATCH] Also define GRUB_EFI_MAX_ALLOCATION_ADDRESS for RISC-V
+
+The commit "Try to pick better locations for kernel and initrd" missed to
+define this macro for the RISC-V (riscv64) architecture, so add it there.
+
+Signed-off-by: David Abdurachmanov <david.abdurachmanov@sifive.com>
+---
+ include/grub/riscv64/efi/memory.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/grub/riscv64/efi/memory.h b/include/grub/riscv64/efi/memory.h
+index c6cb3241714..acb61dca44b 100644
+--- a/include/grub/riscv64/efi/memory.h
++++ b/include/grub/riscv64/efi/memory.h
+@@ -2,5 +2,6 @@
+ #include <grub/efi/memory.h>
+ 
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffffffffULL
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */

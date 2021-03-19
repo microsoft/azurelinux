@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 20 Jul 2020 12:24:02 -0400
+Subject: [PATCH] Fix const char ** pointers in grub-core/net/efi/net.c
+
+This will need to get folded back in the right place on the next rebase,
+but it's before "Make grub_strtol() "end" pointers have safer const
+qualifiers" currently, so for now I'm leaving it here instead of merging
+it back with the original patch.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/net.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index a3f0535d43c..78e5442fc52 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -729,7 +729,7 @@ grub_efi_net_parse_address (const char *address,
+ 	{
+ 	  grub_uint32_t subnet_mask_size;
+ 
+-	  subnet_mask_size = grub_strtoul (rest + 1, (char **) &rest, 0);
++	  subnet_mask_size = grub_strtoul (rest + 1, &rest, 0);
+ 
+ 	  if (!grub_errno && subnet_mask_size <= 32 && *rest == 0)
+ 	    {
+@@ -758,7 +758,7 @@ grub_efi_net_parse_address (const char *address,
+ 	{
+ 	  grub_efi_uint8_t prefix_length;
+ 
+-	  prefix_length = grub_strtoul (rest + 1, (char **) &rest, 0);
++	  prefix_length = grub_strtoul (rest + 1, &rest, 0);
+ 	  if (!grub_errno && prefix_length <= 128 && *rest == 0)
+ 	    {
+ 	      ip6->prefix_length = prefix_length;

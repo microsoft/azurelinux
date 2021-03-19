@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 4 Sep 2014 15:52:08 -0400
+Subject: [PATCH] Minimize the sort ordering for .debug and -rescue- kernels.
+
+Resolves: rhbz#1065360
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub-mkconfig_lib.in | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/util/grub-mkconfig_lib.in b/util/grub-mkconfig_lib.in
+index 301d1ac229a..0f6505bf3b6 100644
+--- a/util/grub-mkconfig_lib.in
++++ b/util/grub-mkconfig_lib.in
+@@ -253,6 +253,14 @@ version_test_gt ()
+     *.old:*.old) ;;
+     *.old:*) version_test_gt_a="`echo "$version_test_gt_a" | sed -e 's/\.old$//'`" ; version_test_gt_cmp=gt ;;
+     *:*.old) version_test_gt_b="`echo "$version_test_gt_b" | sed -e 's/\.old$//'`" ; version_test_gt_cmp=ge ;;
++    *-rescue*:*-rescue*) ;;
++    *?debug:*?debug) ;;
++    *-rescue*:*?debug) return 1 ;;
++    *?debug:*-rescue*) return 0 ;;
++    *-rescue*:*) return 1 ;;
++    *:*-rescue*) return 0 ;;
++    *?debug:*) return 1 ;;
++    *:*?debug) return 0 ;;
+   esac
+   version_test_numeric "$version_test_gt_a" "$version_test_gt_cmp" "$version_test_gt_b"
+   return "$?"

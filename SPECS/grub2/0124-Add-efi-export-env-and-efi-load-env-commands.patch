@@ -1,0 +1,346 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 16 Jan 2019 13:21:46 -0500
+Subject: [PATCH] Add efi-export-env and efi-load-env commands
+
+This adds "efi-export-env VARIABLE" and "efi-load-env", which manipulate the
+environment block stored in the EFI variable
+GRUB_ENV-91376aff-cba6-42be-949d-06fde81128e8.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/Makefile.core.def  |   6 ++
+ grub-core/commands/efi/env.c | 168 +++++++++++++++++++++++++++++++++++++++++++
+ grub-core/kern/efi/efi.c     |   3 +
+ grub-core/kern/efi/init.c    |   5 --
+ grub-core/lib/envblk.c       |  43 +++++++++++
+ util/grub-set-bootflag.c     |   1 +
+ include/grub/efi/efi.h       |   5 ++
+ include/grub/lib/envblk.h    |   3 +
+ 8 files changed, 229 insertions(+), 5 deletions(-)
+ create mode 100644 grub-core/commands/efi/env.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 1e15345107e..81fc274148e 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -820,6 +820,12 @@ module = {
+   enable = efi;
+ };
+ 
++module = {
++  name = efienv;
++  common = commands/efi/env.c;
++  enable = efi;
++};
++
+ module = {
+   name = efifwsetup;
+   efi = commands/efi/efifwsetup.c;
+diff --git a/grub-core/commands/efi/env.c b/grub-core/commands/efi/env.c
+new file mode 100644
+index 00000000000..cbd13e03e81
+--- /dev/null
++++ b/grub-core/commands/efi/env.c
+@@ -0,0 +1,168 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2012  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#include <grub/dl.h>
++#include <grub/mm.h>
++#include <grub/misc.h>
++#include <grub/types.h>
++#include <grub/mm.h>
++#include <grub/misc.h>
++#include <grub/efi/api.h>
++#include <grub/efi/efi.h>
++#include <grub/env.h>
++#include <grub/lib/envblk.h>
++#include <grub/command.h>
++
++GRUB_MOD_LICENSE ("GPLv3+");
++
++static const grub_efi_guid_t grub_env_guid = GRUB_EFI_GRUB_VARIABLE_GUID;
++
++static grub_err_t
++grub_efi_export_env(grub_command_t cmd __attribute__ ((unused)),
++                    int argc, char *argv[])
++{
++  const char *value;
++  char *old_value;
++  struct grub_envblk envblk_s = { NULL, 0 };
++  grub_envblk_t envblk = &envblk_s;
++  grub_err_t err;
++  int changed = 1;
++  grub_efi_status_t status;
++
++  grub_dprintf ("efienv", "argc:%d\n", argc);
++  for (int i = 0; i < argc; i++)
++    grub_dprintf ("efienv", "argv[%d]: %s\n", i, argv[i]);
++
++  if (argc != 1)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("variable name expected"));
++
++  grub_efi_get_variable ("GRUB_ENV", &grub_env_guid, &envblk_s.size,
++                         (void **) &envblk_s.buf);
++  if (!envblk_s.buf || envblk_s.size < 1)
++    {
++      char *buf = grub_malloc (1025);
++      if (!buf)
++        return grub_errno;
++
++      grub_memcpy (buf, GRUB_ENVBLK_SIGNATURE, sizeof (GRUB_ENVBLK_SIGNATURE) - 1);
++      grub_memset (buf + sizeof (GRUB_ENVBLK_SIGNATURE) - 1, '#',
++	      DEFAULT_ENVBLK_SIZE - sizeof (GRUB_ENVBLK_SIGNATURE) + 1);
++      buf[1024] = '\0';
++
++      envblk_s.buf = buf;
++      envblk_s.size = 1024;
++    }
++  else
++    {
++      char *buf = grub_realloc (envblk_s.buf, envblk_s.size + 1);
++      if (!buf)
++	return grub_errno;
++
++      envblk_s.buf = buf;
++      envblk_s.buf[envblk_s.size] = '\0';
++    }
++
++  err = grub_envblk_get(envblk, argv[0], &old_value);
++  if (err != GRUB_ERR_NONE)
++    {
++      grub_dprintf ("efienv", "grub_envblk_get returned %d\n", err);
++      return err;
++    }
++
++  value = grub_env_get(argv[0]);
++  if ((!value && !old_value) ||
++      (value && old_value && !grub_strcmp(old_value, value)))
++    changed = 0;
++
++  if (old_value)
++    grub_free(old_value);
++
++  if (changed == 0)
++    {
++      grub_dprintf ("efienv", "No changes necessary\n");
++      return 0;
++    }
++
++  if (value)
++    {
++      grub_dprintf ("efienv", "setting \"%s\" to \"%s\"\n", argv[0], value);
++      grub_envblk_set(envblk, argv[0], value);
++    }
++  else
++    {
++      grub_dprintf ("efienv", "deleting \"%s\" from envblk\n", argv[0]);
++      grub_envblk_delete(envblk, argv[0]);
++    }
++
++  grub_dprintf ("efienv", "envblk is %lu bytes:\n\"%s\"\n", envblk_s.size, envblk_s.buf);
++
++  grub_dprintf ("efienv", "removing GRUB_ENV\n");
++  status = grub_efi_set_variable ("GRUB_ENV", &grub_env_guid, NULL, 0);
++  if (status != GRUB_EFI_SUCCESS)
++    grub_dprintf ("efienv", "removal returned %ld\n", status);
++
++  grub_dprintf ("efienv", "setting GRUB_ENV\n");
++  status = grub_efi_set_variable ("GRUB_ENV", &grub_env_guid,
++				  envblk_s.buf, envblk_s.size);
++  if (status != GRUB_EFI_SUCCESS)
++    grub_dprintf ("efienv", "setting GRUB_ENV returned %ld\n", status);
++
++  return 0;
++}
++
++static int
++set_var (const char *name, const char *value,
++	 void *whitelist __attribute__((__unused__)))
++{
++  grub_env_set (name, value);
++  return 0;
++}
++
++static grub_err_t
++grub_efi_load_env(grub_command_t cmd __attribute__ ((unused)),
++                    int argc, char *argv[] __attribute__((__unused__)))
++{
++  struct grub_envblk envblk_s = { NULL, 0 };
++  grub_envblk_t envblk = &envblk_s;
++
++  grub_efi_get_variable ("GRUB_ENV", &grub_env_guid, &envblk_s.size,
++                         (void **) &envblk_s.buf);
++  if (!envblk_s.buf || envblk_s.size < 1)
++    return 0;
++
++  if (argc > 0)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("unexpected argument"));
++
++  grub_envblk_iterate (envblk, NULL, set_var);
++  grub_free (envblk_s.buf);
++}
++
++static grub_command_t export_cmd, loadenv_cmd;
++
++GRUB_MOD_INIT(lsefi)
++{
++  export_cmd = grub_register_command ("efi-export-env", grub_efi_export_env,
++	    N_("VARIABLE_NAME"), N_("Export environment variable to UEFI."));
++  loadenv_cmd = grub_register_command ("efi-load-env", grub_efi_load_env,
++	    NULL, N_("Load the grub environment from UEFI."));
++}
++
++GRUB_MOD_FINI(lsefi)
++{
++  grub_unregister_command (export_cmd);
++  grub_unregister_command (loadenv_cmd);
++}
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index 2a446f5031b..14bc10eb564 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -225,6 +225,9 @@ grub_efi_set_variable(const char *var, const grub_efi_guid_t *guid,
+   if (status == GRUB_EFI_SUCCESS)
+     return GRUB_ERR_NONE;
+ 
++  if (status == GRUB_EFI_NOT_FOUND && datasize == 0)
++    return GRUB_ERR_NONE;
++
+   return grub_error (GRUB_ERR_IO, "could not set EFI variable `%s'", var);
+ }
+ 
+diff --git a/grub-core/kern/efi/init.c b/grub-core/kern/efi/init.c
+index 2d12e6188fd..0574d8d6217 100644
+--- a/grub-core/kern/efi/init.c
++++ b/grub-core/kern/efi/init.c
+@@ -85,11 +85,6 @@ stack_protector_init (void)
+ 
+ grub_addr_t grub_modbase;
+ 
+-#define GRUB_EFI_GRUB_VARIABLE_GUID \
+-  { 0x91376aff, 0xcba6, 0x42be, \
+-    { 0x94, 0x9d, 0x06, 0xfd, 0xe8, 0x11, 0x28, 0xe8 } \
+-  }
+-
+ /* Helper for grub_efi_env_init */
+ static int
+ set_var (const char *name, const char *value,
+diff --git a/grub-core/lib/envblk.c b/grub-core/lib/envblk.c
+index 2e4e78b132d..874506da169 100644
+--- a/grub-core/lib/envblk.c
++++ b/grub-core/lib/envblk.c
+@@ -223,6 +223,49 @@ grub_envblk_delete (grub_envblk_t envblk, const char *name)
+     }
+ }
+ 
++struct get_var_state {
++  const char * const name;
++  char * value;
++  int found;
++};
++
++static int
++get_var (const char * const name, const char * const value, void *statep)
++{
++  struct get_var_state *state = (struct get_var_state *)statep;
++
++  if (!grub_strcmp(state->name, name))
++    {
++      state->found = 1;
++      state->value = grub_strdup(value);
++      if (!state->value)
++	grub_errno = grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("out of memory"));
++
++      return 1;
++    }
++
++  return 0;
++}
++
++grub_err_t
++grub_envblk_get (grub_envblk_t envblk, const char * const name, char ** const value)
++{
++  struct get_var_state state = {
++      .name = name,
++      .value = NULL,
++      .found = 0,
++  };
++
++  grub_envblk_iterate(envblk, (void *)&state, get_var);
++
++  *value = state.value;
++
++  if (state.found && !state.value)
++    return grub_errno;
++
++  return GRUB_ERR_NONE;
++}
++
+ void
+ grub_envblk_iterate (grub_envblk_t envblk,
+                      void *hook_data,
+diff --git a/util/grub-set-bootflag.c b/util/grub-set-bootflag.c
+index bb198f02351..6a79ee67444 100644
+--- a/util/grub-set-bootflag.c
++++ b/util/grub-set-bootflag.c
+@@ -25,6 +25,7 @@
+ 
+ #include <config-util.h>     /* For *_DIR_NAME defines */
+ #include <grub/types.h>
++#include <grub/err.h>
+ #include <grub/lib/envblk.h> /* For GRUB_ENVBLK_DEFCFG define */
+ #include <errno.h>
+ #include <stdio.h>
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 2e0691454b1..8dfc89a33b9 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -24,6 +24,11 @@
+ #include <grub/dl.h>
+ #include <grub/efi/api.h>
+ 
++#define GRUB_EFI_GRUB_VARIABLE_GUID \
++  { 0x91376aff, 0xcba6, 0x42be, \
++    { 0x94, 0x9d, 0x06, 0xfd, 0xe8, 0x11, 0x28, 0xe8 } \
++  }
++
+ /* Variables.  */
+ extern grub_efi_system_table_t *EXPORT_VAR(grub_efi_system_table);
+ extern grub_efi_handle_t EXPORT_VAR(grub_efi_image_handle);
+diff --git a/include/grub/lib/envblk.h b/include/grub/lib/envblk.h
+index c3e65592170..ab969af2461 100644
+--- a/include/grub/lib/envblk.h
++++ b/include/grub/lib/envblk.h
+@@ -22,6 +22,8 @@
+ #define GRUB_ENVBLK_SIGNATURE	"# GRUB Environment Block\n"
+ #define GRUB_ENVBLK_DEFCFG	"grubenv"
+ 
++#define DEFAULT_ENVBLK_SIZE	1024
++
+ #ifndef ASM_FILE
+ 
+ struct grub_envblk
+@@ -33,6 +35,7 @@ typedef struct grub_envblk *grub_envblk_t;
+ 
+ grub_envblk_t grub_envblk_open (char *buf, grub_size_t size);
+ int grub_envblk_set (grub_envblk_t envblk, const char *name, const char *value);
++grub_err_t grub_envblk_get (grub_envblk_t envblk, const char * const name, char ** const value);
+ void grub_envblk_delete (grub_envblk_t envblk, const char *name);
+ void grub_envblk_iterate (grub_envblk_t envblk,
+                           void *hook_data,

@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 1 Aug 2018 10:24:52 -0400
+Subject: [PATCH] module-verifier: make it possible to run checkers on
+ grub-module-verifierxx.c
+
+This makes it so you can treat grub-module-verifierxx.c as a file you can
+build directly, so syntax checkers like vim's "syntastic" plugin, which uses
+"gcc -x c -fsyntax-only" to build it, will work.
+
+One still has to do whatever setup is required to make it pick the right
+include dirs, which -W options we use, etc., but this makes it so you can do
+the checking on the file you're editing, rather than on a different file.
+
+v2: fix the typo in the #else clause in util/grub-module-verifierXX.c
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub-module-verifier32.c | 2 ++
+ util/grub-module-verifier64.c | 2 ++
+ util/grub-module-verifierXX.c | 9 +++++++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/util/grub-module-verifier32.c b/util/grub-module-verifier32.c
+index 257229f8f08..ba7d41aafea 100644
+--- a/util/grub-module-verifier32.c
++++ b/util/grub-module-verifier32.c
+@@ -1,2 +1,4 @@
+ #define MODULEVERIFIER_ELF32 1
++#ifndef GRUB_MODULE_VERIFIERXX
+ #include "grub-module-verifierXX.c"
++#endif
+diff --git a/util/grub-module-verifier64.c b/util/grub-module-verifier64.c
+index 4db6b4bedd1..fc23ef800b3 100644
+--- a/util/grub-module-verifier64.c
++++ b/util/grub-module-verifier64.c
+@@ -1,2 +1,4 @@
+ #define MODULEVERIFIER_ELF64 1
++#ifndef GRUB_MODULE_VERIFIERXX
+ #include "grub-module-verifierXX.c"
++#endif
+diff --git a/util/grub-module-verifierXX.c b/util/grub-module-verifierXX.c
+index ceb24309aec..a98e2f9b1ac 100644
+--- a/util/grub-module-verifierXX.c
++++ b/util/grub-module-verifierXX.c
+@@ -1,3 +1,12 @@
++#define GRUB_MODULE_VERIFIERXX
++#if !defined(MODULEVERIFIER_ELF32) && !defined(MODULEVERIFIER_ELF64)
++#if __SIZEOF_POINTER__ == 8
++#include "grub-module-verifier64.c"
++#else
++#include "grub-module-verifier32.c"
++#endif
++#endif
++
+ #include <string.h>
+ 
+ #include <grub/elf.h>

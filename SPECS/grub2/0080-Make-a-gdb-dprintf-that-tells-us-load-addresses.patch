@@ -1,0 +1,178 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 25 Jun 2015 15:11:36 -0400
+Subject: [PATCH] Make a "gdb" dprintf that tells us load addresses.
+
+This makes a grub_dprintf() call during platform init and during module
+loading that tells us the virtual addresses of the .text and .data
+sections of grub-core/kernel.exec and any modules it loads.
+
+Specifically, it displays them in the gdb "add-symbol-file" syntax, with
+the presumption that there's a variable $grubdir that reflects the path
+to any such binaries.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/dl.c       | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+ grub-core/kern/efi/efi.c  |  4 ++--
+ grub-core/kern/efi/init.c | 26 +++++++++++++++++++++++-
+ include/grub/efi/efi.h    |  2 +-
+ 4 files changed, 78 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 88d2077709e..9557254035e 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -501,6 +501,23 @@ grub_dl_find_section (Elf_Ehdr *e, const char *name)
+       return s;
+   return NULL;
+ }
++static long
++grub_dl_find_section_index (Elf_Ehdr *e, const char *name)
++{
++  Elf_Shdr *s;
++  const char *str;
++  unsigned i;
++
++  s = (Elf_Shdr *) ((char *) e + e->e_shoff + e->e_shstrndx * e->e_shentsize);
++  str = (char *) e + s->sh_offset;
++
++  for (i = 0, s = (Elf_Shdr *) ((char *) e + e->e_shoff);
++       i < e->e_shnum;
++       i++, s = (Elf_Shdr *) ((char *) s + e->e_shentsize))
++    if (grub_strcmp (str + s->sh_name, name) == 0)
++      return (long)i;
++  return -1;
++}
+ 
+ /* Me, Vladimir Serbinenko, hereby I add this module check as per new
+    GNU module policy. Note that this license check is informative only.
+@@ -653,6 +670,37 @@ grub_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+ 
+   return GRUB_ERR_NONE;
+ }
++static void
++grub_dl_print_gdb_info (grub_dl_t mod, Elf_Ehdr *e)
++{
++  void *text, *data = NULL;
++  long idx;
++
++  idx = grub_dl_find_section_index (e, ".text");
++  if (idx < 0)
++    return;
++
++  text = grub_dl_get_section_addr (mod, idx);
++  if (!text)
++    return;
++
++  idx = grub_dl_find_section_index (e, ".data");
++  if (idx >= 0)
++    data = grub_dl_get_section_addr (mod, idx);
++
++  if (data)
++    grub_qdprintf ("gdb", "add-symbol-file \\\n"
++		          "/usr/lib/debug/usr/lib/grub/%s-%s/%s.debug "
++			  "\\\n %p -s .data %p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM,
++		  mod->name, text, data);
++  else
++    grub_qdprintf ("gdb", "add-symbol-file \\\n"
++			   "/usr/lib/debug/usr/lib/grub/%s-%s/%s.debug "
++			   "\\\n%p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM,
++		  mod->name, text);
++}
+ 
+ /* Load a module from core memory.  */
+ grub_dl_t
+@@ -712,6 +760,8 @@ grub_dl_load_core_noinit (void *addr, grub_size_t size)
+   grub_dprintf ("modules", "module name: %s\n", mod->name);
+   grub_dprintf ("modules", "init function: %p\n", mod->init);
+ 
++  grub_dl_print_gdb_info (mod, e);
++
+   if (grub_dl_add (mod))
+     {
+       grub_dl_unload (mod);
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index ae9885edb84..d6a2fb57789 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -296,7 +296,7 @@ grub_efi_get_variable (const char *var, const grub_efi_guid_t *guid,
+ /* Search the mods section from the PE32/PE32+ image. This code uses
+    a PE32 header, but should work with PE32+ as well.  */
+ grub_addr_t
+-grub_efi_modules_addr (void)
++grub_efi_section_addr (const char *section_name)
+ {
+   grub_efi_loaded_image_t *image;
+   struct grub_pe32_header *header;
+@@ -321,7 +321,7 @@ grub_efi_modules_addr (void)
+        i < coff_header->num_sections;
+        i++, section++)
+     {
+-      if (grub_strcmp (section->name, "mods") == 0)
++      if (grub_strcmp (section->name, section_name) == 0)
+ 	break;
+     }
+ 
+diff --git a/grub-core/kern/efi/init.c b/grub-core/kern/efi/init.c
+index 6d39bd3ad29..2d12e6188fd 100644
+--- a/grub-core/kern/efi/init.c
++++ b/grub-core/kern/efi/init.c
+@@ -115,10 +115,33 @@ grub_efi_env_init (void)
+   grub_free (envblk_s.buf);
+ }
+ 
++static void
++grub_efi_print_gdb_info (void)
++{
++  grub_addr_t text;
++  grub_addr_t data;
++
++  text = grub_efi_section_addr (".text");
++  if (!text)
++    return;
++
++  data = grub_efi_section_addr (".data");
++  if (data)
++    grub_qdprintf ("gdb",
++		  "add-symbol-file /usr/lib/debug/usr/lib/grub/%s-%s/"
++		  "kernel.exec %p -s .data %p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM, (void *)text, (void *)data);
++  else
++    grub_qdprintf ("gdb",
++		  "add-symbol-file /usr/lib/debug/usr/lib/grub/%s-%s/"
++		  "kernel.exec %p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM, (void *)text);
++}
++
+ void
+ grub_efi_init (void)
+ {
+-  grub_modbase = grub_efi_modules_addr ();
++  grub_modbase = grub_efi_section_addr ("mods");
+   /* First of all, initialize the console so that GRUB can display
+      messages.  */
+   grub_console_init ();
+@@ -142,6 +165,7 @@ grub_efi_init (void)
+ 	      0, 0, 0, NULL);
+ 
+   grub_efi_env_init ();
++  grub_efi_print_gdb_info ();
+   grub_efidisk_init ();
+ }
+ 
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 03f9a9d0118..2e0691454b1 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -138,7 +138,7 @@ grub_err_t grub_arch_efi_linux_check_image(struct linux_arch_kernel_header *lh);
+ grub_err_t grub_arch_efi_linux_boot_image(grub_addr_t addr, char *args);
+ #endif
+ 
+-grub_addr_t grub_efi_modules_addr (void);
++grub_addr_t grub_efi_section_addr (const char *section);
+ 
+ void grub_efi_mm_init (void);
+ void grub_efi_mm_fini (void);

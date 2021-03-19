@@ -1,0 +1,127 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jul 2019 17:33:22 +0200
+Subject: [PATCH] Try mac/guid/etc before grub.cfg on tftp config files.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/normal/main.c | 97 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 51 insertions(+), 46 deletions(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index d85f7598d23..1e509fceb91 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -347,61 +347,66 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+       /* Guess the config filename. It is necessary to make CONFIG static,
+ 	 so that it won't get broken by longjmp.  */
+       char *config;
+-      const char *prefix, *fw_path;
+-
+-      prefix = fw_path = grub_env_get ("fw_path");
+-      if (fw_path)
+-	{
+-	  config = grub_xasprintf ("%s/grub.cfg", fw_path);
+-	  if (config)
+-	    {
+-	      grub_file_t file;
+-
+-	      file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
+-	      if (file)
+-		{
+-		  grub_file_close (file);
+-		  grub_enter_normal_mode (config);
+-		}
+-              else
+-                {
+-                  /*  Ignore all errors.  */
+-                  grub_errno = 0;
+-                }
+-	      grub_free (config);
+-	    }
+-	}
++      const char *prefix;
++      const char *net_search_cfg;
++      int disable_net_search = 0;
+ 
++      prefix = grub_env_get ("fw_path");
+       if (! prefix)
+ 	      prefix = grub_env_get ("prefix");
++
++      net_search_cfg = grub_env_get ("feature_net_search_cfg");
++      if (net_search_cfg && net_search_cfg[0] == 'n')
++	      disable_net_search = 1;
++
+       if (prefix)
+         {
+-          grub_size_t config_len;
+-          int disable_net_search = 0;
+-          const char *net_search_cfg;
+-
+-          config_len = grub_strlen (prefix) +
+-                       sizeof ("/grub.cfg-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX");
+-          config = grub_malloc (config_len);
+-
+-          if (!config)
+-            goto quit;
+-
+-          grub_snprintf (config, config_len, "%s/grub.cfg", prefix);
+-
+-          net_search_cfg = grub_env_get ("feature_net_search_cfg");
+-          if (net_search_cfg && net_search_cfg[0] == 'n')
+-            disable_net_search = 1;
+-
+           if (grub_strncmp (prefix + 1, "tftp", sizeof ("tftp") - 1) == 0 &&
+               !disable_net_search)
+-            grub_net_search_config_file (config);
++            {
++              grub_size_t config_len;
++              config_len = grub_strlen (prefix) +
++                sizeof ("/grub.cfg-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX");
++              config = grub_malloc (config_len);
+ 
+-	  grub_enter_normal_mode (config);
+-	  grub_free (config);
+-	}
++              if (! config)
++                goto quit;
++
++              grub_snprintf (config, config_len, "%s/grub.cfg", prefix);
++
++              grub_net_search_configfile (config);
++
++              grub_enter_normal_mode (config);
++              grub_free (config);
++              config = NULL;
++            }
++
++          if (!config)
++            {
++              config = grub_xasprintf ("%s/grub.cfg", prefix);
++              if (config)
++                {
++                  grub_file_t file;
++
++                  file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
++                  if (file)
++                    {
++                      grub_file_close (file);
++                      grub_enter_normal_mode (config);
++                    }
++                  else
++                    {
++                      /*  Ignore all errors.  */
++                      grub_errno = 0;
++                    }
++                  grub_free (config);
++                }
++            }
++        }
+       else
+-	grub_enter_normal_mode (0);
++        {
++          grub_enter_normal_mode (0);
++        }
+     }
+   else
+     grub_enter_normal_mode (argv[0]);

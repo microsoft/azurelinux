@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 9 Apr 2019 12:42:37 +0200
+Subject: [PATCH] Print grub-emu linux loader messages as debug
+
+They just polute the output and should better be debug messages instead.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/loader/emu/linux.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/loader/emu/linux.c b/grub-core/loader/emu/linux.c
+index 5b85b225eed..22ab6af1727 100644
+--- a/grub-core/loader/emu/linux.c
++++ b/grub-core/loader/emu/linux.c
+@@ -50,7 +50,7 @@ grub_linux_boot (void)
+     initrd_param = grub_xasprintf("%s", "");
+   }
+ 
+-  grub_printf("%serforming 'kexec -l %s %s %s'\n",
++  grub_dprintf ("linux", "%serforming 'kexec -l %s %s %s'\n",
+ 	(kexecute) ? "P" : "Not p",
+ 	kernel_path, initrd_param, boot_cmdline);
+ 
+@@ -67,7 +67,7 @@ grub_linux_boot (void)
+   if (kexecute < 1)
+     grub_fatal (N_("Use '"PACKAGE"-emu --kexec' to force a system restart."));
+ 
+-  grub_printf("Performing 'systemctl kexec' (%s) ",
++  grub_dprintf ("linux", "Performing 'systemctl kexec' (%s) ",
+ 		(kexecute==1) ? "do-or-die" : "just-in-case");
+   rc = grub_util_exec (systemctl);
+ 

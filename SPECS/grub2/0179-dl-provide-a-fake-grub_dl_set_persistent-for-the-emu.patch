@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Thu, 30 Jul 2020 00:13:21 +1000
+Subject: [PATCH] dl: provide a fake grub_dl_set_persistent for the emu target
+
+Trying to start grub-emu with a module that calls grub_dl_set_persistent
+will crash because grub-emu fakes modules and passes NULL to the module
+init function.
+
+Provide an empty function for the emu case.
+
+Fixes: ee7808e2197c (dl: Add support for persistent modules)
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ include/grub/dl.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 2f76e6b0437..20d870f2a47 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -245,11 +245,22 @@ grub_dl_get (const char *name)
+   return 0;
+ }
+ 
++#ifdef GRUB_MACHINE_EMU
++/*
++ * Under grub-emu, modules are faked and NULL is passed to GRUB_MOD_INIT.
++ * So we fake this out to avoid a NULL deref.
++ */
++static inline void
++grub_dl_set_persistent (grub_dl_t mod __attribute__((unused)))
++{
++}
++#else
+ static inline void
+ grub_dl_set_persistent (grub_dl_t mod)
+ {
+   mod->persistent = 1;
+ }
++#endif
+ 
+ static inline int
+ grub_dl_is_persistent (grub_dl_t mod)

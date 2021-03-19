@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 27 Aug 2018 13:14:06 -0400
+Subject: [PATCH] Make grub_error() more verbose
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/err.c | 13 +++++++++++--
+ include/grub/err.h   |  8 ++++++--
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/kern/err.c b/grub-core/kern/err.c
+index 53c734de70e..aebfe0cf839 100644
+--- a/grub-core/kern/err.c
++++ b/grub-core/kern/err.c
+@@ -33,15 +33,24 @@ static struct grub_error_saved grub_error_stack_items[GRUB_ERROR_STACK_SIZE];
+ static int grub_error_stack_pos;
+ static int grub_error_stack_assert;
+ 
++#ifdef grub_error
++#undef grub_error
++#endif
++
+ grub_err_t
+-grub_error (grub_err_t n, const char *fmt, ...)
++grub_error (grub_err_t n, const char *file, const int line, const char *fmt, ...)
+ {
+   va_list ap;
++  int m;
+ 
+   grub_errno = n;
+ 
++  m = grub_snprintf (grub_errmsg, sizeof (grub_errmsg), "%s:%d:", file, line);
++  if (m < 0)
++    m = 0;
++
+   va_start (ap, fmt);
+-  grub_vsnprintf (grub_errmsg, sizeof (grub_errmsg), _(fmt), ap);
++  grub_vsnprintf (grub_errmsg + m, sizeof (grub_errmsg) - m, _(fmt), ap);
+   va_end (ap);
+ 
+   return n;
+diff --git a/include/grub/err.h b/include/grub/err.h
+index b08d5d0de4c..c0f90ef07c8 100644
+--- a/include/grub/err.h
++++ b/include/grub/err.h
+@@ -85,8 +85,12 @@ struct grub_error_saved
+ extern grub_err_t EXPORT_VAR(grub_errno);
+ extern char EXPORT_VAR(grub_errmsg)[GRUB_MAX_ERRMSG];
+ 
+-grub_err_t EXPORT_FUNC(grub_error) (grub_err_t n, const char *fmt, ...)
+-    __attribute__ ((format (GNU_PRINTF, 2, 3)));
++grub_err_t EXPORT_FUNC(grub_error) (grub_err_t n, const char *file, const int line, const char *fmt, ...)
++	__attribute__ ((format (GNU_PRINTF, 4, 5)));
++
++#define grub_error(n, fmt, ...) grub_error (n, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
++
++
+ void EXPORT_FUNC(grub_fatal) (const char *fmt, ...) __attribute__ ((noreturn));
+ void EXPORT_FUNC(grub_error_push) (void);
+ int EXPORT_FUNC(grub_error_pop) (void);

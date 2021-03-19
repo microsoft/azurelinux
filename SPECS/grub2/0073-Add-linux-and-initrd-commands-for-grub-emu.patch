@@ -1,0 +1,347 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Tue, 6 Feb 2018 09:09:00 +0100
+Subject: [PATCH] Add linux and initrd commands for grub-emu
+
+When using grub-emu, the linux and initrd commands are used as arguments
+to the kexec command line tool, to allow booting the selected menu entry.
+---
+ grub-core/Makefile.core.def  |   1 -
+ grub-core/kern/emu/main.c    |   4 +
+ grub-core/kern/emu/misc.c    |  18 ++++-
+ grub-core/loader/emu/linux.c | 172 +++++++++++++++++++++++++++++++++++++++++++
+ include/grub/emu/exec.h      |   4 +-
+ include/grub/emu/hostfile.h  |   3 +-
+ include/grub/emu/misc.h      |   3 +
+ grub-core/Makefile.am        |   1 +
+ 8 files changed, 202 insertions(+), 4 deletions(-)
+ create mode 100644 grub-core/loader/emu/linux.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 058c88ac3af..5354f9613d3 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -1826,7 +1826,6 @@ module = {
+ 
+   common = loader/linux.c;
+   common = lib/cmdline.c;
+-  enable = noemu;
+ 
+   efi = loader/efi/linux.c;
+ };
+diff --git a/grub-core/kern/emu/main.c b/grub-core/kern/emu/main.c
+index 55ea5a11ccd..846fe9715ec 100644
+--- a/grub-core/kern/emu/main.c
++++ b/grub-core/kern/emu/main.c
+@@ -107,6 +107,7 @@ static struct argp_option options[] = {
+    N_("use GRUB files in the directory DIR [default=%s]"), 0},
+   {"verbose",     'v', 0,      0, N_("print verbose messages."), 0},
+   {"hold",     'H', N_("SECS"),      OPTION_ARG_OPTIONAL, N_("wait until a debugger will attach"), 0},
++  {"kexec",       'X', 0,      0, N_("try the untryable."), 0},
+   { 0, 0, 0, 0, 0, 0 }
+ };
+ 
+@@ -164,6 +165,9 @@ argp_parser (int key, char *arg, struct argp_state *state)
+     case 'v':
+       verbosity++;
+       break;
++    case 'X':
++      grub_util_set_kexecute();
++      break;
+ 
+     case ARGP_KEY_ARG:
+       {
+diff --git a/grub-core/kern/emu/misc.c b/grub-core/kern/emu/misc.c
+index 0ff13bcaf8c..eeea092752d 100644
+--- a/grub-core/kern/emu/misc.c
++++ b/grub-core/kern/emu/misc.c
+@@ -39,6 +39,7 @@
+ #include <grub/emu/misc.h>
+ 
+ int verbosity;
++int kexecute;
+ 
+ void
+ grub_util_warn (const char *fmt, ...)
+@@ -82,7 +83,7 @@ grub_util_error (const char *fmt, ...)
+   vfprintf (stderr, fmt, ap);
+   va_end (ap);
+   fprintf (stderr, ".\n");
+-  exit (1);
++  grub_exit (1);
+ }
+ 
+ void *
+@@ -154,6 +155,9 @@ void
+ __attribute__ ((noreturn))
+ grub_exit (int rc)
+ {
++#if defined (GRUB_KERNEL)
++  grub_reboot();
++#endif
+   exit (rc < 0 ? 1 : rc);
+ }
+ #endif
+@@ -215,3 +219,15 @@ grub_util_load_image (const char *path, char *buf)
+ 
+   fclose (fp);
+ }
++
++void
++grub_util_set_kexecute(void)
++{
++  kexecute++;
++}
++
++int
++grub_util_get_kexecute(void)
++{
++  return kexecute;
++}
+diff --git a/grub-core/loader/emu/linux.c b/grub-core/loader/emu/linux.c
+new file mode 100644
+index 00000000000..fda9e00d24c
+--- /dev/null
++++ b/grub-core/loader/emu/linux.c
+@@ -0,0 +1,172 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2006,2007,2008,2009,2010  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/loader.h>
++#include <grub/dl.h>
++#include <grub/command.h>
++#include <grub/time.h>
++
++#include <grub/emu/exec.h>
++#include <grub/emu/hostfile.h>
++#include <grub/emu/misc.h>
++
++GRUB_MOD_LICENSE ("GPLv3+");
++
++static grub_dl_t my_mod;
++
++static char *kernel_path;
++static char *initrd_path;
++static char *boot_cmdline;
++
++static grub_err_t
++grub_linux_boot (void)
++{
++  grub_err_t rc = GRUB_ERR_NONE;
++  char *initrd_param;
++  const char *kexec[] = { "kexec", "-l", kernel_path, boot_cmdline, NULL, NULL };
++  const char *systemctl[] = { "systemctl", "kexec", NULL };
++  int kexecute = grub_util_get_kexecute();
++
++  if (initrd_path) {
++    initrd_param = grub_xasprintf("--initrd=%s", initrd_path);
++    kexec[3] = initrd_param;
++    kexec[4] = boot_cmdline;
++  } else {
++    initrd_param = grub_xasprintf("%s", "");
++  }
++
++  grub_printf("%serforming 'kexec -l %s %s %s'\n",
++	(kexecute) ? "P" : "Not p",
++	kernel_path, initrd_param, boot_cmdline);
++
++  if (kexecute)
++    rc = grub_util_exec(kexec);
++
++  grub_free(initrd_param);
++
++  if (rc != GRUB_ERR_NONE) {
++    grub_error (rc, N_("Error trying to perform kexec load operation."));
++    grub_sleep (3);
++    return rc;
++  }
++  if (kexecute < 1)
++    grub_fatal (N_("Use '"PACKAGE"-emu --kexec' to force a system restart."));
++
++  grub_printf("Performing 'systemctl kexec' (%s) ",
++		(kexecute==1) ? "do-or-die" : "just-in-case");
++  rc = grub_util_exec (systemctl);
++
++  if (kexecute == 1)
++    grub_fatal (N_("Error trying to perform 'systemctl kexec'"));
++
++  /* need to check read-only root before resetting hard!? */
++  grub_printf("Performing 'kexec -e'");
++  kexec[1] = "-e";
++  kexec[2] = NULL;
++  rc = grub_util_exec(kexec);
++  if ( rc != GRUB_ERR_NONE )
++    grub_fatal (N_("Error trying to directly perform 'kexec -e'."));
++
++  return rc;
++}
++
++static grub_err_t
++grub_linux_unload (void)
++{
++  grub_dl_unref (my_mod);
++  if ( boot_cmdline != NULL )
++    grub_free (boot_cmdline);
++  boot_cmdline = NULL;
++  return GRUB_ERR_NONE;
++}
++
++static grub_err_t
++grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)), int argc, char *argv[])
++{
++  int i;
++  char *tempstr;
++
++  grub_dl_ref (my_mod);
++
++  if (argc == 0)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("filename expected"));
++
++  if ( !grub_util_is_regular(argv[0]) )
++    return grub_error(GRUB_ERR_FILE_NOT_FOUND, N_("Cannot find kernel file %s"), argv[0]);
++
++  if ( kernel_path != NULL )
++    grub_free(kernel_path);
++
++  kernel_path = grub_xasprintf("%s", argv[0]);
++
++  if ( boot_cmdline != NULL ) {
++    grub_free(boot_cmdline);
++    boot_cmdline = NULL;
++  }
++
++  if ( argc > 1 )
++  {
++    boot_cmdline = grub_xasprintf("--command-line=%s", argv[1]);
++    for ( i = 2; i < argc; i++ ) {
++      tempstr = grub_xasprintf("%s %s", boot_cmdline, argv[i]);
++      grub_free(boot_cmdline);
++      boot_cmdline = tempstr;
++    }
++  }
++
++  grub_loader_set (grub_linux_boot, grub_linux_unload, 0);
++
++  return GRUB_ERR_NONE;
++}
++
++static grub_err_t
++grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)), int argc, char *argv[])
++{
++  if (argc == 0)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("filename expected"));
++
++  if ( !grub_util_is_regular(argv[0]) )
++    return grub_error(GRUB_ERR_FILE_NOT_FOUND, N_("Cannot find initrd file %s"), argv[0]);
++
++  if ( initrd_path != NULL )
++    grub_free(initrd_path);
++
++  initrd_path = grub_xasprintf("%s", argv[0]);
++
++  grub_dl_unref (my_mod);
++
++  return GRUB_ERR_NONE;
++}
++
++static grub_command_t cmd_linux, cmd_initrd;
++
++GRUB_MOD_INIT(linux)
++{
++  cmd_linux = grub_register_command ("linux", grub_cmd_linux, 0, N_("Load Linux."));
++  cmd_initrd = grub_register_command ("initrd", grub_cmd_initrd, 0, N_("Load initrd."));
++  my_mod = mod;
++  kernel_path = NULL;
++  initrd_path = NULL;
++  boot_cmdline = NULL;
++}
++
++GRUB_MOD_FINI(linux)
++{
++  grub_unregister_command (cmd_linux);
++  grub_unregister_command (cmd_initrd);
++}
+diff --git a/include/grub/emu/exec.h b/include/grub/emu/exec.h
+index d1073ef86af..1b61b4a2e5d 100644
+--- a/include/grub/emu/exec.h
++++ b/include/grub/emu/exec.h
+@@ -23,6 +23,8 @@
+ #include <stdarg.h>
+ 
+ #include <sys/types.h>
++#include <grub/symbol.h>
++
+ pid_t
+ grub_util_exec_pipe (const char *const *argv, int *fd);
+ pid_t
+@@ -32,7 +34,7 @@ int
+ grub_util_exec_redirect_all (const char *const *argv, const char *stdin_file,
+ 			     const char *stdout_file, const char *stderr_file);
+ int
+-grub_util_exec (const char *const *argv);
++EXPORT_FUNC(grub_util_exec) (const char *const *argv);
+ int
+ grub_util_exec_redirect (const char *const *argv, const char *stdin_file,
+ 			 const char *stdout_file);
+diff --git a/include/grub/emu/hostfile.h b/include/grub/emu/hostfile.h
+index cfb1e2b5661..a61568e36e9 100644
+--- a/include/grub/emu/hostfile.h
++++ b/include/grub/emu/hostfile.h
+@@ -22,6 +22,7 @@
+ #include <grub/disk.h>
+ #include <grub/partition.h>
+ #include <sys/types.h>
++#include <grub/symbol.h>
+ #include <grub/osdep/hostfile.h>
+ 
+ int
+@@ -29,7 +30,7 @@ grub_util_is_directory (const char *path);
+ int
+ grub_util_is_special_file (const char *path);
+ int
+-grub_util_is_regular (const char *path);
++EXPORT_FUNC(grub_util_is_regular) (const char *path);
+ 
+ char *
+ grub_util_path_concat (size_t n, ...);
+diff --git a/include/grub/emu/misc.h b/include/grub/emu/misc.h
+index ff9c48a6490..01056954b96 100644
+--- a/include/grub/emu/misc.h
++++ b/include/grub/emu/misc.h
+@@ -57,6 +57,9 @@ void EXPORT_FUNC(grub_util_warn) (const char *fmt, ...) __attribute__ ((format (
+ void EXPORT_FUNC(grub_util_info) (const char *fmt, ...) __attribute__ ((format (GNU_PRINTF, 1, 2)));
+ void EXPORT_FUNC(grub_util_error) (const char *fmt, ...) __attribute__ ((format (GNU_PRINTF, 1, 2), noreturn));
+ 
++void EXPORT_FUNC(grub_util_set_kexecute) (void);
++int EXPORT_FUNC(grub_util_get_kexecute) (void) WARN_UNUSED_RESULT;
++
+ grub_uint64_t EXPORT_FUNC (grub_util_get_cpu_time_ms) (void);
+ 
+ #ifdef HAVE_DEVICE_MAPPER
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index ee88e44e97a..80e7a83edf9 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -307,6 +307,7 @@ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/emu/net.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/emu/hostdisk.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/emu/hostfile.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/extcmd.h
++KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/emu/exec.h
+ if COND_GRUB_EMU_SDL
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/sdl.h
+ endif

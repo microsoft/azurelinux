@@ -1,0 +1,137 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 16 Mar 2018 13:28:57 -0400
+Subject: [PATCH] Work around some minor include path weirdnesses
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ include/grub/arm/efi/console.h    | 24 ++++++++++++++++++++++++
+ include/grub/arm64/efi/console.h  | 24 ++++++++++++++++++++++++
+ include/grub/i386/efi/console.h   | 24 ++++++++++++++++++++++++
+ include/grub/x86_64/efi/console.h | 24 ++++++++++++++++++++++++
+ 4 files changed, 96 insertions(+)
+ create mode 100644 include/grub/arm/efi/console.h
+ create mode 100644 include/grub/arm64/efi/console.h
+ create mode 100644 include/grub/i386/efi/console.h
+ create mode 100644 include/grub/x86_64/efi/console.h
+
+diff --git a/include/grub/arm/efi/console.h b/include/grub/arm/efi/console.h
+new file mode 100644
+index 00000000000..1592f6f76b5
+--- /dev/null
++++ b/include/grub/arm/efi/console.h
+@@ -0,0 +1,24 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2002,2005,2006,2007  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_ARM_EFI_CONSOLE_H
++#define GRUB_ARM_EFI_CONSOLE_H
++
++#include <efi/console.h>
++
++#endif /* ! GRUB_ARM_EFI_CONSOLE_H */
+diff --git a/include/grub/arm64/efi/console.h b/include/grub/arm64/efi/console.h
+new file mode 100644
+index 00000000000..95689339384
+--- /dev/null
++++ b/include/grub/arm64/efi/console.h
+@@ -0,0 +1,24 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2002,2005,2006,2007  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_ARM64_EFI_CONSOLE_H
++#define GRUB_ARM64_EFI_CONSOLE_H
++
++#include <efi/console.h>
++
++#endif /* ! GRUB_ARM64_EFI_CONSOLE_H */
+diff --git a/include/grub/i386/efi/console.h b/include/grub/i386/efi/console.h
+new file mode 100644
+index 00000000000..9231375cb07
+--- /dev/null
++++ b/include/grub/i386/efi/console.h
+@@ -0,0 +1,24 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2002,2005,2006,2007  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_I386_EFI_CONSOLE_H
++#define GRUB_I386_EFI_CONSOLE_H
++
++#include <efi/console.h>
++
++#endif /* ! GRUB_I386_EFI_CONSOLE_H */
+diff --git a/include/grub/x86_64/efi/console.h b/include/grub/x86_64/efi/console.h
+new file mode 100644
+index 00000000000..dba9d8678d0
+--- /dev/null
++++ b/include/grub/x86_64/efi/console.h
+@@ -0,0 +1,24 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2002,2005,2006,2007  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_X86_64_EFI_CONSOLE_H
++#define GRUB_X86_64_EFI_CONSOLE_H
++
++#include <efi/console.h>
++
++#endif /* ! GRUB_X86_64_EFI_CONSOLE_H */

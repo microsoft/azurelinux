@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 7 Dec 2015 14:20:49 -0500
+Subject: [PATCH] Make efi machines load an env block from a variable
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/Makefile.core.def |  1 +
+ grub-core/kern/efi/init.c   | 36 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 45d3edaa4dc..c865a08b027 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -207,6 +207,7 @@ kernel = {
+   efi = kern/efi/acpi.c;
+   efi = kern/efi/sb.c;
+   efi = kern/lockdown.c;
++  efi = lib/envblk.c;
+   i386_coreboot = kern/i386/pc/acpi.c;
+   i386_multiboot = kern/i386/pc/acpi.c;
+   i386_coreboot = kern/acpi.c;
+diff --git a/grub-core/kern/efi/init.c b/grub-core/kern/efi/init.c
+index 7facacf09c7..6d39bd3ad29 100644
+--- a/grub-core/kern/efi/init.c
++++ b/grub-core/kern/efi/init.c
+@@ -27,8 +27,11 @@
+ #include <grub/env.h>
+ #include <grub/mm.h>
+ #include <grub/kernel.h>
++
+ #include <grub/stack_protector.h>
+ 
++#include <grub/lib/envblk.h>
++
+ #ifdef GRUB_STACK_PROTECTOR
+ 
+ static grub_efi_guid_t rng_protocol_guid = GRUB_EFI_RNG_PROTOCOL_GUID;
+@@ -82,6 +85,36 @@ stack_protector_init (void)
+ 
+ grub_addr_t grub_modbase;
+ 
++#define GRUB_EFI_GRUB_VARIABLE_GUID \
++  { 0x91376aff, 0xcba6, 0x42be, \
++    { 0x94, 0x9d, 0x06, 0xfd, 0xe8, 0x11, 0x28, 0xe8 } \
++  }
++
++/* Helper for grub_efi_env_init */
++static int
++set_var (const char *name, const char *value,
++	 void *whitelist __attribute__((__unused__)))
++{
++  grub_env_set (name, value);
++  return 0;
++}
++
++static void
++grub_efi_env_init (void)
++{
++  grub_efi_guid_t efi_grub_guid = GRUB_EFI_GRUB_VARIABLE_GUID;
++  struct grub_envblk envblk_s = { NULL, 0 };
++  grub_envblk_t envblk = &envblk_s;
++
++  grub_efi_get_variable ("GRUB_ENV", &efi_grub_guid, &envblk_s.size,
++                         (void **) &envblk_s.buf);
++  if (!envblk_s.buf || envblk_s.size < 1)
++    return;
++
++  grub_envblk_iterate (envblk, NULL, set_var);
++  grub_free (envblk_s.buf);
++}
++
+ void
+ grub_efi_init (void)
+ {
+@@ -108,10 +141,11 @@ grub_efi_init (void)
+   efi_call_4 (grub_efi_system_table->boot_services->set_watchdog_timer,
+ 	      0, 0, 0, NULL);
+ 
++  grub_efi_env_init ();
+   grub_efidisk_init ();
+ }
+ 
+-void (*grub_efi_net_config) (grub_efi_handle_t hnd, 
++void (*grub_efi_net_config) (grub_efi_handle_t hnd,
+ 			     char **device,
+ 			     char **path);
+ 

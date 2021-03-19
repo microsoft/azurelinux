@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Wed, 22 Apr 2020 12:41:52 +0200
+Subject: [PATCH] kern/term: Also accept F8 as a user interrupt key
+
+Make F8, which used to be the hotkey to show the Windows boot menu during
+boot for a long long time, also interrupt sleeps / stop the menu countdown.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/kern/term.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/kern/term.c b/grub-core/kern/term.c
+index 14d59649832..4d61f4e9790 100644
+--- a/grub-core/kern/term.c
++++ b/grub-core/kern/term.c
+@@ -144,9 +144,10 @@ grub_key_is_interrupt (int key)
+   /*
+    * ESC sometimes is the BIOS setup hotkey and may be hard to discover, also
+    * check F4, which was chosen because is not used as a hotkey to enter the
+-   * BIOS setup by any vendor.
++   * BIOS setup by any vendor. Also, F8 which was the key to get the Windows
++   * bootmenu for a long time.
+    */
+-  if (key == GRUB_TERM_ESC || key == GRUB_TERM_KEY_F4)
++  if (key == GRUB_TERM_ESC || key == GRUB_TERM_KEY_F4 || key == GRUB_TERM_KEY_F8)
+     return 1;
+ 
+   /*

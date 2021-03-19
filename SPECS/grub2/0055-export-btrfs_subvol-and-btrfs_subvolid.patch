@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Wed, 18 Dec 2013 09:57:04 +0000
+Subject: [PATCH] export btrfs_subvol and btrfs_subvolid
+
+We should export btrfs_subvol and btrfs_subvolid to have both visible
+to subsidiary configuration files loaded using configfile.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+---
+ grub-core/fs/btrfs.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index f1fff7385b5..ad1b56b716d 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -2714,6 +2714,8 @@ GRUB_MOD_INIT (btrfs)
+                                subvol_set_env);
+   grub_register_variable_hook ("btrfs_subvolid", subvolid_get_env,
+                                subvolid_set_env);
++  grub_env_export ("btrfs_subvol");
++  grub_env_export ("btrfs_subvolid");
+ }
+ 
+ GRUB_MOD_FINI (btrfs)

@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Wed, 15 May 2013 17:49:45 -0400
+Subject: [PATCH] Don't add '*' to highlighted row
+
+It is already highlighted.
+---
+ grub-core/normal/menu_text.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 18240e76cea..65deafda531 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -242,7 +242,7 @@ print_entry (int y, int highlight, grub_menu_entry_t entry,
+       unicode_title[i] = ' ';
+ 
+   if (data->geo.num_entries > 1)
+-    grub_putcode (highlight ? '*' : ' ', data->term);
++    grub_putcode (' ', data->term);
+ 
+   grub_print_ucs4_menu (unicode_title,
+ 			unicode_title + len,

@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 1 Jun 2017 10:07:50 -0400
+Subject: [PATCH] Add PRIxGRUB_EFI_STATUS and use it.
+
+This avoids syntax checkers getting confused about if it's llx or lx.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/efi/chainloader.c | 3 ++-
+ include/grub/efi/api.h             | 9 +++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index ba3d2930197..47f5aa14817 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -806,7 +806,8 @@ handle_image (void *data, grub_efi_uint32_t datasize)
+   efi_status = efi_call_2 (entry_point, grub_efi_image_handle,
+ 			   grub_efi_system_table);
+ 
+-  grub_dprintf ("chain", "entry_point returned %ld\n", efi_status);
++  grub_dprintf ("chain", "entry_point returned 0x%"PRIxGRUB_EFI_STATUS"\n",
++		efi_status);
+   grub_memcpy (li, &li_bak, sizeof (grub_efi_loaded_image_t));
+   efi_status = grub_efi_free_pool (buffer);
+ 
+diff --git a/include/grub/efi/api.h b/include/grub/efi/api.h
+index 117469450d3..99628801478 100644
+--- a/include/grub/efi/api.h
++++ b/include/grub/efi/api.h
+@@ -546,7 +546,16 @@ typedef grub_uint64_t grub_efi_uint64_t;
+ typedef grub_uint8_t grub_efi_char8_t;
+ typedef grub_uint16_t grub_efi_char16_t;
+ 
++
+ typedef grub_efi_uintn_t grub_efi_status_t;
++/* Make grub_efi_status_t reasonably printable. */
++#if GRUB_CPU_SIZEOF_VOID_P == 8
++#define PRIxGRUB_EFI_STATUS "lx"
++#define PRIdGRUB_EFI_STATUS "ld"
++#else
++#define PRIxGRUB_EFI_STATUS "llx"
++#define PRIdGRUB_EFI_STATUS "lld"
++#endif
+ 
+ #define GRUB_EFI_ERROR_CODE(value)	\
+   ((((grub_efi_status_t) 1) << (sizeof (grub_efi_status_t) * 8 - 1)) | (value))

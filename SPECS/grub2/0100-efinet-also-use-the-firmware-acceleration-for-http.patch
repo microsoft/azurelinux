@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 30 Jul 2018 14:06:42 -0400
+Subject: [PATCH] efinet: also use the firmware acceleration for http
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/net.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index 4bb308026ce..6603cd83edc 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -1324,7 +1324,9 @@ grub_efi_net_boot_from_https (void)
+ 	  && (subtype == GRUB_EFI_URI_DEVICE_PATH_SUBTYPE))
+ 	{
+ 	  grub_efi_uri_device_path_t *uri_dp = (grub_efi_uri_device_path_t *) dp;
+-	  return (grub_strncmp ((const char*)uri_dp->uri, "https://", sizeof ("https://") - 1) == 0) ? 1 : 0;
++	  grub_dprintf ("efinet", "url:%s\n", (const char *)uri_dp->uri);
++	  return (grub_strncmp ((const char *)uri_dp->uri, "https://", sizeof ("https://") - 1) == 0 ||
++	          grub_strncmp ((const char *)uri_dp->uri, "http://", sizeof ("http://") - 1) == 0);
+ 	}
+ 
+       if (GRUB_EFI_END_ENTIRE_DEVICE_PATH (dp))

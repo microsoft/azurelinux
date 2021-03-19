@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 16 Jan 2019 13:21:46 -0500
+Subject: [PATCH] Fix a missing return in efi-export-env and efi-load-env
+ commands
+
+Somewhere along the way this got mis-merged to include a return without
+a value.  Fix it up.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/commands/efi/env.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/commands/efi/env.c b/grub-core/commands/efi/env.c
+index cbd13e03e81..977edb6b065 100644
+--- a/grub-core/commands/efi/env.c
++++ b/grub-core/commands/efi/env.c
+@@ -149,6 +149,8 @@ grub_efi_load_env(grub_command_t cmd __attribute__ ((unused)),
+ 
+   grub_envblk_iterate (envblk, NULL, set_var);
+   grub_free (envblk_s.buf);
++
++  return GRUB_ERR_NONE;
+ }
+ 
+ static grub_command_t export_cmd, loadenv_cmd;

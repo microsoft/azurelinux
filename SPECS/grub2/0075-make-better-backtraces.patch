@@ -1,0 +1,910 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jul 2019 17:05:03 +0200
+Subject: [PATCH] make better backtraces
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ Makefile.util.def                       |   6 ++
+ grub-core/Makefile.core.def             |  16 ++--
+ grub-core/{lib => commands}/backtrace.c |   2 +-
+ grub-core/gdb/cstub.c                   |   1 -
+ grub-core/kern/arm64/backtrace.c        |  94 ++++++++++++++++++++++++
+ grub-core/kern/backtrace.c              |  97 +++++++++++++++++++++++++
+ grub-core/kern/dl.c                     |  45 ++++++++++++
+ grub-core/kern/i386/backtrace.c         | 125 ++++++++++++++++++++++++++++++++
+ grub-core/kern/i386/pc/init.c           |   4 +-
+ grub-core/kern/ieee1275/init.c          |   1 -
+ grub-core/kern/misc.c                   |  13 ++--
+ grub-core/kern/mm.c                     |   6 +-
+ grub-core/lib/arm64/backtrace.c         |  62 ----------------
+ grub-core/lib/i386/backtrace.c          |  78 --------------------
+ include/grub/backtrace.h                |  10 ++-
+ include/grub/dl.h                       |   2 +
+ include/grub/kernel.h                   |   3 +
+ grub-core/kern/arm/efi/startup.S        |   2 +
+ grub-core/kern/arm/startup.S            |   2 +
+ grub-core/kern/arm64/efi/startup.S      |   2 +
+ grub-core/kern/i386/qemu/startup.S      |   3 +-
+ grub-core/kern/ia64/efi/startup.S       |   3 +-
+ grub-core/kern/sparc64/ieee1275/crt0.S  |   3 +-
+ grub-core/Makefile.am                   |   1 +
+ 24 files changed, 414 insertions(+), 167 deletions(-)
+ rename grub-core/{lib => commands}/backtrace.c (98%)
+ create mode 100644 grub-core/kern/arm64/backtrace.c
+ create mode 100644 grub-core/kern/backtrace.c
+ create mode 100644 grub-core/kern/i386/backtrace.c
+ delete mode 100644 grub-core/lib/arm64/backtrace.c
+ delete mode 100644 grub-core/lib/i386/backtrace.c
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index afc4d7b0c3e..41906486a71 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -51,6 +51,12 @@ library = {
+   common = grub-core/partmap/msdos.c;
+   common = grub-core/fs/proc.c;
+   common = grub-core/fs/archelp.c;
++  common = grub-core/kern/backtrace.c;
++
++  x86 = grub-core/kern/i386/backtrace.c;
++  i386_xen = grub-core/kern/i386/backtrace.c;
++  x86_64_xen = grub-core/kern/i386/backtrace.c;
++  arm64 = grub-core/kern/arm64/backtrace.c;
+ };
+ 
+ library = {
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 5354f9613d3..4b7c45a7b06 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -142,6 +142,12 @@ kernel = {
+   common = kern/rescue_reader.c;
+   common = kern/term.c;
+   common = kern/verifiers.c;
++  common = kern/backtrace.c;
++
++  x86 = kern/i386/backtrace.c;
++  i386_xen = kern/i386/backtrace.c;
++  x86_64_xen = kern/i386/backtrace.c;
++  arm64 = kern/arm64/backtrace.c;
+ 
+   noemu = kern/compiler-rt.c;
+   noemu = kern/mm.c;
+@@ -188,9 +194,6 @@ kernel = {
+ 
+   softdiv = lib/division.c;
+ 
+-  x86 = lib/i386/backtrace.c;
+-  x86 = lib/backtrace.c;
+-
+   i386 = kern/i386/dl.c;
+   i386_xen = kern/i386/dl.c;
+   i386_xen_pvh = kern/i386/dl.c;
+@@ -2398,15 +2401,12 @@ module = {
+ 
+ module = {
+   name = backtrace;
+-  x86 = lib/i386/backtrace.c;
+-  i386_xen_pvh = lib/i386/backtrace.c;
+-  i386_xen = lib/i386/backtrace.c;
+-  x86_64_xen = lib/i386/backtrace.c;
+-  common = lib/backtrace.c;
++  common = commands/backtrace.c;
+   enable = x86;
+   enable = i386_xen_pvh;
+   enable = i386_xen;
+   enable = x86_64_xen;
++  enable = arm64;
+ };
+ 
+ module = {
+diff --git a/grub-core/lib/backtrace.c b/grub-core/commands/backtrace.c
+similarity index 98%
+rename from grub-core/lib/backtrace.c
+rename to grub-core/commands/backtrace.c
+index c0ad6ab8be1..8b5ec3913b5 100644
+--- a/grub-core/lib/backtrace.c
++++ b/grub-core/commands/backtrace.c
+@@ -54,7 +54,7 @@ grub_cmd_backtrace (grub_command_t cmd __attribute__ ((unused)),
+ 		    int argc __attribute__ ((unused)),
+ 		    char **args __attribute__ ((unused)))
+ {
+-  grub_backtrace ();
++  grub_backtrace (1);
+   return 0;
+ }
+ 
+diff --git a/grub-core/gdb/cstub.c b/grub-core/gdb/cstub.c
+index b64acd70fee..99281472d36 100644
+--- a/grub-core/gdb/cstub.c
++++ b/grub-core/gdb/cstub.c
+@@ -215,7 +215,6 @@ grub_gdb_trap (int trap_no)
+       grub_printf ("Unhandled exception 0x%x at ", trap_no);
+       grub_backtrace_print_address ((void *) grub_gdb_regs[PC]);
+       grub_printf ("\n");
+-      grub_backtrace_pointer ((void *) grub_gdb_regs[EBP]);
+       grub_fatal ("Unhandled exception");
+     }
+ 
+diff --git a/grub-core/kern/arm64/backtrace.c b/grub-core/kern/arm64/backtrace.c
+new file mode 100644
+index 00000000000..019c6fdfef2
+--- /dev/null
++++ b/grub-core/kern/arm64/backtrace.c
+@@ -0,0 +1,94 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2009  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/misc.h>
++#include <grub/command.h>
++#include <grub/err.h>
++#include <grub/dl.h>
++#include <grub/mm.h>
++#include <grub/term.h>
++#include <grub/backtrace.h>
++
++#define MAX_STACK_FRAME 102400
++
++struct fplr
++{
++  void *lr;
++  struct fplr *fp;
++};
++
++void
++grub_backtrace_pointer (void *frame, unsigned int skip)
++{
++  unsigned int x = 0;
++  struct fplr *fplr = (struct fplr *)frame;
++
++  while (fplr)
++    {
++      const char *name = NULL;
++      char *addr = NULL;
++
++      grub_dprintf("backtrace", "fp is %p next_fp is %p\n",
++		   fplr, fplr->fp);
++
++      if (x >= skip)
++	{
++	  name = grub_get_symbol_by_addr (fplr->lr, 1);
++	  if (name)
++	    addr = grub_resolve_symbol (name);
++	  grub_backtrace_print_address (fplr->lr);
++
++	  if (addr && addr != fplr->lr)
++	    grub_printf (" %s() %p+%p \n", name ? name : "unknown", addr,
++			 (void *)((grub_uint64_t)fplr->lr - (grub_uint64_t)addr));
++	  else
++	    grub_printf(" %s() %p \n", name ? name : "unknown", addr);
++
++	}
++
++      x += 1;
++
++      if (fplr->fp < fplr ||
++	  (grub_uint64_t)fplr->fp - (grub_uint64_t)fplr > MAX_STACK_FRAME ||
++	  fplr->fp == fplr)
++	{
++	  break;
++	}
++      fplr = fplr->fp;
++    }
++}
++
++asm ("\t.global \"_text\"\n"
++     "_text:\n"
++     "\t.quad .text\n"
++     "\t.global \"_data\"\n"
++     "_data:\n"
++     "\t.quad .data\n"
++     );
++
++extern grub_uint64_t _text;
++extern grub_uint64_t _data;
++
++void
++grub_backtrace_arch (unsigned int skip)
++{
++  grub_printf ("Backtrace (.text %p .data %p):\n",
++	       (void *)_text, (void *)_data);
++  skip += 1;
++  grub_backtrace_pointer(__builtin_frame_address(0), skip);
++}
+diff --git a/grub-core/kern/backtrace.c b/grub-core/kern/backtrace.c
+new file mode 100644
+index 00000000000..4a82e865cc6
+--- /dev/null
++++ b/grub-core/kern/backtrace.c
+@@ -0,0 +1,97 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2009  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/misc.h>
++#include <grub/command.h>
++#include <grub/err.h>
++#include <grub/dl.h>
++#include <grub/mm.h>
++#include <grub/term.h>
++#include <grub/backtrace.h>
++
++GRUB_MOD_LICENSE ("GPLv3+");
++
++static void
++grub_backtrace_print_address_default (void *addr)
++{
++#ifndef GRUB_UTIL
++  grub_dl_t mod;
++  void *start_addr;
++
++  FOR_DL_MODULES (mod)
++  {
++    grub_dl_segment_t segment;
++    for (segment = mod->segment; segment; segment = segment->next)
++      if (segment->addr <= addr && (grub_uint8_t *) segment->addr
++	  + segment->size > (grub_uint8_t *) addr)
++	{
++	  grub_printf ("%s.%x+%" PRIxGRUB_SIZE, mod->name,
++		       segment->section,
++		       (grub_size_t)
++		       ((grub_uint8_t *)addr - (grub_uint8_t *)segment->addr));
++	  return;
++	}
++  }
++
++  start_addr = grub_resolve_symbol ("_start");
++  if (start_addr && start_addr < addr)
++    grub_printf ("kernel+%" PRIxGRUB_SIZE,
++		 (grub_size_t)
++		  ((grub_uint8_t *)addr - (grub_uint8_t *)start_addr));
++  else
++#endif
++    grub_printf ("%p", addr);
++}
++
++static void
++grub_backtrace_pointer_default (void *frame __attribute__((__unused__)),
++				unsigned int skip __attribute__((__unused__)))
++{
++  return;
++}
++
++void
++grub_backtrace_pointer (void *frame, unsigned int skip)
++     __attribute__((__weak__,
++		    __alias__(("grub_backtrace_pointer_default"))));
++
++void
++grub_backtrace_print_address (void *addr)
++     __attribute__((__weak__,
++		    __alias__(("grub_backtrace_print_address_default"))));
++
++static void
++grub_backtrace_arch_default(unsigned int skip)
++{
++  grub_backtrace_pointer(__builtin_frame_address(0), skip + 1);
++}
++
++void grub_backtrace_arch (unsigned int skip)
++     __attribute__((__weak__, __alias__(("grub_backtrace_arch_default"))));
++
++void grub_backtrace (unsigned int skip)
++{
++  grub_backtrace_arch(skip + 1);
++}
++
++void grub_debug_backtrace (const char * const debug,
++			   unsigned int skip)
++{
++  if (grub_debug_enabled (debug))
++    grub_backtrace (skip + 1);
++}
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 7afb9e6f724..88d2077709e 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -124,6 +124,50 @@ grub_dl_resolve_symbol (const char *name)
+   return 0;
+ }
+ 
++void *
++grub_resolve_symbol (const char *name)
++{
++	grub_symbol_t sym;
++
++	sym = grub_dl_resolve_symbol (name);
++	if (sym)
++		return sym->addr;
++	return NULL;
++}
++
++const char *
++grub_get_symbol_by_addr(const void *addr, int isfunc)
++{
++  unsigned int i;
++  grub_symbol_t before = NULL, after = NULL;
++  for (i = 0; i < GRUB_SYMTAB_SIZE; i++)
++    {
++      grub_symbol_t sym;
++      for (sym = grub_symtab[i]; sym; sym = sym->next)
++	{
++	  //grub_printf ("addr 0x%08llx symbol %s\n", (unsigned long long)sym->addr, sym->name);
++	  if (sym->addr > addr)
++	    {
++	      if (!after || sym->addr > after->addr)
++		after = sym;
++	    }
++
++	  if (isfunc != sym->isfunc)
++	    continue;
++	  if (sym->addr > addr)
++	    continue;
++
++	  if ((!before && sym->addr <= addr) || (before && before->addr <= sym->addr))
++	    before = sym;
++	}
++    }
++
++  if (before && addr < after->addr)
++    return before->name;
++
++  return NULL;
++}
++
+ /* Register a symbol with the name NAME and the address ADDR.  */
+ grub_err_t
+ grub_dl_register_symbol (const char *name, void *addr, int isfunc,
+@@ -336,6 +380,7 @@ grub_dl_resolve_symbols (grub_dl_t mod, Elf_Ehdr *e)
+   const char *str;
+   Elf_Word size, entsize;
+ 
++  grub_dprintf ("modules", "Resolving symbols for \"%s\"\n", mod->name);
+   for (i = 0, s = (Elf_Shdr *) ((char *) e + e->e_shoff);
+        i < e->e_shnum;
+        i++, s = (Elf_Shdr *) ((char *) s + e->e_shentsize))
+diff --git a/grub-core/kern/i386/backtrace.c b/grub-core/kern/i386/backtrace.c
+new file mode 100644
+index 00000000000..2413f9a57db
+--- /dev/null
++++ b/grub-core/kern/i386/backtrace.c
+@@ -0,0 +1,125 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2009  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/misc.h>
++#include <grub/command.h>
++#include <grub/err.h>
++#include <grub/dl.h>
++#include <grub/mm.h>
++#include <grub/term.h>
++#include <grub/backtrace.h>
++
++#define MAX_STACK_FRAME 102400
++
++void
++grub_backtrace_pointer (void *frame, unsigned int skip)
++{
++  void **ebp = (void **)frame;
++  unsigned long x = 0;
++
++  while (ebp)
++    {
++      void **next_ebp = (void **)ebp[0];
++      const char *name = NULL;
++      char *addr = NULL;
++
++      grub_dprintf("backtrace", "ebp is %p next_ebp is %p\n", ebp, next_ebp);
++
++      if (x >= skip)
++	{
++	  name = grub_get_symbol_by_addr (ebp[1], 1);
++	  if (name)
++	    addr = grub_resolve_symbol (name);
++	  grub_backtrace_print_address (ebp[1]);
++
++	  if (addr && addr != ebp[1])
++	    grub_printf (" %s() %p+%p \n", name ? name : "unknown", addr,
++			 (char *)((char *)ebp[1] - addr));
++	  else
++	    grub_printf(" %s() %p \n", name ? name : "unknown", addr);
++
++#if 0
++	  grub_printf ("(");
++	  for (i = 0, arg = ebp[2]; arg != next_ebp && i < 12; arg++, i++)
++	    grub_printf ("%p,", arg);
++	  grub_printf (")\n");
++#endif
++	}
++
++      x += 1;
++
++      if (next_ebp < ebp || next_ebp - ebp > MAX_STACK_FRAME || next_ebp == ebp)
++	{
++	  //grub_printf ("Invalid stack frame at %p (%p)\n", ebp, next_ebp);
++	  break;
++	}
++      ebp = next_ebp;
++    }
++}
++
++#if defined (__x86_64__)
++asm ("\t.global \"_text\"\n"
++     "_text:\n"
++     "\t.quad .text\n"
++     "\t.global \"_data\"\n"
++     "_data:\n"
++     "\t.quad .data\n"
++     );
++#elif defined(__i386__)
++asm ("\t.global \"_text\"\n"
++     "_text:\n"
++     "\t.long .text\n"
++     "\t.global \"_data\"\n"
++     "_data:\n"
++     "\t.long .data\n"
++     );
++#else
++#warning I dunno...
++#endif
++
++extern unsigned long _text;
++extern unsigned long _data;
++
++#ifdef GRUB_UTIL
++#define EXT_C(x) x
++#endif
++
++void
++grub_backtrace_arch (unsigned int skip)
++{
++  grub_printf ("Backtrace (.text %p .data %p):\n",
++	       (void *)_text, (void *)_data);
++  skip += 1;
++#if defined (__x86_64__)
++  asm volatile ("movq %%rbp, %%rdi\n"
++		"movq 0, %%rsi\n"
++		"movl %0, %%esi\n"
++		"call " EXT_C("grub_backtrace_pointer")
++		:
++		: "r" (skip));
++#elif defined(__i386__)
++  asm volatile ("addl $8, %%esp\n"
++		"pushl %0\n"
++		"pushl %%ebp\n"
++		"call " EXT_C("grub_backtrace_pointer")
++		:
++		: "r" (skip));
++#else
++  grub_backtrace_pointer(__builtin_frame_address(0), skip);
++#endif
++}
+diff --git a/grub-core/kern/i386/pc/init.c b/grub-core/kern/i386/pc/init.c
+index 27bc68b8a53..b51d0abfa6e 100644
+--- a/grub-core/kern/i386/pc/init.c
++++ b/grub-core/kern/i386/pc/init.c
+@@ -153,7 +153,7 @@ compact_mem_regions (void)
+ }
+ 
+ grub_addr_t grub_modbase;
+-extern grub_uint8_t _start[], _edata[];
++extern grub_uint8_t _edata[];
+ 
+ /* Helper for grub_machine_init.  */
+ static int
+@@ -217,7 +217,7 @@ grub_machine_init (void)
+   /* This has to happen before any BIOS calls. */
+   grub_via_workaround_init ();
+ 
+-  grub_modbase = GRUB_MEMORY_MACHINE_DECOMPRESSION_ADDR + (_edata - _start);
++  grub_modbase = GRUB_MEMORY_MACHINE_DECOMPRESSION_ADDR + (_edata - (grub_uint8_t *)_start);
+ 
+   /* Initialize the console as early as possible.  */
+   grub_console_init ();
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index 0cd2a627231..937c1bc44cb 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -63,7 +63,6 @@
+ #define HEAP_MAX_ADDR		(unsigned long) (32 * 1024 * 1024)
+ #endif
+ 
+-extern char _start[];
+ extern char _end[];
+ 
+ #ifdef __sparc__
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index c60601b699d..a432a6be54a 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -1197,15 +1197,15 @@ grub_printf_fmt_check (const char *fmt, const char *fmt_expected)
+ 
+ 
+ /* Abort GRUB. This function does not return.  */
+-static void __attribute__ ((noreturn))
++static inline void __attribute__ ((noreturn))
+ grub_abort (void)
+ {
+-#ifndef GRUB_UTIL
+-#if (defined(__i386__) || defined(__x86_64__)) && !defined(GRUB_MACHINE_EMU)
+-  grub_backtrace();
++#if !defined(GRUB_MACHINE_EMU) && !defined(GRUB_UTIL)
++  grub_backtrace (1);
++#else
++  grub_printf ("\n");
+ #endif
+-#endif
+-  grub_printf ("\nAborted.");
++  grub_printf ("Aborted.");
+ 
+ #ifndef GRUB_UTIL
+   if (grub_term_inputs)
+@@ -1232,6 +1232,7 @@ grub_fatal (const char *fmt, ...)
+ {
+   va_list ap;
+ 
++  grub_printf ("\n");
+   va_start (ap, fmt);
+   grub_vprintf (_(fmt), ap);
+   va_end (ap);
+diff --git a/grub-core/kern/mm.c b/grub-core/kern/mm.c
+index c070afc621f..d8c8377578b 100644
+--- a/grub-core/kern/mm.c
++++ b/grub-core/kern/mm.c
+@@ -97,13 +97,13 @@ get_header_from_pointer (void *ptr, grub_mm_header_t *p, grub_mm_region_t *r)
+       break;
+ 
+   if (! *r)
+-    grub_fatal ("out of range pointer %p", ptr);
++    grub_fatal ("out of range pointer %p\n", ptr);
+ 
+   *p = (grub_mm_header_t) ptr - 1;
+   if ((*p)->magic == GRUB_MM_FREE_MAGIC)
+-    grub_fatal ("double free at %p", *p);
++    grub_fatal ("double free at %p\n", *p);
+   if ((*p)->magic != GRUB_MM_ALLOC_MAGIC)
+-    grub_fatal ("alloc magic is broken at %p: %lx", *p,
++    grub_fatal ("alloc magic is broken at %p: %lx\n", *p,
+ 		(unsigned long) (*p)->magic);
+ }
+ 
+diff --git a/grub-core/lib/arm64/backtrace.c b/grub-core/lib/arm64/backtrace.c
+deleted file mode 100644
+index 1079b5380e1..00000000000
+--- a/grub-core/lib/arm64/backtrace.c
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/*
+- *  GRUB  --  GRand Unified Bootloader
+- *  Copyright (C) 2009  Free Software Foundation, Inc.
+- *
+- *  GRUB is free software: you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
+- *  (at your option) any later version.
+- *
+- *  GRUB is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include <grub/misc.h>
+-#include <grub/command.h>
+-#include <grub/err.h>
+-#include <grub/dl.h>
+-#include <grub/mm.h>
+-#include <grub/term.h>
+-#include <grub/backtrace.h>
+-
+-#define MAX_STACK_FRAME 102400
+-
+-void
+-grub_backtrace_pointer (int frame)
+-{
+-  while (1)
+-    {
+-      void *lp = __builtin_return_address (frame);
+-      if (!lp)
+-	break;
+-
+-      lp = __builtin_extract_return_addr (lp);
+-
+-      grub_printf ("%p: ", lp);
+-      grub_backtrace_print_address (lp);
+-      grub_printf (" (");
+-      for (i = 0; i < 2; i++)
+-	grub_printf ("%p,", ((void **)ptr) [i + 2]);
+-      grub_printf ("%p)\n", ((void **)ptr) [i + 2]);
+-      nptr = *(void **)ptr;
+-      if (nptr < ptr || (void **) nptr - (void **) ptr > MAX_STACK_FRAME
+-	  || nptr == ptr)
+-	{
+-	  grub_printf ("Invalid stack frame at %p (%p)\n", ptr, nptr);
+-	  break;
+-	}
+-      ptr = nptr;
+-    }
+-}
+-
+-void
+-grub_backtrace (void)
+-{
+-  grub_backtrace_pointer (1);
+-}
+-
+diff --git a/grub-core/lib/i386/backtrace.c b/grub-core/lib/i386/backtrace.c
+deleted file mode 100644
+index c67273db3ae..00000000000
+--- a/grub-core/lib/i386/backtrace.c
++++ /dev/null
+@@ -1,78 +0,0 @@
+-/*
+- *  GRUB  --  GRand Unified Bootloader
+- *  Copyright (C) 2009  Free Software Foundation, Inc.
+- *
+- *  GRUB is free software: you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
+- *  (at your option) any later version.
+- *
+- *  GRUB is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+- */
+-#include <config.h>
+-#ifdef GRUB_UTIL
+-#define REALLY_GRUB_UTIL GRUB_UTIL
+-#undef GRUB_UTIL
+-#endif
+-
+-#include <grub/symbol.h>
+-#include <grub/dl.h>
+-
+-#ifdef REALLY_GRUB_UTIL
+-#define GRUB_UTIL REALLY_GRUB_UTIL
+-#undef REALLY_GRUB_UTIL
+-#endif
+-
+-#include <grub/misc.h>
+-#include <grub/command.h>
+-#include <grub/err.h>
+-#include <grub/mm.h>
+-#include <grub/term.h>
+-#include <grub/backtrace.h>
+-
+-#define MAX_STACK_FRAME 102400
+-
+-void
+-grub_backtrace_pointer (void *ebp)
+-{
+-  void *ptr, *nptr;
+-  unsigned i;
+-
+-  ptr = ebp;
+-  while (1)
+-    {
+-      grub_printf ("%p: ", ptr);
+-      grub_backtrace_print_address (((void **) ptr)[1]);
+-      grub_printf (" (");
+-      for (i = 0; i < 2; i++)
+-	grub_printf ("%p,", ((void **)ptr) [i + 2]);
+-      grub_printf ("%p)\n", ((void **)ptr) [i + 2]);
+-      nptr = *(void **)ptr;
+-      if (nptr < ptr || (void **) nptr - (void **) ptr > MAX_STACK_FRAME
+-	  || nptr == ptr)
+-	{
+-	  grub_printf ("Invalid stack frame at %p (%p)\n", ptr, nptr);
+-	  break;
+-	}
+-      ptr = nptr;
+-    }
+-}
+-
+-void
+-grub_backtrace (void)
+-{
+-#ifdef __x86_64__
+-  asm volatile ("movq %%rbp, %%rdi\n"
+-		"callq *%%rax": :"a"(grub_backtrace_pointer));
+-#else
+-  asm volatile ("movl %%ebp, %%eax\n"
+-		"calll *%%ecx": :"c"(grub_backtrace_pointer));
+-#endif
+-}
+-
+diff --git a/include/grub/backtrace.h b/include/grub/backtrace.h
+index 395519762f0..275cf85e2d3 100644
+--- a/include/grub/backtrace.h
++++ b/include/grub/backtrace.h
+@@ -19,8 +19,14 @@
+ #ifndef GRUB_BACKTRACE_HEADER
+ #define GRUB_BACKTRACE_HEADER	1
+ 
+-void grub_backtrace (void);
+-void grub_backtrace_pointer (void *ptr);
++#include <grub/symbol.h>
++#include <grub/types.h>
++
++void EXPORT_FUNC(grub_debug_backtrace) (const char * const debug,
++					unsigned int skip);
++void EXPORT_FUNC(grub_backtrace) (unsigned int skip);
++void grub_backtrace_arch (unsigned int skip);
++void grub_backtrace_pointer (void *ptr, unsigned int skip);
+ void grub_backtrace_print_address (void *addr);
+ 
+ #endif
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 91933b85f2c..2f76e6b0437 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -259,6 +259,8 @@ grub_dl_is_persistent (grub_dl_t mod)
+ 
+ #endif
+ 
++void * EXPORT_FUNC(grub_resolve_symbol) (const char *name);
++const char * EXPORT_FUNC(grub_get_symbol_by_addr) (const void *addr, int isfunc);
+ grub_err_t grub_dl_register_symbol (const char *name, void *addr,
+ 				    int isfunc, grub_dl_t mod);
+ 
+diff --git a/include/grub/kernel.h b/include/grub/kernel.h
+index abbca5ea335..300a9766cda 100644
+--- a/include/grub/kernel.h
++++ b/include/grub/kernel.h
+@@ -111,6 +111,9 @@ grub_addr_t grub_modules_get_end (void);
+ 
+ #endif
+ 
++void EXPORT_FUNC(start) (void);
++void EXPORT_FUNC(_start) (void);
++
+ /* The start point of the C code.  */
+ void grub_main (void) __attribute__ ((noreturn));
+ 
+diff --git a/grub-core/kern/arm/efi/startup.S b/grub-core/kern/arm/efi/startup.S
+index 9f8265315a9..f3bc41f9d0f 100644
+--- a/grub-core/kern/arm/efi/startup.S
++++ b/grub-core/kern/arm/efi/startup.S
+@@ -23,6 +23,8 @@
+ 	.file 	"startup.S"
+ 	.text
+ 	.arm
++	.globl	start, _start
++FUNCTION(start)
+ FUNCTION(_start)
+ 	/*
+ 	 *  EFI_SYSTEM_TABLE and EFI_HANDLE are passed in r1/r0.
+diff --git a/grub-core/kern/arm/startup.S b/grub-core/kern/arm/startup.S
+index 3946fe8e183..5679a1d00ad 100644
+--- a/grub-core/kern/arm/startup.S
++++ b/grub-core/kern/arm/startup.S
+@@ -48,6 +48,8 @@
+ 	
+ 	.text
+ 	.arm
++	.globl	start, _start
++FUNCTION(start)
+ FUNCTION(_start)
+ 	b	codestart
+ 	
+diff --git a/grub-core/kern/arm64/efi/startup.S b/grub-core/kern/arm64/efi/startup.S
+index 666a7ee3c92..41676bdb2b8 100644
+--- a/grub-core/kern/arm64/efi/startup.S
++++ b/grub-core/kern/arm64/efi/startup.S
+@@ -19,7 +19,9 @@
+ #include <grub/symbol.h>
+ 
+ 	.file 	"startup.S"
++	.globl start, _start
+ 	.text
++FUNCTION(start)
+ FUNCTION(_start)
+ 	/*
+ 	 *  EFI_SYSTEM_TABLE and EFI_HANDLE are passed in x1/x0.
+diff --git a/grub-core/kern/i386/qemu/startup.S b/grub-core/kern/i386/qemu/startup.S
+index 0d89858d9b3..939f182fc74 100644
+--- a/grub-core/kern/i386/qemu/startup.S
++++ b/grub-core/kern/i386/qemu/startup.S
+@@ -24,7 +24,8 @@
+ 
+ 	.text
+ 	.code32
+-	.globl _start
++	.globl start, _start
++start:
+ _start:
+ 	jmp	codestart
+ 
+diff --git a/grub-core/kern/ia64/efi/startup.S b/grub-core/kern/ia64/efi/startup.S
+index d75c6d7cc74..8f2a593e529 100644
+--- a/grub-core/kern/ia64/efi/startup.S
++++ b/grub-core/kern/ia64/efi/startup.S
+@@ -24,8 +24,9 @@
+ 	.psr lsb
+ 	.lsb
+ 
+-	.global _start
++	.global start, _start
+ 	.proc _start
++start:
+ _start:
+ 	alloc loc0=ar.pfs,2,4,0,0
+ 	mov loc1=rp
+diff --git a/grub-core/kern/sparc64/ieee1275/crt0.S b/grub-core/kern/sparc64/ieee1275/crt0.S
+index 03b916f0534..701bf63abcf 100644
+--- a/grub-core/kern/sparc64/ieee1275/crt0.S
++++ b/grub-core/kern/sparc64/ieee1275/crt0.S
+@@ -22,7 +22,8 @@
+ 
+ 	.text
+ 	.align	4
+-	.globl	_start
++	.globl	start, _start
++start:
+ _start:
+ 	ba	codestart
+ 	 mov  %o4, %o0
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index 80e7a83edf9..f512573c0da 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -66,6 +66,7 @@ CLEANFILES += grub_script.yy.c grub_script.yy.h
+ 
+ include $(srcdir)/Makefile.core.am
+ 
++KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/backtrace.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/cache.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/command.h
+ KERNEL_HEADER_FILES += $(top_srcdir)/include/grub/device.h

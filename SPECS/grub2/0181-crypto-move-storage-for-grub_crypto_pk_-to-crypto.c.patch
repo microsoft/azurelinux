@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Fri, 2 Oct 2020 10:49:26 +1000
+Subject: [PATCH] crypto: move storage for grub_crypto_pk_* to crypto.c
+
+The way gcry_rsa and friends (the asymmetric ciphers) are loaded for the
+pgp module is a bit quirky.
+
+include/grub/crypto.h contains:
+  extern struct gcry_pk_spec *grub_crypto_pk_rsa;
+
+commands/pgp.c contains the actual storage:
+  struct gcry_pk_spec *grub_crypto_pk_rsa;
+
+And the module itself saves to the storage in pgp.c:
+  GRUB_MOD_INIT(gcry_rsa)
+  {
+    grub_crypto_pk_rsa = &_gcry_pubkey_spec_rsa;
+  }
+
+This is annoying: gcry_rsa now has a dependency on pgp!
+
+We want to be able to bring in gcry_rsa without bringing in PGP,
+so move the storage to crypto.c.
+
+Previously, gcry_rsa depended on pgp and mpi. Now it depends on
+crypto and mpi. As pgp depends on crypto, this doesn't add any new
+module dependencies using the PGP verfier.
+
+[FWIW, the story is different for the symmetric ciphers. cryptodisk
+and friends (zfs encryption etc) use grub_crypto_lookup_cipher_by_name()
+to get a cipher handle. That depends on grub_ciphers being populated
+by people calling grub_cipher_register. import_gcry.py ensures that the
+symmetric ciphers call it.]
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ grub-core/commands/pgp.c | 4 ----
+ grub-core/lib/crypto.c   | 4 ++++
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/commands/pgp.c b/grub-core/commands/pgp.c
+index 2408db4994f..355a43844ac 100644
+--- a/grub-core/commands/pgp.c
++++ b/grub-core/commands/pgp.c
+@@ -147,10 +147,6 @@ const char *hashes[] = {
+   [0x0b] = "sha224"
+ };
+ 
+-struct gcry_pk_spec *grub_crypto_pk_dsa;
+-struct gcry_pk_spec *grub_crypto_pk_ecdsa;
+-struct gcry_pk_spec *grub_crypto_pk_rsa;
+-
+ static int
+ dsa_pad (gcry_mpi_t *hmpi, grub_uint8_t *hval,
+ 	 const gcry_md_spec_t *hash, struct grub_public_subkey *sk);
+diff --git a/grub-core/lib/crypto.c b/grub-core/lib/crypto.c
+index ca334d5a40e..c578128a59d 100644
+--- a/grub-core/lib/crypto.c
++++ b/grub-core/lib/crypto.c
+@@ -121,6 +121,10 @@ grub_md_unregister (gcry_md_spec_t *cipher)
+       }
+ }
+ 
++struct gcry_pk_spec *grub_crypto_pk_dsa;
++struct gcry_pk_spec *grub_crypto_pk_ecdsa;
++struct gcry_pk_spec *grub_crypto_pk_rsa;
++
+ void
+ grub_crypto_hash (const gcry_md_spec_t *hash, void *out, const void *in,
+ 		  grub_size_t inlen)

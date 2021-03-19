@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 31 Aug 2018 16:42:03 -0400
+Subject: [PATCH] Make "reset" an alias for the "reboot" command.
+
+I'm really tired of half the tools I get to use having one and the other half
+having the other.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/commands/reboot.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/commands/reboot.c b/grub-core/commands/reboot.c
+index 46d364c99a9..f5cc2283636 100644
+--- a/grub-core/commands/reboot.c
++++ b/grub-core/commands/reboot.c
+@@ -32,15 +32,18 @@ grub_cmd_reboot (grub_command_t cmd __attribute__ ((unused)),
+   grub_reboot ();
+ }
+ 
+-static grub_command_t cmd;
++static grub_command_t reboot_cmd, reset_cmd;
+ 
+ GRUB_MOD_INIT(reboot)
+ {
+-  cmd = grub_register_command ("reboot", grub_cmd_reboot,
+-			       0, N_("Reboot the computer."));
++  reboot_cmd = grub_register_command ("reboot", grub_cmd_reboot,
++				      0, N_("Reboot the computer."));
++  reset_cmd = grub_register_command ("reset", grub_cmd_reboot,
++				     0, N_("Reboot the computer."));
+ }
+ 
+ GRUB_MOD_FINI(reboot)
+ {
+-  grub_unregister_command (cmd);
++  grub_unregister_command (reboot_cmd);
++  grub_unregister_command (reset_cmd);
+ }

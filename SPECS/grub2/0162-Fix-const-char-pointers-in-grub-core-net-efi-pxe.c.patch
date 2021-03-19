@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 20 Jul 2020 12:24:02 -0400
+Subject: [PATCH] Fix const char ** pointers in grub-core/net/efi/pxe.c
+
+This will need to get folded back in the right place on the next rebase,
+but it's before "Make grub_strtol() "end" pointers have safer const
+qualifiers" currently, so for now I'm leaving it here instead of merging
+it back with the original patch.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/net/efi/pxe.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/net/efi/pxe.c b/grub-core/net/efi/pxe.c
+index 531949cba5c..73e2bb01c1b 100644
+--- a/grub-core/net/efi/pxe.c
++++ b/grub-core/net/efi/pxe.c
+@@ -187,7 +187,7 @@ parse_ip6 (const char *val, grub_uint64_t *ip, const char **rest)
+ 	  ptr++;
+ 	  continue;
+ 	}
+-      t = grub_strtoul (ptr, (char **) &ptr, 16);
++      t = grub_strtoul (ptr, &ptr, 16);
+       if (grub_errno)
+ 	{
+ 	  grub_errno = GRUB_ERR_NONE;
+@@ -225,7 +225,7 @@ pxe_open (struct grub_efi_net_device *dev,
+ 	  int type __attribute__((unused)))
+ {
+   int i;
+-  char *p;
++  const char *p;
+   grub_efi_status_t status;
+   grub_efi_pxe_ip_address_t server_ip;
+   grub_efi_uint64_t file_size = 0;
+@@ -313,7 +313,7 @@ pxe_read (struct grub_efi_net_device *dev,
+ 	  grub_size_t len)
+ {
+   int i;
+-  char *p;
++  const char *p;
+   grub_efi_status_t status;
+   grub_efi_pxe_t *pxe = (prefer_ip6) ? dev->ip6_pxe : dev->ip4_pxe;
+   grub_efi_uint64_t bufsz = len;

@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 17 Jan 2019 13:10:39 -0500
+Subject: [PATCH] Make it possible to subtract conditions from debug=
+
+This makes it so you can do set debug to "all,-scripting,-lexer" and get the
+obvious outcome.  Any negation present will take preference over that
+conditional, so "all,-scripting,scripting" is the same thing as
+"all,-scripting".
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/misc.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index 9a2fae6398e..578bf51a5fc 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -164,12 +164,24 @@ int
+ grub_debug_enabled (const char * condition)
+ {
+   const char *debug;
++  char *negcond;
++  int negated = 0;
+ 
+   debug = grub_env_get ("debug");
+   if (!debug)
+     return 0;
+ 
+-  if (grub_strword (debug, "all") || grub_strword (debug, condition))
++  negcond = grub_zalloc (grub_strlen (condition) + 2);
++  if (negcond)
++    {
++      grub_strcpy (negcond, "-");
++      grub_strcpy (negcond+1, condition);
++      negated = grub_strword (debug, negcond);
++      grub_free (negcond);
++    }
++
++  if (!negated &&
++      (grub_strword (debug, "all") || grub_strword (debug, condition)))
+     return 1;
+ 
+   return 0;

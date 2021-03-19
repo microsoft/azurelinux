@@ -1,0 +1,121 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Thu, 3 Dec 2020 09:13:24 +0100
+Subject: [PATCH] at_keyboard: use set 1 when keyboard is in Translate mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When keyboard controller acts in Translate mode (0x40 mask), then use
+set 1 since translation is done.
+Otherwise use the mode queried from the controller (usually set 2).
+
+Added "atkeyb" debugging messages in at_keyboard module as well.
+
+Resolves: rhbz#1897587
+
+Tested on:
+- Asus N53SN (set 1 used)
+- Dell Precision (set 1 used)
+- HP Elitebook (set 2 used)
+- HP G5430 (set 1 used, keyboard in XT mode!)
+- Lenovo P71 & Lenovo T460s (set 2 used)
+- QEMU/KVM (set 1 used)
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+---
+ grub-core/term/at_keyboard.c | 29 ++++++++++++++++++++++++-----
+ include/grub/at_keyboard.h   |  4 ++++
+ 2 files changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/term/at_keyboard.c b/grub-core/term/at_keyboard.c
+index 597111077bd..26014382608 100644
+--- a/grub-core/term/at_keyboard.c
++++ b/grub-core/term/at_keyboard.c
+@@ -135,20 +135,28 @@ query_mode (void)
+   int e;
+ 
+   e = write_mode (0);
+-  if (!e)
++  if (!e) {
++    grub_dprintf("atkeyb", "query_mode: write_mode(0) failed\n");
+     return 0;
++  }
+ 
+   do {
+     keyboard_controller_wait_until_ready ();
+     ret = grub_inb (KEYBOARD_REG_DATA);
+   } while (ret == GRUB_AT_ACK);
+   /* QEMU translates the set even in no-translate mode.  */
+-  if (ret == 0x43 || ret == 1)
++  if (ret == 0x43 || ret == 1) {
++    grub_dprintf("atkeyb", "query_mode: returning 1 (ret=0x%x)\n", ret);
+     return 1;
+-  if (ret == 0x41 || ret == 2)
++  }
++  if (ret == 0x41 || ret == 2) {
++    grub_dprintf("atkeyb", "query_mode: returning 2 (ret=0x%x)\n", ret);
+     return 2;
+-  if (ret == 0x3f || ret == 3)
++  }
++  if (ret == 0x3f || ret == 3) {
++    grub_dprintf("atkeyb", "query_mode: returning 3 (ret=0x%x)\n", ret);
+     return 3;
++  }
+   return 0;
+ }
+ 
+@@ -165,7 +173,13 @@ set_scancodes (void)
+     }
+ 
+ #if !USE_SCANCODE_SET
+-  ps2_state.current_set = 1;
++  if ((grub_keyboard_controller_orig & KEYBOARD_AT_TRANSLATE) == KEYBOARD_AT_TRANSLATE) {
++    grub_dprintf ("atkeyb", "queried set is %d but keyboard in Translate mode, so actually in set 1\n", grub_keyboard_orig_set);
++    ps2_state.current_set = 1;
++  } else {
++    grub_dprintf ("atkeyb", "using queried set %d\n", grub_keyboard_orig_set);
++    ps2_state.current_set = grub_keyboard_orig_set;
++  }
+   return;
+ #else
+ 
+@@ -266,6 +280,7 @@ grub_keyboard_controller_init (void)
+   grub_keyboard_orig_set = 2;
+ #else
+   grub_keyboard_controller_orig = grub_keyboard_controller_read ();
++  grub_dprintf ("atkeyb", "grub_keyboard_controller_orig = 0x%x\n", grub_keyboard_controller_orig);
+   grub_keyboard_orig_set = query_mode ();
+ #endif
+   set_scancodes ();
+@@ -275,11 +290,15 @@ grub_keyboard_controller_init (void)
+ static grub_err_t
+ grub_keyboard_controller_fini (struct grub_term_input *term __attribute__ ((unused)))
+ {
++/* In !USE_SCANCODE_SET mode, we didn't change anything, so nothing to restore */
++#if USE_SCANCODE_SET
+   if (ps2_state.current_set == 0)
+     return GRUB_ERR_NONE;
++  grub_dprintf ("atkeyb", "restoring set %d, controller 0x%x\n", grub_keyboard_orig_set, grub_keyboard_controller_orig);
+   if (grub_keyboard_orig_set)
+     write_mode (grub_keyboard_orig_set);
+   grub_keyboard_controller_write (grub_keyboard_controller_orig);
++#endif
+   return GRUB_ERR_NONE;
+ }
+ 
+diff --git a/include/grub/at_keyboard.h b/include/grub/at_keyboard.h
+index bcb4d9ba78f..9414dc1b996 100644
+--- a/include/grub/at_keyboard.h
++++ b/include/grub/at_keyboard.h
+@@ -19,6 +19,10 @@
+ #ifndef GRUB_AT_KEYBOARD_HEADER
+ #define GRUB_AT_KEYBOARD_HEADER	1
+ 
++/*
++ * Refer to https://wiki.osdev.org/%228042%22_PS/2_Controller for details.
++ */
++
+ /* Used for sending commands to the controller.  */
+ #define KEYBOARD_COMMAND_ISREADY(x)	!((x) & 0x02)
+ #define KEYBOARD_COMMAND_READ		0x20

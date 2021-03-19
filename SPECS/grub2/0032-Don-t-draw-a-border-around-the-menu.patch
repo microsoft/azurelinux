@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Wed, 15 May 2013 16:47:33 -0400
+Subject: [PATCH] Don't draw a border around the menu
+
+It looks cleaner without it.
+---
+ grub-core/normal/menu_text.c | 43 -------------------------------------------
+ 1 file changed, 43 deletions(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 4895ffe7d1d..e72ed438ba3 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -108,47 +108,6 @@ grub_print_message_indented (const char *msg, int margin_left, int margin_right,
+   grub_print_message_indented_real (msg, margin_left, margin_right, term, 0);
+ }
+ 
+-static void
+-draw_border (struct grub_term_output *term, const struct grub_term_screen_geometry *geo)
+-{
+-  int i;
+-
+-  grub_term_setcolorstate (term, GRUB_TERM_COLOR_NORMAL);
+-
+-  grub_term_gotoxy (term, (struct grub_term_coordinate) { geo->first_entry_x - 1,
+-	geo->first_entry_y - 1 });
+-  grub_putcode (GRUB_UNICODE_CORNER_UL, term);
+-  for (i = 0; i < geo->entry_width + 1; i++)
+-    grub_putcode (GRUB_UNICODE_HLINE, term);
+-  grub_putcode (GRUB_UNICODE_CORNER_UR, term);
+-
+-  for (i = 0; i < geo->num_entries; i++)
+-    {
+-      grub_term_gotoxy (term, (struct grub_term_coordinate) { geo->first_entry_x - 1,
+-	    geo->first_entry_y + i });
+-      grub_putcode (GRUB_UNICODE_VLINE, term);
+-      grub_term_gotoxy (term,
+-			(struct grub_term_coordinate) { geo->first_entry_x + geo->entry_width + 1,
+-			    geo->first_entry_y + i });
+-      grub_putcode (GRUB_UNICODE_VLINE, term);
+-    }
+-
+-  grub_term_gotoxy (term,
+-		    (struct grub_term_coordinate) { geo->first_entry_x - 1,
+-			geo->first_entry_y - 1 + geo->num_entries + 1 });
+-  grub_putcode (GRUB_UNICODE_CORNER_LL, term);
+-  for (i = 0; i < geo->entry_width + 1; i++)
+-    grub_putcode (GRUB_UNICODE_HLINE, term);
+-  grub_putcode (GRUB_UNICODE_CORNER_LR, term);
+-
+-  grub_term_setcolorstate (term, GRUB_TERM_COLOR_NORMAL);
+-
+-  grub_term_gotoxy (term,
+-		    (struct grub_term_coordinate) { geo->first_entry_x - 1,
+-			(geo->first_entry_y - 1 + geo->num_entries
+-			 + GRUB_TERM_MARGIN + 1) });
+-}
+-
+ static int
+ print_message (int nested, int edit, struct grub_term_output *term, int dry_run)
+ {
+@@ -406,8 +365,6 @@ grub_menu_init_page (int nested, int edit,
+ 
+   grub_term_normal_color = grub_color_menu_normal;
+   grub_term_highlight_color = grub_color_menu_highlight;
+-  if (geo->border)
+-    draw_border (term, geo);
+   grub_term_normal_color = old_color_normal;
+   grub_term_highlight_color = old_color_highlight;
+   geo->timeout_y = geo->first_entry_y + geo->num_entries

@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 4 Sep 2014 14:23:23 -0400
+Subject: [PATCH] Generate OS and CLASS in 10_linux from /etc/os-release
+
+This makes us use pretty names in the titles we generate in
+grub2-mkconfig when GRUB_DISTRIBUTOR isn't set.
+
+Resolves: rhbz#996794
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub.d/10_linux.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 635d2fe0cd3..fed73271478 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -29,7 +29,8 @@ export TEXTDOMAINDIR="@localedir@"
+ CLASS="--class gnu-linux --class gnu --class os --unrestricted"
+ 
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+-  OS="$(sed 's, release .*$,,g' /etc/system-release)"
++  OS="$(eval $(grep PRETTY_NAME /etc/os-release) ; echo ${PRETTY_NAME})"
++  CLASS="--class $(eval $(grep '^ID_LIKE=\|^ID=' /etc/os-release) ; [ -n "${ID_LIKE}" ] && echo ${ID_LIKE} || echo ${ID}) ${CLASS}"
+ else
+   OS="${GRUB_DISTRIBUTOR}"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"

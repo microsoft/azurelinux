@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 10 May 2018 13:40:19 -0400
+Subject: [PATCH] Fixup for newer compiler
+
+---
+ grub-core/fs/btrfs.c         | 2 +-
+ include/grub/gpt_partition.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 2b21cbaa67e..4cc86e9b79e 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -218,7 +218,7 @@ struct grub_btrfs_inode
+   grub_uint64_t size;
+   grub_uint8_t dummy2[0x70];
+   struct grub_btrfs_time mtime;
+-} GRUB_PACKED;
++} GRUB_PACKED  __attribute__ ((aligned(8)));
+ 
+ struct grub_btrfs_extent_data
+ {
+diff --git a/include/grub/gpt_partition.h b/include/grub/gpt_partition.h
+index 7a93f43291c..8212697bf6b 100644
+--- a/include/grub/gpt_partition.h
++++ b/include/grub/gpt_partition.h
+@@ -76,7 +76,7 @@ struct grub_gpt_partentry
+   grub_uint64_t end;
+   grub_uint64_t attrib;
+   char name[72];
+-} GRUB_PACKED;
++} GRUB_PACKED  __attribute__ ((aligned(8)));
+ 
+ grub_err_t
+ grub_gpt_partition_map_iterate (grub_disk_t disk,

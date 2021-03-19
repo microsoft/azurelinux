@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 26 Jun 2017 12:46:23 -0400
+Subject: [PATCH] make GRUB_MOD_INIT() declare its function prototypes.
+
+---
+ include/grub/dl.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index b3753c9ca26..91933b85f2c 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -54,6 +54,7 @@ grub_mod_fini (void)
+ 
+ #define GRUB_MOD_INIT(name)	\
+ static void grub_mod_init (grub_dl_t mod __attribute__ ((unused))) __attribute__ ((used)); \
++extern void grub_##name##_init (void); \
+ void \
+ grub_##name##_init (void) { grub_mod_init (0); } \
+ static void \
+@@ -61,6 +62,7 @@ grub_mod_init (grub_dl_t mod __attribute__ ((unused)))
+ 
+ #define GRUB_MOD_FINI(name)	\
+ static void grub_mod_fini (void) __attribute__ ((used)); \
++extern void grub_##name##_fini (void); \
+ void \
+ grub_##name##_fini (void) { grub_mod_fini (); } \
+ static void \

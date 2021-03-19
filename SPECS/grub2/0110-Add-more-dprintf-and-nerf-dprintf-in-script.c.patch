@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 11 Sep 2018 15:58:29 -0400
+Subject: [PATCH] Add more dprintf, and nerf dprintf in script.c
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/disk/diskfilter.c  | 3 +++
+ grub-core/disk/efi/efidisk.c | 1 +
+ grub-core/kern/device.c      | 1 +
+ grub-core/script/script.c    | 5 +++++
+ 4 files changed, 10 insertions(+)
+
+diff --git a/grub-core/disk/diskfilter.c b/grub-core/disk/diskfilter.c
+index 0320115662f..7cdffe3ebd5 100644
+--- a/grub-core/disk/diskfilter.c
++++ b/grub-core/disk/diskfilter.c
+@@ -188,6 +188,8 @@ scan_disk (const char *name, int accept_diskfilter)
+   grub_disk_t disk;
+   static int scan_depth = 0;
+ 
++  grub_dprintf ("diskfilter", "scanning %s\n", name);
++
+   if (!accept_diskfilter && is_valid_diskfilter_name (name))
+     return 0;
+ 
+@@ -1212,6 +1214,7 @@ insert_array (grub_disk_t disk, const struct grub_diskfilter_pv_id *id,
+ 	   the same.  */
+ 	if (pv->disk && grub_disk_native_sectors (disk) >= pv->part_size)
+ 	  return GRUB_ERR_NONE;
++	grub_dprintf ("diskfilter", "checking %s\n", disk->name);
+ 	pv->disk = grub_disk_open (disk->name);
+ 	if (!pv->disk)
+ 	  return grub_errno;
+diff --git a/grub-core/disk/efi/efidisk.c b/grub-core/disk/efi/efidisk.c
+index f077b5f5535..fe8ba6e6c93 100644
+--- a/grub-core/disk/efi/efidisk.c
++++ b/grub-core/disk/efi/efidisk.c
+@@ -855,6 +855,7 @@ grub_efidisk_get_device_name (grub_efi_handle_t *handle)
+ 	  return 0;
+ 	}
+ 
++      grub_dprintf ("efidisk", "getting disk for %s\n", device_name);
+       parent = grub_disk_open (device_name);
+       grub_free (dup_dp);
+ 
+diff --git a/grub-core/kern/device.c b/grub-core/kern/device.c
+index 73b8ecc0c09..f58b58c89d5 100644
+--- a/grub-core/kern/device.c
++++ b/grub-core/kern/device.c
+@@ -34,6 +34,7 @@ grub_device_open (const char *name)
+ {
+   grub_device_t dev = 0;
+ 
++  grub_dprintf ("device", "opening device %s\n", name);
+   if (! name)
+     {
+       name = grub_env_get ("root");
+diff --git a/grub-core/script/script.c b/grub-core/script/script.c
+index ec4d4337c66..844e8343ca7 100644
+--- a/grub-core/script/script.c
++++ b/grub-core/script/script.c
+@@ -22,6 +22,11 @@
+ #include <grub/parser.h>
+ #include <grub/mm.h>
+ 
++#ifdef grub_dprintf
++#undef grub_dprintf
++#endif
++#define grub_dprintf(no, fmt, ...)
++
+ /* It is not possible to deallocate the memory when a syntax error was
+    found.  Because of that it is required to keep track of all memory
+    allocations.  The memory is freed in case of an error, or assigned

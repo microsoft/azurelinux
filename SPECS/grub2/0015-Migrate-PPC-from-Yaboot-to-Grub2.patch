@@ -1,0 +1,151 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mark Hamzy <hamzy@us.ibm.com>
+Date: Wed, 28 Mar 2012 14:46:41 -0500
+Subject: [PATCH] Migrate PPC from Yaboot to Grub2
+
+Add configuration support for serial terminal consoles.  This will set the
+maximum screen size so that text is not overwritten.
+---
+ Makefile.util.def              |   7 +++
+ util/grub.d/20_ppc_terminfo.in | 114 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 121 insertions(+)
+ create mode 100644 util/grub.d/20_ppc_terminfo.in
+
+diff --git a/Makefile.util.def b/Makefile.util.def
+index f8b356cc1fa..2c9b283a230 100644
+--- a/Makefile.util.def
++++ b/Makefile.util.def
+@@ -508,6 +508,13 @@ script = {
+   condition = COND_HOST_LINUX;
+ };
+ 
++script = {
++  name = '20_ppc_terminfo';
++  common = util/grub.d/20_ppc_terminfo.in;
++  installdir = grubconf;
++  condition = COND_HOST_LINUX;
++};
++
+ script = {
+   name = '30_os-prober';
+   common = util/grub.d/30_os-prober.in;
+diff --git a/util/grub.d/20_ppc_terminfo.in b/util/grub.d/20_ppc_terminfo.in
+new file mode 100644
+index 00000000000..10d66586820
+--- /dev/null
++++ b/util/grub.d/20_ppc_terminfo.in
+@@ -0,0 +1,114 @@
++#! /bin/sh
++set -e
++
++# grub-mkconfig helper script.
++# Copyright (C) 2006,2007,2008,2009,2010  Free Software Foundation, Inc.
++#
++# GRUB is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# GRUB is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++bindir=@bindir@
++libdir=@libdir@
++. "@datadir@/@PACKAGE@/grub-mkconfig_lib"
++
++export TEXTDOMAIN=@PACKAGE@
++export TEXTDOMAINDIR=@localedir@
++
++X=80
++Y=24
++TERMINAL=ofconsole
++
++argument () {
++  opt=$1
++  shift
++
++  if test $# -eq 0; then
++      echo "$0: option requires an argument -- '$opt'" 1>&2
++      exit 1
++  fi
++  echo $1
++}
++
++check_terminfo () {
++
++  while test $# -gt 0
++  do
++    option=$1
++    shift
++
++    case "$option" in
++    terminfo | TERMINFO)
++        ;;
++
++    -g)
++        NEWXY=`argument $option "$@"`
++        NEWX=`echo $NEWXY | cut -d x -f 1`
++        NEWY=`echo $NEWXY | cut -d x -f 2`
++
++        if [ ${NEWX} -ge 80 ] ; then
++          X=${NEWX}
++        else
++          echo "Warning: ${NEWX} is less than the minimum size of 80"
++        fi
++
++        if [ ${NEWY} -ge 24 ] ; then
++          Y=${NEWY}
++        else
++          echo "Warning: ${NEWY} is less than the minimum size of 24"
++        fi
++
++        shift
++        ;;
++
++    *)
++#       # accept console or ofconsole
++#       if [ "$option" != "console" -a "$option" != "ofconsole" ] ; then
++#         echo "Error: GRUB_TERMINFO unknown console: $option"
++#         exit 1
++#       fi
++#       # perfer console
++#       TERMINAL=console
++        # accept ofconsole
++        if [ "$option" != "ofconsole" ] ; then
++          echo "Error: GRUB_TERMINFO unknown console: $option"
++          exit 1
++        fi
++        # perfer console
++        TERMINAL=ofconsole
++        ;;
++    esac
++
++  done
++
++}
++
++if ! uname -m | grep -q ppc ; then
++  exit 0
++fi
++
++if [ "x${GRUB_TERMINFO}" != "x" ] ; then
++  F1=`echo ${GRUB_TERMINFO} | cut -d " " -f 1`
++
++  if [ "${F1}" != "terminfo" ] ; then
++    echo "Error: GRUB_TERMINFO is set to \"${GRUB_TERMINFO}\" The first word should be terminfo."
++    exit 1
++  fi
++
++  check_terminfo ${GRUB_TERMINFO}
++fi
++
++cat << EOF
++  terminfo -g ${X}x${Y} ${TERMINAL}
++EOF

@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: William Jon McCann <william.jon.mccann@gmail.com>
+Date: Fri, 7 Jun 2013 11:09:04 -0400
+Subject: [PATCH] Message string cleanups
+
+Make use of terminology consistent. Remove jargon.
+---
+ grub-core/normal/menu_text.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 65deafda531..cc5837ed2b8 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -157,9 +157,8 @@ print_message (int nested, int edit, struct grub_term_output *term, int dry_run)
+ 
+   if (edit)
+     {
+-      ret += grub_print_message_indented_real (_("Minimum Emacs-like screen editing is \
+-supported. TAB lists completions. Press Ctrl-x or F10 to boot, Ctrl-c or F2 for a \
+-command-line or ESC to discard edits and return to the GRUB menu."),
++      ret += grub_print_message_indented_real (_("Press Ctrl-x or F10 to start, Ctrl-c or F2 for a \
++command prompt or Escape to discard edits and return to the menu. Pressing Tab lists possible completions."),
+ 					       STANDARD_MARGIN, STANDARD_MARGIN,
+ 					       term, dry_run);
+     }
+@@ -167,8 +166,8 @@ command-line or ESC to discard edits and return to the GRUB menu."),
+     {
+       char *msg_translated;
+ 
+-      msg_translated = grub_xasprintf (_("Use the %C and %C keys to select which "
+-					 "entry is highlighted."),
++      msg_translated = grub_xasprintf (_("Use the %C and %C keys to change the "
++					 "selection."),
+ 				       GRUB_UNICODE_UPARROW,
+ 				       GRUB_UNICODE_DOWNARROW);
+       if (!msg_translated)
+@@ -181,17 +180,15 @@ command-line or ESC to discard edits and return to the GRUB menu."),
+       if (nested)
+ 	{
+ 	  ret += grub_print_message_indented_real
+-	    (_("Press enter to boot the selected OS, "
+-	       "`e' to edit the commands before booting "
+-	       "or `c' for a command-line. ESC to return previous menu."),
++	    (_("Press 'e' to edit the selected item, "
++	       "or 'c' for a command prompt. Press Escape to return to the previous menu."),
+ 	     STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
+ 	}
+       else
+ 	{
+ 	  ret += grub_print_message_indented_real
+-	    (_("Press enter to boot the selected OS, "
+-	       "`e' to edit the commands before booting "
+-	       "or `c' for a command-line."),
++	    (_("Press 'e' to edit the selected item, "
++	       "or 'c' for a command prompt."),
+ 	     STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
+ 	}	
+     }
+@@ -443,7 +440,7 @@ menu_text_print_timeout (int timeout, void *dataptr)
+       || data->timeout_msg == TIMEOUT_TERSE_NO_MARGIN)
+     msg_translated = grub_xasprintf (_("%ds"), timeout);
+   else
+-    msg_translated = grub_xasprintf (_("The highlighted entry will be executed automatically in %ds."), timeout);
++    msg_translated = grub_xasprintf (_("The selected entry will be started automatically in %ds."), timeout);
+   if (!msg_translated)
+     {
+       grub_print_error ();

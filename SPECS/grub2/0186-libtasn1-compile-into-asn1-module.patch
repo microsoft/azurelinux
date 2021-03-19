@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Fri, 5 Jun 2020 17:47:25 +1000
+Subject: [PATCH] libtasn1: compile into asn1 module
+
+Create a wrapper file that specifies the module license.
+Set up the makefile so it is built.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ grub-core/Makefile.core.def        | 15 +++++++++++++++
+ grub-core/lib/libtasn1_wrap/wrap.c | 26 ++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 grub-core/lib/libtasn1_wrap/wrap.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 97347ae76f9..21d2c541850 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -2576,3 +2576,18 @@ module = {
+   common = commands/i386/wrmsr.c;
+   enable = x86;
+ };
++
++module = {
++  name = asn1;
++  common = lib/libtasn1/lib/decoding.c;
++  common = lib/libtasn1/lib/coding.c;
++  common = lib/libtasn1/lib/element.c;
++  common = lib/libtasn1/lib/structure.c;
++  common = lib/libtasn1/lib/parser_aux.c;
++  common = lib/libtasn1/lib/gstr.c;
++  common = lib/libtasn1/lib/errors.c;
++  common = lib/libtasn1_wrap/wrap.c;
++  cflags = '$(CFLAGS_POSIX) $(CFLAGS_GNULIB)';
++  // -Wno-type-limits comes from libtasn1's configure.ac
++  cppflags = '$(CPPFLAGS_POSIX) $(CPPFLAGS_GNULIB) -I$(srcdir)/lib/libtasn1/lib -Wno-type-limits';
++};
+diff --git a/grub-core/lib/libtasn1_wrap/wrap.c b/grub-core/lib/libtasn1_wrap/wrap.c
+new file mode 100644
+index 00000000000..622ba942e33
+--- /dev/null
++++ b/grub-core/lib/libtasn1_wrap/wrap.c
+@@ -0,0 +1,26 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2020 IBM Corporation
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/dl.h>
++
++/*
++ * libtasn1 is provided under LGPL2.1+, which is compatible
++ * with GPL3+. As Grub as a whole is under GPL3+, this module
++ * is therefore under GPL3+ also.
++ */
++GRUB_MOD_LICENSE ("GPLv3+");
