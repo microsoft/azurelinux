@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -326,6 +326,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-14
+- Fix bugs in SP800-56a Rev.3 patch, including oridinal test
+
 * Thu Mar 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-13
 - Add changes for SP800-56a rev. 3 compliance
 

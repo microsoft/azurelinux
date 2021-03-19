@@ -17,10 +17,12 @@ diff --git a/crypto/ec/ec_check.c b/crypto/ec/ec_check.c
 index d0706d2..c33e2f7 100644
 --- a/crypto/ec/ec_check.c
 +++ b/crypto/ec/ec_check.c
-@@ -10,8 +10,42 @@
+@@ -9,6 +9,34 @@
+ 
  #include "ec_local.h"
  #include <openssl/err.h>
- 
++#include <openssl/crypto.h>
++
 +int EC_GROUP_check_named_curve(const EC_GROUP *group, int nist_only,
 +                               BN_CTX *ctx)
 +{
@@ -47,25 +49,24 @@ index d0706d2..c33e2f7 100644
 +    BN_CTX_free(new_ctx);
 +    return nid;
 +}
-+
+ 
  int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
  {
-+#ifdef OPENSSL_FIPS
-+    /*
-+    * ECC domain parameter validation.
-+    * See SP800-56A R3 5.5.2 "Assurances of Domain-Parameter Validity" Part 1b.
-+    */
-+    return EC_GROUP_check_named_curve(group, 1, ctx) >= 0 ? 1 : 0;
-+#else
-     int ret = 0;
-     const BIGNUM *order;
+@@ -17,6 +45,14 @@ int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
      BN_CTX *new_ctx = NULL;
-@@ -69,4 +103,5 @@ int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
-     BN_CTX_free(new_ctx);
-     EC_POINT_free(point);
-     return ret;
-+#endif /* FIPS_MODULE */
- }
+     EC_POINT *point = NULL;
+ 
++    if (FIPS_mode()) {
++        /*
++        * ECC domain parameter validation.
++        * See SP800-56A R3 5.5.2 "Assurances of Domain-Parameter Validity" Part 1b.
++        */
++       return EC_GROUP_check_named_curve(group, 1, ctx) > 0 ? 1 : 0;
++    }
++
+     /* Custom curves assumed to be correct */
+     if ((group->meth->flags & EC_FLAGS_CUSTOM_CURVE) != 0)
+         return 1;
 diff --git a/crypto/ec/ec_key.c b/crypto/ec/ec_key.c
 index ac3a10a..db4b564 100644
 --- a/crypto/ec/ec_key.c
@@ -463,7 +464,7 @@ index fe52ae7..f225c50 100644
                     const unsigned char *sinfo, size_t sinfolen,
                     const EVP_MD *md);
  
-+int ossl_ec_key_public_check(const EC_KEY *eckey, BN_CTX *ctx);
++int ec_key_public_check(const EC_KEY *eckey, BN_CTX *ctx);
 +int ec_key_private_check(const EC_KEY *eckey);
 +int ec_key_pairwise_check(const EC_KEY *eckey, BN_CTX *ctx);
 +
@@ -490,5 +491,5 @@ index 758e1f0..3fd5d64 100644
  EVP_KDF_ctrl_str                        6595	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_size                            6596	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_derive                          6597	1_1_1b	EXIST::FUNCTION:
-+EC_GROUP_check_named_curve              1563	1_1_1g	EXIST::FUNCTION:EC
++EC_GROUP_check_named_curve              6598	1_1_1g	EXIST::FUNCTION:EC
 \ No newline at end of file
