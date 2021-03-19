@@ -108,7 +108,7 @@
                 "kubernetes-1.17.16",
                 "kubernetes-1.18.10",
                 "kubernetes-1.18.14",
-                "kubernetes-1.19.3",
+                "kubernetes-1.19.7",
                 "kubernetes-1.19.6",
                 "libacvp",
                 "libconfini",
