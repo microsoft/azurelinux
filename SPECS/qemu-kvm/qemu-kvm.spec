@@ -45,6 +45,7 @@ Patch26:        CVE-2018-12617.patch
 Patch27:        CVE-2020-25723.patch
 Patch28:        CVE-2020-27821.patch
 Patch29:        CVE-2020-17380.patch
+Patch30:        CVE-2021-20203.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
