@@ -72,6 +72,7 @@ Conflicts:      %{_cross_name}-gcc-bootstrap3
 Conflicts:      %{_cross_name}-glibc-bootstrap
 Conflicts:      %{_cross_name}-glibc-bootstrap2
 Conflicts:      %{_cross_name}-kernel-headers
+Requires:       libmpc
 
 %description
 Bundle of all files needed to cross compile with gcc including: gcc, glibc, binutils, kernel headers.
@@ -142,6 +143,13 @@ install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cro
 
 # %%post   -p /sbin/ldconfig
 # %%postun -p /sbin/ldconfig
+
+%post 
+
+# Create a symlink from sysroot/usr/include to sysroot/include
+# The GCC toolchain will look for header files under sysroot/usr/include
+mkdir -p %{_cross_sysroot}/usr
+ln -s "../include" %{_cross_sysroot}/usr
 
 %files -f %{_cross_name}-file_manifest.txt
 %defattr(-,root,root)
