@@ -1,6 +1,5 @@
-# This action checks that certain groups of specs have matching tags.
-# The main use case is to ensure that signed specs have the same Version and
-#   Release tags as their unsigned counterparts
+# This action checks that the licenses.json file is up-to-date
+# and that the LICENSES-MAP.md file is up-to-date
 name: Spec License Map Check
 
 on:
@@ -23,10 +22,10 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Run entanglement checking script
+      - name: Run license map checking script
         run: |
           python3 ./SPECS/LICENSES-AND-NOTICES/data/license_map.py \
-          ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \ # input data file
-          ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \ # output markdown file
-          ./SPECS \ # spec folders
+          ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
+          ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+          ./SPECS \
           ./SPECS-SIGNED
