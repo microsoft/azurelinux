@@ -54,10 +54,13 @@ def main(input_filename, output_filename, spec_directories):
 
     specs_not_in_json, specs_not_in_dir = get_missing_specs(spec_directories, license_collection)
 
+    with open(output_filename, 'r') as output_file:
+        old_content = output_filename.read()
+    new_content = generate_markdown(license_collection)
     with open(output_filename, 'w') as output_file:
-        output_file.write(generate_markdown(license_collection))
+        output_file.write(new_content)
 
-    if len(specs_not_in_json) or len(specs_not_in_dir):
+    if len(specs_not_in_json) or len(specs_not_in_dir) or old_content != new_content:
         if len(specs_not_in_json):
             print("Specs present in spec directories that are not present in data file:")
             for s in sorted(specs_not_in_json, key=str.lower):
@@ -69,6 +72,9 @@ def main(input_filename, output_filename, spec_directories):
             for s in sorted(specs_not_in_dir, key=str.lower):
                 print('\t' + s)
             print()
+
+        if old_content != new_content:
+            print("License map file is out of date.")
 
         sys.exit(1)
 
