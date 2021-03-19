@@ -2,8 +2,13 @@
 %define __os_install_post %{nil}
 
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
-# bakes in a specific commit id to pull (GNULIB_REVISION). Use this commit id below.
-%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
+# bakes in a specific commit id to pull (GNULIB_REVISION).
+#
+# Additionally, we are incorporating the F34 patchset and part of this patchset
+# operates on the assumption that we use the rhboot/gnulib fork instead of the
+# upstream gnulib project. So make sure this gnulibversion macro is tied to the
+# correct gnulib source (i.e., bootstrap.conf after applying all patches)
+%global gnulibversion fixes
 
 Summary:        GRand Unified Bootloader
 Name:           grub2
@@ -15,7 +20,8 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}-rc1.tar.gz
-Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
+#Source1:        https://github.com/rhboot/gnulib/archive/%%{gnulibversion}.tar.gz
+Source1:        gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 
 Patch0001: 0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -219,6 +225,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
 BuildRequires:  autoconf
+BuildRequires:  python3
 
 Requires:       device-mapper
 Requires:       xz
@@ -261,10 +268,220 @@ Group:          System Environment/Base
 GRUB UEFI bootloader binaries
 
 %prep
-%autosetup -p1 -n grub-%{version}-rc1
+%setup -q -n grub-%{version}-rc1
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
+
+# TODO: Check if I can use autosetup here instead
+%patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
+%patch0004 -p1
+%patch0005 -p1
+%patch0006 -p1
+%patch0007 -p1
+%patch0008 -p1
+%patch0009 -p1
+%patch0010 -p1
+%patch0011 -p1
+%patch0012 -p1
+%patch0013 -p1
+%patch0014 -p1
+%patch0015 -p1
+%patch0016 -p1
+%patch0017 -p1
+%patch0018 -p1
+%patch0019 -p1
+%patch0020 -p1
+%patch0021 -p1
+%patch0022 -p1
+%patch0023 -p1
+%patch0024 -p1
+%patch0025 -p1
+%patch0026 -p1
+%patch0027 -p1
+%patch0028 -p1
+%patch0029 -p1
+%patch0030 -p1
+%patch0031 -p1
+%patch0032 -p1
+%patch0033 -p1
+%patch0034 -p1
+%patch0035 -p1
+%patch0036 -p1
+%patch0037 -p1
+%patch0038 -p1
+%patch0039 -p1
+%patch0040 -p1
+%patch0041 -p1
+%patch0042 -p1
+%patch0043 -p1
+%patch0044 -p1
+%patch0045 -p1
+%patch0046 -p1
+%patch0047 -p1
+%patch0048 -p1
+%patch0049 -p1
+%patch0050 -p1
+%patch0051 -p1
+%patch0052 -p1
+%patch0053 -p1
+%patch0054 -p1
+%patch0055 -p1
+%patch0056 -p1
+%patch0057 -p1
+%patch0058 -p1
+%patch0059 -p1
+%patch0060 -p1
+%patch0061 -p1
+%patch0062 -p1
+%patch0063 -p1
+%patch0064 -p1
+%patch0065 -p1
+%patch0066 -p1
+%patch0067 -p1
+%patch0068 -p1
+%patch0069 -p1
+%patch0070 -p1
+%patch0071 -p1
+%patch0072 -p1
+%patch0073 -p1
+%patch0074 -p1
+%patch0075 -p1
+%patch0076 -p1
+%patch0077 -p1
+%patch0078 -p1
+%patch0079 -p1
+%patch0080 -p1
+%patch0081 -p1
+%patch0082 -p1
+%patch0083 -p1
+%patch0084 -p1
+%patch0085 -p1
+%patch0086 -p1
+%patch0087 -p1
+%patch0088 -p1
+%patch0089 -p1
+%patch0090 -p1
+%patch0091 -p1
+%patch0092 -p1
+%patch0093 -p1
+%patch0094 -p1
+%patch0095 -p1
+%patch0096 -p1
+%patch0097 -p1
+%patch0098 -p1
+%patch0099 -p1
+%patch0100 -p1
+%patch0101 -p1
+%patch0102 -p1
+%patch0103 -p1
+%patch0104 -p1
+%patch0105 -p1
+%patch0106 -p1
+%patch0107 -p1
+%patch0108 -p1
+%patch0109 -p1
+%patch0110 -p1
+%patch0111 -p1
+%patch0112 -p1
+%patch0113 -p1
+%patch0114 -p1
+%patch0115 -p1
+%patch0116 -p1
+%patch0117 -p1
+%patch0118 -p1
+%patch0119 -p1
+%patch0120 -p1
+%patch0121 -p1
+%patch0122 -p1
+%patch0123 -p1
+%patch0124 -p1
+%patch0125 -p1
+%patch0126 -p1
+%patch0127 -p1
+%patch0128 -p1
+%patch0129 -p1
+%patch0130 -p1
+%patch0131 -p1
+%patch0132 -p1
+%patch0133 -p1
+%patch0134 -p1
+%patch0135 -p1
+%patch0136 -p1
+%patch0137 -p1
+%patch0138 -p1
+%patch0139 -p1
+%patch0140 -p1
+%patch0141 -p1
+%patch0142 -p1
+%patch0143 -p1
+%patch0144 -p1
+%patch0145 -p1
+%patch0146 -p1
+%patch0147 -p1
+%patch0148 -p1
+%patch0149 -p1
+%patch0150 -p1
+%patch0151 -p1
+%patch0152 -p1
+%patch0153 -p1
+%patch0154 -p1
+%patch0155 -p1
+%patch0156 -p1
+%patch0157 -p1
+%patch0158 -p1
+%patch0159 -p1
+%patch0160 -p1
+%patch0161 -p1
+%patch0162 -p1
+%patch0163 -p1
+%patch0164 -p1
+%patch0165 -p1
+%patch0166 -p1
+%patch0167 -p1
+%patch0168 -p1
+%patch0169 -p1
+%patch0170 -p1
+%patch0171 -p1
+%patch0172 -p1
+%patch0173 -p1
+%patch0174 -p1
+%patch0175 -p1
+%patch0176 -p1
+%patch0177 -p1
+%patch0178 -p1
+%patch0179 -p1
+%patch0180 -p1
+%patch0181 -p1
+%patch0182 -p1
+%patch0183 -p1
+%patch0184 -p1
+%patch0185 -p1
+%patch0186 -p1
+%patch0187 -p1
+%patch0188 -p1
+%patch0189 -p1
+%patch0190 -p1
+%patch0191 -p1
+%patch0192 -p1
+%patch0193 -p1
+%patch0194 -p1
+%patch0195 -p1
+%patch0196 -p1
+
+# We are using redhat's fork of gnulib which has the grub-core/lib/gnulib-patches
+# already applied.
+# The repo also hardcodes the redhat hardenening flags so we need to replace
+# that pointer with ours
+#
+# https://github.com/rhboot/gnulib/commit/a2956cf47da2cf331b56ae81e22758bf0a4d6f10
+sed -i 's,redhat/redhat-hardened-cc1,mariner/default-hardened-cc1,g' gnulib/gnulib-tool
+
+# Our GCC does not seem to have the gcc annobin plugin. So remove references to
+# it from redhat's gnulib.
+sed -i 's,-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1,,g' gnulib/gnulib-tool
 
 %build
 ./bootstrap --no-git --gnulib-srcdir=./gnulib
@@ -275,6 +492,18 @@ pushd build-for-pc
 # TODO: Identify which CFLAGS are causing HyperV Gen1 build to fail to boot
 CFLAGS=""
 export CFLAGS
+HOST_CFLAGS=""
+export HOST_CFLAGS
+HOST_CPPFLAGS=""
+export HOST_CPPFLAGS
+HOST_LDFLAGS=""
+export HOST_LDFLAGS
+TARGET_CFLAGS=""
+export TARGET_CFLAGS
+TARGET_CPPFLAGS=""
+export TARGET_CPPFLAGS
+TARGET_LDFLAGS=""
+export TARGET_LDFLAGS
 
 ../configure \
     --prefix=%{_prefix} \
@@ -284,6 +513,7 @@ export CFLAGS
     --disable-efiemu \
     --with-grubdir=grub2 \
     --with-platform=pc \
+    --with-utils=host \
     --target=i386 \
     --program-transform-name=s,grub,%{name}, \
     --with-bootdir="/boot"
@@ -308,6 +538,7 @@ pushd build-for-efi
     --disable-efiemu \
     --with-grubdir=grub2 \
     --with-platform=efi \
+    --with-utils=host \
     --target=%{_arch} \
     --program-transform-name=s,grub,%{name}, \
     --with-bootdir="/boot"
@@ -379,10 +610,16 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %license COPYING
 %dir %{_sysconfdir}/grub.d
 %dir /boot/%{name}
-%config() %{_sysconfdir}/bash_completion.d/grub
+%config() %{_datadir}/bash-completion/completions/*
 %config() %{_sysconfdir}/grub.d/00_header
+%config() %{_sysconfdir}/grub.d/01_users
+%config() %{_sysconfdir}/grub.d/08_fallback_counting
 %config() %{_sysconfdir}/grub.d/10_linux
+%config() %{_sysconfdir}/grub.d/10_reset_boot_success
+%config() %{_sysconfdir}/grub.d/12_menu_auto_hide
+%config() %{_sysconfdir}/grub.d/14_menu_show_once
 %config() %{_sysconfdir}/grub.d/20_linux_xen
+%config() %{_sysconfdir}/grub.d/20_ppc_terminfo
 %config() %{_sysconfdir}/grub.d/30_os-prober
 %config() %{_sysconfdir}/grub.d/30_uefi-firmware
 %config(noreplace) %{_sysconfdir}/grub.d/40_custom
@@ -394,6 +631,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %{_sysconfdir}/sysconfig/grub
 %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
+%{_libdir}/systemd/system/grub2-systemd-integration.service
+%{_libdir}/systemd/system/systemd-logind.service.d/10-grub2-logind-service.conf
+%{_libexecdir}/grub2/systemd-integration.sh
 
 %ifarch x86_64
 %files pc
