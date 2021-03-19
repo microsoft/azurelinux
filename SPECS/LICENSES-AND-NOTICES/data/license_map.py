@@ -73,9 +73,9 @@ def main(input_filename, output_filename, spec_directories):
         sys.exit(1)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_filename', type=Path)
-    parser.add_argument('output_filename', type=Path)
-    parser.add_argument('spec_directories', type=Path, nargs='*')
+    parser = argparse.ArgumentParser(description='Processes spec license data, find missing entries, and regenerate license map file.')
+    parser.add_argument('input_filename', type=Path, help='Path to data file with license data')
+    parser.add_argument('output_filename', type=Path, help='Path to license map markdown file')
+    parser.add_argument('spec_directories', type=Path, nargs='+', help='Directories containing specs')
     p = parser.parse_args()
     main(p.input_filename, p.output_filename, p.spec_directories)

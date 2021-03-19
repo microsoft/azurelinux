@@ -1,0 +1,32 @@
+# This action checks that certain groups of specs have matching tags.
+# The main use case is to ensure that signed specs have the same Version and
+#   Release tags as their unsigned counterparts
+name: Spec License Map Check
+
+on:
+  push:
+    branches: [main, dev, 1.0*]
+  pull_request:
+    branches: [main, dev, 1.0*]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Run entanglement checking script
+        run: |
+          python3 ./SPECS/LICENSES-AND-NOTICES/data/license_map.py \
+          ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \ # input data file
+          ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \ # output markdown file
+          ./SPECS \ # spec folders
+          ./SPECS-SIGNED
