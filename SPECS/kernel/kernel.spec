@@ -134,8 +134,8 @@ Patch1105:      CVE-2020-35499.nopatch
 Patch1106:      CVE-2021-26931.nopatch
 Patch1107:      CVE-2021-26932.nopatch
 Patch1108:      CVE-2021-27365.nopatch
-Patch1108:      CVE-2021-27364.nopatch
-Patch1108:      CVE-2021-27363.nopatch
+Patch1109:      CVE-2021-27364.nopatch
+Patch1110:      CVE-2021-27363.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
