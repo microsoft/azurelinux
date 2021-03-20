@@ -100,6 +100,7 @@ This package provides a command line tool for manipulating disk images.
 %patch27 -p1
 %patch28 -p1
 %patch29 -p1
+%patch30 -p1
 
 %build
 
@@ -160,6 +161,9 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Fri Mar 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-26
+- Patch CVE-2021-20203
+
 * Mon Feb 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.2.0-25
 - Update CVE-2020-17380
 
