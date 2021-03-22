@@ -36,10 +36,12 @@ $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 		spec_destination=$(BUILD_SPECS_DIR)/$$(rpm -qp $$srpm --define='with_check 1' --queryformat %{NAME}-%{VERSION}-%{RELEASE}/%{NAME}.spec) && \
 		spec_dir=$$(dirname $$spec_destination) && \
 		if [ ! -f $@ -o $$srpm -nt $@ ]; then \
-			echo "Extracting \"$$(basename $$srpm)\" to \"$$spec_dir\"." | tee -a $(srpm_expand_log) && \
+			srpm_filename=$$(basename $$srpm) && \
+			echo "Extracting \"$$srpm_filename\" to \"$$spec_dir\"." | tee -a $(srpm_expand_log) && \
 			mkdir -p $$spec_dir && \
 			cd $$spec_dir && \
-			rpm2cpio $$srpm | cpio -idvu 2>>$(srpm_expand_log) || $(call print_error,Failed to expand "$$srpm".) ; \
+			rpm2cpio $$srpm | cpio -idvu 2>>$(srpm_expand_log) && \
+			echo "Extracted \"$$srpm_filename\"." >> $(srpm_expand_log) || $(call print_error,Failed to expand "$$srpm".); \
 		fi \
 	done || $(call print_error,Checking for spec updates failed. See above errors and "$$srpm_expand_log" for more details.); \
 	touch $@
