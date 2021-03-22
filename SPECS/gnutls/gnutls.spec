@@ -30,6 +30,7 @@ Requires:       gc
 
 Patch0:         CVE-2020-24659.patch
 Patch1:         CVE-2021-20231.patch
+Patch1:         CVE-2021-20232.patch
 
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
@@ -102,7 +103,7 @@ make %{?_smp_mflags} check
 
 %changelog
 *   Mon Mar 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.6.14-5
--   Apply patch for CVE-2021-20231 from upstream.
+-   Apply patch for CVE-2021-20231 and CVE-2021-20231 from upstream.
 *   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.6.14-4
 -   Fix check tests.
 *   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
