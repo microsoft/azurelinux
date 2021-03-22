@@ -11,6 +11,7 @@ URL:            https://github.com/cisco/libacvp
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         fipssyms.patch
 Patch1:         dsa.patch
+Patch2:         aes.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -61,7 +62,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
-- Modify DSA test
+- Patch aes_app and dsa_app.
 
 * Mon Feb 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
 - Original version for CBL-Mariner. License verified.
