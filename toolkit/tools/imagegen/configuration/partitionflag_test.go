@@ -16,6 +16,7 @@ var (
 		PartitionFlag("esp"),
 		PartitionFlag("grub"),
 		PartitionFlag("bios_grub"),
+		PartitionFlag("bios-grub"),
 		PartitionFlag("boot"),
 		PartitionFlag("dmroot"),
 	}

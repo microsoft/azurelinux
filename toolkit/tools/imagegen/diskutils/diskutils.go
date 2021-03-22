@@ -472,7 +472,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		switch flag {
 		case configuration.PartitionFlagESP:
 			flagToSet = "esp"
-		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub:
+		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub, configuration.PartitionFlagBiosGrubLegacy:
 			flagToSet = "bios_grub"
 		case configuration.PartitionFlagBoot:
 			flagToSet = "boot"
