@@ -29,14 +29,14 @@ $(BUILD_SPECS_DIR): $(STATUS_FLAGS_DIR)/build_specs.flag
 	@touch $@
 	@echo "Finished updating $@." | tee -a $(srpm_expand_log)
 
+# For each SRPM, if it is newer than the spec extract a new copy of the .spec file
 $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
-	@# For each SRPM, if it is newer than the spec extract a new copy of the .spec file
-	@for srpm in $(srpms); do \
+	@echo "Extracting new or updated SRPMs from \"$(BUILD_SRPMS_DIR)\"." | tee -a $(srpm_expand_log) && \
+	for srpm in $(srpms); do \
 		spec_destination=$(BUILD_SPECS_DIR)/$$(rpm -qp $$srpm --define='with_check 1' --queryformat %{NAME}-%{VERSION}-%{RELEASE}/%{NAME}.spec) && \
 		spec_dir=$$(dirname $$spec_destination) && \
 		if [ ! -f $@ -o $$srpm -nt $@ ]; then \
-			echo "Detected a new SRPM \"$$srpm\"." | tee -a $(srpm_expand_log) && \
-			echo "Extracting to \"$$spec_dir\"." | tee -a $(srpm_expand_log) && \
+			echo "Extracting \"$$(basename $$srpm)\" to \"$$spec_dir\"." | tee -a $(srpm_expand_log) && \
 			mkdir -p $$spec_dir && \
 			cd $$spec_dir && \
 			rpm2cpio $$srpm | cpio -idvu 2>>$(srpm_expand_log) || $(call print_error,Failed to expand "$$srpm".) ; \
