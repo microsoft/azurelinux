@@ -476,6 +476,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
 - Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
+- Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS
 
 * Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
 - Disable QAT kernel configs
