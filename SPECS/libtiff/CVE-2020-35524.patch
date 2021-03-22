@@ -1,0 +1,39 @@
+From 7be2e452ddcf6d7abca88f41d3761e6edab72b22 Mon Sep 17 00:00:00 2001
+From: Thomas Bernard <miniupnp@free.fr>
+Date: Sat, 14 Nov 2020 12:53:01 +0000
+Subject: [PATCH] tiff2pdf.c: properly calculate datasize when saving to JPEG
+ YCbCr
+
+fixes #220
+---
+ tools/tiff2pdf.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/tools/tiff2pdf.c b/tools/tiff2pdf.c
+index 719811ea..d0b0ede7 100644
+--- a/tools/tiff2pdf.c
++++ b/tools/tiff2pdf.c
+@@ -2087,9 +2087,17 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
+ #endif
+ 		(void) 0;
+ 	}
+-	k = checkMultiply64(TIFFScanlineSize(input), t2p->tiff_length, t2p);
+-	if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
+-		k = checkMultiply64(k, t2p->tiff_samplesperpixel, t2p);
++#ifdef JPEG_SUPPORT
++	if(t2p->pdf_compression == T2P_COMPRESS_JPEG
++	   && t2p->tiff_photometric == PHOTOMETRIC_YCBCR) {
++		k = checkMultiply64(TIFFNumberOfStrips(input), TIFFStripSize(input), t2p);
++	} else
++#endif
++	{
++		k = checkMultiply64(TIFFScanlineSize(input), t2p->tiff_length, t2p);
++		if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
++			k = checkMultiply64(k, t2p->tiff_samplesperpixel, t2p);
++		}
+ 	}
+ 	if (k == 0) {
+ 		/* Assume we had overflow inside TIFFScanlineSize */
+-- 
+GitLab
+
