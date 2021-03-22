@@ -25,6 +25,7 @@ CONFIGURE_ARGS="--with-cflags='%{optflags}' --with-cxxflags='%{optflags}' $CONFI
 gem install \\\
         -V \\\
         --local \\\
+        --bindir %{_bindir} \\\
         --build-root %{-d*}%{!?-d:.} \\\
         --force \\\
         --document=ri,rdoc \\\
