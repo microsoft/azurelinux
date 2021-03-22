@@ -31,7 +31,7 @@ $(BUILD_SPECS_DIR): $(STATUS_FLAGS_DIR)/build_specs.flag
 
 # For each SRPM, if it is newer than the spec extract a new copy of the .spec file
 $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
-	@echo "Extracting new or updated SRPMs from \"$(BUILD_SRPMS_DIR)\"." | tee -a $(srpm_expand_log) && \
+	@echo "Extracting new or updated SRPMs from \"$(BUILD_SRPMS_DIR)\"." | tee $(srpm_expand_log) && \
 	for srpm in $(srpms); do \
 		spec_destination=$(BUILD_SPECS_DIR)/$$(rpm -qp $$srpm --define='with_check 1' --queryformat %{NAME}-%{VERSION}-%{RELEASE}/%{NAME}.spec) && \
 		spec_dir=$$(dirname $$spec_destination) && \
