@@ -6,7 +6,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ Patch12:        CVE-2019-7309.patch
 Patch13:        CVE-2019-19126.patch
 Patch14:        CVE-2019-25013.patch
 Patch15:        CVE-2021-3326.patch
+Patch16:        CVE-2020-27618.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -308,6 +309,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon Mar 22 2021 Nick Samson <nisamson@microsoft.com> - 2.28-18
+- Patch CVE-2020-27618
+
 * Tue Feb 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
 - Patch CVE-2021-3326
 
