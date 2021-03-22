@@ -207,7 +207,7 @@ $(toolchain_rpms):
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 			-a $$log_file \
 			&& \
-		echo "Downloaded toolchain RPM: $$rpm_filename" | tee -a $$log_file && \
+		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		break; \
 	done || { \
 			echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
