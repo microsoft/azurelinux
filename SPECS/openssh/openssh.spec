@@ -77,6 +77,7 @@ tar xf %{SOURCE1} --no-same-owner
 install -vdm755 %{buildroot}%{_sharedstatedir}/sshd
 
 sed -i 's/#UsePAM no/UsePAM yes/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#PrintMotd yes/PrintMotd no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
