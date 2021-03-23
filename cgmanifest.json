@@ -1594,6 +1594,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gnulib",
+          "version": "d271f868a8df9bbec29049d01e056481b7a1a263",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-d271f868a8df9bbec29049d01e056481b7a1a263.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "GSL",
           "version": "2.0.0",
           "downloadUrl": "https://github.com/microsoft/GSL/archive/v2.0.0.tar.gz"
