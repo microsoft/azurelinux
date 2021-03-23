@@ -1,10 +1,8 @@
 %define debug_package %{nil}
 %define __os_install_post %{nil}
-
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
-
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
@@ -17,39 +15,33 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}-rc1.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
-
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
-Patch0001: 0001-Add-support-for-Linux-EFI-stub-loading.patch
-Patch0002: 0002-Rework-linux-command.patch
-Patch0003: 0003-Rework-linux16-command.patch
-Patch0004: 0004-Add-secureboot-support-on-efi-chainloader.patch
-Patch0005: 0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
-Patch0006: 0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
-
+Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
+Patch0002:      0002-Rework-linux-command.patch
+Patch0003:      0003-Rework-linux16-command.patch
+Patch0004:      0004-Add-secureboot-support-on-efi-chainloader.patch
+Patch0005:      0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
+Patch0006:      0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
 # ARM64 build patch
-Patch0104: 0104-Rework-how-the-fdt-command-builds.patch
-
+Patch0104:      0104-Rework-how-the-fdt-command-builds.patch
 # General fixes (> 4GB DMA, TPM measurements, etc)
-Patch0112: 0112-Try-to-pick-better-locations-for-kernel-and-initrd.patch
-Patch0115: 0115-x86-efi-Use-bounce-buffers-for-reading-to-addresses-.patch
-Patch0116: 0116-x86-efi-Re-arrange-grub_cmd_linux-a-little-bit.patch
-Patch0117: 0117-x86-efi-Make-our-own-allocator-for-kernel-stuff.patch
-Patch0118: 0118-x86-efi-Allow-initrd-params-cmdline-allocations-abov.patch
-Patch0148: 0148-efi-Set-image-base-address-before-jumping-to-the-PE-.patch
-Patch0149: 0149-tpm-Don-t-propagate-TPM-measurement-errors-to-the-ve.patch
-Patch0150: 0150-x86-efi-Reduce-maximum-bounce-buffer-size-to-16-MiB.patch
-Patch0156: 0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
-
+Patch0112:      0112-Try-to-pick-better-locations-for-kernel-and-initrd.patch
+Patch0115:      0115-x86-efi-Use-bounce-buffers-for-reading-to-addresses-.patch
+Patch0116:      0116-x86-efi-Re-arrange-grub_cmd_linux-a-little-bit.patch
+Patch0117:      0117-x86-efi-Make-our-own-allocator-for-kernel-stuff.patch
+Patch0118:      0118-x86-efi-Allow-initrd-params-cmdline-allocations-abov.patch
+Patch0148:      0148-efi-Set-image-base-address-before-jumping-to-the-PE-.patch
+Patch0149:      0149-tpm-Don-t-propagate-TPM-measurement-errors-to-the-ve.patch
+Patch0150:      0150-x86-efi-Reduce-maximum-bounce-buffer-size-to-16-MiB.patch
+Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 # CVE-2020-15705
-Patch0157: 0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
-
+Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
+BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
+BuildRequires:  python3
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
-BuildRequires:  autoconf
-BuildRequires:  python3
-
 Requires:       device-mapper
 Requires:       xz
 
@@ -60,7 +52,6 @@ The GRUB package contains the GRand Unified Bootloader.
 %package pc
 Summary:        GRUB Library for BIOS
 Group:          System Environment/Programming
-
 Requires:       %{name} = %{version}
 
 %description pc
@@ -70,7 +61,6 @@ Additional library files for grub
 %package efi
 Summary:        GRUB Library for UEFI
 Group:          System Environment/Programming
-
 Requires:       %{name} = %{version}
 
 %description efi
