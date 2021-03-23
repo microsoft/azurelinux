@@ -11,7 +11,7 @@ URL:            https://github.com/rhboot/shim
 License:        BSD
 Vendor:         Microsoft
 Distribution:   Mariner
-Source0:        https://github.com/rhboot/shim/archive/shim-%{version}-rc2.tar.gz
+Source0:        https://github.com/rhboot/shim/archive/shim-%{version}-rc4.tar.gz
 Source1:        https://github.com/rhboot/gnu-efi/archive/%{gnuefiversion}.tar.gz
 Source2:        sbat.csv.in
 Source100:      cbl-mariner-ca.der
@@ -28,7 +28,7 @@ shim will extend various PCRs with the digests of the targets it is
 loading.
 
 %prep
-%autosetup -n shim-shim-%{version}-rc2 -p1
+%autosetup -n shim-shim-%{version}-rc4 -p1
 # Manually set up gnu-efi submodule
 cp %{SOURCE1} gnu-efi-%{gnuefiversion}.tar.gz
 tar -zxf gnu-efi-%{gnuefiversion}.tar.gz

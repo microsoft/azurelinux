@@ -1,3 +1,3 @@
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
 shim,1,UEFI shim,shim,1,https://github.com/rhboot/shim
-shim.mariner1,1,Microsoft CBL-Mariner,shim,@@VERSION@@,https://github.com/microsoft/CBL-Mariner
+shim.mariner,1,Microsoft CBL-Mariner,shim,@@VERSION@@,https://github.com/microsoft/CBL-Mariner

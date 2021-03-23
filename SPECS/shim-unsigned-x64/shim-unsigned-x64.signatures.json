@@ -2,7 +2,7 @@
  "Signatures": {
   "cbl-mariner-ca.der": "34f7436bc56c7b4e526e55dbc207ad6311dbace0403e1d462ad1f9ce3479d386",
   "e32d8c84a5748a2e3b7220dae638418f81a7986d.tar.gz": "31ffc8a4e19423bfad8ac5e93db518ed42fd1e84847eb47de693e71c4ec8b774",
-  "sbat.csv.in": "78f66cd345a84f67b753e20b958c2d7d49bc02a3fc229d2c9b9b772f98dc83d7",
-  "shim-15.3-rc2.tar.gz": "14a72ab1f6f5efcca2eee4dcea3bb0bdeb1a4144a17c39439e7f6578e41b2c57"
+  "sbat.csv.in": "9ede5b7350e0ac77c3c88dffd6cecfd851a43cdcebf512e352f05869ca53914a",
+  "shim-15.3-rc4.tar.gz": "935aae3ed41521672e36afb73a1935578f8e691197b2bf723ac4efe3fd410611"
  }
 }
