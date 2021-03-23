@@ -6454,9 +6454,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rhboot-gnu-efi",
+          "version": "e32d8c84a5748a2e3b7220dae638418f81a7986d",
+          "downloadUrl": "https://github.com/rhboot/gnu-efi/archive/e32d8c84a5748a2e3b7220dae638418f81a7986d.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "shim-unsigned-x64",
           "version": "15.3",
           "downloadUrl": "https://github.com/rhboot/shim/archive/shim-15.3-rc4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rhboot-gnu-efi",
+          "version": "e32d8c84a5748a2e3b7220dae638418f81a7986d",
+          "downloadUrl": "https://github.com/rhboot/gnu-efi/archive/e32d8c84a5748a2e3b7220dae638418f81a7986d.tar.gz"
         }
       }
     },
