@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+
 # This spec purpose is to take an input kernel rpm and input secure-boot-signed
 # kernel binary from the same build and generate a new "kernel" rpm with the
 # signed kernel binary + all of the other original kernel files, triggers,
@@ -66,9 +67,9 @@ ExclusiveArch:  x86_64
 %description
 This package contains the Linux kernel package with kernel signed with the production key
 
-%package -n     kernel
-Summary:        Linux Kernel
-Group:          System Environment/Kernel
+%package -n    kernel
+Summary:       Linux Kernel
+Group:         System Environment/Kernel
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
