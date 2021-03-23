@@ -1,0 +1,10 @@
+--- a/app/app_main.c	2021-03-23 08:24:55.359149078 -0700
++++ b/app/app_main.c	2021-03-23 08:25:21.195465820 -0700
+@@ -132,7 +132,6 @@
+ #ifndef OPENSSL_NO_DSA
+     app_dsa_cleanup();
+ #endif
+-    app_rsa_cleanup();
+     app_ecdsa_cleanup();
+ #endif
+ }
