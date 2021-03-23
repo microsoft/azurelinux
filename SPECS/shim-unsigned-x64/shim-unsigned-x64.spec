@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 
-# shim takes in gnu-efi as a submodule.
+# shim takes in rhboot's mirror of gnu-efi as a submodule.
 %global gnuefiversion e32d8c84a5748a2e3b7220dae638418f81a7986d
 
 Summary:        First stage UEFI bootloader
