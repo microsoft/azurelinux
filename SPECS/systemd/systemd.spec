@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        35%{?dist}
+Release:        37%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
+BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -72,6 +73,7 @@ Requires:       glib
 Requires:       kmod
 Requires:       libcap
 Requires:       libgcrypt
+Requires:       lz4
 Requires:       pam
 Requires:       xz
 Obsoletes:      systemd-bootstrap
@@ -128,6 +130,7 @@ meson  --prefix %{_prefix}                                            \
        -Dpolkit=true                                                  \
        -Dlibcryptsetup=true                                           \
        -Dgcrypt=true                                                  \
+       -Dlz4=true                                                     \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -268,9 +271,15 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
-* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 239-35
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-37
 - Enable SELinux support
 - Remove unused BuildRequires shadow-utils
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-36
+- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+
+* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-35
+- Enable LZ4 so journalctl can read logs from the container host.
 
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-34
 - Fix CVE-2019-6454 patch. Add upstream patch info.

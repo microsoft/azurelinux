@@ -1,14 +1,14 @@
 %global debug_package %{nil}
-%define uname_r %{version}-%{release}
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
-Version:        5.4.91
-Release:        3%{?dist}
+Version:        5.10.21.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.
 # An important consequence is that when making a change to this package, the
@@ -22,7 +22,7 @@ URL:            https://github.com/microsoft/WSL2-Linux-Kernel
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        kernel-%{version}-%{release}.x86_64.rpm
-Source1:        vmlinuz-%{version}-%{release}
+Source1:        vmlinuz-%{uname_r}
 BuildRequires:  cpio
 Requires:       filesystem
 Requires:       kmod
@@ -47,7 +47,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cp -rp ./boot/* %{buildroot}/boot
 cp -rp ./lib/* %{buildroot}/lib
 cp -rp ./var/* %{buildroot}/%{_localstatedir}
-cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{version}-%{release}
+cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -82,6 +82,31 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+- Update to kernel release 5.10.21.1-2
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Update release number to match kernel spec
+- Use uname_r macro instead of version-release for kernel version
+
+* Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
+- Update to kernel release 5.10.13.1-3
+
+* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+- Update to kernel release 5.10.13.1-2
+
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+
+* Tue Feb 16 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
+- Update to kernel release 5.4.91-5.
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Update to kernel release 5.4.91-4.
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add hmac files for FIPS
 

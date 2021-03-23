@@ -132,9 +132,10 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	// Alter the defaults now so they are captured by the dropdowns and then restore the style
 	// for future elements.
 	originalStyle := tview.Styles
+	tview.Styles.ContrastBackgroundColor = tcell.ColorWhite
 	tview.Styles.MoreContrastBackgroundColor = tcell.ColorBlack
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorWhite
-	tview.Styles.PrimaryTextColor = tcell.ColorGreen
+	tview.Styles.PrimaryTextColor = tcell.ColorBlue
 
 	mp.formatDropDown = tview.NewDropDown().
 		SetLabel(uitext.DiskFormatLabel).
@@ -150,15 +151,18 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	mp.nameInput = tview.NewInputField().
 		SetLabel(uitext.DiskNameLabel).
 		SetFieldWidth(maxParittionLabelSize).
-		SetAcceptanceFunc(mp.nameInputValidation)
+		SetAcceptanceFunc(mp.nameInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.mountPointInput = tview.NewInputField().
 		SetLabel(uitext.DiskMountPointLabel).
-		SetAcceptanceFunc(mp.mountPointInputValidation)
+		SetAcceptanceFunc(mp.mountPointInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeInput = tview.NewInputField().
 		SetLabel(fmt.Sprintf("%s %s", uitext.DiskSizeLabel, uitext.DiskSizeLabelMaxHelp)).
-		SetAcceptanceFunc(mp.sizeInputValidation)
+		SetAcceptanceFunc(mp.sizeInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.formNavBar = navigationbar.NewNavigationBar().
 		AddButton(uitext.ButtonCancel, func() {

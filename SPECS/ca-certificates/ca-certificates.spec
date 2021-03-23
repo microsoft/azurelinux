@@ -71,7 +71,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        10%{?dist}
+Release:        13%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -116,7 +116,7 @@ Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
 
-Provides:       ca-certificates-mozilla
+Provides:       ca-certificates-mozilla = %{version}-%{release}
 
 BuildArch:      noarch
 
@@ -311,7 +311,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 # If the 'legacy' subpackage is installed, we need to always refresh the
 # single PEM-encoded certificates every time a certificate bundle gets modified.
-# The cert bundle gets modified whenever one of the packages from %{watched_pkgs}
+# The cert bundle gets modified whenever one of the packages from %%{watched_pkgs}
 # get installed, removed, or updated.
 %triggerin -n %{name}-legacy -- %{watched_pkgs}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
@@ -415,6 +415,16 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Mar 12 2021 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20200720-13
+- Updating Microsoft trusted root CAs.
+
+* Sat Mar 06 2021 CBL-Mariner Servicing Account <clbmargh@microsoft.com> - 20200720-12
+- Updating Microsoft trusted root CAs.
+
+* Mon Feb 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-11
+- Removing the deprecated "Microsoft IT TLS CA 2" CA from the list of trusted anchors.
+- Added explicit version info for the "Provides".
+
 * Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-10
 - Updating Microsoft trusted root CAs.
 

@@ -1,13 +1,13 @@
 Summary:        Parallel Implementation of GZIP
 Name:           pigz
-Version:        2.5
+Version:        2.6
 Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.zlib.net/pigz
-Source0:        https://www.zlib.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/madler/pigz/archive/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  zlib-devel
@@ -37,6 +37,9 @@ install -p -m 755 unpigz %{buildroot}%{_bindir}/
 %{_bindir}/unpigz
 
 %changelog
+* Tue Feb 09 2021 Henry Beberman <henry.beberman@microsoft.com> 2.6-1
+- Update pigz to 2.6
+- Change source url to GitHub.
 * Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> 2.5-1
 - Add pigz spec
 - License verified

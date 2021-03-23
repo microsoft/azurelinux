@@ -1,0 +1,19 @@
+Upstream test fix: https://github.com/psf/requests/pull/5305/files
+Fixes error: "tests/test_requests.py:776: TypeError"
+
+diff -u a/tests/test_requests.py b/tests/test_requests.py
+--- a/tests/test_requests.py	2021-02-27 03:53:27.998760961 -0800
++++ b/tests/test_requests.py	2021-02-27 03:52:40.058691467 -0800
+@@ -773,8 +773,10 @@
+     def test_conflicting_post_params(self, httpbin):
+         url = httpbin('post')
+         with open('Pipfile') as f:
+-            pytest.raises(ValueError, "requests.post(url, data='[{\"some\": \"data\"}]', files={'some': f})")
+-            pytest.raises(ValueError, "requests.post(url, data=u('[{\"some\": \"data\"}]'), files={'some': f})")
++            with pytest.raises(ValueError):
++                requests.post(url, data='[{"some": "data"}]', files={'some': f})
++            with pytest.raises(ValueError):
++                requests.post(url, data=u('[{"some": "data"}]'), files={'some': f})
+ 
+     def test_request_ok_set(self, httpbin):
+         r = requests.get(httpbin('status', '404'))

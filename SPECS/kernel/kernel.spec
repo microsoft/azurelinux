@@ -1,20 +1,20 @@
 %global security_hardening none
-%define uname_r %{version}-%{release}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.4.91
-Release:        3%{?dist}
+Version:        5.10.21.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
-# Arm64 HyperV support required patch
-Patch0:         ver5_4_72_arm64_hyperv_support.patch
-Patch1:         efi-libstub-tpm-enable-tpm-eventlog-function-for-ARM.patch
+Source3:        sha512hmac-openssl.sh
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -129,18 +129,24 @@ Patch1100:      CVE-2020-27777.nopatch
 Patch1101:      CVE-2020-29569.nopatch
 Patch1102:      CVE-2020-28374.nopatch
 Patch1103:      CVE-2020-36158.nopatch
+Patch1104:      CVE-2021-26930.nopatch
+Patch1105:      CVE-2020-35499.nopatch
+Patch1106:      CVE-2021-26931.nopatch
+Patch1107:      CVE-2021-26932.nopatch
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
-BuildRequires:  libkcapi-hmaccalc
 BuildRequires:  libmspack-devel
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -173,6 +179,14 @@ Obsoletes:      linux-dev
 
 %description devel
 This package contains the Linux kernel dev files
+
+%package drivers-accessibility
+Summary:        Kernel accessibility modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-accessibility
+This package contains the Linux kernel accessibility support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -217,13 +231,7 @@ Group:          System Environment/Kernel
 This package contains common device tree blobs (dtb)
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
-
-%ifarch aarch64
-%patch0 -p1
-%endif
-
-%patch1 -p1
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
@@ -325,13 +333,13 @@ EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
 # hmac sign the kernel for FIPS
-sha512hmac %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn"
+--add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio"
 EOF
 
 #    Cleanup dangling symlinks
@@ -353,7 +361,7 @@ ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{una
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %ifarch aarch64
-cp arch/arm64/kernel/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/arch/arm64/kernel/
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
 # disable (JOBS=1) parallel build to fix this issue:
@@ -385,6 +393,9 @@ fi
 %post
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+
+%post drivers-accessibility
+/sbin/depmod -a %{uname_r}
 
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
@@ -422,6 +433,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
+%files drivers-accessibility
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/accessibility
+
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
@@ -456,6 +471,38 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+- Disable QAT kernel configs
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+- Add virtio drivers to be installed into initrd
+- Address CVE-2021-26930, CVE-2020-35499, CVE-2021-26931, CVE-2021-26932
+
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Enable kernel lockdown config
+
+* Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
+- Add configs for CONFIG_BNXT bnxt_en and MSR drivers
+
+* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+- Add configs for speakup and uinput drivers
+- Add kernel-drivers-accessibility subpackage
+
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+- Remove patch to publish efi tpm event log on ARM. Present in updated source.
+- Remove patch for arm64 hyperv support. Present in updated source.
+- Account for new module.lds location on aarch64
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+- Add CONFIG_SCSI_SMARTPQI=y
+
+* Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
+- Add configs to enable tcrypt in FIPS mode
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Use OpenSSL to perform HMAC calc
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
 - Add configs for userspace crypto support
 - HMAC calc the kernel for FIPS

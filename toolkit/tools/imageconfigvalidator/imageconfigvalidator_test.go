@@ -186,3 +186,41 @@ func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 	}
 	assert.Fail(t, "Could not find "+targetPackage+" to test")
 }
+
+func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
+	const (
+		configDirectory     string = "../../imageconfigs/"
+		targetPackage              = "core-fips.json"
+		fipsPackageListFile        = "fips-packages.json"
+	)
+	configFiles, err := ioutil.ReadDir(configDirectory)
+	assert.NoError(t, err)
+
+	// Pick the core-fips config file, but remove the fips package list
+	for _, file := range configFiles {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
+			configPath := filepath.Join(configDirectory, file.Name())
+
+			fmt.Println("Corrupting ", configPath)
+
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
+			assert.NoError(t, err)
+
+			newPackageList := []string{}
+			for _, pl := range config.SystemConfigs[0].PackageLists {
+				if !strings.Contains(pl, fipsPackageListFile) {
+					newPackageList = append(newPackageList, pl)
+				}
+			}
+
+			config.SystemConfigs[0].PackageLists = newPackageList
+
+			err = ValidateConfiguration(config)
+			assert.Error(t, err)
+			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists", err.Error())
+
+			return
+		}
+	}
+	assert.Fail(t, "Could not find "+targetPackage+" to test")
+}

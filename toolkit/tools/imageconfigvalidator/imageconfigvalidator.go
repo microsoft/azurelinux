@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/imagegen/configuration"
@@ -71,6 +72,8 @@ func validatePackages(config configuration.Config) (err error) {
 		validateError      = "failed to validate package lists in config"
 		verityPkgName      = "verity-read-only-root"
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
+		dracutFipsPkgName  = "dracut-fips"
+		fipsKernelCmdLine  = "fips=1"
 	)
 	for _, systemConfig := range config.SystemConfigs {
 		packageList, err := installutils.PackageNamesFromSingleSystemConfig(systemConfig)
@@ -79,6 +82,8 @@ func validatePackages(config configuration.Config) (err error) {
 		}
 		foundVerityInitramfsPackage := false
 		foundVerityInitramfsDebugPackage := false
+		foundDracutFipsPackage := false
+		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
 		for _, pkg := range packageList {
 			if pkg == "kernel" {
 				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
@@ -89,6 +94,9 @@ func validatePackages(config configuration.Config) (err error) {
 			if pkg == verityDebugPkgName {
 				foundVerityInitramfsDebugPackage = true
 			}
+			if pkg == dracutFipsPkgName {
+				foundDracutFipsPackage = true
+			}
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
 			if !foundVerityInitramfsPackage {
@@ -96,6 +104,11 @@ func validatePackages(config configuration.Config) (err error) {
 			}
 			if systemConfig.ReadOnlyVerityRoot.TmpfsOverlayDebugEnabled && !foundVerityInitramfsDebugPackage {
 				return fmt.Errorf("%s: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but '%s' package is not included in the package lists", validateError, verityDebugPkgName)
+			}
+		}
+		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) {
+			if !foundDracutFipsPackage {
+				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
 			}
 		}
 	}

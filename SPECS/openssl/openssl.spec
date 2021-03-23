@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1g
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ Patch19:        openssl-1.1.1-rewire-fips-drbg.patch
 Patch20:        openssl-1.1.1-explicit-params.patch
 Patch21:        openssl-1.1.1-fips-curves.patch
 Patch22:        CVE-2020-1971.patch
+Patch23:        openssl-1.1.1-sp80056arev3.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -130,6 +131,7 @@ cp %{SOURCE4} test/
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -324,6 +326,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Mar 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-13
+- Add changes for SP800-56a rev. 3 compliance
+
 * Wed Feb 03 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1g-12
 - Apply FIPS patches from CentOS 8.
 

@@ -29,9 +29,9 @@
   "kdumpctl": "425419fbb9c21d97ec50d61f2a13bb1ca4ed5a395553075322bd41f99180988a",
   "kdumpctl.8": "025a39d212eed0584da7c23c1bb50d6ab797a0fa3c686ac6b80391af875dbaec",
   "kexec-kdump-howto.txt": "e783390a9aa582a2b5e7981cd3277081385340b5873a3f0633c789811876eccb",
-  "kexec-tools-2.0.20.tar.xz": "dad8077f0315445d1f6335579fc4ade222facf82a67124974c7be5303ba4f8c8",
+  "kexec-tools-2.0.21.tar.xz": "e113142dee891638ad96e0f72cf9277b244477619470b30c41999d312e8e8702",
   "live-image-kdump-howto.txt": "465a7ce28ecd9ff8f8c22ebfb17bbbafd01a52d81134be1203ee753856e4c37c",
-  "makedumpfile-1.6.7.tar.gz": "e702fbdf62b4cd829a76e46f3e24eb3fc7501918b85ebdcd8baef4f53d6ee2c8",
+  "makedumpfile-1.6.8.tar.gz": "85d79b7090e9a8ce0d426795d3bc1de2858def7e12954d9bc6ae03de160b694c",
   "mkdumprd": "ebe0cbd1152d9db3333357e898685854c7667d4c6d9df4c79196ab1e7294dad2",
   "mkdumprd.8": "c2e85b4f28cfda870a8d7b4dec656a0bc88895e4b138e9bc4cf756ff7f839bcf"
  }

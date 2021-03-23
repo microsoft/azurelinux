@@ -1,28 +1,33 @@
 %global security_hardening none
-%define uname_r %{version}-%{release}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.4.91
-Release:        2%{?dist}
+Version:        5.10.21.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 Source1:        config
+Source2:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
+BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
-BuildRequires:  libkcapi-hmaccalc
 BuildRequires:  libmspack-devel
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
+BuildRequires:  python3
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -82,7 +87,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
@@ -167,7 +172,7 @@ EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
 # hmac sign the kernel for FIPS
-sha512hmac %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Register myself to initramfs
@@ -269,6 +274,22 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-2
+- Enable kernel lockdown config
+
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+
+* Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-4
+- Add configs to enable tcrypt in FIPS mode
+
+* Tue Feb 09 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-3
+- Use OpenSSL to perform HMAC calc
+
 * Thu Jan 28 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-2
 - Add configs for userspace crypto support
 - HMAC calc the kernel for FIPS

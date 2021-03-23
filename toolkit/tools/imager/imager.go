@@ -91,17 +91,18 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	)
 
 	var (
-		isRootFS           bool
-		isLoopDevice       bool
-		isOfflineInstall   bool
-		diskDevPath        string
-		kernelPkg          string
-		encryptedRoot      diskutils.EncryptedRootDevice
-		readOnlyRoot       diskutils.VerityDevice
-		partIDToDevPathMap map[string]string
-		partIDToFsTypeMap  map[string]string
-		extraMountPoints   []*safechroot.MountPoint
-		extraDirectories   []string
+		isRootFS               bool
+		isLoopDevice           bool
+		isOfflineInstall       bool
+		diskDevPath            string
+		kernelPkg              string
+		encryptedRoot          diskutils.EncryptedRootDevice
+		readOnlyRoot           diskutils.VerityDevice
+		partIDToDevPathMap     map[string]string
+		partIDToFsTypeMap      map[string]string
+		mountPointToOverlayMap map[string]*installutils.Overlay
+		extraMountPoints       []*safechroot.MountPoint
+		extraDirectories       []string
 	)
 
 	// Get list of packages to install into image
@@ -167,8 +168,19 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 	}
 
+	setupChrootDir := filepath.Join(buildDir, setupRoot)
+
 	// Create Parition to Mountpoint map
-	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
+	if diffDiskBuild {
+		mountPointToOverlayMap, err = installutils.UpdatePartitionMapWithOverlays(partIDToDevPathMap, partIDToFsTypeMap, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, systemConfig)
+		// Schedule unmount of overlays after the upper layers are unmounted.
+		defer installutils.OverlayUnmount(mountPointToOverlayMap)
+		if err != nil {
+			logger.Log.Error("Failed to create the partition map")
+			return
+		}
+	}
 
 	if isOfflineInstall {
 		// Create setup chroot
@@ -179,7 +191,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 		extraMountPoints = append(extraMountPoints, additionalExtraMountPoints...)
 
-		setupChrootDir := filepath.Join(buildDir, setupRoot)
 		setupChroot := safechroot.NewChroot(setupChrootDir, existingChrootDir)
 		err = setupChroot.Initialize(*tdnfTar, extraDirectories, extraMountPoints)
 		if err != nil {
@@ -197,7 +208,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
@@ -211,7 +222,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		// Create any partition-based artifacts
-		err = installutils.ExtractPartitionArtifacts(outputDir, defaultDiskIndex, disks[defaultDiskIndex], partIDToDevPathMap)
+		err = installutils.ExtractPartitionArtifacts(setupChrootDir, outputDir, defaultDiskIndex, disks[defaultDiskIndex], systemConfig, partIDToDevPathMap, mountPointToOverlayMap)
 		if err != nil {
 			return
 		}
@@ -229,7 +240,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -440,12 +451,12 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	})
 	return
 }
-
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
 	const (
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
 		emptyWorkerTar    = ""
+		rootDir           = "/"
 		existingChrootDir = true
 		leaveChrootOnDisk = true
 	)
@@ -455,24 +466,33 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 	// Only invoke CreateInstallRoot for a raw disk. This call will result in mount points being created from a raw disk
 	// into the install root. A rootfs will not have these.
 	if !isRootFS {
-		installMap, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToMountArgsMap)
+		installMap, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
 		if err != nil {
 			err = fmt.Errorf("failed to create install root: %s", err)
 			return
 		}
-		defer installutils.DestroyInstallRoot(installRoot, installMap)
+		defer installutils.DestroyInstallRoot(installRoot, installMap, mountPointToOverlayMap)
+	}
+
+	// Install any tools required for the setup root to function
+	setupChrootPackages := []string{}
+	toolingPackages := installutils.GetRequiredPackagesForInstall()
+	for _, toolingPackage := range toolingPackages {
+		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
 	}
 
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
 		// image setup environment (setuproot chroot or live installer).
 		verityPackages := []string{"device-mapper", "veritysetup"}
-		for _, pkg := range verityPackages {
-			_, err = installutils.TdnfInstall(pkg, "/")
-			if err != nil {
-				err = fmt.Errorf("failed to install read only support package '%s': %w", pkg, err)
-				return
-			}
+		setupChrootPackages = append(setupChrootPackages, verityPackages...)
+	}
+
+	for _, setupChrootPackage := range setupChrootPackages {
+		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
+		if err != nil {
+			err = fmt.Errorf("failed to install required setup chroot package '%s': %w", setupChrootPackage, err)
+			return
 		}
 	}
 
@@ -488,7 +508,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 	defer installChroot.Close(leaveChrootOnDisk)
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, isRootFS, encryptedRoot)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, isRootFS, encryptedRoot, diffDiskBuild)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -539,6 +559,11 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		bootDevice = installMap[rootMountPoint]
 		// If we do not have a seperate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
+	}
+
+	if installMap[rootMountPoint] == installutils.NullDevice {
+		// In case of overlay device being mounted at root, no need to change the bootloader.
+		return
 	}
 	bootUUID, err := installutils.GetUUID(bootDevice)
 	if err != nil {

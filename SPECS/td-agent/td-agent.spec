@@ -5,7 +5,7 @@
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,45 +25,45 @@ BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
 BuildRequires:  ruby
-BuildRequires:  rubygem-bundler
-BuildRequires:  rubygem-msgpack
-BuildRequires:  rubygem-cool.io
-BuildRequires:  rubygem-serverengine
-BuildRequires:  rubygem-oj
 BuildRequires:  rubygem-async-http
-BuildRequires:  rubygem-http_parser.rb
-BuildRequires:  rubygem-yajl-ruby
-BuildRequires:  rubygem-sigdump
-BuildRequires:  rubygem-tzinfo
-BuildRequires:  rubygem-tzinfo-data
-BuildRequires:  rubygem-httpclient
-BuildRequires:  rubygem-td-client
-BuildRequires:  rubygem-td
-BuildRequires:  rubygem-fluent-plugin-td
-BuildRequires:  rubygem-jmespath
 BuildRequires:  rubygem-aws-partitions
-BuildRequires:  rubygem-aws-sigv4
 BuildRequires:  rubygem-aws-sdk-core
 BuildRequires:  rubygem-aws-sdk-kms
-BuildRequires:  rubygem-aws-sdk-sqs
 BuildRequires:  rubygem-aws-sdk-s3
-BuildRequires:  rubygem-fluent-plugin-s3
-BuildRequires:  rubygem-webhdfs
-BuildRequires:  rubygem-fluent-plugin-webhdfs
-BuildRequires:  rubygem-fluent-plugin-rewrite-tag-filter
-BuildRequires:  rubygem-ruby-kafka
-BuildRequires:  rubygem-rdkafka
-BuildRequires:  rubygem-fluent-plugin-kafka
+BuildRequires:  rubygem-aws-sdk-sqs
+BuildRequires:  rubygem-aws-sigv4
+BuildRequires:  rubygem-bundler
+BuildRequires:  rubygem-cool.io
 BuildRequires:  rubygem-elasticsearch
 BuildRequires:  rubygem-fluent-plugin-elasticsearch
-BuildRequires:  rubygem-prometheus-client
+BuildRequires:  rubygem-fluent-plugin-kafka
 BuildRequires:  rubygem-fluent-plugin-prometheus
 BuildRequires:  rubygem-fluent-plugin-prometheus_pushgateway
 BuildRequires:  rubygem-fluent-plugin-record-modifier
-BuildRequires:  rubygem-systemd-journal
+BuildRequires:  rubygem-fluent-plugin-rewrite-tag-filter
+BuildRequires:  rubygem-fluent-plugin-s3
 BuildRequires:  rubygem-fluent-plugin-systemd
-BuildRequires:  rubygem-nokogiri
+BuildRequires:  rubygem-fluent-plugin-td
+BuildRequires:  rubygem-fluent-plugin-webhdfs
 BuildRequires:  rubygem-fluentd
+BuildRequires:  rubygem-http_parser.rb
+BuildRequires:  rubygem-httpclient
+BuildRequires:  rubygem-jmespath
+BuildRequires:  rubygem-msgpack
+BuildRequires:  rubygem-nokogiri
+BuildRequires:  rubygem-oj
+BuildRequires:  rubygem-prometheus-client
+BuildRequires:  rubygem-rdkafka
+BuildRequires:  rubygem-ruby-kafka
+BuildRequires:  rubygem-serverengine
+BuildRequires:  rubygem-sigdump
+BuildRequires:  rubygem-systemd-journal
+BuildRequires:  rubygem-td
+BuildRequires:  rubygem-td-client
+BuildRequires:  rubygem-tzinfo
+BuildRequires:  rubygem-tzinfo-data
+BuildRequires:  rubygem-webhdfs
+BuildRequires:  rubygem-yajl-ruby
 BuildRequires:  sudo
 BuildRequires:  systemd
 BuildRequires:  tar
@@ -73,46 +73,46 @@ Requires:       jemalloc
 Requires:       jemalloc-devel
 Requires:       libxcrypt
 Requires:       ruby
-Requires:  rubygem-bundler
-Requires:  rubygem-msgpack
-Requires:  rubygem-cool.io
-Requires:  rubygem-serverengine
-Requires:  rubygem-oj
-Requires:  rubygem-async-http
-Requires:  rubygem-http_parser.rb
-Requires:  rubygem-yajl-ruby
-Requires:  rubygem-sigdump
-Requires:  rubygem-tzinfo
-Requires:  rubygem-tzinfo-data
-Requires:  rubygem-httpclient
-Requires:  rubygem-td-client
-Requires:  rubygem-td
-Requires:  rubygem-fluent-plugin-td
-Requires:  rubygem-jmespath
-Requires:  rubygem-aws-partitions
-Requires:  rubygem-aws-sigv4
-Requires:  rubygem-aws-sdk-core
-Requires:  rubygem-aws-sdk-kms
-Requires:  rubygem-aws-sdk-sqs
-Requires:  rubygem-aws-sdk-s3
-Requires:  rubygem-fluent-plugin-s3
-Requires:  rubygem-webhdfs
-Requires:  rubygem-fluent-plugin-webhdfs
-Requires:  rubygem-fluent-plugin-rewrite-tag-filter
-Requires:  rubygem-ruby-kafka
-Requires:  rubygem-rdkafka
-Requires:  rubygem-fluent-plugin-kafka
-Requires:  rubygem-elasticsearch
-Requires:  rubygem-fluent-plugin-elasticsearch
-Requires:  rubygem-prometheus-client
-Requires:  rubygem-fluent-plugin-prometheus
-Requires:  rubygem-fluent-plugin-prometheus_pushgateway
-Requires:  rubygem-fluent-plugin-record-modifier
-Requires:  rubygem-systemd-journal
-Requires:  rubygem-fluent-plugin-systemd
-Requires:  rubygem-nokogiri
-Requires:  rubygem-fluentd
-
+Requires:       rubygem-async-http
+Requires:       rubygem-aws-partitions
+Requires:       rubygem-aws-sdk-core
+Requires:       rubygem-aws-sdk-kms
+Requires:       rubygem-aws-sdk-s3
+Requires:       rubygem-aws-sdk-sqs
+Requires:       rubygem-aws-sigv4
+Requires:       rubygem-bundler
+Requires:       rubygem-cool.io
+Requires:       rubygem-elasticsearch
+Requires:       rubygem-fluent-plugin-elasticsearch
+Requires:       rubygem-fluent-plugin-kafka
+Requires:       rubygem-fluent-plugin-prometheus
+Requires:       rubygem-fluent-plugin-prometheus_pushgateway
+Requires:       rubygem-fluent-plugin-record-modifier
+Requires:       rubygem-fluent-plugin-rewrite-tag-filter
+Requires:       rubygem-fluent-plugin-s3
+Requires:       rubygem-fluent-plugin-systemd
+Requires:       rubygem-fluent-plugin-td
+Requires:       rubygem-fluent-plugin-webhdfs
+Requires:       rubygem-fluentd
+Requires:       rubygem-http_parser.rb
+Requires:       rubygem-httpclient
+Requires:       rubygem-jmespath
+Requires:       rubygem-msgpack
+Requires:       rubygem-nokogiri
+Requires:       rubygem-oj
+Requires:       rubygem-prometheus-client
+Requires:       rubygem-rdkafka
+Requires:       rubygem-ruby-kafka
+Requires:       rubygem-serverengine
+Requires:       rubygem-sigdump
+Requires:       rubygem-systemd-journal
+Requires:       rubygem-td
+Requires:       rubygem-td-client
+Requires:       rubygem-tzinfo
+Requires:       rubygem-tzinfo-data
+Requires:       rubygem-webhdfs
+Requires:       rubygem-yajl-ruby
+Requires(pre):  shadow-utils
 
 %description
 The stable distribution of Fluentd
@@ -139,7 +139,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/td-agent/plugin
 mkdir -p %{buildroot}/tmp/td-agent
 
 %pre
-sudo ln -s %{_sbindir}/useradd %{_sbindir}/adduser
 if ! getent group td-agent >/dev/null; then
     %{_sbindir}/groupadd -r td-agent
 fi
@@ -201,6 +200,9 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
+* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.0.1-2
+- Add shadow-utils as BuildRequires and remove creating the sym link for adduser
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Initial CBL-Mariner import from Treasure Data (license: Apache2).
 - License verified.

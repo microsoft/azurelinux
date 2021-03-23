@@ -230,6 +230,7 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install libffi
 build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
+build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
@@ -452,6 +453,7 @@ build_rpm_in_chroot_no_install rpm
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
 chroot_and_install_rpms libcap
+chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod

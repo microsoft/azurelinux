@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        32%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxslt
+BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -62,6 +63,7 @@ Requires:       glib
 Requires:       kmod
 Requires:       libcap
 Requires:       libgcrypt
+Requires:       lz4
 Requires:       pam
 Requires:       xz
 
@@ -108,6 +110,7 @@ meson  --prefix %{_prefix}                                            \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
+       -Dlz4=true                                                     \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -243,8 +246,14 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 239-30
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-34
 - Remove build dependency on shadow-utils to break circular dependency
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
+- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+
+* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-32
+- Enable LZ4 so journalctl can read logs from the container host.
 
 * Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31
 - Fix CVE-2019-6454 patch. Add upstream patch info.

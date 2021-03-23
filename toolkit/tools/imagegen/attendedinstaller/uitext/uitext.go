@@ -5,22 +5,29 @@ package uitext
 
 // "]" is a special character for the TUI text, escape it with "[]"
 
+// Control sequences for text formatting
+const (
+	BoldPrefix = "[::b]"
+)
+
 // Navigation text.
 const (
-	ButtonAccept  = "[Accept[]"
-	ButtonCancel  = "[Cancel[]"
-	ButtonConfirm = "[Confirm[]"
-	ButtonGoBack  = "[Go Back[]"
-	ButtonNext    = "[Next[]"
-	ButtonYes     = "[Yes[]"
-	ButtonQuit    = "[Quit[]"
-	ButtonRestart = "[Restart[]"
+	ButtonAccept     = "[Accept[]"
+	ButtonCancel     = "[Cancel[]"
+	ButtonCancelBold = BoldPrefix + ButtonCancel
+	ButtonConfirm    = "[Confirm[]"
+	ButtonGoBack     = "[Go Back[]"
+	ButtonNext       = "[Next[]"
+	ButtonYes        = "[Yes[]"
+	ButtonQuit       = "[Quit[]"
+	ButtonQuitBold   = BoldPrefix + ButtonQuit
+	ButtonRestart    = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.
 const (
 	NavigationHelp = "Arrow keys make selections. Enter activates."
-	ExitModalTitle = "Do you want to quit setup?"
+	ExitModalTitle = BoldPrefix + "Do you want to quit setup?"
 )
 
 // ConfirmView text.
@@ -85,7 +92,7 @@ const (
 // InstallerView text.
 const (
 	InstallerExperienceTitle = "Select Installation Experience"
-	InstallerTerminalOption  = "Terminal Installer"
+	InstallerTerminalOption  = "Terminal Installer (Speech Enabled)"
 	InstallerGraphicalOption = "Graphical Installer"
 )
 
@@ -96,17 +103,17 @@ const (
 
 // HostNameView text.
 const (
-	HostNameTitle      = "Choose the Hostname for Your System"
-	HostNameInputLabel = "HostName:"
+	HostNameTitle      = "Choose the Host Name for Your System"
+	HostNameInputLabel = "Host Name:"
 
-	HostNameSegment   = "hostname"
+	HostNameSegment   = "host name"
 	DomainNameSegment = "domain name"
 
 	FQDNEmptyErrorFmt         = "empty %s is not allowed"
 	FQDNEndsInDashErrorFmt    = "%s should not end with '-'"
 	FQDNInvalidRuneErrorFmt   = "%s should only contain alpha-numeric, '.' and '-' characters"
 	FQDNInvalidStartErrorFmt  = "%s should start with an alpha character"
-	FQDNInvalidLengthErrorFmt = "hostname must be <= %d characters"
+	FQDNInvalidLengthErrorFmt = "host name must be <= %d characters"
 )
 
 // InstallationView text.
@@ -116,7 +123,7 @@ const (
 
 // UserView text.
 const (
-	SetupUserTitle = "Setup User Account"
+	SetupUserTitle = "Set Up User Account"
 
 	PasswordInputLabel        = "Password"
 	ConfirmPasswordInputLabel = "Confirm Password"
@@ -141,7 +148,7 @@ const (
 // FinishView text.
 const (
 	FinishTitle   = "CBL-Mariner Installation Complete"
-	FinishTextFmt = "Total installation time: %v seconds."
+	FinishTextFmt = "Total installation time: %v seconds. Press Enter to restart."
 )
 
 // Common for input validation.

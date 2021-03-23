@@ -268,15 +268,17 @@ var expectedConfiguration Config = Config{
 			Name:      "SmallerDisk",
 			IsDefault: true,
 			PartitionSettings: []PartitionSetting{
-				{
-					ID:           "MyBoot",
-					MountPoint:   "/boot",
-					MountOptions: "ro,exec",
+				PartitionSetting{
+					ID:             "MyBoot",
+					MountPoint:     "/boot",
+					MountOptions:   "ro,exec",
+					RdiffBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
-				{
-					ID:         "MyRootfs",
-					MountPoint: "/",
-					RemoveDocs: true,
+				PartitionSetting{
+					ID:               "MyRootfs",
+					MountPoint:       "/",
+					RemoveDocs:       true,
+					OverlayBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
 			},
 			PackageLists: []string{
