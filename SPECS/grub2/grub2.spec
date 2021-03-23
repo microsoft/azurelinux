@@ -111,7 +111,6 @@ export CFLAGS
     --disable-efiemu \
     --with-grubdir=grub2 \
     --with-platform=pc \
-    --with-utils=host \
     --target=i386 \
     --program-transform-name=s,grub,%{name}, \
     --with-bootdir="/boot"
@@ -136,7 +135,6 @@ pushd build-for-efi
     --disable-efiemu \
     --with-grubdir=grub2 \
     --with-platform=efi \
-    --with-utils=host \
     --target=%{_arch} \
     --program-transform-name=s,grub,%{name}, \
     --with-bootdir="/boot"
