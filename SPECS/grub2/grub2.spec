@@ -83,29 +83,10 @@ Group:          System Environment/Base
 GRUB UEFI bootloader binaries
 
 %prep
-%setup -q -n grub-%{version}-rc1
+%autosetup -p1 -n grub-%{version}-rc1
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
-
-# TODO: Check if I can use autosetup here instead
-%patch0001 -p1
-%patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
-%patch0005 -p1
-%patch0006 -p1
-%patch0104 -p1
-%patch0112 -p1
-%patch0115 -p1
-%patch0116 -p1
-%patch0117 -p1
-%patch0118 -p1
-%patch0148 -p1
-%patch0149 -p1
-%patch0150 -p1
-%patch0156 -p1
-%patch0157 -p1
 
 %build
 ./bootstrap --no-git --gnulib-srcdir=./gnulib
