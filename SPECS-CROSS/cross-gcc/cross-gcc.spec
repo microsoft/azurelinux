@@ -132,6 +132,11 @@ for source_file in $(cat %{_cross_name}-file_manifest_with_dirs.txt | sort --uni
 done
 install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cross_name}-file_manifest.txt
 
+# Create a symlink from sysroot/usr/include to sysroot/include
+# The GCC toolchain will look for header files under sysroot/usr/include
+mkdir -p %{buildroot}/%{_cross_sysroot}/usr
+ln -s "../include" %{buildroot}/%{_cross_sysroot}/usr
+
 # Turning off so we don't get ldconfig errors for crossarch packages
 # Add the /opt/cross libs to the ldcache
 # mkdir -p %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/
@@ -144,18 +149,12 @@ install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cro
 # %%post   -p /sbin/ldconfig
 # %%postun -p /sbin/ldconfig
 
-%post 
-
-# Create a symlink from sysroot/usr/include to sysroot/include
-# The GCC toolchain will look for header files under sysroot/usr/include
-mkdir -p %{_cross_sysroot}/usr
-ln -s "../include" %{_cross_sysroot}/usr
-
 %files -f %{_cross_name}-file_manifest.txt
 %defattr(-,root,root)
 %license licenses/*
 #%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 %{_cross_prefix}/%{_cross_name}-file_manifest.txt
+%{_cross_sysroot}/usr
 
 %changelog
 * Tue Feb 23 2021 Daniel McIlvaney <damcilva@microsoft.com> - 0.1.0-1
