@@ -18,13 +18,19 @@ Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{versi
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 
+# Incorporate relevant patches from Fedora 34
+# EFI Secure Boot / Handover Protocol patches
 Patch0001: 0001-Add-support-for-Linux-EFI-stub-loading.patch
 Patch0002: 0002-Rework-linux-command.patch
 Patch0003: 0003-Rework-linux16-command.patch
 Patch0004: 0004-Add-secureboot-support-on-efi-chainloader.patch
 Patch0005: 0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
 Patch0006: 0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
+
+# ARM64 build patch
 Patch0104: 0104-Rework-how-the-fdt-command-builds.patch
+
+# General fixes (> 4GB DMA, TPM measurements, etc)
 Patch0112: 0112-Try-to-pick-better-locations-for-kernel-and-initrd.patch
 Patch0115: 0115-x86-efi-Use-bounce-buffers-for-reading-to-addresses-.patch
 Patch0116: 0116-x86-efi-Re-arrange-grub_cmd_linux-a-little-bit.patch
@@ -34,6 +40,8 @@ Patch0148: 0148-efi-Set-image-base-address-before-jumping-to-the-PE-.patch
 Patch0149: 0149-tpm-Don-t-propagate-TPM-measurement-errors-to-the-ve.patch
 Patch0150: 0150-x86-efi-Reduce-maximum-bounce-buffer-size-to-16-MiB.patch
 Patch0156: 0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
+
+# CVE-2020-15705
 Patch0157: 0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 
 BuildRequires:  device-mapper-devel
