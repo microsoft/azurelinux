@@ -24,7 +24,7 @@ loading.
 %prep
 %autosetup -n shim-%{version} -p1
 # shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
-sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.microsoft.csv
+sed -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.microsoft.csv
 cat ./data/sbat.microsoft.csv
 
 %build
