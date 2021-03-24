@@ -3,15 +3,13 @@ Summary:        First stage UEFI bootloader
 Name:           shim-unsigned
 Version:        15.3
 Release:        1%{?dist}
-URL:            https://github.com/rhboot/shim
 License:        BSD
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
+URL:            https://github.com/rhboot/shim
 %ifarch x86_64
 BuildRequires:  shim-unsigned-x64
 %endif
-
 %ifarch aarch64
 BuildRequires:  shim-unsigned-aarch64
 %endif
@@ -24,11 +22,11 @@ under secure boot environments.
 
 %install
 %ifarch x86_64
-install -D -m 0744 /usr/share/shim-unsigned-x64/shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
+install -D -m 0744 %{_datadir}/shim-unsigned-x64/shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 %endif
 
 %ifarch aarch64
-install -D -m 0744 /usr/share/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/boot/efi/EFI/BOOT/bootaa64.efi
+install -D -m 0744 %{_datadir}/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/boot/efi/EFI/BOOT/bootaa64.efi
 %endif
 
 %files
@@ -41,12 +39,14 @@ install -D -m 0744 /usr/share/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/bo
 %endif
 
 %changelog
-* Tue Mar 16 2021 Chris Co <chrco@microsoft.com> 15.3-1
+* Tue Mar 16 2021 Chris Co <chrco@microsoft.com> - 15.3-1
 - Update to 15.3
 
-* Tue Aug 25 2020 Chris Co <chrco@microsoft.com> 15-3
+* Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-3
 - Bump release to get patched shims
-* Thu Jul 30 2020 Chris Co <chrco@microsoft.com> 15-2
+
+* Thu Jul 30 2020 Chris Co <chrco@microsoft.com> - 15-2
 - Update aarch64 source binary path
-* Wed Jul 29 2020 Chris Co <chrco@microsoft.com> 15-1
+
+* Wed Jul 29 2020 Chris Co <chrco@microsoft.com> - 15-1
 - Original version for CBL-Mariner.
