@@ -24,8 +24,8 @@ loading.
 %prep
 %autosetup -n shim-%{version} -p1
 # shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
-sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.mariner.csv
-cat ./data/sbat.mariner.csv
+sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.%{vendor}.csv
+cat ./data/sbat.%{vendor}.csv
 
 %build
 cp %{SOURCE100} cert.der
