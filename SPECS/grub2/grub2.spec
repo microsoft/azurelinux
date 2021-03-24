@@ -167,7 +167,7 @@ chmod 600 %{buildroot}/boot/%{name}/grub.cfg
 rm -rf %{buildroot}%{_infodir}
 
 # Add SBAT
-sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE2} > ./sbat.csv
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" %{SOURCE2} > ./sbat.csv
 cat ./sbat.csv
 
 # Generate grub efi image
