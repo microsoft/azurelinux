@@ -43,5 +43,5 @@ $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 			rpm2cpio $$srpm | cpio -idvu 2>>$(srpm_expand_log) && \
 			echo "Extracted \"$$srpm_filename\"." >> $(srpm_expand_log) || $(call print_error,Failed to expand "$$srpm".); \
 		fi \
-	done || $(call print_error,Checking for spec updates failed. See above errors and "$$srpm_expand_log" for more details.); \
+	done || $(call print_error,Checking for spec updates failed. See above errors and "$(srpm_expand_log)" for more details.); \
 	touch $@
