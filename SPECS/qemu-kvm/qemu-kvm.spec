@@ -163,7 +163,7 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
-* Fri Mar 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-27
+* Tue Mar 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-27
 - Patch CVE-2021-20255
 
 * Fri Mar 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-26
