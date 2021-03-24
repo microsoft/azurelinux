@@ -8,7 +8,7 @@
     "licenses": [
         {
             "origin": "Fedora",
-            "description": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
+            "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
                 "at",
                 "attr",
@@ -74,7 +74,7 @@
         },
         {
             "origin": "Microsoft",
-            "description": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
+            "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "aspnetcore-runtime-3.1",
                 "auoms",
@@ -231,7 +231,7 @@
         },
         {
             "origin": "Photon",
-            "description": "[Photon License](LICENSE-PHOTON.md) and [Photon Notice](NOTICE.APACHE2). <br>  Also see [LICENSE-EXCEPTIONS.PHOTON](LICENSE-EXCEPTIONS.PHOTON).",
+            "license": "[Photon License](LICENSE-PHOTON.md) and [Photon Notice](NOTICE.APACHE2). <br>  Also see [LICENSE-EXCEPTIONS.PHOTON](LICENSE-EXCEPTIONS.PHOTON).",
             "specs": [
                 "acl",
                 "alsa-lib",
@@ -757,21 +757,21 @@
         },
         {
             "origin": "OpenMamba",
-            "description": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
+            "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
                 "bash-completion"
             ]
         },
         {
             "origin": "TreasureData",
-            "description": "[TreasureData ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "license": "[TreasureData ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "td-agent"
             ]
         },
         {
             "origin": "Magnus Edenhill Open Source",
-            "description": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
+            "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
             "specs": [
                 "librdkafka"
             ]

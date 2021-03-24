@@ -15,7 +15,7 @@ from types import SimpleNamespace
 #
 # class License:
 #     origin: str
-#     description: str
+#     license: str
 #     specs: List[str]
 
 def generate_markdown(license_collection):
@@ -27,7 +27,7 @@ def generate_markdown(license_collection):
 
     for license in license_collection.licenses:
         license.specs.sort(key=str.lower)
-        res.append('| {0} | {1} | {2} |'.format(license.origin, license.description, ' <br> '.join(license.specs)))
+        res.append('| {0} | {1} | {2} |'.format(license.origin, license.license, ' <br> '.join(license.specs)))
     
     return '\n'.join(res) + '\n'
 
