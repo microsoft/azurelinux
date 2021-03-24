@@ -72,6 +72,7 @@ Conflicts:      %{_cross_name}-gcc-bootstrap3
 Conflicts:      %{_cross_name}-glibc-bootstrap
 Conflicts:      %{_cross_name}-glibc-bootstrap2
 Conflicts:      %{_cross_name}-kernel-headers
+Requires:       libmpc
 
 %description
 Bundle of all files needed to cross compile with gcc including: gcc, glibc, binutils, kernel headers.
@@ -131,6 +132,11 @@ for source_file in $(cat %{_cross_name}-file_manifest_with_dirs.txt | sort --uni
 done
 install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cross_name}-file_manifest.txt
 
+# Create a symlink from sysroot/usr/include to sysroot/include
+# The GCC toolchain will look for header files under sysroot/usr/include
+mkdir -p %{buildroot}/%{_cross_sysroot}/usr
+ln -s "../include" %{buildroot}/%{_cross_sysroot}/usr
+
 # Turning off so we don't get ldconfig errors for crossarch packages
 # Add the /opt/cross libs to the ldcache
 # mkdir -p %%{buildroot}%%{_sysconfdir}/ld.so.conf.d/
@@ -148,6 +154,7 @@ install -D %{_cross_name}-file_manifest.txt %{buildroot}/%{_cross_prefix}/%{_cro
 %license licenses/*
 #%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 %{_cross_prefix}/%{_cross_name}-file_manifest.txt
+%{_cross_sysroot}/usr
 
 %changelog
 * Tue Feb 23 2021 Daniel McIlvaney <damcilva@microsoft.com> - 0.1.0-1
