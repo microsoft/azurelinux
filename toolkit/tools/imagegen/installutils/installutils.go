@@ -373,8 +373,9 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - mountPointToMountArgsMap is a map of mountpoints to mount options
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
-//- diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild bool) (err error) {
+// - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
+// - hidepidEnable is a flag that denotes whether /proc will be mounted with the hidepid option
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnable bool) (err error) {
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -446,7 +447,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, encryptedRoot)
+		err = configureSystemFiles(installChroot, hostname, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, encryptedRoot, hidepidEnable)
 		if err != nil {
 			return
 		}
@@ -599,7 +600,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnable bool) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -607,7 +608,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, ins
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), installMap, mountPointToFsTypeMap, mountPointToMountArgsMap)
+	err = updateFstab(installChroot.RootDir(), installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, hidepidEnable)
 	if err != nil {
 		return
 	}
@@ -761,21 +762,28 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string) (err error) {
+func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, hidepidEnable bool) (err error) {
 	ReportAction("Configuring fstab")
 
 	for mountPoint, devicePath := range installMap {
 		if mountPoint != "" && devicePath != NullDevice {
-			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint])
+			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], false)
 			if err != nil {
 				return
 			}
 		}
 	}
+
+	if hidepidEnable {
+		err = addEntryToFstab(installRoot, "/proc", "proc", "proc","rw,nosuid,nodev,noexec,relatime,hidepid=2", true)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
-func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string) (err error) {
+func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string, doPseudoFsMount bool) (err error) {
 	const (
 		uuidPrefix       = "UUID="
 		fstabPath        = "/etc/fstab"
@@ -807,6 +815,8 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 		device = devicePath
 	} else if diskutils.IsReadOnlyDevice(devicePath) {
 		device = devicePath
+	} else if doPseudoFsMount {
+		device = devicePath
 	} else {
 		uuid, err := GetUUID(devicePath)
 		if err != nil {
@@ -821,6 +831,8 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 	pass := defaultPass
 	if mountPoint == rootfsMountPoint {
 		pass = rootPass
+	} else if doPseudoFsMount {
+		pass = disablePass
 	}
 
 	// Construct fstab entry and append to fstab file

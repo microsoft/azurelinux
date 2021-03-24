@@ -30,6 +30,7 @@ type SystemConfig struct {
 	Encryption         RootEncryption      `json:"Encryption"`
 	RemoveRpmDb        bool                `json:"RemoveRpmDb"`
 	ReadOnlyVerityRoot ReadOnlyVerityRoot  `json:"ReadOnlyVerityRoot"`
+	HidepidDisable     bool                `json:"HidepidDisable"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
@@ -132,6 +133,8 @@ func (s *SystemConfig) IsValid() (err error) {
 	}
 
 	//Validate Encryption
+
+	//Validate HidepidDisable
 
 	return
 }

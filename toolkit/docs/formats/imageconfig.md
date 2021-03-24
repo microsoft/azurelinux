@@ -251,6 +251,10 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 },
 ```
 
+### HidepidDisable
+
+An optional flag that removes the hidepid option from /proc. Hidepid prevents proc ids from being visible to all users.
+
 ### Users
 
 Users is an array of user information. The User information is a map of key value pairs.
