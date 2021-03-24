@@ -13,5 +13,5 @@ Support for CBL-Mariner is limited to the resources listed above.
 [gh-issue]: https://github.com/microsoft/CBL-Mariner/issues/new/choose
 [gh-bug]: https://github.com/microsoft/CBL-Mariner/issues/new?assignees=&labels=Issue-Bug&template=bug_report.md&title=
 [gh-feature]: https://github.com/microsoft/CBL-Mariner/issues/new?assignees=&labels=Issue-Feature&template=Feature_Request.md&title=
-[demo]: https://docs.microsoft.com/windows/CBL-MarinerDemo
+[demo]: https://github.com/Microsoft/CBL-MarinerDemo
 [contributor]: https://github.com/microsoft/CBL-Mariner/blob/main/CONTRIBUTING.md
