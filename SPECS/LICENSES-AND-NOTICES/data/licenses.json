@@ -101,6 +101,7 @@
                 "freefont",
                 "gflags",
                 "go-md2man",
+                "grpc",
                 "GSL",
                 "ivykis",
                 "jsonbuilder",
