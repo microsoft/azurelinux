@@ -191,7 +191,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
-* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-2
+* Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-2
 - Add SELinux support
 
 * Thu Mar 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-1
