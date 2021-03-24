@@ -1,8 +1,4 @@
 %global debug_package %{nil}
-
-# shim takes in rhboot's mirror of gnu-efi as a submodule.
-%global gnuefiversion e32d8c84a5748a2e3b7220dae638418f81a7986d
-
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-aarch64
 Version:        15.3
@@ -11,11 +7,9 @@ URL:            https://github.com/rhboot/shim
 License:        BSD
 Vendor:         Microsoft
 Distribution:   Mariner
-Source0:        https://github.com/rhboot/shim/archive/shim-%{version}-rc4.tar.gz
-Source1:        https://github.com/rhboot/gnu-efi/archive/%{gnuefiversion}.tar.gz
-Source2:        sbat.csv.in
+Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2
+Source1:        sbat.csv.in
 Source100:      cbl-mariner-ca-20210127.der
-
 BuildRequires:  dos2unix
 BuildRequires:  vim-extra
 ExclusiveArch:  aarch64
@@ -28,14 +22,9 @@ shim will extend various PCRs with the digests of the targets it is
 loading.
 
 %prep
-%autosetup -n shim-shim-%{version}-rc4 -p1
-# Manually set up gnu-efi submodule
-cp %{SOURCE1} gnu-efi-%{gnuefiversion}.tar.gz
-tar -zxf gnu-efi-%{gnuefiversion}.tar.gz
-rmdir gnu-efi
-mv gnu-efi-%{gnuefiversion} gnu-efi
+%autosetup -n shim-%{version} -p1
 # shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
-sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE2} > ./data/sbat.mariner.csv
+sed -e "s,@@VERSION@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.mariner.csv
 cat ./data/sbat.mariner.csv
 
 %build
@@ -57,7 +46,6 @@ make VENDOR_CERT_FILE=cert.der test
 %changelog
 * Tue Mar 16 2021 Chris Co <chrco@microsoft.com> 15.3-1
 - Update to 15.3
-- Add gnu-efi source
 - Remove extra patches. These are incorporated into latest version
 
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> 15-4
