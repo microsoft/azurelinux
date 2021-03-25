@@ -271,7 +271,7 @@ func installBuildRequires(defines map[string]string, runCheck bool) (err error) 
 			stdout string
 		)
 
-		defaultArgs := []string{"install", "-y"}
+		defaultArgs := []string{"install", "-y", "--allowerasing"}
 		installArgs := make([]string, 0, len(buildRequires)+len(defaultArgs))
 
 		installArgs = append(installArgs, defaultArgs...)
