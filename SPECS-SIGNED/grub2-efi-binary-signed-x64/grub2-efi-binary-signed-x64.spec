@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        Signed GRand Unified Bootloader for x86_64 systems
 Name:           grub2-efi-binary-signed-x64
-Version:        2.06
+Version:        2.06~rc1
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -40,7 +40,7 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
-* Wed Mar 10 2021 Chris Co <chrco@microsoft.com> - 2.06-1
+* Wed Mar 10 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-1
 - Update to 2.06-rc1
 - Incorporate SBAT data
 
