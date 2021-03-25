@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.4.91
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -459,6 +459,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Feb 23 2021 Chris Co <chrco@microsoft.com> - 5.4.91-6
+- Remove CONFIG_GCC_PLUGIN_RANDSTRUCT
+- Add CONFIG_SCSI_SMARTPQI=y
+
 * Thu Feb 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
 - Add configs to enable tcrypt in FIPS mode
 
