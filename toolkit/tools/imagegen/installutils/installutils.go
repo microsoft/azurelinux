@@ -775,7 +775,7 @@ func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPoi
 	}
 
 	if hidepidEnable {
-		err = addEntryToFstab(installRoot, "/proc", "proc", "proc","rw,nosuid,nodev,noexec,relatime,hidepid=2", true)
+		err = addEntryToFstab(installRoot, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", true)
 		if err != nil {
 			return
 		}
