@@ -354,6 +354,7 @@ var expectedConfiguration Config = Config{
 				TmpfsOverlays:                nil,
 				TmpfsOverlaySize:             "20%",
 			},
+			HidepidDisabled: true,
 		},
 		{
 			Name: "BiggerDiskA",

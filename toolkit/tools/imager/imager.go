@@ -481,11 +481,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
 	}
 
-	logger.Log.Infof("HidepidDisabled is %v.", systemConfig.HidepidDisable)
-	hidepidEnable := true
-	if systemConfig.HidepidDisable {
-		hidepidEnable = false
-	}
+	logger.Log.Infof("HidepidDisabled is %v.", systemConfig.HidepidDisabled)
+	hidepidEnabled := !systemConfig.HidepidDisabled
 
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
@@ -514,7 +511,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 	defer installChroot.Close(leaveChrootOnDisk)
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnable)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return

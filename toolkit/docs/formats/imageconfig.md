@@ -251,9 +251,9 @@ A sample KernelCommandLine enabling a basic IMA mode and passing two additional 
 },
 ```
 
-### HidepidDisable
+### HidepidDisabled
 
-An optional flag that removes the hidepid option from /proc. Hidepid prevents proc ids from being visible to all users.
+An optional flag that removes the `hidepid` option from `/proc`. `Hidepid` prevents proc IDs from being visible to all users.
 
 ### Users
 
