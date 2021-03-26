@@ -58,6 +58,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/freetype-config
 
 %changelog
+* Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.9.1-5
+- Add enable-fretype-config to configuration
+- Add /usr/bin/freetype-config to freetype-devel
+
 * Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
 - Added %%license line automatically
 

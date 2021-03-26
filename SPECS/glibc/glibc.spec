@@ -34,7 +34,6 @@ Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
-Provides:		%{name}-locale-source = %{version}-%{release}
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -66,6 +65,7 @@ These are the additional language files of glibc.
 Summary:        Additional internationalization files for glibc
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
+Provides:		%{name}-locale-source = %{version}-%{release}
 
 %description i18n
 These are the additional internationalization files of glibc.
@@ -290,9 +290,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 %{_datadir}/i18n/charmaps/*.gz
 %{_datadir}/i18n/locales/*
-%exclude %{_datadir}/i18n/charmaps/UTF-8.gz
-%exclude %{_datadir}/i18n/charmaps/ISO-8859-1.gz
-%exclude %{_datadir}/i18n/locales/en_US
 
 %files devel
 %defattr(-,root,root)
@@ -307,7 +304,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
-- Provides glibc-locale-source from glibc
+- Provides glibc-locale-source from glibc-i18n
+- Add back exluded files to glibc-i18n
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.28-15
 - Replace incorrect %%{_lib} usage with %%{_libdir}
