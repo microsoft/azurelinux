@@ -327,7 +327,7 @@ func installBuildRequires(buildRequires []string) (err error) {
 		return
 	}
 
-	logger.Log.Debugf("Will install the following built-time package requirements: %v", buildRequires)
+	logger.Log.Debugf("Will install the following build-time package requirements: %v", buildRequires)
 
 	defaultArgs := []string{"install", "-y"}
 	installArgs := append(defaultArgs, buildRequires...)
