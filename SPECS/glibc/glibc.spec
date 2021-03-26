@@ -65,7 +65,7 @@ These are the additional language files of glibc.
 Summary:        Additional internationalization files for glibc
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
-Provides:		%{name}-locale-source = %{version}-%{release}
+Provides:       %{name}-locale-source = %{version}-%{release}
 
 %description i18n
 These are the additional internationalization files of glibc.
