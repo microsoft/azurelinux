@@ -3,7 +3,7 @@ Name:           initscripts
 Version:        9.70
 License:        GPLv2
 Group:          System Environment/Base
-Release:        6%{?dist}
+Release:        7%{?dist}
 URL:            https://github.com/fedora-sysv/initscripts
 #Source0:       https://github.com/fedora-sysv/initscripts/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -21,6 +21,7 @@ BuildRequires:  gettext
 BuildRequires:  pkg-config
 BuildRequires:  systemd
 Provides:       /sbin/service
+Provides:       network-scripts = %{version}-%{release}
 
 %description
 This package contains the script that activates and deactivates most
@@ -36,13 +37,6 @@ The debugmode package contains some basic scripts that are used to run
 the system in a debug mode.
 
 Currently, this consists of various memory checking code.
-
-
-%package  -n initnetworkscripts
-Summary:	Binaries of init network
-
-%description  -n initnetworkscripts
-Binaries of init network
 
 %prep
 %setup -q
@@ -179,6 +173,9 @@ EOF
 %{_sysconfdir}/profile.d/debug*
 
 %changelog
+* Tue Mar 23 2021 Henry Li <lihl@microsoft.com> 9.70-7
+- Add provides for network-scripts.
+
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 9.70-6
 -   Rename iproute2 to iproute.
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 9.70-5

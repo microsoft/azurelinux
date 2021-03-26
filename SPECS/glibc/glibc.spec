@@ -4,7 +4,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,7 @@ Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
+Provides:		%{name}-locale-source = %{version}-%{release}
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -305,6 +306,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
+- Provides glibc-locale-source from glibc
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.28-15
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

@@ -1,7 +1,7 @@
 Summary:	software font engine.
 Name:		freetype
 Version:	2.9.1
-Release:    4%{?dist}
+Release:    5%{?dist}
 License:	BSD/GPL
 URL:		https://www.freetype.org/
 Group:		System Environment/Libraries
@@ -26,7 +26,8 @@ It contains the libraries and header files to create applications
 %build
 ./configure \
 	--prefix=%{_prefix} \
-	--with-harfbuzz=no
+	--with-harfbuzz=no \
+	--enable-freetype-config 
 make %{?_smp_mflags}
 
 %install
@@ -54,6 +55,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_bindir}/freetype-config
 
 %changelog
 * Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
