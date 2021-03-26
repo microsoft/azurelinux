@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,11 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  cmake
 BuildRequires:  gcc
+BuildRequires:  zlib-devel
+BuildRequires:  openssl-devel
+
+Requires:       zlib
+Requires:       openssl
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -46,7 +51,12 @@ The grpc-plugins package contains the grpc plugins.
 %build
 mkdir -p cmake/build
 cd cmake/build
-cmake ../.. -DgRPC_INSTALL=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}
+cmake ../.. -DgRPC_INSTALL=ON \
+   -DBUILD_SHARED_LIBS=ON \
+   -DCMAKE_BUILD_TYPE=Release             \
+   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
+   -DgRPC_ZLIB_PROVIDER:STRING='package'  \
+   -DgRPC_SSL_PROVIDER:STRING='package'
 %make_build
 
 %install
@@ -59,7 +69,6 @@ find %{buildroot} -name '*.cmake' -delete
 %license LICENSE
 %{_libdir}/*.so.*
 %{_lib64dir}/*.so.*
-%{_mandir}/man3/*.3*
 %{_datadir}/grpc/roots.pem
 %exclude %{_datadir}/pkgconfig/zlib.pc
 %exclude %{_bindir}/acountry
@@ -79,5 +88,8 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Fri Mar 26 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-2
+- Switch to system provided packages for zlib and openssl.
+
 * Mon Mar 08 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-1
 - Original CBL-Mariner version. License Verified.
