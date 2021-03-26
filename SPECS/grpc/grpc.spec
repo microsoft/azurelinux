@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  cmake
 BuildRequires:  gcc
+AutoProv:       no
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -79,5 +80,8 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Fri Mar 26 2021 Chris Co <chrco@microsoft.com> - 1.35.0-2
+- Turn off RPM AutoProvides to prevent gRPC from mistakenly providing libz.so
+
 * Mon Mar 08 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-1
 - Original CBL-Mariner version. License Verified.
