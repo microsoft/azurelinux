@@ -159,6 +159,8 @@ $(final_toolchain): $(raw_toolchain) $(BUILD_SRPMS_DIR)
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt)
 	touch $@
 
+.SILENT: $(toolchain_rpms)
+
 ifeq ($(REBUILD_TOOLCHAIN),y)
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
