@@ -302,8 +302,8 @@ openjdk8-doc-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-sample-1.8.0.181-8.cm1.aarch64.rpm
 openjdk8-src-1.8.0.181-8.cm1.aarch64.rpm
 openjre8-1.8.0.181-8.cm1.aarch64.rpm
-openldap-2.4.57-1.cm1.aarch64.rpm
-openldap-debuginfo-2.4.57-1.cm1.aarch64.rpm
+openldap-2.4.57-2.cm1.aarch64.rpm
+openldap-debuginfo-2.4.57-2.cm1.aarch64.rpm
 openssl-1.1.1g-13.cm1.aarch64.rpm
 openssl-debuginfo-1.1.1g-13.cm1.aarch64.rpm
 openssl-devel-1.1.1g-13.cm1.aarch64.rpm
