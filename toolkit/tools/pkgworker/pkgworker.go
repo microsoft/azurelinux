@@ -56,10 +56,10 @@ var (
 )
 
 var (
-	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
 	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
-	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
 	equalToRegex              = regexp.MustCompile(` '?='? `)
+	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
+	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
 	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
 )
 
@@ -252,6 +252,7 @@ func findMissingBuildRequires(defines map[string]string, runCheck bool) (missing
 		packageNameMatchIndex = 1
 	)
 
+	// Find the SPEC file extracted from the SRPM
 	specDir := filepath.Join(chrootRpmBuildRoot, "SPECS")
 	allSpecFiles, err := ioutil.ReadDir(specDir)
 	if err != nil {
@@ -313,8 +314,8 @@ func findMissingBuildRequires(defines map[string]string, runCheck bool) (missing
 func installBuildRequires(buildRequires []string) (err error) {
 	const (
 		noMatchingPackagesErr   = "Error(1011) : No matching packages"
-		unresolvedOutputPrefix  = "No package"
 		unresolvedOutputPostfix = "available"
+		unresolvedOutputPrefix  = "No package"
 	)
 
 	var (
