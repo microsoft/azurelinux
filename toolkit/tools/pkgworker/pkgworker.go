@@ -324,7 +324,7 @@ func installBuildRequires(buildRequires []string) (err error) {
 	)
 
 	if len(buildRequires) == 0 {
-		logger.Log.Debug("Build-time package requirements already satisfied. Skipping insallation step.")
+		logger.Log.Debug("Build-time package requirements already satisfied. Skipping installation step.")
 		return
 	}
 
