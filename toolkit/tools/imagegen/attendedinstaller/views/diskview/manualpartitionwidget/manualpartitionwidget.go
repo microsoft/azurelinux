@@ -86,9 +86,6 @@ type ManualPartitionWidget struct {
 	sizeUnitInput    *tview.InputField
 	sizeInput        *tview.InputField
 
-	formatInputReset   func()
-	sizeUnitInputReset func()
-
 	// Disk state
 	bytesRemaining uint64
 	deviceIndex    int
@@ -130,12 +127,13 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 
 	mp.addPartitionForm = tview.NewForm().
 		SetButtonsAlign(tview.AlignCenter)
-	mp.formatInput, mp.formatInputReset = mp.enumInputBox(validPartitionFormats)
-	mp.formatInput = mp.formatInput.SetLabel(uitext.DiskFormatLabel).
+
+	mp.formatInput = mp.enumInputBox(validPartitionFormats).
+		SetLabel(uitext.DiskFormatLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
-	mp.sizeUnitInput, mp.sizeUnitInputReset = mp.enumInputBox(validSizeUnits)
-	mp.sizeUnitInput = mp.sizeUnitInput.SetLabel(uitext.DiskSizeUnitLabel).
+	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
+		SetLabel(uitext.DiskSizeUnitLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.nameInput = tview.NewInputField().
@@ -366,12 +364,9 @@ func (mp *ManualPartitionWidget) validateAddPartitionForm() (err error) {
 func (mp *ManualPartitionWidget) resetAddPartitionForm() {
 	mp.nameInput.SetText("")
 	mp.mountPointInput.SetText("")
-	mp.formatInputReset()
-	mp.sizeUnitInputReset()
 	mp.sizeInput.SetText("")
 	mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
 	mp.formNavBar.SetSelectedButton(noSelection)
-
 	mp.addPartitionForm.SetFocus(0)
 	mp.refreshTitle()
 }
@@ -662,9 +657,8 @@ func (mp *ManualPartitionWidget) onNextButton() {
 }
 
 // enumInputBox returns an input box that only allows values from elements to appear.
-// As well as resetter to reset the selection
-func (mp *ManualPartitionWidget) enumInputBox(elements []string) (field *tview.InputField, resetter func()) {
-	field = tview.NewInputField()
+func (mp *ManualPartitionWidget) enumInputBox(elements []string) *tview.InputField {
+	field := tview.NewInputField()
 	index := 0
 	// Initialize text with the first element
 	field.SetText(elements[index])
@@ -695,7 +689,5 @@ func (mp *ManualPartitionWidget) enumInputBox(elements []string) (field *tview.I
 		field.SetText(elements[index])
 		return nil
 	})
-	return field, func() {
-		index = 0
-	}
+	return field
 }
