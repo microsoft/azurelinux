@@ -485,7 +485,10 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		}
 		if flagToSet != "" {
 			args = append(args, flagToSet, "on")
-			_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", args...)
+			// Golang does not allow mixing of variadic and regular arguments. So add all of the flock args to
+			// the overall arg slice and pass that to execute
+			args = append([]string{"--timeout", timeoutInSeconds, diskDevPath, "parted"}, args...)
+			_, stderr, err := shell.Execute("flock", args...)
 			if err != nil {
 				logger.Log.Warnf("Failed to set flag (%s) using parted: %v", flagToSet, stderr)
 			}
