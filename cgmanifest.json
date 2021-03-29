@@ -2206,7 +2206,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210322/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
