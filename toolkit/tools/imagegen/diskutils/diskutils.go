@@ -424,7 +424,12 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 // InitializeSinglePartition initializes a single partition based on the given partition configuration
 func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
-	const timeoutInSeconds = "5"
+	const (
+		retryDuration    = time.Second
+		timeoutInSeconds = "5"
+		totalAttempts    = 5
+	)
+
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
 	// There are two primary partition naming conventions:
@@ -435,22 +440,25 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
 	}
 
-	var exists bool
-	for _, testPartDevPath := range testPartDevPaths {
-		exists, err = file.PathExists(testPartDevPath)
-		if err != nil {
-			logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
-			return
+	err = retry.Run(func() error {
+		for _, testPartDevPath := range testPartDevPaths {
+			exists, err := file.PathExists(testPartDevPath)
+			if err != nil {
+				logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
+				return err
+			}
+			if exists {
+				partDevPath = testPartDevPath
+				return nil
+			}
+			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
-		if exists {
-			partDevPath = testPartDevPath
-			break
-		}
-		logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
-	}
-
-	if !exists {
+		logger.Log.Warnf("Could not find any valid partition paths. Will retry up to %d times", totalAttempts)
 		err = fmt.Errorf("could not find partition to initialize in /dev")
+		return err
+	}, totalAttempts, retryDuration)
+
+	if err != nil {
 		logger.Log.Errorf("%s", err)
 		return
 	}
