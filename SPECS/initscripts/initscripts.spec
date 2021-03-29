@@ -1,48 +1,42 @@
 Summary:        Scripts to bring up network interfaces and legacy utilities
 Name:           initscripts
 Version:        9.70
+Release:        7%{?dist}
 License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System Environment/Base
-Release:        6%{?dist}
 URL:            https://github.com/fedora-sysv/initscripts
 #Source0:       https://github.com/fedora-sysv/initscripts/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         service.patch
 Patch1:         fix_return_code_during_set_error.patch
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Requires:       systemd
-Requires:       iproute
+BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  pkg-config
+BuildRequires:  popt-devel
 BuildRequires:  python2
 BuildRequires:  python2-libs
-BuildRequires:  popt-devel
-BuildRequires:  gettext
-BuildRequires:  pkg-config
 BuildRequires:  systemd
+Requires:       iproute
+Requires:       systemd
 Provides:       /sbin/service
+Provides:       network-scripts = %{version}-%{release}
 
 %description
 This package contains the script that activates and deactivates most
 network interfaces, some utilities, and other legacy files.
 
 %package -n debugmode
-Summary: Scripts for running in debug mode
-Requires: initscripts
-Group: System Environment/Base
+Summary:        Scripts for running in debug mode
+Group:          System Environment/Base
+Requires:       initscripts
 
 %description -n debugmode
 The debugmode package contains some basic scripts that are used to run
 the system in a debug mode.
 
 Currently, this consists of various memory checking code.
-
-
-%package  -n initnetworkscripts
-Summary:	Binaries of init network
-
-%description  -n initnetworkscripts
-Binaries of init network
 
 %prep
 %setup -q
@@ -71,8 +65,8 @@ rm -f %{buildroot}%{_sbindir}/ifup
 touch %{buildroot}%{_sysconfdir}/rc.d/rc.local
 chmod 755 %{buildroot}%{_sysconfdir}/rc.d/rc.local
 
-ln -sfv rc.d/init.d %{buildroot}/etc/init.d
-rm -rf %{buildroot}%{_prefix}/lib/systemd
+ln -sfv rc.d/init.d %{buildroot}%{_sysconfdir}/init.d
+rm -rf %{buildroot}%{_lib}/systemd
 
 cat >> %{buildroot}%{_sysconfdir}/sysconfig/network <<- "EOF"
 ###
@@ -144,7 +138,7 @@ EOF
 %dir %{_sysconfdir}/rc.d/init.d
 %{_sysconfdir}/rc.d/init.d/*
 %ghost %verify(not md5 size mtime) %config(noreplace,missingok) %{_sysconfdir}/rc.d/rc.local
-%{_prefix}/lib/sysctl.d/00-system.conf
+%{_lib}/sysctl.d/00-system.conf
 %exclude %{_sysconfdir}/profile.d/debug*
 %{_sysconfdir}/profile.d/*
 %{_sbindir}/sys-unconfig
@@ -155,11 +149,11 @@ EOF
 %{_sbindir}/sushell
 %attr(2755,root,root) %{_sbindir}/netreport
 #%{_udevrulesdir}/*
-%{_prefix}/lib/udev/rename_device
-/usr/lib/udev/rules.d/60-net.rules
+%{_lib}/udev/rename_device
+%{_lib}/udev/rules.d/60-net.rules
 %{_sbindir}/service
 %{_mandir}/man*/*
-%dir %attr(775,root,root) /var/run/netreport
+%dir %attr(775,root,root) %{_var}/run/netreport
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %{_sysconfdir}/NetworkManager/dispatcher.d/00-netreport
@@ -171,7 +165,7 @@ EOF
 %{_tmpfilesdir}/initscripts.conf
 %dir %{_libexecdir}/initscripts
 %dir %{_libexecdir}/initscripts/legacy-actions
-/etc/init.d
+%{_sysconfdir}/init.d
 
 %files -n debugmode
 %defattr(-,root,root)
@@ -179,26 +173,39 @@ EOF
 %{_sysconfdir}/profile.d/debug*
 
 %changelog
+* Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 9.70-7
+- Add provides for network-scripts.
+
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 9.70-6
 -   Rename iproute2 to iproute.
+
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 9.70-5
 -   Verified license. Removed sha1. Fixed download URL. Fixed formatting.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.70-4
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue Jan 05 2019 Ankit Jain <ankitja@vmware.com> 9.70-3
 -   Added network configuration to fix "service --status-all"
+
 *   Tue Dec 26 2017 Divya Thaluru <dthaluru@vmware.com> 9.70-2
 -   Fixed return code in /etc/init.d/functions bash script
+
 *   Mon Apr 3 2017 Dheeraj Shetty <dheerajs@vmware.com> 9.70-1
 -   Updated to version 9.70
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 9.65-2
 -   GA - Bump release of all rpms
+
 *   Fri Feb 12 2016 Divya Thaluru <dthaluru@vmware.com> 9.65-2
 -   Fixing service script to start services using systemctl by default
+
 *   Tue Jan 26 2016 Xiaolin Li <xiaolinl@vmware.com> 9.65-1
 -   Updated to version 9.65
+
 *   Mon Jul 20 2015 Divya Thaluru <dthaluru@vmware.com> 9.63-1
 -   Got Spec file from source tar ball and modified it to be compatible to build in Photon
+
 * Mon May 18 2015 Lukáš Nykrýn <lnykryn@redhat.com> - 9.63-1
 - remove ipcalc, it has its own package now
 - network: tell NM to reload its configuration during start
@@ -1935,7 +1942,6 @@ ng
 - fix bonding + dhcp (#91399)
 - fix typo (#103781)
 - sysconfig/network-scripts/ifup: fix use of local
-
 - fix shutdown with NFS root (#100556, <Julian.Blake@cern.ch>)
 - remove /var/run/confirm when done with /etc/rc (#100898)
 - ipcalc: fix some memory handling (#85478, <miked@ed.ac.uk>)
@@ -2033,6 +2039,7 @@ ng
   recognize "probe" as an argument
 
 * Wed Mar 12 2003 Bill Nottingham <notting@redhat.com> 7.14-1
+
 * - do not handle changed chain name; change was reverted
 
 * Tue Feb 25 2003 Bill Nottingham <notting@redhat.com> 7.13-1
@@ -2313,6 +2320,7 @@ ng
 - don't run hwclock --adjust on a read-only filesystem
 
 * Thu Sep  6 2001 Than Ngo <than@redhat.com>
+
 * update initscripts-s390.patch for s390/s390x
 
 * Wed Sep  5 2001 Bill Nottingham <notting@redhat.com>
@@ -3394,7 +3402,6 @@ ng
 * Tue Jun 10 1997 Michael K. Johnson <johnsonm@redhat.com>
 - /sbin/netreport sgid rather than suid.
 - /var/run/netreport writable by group root.
-
 - /etc/ppp/ip-{up|down} no longer exec their local versions, so
   now ifup-post and ifdown-post will be called even if ip-up.local
   and ip-down.local exist.
