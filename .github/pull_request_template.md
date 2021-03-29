@@ -10,7 +10,7 @@ Feel free to delete sections of the template which do not apply to your PR, or a
 - [ ] The toolchain/worker package manifests are up-to-date
 - [ ] Any updated packages successfully build (or no packages were changed)
 - [ ] All package sources are available
-- [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/tools/cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`)
+- [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/tools/cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`, `.github/workflows/cgmanifest.json`)
 - [ ] LICENSE-MAP files are up-to-date (`./SPECS/LICENSES-AND-NOTICES/data/licenses.json`, `./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md`, `./SPECS/LICENSES-AND-NOTICES/LICENSE-EXCEPTIONS.PHOTON`)
 - [ ] All source files have up-to-date hashes in the `*.signatures.json` files
 - [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
