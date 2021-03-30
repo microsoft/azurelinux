@@ -1104,6 +1104,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "eppic",
+          "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
+          "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "erlang",
           "version": "22.0.7",
           "downloadUrl": "https://github.com/erlang/otp/archive/OTP-22.0.7/otp-OTP-22.0.7.tar.gz"
