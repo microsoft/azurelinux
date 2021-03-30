@@ -80,10 +80,10 @@ type ManualPartitionWidget struct {
 	addPartitionForm *tview.Form
 	formFlex         *tview.Flex
 	formNavBar       *navigationbar.NavigationBar
-	formatDropDown   *tview.DropDown
+	formatInput      *tview.InputField
 	mountPointInput  *tview.InputField
 	nameInput        *tview.InputField
-	sizeUnitDropDown *tview.DropDown
+	sizeUnitInput    *tview.InputField
 	sizeInput        *tview.InputField
 
 	// Disk state
@@ -128,25 +128,13 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	mp.addPartitionForm = tview.NewForm().
 		SetButtonsAlign(tview.AlignCenter)
 
-	// Dropdowns do not expose the functions needed to override the list colors.
-	// Alter the defaults now so they are captured by the dropdowns and then restore the style
-	// for future elements.
-	originalStyle := tview.Styles
-	tview.Styles.ContrastBackgroundColor = tcell.ColorWhite
-	tview.Styles.MoreContrastBackgroundColor = tcell.ColorBlack
-	tview.Styles.PrimitiveBackgroundColor = tcell.ColorWhite
-	tview.Styles.PrimaryTextColor = tcell.ColorBlue
-
-	mp.formatDropDown = tview.NewDropDown().
+	mp.formatInput = mp.enumInputBox(validPartitionFormats).
 		SetLabel(uitext.DiskFormatLabel).
-		SetOptions(validPartitionFormats, nil)
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
-	mp.sizeUnitDropDown = tview.NewDropDown().
+	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
 		SetLabel(uitext.DiskSizeUnitLabel).
-		SetOptions(validSizeUnits, nil)
-
-	// Restore the global style
-	tview.Styles = originalStyle
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.nameInput = tview.NewInputField().
 		SetLabel(uitext.DiskNameLabel).
@@ -180,8 +168,8 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	mp.addPartitionForm.
 		AddFormItem(mp.nameInput).
 		AddFormItem(mp.mountPointInput).
-		AddFormItem(mp.formatDropDown).
-		AddFormItem(mp.sizeUnitDropDown).
+		AddFormItem(mp.formatInput).
+		AddFormItem(mp.sizeUnitInput).
 		AddFormItem(mp.sizeInput).
 		AddFormItem(mp.formNavBar).
 		SetFieldBackgroundColor(tview.Styles.InverseTextColor)
@@ -315,11 +303,11 @@ func (mp *ManualPartitionWidget) onPartitionConfirmButton() {
 			// Expand to all available disk space
 			formattedSize = fmt.Sprintf(partitionEntryFormat, mp.bytesRemaining/basePartitionUnit, basePartitionLabel)
 		} else {
-			_, currentUnit := mp.sizeUnitDropDown.GetCurrentOption()
+			currentUnit := mp.sizeUnitInput.GetText()
 			formattedSize = fmt.Sprintf("%s%s", sizeText, currentUnit)
 		}
 
-		_, currentFormat := mp.formatDropDown.GetCurrentOption()
+		currentFormat := mp.formatInput.GetText()
 		mp.addPartitionToTable(mp.nameInput.GetText(), formattedSize, currentFormat, mp.mountPointInput.GetText())
 		mp.pages.HidePage(addPartitionPage)
 		mp.refreshTitle()
@@ -336,15 +324,9 @@ func (mp *ManualPartitionWidget) validateAddPartitionForm() (err error) {
 		return fmt.Errorf(uitext.MountPointAlreadyInUseError)
 	}
 
-	formatIndex, format := mp.formatDropDown.GetCurrentOption()
-	if formatIndex == noSelection {
-		return fmt.Errorf(uitext.NoFormatSelectedError)
-	}
+	format := mp.formatInput.GetText()
 
-	unitIndex, currentUnit := mp.sizeUnitDropDown.GetCurrentOption()
-	if unitIndex == noSelection {
-		return fmt.Errorf(uitext.NoUnitOfSizeSelectedError)
-	}
+	currentUnit := mp.sizeUnitInput.GetText()
 
 	sizeText := mp.sizeInput.GetText()
 	if sizeText == "" {
@@ -382,12 +364,9 @@ func (mp *ManualPartitionWidget) validateAddPartitionForm() (err error) {
 func (mp *ManualPartitionWidget) resetAddPartitionForm() {
 	mp.nameInput.SetText("")
 	mp.mountPointInput.SetText("")
-	mp.formatDropDown.SetCurrentOption(noSelection)
-	mp.sizeUnitDropDown.SetCurrentOption(noSelection)
 	mp.sizeInput.SetText("")
 	mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
 	mp.formNavBar.SetSelectedButton(noSelection)
-
 	mp.addPartitionForm.SetFocus(0)
 	mp.refreshTitle()
 }
@@ -675,4 +654,40 @@ func (mp *ManualPartitionWidget) onNextButton() {
 	} else {
 		mp.nextPage()
 	}
+}
+
+// enumInputBox returns an input box that only allows values from elements to appear.
+func (mp *ManualPartitionWidget) enumInputBox(elements []string) *tview.InputField {
+	field := tview.NewInputField()
+	index := 0
+	// Initialize text with the first element
+	field.SetText(elements[index])
+
+	field.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		key := event.Key()
+		// Override movement left/right. Leave navigation keys intact. Consume all other input.
+		switch key {
+		case tcell.KeyLeft:
+			if index == 0 {
+				index = len(elements)
+			}
+			index--
+		case tcell.KeyRight:
+			index++
+			if index == len(elements) {
+				index = 0
+			}
+		case tcell.KeyEnter, tcell.KeyEscape,
+			tcell.KeyDown, tcell.KeyTab,
+			tcell.KeyUp, tcell.KeyBacktab:
+			// Navigation keys - pass
+			return event
+		default:
+			mp.formNavBar.SetUserFeedback(uitext.EnumNavigationFeedback, tview.Styles.TertiaryTextColor)
+			return nil
+		}
+		field.SetText(elements[index])
+		return nil
+	})
+	return field
 }
