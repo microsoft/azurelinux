@@ -174,7 +174,7 @@ EOF
 
 %changelog
 * Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 9.70-8
-- - Replace incorrect %%{_lib} usage with %%{_libdir}.
+- Replace incorrect %%{_lib} usage with %%{_libdir}.
 
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 9.70-7
 - Add provides for network-scripts.
