@@ -248,10 +248,9 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 }
 
 func (ap *AutoPartitionWidget) populateBlockDeviceOptions() {
-	for i, disk := range ap.systemDevices {
+	for _, disk := range ap.systemDevices {
 		formattedSize := diskutils.BytesToSizeAndUnit(disk.RawDiskSize)
 		diskRepresentation := fmt.Sprintf("%s - %s @ %s", disk.Model, formattedSize, disk.DevicePath)
-		currentRune := rune(i + 'a')
-		ap.deviceList.AddItem(diskRepresentation, "", currentRune, nil)
+		ap.deviceList.AddItem(diskRepresentation, "", 0, nil)
 	}
 }

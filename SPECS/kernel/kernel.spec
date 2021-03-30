@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,6 +133,9 @@ Patch1104:      CVE-2021-26930.nopatch
 Patch1105:      CVE-2020-35499.nopatch
 Patch1106:      CVE-2021-26931.nopatch
 Patch1107:      CVE-2021-26932.nopatch
+Patch1108:      CVE-2021-27365.nopatch
+Patch1109:      CVE-2021-27364.nopatch
+Patch1110:      CVE-2021-27363.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -471,6 +474,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
+- Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
+- Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS
+
 * Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
 - Disable QAT kernel configs
 

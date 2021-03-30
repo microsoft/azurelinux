@@ -69,12 +69,10 @@ const (
 	MountPointStartError               = "Mount point must start with `/`"
 	MountPointInvalidCharacterError    = "Mount point only supports alphanumeric characters and `/`"
 	NameInvalidCharacterError          = "Name only supports alphanumeric characters"
-	NoFormatSelectedError              = "A format must be selected"
 	NoPartitionsError                  = "Must specify at least one boot and one root partition"
 	NoPartitionSelectedError           = "No partition selected"
 	NoSizeSpecifiedError               = "Size must be specified"
 	NotEnoughDiskSpaceError            = "Not enough space left on disk"
-	NoUnitOfSizeSelectedError          = "A unit of size must be selected"
 	PartitionExceedsDiskErrorFmt       = "Device space exceeded by partition (%d)"
 	SizeStartError                     = "Size can not start with `0`"
 	SizeInvalidCharacterError          = "Size must be a number"
@@ -130,6 +128,7 @@ const (
 	UserNameInputLabel        = "User Name"
 
 	PasswordMismatchFeedback = "Passwords do not match"
+	EnumNavigationFeedback   = "Use left or right arrow keys to change the selection"
 
 	EncryptionVerityIncompatible = "Encrypted and read-only roots are currently incompatible with each other"
 

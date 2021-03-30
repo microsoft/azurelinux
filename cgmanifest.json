@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.14.0",
-          "downloadUrl": "http://c-ares.haxx.se/download/c-ares-1.14.0.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
         }
       }
     },
@@ -1584,9 +1584,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "grpc",
+          "version": "1.35.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.35.0/grpc-1.35.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grub2",
-          "version": "2.02",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz"
+          "version": "2.06~rc1",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06-rc1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gnulib",
+          "version": "d271f868a8df9bbec29049d01e056481b7a1a263",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-d271f868a8df9bbec29049d01e056481b7a1a263.tar.gz"
         }
       }
     },
@@ -2186,7 +2206,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210322/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },

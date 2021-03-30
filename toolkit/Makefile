@@ -45,7 +45,7 @@ TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
-PROJECT_ROOT     ?= $(toolkit_root)/..
+PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS

@@ -312,6 +312,7 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
 
@@ -329,7 +330,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
 		return
 	}
-	_, stderr, err = shell.Execute("parted", diskDevPath, "--script", "mklabel", partedArgument)
+	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
 		return
@@ -387,13 +388,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 	// Currently assumes we only make primary partitions.
 	if end == 0 {
-		_, stderr, err := shell.Execute("parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fillToEndOption)
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fillToEndOption)
 		if err != nil {
 			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
 			return "", err
 		}
 	} else {
-		_, stderr, err := shell.Execute("parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
 		if err != nil {
 			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
 			return "", err
@@ -423,6 +424,12 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 // InitializeSinglePartition initializes a single partition based on the given partition configuration
 func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
+	const (
+		retryDuration    = time.Second
+		timeoutInSeconds = "5"
+		totalAttempts    = 5
+	)
+
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
 	// There are two primary partition naming conventions:
@@ -433,22 +440,25 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
 	}
 
-	var exists bool
-	for _, testPartDevPath := range testPartDevPaths {
-		exists, err = file.PathExists(testPartDevPath)
-		if err != nil {
-			logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
-			return
+	err = retry.Run(func() error {
+		for _, testPartDevPath := range testPartDevPaths {
+			exists, err := file.PathExists(testPartDevPath)
+			if err != nil {
+				logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
+				return err
+			}
+			if exists {
+				partDevPath = testPartDevPath
+				return nil
+			}
+			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
-		if exists {
-			partDevPath = testPartDevPath
-			break
-		}
-		logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
-	}
-
-	if !exists {
+		logger.Log.Warnf("Could not find any valid partition paths. Will retry up to %d times", totalAttempts)
 		err = fmt.Errorf("could not find partition to initialize in /dev")
+		return err
+	}, totalAttempts, retryDuration)
+
+	if err != nil {
 		logger.Log.Errorf("%s", err)
 		return
 	}
@@ -458,7 +468,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	// Set partition friendly name (only for gpt)
 	if partitionTableType == "gpt" {
 		partitionName := partition.Name
-		_, stderr, err := shell.Execute("parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
 		if err != nil {
 			logger.Log.Warnf("Failed to set partition friendly name using parted: %v", stderr)
 			// Not-fatal
@@ -472,7 +482,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		switch flag {
 		case configuration.PartitionFlagESP:
 			flagToSet = "esp"
-		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub:
+		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub, configuration.PartitionFlagBiosGrubLegacy:
 			flagToSet = "bios_grub"
 		case configuration.PartitionFlagBoot:
 			flagToSet = "boot"
@@ -483,12 +493,23 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		}
 		if flagToSet != "" {
 			args = append(args, flagToSet, "on")
-			_, stderr, err := shell.Execute("parted", args...)
+			// Golang does not allow mixing of variadic and regular arguments. So add all of the flock args to
+			// the overall arg slice and pass that to execute
+			args = append([]string{"--timeout", timeoutInSeconds, diskDevPath, "parted"}, args...)
+			_, stderr, err := shell.Execute("flock", args...)
 			if err != nil {
 				logger.Log.Warnf("Failed to set flag (%s) using parted: %v", flagToSet, stderr)
 			}
 		}
 	}
+
+	// Make sure all partition information is actually updated.
+	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", stderr)
+		return "", err
+	}
+	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
 	return
 }

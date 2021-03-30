@@ -3,7 +3,7 @@
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
 Version:        5.10.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,16 +38,16 @@ This package contains the Linux kernel package with kernel signed with the produ
 
 %build
 rpm2cpio %{SOURCE0} | cpio -idmv
+cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
 
 %install
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 
-cp -rp ./boot/* %{buildroot}/boot
-cp -rp ./lib/* %{buildroot}/lib
-cp -rp ./var/* %{buildroot}/%{_localstatedir}
-cp %{SOURCE1} %{buildroot}/boot/vmlinuz-%{uname_r}
+cp -rp ./boot/. %{buildroot}/boot
+cp -rp ./lib/. %{buildroot}/lib
+cp -rp ./var/. %{buildroot}/%{_localstatedir}
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -82,6 +82,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
+- Fix file copy
+
 * Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
 - Update to kernel release 5.10.21.1-2
 
