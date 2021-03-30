@@ -1,0 +1,48 @@
+#!/bin/bash
+# Copyright (c) Microsoft Corporation.
+#
+# Arguments:
+#   $1 - kernel version
+#   $2 - kernel image file
+#   $3 - kernel map file
+#   $4 - default install path (blank if root directory)
+
+set -e
+
+KERNEL_VERSION=$1
+KERNEL_IMAGE=$2
+SYSTEM_MAP=$3
+DEST_DIR=${4:-/boot}
+
+echo installkernel $1 $2 $3 $4
+
+FINAL_KERNEL_IMAGE=vmlinuz-$KERNEL_VERSION
+FINAL_INITRD=initrd.img-$KERNEL_VERSION
+FINAL_LINUX_CFG_PATH=$DEST_DIR/linux-$KERNEL_VERSION.cfg
+
+# Copy kernel
+cp $KERNEL_IMAGE $DEST_DIR/$FINAL_KERNEL_IMAGE
+cp $SYSTEM_MAP $DEST_DIR/System.map-$KERNEL_VERSION
+cp $(dirname $SYSTEM_MAP)/.config $DEST_DIR/config-$KERNEL_VERSION
+
+# Remake initrd
+if [ ! -d /lib/modules/$KERNEL_VERSION ]; then
+	echo Cannot find modules for $KERNEL_VERSION
+	echo Please run: make modules_install
+	exit 1
+fi
+mkinitrd -q $DEST_DIR/$FINAL_INITRD $KERNEL_VERSION -k
+
+# Create linux cfg file if it doesn't exist
+if [ ! -f $FINAL_LINUX_CFG_PATH ]; then
+	cp -f $DEST_DIR/mariner.cfg $FINAL_LINUX_CFG_PATH
+fi
+
+# Update contents
+sed -i "s/mariner_linux=.*$/mariner_linux=${FINAL_KERNEL_IMAGE}/" $FINAL_LINUX_CFG_PATH
+sed -i "s/mariner_initrd=.*$/mariner_initrd=${FINAL_INITRD}/" $FINAL_LINUX_CFG_PATH
+
+# Update mariner.cfg symlink so grub boots this configuration now
+ln -sf $DEST_DIR/linux-$KERNEL_VERSION.cfg $DEST_DIR/mariner.cfg
+
+exit 0
