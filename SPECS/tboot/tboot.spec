@@ -3,14 +3,14 @@ Name:           tboot
 Version:        1.9.12
 Release:        1%{?dist}
 License:        BSD
-URL:            https://sourceforge.net/projects/tboot/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://sourceforge.net/projects/tboot/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-ExclusiveArch:  x86_64
 BuildRequires:  trousers-devel
 Requires:       libtspi
+ExclusiveArch:  x86_64
 
 %description
 Trusted Boot (tboot) is an open source, pre- kernel/VMM module that uses
@@ -39,7 +39,7 @@ make debug=y DESTDIR=%{buildroot} install
 
 %changelog
 *   Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> 1.9.12-1
--   Update to version 1.9.12
+-   Update to version 1.9.12 for binutils 2.36.1 compatibility
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.9.7-7
 -   Added %%license line automatically
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.9.7-6

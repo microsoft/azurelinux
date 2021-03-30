@@ -3,14 +3,14 @@
 %global eppic_shortver e8844d3
 %global mkdf_ver 1.6.8
 
+Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.21
 Release:        2%{?dist}
 License:        GPLv2
-Summary:        The kexec/kdump userspace component
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
 URL:            https://github.com/horms/kexec-tools
 
 Source0: http://kernel.org/pub/linux/utils/kernel/kexec/%{name}-%{version}.tar.xz
