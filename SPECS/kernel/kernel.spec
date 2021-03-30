@@ -475,7 +475,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
-- Enable CONFIG_CRYPTO_KEYWRAP, CONFIG_CRYPTO_DRBG_HASH, CONFIG_CRYPTO_DRBG_CTR
+- Enable CONFIG_CRYPTO_DRBG_HASH, CONFIG_CRYPTO_DRBG_CTR
 
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
 - Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
