@@ -1,7 +1,7 @@
 Summary:        Scripts to bring up network interfaces and legacy utilities
 Name:           initscripts
 Version:        9.70
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,7 +66,7 @@ touch %{buildroot}%{_sysconfdir}/rc.d/rc.local
 chmod 755 %{buildroot}%{_sysconfdir}/rc.d/rc.local
 
 ln -sfv rc.d/init.d %{buildroot}%{_sysconfdir}/init.d
-rm -rf %{buildroot}%{_lib}/systemd
+rm -rf %{buildroot}%{_libdir}/systemd
 
 cat >> %{buildroot}%{_sysconfdir}/sysconfig/network <<- "EOF"
 ###
@@ -138,7 +138,7 @@ EOF
 %dir %{_sysconfdir}/rc.d/init.d
 %{_sysconfdir}/rc.d/init.d/*
 %ghost %verify(not md5 size mtime) %config(noreplace,missingok) %{_sysconfdir}/rc.d/rc.local
-%{_lib}/sysctl.d/00-system.conf
+%{_libdir}/sysctl.d/00-system.conf
 %exclude %{_sysconfdir}/profile.d/debug*
 %{_sysconfdir}/profile.d/*
 %{_sbindir}/sys-unconfig
@@ -149,8 +149,8 @@ EOF
 %{_sbindir}/sushell
 %attr(2755,root,root) %{_sbindir}/netreport
 #%{_udevrulesdir}/*
-%{_lib}/udev/rename_device
-%{_lib}/udev/rules.d/60-net.rules
+%{_libdir}/udev/rename_device
+%{_libdir}/udev/rules.d/60-net.rules
 %{_sbindir}/service
 %{_mandir}/man*/*
 %dir %attr(775,root,root) %{_var}/run/netreport
@@ -173,6 +173,9 @@ EOF
 %{_sysconfdir}/profile.d/debug*
 
 %changelog
+* Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 9.70-8
+- Replace incorrect %%{_lib} usage with %%{_libdir}.
+
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 9.70-7
 - Add provides for network-scripts.
 
