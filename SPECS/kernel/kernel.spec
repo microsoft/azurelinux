@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.21.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -474,6 +474,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.21.1-4
+- Update CONFIG_LD_VERSION for binutils 2.36.1
+
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
 - Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
 - Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS

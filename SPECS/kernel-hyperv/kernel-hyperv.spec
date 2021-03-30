@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -274,6 +274,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.21.1-3
+- Update CONFIG_LD_VERSION for binutils 2.36.1
+
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-2
 - Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS
 
