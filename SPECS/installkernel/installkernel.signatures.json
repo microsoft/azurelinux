@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "installkernel": "ba3f101eb5b91f6a9d0b7d07fcf067eaf4aa03971f1e950f55f59903e4750a1f"
+  "COPYING": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+  "installkernel": "6798c2a42eaeb67020fe4b9ee9d04491146b7d10c779ddf1e7b54742a0c4c30a"
  }
 }

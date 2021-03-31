@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 Source0:        installkernel
+Source1:        COPYING
 BuildArch:      noarch
 
 %description
@@ -19,10 +20,13 @@ Mariner system. This script will get called automatically by the Linux kernel's
 %build
 
 %install
-install -vm 744 %{SOURCE0} %{buildroot}/%{_sbindir}/installkernel
+install -vdm 755 %{buildroot}%{_sbindir}
+install -vm 744 %{SOURCE0} %{buildroot}%{_sbindir}/installkernel
+cp %{SOURCE1} COPYING
 
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_sbindir}/installkernel
 
 %changelog
