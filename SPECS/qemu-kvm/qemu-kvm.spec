@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ Patch28:        CVE-2020-27821.patch
 Patch29:        CVE-2020-17380.patch
 Patch30:        CVE-2021-20203.patch
 Patch31:        CVE-2021-20255.patch
+Patch32:        CVE-2021-3416.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -103,6 +104,7 @@ This package provides a command line tool for manipulating disk images.
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
+%patch32 -p1
 
 %build
 
@@ -138,7 +140,50 @@ ln -sv qemu-system-`uname -m` %{buildroot}%{_bindir}/qemu
 chmod 755 %{buildroot}%{_bindir}/qemu
 
 %check
-# Deliberately empty
+testsPassed=true
+make check-unit
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-qtest
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-speed
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-qapi-schema
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-block
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-tcg
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-softfloat
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+make check-acceptance
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    testsPassed=false
+fi
+if [ "$testsPassed" = false ] ; then
+    echo 'Some tests failed. Check log for further details'
+fi
 
 %files
 %defattr(-,root,root)
@@ -163,6 +208,9 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %{_bindir}/qemu-nbd
 
 %changelog
+* Tue Mar 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-28
+- Patch CVE-2021-3416. Added test modules under check section.
+
 * Tue Mar 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-27
 - Patch CVE-2021-20255
 
