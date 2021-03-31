@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,7 @@ make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
+ln -s useradd %{buildroot}%{_sbindir}/adduser
 # Use group id 100(users) by default
 sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
 # Disable usergroups. Use "users" group by default (see /etc/default/useradd)
@@ -139,6 +140,9 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
+- Add sym link to adduser from useradd and create the file for adduser
+
 * Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9
 - Remove PASS_MAX_DAYS customized value 90 to set default value
 

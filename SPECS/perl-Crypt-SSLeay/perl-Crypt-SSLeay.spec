@@ -3,7 +3,7 @@
 Summary:        Crypt::SSLeay - OpenSSL support for LWP
 Name:           perl-Crypt-SSLeay
 Version:        0.72
-Release:        6%{?dist}
+Release:        7%{?dist}
 URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
+Patch0:         Use_TLS_client_method-with-OpenSSL-1.1.1.patch
 Requires:       perl >= 5.28.0
 Requires:       openssl
 BuildRequires:  perl >= 5.28.0
@@ -33,6 +34,7 @@ Work on Crypt::SSLeay has been continued only to provide https support for the L
 %prep
 %setup -q -n Crypt-SSLeay-%{version}
 cp %{SOURCE1} ./
+%patch0 -p0
 
 %build
 PERL5LIB=$(pwd) env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
@@ -53,6 +55,8 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Mon Mar 15 2021 Andrew Phelps <anphel@microsoft.com> 0.72-7
+-   Add patch to fix test issue
 *   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-6
 -   Added %%license macro.
 -   Update License.

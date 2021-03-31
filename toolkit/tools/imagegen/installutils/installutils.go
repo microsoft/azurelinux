@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -45,6 +46,20 @@ const (
 // PackageList represents the list of packages to install into an image
 type PackageList struct {
 	Packages []string `json:"packages"`
+}
+
+// GetRequiredPackagesForInstall returns the list of packages required for
+// the tooling to install an image
+func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
+	packageList := []*pkgjson.PackageVer{}
+
+	// grub2-pc package is needed for the install tools to build/install the legacy grub bootloader
+	// Note: only required on x86_64 installs
+	if runtime.GOARCH == "amd64" {
+		packageList = append(packageList, &pkgjson.PackageVer{Name: "grub2-pc"})
+	}
+
+	return packageList
 }
 
 // CreateMountPointPartitionMap creates a map between the mountpoint supplied in the config file and the device path
@@ -1422,16 +1437,19 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string) (err error) {
 	const (
 		squashErrors = false
+		bootDir      = "/boot"
+		bootDirArg   = "--boot-directory"
+		grub2BootDir = "/boot/grub2"
 	)
 
-	// Since we do not have grub2-pc installed in the setup environment, we need to generate the legacy grub bootloader
-	// inside of the install environment. This assumes the install environment has the grub2-pc package installed
-	err = installChroot.UnsafeRun(func() (err error) {
-		err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", "--boot-directory=/boot", bootDevPath)
-		err = shell.ExecuteLive(squashErrors, "chmod", "-R", "go-rwx", "/boot/grub2/")
+	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
+	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
+	err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
+	if err != nil {
 		return
-	})
-
+	}
+	installGrub2BootDir := filepath.Join(installChroot.RootDir(), grub2BootDir)
+	err = shell.ExecuteLive(squashErrors, "chmod", "-R", "go-rwx", installGrub2BootDir)
 	return
 }
 
@@ -1495,9 +1513,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
-		efiAssetDir        = "/installer/efi/x86_64"
 		grubAssetDir       = "/installer/efi/grub"
-		efiFinalDir        = "EFI/BOOT"
 		grubFinalDir       = "boot/grub2"
 	)
 

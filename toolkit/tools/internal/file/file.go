@@ -129,7 +129,7 @@ func Write(data string, dst string) (err error) {
 
 // Append appends a string to the end of file dst.
 func Append(data string, dst string) (err error) {
-	logger.Log.Debugf("Appending to (%s)", dst)
+	logger.Log.Debugf("Appending to file (%s): (%s)", dst, data)
 
 	dstFile, err := os.OpenFile(dst, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {

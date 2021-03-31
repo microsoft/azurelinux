@@ -1,23 +1,22 @@
+# Prevent librustc_driver from inadvertently being listed as a requirement
+%global __requires_exclude ^librustc_driver-
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.39.0
-Release:        8%{?dist}
-License:        ASL 2.0 and MIT
+Version:        1.47.0
+Release:        1%{?dist}
+License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/2019-09-26/cargo-0.39.0-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/2019-09-26/rustc-1.38.0-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/2019-09-26/cargo-0.39.0-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/2019-09-26/rustc-1.38.0-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/2019-09-26/rust-std-1.38.0-aarch64-unknown-linux-gnu.tar.gz
-
-Patch0:         robust-build.patch
-Patch1:         ignore-linker-output-non-utf8-test.patch
+Source2:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-x86_64-unknown-linux-gnu.tar.gz
+Source3:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-x86_64-unknown-linux-gnu.tar.gz
+Source4:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-x86_64-unknown-linux-gnu.tar.gz
+Source5:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-aarch64-unknown-linux-gnu.tar.gz
+Source6:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-aarch64-unknown-linux-gnu.tar.gz
+Source7:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-aarch64-unknown-linux-gnu.tar.gz
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -28,7 +27,6 @@ BuildRequires:  python2
 %if %{with_check}
 BuildRequires:  python-xml
 %endif
-
 
 %description
 Rust Programming Language
@@ -41,11 +39,8 @@ tar xf %{SOURCE1} --no-same-owner
 popd
 %setup -q -n rustc-%{version}-src
 
-%patch0 -p1
-%patch1 -p1
-
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/2019-09-26/
+%define BUILD_CACHE_DIR build/cache/2020-08-27/
 mkdir -pv %{BUILD_CACHE_DIR}
 %ifarch x86_64
 mv %{SOURCE2} %{BUILD_CACHE_DIR}
@@ -71,9 +66,6 @@ export SUDO_USER=root
 make %{?_smp_mflags}
 
 %check
-# src/test/run-make-fulldeps/linker-output-non-utf8 fails, but given that it was removed in
-# rustc 1.40.0 for "not pulling its weight" and "not properly testing this case", we ignore it.
-# See ignore-linker-output-non-utf8-test.patch for more details.
 make check
 
 %install
@@ -111,6 +103,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Wed Feb 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.47.0-1
+- Update version to 1.47.0
+
 * Wed Jan 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
 - Add ignore-linker-output-non-utf8-test patch to skip faulty test

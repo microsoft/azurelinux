@@ -11,7 +11,7 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 
 # Install required dependencies.
-sudo apt -y install make tar wget curl rpm qemu-utils golang-1.15-go genisoimage python-minimal bison gawk
+sudo apt -y install make tar wget curl rpm qemu-utils golang-1.15-go genisoimage python-minimal bison gawk parted
 
 # Recommended but not required: `pigz` for faster compression operations.
 sudo apt -y install pigz
@@ -25,4 +25,4 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 ```
 
-**You will need to log out and lock back in** for user changes to take effect.
+**You will need to log out and log back in** for user changes to take effect.

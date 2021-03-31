@@ -1,11 +1,11 @@
 %global eppic_ver d84c3541035d95077aa8571f5d5c3e07c6ef510b
 # First 7 digits from ^
 %global eppic_shortver d84c354
-%global mkdf_ver 1.6.7
+%global mkdf_ver 1.6.8
 
 Name:           kexec-tools
-Version:        2.0.20
-Release:        16%{?dist}
+Version:        2.0.21
+Release:        1%{?dist}
 License:        GPLv2
 Summary:        The kexec/kdump userspace component
 Vendor:         Microsoft Corporation
@@ -18,7 +18,7 @@ Source3: kdump.sysconfig.x86_64
 Source4: kdump.sysconfig.i386
 Source7: mkdumprd
 Source8: kdump.conf
-Source9: http://downloads.sourceforge.net/project/makedumpfile/makedumpfile/%{mkdf_ver}/makedumpfile-%{mkdf_ver}.tar.gz
+Source9: https://github.com/makedumpfile/makedumpfile/releases/download/%{mkdf_ver}/makedumpfile-%{mkdf_ver}.tar.gz
 Source10: kexec-kdump-howto.txt
 Source11: fadump-howto.txt
 Source12: mkdumprd.8
@@ -86,7 +86,6 @@ Obsoletes: diskdumputils netdump kexec-tools-eppic
 #
 # Patches 0 through 100 are meant for x86 kexec-tools enablement
 #
-Patch0: kexec-tools-2.0.20-fix-broken-multiboot2-buliding-for-i386.patch
 
 #
 # Patches 101 through 200 are meant for x86_64 kexec-tools enablement
@@ -106,10 +105,7 @@ Patch0: kexec-tools-2.0.20-fix-broken-multiboot2-buliding-for-i386.patch
 #
 # Patches 601 onward are generic patches
 #
-Patch601: ./kexec-tools-2.0.20-eppic-Remove-duplicated-variable-declaration.patch
-Patch602: ./kexec-tools-2.0.20-makedumpfile-Remove-duplicated-variable-declarations.patch
-Patch603: ./kexec-tools-2.0.20-Remove-duplicated-variable-declarations.patch
-Patch604: ./kexec-tools-2.0.20-makedumpfile-Introduce-check-params-option.patch
+Patch601: makedumpfile-printk-fix.patch
 
 %description
 kexec-tools provides /sbin/kexec binary that facilitates a new
@@ -125,12 +121,7 @@ mkdir -p -m755 kcp
 tar -z -x -v -f %{SOURCE9}
 tar -z -x -v -f %{SOURCE19}
 
-%patch0 -p1
-
 %patch601 -p1
-%patch602 -p1
-%patch603 -p1
-%patch604 -p1
 
 %build
 autoreconf
@@ -331,6 +322,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-1
+- Update version to 2.0.21
+- Add patches for makedumpfile to support new printk in 5.10 kernel
 * Sun Aug 09 2020 Mateusz Malisz <mamalisz@microsoft.com> 2.0.20-16
 - Update configuration to fit CBL-Mariner naming and kernel configuration
 - Remove PPC/s390x parts.

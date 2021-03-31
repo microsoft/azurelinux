@@ -456,6 +456,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
 		emptyWorkerTar    = ""
+		rootDir           = "/"
 		existingChrootDir = true
 		leaveChrootOnDisk = true
 	)
@@ -473,16 +474,25 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 		defer installutils.DestroyInstallRoot(installRoot, installMap, mountPointToOverlayMap)
 	}
 
+	// Install any tools required for the setup root to function
+	setupChrootPackages := []string{}
+	toolingPackages := installutils.GetRequiredPackagesForInstall()
+	for _, toolingPackage := range toolingPackages {
+		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
+	}
+
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
 		// image setup environment (setuproot chroot or live installer).
 		verityPackages := []string{"device-mapper", "veritysetup"}
-		for _, pkg := range verityPackages {
-			_, err = installutils.TdnfInstall(pkg, "/")
-			if err != nil {
-				err = fmt.Errorf("failed to install read only support package '%s': %w", pkg, err)
-				return
-			}
+		setupChrootPackages = append(setupChrootPackages, verityPackages...)
+	}
+
+	for _, setupChrootPackage := range setupChrootPackages {
+		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
+		if err != nil {
+			err = fmt.Errorf("failed to install required setup chroot package '%s': %w", setupChrootPackage, err)
+			return
 		}
 	}
 

@@ -3,8 +3,8 @@
 %define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.13.1
-Release:        1%{?dist}
+Version:        5.10.21.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,13 @@ Patch1100:      CVE-2020-27777.nopatch
 Patch1101:      CVE-2020-29569.nopatch
 Patch1102:      CVE-2020-28374.nopatch
 Patch1103:      CVE-2020-36158.nopatch
+Patch1104:      CVE-2021-26930.nopatch
+Patch1105:      CVE-2020-35499.nopatch
+Patch1106:      CVE-2021-26931.nopatch
+Patch1107:      CVE-2021-26932.nopatch
+Patch1108:      CVE-2021-27365.nopatch
+Patch1109:      CVE-2021-27364.nopatch
+Patch1110:      CVE-2021-27363.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -175,6 +182,14 @@ Obsoletes:      linux-dev
 
 %description devel
 This package contains the Linux kernel dev files
+
+%package drivers-accessibility
+Summary:        Kernel accessibility modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-accessibility
+This package contains the Linux kernel accessibility support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -327,7 +342,7 @@ cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn"
+--add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio"
 EOF
 
 #    Cleanup dangling symlinks
@@ -382,6 +397,9 @@ fi
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
+%post drivers-accessibility
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -418,6 +436,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
+%files drivers-accessibility
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/accessibility
+
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
@@ -452,6 +474,28 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
+- Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
+- Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS
+
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+- Disable QAT kernel configs
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+- Add virtio drivers to be installed into initrd
+- Address CVE-2021-26930, CVE-2020-35499, CVE-2021-26931, CVE-2021-26932
+
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Enable kernel lockdown config
+
+* Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
+- Add configs for CONFIG_BNXT bnxt_en and MSR drivers
+
+* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+- Add configs for speakup and uinput drivers
+- Add kernel-drivers-accessibility subpackage
+
 * Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
 - Update source to 5.10.13.1
 - Remove patch to publish efi tpm event log on ARM. Present in updated source.
