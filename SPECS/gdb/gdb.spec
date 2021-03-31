@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        8.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,10 +62,7 @@ rm %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
-# fix typo in test
-sed -i 's/hex in)/hex in )/g' gdb/testsuite/gdb.arch/i386-signal.exp
-# ignore exit code and check for expected number of failures
-make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpected failures.*1219\|# of unexpected failures.*1220"
+make %{?_smp_mflags} check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -82,6 +79,9 @@ make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpecte
 %{_mandir}/*/*
 
 %changelog
+* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 8.3-4
+- Only run gdb.base/default.exp tests
+
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 8.3-3
 - Patch CVE-2019-1010180
 

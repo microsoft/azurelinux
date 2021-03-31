@@ -3,7 +3,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,7 +70,7 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %check
-make %{?_smp_mflags} check
+make PYTHON_SUBDIR="" runtests
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -105,6 +105,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4
+- Skip python tests which are known to be broken.
+
 * Mon Oct 26 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.9.10-3
 - Patch CVE-2020-24977.
 

@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "config": "7dfdd7cd85283d7f9dc7c69502a6ec8092db9aeab7ab7be3880cdf9fc692e5cb",
-  "linux-msft-5.4.91.tar.gz": "5f36254d8e78d0a17b7103df4a37d706b6f24a7cc343c938a8b6453e4137c97c",
+  "config": "c5426e82771a878a06758657e7442ae693f76a88994b3cad36ead19c4a48f2a5",
+  "kernel-5.10.21.1.tar.gz": "7b5ef89649dbcd95344e5a374a3144afdc1f2613995870b1613e585fb91abff0",
   "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
  }
 }

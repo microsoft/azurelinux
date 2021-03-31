@@ -71,7 +71,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -415,6 +415,12 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Mar 12 2021 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20200720-13
+- Updating Microsoft trusted root CAs.
+
+* Sat Mar 06 2021 CBL-Mariner Servicing Account <clbmargh@microsoft.com> - 20200720-12
+- Updating Microsoft trusted root CAs.
+
 * Mon Feb 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-11
 - Removing the deprecated "Microsoft IT TLS CA 2" CA from the list of trusted anchors.
 - Added explicit version info for the "Provides".

@@ -17,7 +17,6 @@ CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
 PACKAGE_IGNORE_LIST    ?=
-SSH_KEY_FILE           ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
@@ -46,7 +45,7 @@ TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
-PROJECT_ROOT     ?= $(toolkit_root)/..
+PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
@@ -81,7 +80,7 @@ IMAGES_DIR      ?= $(OUT_DIR)/images
 ifeq ($(REBUILD_TOOLCHAIN),y)
 toolchain_rpms_dir := $(RPMS_DIR)
 else
-toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache/
+toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
 endif
 
 # External source server

@@ -1,7 +1,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
@@ -15,6 +15,7 @@ Patch5:         CVE-2020-8622.patch
 # CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
 Patch6:         CVE-2020-8623.nopatch
 Patch7:         CVE-2020-8624.patch 
+Patch8:         CVE-2020-8625.patch 
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,6 +94,8 @@ fi
 %{_prefix}/lib/tmpfiles.d/named.conf
 
 %changelog
+*   Mon Mar 01 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 9.16.3-3
+-   Fixes CVE-2020-8625
 *   Fri Sep 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 9.16.3-2
 -   Fixes CVE-2020-8618, CVE-2020-8619, CVE-2020-8620,
 -   CVE-2020-8621, CVE-2020-8622, CVE-2020-8623, CVE-2020-8624
