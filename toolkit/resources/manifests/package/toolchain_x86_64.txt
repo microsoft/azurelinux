@@ -47,10 +47,10 @@ cryptsetup-debuginfo-2.3.3-2.cm1.x86_64.rpm
 cryptsetup-devel-2.3.3-2.cm1.x86_64.rpm
 cryptsetup-libs-2.3.3-2.cm1.x86_64.rpm
 cryptsetup-reencrypt-2.3.3-2.cm1.x86_64.rpm
-curl-7.74.0-1.cm1.x86_64.rpm
-curl-debuginfo-7.74.0-1.cm1.x86_64.rpm
-curl-devel-7.74.0-1.cm1.x86_64.rpm
-curl-libs-7.74.0-1.cm1.x86_64.rpm
+curl-7.76.0-1.cm1.x86_64.rpm
+curl-debuginfo-7.76.0-1.cm1.x86_64.rpm
+curl-devel-7.76.0-1.cm1.x86_64.rpm
+curl-libs-7.76.0-1.cm1.x86_64.rpm
 device-mapper-2.03.05-5.cm1.x86_64.rpm
 device-mapper-devel-2.03.05-5.cm1.x86_64.rpm
 device-mapper-event-2.03.05-5.cm1.x86_64.rpm
