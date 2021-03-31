@@ -281,7 +281,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		GraphicsColor:               tcell.ColorGreen,
 		PrimaryTextColor:            tcell.ColorWhite,
 		SecondaryTextColor:          tcell.ColorDarkCyan,
-		TertiaryTextColor:           tcell.ColorRed,
+		TertiaryTextColor:           tcell.ColorMaroon,
 		InverseTextColor:            tcell.ColorBlack,
 		ContrastSecondaryTextColor:  tcell.ColorGreen,
 	}
