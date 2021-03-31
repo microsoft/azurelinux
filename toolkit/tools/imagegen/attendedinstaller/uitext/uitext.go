@@ -52,13 +52,13 @@ const (
 	// Custom Partition
 	DiskAdvanceTitleFmt   = "Partitions for: %v"
 	DiskAddPartitionTitle = "Add Partition"
-	DiskFormatLabel       = "Format"
-	DiskMountPointLabel   = "Mount Point"
-	DiskNameLabel         = "Name"
+	DiskFormatLabel       = "* Format"
+	DiskMountPointLabel   = "* Mount Point"
+	DiskNameLabel         = "* Name"
 	DiskSpaceLeftFmt      = "Remaining space: %v"
-	DiskSizeLabel         = "Size"
+	DiskSizeLabel         = "* Size"
 	DiskSizeLabelMaxHelp  = "(* for max)"
-	DiskSizeUnitLabel     = "Unit size"
+	DiskSizeUnitLabel     = "* Unit size"
 
 	// Errors
 	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type '%s'"
@@ -83,8 +83,8 @@ const (
 const (
 	EncryptTitle                = "Enter Disk Encryption Password"
 	SkipEncryption              = "[Skip Disk Encryption[]"
-	EncryptPasswordLabel        = "Disk Encryption Password"
-	ConfirmEncryptPasswordLabel = "Confirm Disk Encryption Password"
+	EncryptPasswordLabel        = "* Disk Encryption Password"
+	ConfirmEncryptPasswordLabel = "* Confirm Disk Encryption Password"
 )
 
 // InstallerView text.
@@ -102,7 +102,7 @@ const (
 // HostNameView text.
 const (
 	HostNameTitle      = "Choose the Host Name for Your System"
-	HostNameInputLabel = "Host Name:"
+	HostNameInputLabel = "* Host Name:"
 
 	HostNameSegment   = "host name"
 	DomainNameSegment = "domain name"
@@ -123,9 +123,9 @@ const (
 const (
 	SetupUserTitle = "Set Up User Account"
 
-	PasswordInputLabel        = "Password"
-	ConfirmPasswordInputLabel = "Confirm Password"
-	UserNameInputLabel        = "User Name"
+	PasswordInputLabel        = "* Password"
+	ConfirmPasswordInputLabel = "* Confirm Password"
+	UserNameInputLabel        = "* User Name"
 
 	PasswordMismatchFeedback = "Passwords do not match"
 	EnumNavigationFeedback   = "Use left or right arrow keys to change the selection"
