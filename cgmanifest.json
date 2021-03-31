@@ -3885,8 +3885,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "1.1.1g",
-          "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1g.tar.gz"
+          "version": "1.1.1k",
+          "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1k.tar.gz"
         }
       }
     },
