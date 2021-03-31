@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned
-Version:        15.3
+Version:        15.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -39,8 +39,8 @@ install -D -m 0744 %{_datadir}/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/b
 %endif
 
 %changelog
-* Tue Mar 16 2021 Chris Co <chrco@microsoft.com> - 15.3-1
-- Update to 15.3
+* Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
+- Update to 15.4
 
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-3
 - Bump release to get patched shims

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-aarch64
-Version:        15.3
+Version:        15.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -44,8 +44,8 @@ make VENDOR_CERT_FILE=cert.der test
 %{_datadir}/%{name}/shimaa64.efi
 
 %changelog
-* Tue Mar 16 2021 Chris Co <chrco@microsoft.com> - 15.3-1
-- Update to 15.3
+* Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
+- Update to 15.4
 - Remove extra patches. These are incorporated into latest version
 
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-4
