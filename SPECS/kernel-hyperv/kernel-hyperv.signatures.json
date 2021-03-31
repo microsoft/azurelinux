@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "config": "7dfdd7cd85283d7f9dc7c69502a6ec8092db9aeab7ab7be3880cdf9fc692e5cb",
+  "config": "fd91efcaa152b1e29cf3d73d04e6f1532543802612cef443b3ab1bc58b3731be",
   "linux-msft-5.4.91.tar.gz": "5f36254d8e78d0a17b7103df4a37d706b6f24a7cc343c938a8b6453e4137c97c",
   "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
  }
