@@ -103,6 +103,7 @@
                 "go-md2man",
                 "grpc",
                 "GSL",
+                "installkernel",
                 "ivykis",
                 "jsonbuilder",
                 "kubernetes-1.17.13",
