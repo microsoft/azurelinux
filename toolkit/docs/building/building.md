@@ -134,7 +134,7 @@ Depending on hardware, rebuilding the toolchain can take several hours. The foll
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y DOWNLOAD_SRPMS=y 
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 ## **Package Stage**
@@ -153,11 +153,11 @@ The following command rebuilds all CBL-Mariner packages.
 
 ```bash
 # Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
+sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 ### **Rebuild Minimal Required Packages**
@@ -166,11 +166,11 @@ The following command rebuilds packages for the basic VHD.
 
 ```bash
 # Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json  DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-aarch64"
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json  DOWNLOAD_SRPMS=y REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8 openjdk8_aarch64 shim-unsigned-amd64"
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 Note that the image build commands in [Build Images](#build-images) will **automatically** build _only_ the packages required by a selected image configuration and then builds the image.
@@ -185,13 +185,13 @@ All images are generated in the `out/images` folder.
 
 ```bash
 # To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 
 # To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
-sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 
 # To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y DOWNLOAD_SRPMS=y
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 ### ISO Images
@@ -306,7 +306,7 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Mariner source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
