@@ -3544,6 +3544,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nDPI",
+          "version": "3.4",
+          "downloadUrl": "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "net-snmp",
           "version": "5.9",
           "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
@@ -3697,6 +3707,16 @@
           "name": "nss",
           "version": "3.44",
           "downloadUrl": "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ntopng",
+          "version": "4.2",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
         }
       }
     },
