@@ -269,7 +269,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		SecondaryTextColor:          tcell.ColorBlack,
 		TertiaryTextColor:           tcell.ColorRed,
 		InverseTextColor:            tcell.ColorGreen,
-		ContrastSecondaryTextColor:  tcell.ColorGreen,
+		ContrastSecondaryTextColor:  tcell.ColorSilver,
 	}
 
 	tview.Styles = tview.Theme{
@@ -339,11 +339,13 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	ai.exitModal = tview.NewModal().
 		SetText(uitext.ExitModalTitle).
-		AddButtons([]string{uitext.ButtonQuitBold, uitext.ButtonCancelBold}).
+		AddButtons([]string{uitext.ButtonQuit, uitext.ButtonCancel}).
 		SetBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetButtonBackgroundColor(ai.backdropStyle.TertiaryTextColor).
+		SetTextColor(ai.backdropStyle.ContrastSecondaryTextColor).
+		SetButtonTextColor(ai.backdropStyle.ContrastSecondaryTextColor).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if buttonLabel == uitext.ButtonQuitBold {
+			if buttonLabel == uitext.ButtonQuit {
 				ai.userQuitInstallation = true
 				ai.app.Stop()
 			} else {

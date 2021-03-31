@@ -5,29 +5,22 @@ package uitext
 
 // "]" is a special character for the TUI text, escape it with "[]"
 
-// Control sequences for text formatting
-const (
-	BoldPrefix = "[::b]"
-)
-
 // Navigation text.
 const (
-	ButtonAccept     = "[Accept[]"
-	ButtonCancel     = "[Cancel[]"
-	ButtonCancelBold = BoldPrefix + ButtonCancel
-	ButtonConfirm    = "[Confirm[]"
-	ButtonGoBack     = "[Go Back[]"
-	ButtonNext       = "[Next[]"
-	ButtonYes        = "[Yes[]"
-	ButtonQuit       = "[Quit[]"
-	ButtonQuitBold   = BoldPrefix + ButtonQuit
-	ButtonRestart    = "[Restart[]"
+	ButtonAccept  = "[Accept[]"
+	ButtonCancel  = "[Cancel[]"
+	ButtonConfirm = "[Confirm[]"
+	ButtonGoBack  = "[Go Back[]"
+	ButtonNext    = "[Next[]"
+	ButtonYes     = "[Yes[]"
+	ButtonQuit    = "[Quit[]"
+	ButtonRestart = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.
 const (
 	NavigationHelp = "Arrow keys make selections. Enter activates."
-	ExitModalTitle = BoldPrefix + "Do you want to quit setup?"
+	ExitModalTitle = "Do you want to quit setup?"
 )
 
 // ConfirmView text.
