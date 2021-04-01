@@ -142,47 +142,40 @@ chmod 755 %{buildroot}%{_bindir}/qemu
 %check
 testsPassed=true
 make check-unit
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-qtest
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-speed
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-qapi-schema
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-block
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-tcg
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-softfloat
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 make check-acceptance
-retVal=$?
-if [ $retVal -ne 0 ]; then
+if [ $? -ne 0 ]; then
     testsPassed=false
 fi
 if [ "$testsPassed" = false ] ; then
-    echo 'Some tests failed. Check log for further details'
+    echo 'One (or more) tests failed. Check log for further details'
+    (exit 1)
 fi
 
 %files
