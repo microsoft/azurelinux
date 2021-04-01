@@ -1,10 +1,10 @@
 Summary:        Shell script to auto detect free size on disk and grow partition.
 Name:           cloud-utils-growpart
-Version:        0.30
-Release:        6%{?dist}
+Version:        0.32
+Release:        1%{?dist}
 License:        GPLv3
 Group:          System Environment
-Source0:        https://launchpad.net/cloud-utils/trunk/0.3/+download/cloud-utils-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-utils/trunk/%{version}/+download/cloud-utils-%{version}.tar.gz
 URL:            https://launchpad.net/cloud-utils
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,9 +34,10 @@ cp man/growpart.* $RPM_BUILD_ROOT/%{_mandir}/man1/
 %doc %{_mandir}/man1/growpart.*
 
 %changelog
-* Sat May 09 00:21:21 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.30-6
-- Added %%license line automatically
-
+*   Sat Mar 13 2021 Henry Beberman <henry.beberman@microsoft.com> 0.32-1
+-   Update to version 0.32 for more robust parsing of kernel version in growpart
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.30-6
+-   Added %%license line automatically
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 0.30-5
 -   Renaming cloud-utils to cloud-utils-growpart
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.30-4

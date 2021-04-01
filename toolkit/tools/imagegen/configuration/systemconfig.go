@@ -92,7 +92,10 @@ func (s *SystemConfig) IsValid() (err error) {
 		if mountPointUsed[partitionSetting.MountPoint] {
 			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at '%s'", partitionSetting.MountPoint)
 		}
-		mountPointUsed[partitionSetting.MountPoint] = true
+		if partitionSetting.MountPoint != "" {
+			// Don't track unmounted partition duplication (They will all mount at "")
+			mountPointUsed[partitionSetting.MountPoint] = true
+		}
 	}
 
 	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {

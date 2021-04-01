@@ -1,0 +1,25 @@
+Add capabilities added in the following PRs:
+https://gitlab.com/apparmor/apparmor/-/merge_requests/589
+https://gitlab.com/apparmor/apparmor/-/merge_requests/656
+
+
+diff -ruN a/utils/severity.db b/utils/severity.db
+--- a/utils/severity.db	2021-03-03 14:58:53.935892842 -0800
++++ b/utils/severity.db	2021-03-03 15:00:30.410334739 -0800
+@@ -28,6 +28,8 @@
+        CAP_SETGID 9
+        CAP_SETUID 9
+        CAP_FOWNER 9
++       CAP_BPF 9
++       CAP_CHECKPOINT_RESTORE 9
+ # Denial of service, bypass audit controls, information leak
+        CAP_SYS_TIME 8
+        CAP_NET_ADMIN 8
+@@ -49,6 +51,7 @@
+        CAP_BLOCK_SUSPEND 8
+        CAP_DAC_READ_SEARCH 7
+        CAP_AUDIT_READ 7
++       CAP_PERFMON 7
+ # unused
+        CAP_NET_BROADCAST 0
+ 

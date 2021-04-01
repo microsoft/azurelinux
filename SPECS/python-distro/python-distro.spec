@@ -5,14 +5,14 @@
 Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            https://pypi.python.org/pypi/distro
-Source0:        https://files.pythonhosted.org/packages/ca/e3/78443d739d7efeea86cbbe0216511d29b2f5ca8dbf51a6f2898432738987/distro-%{version}.tar.gz
-%define sha1    distro=d72ac60844b2b472fc815441afe60fc1da728926
+#Source0:       https://github.com/nir0s/distro/archive/v%{version}.tar.gz
+Source0:        distro-%{version}-github.tar.gz
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -71,6 +71,8 @@ tox
 %license LICENSE
 
 %changelog
+*   Fri Feb 26 2021 Andrew Phelps <anphel@microsoft.com> 1.4.0-4
+-   Use github source to fix check tests.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.0-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Thu Jul 11 2019 Tapas Kundu <tkundu@vmware.com> 1.4.0-2

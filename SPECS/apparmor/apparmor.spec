@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           apparmor
 Version:        2.13
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 License:        GNU LGPL v2.1
 URL:            https://launchpad.net/apparmor
@@ -9,6 +9,7 @@ Source0:        https://launchpad.net/apparmor/2.13/2.13.0/+download/%{name}-%{v
 Patch0:         apparmor-set-profiles-complain-mode.patch
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         apparmor-fix-make-check.patch
+Patch3:         apparmor-update-severity-db.patch
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 Vendor:         Microsoft Corporation
@@ -160,6 +161,7 @@ This package contains the AppArmor module for perl.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 export PYTHONPATH=/usr/lib/python3.7/site-packages
@@ -355,6 +357,8 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+*   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 2.13-12
+-   Add patch to severity.db to fix tests.
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.13-11
 -   Nopatch CVE-2016-1585
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-10

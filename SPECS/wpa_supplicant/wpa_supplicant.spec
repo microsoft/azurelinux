@@ -1,7 +1,7 @@
 Summary:        WPA client
 Name:           wpa_supplicant
 Version:        2.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,8 @@ Group:          Applications/Communications
 URL:            https://w1.fi
 Source0:        https://w1.fi/releases/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-16275.patch
+Patch1:         CVE-2021-0326.patch
+Patch2:         CVE-2021-27803.patch
 BuildRequires:  libnl3-devel
 BuildRequires:  openssl-devel
 Requires:       libnl3
@@ -18,8 +20,7 @@ Requires:       openssl
 WPA Supplicant is a Wi-Fi Protected Access (WPA) client and IEEE 802.1X supplicant
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 cat > wpa_supplicant/.config << "EOF"
@@ -97,29 +98,32 @@ EOF
 %{_sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf
 
 %changelog
+* Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-3
+- Add patch for CVE-2021-0326 and CVE-2021-27803
+
 * Mon Nov 16 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9-2
 - Change name of CVE-2019-16275 patch.
 
-*   Thu May 14 2020 Henry Beberman <hebeberm@microsoft.com> 2.9-1
--   Update version to 2.9.
--   Add patch for CVE-2019-16275.
+* Thu May 14 2020 Henry Beberman <hebeberm@microsoft.com> - 2.9-1
+- Update version to 2.9.
+- Add patch for CVE-2019-16275.
 
-*   Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.7-4
--   Added %%license line automatically
+* Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.7-4
+- Added %%license line automatically
 
-*   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.7-3
--   Rename libnl to libnl3.
--   Remove sha1 macro.
+* Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7-3
+- Rename libnl to libnl3.
+- Remove sha1 macro.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.7-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Jan 3 2019 Michelle Wang <michellew@vmware.com> 2.7-1
--   Update version to 2.7.
+* Thu Jan 3 2019 Michelle Wang <michellew@vmware.com> - 2.7-1
+- Update version to 2.7.
 
-*   Fri Aug 17 2018 Alexey Makhalov <amakhalov@vmware.com> 2.6-2
--   Improve .service file: wait wlanX to appear, run daemon in background.
--   Added skeleton for wlan0 conf file.
+* Fri Aug 17 2018 Alexey Makhalov <amakhalov@vmware.com> - 2.6-2
+- Improve .service file: wait wlanX to appear, run daemon in background.
+- Added skeleton for wlan0 conf file.
 
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.6-1
--   Initial build. First version.
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.6-1
+- Initial build. First version.

@@ -159,8 +159,7 @@ func (iv *InstallationView) populateInstallOptions() (err error) {
 	}
 
 	for _, option := range iv.installOptions {
-		currentRune := rune(iv.optionList.GetItemCount() + 'a')
-		iv.optionList.AddItem(option, "", currentRune, nil)
+		iv.optionList.AddItem(option, "", 0, nil)
 	}
 
 	return
