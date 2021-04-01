@@ -302,9 +302,9 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 # Verify for build-id match
 # We observe different IDs sometimes
 # TODO: debug it
-ID1=`readelf -n vmlinux | grep "Build ID"`
+ID1=`eu-readelf -n vmlinux | grep "Build ID"`
 ./scripts/extract-vmlinux arch/x86/boot/bzImage > extracted-vmlinux
-ID2=`readelf -n extracted-vmlinux | grep "Build ID"`
+ID2=`eu-readelf -n extracted-vmlinux | grep "Build ID"`
 if [ "$ID1" != "$ID2" ] ; then
         echo "Build IDs do not match"
         echo $ID1
