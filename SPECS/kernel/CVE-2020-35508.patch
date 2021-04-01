@@ -1,0 +1,52 @@
+From b4e00444cab4c3f3fec876dc0cccc8cbb0d1a948 Mon Sep 17 00:00:00 2001
+From: Eddy Wu <itseddy0402@gmail.com>
+Date: Sat, 7 Nov 2020 14:47:22 +0800
+Subject: [PATCH] fork: fix copy_process(CLONE_PARENT) race with the exiting
+ ->real_parent
+
+current->group_leader->exit_signal may change during copy_process() if
+current->real_parent exits.
+
+Move the assignment inside tasklist_lock to avoid the race.
+
+Signed-off-by: Eddy Wu <eddy_wu@trendmicro.com>
+Acked-by: Oleg Nesterov <oleg@redhat.com>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+---
+ kernel/fork.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 32083db7a2a23e..6d266388d3804c 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -2167,14 +2167,9 @@ static __latent_entropy struct task_struct *copy_process(
+ 	/* ok, now we should be set up.. */
+ 	p->pid = pid_nr(pid);
+ 	if (clone_flags & CLONE_THREAD) {
+-		p->exit_signal = -1;
+ 		p->group_leader = current->group_leader;
+ 		p->tgid = current->tgid;
+ 	} else {
+-		if (clone_flags & CLONE_PARENT)
+-			p->exit_signal = current->group_leader->exit_signal;
+-		else
+-			p->exit_signal = args->exit_signal;
+ 		p->group_leader = p;
+ 		p->tgid = p->pid;
+ 	}
+@@ -2218,9 +2213,14 @@ static __latent_entropy struct task_struct *copy_process(
+ 	if (clone_flags & (CLONE_PARENT|CLONE_THREAD)) {
+ 		p->real_parent = current->real_parent;
+ 		p->parent_exec_id = current->parent_exec_id;
++		if (clone_flags & CLONE_THREAD)
++			p->exit_signal = -1;
++		else
++			p->exit_signal = current->group_leader->exit_signal;
+ 	} else {
+ 		p->real_parent = current;
+ 		p->parent_exec_id = current->self_exec_id;
++		p->exit_signal = args->exit_signal;
+ 	}
+ 
+ 	klp_copy_process(p);
