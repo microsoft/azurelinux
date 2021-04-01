@@ -370,7 +370,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `SOURCE_URL=...`
 
-> URL to download unavailable source files from when creating `*.src.rpm` files prior to build.
+> URL to download unavailable source files from when creating `*.src.rpm` files prior to build. Only one URL can be set at a time; there is no support for a list of multiple source URLs.
 
 #### `PACKAGE_URL_LIST=...`
 
