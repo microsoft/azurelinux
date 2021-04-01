@@ -258,6 +258,8 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	const osReleaseFile = "/etc/os-release"
 
+	// For "bright" colors, we need to manually specify RGB values
+	// As they do not nhave
 	ai.backdropStyle = tview.Theme{
 		PrimitiveBackgroundColor:    tcell.ColorBlack,
 		ContrastBackgroundColor:     tcell.ColorWhite,
@@ -269,7 +271,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		SecondaryTextColor:          tcell.ColorBlack,
 		TertiaryTextColor:           tcell.ColorRed,
 		InverseTextColor:            tcell.ColorGreen,
-		ContrastSecondaryTextColor:  tcell.ColorSilver,
+		ContrastSecondaryTextColor:  tcell.NewRGBColor(255, 255, 255), // VGA bright white
 	}
 
 	tview.Styles = tview.Theme{
@@ -281,7 +283,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		GraphicsColor:               tcell.ColorGreen,
 		PrimaryTextColor:            tcell.ColorWhite,
 		SecondaryTextColor:          tcell.ColorDarkCyan,
-		TertiaryTextColor:           tcell.ColorMaroon,
+		TertiaryTextColor:           tcell.NewRGBColor(255, 85, 85), // VGA bright red
 		InverseTextColor:            tcell.ColorBlack,
 		ContrastSecondaryTextColor:  tcell.ColorGreen,
 	}
