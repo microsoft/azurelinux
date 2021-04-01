@@ -4,7 +4,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD
 URL:            https://rpm.org
 Group:          Applications/System
@@ -14,6 +14,7 @@ Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
+Patch1: CVE-2021-20271.patch
 Requires:       bash
 Requires:       libdb
 Requires:       rpm-libs = %{version}-%{release}
@@ -102,6 +103,7 @@ Python3 rpm.
 %prep
 %setup -n rpm-%{name}-%{version}-release
 %patch0 -p1
+%patch1 -p1
 
 %build
 sed -i '/define _GNU_SOURCE/a #include "../config.h"' tools/sepdebugcrcfix.c
@@ -269,6 +271,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Thu Apr 01 2021 Mariner Autopatcher <cblmargh@microsoft.com> 4.14.2-11
+-   Added patch file(s) CVE-2021-20271.patch
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-10
 -   Add a vendor definition so rpm will search /usr/lib/rpm/<vendor> for macros.
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.2-9
