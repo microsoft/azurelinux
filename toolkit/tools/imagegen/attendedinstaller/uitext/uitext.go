@@ -3,6 +3,10 @@
 
 package uitext
 
+const (
+	RequiredInputMark = "* "
+)
+
 // "]" is a special character for the TUI text, escape it with "[]"
 
 // Navigation text.
@@ -43,15 +47,19 @@ const (
 	DiskTitle = "Select a Disk"
 
 	// Custom Partition
-	DiskAdvanceTitleFmt   = "Partitions for: %v"
-	DiskAddPartitionTitle = "Add Partition"
-	DiskFormatLabel       = "* Format"
-	DiskMountPointLabel   = "* Mount Point"
-	DiskNameLabel         = "* Name"
-	DiskSpaceLeftFmt      = "Remaining space: %v"
-	DiskSizeLabel         = "* Size"
-	DiskSizeLabelMaxHelp  = "(* for max)"
-	DiskSizeUnitLabel     = "* Unit size"
+	DiskAdvanceTitleFmt      = "Partitions for: %v"
+	DiskAddPartitionTitle    = "Add Partition"
+	DiskFormatLabel          = "Format"
+	DiskMountPointLabel      = "Mount Point"
+	DiskNameLabel            = "Name"
+	DiskSizeLabel            = "Size"
+	DiskSpaceLeftFmt         = "Remaining space: %v"
+	FormDiskSizeLabelMaxHelp = "(* for max)"
+	FormDiskSizeUnitLabel    = "* Unit size"
+	FormDiskFormatLabel      = RequiredInputMark + DiskFormatLabel
+	FormDiskMountPointLabel  = RequiredInputMark + DiskMountPointLabel
+	FormDiskNameLabel        = RequiredInputMark + DiskNameLabel
+	FormDiskSizeLabel        = RequiredInputMark + DiskSizeLabel
 
 	// Errors
 	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type '%s'"

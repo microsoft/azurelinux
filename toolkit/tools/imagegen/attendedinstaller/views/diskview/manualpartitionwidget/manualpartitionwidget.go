@@ -130,26 +130,26 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 		SetButtonsAlign(tview.AlignCenter)
 
 	mp.formatInput = mp.enumInputBox(validPartitionFormats).
-		SetLabel(uitext.DiskFormatLabel).
+		SetLabel(uitext.FormDiskFormatLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
-		SetLabel(uitext.DiskSizeUnitLabel).
+		SetLabel(uitext.FormDiskSizeUnitLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.nameInput = tview.NewInputField().
-		SetLabel(uitext.DiskNameLabel).
+		SetLabel(uitext.FormDiskNameLabel).
 		SetFieldWidth(maxParittionLabelSize).
 		SetAcceptanceFunc(mp.nameInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.mountPointInput = tview.NewInputField().
-		SetLabel(uitext.DiskMountPointLabel).
+		SetLabel(uitext.FormDiskMountPointLabel).
 		SetAcceptanceFunc(mp.mountPointInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeInput = tview.NewInputField().
-		SetLabel(fmt.Sprintf("%s %s", uitext.DiskSizeLabel, uitext.DiskSizeLabelMaxHelp)).
+		SetLabel(fmt.Sprintf("%s %s", uitext.FormDiskSizeLabel, uitext.FormDiskSizeLabelMaxHelp)).
 		SetAcceptanceFunc(mp.sizeInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
