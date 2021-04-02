@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.17
-Release:        4%{?dist}
+Version:        10.3.28
+Release:        1%{?dist}
 License:        GPLv2 with exceptions and LGPLv2 and BSD
 Group:          Applications/Databases
 Vendor:         Microsoft Corporation
@@ -202,6 +202,8 @@ rm -rf %{buildroot}
 %{_mandir}/man1/perror.1.gz
 %{_datadir}/mysql/charsets/*
 %{_datadir}/magic
+%{_datadir}/pam_user_map.so
+%{_datadir}/user_map.conf
 %doc COPYING CREDITS
 
 %exclude /usr/share/mysql/bench
@@ -289,8 +291,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/replace.1.gz
 %{_mandir}/man1/resolveip.1.gz
 %{_mandir}/man1/resolve_stack_dump.1.gz
-%{_mandir}/man1/tokuftdump.1.gz
-%{_mandir}/man1/tokuft_logprint.1.gz
 %{_mandir}/man1/wsrep_sst_common.1.gz
 %{_mandir}/man1/wsrep_sst_mysqldump.1.gz
 %{_mandir}/man1/wsrep_sst_rsync.1.gz
@@ -334,8 +334,7 @@ rm -rf %{buildroot}
 %{_libdir}/libmariadb.so
 %{_libdir}/libmariadbd.so
 %{_libdir}/libmysqld.so
-%{_libdir}/pkgconfig/libmariadb.pc
-%{_datadir}/pkgconfig/mariadb.pc
+%{_libdir}/pkgconfig/*mariadb.pc
 
 %files errmsg
 %{_datadir}/mysql/czech/errmsg.sys
@@ -365,6 +364,9 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+*   Fri Apr 02 2021 Nicolas Ontiveros <niontive@microsoft.com> 10.3.28-1
+-   Upgrade to version 10.3.28, which resolves CVE-2021-27928
+
 *   Thu Jan 14 2021 Andrew Phelps <anphel@microsoft.com> 10.3.17-4
 -   Disable failing "test-connect" test and binary "test-connect-t"
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 10.3.17-3
