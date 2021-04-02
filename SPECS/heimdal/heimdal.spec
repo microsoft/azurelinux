@@ -56,7 +56,7 @@ BuildRequires:  libedit-devel
 BuildRequires:  libtool
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  openldap
+BuildRequires:  openldap-devel
 #Required for tests/ldap
 #BuildRequires:  openldap-servers
 BuildRequires:  pam-devel

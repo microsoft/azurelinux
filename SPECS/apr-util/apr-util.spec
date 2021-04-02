@@ -38,7 +38,7 @@ build applications using the APR utility library.
 %package ldap
 Group: Development/Libraries
 Summary: APR utility library LDAP support
-BuildRequires: openldap
+BuildRequires: openldap-devel
 Requires: apr-util
 Requires: openldap
 
