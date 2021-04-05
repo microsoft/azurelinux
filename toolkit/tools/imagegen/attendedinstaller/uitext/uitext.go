@@ -3,8 +3,10 @@
 
 package uitext
 
+// Useful prefix strings
 const (
 	RequiredInputMark = "* "
+	BoldPrefix        = "[::b]"
 )
 
 // "]" is a special character for the TUI text, escape it with "[]"
@@ -24,7 +26,7 @@ const (
 // AttendedInstaller wrapper text.
 const (
 	NavigationHelp = "Arrow keys make selections. Enter activates."
-	ExitModalTitle = "Do you want to quit setup?"
+	ExitModalTitle = BoldPrefix + "Do you want to quit setup?"
 )
 
 // ConfirmView text.

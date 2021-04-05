@@ -271,7 +271,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		SecondaryTextColor:          tcell.ColorBlack,
 		TertiaryTextColor:           tcell.ColorRed,
 		InverseTextColor:            tcell.ColorGreen,
-		ContrastSecondaryTextColor:  tcell.NewRGBColor(255, 255, 255), // VGA bright white
+		ContrastSecondaryTextColor:  tcell.ColorWhite, // VGA bright white
 	}
 
 	tview.Styles = tview.Theme{
@@ -283,7 +283,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		GraphicsColor:               tcell.ColorGreen,
 		PrimaryTextColor:            tcell.ColorWhite,
 		SecondaryTextColor:          tcell.ColorDarkCyan,
-		TertiaryTextColor:           tcell.NewRGBColor(255, 85, 85), // VGA bright red
+		TertiaryTextColor:           tcell.ColorRed,
 		InverseTextColor:            tcell.ColorBlack,
 		ContrastSecondaryTextColor:  tcell.ColorGreen,
 	}
@@ -345,7 +345,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		SetBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetButtonBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetTextColor(ai.backdropStyle.ContrastSecondaryTextColor).
-		SetButtonTextColor(ai.backdropStyle.ContrastSecondaryTextColor).
+		SetButtonTextColor(ai.backdropStyle.PrimitiveBackgroundColor).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == uitext.ButtonQuit {
 				ai.userQuitInstallation = true
