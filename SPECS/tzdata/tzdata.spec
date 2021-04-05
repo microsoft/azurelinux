@@ -26,7 +26,7 @@ cd %{blddir}
 ZONEINFO=%{buildroot}%{_datarootdir}/zoneinfo
 install -vdm 755 $ZONEINFO/{posix,right}
 for tz in etcetera southamerica northamerica europe africa antarctica  \
-    asia australasia backward pacificnew systemv; do
+    asia australasia backward; do
     zic -L /dev/null    -d $ZONEINFO        -y "sh yearistype.sh" ${tz}
     zic -L /dev/null    -d $ZONEINFO/posix  -y "sh yearistype.sh" ${tz}
     zic -L leapseconds  -d $ZONEINFO/right  -y "sh yearistype.sh" ${tz}
@@ -45,6 +45,7 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %changelog
 * Mon Apr 05 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2021a-1
 - Update to version  "2021a".
+- Removed 'pacificnew' and 'systemv' from parsed zone info, since they have been removed from the sources.
 
 * Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019c-3
 - Added %%license line automatically
