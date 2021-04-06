@@ -186,7 +186,8 @@
             "RemoveRpmDb": false,
             "ReadOnlyVerityRoot": {
                 "Enable": false
-            }
+            },
+            "HidepidDisabled": true
         },
         {
             "Name": "BiggerDiskA",
