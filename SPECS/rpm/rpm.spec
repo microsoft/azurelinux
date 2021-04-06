@@ -22,7 +22,6 @@ BuildRequires:  libdb-devel
 BuildRequires:  lua-devel
 BuildRequires:  nss-devel
 BuildRequires:  popt-devel
-BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
@@ -90,14 +89,6 @@ Requires:       %{name} = %{version}-%{release}
 %description lang
 These are the additional language files of rpm.
 
-%package -n     python-rpm
-Summary:        Python 2 bindings for rpm.
-Group:          Development/Libraries
-Requires:       python2
-Provides:       %{name}-python = %{version}-%{release}
-
-%description -n python-rpm
-
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
@@ -135,7 +126,6 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 make %{?_smp_mflags}
 
 pushd python
-python2 setup.py build
 python3 setup.py build
 popd
 
@@ -155,7 +145,6 @@ install -vm755 %{SOURCE1} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
 
 pushd python
-python2 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 popd
 

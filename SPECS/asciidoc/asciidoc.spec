@@ -11,12 +11,12 @@ Distribution:   Mariner
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
 Requires:       python3
-Requires:       python-xml
+Requires:       python3-xml
 Requires:       libxslt
 Requires:       docbook-style-xsl
 Requires:       docbook-dtd-xml
