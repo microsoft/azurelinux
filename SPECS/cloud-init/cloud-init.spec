@@ -2,7 +2,7 @@
 
 Name:           cloud-init
 Version:        19.1
-Release:        4%{?dist}
+Release:        6%{?dist}
 Summary:        Cloud instance init scripts
 Group:          System Environment/Base
 License:        GPLv3
@@ -14,14 +14,16 @@ Source1:        cloud-mariner.cfg
 Source2:        99-disable-networking-config.cfg
 
 Patch0:         mariner-distro.patch
-Patch2:         vca-admin-pwd.patch
-Patch3:         mariner-hosts-template.patch
-Patch5:         datasource-guestinfo.patch
-Patch6:         systemd-service-changes.patch
-Patch7:         makecheck.patch
-Patch8:         systemd-resolved-config.patch
-Patch9:         cloud-init-azureds.patch
-Patch10:        ds-identity.patch
+Patch1:         vca-admin-pwd.patch
+Patch2:         mariner-hosts-template.patch
+Patch3:         datasource-guestinfo.patch
+Patch4:         systemd-service-changes.patch
+Patch5:         makecheck.patch
+Patch6:         systemd-resolved-config.patch
+Patch7:         cloud-init-azureds.patch
+Patch8:         ds-identity.patch
+Patch9:         CVE-2020-8631.patch
+Patch10:        CVE-2020-8632.patch
 
 BuildRequires:  python3
 BuildRequires:  python3-libs
@@ -34,7 +36,12 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-six
 # %if %{with_check}
+BuildRequires:  dnf
+BuildRequires:  python3-configobj
+BuildRequires:  python3-pip
 BuildRequires:  python3-requests
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
 # %endif
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-urllib3
@@ -68,16 +75,7 @@ ssh keys and to let the user run various scripts.
 
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch0 -p1
-%patch2 -p1
-%patch3 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
+%autosetup -p1 -n %{name}-%{version}
 
 find systemd -name "cloud*.service*" | xargs sed -i s/StandardOutput=journal+console/StandardOutput=journal/g
 
@@ -98,10 +96,16 @@ cp -p %{SOURCE1} %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/cloud/cloud.cfg.d/
 
 %check
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-ln -s /usr/bin/pip3 /usr/bin/pip
-$easy_install_3 tox
-tox -e py36
+pip3 install atomicwrites
+pip3 install attrs
+pip3 install httpretty
+pip3 install jsonpatch
+pip3 install more-itertools
+pip3 install mock
+pip3 install nose
+pip3 install unittest2
+useradd test -G root -m
+LANG=en_US.UTF-8 sudo -u test nosetests cloudinit
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -146,6 +150,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/cloud
 
 %changelog
+*   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 19.1-6
+-   Fix check tests
+*   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.1-5
+-   Use autosetup
+-   Fix CVE-2020-8631
+-   Fix CVE-2020-8632
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 19.1-4
 -   Rename iproute2 to iproute.
 -   License verified.

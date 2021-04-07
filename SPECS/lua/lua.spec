@@ -172,6 +172,7 @@ install -Dpm 0644 %{SOURCE1000} $RPM_BUILD_ROOT/%{macrosdir}/macros.lua
 %changelog
 * Thu Oct 01 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-11
 - Nopatch CVE-2020-24342
+- Apply patch for CVE-2019-6706 from Lua mailing list
 - Apply patch for CVE-2020-15888 from Open Embedded
 
 * Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-10

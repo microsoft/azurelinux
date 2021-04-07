@@ -3,7 +3,7 @@
 
 Name:           python-imagesize
 Version:        1.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        python module to analyze jpeg/jpeg2000/png/gif image header and return image size.
 License:        MIT
 Group:          Development/Languages/Python
@@ -58,8 +58,14 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 
 %check
-py.test2
-py.test3
+easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
+$easy_install_2 pytest pathlib2 pluggy
+python2 setup.py test
+pushd ../p3dir
+easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
+$easy_install_3 pytest pathlib2 pluggy
+python3 setup.py test
+popd
 
 %files
 %defattr(-,root,root,-)
@@ -71,9 +77,10 @@ py.test3
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.0-5
-- Added %%license line automatically
-
+*   Tue Dec 22 2020 Andrew Phelps <anphel@microsoft.com> 1.1.0-6
+-   Fix check tests by installing python test dependencies.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.0-5
+-   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1.0-4
 -   Renaming python-pytest to pytest
 *   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 1.1.0-3

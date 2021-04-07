@@ -1,7 +1,7 @@
 Summary:	Contains programs for manipulating text files
 Name:		gawk
 Version:	4.2.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv3
 URL:		http://www.gnu.org/software/gawk
 Group:		Applications/File
@@ -34,6 +34,8 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 %find_lang %{name}
 
 %check
+# Skip the timeout test, which is unreliable on our (vm) build machines
+sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
 make %{?_smp_mflags} check
 
@@ -51,10 +53,12 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 %{_sysconfdir}/profile.d/gawk.csh
 %{_sysconfdir}/profile.d/gawk.sh
-%changelog
-* Sat May 09 00:21:17 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.1-3
-- Added %%license line automatically
 
+%changelog
+*   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-4
+-   Skip timeout test
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.2.1-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Sep 17 2018 Sujay G <gsujay@vmware.com> 4.2.1-1

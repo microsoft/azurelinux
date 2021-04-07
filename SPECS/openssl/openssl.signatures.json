@@ -1,5 +1,9 @@
 {
  "Signatures": {
-  "openssl-1.1.1g.tar.gz": "ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46"
+  "ec_curve.c": "138a74284d4193a8eb7c55d3420b9addff81b29687435d6cd1cf8583130e19af",
+  "ectest.c": "a03d49c8de47405912932f946c1f28f2374194cbc053df58dbb228f7ed4b09b3",
+  "hobble-openssl": "7140fcaa43acf82bd40228e0157d42ee8ad52effbffadf84252adab73337d5bd",
+  "ideatest.c": "0ee7bbb2c4a5984015d041135ea645af971cb1a0c7198fc59c7871366fd582f6",
+  "openssl-1.1.1g-hobbled.tar.xz": "2408ab62a3474eea4d87a587ae8d6663af66551ac4a3da6993723cdfe0c314fe"
  }
 }

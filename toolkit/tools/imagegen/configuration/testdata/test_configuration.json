@@ -45,7 +45,10 @@
                     "ID": "MyRootfs",
                     "Start": 9,
                     "End": 1024,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 }
             ]
         },
@@ -69,7 +72,10 @@
                     "ID": "MyRootfsA",
                     "Start": 9,
                     "End": 1024,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 },
                 {
                     "ID": "MyBootB",
@@ -83,7 +89,10 @@
                     "ID": "MyRootfsB",
                     "Start": 1033,
                     "End": 2048,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Flags": [
+                        "dmroot"
+                    ]
                 },
                 {
                     "ID": "SharedData",
@@ -102,12 +111,14 @@
                 {
                     "ID": "MyBoot",
                     "MountPoint": "/boot",
-                    "MountOptions": "ro,exec"
+                    "MountOptions": "ro,exec",
+                    "RdiffBaseImage": "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 },
                 {
                     "ID": "MyRootfs",
                     "MountPoint": "/",
-                    "RemoveDocs": true
+                    "RemoveDocs": true,
+                    "OverlayBaseImage": "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
                 }
             ],
             "PackageLists": [
@@ -171,6 +182,10 @@
             "Encryption" : {
                 "Enable":   true,
                 "Password": "EncryptPassphrase123"
+            },
+            "RemoveRpmDb": false,
+            "ReadOnlyVerityRoot": {
+                "Enable": false
             }
         },
         {

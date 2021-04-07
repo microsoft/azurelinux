@@ -6,6 +6,7 @@
   "hypervkvpd.service": "25339871302f7a47e1aecfa9fc2586c78bc37edb98773752f0a5dec30f0ed3a1",
   "hypervvss.rules": "94cead44245ef6553ab79c0bbac8419e3ff4b241f01bcec66e6f508098cbedd1",
   "hypervvssd.service": "22270d9f0f23af4ea7905f19c1d5d5495e40c1f782cbb87a99f8aec5a011078d",
-  "linux-msft-5.4.51.tar.gz": "3bcd6b09e952fac4f708614658b508ce80c8e25c04780b6b44a481b1479a08e7"
+  "hv_set_ifconfig": "0865f76b18f8f04cb54b7779c2d5d400dab68b132210e17db98117012d177c90",
+  "linux-msft-5.4.91.tar.gz": "5f36254d8e78d0a17b7103df4a37d706b6f24a7cc343c938a8b6453e4137c97c"
  }
 }

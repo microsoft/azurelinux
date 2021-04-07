@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.88
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -54,6 +54,7 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 # Install required modules for test - Test::Pod, Test::Exception, Test::Warn and Test::NoWarnings
 export PERL_MM_USE_DEFAULT=1
 echo "yes" | cpan -a
+cpan local::lib
 cpan -i Test::Pod Test::Exception Test::Warn Test::NoWarnings
 make test
 
@@ -63,11 +64,16 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.88-4
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 1.88-3: Adding 'local::lib' perl5 library to fix test dependencies.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.88-3
 -   Use new perl package names.
 -   Change perl_vendorlib to perl_vendorarch directory for packaging.
 -   Provide perl(Net::SSLeay*).
-* Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
 - Added %%license line automatically
 
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.88-1

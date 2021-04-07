@@ -1,13 +1,18 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
+# CVE-2020-35522 also covers 35521.
+Patch0: CVE-2020-35521.nopatch
+Patch1: CVE-2020-35522.patch
+Patch2: CVE-2020-35523.patch
+Patch3: CVE-2020-35524.patch
 BuildRequires:  libjpeg-turbo-devel
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
@@ -25,6 +30,10 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -q -n libtiff-v%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 sh autogen.sh
@@ -58,6 +67,10 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
+- Merge the following releases from 1.0 to dev branch
+- joslobo@microsoft.com, 4.1.0-2: Add patches for CVE-2020-35521, CVE-2020-35522, CVE-2020-35523, CVE-2020-35524
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.1.0-2
 - Provide libtiff-tools.
 

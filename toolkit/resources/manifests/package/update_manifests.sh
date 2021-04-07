@@ -284,7 +284,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^pinentry-" >> $1
     cat $TmpPkgGen | grep "^gnupg2-" >> $1
     cat $TmpPkgGen | grep "^gpgme-" >> $1
-    cat $TmpPkgGen | grep "^mariner-repos-" >> $1
+    cat $TmpPkgGen | grep "^mariner-repos-" | grep -v "mariner-repos-extras">> $1
     cat $TmpPkgGen | grep "^libffi-" >> $1
     cat $TmpPkgGen | grep "^libtasn1-" >> $1
     cat $TmpPkgGen | grep "^p11-kit-" >> $1

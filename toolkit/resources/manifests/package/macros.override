@@ -18,10 +18,26 @@
 %skip_check_python2 1
 %skip_check_bash 1
 %skip_check_gtk_doc 1
+%skip_check_tdnf 1
 %skip_check_vim 1
 
 # Chmods /dev/null to 600 breaking many non-root applications.
 %skip_check_zstd 1
+
+# JNA requires X11 dependencies which are only available in toolchain build environment
+%skip_check_jna 1
+
+# We are missing many of the dependency packages for the Dracut tests
+%skip_check_dracut 1
+
+# Strongswan's rsa testsuite occasionally hangs
+%skip_check_strongswan 1
+
+# asciidoc tests require the "source-highlight" package which is not available
+%skip_check_asciidoc 1
+
+# ipv6calc tests require "perl(URI::Escape)" which is not in the 1.0 branches
+%skip_check_ipv6calc 1
 
 # Still fails package build when it fails
 %skip_check_gcc 1

@@ -1,0 +1,18 @@
+name: Trigger release build after the release PR is merged.
+
+on:
+  pull_request:
+    branches: [ 1.0 ]
+    types: [ closed ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'pull_request') && (github.event.pull_request.merged == 'true') && startsWith(github.event.pull_request.title, 'Automated Mariner Release') }}
+    steps:
+      - name: Azure Pipelines Action
+        uses: Azure/pipelines@v1
+        with:
+          azure-devops-project-url: 'https://dev.azure.com/mariner-org/mariner'
+          azure-pipeline-name: 'AutoRelease2-PushTagAndBuild'
+          azure-devops-token: '${{ secrets.MARINER_BOT_BUILDER_PAT }}'

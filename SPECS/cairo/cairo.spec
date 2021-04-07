@@ -1,13 +1,14 @@
 Summary:        A 2D graphics library.
 Name:           cairo
 Version:        1.16.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2 or MPLv1.1
 URL:            https://cairographics.org
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://cairographics.org/releases/%{name}-%{version}.tar.xz
+Patch0:         CVE-2018-19876.patch
 BuildRequires:  pkg-config
 BuildRequires:  libpng-devel
 BuildRequires:  libxml2-devel
@@ -58,7 +59,7 @@ Requires:       fontconfig-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -106,6 +107,10 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-6
+- Merge the following releases from 1.0 to dev branch
+- niontive@microsoft.com, 1.16.0-5: Fix CVE-2018-19876
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.16.0-5
 - Import gobject support from Fedora 32 spec (license: MIT)
 - Update URLs to https

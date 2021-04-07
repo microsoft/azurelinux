@@ -7,15 +7,18 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
-Group:          Development/Libraries
-URL:            https://search.cpan.org/dist/WWW-Curl/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Libraries
+URL:            https://search.cpan.org/dist/WWW-Curl/
 Source0:        https://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT/WWW-Curl-%{version}.tar.gz
-Patch0:         0001-Curl-macros-fix.patch
 
+Patch0:         0001-Curl-macros-fix.patch
+Patch1:         WWW-Curl-4.17-Adapt-to-changes-in-cURL-7.69.0.patch
+
+BuildRequires:  curl-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
@@ -33,8 +36,7 @@ Provides:       perl(WWW::Curl::Share) = %{version}-%{release}
 WWW::Curl is a Perl extension interface for libcurl.
 
 %prep
-%setup -q -n WWW-Curl-%{version}
-%patch0 -p1
+%autosetup -p1 -n WWW-Curl-%{version}
 rm -rf inc && sed -i -e '/^inc\//d' MANIFEST
 sed -i 's/_LASTENTRY\\z/_LASTENTRY\\z|CURL_DID_MEMORY_FUNC_TYPEDEFS\\z/' Makefile.PL
 
@@ -73,6 +75,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 4.17-10
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 4.17-10: Adapting Fedora 32 patch (license: MIT) for "curl" versions >= 7.69.0.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.17-9
 -   Use new perl package names.
 -   Provide perl(WWW::Curl*).

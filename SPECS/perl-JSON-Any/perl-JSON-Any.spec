@@ -1,7 +1,7 @@
 Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
 Version:        1.39
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Perl Artistic License 2.0
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
@@ -35,7 +35,8 @@ find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
 
 %check
 export PERL_MM_USE_DEFAULT=1
-cpan Test::Fatal  Test::Requires Test::Warnings Test::Without::Module
+cpan local::lib
+cpan Test::Fatal Test::Requires Test::Warnings Test::Without::Module
 make test
 
 %files
@@ -44,10 +45,15 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.39-8
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 1.39-7: Adding 'local::lib' perl5 library to fix test dependencies.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.39-7
 -   Use new perl package names.
 -   Provide perl(JSON::Any).
-* Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.39-6
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.39-6
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.39-5

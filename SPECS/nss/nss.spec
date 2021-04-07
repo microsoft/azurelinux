@@ -1,7 +1,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MPLv2.0
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Group:          Applications/System
@@ -73,11 +73,10 @@ install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
 install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 
 %check
-cd nss/tests
-chmod g+w . -R
-useradd test -G root -m
-HOST=localhost DOMSUF=localdomain BUILD_OPT=1
-sudo -u test ./all.sh && userdel test -r -f
+pushd nss/tests
+export USE_64=1
+HOST=localhost DOMSUF=localdomain BUILD_OPT=1 ./all.sh
+popd
 
 %post   -p /sbin/ldconfig
 
@@ -104,6 +103,10 @@ sudo -u test ./all.sh && userdel test -r -f
 %{_libdir}/libsoftokn3.so
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-4
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 3.44-3: Fix check tests
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3
 -   Provide nss-tools, -util, -static, -softokn, -softokn-devel
 -   Provide nss-pkcs11-devel, -pkcs11-devel-static

@@ -1,29 +1,25 @@
-%define _userunitdir /usr/lib/systemd/user
-
-Version:        0.23.16.1
-Release:        2%{?dist}
-Name:           p11-kit
+%define _userunitdir %{_lib}/systemd/user
 Summary:        Library for loading and sharing PKCS#11 modules
+Name:           p11-kit
+Version:        0.23.22
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-License:        BSD
 URL:            https://p11-glue.freedesktop.org/p11-kit.html
-Source0:        https://github.com/p11-glue/p11-kit/releases/download/%{version}/p11-kit-%{version}.tar.gz
+Source0:        https://github.com/p11-glue/p11-kit/releases/download/%{version}/p11-kit-%{version}.tar.xz
 Source1:        trust-extract-compat
 Source2:        p11-kit-client.service
-
 BuildRequires:  gcc
-BuildRequires:  libtasn1-devel >= 2.3
-BuildRequires:  libffi-devel
 BuildRequires:  gtk-doc
+BuildRequires:  libffi-devel
+BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  systemd-devel
 
 %description
 p11-kit provides a way to load and enumerate PKCS#11 modules, as well
 as a standard configuration setup for installing PKCS#11 modules in
 such a way that they're discoverable.
-
 
 %package devel
 Summary:        Development files for %{name}
@@ -33,18 +29,16 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %package trust
-Summary:            System trust module from %{name}
-Requires:           %{name}%{?_isa} = %{version}-%{release}
-Requires(post):     chkconfig
-Requires(postun):   chkconfig
-Conflicts:          nss < 3.14.3-9
+Summary:        System trust module from %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires(post): chkconfig
+Requires(postun): chkconfig
+Conflicts:      nss < 3.14.3-9
 
 %description trust
 The %{name}-trust package contains a system trust PKCS#11 module which
 contains certificate anchors and black lists.
-
 
 %package server
 Summary:        Server and client commands for %{name}
@@ -55,7 +49,6 @@ The %{name}-server package contains command line tools that enables
 exporting PKCS#11 modules through a Unix domain socket.  Note that this
 feature is still experimental.
 
-
 # solution taken from icedtea-web.spec
 %define multilib_arches ppc64 sparc64 x86_64 ppc64le
 %ifarch %{multilib_arches}
@@ -63,7 +56,8 @@ feature is still experimental.
 %else
 %define alt_ckbi  libnssckbi.so
 %endif
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 %prep
 %setup -q
@@ -75,34 +69,31 @@ feature is still experimental.
 make %{?_smp_mflags} V=1
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
-install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libexecdir}/p11-kit/
+make install DESTDIR=%{buildroot}
+mkdir -p %{buildroot}%{_sysconfdir}/pkcs11/modules
+find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
+install -p -m 755 %{SOURCE1} %{buildroot}%{_libexecdir}/p11-kit/
 # Install the example conf with %%doc instead
-rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
-mkdir -p $RPM_BUILD_ROOT%{_userunitdir}
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_userunitdir}
+rm %{buildroot}%{_sysconfdir}/pkcs11/pkcs11.conf.example
+mkdir -p %{buildroot}%{_userunitdir}
+install -p -m 644 %{SOURCE2} %{buildroot}%{_userunitdir}
 
 %check
 make check
 
 
 %post -p /sbin/ldconfig
-
 %post trust
 %{_sbindir}/update-alternatives --install %{_libdir}/libnssckbi.so \
         %{alt_ckbi} %{_libdir}/pkcs11/p11-kit-trust.so 30
 
 %postun -p /sbin/ldconfig
-
 %postun trust
 if [ $1 -eq 0 ] ; then
         # package removal
         %{_sbindir}/update-alternatives --remove %{alt_ckbi} %{_libdir}/pkcs11/p11-kit-trust.so
 fi
-
 
 %files
 %license COPYING
@@ -142,8 +133,11 @@ fi
 %{_userunitdir}/p11-kit-server.service
 %{_userunitdir}/p11-kit-server.socket
 
-
 %changelog
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 0.23.22-1
+- Upgrade to version 0.23.22 to fix CVE-2020-29361, CVE-2020-29362, and CVE-2020-29363
+- Update source URL
+
 * Wed May 27 2020 Paul Monson <paulmon@microsoft.com> - 0.23.16.1-2
 - Initial CBL-Mariner import from Fedora 29 (license:MIT).
 - License verified.

@@ -17,9 +17,14 @@ var (
 		PartitionTableType("mbr"),
 		PartitionTableType(""),
 	}
-	invalidPartitionTableType     = PartitionTableType("not_a_partition_type")
-	validPartitionTableTypeJSON   = `"gpt"`
-	invalidPartitionTableTypeJSON = `1234`
+	invalidPartitionTableType                 = PartitionTableType("not_a_partition_type")
+	validPartitionTableTypeJSON               = `"gpt"`
+	invalidPartitionTableTypeJSON             = `1234`
+	validPartitionTableTypesToPartedArguments = map[PartitionTableType]string{
+		PartitionTableType("gpt"): "gpt",
+		PartitionTableType("mbr"): "msdos",
+		PartitionTableType(""):    "",
+	}
 )
 
 func TestShouldSucceedValidPartitionsMatch_PartitionTableType(t *testing.T) {
@@ -74,4 +79,21 @@ func TestShouldFailParsingInvalidJSON_PartitionTableType(t *testing.T) {
 	err := marshalJSONString(invalidPartitionTableTypeJSON, &checkedPartitionType)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [PartitionTableType]: json: cannot unmarshal number into Go value of type configuration.IntermediateTypePartitionTableType", err.Error())
+}
+
+func TestShouldSucceedConvertToPartedArgument_PartitionTableType(t *testing.T) {
+	var ptt PartitionTableType
+	assert.Equal(t, len(validPartitionTableTypes), len(ptt.GetValidPartitionTableTypes()))
+
+	for _, partitionType := range validPartitionTableTypes {
+		partedArgument, err := partitionType.ConvertToPartedArgument()
+		assert.NoError(t, err)
+		assert.Equal(t, partedArgument, validPartitionTableTypesToPartedArguments[partitionType])
+	}
+}
+
+func TestShouldFailConvertToPartedArgument_PartitionTableType(t *testing.T) {
+	_, err := invalidPartitionTableType.ConvertToPartedArgument()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for PartitionTableType (not_a_partition_type)", err.Error())
 }

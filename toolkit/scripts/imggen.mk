@@ -11,7 +11,11 @@ assets_files             = $(shell find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
+ifeq ($(build_arch),aarch64)
+initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
+else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
+endif
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
@@ -35,7 +39,11 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
 imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
+ifeq ($(build_arch),aarch64)
+initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
+else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
+endif
 meta_user_data_iso       = ${IMAGES_DIR)/meta-user-data.iso
 
 $(call create_folder,$(workspace_dir))
@@ -64,7 +72,8 @@ fetch-external-image-packages: $(image_external_package_cache_summary)
 validate-image-config: $(validate-config)
 $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files)
 	$(go-imageconfigvalidator) \
-		--input=$(CONFIG_FILE) && \
+		--input=$(CONFIG_FILE) \
+		--dir=$(CONFIG_BASE_DIR) && \
 	touch $@
 
 
@@ -112,8 +121,8 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--build-dir $(workspace_dir) \
 		--input $(CONFIG_FILE) \
 		--base-dir=$(CONFIG_BASE_DIR) \
-		--log-level $(LOG_LEVEL) \
-		--log-file $(LOGS_DIR)/imggen/imager.log \
+		--log-level=$(LOG_LEVEL) \
+		--log-file=$(LOGS_DIR)/imggen/imager.log \
 		--local-repo $(local_and_external_rpm_cache) \
 		--tdnf-worker $(BUILD_DIR)/worker/worker_chroot.tar.gz \
 		--repo-file=$(imggen_local_repo) \
@@ -133,8 +142,8 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--output-dir $(artifact_dir) \
 		--tmp-dir $(image_roaster_tmp_dir) \
 		--release-version $(RELEASE_VERSION) \
-		--log-level $(LOG_LEVEL) \
-		--log-file $(LOGS_DIR)/imggen/roast.log \
+		--log-level=$(LOG_LEVEL) \
+		--log-file=$(LOGS_DIR)/imggen/roast.log \
 		--image-tag=$(IMAGE_TAG)
 
 $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
@@ -175,8 +184,8 @@ iso: $(go-isomaker) $(go-liveinstaller) $(go-imager) $(depend_CONFIG_FILE) $(CON
 		--release-version $(RELEASE_VERSION) \
 		--resources $(RESOURCES_DIR) \
 		--iso-repo $(local_and_external_rpm_cache) \
-		--log-level $(LOG_LEVEL) \
-		--log-file $(LOGS_DIR)/imggen/isomaker.log \
+		--log-level=$(LOG_LEVEL) \
+		--log-file=$(LOGS_DIR)/imggen/isomaker.log \
 		$(if $(UNATTENDED_INSTALLER),--unattended-install) \
 		--output-dir $(artifact_dir) \
 		--image-tag=$(IMAGE_TAG)

@@ -1,10 +1,9 @@
 %global __requires_exclude perl\\(.*\\)
-%define sha1 net-snmp=78f70731df9dcdb13fe8f60eb7d80d7583da4d2c
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
-Version:        5.8
-Release:        6%{?dist}
-License:        BSD (like)
+Version:        5.9
+Release:        3%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Networking/Other
@@ -12,9 +11,13 @@ URL:            http://net-snmp.sourceforge.net/
 Source0:        http://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1:        snmpd.service
 Source2:        snmptrapd.service
+
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  systemd
+%if %{with_check}
+BuildRequires:  net-tools
+%endif
 Requires:       systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       %{name}-utils = %{version}-%{release}
@@ -31,7 +34,7 @@ Requires:       net-snmp = %{version}
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure \
@@ -82,7 +85,6 @@ rm -rf %{buildroot}/*
 %license COPYING
 %doc NEWS README ChangeLog
 %defattr(-,root,root)
-%license COPYING
 /lib/systemd/system/snmpd.service
 /lib/systemd/system/snmptrapd.service
 %{_bindir}
@@ -91,59 +93,68 @@ rm -rf %{buildroot}/*
 
 %files devel
 %defattr(-,root,root)
+%{_datadir}
 %{_includedir}
 %{_libdir}/*.la
 %{perl_vendorarch}/*
 %{_mandir}/man3/*.3.*
 %{_libdir}/*.so
-%{_datadir}
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
-* Thu Feb 04 2021 Henry Li <lihl@microsoft.com> - 5.8-6
-- Provides net-snmp-utils from net-snmp.
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.8-5
--   Use new perl package names.
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-3
+- Merge the following releases from dev to 1.0 spec
+- joschmit@microsoft.com, 5.8-5: Use new perl package names.
 -   Change perl library path to perl_vendorarch directory for packaging.
 -   Include man pages in devel.
+- lihl@microsoft.com, 5.8-6: Provides net-snmp-utils from net-snmp.
+-   Replace incorrect %%{_lib} usage with %%{_libdir}
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.8-4
--   Added %%license line automatically
+* Tue Nov 10 2020 Andrew Phelps <anphel@microsoft.com> - 5.9-2
+- Fix check test by adding net-tools build requirement.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.8-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.9-1
+- Updating to 5.9 to fix CVE-2019-20892. A patch couldn't be applied without backporting.
+- Switching to %%autosetup.
+- License verified.
+- Removed %%sha1 macro.
+- Updating whitespaces to fix issues reported by the linter.
 
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 5.8-2
--   Using %configure and changing for perl upgrade
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
+- Added %%license line automatically
 
-*   Wed Sep 19 2018 Keerthana K <keerthanak@vmware.com> 5.8-1
--   Update to version 5.8
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 5.8-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Jul 31 2018 Ajay Kaher <akaher@vmware.com> 5.7.3-9
--   Excluded perllocal.pod for aarch64
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> - 5.8-2
+- Using %configure and changing for perl upgrade
 
-*   Mon Apr 16 2018 Xiaolin Li <xiaolinl@vmware.com> 5.7.3-8
--   Apply patch for CVE-2018-1000116
+* Wed Sep 19 2018 Keerthana K <keerthanak@vmware.com> - 5.8-1
+- Update to version 5.8
 
-*   Mon Jul 24 2017 Dheeraj Shetty <dheerajs@vmware.com> 5.7.3-7
--   Make service file a different source
+* Tue Jul 31 2018 Ajay Kaher <akaher@vmware.com> - 5.7.3-9
+- Excluded perllocal.pod for aarch64
 
-*   Tue Apr 04 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.7.3-6
--   Patch to remove U64 typedef
+* Mon Apr 16 2018 Xiaolin Li <xiaolinl@vmware.com> - 5.7.3-8
+- Apply patch for CVE-2018-1000116
 
-*   Tue Oct 04 2016 ChangLee <changLee@vmware.com> 5.7.3-5
--   Modified %check
+* Mon Jul 24 2017 Dheeraj Shetty <dheerajs@vmware.com> - 5.7.3-7
+- Make service file a different source
 
-*   Thu May 26 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 5.7.3-4
--   Excluded the perllocal.pod log.
+* Tue Apr 04 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 5.7.3-6
+- Patch to remove U64 typedef
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.7.3-3
--   GA - Bump release of all rpms
+* Tue Oct 04 2016 ChangLee <changLee@vmware.com> - 5.7.3-5
+- Modified %check
 
-*   Wed May 04 2016 Nick Shi <nshi@vmware.com> 5.7.3-2
--   Add snmpd and snmptrapd to systemd service.
+* Thu May 26 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 5.7.3-4
+- Excluded the perllocal.pod log.
 
-*   Mon Nov 30 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 5.7.3-1
--   Initial build.  First version
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 5.7.3-3
+- GA - Bump release of all rpms
+
+* Wed May 04 2016 Nick Shi <nshi@vmware.com> - 5.7.3-2
+- Add snmpd and snmptrapd to systemd service.
+
+* Mon Nov 30 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 5.7.3-1
+- Initial build.  First version

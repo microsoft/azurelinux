@@ -1,0 +1,12 @@
+--- a/modulemd/meson.build	2021-01-05 17:22:11.418212214 -0800
++++ b/modulemd/meson.build	2021-01-05 17:23:31.586567370 -0800
+@@ -299,7 +299,8 @@
+     import_header_script = find_program('common/tests/test-import-headers.sh')
+     test ('test_v1_import_headers', import_header_script,
+           env : test_env,
+-          args : modulemd_v1_hdrs)
++          args : modulemd_v1_hdrs,
++          timeout : 600)
+ endif
+ 
+ if build_api_v2

@@ -1,18 +1,24 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        8.0.1
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        NCSA
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  libffi-devel
 BuildRequires:  python2
 BuildRequires:  ninja-build
+
+%if %{with_check}
+BuildRequires:  python-xml
+%endif
+
 Requires:       libxml2
 
 %description
@@ -42,8 +48,11 @@ cmake -G Ninja                              \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
+      -DLLVM_INCLUDE_TESTS=ON               \
+      -DLLVM_BUILD_TESTS=ON                 \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
+      -DLLVM_ENABLE_RTTI=ON                 \
       -Wno-dev ..
 
 %ninja_build LLVM
@@ -59,7 +68,7 @@ cmake -G Ninja                              \
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 cd build
-make %{?_smp_mflags} check-llvm
+ninja check-all
 
 %clean
 rm -rf %{buildroot}/*
@@ -85,6 +94,10 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+*   Wed Feb 03 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.0.1-5
+-   Enable RTTI (runtime type information) so other packages can depend on it.
+*   Thu Dec 17 2020 Andrew Phelps <anphel@microsoft.com> - 8.0.1-4
+-   Enable tests in build and run test with ninja.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.1-3
 -   Switch to ninja-build to use LLVM_PARALLEL_LINK_JOBS=1 to reduce
 -   fatal OOM errors during linking phase.

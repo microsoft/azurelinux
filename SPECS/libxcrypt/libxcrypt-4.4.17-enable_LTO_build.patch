@@ -1,0 +1,70 @@
+From a1bff4255fb9cad501a8a5d4bffb8f95df0f615f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Thu, 13 Aug 2020 18:51:50 +0200
+Subject: [PATCH] crypt-port: Add the bits for compiling with link-time
+ optimization.
+
+GCC 10.2 and LLVM/Clang 10 offer initial support for building
+libraries, that are using symbol versioning features, with LTO.
+
+To make use of this with GCC 10.2, the exported versioned symbols
+need to be declared explicitly with __attribute__((symver (...))).
+
+LLVM/Clang 10 supports symbol versioning with LTO out of the box
+without any changes needed.
+
+Fixes #24.
+---
+ lib/crypt-port.h | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/lib/crypt-port.h b/lib/crypt-port.h
+index bec36ac..ca86261 100644
+--- a/lib/crypt-port.h
++++ b/lib/crypt-port.h
+@@ -179,11 +179,29 @@ _crypt_strcpy_or_abort (void *, const size_t, const void *);
+ # define _strong_alias(name, aliasname) \
+   extern __typeof (name) aliasname __THROW __attribute__ ((alias (#name)))
+ 
++/* Starting with GCC 10.2, we can use the symver attribute, which also works
++   with link-time optimization enabled.  */
++# if __GNUC__ > 10 || (__GNUC__ == 10 && __GNUC_MINOR__ >= 2)
++
++/* Referencing specific _compatibility_ symbols still needs inline asm.  */
++# define _symver_ref(extstr, intname, version) \
++  __asm__ (".symver " #intname "," extstr "@" #version)
++
++/* Set the symbol version for EXTNAME, which uses INTNAME as its
++   implementation.  */
++# define symver_set(extstr, intname, version, mode) \
++  extern __typeof (intname) intname __THROW \
++    __attribute__((symver (extstr mode #version)))
++
++# else
++
+ /* Set the symbol version for EXTNAME, which uses INTNAME as its
+    implementation.  */
+ # define symver_set(extstr, intname, version, mode) \
+   __asm__ (".symver " #intname "," extstr mode #version)
+ 
++# endif
++
+ #else
+ # error "Don't know how to do symbol versioning with this compiler"
+ #endif
+@@ -239,9 +257,14 @@ _crypt_strcpy_or_abort (void *, const size_t, const void *);
+ 
+ /* Tests may need to _refer_ to compatibility symbols, but should never need
+    to _define_ them.  */
+-
+ #define symver_ref(extstr, intname, version) \
++  _symver_ref(extstr, intname, version)
++
++/* Generic way for referencing specific _compatibility_ symbols.  */
++#ifndef _symver_ref
++#define _symver_ref(extstr, intname, version) \
+   symver_set(extstr, intname, version, "@")
++#endif
+ 
+ /* Define configuration macros used during compile-time by the
+    GOST R 34.11-2012 "Streebog" hash function.  */

@@ -1,0 +1,116 @@
+diff -urN uuid-1.6.2/configure uuid-1.6.2/configure
+--- uuid-1.6.2/configure	2008-07-04 15:43:09.000000000 -0600
++++ uuid-1.6.2/configure	2012-06-06 19:19:41.659880386 -0600
+@@ -14208,7 +14208,7 @@
+ 
+ 
+ 
+-for ac_header in netdb.h ifaddrs.h net/if.h net/if_dl.h net/if_arp.h netinet/in.h arpa/inet.h
++for ac_header in netdb.h ifaddrs.h net/if.h net/if_dl.h net/if_arp.h netinet/in.h arpa/inet.h netpacket/packet.h
+ do
+ as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ { $as_echo "$as_me:$LINENO: checking for $ac_header" >&5
+diff -urN uuid-1.6.2/uuid.c uuid-1.6.2/uuid.c
+--- uuid-1.6.2/uuid.c	2008-03-07 03:49:59.000000000 -0700
++++ uuid-1.6.2/uuid.c	2012-06-06 15:50:30.060881473 -0600
+@@ -72,6 +72,8 @@
+ /* IEEE 802 MAC address octet length */
+ #define IEEE_MAC_OCTETS 6
+ 
++static unsigned char mac_unset[IEEE_MAC_OCTETS] = {BM_OCTET(1,0,0,0,0,0,0,0), 0x00, 0x00, 0x00, 0x00, 0x00};
++
+ /* UUID binary representation according to UUID standards */
+ typedef struct {
+     uuid_uint32_t  time_low;                  /* bits  0-31 of time field */
+@@ -967,7 +969,7 @@
+      *  GENERATE NODE
+      */
+ 
+-    if ((mode & UUID_MAKE_MC) || (uuid->mac[0] & BM_OCTET(1,0,0,0,0,0,0,0))) {
++    if ((mode & UUID_MAKE_MC) || !memcmp(uuid->mac, mac_unset, IEEE_MAC_OCTETS)) {
+         /* generate random IEEE 802 local multicast MAC address */
+         if (prng_data(uuid->prng, (void *)&(uuid->obj.node), sizeof(uuid->obj.node)) != PRNG_RC_OK)
+             return UUID_RC_INT;
+diff -urN uuid-1.6.2/uuid_mac.c uuid-1.6.2/uuid_mac.c
+--- uuid-1.6.2/uuid_mac.c	2008-03-07 03:49:59.000000000 -0700
++++ uuid-1.6.2/uuid_mac.c	2012-06-06 19:30:49.050879930 -0600
+@@ -76,6 +76,9 @@
+ #ifdef HAVE_IFADDRS_H
+ #include <ifaddrs.h>
+ #endif
++#ifdef HAVE_NETPACKET_PACKET_H
++#include <netpacket/packet.h>
++#endif
+ 
+ /* own headers (part (1/2) */
+ #include "uuid_mac.h"
+@@ -87,6 +90,10 @@
+ #define TRUE (/*lint -save -e506*/ !FALSE /*lint -restore*/)
+ #endif
+ 
++#if !defined(min)
++#define min(a,b) ((a) < (b) ? (a) : (b))
++#endif
++
+ /* return the Media Access Control (MAC) address of
+    the FIRST network interface card (NIC) */
+ int mac_address(unsigned char *data_ptr, size_t data_len)
+@@ -95,28 +102,41 @@
+     if (data_ptr == NULL || data_len < MAC_LEN)
+         return FALSE;
+ 
+-#if defined(HAVE_IFADDRS_H) && defined(HAVE_NET_IF_DL_H) && defined(HAVE_GETIFADDRS)
++#if defined(HAVE_IFADDRS_H) && (defined(HAVE_NET_IF_DL_H) || defined(HAVE_NETPACKET_PACKET_H)) && defined(HAVE_GETIFADDRS)
+     /* use getifaddrs(3) on BSD class platforms (xxxBSD, MacOS X, etc) */
+     {
+         struct ifaddrs *ifap;
+         struct ifaddrs *ifap_head;
++#if defined(HAVE_NET_IF_DL_H)
+         const struct sockaddr_dl *sdl;
+         unsigned char *ucp;
+-        int i;
++#else
++	const struct sockaddr_ll *sll;
++#endif
+ 
+         if (getifaddrs(&ifap_head) < 0)
+             return FALSE;
+         for (ifap = ifap_head; ifap != NULL; ifap = ifap->ifa_next) {
++#if defined(HAVE_NET_IF_DL_H)
+             if (ifap->ifa_addr != NULL && ifap->ifa_addr->sa_family == AF_LINK) {
+                 sdl = (const struct sockaddr_dl *)(void *)ifap->ifa_addr;
+                 ucp = (unsigned char *)(sdl->sdl_data + sdl->sdl_nlen);
+                 if (sdl->sdl_alen > 0) {
+-                    for (i = 0; i < MAC_LEN && i < sdl->sdl_alen; i++, ucp++)
+-                        data_ptr[i] = (unsigned char)(*ucp & 0xff);
++                    memcpy(data_ptr, ucp, min(sdl->sdl_alen, MAC_LEN));
+                     freeifaddrs(ifap_head);
+                     return TRUE;
+                 }
+             }
++#else
++            if (ifap->ifa_addr != NULL && ifap->ifa_addr->sa_family == AF_PACKET) {
++                sll = (const struct sockaddr_ll *)(void *)ifap->ifa_addr;
++                if (sll->sll_hatype == ARPHRD_ETHER) {
++                    memcpy(data_ptr, sll->sll_addr, min(sll->sll_halen, MAC_LEN));
++                    freeifaddrs(ifap_head);
++                    return TRUE;
++                }
++            }
++#endif
+         }
+         freeifaddrs(ifap_head);
+     }
+diff -urN uuid-1.6.2/config.h.in uuid-1.6.2/config.h.in
+--- uuid-1.6.2/config.h.in	2008-07-04 15:43:10.000000000 -0600
++++ uuid-1.6.2/config.h.in	2012-06-06 21:59:03.370227352 -0600
+@@ -75,6 +75,9 @@
+ /* Define to 1 if you have the <netinet/in.h> header file. */
+ #undef HAVE_NETINET_IN_H
+ 
++/* Define to 1 if you have the <netpacket/packet.h> header file. */
++#undef HAVE_NETPACKET_PACKET_H
++
+ /* Define to 1 if you have the <net/if_arp.h> header file. */
+ #undef HAVE_NET_IF_ARP_H
+ 

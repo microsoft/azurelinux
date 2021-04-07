@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -79,8 +79,6 @@ do
     sed -i "s/^${FUNCTION}/# &/" %{buildroot}%{_sysconfdir}/login.defs
 done
 
-sed -i "s/^PASS_MAX_DAYS.*/PASS_MAX_DAYS    90/" %{buildroot}%{_sysconfdir}/login.defs
-
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
@@ -143,6 +141,10 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+- Merge the following releases from 1.0 to dev branch
+- schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-10
 - Provide passwd.
 

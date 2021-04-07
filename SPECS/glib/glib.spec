@@ -10,6 +10,7 @@ URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar.xz
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
+Patch2:         glib-CVE-2020-35457.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -119,6 +120,10 @@ make DESTDIR=%{buildroot} install
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.58.0-13
+- Merge the following releases from 1.0 to dev branch
+- nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
+
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
 - Add gtk-doc as build requirement
 - Add --enable-gtk-doc during configuration
