@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -110,6 +110,16 @@ WantedBy=multi-user.target
 
 EOF
 
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+	
+cat > %{buildroot}%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
+%%_httpd_apxs %%{_bindir}/apxs
+%%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
+%%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
+%%_httpd_contentdir %{_sysconfdir}/httpd
+%%_httpd_moddir %%{_libdir}/httpd/modules
+EOF
+
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable httpd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-httpd.preset
 
@@ -164,6 +174,7 @@ fi
 %{_bindir}/dbmmanage
 %{_mandir}/man1/apxs.1*
 %{_includedir}/*
+%{_rpmconfigdir}/macros.d/macros.httpd
 
 %files docs
 %defattr(-,root,root)
@@ -203,6 +214,9 @@ fi
 %exclude %{_mandir}/man1/apxs.1*
 
 %changelog
+* Wed Apr 07 2021 Henry Li <lihl@microsoft.com> - 2.4.46-5
+- Add macros.httpd to provide necessary httpd macros
+
 * Tue Feb 09 2021 Henry Li <lihl@microsoft.com> - 2.4.46-4
 - Add Provides for httpd-mmn and httpd-filesystem from httpd
 - Fix files section for httpd-devel and httpd-tools
