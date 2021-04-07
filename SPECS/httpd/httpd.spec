@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
+Source1:        macros.httpd
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
@@ -111,14 +112,7 @@ WantedBy=multi-user.target
 EOF
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
-	
-cat > %{buildroot}%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
-%%_httpd_apxs %%{_bindir}/apxs
-%%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
-%%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
-%%_httpd_contentdir %{_sysconfdir}/httpd
-%%_httpd_moddir %%{_libdir}/httpd/modules
-EOF
+install -m 644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/macros.httpd
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable httpd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-httpd.preset
