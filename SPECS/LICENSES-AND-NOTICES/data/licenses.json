@@ -162,7 +162,7 @@
                 "python-logutils",
                 "python-nocasedict",
                 "python-pecan",
-                "python-remote",
+                "python-remoto",
                 "python-repoze-lru",
                 "python-routes",
                 "python-rsa",
