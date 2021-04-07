@@ -3,7 +3,7 @@
 Summary:        Signed Linux Kernel for x86_64 systems
 Name:           kernel-signed-x64
 Version:        5.10.21.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
+* Wed Apr 07 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-5
+- Update to kernel release 5.10.21.1-5
+
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
 - Update to kernel release 5.10.21.1-4
 

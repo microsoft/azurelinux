@@ -474,7 +474,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Wed Apr 7 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-5
+* Wed Apr 07 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-5
 - Enable kernel debugging
 
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
