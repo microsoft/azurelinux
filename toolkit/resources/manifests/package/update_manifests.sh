@@ -197,7 +197,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
-    sed -i '/which/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
     sed -i '/^zstd-doc/d' $TmpPkgGen
     sed -i '/^zip-/d' $TmpPkgGen
@@ -297,6 +296,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^python-xml-" >> $1
     cat $TmpPkgGen | grep "^python3-" >> $1
     cat $TmpPkgGen | grep "^systemd-rpm-macros-" >> $1
+    cat $TmpPkgGen | grep "^which-" >> $1
 }
 
 # Generate toolchain_*.txt based on the toolchain_built_rpms_all.tar.gz file contents
