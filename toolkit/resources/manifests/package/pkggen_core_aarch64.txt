@@ -170,7 +170,6 @@ ca-certificates-base-20200720-13.cm1.noarch.rpm
 finger-0.17-4.cm1.aarch64.rpm
 tcp_wrappers-7.6-9.cm1.aarch64.rpm
 audit-libs-3.0-5.cm1.aarch64.rpm
-openldap-2.4.57-2.cm1.aarch64.rpm
 libsepol-2.9-5.cm1.aarch64.rpm
 libselinux-2.9-3.cm1.aarch64.rpm
 libsemanage-2.9-4.cm1.aarch64.rpm
