@@ -3,8 +3,8 @@
 %define uname_r %{version}-rolling-lts-mariner-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.21.1
-Release:        4%{?dist}
+Version:        5.10.28.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -474,6 +474,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
+- Update source to 5.10.28.1
+
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
 - Enable CONFIG_CRYPTO_DRBG_HASH, CONFIG_CRYPTO_DRBG_CTR
 
