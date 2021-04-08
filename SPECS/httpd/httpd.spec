@@ -3,13 +3,14 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
+Source1:        macros.httpd
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
@@ -110,6 +111,9 @@ WantedBy=multi-user.target
 
 EOF
 
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/macros.httpd
+
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable httpd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-httpd.preset
 
@@ -164,6 +168,7 @@ fi
 %{_bindir}/dbmmanage
 %{_mandir}/man1/apxs.1*
 %{_includedir}/*
+%{_rpmconfigdir}/macros.d/macros.httpd
 
 %files docs
 %defattr(-,root,root)
@@ -203,6 +208,9 @@ fi
 %exclude %{_mandir}/man1/apxs.1*
 
 %changelog
+* Wed Apr 07 2021 Henry Li <lihl@microsoft.com> - 2.4.46-5
+- Add macros.httpd to provide necessary httpd macros
+
 * Tue Feb 09 2021 Henry Li <lihl@microsoft.com> - 2.4.46-4
 - Add Provides for httpd-mmn and httpd-filesystem from httpd
 - Fix files section for httpd-devel and httpd-tools
