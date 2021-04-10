@@ -136,6 +136,26 @@ Patch1107:      CVE-2021-26932.nopatch
 Patch1108:      CVE-2021-27365.nopatch
 Patch1109:      CVE-2021-27364.nopatch
 Patch1110:      CVE-2021-27363.nopatch
+Patch1111:      CVE-2020-27170.nopatch
+Patch1112:      CVE-2020-27171.nopatch
+Patch1113:      CVE-2021-28375.nopatch
+Patch1114:      CVE-2021-28660.nopatch
+Patch1115:      CVE-2021-28950.nopatch
+Patch1116:      CVE-2021-28951.nopatch
+Patch1117:      CVE-2021-28952.nopatch
+Patch1118:      CVE-2021-28971.nopatch
+Patch1119:      CVE-2021-28972.nopatch
+Patch1120:      CVE-2021-29266.nopatch
+Patch1121:      CVE-2021-28964.nopatch
+Patch1122:      CVE-2020-35508.nopatch
+Patch1123:      CVE-2020-16120.nopatch
+Patch1124:      CVE-2021-29264.nopatch
+Patch1125:      CVE-2021-29265.nopatch
+Patch1126:      CVE-2021-29646.nopatch
+Patch1127:      CVE-2021-29647.nopatch
+Patch1128:      CVE-2021-29649.nopatch
+Patch1129:      CVE-2021-29650.nopatch
+Patch1130:      CVE-2021-30002.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -476,6 +496,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
 - Update source to 5.10.28.1
+- Address CVE-2020-27170, CVE-2020-27171, CVE-2021-28375, CVE-2021-28660,
+  CVE-2021-28950, CVE-2021-28951, CVE-2021-28952, CVE-2021-28971,
+  CVE-2021-28972, CVE-2021-29266, CVE-2021-28964, CVE-2020-35508,
+  CVE-2020-16120, CVE-2021-29264, CVE-2021-29265, CVE-2021-29646,
+  CVE-2021-29647, CVE-2021-29649, CVE-2021-29650, CVE-2021-30002
 
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
 - Enable CONFIG_CRYPTO_DRBG_HASH, CONFIG_CRYPTO_DRBG_CTR
