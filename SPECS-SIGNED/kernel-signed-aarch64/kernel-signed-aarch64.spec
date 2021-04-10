@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%define uname_r %{version}-rolling-lts-mariner-%{release}
+%define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for aarch64 systems
 Name:           kernel-signed-aarch64
 Version:        5.10.28.1
@@ -84,6 +84,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
 - Update source to 5.10.28.1
+- Update uname_r define to match the new value derived from the source
 
 * Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
 - Update to kernel release 5.10.21.1-4

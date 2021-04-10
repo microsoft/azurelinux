@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-rolling-lts-mariner-%{release}
+%define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.28.1
@@ -496,6 +496,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
 - Update source to 5.10.28.1
+- Update uname_r define to match the new value derived from the source
 - Address CVE-2020-27170, CVE-2020-27171, CVE-2021-28375, CVE-2021-28660,
   CVE-2021-28950, CVE-2021-28951, CVE-2021-28952, CVE-2021-28971,
   CVE-2021-28972, CVE-2021-29266, CVE-2021-28964, CVE-2020-35508,
