@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,6 +74,7 @@ These are the additional language files of glibc.
 Summary:        Additional internationalization files for glibc
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
+Provides:       %{name}-locale-source = %{version}-%{release}
 
 %description i18n
 These are the additional internationalization files of glibc.
@@ -290,9 +291,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 %{_datadir}/i18n/charmaps/*.gz
 %{_datadir}/i18n/locales/*
-%exclude %{_datadir}/i18n/charmaps/UTF-8.gz
-%exclude %{_datadir}/i18n/charmaps/ISO-8859-1.gz
-%exclude %{_datadir}/i18n/locales/en_US
 
 %files devel
 %defattr(-,root,root)
@@ -306,13 +304,17 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-16
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
 - Merge the following releases from 1.0 to dev branch
 - lihl@microsoft.com, 2.28-13: Added patch to resolve CVE-2019-7309, Used autosteup
 - thcrain@microsoft.com, 2.28-14: Patch CVE-2019-19126
 - mamalisz@microsoft.com, 2.28-15: Exclude binaries(such as bash) from requires list.
 - nicolasg@microsoft.com, 2.28-16: Patch CVE-2019-25013
 - thcrain@microsoft.com, 2.28-17: Patch CVE-2021-3326
+
+* Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
+- Provides glibc-locale-source from glibc-i18n
+- Add back exluded files to glibc-i18n
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.28-15
 - Replace incorrect %%{_lib} usage with %%{_libdir}

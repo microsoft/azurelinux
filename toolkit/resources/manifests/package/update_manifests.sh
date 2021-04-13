@@ -199,7 +199,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
-    sed -i '/which/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
     sed -i '/^zstd-doc/d' $TmpPkgGen
     sed -i '/^zip-/d' $TmpPkgGen
@@ -300,6 +299,7 @@ generate_pkggen_core () {
         grep "^python-xml-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
         grep "^systemd-rpm-macros-" $TmpPkgGen
+        grep "^which-" $TmpPkgGen
     } > "$1"
 }
 
