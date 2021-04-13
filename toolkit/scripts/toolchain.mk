@@ -25,15 +25,15 @@ toolchain_files = \
 	$(shell find $(SCRIPTS_DIR)/toolchain/SCRIPTS ) \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
 
-toolchain_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
+TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
 # Outputs: $(toolchain_rpms_dir)/<arch>/<name>.<arch>.rpm
 sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
-toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(toolchain_manifest))
-toolchain_rpms_buildarch := $(shell grep $(build_arch) $(toolchain_manifest))
-toolchain_rpms_noarch := $(shell grep noarch $(toolchain_manifest))
+toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(TOOLCHAIN_MANIFEST))
+toolchain_rpms_buildarch := $(shell grep $(build_arch) $(TOOLCHAIN_MANIFEST))
+toolchain_rpms_noarch := $(shell grep noarch $(TOOLCHAIN_MANIFEST))
 
 $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(toolchain_downloads_logs_dir))
@@ -165,7 +165,7 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(toolchain_rpms): $(toolchain_manifest) | $(final_toolchain)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
 	@echo Extracting RPM $@ from toolchain && \
 	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
 		mkdir -p $(dir $@) && \
@@ -185,7 +185,7 @@ $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(TOOLCHAIN_ARCHIVE) $(shell find
 	touch $(BUILD_DIR)/toolchain_temp/* && \
 	touch $@
 
-$(toolchain_rpms): $(toolchain_manifest) $(toolchain_local_temp)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(toolchain_local_temp)
 	tempFile=$(toolchain_local_temp)/$(notdir $@) && \
 	if [ ! -f $@ -o $(TOOLCHAIN_ARCHIVE) -nt $@ ]; then \
 		echo Extracting RPM $@ from toolchain && \
