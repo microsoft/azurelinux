@@ -3,8 +3,8 @@
 %bcond_without debug
 
 Name:           chrony
-Version:        3.5.1
-Release:        3%{?dist}
+Version:        4.0
+Release:        1%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,9 +21,6 @@ Source10:       https://github.com/mlichvar/clknetsim/archive/%{clknetsim_ver}/c
 
 # add NTP servers from DHCP when starting service
 Patch2:         chrony-service-helper.patch
-# fix test suite to work with newer clknetsim
-Patch3:         chrony-packettest.patch
-
 BuildRequires:  bison
 BuildRequires:  gcc
 BuildRequires:  gnupg2
@@ -62,15 +59,11 @@ service to other computers in the network.
 
 %setup -q -n %{name}-%{version} -a 10
 %patch2 -p1 -b .service-helper
-%patch3 -p1 -b .packettest
 
 # review changes in packaged configuration files and scripts
 md5sum -c <<-EOF | (! grep -v 'OK$')
-        47ad7eccc410b981d2f2101cf5682616  examples/chrony-wait.service
-        e473a9fab7fe200cacce3dca8b66290b  examples/chrony.conf.example2
         96999221eeef476bd49fe97b97503126  examples/chrony.keys.example
         6a3178c4670de7de393d9365e2793740  examples/chrony.logrotate
-        8748a663f0b1943ea491858f414a6b26  examples/chrony.nm-dispatcher
         b23bcc3bd78e195ca2849459e459f3ed  examples/chronyd.service
 EOF
 
@@ -135,8 +128,6 @@ install -m 644 -p examples/chrony.logrotate \
 
 install -m 644 -p examples/chronyd.service \
         $RPM_BUILD_ROOT%{_unitdir}/chronyd.service
-install -m 755 -p examples/chrony.nm-dispatcher \
-        $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d/20-chrony
 install -m 644 -p examples/chrony-wait.service \
         $RPM_BUILD_ROOT%{_unitdir}/chrony-wait.service
 install -m 644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_unitdir}/chrony-dnssrv@.service
@@ -201,6 +192,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Tue Apr 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.0-1
+- Update to 4.0 to rebuild for nettle
+
 * Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> - 3.5.1-3
 - Add build requirements needed for check tests
 
