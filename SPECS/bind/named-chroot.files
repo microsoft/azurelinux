@@ -1,0 +1,24 @@
+# Configuration of files used in chroot
+# Following files are made available after named-chroot.service start
+# if they are missing or empty in target directory.
+/etc/localtime
+/etc/named.root.key
+/etc/named.conf
+/etc/named.rfc1912.zones
+/etc/rndc.conf
+/etc/rndc.key
+/etc/named.iscdlv.key
+/etc/crypto-policies/back-ends/bind.config
+/etc/protocols
+/etc/services
+/etc/named.dnssec.keys
+/etc/pki/dnssec-keys
+/etc/named
+/usr/lib64/bind
+/usr/lib/bind
+/usr/share/GeoIP
+/run/named
+# Warning: the order is important
+# If a directory containing $ROOTDIR is listed here,
+# it MUST be listed last. (/var/named contains /var/named/chroot)
+/var/named
