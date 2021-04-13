@@ -92,9 +92,10 @@ const (
 
 // InstallerView text.
 const (
-	InstallerExperienceTitle = "Select Installation Experience"
-	InstallerTerminalOption  = "Terminal Installer (Speech Enabled)"
-	InstallerGraphicalOption = "Graphical Installer"
+	InstallerExperienceTitle        = "Select Installation Experience"
+	InstallerTerminalNoSpeechOption = "Terminal Installer"
+	InstallerTerminalOption         = InstallerTerminalNoSpeechOption + " (Speech Enabled)"
+	InstallerGraphicalOption        = "Graphical Installer"
 )
 
 // EulaView text.

@@ -9,6 +9,7 @@ import (
 
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/customshortcutlist"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/navigationbar"
+	"microsoft.com/pkggen/imagegen/attendedinstaller/speakuputils"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
 	"microsoft.com/pkggen/imagegen/configuration"
@@ -31,8 +32,9 @@ const (
 )
 
 const (
-	terminalUIOption  = iota
-	calamaresUIOption = iota
+	terminalUISpeechOption = iota
+	terminalUINoSpeechOption
+	calamaresUIOption
 )
 
 // InstallerView contains the installer selection UI.
@@ -55,7 +57,7 @@ func New(calamaresInstallFunc func()) *InstallerView {
 		calamaresInstallFunc: calamaresInstallFunc,
 	}
 
-	iv.installerOptions = []string{uitext.InstallerTerminalOption}
+	iv.installerOptions = []string{uitext.InstallerTerminalOption, uitext.InstallerTerminalNoSpeechOption}
 
 	_, err := exec.LookPath(calamaresToolName)
 	if err != nil {
@@ -149,7 +151,10 @@ func (iv *InstallerView) OnShow() {
 
 func (iv *InstallerView) onNextButton(nextPage func()) {
 	switch iv.optionList.GetCurrentItem() {
-	case terminalUIOption:
+	case terminalUINoSpeechOption:
+		speakuputils.StopSpeakup()
+		fallthrough
+	case terminalUISpeechOption:
 		nextPage()
 	case calamaresUIOption:
 		iv.calamaresInstallFunc()
