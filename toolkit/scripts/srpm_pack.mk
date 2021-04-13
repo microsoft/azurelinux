@@ -38,23 +38,25 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
+
+.SILENT: $(STATUS_FLAGS_DIR)/build_srpms.flag
+
+#FIXME: rpmspec query below does not take srpm file into account
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
-		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
+		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm 2>/dev/null) && \
 		for url in $(SRPM_URL_LIST); do \
 			wget $${url}/$${srpm_file} \
 				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
-				--no-verbose \
+				-q \
 				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 				$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 				&& \
 			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 			break; \
-		done || $(call print_error,Loop in $@ failed) ; \
-		{ [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || \
-			$(call print_error,Failed to download $${srpm_file});  } \
-	done || $(call print_error,Loop in $@ failed) ; \
+		done && echo "Downloaded $${url}/$${srpm_file}"; \
+	done || ( [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || $(call print_error,Failed to download $${srpm_file}) ); \
 	touch $@
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_sources) $(SPECS_DIR) $(go-srpmpacker)
