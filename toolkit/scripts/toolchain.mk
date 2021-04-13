@@ -197,7 +197,7 @@ $(toolchain_rpms): $(toolchain_manifest) $(toolchain_local_temp)
 else
 # Download from online package server
 $(toolchain_rpms):
-	@rpm_filename="$(notdir $@)" && \
+	rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
 	echo "Downloading toolchain RPM: $$rpm_filename" | tee "$$log_file" && \
