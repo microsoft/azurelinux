@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/file"
@@ -51,7 +52,12 @@ var (
 )
 
 var (
-	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
+	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
+	equalToRegex              = regexp.MustCompile(` '?='? `)
+	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
+	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
+	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
+	packageUnavailableRegex   = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
 func main() {
@@ -304,7 +310,7 @@ func removeLibArchivesFromSystem() (err error) {
 
 		// Skip directories that are meant for device files and kernel virtual filesystems.
 		// These will not contain .la files and are mounted into the safechroot from the host.
-		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != -1 {
+		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != sliceutils.NotFound {
 			return filepath.SkipDir
 		}
 

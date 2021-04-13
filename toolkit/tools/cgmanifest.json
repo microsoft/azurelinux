@@ -31,6 +31,15 @@
             "Component": {
                 "Type": "Go",
                 "Go": {
+                    "Name": "github.com/deckarep/golang-set",
+                    "Version": "v1.7.1"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "Go",
+                "Go": {
                     "Name": "github.com/gdamore/tcell",
                     "Version": "v1.3.0"
                 }
@@ -123,6 +132,15 @@
                 "Go": {
                     "Name": "gonum.org/v1/gonum",
                     "Version": "v0.6.2"
+                }
+            }
+        },
+        {
+            "Component": {
+                "Type": "Go",
+                "Go": {
+                    "Name": "github.com/bendahl/uinput",
+                    "Version": "v1.4.0"
                 }
             }
         },

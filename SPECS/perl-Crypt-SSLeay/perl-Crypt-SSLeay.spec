@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
+Patch0:         Use_TLS_client_method-with-OpenSSL-1.1.1.patch
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(XSLoader)
 Requires:       openssl
@@ -43,6 +44,7 @@ Work on Crypt::SSLeay has been continued only to provide https support for the L
 %prep
 %setup -q -n Crypt-SSLeay-%{version}
 cp %{SOURCE1} ./
+%patch0 -p0
 
 %build
 PERL5LIB=$(pwd) env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
@@ -63,6 +65,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.72-8
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 0.72-7: Add patch to fix test issue
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.72-7
 -   Use new perl package names.
 -   Change perl_vendorlib to perl_vendorarch directory for packaging.

@@ -135,6 +135,15 @@ func DefaultDefines() map[string]string {
 	}
 }
 
+// GetInstalledPackages returns a string list of all packages installed on the system
+// in the "[name]-[version]-[release].[distribution].[architecture]" format.
+// Example: tdnf-2.1.0-4.cm1.x86_64
+func GetInstalledPackages() (result []string, err error) {
+	const queryArg = "-qa"
+
+	return executeRpmCommand(rpmProgram, queryArg)
+}
+
 // QuerySPEC queries a SPEC file with queryFormat. Returns the output split by line and trimmed.
 func QuerySPEC(specFile, sourceDir, queryFormat string, defines map[string]string, extraArgs ...string) (result []string, err error) {
 	const queryArg = "-q"

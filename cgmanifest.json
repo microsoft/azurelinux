@@ -325,8 +325,8 @@
         "type": "other",
         "other": {
           "name": "azure-iotedge",
-          "version": "1.0.9.1",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.0.9.1.tar.gz"
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
         }
       }
     },
@@ -565,8 +565,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.14.0",
-          "downloadUrl": "http://c-ares.haxx.se/download/c-ares-1.14.0.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
         }
       }
     },
@@ -745,8 +745,8 @@
         "type": "other",
         "other": {
           "name": "cloud-utils-growpart",
-          "version": "0.30",
-          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.3/+download/cloud-utils-0.30.tar.gz"
+          "version": "0.32",
+          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.32/+download/cloud-utils-0.32.tar.gz"
         }
       }
     },
@@ -865,8 +865,8 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "7.2.8",
-          "downloadUrl": "https://github.com/crash-utility/crash/archive/7.2.8.tar.gz"
+          "version": "7.2.9",
+          "downloadUrl": "https://github.com/crash-utility/crash/archive/7.2.9.tar.gz"
         }
       }
     },
@@ -1237,6 +1237,26 @@
           "name": "erlang",
           "version": "22.0.7",
           "downloadUrl": "https://github.com/erlang/otp/archive/OTP-22.0.7/otp-OTP-22.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "espeak-ng",
+          "version": "1.50",
+          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/releases/download/1.50/espeak-ng-1.50.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "espeakup",
+          "version": "0.80",
+          "downloadUrl": "https://github.com/williamh/espeakup/archive/v0.80.tar.gz"
         }
       }
     },
@@ -1694,9 +1714,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "grpc",
+          "version": "1.35.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.35.0/grpc-1.35.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grub2",
-          "version": "2.02",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz"
+          "version": "2.06~rc1",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06-rc1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gnulib",
+          "version": "d271f868a8df9bbec29049d01e056481b7a1a263",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-d271f868a8df9bbec29049d01e056481b7a1a263.tar.gz"
         }
       }
     },
@@ -1825,8 +1865,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.21.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
         }
       }
     },
@@ -2135,8 +2175,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.21.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
         }
       }
     },
@@ -2145,8 +2185,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.21.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
         }
       }
     },
@@ -2155,8 +2195,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.4.91",
-          "downloadUrl": "https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.91.tar.gz"
+          "version": "5.10.21.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
         }
       }
     },
@@ -2165,8 +2205,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.20",
-          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.20.tar.xz"
+          "version": "2.0.21",
+          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.21.tar.xz"
         }
       }
     },
@@ -2256,7 +2296,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.17.13",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2266,7 +2306,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.17.16",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2276,7 +2316,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.10",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2286,17 +2326,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.19.3",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2306,7 +2336,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.6",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.6-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.6-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2377,6 +2407,16 @@
           "name": "libarchive",
           "version": "3.4.2",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.7",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2585,8 +2625,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.8.3",
-          "downloadUrl": "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.8.3.tar.bz2"
+          "version": "1.8.7",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
         }
       }
     },
@@ -2635,8 +2675,8 @@
         "type": "other",
         "other": {
           "name": "libiothsm-std",
-          "version": "1.0.9.1",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.0.9.1.tar.gz"
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
         }
       }
     },
@@ -3464,6 +3504,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "makedumpfile",
+          "version": "1.6.8",
+          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.6.8/makedumpfile-1.6.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "man-db",
           "version": "2.8.4",
           "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.8.4.tar.xz"
@@ -3704,6 +3754,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nDPI",
+          "version": "3.4",
+          "downloadUrl": "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "net-snmp",
           "version": "5.9",
           "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9/net-snmp-5.9.tar.gz"
@@ -3857,6 +3917,16 @@
           "name": "nss-altfiles",
           "version": "2.23.0",
           "downloadUrl": "https://github.com/aperezdc/nss-altfiles/archive/v2.23.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ntopng",
+          "version": "4.2",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
         }
       }
     },
@@ -4067,6 +4137,16 @@
           "name": "patch",
           "version": "2.7.6",
           "downloadUrl": "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pcaudiolib",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
         }
       }
     },
@@ -4515,8 +4595,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.5",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.5/postgresql-12.5.tar.bz2"
+          "version": "12.6",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.6/postgresql-12.6.tar.bz2"
         }
       }
     },
@@ -4856,7 +4936,7 @@
         "other": {
           "name": "python-distro",
           "version": "1.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ca/e3/78443d739d7efeea86cbbe0216511d29b2f5ca8dbf51a6f2898432738987/distro-1.4.0.tar.gz"
+          "downloadUrl": "https://github.com/nir0s/distro/archive/v1.4.0.tar.gz"
         }
       }
     },
@@ -5675,8 +5755,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.9",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tar.xz"
+          "version": "3.7.10",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz"
         }
       }
     },
@@ -6685,8 +6765,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.39.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.39.0-src.tar.xz"
+          "version": "1.47.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.xz"
         }
       }
     },

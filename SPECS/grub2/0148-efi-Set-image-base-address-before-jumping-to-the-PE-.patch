@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Thu, 23 Apr 2020 15:06:46 +0200
+Subject: [PATCH] efi: Set image base address before jumping to the PE/COFF
+ entry point
+
+Upstream GRUB uses the EFI LoadImage() and StartImage() to boot the Linux
+kernel. But our custom EFI loader that supports Secure Boot instead uses
+the EFI handover protocol (for x86) or jumping directly to the PE/COFF
+entry point (for aarch64).
+
+This is done to allow the bootloader to verify the images using the shim
+lock protocol to avoid booting untrusted binaries.
+
+Since the bootloader loads the kernel from the boot media instead of using
+LoadImage(), it is responsible to set the Loaded Image base address before
+booting the kernel.
+
+Otherwise the kernel EFI stub will complain that it was not set correctly
+and print the following warning message:
+
+EFI stub: ERROR: FIRMWARE BUG: efi_loaded_image_t::image_base has bogus value
+
+Resolves: rhbz#1814690
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/loader/efi/linux.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index 0622dfa48d4..e8b9ecb17f6 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -72,6 +72,7 @@ grub_err_t
+ grub_efi_linux_boot (void *kernel_addr, grub_off_t handover_offset,
+ 		     void *kernel_params)
+ {
++  grub_efi_loaded_image_t *loaded_image = NULL;
+   handover_func hf;
+   int offset = 0;
+ 
+@@ -79,6 +80,19 @@ grub_efi_linux_boot (void *kernel_addr, grub_off_t handover_offset,
+   offset = 512;
+ #endif
+ 
++  /*
++   * Since the EFI loader is not calling the LoadImage() and StartImage()
++   * services for loading the kernel and booting respectively, it has to
++   * set the Loaded Image base address.
++   */
++  loaded_image = grub_efi_get_loaded_image (grub_efi_image_handle);
++  if (loaded_image)
++    loaded_image->image_base = kernel_addr;
++  else
++    grub_dprintf ("linux", "Loaded Image base address could not be set\n");
++
++  grub_dprintf ("linux", "kernel_addr: %p handover_offset: %p params: %p\n",
++		kernel_addr, (void *)(grub_efi_uintn_t)handover_offset, kernel_params);
+   hf = (handover_func)((char *)kernel_addr + handover_offset + offset);
+   hf (grub_efi_image_handle, grub_efi_system_table, kernel_params);
+ 

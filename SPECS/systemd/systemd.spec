@@ -294,6 +294,7 @@ rm -rf %{buildroot}/*
 -   Fix CVE-2020-13776
 - niontive@microsoft.com, 2.39-34: Fix CVE-2019-6454, CVE-2020-1712 patches. Add upstream patch info.
 - henry.beberman@microsoft.com, 2.39-35: Enable LZ4 so journalctl can read logs from the container host.
+- chrco@microsoft.com, 2.39-36: Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
 - Replace incorrect %%{_lib} usage with %%{_libdir}

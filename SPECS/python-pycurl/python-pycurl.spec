@@ -5,7 +5,7 @@
 
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A Python interface to libcurl
 Group:          Development/Languages
 License:        LGPLv2+ or MIT
@@ -92,13 +92,13 @@ export PYCURL_VSFTPD_PATH=vsftpd
 
 easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
 $easy_install_2 nose nose-show-skipped bottle flaky pyflakes
-rm -f tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py
+rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py tests/multi_timer_test.py
 LANG=en_US.UTF-8  make test PYTHON=python%{python2_version} NOSETESTS="nosetests-%{python2_version} -v"
 
 cd ../p3dir
 easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
 $easy_install_3 nose nose-show-skipped bottle==0.12.16 flaky pyflakes
-rm -f tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py
+rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py tests/multi_timer_test.py
 LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests-3.4 -v"
 
 %clean
@@ -118,6 +118,8 @@ rm -rf %{buildroot}
 %doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+*   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
+-   Disable unreliable multi_timer_test
 *   Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-5
 -   Disable unreliable memory_mgmt_test
 *   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-4

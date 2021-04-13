@@ -1,27 +1,28 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.4.91
-Release:        6%{?dist}
+Version:        5.10.21.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 make mrproper
 make headers_check
 
 %install
-cd %{_builddir}/WSL2-Linux-Kernel-linux-msft-%{version}
+cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 make headers
 find usr/include -name '.*' -delete
 rm usr/include/Makefile
@@ -34,8 +35,26 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Tue Feb 23 2021 Chris Co <chrco@microsoft.com> - 5.4.91-6
-- Update to match kernel spec 5.4.91-6
+* Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
+- Update to kernel release 5.10.21.1-3
+
+* Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.21.1-2
+- Update to kernel release 5.10.21.1-2
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+
+* Fri Mar 05 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-4
+- Update to kernel release 5.10.13.1-4
+
+* Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
+- Update to kernel release 5.10.13.1-3
+
+* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+- Update to kernel release 5.10.13.1-2
+
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
 
 * Tue Feb 16 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.91-5
 - Update to kernel release 5.4.91-5

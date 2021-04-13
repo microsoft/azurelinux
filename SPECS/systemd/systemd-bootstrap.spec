@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -242,11 +242,14 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-33
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-34
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 239-30: Configure to support merged /usr.
 - joschmit@microsoft.com, 239-31: Replace incorrect %%{_lib} usage with %%{_libdir}
 -   Turn off dependency generators
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
+- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
 
 * Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-32
 - Enable LZ4 so journalctl can read logs from the container host.

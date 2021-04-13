@@ -74,7 +74,7 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %check
-make %{?_smp_mflags} check
+make PYTHON_SUBDIR="" runtests
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -112,6 +112,7 @@ rm -rf %{buildroot}/*
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
+- anphel@microsoft.com, 2.9.10-4: Skip python tests which are known to be broken.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-6
 - Provide libxml2-devel%%{?_isa}

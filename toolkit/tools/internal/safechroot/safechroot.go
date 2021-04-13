@@ -519,7 +519,8 @@ func (c *Chroot) restoreRoot(originalRoot, originalWd *os.File) {
 func (c *Chroot) createMountPoints(allMountPoints []*MountPoint) (err error) {
 	for _, mountPoint := range allMountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
-		logger.Log.Debugf("Mounting (%s)", fullPath)
+		logger.Log.Debugf("Mounting: source: (%s), target: (%s), fstype: (%s), flags: (%#x), data: (%s)",
+			mountPoint.source, fullPath, mountPoint.fstype, mountPoint.flags, mountPoint.data)
 
 		err = os.MkdirAll(fullPath, os.ModePerm)
 		if err != nil {

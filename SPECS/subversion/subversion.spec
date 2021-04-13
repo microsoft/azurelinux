@@ -1,28 +1,36 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://subversion.apache.org/
 Group:          Utilities/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2020-17525.patch
+
+BuildRequires:  apr-devel
+BuildRequires:  apr-util
+BuildRequires:  apr-util-devel
+BuildRequires:  expat-devel
+BuildRequires:  libserf-devel
+BuildRequires:  libtool
+BuildRequires:  lz4
+BuildRequires:  utf8proc-devel
+BuildRequires:  swig
+BuildRequires:  sqlite-devel
+BuildRequires:  perl(ExtUtils::Embed)
+%if %{with_check}
+BuildRequires:  python-xml
+BuildRequires:  python2
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 
 Requires:       apr
 Requires:       apr-util
 Requires:       libserf
-BuildRequires:  apr-devel
-BuildRequires:  apr-util
-BuildRequires:  apr-util-devel
-BuildRequires:  sqlite-devel
-BuildRequires:  libtool
-BuildRequires:  expat-devel
-BuildRequires:  libserf-devel
-BuildRequires:  lz4
-BuildRequires:  utf8proc-devel
-BuildRequires:  swig
-BuildRequires:  perl(ExtUtils::Embed)
 Requires:       utf8proc
 
 %description
@@ -43,7 +51,7 @@ Provides Perl (SWIG) support for Subversion version control system.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 export CFLAGS="%{build_cflags} -Wformat"
@@ -97,6 +105,11 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.0-4
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 1.14.0-3: Adding 'BuildRequires' on 'python', 'shadow-utils' and 'sudo' to fix the package tests.
+- henry.beberman@microsoft.com, 1.14.0-4: Patch CVE-2020-17525.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.14.0-3
 -   Use new perl package names.
 -   Add perl(ExtUtils::Embed) build requirement.

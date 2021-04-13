@@ -2,7 +2,7 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        2.13
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GNU LGPL v2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source0:        https://launchpad.net/apparmor/2.13/2.13.0/+download/%{name}-%{v
 Patch0:         apparmor-set-profiles-complain-mode.patch
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         apparmor-fix-make-check.patch
+Patch3:         apparmor-update-severity-db.patch
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 BuildRequires:  apr
@@ -151,6 +152,7 @@ This package contains the AppArmor module for perl.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 export PYTHONPATH=%{_libdir}/python3.7/site-packages
@@ -343,6 +345,10 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.13-14
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 2.13-12: Add patch to severity.db to fix tests.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.13-13
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

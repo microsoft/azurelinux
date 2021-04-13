@@ -18,13 +18,15 @@ clean: clean-expand-specs
 clean-expand-specs:
 	rm -rf $(BUILD_SPECS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_specs.flag
+	rm -rf $(srpm_expand_logs_dir)
 
 # The directory freshness is tracked with a status flag. The status flag is only updated when all SPECS have been
 # updated.
 $(BUILD_SPECS_DIR): $(STATUS_FLAGS_DIR)/build_specs.flag
 	@touch $@
-	@echo Finished updating $@
+	@echo "Finished updating $@." | tee -a $(srpm_expand_log)
 
+# For each SRPM, if it is newer than the spec extract a new copy of the .spec file
 $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 	# For each SRPM, if it is newer than the spec extract a new copy of the .spec file
 	for srpm in $(srpms_basename); do \
@@ -38,6 +40,3 @@ $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 		fi || $(call print_error,If in $@ failed) ; \
 	done || $(call print_error,Loop in $@ failed) ; \
 	touch $@
-
-
-

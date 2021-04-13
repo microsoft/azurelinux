@@ -9,14 +9,14 @@ Group:          System Environment/Libraries
 # The site does NOT have an HTTPS cert available.
 URL:            http://www.libpng.org/
 Source0:        https://downloads.sourceforge.net/libpng/%{name}-%{version}.tar.xz
+Patch0:         libpng-fix-pngtest-random-failures.patch
+
 %description
 The libpng package contains libraries used by other programs for reading and writing PNG files. The PNG format was designed as a replacement for GIF and, to a lesser extent, TIFF, with many improvements and extensions and lack of patent problems.
 
 %package        devel
 Summary:        Header and development files
-
 Requires:       %{name} = %{version}-%{release}
-
 Provides:       pkgconfig(libpng) = %{version}-%{release}
 Provides:       pkgconfig(libpng16) = %{version}-%{release}
 
@@ -25,6 +25,7 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %configure
@@ -34,6 +35,7 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
+chmod +x ./tests/pngtest-all
 make %{?_smp_mflags} -k check
 
 %post -p /sbin/ldconfig
@@ -60,7 +62,8 @@ make %{?_smp_mflags} -k check
 %changelog
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.37-4
 - Merge the following releases from 1.0 to dev branch
-- pawelwi@microsoft.com, 1.6.37-4: Moved "Provides" for "pkgconfig(*)" to the correct (-devel) subpackage.
+- pawelwi@microsoft.com, 1.6.37-3: Moved "Provides" for "pkgconfig(*)" to the correct (-devel) subpackage.
+- anphel@microsoft.com, 1.6.37-4: Add upstream patch to fix random test failure with pngtest.
 
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.6.37-3
 - Provides libpng16 from libpng

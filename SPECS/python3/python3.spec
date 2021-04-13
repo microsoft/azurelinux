@@ -2,7 +2,7 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.9
+Version:        3.7.10
 Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
@@ -13,9 +13,6 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
-# CVE-2020-27619 patch is pulled from upstream commit
-Patch3:         CVE-2020-27619.patch
-Patch4:         CVE-2021-3177.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -181,10 +178,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-, root, root)
 %license LICENSE
@@ -278,12 +271,14 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.9-1
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
 - thcrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619
 - pawelw@microsoft.com, 3.7.9-3: Adding explicit runtime dependency on 'python3-xml' for the 'python3-setuptool' subpackage.
 - nisamson@microsoft.com, 3.7.9-4: Patched CVE-2021-3177 with backported patch. Moved to autosetup.
+- thcrain@microsoft.com, 3.7.10-1: Update to 3.7.10, the latest security release for 3.7, to fix CVE-2021-23336
+-   Remove backported patches for CVE-2020-27619, CVE-2021-3177
 
 * Tue Mar 09 2021 Henry Li <lihl@microsoft.com> - 3.7.7-10
 - Remove 2to3 binaries from python3-devel

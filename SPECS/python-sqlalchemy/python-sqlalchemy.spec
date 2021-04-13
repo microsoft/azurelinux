@@ -2,7 +2,7 @@
 Summary:        The Python SQL Toolkit and Object Relational Mapper
 Name:           python-sqlalchemy
 Version:        1.3.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,10 @@ Source0:        https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLA
 BuildRequires:  python-setuptools
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
+%if %{with_check}
+BuildRequires:  python-pip
+%endif
+
 Requires:       python2
 Requires:       python2-libs
 Provides:       %{name}-doc = %{version}-%{release}
@@ -26,11 +30,10 @@ SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives app
 python2 setup.py build
 
 %check
-easy_install apipkg
-easy_install py
-easy_install mock
-export PYTHONPATH=$PYTHONPATH:%{_builddir}/SQLAlchemy-%{version}/.eggs/pytest-3.0.3-py2.7.egg
-python2 setup.py test
+pip install tox
+# Modify requirements.py with sqlite modification from upstream fix: https://github.com/sqlalchemy/sqlalchemy/pull/4921
+sed -i 's/"postgresql", "oracle", "firebird"/"postgresql", "oracle", "firebird", "sqlite >= 3.30.0"/g' test/requirements.py
+LANG=en_US.UTF-8 tox -e py27
 
 %install
 python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
@@ -41,10 +44,14 @@ python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 %{python2_sitelib}/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.2-4
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 1.3.2-3: Use tox to run check tests. Add upstream fix
+
 * Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 1.3.2-3
 - Provides python-sqlalchemy-doc
 
-* Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.2-2
 - Added %%license line automatically
 
 * Thu Mar 19 2020 Paul Monson <paulmon@microsoft.com> 1.3.2-1

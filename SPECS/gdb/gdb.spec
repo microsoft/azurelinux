@@ -65,10 +65,7 @@ rm %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
-# fix typo in test
-sed -i 's/hex in)/hex in )/g' gdb/testsuite/gdb.arch/i386-signal.exp
-# ignore exit code and check for expected number of failures
-make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpected failures.*1219\|# of unexpected failures.*1220"
+make %{?_smp_mflags} check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -88,6 +85,7 @@ make %{?_smp_mflags} check || tail gdb/testsuite/gdb.sum  | grep "# of unexpecte
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-4
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 8.3-3: Patch CVE-2019-1010180
+- anphel@microsoft.com, 8.3-4: Only run gdb.base/default.exp tests
 
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 8.3-3
 - Add gcc-c++ and gcc-gfortran as dependencies

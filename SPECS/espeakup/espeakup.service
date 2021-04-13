@@ -1,0 +1,14 @@
+[Unit]
+Description=Connector between espeak-ng userspace synthesizer and speakup kernel module
+Wants=dev-softsynthu.device
+After=sound.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/espeakup.pid
+ExecStart=/bin/sh -c '/usr/bin/espeakup -V en+f2'
+ExecReload=/bin/kill $MAINPID
+Restart=always
+
+[Install]
+WantedBy=sound.target multi-user.target

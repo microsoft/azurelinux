@@ -1,0 +1,23 @@
+From d6a6b00aa4334b461c1a09c27b6c681eaac8da8a Mon Sep 17 00:00:00 2001
+From: Martin Schreiber <mse00000@gmail.com>
+Date: Sat, 10 Mar 2018 06:55:58 +0100
+Subject: [PATCH] * Alsa: fixed sample_size calculation, multiply with channel
+ count.
+
+---
+ src/alsa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/alsa.c b/src/alsa.c
+index 34e39be..6af1941 100644
+--- a/src/alsa.c
++++ b/src/alsa.c
+@@ -53,7 +53,7 @@ alsa_object_open(struct audio_object *object,
+ 		return -EEXIST;
+ 
+ 	snd_pcm_format_t pcm_format;
+-#define FORMAT(srcfmt, dstfmt, size) case srcfmt: pcm_format = dstfmt; self->sample_size = size; break;
++#define FORMAT(srcfmt, dstfmt, size) case srcfmt: pcm_format = dstfmt; self->sample_size = size*channels; break;
+ 	switch (format)
+ 	{
+ 	FORMAT(AUDIO_OBJECT_FORMAT_ALAW,      SND_PCM_FORMAT_A_LAW, 1)

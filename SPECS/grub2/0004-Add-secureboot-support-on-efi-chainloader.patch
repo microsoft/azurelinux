@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Raymund Will <rw@suse.com>
-Date: Fri, 10 Apr 2015 01:45:02 -0400
+Date: Mon, 8 Jul 2019 11:55:18 +0200
 Subject: [PATCH] Add secureboot support on efi chainloader
 
 Expand the chainloader to be able to verify the image by means of shim
@@ -167,18 +167,18 @@ Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 ---
  grub-core/kern/efi/efi.c           |  14 +-
  grub-core/loader/arm64/linux.c     |   4 +-
- grub-core/loader/efi/chainloader.c | 817 +++++++++++++++++++++++++++++++++----
+ grub-core/loader/efi/chainloader.c | 816 +++++++++++++++++++++++++++++++++----
  grub-core/loader/efi/linux.c       |  25 +-
  grub-core/loader/i386/efi/linux.c  |  17 +-
  include/grub/efi/linux.h           |   2 +-
  include/grub/efi/pe32.h            |  52 ++-
- 7 files changed, 840 insertions(+), 91 deletions(-)
+ 7 files changed, 840 insertions(+), 90 deletions(-)
 
 diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
-index c8a9d8307c0..91129e33566 100644
+index 35b8f670602..4a2259aa1c7 100644
 --- a/grub-core/kern/efi/efi.c
 +++ b/grub-core/kern/efi/efi.c
-@@ -283,14 +283,20 @@ grub_efi_secure_boot (void)
+@@ -296,14 +296,20 @@ grub_efi_secure_boot (void)
    grub_efi_boolean_t ret = 0;
  
    secure_boot = grub_efi_get_variable("SecureBoot", &efi_var_guid, &datasize);
@@ -204,18 +204,18 @@ index c8a9d8307c0..91129e33566 100644
    if (*secure_boot && !*setup_mode)
      ret = 1;
 diff --git a/grub-core/loader/arm64/linux.c b/grub-core/loader/arm64/linux.c
-index 6c00af98dce..a1ac7a38867 100644
+index a312c668685..04994d5c67d 100644
 --- a/grub-core/loader/arm64/linux.c
 +++ b/grub-core/loader/arm64/linux.c
-@@ -282,6 +282,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
-   grub_file_t file = 0;
-   struct linux_armxx_kernel_header lh;
+@@ -284,6 +284,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   struct linux_arch_kernel_header lh;
    struct grub_armxx_linux_pe_header *pe;
+   grub_err_t err;
 +  int rc;
  
    grub_dl_ref (my_mod);
  
-@@ -326,7 +327,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+@@ -328,7 +329,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
  
    grub_dprintf ("linux", "kernel @ %p\n", kernel_addr);
  
@@ -226,7 +226,7 @@ index 6c00af98dce..a1ac7a38867 100644
        grub_error (GRUB_ERR_INVALID_COMMAND, N_("%s has invalid signature"), argv[0]);
        goto fail;
 diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
-index adc85636633..af2189619a3 100644
+index 2bd80f4db3d..b54cf6986fc 100644
 --- a/grub-core/loader/efi/chainloader.c
 +++ b/grub-core/loader/efi/chainloader.c
 @@ -32,6 +32,8 @@
@@ -261,15 +261,7 @@ index adc85636633..af2189619a3 100644
  
    grub_dl_unref (my_mod);
    return GRUB_ERR_NONE;
-@@ -173,7 +181,6 @@ make_file_path (grub_efi_device_path_t *dp, const char *filename)
-   /* Fill the file path for the directory.  */
-   d = (grub_efi_device_path_t *) ((char *) file_path
- 				  + ((char *) d - (char *) dp));
--  grub_efi_print_device_path (d);
-   copy_file_path ((grub_efi_file_path_device_path_t *) d,
- 		  dir_start, dir_end - dir_start);
- 
-@@ -191,20 +198,690 @@ make_file_path (grub_efi_device_path_t *dp, const char *filename)
+@@ -213,20 +221,690 @@ make_file_path (grub_efi_device_path_t *dp, const char *filename)
    return file_path;
  }
  
@@ -963,7 +955,7 @@ index adc85636633..af2189619a3 100644
  
    if (argc == 0)
      return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("filename expected"));
-@@ -216,15 +893,45 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -238,15 +916,45 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
    address = 0;
    image_handle = 0;
    file_path = 0;
@@ -997,7 +989,7 @@ index adc85636633..af2189619a3 100644
 +      *(--p16) = 0;
 +    }
 +
-   file = grub_file_open (filename);
+   file = grub_file_open (filename, GRUB_FILE_TYPE_EFI_CHAINLOADED_IMAGE);
    if (! file)
      goto fail;
  
@@ -1011,7 +1003,7 @@ index adc85636633..af2189619a3 100644
    if (! dev)
      goto fail;
  
-@@ -261,17 +968,14 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -283,17 +991,14 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
    if (! file_path)
      goto fail;
  
@@ -1032,7 +1024,7 @@ index adc85636633..af2189619a3 100644
  
    status = efi_call_4 (b->allocate_pages, GRUB_EFI_ALLOCATE_ANY_PAGES,
  			      GRUB_EFI_LOADER_CODE,
-@@ -285,7 +989,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -307,7 +1012,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
      }
  
    boot_image = (void *) ((grub_addr_t) address);
@@ -1041,7 +1033,7 @@ index adc85636633..af2189619a3 100644
      {
        if (grub_errno == GRUB_ERR_NONE)
  	grub_error (GRUB_ERR_BAD_OS, N_("premature end of file %s"),
-@@ -295,7 +999,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -317,7 +1022,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
      }
  
  #if defined (__i386__) || defined (__x86_64__)
@@ -1050,12 +1042,12 @@ index adc85636633..af2189619a3 100644
      {
        struct grub_macho_fat_header *head = boot_image;
        if (head->magic
-@@ -304,6 +1008,14 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -326,6 +1031,14 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
  	  grub_uint32_t i;
  	  struct grub_macho_fat_arch *archs
  	    = (struct grub_macho_fat_arch *) (head + 1);
 +
-+	  if (grub_efi_secure_boot())
++	  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
 +	    {
 +	      grub_error (GRUB_ERR_BAD_OS,
 +			  "MACHO binaries are forbidden with Secure Boot");
@@ -1065,7 +1057,7 @@ index adc85636633..af2189619a3 100644
  	  for (i = 0; i < grub_cpu_to_le32 (head->nfat_arch); i++)
  	    {
  	      if (GRUB_MACHO_CPUTYPE_IS_HOST_CURRENT (archs[i].cputype))
-@@ -318,79 +1030,39 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -340,79 +1053,39 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
  	      > ~grub_cpu_to_le32 (archs[i].size)
  	      || grub_cpu_to_le32 (archs[i].offset)
  	      + grub_cpu_to_le32 (archs[i].size)
@@ -1162,7 +1154,7 @@ index adc85636633..af2189619a3 100644
    if (dev)
      grub_device_close (dev);
  
-@@ -402,6 +1074,9 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+@@ -424,6 +1097,9 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
    if (address)
      efi_call_2 (b->free_pages, address, pages);
  
@@ -1218,10 +1210,10 @@ index c24202a5dd1..c8ecce6dfd0 100644
  
  #pragma GCC diagnostic push
 diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
-index 3db82e782df..8db228c5bf5 100644
+index bb2616a8092..6b24cbb9483 100644
 --- a/grub-core/loader/i386/efi/linux.c
 +++ b/grub-core/loader/i386/efi/linux.c
-@@ -118,6 +118,8 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+@@ -117,6 +117,8 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
        goto fail;
      }
  
@@ -1230,15 +1222,15 @@ index 3db82e782df..8db228c5bf5 100644
    params->ramdisk_size = size;
    params->ramdisk_image = (grub_uint32_t)(grub_addr_t) initrd_mem;
  
-@@ -160,6 +162,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
-   struct linux_kernel_header lh;
+@@ -159,6 +161,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   struct linux_i386_kernel_header lh;
    grub_ssize_t len, start, filelen;
    void *kernel = NULL;
 +  int rc;
  
    grub_dl_ref (my_mod);
  
-@@ -185,11 +188,13 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+@@ -184,11 +187,13 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
  
    if (grub_file_read (file, kernel, filelen) != filelen)
      {
@@ -1254,7 +1246,7 @@ index 3db82e782df..8db228c5bf5 100644
      {
        grub_error (GRUB_ERR_INVALID_COMMAND, N_("%s has invalid signature"),
  		  argv[0]);
-@@ -204,6 +209,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+@@ -203,6 +208,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
        goto fail;
      }
  
@@ -1263,7 +1255,7 @@ index 3db82e782df..8db228c5bf5 100644
    grub_memset (params, 0, 16384);
  
    grub_memcpy (&lh, kernel, sizeof (lh));
-@@ -242,6 +249,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+@@ -241,6 +248,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
        goto fail;
      }
  
@@ -1299,10 +1291,10 @@ index d9ede36773b..0033d9305a9 100644
  grub_err_t
  EXPORT_FUNC(grub_efi_linux_boot) (void *kernel_address, grub_off_t offset,
 diff --git a/include/grub/efi/pe32.h b/include/grub/efi/pe32.h
-index 7d44732d2c3..c03cc599f63 100644
+index 0ed8781f037..a43adf27464 100644
 --- a/include/grub/efi/pe32.h
 +++ b/include/grub/efi/pe32.h
-@@ -214,7 +214,11 @@ struct grub_pe64_optional_header
+@@ -223,7 +223,11 @@ struct grub_pe64_optional_header
  struct grub_pe32_section_table
  {
    char name[8];
@@ -1315,7 +1307,7 @@ index 7d44732d2c3..c03cc599f63 100644
    grub_uint32_t virtual_address;
    grub_uint32_t raw_data_size;
    grub_uint32_t raw_data_offset;
-@@ -225,12 +229,18 @@ struct grub_pe32_section_table
+@@ -234,12 +238,18 @@ struct grub_pe32_section_table
    grub_uint32_t characteristics;
  };
  
@@ -1338,7 +1330,7 @@ index 7d44732d2c3..c03cc599f63 100644
  
  #define GRUB_PE32_SCN_ALIGN_1BYTES		0x00100000
  #define GRUB_PE32_SCN_ALIGN_2BYTES		0x00200000
-@@ -239,10 +249,28 @@ struct grub_pe32_section_table
+@@ -248,10 +258,28 @@ struct grub_pe32_section_table
  #define GRUB_PE32_SCN_ALIGN_16BYTES		0x00500000
  #define GRUB_PE32_SCN_ALIGN_32BYTES		0x00600000
  #define GRUB_PE32_SCN_ALIGN_64BYTES		0x00700000
@@ -1367,7 +1359,7 @@ index 7d44732d2c3..c03cc599f63 100644
  #define GRUB_PE32_SIGNATURE_SIZE 4
  
  struct grub_pe32_header
-@@ -265,6 +293,20 @@ struct grub_pe32_header
+@@ -274,6 +302,20 @@ struct grub_pe32_header
  #endif
  };
  
