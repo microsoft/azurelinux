@@ -207,15 +207,14 @@ $(toolchain_rpms):
 		wget $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			-a $$log_file \
-			&& \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
+			-a $$log_file && \
+		echo "Downloaded toolchain RPM: $$rpm_filename" | tee -a $$log_file && \
 		break; \
 	done || { \
-			echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
-			echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
-			tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
-			$(call print_error,\nToolchain download failed. See above errors for more details.) \
-		}
+		echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
+		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
+		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
+		$(call print_error,\nToolchain download failed. See above errors for more details.) \
+	}
 endif
 endif
