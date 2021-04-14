@@ -13,17 +13,6 @@
             }
         },
         {
-            "Name": "CBL-Mariner Virtualization Host",
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
-            }
-        },
-        {
             "Name": "CBL-Mariner Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
@@ -31,28 +20,6 @@
             ],
             "KernelOptions": {
                 "default": "kernel"
-            }
-        },
-        {
-            "Name": "CBL-Mariner Core Read-Only",
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/read-only-root-packages.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
-            },
-            "ReadOnlyVerityRoot": {
-                "Enable": true,
-                "TmpfsOverlays": [
-                    "/var"
-                ],
-                "TmpfsOverlayDebugEnabled": false,
-                "VerityErrorBehavior": "restart"
-            },
-            "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot"
             }
         }
     ]

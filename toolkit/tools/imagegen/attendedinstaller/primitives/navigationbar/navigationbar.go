@@ -6,6 +6,7 @@ package navigationbar
 import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 )
 
 const (
@@ -130,7 +131,7 @@ func (n *NavigationBar) ClearUserFeedback() *NavigationBar {
 
 // SetUserFeedback sets a message for the user in a given color.
 func (n *NavigationBar) SetUserFeedback(feedback string, color tcell.Color) *NavigationBar {
-	n.feedback = feedback
+	n.feedback = uitext.BoldPrefix + feedback
 	n.feedbackColor = color
 	return n
 }

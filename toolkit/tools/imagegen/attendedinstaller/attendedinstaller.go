@@ -64,15 +64,16 @@ const (
 
 // AttendedInstaller contains the attended installer configuration
 type AttendedInstaller struct {
-	app              *tview.Application
-	exitModal        *tview.Modal
-	grid             *tview.Grid
-	pauseCustomInput bool
-	currentView      int
-	allViews         []views.View
-	backdropStyle    tview.Theme
-	titleText        *tview.TextView
-	keyboard         uinput.Keyboard
+	app               *tview.Application
+	exitModal         *tview.Modal
+	grid              *tview.Grid
+	pauseCustomInput  bool
+	pauseSpeakupInput bool
+	currentView       int
+	allViews          []views.View
+	backdropStyle     tview.Theme
+	titleText         *tview.TextView
+	keyboard          uinput.Keyboard
 
 	installationFunc     func(configuration.Config, chan int, chan string) error
 	calamaresInstallFunc func() error
@@ -183,11 +184,13 @@ func (ai *AttendedInstaller) showView(newView int) (err error) {
 	logger.Log.Debugf("Showing view: %s", view.Name())
 
 	// Clear the text-to-speech buffer when we change pages
+	ai.pauseSpeakupInput = true
 	err = speakuputils.ClearSpeakupBuffer(ai.keyboard)
 	if err != nil {
 		logger.Log.Warnf("Error clearing speakup buffer")
 		err = nil
 	}
+	ai.pauseSpeakupInput = false
 
 	err = view.Reset()
 	if err != nil {
@@ -216,6 +219,11 @@ func (ai *AttendedInstaller) quit() {
 }
 
 func (ai *AttendedInstaller) globalInputCapture(event *tcell.EventKey) *tcell.EventKey {
+	// If we're clearing the speakup buffer, don't process keypresses
+	// tcell has no easy way of differentiating between keypad enter (speakup clear) and enter
+	if ai.pauseSpeakupInput && event.Key() == tcell.KeyEnter {
+		return nil
+	}
 	if !ai.pauseCustomInput {
 		event = ai.allViews[ai.currentView].HandleInput(event)
 		if event == nil {
@@ -250,6 +258,8 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	const osReleaseFile = "/etc/os-release"
 
+	// For "bright" colors, we need to manually specify RGB values
+	// As they do not nhave
 	ai.backdropStyle = tview.Theme{
 		PrimitiveBackgroundColor:    tcell.ColorBlack,
 		ContrastBackgroundColor:     tcell.ColorWhite,
@@ -261,7 +271,7 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 		SecondaryTextColor:          tcell.ColorBlack,
 		TertiaryTextColor:           tcell.ColorRed,
 		InverseTextColor:            tcell.ColorGreen,
-		ContrastSecondaryTextColor:  tcell.ColorGreen,
+		ContrastSecondaryTextColor:  tcell.ColorWhite,
 	}
 
 	tview.Styles = tview.Theme{
@@ -331,11 +341,13 @@ func (ai *AttendedInstaller) initializeUI() (err error) {
 
 	ai.exitModal = tview.NewModal().
 		SetText(uitext.ExitModalTitle).
-		AddButtons([]string{uitext.ButtonQuitBold, uitext.ButtonCancelBold}).
+		AddButtons([]string{uitext.ButtonQuitWhiteBold, uitext.ButtonCancelWhiteBold}).
 		SetBackgroundColor(ai.backdropStyle.TertiaryTextColor).
 		SetButtonBackgroundColor(ai.backdropStyle.TertiaryTextColor).
+		SetTextColor(ai.backdropStyle.ContrastSecondaryTextColor).
+		SetButtonTextColor(ai.backdropStyle.PrimitiveBackgroundColor).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if buttonLabel == uitext.ButtonQuitBold {
+			if buttonLabel == uitext.ButtonQuitWhiteBold {
 				ai.userQuitInstallation = true
 				ai.app.Stop()
 			} else {

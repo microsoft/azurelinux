@@ -102,8 +102,6 @@ func (ev *EncryptView) Initialize(backButtonText string, sysConfig *configuratio
 
 // HandleInput handles custom input.
 func (ev *EncryptView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
-	ev.navBar.ClearUserFeedback()
-
 	// Allow Up-Down to navigate the form
 	switch event.Key() {
 	case tcell.KeyUp:
@@ -119,6 +117,7 @@ func (ev *EncryptView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 func (ev *EncryptView) Reset() (err error) {
 	ev.navBar.ClearUserFeedback()
 	ev.navBar.SetSelectedButton(noSelection)
+	ev.form.SetFocus(0)
 
 	ev.sysConfig.Encryption.Password = ""
 	ev.sysConfig.Encryption.Enable = false
@@ -146,6 +145,7 @@ func (ev *EncryptView) OnShow() {
 }
 
 func (ev *EncryptView) onNextButton(nextPage func(), cfg *configuration.Config) {
+	ev.navBar.ClearUserFeedback()
 	enteredPassword := ev.passwordField.GetText()
 
 	if enteredPassword != ev.confirmPasswordField.GetText() {
