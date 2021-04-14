@@ -7,20 +7,23 @@ package uitext
 const (
 	RequiredInputMark = "* "
 	BoldPrefix        = "[::b]"
+	WhiteBoldPrefix   = "[#ffffff::b]"
 )
 
 // "]" is a special character for the TUI text, escape it with "[]"
 
 // Navigation text.
 const (
-	ButtonAccept  = "[Accept[]"
-	ButtonCancel  = "[Cancel[]"
-	ButtonConfirm = "[Confirm[]"
-	ButtonGoBack  = "[Go Back[]"
-	ButtonNext    = "[Next[]"
-	ButtonYes     = "[Yes[]"
-	ButtonQuit    = "[Quit[]"
-	ButtonRestart = "[Restart[]"
+	ButtonAccept          = "[Accept[]"
+	ButtonCancel          = "[Cancel[]"
+	ButtonCancelWhiteBold = WhiteBoldPrefix + ButtonCancel
+	ButtonConfirm         = "[Confirm[]"
+	ButtonGoBack          = "[Go Back[]"
+	ButtonNext            = "[Next[]"
+	ButtonYes             = "[Yes[]"
+	ButtonQuit            = "[Quit[]"
+	ButtonQuitWhiteBold   = WhiteBoldPrefix + ButtonQuit
+	ButtonRestart         = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.
