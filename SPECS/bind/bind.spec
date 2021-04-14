@@ -94,7 +94,7 @@ For other supported HSM modules please check the BIND documentation.
 %package pkcs11-utils
 Summary: Bind tools with native PKCS#11 for using DNSSEC
 Requires: bind-pkcs11-libs%{?_isa} = %{version}-%{release}
-Obsoletes: bind-pkcs11 < 32:9.9.4-16.P2
+Obsoletes: bind-pkcs11 < 9.9.4-16.P2
 Requires: bind-dnssec-doc = %{version}-%{release}
 	
 %description pkcs11-utils	
@@ -124,7 +124,7 @@ with native PKCS#11 functionality.
 Summary: Libraries used by the BIND DNS packages
 Requires: bind-license = %{version}-%{release}
 Provides: bind-libs-lite = %{version}-%{release}
-Obsoletes: bind-libs-lite < 32:9.16.13
+Obsoletes: bind-libs-lite < 9.16.13
 	
 %description libs	
 Contains heavyweight version of BIND suite libraries used by both named DNS
@@ -410,16 +410,51 @@ fi
 # Package upgrade, not uninstall
 %systemd_postun_with_restart named-pkcs11.service
 
+# Fix permissions on existing device files on upgrade
+%define chroot_fix_devices() \
+if [ $1 -gt 1 ]; then \
+  for DEV in "%{1}/dev"/{null,random,zero}; do \
+    if [ -e "$DEV" -a "$(/bin/stat --printf="%G %a" "$DEV")" = "root 644" ]; \
+    then \
+      /bin/chmod 0664 "$DEV" \
+      /bin/chgrp named "$DEV" \
+    fi \
+  done \
+fi
+
+%ldconfig_scriptlets libs
+
+%ldconfig_scriptlets pkcs11-libs
+
+%post chroot
+%systemd_post named-chroot.service
+%chroot_fix_devices %{chroot_prefix}
+
+%posttrans chroot
+if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
+  [ -x /sbin/restorecon ] && /sbin/restorecon %{chroot_prefix}/dev/* > /dev/null 2>&1;
+fi;
+
+%preun chroot
+# wait for stop of both named-chroot and named-chroot-setup services
+# on uninstall
+%systemd_preun named-chroot.service named-chroot-setup.service
+
+%postun chroot
+# Package upgrade, not uninstall
+%systemd_postun_with_restart named-chroot.service
+
+
 %files
 # TODO: Move from lib/bind to lib/named, as used by upstream
 %dir %{_libdir}/bind
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
-%config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
+#%config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
 %{_tmpfilesdir}/named.conf
-%{_sysconfdir}/rwtab.d/named
+#%{_sysconfdir}/rwtab.d/named
 %{_unitdir}/named.service
 %{_unitdir}/named-setup-rndc.service
 %{_sbindir}/named-journalprint
@@ -444,9 +479,9 @@ fi
 	
 # Hide configuration
 %defattr(0640,root,named,0750)
-%dir %{_sysconfdir}/named
-%config(noreplace) %verify(not link) %{_sysconfdir}/named.conf
-%config(noreplace) %verify(not link) %{_sysconfdir}/named.rfc1912.zones
+#%dir %{_sysconfdir}/named
+#%config(noreplace) %verify(not link) %{_sysconfdir}/named.conf
+#%config(noreplace) %verify(not link) %{_sysconfdir}/named.rfc1912.zones
 %defattr(0660,root,named,01770)
 %dir %{_localstatedir}/named
 %defattr(0660,named,named,0770)
@@ -469,13 +504,8 @@ fi
 
 %files libs
 %{_libdir}/*so.*
-#%{_libdir}/libbind9-%{version}*.so
-#%{_libdir}/libisccc-%{version}*.so
-#%{_libdir}/libns-%{version}*.so
-#%{_libdir}/libdns-%{version}*.so
-#%{_libdir}/libirs-%{version}*.so
-#%{_libdir}/libisc-%{version}*.so
-#%{_libdir}/libisccfg-%{version}*.so
+%exclude %{_libdir}/libdns-pkcs11*
+%exclude %{_libdir}/libns-pkcs11*
 
 %files license
 %license LICENSE
