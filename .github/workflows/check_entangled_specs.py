@@ -9,8 +9,7 @@ import sys
 
 version_release_matching_groups = [
     frozenset([
-        "SPECS-SIGNED/kernel-signed-x64/kernel-signed-x64.spec",
-        "SPECS-SIGNED/kernel-signed-aarch64/kernel-signed-aarch64.spec",
+        "SPECS-SIGNED/kernel-signed/kernel-signed.spec",
         "SPECS/kernel/kernel.spec",
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
