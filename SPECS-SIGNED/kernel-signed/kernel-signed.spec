@@ -1,7 +1,13 @@
 %global debug_package %{nil}
+%ifarch x86_64
+%global buildarch x86_64
+%endif
+%ifarch aarch64
+%global buildarch aarch64
+%endif
 %define uname_r %{version}-%{release}
-Summary:        Signed Linux Kernel for aarch64 systems
-Name:           kernel-signed-aarch64
+Summary:        Signed Linux Kernel for %{buildarch} systems
+Name:           kernel-signed-%{buildarch}
 Version:        5.10.28.1
 Release:        3%{?dist}
 License:        GPLv2
@@ -58,10 +64,9 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        kernel-%{version}-%{release}.aarch64.rpm
+Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 BuildRequires:  cpio
-ExclusiveArch:  aarch64
 
 %description
 This package contains the Linux kernel package with kernel signed with the production key
