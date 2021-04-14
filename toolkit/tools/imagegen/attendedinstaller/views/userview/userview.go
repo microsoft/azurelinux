@@ -126,6 +126,7 @@ func (uv *UserView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 func (uv *UserView) Reset() (err error) {
 	uv.navBar.ClearUserFeedback()
 	uv.navBar.SetSelectedButton(noSelection)
+	uv.form.SetFocus(0)
 
 	uv.user.Name = ""
 	uv.user.Password = ""

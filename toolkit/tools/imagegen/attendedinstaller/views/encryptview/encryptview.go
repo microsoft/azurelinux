@@ -117,6 +117,7 @@ func (ev *EncryptView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 func (ev *EncryptView) Reset() (err error) {
 	ev.navBar.ClearUserFeedback()
 	ev.navBar.SetSelectedButton(noSelection)
+	ev.form.SetFocus(0)
 
 	ev.sysConfig.Encryption.Password = ""
 	ev.sysConfig.Encryption.Enable = false
