@@ -111,8 +111,6 @@ func (uv *UserView) Initialize(backButtonText string, sysConfig *configuration.S
 
 // HandleInput handles custom input.
 func (uv *UserView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
-	uv.navBar.ClearUserFeedback()
-
 	// Allow Up-Down to navigate the form
 	switch event.Key() {
 	case tcell.KeyUp:
@@ -128,6 +126,7 @@ func (uv *UserView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 func (uv *UserView) Reset() (err error) {
 	uv.navBar.ClearUserFeedback()
 	uv.navBar.SetSelectedButton(noSelection)
+	uv.form.SetFocus(0)
 
 	uv.user.Name = ""
 	uv.user.Password = ""
@@ -207,6 +206,7 @@ func (uv *UserView) userNameAcceptanceCheck(textToCheck string, lastRune rune) b
 func (uv *UserView) onNextButton(nextPage func()) {
 	enteredUserName := uv.userNameField.GetText()
 	enteredPassword := uv.passwordField.GetText()
+	uv.navBar.ClearUserFeedback()
 
 	err := validateUserName(enteredUserName)
 	if err != nil {
