@@ -1,0 +1,20 @@
+--- ./Makefile	2021-04-06 08:53:18.554954462 -0700
++++ ./Makefile_mariner	2021-04-14 09:44:09.424948057 -0700
+@@ -70,7 +70,7 @@
+ cppcheck:
+ 	cppcheck --force -q --enable=performance --enable=warning --enable=portability *.h *.c
+ 
+-install: install-man install-shared install-includes
++install: install-man install-shared install-includes install-static
+ 
+ install-man:
+ 	install -d -m 0755 $(DESTDIR)$(PREFIX)/share/man/man3
+@@ -79,7 +79,7 @@
+ 
+ install-shared:
+ 	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
+-	$(INSTALL_STRIP) -m 0755 lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/
++	install -m 0755 lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/
+ 	$(RM) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so.$(LIBMAJOR)
+ 	ln -sf lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so.$(LIBMAJOR)
+ 	ln -sf lib$(NAME).so.$(LIBMAJOR) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so

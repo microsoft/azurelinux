@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +28,7 @@ Patch5:         openssl-1.1.1-fips.patch
 Patch6:         openssl-1.1.1-version-override.patch
 Patch7:         openssl-1.1.1-seclevel.patch
 Patch8:         openssl-1.1.1-fips-post-rand.patch
-Patch9:        openssl-1.1.1-evp-kdf.patch
+Patch9:         openssl-1.1.1-evp-kdf.patch
 Patch10:        openssl-1.1.1-ssh-kdf.patch
 Patch11:        openssl-1.1.1-krb5-kdf.patch
 Patch12:        openssl-1.1.1-edk2-build.patch
@@ -40,6 +40,9 @@ Patch17:        openssl-1.1.1-kdf-selftest.patch
 Patch18:        openssl-1.1.1-rewire-fips-drbg.patch
 Patch19:        openssl-1.1.1-fips-curves.patch
 Patch20:        openssl-1.1.1-sp80056arev3.patch
+Patch21:        openssl-1.1.1-jitterentropy.patch
+BuildRequires:  jitterentropy-devel
+BuildRequires:  jitterentropy-static
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -126,6 +129,7 @@ cp %{SOURCE4} test/
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -147,7 +151,7 @@ export HASHBANGPERL=%{_bindir}/perl
 #       Issue link: https://github.com/openssl/openssl/issues/7048.
 #       For more details please read the comment inside the patch.
 ./config \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
+    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib -ljitterentropy \
     shared \
     no-aria \
     enable-bf \
@@ -320,6 +324,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Apr 14 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
+- Use jitterentropy instead of getrandom() for seeding
+
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-1
 - Update to version 1.1.1k
 

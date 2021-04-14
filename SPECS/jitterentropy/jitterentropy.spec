@@ -21,7 +21,6 @@ It is a small-scale, yet fast entropy source that is viable in almost all enviro
 %package devel
 Summary:        Development libraries for jitterentropy-library
 Group:          Development/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Development headers for jitterentropy-library
