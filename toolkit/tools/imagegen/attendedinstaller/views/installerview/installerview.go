@@ -152,7 +152,11 @@ func (iv *InstallerView) OnShow() {
 func (iv *InstallerView) onNextButton(nextPage func()) {
 	switch iv.optionList.GetCurrentItem() {
 	case terminalUINoSpeechOption:
-		speakuputils.StopSpeakup()
+		err := speakuputils.StopSpeakup()
+		if err != nil {
+			logger.Log.Warnf("Failed to stop speakup, continuing")
+			err = nil
+		}
 		fallthrough
 	case terminalUISpeechOption:
 		nextPage()
