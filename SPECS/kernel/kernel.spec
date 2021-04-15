@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.28.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -156,6 +156,8 @@ Patch1127:      CVE-2021-29647.nopatch
 Patch1128:      CVE-2021-29649.nopatch
 Patch1129:      CVE-2021-29650.nopatch
 Patch1130:      CVE-2021-30002.nopatch
+# CVE-2021-29648 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1131:      CVE-2021-29648.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -494,6 +496,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Apr 15 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.28.1-2
+- Address CVE-2021-29648
+
 * Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
 - Update source to 5.10.28.1
 - Update uname_r define to match the new value derived from the source
