@@ -3435,8 +3435,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3455,8 +3455,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.15.tar.gz"
         }
       }
     },
