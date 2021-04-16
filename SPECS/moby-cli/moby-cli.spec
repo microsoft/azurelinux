@@ -38,6 +38,7 @@ Requires: xz
 %setup -q -n %{name}-%{version} -c
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
+# Fix incorrect package name reference for go-md2man
 sed -i 's/md2man/go-md2man/g' ./man/md2man-all.sh
 
 %build
@@ -95,6 +96,7 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %changelog
 * Thu Apr 15 2021 Andrew Phelps <anphel@microsoft.com> 19.03.15+azure-1
 - Update to version 19.03.15+azure
+- Rename 'md2man' to 'go-md2man' in md2man-all.sh
 
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 19.03.11+azure-2
 - Increment release to force republishing using golang 1.15.
