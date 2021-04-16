@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -270,6 +270,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
+- Bump version to match grub-efi-binary-signed spec
+
 * Fri Apr 02 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.06~rc1-3
 - Apply no patches for CVE-2021-3418 CVE-2020-14372 CVE-2020-25632
   CVE-2020-25647 CVE-2020-27779 CVE-2021-20233 CVE-2020-10713 CVE-2020-14308
