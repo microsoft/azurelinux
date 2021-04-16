@@ -151,19 +151,6 @@ BuildArch:  noarch
 The policycoreutils-python-utils package contains the management tools use to manage
 an SELinux environment.
 
-%package python3
-Summary: SELinux policy core python3 interfaces
-Requires:policycoreutils = %{version}-%{release}
-Requires:libsemanage-python3 >= %{libsemanagever} libselinux-python3
-Requires: python3-audit
-Requires: checkpolicy
-Requires: setools-python3 >= 4.1.1
-BuildArch: noarch
-
-%description python3
-The policycoreutils-python3 package contains the interfaces that can be used
-by python 3 in an SELinux environment.
-
 %package devel
 Summary: SELinux policy core policy devel utilities
 Requires: policycoreutils-python-utils
@@ -203,29 +190,6 @@ The policycoreutils-restorecond package contains the restorecond service.
 %{_mandir}/man8/semanage*.8*
 %{_mandir}/ru/man8/semanage*.8*
 %{_datadir}/bash-completion/completions/semanage
-
-%files python3
-%license python/COPYING
-%{python3_sitelib}/seobject.py*
-%{python3_sitelib}/sepolgen
-%dir %{python3_sitelib}/sepolicy
-%{python3_sitelib}/sepolicy/templates
-%dir %{python3_sitelib}/sepolicy/help
-%{python3_sitelib}/sepolicy/help/*
-%{python3_sitelib}/sepolicy/__init__.py*
-%{python3_sitelib}/sepolicy/booleans.py*
-%{python3_sitelib}/sepolicy/communicate.py*
-%{python3_sitelib}/sepolicy/generate.py*
-%{python3_sitelib}/sepolicy/gui.py*
-%{python3_sitelib}/sepolicy/interface.py*
-%{python3_sitelib}/sepolicy/manpage.py*
-%{python3_sitelib}/sepolicy/network.py*
-%{python3_sitelib}/sepolicy/sepolicy.glade
-%{python3_sitelib}/sepolicy/transition.py*
-%{python3_sitelib}/sepolicy/sedbus.py*
-%{python3_sitelib}/sepolicy*.egg-info
-%{python3_sitelib}/sepolicy/__pycache__
-%_mandir}/man8/sepolicy-gui.8.gz
 
 %files devel
 %{_bindir}/sepolgen
