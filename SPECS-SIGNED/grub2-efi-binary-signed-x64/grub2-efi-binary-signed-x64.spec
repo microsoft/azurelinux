@@ -1,8 +1,16 @@
 %global debug_package %{nil}
-Summary:        Signed GRand Unified Bootloader for x86_64 systems
-Name:           grub2-efi-binary-signed-x64
+%ifarch x86_64
+%global buildarch x86_64
+%global grubefiname grubx64.efi
+%endif
+%ifarch aarch64
+%global buildarch aarch64
+%global grubefiname grubaa64.efi
+%endif
+Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
+Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06~rc1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,14 +27,13 @@ URL:            https://www.gnu.org/software/grub
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        grub2-efi-unsigned-%{version}-%{release}.x86_64.rpm
-Source1:        grubx64.efi
+Source0:        grub2-efi-unsigned-%{version}-%{release}.%{buildarch}.rpm
+Source1:        %{grubefiname}
 Conflicts:      grub2-efi-binary
-ExclusiveArch:  x86_64
 
 %description
 This package contains the GRUB EFI image signed for secure boot. The package is
-specifically created for installing on x86_64 systems
+specifically created for installing on %{buildarch} systems
 
 %prep
 
@@ -34,12 +41,15 @@ specifically created for installing on x86_64 systems
 
 %install
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
-cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 
 %files
-/boot/efi/EFI/BOOT/grubx64.efi
+/boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
+- Commonize to one spec instead of having a spec per arch
+
 * Fri Apr 02 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.06~rc1-3
 - Update release to be aligned with unsigned version
 
