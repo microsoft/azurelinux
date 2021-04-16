@@ -29,9 +29,16 @@ URL:            https://www.gnu.org/software/grub
 #   4. Build this spec
 Source0:        grub2-efi-unsigned-%{version}-%{release}.%{buildarch}.rpm
 Source1:        %{grubefiname}
-Conflicts:      grub2-efi-binary
 
 %description
+This package contains the GRUB EFI image signed for secure boot. The package is
+specifically created for installing on %{buildarch} systems
+
+%package -n     grub2-efi-binary
+Summary:        GRand Unified Bootloader
+Group:          Applications/System
+
+%description -n grub2-efi-binary
 This package contains the GRUB EFI image signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
 
@@ -43,12 +50,13 @@ specifically created for installing on %{buildarch} systems
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
 cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 
-%files
+%files -n grub2-efi-binary
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
 - Commonize to one spec instead of having a spec per arch
+- Define a new grub2-efi-binary subpackage which contains the signed collateral
 
 * Fri Apr 02 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.06~rc1-3
 - Update release to be aligned with unsigned version
