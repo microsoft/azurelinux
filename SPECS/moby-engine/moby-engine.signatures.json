@@ -4,6 +4,6 @@
   "NOTICE": "6fa0790288289acbdb9c0d8ee8e7769b65332aa4c080964b6f1623b4eda3cab0",
   "docker.service": "1a748c285a3cb5c8fb01db35d5b1f9029d170fd4b4e8428fec745b9bf0424bbc",
   "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
-  "moby-engine-19.03.11+azure.tar.gz": "23d11a9e3a95bad471a3e4a8e9fa2f4663a6c5b194431bba80a69a5f3b879dee"
+  "moby-engine-19.03.15+azure.tar.gz": "0daaaea884f8682cc2e1c466c2001ee55ac52fa5a0faedc070a5f59bbb39defa"
  }
 }

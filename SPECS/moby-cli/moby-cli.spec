@@ -1,15 +1,15 @@
 Summary: The open-source application container engine client.
 Name: moby-cli
-Version: 19.03.11+azure
-Release: 2%{?dist}
+Version: 19.03.15+azure
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
 # Git clone is a standard practice of producing source files for moby-* packages.
 # Please look at ./generate-sources.sh for generating source tar ball.
 # REPO = https://github.com/docker/cli.git
-%define CLI_COMMIT dd360c7c0de8d9132a3965db6a59d3ae74f43ba7
-#Source0: https://github.com/docker/cli/archive/v19.03.11.tar.gz
+%define CLI_COMMIT 48d30b5b32e99c932b4ea3edca74353feddd83ff
+#Source0: https://github.com/docker/cli/archive/v19.03.15.tar.gz
 Source0: moby-cli-%{version}.tar.gz
 Source1: NOTICE
 Source2: LICENSE
@@ -92,6 +92,9 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 /usr/share/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Thu Apr 15 2021 Andrew Phelps <anphel@microsoft.com> 19.03.15+azure-1
+- Update to version 19.03.15+azure
+
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 19.03.11+azure-2
 - Increment release to force republishing using golang 1.15.
 
