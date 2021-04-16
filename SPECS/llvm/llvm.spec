@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        8.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
@@ -39,6 +39,7 @@ cd build
 cmake -G Ninja                              \
       -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLVM_ENABLE_FFI=ON                  \
+      -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
@@ -85,6 +86,9 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Thu Apr 15 2021 Henry Li <lihl@microsoft.com> - 8.0.1-4
+- Add -DLLVM_ENABLE_RTTI=ON to cmake build option
+
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.1-3
 -   Switch to ninja-build to use LLVM_PARALLEL_LINK_JOBS=1 to reduce
 -   fatal OOM errors during linking phase.

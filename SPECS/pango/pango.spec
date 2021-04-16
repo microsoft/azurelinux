@@ -1,13 +1,14 @@
 Summary:	library for laying out and rendering of text.
 Name:		pango
-Version:	1.40.4
-Release:    4%{?dist}
+Version:	1.44.7
+Release:    1%{?dist}
 License:	LGPLv2 or MPLv1.1
 URL:		http://pango.org
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	    https://download.gnome.org/sources/pango/1.40/%{name}-%{version}.tar.xz
+#Source0:	    https://download.gnome.org/sources/pango/1.48/%{name}-%{version}.tar.xz
+Source0:		%{name}-%{version}.tar.xz
 BuildRequires:	glib-devel
 BuildRequires:	cairo
 BuildRequires:	cairo-devel
@@ -16,7 +17,10 @@ BuildRequires:	fontconfig
 BuildRequires:	fontconfig-devel
 BuildRequires:	harfbuzz
 BuildRequires:	harfbuzz-devel
+BuildRequires:	meson
 BuildRequires:	freetype
+BuildRequires:  pkgconfig(fribidi)
+BuildRequires:  gobject-introspection-devel
 Requires:	    harfbuzz-devel
 %description
 Pango is a library for laying out and rendering of text, with an emphasis on internationalization. Pango can be used anywhere that text layout is needed, though most of the work on Pango so far has been done in the context of the GTK+ widget toolkit.
@@ -29,12 +33,15 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -q
-%build
-./configure \
-	--prefix=%{_prefix}
-make %{?_smp_mflags}
+
+%build	
+%meson \
+  -Dinstall-tests=true
+
+%meson_build
+
 %install
-make DESTDIR=%{buildroot} install
+%meson_install
 find %{buildroot} -name '*.la' -delete
 
 %check

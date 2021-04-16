@@ -1,13 +1,14 @@
 Summary:	opentype text shaping engine
 Name:		harfbuzz
-Version:	1.9.0
-Release:    4%{?dist}
+Version:	2.6.4
+Release:    1%{?dist}
 License:	MIT
 URL:		http://harfbuzz.org
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	    https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.bz2
+#Source0:	    https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.bz2
+Source0:        %{name}-%{version}.tar.xz
 BuildRequires:	glib-devel
 BuildRequires:	freetype
 BuildRequires:	freetype-devel
