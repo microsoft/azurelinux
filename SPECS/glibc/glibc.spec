@@ -38,7 +38,6 @@ Patch12:        CVE-2019-7309.patch
 Patch13:        CVE-2019-19126.patch
 Patch14:        CVE-2019-25013.patch
 Patch15:		CVE-2021-3326.patch
-Patch15:        CVE-2021-3326.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)

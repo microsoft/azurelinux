@@ -12,7 +12,6 @@ import (
 	"regexp"
 	"strings"
 
-	mapset "github.com/deckarep/golang-set"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/file"
@@ -154,7 +153,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 }
 
 func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
-	// Convert /localrpms into a repository that a package manager can use
+	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
 		return
