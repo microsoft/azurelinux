@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bmake",
+          "version": "20201010",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bmon",
           "version": "4.0",
           "downloadUrl": "https://github.com/tgraf/bmon/archive/v4.0.tar.gz"
