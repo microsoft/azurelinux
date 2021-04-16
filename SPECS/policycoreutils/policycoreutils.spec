@@ -189,7 +189,7 @@ BuildRequires: systemd
 The policycoreutils-restorecond package contains the restorecond service.
 
 %files python-utils
-%license python/copying
+%license python/COPYING
 %{_sbindir}/semanage
 %{_bindir}/chcat
 %{_bindir}/audit2allow
