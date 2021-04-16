@@ -38,6 +38,7 @@ Requires: xz
 %setup -q -n %{name}-%{version} -c
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
+sed -i 's/md2man/go-md2man/g' ./man/md2man-all.sh
 
 %build
 export GOPATH=%{OUR_GOPATH}
