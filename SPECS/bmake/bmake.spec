@@ -3,6 +3,8 @@ Name:          bmake
 Version:       20201010
 Release:       2%{?dist}
 License:       BSD
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
 Requires:      mk-files
@@ -10,8 +12,6 @@ Requires:      mk-files
 BuildRequires: gcc
 BuildRequires: sed
 BuildRequires: util-linux
-# Required by tests
-#BuildRequires: tcsh ksh
 
 %description
 bmake, the NetBSD make tool, is a program designed to simplify the
@@ -62,8 +62,10 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
-* Fri Apr 16, 2021 Vincent Tam <vtam@microsoft.com> - 20201010-2
+* Fri Apr 16 2021 Vincent Tam <vtam@microsoft.com> - 20201010-2
 - Disable tests for tcsh / ksh
+- License verified
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
 * Tue Oct 20 2020 Petr Menšík <pemensik@redhat.com> - 20201010-1
 - Update to 20201010 (#1876115)
