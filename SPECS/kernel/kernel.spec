@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.28.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -494,6 +494,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Apr 13 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-2
+- Bump release number to match kernel-signed update
+
 * Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
 - Update source to 5.10.28.1
 - Update uname_r define to match the new value derived from the source
