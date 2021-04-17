@@ -1775,8 +1775,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.1",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.1.tar.gz"
+          "version": "68.2.0.6",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
         }
       }
     },
