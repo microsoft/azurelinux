@@ -92,6 +92,7 @@ unset JAVA_HOME &&
 	--with-freetype-include=/usr/include/freetype2 \
 	--with-freetype-lib=/usr/lib \
 	--with-stdc++lib=dynamic \
+	--with-native-debug-symbols=none \
 	--disable-zip-debug-info
 
 make \
@@ -115,8 +116,6 @@ make DESTDIR=%{buildroot} install \
 
 install -vdm755 %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 chown -R root:root %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
-# Needed due to spurious debuginfo generation in 8u282
-find ${buildroot}%{_libdir}/jvm/OpenJDK-%{version}/bin -iname \*.debuginfo -delete
 install -vdm755 %{buildroot}%{_bindir}
 find /usr/local/jvm/openjdk-1.8.0-internal/jre/lib/amd64 -iname \*.diz -delete
 mv /usr/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
@@ -139,6 +138,7 @@ alternatives --install %{_bindir}/javac javac %{_libdir}/jvm/OpenJDK-%{version}/
   --slave %{_bindir}/jinfo jinfo %{_libdir}/jvm/OpenJDK-%{version}/bin/jinfo \
   --slave %{_bindir}/jmap jmap %{_libdir}/jvm/OpenJDK-%{version}/bin/jmap \
   --slave %{_bindir}/jps jps %{_libdir}/jvm/OpenJDK-%{version}/bin/jps \
+  --slave %{_bindir}/jfr jfr %{_libdir}/jvm/OpenJDK-%{version}/bin/jfr \
   --slave %{_bindir}/jrunscript jrunscript %{_libdir}/jvm/OpenJDK-%{version}/bin/jrunscript \
   --slave %{_bindir}/jsadebugd jsadebugd %{_libdir}/jvm/OpenJDK-%{version}/bin/jsadebugd \
   --slave %{_bindir}/jstack jstack %{_libdir}/jvm/OpenJDK-%{version}/bin/jstack \
@@ -203,6 +203,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jhat
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jinfo
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jjs
+%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jmap
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jps
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jrunscript
@@ -219,6 +220,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/xjc
 %{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
+%exclude %{_libdir}/jvm/OpenJDK-%(version)/bin/*.debuginfo
 
 %files	-n openjre8
 %defattr(-,root,root)
@@ -250,6 +252,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+*   Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.282-1
+-   Update to 8u282 to address CVEs
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.212-10
 -   Disable -Werrors that break the build in cflags and cxxflags.
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.212-9
