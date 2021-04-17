@@ -2,8 +2,8 @@
 %global security_hardening none
 Summary:        OpenJDK
 Name:           openjdk8
-Version:        1.8.0.212
-Release:        10%{?dist}
+Version:        1.8.0.282
+Release:        1%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://openjdk.java.net
 Group:          Development/Tools
@@ -11,9 +11,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Source0 tarball is generated from Mercurial clones
 # See generate_source_tarball.sh
-Source0:        openjdk-%{version}-b04.tar.gz
+Source0:        openjdk-%{version}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs.patch
+Patch1:         check-system-ca-certs-282.patch
 ExclusiveArch:  x86_64
 BuildRequires:  alsa-lib
 BuildRequires:  alsa-lib-devel
@@ -68,7 +68,7 @@ Requires:       %{name} = %{version}-%{release}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-%{version}-b04
+%setup -qn openjdk-%{version}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
@@ -115,6 +115,8 @@ make DESTDIR=%{buildroot} install \
 
 install -vdm755 %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 chown -R root:root %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
+# Needed due to spurious debuginfo generation in 8u282
+find ${buildroot}%{_libdir}/jvm/OpenJDK-%{version}/bin -iname \*.debuginfo -delete
 install -vdm755 %{buildroot}%{_bindir}
 find /usr/local/jvm/openjdk-1.8.0-internal/jre/lib/amd64 -iname \*.diz -delete
 mv /usr/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
