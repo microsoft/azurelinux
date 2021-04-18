@@ -101,6 +101,8 @@ sh configure \
 	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
+	--with-native-debug-symbols=none \
+	--disable-zip-debug-info \
 	--with-stdc++lib=dynamic
 
 make \
@@ -125,8 +127,6 @@ make DESTDIR=%{buildroot} install \
 install -vdm755 %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 chown -R root:root %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 install -vdm755 %{buildroot}%{_bindir}
-# Needed due to spurious debuginfo generation in 8u282
-find ${buildroot}%{_libdir}/jvm/OpenJDK-%{version}/bin -iname \*.debuginfo -delete
 find %{_prefix}/local/jvm/openjdk-1.8.0-internal/jre/lib/aarch64 -iname \*.diz -delete
 mv %{_prefix}/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
 
@@ -201,6 +201,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/extcheck
 %{_libdir}/jvm/OpenJDK-%{version}/bin/idlj
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jar
+%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jarsigner
 %{_libdir}/jvm/OpenJDK-%{version}/bin/java-rmi.cgi
 %{_libdir}/jvm/OpenJDK-%{version}/bin/javac
@@ -228,6 +229,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsgen
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsimport
 %{_libdir}/jvm/OpenJDK-%{version}/bin/xjc
+%exclude %{_libdir}/jvm/OpenJDK-%{version}/bin/*.debuginfo
 
 %files -n openjre8
 %defattr(-,root,root)
@@ -259,6 +261,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+* Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.282-1
+- Update to 8u282 to address CVEs.
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
