@@ -1,0 +1,53 @@
+diff -r 6b81fd2227d1 -r 3334efeacd83 src/share/classes/sun/security/ssl/TrustManagerFactoryImpl.java
+--- a/jdk/src/share/classes/sun/security/ssl/TrustManagerFactoryImpl.java	Fri Apr 01 05:33:37 2016 +0100
++++ b/jdk/src/share/classes/sun/security/ssl/TrustManagerFactoryImpl.java	Fri Apr 01 06:04:05 2016 +0100
+@@ -174,15 +174,20 @@
+                     storeFile = new File(storeFileName);
+                     fis = getFileInputStream(storeFile);
+                 } else {
+-                    String javaHome = props.get("javaHome");
+-                    storeFile = new File(javaHome + sep + "lib" + sep
+-                                                    + "security" + sep +
+-                                                    "jssecacerts");
++                    /* Check system cacerts DB first; /etc/pki/java/cacerts */
++                    storeFile = new File(sep + "etc" + sep + "pki" + sep
++                                         + "java" + sep + "cacerts");
+                     if ((fis = getFileInputStream(storeFile)) == null) {
++                        String javaHome = props.get("javaHome");
+                         storeFile = new File(javaHome + sep + "lib" + sep
+-                                                    + "security" + sep +
+-                                                    "cacerts");
+-                        fis = getFileInputStream(storeFile);
++                                             + "security" + sep +
++                                             "jssecacerts");
++                        if ((fis = getFileInputStream(storeFile)) == null) {
++                            storeFile = new File(javaHome + sep + "lib" + sep
++                                                 + "security" + sep +
++                                                 "cacerts");
++                            fis = getFileInputStream(storeFile);
++                        }
+                     }
+                 }
+ 
+diff -r 6b81fd2227d1 -r 3334efeacd83 src/share/classes/sun/security/tools/KeyStoreUtil.java
+--- a/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java	Fri Apr 01 05:33:37 2016 +0100
++++ b/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java	Fri Apr 01 06:04:05 2016 +0100
+@@ -87,9 +87,14 @@
+         throws Exception
+     {
+         String sep = File.separator;
+-        File file = new File(System.getProperty("java.home") + sep
+-                             + "lib" + sep + "security" + sep
+-                             + "cacerts");
++        /* Check system cacerts DB first; /etc/pki/java/cacerts */
++        File file = new File(sep + "etc" + sep + "pki" + sep
++                             + "java" + sep + "cacerts");
++        if (!file.exists()) {
++            file = new File(System.getProperty("java.home") + sep
++                            + "lib" + sep + "security" + sep
++                            + "cacerts");
++        }
+         if (!file.exists()) {
+             return null;
+         }
+
