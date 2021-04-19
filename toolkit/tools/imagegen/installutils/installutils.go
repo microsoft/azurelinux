@@ -1424,7 +1424,7 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 
 	switch bootType {
 	case legacyBootType:
-		err = installLegacyBootloader(installChroot, bootDevPath)
+		err = installLegacyBootloader(installChroot, bootDevPath, encryptEnabled)
 		if err != nil {
 			return
 		}
@@ -1445,13 +1445,21 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 
 // Note: We assume that the /boot directory is present. Whether it is backed by an explicit "boot" partition or present
 // as part of a general "root" partition is assumed to have been done already.
-func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string) (err error) {
+func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string, encryptEnabled bool) (err error) {
 	const (
 		squashErrors = false
 		bootDir      = "/boot"
 		bootDirArg   = "--boot-directory"
 		grub2BootDir = "/boot/grub2"
 	)
+
+	// Add grub cryptodisk settings
+	if encryptEnabled {
+		err = EnableCryptoDisk(installChroot)
+		if err != nil {
+			return
+		}
+	}
 
 	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
 	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
@@ -1473,22 +1481,16 @@ func EnableCryptoDisk(installChroot *safechroot.Chroot) (err error) {
 		grubPreloadModules = `GRUB_PRELOAD_MODULES="lvm"`
 	)
 
-	err = installChroot.UnsafeRun(func() error {
-		err := file.Append(grubCryptoDisk, grubPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
-			return err
-		}
-
-		err = file.Append(grubPreloadModules, grubPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to add grub preload modules: %v", err)
-			return err
-		}
-
-		return err
-	})
-
+	err = file.Append(grubCryptoDisk, grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
+		return
+	}
+	err = file.Append(grubPreloadModules, grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to add grub preload modules: %v", err)
+		return
+	}
 	return
 }
 
