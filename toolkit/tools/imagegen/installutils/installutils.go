@@ -1460,7 +1460,6 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 			return
 		}
 	}
-
 	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
 	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
 	err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
