@@ -1455,7 +1455,7 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 
 	// Add grub cryptodisk settings
 	if encryptEnabled {
-		err = EnableCryptoDisk(installChroot)
+		err = enableCryptoDisk(installChroot)
 		if err != nil {
 			return
 		}
@@ -1469,28 +1469,6 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 	}
 	installGrub2BootDir := filepath.Join(installChroot.RootDir(), grub2BootDir)
 	err = shell.ExecuteLive(squashErrors, "chmod", "-R", "go-rwx", installGrub2BootDir)
-	return
-}
-
-// EnableCryptoDisk enables Grub to boot from an encrypted disk
-// - installChroot is the installation chroot
-func EnableCryptoDisk(installChroot *safechroot.Chroot) (err error) {
-	const (
-		grubPath           = "/etc/default/grub"
-		grubCryptoDisk     = "GRUB_ENABLE_CRYPTODISK=y\n"
-		grubPreloadModules = `GRUB_PRELOAD_MODULES="lvm"`
-	)
-
-	err = file.Append(grubCryptoDisk, grubPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
-		return
-	}
-	err = file.Append(grubPreloadModules, grubPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to add grub preload modules: %v", err)
-		return
-	}
 	return
 }
 
@@ -1515,6 +1493,28 @@ func GetPartUUID(device string) (stdout string, err error) {
 	}
 	logger.Log.Trace(stdout)
 	stdout = strings.TrimSpace(stdout)
+	return
+}
+
+// enableCryptoDisk enables Grub to boot from an encrypted disk
+// - installChroot is the installation chroot
+func enableCryptoDisk(installChroot *safechroot.Chroot) (err error) {
+	const (
+		grubPath           = "/etc/default/grub"
+		grubCryptoDisk     = "GRUB_ENABLE_CRYPTODISK=y\n"
+		grubPreloadModules = `GRUB_PRELOAD_MODULES="lvm"`
+	)
+
+	err = file.Append(grubCryptoDisk, grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
+		return
+	}
+	err = file.Append(grubPreloadModules, grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to add grub preload modules: %v", err)
+		return
+	}
 	return
 }
 
