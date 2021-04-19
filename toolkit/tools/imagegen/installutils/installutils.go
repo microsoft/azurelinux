@@ -1455,7 +1455,7 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 
 	// Add grub cryptodisk settings
 	if encryptEnabled {
-		err = enableCryptoDisk(installChroot)
+		err = enableCryptoDisk()
 		if err != nil {
 			return
 		}
@@ -1498,7 +1498,7 @@ func GetPartUUID(device string) (stdout string, err error) {
 
 // enableCryptoDisk enables Grub to boot from an encrypted disk
 // - installChroot is the installation chroot
-func enableCryptoDisk(installChroot *safechroot.Chroot) (err error) {
+func enableCryptoDisk() (err error) {
 	const (
 		grubPath           = "/etc/default/grub"
 		grubCryptoDisk     = "GRUB_ENABLE_CRYPTODISK=y\n"
