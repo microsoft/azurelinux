@@ -17,6 +17,7 @@ ignore_list=" \
   kf5 \
   mariner-repos \
   mariner-rpm-macros \
+  shim \
   moby-buildx \
   moby-containerd \
   python-markupsafe \
