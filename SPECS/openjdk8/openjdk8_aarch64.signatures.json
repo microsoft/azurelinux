@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "openjdk-1.8.0.282.tar.gz": "eee45ff11c56936dfb1dd4b784f8e6c22d623691e9e298dcaa7a95bd35063a47"
- }
+    "Signatures": {
+        "openjdk-aarch64-jdk8u-aarch64-shenandoah-jdk8u282-b08.tar.gz": "5c96d6af04fc8aa0bfac145791a0e26b549cf415d85cd7e6596ccb0949f0505c "
+    }
 }

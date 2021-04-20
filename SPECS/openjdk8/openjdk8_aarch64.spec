@@ -1,8 +1,8 @@
 %define _use_internal_dependency_generator 0
 %global security_hardening none
-%define _jdk_update 181
-%define _jdk_build 13
-%define _repo_ver aarch64-jdk8u%{_jdk_update}-b%{_jdk_build}
+%define _jdk_update 282
+%define _jdk_build 08
+%define _repo_ver aarch64-shenandoah-jdk8u%{_jdk_update}-b%{_jdk_build}
 %define _url_src https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/
 %define bootstrapjdk %{_libdir}/jvm/OpenJDK-1.8.0.181-bootstrap
 Summary:        OpenJDK
@@ -13,7 +13,7 @@ License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AN
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u/
+URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u-shenandoah/
 Source0:        %{_url_src}/archive/%{_repo_ver}.tar.gz
 Patch0:         Awt_build_headless_only.patch
 Patch1:         check-system-ca-certs-282.patch
@@ -78,7 +78,7 @@ Obsoletes:      openjdk-src <= %{version}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-aarch64-jdk8u-%{_repo_ver}
+%setup -qn openjdk-aarch64-jdk8u-aarch64-shenandoah-%{_repo_ver}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
@@ -263,6 +263,8 @@ rm -rf %{buildroot}/*
 %changelog
 * Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.282-1
 - Update to 8u282 to address CVEs.
+- Switch to Shenandoah version of the aarch64 port
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
