@@ -184,6 +184,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-, root, root)
 %license LICENSE

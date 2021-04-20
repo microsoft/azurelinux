@@ -13,14 +13,14 @@ Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  meson
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
 BuildRequires:  python-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
-BuildRequires:  meson
-BuildRequires: libselinux-devel
 Requires:       libffi
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
@@ -123,7 +123,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %changelog
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
 - Upgrade to version 2.60.1
-- Switch to meson build and install 
+- Switch to meson build and install
 - Fix file section for glib-devel
 
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12

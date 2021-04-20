@@ -1,15 +1,15 @@
+Summary:        Library implementing the Unicode Bidirectional Algorithm
+Name:           fribidi
+Version:        1.0.9
+Release:        2%{?dist}
+License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: Library implementing the Unicode Bidirectional Algorithm
-Name: fribidi
-Version: 1.0.9
-Release: 2%{?dist}
-URL: https://github.com/fribidi/fribidi/
-Source: https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-License: LGPLv2+ and UCD
-BuildRequires: gcc
-BuildRequires: meson
-Patch0: %{name}-drop-bundled-gnulib.patch
+URL:            https://github.com/fribidi/fribidi/
+Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Patch0:         %{name}-drop-bundled-gnulib.patch
+BuildRequires:  gcc
+BuildRequires:  meson
 
 %description
 A library to handle bidirectional scripts (for example Hebrew, Arabic),
@@ -17,8 +17,8 @@ so that the display is done in the proper way; while the text data itself
 is always written in logical order.
 
 %package devel
-Summary: Libraries and include files for FriBidi
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Libraries and include files for FriBidi
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Include files and libraries needed for developing applications which use
@@ -36,7 +36,7 @@ FriBidi.
 
 %install
 %meson_install
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
@@ -281,4 +281,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Fri May 16 2003 Jeremy Katz <katzj@redhat.com> 0.10.4-2
 - Initial build in Red Hat Linux
-
