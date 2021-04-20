@@ -75,7 +75,7 @@ ifneq ($(CONFIG_FILE),)
 # Actual validation is handled in imggen.mk
 $(optimized_file): $(validate-pkggen-config)
 endif
-$(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(toolchain_rpms) $(pkggen_rpms) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) toolchain $(pkggen_rpms) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-graphoptimizer) \
 		--input $(graph_file) \
 		--rpm-dir $(RPMS_DIR) \
