@@ -7,10 +7,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-#Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar.xz
-Source0:        %{name}-%{version}.tar.xz
-#Patch0:         glib-CVE-2019-12450.patch
-#Patch1:         glib-CVE-2019-13012.patch
+Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
+Patch0:         glib-CVE-2019-12450.patch
+Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -122,6 +121,11 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
+- Upgrade to version 2.60.1
+- Switch to meson build and install 
+- Fix file section for glib-devel
+
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
 - Add gtk-doc as build requirement
 - Add --enable-gtk-doc during configuration

@@ -53,6 +53,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 #%%{_mandir}/man3/*.gz
 
 %changelog
+* Thu Apr 15 2021 Henry Li <lihl@microsoft.com> - 1.0.9-2
+- Initial import from Fedora 32 (license: MIT)
+- Remove distro check that does not apply to CBL-Mariner
+
 * Thu Mar 05 2020 Akira TAGOH <tagoh@redhat.com> - 1.0.9-1
 - New upstream release.
   Resolves: rhbz#1809478

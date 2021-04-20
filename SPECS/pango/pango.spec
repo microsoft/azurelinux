@@ -7,8 +7,7 @@ URL:		http://pango.org
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:	    https://download.gnome.org/sources/pango/1.48/%{name}-%{version}.tar.xz
-Source0:		%{name}-%{version}.tar.xz
+Source0:	    https://download.gnome.org/sources/pango/1.44/%{name}-%{version}.tar.xz
 BuildRequires:	glib-devel
 BuildRequires:	cairo
 BuildRequires:	cairo-devel
@@ -28,6 +27,7 @@ Pango is a library for laying out and rendering of text, with an emphasis on int
 %package	devel
 Summary:	Header and development files
 Requires:	%{name} = %{version}-%{release}
+
 %description	devel
 It contains the libraries and header files to create applications
 
@@ -35,8 +35,7 @@ It contains the libraries and header files to create applications
 %setup -q
 
 %build	
-%meson \
-  -Dinstall-tests=true
+%meson
 
 %meson_build
 
@@ -60,6 +59,11 @@ make %{?_smp_mflags} -k check || exit 0
 %{_bindir}/*
 %{_libdir}/*.so*
 %{_datadir}/*
+%{_libdir}/girepository-1.0/Pango-1.0.typelib
+%{_libdir}/girepository-1.0/PangoCairo-1.0.typelib
+%{_libdir}/girepository-1.0/PangoFc-1.0.typelib
+%{_libdir}/girepository-1.0/PangoFT2-1.0.typelib
+%{_libdir}/girepository-1.0/PangoOT-1.0.typelib
 
 %files devel
 %defattr(-,root,root)
@@ -68,6 +72,12 @@ make %{?_smp_mflags} -k check || exit 0
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 1.44.7-1
+- Upgrade to version 1.44.7
+- Switch to meson build and install
+- Add meson and pkgconfig(fribidi) as build requirement
+- Fix file section for pango
+
 * Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.40.4-4
 - Added %%license line automatically
 

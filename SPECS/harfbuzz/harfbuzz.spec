@@ -7,8 +7,7 @@ URL:		http://harfbuzz.org
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:	    https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.bz2
-Source0:        %{name}-%{version}.tar.xz
+Source0:	    https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
 BuildRequires:	glib-devel
 BuildRequires:	freetype
 BuildRequires:	freetype-devel
@@ -59,6 +58,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
 
 %changelog
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.6.4-1
+- Upgrade to version 2.6.4
+
 * Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9.0-4
 - Added %%license line automatically
 
