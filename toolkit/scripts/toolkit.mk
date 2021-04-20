@@ -28,12 +28,12 @@ clean-package-toolkit:
 	rm -rf $(toolkit_build_dir)
 
 package-toolkit: go-tools
-	rm -rf $(toolkit_build_dir) && \
-	mkdir -p $(toolkit_build_dir) && \
-	mkdir -p $(toolkit_tools_dir) && \
-	cp -r $(toolkit_root)/* $(toolkit_build_dir) && \
-	cp $(toolkit_component_extra_files) $(toolkit_build_dir) && \
-	cp $(go_tool_targets) $(toolkit_tools_dir) && \
-	echo "$(toolkit_version)" > $(toolkit_release_file) && \
-	rm -rf $(toolkit_build_dir)/out && \
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(toolkit_archive) -C $(toolkit_build_dir)/.. $(notdir $(toolkit_build_dir))
+	rm -rf "$(toolkit_build_dir)" && \
+	mkdir -p "$(toolkit_build_dir)" && \
+	mkdir -p "$(toolkit_tools_dir)" && \
+	cp -r $(toolkit_root)/* "$(toolkit_build_dir)" && \
+	cp $(toolkit_component_extra_files) "$(toolkit_build_dir)" && \
+	cp $(go_tool_targets) "$(toolkit_tools_dir)" && \
+	echo "$(toolkit_version)" > "$(toolkit_release_file)" && \
+	rm -rf "$(toolkit_build_dir)/out" && \
+	tar -I $(ARCHIVE_TOOL) -cvp -f "$(toolkit_archive)" -C $(toolkit_build_dir)/.. $(notdir $(toolkit_build_dir))
