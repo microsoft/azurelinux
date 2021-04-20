@@ -27,7 +27,7 @@ URL:            https://www.gnu.org/software/grub
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        grub2-efi-unsigned-%{version}-%{release}.%{buildarch}.rpm
+Source0:        grub2-efi-binary-%{version}-%{release}.%{buildarch}.rpm
 Source1:        %{grubefiname}
 
 %description
