@@ -1,14 +1,16 @@
 %global debug_package %{nil}
+%global release_number 1
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.4
-Release:        1%{?dist}
+Release:        %{release_number}%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rhboot/shim
-# This shim binary is signed with the Microsoft UEFI CA key
-Source0:        %{name}-%{version}.tar.gz
+# This signed-shim tarball contains the shim binary signed with
+# the Microsoft UEFI CA key
+Source0:        signed-%{name}-%{version}-%{release_number}.tar.gz
 ExclusiveArch:  x86_64
 
 %description
