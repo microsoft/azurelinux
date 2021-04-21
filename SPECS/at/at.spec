@@ -175,7 +175,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root) %{_bindir}/at
-%attr(0644,root,root)  /lib/systemd/system/atd.service
+%attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.1.23-7
