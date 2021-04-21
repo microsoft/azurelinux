@@ -140,7 +140,7 @@ chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown root:root %{_localstatedir}/spool/at/.SEQ
 %systemd_post atd.service
 
-%preun	
+%preun
 %systemd_preun atd.service
 
 %postun
