@@ -22,7 +22,7 @@ under secure boot environments.
 
 %install
 install -d %{buildroot}/boot/efi/EFI/BOOT
-cp shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
+install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 
 %files
 %defattr(-,root,root)
