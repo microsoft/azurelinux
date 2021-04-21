@@ -25,20 +25,15 @@ Source3:        named.root
 Source4:        named.localhost
 Source5:        named.loopback
 Source6:        named.empty
-Source7:       named.rfc1912.zones
-Source8:       named.conf.sample
-Source9:       named.root.key
+Source7:        named.rfc1912.zones
+Source8:        named.conf.sample
+Source9:        named.root.key
 Source10:       trusted-key.key
-Source11:       named.service
-Source12:       named-chroot.service
-Source13:       setup-named-chroot.sh
-Source14:       generate-rndc-key.sh
-Source15:       named.rwtab
-Source16:       named-chroot-setup.service
-Source17:       named-setup-rndc.service
-Source18:       named-pkcs11.service
-Source19:       setup-named-softhsm.sh
-Source20:       named-chroot.files
+Source11:       setup-named-chroot.sh
+Source12:       generate-rndc-key.sh
+Source13:       named.rwtab
+Source14:       setup-named-softhsm.sh
+Source15:       named-chroot.files
 # CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
 Patch0:         CVE-2019-6470.nopatch
 Patch1:         CVE-2020-8618.patch
@@ -140,7 +135,7 @@ Contains license of the BIND DNS suite.
 %package devel
 Summary:  Header files and libraries needed for bind-dyndb-ldap
 Provides: bind-lite-devel = %{version}-%{release}
-Obsoletes: bind-lite-devel < 32:9.16.6-3
+Obsoletes: bind-lite-devel < 9.16.6-3
 Requires: bind-libs%{?_isa} = %{version}-%{release}
 Requires: openssl-devel%{?_isa} libxml2-devel%{?_isa}
 Requires: libcap-devel%{?_isa}
@@ -262,25 +257,16 @@ touch %{buildroot}/%{chroot_prefix}%{_sysconfdir}/named.conf
 
 %make_install
 
-# Systemd unit files
-mkdir -p %{buildroot}%{_unitdir}
-install -m 644 %{SOURCE11} %{buildroot}%{_unitdir}
-install -m 644 %{SOURCE12} %{buildroot}%{_unitdir}
-install -m 644 %{SOURCE16} %{buildroot}%{_unitdir}
-install -m 644 %{SOURCE17} %{buildroot}%{_unitdir}
-
-install -m 644 %{SOURCE18}  %{buildroot}%{_unitdir}
-
 mkdir -p  %{buildroot}%{_libexecdir}
-install -m 755 %{SOURCE13} %{buildroot}%{_libexecdir}/setup-named-chroot.sh
-install -m 755 %{SOURCE14} %{buildroot}%{_libexecdir}/generate-rndc-key.sh
+install -m 755 %{SOURCE11} %{buildroot}%{_libexecdir}/setup-named-chroot.sh
+install -m 755 %{SOURCE12} %{buildroot}%{_libexecdir}/generate-rndc-key.sh
 
-install -m 755 %{SOURCE19} %{buildroot}%{_libexecdir}/setup-named-softhsm.sh
+install -m 755 %{SOURCE14} %{buildroot}%{_libexecdir}/setup-named-softhsm.sh
 
 install -m 644 %{SOURCE2} %{buildroot}/etc/logrotate.d/named
 mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/named
-install -m 644 %{SOURCE20} %{buildroot}%{_sysconfdir}/named-chroot.files
+install -m 644 %{SOURCE15} %{buildroot}%{_sysconfdir}/named-chroot.files
 
 # Install isc/errno2result.h header
 install -m 644 lib/isc/unix/errno2result.h %{buildroot}%{_includedir}/bind9/isc
@@ -343,7 +329,7 @@ done
 :;
 
 mkdir -p %{buildroot}%{_sysconfdir}/rwtab.d
-install -m 644 %{SOURCE15} %{buildroot}%{_sysconfdir}/rwtab.d/named
+install -m 644 %{SOURCE13} %{buildroot}%{_sysconfdir}/rwtab.d/named
 
 # Remove unwanted files
 rm -f %{buildroot}/usr/etc/bind.keys
@@ -357,58 +343,16 @@ if ! getent passwd named >/dev/null; then
         -s /bin/false -M -r named
 fi
 
-%post
-/sbin/ldconfig
-if [ "$1" -eq 1 ]; then
-  # Initial installation
-  [ -x /sbin/restorecon ] && /sbin/restorecon /etc/rndc.* /etc/named.* >/dev/null 2>&1 ;
-  # rndc.key has to have correct perms and ownership, CVE-2007-6283
-  [ -e /etc/rndc.key ] && chown root:named /etc/rndc.key
-  [ -e /etc/rndc.key ] && chmod 0640 /etc/rndc.key
-else
-  # Upgrade, use invalid shell
-  if getent passwd named | grep ':/bin/false$' >/dev/null; then
-    /sbin/usermod -s /sbin/nologin named
-  fi
-  # Checkconf will parse out comments
-  if /usr/sbin/named-checkconf -p /etc/named.conf 2>/dev/null | grep -q named.iscdlv.key
-  then
-    echo "Replacing obsolete named.iscdlv.key with named.root.key..."
-    if cp -Rf --preserve=all --remove-destination /etc/named.conf /etc/named.conf.rpmbackup; then
-      sed -e 's/named\.iscdlv\.key/named.root.key/' \
-        /etc/named.conf.rpmbackup > /etc/named.conf || \
-      mv /etc/named.conf.rpmbackup /etc/named.conf
-    fi
-  fi
-fi
-%systemd_post named.service
-
-%preun
-# Package removal, not upgrade
-%systemd_preun named.service
+%post -p /sbin/ldconfig
 
 %postun
 /sbin/ldconfig
-# Package upgrade, not uninstall
-%systemd_postun_with_restart named.service
 if getent passwd named >/dev/null; then
     userdel named
 fi
 if getent group named >/dev/null; then
     groupdel named
 fi
-
-%post pkcs11
-# Initial installation
-%systemd_post named-pkcs11.service
-
-%preun pkcs11
-# Package removal, not upgrade
-%systemd_preun named-pkcs11.service
-
-%postun pkcs11
-# Package upgrade, not uninstall
-%systemd_postun_with_restart named-pkcs11.service
 
 # Fix permissions on existing device files on upgrade
 %define chroot_fix_devices() \
@@ -427,7 +371,6 @@ fi
 %ldconfig_scriptlets pkcs11-libs
 
 %post chroot
-%systemd_post named-chroot.service
 %chroot_fix_devices %{chroot_prefix}
 
 %posttrans chroot
@@ -435,28 +378,14 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
   [ -x /sbin/restorecon ] && /sbin/restorecon %{chroot_prefix}/dev/* > /dev/null 2>&1;
 fi;
 
-%preun chroot
-# wait for stop of both named-chroot and named-chroot-setup services
-# on uninstall
-%systemd_preun named-chroot.service named-chroot-setup.service
-
-%postun chroot
-# Package upgrade, not uninstall
-%systemd_postun_with_restart named-chroot.service
-
-
 %files
 # TODO: Move from lib/bind to lib/named, as used by upstream
 %dir %{_libdir}/bind
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
-#%config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
 %{_tmpfilesdir}/named.conf
-#%{_sysconfdir}/rwtab.d/named
-%{_unitdir}/named.service
-%{_unitdir}/named-setup-rndc.service
 %{_sbindir}/named-journalprint
 %{_sbindir}/named-checkconf
 %{_bindir}/named-rrchecker
@@ -477,11 +406,6 @@ fi;
 %doc CHANGES README named.conf.default
 %doc sample/
 	
-# Hide configuration
-%defattr(0640,root,named,0750)
-#%dir %{_sysconfdir}/named
-#%config(noreplace) %verify(not link) %{_sysconfdir}/named.conf
-#%config(noreplace) %verify(not link) %{_sysconfdir}/named.rfc1912.zones
 %defattr(0660,root,named,01770)
 %dir %{_localstatedir}/named
 %defattr(0660,named,named,0770)
@@ -534,7 +458,6 @@ fi;
 
 %files pkcs11
 %{_sbindir}/named-pkcs11
-%{_unitdir}/named-pkcs11.service
 %{_mandir}/man8/named-pkcs11.8*
 %{_libexecdir}/setup-named-softhsm.sh
 	
@@ -575,8 +498,6 @@ fi;
 
 %files chroot
 %config(noreplace) %{_sysconfdir}/named-chroot.files
-%{_unitdir}/named-chroot.service
-%{_unitdir}/named-chroot-setup.service
 %{_libexecdir}/setup-named-chroot.sh
 %defattr(0664,root,named,-)
 %ghost %dev(c,1,3) %verify(not mtime) %{chroot_prefix}/dev/null
