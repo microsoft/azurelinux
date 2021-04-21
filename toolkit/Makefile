@@ -22,6 +22,7 @@ REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
+REBUILD_DEPENDENT_PACKAGES      ?= y
 DOWNLOAD_SRPMS                  ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n

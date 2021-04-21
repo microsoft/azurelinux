@@ -67,25 +67,34 @@ $(graph_file): $(specs_file) $(go-grapher)
 		$(logging_command) \
 		--output $@
 
+graphoptimizer_extra_flags :=
+
 # Remove any packages which don't need to be built, and flag any for rebuild if
 # their dependencies are updated.
 ifneq ($(CONFIG_FILE),)
 # If an optional config file is passed, validate it and any files it includes. The target should always depend
 # on the value of $(CONFIG_FILE) however, so keep $(depend_CONFIG_FILE) always.
 # Actual validation is handled in imggen.mk
+graphotimizer_extra_flags += --base-dir=$(CONFIG_BASE_DIR)
+
 $(optimized_file): $(validate-pkggen-config)
+
 endif
+
+ifeq ($(REBUILD_DEPENDENT_PACKAGES), y)
+graphoptimizer_extra_flags += --rebuild-missing-dep-chains
+endif
+
 $(optimized_file): $(graph_file) $(go-graphoptimizer) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) toolchain $(pkggen_rpms) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-graphoptimizer) \
 		--input $(graph_file) \
 		--rpm-dir $(RPMS_DIR) \
 		--dist-tag $(DIST_TAG) \
-		--rebuild-missing-dep-chains \
 		--packages "$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--ignore-packages="$(PACKAGE_IGNORE_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		$(if $(CONFIG_FILE),--base-dir=$(CONFIG_BASE_DIR)) \
+		$(graphotimizer_extra_flags) \
 		$(logging_command) \
 		--output $@
 
