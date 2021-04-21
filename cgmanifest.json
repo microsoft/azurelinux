@@ -6515,8 +6515,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.32.3",
-          "downloadUrl": "https://www.sqlite.org/2020/sqlite-autoconf-3320300.tar.gz"
+          "version": "3.34.1",
+          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3340100.tar.gz"
         }
       }
     },
