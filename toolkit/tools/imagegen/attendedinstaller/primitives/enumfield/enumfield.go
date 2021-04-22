@@ -126,11 +126,17 @@ func (n *EnumField) Draw(screen tcell.Screen) {
 	}
 
 	// Draw the background
-	var fieldStyle tcell.Style
+	var (
+		fieldStyle tcell.Style
+		textColor  tcell.Color
+	)
+
 	if n.HasFocus() {
 		fieldStyle = tcell.StyleDefault.Background(n.backgroundColorActivated)
+		textColor = n.textColorActivated
 	} else {
 		fieldStyle = tcell.StyleDefault.Background(n.backgroundColor)
+		textColor = n.textColor
 	}
 
 	for index := 0; index < len(n.options[n.selectedOption]); index++ {
@@ -138,12 +144,6 @@ func (n *EnumField) Draw(screen tcell.Screen) {
 	}
 
 	// Draw the text
-	var textColor tcell.Color
-	if n.HasFocus() {
-		textColor = n.textColorActivated
-	} else {
-		textColor = n.textColor
-	}
 	text := n.options[n.selectedOption]
 	tview.Print(screen, tview.Escape(text), x, y, fieldWidth, tview.AlignLeft, textColor)
 }
