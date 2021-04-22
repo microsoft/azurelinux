@@ -4,16 +4,17 @@ Name:           sqlite
 Version:        3.34.1
 Release:        1%{?dist}
 License:        Public Domain
-URL:            https://www.sqlite.org
-Group:          System Environment/GeneralLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/GeneralLibraries
+URL:            https://www.sqlite.org
 Source0:        https://www.sqlite.org/2021/%{name}-autoconf-%{sourcever}.tar.gz
-# CVE-2015-3717 applies to versions shipped in iOS and OS X 
+# CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
-Obsoletes:      sqlite-autoconf
 Requires:       sqlite-libs = %{version}-%{release}
+Obsoletes:      sqlite-autoconf
 Provides:       sqlite3
+
 %description
 This package contains most of the static files that comprise the
 www.sqlite.org website including all of the SQL Syntax and the
@@ -33,6 +34,7 @@ Group:          Libraries
 Provides:       pkgconfig(sqlite3)
 Obsoletes:      libsqlite
 Obsoletes:      sqlite-autoconf
+
 %description libs
 The sqlite3 library.
 
@@ -54,24 +56,20 @@ make
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
 install -D -m644 sqlite3.1 %{buildroot}/%{_mandir}/man1/sqlite3.1
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_infodir}
 %{_fixperms} %{buildroot}/*
 
 %check
 make %{?_smp_mflags} check
 
-%postun devel
-/sbin/ldconfig
-
-%post libs
-/sbin/ldconfig
-
-%postun libs
-/sbin/ldconfig
+%postun devel -p /sbin/ldconfig
+%post libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %clean
 rm -rf %{buildroot}/*
+
 
 %files
 %defattr(-,root,root)
