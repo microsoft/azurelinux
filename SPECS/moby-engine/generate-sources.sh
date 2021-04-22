@@ -5,8 +5,8 @@
 # Git clone is a standard practice of producing source files for moby-* packages.
 
 ENGINE_REPO=https://github.com/moby/moby.git
-ENGINE_COMMIT=77e06fda0c9457c99a210e9648c064b44805fa2d
-VERSION=19.03.11+azure
+ENGINE_COMMIT=420b1d36250f9cfdc561f086f25a213ecb669b6f
+VERSION=19.03.15+azure
 
 # docker-proxy binary comes from libnetwork
 # The proxy code rarely sees any changes

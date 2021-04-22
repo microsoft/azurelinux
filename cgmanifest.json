@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bmake",
+          "version": "20201010",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bmon",
           "version": "4.0",
           "downloadUrl": "https://github.com/tgraf/bmon/archive/v4.0.tar.gz"
@@ -1775,8 +1785,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.1",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.1.tar.gz"
+          "version": "68.2.0.6",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
         }
       }
     },
@@ -3435,8 +3445,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3455,8 +3465,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.15.tar.gz"
         }
       }
     },
