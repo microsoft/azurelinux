@@ -1,15 +1,15 @@
-Summary: NVIDIA container runtime
-Name: nvidia-container-runtime
-Version: 3.4.2
-Release: 1%{?dist}
-License: ASL 2.0
-# runc NOTICE file: https://github.com/opencontainers/runc/blob/master/NOTICE
-URL: https://github.com/NVIDIA/nvidia-container-runtime
-Group: Development Tools
-Vendor: Microsoft Corporation
-Packager: NVIDIA CORPORATION <cudatools@nvidia.com>
+Summary:      NVIDIA container runtime
+Name:         nvidia-container-runtime
+Version:      3.4.2
+Release:      2%{?dist}
+License:      ASL 2.0
+URL:          https://github.com/NVIDIA/nvidia-container-runtime
+Group:        Development Tools
+Vendor:       Microsoft Corporation
+Packager:     NVIDIA CORPORATION <cudatools@nvidia.com>
 Distribution: Mariner
-Source0: nvidia-container-runtime-3.4.2.tar.gz
+#Source0:     https://github.com/NVIDIA/${name}/archive/v%{version}.tar.gz
+Source0:      %{name}-%{version}.tar.gz
 
 BuildRequires: golang
 
