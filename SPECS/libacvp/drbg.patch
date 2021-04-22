@@ -1,0 +1,15 @@
+--- a/app/app_drbg.c	2021-01-27 06:27:36.184980219 -0800
++++ b/app/app_drbg.c	2021-04-21 12:53:51.145612585 -0700
+@@ -306,6 +306,12 @@
+         return result;
+     }
+ 
++    fips_rc = FIPS_drbg_init(drbg_ctx, nid, DRBG_FLAG_TEST);
++    if (!fips_rc) {
++        printf("ERROR: failed to init drbg\n");
++        return result;
++    }
++
+     /*
+      * Set entropy and nonce
+      */
