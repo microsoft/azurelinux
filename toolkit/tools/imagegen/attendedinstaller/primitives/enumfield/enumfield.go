@@ -112,9 +112,9 @@ func (n *EnumField) Draw(screen tcell.Screen) {
 	if (n.labelWidth > 0) && (n.labelWidth < labelWidth) {
 		labelWidth = n.labelWidth
 	}
-
-	_, drawnWidth := tview.Print(screen, n.label, x, y, labelWidth, tview.AlignLeft, n.labelColor)
-	x += drawnWidth
+	tview.Print(screen, n.label, x, y, labelWidth, tview.AlignLeft, n.labelColor)
+	// Always move to the edge to align input fields
+	x += n.labelWidth
 
 	// Don't draw the option part if there are no options
 	if len(n.options) == 0 {

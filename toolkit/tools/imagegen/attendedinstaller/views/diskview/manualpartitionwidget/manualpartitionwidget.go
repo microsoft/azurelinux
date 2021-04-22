@@ -131,13 +131,13 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 		SetButtonsAlign(tview.AlignCenter)
 
 	// Calculate longest label size to align enum input fields
-	diskSizeLabelFull := fmt.Sprintf("%s %s", uitext.DiskSizeLabel, uitext.DiskSizeLabelMaxHelp)
+	diskSizeLabelFull := fmt.Sprintf("%s %s", uitext.FormDiskSizeLabel, uitext.FormDiskSizeLabelMaxHelp)
 	var maxLabelWidth int
 	labels := []string{
-		uitext.DiskFormatLabel,
-		uitext.DiskSizeUnitLabel,
-		uitext.DiskNameLabel,
-		uitext.DiskMountPointLabel,
+		uitext.FormDiskFormatLabel,
+		uitext.FormDiskSizeUnitLabel,
+		uitext.FormDiskNameLabel,
+		uitext.FormDiskMountPointLabel,
 		diskSizeLabelFull,
 	}
 	for _, label := range labels {
@@ -148,13 +148,13 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	}
 
 	mp.formatInput = mp.enumInputBox(validPartitionFormats).
-		SetLabel(uitext.DiskFormatLabel).
+		SetLabel(uitext.FormDiskFormatLabel).
 		SetLabelWidth(maxLabelWidth).
 		SetFieldBackgroundColor(tcell.ColorWhite).
 		SetBackgroundColorActivated(tcell.ColorPurple)
 
 	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
-		SetLabel(uitext.DiskSizeUnitLabel).
+		SetLabel(uitext.FormDiskSizeUnitLabel).
 		SetLabelWidth(maxLabelWidth).
 		SetFieldBackgroundColor(tcell.ColorWhite).
 		SetBackgroundColorActivated(tcell.ColorPurple)
