@@ -2,7 +2,7 @@
 %global security_hardening none
 Summary:        OpenJDK
 Name:           openjdk8
-Version:        1.8.0.282
+Version:        1.8.0.292
 Release:        1%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://openjdk.java.net
@@ -13,7 +13,7 @@ Distribution:   Mariner
 # See generate_source_tarball.sh
 Source0:        openjdk-%{version}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs-282.patch
+Patch1:         check-system-ca-certs-292.patch
 ExclusiveArch:  x86_64
 BuildRequires:  alsa-lib
 BuildRequires:  alsa-lib-devel
@@ -252,8 +252,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.282-1
--   Update to 8u282 to address CVEs
+*   Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
+-   Update to 8u292 to address CVEs
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.212-10
 -   Disable -Werrors that break the build in cflags and cxxflags.
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.212-9
