@@ -218,6 +218,7 @@
                 "rubygem-webhdfs",
                 "rubygem-yajl-ruby",
                 "rubygem-zip-zip",
+                "shim",
                 "shim-unsigned",
                 "shim-unsigned-aarch64",
                 "shim-unsigned-x64",
