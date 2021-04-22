@@ -52,11 +52,8 @@ func CleanupRepo(repoDir string) (err error) {
 	}
 
 	err = os.Remove(repoDataLockPath)
-	if err != nil && !os.IsNotExist(err) {
-		return
-	}
 
-	return nil
+	return
 }
 
 // OrganizePackagesByArch will recursively move RPMs from srcDir into architecture folders under repoDir
