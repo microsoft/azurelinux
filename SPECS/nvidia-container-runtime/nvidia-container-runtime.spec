@@ -38,7 +38,7 @@ install -m 755 nvidia-container-runtime %{buildroot}%{_bindir}/%{name}
 
 %changelog
 * Wed Apr 21 2021 Joseph Knierman <jknierman@microsoft.com> 3.4.2-2
-- Added nvidia-container-toolkit >= 1.4.2 to mariner
+- Initial CBL-Mariner import
 
 * Fri Feb 05 2021 NVIDIA CORPORATION <cudatools@nvidia.com> 3.4.2-1
 - Add dependence on nvidia-container-toolkit >= 1.4.2
