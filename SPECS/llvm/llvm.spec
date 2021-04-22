@@ -37,7 +37,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir -p build
 cd build
 cmake -G Ninja                              \
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}           \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}     \
       -DLLVM_ENABLE_FFI=ON                  \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \

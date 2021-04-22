@@ -73,6 +73,9 @@ The glib2-doc package includes documentation for the GLib library.
 %setup -q
 
 %build
+# Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
+rm glib/pcre/*.[ch]
+
 %meson \
     -Dgtk_doc=true \
     --default-library=both

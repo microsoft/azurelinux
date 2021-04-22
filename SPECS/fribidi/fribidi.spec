@@ -50,12 +50,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/fribidi
 %{_libdir}/libfribidi.so
 %{_libdir}/pkgconfig/*.pc
-#%%{_mandir}/man3/*.gz
 
 %changelog
 * Thu Apr 15 2021 Henry Li <lihl@microsoft.com> - 1.0.9-2
-- Initial import from Fedora 32 (license: MIT)
-- Remove distro check that does not apply to CBL-Mariner
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Remove distro check that does not apply to CBL-Mariner.
+- License verified.
 
 * Thu Mar 05 2020 Akira TAGOH <tagoh@redhat.com> - 1.0.9-1
 - New upstream release.
