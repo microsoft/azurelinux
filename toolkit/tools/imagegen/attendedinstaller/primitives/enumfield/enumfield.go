@@ -107,16 +107,18 @@ func (n *EnumField) Draw(screen tcell.Screen) {
 	}
 
 	// Draw label.
-	if n.labelWidth > 0 {
-		labelWidth := n.labelWidth
-		if labelWidth > rightLimit-x {
-			labelWidth = rightLimit - x
-		}
-		tview.Print(screen, n.label, x, y, labelWidth, tview.AlignLeft, n.labelColor)
-		x += labelWidth
-	} else {
-		_, drawnWidth := tview.Print(screen, n.label, x, y, rightLimit-x, tview.AlignLeft, n.labelColor)
-		x += drawnWidth
+	// Make sure labelWidth is not greater than n.labelWidth
+	labelWidth := rightLimit - x
+	if (n.labelWidth > 0) && (n.labelWidth < labelWidth) {
+		labelWidth = n.labelWidth
+	}
+
+	_, drawnWidth := tview.Print(screen, n.label, x, y, labelWidth, tview.AlignLeft, n.labelColor)
+	x += drawnWidth
+
+	// Don't draw the option part if there are no options
+	if len(n.options) == 0 {
+		return
 	}
 
 	// get as much space as needed or available
