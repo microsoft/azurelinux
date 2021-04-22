@@ -210,7 +210,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/libvtep-2.12.so.0*
 %{_libdir}/libovsdb.so
 %{_libdir}/libovsdb-2.12.so.0*
-%{_libdir}/libsflow.so*
+%{_libdir}/libsflow.so
 %{_libdir}/libsflow-2.12.so.0*
 %{_sysconfdir}/openvswitch/default.conf
 %{_sysconfdir}/bash_completion.d/ovs-*-bashcomp.bash
