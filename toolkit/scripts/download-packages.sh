@@ -17,15 +17,18 @@ function get_packages {
 }
 
 function make_tarball {
-    # First argument is a directory
-    dir_part="$1"
-    # Second argument is a package type
-    type_part="$2"
-    # Both used for naming
-    archive_name="$dir_part"_"$type_part".tar.gz
-    echo "-- Packaging into a tarball - $archive_name..."
-    tar --remove-files -czvf $archive_name *.rpm
-    echo "-- Cleaning up..."
+    archive_name=rpms.tar.gz
+
+    for package_type in $packages_types; do
+        mkdir -p RPMS/$package_type
+        mv *.$package_type.rpm RPMS/$package_type/
+    done
+
+    mkdir -p RPMS/noarch
+    mv *.noarch.rpm RPMS/noarch/
+
+    echo "-- Packaging into a tarball..."
+    tar --remove-files -czvf $archive_name RPMS
 }
 
 function help {
@@ -84,14 +87,12 @@ for directory in $directories; do
 
         # Appendix contains the slash, if needed.
         get_packages "$repository_url"/"$directory"/"$package_type""$appendix"
-        mkdir -p "$package_type""$appendix"
-        mv *.rpm "$package_type""$appendix"/
-
-        if [[ 1 == $tar_packages ]]; then
-            make_tarball $directory $package_type
-        fi
     done
 done
+
+if [[ 1 == $tar_packages ]]; then
+    make_tarball
+fi
 
 echo "Total execution time:"
 after_run=$(date +%s)
