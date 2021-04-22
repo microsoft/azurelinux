@@ -119,7 +119,7 @@ for component in ${components_to_build}; do
 done
 
 # build pause
-pushd build/pause
+pushd build/pause/linux
 gcc -Os -Wall -Werror -static -o %{_builddir}/%{name}/node/bin/pause pause.c
 strip %{_builddir}/%{name}/node/bin/pause
 popd
@@ -271,6 +271,7 @@ fi
 
 * Thu Apr 22 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.20.2-1
 - Update to version  "1.20.2-hotfix.20210310".
+- Adjust "pause" building steps with the new sources layout.
 
 * Thu Apr 22 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.9-1
 - Update to version  "1.19.9-hotfix.20210322".
