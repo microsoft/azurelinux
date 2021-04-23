@@ -6,7 +6,7 @@ License:      ASL 2.0
 URL:          https://github.com/NVIDIA/nvidia-container-runtime
 Vendor:       Microsoft Corporation
 Distribution: Mariner
-#Source0:     https://github.com/NVIDIA/%{name}/archive/v%{version}.tar.gz
+#Source0:     https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:      %{name}-%{version}.tar.gz
 
 BuildRequires: golang
