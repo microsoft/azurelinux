@@ -9,25 +9,21 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.17.13
-Release:        6%{?dist}
+Version:        1.20.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
 Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210310.tar.gz
 Source1:        kubelet.service
-Source2:        golang-1.15-k8s-1.17-test.patch
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
-# CVE-2020-8563 Only applies when using VSphere as cloud provider,
-#               Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
-Patch1:         CVE-2020-8563.nopatch
 BuildRequires:  flex-devel
-BuildRequires:  golang >= 1.13.15
+BuildRequires:  golang >= 1.15.5
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -123,7 +119,7 @@ for component in ${components_to_build}; do
 done
 
 # build pause
-pushd build/pause
+pushd build/pause/linux
 gcc -Os -Wall -Werror -static -o %{_builddir}/%{name}/node/bin/pause pause.c
 strip %{_builddir}/%{name}/node/bin/pause
 popd
@@ -270,21 +266,33 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.17.13-6
-- Update to version  "1.17.13-hotfix.20210310".
+* Thu Apr 22 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.20.2-1
+- Update to version  "1.20.2-hotfix.20210310".
+- Adjust "pause" building steps with the new sources layout.
 
-* Tue Jan 19 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-5
-- Update to version 1.17.13-hotfix.20210118
+* Thu Apr 22 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.9-1
+- Update to version  "1.19.9-hotfix.20210322".
 
-* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-4
+* Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.7-1
+- Update to version  "1.19.7-hotfix.20210310".
+
+* Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.6-2
+- Update to version  "1.19.6-hotfix.20210310".
+
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.6-1
+- Move to version 1.19.6
+
+* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-5
 - Packages for container images
 
-* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-3
-- Fix test issue when building against golang 1.15
+* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-4
 - CVE-2020-8563
 
-* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-2
-- CVE-2020-8565
+* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-3
+- CVE-2020-8564, CVE-2020-8565, CVE-2020-8566
 
-* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.13-1
-- Original version for CBL-Mariner of K8s 1.17.13.
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-2
+- Rename spec file
+
+* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
+- Original version for CBL-Mariner of K8s 1.19.1.

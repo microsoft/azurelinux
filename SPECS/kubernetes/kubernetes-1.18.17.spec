@@ -9,18 +9,18 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.17.16
-Release:        2%{?dist}
+Version:        1.18.17
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210322/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210310.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210322.tar.gz
 Source1:        kubelet.service
-Source2:        golang-1.15-k8s-1.17-test.patch
+Source2:        golang-1.15-k8s-1.18-test.patch
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
 # CVE-2020-8563 Only applies when using VSphere as cloud provider,
@@ -270,54 +270,66 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.17.16-2
-- Update to version  "1.17.16-hotfix.20210310".
+* Thu Apr 22 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.17-1
+- Update to version  "1.18.17-hotfix.20210322".
 
-* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.16-1
-- Move to version 1.17.16
+* Mon Mar 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-3
+- Update to version  "1.18.14-hotfix.20210322".
 
-* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-7
+* Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-2
+- Update to version  "1.18.14-hotfix.20210310".
+
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.14-1
+- Move to version 1.18.14
+
+* Fri Jan 15 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-8
 - Packages for container images
 
-* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-6
+* Tue Jan 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-7
 - Fix test issue when building against golang 1.15
 - CVE-2020-8563
 
-* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-5
+* Mon Jan 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-6
 - CVE-2020-8564, CVE-2020-8565, CVE-2020-8566
 
-* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-4
+* Thu Dec 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-5
 - Rename spec file
 
-* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.17.11-3
-- Rename ms-kubernetes-1.17.11 into kubernetes and lint spec
+* Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-4
+- Rename ms-kubernetes-1.81.8 into kubernetes and lint spec
 
-* Wed Nov 18 2020 George Mileka <gmileka@microsoft.com> 1.17.11-2
+* Wed Nov 18 2020 George Mileka <gmileka@microsoft.com> 1.18.8-3
 - Added license file and macro.
 
-* Fri Oct 2 2020 George Mileka <gmileka@microsoft.com 1.17.11-1
-- Moved k8s to 1.17.11.
+* Thu Oct 29 2020 Anirudh Gopal <angop@microsoft.com> 1.18.8-2
+- Update k8s to v1.18.8-hotfix.20200917 release
 
-* Mon Aug 17 2020 Jiri Appl <jiria@microsoft.com> 1.17.7-4
+* Fri Oct 2 2020 George Mileka <gmileka@microsoft.com> 1.18.8-1
+- Moved k8s to 1.18.8.
+
+* Mon Aug 17 2020 Jiri Appl <jiria@microsoft.com> 1.18.6-4
 - Clean up the spec.
 
-* Thu Aug 6 2020 George Mileka <gmileka@microsoft.com> 1.17.7-3
+* Thu Aug 6 2020 George Mileka <gmileka@microsoft.com> 1.18.6-3
 - Create /etc/kubernetes/manifests.
 
-* Wed Jul 30 2020 Jiri Appl <jiria@microsoft.com> 1.17.7-2
+* Wed Jul 30 2020 Jiri Appl <jiria@microsoft.com> 1.18.6-2
 - Removed container images.
 
-* Fri Jul 24 2020 George Mileka <gmileka@microsoft.com> 1.17.7
-- Moved to 1.17.7.
+* Fri Jul 24 2020 George Mileka <gmileka@microsoft.com> 1.18.6
+- Moved to 1.18.6.
 
-* Tue Jun 30 2020 George Mileka <gmileka@microsoft.com> 1.17.3-2
-- Adding the 1.16 kubeproxy and coredns for downgrade scenarios.
+* Tue Jun 30 2020 George Mileka <gmileka@microsoft.com> 1.18.2
+- Adding the 1.16 knd 1.17 ubeproxy and coredns for downgrade scenarios.
 
-* Thu Jun 03 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.17.3-2
+* Fri Jun 05 2020 George Mileka <gmileka@microsoft.com> 1.18.2
+- Switched to K8s 1.18.2.
+
+* Thu Jun 04 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.0-2
 - Renaming iproute2 to iproute.
 
-* Fri May 29 2020 George Mileka <gmileka@microsoft.com> 1.17.3.
+* Fri May 29 2020 George Mileka <gmileka@microsoft.com> 1.18.0
 - Switched to ecpacr.
 
-* Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.17.3-hotfix.20200408
-- Original version for CBL-Mariner of K8s 1.17.3-hotfix.20200408.
+* Tue Apr 14 2020 George Mileka <gmileka@microsoft.com> 1.18.0
+- Original version for CBL-Mariner of K8s 1.18.0.
