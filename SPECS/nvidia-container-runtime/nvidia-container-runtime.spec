@@ -22,15 +22,15 @@ containers.
 cd src/
 make build
 mkdir -p %{buildroot}%{_bindir}
-cp nvidia-container-runtime %{buildroot}%{_bindir}
+cp %{name} %{buildroot}%{_bindir}
 
 %install
 cd src
-install -m 755 nvidia-container-runtime %{buildroot}%{_bindir}/%{name}
+install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 
 %files
 %license LICENSE
-%{_bindir}/nvidia-container-runtime
+%{_bindir}/%{name}
 
 %changelog
 * Wed Apr 21 2021 Joseph Knierman <jknierman@microsoft.com> - 3.4.2-2
