@@ -9,7 +9,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        5.10.28.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -139,6 +139,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
+- Bump release number to match kernel release
+
 * Mon Apr 19 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-3
 - Define a new kernel subpackage
 
