@@ -16,7 +16,7 @@ Group:          Development/Tools
 URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u-shenandoah/
 Source0:        %{_url_src}/archive/%{_repo_ver}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs-282.patch
+Patch1:         check-system-ca-certs-292.patch
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
