@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://pango.org
 Source0:        https://download.gnome.org/sources/pango/1.44/%{name}-%{version}.tar.xz
-BuildRequires:  cairo
 BuildRequires:  cairo-devel
 BuildRequires:  fontconfig
 BuildRequires:  fontconfig-devel

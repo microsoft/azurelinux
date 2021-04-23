@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://harfbuzz.org
 Source0:        https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
-BuildRequires:  freetype
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
 Requires:       glib

@@ -88,8 +88,8 @@ rm glib/pcre/*.[ch]
 mv %{buildroot}%{_bindir}/gio-querymodules %{buildroot}%{_bindir}/gio-querymodules-%{__isa_bits}
 
 # Manually create this directory. The build procedure of glib requires setting -Dfam=true to 
-produce this directory, but this config will introduce new BR that introduces build cycles that 
-can't be resolved. Since the 'fam' feature is not needed currently, we will not enable it.
+# produce this directory, but this config will introduce new BR that introduces build cycles that 
+# can't be resolved. Since the 'fam' feature is not needed currently, we will not enable it.
 mkdir -p %{buildroot}%{_libdir}/gio/modules
 touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
