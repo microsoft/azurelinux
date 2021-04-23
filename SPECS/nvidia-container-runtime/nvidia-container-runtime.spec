@@ -1,24 +1,22 @@
-Summary:      NVIDIA container runtime
-Name:         nvidia-container-runtime
-Version:      3.4.2
-Release:      2%{?dist}
-License:      ASL 2.0
-URL:          https://github.com/NVIDIA/nvidia-container-runtime
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-#Source0:     https://github.com/NVIDIA/%{name}/archive/v%{version}.tar.gz
-Source0:      %{name}-%{version}.tar.gz
-
-BuildRequires: golang
-
-Requires: libseccomp
+Summary:        NVIDIA container runtime
+Name:           nvidia-container-runtime
+Version:        3.4.2
+Release:        2%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/NVIDIA/nvidia-container-runtime
+#Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+BuildRequires:  golang
+Requires:       libseccomp
 
 %description
 Provides a modified version of runc allowing users to run GPU enabled
 containers.
 
 %prep
-%setup
+%setup -q
 
 %build
 cd src/
@@ -35,7 +33,7 @@ install -m 755 nvidia-container-runtime %{buildroot}%{_bindir}/%{name}
 %{_bindir}/nvidia-container-runtime
 
 %changelog
-* Wed Apr 21 2021 Joseph Knierman <jknierman@microsoft.com> 3.4.2-2
+* Wed Apr 21 2021 Joseph Knierman <jknierman@microsoft.com> - 3.4.2-2
 - License verified
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
 
