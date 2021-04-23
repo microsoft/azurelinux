@@ -4,9 +4,7 @@ Version:      3.4.2
 Release:      2%{?dist}
 License:      ASL 2.0
 URL:          https://github.com/NVIDIA/nvidia-container-runtime
-Group:        Development Tools
 Vendor:       Microsoft Corporation
-Packager:     NVIDIA CORPORATION <cudatools@nvidia.com>
 Distribution: Mariner
 #Source0:     https://github.com/NVIDIA/${name}/archive/v%{version}.tar.gz
 Source0:      %{name}-%{version}.tar.gz
@@ -38,7 +36,8 @@ install -m 755 nvidia-container-runtime %{buildroot}%{_bindir}/%{name}
 
 %changelog
 * Wed Apr 21 2021 Joseph Knierman <jknierman@microsoft.com> 3.4.2-2
-- Initial CBL-Mariner import
+- License verified
+- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
 
 * Fri Feb 05 2021 NVIDIA CORPORATION <cudatools@nvidia.com> 3.4.2-1
 - Add dependence on nvidia-container-toolkit >= 1.4.2
