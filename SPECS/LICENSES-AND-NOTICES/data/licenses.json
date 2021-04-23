@@ -772,6 +772,13 @@
             ]
         },
         {
+            "origin": "Nvidia",
+            "license": "[Nvidia ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "specs": [
+                "libnvidia-container"
+            ]
+        },
+        {
             "origin": "Magnus Edenhill Open Source",
             "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
             "specs": [
