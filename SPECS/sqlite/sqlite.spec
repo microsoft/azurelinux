@@ -12,7 +12,6 @@ Source0:        https://www.sqlite.org/2021/%{name}-autoconf-%{sourcever}.tar.gz
 # CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
 Requires:       sqlite-libs = %{version}-%{release}
-Obsoletes:      sqlite-autoconf
 Provides:       sqlite3
 
 %description
@@ -32,8 +31,6 @@ header files for development.
 Summary:        sqlite3 library
 Group:          Libraries
 Provides:       pkgconfig(sqlite3)
-Obsoletes:      libsqlite
-Obsoletes:      sqlite-autoconf
 
 %description libs
 The sqlite3 library.
@@ -91,6 +88,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227
+- Remove Obsoletes tags
 
 * Thu Oct 22 2020 Ruying Chen <v-ruyche@microsoft.com> - 3.32.3-2
 - Nopatch CVE-2015-3717. Applies to versions shipped in iOS and OS X.
