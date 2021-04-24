@@ -2,7 +2,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned
 Version:        15.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,7 +11,11 @@ URL:            https://github.com/rhboot/shim
 BuildRequires:  shim-unsigned-x64
 %endif
 %ifarch aarch64
-BuildRequires:  shim-unsigned-aarch64
+# Force using shim-15 release for aarch64 builds.
+# There is a regression in shim-15.4 aarch64 builds where, if built with
+# binutils pre-2.35, the binary will fail to boot with "Synchronous Exception"
+# error.
+BuildRequires:  shim-unsigned-aarch64 = 15
 %endif
 
 %description
@@ -39,6 +43,9 @@ install -D -m 0744 %{_datadir}/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/b
 %endif
 
 %changelog
+* Fri Apr 23 2021 Chris Co <chrco@microsoft.com> - 15.4-2
+- Enforce using aarch64 shim-15
+
 * Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Update to 15.4
 
