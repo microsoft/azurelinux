@@ -8,6 +8,13 @@ import (
 	"microsoft.com/pkggen/internal/shell"
 )
 
+// Constants for start/stop speakup functions
+const (
+	squashError      = false
+	systemctlProgram = "systemctl"
+	espeakupService  = "espeakup.service"
+)
+
 // CreateVirtualKeyboard creates and returns a virtual keyboard from the uinput package
 func CreateVirtualKeyboard() (keyboard uinput.Keyboard, err error) {
 	keyboard, err = uinput.CreateKeyboard("/dev/uinput", []byte("MarinerVirtualKeyboard"))
@@ -39,16 +46,20 @@ func ClearSpeakupBuffer(k uinput.Keyboard) (err error) {
 
 // StopSpeakup stops the espeakup connector daemon using systemctl
 func StopSpeakup() (err error) {
-	const (
-		squashError      = "false"
-		systemctlProgram = "systemctl"
-		espeakupService  = "espeakup.service"
-	)
-
-	err = shell.ExecuteLive(false, systemctlProgram, []string{"disable", espeakupService}...)
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"disable", espeakupService}...)
 	if err != nil {
 		return
 	}
-	err = shell.ExecuteLive(false, systemctlProgram, []string{"stop", espeakupService}...)
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"stop", espeakupService}...)
+	return
+}
+
+// StartSpeakup stops the espeakup connector daemon using systemctl
+func StartSpeakup() (err error) {
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"enable", espeakupService}...)
+	if err != nil {
+		return
+	}
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"start", espeakupService}...)
 	return
 }
