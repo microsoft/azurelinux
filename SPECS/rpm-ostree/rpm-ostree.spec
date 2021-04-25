@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2019.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -161,6 +161,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-8
+- Bump release to rebuild with rust 1.47.0-2 (security update)
+
 * Tue Dec 08 2020 Pawel Wingrodzki <pawelwi@microsoft.com> - 2019.3-7
 - Fixing 'lib-introspection' test.
 - Skipping 'ucontainer' test.
