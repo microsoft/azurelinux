@@ -78,7 +78,7 @@ Obsoletes:      openjdk-src <= %{version}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -n aarch64-shenandoah-%{_repo_ver}
+%setup -n openjdk-aarch64-jdk8u-aarch64-shenandoah-%{_repo_ver}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c

@@ -1,5 +1,7 @@
 %define _use_internal_dependency_generator 0
 %global security_hardening none
+%define _jdk_update 292
+%define _jdk_build 10
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.292
@@ -68,7 +70,7 @@ Requires:       %{name} = %{version}-%{release}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-%{version}
+%setup -qn openjdk-jdk8u-jdk8u%{_jdk_update}-b%{_jdk_version}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
