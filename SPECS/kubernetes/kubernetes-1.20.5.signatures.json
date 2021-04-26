@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "kubelet.service": "22ea9e0b85aa9db9e1accfb6c21843683425fc1af9c0a2669523e42a455dc57e",
+  "kubernetes-node-linux-amd64-1.20.5-hotfix.20210322.tar.gz": "941ba0db5ab2c62bb42191de73cc005cc6f654525bf75438b86c87b7fb9a3ad2"
+ }
+}

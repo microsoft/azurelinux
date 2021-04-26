@@ -90,7 +90,6 @@
                 "clamav",
                 "cloud-hypervisor",
                 "cloud-init-vmware-guestinfo",
-                "coredns-1.6.5",
                 "coredns-1.6.7",
                 "coredns-1.7.0",
                 "distroless-packages",
@@ -107,12 +106,12 @@
                 "installkernel",
                 "ivykis",
                 "jsonbuilder",
-                "kubernetes-1.17.13",
-                "kubernetes-1.17.16",
-                "kubernetes-1.18.10",
                 "kubernetes-1.18.14",
+                "kubernetes-1.18.17",
                 "kubernetes-1.19.7",
-                "kubernetes-1.19.6",
+                "kubernetes-1.19.9",
+                "kubernetes-1.20.2",
+                "kubernetes-1.20.5",
                 "libacvp",
                 "libconfini",
                 "libconfuse",
@@ -773,9 +772,10 @@
         },
         {
             "origin": "Nvidia",
-            "license": "[2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "libnvidia-container"
+                "libnvidia-container",
+                "nvidia-container-runtime"
             ]
         },
         {

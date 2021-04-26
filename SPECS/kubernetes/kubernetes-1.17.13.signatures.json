@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "golang-1.15-k8s-1.17-test.patch": "4607a1675331e309f651737cd10114e2a610dcd0250ec06a46e4de7feb000161",
-  "kubelet.service": "22ea9e0b85aa9db9e1accfb6c21843683425fc1af9c0a2669523e42a455dc57e",
-  "kubernetes-node-linux-amd64-1.17.13-hotfix.20210310.tar.gz": "d4956906392c59dc72554352bc99c671eac6fef6c529766fad52e656f52d3354"
- }
-}
