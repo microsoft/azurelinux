@@ -51,17 +51,20 @@ def get_missing_specs(spec_directories, license_collection):
     return specs_not_in_json, specs_not_in_dir
 
 
-def main(input_filename, output_filename, spec_directories):
+def main(input_filename, output_filename, spec_directories, only_update):
     with open(input_filename, 'r') as input_file:
         license_collection = deserialize_json(input_file)
-
-    specs_not_in_json, specs_not_in_dir = get_missing_specs(spec_directories, license_collection)
 
     with open(output_filename, 'r') as output_file:
         old_content = output_file.read()
     new_content = generate_markdown(license_collection)
     with open(output_filename, 'w') as output_file:
         output_file.write(new_content)
+
+    if only_update:
+        return
+
+    specs_not_in_json, specs_not_in_dir = get_missing_specs(spec_directories, license_collection)
 
     if len(specs_not_in_json) or len(specs_not_in_dir) or old_content != new_content:
         if len(specs_not_in_json):
@@ -83,8 +86,9 @@ def main(input_filename, output_filename, spec_directories):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes spec license data, find missing entries, and regenerate license map file.')
-    parser.add_argument('input_filename', type=Path, help='Path to data file with license data')
-    parser.add_argument('output_filename', type=Path, help='Path to license map markdown file')
-    parser.add_argument('spec_directories', type=Path, nargs='+', help='Directories containing specs')
+    parser.add_argument('input_filename', type=Path, help='Path to data file with license data.')
+    parser.add_argument('output_filename', type=Path, help='Path to license map markdown file.')
+    parser.add_argument('spec_directories', type=Path, nargs='+', help='Directories containing specs.')
+    parser.add_argument('--only_update', help='Does not perform a check, only updates the markdown file according to the input JSON.', action='store_true')
     p = parser.parse_args()
-    main(p.input_filename, p.output_filename, p.spec_directories)
+    main(p.input_filename, p.output_filename, p.spec_directories, p.only_update)
