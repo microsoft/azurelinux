@@ -1235,6 +1235,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fribidi",
+          "version": "1.0.9",
+          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.9/fribidi-1.0.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -1336,8 +1346,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.58.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.58/glib-2.58.0.tar.xz"
+          "version": "2.60.1",
+          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.60/glib-2.60.1.tar.xz"
         }
       }
     },
@@ -1596,8 +1606,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "1.9.0",
-          "downloadUrl": "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.9.0.tar.bz2"
+          "version": "2.6.4",
+          "downloadUrl": "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-2.6.4.tar.xz"
         }
       }
     },
@@ -3746,8 +3756,8 @@
         "type": "other",
         "other": {
           "name": "pango",
-          "version": "1.40.4",
-          "downloadUrl": "https://download.gnome.org/sources/pango/1.40/pango-1.40.4.tar.xz"
+          "version": "1.44.7",
+          "downloadUrl": "https://download.gnome.org/sources/pango/1.44/pango-1.44.7.tar.xz"
         }
       }
     },
