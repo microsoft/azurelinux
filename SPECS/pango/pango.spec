@@ -57,11 +57,7 @@ make %{?_smp_mflags} -k check || exit 0
 %{_bindir}/*
 %{_libdir}/*.so*
 %{_datadir}/*
-%{_libdir}/girepository-1.0/Pango-1.0.typelib
-%{_libdir}/girepository-1.0/PangoCairo-1.0.typelib
-%{_libdir}/girepository-1.0/PangoFc-1.0.typelib
-%{_libdir}/girepository-1.0/PangoFT2-1.0.typelib
-%{_libdir}/girepository-1.0/PangoOT-1.0.typelib
+%{_libdir}/girepository-1.0/*
 
 %files devel
 %defattr(-,root,root)
