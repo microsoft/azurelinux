@@ -1,7 +1,7 @@
 Summary:        A Rust-VMM based cloud hypervisor from Intel
 Name:           cloud-hypervisor
 Version:        0.6.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 or BSD
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Group:          Development/Tools
