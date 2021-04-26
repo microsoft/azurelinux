@@ -1,27 +1,25 @@
 %define modprobe_version 450.57
 %define _major 1
-
-Summary:      NVIDIA container runtime library
-Name:         libnvidia-container
-Version:      1.3.3
-License:      BSD-3-Clause AND Apache-2.0 AND GPL-3.0-or-later AND LGPL-3.0-or-later AND MIT AND GPL-2.0-only
-URL:          https://github.com/NVIDIA/libnvidia-container
-Release:      2%{?dist}
-Vendor:       Microsoft Corporation
-Distribution: Mariner
+Summary:        NVIDIA container runtime library
+Name:           libnvidia-container
+Version:        1.3.3
+Release:        2%{?dist}
+License:        BSD-3-Clause AND Apache-2.0 AND GPL-3.0-or-later AND LGPL-3.0-or-later AND MIT AND GPL-2.0-only
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/NVIDIA/libnvidia-container
 #Source0:     https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
-Source0:      %{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 #Source1:     https://github.com/NVIDIA/nvidia-modprobe/archive/%%{modprobe_version}.tar.gz
-Source1:      nvidia-modprobe-%{modprobe_version}.tar.gz
-Patch0:       common.mk.patch
-Patch1:       libtirpc.patch
-Patch2:       nvidia-modprobe.patch
-
-BuildRequires: make
-BuildRequires: which
-BuildRequires: rpcsvc-proto
-BuildRequires: libseccomp-devel
-BuildRequires: libtirpc-devel
+Source1:        nvidia-modprobe-%{modprobe_version}.tar.gz
+Patch0:         common.mk.patch
+Patch1:         libtirpc.patch
+Patch2:         nvidia-modprobe.patch
+BuildRequires:  libseccomp-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  make
+BuildRequires:  rpcsvc-proto
+BuildRequires:  which
 
 %description
 The nvidia-container library provides an interface to configure GNU/Linux
@@ -29,7 +27,7 @@ containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 %prep
-%setup
+%setup -q
 %patch0 -p1
 %patch1 -p1
 
@@ -43,31 +41,36 @@ touch deps/src/nvidia-modprobe-%{modprobe_version}/.download_stamp
 %make_build WITH_LIBELF=yes
 
 %install
-DESTDIR=%{buildroot} %{__make} install prefix=%{_prefix} exec_prefix=%{_exec_prefix} bindir=%{_bindir} libdir=%{_libdir} includedir=%{_includedir} docdir=%{_licensedir} WITH_LIBELF=yes
+DESTDIR=%{buildroot} make install prefix=%{_prefix} exec_prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} includedir=%{_includedir} docdir=%{_licensedir} WITH_LIBELF=yes
 
 %package -n %{name}%{_major}
-Summary: NVIDIA container runtime library
+Summary:        NVIDIA container runtime library
+
 %description -n %{name}%{_major}
 The nvidia-container library provides an interface to configure GNU/Linux
 containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package requires the NVIDIA driver (>= 340.29) to be installed separately.
+
 %post -n %{name}%{_major} -p /sbin/ldconfig
 %postun -n %{name}%{_major} -p /sbin/ldconfig
+
 %files -n %{name}%{_major}
 %license %{_licensedir}/*
 %{_libdir}/lib*.so.*
 
 %package devel
-Requires: %{name}%{_major}%{?_isa} = %{version}-%{release}
-Summary: NVIDIA container runtime library (development files)
+Summary:        NVIDIA container runtime library (development files)
+Requires:       %{name}%{_major}%{?_isa} = %{version}-%{release}
+
 %description devel
 The nvidia-container library provides an interface to configure GNU/Linux
 containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains the files required to compile programs with the library.
+
 %files devel
 %license %{_licensedir}/*
 %{_includedir}/*.h
@@ -75,47 +78,54 @@ This package contains the files required to compile programs with the library.
 %{_libdir}/pkgconfig/*.pc
 
 %package static
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
-Summary: NVIDIA container runtime library (static library)
+Summary:        NVIDIA container runtime library (static library)
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+
 %description static
 The nvidia-container library provides an interface to configure GNU/Linux
 containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package requires the NVIDIA driver (>= 340.29) to be installed separately.
+
 %files static
 %license %{_licensedir}/*
 %{_libdir}/lib*.a
 
 %define debug_package %{nil}
+
 %package -n %{name}%{_major}-debuginfo
-Requires: %{name}%{_major}%{?_isa} = %{version}-%{release}
-Summary: NVIDIA container runtime library (debugging symbols)
+Summary:        NVIDIA container runtime library (debugging symbols)
+Requires:       %{name}%{_major}%{?_isa} = %{version}-%{release}
+
 %description -n %{name}%{_major}-debuginfo
 The nvidia-container library provides an interface to configure GNU/Linux
 containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains the debugging symbols for the library.
+
 %files -n %{name}%{_major}-debuginfo
 %license %{_licensedir}/*
-%{_prefix}/lib/debug%{_libdir}/lib*.so.*
+%{_lib}/debug%{_libdir}/lib*.so.*
 
 %package tools
-Requires: %{name}%{_major}%{?_isa} >= %{version}-%{release}
-Summary: NVIDIA container runtime library (command-line tools)
+Summary:        NVIDIA container runtime library (command-line tools)
+Requires:       %{name}%{_major}%{?_isa} >= %{version}-%{release}
+
 %description tools
 The nvidia-container library provides an interface to configure GNU/Linux
 containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains command-line tools that facilitate using the library.
+
 %files tools
 %license %{_licensedir}/*
 %{_bindir}/*
 
 %changelog
-* Fri Apr 23 2021 joseph knierman <joknierm@microsoft.com> 1.3.3-2
+* Fri Apr 23 2021 joseph knierman <joknierm@microsoft.com> - 1.3.3-2
 - License verified
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
 
@@ -261,4 +271,3 @@ This package contains command-line tools that facilitate using the library.
 
 * Tue Sep 05 2017 NVIDIA CORPORATION <cudatools@nvidia.com> 1.0.0-0.1.alpha.1
 - Initial release
-
