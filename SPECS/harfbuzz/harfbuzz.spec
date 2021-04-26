@@ -58,6 +58,7 @@ make %{?_smp_mflags} -k check
 %changelog
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.6.4-1
 - Upgrade to version 2.6.4
+- Remove freetype from build requirement
 
 * Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9.0-4
 - Added %%license line automatically

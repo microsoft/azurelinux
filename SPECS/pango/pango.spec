@@ -75,6 +75,7 @@ make %{?_smp_mflags} -k check || exit 0
 - Switch to meson build and install
 - Add meson and pkgconfig(fribidi) as build requirement
 - Fix file section for pango
+- Remove cairo from build requirement
 
 * Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.40.4-4
 - Added %%license line automatically
