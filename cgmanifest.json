@@ -3804,6 +3804,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nvidia-container-runtime",
+          "version": "3.4.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nvme-cli",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.8.1.tar.gz"
