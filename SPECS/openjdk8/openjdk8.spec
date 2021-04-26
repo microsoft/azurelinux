@@ -70,7 +70,7 @@ Requires:       %{name} = %{version}-%{release}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-jdk8u-jdk8u%{_jdk_update}-b%{_jdk_version}
+%setup -qn openjdk-jdk8u-jdk8u%{_jdk_update}-b%{_jdk_build}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
