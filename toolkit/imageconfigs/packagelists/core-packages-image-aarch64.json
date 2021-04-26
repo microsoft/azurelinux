@@ -1,6 +1,6 @@
 {
     "packages": [
-        "shim",
+        "shim-unsigned",
         "grub2-efi-binary",
         "ca-certificates",
         "core-packages-base-image",
