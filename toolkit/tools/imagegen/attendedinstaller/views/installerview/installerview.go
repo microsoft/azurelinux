@@ -147,6 +147,11 @@ func (iv *InstallerView) Primitive() tview.Primitive {
 
 // OnShow gets called when the view is shown to the user
 func (iv *InstallerView) OnShow() {
+	err := speakuputils.StartSpeakup()
+	if err != nil {
+		logger.Log.Warnf("Failed to start speakup, continuing")
+		err = nil
+	}
 }
 
 func (iv *InstallerView) onNextButton(nextPage func()) {
