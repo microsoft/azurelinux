@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "config": "8bee0b32b330cb87653f25b8b88ebc817ddeed9f950d4220be9e72ebb60a5c9c",
-  "config_aarch64": "4bc0a7d39e49ad18c68cddff33316d910edc726f0c5cb4b3bf5a6e92ec394d8a",
+  "config": "37dacc87cdac3d733618dea2733d5e4d98caed2bcf9c0cdc30c46691ccd695ef",
+  "config_aarch64": "cd6fd817674f65a2c12ef6069835762fa0f41d8bff1d05655604dcbd25e03f14",
   "kernel-5.10.28.1.tar.gz": "51118e54227410d15c20246e4905d897a8b6b3ebe1326ebe44e1080d0d17c27d",
   "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
  }

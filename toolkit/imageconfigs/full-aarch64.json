@@ -1,0 +1,26 @@
+{
+    "SystemConfigs": [
+        {
+            "Name": "CBL-Mariner Full",
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/developer-packages.json",
+                "packagelists/virtualization-host-packages.json",
+                "packagelists/core-packages-image-aarch64.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            }
+        },
+        {
+            "Name": "CBL-Mariner Core",
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/core-packages-image-aarch64.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            }
+        }
+    ]
+}
