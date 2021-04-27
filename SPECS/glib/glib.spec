@@ -132,7 +132,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-2
+* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-2
 - Remove CVE-2019-13012 patch (already in the this version)
 - Merge the following releases from 1.0 to dev branch
 - nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.

@@ -272,7 +272,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
+* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
 - thcrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619
