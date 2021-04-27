@@ -27,6 +27,7 @@ Requires:       openssl
 Requires:       python3-libs = %{version}-%{release}
 Requires:       readline
 Requires:       xz
+Provides:       python
 Provides:       python-sqlite
 Provides:       python(abi)
 Provides:       %{_bindir}/python
@@ -279,6 +280,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 - nisamson@microsoft.com, 3.7.9-4: Patched CVE-2021-3177 with backported patch. Moved to autosetup.
 - thcrain@microsoft.com, 3.7.10-1: Update to 3.7.10, the latest security release for 3.7, to fix CVE-2021-23336
 -   Remove backported patches for CVE-2020-27619, CVE-2021-3177
+
+* Tue Apr 20 2021 Henry Li <lihl@microsoft.com> - 3.7.7-11
+- Provides python from python3
 
 * Tue Mar 09 2021 Henry Li <lihl@microsoft.com> - 3.7.7-10
 - Remove 2to3 binaries from python3-devel
