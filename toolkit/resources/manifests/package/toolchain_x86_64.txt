@@ -366,7 +366,6 @@ python3-libxml2-2.9.10-4.cm1.x86_64.rpm
 python3-pwquality-1.4.2-6.cm1.x86_64.rpm
 python-curses-2.7.18-7.cm1.x86_64.rpm
 python3-rpm-4.14.2-11.cm1.x86_64.rpm
-python-curses-2.7.18-7.cm1.x86_64.rpm
 python-gpg-1.13.1-6.cm1.x86_64.rpm
 python-rpm-4.14.2-11.cm1.x86_64.rpm
 python-setuptools-40.2.0-6.cm1.noarch.rpm
