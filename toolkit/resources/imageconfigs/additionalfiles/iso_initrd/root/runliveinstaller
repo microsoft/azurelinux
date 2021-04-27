@@ -28,21 +28,27 @@ else
     done
 fi
 
-# FIXME(thcrain-msft)
-# This is a loop of silence to keep the default audio device alive
-# This is a temporary workaround that is needed for VirtualBox,
-# which is currently the most convenient platform to test on which
-# has sound driver support. It creates a bit of hiss.
-speaker-test -l0 -t wav -w ../../../../root/silence.wav -r 22050 >/dev/null 2>&1 &
 
-# Set better defaults for speakup punctuation level/speed
-echo 2 > /sys/accessibility/speakup/punc_level
-echo 2 > /sys/accessibility/speakup/reading_punc
-echo 2 > /sys/accessibility/speakup/soft/rate
+# Restrict speakup use to attended installs
+if [[ -f "$CONFIG_ROOT/unattended_config.json" ]]; then
+    # FIXME(thcrain-msft)
+    # This is a loop of silence to keep the default audio device alive
+    # This is a temporary workaround that is needed for VirtualBox,
+    # which is currently the most convenient platform to test on which
+    # has sound driver support. It creates a bit of hiss.
+    speaker-test -l0 -t wav -w ../../../../root/silence.wav -r 22050 >/dev/null 2>&1 &
 
-# Ensure the userspace speakup connector is up
-systemctl enable espeakup
-systemctl start espeakup
+    # Set better defaults for speakup punctuation level/speed
+    echo 2 > /sys/accessibility/speakup/punc_level
+    echo 2 > /sys/accessibility/speakup/reading_punc
+    echo 2 > /sys/accessibility/speakup/soft/rate
+
+    # Ensure the userspace speakup connector is up
+    systemctl enable espeakup
+    systemctl start espeakup
+fi
+
+
 
 
 CONFIG_ROOT=$ISO_ROOT/config

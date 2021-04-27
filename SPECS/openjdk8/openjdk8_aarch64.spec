@@ -1,77 +1,84 @@
 %define _use_internal_dependency_generator 0
 %global security_hardening none
-%define _jdk_update 181
-%define _jdk_build 13
-%define _repo_ver aarch64-jdk8u%{_jdk_update}-b%{_jdk_build}
+%define _jdk_update 292
+%define _jdk_build 10
+%define _repo_ver aarch64-shenandoah-jdk8u%{_jdk_update}-b%{_jdk_build}
 %define _url_src https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/
-
+%define bootstrapjdk %{_libdir}/jvm/OpenJDK-1.8.0.181-bootstrap
 Summary:        OpenJDK
 Name:           openjdk8
-Version:        1.8.0.181
-Release:        8%{?dist}
-License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
-URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u/
-Group:          Development/Tools
+Version:        1.8.0.292
+Release:        1%{?dist}
+License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
+URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u-shenandoah/
 Source0:        %{_url_src}/archive/%{_repo_ver}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs.patch
-ExclusiveArch:  aarch64
-BuildRequires:  pcre-devel
-BuildRequires:	which
-BuildRequires:	zip
-BuildRequires:	unzip
-BuildRequires:  zlib-devel
-BuildRequires:	chkconfig
+Patch1:         check-system-ca-certs-292.patch
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
-Requires:       openjre8 = %{version}-%{release}
+BuildRequires:  pcre-devel
+BuildRequires:  unzip
+BuildRequires:  which
+BuildRequires:  zip
+BuildRequires:  zlib-devel
 Requires:       chkconfig
+Requires:       openjre8 = %{version}-%{release}
+AutoReqProv:    no
 Obsoletes:      openjdk <= %{version}
-AutoReqProv: 	no
-%define bootstrapjdk /usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap
+Provides:       java-devel = %{version}-%{release}
+Provides:       java-1.8.0-openjdk = %{version}-%{release}
+Provides:       java-1.8.0-openjdk-headless = %{version}-%{release}
+Provides:       java-1.8.0-openjdk-devel = %{version}-%{release}
+ExclusiveArch:  aarch64
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
 
 %package	-n openjre8
-Summary:	Java runtime environment
-AutoReqProv: 	no
-Obsoletes:      openjre <= %{version}
+Summary:        Java runtime environment
 Requires:       chkconfig
-Requires:	libstdc++
+Requires:       libstdc++
+AutoReqProv:    no
+Obsoletes:      openjre <= %{version}
+Provides:       java = %{version}-%{release}
+Provides:       java-headless = %{version}-%{release}
+
 %description	-n openjre8
 It contains the libraries files for Java runtime environment
 
-
 %package	sample
-Summary:	Sample java applications.
+Summary:        Sample java applications.
 Group:          Development/Languages/Java
-Obsoletes:      openjdk-sample <= %{version}
 Requires:       %{name} = %{version}-%{release}
+Obsoletes:      openjdk-sample <= %{version}
+
 %description	sample
 It contains the Sample java applications.
 
 %package		doc
-Summary:		Documentation and demo applications for openjdk
+Summary:        Documentation and demo applications for openjdk
 Group:          Development/Languages/Java
-Obsoletes:      openjdk-doc <= %{version}
 Requires:       %{name} = %{version}-%{release}
+Obsoletes:      openjdk-doc <= %{version}
+
 %description	doc
 It contains the documentation and demo applications for openjdk
 
 %package 		src
 Summary:        OpenJDK Java classes for developers
 Group:          Development/Languages/Java
-Obsoletes:      openjdk-src <= %{version}
 Requires:       %{name} = %{version}-%{release}
+Obsoletes:      openjdk-src <= %{version}
+
 %description	src
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-aarch64-jdk8u-%{_repo_ver}
+%setup -n openjdk-aarch64-jdk8u-%{_repo_ver}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
@@ -92,8 +99,10 @@ sh configure \
 	--with-cacerts-file=%{bootstrapjdk}/jre/lib/security/cacerts \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
 	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
-	--with-freetype-include=/usr/include/freetype2 \
-	--with-freetype-lib=/usr/lib \
+	--with-freetype-include=%{_includedir}/freetype2 \
+	--with-freetype-lib=%{_libdir} \
+	--with-native-debug-symbols=none \
+	--disable-zip-debug-info \
 	--with-stdc++lib=dynamic
 
 make \
@@ -118,8 +127,8 @@ make DESTDIR=%{buildroot} install \
 install -vdm755 %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 chown -R root:root %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 install -vdm755 %{buildroot}%{_bindir}
-find /usr/local/jvm/openjdk-1.8.0-internal/jre/lib/aarch64 -iname \*.diz -delete
-mv /usr/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
+find %{_prefix}/local/jvm/openjdk-1.8.0-internal/jre/lib/aarch64 -iname \*.diz -delete
+mv %{_prefix}/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
 
 %post
 alternatives --install %{_bindir}/javac javac %{_libdir}/jvm/OpenJDK-%{version}/bin/javac 2000 \
@@ -178,6 +187,8 @@ alternatives --remove java %{_libdir}/jvm/OpenJDK-%{version}/jre/bin/java
 %clean
 rm -rf %{buildroot}/*
 
+
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -187,9 +198,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/THIRD_PARTY_README
 %{_libdir}/jvm/OpenJDK-%{version}/lib
 %{_libdir}/jvm/OpenJDK-%{version}/include/
+%{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/extcheck
+%{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/idlj
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jar
+%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jarsigner
 %{_libdir}/jvm/OpenJDK-%{version}/bin/java-rmi.cgi
 %{_libdir}/jvm/OpenJDK-%{version}/bin/javac
@@ -217,8 +231,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsgen
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsimport
 %{_libdir}/jvm/OpenJDK-%{version}/bin/xjc
+%exclude %{_libdir}/jvm/OpenJDK-%{version}/bin/*.debuginfo
 
-%files	-n openjre8
+%files -n openjre8
 %defattr(-,root,root)
 %dir %{_libdir}/jvm/OpenJDK-%{version}
 %{_libdir}/jvm/OpenJDK-%{version}/jre/
@@ -248,28 +263,59 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.181-8
+* Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
+- Update to 8u292 to address CVEs.
+- Switch to Shenandoah version of the aarch64 port
+
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-12
+- Provide java and java-headless.
+
+* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-11
+- Provide java-1.8.0-openjdk and java-devel.
+
+*   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-10
+-   Provide java-1.8.0-openjdk-devel.
+
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-9
+-   Remove unused buildrequires.
+-   Provide java-1.8.0-openjdk-headless.
+
+*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.0.181-8
 -   Disable -Werrors that break the build in cflags and cxxflags.
-*   Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.0.181-7
+
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.0.181-7
 -   Added %%license line automatically
+
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.181-6
 -   Removing *Requires for "ca-certificates".
+
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.0.181-5
 -   Replace BuildArch with ExclusiveArch
+
 *   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.0.181-4
 -   Rename freetype2-devel to freetype-devel.
+
 *   Thu Apr 16 2020 Paul Monson <paulmon@microsoft.com> 8.0.181-3
 -   Remove harfbuzz-devel.  License verified.
+
 *   Wed Feb 12 2020 Andrew Phelps <anphel@microsoft.com> 8.0.181-2
 -   Remove ExtraBuildRequires
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.0.181-1
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Thu Mar 21 2019 Ajay Kaher <akaher@vmware.com> 1.8.0.181-1
 -   Update to version 1.8.0.181
+
 *   Mon Oct 29 2018 Ajay Kaher <akaher@vmware.com> 1.8.0.151-3
 -   Adding BuildArch
+
 *   Mon Oct 29 2018 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.151-2
 -   Use ExtraBuildRequires
+
 *   Thu Dec 21 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.151-1
 -   Initial version of OpenJDK for aarch64. SPEC file was forked from
     openjdk8-1.8.0.152-1 of x86_64

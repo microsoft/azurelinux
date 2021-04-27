@@ -50,4 +50,3 @@ diff -r 6b81fd2227d1 -r 3334efeacd83 src/share/classes/sun/security/tools/KeySto
          if (!file.exists()) {
              return null;
          }
-

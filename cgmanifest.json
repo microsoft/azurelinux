@@ -945,8 +945,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.84",
-          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.84.tar.xz"
+          "version": "2.85",
+          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.85.tar.xz"
         }
       }
     },
@@ -3555,8 +3555,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.23",
-          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz"
+          "version": "8.0.24",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
         }
       }
     },
@@ -3874,9 +3874,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openjdk8",
-          "version": "1.8.0.181",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u//archive/aarch64-jdk8u181-b13.tar.gz"
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
