@@ -198,7 +198,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/THIRD_PARTY_README
 %{_libdir}/jvm/OpenJDK-%{version}/lib
 %{_libdir}/jvm/OpenJDK-%{version}/include/
+%{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/extcheck
+%{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/idlj
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jar
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
