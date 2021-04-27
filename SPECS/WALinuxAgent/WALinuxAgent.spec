@@ -17,7 +17,6 @@ BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  systemd
 Requires:       grep
-Requires:       sed
 Requires:       iptables
 Requires:       openssh
 Requires:       openssl
@@ -25,6 +24,7 @@ Requires:       python-pyasn1
 Requires:       python-xml
 Requires:       python2
 Requires:       python2-libs
+Requires:       sed
 Requires:       sudo
 Requires:       systemd
 Requires:       util-linux

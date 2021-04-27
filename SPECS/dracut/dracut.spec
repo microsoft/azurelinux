@@ -22,13 +22,13 @@ BuildRequires:  bash
 BuildRequires:  git
 BuildRequires:  kmod-devel
 BuildRequires:  pkg-config
-Requires:       grep
-Requires:       sed
 Requires:       bash >= 4
 Requires:       coreutils
 Requires:       cpio
 Requires:       findutils
+Requires:       grep
 Requires:       kmod
+Requires:       sed
 Requires:       systemd
 Requires:       util-linux
 

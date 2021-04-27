@@ -8,12 +8,13 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  openssl-devel
 BuildRequires:  curl-devel
+BuildRequires:  openssl-devel
 BuildRequires:  tpm2-tss-devel >= 2.3.0
-Requires:       openssl curl
-Requires:       tpm2-tss >= 2.3.0
+Requires:       curl
 Requires:       gawk
+Requires:       openssl
+Requires:       tpm2-tss >= 2.3.0
 %description
 The source repository for the TPM (Trusted Platform Module) 2 tools
 

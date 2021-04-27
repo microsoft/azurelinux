@@ -17,13 +17,13 @@ URL: https://github.com/docker/cli
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-BuildRequires: golang
 BuildRequires: bash
 BuildRequires: gcc
-BuildRequires: libltdl-devel
-BuildRequires: make
 BuildRequires: git
 BuildRequires: go-md2man
+BuildRequires: golang
+BuildRequires: libltdl-devel
+BuildRequires: make
 
 Requires: bash
 Requires: tar
