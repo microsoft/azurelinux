@@ -71,7 +71,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -101,7 +101,6 @@ Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
 Source23:       certdata.microsoft.txt
 
-BuildRequires:  /bin/ln
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 BuildRequires:  docbook-dtd-xml
@@ -415,6 +414,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 20200720-14
+- Removing redundant "Requires".
+
 * Fri Mar 12 2021 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20200720-13
 - Updating Microsoft trusted root CAs.
 

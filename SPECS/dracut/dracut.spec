@@ -5,7 +5,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        5%{?dist}
+Release:        6%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -22,8 +22,8 @@ BuildRequires:  bash
 BuildRequires:  git
 BuildRequires:  kmod-devel
 BuildRequires:  pkg-config
-Requires:       /bin/grep
-Requires:       /bin/sed
+Requires:       grep
+Requires:       sed
 Requires:       bash >= 4
 Requires:       coreutils
 Requires:       cpio
@@ -174,6 +174,9 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 049-6
+- Replacing "Requires" on binary paths with package names.
+
 * Fri Feb 12 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-5
 - Enable kernel crypto testing in dracut-fips
 

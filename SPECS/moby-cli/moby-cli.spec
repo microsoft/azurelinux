@@ -1,7 +1,7 @@
 Summary: The open-source application container engine client.
 Name: moby-cli
 Version: 19.03.15+azure
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -25,7 +25,7 @@ BuildRequires: make
 BuildRequires: git
 BuildRequires: go-md2man
 
-Requires: /bin/sh
+Requires: bash
 Requires: tar
 Requires: xz
 
@@ -94,6 +94,9 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 /usr/share/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 19.03.15+azure-2
+- Replacing "Requires" on binary paths with package names.
+
 * Thu Apr 15 2021 Andrew Phelps <anphel@microsoft.com> 19.03.15+azure-1
 - Update to version 19.03.15+azure
 - Rename 'md2man' to 'go-md2man' in md2man-all.sh

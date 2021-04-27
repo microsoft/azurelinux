@@ -1,7 +1,7 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
 Version:        4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 3-Clause
 URL:            https://github.com/tpm2-software/tpm2-tools
 Group:          System Environment/Security
@@ -13,7 +13,7 @@ BuildRequires:  curl-devel
 BuildRequires:  tpm2-tss-devel >= 2.3.0
 Requires:       openssl curl
 Requires:       tpm2-tss >= 2.3.0
-Requires:       /bin/awk
+Requires:       gawk
 %description
 The source repository for the TPM (Trusted Platform Module) 2 tools
 
@@ -37,6 +37,9 @@ make DESTDIR=%{buildroot} install
 %{_datarootdir}/bash-completion/completions/tss2_*
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-2
+- Replacing "Requires" on binary paths with package names.
+
 *   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2-1
 -   Update to 4.2.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.4-2

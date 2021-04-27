@@ -5,7 +5,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          2%{?dist}
+Release:          3%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -15,9 +15,9 @@ Distribution:     Mariner
 Source0:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-words-%{version}.gz
 
-Requires:         /bin/ln
-Requires(post):   /bin/ln
-Requires(postun): /bin/rm
+Requires:         coreutils
+Requires(post):   coreutils
+Requires(postun): coreutils
 
 %description
 CrackLib tests passwords to determine whether they match certain
@@ -210,6 +210,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.9.7-3
+- Replacing "Requires" on binary paths with package names.
+
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
 - Added %%license line automatically
 

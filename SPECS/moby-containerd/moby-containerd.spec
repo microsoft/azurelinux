@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.3.4+azure
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -42,7 +42,7 @@ BuildRequires: golang
 BuildRequires: which
 BuildRequires: go-md2man
 
-Requires: /bin/sh
+Requires: bash
 Requires: device-mapper-libs >= 1.02.90-1
 Requires: libcgroup
 Requires: libseccomp >= 2.3
@@ -133,6 +133,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.4+azure-3
+- Replacing "Requires" on binary paths with package names.
+
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.3.4+azure-2
 - Increment release to force republishing using golang 1.15.
 * Thu Jun 11 2020 Andrew Phelps <anphel@microsoft.com> 1.3.4+azure-1

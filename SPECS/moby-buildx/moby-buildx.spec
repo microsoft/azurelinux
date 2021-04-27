@@ -1,7 +1,7 @@
 Summary: A Docker CLI plugin for extended build capabilities with BuildKit
 Name: moby-buildx
 Version: 0.4.1+azure
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -25,7 +25,7 @@ BuildRequires: golang
 # Maybe we can just build our own packages... for now this gets built/installed  before running rpmbuild
 
 # required packages on install
-Requires: /bin/sh
+Requires: bash
 
 # conflicting packages
 Conflicts: docker-ce
@@ -79,6 +79,9 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.1+azure-3
+- Replacing "Requires" on binary paths with package names.
+
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 0.4.1+azure-2
 - Increment release to force republishing using golang 1.15.
 * Thu Jun 11 2020 Andrew Phelps <anphel@microsoft.com> 0.4.1+azure-1

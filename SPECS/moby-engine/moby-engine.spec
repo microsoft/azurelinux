@@ -1,7 +1,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 19.03.15+azure
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 
@@ -51,7 +51,7 @@ BuildRequires: golang
 BuildRequires: git
 
 Requires: audit
-Requires: /bin/sh
+Requires: bash
 Requires: device-mapper-libs >= 1.02.90-1
 Requires: iptables
 Requires: libcgroup
@@ -149,6 +149,9 @@ fi
 /usr/share/doc/%{name}-%{version}/*
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 19.03.15+azure-2
+- Replacing "Requires" on binary paths with package names.
+
 * Thu Apr 15 2021 Andrew Phelps <anphel@microsoft.com> 19.03.15+azure-1
 - Update to version 19.03.15+azure
 

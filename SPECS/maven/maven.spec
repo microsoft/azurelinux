@@ -1,7 +1,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.5.4
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0
 URL:            https://maven.apache.org/
 Group:          Applications/System
@@ -18,7 +18,7 @@ BuildRequires:  openjre8
 BuildRequires:  openjdk8
 BuildRequires:  wget >= 1.15
 Requires:       openjre8
-Requires:       /usr/bin/which
+Requires:       which
 
 %define _prefix /var/opt/apache-%{name}
 %define _bindir %{_prefix}/bin
@@ -97,6 +97,9 @@ done
 %exclude %{_libdir}/jansi-native
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.4-14
+- Replacing "Requires" on binary paths with package names.
+
 * Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.5.4-13
 - Added %%license line automatically
 

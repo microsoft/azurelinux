@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.2.52
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,8 +16,8 @@ BuildRequires:  python-xml
 BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  systemd
-Requires:       /bin/grep
-Requires:       /bin/sed
+Requires:       grep
+Requires:       sed
 Requires:       iptables
 Requires:       openssh
 Requires:       openssl
@@ -76,6 +76,9 @@ python2 setup.py check && python2 setup.py test
 %{_lib}/python2.7/site-packages/*
 
 %changelog
+* Tue Apr 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.2.52-3
+- Replacing "Requires" on binary paths with package names.
+
 * Mon Jan 25 2021 Henry Beberman <henry.beberman@microsoft.com> 2.2.52-2
 - Remove log symlink and use /var/log/waagent.log directly
 
