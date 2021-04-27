@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "aarch64-jdk8u181-b13.tar.gz": "c225d344b421d9260a6d0c039ac04500389a0f138246e4a8242d25b3a93fb9fc"
- }
+    "Signatures": {
+        "aarch64-shenandoah-jdk8u292-b10.tar.gz": "f46e116b23a09e80888d90dcd977da11f6ed83cae2bca09132618893d93b1405"
+    }
 }

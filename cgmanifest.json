@@ -3854,9 +3854,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openjdk8",
-          "version": "1.8.0.181",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u//archive/aarch64-jdk8u181-b13.tar.gz"
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
