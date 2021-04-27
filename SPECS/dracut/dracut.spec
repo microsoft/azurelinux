@@ -1,11 +1,11 @@
 # Copied this spec file from inside of dracut-041.tar.xz and edited later.
 
-%define dracutlibdir %{_lib}/dracut
-%define _unitdir %{_lib}/systemd/system
+%define dracutlibdir %{_libdir}/dracut
+%define _unitdir %{_libdir}/systemd/system
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        5%{?dist}
+Release:        6%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -64,14 +64,14 @@ cp %{SOURCE1} .
 
 %build
 %configure --systemdsystemunitdir=%{_unitdir} --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
-           --libdir=%{_lib}   --disable-documentation
+           --libdir=%{_libdir}   --disable-documentation
 
 make %{?_smp_mflags}
 
 %install
 make %{?_smp_mflags} install \
      DESTDIR=%{buildroot} \
-     libdir=%{_lib}
+     libdir=%{_libdir}
 
 echo "DRACUT_VERSION=%{version}-%{release}" > %{buildroot}/%{dracutlibdir}/dracut-version.sh
 
@@ -126,7 +126,7 @@ rm -rf -- %{buildroot}
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
-%{_lib}/dracut/dracut-init.sh
+%{_libdir}/dracut/dracut-init.sh
 %{_datadir}/pkgconfig/dracut.pc
 %{dracutlibdir}/dracut-functions.sh
 %{dracutlibdir}/dracut-functions
@@ -174,6 +174,9 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 049-6
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Fri Feb 12 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-5
 - Enable kernel crypto testing in dracut-fips
 

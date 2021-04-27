@@ -1,6 +1,6 @@
 %global _hardened_build 1
 %global libdir %{_libdir}/heimdal
-%global bindir %{_lib}/heimdal
+%global bindir %{_libdir}/heimdal
 # Use systemd unit files on RHEL 7 and above.
 %if ! (0%{?rhel} && 0%{?rhel} < 7)
   %global _with_systemd 1
@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.7.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -488,6 +488,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 7.7.0-6
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

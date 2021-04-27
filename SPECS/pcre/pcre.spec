@@ -1,7 +1,7 @@
 Summary:        Grep for perl compatible regular expressions
 Name:           pcre
 Version:        8.44
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,8 +54,8 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 mv -v %{buildroot}/usr/lib/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so
-ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
+ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
+ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
 
 %check
 make %{?_smp_mflags} check
@@ -90,6 +90,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libpcre.so.*
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-2
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Oct 29 2020 Joe Schmitt <joschmit@microsoft.com> - 8.44-1
 - Update to version 8.44 to fix CVE-2020-14155.
 

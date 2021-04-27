@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -138,7 +138,7 @@ install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
-install -vdm 755 %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}
+install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 # Verify for build-id match
@@ -159,9 +159,9 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
 install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
 cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 644 vmlinux %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
-ln -s vmlinux-%{uname_r} %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}/vmlinux
+ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
@@ -274,6 +274,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.21.1-3
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-2
 - Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS
 

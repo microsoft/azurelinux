@@ -56,14 +56,14 @@ make BINDIR=%{_sbindir} LIBDIR=%{_libdir} %{?_smp_mflags}
 mkdir -p %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_mandir}/man5
 mkdir -p %{buildroot}%{_mandir}/man8
-mkdir -p %{buildroot}%{_lib}/systemd/system
+mkdir -p %{buildroot}%{_libdir}/systemd/system
 mkdir -p %{buildroot}%{_sysconfdir}/wpa_supplicant
 cd wpa_supplicant
 install -v -m755 wpa_{cli,passphrase,supplicant} %{buildroot}%{_sbindir}/
 install -v -m644 doc/docbook/wpa_supplicant.conf.5 %{buildroot}%{_mandir}/man5/
 install -v -m644 doc/docbook/wpa_{cli,passphrase,supplicant}.8 %{buildroot}%{_mandir}/man8/
 
-cat > %{buildroot}%{_lib}/systemd/system/wpa_supplicant@.service << "EOF"
+cat > %{buildroot}%{_libdir}/systemd/system/wpa_supplicant@.service << "EOF"
 [Unit]
 Description=WPA supplicant (%{I})
 BindsTo=sys-subsystem-net-devices-%{i}.device

@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -180,8 +180,8 @@ done
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/pause
 
 # install service files
-install -d -m 0755 %{buildroot}/%{_lib}/systemd/system
-install -p -m 644 -t %{buildroot}%{_lib}/systemd/system %{SOURCE1}
+install -d -m 0755 %{buildroot}%{_libdir}/systemd/system
+install -p -m 644 -t %{buildroot}%{_libdir}/systemd/system %{SOURCE1}
 
 # install config files
 install -d -m 0755 %{buildroot}%{_sysconfdir}/kubernetes
@@ -191,8 +191,8 @@ install -d -m 644 %{buildroot}%{_sysconfdir}/kubernetes/manifests
 install -dm755 %{buildroot}%{_sharedstatedir}/kubelet
 install -dm755 %{buildroot}%{_var}/run/kubernetes
 
-install -d -m 0755 %{buildroot}/%{_lib}/tmpfiles.d
-cat << EOF >> %{buildroot}/%{_lib}/tmpfiles.d/kubernetes.conf
+install -d -m 0755 %{buildroot}%{_libdir}/tmpfiles.d
+cat << EOF >> %{buildroot}%{_libdir}/tmpfiles.d/kubernetes.conf
 d %{_var}/run/kubernetes 0755 kube kube -
 EOF
 
@@ -229,12 +229,12 @@ fi
 %defattr(-,root,root)
 %license LICENSES
 %{_bindir}/kubelet
-%{_lib}/tmpfiles.d/kubernetes.conf
+%{_libdir}/tmpfiles.d/kubernetes.conf
 %dir %{_sysconfdir}/kubernetes
 %dir %{_sysconfdir}/kubernetes/manifests
 %dir %{_sharedstatedir}/kubelet
 %dir %{_var}/run/kubernetes
-%{_lib}/systemd/system/kubelet.service
+%{_libdir}/systemd/system/kubelet.service
 
 %files client
 %defattr(-,root,root)
@@ -270,6 +270,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-3
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-2
 - Update to version  "1.18.14-hotfix.20210310".
 

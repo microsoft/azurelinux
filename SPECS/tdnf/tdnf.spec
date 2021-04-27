@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -126,7 +126,7 @@ install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
 install -v -D -m 0644 %{SOURCE3} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
 install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-mv %{buildroot}%{_lib}/pkgconfig/tdnfcli.pc %{buildroot}%{_lib}/pkgconfig/tdnf-cli-libs.pc
+mv %{buildroot}%{_libdir}/pkgconfig/tdnfcli.pc %{buildroot}%{_libdir}/pkgconfig/tdnf-cli-libs.pc
 mkdir -p %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck
 mv %{buildroot}/%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
 
@@ -201,6 +201,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Mon Dec 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6
 - Patching TDNF to print at least one space between columns in 'tdnf list' output.
 - Fixing whitelist warnings in previous patches.

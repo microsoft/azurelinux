@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        4.4.18
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,7 +63,7 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/profile.d
 install -vdm 755 %{buildroot}%{_sysconfdir}/skel
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion
 install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/bash-completion
-rm %{buildroot}%{_lib}/bash/Makefile.inc
+rm %{buildroot}%{_libdir}/bash/Makefile.inc
 
 # Create dircolors
 cat > %{buildroot}%{_sysconfdir}/profile.d/dircolors.sh << "EOF"
@@ -332,6 +332,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.18-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
 - Nopatch CVE-2019-18276
 

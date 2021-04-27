@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.21.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -295,7 +295,7 @@ install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
-install -vdm 755 %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}
+install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
@@ -323,9 +323,9 @@ install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
 install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
 cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 644 vmlinux %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
-ln -s vmlinux-%{uname_r} %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}/vmlinux
+ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
@@ -458,7 +458,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_lib64}/traceevent
 %endif
 %ifarch aarch64
-%{_lib}/traceevent
+%{_libdir}/traceevent
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
@@ -474,6 +474,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.21.1-4
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
 - Address CVE-2021-27365, CVE-2021-27364, CVE-2021-27363
 - Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS

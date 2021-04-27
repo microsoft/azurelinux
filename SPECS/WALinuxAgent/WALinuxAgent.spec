@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.2.52
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,7 +64,7 @@ python2 setup.py check && python2 setup.py test
 %systemd_postun_with_restart waagent.service
 
 %files
-%{_lib}/systemd/system/*
+%{_libdir}/systemd/system/*
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
 %doc Changelog
@@ -73,9 +73,12 @@ python2 setup.py check && python2 setup.py test
 %config %{_sysconfdir}/waagent.conf
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
-%{_lib}/python2.7/site-packages/*
+%{_libdir}/python2.7/site-packages/*
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.52-3
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
 * Mon Jan 25 2021 Henry Beberman <henry.beberman@microsoft.com> 2.2.52-2
 - Remove log symlink and use /var/log/waagent.log directly
 
