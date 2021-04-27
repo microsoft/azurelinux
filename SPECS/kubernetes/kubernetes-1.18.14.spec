@@ -270,6 +270,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Mon May 03 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.14-4
+- Increment release to force republishing using golang 1.15.11.
+
 * Thu Apr 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-4
 - Update to version  "1.18.14-hotfix.20210428".
 
