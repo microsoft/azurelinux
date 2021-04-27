@@ -3,6 +3,10 @@ alsa-lib-debuginfo-1.2.2-1.cm1.x86_64.rpm
 alsa-lib-devel-1.2.2-1.cm1.x86_64.rpm
 autoconf-2.69-11.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
+bash-4.4.18-7.cm1.x86_64.rpm
+bash-debuginfo-4.4.18-7.cm1.x86_64.rpm
+bash-devel-4.4.18-7.cm1.x86_64.rpm
+bash-lang-4.4.18-7.cm1.x86_64.rpm
 binutils-2.32-5.cm1.x86_64.rpm
 binutils-debuginfo-2.32-5.cm1.x86_64.rpm
 binutils-devel-2.32-5.cm1.x86_64.rpm
@@ -94,6 +98,9 @@ gnupg2-2.2.20-4.cm1.x86_64.rpm
 gnupg2-debuginfo-2.2.20-4.cm1.x86_64.rpm
 gperf-3.1-3.cm1.x86_64.rpm
 gperf-debuginfo-3.1-3.cm1.x86_64.rpm
+gpgme-1.13.1-6.cm1.x86_64.rpm
+gpgme-debuginfo-1.13.1-6.cm1.x86_64.rpm
+gpgme-devel-1.13.1-6.cm1.x86_64.rpm
 grep-3.1-4.cm1.x86_64.rpm
 grep-debuginfo-3.1-4.cm1.x86_64.rpm
 grep-lang-3.1-4.cm1.x86_64.rpm
@@ -160,6 +167,12 @@ libpipeline-debuginfo-1.5.0-4.cm1.x86_64.rpm
 libpipeline-devel-1.5.0-4.cm1.x86_64.rpm
 libpkgconf-1.7.0-3.cm1.x86_64.rpm
 libpkgconf-devel-1.7.0-3.cm1.x86_64.rpm
+libselinux-2.9-5.cm1.x86_64.rpm
+libselinux-debuginfo-2.9-5.cm1.x86_64.rpm
+libselinux-devel-2.9-5.cm1.x86_64.rpm
+libselinux-python-2.9-5.cm1.x86_64.rpm
+libselinux-python3-2.9-5.cm1.x86_64.rpm
+libselinux-utils-2.9-5.cm1.x86_64.rpm
 libsepol-3.1-1.cm1.x86_64.rpm
 libsepol-debuginfo-3.1-1.cm1.x86_64.rpm
 libsepol-devel-3.1-1.cm1.x86_64.rpm
@@ -239,6 +252,10 @@ pam-devel-1.3.1-5.cm1.x86_64.rpm
 pam-lang-1.3.1-5.cm1.x86_64.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
 patch-debuginfo-2.7.6-7.cm1.x86_64.rpm
+pcre-8.44-2.cm1.x86_64.rpm
+pcre-debuginfo-8.44-2.cm1.x86_64.rpm
+pcre-devel-8.44-2.cm1.x86_64.rpm
+pcre-libs-8.44-2.cm1.x86_64.rpm
 perl-5.32.0-463.cm1.x86_64.rpm
 perl-Archive-Tar-2.36-463.cm1.noarch.rpm
 perl-Attribute-Handlers-1.01-463.cm1.noarch.rpm
@@ -456,6 +473,7 @@ procps-ng-debuginfo-3.3.15-5.cm1.x86_64.rpm
 procps-ng-devel-3.3.15-5.cm1.x86_64.rpm
 procps-ng-lang-3.3.15-5.cm1.x86_64.rpm
 python-curses-2.7.18-7.cm1.x86_64.rpm
+python-gpg-1.13.1-6.cm1.x86_64.rpm
 python-rpm-4.14.2.1-1.cm1.x86_64.rpm
 python-xml-2.7.18-7.cm1.x86_64.rpm
 python2-2.7.18-7.cm1.x86_64.rpm
@@ -468,6 +486,7 @@ python3-3.7.10-1.cm1.x86_64.rpm
 python3-curses-3.7.10-1.cm1.x86_64.rpm
 python3-debuginfo-3.7.10-1.cm1.x86_64.rpm
 python3-devel-3.7.10-1.cm1.x86_64.rpm
+python3-gpg-1.13.1-6.cm1.x86_64.rpm
 python3-libs-3.7.10-1.cm1.x86_64.rpm
 python3-libxml2-2.9.10-7.cm1.x86_64.rpm
 python3-pip-3.7.10-1.cm1.noarch.rpm
@@ -495,8 +514,16 @@ sqlite-3.32.3-2.cm1.x86_64.rpm
 sqlite-debuginfo-3.32.3-2.cm1.x86_64.rpm
 sqlite-devel-3.32.3-2.cm1.x86_64.rpm
 sqlite-libs-3.32.3-2.cm1.x86_64.rpm
+swig-4.0.2-1.cm1.x86_64.rpm
+swig-debuginfo-4.0.2-1.cm1.x86_64.rpm
 tar-1.32-2.cm1.x86_64.rpm
 tar-debuginfo-1.32-2.cm1.x86_64.rpm
+tdnf-2.1.0-7.cm1.x86_64.rpm
+tdnf-cli-libs-2.1.0-7.cm1.x86_64.rpm
+tdnf-debuginfo-2.1.0-7.cm1.x86_64.rpm
+tdnf-devel-2.1.0-7.cm1.x86_64.rpm
+tdnf-plugin-repogpgcheck-2.1.0-7.cm1.x86_64.rpm
+tdnf-python-2.1.0-7.cm1.x86_64.rpm
 texinfo-6.5-8.cm1.x86_64.rpm
 texinfo-debuginfo-6.5-8.cm1.x86_64.rpm
 util-linux-2.36.1-3.cm1.x86_64.rpm

@@ -41,6 +41,9 @@ readline-7.0-5.cm1.x86_64.rpm
 readline-devel-7.0-5.cm1.x86_64.rpm
 coreutils-8.30-8.cm1.x86_64.rpm
 coreutils-lang-8.30-8.cm1.x86_64.rpm
+bash-4.4.18-7.cm1.x86_64.rpm
+bash-devel-4.4.18-7.cm1.x86_64.rpm
+bash-lang-4.4.18-7.cm1.x86_64.rpm
 bzip2-1.0.6-16.cm1.x86_64.rpm
 bzip2-devel-1.0.6-16.cm1.x86_64.rpm
 bzip2-libs-1.0.6-16.cm1.x86_64.rpm
@@ -188,10 +191,15 @@ libssh2-devel-1.9.0-1.cm1.x86_64.rpm
 curl-7.74.0-2.cm1.x86_64.rpm
 curl-devel-7.74.0-2.cm1.x86_64.rpm
 curl-libs-7.74.0-2.cm1.x86_64.rpm
+tdnf-2.1.0-7.cm1.x86_64.rpm
+tdnf-cli-libs-2.1.0-7.cm1.x86_64.rpm
+tdnf-devel-2.1.0-7.cm1.x86_64.rpm
+tdnf-plugin-repogpgcheck-2.1.0-7.cm1.x86_64.rpm
 libxml2-2.9.10-7.cm1.x86_64.rpm
 libxml2-devel-2.9.10-7.cm1.x86_64.rpm
 libltdl-2.4.6-7.cm1.x86_64.rpm
 libltdl-devel-2.4.6-7.cm1.x86_64.rpm
+pcre-libs-8.44-2.cm1.x86_64.rpm
 krb5-1.17-7.cm1.x86_64.rpm
 lua-5.3.5-11.cm1.x86_64.rpm
 lua-libs-5.3.5-11.cm1.x86_64.rpm
@@ -204,6 +212,7 @@ libksba-1.3.5-4.cm1.x86_64.rpm
 npth-1.6-3.cm1.x86_64.rpm
 pinentry-1.1.0-3.cm1.x86_64.rpm
 gnupg2-2.2.20-4.cm1.x86_64.rpm
+gpgme-1.13.1-6.cm1.x86_64.rpm
 mariner-repos-1.0-13.cm1.noarch.rpm
 mariner-repos-preview-1.0-13.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.x86_64.rpm
