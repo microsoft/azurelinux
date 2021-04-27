@@ -21,7 +21,7 @@ BuildRequires: git
 BuildRequires: libsepol-devel >= 2.9-1
 BuildRequires: qt5-qtbase-devel
 BuildRequires: swig
-BuildRequires: Cython
+BuildRequires: cython3
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 BuildRequires: python3-xml
