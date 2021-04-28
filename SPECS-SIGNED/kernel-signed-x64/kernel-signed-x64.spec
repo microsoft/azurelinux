@@ -82,7 +82,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 
 %changelog
-* Tue Apr 27 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
+* Fri Mar 26 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.21.1-4
 - Update to kernel release 5.10.21.1-4
 
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-3
