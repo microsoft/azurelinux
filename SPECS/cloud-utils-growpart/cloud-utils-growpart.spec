@@ -1,7 +1,7 @@
 Summary:        Shell script to auto detect free size on disk and grow partition.
 Name:           cloud-utils-growpart
 Version:        0.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Group:          System Environment
 Source0:        https://launchpad.net/cloud-utils/trunk/%{version}/+download/cloud-utils-%{version}.tar.gz
@@ -12,6 +12,7 @@ Requires:       gptfdisk
 Requires:       gawk
 Requires:       util-linux
 BuildArch:      noarch
+Patch0:         growpart-remove-flock-disk-locking.patch
 
 %description
 Cloud-utils brings in growpart script. This script is very useful for
@@ -20,6 +21,7 @@ This is generally used by cloud-init for disk space manangement on cloud images.
 
 %prep
 %setup -q -n cloud-utils-%{version}
+%patch0 -p1
 
 %build
 %install
@@ -34,6 +36,8 @@ cp man/growpart.* $RPM_BUILD_ROOT/%{_mandir}/man1/
 %doc %{_mandir}/man1/growpart.*
 
 %changelog
+*   Tue Apr 27 2021 Chris Co <chrco@microsoft.com> - 0.32-2
+-   Add patch to handle unexpected timeout
 *   Sat Mar 13 2021 Henry Beberman <henry.beberman@microsoft.com> 0.32-1
 -   Update to version 0.32 for more robust parsing of kernel version in growpart
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.30-6
