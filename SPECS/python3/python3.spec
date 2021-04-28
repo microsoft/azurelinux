@@ -255,7 +255,7 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Tue Apr 28 2021 Andrew Phelps <anphel@microsoft.com> - 3.7.10-2
+* Wed Apr 28 2021 Andrew Phelps <anphel@microsoft.com> - 3.7.10-2
 - Add patch to fix test_ssl tests.
 
 * Mon Mar 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
