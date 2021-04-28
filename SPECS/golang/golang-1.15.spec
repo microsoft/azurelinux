@@ -116,7 +116,7 @@ fi
 
 %changelog
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.15.11-1
-- Updated to version 1.15.1 to fix CVE-2021-27918
+- Updated to version 1.15.11 to fix CVE-2021-27918
 
 * Wed Feb 03 2021 Andrew Phelps <anphel@microsoft.com> - 1.15.7-1
 - Updated to version 1.15.7 to fix CVE-2021-3114

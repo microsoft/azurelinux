@@ -84,8 +84,8 @@ make install BINDIR=%{buildroot}%{_sbindir}
 %{_sbindir}/runc
 
 %changelog
-* Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0.rc8-8
-- Increment release to force republishing using golang 1.15.11.
+*   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0.rc8-8
+-   Increment release to force republishing using golang 1.15.11.
 *   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.0.0.rc8-7
 -   Increment release to force republishing using golang 1.15.
 *   Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.0.0.rc8-6
