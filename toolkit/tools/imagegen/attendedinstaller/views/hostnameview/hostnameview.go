@@ -62,7 +62,6 @@ func (hv *HostNameView) Initialize(backButtonText string, sysConfig *configurati
 		SetFieldWidth(maxHostNameLength).
 		SetAcceptanceFunc(
 			func(textToCheck string, lastChar rune) bool {
-				hv.navBar.ClearUserFeedback()
 
 				if len(textToCheck) > maxHostNameLength {
 					return false
@@ -72,6 +71,7 @@ func (hv *HostNameView) Initialize(backButtonText string, sysConfig *configurati
 					return false
 				}
 
+				hv.navBar.ClearUserFeedback()
 				return true
 			})
 

@@ -572,14 +572,6 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	bootType := systemConfig.BootType
-	if systemConfig.Encryption.Enable && bootType == "legacy" {
-		err = installutils.EnableCryptoDisk(installChroot)
-		if err != nil {
-			err = fmt.Errorf("Unable to enable crypto disk: %s", err)
-			return
-		}
-	}
-
 	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath)
 	if err != nil {
 		err = fmt.Errorf("failed to install bootloader: %s", err)

@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2019.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -161,9 +161,12 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-8
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 2019.3-7: Systemd supports merged /usr. Update unit file directory macro.
+
+* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-8
+- Bump release to rebuild with rust 1.47.0-2 (security update)
 
 * Tue Dec 08 2020 Pawel Wingrodzki <pawelwi@microsoft.com> - 2019.3-7
 - Fixing 'lib-introspection' test.

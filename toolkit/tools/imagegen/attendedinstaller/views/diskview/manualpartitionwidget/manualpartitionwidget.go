@@ -77,14 +77,15 @@ type ManualPartitionWidget struct {
 	pages          *tview.Pages
 
 	// Add partition form elements
-	addPartitionForm *tview.Form
-	formFlex         *tview.Flex
-	formNavBar       *navigationbar.NavigationBar
-	formatInput      *tview.InputField
-	mountPointInput  *tview.InputField
-	nameInput        *tview.InputField
-	sizeUnitInput    *tview.InputField
-	sizeInput        *tview.InputField
+	addPartitionForm  *tview.Form
+	formFlex          *tview.Flex
+	formNavBar        *navigationbar.NavigationBar
+	formatInput       *tview.InputField
+	mountPointInput   *tview.InputField
+	nameInput         *tview.InputField
+	sizeUnitInput     *tview.InputField
+	sizeInput         *tview.InputField
+	formSpaceLeftText *tview.TextView
 
 	// Disk state
 	bytesRemaining uint64
@@ -129,28 +130,30 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 		SetButtonsAlign(tview.AlignCenter)
 
 	mp.formatInput = mp.enumInputBox(validPartitionFormats).
-		SetLabel(uitext.DiskFormatLabel).
+		SetLabel(uitext.FormDiskFormatLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
-		SetLabel(uitext.DiskSizeUnitLabel).
+		SetLabel(uitext.FormDiskSizeUnitLabel).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.nameInput = tview.NewInputField().
-		SetLabel(uitext.DiskNameLabel).
+		SetLabel(uitext.FormDiskNameLabel).
 		SetFieldWidth(maxParittionLabelSize).
 		SetAcceptanceFunc(mp.nameInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.mountPointInput = tview.NewInputField().
-		SetLabel(uitext.DiskMountPointLabel).
+		SetLabel(uitext.FormDiskMountPointLabel).
 		SetAcceptanceFunc(mp.mountPointInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeInput = tview.NewInputField().
-		SetLabel(fmt.Sprintf("%s %s", uitext.DiskSizeLabel, uitext.DiskSizeLabelMaxHelp)).
+		SetLabel(fmt.Sprintf("%s %s", uitext.FormDiskSizeLabel, uitext.FormDiskSizeLabelMaxHelp)).
 		SetAcceptanceFunc(mp.sizeInputValidation).
 		SetFieldBackgroundColor(tcell.ColorWhite)
+
+	mp.formSpaceLeftText = tview.NewTextView()
 
 	mp.formNavBar = navigationbar.NewNavigationBar().
 		AddButton(uitext.ButtonCancel, func() {
@@ -188,7 +191,8 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 
 	formFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(mp.addPartitionForm, formHeight+mp.formNavBar.GetHeight()+1, 0, true)
+		AddItem(mp.addPartitionForm, formHeight+mp.formNavBar.GetHeight()+1, 0, true).
+		AddItem(mp.formSpaceLeftText, textHeight, 0, true)
 
 	mp.formFlex = uiutils.CenterVerticallyDynamically(formFlex)
 
@@ -220,7 +224,7 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 func (mp *ManualPartitionWidget) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 	frontPage, _ := mp.pages.GetFrontPage()
 	if frontPage == addPartitionPage {
-		mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
+		mp.formSpaceLeftText.SetText(mp.spaceLeftText.GetText(stripSpaceTags))
 
 		switch event.Key() {
 		case tcell.KeyUp:
@@ -232,8 +236,6 @@ func (mp *ManualPartitionWidget) HandleInput(event *tcell.EventKey) *tcell.Event
 		}
 	} else {
 		// The front page is the partition table
-		mp.navBar.ClearUserFeedback()
-
 		if mp.navBar.UnfocusedInputHandler(event) {
 			return nil
 		}
@@ -365,7 +367,8 @@ func (mp *ManualPartitionWidget) resetAddPartitionForm() {
 	mp.nameInput.SetText("")
 	mp.mountPointInput.SetText("")
 	mp.sizeInput.SetText("")
-	mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
+	mp.formSpaceLeftText.SetText(mp.spaceLeftText.GetText(stripSpaceTags))
+	mp.formNavBar.ClearUserFeedback()
 	mp.formNavBar.SetSelectedButton(noSelection)
 	mp.addPartitionForm.SetFocus(0)
 	mp.refreshTitle()
@@ -648,6 +651,7 @@ func (mp *ManualPartitionWidget) nameInputValidation(textToCheck string, lastCha
 }
 
 func (mp *ManualPartitionWidget) onNextButton() {
+	mp.navBar.ClearUserFeedback()
 	err := mp.unmarshalPartitionTable()
 	if err != nil {
 		mp.navBar.SetUserFeedback(err.Error(), tview.Styles.TertiaryTextColor)
