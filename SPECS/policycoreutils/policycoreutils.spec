@@ -225,7 +225,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %{python3_sitelib}/sepolicy/sedbus.py*
 %{python3_sitelib}/sepolicy*.egg-info
 %{python3_sitelib}/sepolicy/__pycache__
-%_mandir}/man8/sepolicy-gui.8.gz
+%{_mandir}/man8/sepolicy-gui.8.gz
 
 %files devel
 %{_bindir}/sepolgen
