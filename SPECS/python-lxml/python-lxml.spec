@@ -1,9 +1,8 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 Group:          Development/Libraries
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
@@ -13,16 +12,12 @@ Source0:        lxml-%{version}.tar.gz
 Patch0:         lxml-make-check-fix.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python-xml
 BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
 BuildRequires:  Cython
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
-Requires:       python2
 Requires:       libxslt
 
 %description
@@ -44,13 +39,11 @@ rm -rf ../p3dir
 cp -a . ../p3dir
 
 %build
-python2 setup.py build
 pushd ../p3dir
 python3 setup.py build
 popd
 
 %install
-python2 setup.py install --skip-build --root %{buildroot}
 pushd ../p3dir
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
@@ -58,7 +51,6 @@ popd
 %check
 export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
-make test
 pushd ../p3dir
 make test
 popd
@@ -69,17 +61,16 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %license LICENSES.txt
-%{python2_sitelib}/lxml/*
-%{python2_sitelib}/lxml-%{version}-py2.7.egg-info
 
 %files -n python3-lxml
 %defattr(-,root,root,-)
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.4-6
-- Added %%license line automatically
-
+*   Thu Apr 29 2021 Andrew Phelps <anphel@microsoft.com> 4.2.4-7
+-   Remove python2 support.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-6
+-   Added %%license line automatically
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.4-5
 -   Renaming cython to Cython
 *   Mon Apr 13 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-4
