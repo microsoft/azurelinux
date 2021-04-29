@@ -28,9 +28,10 @@ else
     done
 fi
 
+CONFIG_ROOT=$ISO_ROOT/config
 
 # Restrict speakup use to attended installs
-if [[ -f "$CONFIG_ROOT/unattended_config.json" ]]; then
+if [[ ! -f "$CONFIG_ROOT/unattended_config.json" ]]; then
     # FIXME(thcrain-msft)
     # This is a loop of silence to keep the default audio device alive
     # This is a temporary workaround that is needed for VirtualBox,
@@ -47,11 +48,6 @@ if [[ -f "$CONFIG_ROOT/unattended_config.json" ]]; then
     systemctl enable espeakup
     systemctl start espeakup
 fi
-
-
-
-
-CONFIG_ROOT=$ISO_ROOT/config
 
 cd /installer
 
