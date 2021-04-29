@@ -3,7 +3,7 @@
 Summary:        Parse and convert to JSON (JavaScript Object Notation)
 Name:           perl-JSON
 Version:        4.02
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,11 +28,10 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
-Requires:       perl
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(JSON)
 BuildArch:      noarch
 %{?perl_default_filter}
-%{?perl_default_subpackage_tests}
 
 %description
 This module converts between JSON (JavaScript Object Notation) and Perl
@@ -65,6 +64,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 4.02-6
+- Remove %perl_default_subpackage_tests, which breaks under non-RUN_CHECK builds
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.02-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
