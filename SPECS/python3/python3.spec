@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.7
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Requires:       openssl
 Requires:       python3-libs = %{version}-%{release}
 Requires:       readline
 Requires:       xz
+Provides:       python
 Provides:       python-sqlite
 Provides:       python(abi)
 Provides:       %{_bindir}/python
@@ -183,6 +184,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-, root, root)
 %license LICENSE
@@ -276,6 +278,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Tue Apr 20 2021 Henry Li <lihl@microsoft.com> - 3.7.7-11
+- Provides python from python3
+
 * Tue Mar 09 2021 Henry Li <lihl@microsoft.com> - 3.7.7-10
 - Remove 2to3 binaries from python3-devel
 

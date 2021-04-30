@@ -9,7 +9,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,11 @@ Provides:       rubygem(io-console) = %{version}-%{release}
 Provides:       rubygem(psych) = %{version}-%{release}
 Provides:       rubygem(did_you_mean) = %{version}-%{release}
 Provides:       rubygem(irb) = %{version}-%{release}
+Provides:       rubygem-bigdecimal = %{version}-%{release}
+Provides:       rubygem-io-console = %{version}-%{release}
+Provides:       rubygem-psych = %{version}-%{release}
+Provides:       rubygem-irb = %{version}-%{release}
+Provides:       rubygem-did_you_mean = %{version}-%{release}
 
 %description
 The Ruby package contains the Ruby development environment.
@@ -172,7 +177,13 @@ rm -rf %{buildroot}/*
 %{rubygems_dir}/rubygems
 
 %changelog
-* Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 2.6.6-4
+* Fri Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
+- Add bindir path to gem installation to install executable at
+  system bin directory instead of bin directory under gem home directory
+- Add Provides for rubygem-bigdecimal, rubygem-irb, rubygem-io-console, rubygem-did_you_mean
+  and rubygem-psych
+
+* Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 2.7.2-1
 - Upgrade to version 2.7.2
 - Add files like macros.rubygems, imported from Fedora 32 (license: MIT)
 - Add patches to prevent ruby vesion abuse

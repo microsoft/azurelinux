@@ -1,25 +1,28 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
-Version:        2.58.0
-Release:        12%{?dist}
+Version:        2.60.1
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  meson
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
 BuildRequires:  python-xml
-BuildRequires:  python2 >= 2.7
-BuildRequires:  python2-libs >= 2.7
+BuildRequires:  python3
+BuildRequires:  python3-libs
 BuildRequires:  which
 Requires:       libffi
+Requires:       libseliux
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
@@ -35,7 +38,7 @@ Requires:       glib = %{version}-%{release}
 Requires:       libffi-devel
 Requires:       pcre-devel
 Requires:       python-xml
-Requires:       python2
+Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
 Provides:       glib2-devel%{?_isa} = %{version}-%{release}
 Provides:       pkgconfig(glib-2.0)
@@ -69,18 +72,27 @@ The glib2-doc package includes documentation for the GLib library.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
 
 %build
-./autogen.sh
-%configure --with-pcre=system \
-            --enable-static \
-            --enable-gtk-doc
-make %{?_smp_mflags}
+# Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
+rm glib/pcre/*.[ch]
+
+%meson \
+    -Dgtk_doc=true \
+    --default-library=both
+
+%meson_build
 
 %install
-make DESTDIR=%{buildroot} install
+%meson_install
+
+mv %{buildroot}%{_bindir}/gio-querymodules %{buildroot}%{_bindir}/gio-querymodules-%{__isa_bits}
+
+# Manually create this directory. The build procedure of glib requires setting -Dfam=true to 
+# produce this directory, but this config will introduce new BR that introduces build cycles that 
+# can't be resolved. Since the 'fam' feature is not needed currently, we will not enable it.
+mkdir -p %{buildroot}%{_libdir}/gio/modules
+touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
@@ -99,7 +111,6 @@ make DESTDIR=%{buildroot} install
 %{_bindir}/*
 %{_libdir}/*.a
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*
 %{_libdir}/gio/*
 %{_libdir}/glib-*/*
@@ -119,6 +130,14 @@ make DESTDIR=%{buildroot} install
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-2
+- Add libselinux as runtime requirement for glib
+
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
+- Upgrade to version 2.60.1
+- Switch to meson build and install
+- Fix file section for glib-devel
+
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.58.0-12
 - Add gtk-doc as build requirement
 - Add --enable-gtk-doc during configuration

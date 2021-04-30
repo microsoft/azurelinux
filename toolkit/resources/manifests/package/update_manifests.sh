@@ -63,6 +63,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
+    sed -i '/glib-doc/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
     sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
@@ -74,6 +75,11 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
+    sed -i '/libselinux-devel/d' $TmpPkgGen
+    sed -i '/libselinux-python/d' $TmpPkgGen
+    sed -i '/libselinux-python3/d' $TmpPkgGen
+    sed -i '/libselinux-utils/d' $TmpPkgGen
+    sed -i '/libsepol-devel/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
@@ -197,7 +203,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
-    sed -i '/which/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
     sed -i '/^zstd-doc/d' $TmpPkgGen
     sed -i '/^zip-/d' $TmpPkgGen
@@ -269,6 +274,8 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^tdnf-" >> $1
     cat $TmpPkgGen | grep "^createrepo_c-" >> $1
     cat $TmpPkgGen | grep "^libxml2-" >> $1
+    cat $TmpPkgGen | grep "^libsepol-" >> $1
+    cat $TmpPkgGen | grep "^libselinux-" >> $1
     cat $TmpPkgGen | grep "^glib-" >> $1
     cat $TmpPkgGen | grep "^libltdl-" >> $1
     cat $TmpPkgGen | grep "^pcre-" >> $1
@@ -297,6 +304,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^python-xml-" >> $1
     cat $TmpPkgGen | grep "^python3-" >> $1
     cat $TmpPkgGen | grep "^systemd-rpm-macros-" >> $1
+    cat $TmpPkgGen | grep "^which-" >> $1
 }
 
 # Generate toolchain_*.txt based on the toolchain_built_rpms_all.tar.gz file contents

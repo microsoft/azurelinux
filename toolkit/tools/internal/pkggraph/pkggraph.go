@@ -470,12 +470,14 @@ func (g *PkgGraph) RemovePkgNode(pkgNode *PkgNode) {
 func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEntry *LookupNode, err error) {
 	var (
 		requestInterval, nodeInterval pkgjson.PackageVerInterval
+		bestLocalNode                 *LookupNode
 	)
 	requestInterval, err = pkgVer.Interval()
 	if err != nil {
 		return
 	}
 
+	bestLocalNode = nil
 	packageNodes := g.lookupTable()[pkgVer.Name]
 	for _, node := range packageNodes {
 		if node.RunNode == nil {
@@ -489,9 +491,20 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 		}
 
 		if nodeInterval.Satisfies(&requestInterval) {
+			// Only local packages will have a build node
+			if node.BuildNode != nil {
+				bestLocalNode = node
+			}
 			// Keep going, we want the highest version which satisfies both conditionals
 			lookupEntry = node
 		}
+	}
+
+	// If the pkgVer resolves to a remote node, and that node
+	// is never found during the build, we have no way to
+	// fall back to the local package at this time.
+	if bestLocalNode != nil && bestLocalNode != lookupEntry {
+		logger.Log.Warnf("Resolving '%s' to remote node '%s' instead of local node '%s'", pkgVer, lookupEntry.RunNode.String(), bestLocalNode.RunNode.String())
 	}
 	return
 }

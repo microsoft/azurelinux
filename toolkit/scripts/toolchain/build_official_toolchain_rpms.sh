@@ -402,11 +402,46 @@ build_rpm_in_chroot_no_install gtest
 
 build_rpm_in_chroot_no_install libsolv
 
-# glib needs perl-XML-Parser, python-xml
+# glib needs perl-XML-Parser, python-xml, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
 
 # python-xml is built by building python2
 chroot_and_install_rpms python-xml
+
+build_rpm_in_chroot_no_install itstool
+
+# gtk-doc needs itstool
+chroot_and_install_rpms itstool
+
+# gtk-doc and ca-certificates require libxslt
+chroot_and_install_rpms docbook-dtd-xml
+chroot_and_install_rpms docbook-style-xsl
+chroot_and_install_rpms libxslt
+chroot_and_install_rpms python3
+build_rpm_in_chroot_no_install gtk-doc
+
+# p11-kit, libtasn1 and glib need gtk-doc
+chroot_and_install_rpms gtk-doc
+
+# ninja-build requires gtest
+chroot_and_install_rpms gtest
+build_rpm_in_chroot_no_install ninja-build
+
+# meson requires ninja-build, gettext
+chroot_and_install_rpms ninja-build
+chroot_and_install_rpms gettext
+build_rpm_in_chroot_no_install meson
+
+build_rpm_in_chroot_no_install libsepol
+build_rpm_in_chroot_no_install swig
+
+# libselinux requires libsepol and swig
+chroot_and_install_rpms libsepol
+chroot_and_install_rpms swig
+build_rpm_in_chroot_no_install libselinux
+
+chroot_and_install_rpms meson
+chroot_and_install_rpms libselinux
 
 build_rpm_in_chroot_no_install glib
 build_rpm_in_chroot_no_install libassuan
@@ -419,12 +454,9 @@ chroot_and_install_rpms npth
 chroot_and_install_rpms libassuan
 chroot_and_install_rpms libksba
 build_rpm_in_chroot_no_install gnupg2
-build_rpm_in_chroot_no_install swig
 
-# gpgme needs swig, gnupg2 and python3
-chroot_and_install_rpms swig
+# gpgme needs gnupg2 and python3
 chroot_and_install_rpms gnupg2
-chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gpgme
 
 # tdnf needs python3, gpgme, curl and libsolv
@@ -441,51 +473,20 @@ build_rpm_in_chroot_no_install tdnf
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
-# ca-certificates requires libxslt
-chroot_and_install_rpms docbook-dtd-xml
-chroot_and_install_rpms docbook-style-xsl
-chroot_and_install_rpms libxslt
-build_rpm_in_chroot_no_install itstool
-
-# gtk-doc needs itstool
-chroot_and_install_rpms itstool
-build_rpm_in_chroot_no_install gtk-doc
-
-# p11-kit and libtasn1 needs gtk-doc
-chroot_and_install_rpms gtk-doc
-build_rpm_in_chroot_no_install libtasn1
-
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
-build_rpm_in_chroot_no_install ninja-build
-
-# meson requires ninja-build, gettext
-chroot_and_install_rpms ninja-build
-chroot_and_install_rpms gettext
-build_rpm_in_chroot_no_install meson
-
 build_rpm_in_chroot_no_install libpwquality
 build_rpm_in_chroot_no_install json-c
-build_rpm_in_chroot_no_install libsepol
 
-# libselinux requires libsepol
-chroot_and_install_rpms libsepol
-build_rpm_in_chroot_no_install libselinux
-
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, shadow-utils
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, shadow-utils
 chroot_and_install_rpms libcap
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
-chroot_and_install_rpms meson
 chroot_and_install_rpms shadow-utils
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
-# lvm2 requires libselinux, libsepol, ncurses, systemd-bootstrap, libaio,
-chroot_and_install_rpms libselinux
-chroot_and_install_rpms libsepol
+# lvm2 requires ncurses, systemd-bootstrap, libaio,
 chroot_and_install_rpms ncurses
 chroot_and_install_rpms systemd-bootstrap
 chroot_and_install_rpms libaio
@@ -504,6 +505,7 @@ build_rpm_in_chroot_no_install cryptsetup
 chroot_and_install_rpms intltool
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
+build_rpm_in_chroot_no_install libtasn1
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1

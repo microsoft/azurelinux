@@ -1,18 +1,16 @@
-%define majver %(echo %version | cut -d. -f 1-2)
-
+%define majver %(echo %{version} | cut -d. -f 1-2)
 Summary:        Compiler for the Vala programming language
 Name:           vala
 Version:        0.34.6
-Release:        2%{?dist}
-URL:            https://wiki.gnome.org/Projects/Vala
-Group:          Development/Languages
+Release:        3%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages
+URL:            https://wiki.gnome.org/Projects/Vala
 Source0:        http://download.gnome.org/sources/vala/%{majver}/vala-%{version}.tar.xz
-
-BuildRequires: glib-devel
-BuildRequires: glibc-devel
+BuildRequires:  glib-devel
+BuildRequires:  glibc-devel
 
 %description
 Vala is a programming language using modern high level abstractions without imposing additional
@@ -20,17 +18,17 @@ runtime requirements and without using a different ABI compared to applications 
 written in C.
 
 %package devel
-Group:         Development/Libraries
-Summary:       Static libraries and headers for Vala.
-Requires:      %{name} = %{version}-%{release}
+Summary:        Static libraries and headers for Vala.
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 %{summary}
 
 %package tools
-Group:         Development/Languages
-Summary:       Tools for creating projects and bindings for Vala.
-Requires:      %{name} = %{version}-%{release}
+Summary:        Tools for creating projects and bindings for Vala.
+Group:          Development/Languages
+Requires:       %{name} = %{version}-%{release}
 
 %description tools
 %{summary}
@@ -52,9 +50,27 @@ make DESTDIR=%{buildroot} install
 %defattr(-,root,root)
 %license COPYING
 %dir %{_datadir}/vala-%{majver}
-%doc AUTHORS COPYING THANKS
+%license COPYING
+%doc AUTHORS THANKS
 %{_datadir}/vala-%{majver}/*
 %{_libdir}/libvala-*.so.*
+%{_bindir}/vala
+%{_bindir}/vala-%{majver}
+%{_bindir}/vala-gen-introspect
+%{_bindir}/vala-gen-introspect-%{majver}
+%{_bindir}/valac
+%{_bindir}/valac-%{majver}
+%{_bindir}/vapigen*
+%{_libdir}/pkgconfig/libvala-*.pc
+%{_libdir}/pkgconfig/vapigen-%{majver}.pc
+%{_libdir}/pkgconfig/vapigen.pc
+%{_libdir}/vala-*
+%{_mandir}/man1/vala-gen-introspect*
+%{_mandir}/man1/valac*
+%{_mandir}/man1/vapigen*
+%{_datadir}/aclocal/vala.m4
+%{_datadir}/aclocal/vapigen.m4
+%{_datadir}/vala/
 
 %files devel
 %defattr(-,root,root)
@@ -86,6 +102,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man1/vapigen*
 
 %changelog
+* Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.34.6-3
+- Add necessary files to vala package
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.34.6-2
 -   Added %%license line automatically
 
