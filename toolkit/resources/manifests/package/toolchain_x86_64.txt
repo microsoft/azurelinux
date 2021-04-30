@@ -109,7 +109,7 @@ gdbm-lang-1.18-4.cm1.x86_64.rpm
 gettext-0.21-1.cm1.x86_64.rpm
 gettext-debuginfo-0.21-1.cm1.x86_64.rpm
 gfortran-9.1.0-11.cm1.x86_64.rpm
-glib-2.60.1-1.cm1.x86_64.rpm
+glib-2.60.1-2.cm1.x86_64.rpm
 glibc-2.28-16.cm1.x86_64.rpm
 glibc-devel-2.28-16.cm1.x86_64.rpm
 glibc-i18n-2.28-16.cm1.x86_64.rpm
@@ -117,10 +117,10 @@ glibc-iconv-2.28-16.cm1.x86_64.rpm
 glibc-lang-2.28-16.cm1.x86_64.rpm
 glibc-nscd-2.28-16.cm1.x86_64.rpm
 glibc-tools-2.28-16.cm1.x86_64.rpm
-glib-debuginfo-2.60.1-1.cm1.x86_64.rpm
-glib-devel-2.60.1-1.cm1.x86_64.rpm
-glib-schemas-2.60.1-1.cm1.x86_64.rpm
-glib-doc-2.60.1-1.cm1.noarch.rpm
+glib-debuginfo-2.60.1-2.cm1.x86_64.rpm
+glib-devel-2.60.1-2.cm1.x86_64.rpm
+glib-schemas-2.60.1-2.cm1.x86_64.rpm
+glib-doc-2.60.1-2.cm1.noarch.rpm
 gmock-1.8.1-5.cm1.x86_64.rpm
 gmock-devel-1.8.1-5.cm1.x86_64.rpm
 gmock-static-1.8.1-5.cm1.x86_64.rpm
