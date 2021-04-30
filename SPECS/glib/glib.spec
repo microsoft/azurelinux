@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
 Requires:       libffi
+Requires:       libseliux
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
@@ -129,6 +130,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-2
+- Add libselinux as runtime requirement for glib
+
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
 - Upgrade to version 2.60.1
 - Switch to meson build and install
