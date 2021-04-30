@@ -9,6 +9,7 @@ URL:           https://cython.org
 #Source0:      https://github.com/cython/cython/archive/%{version}.tar.gz
 Source0:       %{name}-%{version}.tar.gz
 Patch0:        fix_abc_tests.patch
+Patch1:        cython_testfix_with_outer_raising.patch
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 BuildRequires: python3
@@ -23,6 +24,7 @@ Cython is an optimising static compiler for both the Python programming language
 %prep
 %setup -q -n cython-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 python3 setup.py build
@@ -51,6 +53,7 @@ rm -rf %{buildroot}
 %changelog
 *   Wed Apr 28 2021 Andrew Phelps <anphel@microsoft.com> 0.28.5-8
 -   Build for python3.
+-   Add patch to fix python3.7 test failure.
 *   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 0.28.5-7
 -   Fix check tests.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.28.5-6
