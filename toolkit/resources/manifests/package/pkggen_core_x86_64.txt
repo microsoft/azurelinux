@@ -100,8 +100,6 @@ elfutils-libelf-lang-0.176-3.cm1.x86_64.rpm
 expat-2.2.6-4.cm1.x86_64.rpm
 expat-devel-2.2.6-4.cm1.x86_64.rpm
 expat-libs-2.2.6-4.cm1.x86_64.rpm
-libpipeline-1.5.0-3.cm1.x86_64.rpm
-libpipeline-devel-1.5.0-3.cm1.x86_64.rpm
 gdbm-1.18-4.cm1.x86_64.rpm
 gdbm-devel-1.18-4.cm1.x86_64.rpm
 gdbm-lang-1.18-4.cm1.x86_64.rpm
@@ -198,7 +196,9 @@ tdnf-plugin-repogpgcheck-2.1.0-4.cm1.x86_64.rpm
 createrepo_c-0.11.1-6.cm1.x86_64.rpm
 libxml2-2.9.10-6.cm1.x86_64.rpm
 libxml2-devel-2.9.10-6.cm1.x86_64.rpm
-glib-2.60.1-1.cm1.x86_64.rpm
+libsepol-3.1-1.cm1.x86_64.rpm
+libselinux-2.9-5.cm1.x86_64.rpm
+glib-2.60.1-2.cm1.x86_64.rpm
 libltdl-2.4.6-7.cm1.x86_64.rpm
 libltdl-devel-2.4.6-7.cm1.x86_64.rpm
 pcre-libs-8.42-4.cm1.x86_64.rpm

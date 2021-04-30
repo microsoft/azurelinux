@@ -60,8 +60,9 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
-    sed -i '/gfortran/d' $TmpPkgGen
+    sed -i '/gfortran/d' $TmpPkgGen 
     sed -i '/glib-devel/d' $TmpPkgGen
+    sed -i '/glib-doc/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
@@ -74,6 +75,11 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
+    sed -i '/libselinux-devel/d' $TmpPkgGen
+    sed -i '/libselinux-python/d' $TmpPkgGen
+    sed -i '/libselinux-python3/d' $TmpPkgGen
+    sed -i '/libselinux-utils/d' $TmpPkgGen
+    sed -i '/libsepol-devel/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
@@ -250,7 +256,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^nss-" >> $1
     cat $TmpPkgGen | grep "^elfutils-" >> $1
     cat $TmpPkgGen | grep "^expat-" >> $1
-    cat $TmpPkgGen | grep "^libpipeline-" >> $1
+    cat $TmpPkgGen | grep "^libsed-" >> $1
     cat $TmpPkgGen | grep "^gdbm-" >> $1
     cat $TmpPkgGen | grep "^perl-" >> $1
     cat $TmpPkgGen | grep "^texinfo-" >> $1
@@ -268,6 +274,8 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^tdnf-" >> $1
     cat $TmpPkgGen | grep "^createrepo_c-" >> $1
     cat $TmpPkgGen | grep "^libxml2-" >> $1
+    cat $TmpPkgGen | grep "^libsepol-" >> $1
+    cat $TmpPkgGen | grep "^libselinux-" >> $1
     cat $TmpPkgGen | grep "^glib-" >> $1
     cat $TmpPkgGen | grep "^libltdl-" >> $1
     cat $TmpPkgGen | grep "^pcre-" >> $1
