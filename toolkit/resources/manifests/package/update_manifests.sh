@@ -60,9 +60,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
-    sed -i '/gfortran/d' $TmpPkgGen 
+    sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
-    sed -i '/glib-doc/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
@@ -256,7 +255,7 @@ generate_pkggen_core () {
     cat $TmpPkgGen | grep "^nss-" >> $1
     cat $TmpPkgGen | grep "^elfutils-" >> $1
     cat $TmpPkgGen | grep "^expat-" >> $1
-    cat $TmpPkgGen | grep "^libsed-" >> $1
+    cat $TmpPkgGen | grep "^libpipeline-" >> $1
     cat $TmpPkgGen | grep "^gdbm-" >> $1
     cat $TmpPkgGen | grep "^perl-" >> $1
     cat $TmpPkgGen | grep "^texinfo-" >> $1
