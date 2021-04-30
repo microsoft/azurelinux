@@ -1,10 +1,10 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-rolling-lts-mariner-%{release}
+%define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.21.1
-Release:        3%{?dist}
+Version:        5.10.28.1
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -274,8 +274,21 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.21.1-3
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
+- Bump release number to match kernel release
+
+* Mon Apr 19 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-3
+- Bump release number to match kernel-signed update
+
+* Thu Apr 15 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.28.1-2
+- Update to kernel release 5.10.28.1-2
+
+* Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
+- Update source to 5.10.28.1
+- Update uname_r define to match the new value derived from the source
 
 * Thu Mar 18 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-2
 - Enable CONFIG_FANOTIFY_ACCESS_PERMISSIONS

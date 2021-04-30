@@ -1,7 +1,7 @@
 Summary:        WPA client
 Name:           wpa_supplicant
 Version:        2.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://w1.fi/releases/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-16275.patch
 Patch1:         CVE-2021-0326.patch
 Patch2:         CVE-2021-27803.patch
+Patch3:         CVE-2021-30004.patch
 BuildRequires:  libnl3-devel
 BuildRequires:  openssl-devel
 Requires:       libnl3
@@ -98,6 +99,9 @@ EOF
 %{_sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf
 
 %changelog
+* Fri Apr 09 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9-4
+- Add patch for CVE-2021-30004
+
 * Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-3
 - Add patch for CVE-2021-0326 and CVE-2021-27803
 

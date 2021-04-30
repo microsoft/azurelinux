@@ -19,6 +19,7 @@ ignore_list=" \
   kf5 \
   mariner-repos \
   mariner-rpm-macros \
+  shim \
   moby-buildx \
   moby-containerd \
   openjdk8 \
@@ -33,10 +34,11 @@ ignore_list=" \
   qt5-rpm-macros \
   runc \
   grub2-efi-binary-signed-aarch64 \
-  grub2-efi-binary-signed-x64 \
+  grub2-efi-binary-signed-x86_64 \
   kernel-signed-aarch64 \
-  kernel-signed-x64 \
-  verity-read-only-root"
+  kernel-signed-x86_64 \
+  verity-read-only-root \
+  installkernel"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/

@@ -57,7 +57,7 @@
         "rpm",
         "sed",
         "shadow-utils",
-        "shim-unsigned",
+        "shim",
         "sqlite",
         "systemd",
         "tar",

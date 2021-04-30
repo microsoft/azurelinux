@@ -11,8 +11,9 @@ Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{vers
 Patch0:         CVE-2019-12450.patch
 Patch1:         CVE-2020-35457.patch
 # CVE-2021-27218 and CVE-2021-27219 are both solved by the patch for the first
-Patch2:         CVE-2021-27218.patch
-Patch3:         CVE-2021-27219.nopatch
+Patch3:         CVE-2021-27218.patch
+Patch4:         CVE-2021-27219.nopatch
+Patch5:         CVE-2021-28153.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -137,6 +138,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 - Merge the following releases from 1.0 to dev branch
 - nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
 - thcrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219
+- niontive@microsoft.com, 2.58.0-9: Added patch for CVE-2021-28153
 
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
 - Upgrade to version 2.60.1

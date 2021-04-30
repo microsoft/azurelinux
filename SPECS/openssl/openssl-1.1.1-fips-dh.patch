@@ -1,6 +1,6 @@
-diff -up openssl-1.1.1g/crypto/bn/bn_const.c.fips-dh openssl-1.1.1g/crypto/bn/bn_const.c
---- openssl-1.1.1g/crypto/bn/bn_const.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/bn/bn_const.c	2020-07-17 10:36:29.245788441 +0200
+diff -up openssl-1.1.1j/crypto/bn/bn_const.c.fips-dh openssl-1.1.1j/crypto/bn/bn_const.c
+--- openssl-1.1.1j/crypto/bn/bn_const.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/bn/bn_const.c	2021-03-03 14:23:27.403092418 +0100
 @@ -1,13 +1,17 @@
  /*
 - * Copyright 2005-2016 The OpenSSL Project Authors. All Rights Reserved.
@@ -477,9 +477,9 @@ diff -up openssl-1.1.1g/crypto/bn/bn_const.c.fips-dh openssl-1.1.1g/crypto/bn/bn
 -    return BN_bin2bn(RFC3526_PRIME_8192, sizeof(RFC3526_PRIME_8192), bn);
 +    return COPY_BN(bn, _bignum_modp_8192_p);
  }
-diff -up openssl-1.1.1g/crypto/bn/bn_dh.c.fips-dh openssl-1.1.1g/crypto/bn/bn_dh.c
---- openssl-1.1.1g/crypto/bn/bn_dh.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/bn/bn_dh.c	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/bn/bn_dh.c.fips-dh openssl-1.1.1j/crypto/bn/bn_dh.c
+--- openssl-1.1.1j/crypto/bn/bn_dh.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/bn/bn_dh.c	2021-03-03 14:23:27.404092427 +0100
 @@ -1,7 +1,7 @@
  /*
 - * Copyright 2014-2017 The OpenSSL Project Authors. All Rights Reserved.
@@ -1956,9 +1956,9 @@ diff -up openssl-1.1.1g/crypto/bn/bn_dh.c.fips-dh openssl-1.1.1g/crypto/bn/bn_dh
  
 -#endif
 +#endif /* OPENSSL_NO_DH */
-diff -up openssl-1.1.1g/crypto/dh/dh_check.c.fips-dh openssl-1.1.1g/crypto/dh/dh_check.c
---- openssl-1.1.1g/crypto/dh/dh_check.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_check.c	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/dh/dh_check.c.fips-dh openssl-1.1.1j/crypto/dh/dh_check.c
+--- openssl-1.1.1j/crypto/dh/dh_check.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/dh/dh_check.c	2021-03-03 14:23:27.404092427 +0100
 @@ -10,6 +10,7 @@
  #include <stdio.h>
  #include "internal/cryptlib.h"
@@ -2043,9 +2043,9 @@ diff -up openssl-1.1.1g/crypto/dh/dh_check.c.fips-dh openssl-1.1.1g/crypto/dh/dh
 +    return dh_check_pub_key_int(dh, q, pub_key, ret);
 +}
 +
-diff -up openssl-1.1.1g/crypto/dh/dh_gen.c.fips-dh openssl-1.1.1g/crypto/dh/dh_gen.c
---- openssl-1.1.1g/crypto/dh/dh_gen.c.fips-dh	2020-07-17 10:36:29.182787923 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_gen.c	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/dh/dh_gen.c.fips-dh openssl-1.1.1j/crypto/dh/dh_gen.c
+--- openssl-1.1.1j/crypto/dh/dh_gen.c.fips-dh	2021-03-03 14:23:27.338091859 +0100
++++ openssl-1.1.1j/crypto/dh/dh_gen.c	2021-03-03 14:23:27.404092427 +0100
 @@ -27,8 +27,7 @@ int DH_generate_parameters_ex(DH *ret, i
                                BN_GENCB *cb)
  {
@@ -2075,10 +2075,10 @@ diff -up openssl-1.1.1g/crypto/dh/dh_gen.c.fips-dh openssl-1.1.1g/crypto/dh/dh_g
      ctx = BN_CTX_new();
      if (ctx == NULL)
          goto err;
-diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_key.c
---- openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh	2020-07-17 10:36:29.182787923 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_key.c	2020-07-17 11:00:07.783777846 +0200
-@@ -100,10 +100,18 @@ static int generate_key(DH *dh)
+diff -up openssl-1.1.1j/crypto/dh/dh_key.c.fips-dh openssl-1.1.1j/crypto/dh/dh_key.c
+--- openssl-1.1.1j/crypto/dh/dh_key.c.fips-dh	2021-03-03 14:23:27.338091859 +0100
++++ openssl-1.1.1j/crypto/dh/dh_key.c	2021-03-03 14:51:36.235296236 +0100
+@@ -120,10 +120,18 @@ static int generate_key(DH *dh)
      BIGNUM *pub_key = NULL, *priv_key = NULL;
  
  #ifdef OPENSSL_FIPS
@@ -2101,7 +2101,7 @@ diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_k
      }
  #endif
  
-@@ -139,7 +147,15 @@ static int generate_key(DH *dh)
+@@ -159,7 +167,15 @@ static int generate_key(DH *dh)
      }
  
      if (generate_new_key) {
@@ -2118,7 +2118,7 @@ diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_k
              do {
                  if (!BN_priv_rand_range(priv_key, dh->q))
                      goto err;
-@@ -175,6 +191,15 @@ static int generate_key(DH *dh)
+@@ -195,6 +211,15 @@ static int generate_key(DH *dh)
          }
          /* We MUST free prk before any further use of priv_key */
          BN_clear_free(prk);
@@ -2134,7 +2134,7 @@ diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_k
      }
  
      dh->pub_key = pub_key;
-@@ -197,6 +222,7 @@ static int compute_key(unsigned char *ke
+@@ -217,6 +242,7 @@ static int compute_key(unsigned char *ke
      BN_CTX *ctx = NULL;
      BN_MONT_CTX *mont = NULL;
      BIGNUM *tmp;
@@ -2142,7 +2142,7 @@ diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_k
      int ret = -1;
      int check_result;
  
-@@ -243,6 +269,18 @@ static int compute_key(unsigned char *ke
+@@ -263,6 +289,18 @@ static int compute_key(unsigned char *ke
          DHerr(DH_F_COMPUTE_KEY, ERR_R_BN_LIB);
          goto err;
      }
@@ -2159,11 +2159,11 @@ diff -up openssl-1.1.1g/crypto/dh/dh_key.c.fips-dh openssl-1.1.1g/crypto/dh/dh_k
 +        goto err;
 +    }
  
-     ret = BN_bn2bin(tmp, key);
+     ret = BN_bn2binpad(tmp, key, BN_num_bytes(dh->p));
   err:
-diff -up openssl-1.1.1g/crypto/dh/dh_lib.c.fips-dh openssl-1.1.1g/crypto/dh/dh_lib.c
---- openssl-1.1.1g/crypto/dh/dh_lib.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_lib.c	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/dh/dh_lib.c.fips-dh openssl-1.1.1j/crypto/dh/dh_lib.c
+--- openssl-1.1.1j/crypto/dh/dh_lib.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/dh/dh_lib.c	2021-03-03 14:23:27.405092436 +0100
 @@ -8,6 +8,7 @@
   */
  
@@ -2193,9 +2193,9 @@ diff -up openssl-1.1.1g/crypto/dh/dh_lib.c.fips-dh openssl-1.1.1g/crypto/dh/dh_l
          dh->length = BN_num_bits(q);
      }
  
-diff -up openssl-1.1.1g/crypto/dh/dh_local.h.fips-dh openssl-1.1.1g/crypto/dh/dh_local.h
---- openssl-1.1.1g/crypto/dh/dh_local.h.fips-dh	2020-07-17 10:36:28.968786163 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_local.h	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/dh/dh_local.h.fips-dh openssl-1.1.1j/crypto/dh/dh_local.h
+--- openssl-1.1.1j/crypto/dh/dh_local.h.fips-dh	2021-03-03 14:23:27.202090689 +0100
++++ openssl-1.1.1j/crypto/dh/dh_local.h	2021-03-03 14:23:27.405092436 +0100
 @@ -35,6 +35,7 @@ struct dh_st {
      const DH_METHOD *meth;
      ENGINE *engine;
@@ -2215,9 +2215,9 @@ diff -up openssl-1.1.1g/crypto/dh/dh_local.h.fips-dh openssl-1.1.1g/crypto/dh/dh
 +/* FIPS mode only check which requires nid set and looks up q based on it. */
 +int dh_check_pub_key_full(const DH *dh, const BIGNUM *pub_key, int *ret);
 +
-diff -up openssl-1.1.1g/crypto/dh/dh_rfc7919.c.fips-dh openssl-1.1.1g/crypto/dh/dh_rfc7919.c
---- openssl-1.1.1g/crypto/dh/dh_rfc7919.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/dh/dh_rfc7919.c	2020-07-17 10:36:29.246788449 +0200
+diff -up openssl-1.1.1j/crypto/dh/dh_rfc7919.c.fips-dh openssl-1.1.1j/crypto/dh/dh_rfc7919.c
+--- openssl-1.1.1j/crypto/dh/dh_rfc7919.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/dh/dh_rfc7919.c	2021-03-03 14:23:27.405092436 +0100
 @@ -7,6 +7,8 @@
   * https://www.openssl.org/source/license.html
   */
@@ -2387,10 +2387,10 @@ diff -up openssl-1.1.1g/crypto/dh/dh_rfc7919.c.fips-dh openssl-1.1.1g/crypto/dh/
 +    return dh_match_group(dh, q, NULL) != NID_undef;
 +}
 +
-diff -up openssl-1.1.1g/crypto/ec/ec_key.c.fips-dh openssl-1.1.1g/crypto/ec/ec_key.c
---- openssl-1.1.1g/crypto/ec/ec_key.c.fips-dh	2020-07-17 11:00:53.958175227 +0200
-+++ openssl-1.1.1g/crypto/ec/ec_key.c	2020-07-20 13:24:03.941107320 +0200
-@@ -280,9 +280,18 @@ int ec_key_simple_generate_key(EC_KEY *e
+diff -up openssl-1.1.1j/crypto/ec/ec_key.c.fips-dh openssl-1.1.1j/crypto/ec/ec_key.c
+--- openssl-1.1.1j/crypto/ec/ec_key.c.fips-dh	2021-03-03 14:23:27.339091868 +0100
++++ openssl-1.1.1j/crypto/ec/ec_key.c	2021-03-03 14:23:27.405092436 +0100
+@@ -281,9 +281,18 @@ int ec_key_simple_generate_key(EC_KEY *e
      if (!EC_POINT_mul(eckey->group, pub_key, priv_key, NULL, NULL, ctx))
          goto err;
  
@@ -2410,7 +2410,7 @@ diff -up openssl-1.1.1g/crypto/ec/ec_key.c.fips-dh openssl-1.1.1g/crypto/ec/ec_k
      ok = 1;
  
   err:
-@@ -296,8 +305,23 @@ int ec_key_simple_generate_key(EC_KEY *e
+@@ -297,8 +306,23 @@ int ec_key_simple_generate_key(EC_KEY *e
  
  int ec_key_simple_generate_public_key(EC_KEY *eckey)
  {
@@ -2435,9 +2435,9 @@ diff -up openssl-1.1.1g/crypto/ec/ec_key.c.fips-dh openssl-1.1.1g/crypto/ec/ec_k
  }
  
  int EC_KEY_check_key(const EC_KEY *eckey)
-diff -up openssl-1.1.1g/crypto/evp/p_lib.c.fips-dh openssl-1.1.1g/crypto/evp/p_lib.c
---- openssl-1.1.1g/crypto/evp/p_lib.c.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/crypto/evp/p_lib.c	2020-07-17 10:36:29.247788458 +0200
+diff -up openssl-1.1.1j/crypto/evp/p_lib.c.fips-dh openssl-1.1.1j/crypto/evp/p_lib.c
+--- openssl-1.1.1j/crypto/evp/p_lib.c.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/crypto/evp/p_lib.c	2021-03-03 14:23:27.405092436 +0100
 @@ -540,7 +540,8 @@ EC_KEY *EVP_PKEY_get1_EC_KEY(EVP_PKEY *p
  
  int EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key)
@@ -2448,251 +2448,9 @@ diff -up openssl-1.1.1g/crypto/evp/p_lib.c.fips-dh openssl-1.1.1g/crypto/evp/p_l
      int ret = EVP_PKEY_assign(pkey, type, key);
  
      if (ret)
-diff -up openssl-1.1.1g/crypto/fips/fips_dh_selftest.c.fips-dh openssl-1.1.1g/crypto/fips/fips_dh_selftest.c
---- openssl-1.1.1g/crypto/fips/fips_dh_selftest.c.fips-dh	2020-09-17 14:38:55.074927727 +0200
-+++ openssl-1.1.1g/crypto/fips/fips_dh_selftest.c	2020-10-22 16:06:54.406229842 +0200
-@@ -59,107 +59,141 @@
- 
- #ifdef OPENSSL_FIPS
- 
--static const unsigned char dh_test_2048_p[] = {
--    0xAE, 0xEC, 0xEE, 0x22, 0xFA, 0x3A, 0xA5, 0x22, 0xC0, 0xDE, 0x0F, 0x09,
--    0x7E, 0x17, 0xC0, 0x05, 0xF9, 0xF1, 0xE7, 0xC6, 0x87, 0x14, 0x6D, 0x11,
--    0xE7, 0xAE, 0xED, 0x2F, 0x72, 0x59, 0xC5, 0xA9, 0x9B, 0xB8, 0x02, 0xA5,
--    0xF3, 0x69, 0x70, 0xD6, 0xDD, 0x90, 0xF9, 0x19, 0x79, 0xBE, 0x60, 0x8F,
--    0x25, 0x92, 0x30, 0x1C, 0x51, 0x51, 0x38, 0x26, 0x82, 0x25, 0xE6, 0xFC,
--    0xED, 0x65, 0x96, 0x8F, 0x57, 0xE5, 0x53, 0x8B, 0x38, 0x63, 0xC7, 0xCE,
--    0xBC, 0x1B, 0x4D, 0x18, 0x2A, 0x5B, 0x04, 0x3F, 0x6A, 0x3C, 0x94, 0x39,
--    0xAE, 0x36, 0xD6, 0x5E, 0x0F, 0xA2, 0xCC, 0xD0, 0xD4, 0xD5, 0xC6, 0x1E,
--    0xF6, 0xA0, 0xF5, 0x89, 0x4E, 0xB4, 0x0B, 0xA4, 0xB3, 0x2B, 0x3D, 0xE2,
--    0x4E, 0xE1, 0x49, 0x25, 0x99, 0x5F, 0x32, 0x16, 0x33, 0x32, 0x1B, 0x7A,
--    0xA5, 0x5C, 0x6B, 0x34, 0x0D, 0x39, 0x99, 0xDC, 0xF0, 0x76, 0xE5, 0x5A,
--    0xD4, 0x71, 0x00, 0xED, 0x5A, 0x73, 0xFB, 0xC8, 0x01, 0xAD, 0x99, 0xCF,
--    0x99, 0x52, 0x7C, 0x9C, 0x64, 0xC6, 0x76, 0x40, 0x57, 0xAF, 0x59, 0xD7,
--    0x38, 0x0B, 0x40, 0xDE, 0x33, 0x0D, 0xB8, 0x76, 0xEC, 0xA9, 0xD8, 0x73,
--    0xF8, 0xEF, 0x26, 0x66, 0x06, 0x27, 0xDD, 0x7C, 0xA4, 0x10, 0x9C, 0xA6,
--    0xAA, 0xF9, 0x53, 0x62, 0x73, 0x1D, 0xBA, 0x1C, 0xF1, 0x67, 0xF4, 0x35,
--    0xED, 0x6F, 0x37, 0x92, 0xE8, 0x4F, 0x6C, 0xBA, 0x52, 0x6E, 0xA1, 0xED,
--    0xDA, 0x9F, 0x85, 0x11, 0x82, 0x52, 0x62, 0x08, 0x44, 0xF1, 0x30, 0x03,
--    0xC3, 0x38, 0x2C, 0x79, 0xBD, 0xD4, 0x43, 0x45, 0xEE, 0x8E, 0x50, 0xFC,
--    0x29, 0x46, 0x9A, 0xFE, 0x54, 0x1A, 0x19, 0x8F, 0x4B, 0x84, 0x08, 0xDE,
--    0x20, 0x62, 0x73, 0xCC, 0xDD, 0x7E, 0xF0, 0xEF, 0xA2, 0xFD, 0x86, 0x58,
--    0x4B, 0xD8, 0x37, 0xEB
-+static const unsigned char dh_test_2048_priv_key[] = {
-+    0x0C, 0x4B, 0x30, 0x89, 0xD1, 0xB8, 0x62, 0xCB,
-+    0x3C, 0x43, 0x64, 0x91, 0xF0, 0x91, 0x54, 0x70,
-+    0xC5, 0x27, 0x96, 0xE3, 0xAC, 0xBE, 0xE8, 0x00,
-+    0xEC, 0x55, 0xF6, 0xCC
- };
- 
--static const unsigned char dh_test_2048_g[] = {
--    0x02
-+static const unsigned char dh_test_2048_pub_key[] = {
-+    0xE8, 0x8B, 0xEC, 0x36, 0x93, 0xB4, 0x94, 0x44,
-+    0xA3, 0x7D, 0x09, 0x5C, 0x0B, 0x60, 0x79, 0x4B,
-+    0x2B, 0xCA, 0xCF, 0xB7, 0x16, 0x30, 0x4A, 0xD0,
-+    0xEA, 0x23, 0x04, 0x24, 0x8C, 0x50, 0x82, 0x11,
-+    0x79, 0x4C, 0x57, 0x6F, 0x96, 0xAC, 0xF9, 0x78,
-+    0x38, 0x83, 0x03, 0x0B, 0x77, 0x47, 0xB7, 0x84,
-+    0xB9, 0x6F, 0xE6, 0xB9, 0xCC, 0xA7, 0x2B, 0x94,
-+    0xAE, 0x8A, 0xCA, 0x58, 0x15, 0x7B, 0xA0, 0x73,
-+    0x5D, 0xD4, 0xD7, 0xC6, 0xBA, 0xA6, 0x03, 0x30,
-+    0x6B, 0x52, 0x85, 0x94, 0x57, 0x11, 0xFB, 0xAA,
-+    0x83, 0x71, 0x5E, 0x0E, 0xC4, 0x86, 0x89, 0xF8,
-+    0x38, 0x5A, 0xAE, 0x66, 0xF2, 0xA1, 0x67, 0xE0,
-+    0xF5, 0x7A, 0x38, 0xE6, 0x21, 0x98, 0xF0, 0x33,
-+    0xD6, 0xD7, 0x27, 0x82, 0xED, 0xDE, 0x73, 0x52,
-+    0xD4, 0x2C, 0xCF, 0x0A, 0xB1, 0xA1, 0xA0, 0x5A,
-+    0xCE, 0x05, 0x40, 0xE7, 0xF7, 0x0C, 0xE2, 0x63,
-+    0x21, 0xA0, 0xF3, 0x26, 0x9B, 0xEC, 0x6B, 0x33,
-+    0x4D, 0x34, 0x9B, 0x8D, 0x86, 0x10, 0xB8, 0xE8,
-+    0x96, 0x84, 0x66, 0x49, 0x27, 0xED, 0x2B, 0x76,
-+    0x19, 0xF6, 0x9C, 0xCB, 0x71, 0x4F, 0xF9, 0x16,
-+    0xB4, 0xD0, 0xC6, 0x49, 0x7A, 0x53, 0xDD, 0x53,
-+    0xA1, 0x0E, 0x0B, 0xB6, 0x33, 0xC4, 0xE9, 0xCF,
-+    0x5A, 0x1E, 0x4D, 0xC8, 0xE3, 0x1F, 0x14, 0x9D,
-+    0xF0, 0x14, 0x70, 0x39, 0x50, 0x21, 0x8A, 0xEA,
-+    0x7C, 0x72, 0xA3, 0x3F, 0x67, 0x5C, 0x1E, 0x32,
-+    0xA7, 0x5D, 0x78, 0xCC, 0xE3, 0xA9, 0x03, 0x76,
-+    0x4A, 0xD4, 0x65, 0x0E, 0x11, 0xEF, 0x56, 0x25,
-+    0xE5, 0x78, 0x1A, 0xA8, 0x49, 0x8C, 0x14, 0x2E,
-+    0xF7, 0xFA, 0x70, 0x27, 0xB1, 0x89, 0x66, 0x8F,
-+    0xFA, 0xFC, 0xED, 0x15, 0x98, 0xE8, 0x0D, 0x72,
-+    0x17, 0x02, 0x67, 0x14, 0x55, 0x6C, 0x32, 0x98,
-+    0x59, 0xF3, 0x17, 0xBC, 0x55, 0xA1, 0x39, 0x69
- };
- 
--static const unsigned char dh_test_2048_pub_key[] = {
--    0xA0, 0x39, 0x11, 0x77, 0x9A, 0xC1, 0x30, 0x1F, 0xBE, 0x48, 0xA7, 0xAA,
--    0xA0, 0x84, 0x54, 0x64, 0xAD, 0x1B, 0x70, 0xFA, 0x13, 0x55, 0x63, 0xD2,
--    0x1F, 0x62, 0x32, 0x93, 0x8E, 0xC9, 0x3E, 0x09, 0xA7, 0x64, 0xE4, 0x12,
--    0x6E, 0x1B, 0xF2, 0x92, 0x3B, 0xB9, 0xCB, 0x56, 0xEA, 0x07, 0x88, 0xB5,
--    0xA6, 0xBC, 0x16, 0x1F, 0x27, 0xFE, 0xD8, 0xAA, 0x40, 0xB2, 0xB0, 0x2D,
--    0x37, 0x76, 0xA6, 0xA4, 0x82, 0x2C, 0x0E, 0x22, 0x64, 0x9D, 0xCB, 0xD1,
--    0x00, 0xB7, 0x89, 0x14, 0x72, 0x4E, 0xBE, 0x48, 0x41, 0xF8, 0xB2, 0x51,
--    0x11, 0x09, 0x4B, 0x22, 0x01, 0x23, 0x39, 0x96, 0xE0, 0x15, 0xD7, 0x9F,
--    0x60, 0xD1, 0xB7, 0xAE, 0xFE, 0x5F, 0xDB, 0xE7, 0x03, 0x17, 0x97, 0xA6,
--    0x16, 0x74, 0xBD, 0x53, 0x81, 0x19, 0xC5, 0x47, 0x5E, 0xCE, 0x8D, 0xED,
--    0x45, 0x5D, 0x3C, 0x00, 0xA0, 0x0A, 0x68, 0x6A, 0xE0, 0x8E, 0x06, 0x46,
--    0x6F, 0xD7, 0xF9, 0xDF, 0x31, 0x7E, 0x77, 0x44, 0x0D, 0x98, 0xE0, 0xCA,
--    0x98, 0x09, 0x52, 0x04, 0x90, 0xEA, 0x6D, 0xF4, 0x30, 0x69, 0x8F, 0xB1,
--    0x9B, 0xC1, 0x43, 0xDB, 0xD5, 0x8D, 0xC8, 0x8E, 0xB6, 0x0B, 0x05, 0xBE,
--    0x0E, 0xC5, 0x99, 0xC8, 0x6E, 0x4E, 0xF3, 0xCB, 0xC3, 0x5E, 0x9B, 0x53,
--    0xF7, 0x06, 0x1C, 0x4F, 0xC7, 0xB8, 0x6E, 0x30, 0x18, 0xCA, 0x9B, 0xB9,
--    0xBC, 0x5F, 0x17, 0x72, 0x29, 0x5A, 0xE5, 0xD9, 0x96, 0xB7, 0x0B, 0xF3,
--    0x2D, 0x8C, 0xF1, 0xE1, 0x0E, 0x0D, 0x74, 0xD5, 0x9D, 0xF0, 0x06, 0xA9,
--    0xB4, 0x95, 0x63, 0x76, 0x46, 0x55, 0x48, 0x82, 0x39, 0x90, 0xEF, 0x56,
--    0x75, 0x34, 0xB8, 0x34, 0xC3, 0x18, 0x6E, 0x1E, 0xAD, 0xE3, 0x48, 0x7E,
--    0x93, 0x2C, 0x23, 0xE7, 0xF8, 0x90, 0x73, 0xB1, 0x77, 0x80, 0x67, 0xA9,
--    0x36, 0x9E, 0xDA, 0xD2
-+static const unsigned char dh_test_2048_peer_key[] = {
-+    0xD3, 0xAA, 0x26, 0x20, 0x2C, 0x02, 0x38, 0x0A,
-+    0x2E, 0x4D, 0xC0, 0x62, 0xCB, 0xD8, 0x7F, 0xF2,
-+    0x54, 0x23, 0xC3, 0x90, 0x33, 0xD8, 0xF7, 0x93,
-+    0xAD, 0x5F, 0xDA, 0xE6, 0xA4, 0xAB, 0x29, 0xE1,
-+    0x4B, 0x75, 0xE8, 0x3B, 0x4E, 0xC7, 0xB5, 0x43,
-+    0xCD, 0xF7, 0xB9, 0x0F, 0x43, 0x68, 0xED, 0xF7,
-+    0xD1, 0xFD, 0x13, 0x39, 0xCA, 0x39, 0x35, 0x39,
-+    0xB4, 0x5A, 0x12, 0x96, 0xC6, 0x85, 0xEC, 0x80,
-+    0xC0, 0x0D, 0xBC, 0xC6, 0x59, 0xC0, 0xAD, 0xB6,
-+    0xD8, 0x68, 0xD4, 0xE0, 0x2A, 0x8B, 0x21, 0x09,
-+    0xC0, 0xDB, 0xD9, 0xBA, 0x63, 0xC0, 0x11, 0x22,
-+    0xBB, 0xF2, 0x81, 0x35, 0x5C, 0xE0, 0xCE, 0xBE,
-+    0xAB, 0x2E, 0x83, 0x44, 0xCA, 0x05, 0x07, 0xDF,
-+    0xAD, 0x1D, 0xAD, 0x12, 0x15, 0xD3, 0x9C, 0x8C,
-+    0x92, 0xD3, 0xDE, 0x02, 0x00, 0x7B, 0x30, 0x97,
-+    0x07, 0xC0, 0x7C, 0x58, 0xF8, 0x98, 0xAE, 0xB9,
-+    0xE8, 0x82, 0x56, 0x0A, 0xEC, 0x4B, 0xF7, 0xEC,
-+    0x85, 0xBA, 0xDF, 0xD7, 0xEA, 0x9D, 0x68, 0xAE,
-+    0x1A, 0x2C, 0xEC, 0x25, 0x6A, 0x07, 0x2B, 0xFE,
-+    0x6D, 0x49, 0xD7, 0x8A, 0x1C, 0x5E, 0xC9, 0xA5,
-+    0x2C, 0xF2, 0xB5, 0x8A, 0x14, 0x91, 0x15, 0x6B,
-+    0x71, 0x2E, 0x6D, 0x31, 0x1F, 0xC8, 0x61, 0x46,
-+    0xF2, 0x0D, 0xCC, 0x10, 0xF7, 0x08, 0x9E, 0xBB,
-+    0x66, 0x0D, 0x0D, 0x6D, 0xE7, 0x82, 0x0E, 0x71,
-+    0xA4, 0x51, 0xC2, 0x63, 0xA5, 0xDC, 0xFA, 0xF1,
-+    0x04, 0xD8, 0xCF, 0x16, 0x9F, 0x7F, 0x73, 0xA2,
-+    0x3B, 0xF9, 0x0D, 0xC7, 0xDD, 0x9A, 0x3A, 0x2B,
-+    0x0F, 0xB0, 0xB3, 0x97, 0x9D, 0xF1, 0xF0, 0x73,
-+    0x7C, 0xFD, 0x76, 0x3A, 0xEB, 0x34, 0xDD, 0x87,
-+    0xE6, 0x52, 0x79, 0xDD, 0x53, 0x9A, 0xCB, 0x62,
-+    0xE4, 0xF1, 0xB2, 0xCA, 0x6B, 0xD8, 0xC2, 0x69,
-+    0xBD, 0xA9, 0xB8, 0xE8, 0x76, 0x88, 0x91, 0x6D
- };
- 
--static const unsigned char dh_test_2048_priv_key[] = {
--    0x0C, 0x4B, 0x30, 0x89, 0xD1, 0xB8, 0x62, 0xCB, 0x3C, 0x43, 0x64, 0x91,
--    0xF0, 0x91, 0x54, 0x70, 0xC5, 0x27, 0x96, 0xE3, 0xAC, 0xBE, 0xE8, 0x00,
--    0xEC, 0x55, 0xF6, 0xCC
-+static const unsigned char dh_test_2048_expected_key[] = {
-+    0xB1, 0x26, 0x63, 0xAD, 0xB9, 0x4D, 0x9A, 0x38,
-+    0x14, 0x25, 0x16, 0x4D, 0x3A, 0x18, 0x36, 0x10,
-+    0xF8, 0xB1, 0x2C, 0x22, 0x4F, 0xD6, 0xA6, 0x2B,
-+    0xEB, 0xDF, 0x39, 0xAA, 0x31, 0x8E, 0x44, 0x40,
-+    0x09, 0xB6, 0x55, 0x7C, 0x95, 0x6E, 0x1F, 0x00,
-+    0x5B, 0xF8, 0x94, 0x1E, 0x5B, 0x69, 0x7A, 0x63,
-+    0x38, 0x12, 0x7B, 0xE6, 0xDD, 0x58, 0x08, 0x8E,
-+    0x88, 0xF7, 0x82, 0xA5, 0x5D, 0xED, 0x24, 0x10,
-+    0x0E, 0x87, 0x2E, 0x9A, 0x3A, 0xF0, 0xDB, 0xA5,
-+    0x0E, 0x85, 0xAE, 0xFC, 0xD0, 0x35, 0x30, 0x79,
-+    0xFE, 0x84, 0x84, 0xF1, 0x15, 0x14, 0x9C, 0x84,
-+    0x72, 0xA6, 0xB3, 0x7C, 0xB7, 0xEF, 0x38, 0xF5,
-+    0x2C, 0x90, 0x1B, 0xFC, 0x41, 0x85, 0x0A, 0xDE,
-+    0x1B, 0xD3, 0x7E, 0x93, 0xCB, 0x59, 0xE8, 0x7C,
-+    0xAB, 0x47, 0x3A, 0x02, 0x22, 0x4F, 0xAC, 0xAD,
-+    0xE9, 0x56, 0x32, 0xEB, 0x3D, 0x02, 0x9B, 0x1F,
-+    0x7C, 0x70, 0x0F, 0x83, 0xEF, 0x4D, 0x88, 0xE8,
-+    0x70, 0x91, 0x34, 0xDD, 0x1C, 0xEF, 0x56, 0x97,
-+    0xA3, 0x6E, 0xF6, 0x88, 0xAC, 0xF3, 0xA2, 0xBE,
-+    0x30, 0xBD, 0xE0, 0xC0, 0xCD, 0x01, 0x46, 0x5E,
-+    0x96, 0xC6, 0x14, 0x44, 0x60, 0xC0, 0x99, 0xFD,
-+    0xF0, 0x0A, 0xF6, 0x7D, 0x29, 0xD6, 0x0D, 0xEE,
-+    0x10, 0x91, 0x0F, 0x55, 0x71, 0x29, 0xA7, 0x6A,
-+    0xEB, 0x18, 0x9B, 0x40, 0xF7, 0x37, 0x50, 0x91,
-+    0xBC, 0x16, 0x5D, 0x29, 0x24, 0x63, 0xA2, 0x73,
-+    0x0F, 0xA7, 0xA4, 0x0D, 0x00, 0xD4, 0x5F, 0x61,
-+    0x74, 0x73, 0x99, 0x14, 0x73, 0xC7, 0x35, 0x2A,
-+    0xC0, 0xBA, 0x38, 0x9E, 0x05, 0x09, 0x81, 0xA5,
-+    0xDE, 0x8E, 0xB5, 0xE0, 0x77, 0xA7, 0x2F, 0x1A,
-+    0x47, 0xD2, 0x68, 0xD4, 0x3E, 0x9A, 0x02, 0xA0,
-+    0x5C, 0xC7, 0xFB, 0xE4, 0x2C, 0x7B, 0xC6, 0x26,
-+    0x35, 0x92, 0x12, 0x88, 0x62, 0x36, 0x98, 0xFE
- };
- 
- int FIPS_selftest_dh()
- {
-     DH *dh = NULL;
-     int ret = 0;
--    void *pub_key_bin = NULL;
-+    unsigned char shared_key[sizeof(dh_test_2048_expected_key)];
-     int len;
--    BIGNUM *p = NULL, *g = NULL, *priv_key = NULL, *tmp_pub_key = NULL;
--    const BIGNUM *pub_key;
-+    BIGNUM *priv_key = NULL;
-+    BIGNUM *pub_key = NULL;
-+    BIGNUM *peer_key = NULL;
- 
--    fips_load_key_component(p, dh_test_2048);
--    fips_load_key_component(g, dh_test_2048);
--    /* note that the private key is much shorter than normally used
--     * but still g ** priv_key > p
--     */
-     fips_load_key_component(priv_key, dh_test_2048);
--    if ((tmp_pub_key = BN_new()) == NULL)
--        goto err;
--
--    dh = DH_new();
-+    fips_load_key_component(pub_key, dh_test_2048);
-+    fips_load_key_component(peer_key, dh_test_2048);
- 
--    if (dh == NULL)
-+    if ((dh = DH_new_by_nid(NID_ffdhe2048)) == NULL)
-         goto err;
- 
--    DH_set0_pqg(dh, p, NULL, g);
--    DH_set0_key(dh, tmp_pub_key, priv_key);
-+    DH_set0_key(dh, pub_key, priv_key);
- 
--    if (DH_generate_key(dh) <= 0)
--        goto err;
--
--    DH_get0_key(dh, &pub_key, NULL);
--
--    if (pub_key == NULL)
--        goto err;
-+    len = DH_compute_key(shared_key, peer_key, dh);
- 
--    len = BN_num_bytes(pub_key);
--    if ((pub_key_bin = OPENSSL_malloc(len)) == NULL)
--        goto err;
--    BN_bn2bin(pub_key, pub_key_bin);
--
--    if (len != sizeof(dh_test_2048_pub_key) ||
--        memcmp(pub_key_bin, dh_test_2048_pub_key, len) != 0)
-+    if (len != sizeof(dh_test_2048_expected_key) ||
-+        memcmp(shared_key, dh_test_2048_expected_key, len) != 0)
-         goto err;
- 
-     ret = 1;
-@@ -168,13 +202,10 @@ int FIPS_selftest_dh()
-     if (dh)
-         DH_free(dh);
-     else {
--        BN_free(p);
--        BN_free(g);
-         BN_free(priv_key);
--        BN_free(tmp_pub_key);
-+        BN_free(pub_key);
-     }
--
--    OPENSSL_free(pub_key_bin);
-+    BN_free(peer_key);
-     return ret;
- }
- #endif
-diff -up openssl-1.1.1g/crypto/objects/obj_dat.h.fips-dh openssl-1.1.1g/crypto/objects/obj_dat.h
---- openssl-1.1.1g/crypto/objects/obj_dat.h.fips-dh	2020-07-17 10:36:29.239788392 +0200
-+++ openssl-1.1.1g/crypto/objects/obj_dat.h	2020-07-17 10:36:29.247788458 +0200
+diff -up openssl-1.1.1j/crypto/objects/obj_dat.h.fips-dh openssl-1.1.1j/crypto/objects/obj_dat.h
+--- openssl-1.1.1j/crypto/objects/obj_dat.h.fips-dh	2021-03-03 14:23:27.394092341 +0100
++++ openssl-1.1.1j/crypto/objects/obj_dat.h	2021-03-03 14:23:27.406092444 +0100
 @@ -1078,7 +1078,7 @@ static const unsigned char so[7762] = {
      0x2A,0x86,0x48,0x86,0xF7,0x0D,0x02,0x0D,       /* [ 7753] OBJ_hmacWithSHA512_256 */
  };
@@ -2754,9 +2512,9 @@ diff -up openssl-1.1.1g/crypto/objects/obj_dat.h.fips-dh openssl-1.1.1g/crypto/o
       481,    /* "nSRecord" */
       173,    /* "name" */
       681,    /* "onBasis" */
-diff -up openssl-1.1.1g/crypto/objects/objects.txt.fips-dh openssl-1.1.1g/crypto/objects/objects.txt
---- openssl-1.1.1g/crypto/objects/objects.txt.fips-dh	2020-07-17 10:36:29.239788392 +0200
-+++ openssl-1.1.1g/crypto/objects/objects.txt	2020-07-17 10:36:29.247788458 +0200
+diff -up openssl-1.1.1j/crypto/objects/objects.txt.fips-dh openssl-1.1.1j/crypto/objects/objects.txt
+--- openssl-1.1.1j/crypto/objects/objects.txt.fips-dh	2021-03-03 14:23:27.395092350 +0100
++++ openssl-1.1.1j/crypto/objects/objects.txt	2021-03-03 14:23:27.406092444 +0100
 @@ -1657,6 +1657,13 @@ id-pkinit 5                     : pkInit
                              : ffdhe4096
                              : ffdhe6144
@@ -2771,9 +2529,9 @@ diff -up openssl-1.1.1g/crypto/objects/objects.txt.fips-dh openssl-1.1.1g/crypto
  
  # OIDs for DSTU-4145/DSTU-7564 (http://zakon2.rada.gov.ua/laws/show/z0423-17)
  
-diff -up openssl-1.1.1g/crypto/objects/obj_mac.num.fips-dh openssl-1.1.1g/crypto/objects/obj_mac.num
---- openssl-1.1.1g/crypto/objects/obj_mac.num.fips-dh	2020-07-17 10:36:29.239788392 +0200
-+++ openssl-1.1.1g/crypto/objects/obj_mac.num	2020-07-17 10:36:29.248788466 +0200
+diff -up openssl-1.1.1j/crypto/objects/obj_mac.num.fips-dh openssl-1.1.1j/crypto/objects/obj_mac.num
+--- openssl-1.1.1j/crypto/objects/obj_mac.num.fips-dh	2021-03-03 14:23:27.395092350 +0100
++++ openssl-1.1.1j/crypto/objects/obj_mac.num	2021-03-03 14:23:27.406092444 +0100
 @@ -1196,3 +1196,9 @@ sshkdf		1195
  kbkdf		1196
  krb5kdf		1197
@@ -2784,9 +2542,9 @@ diff -up openssl-1.1.1g/crypto/objects/obj_mac.num.fips-dh openssl-1.1.1g/crypto
 +modp_4096		1202
 +modp_6144		1203
 +modp_8192		1204
-diff -up openssl-1.1.1g/doc/man3/DH_new_by_nid.pod.fips-dh openssl-1.1.1g/doc/man3/DH_new_by_nid.pod
---- openssl-1.1.1g/doc/man3/DH_new_by_nid.pod.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/doc/man3/DH_new_by_nid.pod	2020-07-17 10:36:29.248788466 +0200
+diff -up openssl-1.1.1j/doc/man3/DH_new_by_nid.pod.fips-dh openssl-1.1.1j/doc/man3/DH_new_by_nid.pod
+--- openssl-1.1.1j/doc/man3/DH_new_by_nid.pod.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/doc/man3/DH_new_by_nid.pod	2021-03-03 14:23:27.406092444 +0100
 @@ -8,13 +8,15 @@ DH_new_by_nid, DH_get_nid - get or find
  
   #include <openssl/dh.h>
@@ -2805,9 +2563,9 @@ diff -up openssl-1.1.1g/doc/man3/DH_new_by_nid.pod.fips-dh openssl-1.1.1g/doc/ma
  
  DH_get_nid() determines if the parameters contained in B<dh> match
  any named set. It returns the NID corresponding to the matching parameters or
-diff -up openssl-1.1.1g/doc/man3/EVP_PKEY_CTX_ctrl.pod.fips-dh openssl-1.1.1g/doc/man3/EVP_PKEY_CTX_ctrl.pod
---- openssl-1.1.1g/doc/man3/EVP_PKEY_CTX_ctrl.pod.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/doc/man3/EVP_PKEY_CTX_ctrl.pod	2020-07-17 10:36:29.248788466 +0200
+diff -up openssl-1.1.1j/doc/man3/EVP_PKEY_CTX_ctrl.pod.fips-dh openssl-1.1.1j/doc/man3/EVP_PKEY_CTX_ctrl.pod
+--- openssl-1.1.1j/doc/man3/EVP_PKEY_CTX_ctrl.pod.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/doc/man3/EVP_PKEY_CTX_ctrl.pod	2021-03-03 14:23:27.406092444 +0100
 @@ -294,10 +294,11 @@ The EVP_PKEY_CTX_set_dh_pad() macro sets
  If B<pad> is zero (the default) then no padding is performed.
  
@@ -2824,9 +2582,9 @@ diff -up openssl-1.1.1g/doc/man3/EVP_PKEY_CTX_ctrl.pod.fips-dh openssl-1.1.1g/do
  The nid parameter and the rfc5114 parameter are mutually exclusive.
  
  The EVP_PKEY_CTX_set_dh_rfc5114() and EVP_PKEY_CTX_set_dhx_rfc5114() macros are
-diff -up openssl-1.1.1g/include/crypto/bn_dh.h.fips-dh openssl-1.1.1g/include/crypto/bn_dh.h
---- openssl-1.1.1g/include/crypto/bn_dh.h.fips-dh	2020-04-21 14:22:39.000000000 +0200
-+++ openssl-1.1.1g/include/crypto/bn_dh.h	2020-07-17 10:36:29.248788466 +0200
+diff -up openssl-1.1.1j/include/crypto/bn_dh.h.fips-dh openssl-1.1.1j/include/crypto/bn_dh.h
+--- openssl-1.1.1j/include/crypto/bn_dh.h.fips-dh	2021-02-16 16:24:01.000000000 +0100
++++ openssl-1.1.1j/include/crypto/bn_dh.h	2021-03-03 14:23:27.406092444 +0100
 @@ -1,7 +1,7 @@
  /*
 - * Copyright 2015-2016 The OpenSSL Project Authors. All Rights Reserved.
@@ -2875,9 +2633,9 @@ diff -up openssl-1.1.1g/include/crypto/bn_dh.h.fips-dh openssl-1.1.1g/include/cr
 +extern const BIGNUM _bignum_modp_4096_q;
 +extern const BIGNUM _bignum_modp_6144_q;
 +extern const BIGNUM _bignum_modp_8192_q;
-diff -up openssl-1.1.1g/include/openssl/obj_mac.h.fips-dh openssl-1.1.1g/include/openssl/obj_mac.h
---- openssl-1.1.1g/include/openssl/obj_mac.h.fips-dh	2020-07-17 10:36:29.240788400 +0200
-+++ openssl-1.1.1g/include/openssl/obj_mac.h	2020-07-17 10:36:29.248788466 +0200
+diff -up openssl-1.1.1j/include/openssl/obj_mac.h.fips-dh openssl-1.1.1j/include/openssl/obj_mac.h
+--- openssl-1.1.1j/include/openssl/obj_mac.h.fips-dh	2021-03-03 14:23:27.396092358 +0100
++++ openssl-1.1.1j/include/openssl/obj_mac.h	2021-03-03 14:23:27.407092453 +0100
 @@ -5115,6 +5115,24 @@
  #define SN_ffdhe8192            "ffdhe8192"
  #define NID_ffdhe8192           1130
@@ -2903,10 +2661,10 @@ diff -up openssl-1.1.1g/include/openssl/obj_mac.h.fips-dh openssl-1.1.1g/include
  #define SN_ISO_UA               "ISO-UA"
  #define NID_ISO_UA              1150
  #define OBJ_ISO_UA              OBJ_member_body,804L
-diff -up openssl-1.1.1g/ssl/s3_lib.c.fips-dh openssl-1.1.1g/ssl/s3_lib.c
---- openssl-1.1.1g/ssl/s3_lib.c.fips-dh	2020-07-17 10:36:29.199788063 +0200
-+++ openssl-1.1.1g/ssl/s3_lib.c	2020-07-17 10:36:29.248788466 +0200
-@@ -4858,13 +4858,51 @@ int ssl_derive(SSL *s, EVP_PKEY *privkey
+diff -up openssl-1.1.1j/ssl/s3_lib.c.fips-dh openssl-1.1.1j/ssl/s3_lib.c
+--- openssl-1.1.1j/ssl/s3_lib.c.fips-dh	2021-03-03 14:23:27.354091997 +0100
++++ openssl-1.1.1j/ssl/s3_lib.c	2021-03-03 14:23:27.407092453 +0100
+@@ -4849,13 +4849,51 @@ int ssl_derive(SSL *s, EVP_PKEY *privkey
  EVP_PKEY *ssl_dh_to_pkey(DH *dh)
  {
      EVP_PKEY *ret;
@@ -2958,91 +2716,15 @@ diff -up openssl-1.1.1g/ssl/s3_lib.c.fips-dh openssl-1.1.1g/ssl/s3_lib.c
      return ret;
  }
  #endif
-diff -up openssl-1.1.1g/ssl/t1_lib.c.fips-dh openssl-1.1.1g/ssl/t1_lib.c
---- openssl-1.1.1g/ssl/t1_lib.c.fips-dh	2020-07-17 10:36:29.243788425 +0200
-+++ openssl-1.1.1g/ssl/t1_lib.c	2020-07-17 10:36:29.249788474 +0200
-@@ -2511,46 +2511,48 @@ int SSL_check_chain(SSL *s, X509 *x, EVP
- #ifndef OPENSSL_NO_DH
- DH *ssl_get_auto_dh(SSL *s)
- {
-+    DH *dhp = NULL;
-+    BIGNUM *p = NULL, *g = NULL;
-     int dh_secbits = 80;
--    if (s->cert->dh_tmp_auto == 2)
--        return DH_get_1024_160();
--    if (s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL | SSL_aPSK)) {
--        if (s->s3->tmp.new_cipher->strength_bits == 256)
--            dh_secbits = 128;
--        else
--            dh_secbits = 80;
--    } else {
--        if (s->s3->tmp.cert == NULL)
--            return NULL;
--        dh_secbits = EVP_PKEY_security_bits(s->s3->tmp.cert->privatekey);
-+    if (s->cert->dh_tmp_auto != 2) {
-+        if (s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL | SSL_aPSK)) {
-+            if (s->s3->tmp.new_cipher->strength_bits == 256)
-+                dh_secbits = 128;
-+            else
-+                dh_secbits = 80;
-+        } else {
-+            if (s->s3->tmp.cert == NULL)
-+                return NULL;
-+            dh_secbits = EVP_PKEY_security_bits(s->s3->tmp.cert->privatekey);
-+        }
-     }
- 
--    if (dh_secbits >= 128) {
--        DH *dhp = DH_new();
--        BIGNUM *p, *g;
--        if (dhp == NULL)
--            return NULL;
--        g = BN_new();
--        if (g == NULL || !BN_set_word(g, 2)) {
--            DH_free(dhp);
--            BN_free(g);
--            return NULL;
--        }
--        if (dh_secbits >= 192)
--            p = BN_get_rfc3526_prime_8192(NULL);
--        else
--            p = BN_get_rfc3526_prime_3072(NULL);
--        if (p == NULL || !DH_set0_pqg(dhp, p, NULL, g)) {
--            DH_free(dhp);
--            BN_free(p);
--            BN_free(g);
--            return NULL;
--        }
--        return dhp;
-+    dhp = DH_new();
-+    if (dhp == NULL)
-+        return NULL;
-+    g = BN_new();
-+    if (g == NULL || !BN_set_word(g, 2)) {
-+        DH_free(dhp);
-+        BN_free(g);
-+        return NULL;
-+    }
-+    if (dh_secbits >= 192)
-+        p = BN_get_rfc3526_prime_8192(NULL);
-+    else if (dh_secbits >= 152)
-+        p = BN_get_rfc3526_prime_4096(NULL);
-+    else if (dh_secbits >= 128)
-+        p = BN_get_rfc3526_prime_3072(NULL);
+diff -up openssl-1.1.1j/ssl/t1_lib.c.fips-dh openssl-1.1.1j/ssl/t1_lib.c
+--- openssl-1.1.1j/ssl/t1_lib.c.fips-dh	2021-03-03 14:23:27.401092401 +0100
++++ openssl-1.1.1j/ssl/t1_lib.c	2021-03-03 14:23:27.407092453 +0100
+@@ -2542,7 +2542,7 @@ DH *ssl_get_auto_dh(SSL *s)
+         p = BN_get_rfc3526_prime_4096(NULL);
+     else if (dh_secbits >= 128)
+         p = BN_get_rfc3526_prime_3072(NULL);
+-    else if (dh_secbits >= 112)
 +    else if (dh_secbits >= 112 || FIPS_mode())
-+        p = BN_get_rfc3526_prime_2048(NULL);
-+    else
-+        p = BN_get_rfc2409_prime_1024(NULL);
-+    if (p == NULL || !DH_set0_pqg(dhp, p, NULL, g)) {
-+        DH_free(dhp);
-+        BN_free(p);
-+        BN_free(g);
-+        return NULL;
-     }
--    if (dh_secbits >= 112)
--        return DH_get_2048_224();
--    return DH_get_1024_160();
-+    return dhp;
- }
- #endif
- 
+         p = BN_get_rfc3526_prime_2048(NULL);
+     else
+         p = BN_get_rfc2409_prime_1024(NULL);

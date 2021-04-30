@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:  nettle-devel
+BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  openssl-devel
@@ -20,7 +20,7 @@ BuildRequires:  net-tools
 BuildRequires:  which
 %endif
 
-Requires:       nettle
+Requires:       nettle >= 3.7.2
 Requires:       autogen-libopts
 Requires:       libtasn1
 Requires:       openssl

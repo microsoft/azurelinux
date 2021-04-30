@@ -50,7 +50,7 @@ mkdir -p "$log_path"
 ORIGINAL_HOME=$HOME
 HOME=/root
 
-while read -r package; do
+while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
 

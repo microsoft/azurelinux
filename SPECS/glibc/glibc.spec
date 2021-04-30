@@ -37,7 +37,8 @@ Patch12:        CVE-2019-7309.patch
 # CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
 Patch13:        CVE-2019-19126.patch
 Patch14:        CVE-2019-25013.patch
-Patch15:		CVE-2021-3326.patch
+Patch15:        CVE-2021-3326.patch
+Patch16:        CVE-2020-27618.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
@@ -310,6 +311,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 - mamalisz@microsoft.com, 2.28-15: Exclude binaries(such as bash) from requires list.
 - nicolasg@microsoft.com, 2.28-16: Patch CVE-2019-25013
 - thcrain@microsoft.com, 2.28-17: Patch CVE-2021-3326
+- nisamson@microsoft.com, 2.28-18: Patch CVE-2021-27618
 
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
 - Provides glibc-locale-source from glibc-i18n

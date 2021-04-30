@@ -10,15 +10,15 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.19.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210310.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210428.tar.gz
 Source1:        kubelet.service
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
@@ -176,7 +176,7 @@ done
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}/node/bin/pause
 
 # install service files
-install -d -m 0755 %{buildroot}%{_libdir}/systemd/system
+install -d -m 0755 %{buildroot}/%{_libdir}/systemd/system
 install -p -m 644 -t %{buildroot}%{_libdir}/systemd/system %{SOURCE1}
 
 # install config files
@@ -187,8 +187,8 @@ install -d -m 644 %{buildroot}%{_sysconfdir}/kubernetes/manifests
 install -dm755 %{buildroot}%{_sharedstatedir}/kubelet
 install -dm755 %{buildroot}%{_var}/run/kubernetes
 
-install -d -m 0755 %{buildroot}%{_libdir}/tmpfiles.d
-cat << EOF >> %{buildroot}%{_libdir}/tmpfiles.d/kubernetes.conf
+install -d -m 0755 %{buildroot}/%{_libdir}/tmpfiles.d
+cat << EOF >> %{buildroot}/%{_libdir}/tmpfiles.d/kubernetes.conf
 d %{_var}/run/kubernetes 0755 kube kube -
 EOF
 
@@ -266,8 +266,11 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.19.7-2
+* Fri Apr 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.19.7-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Apr 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.7-2
+- Update to version  "1.19.7-hotfix.20210428".
 
 * Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.7-1
 - Update to version  "1.19.7-hotfix.20210310".

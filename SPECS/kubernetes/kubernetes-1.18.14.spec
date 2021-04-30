@@ -10,15 +10,15 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.14
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210310.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210428.tar.gz
 Source1:        kubelet.service
 Source2:        golang-1.15-k8s-1.18-test.patch
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
@@ -270,8 +270,14 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-3
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Apr 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-4
+- Update to version  "1.18.14-hotfix.20210428".
+
+* Mon Mar 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-3
+- Update to version  "1.18.14-hotfix.20210322".
 
 * Thu Mar 18 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-2
 - Update to version  "1.18.14-hotfix.20210310".
