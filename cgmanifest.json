@@ -884,6 +884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "device-mapper-multipath",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/opensvc/multipath-tools/archive/refs/tags/0.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dhcp",
           "version": "4.4.2",
           "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
