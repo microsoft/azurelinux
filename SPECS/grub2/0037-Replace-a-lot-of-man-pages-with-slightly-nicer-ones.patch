@@ -1,0 +1,1959 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 4 Mar 2014 11:00:23 -0500
+Subject: [PATCH] Replace a lot of man pages with slightly nicer ones.
+
+Replace a bunch of machine generated ones with ones that look nicer.
+---
+ configure.ac                      |  23 ++++++
+ conf/Makefile.extra-dist          |   1 -
+ docs/Makefile.am                  |   2 -
+ docs/man/grub-bios-setup.h2m      |   6 --
+ docs/man/grub-editenv.h2m         |   5 --
+ docs/man/grub-emu.h2m             |   6 --
+ docs/man/grub-file.h2m            |   2 -
+ docs/man/grub-fstest.h2m          |   4 -
+ docs/man/grub-glue-efi.h2m        |   4 -
+ docs/man/grub-install.h2m         |   6 --
+ docs/man/grub-kbdcomp.h2m         |  10 ---
+ docs/man/grub-macbless.h2m        |   4 -
+ docs/man/grub-macho2img.h2m       |   4 -
+ docs/man/grub-menulst2cfg.h2m     |   4 -
+ docs/man/grub-mkconfig.h2m        |   4 -
+ docs/man/grub-mkfont.h2m          |   4 -
+ docs/man/grub-mkimage.h2m         |   6 --
+ docs/man/grub-mklayout.h2m        |  10 ---
+ docs/man/grub-mknetdir.h2m        |   4 -
+ docs/man/grub-mkpasswd-pbkdf2.h2m |   4 -
+ docs/man/grub-mkrelpath.h2m       |   4 -
+ docs/man/grub-mkrescue.h2m        |   4 -
+ docs/man/grub-mkstandalone.h2m    |   4 -
+ docs/man/grub-mount.h2m           |   2 -
+ docs/man/grub-ofpathname.h2m      |   4 -
+ docs/man/grub-pe2elf.h2m          |   4 -
+ docs/man/grub-probe.h2m           |   4 -
+ docs/man/grub-reboot.h2m          |   5 --
+ docs/man/grub-render-label.h2m    |   3 -
+ docs/man/grub-script-check.h2m    |   4 -
+ docs/man/grub-set-default.h2m     |   5 --
+ docs/man/grub-sparc64-setup.h2m   |   6 --
+ docs/man/grub-syslinux2cfg.h2m    |   4 -
+ gentpl.py                         |   5 +-
+ util/grub-bios-setup.8            |  54 +++++++++++++
+ util/grub-editenv.1               |  46 +++++++++++
+ util/grub-file.1                  | 165 ++++++++++++++++++++++++++++++++++++++
+ util/grub-fstest.1                |  99 +++++++++++++++++++++++
+ util/grub-glue-efi.1              |  31 +++++++
+ util/grub-install.8               | 128 +++++++++++++++++++++++++++++
+ util/grub-kbdcomp.1               |  19 +++++
+ util/grub-macbless.1              |  22 +++++
+ util/grub-menulst2cfg.1           |  12 +++
+ util/grub-mkconfig.8              |  17 ++++
+ util/grub-mkfont.1                |  87 ++++++++++++++++++++
+ util/grub-mkimage.1               |  95 ++++++++++++++++++++++
+ util/grub-mklayout.1              |  27 +++++++
+ util/grub-mknetdir.1              |  12 +++
+ util/grub-mkpasswd-pbkdf2.1       |  27 +++++++
+ util/grub-mkrelpath.1             |  12 +++
+ util/grub-mkrescue.1              | 123 ++++++++++++++++++++++++++++
+ util/grub-mkstandalone.1          | 100 +++++++++++++++++++++++
+ util/grub-ofpathname.8            |  12 +++
+ util/grub-probe.8                 |  80 ++++++++++++++++++
+ util/grub-reboot.8                |  21 +++++
+ util/grub-render-label.1          |  51 ++++++++++++
+ util/grub-script-check.1          |  21 +++++
+ util/grub-set-default.8           |  21 +++++
+ util/grub-sparc64-setup.8         |  12 +++
+ 59 files changed, 1318 insertions(+), 147 deletions(-)
+ delete mode 100644 docs/man/grub-bios-setup.h2m
+ delete mode 100644 docs/man/grub-editenv.h2m
+ delete mode 100644 docs/man/grub-emu.h2m
+ delete mode 100644 docs/man/grub-file.h2m
+ delete mode 100644 docs/man/grub-fstest.h2m
+ delete mode 100644 docs/man/grub-glue-efi.h2m
+ delete mode 100644 docs/man/grub-install.h2m
+ delete mode 100644 docs/man/grub-kbdcomp.h2m
+ delete mode 100644 docs/man/grub-macbless.h2m
+ delete mode 100644 docs/man/grub-macho2img.h2m
+ delete mode 100644 docs/man/grub-menulst2cfg.h2m
+ delete mode 100644 docs/man/grub-mkconfig.h2m
+ delete mode 100644 docs/man/grub-mkfont.h2m
+ delete mode 100644 docs/man/grub-mkimage.h2m
+ delete mode 100644 docs/man/grub-mklayout.h2m
+ delete mode 100644 docs/man/grub-mknetdir.h2m
+ delete mode 100644 docs/man/grub-mkpasswd-pbkdf2.h2m
+ delete mode 100644 docs/man/grub-mkrelpath.h2m
+ delete mode 100644 docs/man/grub-mkrescue.h2m
+ delete mode 100644 docs/man/grub-mkstandalone.h2m
+ delete mode 100644 docs/man/grub-mount.h2m
+ delete mode 100644 docs/man/grub-ofpathname.h2m
+ delete mode 100644 docs/man/grub-pe2elf.h2m
+ delete mode 100644 docs/man/grub-probe.h2m
+ delete mode 100644 docs/man/grub-reboot.h2m
+ delete mode 100644 docs/man/grub-render-label.h2m
+ delete mode 100644 docs/man/grub-script-check.h2m
+ delete mode 100644 docs/man/grub-set-default.h2m
+ delete mode 100644 docs/man/grub-sparc64-setup.h2m
+ delete mode 100644 docs/man/grub-syslinux2cfg.h2m
+ create mode 100644 util/grub-bios-setup.8
+ create mode 100644 util/grub-editenv.1
+ create mode 100644 util/grub-file.1
+ create mode 100644 util/grub-fstest.1
+ create mode 100644 util/grub-glue-efi.1
+ create mode 100644 util/grub-install.8
+ create mode 100644 util/grub-kbdcomp.1
+ create mode 100644 util/grub-macbless.1
+ create mode 100644 util/grub-menulst2cfg.1
+ create mode 100644 util/grub-mkconfig.8
+ create mode 100644 util/grub-mkfont.1
+ create mode 100644 util/grub-mkimage.1
+ create mode 100644 util/grub-mklayout.1
+ create mode 100644 util/grub-mknetdir.1
+ create mode 100644 util/grub-mkpasswd-pbkdf2.1
+ create mode 100644 util/grub-mkrelpath.1
+ create mode 100644 util/grub-mkrescue.1
+ create mode 100644 util/grub-mkstandalone.1
+ create mode 100644 util/grub-ofpathname.8
+ create mode 100644 util/grub-probe.8
+ create mode 100644 util/grub-reboot.8
+ create mode 100644 util/grub-render-label.1
+ create mode 100644 util/grub-script-check.1
+ create mode 100644 util/grub-set-default.8
+ create mode 100644 util/grub-sparc64-setup.8
+
+diff --git a/configure.ac b/configure.ac
+index c0103b30d4e..b8c4d52dfd1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -77,6 +77,29 @@ grub_TRANSFORM([grub-set-default])
+ grub_TRANSFORM([grub-sparc64-setup])
+ grub_TRANSFORM([grub-render-label])
+ grub_TRANSFORM([grub-file])
++grub_TRANSFORM([grub-bios-setup.3])
++grub_TRANSFORM([grub-editenv.1])
++grub_TRANSFORM([grub-fstest.3])
++grub_TRANSFORM([grub-glue-efi.3])
++grub_TRANSFORM([grub-install.1])
++grub_TRANSFORM([grub-kbdcomp.3])
++grub_TRANSFORM([grub-menulst2cfg.1])
++grub_TRANSFORM([grub-mkconfig.1])
++grub_TRANSFORM([grub-mkfont.3])
++grub_TRANSFORM([grub-mkimage.1])
++grub_TRANSFORM([grub-mklayout.3])
++grub_TRANSFORM([grub-mknetdir.3])
++grub_TRANSFORM([grub-mkpasswd-pbkdf2.3])
++grub_TRANSFORM([grub-mkrelpath.3])
++grub_TRANSFORM([grub-mkrescue.1])
++grub_TRANSFORM([grub-mkstandalone.3])
++grub_TRANSFORM([grub-ofpathname.3])
++grub_TRANSFORM([grub-probe.3])
++grub_TRANSFORM([grub-reboot.3])
++grub_TRANSFORM([grub-render-label.3])
++grub_TRANSFORM([grub-script-check.3])
++grub_TRANSFORM([grub-set-default.1])
++grub_TRANSFORM([grub-sparc64-setup.3])
+ 
+ # Optimization flag.  Allow user to override.
+ if test "x$TARGET_CFLAGS" = x; then
+diff --git a/conf/Makefile.extra-dist b/conf/Makefile.extra-dist
+index 8f1485d52a5..b909f2c073a 100644
+--- a/conf/Makefile.extra-dist
++++ b/conf/Makefile.extra-dist
+@@ -11,7 +11,6 @@ EXTRA_DIST += unicode
+ EXTRA_DIST += util/import_gcry.py
+ EXTRA_DIST += util/import_unicode.py
+ 
+-EXTRA_DIST += docs/man
+ EXTRA_DIST += docs/autoiso.cfg
+ EXTRA_DIST += docs/grub.cfg
+ EXTRA_DIST += docs/osdetect.cfg
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index 93eb3962765..ab28f199694 100644
+--- a/docs/Makefile.am
++++ b/docs/Makefile.am
+@@ -5,5 +5,3 @@ info_TEXINFOS = grub.texi grub-dev.texi
+ grub_TEXINFOS = fdl.texi
+ 
+ EXTRA_DIST = font_char_metrics.png font_char_metrics.txt
+-
+-
+diff --git a/docs/man/grub-bios-setup.h2m b/docs/man/grub-bios-setup.h2m
+deleted file mode 100644
+index ac6ede36296..00000000000
+--- a/docs/man/grub-bios-setup.h2m
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[NAME]
+-grub-bios-setup \- set up a device to boot using GRUB
+-[SEE ALSO]
+-.BR grub-install (8),
+-.BR grub-mkimage (1),
+-.BR grub-mkrescue (1)
+diff --git a/docs/man/grub-editenv.h2m b/docs/man/grub-editenv.h2m
+deleted file mode 100644
+index 3859d3d4c4f..00000000000
+--- a/docs/man/grub-editenv.h2m
++++ /dev/null
+@@ -1,5 +0,0 @@
+-[NAME]
+-grub-editenv \- edit GRUB environment block
+-[SEE ALSO]
+-.BR grub-reboot (8),
+-.BR grub-set-default (8)
+diff --git a/docs/man/grub-emu.h2m b/docs/man/grub-emu.h2m
+deleted file mode 100644
+index ef1c000656a..00000000000
+--- a/docs/man/grub-emu.h2m
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[NAME]
+-grub-emu \- GRUB emulator
+-[SEE ALSO]
+-If you are trying to install GRUB, then you should use
+-.BR grub-install (8)
+-rather than this program.
+diff --git a/docs/man/grub-file.h2m b/docs/man/grub-file.h2m
+deleted file mode 100644
+index e09bb4d3101..00000000000
+--- a/docs/man/grub-file.h2m
++++ /dev/null
+@@ -1,2 +0,0 @@
+-[NAME]
+-grub-file \- check file type
+diff --git a/docs/man/grub-fstest.h2m b/docs/man/grub-fstest.h2m
+deleted file mode 100644
+index 9676b159afd..00000000000
+--- a/docs/man/grub-fstest.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-fstest \- debug tool for GRUB filesystem drivers
+-[SEE ALSO]
+-.BR grub-probe (8)
+diff --git a/docs/man/grub-glue-efi.h2m b/docs/man/grub-glue-efi.h2m
+deleted file mode 100644
+index c1c6ded49ff..00000000000
+--- a/docs/man/grub-glue-efi.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-glue-efi \- generate a fat binary for EFI
+-[DESCRIPTION]
+-grub-glue-efi processes ia32 and amd64 EFI images and glues them according to Apple format.
+diff --git a/docs/man/grub-install.h2m b/docs/man/grub-install.h2m
+deleted file mode 100644
+index 8cbbc87a0f2..00000000000
+--- a/docs/man/grub-install.h2m
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[NAME]
+-grub-install \- install GRUB to a device
+-[SEE ALSO]
+-.BR grub-mkconfig (8),
+-.BR grub-mkimage (1),
+-.BR grub-mkrescue (1)
+diff --git a/docs/man/grub-kbdcomp.h2m b/docs/man/grub-kbdcomp.h2m
+deleted file mode 100644
+index d81f9157e01..00000000000
+--- a/docs/man/grub-kbdcomp.h2m
++++ /dev/null
+@@ -1,10 +0,0 @@
+-[NAME]
+-grub-kbdcomp \- generate a GRUB keyboard layout file
+-[DESCRIPTION]
+-grub-kbdcomp processes a X keyboard layout description in
+-.BR keymaps (5)
+-format into a format that can be used by GRUB's
+-.B keymap
+-command.
+-[SEE ALSO]
+-.BR grub-mklayout (8)
+diff --git a/docs/man/grub-macbless.h2m b/docs/man/grub-macbless.h2m
+deleted file mode 100644
+index 0197c0087d7..00000000000
+--- a/docs/man/grub-macbless.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-macbless \- bless a mac file/directory
+-[SEE ALSO]
+-.BR grub-install (1)
+diff --git a/docs/man/grub-macho2img.h2m b/docs/man/grub-macho2img.h2m
+deleted file mode 100644
+index d79aaeed8f9..00000000000
+--- a/docs/man/grub-macho2img.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-macho2img \- convert Mach-O to raw image
+-[SEE ALSO]
+-.BR grub-mkimage (1)
+diff --git a/docs/man/grub-menulst2cfg.h2m b/docs/man/grub-menulst2cfg.h2m
+deleted file mode 100644
+index c2e0055ed7e..00000000000
+--- a/docs/man/grub-menulst2cfg.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-menulst2cfg \- transform legacy menu.lst into grub.cfg
+-[SEE ALSO]
+-.BR grub-mkconfig (8)
+diff --git a/docs/man/grub-mkconfig.h2m b/docs/man/grub-mkconfig.h2m
+deleted file mode 100644
+index 9b42f813010..00000000000
+--- a/docs/man/grub-mkconfig.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkconfig \- generate a GRUB configuration file
+-[SEE ALSO]
+-.BR grub-install (8)
+diff --git a/docs/man/grub-mkfont.h2m b/docs/man/grub-mkfont.h2m
+deleted file mode 100644
+index d46fe600eca..00000000000
+--- a/docs/man/grub-mkfont.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkfont \- make GRUB font files
+-[SEE ALSO]
+-.BR grub-mkconfig (8)
+diff --git a/docs/man/grub-mkimage.h2m b/docs/man/grub-mkimage.h2m
+deleted file mode 100644
+index f0fbc2bb197..00000000000
+--- a/docs/man/grub-mkimage.h2m
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[NAME]
+-grub-mkimage \- make a bootable image of GRUB
+-[SEE ALSO]
+-.BR grub-install (8),
+-.BR grub-mkrescue (1),
+-.BR grub-mknetdir (8)
+diff --git a/docs/man/grub-mklayout.h2m b/docs/man/grub-mklayout.h2m
+deleted file mode 100644
+index 1e43409c0ab..00000000000
+--- a/docs/man/grub-mklayout.h2m
++++ /dev/null
+@@ -1,10 +0,0 @@
+-[NAME]
+-grub-mklayout \- generate a GRUB keyboard layout file
+-[DESCRIPTION]
+-grub-mklayout processes a keyboard layout description in
+-.BR keymaps (5)
+-format into a format that can be used by GRUB's
+-.B keymap
+-command.
+-[SEE ALSO]
+-.BR grub-mkconfig (8)
+diff --git a/docs/man/grub-mknetdir.h2m b/docs/man/grub-mknetdir.h2m
+deleted file mode 100644
+index a2ef13ec111..00000000000
+--- a/docs/man/grub-mknetdir.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mknetdir \- prepare a GRUB netboot directory.
+-[SEE ALSO]
+-.BR grub-mkimage (1)
+diff --git a/docs/man/grub-mkpasswd-pbkdf2.h2m b/docs/man/grub-mkpasswd-pbkdf2.h2m
+deleted file mode 100644
+index 4d202f3da7e..00000000000
+--- a/docs/man/grub-mkpasswd-pbkdf2.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkpasswd-pbkdf2 \- generate hashed password for GRUB
+-[SEE ALSO]
+-.BR grub-mkconfig (8)
+diff --git a/docs/man/grub-mkrelpath.h2m b/docs/man/grub-mkrelpath.h2m
+deleted file mode 100644
+index d01f3961e3f..00000000000
+--- a/docs/man/grub-mkrelpath.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkrelpath \- make a system path relative to its root
+-[SEE ALSO]
+-.BR grub-probe (8)
+diff --git a/docs/man/grub-mkrescue.h2m b/docs/man/grub-mkrescue.h2m
+deleted file mode 100644
+index a427f02e3c6..00000000000
+--- a/docs/man/grub-mkrescue.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkrescue \- make a GRUB rescue image
+-[SEE ALSO]
+-.BR grub-mkimage (1)
+diff --git a/docs/man/grub-mkstandalone.h2m b/docs/man/grub-mkstandalone.h2m
+deleted file mode 100644
+index c77313978ad..00000000000
+--- a/docs/man/grub-mkstandalone.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-mkstandalone \- make a memdisk-based GRUB image
+-[SEE ALSO]
+-.BR grub-mkimage (1)
+diff --git a/docs/man/grub-mount.h2m b/docs/man/grub-mount.h2m
+deleted file mode 100644
+index 8d168982d72..00000000000
+--- a/docs/man/grub-mount.h2m
++++ /dev/null
+@@ -1,2 +0,0 @@
+-[NAME]
+-grub-mount \- export GRUB filesystem with FUSE
+diff --git a/docs/man/grub-ofpathname.h2m b/docs/man/grub-ofpathname.h2m
+deleted file mode 100644
+index 74b43eea039..00000000000
+--- a/docs/man/grub-ofpathname.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-ofpathname \- find OpenBOOT path for a device
+-[SEE ALSO]
+-.BR grub-probe (8)
+diff --git a/docs/man/grub-pe2elf.h2m b/docs/man/grub-pe2elf.h2m
+deleted file mode 100644
+index 7ca29bd703c..00000000000
+--- a/docs/man/grub-pe2elf.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-pe2elf \- convert PE image to ELF
+-[SEE ALSO]
+-.BR grub-mkimage (1)
+diff --git a/docs/man/grub-probe.h2m b/docs/man/grub-probe.h2m
+deleted file mode 100644
+index 6e1ffdcf937..00000000000
+--- a/docs/man/grub-probe.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-probe \- probe device information for GRUB
+-[SEE ALSO]
+-.BR grub-fstest (1)
+diff --git a/docs/man/grub-reboot.h2m b/docs/man/grub-reboot.h2m
+deleted file mode 100644
+index e4acace65ce..00000000000
+--- a/docs/man/grub-reboot.h2m
++++ /dev/null
+@@ -1,5 +0,0 @@
+-[NAME]
+-grub-reboot \- set the default boot entry for GRUB, for the next boot only
+-[SEE ALSO]
+-.BR grub-set-default (8),
+-.BR grub-editenv (1)
+diff --git a/docs/man/grub-render-label.h2m b/docs/man/grub-render-label.h2m
+deleted file mode 100644
+index 50ae5247c05..00000000000
+--- a/docs/man/grub-render-label.h2m
++++ /dev/null
+@@ -1,3 +0,0 @@
+-[NAME]
+-grub-render-label \- generate a .disk_label for Apple Macs.
+-
+diff --git a/docs/man/grub-script-check.h2m b/docs/man/grub-script-check.h2m
+deleted file mode 100644
+index 3653682671a..00000000000
+--- a/docs/man/grub-script-check.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-script-check \- check grub.cfg for syntax errors
+-[SEE ALSO]
+-.BR grub-mkconfig (8)
+diff --git a/docs/man/grub-set-default.h2m b/docs/man/grub-set-default.h2m
+deleted file mode 100644
+index 7945001c154..00000000000
+--- a/docs/man/grub-set-default.h2m
++++ /dev/null
+@@ -1,5 +0,0 @@
+-[NAME]
+-grub-set-default \- set the saved default boot entry for GRUB
+-[SEE ALSO]
+-.BR grub-reboot (8),
+-.BR grub-editenv (1)
+diff --git a/docs/man/grub-sparc64-setup.h2m b/docs/man/grub-sparc64-setup.h2m
+deleted file mode 100644
+index 18f803a50db..00000000000
+--- a/docs/man/grub-sparc64-setup.h2m
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[NAME]
+-grub-sparc64-setup \- set up a device to boot using GRUB
+-[SEE ALSO]
+-.BR grub-install (8),
+-.BR grub-mkimage (1),
+-.BR grub-mkrescue (1)
+diff --git a/docs/man/grub-syslinux2cfg.h2m b/docs/man/grub-syslinux2cfg.h2m
+deleted file mode 100644
+index ad25c8ab753..00000000000
+--- a/docs/man/grub-syslinux2cfg.h2m
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[NAME]
+-grub-syslinux2cfg \- transform syslinux config into grub.cfg
+-[SEE ALSO]
+-.BR grub-menulst2cfg (8)
+diff --git a/gentpl.py b/gentpl.py
+index c86550d4f9e..2cba0bbbd6f 100644
+--- a/gentpl.py
++++ b/gentpl.py
+@@ -805,10 +805,7 @@ def manpage(defn, adddeps):
+ 
+     output("if COND_MAN_PAGES\n")
+     gvar_add("man_MANS", name + "." + mansection)
+-    rule(name + "." + mansection, name + " " + adddeps, """
+-chmod a+x """ + name + """
+-PATH=$(builddir):$$PATH pkgdatadir=$(builddir) $(HELP2MAN) --section=""" + mansection + """ -i $(top_srcdir)/docs/man/""" + name + """.h2m -o $@ """ + name + """
+-""")
++    rule(name + "." + mansection, name + " " + adddeps, "cat $(top_srcdir)/util/" + name + "." + mansection + " | $(top_builddir)/config.status --file=$@:-")
+     gvar_add("CLEANFILES", name + "." + mansection)
+     output("endif\n")
+ 
+diff --git a/util/grub-bios-setup.8 b/util/grub-bios-setup.8
+new file mode 100644
+index 00000000000..56f582b3d75
+--- /dev/null
++++ b/util/grub-bios-setup.8
+@@ -0,0 +1,54 @@
++.TH GRUB-BIOS-SETUP 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-bios-setup\fR \(em Set up images to boot from a device.
++
++.SH SYNOPSIS
++\fBgrub-bios-setup\fR [-a | --allow-floppy] [-b | --boot-image=\fIFILE\fR]
++.RS 17
++[-c | --core-image=\fIFILE\fR] [-d | --directory=\fIDIR\fR]
++.RE
++.RS 17
++[-f | --force] [-m | --device-map=\fIFILE\fR]
++.RE
++.RS 17
++[-s | --skip-fs-probe] [-v | --verbose] \fIDEVICE\fR
++
++.SH DESCRIPTION
++You should not normally run this program directly.  Use grub-install instead.
++
++.SH OPTIONS
++.TP
++\fB--allow-floppy\fR
++Make the device also bootable as a floppy.  This option is the default for
++/dev/fdX devices.  Some BIOSes will not boot images created with this option.
++
++.TP
++\fB--boot-image\fR=\fIFILE\fR
++Use FILE as the boot image.  The default value is \fBboot.img\fR.
++
++.TP
++\fB--core-image\fR=\fIFILE\fR
++Use FILE as ther core image.  The default value is \fBcore.img\fR.
++
++.TP
++\fB--directory\fR=\fIDIR\fR
++Use GRUB files in the directory DIR.  The default value is \fB/boot/grub\fR.
++
++.TP
++\fB--force\fR
++Install even if problems are detected.
++
++.TP
++\fB--device-map\fR=\fIFILE\fR
++Use FILE as the device map.  The default value is /boot/grub/device.map .
++
++.TP
++\fB--skip-fs-probe\fR
++Do not probe DEVICE for filesystems.
++
++.TP
++\fB--verbose\fR
++Print verbose messages.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-editenv.1 b/util/grub-editenv.1
+new file mode 100644
+index 00000000000..d28ba03ba42
+--- /dev/null
++++ b/util/grub-editenv.1
+@@ -0,0 +1,46 @@
++.TH GRUB-EDITENV 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-editenv\fR \(em Manage the GRUB environment block.
++
++.SH SYNOPSIS
++\fBgrub-editenv\fR [-v | --verbose] [\fIFILE\fR]
++.RS 14
++<create | list | set \fINAME\fR=\fIVALUE\fR | unset \fINAME\fR>
++
++.SH DESCRIPTION
++\fBgrub-editenv\fR is a command line tool to manage GRUB's stored environment.
++
++.SH OPTIONS
++.TP
++\fB--verbose\fR
++Print verbose messages.
++
++.TP
++\fBFILE\fR
++.RS 7
++File name to use for grub environment.  Default is /boot/grub/grubenv .
++.RE
++
++.SH COMMANDS
++.TP
++\fBcreate\fR
++.RS 7
++Create a blank environment block file.
++.RE
++
++.TP
++\fBlist\fR
++.RS 7
++List the current variables.
++.RE
++
++.TP
++\fBset\fR [\fINAME\fR=\fIVALUE\fR ...]
++Set variables.
++
++.TP
++\fBunset [\fINAME\fR ...]
++Delete variables.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-file.1 b/util/grub-file.1
+new file mode 100644
+index 00000000000..b29cb327889
+--- /dev/null
++++ b/util/grub-file.1
+@@ -0,0 +1,165 @@
++.TH GRUB-FILE 1 "Web Feb 26 2014"
++.SH NAME
++\fBgrub-file\fR \(em Check if FILE is of specified type.
++
++.SH SYNOPSIS
++\fBgrub-file\fR (--is-i386-xen-pae-domu | --is-x86_64-xen-domu |
++.RS 11
++--is-x86-xen-dom0 | --is-x86-multiboot |
++.RE
++.RS 11
++--is-x86-multiboot2 | --is-arm-linux | --is-arm64-linux |
++.RE
++.RS 11
++--is-ia64-linux | --is-mips-linux | --is-mipsel-linux |
++.RE
++.RS 11
++--is-sparc64-linux | --is-powerpc-linux | --is-x86-linux |
++.RE
++.RS 11
++--is-x86-linux32 | --is-x86-kfreebsd | --is-i386-kfreebsd |
++.RE
++.RS 11
++--is-x86_64-kfreebsd | --is-x86-knetbsd |
++.RE
++.RS 11
++--is-i386-knetbsd | --is-x86_64-knetbsd | --is-i386-efi |
++.RE
++.RS 11
++--is-x86_64-efi | --is-ia64-efi | --is-arm64-efi |
++.RE
++.RS 11
++--is-arm-efi | --is-hibernated-hiberfil | --is-x86_64-xnu |
++.RE
++.RS 11
++--is-i386-xnu | --is-xnu-hibr | --is-x86-bios-bootsector)
++.RE
++.RS 11
++\fIFILE\fR
++
++.SH DESCRIPTION
++\fBgrub-file\fR is used to check if \fIFILE\fR is of a specified type.
++
++.SH OPTIONS
++.TP
++--is-i386-xen-pae-domu
++Check if FILE can be booted as i386 PAE Xen unprivileged guest kernel
++
++.TP
++--is-x86_64-xen-domu
++Check if FILE can be booted as x86_64 Xen unprivileged guest kernel
++
++.TP
++--is-x86-xen-dom0
++Check if FILE can be used as Xen x86 privileged guest kernel
++
++.TP
++--is-x86-multiboot
++Check if FILE can be used as x86 multiboot kernel
++
++.TP
++--is-x86-multiboot2
++Check if FILE can be used as x86 multiboot2 kernel
++
++.TP
++--is-arm-linux
++Check if FILE is ARM Linux
++
++.TP
++--is-arm64-linux
++Check if FILE is ARM64 Linux
++
++.TP
++--is-ia64-linux
++Check if FILE is IA64 Linux
++
++.TP
++--is-mips-linux
++Check if FILE is MIPS Linux
++
++.TP
++--is-mipsel-linux
++Check if FILE is MIPSEL Linux
++
++.TP
++--is-sparc64-linux
++Check if FILE is SPARC64 Linux
++
++.TP
++--is-powerpc-linux
++Check if FILE is POWERPC Linux
++
++.TP
++--is-x86-linux
++Check if FILE is x86 Linux
++
++.TP
++--is-x86-linux32
++Check if FILE is x86 Linux supporting 32-bit protocol
++
++.TP
++--is-x86-kfreebsd
++Check if FILE is x86 kFreeBSD
++
++.TP
++--is-i386-kfreebsd
++Check if FILE is i386 kFreeBSD
++
++.TP
++--is-x86_64-kfreebsd
++Check if FILE is x86_64 kFreeBSD
++
++.TP
++--is-x86-knetbsd
++Check if FILE is x86 kNetBSD
++
++.TP
++--is-i386-knetbsd
++Check if FILE is i386 kNetBSD
++
++.TP
++--is-x86_64-knetbsd
++Check if FILE is x86_64 kNetBSD
++
++.TP
++--is-i386-efi
++Check if FILE is i386 EFI file
++
++.TP
++--is-x86_64-efi
++Check if FILE is x86_64 EFI file
++
++.TP
++--is-ia64-efi
++Check if FILE is IA64 EFI file
++
++.TP
++--is-arm64-efi
++Check if FILE is ARM64 EFI file
++
++.TP
++--is-arm-efi
++Check if FILE is ARM EFI file
++
++.TP
++--is-hibernated-hiberfil
++Check if FILE is hiberfil.sys in hibernated state
++
++.TP
++--is-x86_64-xnu
++Check if FILE is x86_64 XNU (Mac OS X kernel)
++
++.TP
++--is-i386-xnu
++Check if FILE is i386 XNU (Mac OS X kernel)
++
++.TP
++--is-xnu-hibr
++Check if FILE is XNU (Mac OS X kernel) hibernated image
++
++.TP
++--is-x86-bios-bootsector
++Check if FILE is BIOS bootsector
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-fstest.1 b/util/grub-fstest.1
+new file mode 100644
+index 00000000000..792fa78634c
+--- /dev/null
++++ b/util/grub-fstest.1
+@@ -0,0 +1,99 @@
++.TH GRUB-FSTEST 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-fstest\fR — Debug tool for GRUB's filesystem driver.
++
++.SH SYNOPSIS
++\fBgrub-fstest\fR [-c | --diskcount=\fINUM\fR] [-C | --crypto]
++.RS 13
++[-d | --debug=\fISTRING\fR] [-K | --zfs-key=\fIFILE\fR|\fIprompt\fR]
++.RE
++.RS 13
++[-n | --length=\fINUM\fR] [-r | --root=\fIDEVICE_NAME\fR]
++.RE
++.RS 13
++[-s | --skip=\fINUM\fR] [-u | --uncompress] [-v | --verbose]
++.RE
++.RS 13
++\fIIMAGE_PATH\fR <blocklist \fIFILE\fR | cat \fIFILE\fR |
++.RE
++.RS 13
++cmp \fIFILE\fR \fILOCAL\fR | cp \fIFILE\fR \fILOCAL\fR | crc \fIFILE\fR |
++.RE
++.RS 13
++hex \fIFILE\fR | ls \fIPATH\fR | xnu_uuid \fIDEVICE\fR>
++
++.SH DESCRIPTION
++\fBgrub-fstest\fR is a tool for testing GRUB's filesystem drivers.  You should not normally need to run this program.
++
++.SH OPTIONS
++.TP
++\fB--diskcount\fR=\fINUM\fR
++Specify the number of input files.
++
++.TP
++\fB--crypto\fR
++Mount cryptographic devices.
++
++.TP
++\fB--debug\fR=\fISTRING\fR
++Set debug environment variable.
++
++.TP
++\fB--zfs-key\fR=\fIFILE\fR|\fIprompt\fR
++Load ZFS cryptographic key.
++
++.TP
++\fB--length\fR=\fINUM\fR
++Handle NUM bytes in output file.
++
++.TP
++\fB--root\fR=\fIDEVICE_NAME\fR
++Set root device.
++
++.TP
++\fB--skip\fR=\fINUM\fR
++Skip NUM bytes from output file.
++
++.TP
++\fB--uncompress\fR
++Uncompress data.
++
++.TP
++\fB--verbose\fR
++Print verbose messages.
++
++.SH COMMANDS
++.TP
++\fBblocklist\fR \fIFILE\fR
++Display block list of \fIFILE\fR.
++
++.TP
++\fBcat\fR \fIFILE\fR
++Display \fIFILE\fR on standard output.
++
++.TP
++\fBcmp\fR \fIFILE\fR \fILOCAL\fR
++Compare \fIFILE\fR with local file \fILOCAL\fR.
++
++.TP
++\fBcp\fR \fIFILE\fR \fILOCAL\fR
++Copy \fIFILE\fR to local file \fILOCAL\fR.
++
++.TP
++\fBcrc\fR \fIFILE\fR
++Display the CRC-32 checksum of \fIFILE\fR.
++
++.TP
++\fBhex\fR \fIFILE\fR
++Display contents of \fIFILE\fR in hexidecimal.
++
++.TP
++\fBls\fR \fIPATH\fR
++List files at \fIPATH\fR.
++
++.TP
++\fBxnu_uuid\fR \fIDEVICE\fR
++Display the XNU UUID of \fIDEVICE\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-glue-efi.1 b/util/grub-glue-efi.1
+new file mode 100644
+index 00000000000..72bd555d577
+--- /dev/null
++++ b/util/grub-glue-efi.1
+@@ -0,0 +1,31 @@
++.TH GRUB-GLUE-EFI 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-glue-efi\fR \(em Create an Apple fat EFI binary.
++
++.SH SYNOPSIS
++\fBgrub-glue-efi\fR <-3 | --input32=\fIFILE\fR> <-6 | --input64=\fIFILE\fR>
++.RS 15
++<-o | --output=\fIFILE\fR> [-v | --verbose]
++
++.SH DESCRIPTION
++\fBgrub-glue-efi\fR creates an Apple fat EFI binary from two EFI binaries.
++
++.SH OPTIONS
++.TP
++\fB--input32\fR=\fIFILE\fR
++Read 32-bit binary from \fIFILE\fR.
++
++.TP
++\fB--input64\fR=\fIFILE\fR
++Read 64-bit binary from \fIFILE\fR.
++
++.TP
++\fB--output\fR=\fIFILE\fR
++Write resulting fat binary to \fIFILE\fR.
++
++.TP
++\fB--verbose\fR
++Print verbose messages.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-install.8 b/util/grub-install.8
+new file mode 100644
+index 00000000000..1db89e94b3b
+--- /dev/null
++++ b/util/grub-install.8
+@@ -0,0 +1,128 @@
++.TH GRUB-INSTALL 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-install\fR \(em Install GRUB on a device.
++
++.SH SYNOPSIS
++\fBgrub-install\fR [--modules=\fIMODULES\fR] [--install-modules=\fIMODULES\fR]
++.RS 14
++[--themes=\fITHEMES\fR] [--fonts=\fIFONTS\fR] [--locales=\fILOCALES\fR]
++.RE
++.RS 14
++[--compress[=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR]] [-d | --directory=\fIDIR\fR]
++.RE
++.RS 14
++[--grub-mkimage=\fIFILE\fR] [--boot-directory=\fIDIR\fR]
++.RE
++.RS 14
++[--target=\fITARGET\fR] [--grub-setup=\fIFILE\fR]
++.RE
++.RS 14
++[--grub-mkrelpath=\fIFILE\fR] [--grub-probe=\fIFILE\fR]
++.RE
++.RS 14
++[--allow-floppy] [--recheck] [--force] [--force-file-id]
++.RE
++.RS 14
++[--disk-module=\fIMODULE\fR] [--no-nvram] [--removable]
++.RE
++.RS 14
++[--bootloader-id=\fIID\fR] [--efi-directory=\fIDIR\fR] \fIINSTALL_DEVICE\fR
++
++.SH DESCRIPTION
++\fBgrub-install\fR installs GRUB onto a device.  This includes copying GRUB images into the target directory (generally \fI/boot/grub\fR), and on some platforms may also include installing GRUB onto a boot sector.
++
++.SH OPTIONS
++.TP
++\fB--modules\fR=\fIMODULES\fR\!
++Pre-load modules specified by \fIMODULES\fR.
++
++.TP
++\fB--install-modules\fR=\fIMODULES\fR
++Install only \fIMODULES\fR and their dependencies.  The default is to install all available modules.
++
++.TP
++\fB--themes\fR=\fITHEMES\fR
++Install \fITHEMES\fR.  The default is to install the \fIstarfield\fR theme, if available.
++
++.TP
++\fB--fonts\fR=\fIFONTS\fR
++Install \fIFONTS\fR.  The default is to install the \fIunicode\fR font.
++
++.TP
++\fB--locales\fR=\fILOCALES\fR
++Install only locales listed in \fILOCALES\fR.  The default is to install all available locales.
++
++.TP
++\fB--compress\fR=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR
++Compress GRUB files using the specified compression algorithm.
++
++.TP
++\fB--directory\fR=\fIDIR\fR
++Use images and modules in \fIDIR\fR.
++
++.TP
++\fB--grub-mkimage\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-mkimage\fR.  The default is \fI/usr/bin/grub-mkimage\fR.
++
++.TP
++\fB--boot-directory\fR=\fIDIR\fR
++Use \fIDIR\fR as the boot directory.  The default is \fI/boot\fR.  GRUB will put its files in a subdirectory of this directory named \fIgrub\fR.
++
++.TP
++\fB--target\fR=\fITARGET\fR
++Install GRUB for \fITARGET\fR platform.  The default is the platform \fBgrub-install\fR is running on.
++
++.TP
++\fB--grub-setup\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-setup\fR.  The default is \fI/usr/bin/grub-setup\fR.
++
++.TP
++\fB--grub-mkrelpath\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-mkrelpath\fR.  The default is \fI/usr/bin/grub-mkrelpath\fR.
++
++.TP
++\fB--grub-probe\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-probe\fR.  The default is \fI/usr/bin/grub-mkrelpath\fR.
++
++.TP
++\fB--allow-floppy
++Make the device also bootable as a floppy.  This option is the default for /dev/fdX devices. Some BIOSes will not boot images created with this option.
++
++.TP
++\fB--recheck
++Delete any existing device map and create a new one if necessary.
++
++.TP
++\fB--force
++Install even if problems are detected.
++
++.TP
++\fB--force-file-id
++Use identifier file even if UUID is available.
++
++.TP
++\fB--disk-module\fR=\fIMODULE\fR
++Use \fIMODULE\fR for disk access.  This allows you to manually specify either \fIbiosdisk\fR or \fInative\fR disk access.  This option is only available on the BIOS target platform.
++
++.TP
++\fB--no-nvram
++Do not update the \fIboot-device\fR NVRAM variable.  This option is only available on IEEE1275 target platforms.
++
++.TP
++\fB--removable
++Treat the target device as if it is removeable.  This option is only available on the EFI target platform.
++
++.TP
++\fB--bootloader-id\fR=\fIID\fR
++Use \fIID\fR as the bootloader ID.  This option is only available on the EFI target platform.
++
++.TP
++\fB--efi-directory\fR=\fIDIR\fR
++Use \fIDIR\fR as the EFI System Partition root.  This option is only available on the EFI target platform.
++
++.TP
++\fIINSTALL_DEVICE\fR
++Install GRUB to the block device \fIINSTALL_DEVICE\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-kbdcomp.1 b/util/grub-kbdcomp.1
+new file mode 100644
+index 00000000000..0bb969a5b43
+--- /dev/null
++++ b/util/grub-kbdcomp.1
+@@ -0,0 +1,19 @@
++.TH GRUB-KBDCOMP 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-kbdcomp\fR \(em Generate a GRUB keyboard layout file.
++
++.SH SYNOPSIS
++\fBgrub-kbdcomp\fR <-o | --output=\fIFILE\fR> \fICKBMAP_ARGUMENTS\fR
++
++.SH DESCRIPTION
++\fBgrub-kbdcomp\fR processes an X keyboard layout description in
++\fBkeymaps\fR(5) format into a format that can be used by GRUB's \fBkeymap\fR
++command.
++
++.SH OPTIONS
++.TP
++\fB--output\fR=\fIFILE\fR
++Write output to \fIFILE\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-macbless.1 b/util/grub-macbless.1
+new file mode 100644
+index 00000000000..41a96186f70
+--- /dev/null
++++ b/util/grub-macbless.1
+@@ -0,0 +1,22 @@
++.TH GRUB-MACBLESS 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-macbless\fR \(em Mac-style bless on HFS or HFS+
++
++.SH SYNOPSIS
++\fBgrub-macbless\fR [-v | --verbose] [-p | --ppc] \fIFILE\fR | [-x | --x86] \fIFILE\fR
++
++.SH OPTIONS
++.TP
++--x86
++Bless for x86 based Macs.
++
++.TP
++--ppc
++Bless for PPC based Macs.
++
++.TP
++--verbose
++Print verbose messages.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-menulst2cfg.1 b/util/grub-menulst2cfg.1
+new file mode 100644
+index 00000000000..91e2ef87113
+--- /dev/null
++++ b/util/grub-menulst2cfg.1
+@@ -0,0 +1,12 @@
++.TH GRUB-MENULST2CFG 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-menulst2cfg\fR \(em Convert a configuration file from GRUB 0.xx to GRUB 2.xx format.
++
++.SH SYNOPSIS
++\fBgrub-menulst2cfg\fR [\fIINFILE\fR [\fIOUTFILE\fR]]
++
++.SH DESCRIPTION
++\fBgrub-menulst2cfg\fR converts a configuration file from GRUB 0.xx to the current format.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkconfig.8 b/util/grub-mkconfig.8
+new file mode 100644
+index 00000000000..a2d1f577b9b
+--- /dev/null
++++ b/util/grub-mkconfig.8
+@@ -0,0 +1,17 @@
++.TH GRUB-MKCONFIG 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkconfig\fR \(em Generate a GRUB configuration file.
++
++.SH SYNOPSIS
++\fBgrub-mkconfig\fR [-o | --output=\fIFILE\fR]
++
++.SH DESCRIPTION
++\fBgrub-mkconfig\fR generates a configuration file for GRUB.
++
++.SH OPTIONS
++.TP
++\fB--output\fR=\fIFILE\fR
++Write generated output to \fIFILE\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkfont.1 b/util/grub-mkfont.1
+new file mode 100644
+index 00000000000..3494857987d
+--- /dev/null
++++ b/util/grub-mkfont.1
+@@ -0,0 +1,87 @@
++.TH GRUB-MKFONT 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkfont\fR \(em Convert common font file formats into the PF2 format.
++
++.SH SYNOPSIS
++\fBgrub-mkfont\fR [--ascii-bitmaps] [-a | --force-autohint]
++.RS 13
++[-b | --bold] [-c | --asce=\fINUM\fR] [-d | --desc=\fINUM\fR]
++.RE
++.RS 13
++[-i | --index=\fINUM\fR] [-n | --name=\fINAME\fR] [--no-bitmap]
++.RE
++.RS 13
++[--no-hinting] <-o | --output=\fIFILE\fR>
++.RE
++.RS 13
++[-r | --range=\fIFROM-TO\fR[\fI,FROM-TO\fR]] [-s | --size=\fISIZE\fR]
++.RE
++.RS 13
++[-v | --verbose] [--width-spec] \fIFONT_FILES\fR
++
++.SH DESCRIPTION
++\fBgrub-mkfont\fR converts font files from common formats into the PF2 format used by GRUB.
++
++.SH OPTIONS
++.TP
++--ascii-bitmaps
++Save only bitmaps for ASCII characters.
++
++.TP
++--force-autohint
++Force generation of automatic hinting.
++
++.TP
++--bold
++Convert font to bold.
++
++.TP
++--asce=\fINUM\fR
++Set font ascent to \fINUM\fR.
++
++.TP
++--desc=\fINUM\fR
++Set font descent to \fINUM\fR.
++
++.TP
++--index=\fINUM\fR
++Select face index \fINUM\fR.
++
++.TP
++--name=\fINAME\fR
++Set font family to \fINAME\fR.
++
++.TP
++--no-bitmap
++Ignore bitmap strikes when loading.
++
++.TP
++--no-hinting
++Disable hinting.
++
++.TP
++--output=\fIFILE\fR
++Save ouptut to \fIFILE\fR.  This argument is required.
++
++.TP
++--range=\fIFROM-TO\fR\fI,FROM-TO\fR
++Set the font ranges to each pair of \fIFROM\fR,\fITO\fR.
++
++.TP
++--size=\fISIZE\fR
++Set font size to \fISIZE\fR.
++
++.TP
++--verbose
++Print verbose messages.
++
++.TP
++--width-spec
++Create a width summary file.
++
++.TP
++\fIFONT_FILES\fR
++The input files to be converted.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkimage.1 b/util/grub-mkimage.1
+new file mode 100644
+index 00000000000..4dea4f54597
+--- /dev/null
++++ b/util/grub-mkimage.1
+@@ -0,0 +1,95 @@
++.TH GRUB-MKIMAGE 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkimage\fR \(em Make a bootable GRUB image.
++
++.SH SYNOPSIS
++\fBgrub-mkimage\fR [-c | --config=\fRFILE\fI] [-C | --compression=(\fIxz\fR,\fInone\fR,\fIauto\fR)]
++.RS 14
++[-d | --directory=\fRDIR\fR] [-k | --pubkey=\fIFILE\fR]
++.RE
++.RS 14
++[-m | --memdisk=\fIFILE\fR] [-n | --note] [-o | --output=\fIFILE\fR]
++.RE
++.RS 14
++[-O | --format=\fIFORMAT\fR] [-p | --prefix=\fIDIR\fR]
++.RE
++.RS 14
++[-v | --verbose] \fIMODULES\fR
++
++.SH DESCRIPTION
++\fBgrub-mkimage\fI builds a bootable image of GRUB.
++
++.SH OPTIONS
++.TP
++--config=\fIFILE\fR
++Embed \fIFILE\fR as the image's initial configuration file.
++
++.TP
++--compression=(\fIxz\fR,\fInone\fR,\fIauto\fR)
++Use one of \fIxz\fR, \fInone\fR, or \fIauto\fR as the compression method for the core image.
++
++.TP
++--directory=\fIDIR\fR
++Use images and modules from \fIDIR\fR.  The default value is \fB/usr/lib/grub/<platform>\fR.
++
++.TP
++--pubkey=\fIFILE\fR
++Embed the public key \fIFILE\fR for signature checking.
++
++.TP
++--memdisk=\fIFILE\fR
++Embed the memdisk image \fIFILE\fR.  If no \fB-p\fR option is also specified, this implies \fI-p (memdisk)/boot/grub\fR.
++
++.TP
++--note
++Add a CHRP \fINOTE\fR section.  This option is only valid on IEEE1275 platforms.
++
++.TP
++--output=\fIFILE\fR
++Write the generated file to \fIFILE\fR.  The default is to write to standard output.
++
++.TP
++--format=\fIFORMAT\fR
++Generate an image in the specified \fIFORMAT\fR.  Valid values are:
++.RS
++.RS 4
++.P
++i386-coreboot,
++i386-multiboot,
++i386-pc,
++i386-pc-pxe,
++i386-efi,
++i386-ieee1275,
++i386-qemu,
++x86_64-efi,
++mipsel-yeeloong-flash,
++mipsel-fuloong2f-flash,
++mipself-loongson-elf,
++powerpc-ieee1275,
++sparc64-ieee1275-raw,
++sparc64-ieee1275-cdcore,
++sparc64-ieee1275-aout,
++ia64-efi,
++mips-arc,
++mipsel-arc,
++mipsel-qemu_mips-elf,
++mips-qemu_mips-flash,
++mipsel-qemu_mips-flash,
++mips-qemu_mips-elf
++.RE
++.RE
++
++.TP
++--prefix=\fIDIR\fR
++Set prefix directory.  The default value is \fI/boot/grub\fR.
++
++.TP
++--verbose
++Print verbose messages.
++
++.TP
++\fIMODULES\fR
++Include \fIMODULES\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mklayout.1 b/util/grub-mklayout.1
+new file mode 100644
+index 00000000000..d1bbc2ec515
+--- /dev/null
++++ b/util/grub-mklayout.1
+@@ -0,0 +1,27 @@
++.TH GRUB-MKLAYOUT 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mklayout\fR \(em Generate a GRUB keyboard layout file.
++
++.SH SYNOPSIS
++\fBgrub-mklayout\fR [-i | --input=\fIFILE\fR] [-o | --output=\fIFILE\fR]
++.RS 15
++[-v | --verbose]
++
++.SH DESCRIPTION
++\fBgrub-mklayout\fR generates a GRUB keyboard layout description which corresponds with the Linux console layout description given as input.
++
++.SH OPTIONS
++.TP
++--input=\fIFILE\fR
++Use \fIFILE\fR as the input.  The default value is the standard input device.
++
++.TP
++--output=\fIFILE\fR
++Use \fIFILE\fR as the output.  The default value is the standard output device.
++
++.TP
++--verbose
++Print verbose messages.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mknetdir.1 b/util/grub-mknetdir.1
+new file mode 100644
+index 00000000000..fa7e8d4ef0d
+--- /dev/null
++++ b/util/grub-mknetdir.1
+@@ -0,0 +1,12 @@
++.TH GRUB-MKNETDIR 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mknetdir\fR \(em Prepare a GRUB netboot directory.
++
++.SH SYNOPSIS
++\fBgrub-mknetdir\fR
++
++.SH DESCRIPTION
++\fBgrub-mknetdir\fR prepares a directory for GRUB to be netbooted from.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkpasswd-pbkdf2.1 b/util/grub-mkpasswd-pbkdf2.1
+new file mode 100644
+index 00000000000..73c437c15d8
+--- /dev/null
++++ b/util/grub-mkpasswd-pbkdf2.1
+@@ -0,0 +1,27 @@
++.TH GRUB-MKPASSWD-PBKDF2 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkpasswd-pbkdf2\fR \(em Generate a PBKDF2 password hash.
++
++.SH SYNOPSIS
++\fBgrub-mkpasswd-pbkdf2\fR [-c | --iteration-count=\fINUM\fR] [-l | --buflen=\fINUM\fR]
++.RS 22
++[-s | --salt=\fINUM\fR]
++
++.SH DESCRIPTION
++\fBgrub-mkpasswd-pbkdf2\fR generates a PBKDF2 password string suitable for use in a GRUB configuration file.
++
++.SH OPTIONS
++.TP
++--iteration-count=\fINUM\fR
++Number of PBKDF2 iterations.
++
++.TP
++--buflen=\fINUM\fR
++Length of generated hash.
++
++.TP
++--salt=\fINUM\fR
++Length of salt to use.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkrelpath.1 b/util/grub-mkrelpath.1
+new file mode 100644
+index 00000000000..85f1113621d
+--- /dev/null
++++ b/util/grub-mkrelpath.1
+@@ -0,0 +1,12 @@
++.TH GRUB-MKRELPATH 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkrelpath\fR \(em Generate a relative GRUB path given an OS path.
++
++.SH SYNOPSIS
++\fBgrub-mkrelpath\fR \fIFILE\fR
++
++.SH DESCRIPTION
++\fBgrub-mkrelpath\fR takes an OS filesystem path for \fIFILE\fR and returns a relative path suitable for use in a GRUB configuration file.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkrescue.1 b/util/grub-mkrescue.1
+new file mode 100644
+index 00000000000..4ed9fc723fd
+--- /dev/null
++++ b/util/grub-mkrescue.1
+@@ -0,0 +1,123 @@
++.TH GRUB-MKRESCUE 3 "Wed Feb 26 2014"
++.SH NAME
++grub-mkrescue \(em Generate a GRUB rescue image using GNU Xorriso.
++
++.SH SYNOPSIS
++\fBgrub-mkrescue\fR [-o | --output=\fIFILE\fR] [--modules=\fIMODULES\fR]
++.RS 15
++[--install-modules=\fIMODULES\fR] [--themes=\fITHEMES\fR]
++.RE
++.RS 15
++[--fonts=\fIFONTS\fR] [--locales=\fILOCALES\fR]
++.RE
++.RS 15
++[--compress[=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR]] [-d | --directory=\fIDIR\fR]
++.RE
++.RS 15
++[--grub-mkimage=\fIFILE\fR] [--rom-directory=\fIDIR\fR]
++.RE
++.RS 15
++[--xorriso=\fIFILE\fR] [--grub-glue-efi=\fIFILE\fR]
++.RE
++.RS 15
++[--grub-render-label=\fIFILE\fR] [--label-font=\fIFILE\fR]
++.RE
++.RS 15
++[--label-color=\fICOLOR\fR] [--label-bgcolor=\fIFILE\fR]
++.RE
++.RS 15
++[--product-name=\fISTRING\fR] [--product-version=\fISTRING\fR]
++.RE
++.RS 15
++[--sparc-boot] [--arcs-boot]
++
++.SH DESCRIPTION
++\fBgrub-mkrescue\fR can be used to generate a rescue image with the GRUB bootloader.
++
++.SH OPTIONS
++.TP
++\fB--output\fR=\fIFILE\fR
++Write the generated file to \fIFILE\fR.  The default is to write to standard output.
++
++.TP
++\fB--modules\fR=\fIMODULES\fR
++Pre-load modules specified by \fIMODULES\fR.
++
++.TP
++\fB--install-modules\fR=\fIMODULES\fR
++Install only \fIMODULES\fR and their dependencies.  The default is to install all available modules.
++
++.TP
++\fB--themes\fR=\fITHEMES\fR
++Install \fITHEMES\fR.  The default is to install the \fIstarfield\fR theme, if available.
++
++.TP
++\fB--fonts\fR=\fIFONTS\fR
++Install \fIFONTS\fR.  The default is to install the \fIunicode\fR font.
++
++.TP
++\fB--locales\fR=\fILOCALES\fR
++Install only locales listed in \fILOCALES\fR.  The default is to install all available locales.
++
++.TP
++\fB--compress\fR[=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR]
++Compress GRUB files using the specified compression algorithm.
++
++.TP
++\fB--directory\fR=\fIDIR\fR
++Use images and modules in \fIDIR\fR.
++
++.TP
++\fB--grub-mkimage\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-mkimage\fR(1).  The default is \fI/usr/bin/grub-mkimage\fR.
++
++.TP
++\fB--rom-directory\fR=\fIDIR\fR
++Save ROM images in \fIDIR\fR.
++
++.TP
++\fB--xorriso\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBxorriso\fI.
++
++.TP
++\fB--grub-glue-efi\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-glue-efi\fR(3).
++
++.TP
++\fB--grub-render-label\fR=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-render-label\fR(3).
++
++.TP
++\fB--label-font\fR=\fIFILE\fR
++Use \fIFILE\fR as the font file for generated labels.
++
++.TP
++\fB--label-color\fR=\fICOLOR\fR
++Use \fICOLOR\fI as the color for generated labels.
++
++.TP
++\fB--label-bgcolor\fR=\fICOLOR\fR
++Use \fICOLOR\fR as the background color for generated labels.
++
++.TP
++\fB--product-name\fR=\fISTRING\fR
++Use \fISTRING\fR as the product name in generated labels.
++
++.TP
++\fB--product-version\fR=\fISTRING\fR
++Use \fISTRING\fR as the product version in generated labels.
++
++.TP
++\fB--sparc-boot\fR
++Enable booting the SPARC platform.  This disables HFS+, APM, ARCS, and "boot as disk image" on the \fIi386-pc\fR target platform.
++
++.TP
++\fB--arcs-boot\fR
++Enable ARCS booting.  This is typically for big-endian MIPS machines, and disables HFS+, APM, sparc64, and "boot as disk image" on the \fIi386-pc\fR target platform.
++
++.TP
++\fB--\fR
++All options after a \fB--\fR will be passed directly to xorriso's command line when generating the image.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-mkstandalone.1 b/util/grub-mkstandalone.1
+new file mode 100644
+index 00000000000..ba2d2bdf279
+--- /dev/null
++++ b/util/grub-mkstandalone.1
+@@ -0,0 +1,100 @@
++.TH GRUB-MKSTANDALONE 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-mkstandalone\fR \(em Generate a standalone image in the selected format.
++
++.SH SYNOPSIS
++\fBgrub-mkstandalone\fR [-o | --output=\fIFILE\fR] [-O | --format=\fIFORMAT\fR]
++.RS 19
++[-C | --compression=(\fIxz\fR|\fInone\fR|\fIauto\fR)]
++.RE
++.RS 19
++[--modules=\fIMODULES\fR] [--install-modules=\fIMODULES\fR]
++.RE
++.RS 19
++[--themes=\fITHEMES\fR] [--fonts=\fIFONTS\fR]
++.RE
++.RS 19
++[--locales=\fILOCALES\fR] [--compress[=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR]]
++.RE
++.RS 19
++[-d | --directory=\fIDIR\fR] [--grub-mkimage=\fIFILE\fR]
++.RE
++.RS 19
++\fISOURCE...\fR
++
++.SH DESCRIPTION
++
++.SH OPTIONS
++.TP
++--output=\fIFILE\fR
++Write the generated file to \fIFILE\fR.  The default is to write to standard output.
++
++.TP
++--format=\fIFORMAT\fR
++Generate an image in the specified \fIFORMAT\fR.  Valid values are:
++.RS
++.RS 4
++.P
++i386-coreboot,
++i386-multiboot,
++i386-pc,
++i386-pc-pxe,
++i386-efi,
++i386-ieee1275,
++i386-qemu,
++x86_64-efi,
++mipsel-yeeloong-flash,
++mipsel-fuloong2f-flash,
++mipself-loongson-elf,
++powerpc-ieee1275,
++sparc64-ieee1275-raw,
++sparc64-ieee1275-cdcore,
++sparc64-ieee1275-aout,
++ia64-efi,
++mips-arc,
++mipsel-arc,
++mipsel-qemu_mips-elf,
++mips-qemu_mips-flash,
++mipsel-qemu_mips-flash,
++mips-qemu_mips-elf
++.RE
++.RE
++
++.TP
++--compression=(\fIxz\fR|\fInone\fR|\fIauto\fR)
++Use one of \fIxz\fR, \fInone\fR, or \fIauto\fR as the compression method for the core image.
++
++.TP
++--modules=\fIMODULES\fR
++Pre-load modules specified by \fIMODULES\fR.
++
++.TP
++--install-modules=\fIMODULES\fR
++Install only \fIMODULES\fR and their dependencies.  The default is to install all available modules.
++
++.TP
++--themes=\fITHEMES\fR
++Install \fITHEMES\fR.  The default is to install the \fIstarfield\fR theme, if available.
++
++.TP
++--fonts=\fIFONTS\fR
++Install \fIFONTS\fR.  The default is to install the \fIunicode\fR font.
++
++.TP
++--locales=\fILOCALES\fR
++Install only locales listed in \fILOCALES\fR.  The default is to install all available locales.
++
++.TP
++--compress[=\fIno\fR,\fIxz\fR,\fIgz\fR,\fIlzo\fR]
++Compress GRUB files using the specified compression algorithm.
++
++.TP
++--directory=\fIDIR\fR
++Use images and modules in \fIDIR\fR.
++
++.TP
++--grub-mkimage=\fIFILE\fR
++Use \fIFILE\fR as \fBgrub-mkimage\fR.  The default is \fI/usr/bin/grub-mkimage\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-ofpathname.8 b/util/grub-ofpathname.8
+new file mode 100644
+index 00000000000..bf3743aeba1
+--- /dev/null
++++ b/util/grub-ofpathname.8
+@@ -0,0 +1,12 @@
++.TH GRUB-OFPATHNAME 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-ofpathname\fR \(em Generate an IEEE-1275 device path for a specified device.
++
++.SH SYNOPSIS
++\fBgrub-ofpathname\fR \fIDEVICE\fR
++
++.SH DESCRIPTION
++\fBgrub-ofpathname\fR generates an IEEE-1275 device path for the specified \fIDEVICE\fR.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-probe.8 b/util/grub-probe.8
+new file mode 100644
+index 00000000000..04e26c832bb
+--- /dev/null
++++ b/util/grub-probe.8
+@@ -0,0 +1,80 @@
++.TH GRUB-PROBE 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-probe\fR \(em Probe device information for a given path.
++
++.SH SYNOPSIS
++\fBgrub-probe\fR \[-d | --device] [-m | --device-map=\fIFILE\fR]
++.RS 12
++[-t | --target=(fs|fs_uuid|fs_label|drive|device|partmap|
++.RE
++.RS 28
++abstraction|cryptodisk_uuid|
++.RE
++.RS 28
++msdos_parttype)]
++.RE
++.RS 12
++[-v | --verbose] (PATH|DEVICE)
++
++.SH DESCRIPTION
++\fBgrub-probe\fR probes a path or device for filesystem and related information.
++
++.SH OPTIONS
++.TP
++--device
++Final option represents a \fIDEVICE\fR, rather than a filesystem \fIPATH\fR.
++.TP
++--device-map=\fIFILE\fR
++Use \fIFILE\fR as the device map.  The default value is \fI/boot/grub/device.map\fR.
++
++.TP
++--target=(fs|fs_uuid|fs_label|drive|device|partmap|msdos_parttype)
++Select among various output definitions.  The default is \fIfs\fR.
++.RS
++.TP
++\fIfs\fR
++filesystem module
++
++.TP
++\fIfs_uuid\fR
++filesystem UUID
++
++.TP
++\fIfs_label\fR
++filesystem label
++
++.TP
++\fIdrive\fR
++GRUB drive name
++
++.TP
++\fIdevice\fR
++System device
++
++.TP
++\fIpartmap\fR
++partition map module
++
++.TP
++\fIabstraction\fR
++abstraction module
++
++.TP
++\fIcryptodisk_uuid\fR
++cryptographic container
++
++.TP
++\fImsdos_partmap\fR
++MS-DOS partition map
++.RE
++
++.TP
++--verbose
++Print verbose output.
++
++.TP
++(\fIPATH\fR|\fIDEVICE\fR)
++If --device is passed, a block \fIDEVICE\fR.  Otherwise, the \fIPATH\fR of a file on the filesystem.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-reboot.8 b/util/grub-reboot.8
+new file mode 100644
+index 00000000000..faa5e4eece2
+--- /dev/null
++++ b/util/grub-reboot.8
+@@ -0,0 +1,21 @@
++.TH GRUB-REBOOT 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-reboot\fR \(em Set the default boot menu entry for the next boot only.
++
++.SH SYNOPSIS
++\fBgrub-reboot\fR [--boot-directory=\fIDIR\fR] \fIMENU_ENTRY\fR
++
++.SH DESCRIPTION
++\fBgrub-reboot\fR sets the default boot menu entry for the next boot, but not further boots after that.  This command only works for GRUB configuration files created with \fIGRUB_DEFAULT=saved\fR in \fI/etc/default/grub\fR.
++
++.SH OPTIONS
++.TP
++--boot-directory=\fIDIR\fR
++Find GRUB images under \fIDIR/grub\fR.  The default value is \fI/boot\fR, resulting in grub images being search for at \fI/boot/grub\fR.
++
++.TP
++\fIMENU_ENTRY\fR
++A number, a menu item title or a menu item identifier.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-render-label.1 b/util/grub-render-label.1
+new file mode 100644
+index 00000000000..4d51c8abf01
+--- /dev/null
++++ b/util/grub-render-label.1
+@@ -0,0 +1,51 @@
++.TH GRUB-RENDER-LABEL 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-render-label\fR \(em Render an Apple disk label.
++
++.SH SYNOPSIS
++\fBgrub-render-label\fR [-b | --bgcolor=\fICOLOR\fR] [-c | --color=\fICOLOR\fR]
++.RS 19
++[-f | --font=\fIFILE\fR] [-i | --input=\fIFILE\fR]
++.RE
++.RS 19
++[-o | --output=\fIFILE\fR] [-t | --text=\fISTRING\fR]
++.RE
++.RS 19
++[-v | --verbose]
++
++.SH DESCRIPTION
++\fBgrub-render-label\fR renders an Apple disk label (.disk_label) file.
++
++
++.SH OPTIONS
++.TP
++\fB--color\fR=\fICOLOR\fR
++Use \fICOLOR\fI as the color for generated labels.
++
++.TP
++\fB--bgcolor\fR=\fICOLOR\fR
++Use \fICOLOR\fR as the background color for generated labels.
++
++.TP
++\fB--font\fR=\fIFILE\fR
++Use \fIFILE\fR as the font file for generated labels.
++
++.TP
++--input=\fIFILE\fR
++Read input text from \fIFILE\fR.
++
++.TP
++--output=\fIFILE\fR
++Render output to \fIFILE\fR.
++
++.TP
++--text=\fISTRING\fR
++Use \fISTRING\fR as input text.
++
++.TP
++--verbose
++Print verbose output.
++
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-script-check.1 b/util/grub-script-check.1
+new file mode 100644
+index 00000000000..0f1f625b05d
+--- /dev/null
++++ b/util/grub-script-check.1
+@@ -0,0 +1,21 @@
++.TH GRUB-SCRIPT-CHECK 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-script-check\fR \(em Check GRUB configuration file for syntax errors.
++
++.SH SYNOPSIS
++\fBgrub-script-check\fR [-v | --verbose] \fIPATH\fR
++
++.SH DESCRIPTION
++\fBgrub-script-check\fR verifies that a specified GRUB configuration file does not contain syntax errors.
++
++.SH OPTIONS
++.TP
++--verbose
++Print verbose output.
++
++.TP
++\fIPATH\fR
++Path of the file to use as input.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-set-default.8 b/util/grub-set-default.8
+new file mode 100644
+index 00000000000..a96265a1509
+--- /dev/null
++++ b/util/grub-set-default.8
+@@ -0,0 +1,21 @@
++.TH GRUB-SET-DEFAULT 1 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-set-default\fR \(em Set the default boot menu entry for GRUB.
++
++.SH SYNOPSIS
++\fBgrub-set-default\fR [--boot-directory=\fIDIR\fR] \fIMENU_ENTRY\fR
++
++.SH DESCRIPTION
++\fBgrub-set-default\fR sets the default boot menu entry for all subsequent boots.  This command only works for GRUB configuration files created with \fIGRUB_DEFAULT=saved\fR in \fI/etc/default/grub\fR.
++
++.SH OPTIONS
++.TP
++--boot-directory=\fIDIR\fR
++Find GRUB images under \fIDIR/grub\fR.  The default value is \fI/boot\fR, resulting in grub images being search for at \fI/boot/grub\fR.
++
++.TP
++\fIMENU_ENTRY\fR
++A number, a menu item title or a menu item identifier.
++
++.SH SEE ALSO
++.BR "info grub"
+diff --git a/util/grub-sparc64-setup.8 b/util/grub-sparc64-setup.8
+new file mode 100644
+index 00000000000..37ea2dd5eaa
+--- /dev/null
++++ b/util/grub-sparc64-setup.8
+@@ -0,0 +1,12 @@
++.TH GRUB-SPARC64-SETUP 3 "Wed Feb 26 2014"
++.SH NAME
++\fBgrub-sparc64-setup\fR \(em Set up a device to boot a sparc64 GRUB image.
++
++.SH SYNOPSIS
++\fBgrub-sparc64-setup\fR [OPTIONS].
++
++.SH DESCRIPTION
++You should not normally run this program directly.  Use grub-install instead.
++
++.SH SEE ALSO
++.BR "info grub"
