@@ -1,14 +1,14 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
-Version:        8.6.10
-Release:        4%{?dist}
+Version:        9.1.0
+Release:        1%{?dist}
 License:        GPLv2
 URL:            http://asciidoc.org/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/%{name}/%{name}-py3/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:       https://github.com/%{name}-py/%{name}-py/releases/download/%{version}/%{name}-%{version}.tar.gz
+#Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3
 BuildRequires:  python3-xml
@@ -25,7 +25,7 @@ Requires:       docbook-dtd-xml
 AsciiDoc is a human readable text document format that can be easily converted to other document formats.
 
 %prep
-%setup -q -n %{name}-py3-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 autoreconf -v
@@ -39,15 +39,15 @@ rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
 
 %check
-python tests/testasciidoc.py update
-python tests/testasciidoc.py run
+python3 tests/testasciidoc.py update
+python3 tests/testasciidoc.py run
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license COPYRIGHT
 %{_bindir}/*
 %{_sysconfdir}/*
 %{_mandir}/*

@@ -17,7 +17,7 @@ BuildRequires:  libselinux-devel
 BuildRequires:  meson
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
@@ -37,7 +37,7 @@ Group:          Development/Libraries
 Requires:       glib = %{version}-%{release}
 Requires:       libffi-devel
 Requires:       pcre-devel
-Requires:       python-xml
+Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
 Provides:       glib2-devel%{?_isa} = %{version}-%{release}

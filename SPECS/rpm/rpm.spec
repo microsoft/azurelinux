@@ -1,4 +1,3 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Package manager
 Name:           rpm
@@ -257,10 +256,6 @@ rm -rf %{buildroot}
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
-
-%files -n python-rpm
-%defattr(-,root,root)
-%{python2_sitelib}/*
 
 %files -n python3-rpm
 %defattr(-,root,root)

@@ -1,7 +1,7 @@
 alsa-lib-1.2.2-1.cm1.x86_64.rpm
 alsa-lib-debuginfo-1.2.2-1.cm1.x86_64.rpm
 alsa-lib-devel-1.2.2-1.cm1.x86_64.rpm
-asciidoc-8.6.10-4.cm1.noarch.rpm
+asciidoc-9.1.0-1.cm1.noarch.rpm
 autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
 bash-4.4.18-5.cm1.x86_64.rpm
@@ -38,7 +38,6 @@ cracklib-debuginfo-2.9.7-2.cm1.x86_64.rpm
 cracklib-devel-2.9.7-2.cm1.x86_64.rpm
 cracklib-dicts-2.9.7-2.cm1.x86_64.rpm
 cracklib-lang-2.9.7-2.cm1.x86_64.rpm
-cracklib-python-2.9.7-2.cm1.x86_64.rpm
 createrepo_c-0.11.1-6.cm1.x86_64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.x86_64.rpm
 createrepo_c-devel-0.11.1-6.cm1.x86_64.rpm
@@ -539,11 +538,6 @@ python3-setuptools-3.7.7-11.cm1.noarch.rpm
 python3-test-3.7.7-11.cm1.x86_64.rpm
 python3-tools-3.7.7-11.cm1.x86_64.rpm
 python3-xml-3.7.7-11.cm1.x86_64.rpm
-python-curses-2.7.18-4.cm1.x86_64.rpm
-python-gpg-1.13.1-5.cm1.x86_64.rpm
-python-rpm-4.14.2.1-1.cm1.x86_64.rpm
-python-setuptools-40.2.0-6.cm1.noarch.rpm
-python-xml-2.7.18-4.cm1.x86_64.rpm
 readline-7.0-5.cm1.x86_64.rpm
 readline-debuginfo-7.0-5.cm1.x86_64.rpm
 readline-devel-7.0-5.cm1.x86_64.rpm

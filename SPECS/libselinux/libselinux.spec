@@ -1,4 +1,3 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        SELinux library and simple utilities
 Name:           libselinux
@@ -12,7 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre-devel, swig
-BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 Requires:       pcre-libs
 Requires:       libsepol
@@ -52,17 +50,6 @@ Provides:       pkgconfig(libselinux)
 The libselinux-devel package contains the libraries and header files
 needed for developing SELinux applications.
 
-%package        python
-Summary:        SELinux python2 bindings for libselinux
-Group:          Development/Libraries
-Requires:       libselinux = %{version}-%{release}
-Requires:       python2
-Requires:       python2-libs
-
-%description    python
-The libselinux-python package contains the python2 bindings for developing
-SELinux applications.
-
 %package        python3
 Summary:        SELinux python3 bindings for libselinux
 Group:          Development/Libraries
@@ -82,11 +69,9 @@ SELinux applications.
 sed '/unistd.h/a#include <sys/uio.h>' -i src/setrans_client.c
 make clean
 make %{?_smp_mflags} swigify CFLAGS="%{build_cflags} -Wno-error=strict-overflow"
-make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=/usr/bin/python2 pywrap
 make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=/usr/bin/python3 pywrap
 
 %install
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python2 install install-pywrap
 
 make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python3 install install-pywrap
 
@@ -124,10 +109,6 @@ rm -rf %{buildroot}
 %{_includedir}/selinux/*
 %{_libdir}/libselinux.a
 %{_mandir}/man3/*
-
-%files python
-%defattr(-,root,root,-)
-%{python2_sitelib}/*
 
 %files python3
 %defattr(-,root,root,-)

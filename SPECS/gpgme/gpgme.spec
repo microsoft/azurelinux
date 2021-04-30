@@ -39,15 +39,6 @@ Requires:       %{name} = %{version}-%{release}
 %description -n python3-gpg
 %{summary}.
 
-%package -n     python-gpg
-Summary:        GPG bindings for Python
-BuildRequires:  python2-devel
-BuildRequires:  swig
-Requires:       %{name} = %{version}-%{release}
-
-%description -n python-gpg
-%{summary}.
-
 %prep
 %setup -q
 
@@ -91,12 +82,6 @@ make check
 %doc lang/python/README
 %{python3_sitearch}/gpg-*.egg-info
 %{python3_sitearch}/gpg/
-
-
-%files -n python-gpg
-%doc lang/python/README
-%{python_sitearch}/gpg-*.egg-info
-%{python_sitearch}/gpg/
 
 %changelog
 *   Thu Aug 20 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.1-5
