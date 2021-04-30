@@ -75,7 +75,6 @@ Provides:       systemd-udev = %{version}-%{release}
 Provides:       udev = %{version}-%{release}
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
-Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 
 %description
