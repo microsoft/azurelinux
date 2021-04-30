@@ -1,7 +1,7 @@
 Summary:        Azure IoT Edge Security Daemon
 Name:           azure-iotedge
 Version:        1.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 
 # A buildable azure-iotedge environments needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
@@ -166,6 +166,9 @@ echo "==========================================================================
 %doc %{_docdir}/iotedge-%{version}/trademark
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-4
+- Bump release to rebuild with rust 1.47.0-3 (security update)
+
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-3
 - Bump release to rebuild with rust 1.47.0-2 (security update)
 

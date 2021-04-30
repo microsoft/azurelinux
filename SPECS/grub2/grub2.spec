@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,13 @@ Patch0003:      0003-Rework-linux16-command.patch
 Patch0004:      0004-Add-secureboot-support-on-efi-chainloader.patch
 Patch0005:      0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
 Patch0006:      0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
+# Kernel cmdline fix
+Patch0017:      0017-Pass-x-hex-hex-straight-through-unmolested.patch
+# Nicer documentation. Also makes patch #166 apply cleanly
+Patch0037:      0037-Replace-a-lot-of-man-pages-with-slightly-nicer-ones.patch
+Patch0052:      0052-Make-our-info-pages-say-grub2-where-appropriate.patch
+# General fix
+Patch0069:      0069-Make-pmtimer-tsc-calibration-not-take-51-seconds-to-.patch
 # ARM64 build patch
 Patch0104:      0104-Rework-how-the-fdt-command-builds.patch
 # General fixes (> 4GB DMA, TPM measurements, etc)
@@ -37,6 +44,22 @@ Patch0150:      0150-x86-efi-Reduce-maximum-bounce-buffer-size-to-16-MiB.patch
 Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 # CVE-2020-15705
 Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
+# Fix to prevent user from overwriting signed grub binary using grub2-install
+Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
+# Add nopatches for tooling
+Patch1000:      CVE-2021-3418.nopatch
+Patch1001:      CVE-2020-14372.nopatch
+Patch1002:      CVE-2020-25632.nopatch
+Patch1003:      CVE-2020-25647.nopatch
+Patch1004:      CVE-2020-27779.nopatch
+Patch1005:      CVE-2021-20233.nopatch
+Patch1006:      CVE-2020-10713.nopatch
+Patch1007:      CVE-2020-14308.nopatch
+Patch1008:      CVE-2020-14309.nopatch
+Patch1009:      CVE-2020-14310.nopatch
+Patch1010:      CVE-2020-14311.nopatch
+Patch1011:      CVE-2020-27749.nopatch
+Patch1012:      CVE-2021-20225.nopatch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -247,6 +270,17 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
+- Bump version to match grub-efi-binary-signed spec
+
+* Fri Apr 02 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.06~rc1-3
+- Apply no patches for CVE-2021-3418 CVE-2020-14372 CVE-2020-25632
+  CVE-2020-25647 CVE-2020-27779 CVE-2021-20233 CVE-2020-10713 CVE-2020-14308
+  CVE-2020-14309 CVE-2020-14310 CVE-2020-14311 CVE-2020-27749 CVE-2021-20225
+
+* Fri Mar 26 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-2
+- Add a few more F34 patches (017, 037, 052, 069, 166)
+
 * Wed Mar 10 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-1
 - Update to 2.06-rc1. Remove old out-of-tree patches. Add patches from F34
 - Incorporate SBAT data

@@ -5,8 +5,8 @@
 # Git clone is a standard practice of producing source files for moby-* packages.
 
 CLI_REPO=https://github.com/docker/cli.git
-CLI_COMMIT=dd360c7c0de8d9132a3965db6a59d3ae74f43ba7
-VERSION=19.03.11+azure
+CLI_COMMIT=48d30b5b32e99c932b4ea3edca74353feddd83ff
+VERSION=19.03.15+azure
 
 mkdir -p /build/cli-src
 cd /build/cli-src

@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Source0:        %{name}-%{version}.tar.gz
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
 BuildRequires:  git
+BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  zlib-devel
@@ -25,6 +26,7 @@ BuildRequires:  openssl-devel
 
 Requires:       zlib
 Requires:       openssl
+Requires:       c-ares
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -56,7 +58,8 @@ cmake ../.. -DgRPC_INSTALL=ON \
    -DCMAKE_BUILD_TYPE=Release             \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
    -DgRPC_ZLIB_PROVIDER:STRING='package'  \
-   -DgRPC_SSL_PROVIDER:STRING='package'
+   -DgRPC_SSL_PROVIDER:STRING='package'   \
+   -DgRPC_CARES_PROVIDER:STRING='package' 
 %make_build
 
 %install
@@ -88,6 +91,9 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Wed Apr 28 2021 Nick Samson <nick.samson@microsoft.com> - 1.35.0-3
+- Switch to system package for c-ares dependency.
+
 * Fri Mar 26 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-2
 - Switch to system provided packages for zlib and openssl.
 
