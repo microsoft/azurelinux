@@ -22,7 +22,7 @@ BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
 Requires:       libffi
-Requires:       libseliux
+Requires:       libselinux
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
