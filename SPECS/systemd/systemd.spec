@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,7 @@ Provides:       systemd-udev = %{version}-%{release}
 Provides:       udev = %{version}-%{release}
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
+Provides:       system-setup-keyboard = 0.9
 
 %description
 Systemd is an init replacement with better process control and security
@@ -298,6 +299,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Apr 26 2021 Henry Li <lihl@microsoft.com> - 239-38
+- Provides system-setup-keyboard.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

@@ -1,13 +1,14 @@
 Summary:       Device Tree Compiler
 Name:          dtc
 Version:       1.5.1
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       BSD or GPLv2+
 URL:           https://devicetree.org/
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 Source0:       https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
+Patch0:        dtc-disable-warning.patch
 
 BuildRequires: gcc make
 BuildRequires: flex bison swig
@@ -28,7 +29,7 @@ Requires: %{name} = %{version}-%{release}
 This package provides development files for libfdt
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i 's/python2/python3/' pylibfdt/setup.py
 sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
 
@@ -49,6 +50,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/*
 %{_libdir}/libfdt-%{version}.so
 %{_libdir}/libfdt.so.*
+%{python3_sitearch}/
 
 %files devel
 %{_libdir}/libfdt.so
@@ -56,9 +58,14 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Mon Apr 12 2021 Henry Li <lihl@microsoft.com> 1.5.1-3
+- Apply patch to disable treating cast-qual and missing-prototypes as errors
+- Add %{python3_sitearch}/
+
 * Thu Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.5.1-2
 - Fixed "Source0" tag.
 - License verified and "License" tag updated.
 - Removed "%%define sha1".
+
 * Thu Sep 26 2019 Henry Beberman <hebeberm@microsoft.com> - 1.5.1-1
 - Original version for CBL-Mariner.
