@@ -379,7 +379,6 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 fi;
 
 %files
-# TODO: Move from lib/bind to lib/named, as used by upstream
 %dir %{_libdir}/bind
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
@@ -550,6 +549,11 @@ fi;
 %{_prefix}/lib/tmpfiles.d/named.conf
 
 %changelog
+* Mon May 03 2021 Henry Li <lihl@microsoft.com> - 9.16.3-3
+- Add bind, bind-devel, bind-libs, bind-license, bind-pkcs11, bind-pkcs11-libs,
+  bind-pkcs11-utils, bind-pkcs11-devel, bind-dnssec-utils, bind-dnssec-doc,
+  bind-python3-bind and bind-chroot packages 
+
 *   Fri Sep 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 9.16.3-2
 -   Fixes CVE-2020-8618, CVE-2020-8619, CVE-2020-8620,
 -   CVE-2020-8621, CVE-2020-8622, CVE-2020-8623, CVE-2020-8624
