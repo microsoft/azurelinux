@@ -1,22 +1,19 @@
-%global        bind_dir          /var/named	
+%global        bind_dir          %{_var}/named
 %global        chroot_prefix     %{bind_dir}/chroot
 %global        chroot_create_directories /dev /run/named %{_localstatedir}/{log,named,tmp} \\\
                                          %{_sysconfdir}/crypto-policies/back-ends %{_sysconfdir}/pki/dnssec-keys %{_sysconfdir}/named \\\
                                          %{_libdir}/bind %{_libdir}/named %{_datadir}/GeoIP
-
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
 %{!?_export_dir:%global _export_dir /bind9-export/}
-# libisc-nosym requires to be linked with unresolved symbols
-# When libisc-nosym linking is fixed, it can be defined to 1
-# Visit https://bugzilla.redhat.com/show_bug.cgi?id=1540300
-%undefine _strict_symbol_defs_build
-
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.3
 Release:        3%{?dist}
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Development/Tools
 URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
 Source1:        named.sysconfig
@@ -46,27 +43,29 @@ Patch6:         CVE-2020-8623.nopatch
 Patch7:         CVE-2020-8624.patch
 Patch8:         bind-9.14-config-pkcs11.patch
 Patch9:         bind-9.10-dist-native-pkcs11.patch
-
-Group:          Development/Tools
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Requires:       openssl
-Requires:       libuv
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
-Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
-BuildRequires:  openssl-devel
-BuildRequires:  libcap-devel
-BuildRequires:  python3
-BuildRequires:  python3-ply
-BuildRequires:  libuv-devel
-BuildRequires:  lmdb-devel
+BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
+BuildRequires:  libcap-devel
 BuildRequires:  libtool
-BuildRequires:  gcc
+BuildRequires:  libuv-devel
+BuildRequires:  lmdb-devel
 BuildRequires:  make
+BuildRequires:  openssl-devel
+BuildRequires:  python3
+BuildRequires:  python3-ply
+Requires:       libuv
+Requires:       openssl
+Requires(postun): %{_sbindir}/groupdel
+Requires(postun): %{_sbindir}/userdel
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 # Enforce fix for CVE-2019-6470
 Conflicts:      dhcp < 4.4.1
+# libisc-nosym requires to be linked with unresolved symbols
+# When libisc-nosym linking is fixed, it can be defined to 1
+# Visit https://bugzilla.redhat.com/show_bug.cgi?id=1540300
+%undefine _strict_symbol_defs_build
 
 %description
 BIND is open source software that implements the Domain Name System (DNS) protocols
@@ -74,74 +73,75 @@ for the Internet. It is a reference implementation of those protocols, but it is
 also production-grade software, suitable for use in high-volume and high-reliability applications.
 
 %package pkcs11
-Summary: Bind with native PKCS#11 functionality for crypto
-Requires: systemd
-Requires: bind%{?_isa} = %{version}-%{release}
-Requires: bind-libs%{?_isa} = %{version}-%{release}
-Requires: bind-pkcs11-libs%{?_isa} = %{version}-%{release}
-Recommends: softhsm
-	
+Summary:        Bind with native PKCS#11 functionality for crypto
+Requires:       bind%{?_isa} = %{version}-%{release}
+Requires:       bind-libs%{?_isa} = %{version}-%{release}
+Requires:       bind-pkcs11-libs%{?_isa} = %{version}-%{release}
+Requires:       systemd
+Recommends:     softhsm
+
 %description pkcs11
 This is a version of BIND server built with native PKCS#11 functionality.
 It is important to have SoftHSM v2+ installed and some token initialized.
 For other supported HSM modules please check the BIND documentation.
-	
+
 %package pkcs11-utils
-Summary: Bind tools with native PKCS#11 for using DNSSEC
-Requires: bind-pkcs11-libs%{?_isa} = %{version}-%{release}
-Obsoletes: bind-pkcs11 < 9.9.4-16.P2
-Requires: bind-dnssec-doc = %{version}-%{release}
-	
-%description pkcs11-utils	
+Summary:        Bind tools with native PKCS#11 for using DNSSEC
+Requires:       bind-dnssec-doc = %{version}-%{release}
+Requires:       bind-pkcs11-libs%{?_isa} = %{version}-%{release}
+Obsoletes:      bind-pkcs11 < 9.9.4-16.P2
+
+%description pkcs11-utils
 This is a set of PKCS#11 utilities that when used together create rsa
 keys in a PKCS11 keystore. Also utilities for working with DNSSEC
 compiled with native PKCS#11 functionality are included.
-	
+
 %package pkcs11-libs
-Summary: Bind libraries compiled with native PKCS#11
-Requires: bind-license = %{version}-%{release}
-Requires: bind-libs%{?_isa} = %{version}-%{release}
+Summary:        Bind libraries compiled with native PKCS#11
+Requires:       bind-libs%{?_isa} = %{version}-%{release}
+Requires:       bind-license = %{version}-%{release}
 
 %description pkcs11-libs
 This is a set of BIND libraries (dns, isc) compiled with native PKCS#11
 functionality.
-	
+
 %package pkcs11-devel
-Summary: Development files for Bind libraries compiled with native PKCS#11
-Requires: bind-pkcs11-libs%{?_isa} = %{version}-%{release}
-Requires: bind-devel%{?_isa} = %{version}-%{release}
-	
+Summary:        Development files for Bind libraries compiled with native PKCS#11
+Requires:       bind-devel%{?_isa} = %{version}-%{release}
+Requires:       bind-pkcs11-libs%{?_isa} = %{version}-%{release}
+
 %description pkcs11-devel
 This a set of development files for BIND libraries (dns, isc) compiled
 with native PKCS#11 functionality.
-	
-%package libs	
-Summary: Libraries used by the BIND DNS packages
-Requires: bind-license = %{version}-%{release}
-Provides: bind-libs-lite = %{version}-%{release}
-Obsoletes: bind-libs-lite < 9.16.13
-	
-%description libs	
+
+%package libs
+Summary:        Libraries used by the BIND DNS packages
+Requires:       bind-license = %{version}-%{release}
+Provides:       bind-libs-lite = %{version}-%{release}
+Obsoletes:      bind-libs-lite < 9.16.13
+
+%description libs
 Contains heavyweight version of BIND suite libraries used by both named DNS
 server and utilities in bind-utils package.
-	
+
 %package license
-Summary:  License of the BIND DNS suite
-BuildArch:noarch
-	
+Summary:        License of the BIND DNS suite
+BuildArch:      noarch
+
 %description license
 Contains license of the BIND DNS suite.
 
 %package devel
-Summary:  Header files and libraries needed for bind-dyndb-ldap
-Provides: bind-lite-devel = %{version}-%{release}
-Obsoletes: bind-lite-devel < 9.16.6-3
-Requires: bind-libs%{?_isa} = %{version}-%{release}
-Requires: openssl-devel%{?_isa} libxml2-devel%{?_isa}
-Requires: libcap-devel%{?_isa}
-Requires: krb5-devel%{?_isa}
-Requires: lmdb-devel%{?_isa}
-Requires:  json-c-devel%{?_isa}	
+Summary:        Header files and libraries needed for bind-dyndb-ldap
+Requires:       bind-libs%{?_isa} = %{version}-%{release}
+Requires:       json-c-devel%{?_isa}
+Requires:       krb5-devel%{?_isa}
+Requires:       libcap-devel%{?_isa}
+Requires:       libxml2-devel%{?_isa}
+Requires:       lmdb-devel%{?_isa}
+Requires:       openssl-devel%{?_isa}
+Provides:       bind-lite-devel = %{version}-%{release}
+Obsoletes:      bind-lite-devel < 9.16.6-3
 
 %description devel
 The bind-devel package contains full version of the header files and libraries
@@ -150,53 +150,53 @@ bind libraries for third party applications.
 
 %package chroot
 Summary:        A chroot runtime environment for the ISC BIND DNS server, named(8)
-Prefix:         %{chroot_prefix}
+Requires:       bind%{?_isa} = %{version}-%{release}
 # grep is required due to setup-named-chroot.sh script
 Requires:       grep
-Requires:       bind%{?_isa} = %{version}-%{release}
-	
+
 %description chroot
 This package contains a tree of files which can be used as a
 chroot(2) jail for the named(8) program from the BIND package.
 Based on the code from Jan "Yenya" Kasprzak <kas@fi.muni.cz>
 
 %package dnssec-utils
-Summary: DNSSEC keys and zones management utilities
-Requires: bind-libs%{?_isa} = %{version}-%{release}
-Recommends: bind-utils
-Requires: python3-bind = %{version}-%{release}
-Requires: bind-dnssec-doc = %{version}-%{release}
-	
-%description dnssec-utils	
+Summary:        DNSSEC keys and zones management utilities
+Requires:       bind-dnssec-doc = %{version}-%{release}
+Requires:       bind-libs%{?_isa} = %{version}-%{release}
+Requires:       python3-bind = %{version}-%{release}
+Recommends:     bind-utils
+
+%description dnssec-utils
 Bind-dnssec-utils contains a collection of utilities for editing
 DNSSEC keys and BIND zone files. These tools provide generation,
 revocation and verification of keys and DNSSEC signatures in zone files.
-	
+
 You should install bind-dnssec-utils if you need to sign a DNS zone
 or maintain keys for it.
-	
+
 %package dnssec-doc
-Summary: Manual pages of DNSSEC utilities
-Requires: bind-license = %{version}-%{release}
-BuildArch:noarch
-	
+Summary:        Manual pages of DNSSEC utilities
+Requires:       bind-license = %{version}-%{release}
+BuildArch:      noarch
+
 %description dnssec-doc
 Bind-dnssec-doc contains manual pages for bind-dnssec-utils.
 
-%package -n python3-bind	
-Summary:   A module allowing rndc commands to be sent from Python programs
-Requires:  bind-license = %{version}-%{release}
-Requires:  python3 python3-ply
-BuildArch: noarch
-	
+%package -n python3-bind
+Summary:        A module allowing rndc commands to be sent from Python programs
+Requires:       bind-license = %{version}-%{release}
+Requires:       python3
+Requires:       python3-ply
+BuildArch:      noarch
+
 %description -n python3-bind
 This package provides a module which allows commands to be sent to rndc directly from Python programs.
 
 %package utils
-Summary: BIND utilities
+Summary:        BIND utilities
+
 %description utils
 %{summary}.
-
 
 %prep
 %setup -q
@@ -219,7 +219,7 @@ libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 %build
 ./configure \
     --prefix=%{_prefix} \
-    --with-python=%{__python3} \
+    --with-python=python3 \
     --with-libtool \
     --localstatedir=%{_var} \
     --disable-static \
@@ -240,14 +240,14 @@ mkdir -p %{buildroot}%{_localstatedir}/named/{slaves,data,dynamic}
 mkdir -p %{buildroot}%{_mandir}/{man1,man5,man8}
 mkdir -p %{buildroot}/run/named
 
-#chroot	
+#chroot
 for D in %{chroot_create_directories}
 do
-  mkdir -p %{buildroot}/%{chroot_prefix}${D}	
+  mkdir -p %{buildroot}/%{chroot_prefix}${D}
 done
 
 # create symlink as it is on real filesystem
-pushd %{buildroot}/%{chroot_prefix}/var
+pushd %{buildroot}/%{chroot_prefix}%{_var}
 ln -s ../run run
 popd
 
@@ -263,7 +263,7 @@ install -m 755 %{SOURCE12} %{buildroot}%{_libexecdir}/generate-rndc-key.sh
 
 install -m 755 %{SOURCE14} %{buildroot}%{_libexecdir}/setup-named-softhsm.sh
 
-install -m 644 %{SOURCE2} %{buildroot}/etc/logrotate.d/named
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/named
 mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/named
 install -m 644 %{SOURCE15} %{buildroot}%{_sysconfdir}/named-chroot.files
@@ -275,7 +275,7 @@ install -m 644 lib/isc/unix/errno2result.h %{buildroot}%{_includedir}/bind9/isc
 cp -fp config.h %{buildroot}%{_includedir}/bind9
 
 # Remove libtool .la files:
-find %{buildroot}%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # PKCS11 versions manpages
 pushd %{buildroot}%{_mandir}/man8
@@ -305,26 +305,26 @@ install -m 640 %{SOURCE5} %{buildroot}%{_localstatedir}/named/named.loopback
 install -m 640 %{SOURCE6} %{buildroot}%{_localstatedir}/named/named.empty
 install -m 640 %{SOURCE7} %{buildroot}%{_sysconfdir}/named.rfc1912.zones
 
-mkdir -p %{buildroot}/%{_prefix}/lib/tmpfiles.d
+mkdir -p %{buildroot}/%{_lib}/tmpfiles.d
 cat << EOF >> %{buildroot}/%{_sysconfdir}/named.conf
 zone "." in {
     type master;
     allow-update {none;}; // no DDNS by default
 };
 EOF
-echo "d /run/named 0755 named named - -" > %{buildroot}/%{_prefix}/lib/tmpfiles.d/named.conf
+echo "d /run/named 0755 named named - -" > %{buildroot}/%{_lib}/tmpfiles.d/named.conf
 
 # sample bind configuration files for %%doc:
 mkdir -p sample/etc sample/var/named/{data,slaves}
 install -m 644 %{SOURCE8} sample/etc/named.conf
 # Copy default configuration to %%doc to make it usable from system-config-bind
-cp %{buildroot}/%{_prefix}/lib/tmpfiles.d/named.conf named.conf.default
+cp %{buildroot}/%{_lib}/tmpfiles.d/named.conf named.conf.default
 install -m 644 %{SOURCE7} sample/etc/named.rfc1912.zones
 install -m 644 %{SOURCE4} %{SOURCE5} %{SOURCE6}  sample/var/named
 install -m 644 %{SOURCE3} sample/var/named/named.ca
-for f in my.internal.zone.db slaves/my.slave.internal.zone.db slaves/my.ddns.internal.zone.db my.external.zone.db; do 
+for f in my.internal.zone.db slaves/my.slave.internal.zone.db slaves/my.ddns.internal.zone.db my.external.zone.db; do
   echo '@ in soa localhost. root 1 3H 15M 1W 1D
-  ns localhost.' > sample/var/named/$f; 
+  ns localhost.' > sample/var/named/$f;
 done
 :;
 
@@ -332,19 +332,18 @@ mkdir -p %{buildroot}%{_sysconfdir}/rwtab.d
 install -m 644 %{SOURCE13} %{buildroot}%{_sysconfdir}/rwtab.d/named
 
 # Remove unwanted files
-rm -f %{buildroot}/usr/etc/bind.keys
+rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
 %pre
 if ! getent group named >/dev/null; then
     groupadd -r named
 fi
 if ! getent passwd named >/dev/null; then
-    useradd -g named -d /var/lib/bind\
+    useradd -g named -d %{_sharedstatedir}/bind\
         -s /bin/false -M -r named
 fi
 
 %post -p /sbin/ldconfig
-
 %postun
 /sbin/ldconfig
 if getent passwd named >/dev/null; then
@@ -358,23 +357,23 @@ fi
 %define chroot_fix_devices() \
 if [ $1 -gt 1 ]; then \
   for DEV in "%{1}/dev"/{null,random,zero}; do \
-    if [ -e "$DEV" -a "$(/bin/stat --printf="%G %a" "$DEV")" = "root 644" ]; \
+    if [ -e "$DEV" -a "$(/bin/stat --printf="%{G} %{a}" "$DEV")" = "root 644" ]; \
     then \
       /bin/chmod 0664 "$DEV" \
       /bin/chgrp named "$DEV" \
     fi \
   done \
 fi
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 %ldconfig_scriptlets libs
-
 %ldconfig_scriptlets pkcs11-libs
 
 %post chroot
 %chroot_fix_devices %{chroot_prefix}
 
 %posttrans chroot
-if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
+if [ -x %{_sbindir}/selinuxenabled ] && %{_sbindir}/selinuxenabled; then
   [ -x /sbin/restorecon ] && /sbin/restorecon %{chroot_prefix}/dev/* > /dev/null 2>&1;
 fi;
 
@@ -404,7 +403,7 @@ fi;
 %{_mandir}/man8/filter-aaaa.8.gz
 %doc CHANGES README named.conf.default
 %doc sample/
-	
+
 %defattr(0660,root,named,01770)
 %dir %{_localstatedir}/named
 %defattr(0660,named,named,0770)
@@ -421,7 +420,7 @@ fi;
 # ^- rndc.key now created on first install only if it does not exist
 %ghost %config(noreplace) %{_sysconfdir}/rndc.conf
 # ^- The default rndc.conf which uses rndc.key is in named's default internal config -
-#    so rndc.conf is not necessary.
+# so rndc.conf is not necessary.
 %defattr(-,named,named,-)
 %dir /run/named
 
@@ -459,7 +458,7 @@ fi;
 %{_sbindir}/named-pkcs11
 %{_mandir}/man8/named-pkcs11.8*
 %{_libexecdir}/setup-named-softhsm.sh
-	
+
 %files pkcs11-utils
 %{_sbindir}/dnssec*pkcs11
 %{_sbindir}/pkcs11-destroy
@@ -468,11 +467,11 @@ fi;
 %{_sbindir}/pkcs11-tokens
 %{_mandir}/man8/pkcs11*.8*
 %{_mandir}/man8/dnssec*-pkcs11.8*
-	
+
 %files pkcs11-libs
 %{_libdir}/libdns-pkcs11*
 %{_libdir}/libns-pkcs11*
-	
+
 %files pkcs11-devel
 %{_includedir}/bind9/pk11/*.h
 %exclude %{_includedir}/bind9/pk11/site.h
@@ -486,12 +485,12 @@ fi;
 %files dnssec-utils
 %{_sbindir}/dnssec*
 %exclude %{_sbindir}/dnssec*pkcs11
-	
+
 %files dnssec-doc
-%{_mandir}/man8/dnssec*.8*	
+%{_mandir}/man8/dnssec*.8*
 %exclude %{_mandir}/man8/dnssec*-pkcs11.8*
 
-%files -n python3-bind	
+%files -n python3-bind
 %{python3_sitelib}/*.egg-info
 %{python3_sitelib}/isc/
 
@@ -499,10 +498,10 @@ fi;
 %config(noreplace) %{_sysconfdir}/named-chroot.files
 %{_libexecdir}/setup-named-chroot.sh
 %defattr(0664,root,named,-)
-%ghost %dev(c,1,3) %verify(not mtime) %{chroot_prefix}/dev/null
-%ghost %dev(c,1,8) %verify(not mtime) %{chroot_prefix}/dev/random
-%ghost %dev(c,1,9) %verify(not mtime) %{chroot_prefix}/dev/urandom
-%ghost %dev(c,1,5) %verify(not mtime) %{chroot_prefix}/dev/zero
+%ghost %{dev(c,1,3)} %verify(not mtime) %{chroot_prefix}/dev/null
+%ghost %{dev(c,1,8)} %verify(not mtime) %{chroot_prefix}/dev/random
+%ghost %{dev(c,1,9)} %verify(not mtime) %{chroot_prefix}/dev/urandom
+%ghost %{dev(c,1,5)} %verify(not mtime) %{chroot_prefix}/dev/zero
 %defattr(0640,root,named,0750)
 %dir %{chroot_prefix}
 %dir %{chroot_prefix}/dev
@@ -516,7 +515,7 @@ fi;
 %dir %{chroot_prefix}/run
 %ghost %config(noreplace) %{chroot_prefix}%{_sysconfdir}/named.conf
 %defattr(-,root,root,-)
-%dir %{chroot_prefix}/usr
+%dir %{chroot_prefix}%{_prefix}
 %dir %{chroot_prefix}/%{_libdir}
 %dir %{chroot_prefix}/%{_libdir}/bind
 %dir %{chroot_prefix}/%{_datadir}/GeoIP
@@ -546,45 +545,60 @@ fi;
 %{_mandir}/man8/named-compilezone.8*
 %{_mandir}/man8/named-nzd2nzf.8*
 %{_sysconfdir}/*
-%{_prefix}/lib/tmpfiles.d/named.conf
+%{_lib}/tmpfiles.d/named.conf
 
 %changelog
 * Mon May 03 2021 Henry Li <lihl@microsoft.com> - 9.16.3-3
 - Add bind, bind-devel, bind-libs, bind-license, bind-pkcs11, bind-pkcs11-libs,
   bind-pkcs11-utils, bind-pkcs11-devel, bind-dnssec-utils, bind-dnssec-doc,
-  bind-python3-bind and bind-chroot packages 
+  bind-python3-bind and bind-chroot packages
 
 *   Fri Sep 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 9.16.3-2
 -   Fixes CVE-2020-8618, CVE-2020-8619, CVE-2020-8620,
 -   CVE-2020-8621, CVE-2020-8622, CVE-2020-8623, CVE-2020-8624
+
 *   Wed May 27 2020 Daniel McIlvaney <damcilva@microsoft.com> - 9.16.3-1
 -   Update to version 9.16.3, fixes CVE-2018-5743, CVE-2018-5744, CVE-2019-6465, CVE-2019-6467, CVE-2019-6471, CVE-2020-8616, CVE-2020-8617
+
 *   Sat May 09 00:21:20 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.13.3-4
 -   Added %%license line automatically
+
 *   Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> 9.13.3-3
 -   Renaming bindutils to bind.
 -   Add bind-utils subpackage.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.13.3-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Sun Sep 23 2018 Sujay G <gsujay@vmware.com> 9.13.3-1
 -   Bump bindutils version to 9.13.3
+
 *   Mon Feb 12 2018 Xiaolin Li <xiaolinl@vmware.com> 9.10.6-1
 -   Upgrading version to 9.10.6-P1, fix CVE-2017-3145
+
 *   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 9.10.4-4
 -   Remove shadow from requires and use explicit tools for post actions
+
 *   Fri Apr 14 2017 Kumar Kaushik <kaushikk@vmware.com> 9.10.4-3
 -   Upgrading version to 9.10.4-P8
+
 *   Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 9.10.4-2
 -   add shadow to requires
+
 *   Mon Jun 06 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 9.10.4-1
 -   Upgraded the version to 9.10.4
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 9.10.3-3
 -   GA - Bump release of all rpms
+
 *   Fri Apr 29 2016 Xiaolin Li <xiaolinl@vmware.com> 9.10.3-2
 -   Add group named and user named
+
 *   Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 9.10.3-1
 -   Updated to version 9.10.3
+
 *   Tue Aug 11 2015 Divya Thaluru <dthaluru@vmware.com> 9.10.1-1
 -   Fixing release
+
 *   Tue Jan 20 2015 Divya Thaluru <dthaluru@vmware.com> 9.10.1-P1
 -   Initial build. First version
