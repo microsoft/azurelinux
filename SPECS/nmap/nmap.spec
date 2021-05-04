@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.90
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,7 +35,8 @@ Nmap implementation of the ncat tool
 rm -rf libpcap macosx mswin32 libssh2 libz
 
 %build
-%configure
+# Zenmap and Ndiff are python2 only: https://github.com/nmap/nmap/issues/1176
+%configure --without-zenmap --without-ndiff
 %make_build
 
 %install
@@ -57,7 +58,10 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
-* Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> 7.90-1
+* Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.90-2
+- Remove zenmap/ndiff from configuration
+
+* Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> - 7.90-1
 - Add nmap spec
 - License verified
 - Original version for CBL-Mariner

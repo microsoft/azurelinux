@@ -49,20 +49,24 @@ make test
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.39-7: Adding 'local::lib' perl5 library to fix test dependencies.
 
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.39-7
--   Use new perl package names.
--   Provide perl(JSON::Any).
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.39-7
+- Use new perl package names.
+- Provide perl(JSON::Any).
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.39-6
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.39-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.39-4
--   Consuming perl version upgrade of 5.28.0
-*   Tue Aug 08 2017 Chang Lee <Chang Lee@vmware.com> 1.39-3
--   Adding dependencies for %check
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.39-2
--   GA - Bump release of all rpms
-*   Mon Mar 28 2016 Mahmoud Bassiouny <mbassiounu@vmware.com> 1.39-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.39-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> - 1.39-4
+- Consuming perl version upgrade of 5.28.0
+
+* Tue Aug 08 2017 Chang Lee <Chang Lee@vmware.com> - 1.39-3
+- Adding dependencies for %check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.39-2
+- GA - Bump release of all rpms
+
+* Mon Mar 28 2016 Mahmoud Bassiouny <mbassiounu@vmware.com> - 1.39-1
+- Initial version.

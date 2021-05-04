@@ -112,6 +112,8 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %files devel
 %defattr(-, root, root)
 %{_bindir}/*
+%exclude %{_bindir}/glib-compile-schemas
+%exclude %{_bindir}/gsettings
 %{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
@@ -119,9 +121,8 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/glib-*/*
 %{_includedir}/*
 %{_datadir}/*
-%{_bindir}/glib-compile-schemas
-%{_bindir}/gsettings
-%{_datadir}/glib-2.0/schemas/*
+%exclude %{_datadir}/gtk-doc/html/
+%exclude %{_datadir}/glib-2.0/schemas/
 
 %files schemas
 %defattr(-, root, root)
@@ -135,6 +136,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %changelog
 * Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-2
 - Remove CVE-2019-13012 patch (already in the this version)
+- Exclude doubly-packaged files from devel subpackage
 - Merge the following releases from 1.0 to dev branch
 - nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
 - thcrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219

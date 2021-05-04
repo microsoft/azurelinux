@@ -264,7 +264,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %{_libdir}/debug
-%{_lib64}/traceevent
+%{_lib64dir}/traceevent
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file

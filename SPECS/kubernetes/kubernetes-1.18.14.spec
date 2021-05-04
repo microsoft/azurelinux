@@ -270,7 +270,7 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-5
+* Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Thu Apr 29 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.18.14-4

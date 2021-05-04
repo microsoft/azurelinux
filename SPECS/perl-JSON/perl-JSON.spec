@@ -37,6 +37,17 @@ BuildArch:      noarch
 This module converts between JSON (JavaScript Object Notation) and Perl
 data structure into each other. For JSON, see http://www.crockford.com/JSON/.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       coreutils
+Requires:       perl-Test-Harness
+Requires:       perl(Tie::IxHash)
+ 
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n JSON-%{version}
 
@@ -53,6 +64,23 @@ make %{?_smp_mflags}
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
+	
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/00_pod.t
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+# t/20_unknown.t writes to CWD
+DIR=$(mktemp -d)
+cp -a %{_libexecdir}/%{name}/t "$DIR"
+unset PERL_JSON_BACKEND PERL_JSON_DEBUG PERL_JSON_PP_USE_B
+pushd "$DIR"
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -r "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
 make test
@@ -62,10 +90,13 @@ make test
 %doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
+	
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
 * Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 4.02-6
-- Remove %perl_default_subpackage_tests, which breaks under non-RUN_CHECK builds
+- Manually define tests subpackage, taken from Fedora 34 (license: MIT)
 
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.02-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

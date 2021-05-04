@@ -89,22 +89,23 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 /lib/systemd/system/snmpd.service
 /lib/systemd/system/snmptrapd.service
-%{_bindir}
+%{_bindir}/*
 %{_libdir}/*.so.*
 /sbin/*
 
 %files devel
 %defattr(-,root,root)
-%{_datadir}
-%{_includedir}
+%{_datadir}/*
+%{_includedir}/*
 %{_libdir}/*.la
+%{_libdir}/pkgconfig/*.pc
 %{perl_vendorarch}/*
-%{_mandir}/man3/*.3.*
 %{_libdir}/*.so
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-4
+- Fix man pages being doubly-listed in devel subpackage
 - Merge the following releases from dev to 1.0 spec
 - joschmit@microsoft.com, 5.8-5: Use new perl package names.
 -   Change perl library path to perl_vendorarch directory for packaging.
