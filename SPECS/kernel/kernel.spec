@@ -158,6 +158,10 @@ Patch1129:      CVE-2021-29650.nopatch
 Patch1130:      CVE-2021-30002.nopatch
 # CVE-2021-29648 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1131:      CVE-2021-29648.nopatch
+Patch1132:      CVE-2021-23133.nopatch
+Patch1133:      CVE-2021-29154.nopatch
+# CVE-2021-30178 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1134:      CVE-2021-30178.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -498,6 +502,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon May 3 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
 - Update source to 5.10.32.1
+- Address CVE-2021-23133, CVE-2021-29154, CVE-2021-30178
 
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Disable CONFIG_EFI_DISABLE_PCI_DMA. It can cause boot issues on some hardware.
