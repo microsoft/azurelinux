@@ -229,10 +229,6 @@ ca-certificates-tools-20200720-9.cm1.noarch.rpm
 ca-certificates-base-20200720-9.cm1.noarch.rpm
 dwz-0.13-4.cm1.x86_64.rpm
 unzip-6.0-16.cm1.x86_64.rpm
-python2-2.7.18-4.cm1.x86_64.rpm
-python2-devel-2.7.18-4.cm1.x86_64.rpm
-python2-libs-2.7.18-4.cm1.x86_64.rpm
-python-xml-2.7.18-4.cm1.x86_64.rpm
 python3-3.7.7-11.cm1.x86_64.rpm
 python3-devel-3.7.7-11.cm1.x86_64.rpm
 python3-libs-3.7.7-11.cm1.x86_64.rpm
