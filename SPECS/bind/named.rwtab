@@ -1,0 +1,6 @@
+dirs    /var/named
+
+files	/var/named/named.ca
+files	/var/named/named.empty
+files	/var/named/named.localhost
+files	/var/named/named.loopback
