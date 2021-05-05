@@ -2004,16 +2004,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jsonbuilder",
-          "version": "0.2.1",
-          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "json-glib",
           "version": "1.4.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
@@ -6905,8 +6895,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.36",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.36/uClibc-ng-1.0.36.tar.xz"
+          "version": "1.0.37",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.37/uClibc-ng-1.0.37.tar.xz"
         }
       }
     },
