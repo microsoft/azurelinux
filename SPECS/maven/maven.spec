@@ -1,3 +1,12 @@
+# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
+%define sources_generation 0
+%define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
+%define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
+
+%if ! 0%{?sources_generation}
+%define offline_build -o
+%endif
+
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.1
@@ -9,8 +18,10 @@ Group:          Applications/System
 URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/maven/maven-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 Source1:        https://archive.apache.org/dist/maven/maven-3/%{version}/binaries/apache-%{name}-%{version}-bin.tar.gz
-Source2:        apache-%{name}-%{version}-m2.tar.gz
-Source3:        apache-%{name}-%{version}-licenses.tar.gz
+%if ! 0%{?sources_generation}
+Source2:        %{m2_cache_tarball_name}
+Source3:        %{licenses_tarball_name}
+%endif
 # Note: this license tarball will need to be regenerated if this package is upgraded by running: apache-maven/src/main/appended-resources/META-INF/LICENSE.vm
 BuildRequires:  ant
 BuildRequires:  openjdk8
@@ -20,32 +31,52 @@ Requires:       %{_bindir}/which
 Requires:       openjre8
 
 %define _prefix %{_var}/opt/apache-%{name}
+%define _bindir %{_prefix}/bin
+%define _libdir %{_prefix}/lib
 
 %description
 The Maven package contains binaries for a build system
 
+%if 0%{?sources_generation}
+
+%package cached-sources
+Summary:    NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
+
+%description cached-sources
+%{summary}
+This is an artificial package to ease generation of cached sources for
+the regular builds of "maven" when the "sources_generation" macro is set to 0.
+
+%endif
+
 %prep
 # Setup mvn binary
 tar xf %{SOURCE1} --no-same-owner
-mv ./apache-maven-3.5.4 %{_var}/opt/
-ln -sfvn apache-maven-3.5.4 %{_var}/opt/apache-maven
-ln -sfv %{_var}/opt/apache-maven/bin/mvn %{_bindir}/mvn
+mv ./apache-maven-%{version} /var/opt/
+ln -sfvn apache-maven-%{version} /var/opt/apache-maven
+ln -sfv /var/opt/apache-maven/bin/mvn /usr/bin/mvn
+
+%if ! 0%{?sources_generation}
+
 # Setup maven .m2 cache directory
 mkdir /root/.m2
 pushd /root/.m2
 tar xf %{SOURCE2} --no-same-owner
 popd
 
+%endif
+
 %setup -q -n apache-%{name}-%{version}
+%if ! 0%{?sources_generation}
+
 # Setup licenses. Remove LICENSE.vm script, which downloads all subproject license files, and replace with prepopulated license tarball.
 rm -v apache-maven/src/main/appended-resources/META-INF/LICENSE.vm
 pushd apache-maven
 tar xf %{SOURCE3} --no-same-owner
-cp -v ./target/licenses/lib/* %{_var}/opt/apache-maven/lib
+cp -v ./target/licenses/lib/* /var/opt/apache-maven/lib
 popd
 
-%clean
-rm -rf %{buildroot}
+%endif
 
 %build
 MAVEN_DIST_DIR=%{buildroot}%{_prefix}
@@ -54,9 +85,21 @@ export JAVA_HOME=$(find %{_lib}/jvm -name "OpenJDK*")
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 
 sed -i 's/www.opensource/opensource/g' DEPENDENCIES
-mvn -DdistributionTargetDir=$MAVEN_DIST_DIR -DskipTests clean package -o
+mvn -DdistributionTargetDir=$MAVEN_DIST_DIR -DskipTests clean package %{?offline_build}
 
 %install
+%if 0%{?sources_generation}
+
+echo "Compressing cached repositories."
+tar -C /root/.m2 -cpvz -f %{m2_cache_tarball_name} repository
+mv %{m2_cache_tarball_name} %{buildroot}%{_prefix}
+
+echo "Compressing cached licenses."
+tar -C apache-maven -cpvz -f %{licenses_tarball_name} target/licenses/lib
+mv %{licenses_tarball_name} %{buildroot}%{_prefix}
+
+%endif
+
 mkdir -p %{buildroot}%{_datadir}/java/maven
 
 for jar in %{buildroot}/%{_libdir}/*.jar
@@ -84,7 +127,7 @@ done
 %{_bindir}/*
 /bin/*
 %{_datadir}/java/maven/*.jar
-%{_prefix}/boot/plexus-classworlds-2.5.2.jar
+%{_prefix}/boot/plexus-classworlds-2.6.0.jar
 %{_prefix}/conf/logging/simplelogger.properties
 %{_prefix}/conf/settings.xml
 %{_prefix}/conf/toolchains.xml
@@ -93,9 +136,18 @@ done
 %{_prefix}/README.txt
 %exclude %{_libdir}/jansi-native
 
+%if 0%{?sources_generation}
+
+%files cached-sources
+%{_prefix}/%{m2_cache_tarball_name}
+%{_prefix}/%{licenses_tarball_name}
+
+%endif
+
 %changelog
 * Wed May 05 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.1-1
-- Updating to version 3.8.1 to fix CVE-2021-26291.
+- Updated to version 3.8.1 to fix CVE-2021-26291.
+- Added an artificial 'cached-sources' subpackage.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.5.4-13
 - Added %%license line automatically
