@@ -42,7 +42,6 @@ Summary:        Tests for %{name}
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       coreutils
 Requires:       perl-Test-Harness
-Requires:       perl(Tie::IxHash)
  
 %description tests
 Tests from %{name}. Execute them

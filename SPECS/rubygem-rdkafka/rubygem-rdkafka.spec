@@ -3,7 +3,7 @@
 %global gem_name rdkafka
 Summary:        Modern Kafka client library for Ruby based on librdkafka
 Name:           rubygem-rdkafka
-Version:        0.7.0
+Version:        0.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} ./%{gem_name
 %{gemdir}
 
 %changelog
+* Tue May 04 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.0-1
+- Upgrade to 0.8.0 to match td-agent requirement
+
 * Tue Jan 05 2021 Henry Li <lihl@microsoft.com> - 0.7.0-1
 - License verified
 - Original version for CBL-Mariner

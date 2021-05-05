@@ -56,7 +56,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  which
 
 %if %{with_check}
-BuildRequires:  python3-pygobject
+BuildRequires:  python3-gobject
 %endif
 
 Requires:       bubblewrap

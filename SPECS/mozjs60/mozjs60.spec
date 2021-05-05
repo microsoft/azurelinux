@@ -3,7 +3,7 @@
 Summary:       SpiderMonkey JavaScript library
 Name:          mozjs%{major}
 Version:       60.9.0
-Release:       9%{?dist}
+Release:       10%{?dist}
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 License:       MPLv2.0 and MPLv1.1 and BSD and GPLv2+ and GPLv3+ and LGPLv2+ and AFL and ASL 2.0
@@ -74,6 +74,12 @@ export CFLAGS="%{optflags}"
 export CXXFLAGS="$CFLAGS"
 export LINKFLAGS="%{?__global_ldflags}"
 
+# If the host underlying the worker chroot has /dev/shm as a symlink, build fails
+# due to Python2 multiprocessing failures
+if [ -h /dev/shm ]; then
+  mkdir -pv $(readlink $LFS/dev/shm)
+fi
+
 autoconf-2.13
 %configure \
   --without-system-icu \
@@ -128,6 +134,8 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+* Tue May 04 2021 Thomas Crain <thcrain@microsoft.com> - 60.9.0-10
+- Ensure availability of underlying /dev/shm folder during build 
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 60.9.0-9
 -   Fix calls to python2 in check section
 *   Thu May 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 60.9.0-8

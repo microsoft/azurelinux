@@ -3,7 +3,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,11 @@ tar xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
+# Rust doesn't recognize our .tar.gz bootstrap files when XZ support is enabled
+# This causes stage 0 bootstrap to look online for sources
+# So, we remove XZ support detection in the bootstrap program
+sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
+
 # Setup build/cache directory
 %define BUILD_CACHE_DIR build/cache/2020-08-27/
 mkdir -pv %{BUILD_CACHE_DIR}
@@ -64,6 +69,8 @@ mv %{SOURCE7} %{BUILD_CACHE_DIR}
 # Disable symbol generation
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
+
+
 
 sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
 # Exporting SUDO_USER=root bypasses a check in the python bootstrap that
@@ -110,6 +117,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Tue May 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-4
+- Remove XZ support detection in bootstrap
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
 - Redo patch for CVE-2021-28879 with regards to patches listed above
