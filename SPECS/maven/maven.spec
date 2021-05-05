@@ -19,7 +19,7 @@ URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/maven/maven-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Using pre-compiled binaries because 'maven' requires itself during build-time.
 Source1:        https://archive.apache.org/dist/maven/maven-3/%{version}/binaries/apache-%{name}-%{version}-bin.tar.gz
-# In order to re-generate these sources after a version update switch "sources_generation" to 1
+# In order to re-generate these sources after a version update, switch "sources_generation" to 1
 # and make sure network is enabled during the build. The tarballs will be inside the built 'maven-cached-sources' subpackage.
 %if ! 0%{?sources_generation}
 Source2:        %{m2_cache_tarball_name}
