@@ -98,6 +98,8 @@ echo "Compressing cached licenses."
 tar -C apache-maven -cpvz -f %{licenses_tarball_name} target/licenses/lib
 mv %{licenses_tarball_name} %{buildroot}%{_prefix}
 
+rm %{buildroot}%{_prefix}/boot/plexus-classworlds.license
+
 %endif
 
 mkdir -p %{buildroot}%{_datadir}/java/maven
