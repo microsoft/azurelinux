@@ -139,7 +139,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Mon May 3 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
+* Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
 - Update source to 5.10.32.1
 
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
