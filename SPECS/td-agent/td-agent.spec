@@ -200,7 +200,7 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
-* Wed Apr 05 2021 Henry Li <lihl@microsoft.com> - 4.0.1-3
+* Wed May 05 2021 Henry Li <lihl@microsoft.com> - 4.0.1-3
 - Update patch to use ruby 2.6.7
 
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.0.1-2
