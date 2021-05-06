@@ -22,6 +22,7 @@ BuildRequires:  Cython
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+Requires:       python2
 Requires:       libxslt
 
 %description
@@ -78,6 +79,7 @@ rm -rf %{buildroot}
 %changelog
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-6
 -   Added %%license line automatically
+
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.4-5
 -   Renaming cython to Cython
 *   Mon Apr 13 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-4
