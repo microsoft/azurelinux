@@ -1,3 +1,4 @@
+%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:       C extensions for Python
 Name:          Cython
@@ -12,38 +13,62 @@ Patch0:        fix_abc_tests.patch
 Patch1:        cython_testfix_with_outer_raising.patch
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
+BuildRequires: python2-devel
+BuildRequires: python2-libs
+BuildRequires: python-xml
+Requires:      python2
+Provides:      python2-%{name}
+
+%description
+Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
+
+%package -n python3-%{name}
+Summary:       C extensions for Python
 BuildRequires: python3
 BuildRequires: python3-devel
 BuildRequires: python3-libs
 BuildRequires: python3-xml
 Requires:      python3
 
-%description
+%description -n python3-%{name}
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
 
 %prep
-%setup -q -n cython-%{version}
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1 -n cython-%{version}
 
 %build
+python2 setup.py build
 python3 setup.py build
 
 %install
-python3 setup.py install --skip-build --root %{buildroot}
+python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+mv %{buildroot}/%{_bindir}/cygdb %{buildroot}/%{_bindir}/cygdb3
+mv %{buildroot}/%{_bindir}/cython %{buildroot}/%{_bindir}/cython3
+mv %{buildroot}/%{_bindir}/cythonize %{buildroot}/%{_bindir}/cythonize3
+python2 setup.py install --skip-build --root %{buildroot}
 
 %check
 # Skip lvalue_refs test which was fixed in a later release: https://github.com/cython/cython/pull/2783
 echo "lvalue_refs" >> tests/bugs.txt
+python2 runtests.py -vv
 python3 runtests.py -vv
-
-%clean
-rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
 %license LICENSE.txt
-%{_bindir}/*
+%{_bindir}/cygdb
+%{_bindir}/cython
+%{_bindir}/cythonize
+%{python2_sitelib}/Cython-%{version}-*.egg-info
+%{python2_sitelib}/Cython/*
+%{python2_sitelib}/cython.py*
+%{python2_sitelib}/pyximport/*
+
+%files -n python3-%{name}
+%license LICENSE.txt
+%{_bindir}/cygdb3
+%{_bindir}/cython3
+%{_bindir}/cythonize3
 %{python3_sitelib}/Cython-%{version}-*.egg-info
 %{python3_sitelib}/Cython/*
 %{python3_sitelib}/cython.py*
