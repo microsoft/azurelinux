@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.32.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -493,6 +493,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu May 27 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-7
+- Set lockdown=integrity by default
+
 * Wed May 26 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-6
 - Add Mariner cert into the trusted kernel keyring
 
