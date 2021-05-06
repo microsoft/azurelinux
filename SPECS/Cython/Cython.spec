@@ -1,6 +1,6 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-Summary:       C extensions for Python
+Summary:       C extensions for Python 2
 Name:          Cython
 Version:       0.28.5
 Release:       8%{?dist}
@@ -24,7 +24,7 @@ Provides:      cython
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
 
 %package -n python3-%{name}
-Summary:       C extensions for Python
+Summary:       C extensions for Python 3
 BuildRequires: python3
 BuildRequires: python3-devel
 BuildRequires: python3-libs
