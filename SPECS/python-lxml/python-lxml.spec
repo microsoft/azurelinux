@@ -77,8 +77,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-6
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.4-6
+- Added %%license line automatically
 
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.4-5
 -   Renaming cython to Cython
