@@ -105,8 +105,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.14",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/516b337a-83f9-4946-b2a6-b2f686e09a76/d0e82549e890c5d852c461319ffd5b31/aspnetcore-runtime-3.1.14-linux-x64.tar.gz"
         }
       }
     },
@@ -1005,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.14",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/4e5f17fa-fa56-40bc-bf3d-fd6abc91d0ad/08bd80f3751c0ac602dd41dc2534265e/dotnet-runtime-3.1.14-linux-x64.tar.gz"
         }
       }
     },
@@ -1015,8 +1015,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-sdk-3.1",
-          "version": "3.1.105",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/37268c18-226d-436b-b13c-4b77b7f42140/17e8a85360206006a557d634d16713cd/dotnet-sdk-3.1.105-linux-x64.tar.gz"
+          "version": "3.1.114",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/79c30043-e62b-49e5-ba42-0aea2af1499a/f853a4f12fb4376532826272cdbbdd66/dotnet-sdk-3.1.114-linux-x64.tar.gz"
         }
       }
     },
