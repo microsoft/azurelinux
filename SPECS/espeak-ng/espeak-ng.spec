@@ -1,7 +1,7 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
 Version:        1.50
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
 License:        GPLv3 AND Unicode
@@ -47,6 +47,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 ln -s libespeak-ng.so %{buildroot}%{_libdir}/libespeak.so
 rm %{buildroot}%{_libdir}/libespeak.la
 
+# Rename problematic file with space in its name
+pushd '%{buildroot}%{_datadir}/espeak-ng-data/voices/!v'
+mv 'Mr serious' 'Mr_serious'
+popd
+
 %check
 make check
 
@@ -74,6 +79,9 @@ make check
 %{_libdir}/*.so
 
 %changelog
+* Wed May 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-3
+- Rename 'Mr serious' voice file to 'Mr_serious' to avoid spaces in filenames
+
 * Fri Mar 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-2
 - Add tests-fix-greek-letter-variants.patch to address failing test
 - Adjust tests-newline-fixes.patch to account for new patch
