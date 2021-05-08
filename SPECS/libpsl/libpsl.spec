@@ -1,18 +1,18 @@
-Summary:    libpsl - C library to handle the Public Suffix List
-Name:       libpsl
-Version:    0.20.2
-Release:        4%{?dist}
-License:    MIT
-URL:        https://github.com/rockdaboot/libpsl
-Group:      System Environment/Development
+Summary:        libpsl - C library to handle the Public Suffix List
+Name:           libpsl
+Version:        0.20.2
+Release:        5%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    https://github.com/rockdaboot/libpsl/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-%define sha1 libpsl=890376d6038652911cfa853ccfb5b993ae0743ee
+Group:          System Environment/Development
+URL:            https://github.com/rockdaboot/libpsl
+Source0:        https://github.com/rockdaboot/libpsl/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires: icu-devel
-BuildRequires: python2
-Requires:      icu
+BuildRequires:  icu-devel
+BuildRequires:  python2
+
+Requires:       icu
 
 %description
 libpsl is a C library to handle the Public Suffix List. A "public suffix" is a
@@ -75,7 +75,7 @@ make check
 
 %files
 %defattr(-,root,root)
-%license LICENSE
+%license COPYING LICENSE
 %{_libdir}/*.so.*
 
 %files -n psl
@@ -94,12 +94,20 @@ make check
 %{_libdir}/pkgconfig/*
 
 %changelog
-* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.20.2-4
+* Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.2-5
+- Bumping up release to re-compile against the new version of the 'icu' libraries.
+- License verified.
+- Removing the 'sha1' macro.
+- Updated the '%%license' macro.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.20.2-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.20.2-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 0.20.2-2
--   Added BuildRequires python2
-*   Mon Sep 17 2018 Bo Gan <ganb@vmware.com> 0.20.2-1
--   Initial packaging of libpsl
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.20.2-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 0.20.2-2
+- Added BuildRequires python2
+
+* Mon Sep 17 2018 Bo Gan <ganb@vmware.com> 0.20.2-1
+- Initial packaging of libpsl

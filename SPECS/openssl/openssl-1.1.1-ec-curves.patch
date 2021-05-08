@@ -208,3 +208,59 @@ diff -up openssl-1.1.1h/test/ecdsatest.h.curves openssl-1.1.1h/test/ecdsatest.h
      /* prime KATs from NIST CAVP */
      {NID_secp224r1, NID_sha224,
       "699325d6fc8fbbb4981a6ded3c3a54ad2e4e3db8a5669201912064c64e700c139248cdc1"
+--- openssl-1.1.1h/test/recipes/15-test_genec.t.ec-curves	2020-11-06 13:58:36.402895540 +0100
++++ openssl-1.1.1h/test/recipes/15-test_genec.t	2020-11-06 13:59:38.508484498 +0100
+@@ -20,45 +20,11 @@ plan skip_all => "This test is unsupport
+     if disabled("ec");
+ 
+ my @prime_curves = qw(
+-    secp112r1
+-    secp112r2
+-    secp128r1
+-    secp128r2
+-    secp160k1
+-    secp160r1
+-    secp160r2
+-    secp192k1
+-    secp224k1
+     secp224r1
+     secp256k1
+     secp384r1
+     secp521r1
+-    prime192v1
+-    prime192v2
+-    prime192v3
+-    prime239v1
+-    prime239v2
+-    prime239v3
+     prime256v1
+-    wap-wsg-idm-ecid-wtls6
+-    wap-wsg-idm-ecid-wtls7
+-    wap-wsg-idm-ecid-wtls8
+-    wap-wsg-idm-ecid-wtls9
+-    wap-wsg-idm-ecid-wtls12
+-    brainpoolP160r1
+-    brainpoolP160t1
+-    brainpoolP192r1
+-    brainpoolP192t1
+-    brainpoolP224r1
+-    brainpoolP224t1
+-    brainpoolP256r1
+-    brainpoolP256t1
+-    brainpoolP320r1
+-    brainpoolP320t1
+-    brainpoolP384r1
+-    brainpoolP384t1
+-    brainpoolP512r1
+-    brainpoolP512t1
+ );
+ 
+ my @binary_curves = qw(
+@@ -115,7 +81,6 @@ push(@other_curves, 'SM2')
+     if !disabled("sm2");
+ 
+ my @curve_aliases = qw(
+-    P-192
+     P-224
+     P-256
+     P-384

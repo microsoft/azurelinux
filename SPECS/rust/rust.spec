@@ -3,7 +3,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,13 @@ Source4:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-x86
 Source5:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-aarch64-unknown-linux-gnu.tar.gz
+Patch0:         CVE-2020-36317.patch
+Patch1:         CVE-2021-28875.patch
+Patch2:         CVE-2021-28877.patch
+Patch3:         CVE-2021-28876.patch
+Patch4:         CVE-2021-28879.patch
+Patch5:         CVE-2021-28878.patch
+Patch6:         CVE-2020-36323.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -37,7 +44,7 @@ mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
-%setup -q -n rustc-%{version}-src
+%autosetup -p1 -n rustc-%{version}-src
 
 # Setup build/cache directory
 %define BUILD_CACHE_DIR build/cache/2020-08-27/
@@ -103,6 +110,13 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
+- Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
+- Redo patch for CVE-2021-28879 with regards to patches listed above
+
+* Mon Apr 19 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-2
+- Patch CVE-2021-28879
+
 * Wed Feb 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.47.0-1
 - Update version to 1.47.0
 

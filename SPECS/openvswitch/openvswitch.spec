@@ -2,16 +2,14 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
-Version:        2.12.0
-Release:        3%{?dist}
+Version:        2.12.3
+Release:        2%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
-# https://github.com/openvswitch/ovs/commit/53c1b8b166f3dd217bc391d707885f789e9ecc49.patch
-Patch0:         CVE-2020-35498.patch
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng
 BuildRequires:  libcap-ng-devel
@@ -202,7 +200,18 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_unitdir}/openvswitch.service
 %{_unitdir}/ovs-vswitchd.service
 %{_unitdir}/ovsdb-server.service
-%{_libdir}/lib*
+%{_libdir}/libovn.so
+%{_libdir}/libovn-2.12.so.0*
+%{_libdir}/libopenvswitch.so
+%{_libdir}/libopenvswitch-2.12.so.0*
+%{_libdir}/libofproto.so
+%{_libdir}/libofproto-2.12.so.0*
+%{_libdir}/libvtep.so
+%{_libdir}/libvtep-2.12.so.0*
+%{_libdir}/libovsdb.so
+%{_libdir}/libovsdb-2.12.so.0*
+%{_libdir}/libsflow.so
+%{_libdir}/libsflow-2.12.so.0*
 %{_sysconfdir}/openvswitch/default.conf
 %{_sysconfdir}/bash_completion.d/ovs-*-bashcomp.bash
 %{_datadir}/openvswitch/*.ovsschema
@@ -280,6 +289,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/ovn-trace.8.gz
 
 %changelog
+* Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-2
+- Don't include static libraries in openvswitch package
+
+* Thu Apr 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-1
+- Upgrade to version 2.12.3, which fixes CVE-2020-27827
+
 * Mon Feb 22 2021 Emre Girgin <mrgirgin@microsoft.com> - 2.12.0-3
 - Fix CVE-2020-35498.
 

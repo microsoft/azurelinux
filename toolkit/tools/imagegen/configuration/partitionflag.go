@@ -20,6 +20,8 @@ const (
 	PartitionFlagGrub PartitionFlag = "grub"
 	// PartitionFlagBiosGrub indicates this is a bios grub boot partition
 	PartitionFlagBiosGrub PartitionFlag = "bios_grub"
+	// PartitionFlagBiosGrubLegacy indicates this is a bios grub boot partition. Needed to preserve legacy config behavior.
+	PartitionFlagBiosGrubLegacy PartitionFlag = "bios-grub"
 	// PartitionFlagBoot indicates this is a boot partition
 	PartitionFlagBoot PartitionFlag = "boot"
 	// PartitionFlagDeviceMapperRoot indicates this partition will be used for a device mapper root device
@@ -37,6 +39,7 @@ func (p *PartitionFlag) GetValidPartitionFlags() (types []PartitionFlag) {
 		PartitionFlagESP,
 		PartitionFlagGrub,
 		PartitionFlagBiosGrub,
+		PartitionFlagBiosGrubLegacy,
 		PartitionFlagBoot,
 		PartitionFlagDeviceMapperRoot,
 	}

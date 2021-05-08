@@ -16,7 +16,7 @@ TLS_CERT_BASENAME=$(basename $TLS_CERT)
 TLS_KEY_BASENAME=$(basename $TLS_KEY)
 CA_CERT_BASENAME=$(basename $CA_CERT)
 
-while IFS= read -r line; do
+while IFS= read -r line || [ -n "$line" ]; do
     echo $line
     echo "$line" >> $USER_DATA_TEMP
     if  [ $line = "#cloud-config" ]; then

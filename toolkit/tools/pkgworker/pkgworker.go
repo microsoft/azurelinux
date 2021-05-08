@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	mapset "github.com/deckarep/golang-set"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/file"
@@ -55,9 +56,11 @@ var (
 )
 
 var (
-	greaterThanOrEqualRegex = regexp.MustCompile(` '?>='? [^ ]*`)
-	equalToRegex            = regexp.MustCompile(` '?='? `)
-	lessThanOrEqualToRegex  = regexp.MustCompile(` '?<='? `)
+	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
+	equalToRegex              = regexp.MustCompile(` '?='? `)
+	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
+	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
+	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
 )
 
 func main() {
@@ -109,6 +112,8 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 
 func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup bool, runCheck bool) (err error) {
 	const (
+		buildHeartbeatTimeout = 30 * time.Minute
+
 		existingChrootDir = false
 		squashErrors      = false
 
@@ -117,8 +122,29 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 		rpmDirName     = "RPMS"
 	)
 
+	var builtRPMs []string
+
 	srpmBaseName := filepath.Base(srpmFile)
-	logger.Log.Infof("Building (%s)", srpmBaseName)
+
+	quit := make(chan bool)
+	go func() {
+		logger.Log.Infof("Building (%s).", srpmBaseName)
+
+		for {
+			select {
+			case <-quit:
+				if err == nil {
+					logger.Log.Infof("Built (%s) -> %v.", srpmBaseName, builtRPMs)
+				}
+				return
+			case <-time.After(buildHeartbeatTimeout):
+				logger.Log.Infof("Heartbeat: still building (%s).", srpmBaseName)
+			}
+		}
+	}()
+	defer func() {
+		quit <- true
+	}()
 
 	// Create the chroot used to build the SRPM
 	chroot := safechroot.NewChroot(chrootDir, existingChrootDir)
@@ -140,29 +166,21 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 		return
 	}
 
-	var builtRPMs []string
-
 	err = chroot.Run(func() (err error) {
 		return buildRPMFromSRPMInChroot(srpmFileInChroot, runCheck, defines)
 	})
-
 	if err != nil {
 		return
 	}
 
 	rpmBuildOutputDir := filepath.Join(chroot.RootDir(), chrootRpmBuildRoot, rpmDirName)
 	builtRPMs, err = moveBuiltRPMs(rpmBuildOutputDir, rpmDirPath)
-	if err != nil {
-		return
-	}
-
-	logger.Log.Infof("Built (%s) -> %v", srpmBaseName, builtRPMs)
 
 	return
 }
 
 func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string) (err error) {
-	// Convert /localrpms into a repository that a package manager can use
+	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
 		return
@@ -174,8 +192,14 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 		return
 	}
 
-	// Query and install the build requirements for this SRPM
-	err = installBuildRequires(defines, runCheck)
+	// Find build requirements still not installed on the system.
+	missingBuildRequires, err := findMissingBuildRequires(defines, runCheck)
+	if err != nil {
+		return
+	}
+
+	// Install the missing build requirements for this SRPM.
+	err = installBuildRequires(missingBuildRequires)
 	if err != nil {
 		return
 	}
@@ -236,16 +260,13 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 	return
 }
 
-func installBuildRequires(defines map[string]string, runCheck bool) (err error) {
-	// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
+func findMissingBuildRequires(defines map[string]string, runCheck bool) (missingBuildRequires []string, err error) {
 	const (
-		emptyQueryFormat        = ""
-		caCertificatesPackage   = "ca-certificates"
-		unresolvedOutputPrefix  = "No package"
-		unresolvedOutputPostfix = "available"
-		alreadyInstalledPostfix = "is already installed."
-		noMatchingPackagesErr   = "Error(1011) : No matching packages"
+		caCertificatesPackage = "ca-certificates"
+		emptyQueryFormat      = ""
+		packageNameMatchIndex = 1
 	)
+
 	// Find the SPEC file extracted from the SRPM
 	specDir := filepath.Join(chrootRpmBuildRoot, "SPECS")
 	allSpecFiles, err := ioutil.ReadDir(specDir)
@@ -254,7 +275,7 @@ func installBuildRequires(defines map[string]string, runCheck bool) (err error) 
 	}
 
 	if len(allSpecFiles) != 1 {
-		return fmt.Errorf("unexpected number of SPEC files extracted, wanted (1) and found (%d)", len(allSpecFiles))
+		return missingBuildRequires, fmt.Errorf("unexpected number of SPEC files extracted, wanted (1) and found (%d)", len(allSpecFiles))
 	}
 
 	specFile := filepath.Join(specDir, allSpecFiles[0].Name())
@@ -265,65 +286,95 @@ func installBuildRequires(defines map[string]string, runCheck bool) (err error) 
 		return
 	}
 
-	if runCheck || len(buildRequires) > 0 {
-		var (
-			stderr string
-			stdout string
-		)
+	logger.Log.Debugf("List of all 'BuildRequires': %v", buildRequires)
 
-		defaultArgs := []string{"install", "-y"}
-		installArgs := make([]string, 0, len(buildRequires)+len(defaultArgs))
+	installedPackages, err := rpm.GetInstalledPackages()
+	if err != nil {
+		return
+	}
 
-		installArgs = append(installArgs, defaultArgs...)
+	logger.Log.Debugf("List of all installed packages: %v", installedPackages)
 
-		for _, pkg := range buildRequires {
-			// Replace version conditionals with tdnf friendly version:
-			// - replace >= with "latest" (no version)
-			// - replace = and <= with the exact version
-			buildReq := greaterThanOrEqualRegex.ReplaceAllString(pkg, "")
-			buildReq = equalToRegex.ReplaceAllString(buildReq, "-")
-			buildReq = lessThanOrEqualToRegex.ReplaceAllString(buildReq, "-")
+	installedPackagesSet := mapset.NewSet()
+	for _, installedPackage := range installedPackages {
+		installedPackage = installedPackageNameRegex.FindStringSubmatch(installedPackage)[packageNameMatchIndex]
+		installedPackagesSet.Add(installedPackage)
+	}
 
-			// Add each package to the installArgs
-			installArgs = append(installArgs, strings.TrimSpace(buildReq))
+	for _, singleBuildRequires := range buildRequires {
+		// Replace version conditionals with tdnf friendly version:
+		// - replace >= with "latest" (no version)
+		// - replace = and <= with the exact version
+		packageNameWithVersion := greaterThanOrEqualRegex.ReplaceAllString(singleBuildRequires, "")
+		packageNameWithVersion = equalToRegex.ReplaceAllString(packageNameWithVersion, "-")
+		packageNameWithVersion = lessThanOrEqualToRegex.ReplaceAllString(packageNameWithVersion, "-")
+		packageNameWithVersion = strings.TrimSpace(packageNameWithVersion)
+
+		packageName := brPackageNameRegex.FindString(singleBuildRequires)
+		if !installedPackagesSet.Contains(packageName) {
+			logger.Log.Debugf("Found a 'BuildRequires' to install: %s", packageNameWithVersion)
+			missingBuildRequires = append(missingBuildRequires, packageNameWithVersion)
 		}
+	}
 
-		if runCheck {
-			logger.Log.Debug("Adding the 'ca-certificates' package - needed for package tests.")
+	if runCheck {
+		logger.Log.Debug("Adding the 'ca-certificates' package - needed for package tests.")
 
-			installArgs = append(installArgs, caCertificatesPackage)
-		}
+		missingBuildRequires = append(missingBuildRequires, caCertificatesPackage)
+	}
 
-		stdout, stderr, err = shell.Execute("tdnf", installArgs...)
-		if err != nil {
-			logger.Log.Warnf("Failed to install build requirements. stderr: %s\nstdout: %s", stderr, stdout)
-			// TDNF will output an error if all packages are already installed.
-			// Ignore it iff there is no other error present in stderr.
-			splitStderr := strings.Split(stderr, "\n")
-			for _, line := range splitStderr {
-				trimmedLine := strings.TrimSpace(line)
-				if trimmedLine == "" {
-					continue
-				}
+	return
+}
 
-				if !strings.HasSuffix(trimmedLine, alreadyInstalledPostfix) && trimmedLine != noMatchingPackagesErr {
-					return fmt.Errorf(trimmedLine)
-				}
+func installBuildRequires(buildRequires []string) (err error) {
+	const (
+		noMatchingPackagesErr   = "Error(1011) : No matching packages"
+		unresolvedOutputPostfix = "available"
+		unresolvedOutputPrefix  = "No package"
+	)
+
+	var (
+		stderr string
+		stdout string
+	)
+
+	if len(buildRequires) == 0 {
+		logger.Log.Debug("Build-time package requirements already satisfied. Skipping installation step.")
+		return
+	}
+
+	logger.Log.Debugf("Will install the following build-time package requirements: %v", buildRequires)
+
+	defaultArgs := []string{"install", "-y"}
+	installArgs := append(defaultArgs, buildRequires...)
+
+	stdout, stderr, err = shell.Execute("tdnf", installArgs...)
+	if err != nil {
+		logger.Log.Warnf("Failed to install build requirements. stderr: %s\nstdout: %s", stderr, stdout)
+		// Save only the relevant stderr in the error returned by the function.
+		splitStderr := strings.Split(stderr, "\n")
+		for _, line := range splitStderr {
+			trimmedLine := strings.TrimSpace(line)
+			if (trimmedLine == "") ||
+				(trimmedLine == noMatchingPackagesErr) {
+				continue
 			}
+
+			return fmt.Errorf(trimmedLine)
 		}
+	}
 
-		if err == nil {
-			// TDNF will ignore unavailable packages that have been requested to be installed without reporting an error code.
-			// Search the stdout of TDNF for such a failure and warn the user.
-			// This may happen if a SPEC requires the the path to a tool (e.g. /bin/cp), so mark it as a warning for now.
-			splitStdout := strings.Split(stdout, "\n")
-			for _, line := range splitStdout {
-				trimmedLine := strings.TrimSpace(line)
+	if err == nil {
+		// TDNF will ignore unavailable packages that have been requested to be installed without reporting an error code.
+		// Search the stdout of TDNF for such a failure and warn the user.
+		// This may happen if a SPEC requires the the path to a tool (e.g. /bin/cp), so mark it as a warning for now.
+		splitStdout := strings.Split(stdout, "\n")
+		for _, line := range splitStdout {
+			trimmedLine := strings.TrimSpace(line)
 
-				// If a package was not available, update err
-				if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-					logger.Log.Warnf("Unable to install buildrequires: %s", trimmedLine)
-				}
+			// If a package was not available, update err
+			if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
+				logger.Log.Warnf("Unable to install buildrequires: %s", trimmedLine)
 			}
 		}
 	}
@@ -344,7 +395,7 @@ func removeLibArchivesFromSystem() (err error) {
 
 		// Skip directories that are meant for device files and kernel virtual filesystems.
 		// These will not contain .la files and are mounted into the safechroot from the host.
-		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != -1 {
+		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != sliceutils.NotFound {
 			return filepath.SkipDir
 		}
 

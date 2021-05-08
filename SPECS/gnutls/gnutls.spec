@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:  nettle-devel
+BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  openssl-devel
@@ -20,7 +20,7 @@ BuildRequires:  net-tools
 BuildRequires:  which
 %endif
 
-Requires:       nettle
+Requires:       nettle >= 3.7.2
 Requires:       autogen-libopts
 Requires:       libtasn1
 Requires:       openssl
@@ -29,6 +29,8 @@ Requires:       guile
 Requires:       gc
 
 Patch0:         CVE-2020-24659.patch
+Patch1:         CVE-2021-20231.patch
+Patch2:         CVE-2021-20232.patch
 
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
@@ -100,6 +102,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+*   Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 3.6.14-6
+-   Bump release to rebuild with new nettle (3.7.2)
+*   Mon Mar 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.6.14-5
+-   Apply patch for CVE-2021-20231 and CVE-2021-20231 from upstream.
 *   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.6.14-4
 -   Fix check tests.
 *   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3

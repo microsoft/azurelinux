@@ -1,0 +1,31 @@
+# This action checks that the licenses.json file is up-to-date
+# and that the LICENSES-MAP.md file is up-to-date
+name: Spec License Map Check
+
+on:
+  push:
+    branches: [main, dev, 1.0*]
+  pull_request:
+    branches: [main, dev, 1.0*]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Run license map checking script
+        run: |
+          python3 ./toolkit/scripts/licenses/license_map.py \
+          ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
+          ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+          ./SPECS \
+          ./SPECS-SIGNED

@@ -105,8 +105,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.14",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/516b337a-83f9-4946-b2a6-b2f686e09a76/d0e82549e890c5d852c461319ffd5b31/aspnetcore-runtime-3.1.14-linux-x64.tar.gz"
         }
       }
     },
@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bmake",
+          "version": "20201010",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bmon",
           "version": "4.0",
           "downloadUrl": "https://github.com/tgraf/bmon/archive/v4.0.tar.gz"
@@ -475,8 +485,8 @@
         "type": "other",
         "other": {
           "name": "cairo",
-          "version": "1.16.0",
-          "downloadUrl": "http://cairographics.org/releases/cairo-1.16.0.tar.xz"
+          "version": "1.17.4",
+          "downloadUrl": "https://cairographics.org/snapshots/cairo-1.17.4.tar.xz"
         }
       }
     },
@@ -495,8 +505,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.14.0",
-          "downloadUrl": "http://c-ares.haxx.se/download/c-ares-1.14.0.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
         }
       }
     },
@@ -595,8 +605,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.0",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.0.tar.gz"
+          "version": "0.103.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.2.tar.gz"
         }
       }
     },
@@ -677,16 +687,6 @@
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "coredns",
-          "version": "1.6.5",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.5.tar.gz"
         }
       }
     },
@@ -835,8 +835,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.74.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.74.0.tar.gz"
+          "version": "7.76.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.76.0.tar.gz"
         }
       }
     },
@@ -887,6 +887,16 @@
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "device-mapper-multipath",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/opensvc/multipath-tools/archive/refs/tags/0.8.6.tar.gz"
         }
       }
     },
@@ -955,8 +965,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.84",
-          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.84.tar.xz"
+          "version": "2.85",
+          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.85.tar.xz"
         }
       }
     },
@@ -1005,8 +1015,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.14",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/4e5f17fa-fa56-40bc-bf3d-fd6abc91d0ad/08bd80f3751c0ac602dd41dc2534265e/dotnet-runtime-3.1.14-linux-x64.tar.gz"
         }
       }
     },
@@ -1015,8 +1025,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-sdk-3.1",
-          "version": "3.1.105",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/37268c18-226d-436b-b13c-4b77b7f42140/17e8a85360206006a557d634d16713cd/dotnet-sdk-3.1.105-linux-x64.tar.gz"
+          "version": "3.1.114",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/79c30043-e62b-49e5-ba42-0aea2af1499a/f853a4f12fb4376532826272cdbbdd66/dotnet-sdk-3.1.114-linux-x64.tar.gz"
         }
       }
     },
@@ -1395,8 +1405,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.23.3",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.23.3.tar.xz"
+          "version": "2.23.4",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.23.4.tar.xz"
         }
       }
     },
@@ -1515,8 +1525,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.7",
-          "downloadUrl": "https://dl.google.com/go/go1.15.7.src.tar.gz"
+          "version": "1.15.11",
+          "downloadUrl": "https://dl.google.com/go/go1.15.11.src.tar.gz"
         }
       }
     },
@@ -1594,9 +1604,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "grpc",
+          "version": "1.35.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.35.0/grpc-1.35.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grub2",
-          "version": "2.02",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/grub/grub-2.02.tar.xz"
+          "version": "2.06~rc1",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06-rc1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gnulib",
+          "version": "d271f868a8df9bbec29049d01e056481b7a1a263",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-d271f868a8df9bbec29049d01e056481b7a1a263.tar.gz"
         }
       }
     },
@@ -1735,8 +1765,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -1765,8 +1795,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "64.2.0.2",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v64.2.0.2.tar.gz"
+          "version": "68.2.0.6",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
         }
       }
     },
@@ -1984,16 +2014,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jsonbuilder",
-          "version": "0.2.1",
-          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "json-glib",
           "version": "1.4.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
@@ -2045,8 +2065,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2055,8 +2075,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2065,8 +2085,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2165,38 +2185,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.17.13",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.17.16",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.18.10",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2205,8 +2195,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.19.3",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.3-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "version": "1.18.17",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2215,8 +2205,38 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.19.6",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.6-hotfix.20210118/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.9",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.20.2",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.20.5",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -3355,8 +3375,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.3.17",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.17.tar.gz"
+          "version": "10.3.28",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.28.tar.gz"
         }
       }
     },
@@ -3365,8 +3385,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.5.4",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.5.4/source/apache-maven-3.5.4-src.tar.gz"
+          "version": "3.8.1",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.1/source/apache-maven-3.8.1-src.tar.gz"
         }
       }
     },
@@ -3445,8 +3465,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3465,8 +3485,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3555,8 +3575,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.23",
-          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz"
+          "version": "8.0.24",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
         }
       }
     },
@@ -3625,8 +3645,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.4.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz"
+          "version": "3.7.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.2.tar.gz"
         }
       }
     },
@@ -3814,6 +3834,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nvidia-container-runtime",
+          "version": "3.4.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nvme-cli",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.8.1.tar.gz"
@@ -3854,9 +3884,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openjdk8",
-          "version": "1.8.0.181",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u//archive/aarch64-jdk8u181-b13.tar.gz"
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -3895,8 +3935,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "1.1.1g",
-          "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1g.tar.gz"
+          "version": "1.1.1k",
+          "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1k.tar.gz"
         }
       }
     },
@@ -3915,8 +3955,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.12.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.12.0.tar.gz"
+          "version": "2.12.3",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.12.3.tar.gz"
         }
       }
     },
@@ -6405,8 +6445,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.6",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.xz"
+          "version": "2.6.7",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.7.tar.xz"
         }
       }
     },
@@ -6515,8 +6555,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15/shim-15.tar.bz2"
+          "version": "15.4",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
         }
       }
     },
@@ -6565,8 +6605,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.32.3",
-          "downloadUrl": "https://www.sqlite.org/2020/sqlite-autoconf-3320300.tar.gz"
+          "version": "3.34.1",
+          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3340100.tar.gz"
         }
       }
     },
@@ -6915,8 +6955,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2019c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2019c.tar.gz"
+          "version": "2021a",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2021a.tar.gz"
         }
       }
     },
@@ -6925,8 +6965,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.36",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.36/uClibc-ng-1.0.36.tar.xz"
+          "version": "1.0.37",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.37/uClibc-ng-1.0.37.tar.xz"
         }
       }
     },

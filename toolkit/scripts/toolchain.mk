@@ -159,6 +159,8 @@ $(final_toolchain): $(raw_toolchain) $(BUILD_SRPMS_DIR)
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt)
 	touch $@
 
+.SILENT: $(toolchain_rpms)
+
 ifeq ($(REBUILD_TOOLCHAIN),y)
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
@@ -188,31 +190,31 @@ $(toolchain_rpms): $(toolchain_manifest) $(toolchain_local_temp)
 	if [ ! -f $@ -o $(TOOLCHAIN_ARCHIVE) -nt $@ ]; then \
 		echo Extracting RPM $@ from toolchain && \
 		mkdir -p $(dir $@) && \
-		mv $${tempFile} $(dir $@) && \
+		mv $$tempFile $(dir $@) && \
 		touch $@ ; \
 	fi || $(call print_error, $@ failed) && \
 	touch $@
 else
 # Download from online package server
 $(toolchain_rpms):
-	$(eval rpm_filename := "$(notdir $@)")
-	$(eval rpm_dir := "$(dir $@)")
-	$(eval log_file := "$(toolchain_downloads_logs_dir)/$(rpm_filename).log")
-	@echo "Downloading toolchain RPM: $(rpm_filename)" | tee "$(log_file)" && \
-	mkdir -p $(rpm_dir) && \
-	cd $(rpm_dir) && \
+	@rpm_filename="$(notdir $@)" && \
+	rpm_dir="$(dir $@)" && \
+	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
+	echo "Downloading toolchain RPM: $$rpm_filename" | tee "$$log_file" && \
+	mkdir -p $$rpm_dir && \
+	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
-		wget $${url}/$(rpm_filename) \
+		wget $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			-a $(log_file) \
+			-a $$log_file \
 			&& \
-		echo "Downloaded toolchain RPM: $(rpm_filename)" | tee -a $(log_file) && \
+		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		break; \
 	done || { \
-			echo "\nERROR: Failed to download toolchain package: $(rpm_filename)." && \
-			echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$(log_file)':\n" && \
-			tail -n$(toolchain_log_tail_length) $(log_file) | sed 's/^/\t/' && \
+			echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
+			echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
+			tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
 			$(call print_error,\nToolchain download failed. See above errors for more details.) \
 		}
 endif

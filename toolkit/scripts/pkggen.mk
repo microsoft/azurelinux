@@ -176,7 +176,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(workplan) $(chroot_worker) $(go-pkgworker
 ifeq ($(RUN_CHECK),y)
 	$(warning Make argument 'RUN_CHECK' set to 'y', running package tests. Will add the 'ca-certificates' package and enable networking for package builds.)
 endif
-	rm -f $(LOGS_DIR)/pkggen/failures.txt && \
+	@rm -f $(LOGS_DIR)/pkggen/failures.txt && \
 	$(MAKE) --silent -f $(workplan) go-pkgworker=$(go-pkgworker) CHROOT_DIR=$(CHROOT_DIR) chroot_worker=$(chroot_worker) SRPMS_DIR=$(SRPMS_DIR) RPMS_DIR=$(RPMS_DIR) pkggen_local_repo=$(pkggen_local_repo) LOGS_DIR=$(LOGS_DIR) TOOLCHAIN_MANIFESTS_DIR=$(TOOLCHAIN_MANIFESTS_DIR) GOAL_PackagesToBuild && \
 	{ [ ! -f $(LOGS_DIR)/pkggen/failures.txt ] || \
 		$(call print_error,Failed to build: $$(cat $(LOGS_DIR)/pkggen/failures.txt)); } && \

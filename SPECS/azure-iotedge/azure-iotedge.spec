@@ -1,7 +1,7 @@
 Summary:        Azure IoT Edge Security Daemon
 Name:           azure-iotedge
 Version:        1.1.0
-Release:        1%{?dist}
+Release:        4%{?dist}
 
 # A buildable azure-iotedge environments needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
@@ -21,7 +21,7 @@ URL:            https://github.com/azure/iotedge
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:  rust == 1.47.0
+BuildRequires:  rust = 1.47.0
 BuildRequires:  cmake
 BuildRequires:  curl
 BuildRequires:  git
@@ -166,27 +166,47 @@ echo "==========================================================================
 %doc %{_docdir}/iotedge-%{version}/trademark
 
 %changelog
-*   Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> 1.1.0-1
--   Update to version 1.1.0
-*   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> 1.0.9.1-2
--   Disable FORTIFY_SOURCE=2 to fix compilation error with hardened defaults.
-*   Wed May 27 2020 Andrew Phelps <anphel@microsoft.com> 1.0.9.1-1
--   Update to version 1.0.9.1. Fix tarball build notes.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.9-8
--   Added %%license line automatically
-*   Thu May 07 2020 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.9-7
--   Fix docker based build issue.
-*   Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.9-6
--   Rename shadow to shadow-utils.
-*   Tue May 05 2020 Mohan Datla <mdatla@microsoft.com> 1.0.9-5
--   Add moby-engine and moby-cli dependencies
-*   Wed Apr 29 2020 Mohan Datla <mdatla@microsoft.com> 1.0.9-4
--   Removed dependency on docker.
-*   Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0.9-3
--   Fixed 'Source0' tag.
-*   Mon Apr 20 2020 Andrew Phelps <anphel@microsoft.com> 1.0.9-2
--   Support building offline with prepopulated .cargo directory.
-*   Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> 1.0.9-1
--   Update to 1.0.9. License verified.
-*   Tue Dec 3 2019 Henry Beberman <hebeberm@microsoft.com> 1.0.8.4-1
--   Original version for CBL-Mariner.
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-4
+- Bump release to rebuild with rust 1.47.0-3 (security update)
+
+* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-3
+- Bump release to rebuild with rust 1.47.0-2 (security update)
+
+* Fri Apr 09 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-2
+- Fixing a 'BuildRequires' typo from "==" to "=".
+
+* Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> - 1.1.0-1
+- Update to version 1.1.0
+
+* Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0.9.1-2
+- Disable FORTIFY_SOURCE=2 to fix compilation error with hardened defaults.
+
+* Wed May 27 2020 Andrew Phelps <anphel@microsoft.com> - 1.0.9.1-1
+- Update to version 1.0.9.1. Fix tarball build notes.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.9-8
+- Added %%license line automatically
+
+* Thu May 07 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.9-7
+- Fix docker based build issue.
+
+* Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0.9-6
+- Rename shadow to shadow-utils.
+
+* Tue May 05 2020 Mohan Datla <mdatla@microsoft.com> - 1.0.9-5
+- Add moby-engine and moby-cli dependencies
+
+* Wed Apr 29 2020 Mohan Datla <mdatla@microsoft.com> - 1.0.9-4
+- Removed dependency on docker.
+
+* Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.9-3
+- Fixed 'Source0' tag.
+
+* Mon Apr 20 2020 Andrew Phelps <anphel@microsoft.com> - 1.0.9-2
+- Support building offline with prepopulated .cargo directory.
+
+* Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0.9-1
+- Update to 1.0.9. License verified.
+
+* Tue Dec 3 2019 Henry Beberman <hebeberm@microsoft.com> - 1.0.8.4-1
+- Original version for CBL-Mariner.

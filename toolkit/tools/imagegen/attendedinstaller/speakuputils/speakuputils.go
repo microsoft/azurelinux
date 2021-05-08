@@ -5,6 +5,14 @@ package speakuputils
 
 import (
 	"github.com/bendahl/uinput"
+	"microsoft.com/pkggen/internal/shell"
+)
+
+// Constants for start/stop speakup functions
+const (
+	squashError      = false
+	systemctlProgram = "systemctl"
+	espeakupService  = "espeakup.service"
 )
 
 // CreateVirtualKeyboard creates and returns a virtual keyboard from the uinput package
@@ -33,5 +41,25 @@ func ClearSpeakupBuffer(k uinput.Keyboard) (err error) {
 	}
 	// This could be any key that doesn't trigger input to a field
 	err = k.KeyPress(uinput.KeyRightctrl)
+	return
+}
+
+// StopSpeakup stops the espeakup connector daemon using systemctl
+func StopSpeakup() (err error) {
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"disable", espeakupService}...)
+	if err != nil {
+		return
+	}
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"stop", espeakupService}...)
+	return
+}
+
+// StartSpeakup stops the espeakup connector daemon using systemctl
+func StartSpeakup() (err error) {
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"enable", espeakupService}...)
+	if err != nil {
+		return
+	}
+	err = shell.ExecuteLive(squashError, systemctlProgram, []string{"start", espeakupService}...)
 	return
 }

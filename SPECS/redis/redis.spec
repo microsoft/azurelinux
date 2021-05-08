@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        5.0.5
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        BSD
 URL:            https://redis.io/
 Group:          Applications/Databases
@@ -11,6 +11,10 @@ Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         CVE-2020-14147.patch
 Patch2:         disable_active_defrag_big_keys.patch
+# CVE-2021-21309 affects 32-bit executables only. Mariner always builds with -m64 and does not support 32-bit architectures.
+Patch3:         CVE-2021-21309.nopatch
+Patch4:         CVE-2021-3470.patch
+
 BuildRequires:  gcc
 BuildRequires:  systemd
 BuildRequires:  make
@@ -84,6 +88,10 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Fri Apr 09 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.0.5-7
+- Add patch for CVE-2021-3470
+* Thu Mar 11 2021 Mateusz Malisz <mamalisz@microsoft.com> 5.0.5-6
+- Add nopatch for CVE-2021-21309.
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 5.0.5-5
 - Add patch to remove an unreliable test. License verified.
 * Fri Oct 23 2020 Henry Li <lihl@microsoft.com> 5.0.5-4

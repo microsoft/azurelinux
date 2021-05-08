@@ -1,14 +1,14 @@
 Summary: The open-source application container engine
 Name:    moby-engine
-Version: 19.03.11+azure
-Release: 4%{?dist}
+Version: 19.03.15+azure
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 
 # Git clone is a standard practice of producing source files for moby.
 # Please look at ./generate-sources.sh for generating source tar ball.
 # ENGINE_REPO=https://github.com/moby/moby.git
-%define MOBY_GITCOMMIT 77e06fda0c9457c99a210e9648c064b44805fa2d
+%define MOBY_GITCOMMIT 420b1d36250f9cfdc561f086f25a213ecb669b6f
 
 # docker-proxy binary comes from libnetwork
 # The proxy code rarely sees any changes
@@ -21,7 +21,7 @@ Group:   Tools/Container
 # TINI_REPO=https://github.com/krallin/tini.git
 # TINI_COMMIT=fec3683b971d9c3ef73f284f176672c44b448662
 
-#Source0: https://github.com/moby/moby/archive/v19.03.11.tar.gz
+#Source0: https://github.com/moby/moby/archive/v19.03.15.tar.gz
 Source0: moby-engine-%{version}.tar.gz
 Source2: docker.service
 Source3: docker.socket
@@ -149,6 +149,9 @@ fi
 /usr/share/doc/%{name}-%{version}/*
 
 %changelog
+* Thu Apr 15 2021 Andrew Phelps <anphel@microsoft.com> 19.03.15+azure-1
+- Update to version 19.03.15+azure
+
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 19.03.11+azure-4
 - Increment release to force republishing using golang 1.15.
 

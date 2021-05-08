@@ -42,9 +42,14 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.5
-Release:      4%{?dist}
+Release:      5%{?dist}
+# See LICENSE.GPL3-EXCEPT.txt, for exception details
+License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
 Distribution: Mariner
+URL:          https://qt-project.org/
+%global       majmin %(echo %{version} | cut -d. -f1-2)
+Source0:      https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 BuildRequires: build-essential
 BuildRequires: systemd
@@ -64,14 +69,9 @@ BuildRequires: libjpeg-turbo-devel
 BuildRequires: zlib-devel
 BuildRequires: qt5-rpm-macros
 
+Requires:         icu
 Requires(post):   chkconfig
 Requires(postun): chkconfig
-
-# See LGPL_EXCEPTIONS.txt, for exception details
-License: LGPLv2 with exceptions or GPLv3 with exceptions
-Url:     http://qt-project.org/
-%global  majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -529,6 +529,7 @@ fi
 %license LICENSE.FDL
 %license LICENSE.GPL*
 %license LICENSE.LGPL*
+%license LICENSE.QT-LICENSE-AGREEMENT-4.0
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -761,6 +762,14 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-5
+- Added explicit 'Requires' on 'icu'.
+- Bumping up release to re-compile against the new version of the 'icu' libraries.
+- License verified.
+- Updated the 'License' tag.
+- Updated the 'URL' tag.
+- Updated the '%%license' macro.
+
 * Thu Jul 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-4
 - Add missing Requires for chkconfig.
 

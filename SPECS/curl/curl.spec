@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.74.0
+Version:        7.76.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,21 +8,18 @@ Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
-
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
-
+Requires:       curl-libs = %{version}-%{release}
+Requires:       krb5
+Requires:       libssh2
+Requires:       openssl
 #%if %{with_check}
 #BuildRequires:  python3
 #BuildRequires:  shadow-utils
 #BuildRequires:  sudo
 #%endif
-
-Requires:       curl-libs = %{version}-%{release}
-Requires:       krb5
-Requires:       libssh2
-Requires:       openssl
 
 %description
 The cURL package contains an utility and a library used for
@@ -81,6 +78,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -100,8 +98,11 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Fri Feb 26 2021 Daniel Burgener <daburgen@microsoft.com> - 7.74.0-2
+* Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-2
 - Disable check just for the sake of seeing what the impact is.  Will come back and fix later
+
+* Wed Mar 31 2021 Nicolas Ontiveros <niontive@microsoft.com> - 7.76.0-1
+- Upgrade to version 7.76.0 to fix CVE-2021-22876 and CVE-2021-22890.
 
 * Tue Dec 22 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.74.0-1
 - Updating to 7.74.0 to fix CVE-2020-8169 and incorporate fixes for other CVEs as well.

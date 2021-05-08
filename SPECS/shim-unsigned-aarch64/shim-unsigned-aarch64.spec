@@ -2,13 +2,13 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-aarch64
 Version:        15
-Release:        4%{?dist}
+Release:        5%{?dist}
 URL:            https://github.com/rhboot/shim
 License:        BSD
 Vendor:         Microsoft
 Distribution:   Mariner
 Source0:        https://github.com/rhboot/shim/releases/download/15/shim-%{version}.tar.bz2
-Source1:        cbl-mariner-ca.der
+Source1:        cbl-mariner-ca-20210127.der
 ExclusiveArch:  aarch64
 
 BuildRequires:  gnu-efi
@@ -102,6 +102,8 @@ install -vm 644 shimaa64.efi %{buildroot}/usr/share/%{name}/shimaa64.efi
 /usr/share/%{name}/shimaa64.efi
 
 %changelog
+* Fri Apr 23 2021 Chris Co <chrco@microsoft.com> 15-5
+- Update cert
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> 15-4
 - Apply patch files (from CentOS: shim-15-8.el7)
 * Thu Jul 30 2020 Chris Co <chrco@microsoft.com> 15-3

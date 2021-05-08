@@ -3,25 +3,27 @@
 
 package uitext
 
-// "]" is a special character for the TUI text, escape it with "[]"
-
-// Control sequences for text formatting
+// Useful prefix strings
 const (
-	BoldPrefix = "[::b]"
+	RequiredInputMark = "* "
+	BoldPrefix        = "[::b]"
+	WhiteBoldPrefix   = "[#ffffff::b]"
 )
+
+// "]" is a special character for the TUI text, escape it with "[]"
 
 // Navigation text.
 const (
-	ButtonAccept     = "[Accept[]"
-	ButtonCancel     = "[Cancel[]"
-	ButtonCancelBold = BoldPrefix + ButtonCancel
-	ButtonConfirm    = "[Confirm[]"
-	ButtonGoBack     = "[Go Back[]"
-	ButtonNext       = "[Next[]"
-	ButtonYes        = "[Yes[]"
-	ButtonQuit       = "[Quit[]"
-	ButtonQuitBold   = BoldPrefix + ButtonQuit
-	ButtonRestart    = "[Restart[]"
+	ButtonAccept          = "[Accept[]"
+	ButtonCancel          = "[Cancel[]"
+	ButtonCancelWhiteBold = WhiteBoldPrefix + ButtonCancel
+	ButtonConfirm         = "[Confirm[]"
+	ButtonGoBack          = "[Go Back[]"
+	ButtonNext            = "[Next[]"
+	ButtonYes             = "[Yes[]"
+	ButtonQuit            = "[Quit[]"
+	ButtonQuitWhiteBold   = WhiteBoldPrefix + ButtonQuit
+	ButtonRestart         = "[Restart[]"
 )
 
 // AttendedInstaller wrapper text.
@@ -50,15 +52,19 @@ const (
 	DiskTitle = "Select a Disk"
 
 	// Custom Partition
-	DiskAdvanceTitleFmt   = "Partitions for: %v"
-	DiskAddPartitionTitle = "Add Partition"
-	DiskFormatLabel       = "Format"
-	DiskMountPointLabel   = "Mount Point"
-	DiskNameLabel         = "Name"
-	DiskSpaceLeftFmt      = "Remaining space: %v"
-	DiskSizeLabel         = "Size"
-	DiskSizeLabelMaxHelp  = "(* for max)"
-	DiskSizeUnitLabel     = "Unit size"
+	DiskAdvanceTitleFmt      = "Partitions for: %v"
+	DiskAddPartitionTitle    = "Add Partition"
+	DiskFormatLabel          = "Format"
+	DiskMountPointLabel      = "Mount Point"
+	DiskNameLabel            = "Name"
+	DiskSizeLabel            = "Size"
+	DiskSpaceLeftFmt         = "Remaining space: %v"
+	FormDiskSizeLabelMaxHelp = "(* for max)"
+	FormDiskSizeUnitLabel    = "* Unit size"
+	FormDiskFormatLabel      = RequiredInputMark + DiskFormatLabel
+	FormDiskMountPointLabel  = RequiredInputMark + DiskMountPointLabel
+	FormDiskNameLabel        = RequiredInputMark + DiskNameLabel
+	FormDiskSizeLabel        = RequiredInputMark + DiskSizeLabel
 
 	// Errors
 	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type '%s'"
@@ -69,12 +75,10 @@ const (
 	MountPointStartError               = "Mount point must start with `/`"
 	MountPointInvalidCharacterError    = "Mount point only supports alphanumeric characters and `/`"
 	NameInvalidCharacterError          = "Name only supports alphanumeric characters"
-	NoFormatSelectedError              = "A format must be selected"
 	NoPartitionsError                  = "Must specify at least one boot and one root partition"
 	NoPartitionSelectedError           = "No partition selected"
 	NoSizeSpecifiedError               = "Size must be specified"
 	NotEnoughDiskSpaceError            = "Not enough space left on disk"
-	NoUnitOfSizeSelectedError          = "A unit of size must be selected"
 	PartitionExceedsDiskErrorFmt       = "Device space exceeded by partition (%d)"
 	SizeStartError                     = "Size can not start with `0`"
 	SizeInvalidCharacterError          = "Size must be a number"
@@ -85,15 +89,16 @@ const (
 const (
 	EncryptTitle                = "Enter Disk Encryption Password"
 	SkipEncryption              = "[Skip Disk Encryption[]"
-	EncryptPasswordLabel        = "Disk Encryption Password"
-	ConfirmEncryptPasswordLabel = "Confirm Disk Encryption Password"
+	EncryptPasswordLabel        = "* Disk Encryption Password"
+	ConfirmEncryptPasswordLabel = "* Confirm Disk Encryption Password"
 )
 
 // InstallerView text.
 const (
-	InstallerExperienceTitle = "Select Installation Experience"
-	InstallerTerminalOption  = "Terminal Installer (Speech Enabled)"
-	InstallerGraphicalOption = "Graphical Installer"
+	InstallerExperienceTitle        = "Select Installation Experience"
+	InstallerTerminalNoSpeechOption = "Terminal Installer"
+	InstallerTerminalOption         = InstallerTerminalNoSpeechOption + " (Speech Enabled)"
+	InstallerGraphicalOption        = "Graphical Installer"
 )
 
 // EulaView text.
@@ -104,7 +109,7 @@ const (
 // HostNameView text.
 const (
 	HostNameTitle      = "Choose the Host Name for Your System"
-	HostNameInputLabel = "Host Name:"
+	HostNameInputLabel = "* Host Name:"
 
 	HostNameSegment   = "host name"
 	DomainNameSegment = "domain name"
@@ -125,11 +130,12 @@ const (
 const (
 	SetupUserTitle = "Set Up User Account"
 
-	PasswordInputLabel        = "Password"
-	ConfirmPasswordInputLabel = "Confirm Password"
-	UserNameInputLabel        = "User Name"
+	PasswordInputLabel        = "* Password"
+	ConfirmPasswordInputLabel = "* Confirm Password"
+	UserNameInputLabel        = "* User Name"
 
 	PasswordMismatchFeedback = "Passwords do not match"
+	EnumNavigationFeedback   = "Use left or right arrow keys to change the selection"
 
 	EncryptionVerityIncompatible = "Encrypted and read-only roots are currently incompatible with each other"
 
