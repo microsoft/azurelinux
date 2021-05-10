@@ -5124,6 +5124,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pexpect",
+          "version": "4.8.0",
+          "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pip",
           "version": "19.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4e9a93319ae5bb371057786f1590b157341f7542d7d/pip-19.2.tar.gz"
@@ -5167,6 +5177,16 @@
           "name": "python-psycopg2",
           "version": "2.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-2.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ptyprocess",
+          "version": "0.7.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/ptyprocess/ptyprocess-0.7.0.tar.gz"
         }
       }
     },
@@ -6517,6 +6537,16 @@
           "name": "socat",
           "version": "1.7.3.4",
           "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sos",
+          "version": "4.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.1.tar.gz"
         }
       }
     },
