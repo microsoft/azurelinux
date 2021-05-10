@@ -324,8 +324,8 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Apr 14 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
-- Use jitterentropy instead of getrandom() for seeding
+* Mon May 10 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
+- Use jitterentropy and getrandom() for seeding
 
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-1
 - Update to version 1.1.1k
