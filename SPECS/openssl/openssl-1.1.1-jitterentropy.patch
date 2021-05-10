@@ -113,7 +113,7 @@ index e814246..84c4c03 100644
 +#ifdef OPENSSL_FIPS
 +        if (FIPS_mode()) {
 +            /* Use jent to fill entropy pool */
-+            bytes_needed = rand_pool_bytes_needed();
++            bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
 +            attempts = 3;
 +            while (bytes_needed !=0 && attempts-- > 0) {
 +                buffer = rand_pool_add_begin(pool, bytes_needed);
@@ -173,8 +173,8 @@ index 3fd5d64..5c48ac5 100644
  EVP_KDF_ctrl_str                        6595	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_size                            6596	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_derive                          6597	1_1_1b	EXIST::FUNCTION:
--EC_GROUP_check_named_curve              1563	1_1_1g	EXIST::FUNCTION:EC
+-EC_GROUP_check_named_curve              6598	1_1_1g	EXIST::FUNCTION:EC
 \ No newline at end of file
-+EC_GROUP_check_named_curve              1563    1_1_1g	EXIST::FUNCTION:EC
-+FIPS_init_entropy                       6598    1_1_1k  EXIST::FUNCTION:
++EC_GROUP_check_named_curve              6598    1_1_1g	EXIST::FUNCTION:EC
++FIPS_init_entropy                       6599    1_1_1k  EXIST::FUNCTION:
 \ No newline at end of file
