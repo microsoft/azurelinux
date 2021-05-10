@@ -1745,8 +1745,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.28.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
         }
       }
     },
@@ -1775,8 +1775,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.1",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.1.tar.gz"
+          "version": "68.2.0.6",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
         }
       }
     },
@@ -2055,8 +2055,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.28.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
         }
       }
     },
@@ -2065,8 +2065,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.28.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
         }
       }
     },
@@ -2075,8 +2075,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.21.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.21.1.tar.gz"
+          "version": "5.10.28.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
         }
       }
     },
@@ -3435,8 +3435,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3455,8 +3455,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "19.03.11+azure",
-          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.11.tar.gz"
+          "version": "19.03.15+azure",
+          "downloadUrl": "https://github.com/moby/moby/archive/v19.03.15.tar.gz"
         }
       }
     },
@@ -3615,8 +3615,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.4.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz"
+          "version": "3.7.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.2.tar.gz"
         }
       }
     },

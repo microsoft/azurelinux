@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.21.1-rolling-lts-mariner Kernel Configuration
+# Linux/arm64 5.10.28.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 9.1.0"
 CONFIG_CC_IS_GCC=y
@@ -2031,7 +2031,6 @@ CONFIG_PCIEASPM_DEFAULT=y
 CONFIG_PCIE_PME=y
 CONFIG_PCIE_DPC=y
 CONFIG_PCIE_PTM=y
-# CONFIG_PCIE_BW is not set
 # CONFIG_PCIE_EDR is not set
 CONFIG_PCI_MSI=y
 CONFIG_PCI_MSI_IRQ_DOMAIN=y
@@ -7559,6 +7558,7 @@ CONFIG_HYPERV_TIMER=y
 CONFIG_HYPERV_UTILS=m
 CONFIG_HYPERV_BALLOON=y
 CONFIG_DXGKRNL=y
+# CONFIG_DXGKRNL_DEBUG is not set
 # end of Microsoft Hyper-V guest support
 
 #

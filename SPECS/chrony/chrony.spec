@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        3.5.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ BuildRequires:  gnupg2
 BuildRequires:  libcap-devel
 BuildRequires:  libedit-devel
 BuildRequires:  libseccomp-devel
-BuildRequires:  nettle-devel
+BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  systemd
 
 %if %{with_check}
@@ -201,6 +201,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Tue Apr 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.5.1-4
+- Bump release to rebuild with new nettle (3.7.2)
+
 * Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> - 3.5.1-3
 - Add build requirements needed for check tests
 
