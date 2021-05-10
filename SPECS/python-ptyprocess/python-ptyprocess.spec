@@ -3,7 +3,7 @@
 Summary:        Run a subprocess in a pseudo terminal
 Name:           python-%{srcname}
 Version:        0.7.0
-Release:        12%{?dist}
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ python3 -m pytest -v
 %changelog
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- Updated to latest package version
 - License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-12
