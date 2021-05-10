@@ -21,8 +21,8 @@ func CreateRepo(repoDir string) (err error) {
 	err = CleanupRepo(repoDir)
 
 	if err != nil {
-		logger.Log.Warnf("Failed to cleanup repo %s: %v", repoDir, err)
-		return
+		// This error is not fatal.
+		logger.Log.Debugf("Failed to cleanup repo %s: %v", repoDir, err)
 	}
 
 	// Create a new repodata
