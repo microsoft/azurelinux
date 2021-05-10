@@ -1,6 +1,6 @@
 # CBL-Mariner Changelog
 
-All notable changes to this project will be documented in this file. For each notable change , please create an entry under the "Unreleased" header in a relevant category. If there is no relevant category present, please add one as appropriate.
+All notable changes to this project will be documented in this file. For each notable change , please create an entry under the "Unreleased" header in a relevant category with a link to the related PR. If there is no relevant category present, please add one as appropriate.
 
 Suggested categories: "Security Fixes", "Package Additions", "Package Version Updates", "Package Test Fixes", "Toolkit Changes".
 
