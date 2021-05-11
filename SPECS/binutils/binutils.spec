@@ -114,7 +114,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libctf.so*
 
 %changelog
-*   Fri May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.36.1-1
+*   Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.36.1-1
 -   Update to version 2.36.1
 
 *   Mon Jan 11 2021 Emre Girgin <mrgirgin@microsoft.com> 2.32-5

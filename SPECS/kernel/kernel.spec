@@ -500,7 +500,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Mon May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
+* Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Use eu-readelf to verify build-id match
 

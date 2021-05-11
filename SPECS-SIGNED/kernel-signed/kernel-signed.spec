@@ -139,7 +139,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Mon May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
+* Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
 - Update to kernel release 5.10.32.1-2
 
 * Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1

@@ -324,7 +324,7 @@ done
 /usr/share/makedumpfile/
 
 %changelog
-* Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-2
+* Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-2
 - Update eppic version for compatibility with binutils 2.36.1
 - Add Group and URL
 * Tue Feb 23 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-1
