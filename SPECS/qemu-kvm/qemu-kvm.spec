@@ -208,7 +208,7 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
-* Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.0-30
+* Mon May 11 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.0-30
 - Remove LDFLAGS_NOPIE to compile with binutils 2.36.1
 
 * Wed Apr 07 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-29

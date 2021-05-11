@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -35,8 +35,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
-- Update to kernel release 5.10.32.1-2
+* Mon May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-2
+- Update to kernel release 5.10.32.1
 
 * Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
 - Update source to 5.10.32.1
