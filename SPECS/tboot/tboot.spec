@@ -38,7 +38,7 @@ make debug=y DESTDIR=%{buildroot} install
 %exclude %{_sysconfdir}
 
 %changelog
-*   Mon Mar 29 2021 Andrew Phelps <anphel@microsoft.com> 1.9.12-1
+*   Mon May 11 2021 Andrew Phelps <anphel@microsoft.com> 1.9.12-1
 -   Update to version 1.9.12 for binutils 2.36.1 compatibility
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.9.7-7
 -   Added %%license line automatically
