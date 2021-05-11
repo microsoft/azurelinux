@@ -434,8 +434,43 @@ func TestShouldCorrectlyConvertPackageNameWithLesserVersionConstraint(t *testing
 	assert.Equal(t, "9.1.0", packageVer.Version)
 }
 
-func TestShouldFailToConvertInvalidPackageListEntry(t *testing.T) {
+func TestShouldCorrectlyConvertPackageNameWithAllowedWhitespaces(t *testing.T) {
+	packageVer, err := PackagesListEntryToPackageVer("  gcc-devel\t\t< 9.1.0    ")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "gcc-devel", packageVer.Name)
+	assert.Equal(t, "<", packageVer.Condition)
+	assert.Equal(t, "", packageVer.SCondition)
+	assert.Equal(t, "", packageVer.SVersion)
+	assert.Equal(t, "9.1.0", packageVer.Version)
+}
+
+func TestShouldFailToConvertPackageListEntryStartingWithInvalidCharacter(t *testing.T) {
 	_, err := PackagesListEntryToPackageVer("=gcc-devel")
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailToConvertPackageListEntryWithInvalidComparison(t *testing.T) {
+	_, err := PackagesListEntryToPackageVer("gcc-devel=>9.1.0")
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailToConvertPackageListEntryWithWhitespacesInComparison(t *testing.T) {
+	_, err := PackagesListEntryToPackageVer("gcc-devel< =9.1.0")
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailToConvertPackageListEntryWithWhitespacesInName(t *testing.T) {
+	_, err := PackagesListEntryToPackageVer("gcc devel")
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailToConvertPackageListEntryWithWhitespacesInVersion(t *testing.T) {
+	_, err := PackagesListEntryToPackageVer("gcc-devel<9 1.0")
 
 	assert.Error(t, err)
 }

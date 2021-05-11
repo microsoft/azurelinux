@@ -25,7 +25,7 @@ var (
 	// Examples:
 	//	gcc ->       "gcc" "" ""
 	//	gcc=9.1.0 -> "gcc" "=" "1.9.0"
-	packageWithVersionRegex = regexp.MustCompile(`^([^<>=]+)([<>=]+)?(.*)?$`)
+	packageWithVersionRegex = regexp.MustCompile(`^\s*([^><=\s]+)\s*(?:((?:[<>]=)|(?:[<>=]))\s*([^<>=\s]+))?\s*$`)
 )
 
 // PackageRepo contains an array of SRPMs and relational dependencies
