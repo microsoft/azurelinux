@@ -49,6 +49,8 @@ rm %{buildroot}%{_libdir}/libespeak.la
 
 # Rename problematic file with space in name
 # This file does not work well with our GNU Make build system when placed in the ISO initrd
+# GNU Make hacks to allow spaces in filenames are hacky and likely to make things worse
+# Sample error: "make[1]: *** No rule to make target 'serious', needed by 'image'. Stop."
 mv "%{buildroot}%{_datadir}/espeak-ng-data/voices/!v/Mr serious" "%{buildroot}%{_datadir}/espeak-ng-data/voices/!v/Mr_serious" 
 
 %check
