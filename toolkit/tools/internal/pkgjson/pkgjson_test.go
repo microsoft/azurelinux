@@ -451,6 +451,12 @@ func TestShouldFailToConvertPackageListEntryStartingWithInvalidCharacter(t *test
 	assert.Error(t, err)
 }
 
+func TestShouldFailToConvertPackageListEntryWithIncompleteComparison(t *testing.T) {
+	_, err := PackagesListEntryToPackageVer("gcc-devel=")
+
+	assert.Error(t, err)
+}
+
 func TestShouldFailToConvertPackageListEntryWithInvalidComparison(t *testing.T) {
 	_, err := PackagesListEntryToPackageVer("gcc-devel=>9.1.0")
 
