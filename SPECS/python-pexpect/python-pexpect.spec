@@ -9,9 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pexpect/pexpect
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
-BuildRequires:  %{_bindir}/man
 BuildArch:      noarch
 %if %{with_check}
+BuildRequires:  man-db
 BuildRequires:  openssl
 %endif
 
@@ -86,6 +86,8 @@ TRAVIS=true py.test-3 --verbose
 %changelog
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-8
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- Ensure check-time requirements are specified as such
+- Remove Fedora macro-based Python build machinery
 - License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.8.0-7
