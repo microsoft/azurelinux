@@ -1,11 +1,21 @@
 --- ./Makefile	2021-04-06 08:53:18.554954462 -0700
 +++ ./Makefile	2021-04-14 09:44:09.424948057 -0700
-@@ -70,7 +70,7 @@
+@@ -19,6 +19,9 @@
+   CFLAGS += -fstack-protector-all
+ endif
+ 
++# Add OpenSSL and OpenSSL FIPS definitions
++CFLAGS += -DOPENSSL -DOPENSSL_FIPS
++
+ # Change as necessary
+ PREFIX := /usr/local
+ # library target directory (either lib or lib64)
+@@ -70,7 +73,7 @@
  cppcheck:
  	cppcheck --force -q --enable=performance --enable=warning --enable=portability *.h *.c
  
 -install: install-man install-shared install-includes
-+install: install-man install-includes install-static
++install: install-man install-static install-includes
  
  install-man:
  	install -d -m 0755 $(DESTDIR)$(PREFIX)/share/man/man3
