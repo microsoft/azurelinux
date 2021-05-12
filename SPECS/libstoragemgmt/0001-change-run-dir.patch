@@ -1,0 +1,9 @@
+diff --git a/packaging/daemon/libstoragemgmt.conf b/packaging/daemon/libstoragemgmt.conf
+index 1c118a9..cdb43c2 100644
+--- a/packaging/daemon/libstoragemgmt.conf
++++ b/packaging/daemon/libstoragemgmt.conf
+@@ -1,2 +1,2 @@
+-D /var/run/lsm 0775 root libstoragemgmt -
+-D /var/run/lsm/ipc 0775 root libstoragemgmt -
++D /run/lsm 0775 root libstoragemgmt -
++D /run/lsm/ipc 0775 root libstoragemgmt -

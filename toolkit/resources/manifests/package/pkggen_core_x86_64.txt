@@ -74,7 +74,7 @@ zstd-libs-1.4.4-1.cm1.x86_64.rpm
 libtool-2.4.6-5.cm1.x86_64.rpm
 flex-2.6.4-6.cm1.x86_64.rpm
 flex-devel-2.6.4-6.cm1.x86_64.rpm
-bison-3.1-3.cm1.x86_64.rpm
+bison-3.1-4.cm1.x86_64.rpm
 popt-1.16-7.cm1.x86_64.rpm
 popt-devel-1.16-7.cm1.x86_64.rpm
 popt-lang-1.16-7.cm1.x86_64.rpm

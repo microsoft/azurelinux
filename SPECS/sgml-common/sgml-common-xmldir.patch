@@ -1,0 +1,19 @@
+--- sgml-common-0.6.3/xml-iso-entities/Makefile.am.xmldir	Fri Oct  5 16:37:43 2001
++++ sgml-common-0.6.3/xml-iso-entities/Makefile.am	Fri Oct  5 16:37:57 2001
+@@ -1,4 +1,4 @@
+-isoentdir = $(prefix)/share/sgml/xml-iso-entities-8879.1986
++isoentdir = $(prefix)/share/xml/xml-iso-entities-8879.1986
+ isoent_DATA = ISOamsa.ent ISOamsb.ent ISOamsc.ent ISOamsn.ent ISOamso.ent ISOamsr.ent \
+               ISObox.ent ISOcyr1.ent ISOcyr2.ent ISOdia.ent ISOgrk1.ent ISOgrk2.ent \
+               ISOgrk3.ent ISOgrk4.ent ISOlat1.ent ISOlat2.ent ISOnum.ent ISOpub.ent \
+--- sgml-common-0.6.3/xml-iso-entities/Makefile.in.xmldir	2007-05-15 17:21:31.000000000 +0100
++++ sgml-common-0.6.3/xml-iso-entities/Makefile.in	2007-05-15 17:21:43.000000000 +0100
+@@ -62,7 +62,7 @@
+ VERSION = @VERSION@
+ docdir = @docdir@
+ 
+-isoentdir = $(prefix)/share/sgml/xml-iso-entities-8879.1986
++isoentdir = $(prefix)/share/xml/xml-iso-entities-8879.1986
+ isoent_DATA = ISOamsa.ent ISOamsb.ent ISOamsc.ent ISOamsn.ent ISOamso.ent ISOamsr.ent               ISObox.ent ISOcyr1.ent ISOcyr2.ent ISOdia.ent ISOgrk1.ent ISOgrk2.ent               ISOgrk3.ent ISOgrk4.ent ISOlat1.ent ISOlat2.ent ISOnum.ent ISOpub.ent               ISOtech.ent catalog
+ 
+ 

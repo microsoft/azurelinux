@@ -9,3 +9,4 @@ The CBL-Mariner SPEC files originated from a variety of sources with varying lic
 | TreasureData | [ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0) | td-agent |
 | Nvidia | [ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0) | nvidia-container-runtime |
 | Magnus Edenhill Open Source | [Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING) | librdkafka |
+| Ceph | [LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1) | ceph |
