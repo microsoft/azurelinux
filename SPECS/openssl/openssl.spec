@@ -41,8 +41,7 @@ Patch18:        openssl-1.1.1-rewire-fips-drbg.patch
 Patch19:        openssl-1.1.1-fips-curves.patch
 Patch20:        openssl-1.1.1-sp80056arev3.patch
 Patch21:        openssl-1.1.1-jitterentropy.patch
-BuildRequires:  jitterentropy-devel
-BuildRequires:  jitterentropy-static
+BuildRequires:  jitterentropy
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -151,7 +150,7 @@ export HASHBANGPERL=%{_bindir}/perl
 #       Issue link: https://github.com/openssl/openssl/issues/7048.
 #       For more details please read the comment inside the patch.
 ./config \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib -ljitterentropy \
+    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib -ljitterentropy-openssl \
     shared \
     no-aria \
     enable-bf \

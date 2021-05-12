@@ -1,3 +1,4 @@
+%define         debug_package %{nil}
 Summary:        Library implementing the jitter entropy source
 Name:           jitterentropy
 Version:        3.0.1
@@ -18,20 +19,6 @@ The Jitter RNG provides a noise source using the CPU execution timing jitter.
 It does not depend on any system resource other than a high-resolution time stamp.
 It is a small-scale, yet fast entropy source that is viable in almost all environments and on a lot of CPU architectures.
 
-%package devel
-Summary:        Development libraries for jitterentropy-library
-Group:          Development/Libraries
-
-%description devel
-Development headers for jitterentropy-library
-
-%package static
-Summary:        Libraries for static linking of applications which will use jitterentropy library.
-Group:          Development/Libraries
-Requires:       %{name}-devel = %{version}-%{release}
-
-%description static
-Libraries for static linking of applications which will use jitterentropy library.
 
 %prep
 %autosetup -n %{name}-library-%{version} -p1
@@ -44,20 +31,15 @@ make
 mkdir -p %{buildroot}/usr/include/
 make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+# Rename static library to libjitterentropy-openssl
+mv %{buildroot}/%{_libdir}/lib%{name}.a %{buildroot}/%{_libdir}/lib%{name}-openssl.a
 
 %files
 %doc README.md
 %license COPYING COPYING.bsd COPYING.gplv2
-%{_libdir}/lib%{name}.so*
-
-%files devel
 %{_includedir}/*
 %{_mandir}/man3/*
-
-%files static
-%{_libdir}/lib%{name}.a
+%{_libdir}/lib%{name}-openssl.a
 
 %changelog
 * Wed Apr 14 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.0.1-1
