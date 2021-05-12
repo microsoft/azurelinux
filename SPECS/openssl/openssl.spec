@@ -319,7 +319,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
-- Remove DRBG rewire patch
+- Remove FIPS DRBG rewire patch
 
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-1
 - Update to version 1.1.1k
