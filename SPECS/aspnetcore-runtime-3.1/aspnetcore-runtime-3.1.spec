@@ -37,8 +37,10 @@ cp -r shared/Microsoft.AspNetCore.App %{buildroot}%{_libdir}/dotnet/shared
 %changelog
 * Wed May 12 2021 Andrew Phelps <anphel@microosft.com> - 3.1.15-1
 - Update version to 3.1.15
+
 * Fri May 7 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 3.1.14-1
 - Update version to 3.1.14
+
 * Thu Nov 12 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.1.5-1
 - Add aspnetcore-runtime spec.
 - License verified
