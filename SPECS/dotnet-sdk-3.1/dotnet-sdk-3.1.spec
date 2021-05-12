@@ -7,9 +7,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-Url:            https://github.com/dotnet/core
+URL:            https://github.com/dotnet/core
 Source0:        https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz
-
 Requires:       dotnet-runtime-3.1
 Requires:       icu
 ExclusiveArch:  x86_64
