@@ -1,13 +1,13 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.23
+Version:        8.0.24
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.mysql.com
-Source0:        https://cdn.mysql.com/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
+Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
@@ -76,66 +76,70 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-*   Thu Feb 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 8.0.23-1
--   Upgrade to 8.0.23. Fixes CVE-2020-15358.
+* Sat Apr 24 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.24-1
+- Upgrade to 8.0.24 to fix 30 CVEs
+- Update source URL
 
-*   Thu Nov 05 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-2
--   Added no patch for CVE-2012-5627
+* Thu Feb 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 8.0.23-1
+- Upgrade to 8.0.23. Fixes CVE-2020-15358.
 
-*   Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
--   Upgrade to 8.0.22. Fixes 40 CVES.
--   Lint spec
+* Thu Nov 05 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-2
+- Added no patch for CVE-2012-5627
 
-*   Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.21-1
--   Upgrade to 8.0.21. Fixes 32 CVEs.
+* Tue Nov 03 2020 Rachel Menge <rachelmenge@microsoft.com> - 8.0.22-1
+- Upgrade to 8.0.22. Fixes 40 CVES.
+- Lint spec
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.20-2
--   Added %%license line automatically
+* Tue Aug 18 2020 Henry Beberman <henry.beberman@microsoft.com> - 8.0.21-1
+- Upgrade to 8.0.21. Fixes 32 CVEs.
 
-*   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 8.0.20-1
--   Upgrade to 8.0.20. Fixes 70 CVEs.
--   Update URL.
--   Fix CVE-2020-2804.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.20-2
+- Added %%license line automatically
 
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 8.0.17-1
--   Update to version 8.0.17. License verified.
+* Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> - 8.0.20-1
+- Upgrade to 8.0.20. Fixes 70 CVEs.
+- Update URL.
+- Fix CVE-2020-2804.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.0.14-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> - 8.0.17-1
+- Update to version 8.0.17. License verified.
 
-*   Tue Jan 22 2019 Siju Maliakkal <smaliakkal@vmware.com> 8.0.14-1
--   Upgrade to 8.0.14
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 8.0.14-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Wed Jan 02 2019 Him Kalyan Bordoloi <bordoloih@vmware.com> 8.0.13-1
--   Upgrade to version 8.0.13
--   Workaround for broken DCMAKE_BUILD_TYPE=RELEASE(Mysql Bug#92945). Revert in next version
+* Tue Jan 22 2019 Siju Maliakkal <smaliakkal@vmware.com> - 8.0.14-1
+- Upgrade to 8.0.14
 
-*   Mon Nov 19 2018 Ajay Kaher <akaher@vmware.com> 8.0.12-4
--   Enabling for aarch64
+* Wed Jan 02 2019 Him Kalyan Bordoloi <bordoloih@vmware.com> - 8.0.13-1
+- Upgrade to version 8.0.13
+- Workaround for broken DCMAKE_BUILD_TYPE=RELEASE(Mysql Bug#92945). Revert in next version
 
-*   Mon Oct 22 2018 Ajay Kaher <akaher@vmware.com> 8.0.12-3
--   Adding BuildArch
+* Mon Nov 19 2018 Ajay Kaher <akaher@vmware.com> - 8.0.12-4
+- Enabling for aarch64
 
-*   Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 8.0.12-2
--   Use libtirpc instead obsoleted rpc from glibc.
+* Mon Oct 22 2018 Ajay Kaher <akaher@vmware.com> - 8.0.12-3
+- Adding BuildArch
 
-*   Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 8.0.12-1
--   Update to version 8.0.12
+* Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> - 8.0.12-2
+- Use libtirpc instead obsoleted rpc from glibc.
 
-*   Wed Aug 08 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 5.7.23-1
--   Update to version 5.7.23 to get it to build with gcc 7.3
+* Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 8.0.12-1
+- Update to version 8.0.12
 
-*   Thu Jan 25 2018 Divya Thaluru <dthaluru@vmware.com> 5.7.20-2
--   Added patch for CVE-2018-2696
+* Wed Aug 08 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 5.7.23-1
+- Update to version 5.7.23 to get it to build with gcc 7.3
 
-*   Wed Oct 25 2017 Xiaolin Li <xiaolinl@vmware.com> 5.7.20-1
--   Update to version 5.7.20
+* Thu Jan 25 2018 Divya Thaluru <dthaluru@vmware.com> - 5.7.20-2
+- Added patch for CVE-2018-2696
 
-*   Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 5.7.18-3
--   Fix typo in description
+* Wed Oct 25 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.7.20-1
+- Update to version 5.7.20
 
-*   Fri Jul 14 2017 Xiaolin Li <xiaolinl@vmware.com> 5.7.18-2
--   Run make test in the %check section
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 5.7.18-3
+- Fix typo in description
 
-*   Tue Jun 13 2017 Xiaolin Li <xiaolinl@vmware.com> 5.7.18-1
--   Initial packaging for Photon
+* Fri Jul 14 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.7.18-2
+- Run make test in the %check section
+
+* Tue Jun 13 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.7.18-1
+- Initial packaging for Photon

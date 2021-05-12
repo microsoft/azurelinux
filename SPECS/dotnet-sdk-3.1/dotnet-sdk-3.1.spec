@@ -1,14 +1,14 @@
 %define debug_package %{nil}
 Summary:        Microsoft .NET Core SDK
 Name:           dotnet-sdk-3.1
-Version:        3.1.105
+Version:        3.1.114
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        MIT
 Url:            https://github.com/dotnet/core
 Group:          Development/Tools
-Source0:        https://download.visualstudio.microsoft.com/download/pr/37268c18-226d-436b-b13c-4b77b7f42140/17e8a85360206006a557d634d16713cd/dotnet-sdk-3.1.105-linux-x64.tar.gz
+Source0:        https://download.visualstudio.microsoft.com/download/pr/79c30043-e62b-49e5-ba42-0aea2af1499a/f853a4f12fb4376532826272cdbbdd66/dotnet-sdk-3.1.114-linux-x64.tar.gz
 ExclusiveArch:  x86_64
 
 Requires:       dotnet-runtime-3.1
@@ -36,6 +36,8 @@ cp LICENSE.txt ThirdPartyNotices.txt %{buildroot}%{_docdir}/dotnet-sdk-%{version
     %{_docdir}/*
 
 %changelog
+*   Fri May 07 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.1.114-1
+-   Update version to 3.1.114
 *   Fri Jun 19 2020 Andrew Phelps <anphel@microsoft.com> 3.1.105-1
 -   Update version to 3.1.105
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.102-5
