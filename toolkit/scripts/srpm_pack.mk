@@ -56,7 +56,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 			break; \
 		done && echo "Downloaded $${url}/$${srpm_file}"; \
 	done || ( [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || \
-	( [ $SRPM_RELAXED_DOWNLOAD == y ] && echo "Failed to download $${srpm_file}. Skipping.") || \
+	( [ "$(SRPM_RELAXED_DOWNLOAD)" == "y" ] && echo "Failed to download $${srpm_file}. Skipping.") || \
 	$(call print_error,Failed to download $${srpm_file}) ); \
 	touch $@
 else
