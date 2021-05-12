@@ -3,15 +3,15 @@
 Summary:        Unicode-aware Pure Python Expect-like module
 Name:           python-%{modname}
 Version:        4.8.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pexpect/pexpect
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
-BuildRequires:  %{_bindir}/man
 BuildArch:      noarch
 %if %{with_check}
+BuildRequires:  man-db
 BuildRequires:  openssl
 %endif
 
@@ -84,6 +84,9 @@ TRAVIS=true py.test-3 --verbose
 %{python3_sitelib}/%{modname}-*.egg-info
 
 %changelog
+* Tue May 11 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-9
+- Remove /usr/bin/man dependency, replace with check-time man-db dependency
+
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-8
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
