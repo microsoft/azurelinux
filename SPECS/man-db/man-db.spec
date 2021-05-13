@@ -45,7 +45,7 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 %find_lang %{name} --all-name
 
 # remove zsoelim man page - part of groff package
-rm $RPM_BUILD_ROOT%{_datadir}/man/man1/zsoelim.1
+rm %{buildroot}%{_datadir}/man/man1/zsoelim.1
 
 %check
 getent group man >/dev/null || groupadd -r man
