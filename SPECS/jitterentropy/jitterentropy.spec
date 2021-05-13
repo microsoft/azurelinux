@@ -24,7 +24,7 @@ It is a small-scale, yet fast entropy source that is viable in almost all enviro
 %autosetup -n %{name}-library-%{version} -p1
 
 %build
-%set_build_flags
+export CFLAGS='-DOPENSSL -DOPENSSL_FIPS'
 make
 
 %install
