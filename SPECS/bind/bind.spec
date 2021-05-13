@@ -1,21 +1,14 @@
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.3
-Release:        3%{?dist}
+Version:        9.16.15
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
 # CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
 Patch0:         CVE-2019-6470.nopatch
-Patch1:         CVE-2020-8618.patch
-Patch2:         CVE-2020-8619.patch
-Patch3:         CVE-2020-8620.patch
-Patch4:         CVE-2020-8621.patch
-Patch5:         CVE-2020-8622.patch
 # CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
-Patch6:         CVE-2020-8623.nopatch
-Patch7:         CVE-2020-8624.patch 
-Patch8:         CVE-2020-8625.patch 
+Patch1:         CVE-2020-8623.nopatch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,11 +82,12 @@ fi
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/*
-%{_mandir}/man1/*
 %{_sysconfdir}/*
 %{_prefix}/lib/tmpfiles.d/named.conf
 
 %changelog
+*   Wed May 12 2021 Andrew Phelps <anphel@microsoft.com> - 9.16.15-1
+-   Update version to 9.16.15 to fix CVE-2021-25215
 *   Mon Mar 01 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 9.16.3-3
 -   Fixes CVE-2020-8625
 *   Fri Sep 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 9.16.3-2
