@@ -109,11 +109,13 @@ make %{?_smp_mflags} check
 %{_libdir}/libopcodes.so
 %{_libdir}/bfd-plugins/libdep.so
 %{_libdir}/libctf-nobfd.a
-%{_libdir}/libctf-nobfd.so*
-%{_libdir}/libctf-nobfd.so.*
+%{_libdir}/libctf-nobfd.so
+%{_libdir}/libctf-nobfd.so.0
+%{_libdir}/libctf-nobfd.so.0.*
 %{_libdir}/libctf.a
-%{_libdir}/libctf.so*
-%{_libdir}/libctf.so.*
+%{_libdir}/libctf.so
+%{_libdir}/libctf.so.0
+%{_libdir}/libctf.so.0.*
 
 %changelog
 *   Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.36.1-1
