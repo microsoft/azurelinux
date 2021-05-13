@@ -2,7 +2,7 @@
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
 Version:        4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ BuildRequires:  gettext
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       bzip2
+Requires:       python3
 Requires:       python3-libxml2
 Requires:       python3-pexpect
 Requires:       python3-rpm
@@ -34,6 +35,10 @@ python3 setup.py build
 
 %install
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot} --install-scripts=%{_sbindir}
+
+# Remove doubly-packaged documentation files
+rm -rf %{buildroot}%{_datadir}/licenses/sos
+rm -rf %{buildroot}%{_datadir}/doc/sos
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}
 install -d -m 700 %{buildroot}%{_sysconfdir}/%{name}/cleaner
@@ -63,6 +68,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Wed May 12 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-3
+- Fix build break due to doubly-packaged license/doc files
+
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Linted spec to Mariner style
