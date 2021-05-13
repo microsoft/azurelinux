@@ -1,7 +1,7 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
 Version:        2.8.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
@@ -44,6 +44,9 @@ make DESTDIR=%{buildroot} install
 find %{buildroot}%{_libdir} -name '*.la' -delete
 %find_lang %{name} --all-name
 
+# remove zsoelim man page - part of groff package
+rm %{buildroot}%{_datadir}/man/man1/zsoelim.1
+
 %check
 getent group man >/dev/null || groupadd -r man
 getent passwd man >/dev/null || useradd -c "man" -d /var/cache/man -g man \
@@ -77,6 +80,9 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Thu May 13 2021 Henry Li <lihl@microsoft.com> 2.8.4-7
+- Remove zsoelim man page, which is provided by groff
+
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.8.4-6
 -   Add explicit provide for "man"
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.8.4-5

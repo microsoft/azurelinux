@@ -9,7 +9,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -305,20 +305,20 @@ install -m 640 %{SOURCE5} %{buildroot}%{_localstatedir}/named/named.loopback
 install -m 640 %{SOURCE6} %{buildroot}%{_localstatedir}/named/named.empty
 install -m 640 %{SOURCE7} %{buildroot}%{_sysconfdir}/named.rfc1912.zones
 
-mkdir -p %{buildroot}/%{_lib}/tmpfiles.d
+mkdir -p %{buildroot}/%{_tmpfilesdir}
 cat << EOF >> %{buildroot}/%{_sysconfdir}/named.conf
 zone "." in {
     type master;
     allow-update {none;}; // no DDNS by default
 };
 EOF
-echo "d /run/named 0755 named named - -" > %{buildroot}/%{_lib}/tmpfiles.d/named.conf
+echo "d /run/named 0755 named named - -" > %{buildroot}/%{_tmpfilesdir}/named.conf
 
 # sample bind configuration files for %%doc:
 mkdir -p sample/etc sample/var/named/{data,slaves}
 install -m 644 %{SOURCE8} sample/etc/named.conf
 # Copy default configuration to %%doc to make it usable from system-config-bind
-cp %{buildroot}/%{_lib}/tmpfiles.d/named.conf named.conf.default
+cp %{buildroot}/%{_tmpfilesdir}/named.conf named.conf.default
 install -m 644 %{SOURCE7} sample/etc/named.rfc1912.zones
 install -m 644 %{SOURCE4} %{SOURCE5} %{SOURCE6}  sample/var/named
 install -m 644 %{SOURCE3} sample/var/named/named.ca
@@ -383,7 +383,6 @@ fi;
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
-%{_tmpfilesdir}/named.conf
 %{_sbindir}/named-journalprint
 %{_sbindir}/named-checkconf
 %{_bindir}/named-rrchecker
@@ -479,9 +478,6 @@ fi;
 %{_libdir}/libdns-pkcs11.so
 %{_libdir}/libns-pkcs11.so
 
-%files license
-%license COPYRIGHT LICENSE
-
 %files dnssec-utils
 %{_sbindir}/dnssec*
 %exclude %{_sbindir}/dnssec*pkcs11
@@ -498,10 +494,10 @@ fi;
 %config(noreplace) %{_sysconfdir}/named-chroot.files
 %{_libexecdir}/setup-named-chroot.sh
 %defattr(0664,root,named,-)
-%ghost %{dev(c,1,3)} %verify(not mtime) %{chroot_prefix}/dev/null
-%ghost %{dev(c,1,8)} %verify(not mtime) %{chroot_prefix}/dev/random
-%ghost %{dev(c,1,9)} %verify(not mtime) %{chroot_prefix}/dev/urandom
-%ghost %{dev(c,1,5)} %verify(not mtime) %{chroot_prefix}/dev/zero
+%ghost %dev(c,1,3) %verify(not mtime) %{chroot_prefix}/dev/null
+%ghost %dev(c,1,8) %verify(not mtime) %{chroot_prefix}/dev/random
+%ghost %dev(c,1,9) %verify(not mtime) %{chroot_prefix}/dev/urandom
+%ghost %dev(c,1,5) %verify(not mtime) %{chroot_prefix}/dev/zero
 %defattr(0640,root,named,0750)
 %dir %{chroot_prefix}
 %dir %{chroot_prefix}/dev
@@ -545,9 +541,14 @@ fi;
 %{_mandir}/man8/named-compilezone.8*
 %{_mandir}/man8/named-nzd2nzf.8*
 %{_sysconfdir}/*
-%{_lib}/tmpfiles.d/named.conf
+%{_tmpfilesdir}/named.conf
 
 %changelog
+* Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4
+- Fix file path error caused by linting
+- Remove duplicate %files section for bind-license
+- Remove named.conf from main package, which is already provided by bind-utils
+
 * Mon May 03 2021 Henry Li <lihl@microsoft.com> - 9.16.3-3
 - Add bind, bind-devel, bind-libs, bind-license, bind-pkcs11, bind-pkcs11-libs,
   bind-pkcs11-utils, bind-pkcs11-devel, bind-dnssec-utils, bind-dnssec-doc,
