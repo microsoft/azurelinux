@@ -546,6 +546,7 @@ fi;
 %changelog
 * Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4
 - Fix file path error caused by linting
+- Remove duplicate %files section for bind-license
 - Remove named.conf from main package, which is already provided by bind-utils
 
 * Mon May 03 2021 Henry Li <lihl@microsoft.com> - 9.16.3-3
