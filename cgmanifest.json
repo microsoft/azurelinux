@@ -2176,7 +2176,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2196,7 +2196,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2216,7 +2216,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.2",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
