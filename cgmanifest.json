@@ -875,8 +875,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.13",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.13.tar.gz"
+          "version": "0.28.5",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.28.5.tar.gz"
         }
       }
     },

@@ -13,7 +13,6 @@
 
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
-  Cython \
   byacc \
   initramfs \
   kf5 \
