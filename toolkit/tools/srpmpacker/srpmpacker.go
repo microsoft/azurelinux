@@ -106,6 +106,7 @@ var (
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
 	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	runCheck     = app.Flag("run-check", "Run the check during package build").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
@@ -456,7 +457,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		containingDir := filepath.Dir(specFile)
 
 		// Find the SRPM that this SPEC will produce.
-		defines := rpm.DefaultDefines()
+		defines := rpm.DefaultDefines(*runCheck)
 		defines[rpm.DistTagDefine] = distTag
 
 		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
@@ -705,7 +706,7 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	// This will only contain signatures that have either been validated or updated by this tool.
 	currentSignatures := make(map[string]string)
 
-	defines := rpm.DefaultDefines()
+	defines := rpm.DefaultDefines(*runCheck)
 	if distTag != "" {
 		defines[rpm.DistTagDefine] = distTag
 	}
