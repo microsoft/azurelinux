@@ -275,7 +275,7 @@ func printReversedMap(data map[string][]string, valueDescription string, maxResu
 // printMap will sort and print the largest entries, using the valueDescription in the format.
 func printMap(data map[string][]string, valueDescription string, maxResults int) {
 	const inverse = false
-	pairList := sortMap(data, false)
+	pairList := sortMap(data, inverse)
 	printSlice(pairList, valueDescription, maxResults)
 }
 
