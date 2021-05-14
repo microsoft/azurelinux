@@ -1524,6 +1524,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "golang-crypto",
+          "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
+          "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-sys",
+          "version": "b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d",
+          "downloadUrl": "https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "go-md2man",
           "version": "2.0.0",
           "downloadUrl": "https://github.com/cpuguy83/go-md2man/archive/v2.0.0.tar.gz"
@@ -3184,6 +3204,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "logrus",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lshw",
           "version": "B.02.18",
           "downloadUrl": "http://www.ezix.org/software/files/lshw-B.02.18.tar.gz"
@@ -3465,8 +3495,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.0.0~rc10+azure",
-          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.tar.xz"
+          "version": "1.0.0~rc94+azure",
+          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc94/runc.tar.xz"
         }
       }
     },
@@ -6444,6 +6474,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "runtime-spec",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rust",
           "version": "1.47.0",
           "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.xz"
@@ -6957,6 +6997,16 @@
           "name": "unzip",
           "version": "6.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "urfave-cli",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
         }
       }
     },
