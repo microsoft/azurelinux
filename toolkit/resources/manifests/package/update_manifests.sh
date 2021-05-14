@@ -197,7 +197,6 @@ generate_pkggen_core () {
         grep "^tcp_wrappers-" $TmpPkgGen
         grep "^audit-libs-" $TmpPkgGen
         grep "^cyrus-sasl-" $TmpPkgGen
-        grep "^openldap-" $TmpPkgGen
         grep "^libsepol-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
         grep "^libsemanage-" $TmpPkgGen
