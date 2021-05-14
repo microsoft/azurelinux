@@ -71,6 +71,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--rpm-dir $(RPMS_DIR) \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
+		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--output $@
 
