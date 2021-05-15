@@ -4,11 +4,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"gonum.org/v1/gonum/graph"
+	graphpath "gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -56,10 +59,10 @@ func analyzeGraph(inputFile string, maxResults int) (err error) {
 		return
 	}
 
-	printDirectlyMostUnresolved(pkgGraph, maxResults)
-	printDirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
+	//printDirectlyMostUnresolved(pkgGraph, maxResults)
+	//printDirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
 
-	printIndirectlyMostUnresolved(pkgGraph, maxResults)
+	//printIndirectlyMostUnresolved(pkgGraph, maxResults)
 	printIndirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
 
 	return
@@ -186,6 +189,9 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 
 		search := traverse.BreadthFirst{}
 		search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
+			var pathStrings []string
+			var stringBuilder strings.Builder
+
 			dependency := n.(*pkggraph.PkgNode)
 
 			// Only consider unresolved build nodes.
@@ -200,7 +206,42 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			}
 
 			dependencyName := nodeDependencyName(dependency)
-			insertIfMissing(srpmsBlockedBy, pkgSRPM, dependencyName)
+			for _, knownDependency := range srpmsBlockedBy[pkgSRPM] {
+				if strings.HasPrefix(knownDependency, dependencyName) {
+					return
+				}
+			}
+
+			stringBuilder.WriteString(dependencyName)
+
+			// Find the path from the blocked node to its blocker.
+			dependencyPath, _ := graphpath.AStar(node, dependency, pkgGraph, graphpath.NullHeuristic)
+			dependencyPathNodes, _ := dependencyPath.To(dependency.ID())
+
+			// Convert the path to a string. We skip the first element as that's the blocked node.
+			if len(dependencyPathNodes) > 2 {
+				stringBuilder.WriteString(": ")
+
+				previousPathString := ""
+				for _, pathNode := range dependencyPathNodes[1:] {
+					packageNode := pathNode.(*pkggraph.PkgNode)
+					pathPackageName := nodeRPMName(packageNode)
+					packageDependencyName := nodeDependencyName(packageNode)
+					if pathPackageName != packageDependencyName {
+						pathPackageName += fmt.Sprintf(" [%s]", packageDependencyName)
+					}
+
+					// Meta nodes may end up having the same name as build nodes and we don't need to see them twice.
+					if previousPathString != pathPackageName {
+						pathStrings = append(pathStrings, pathPackageName)
+						previousPathString = pathPackageName
+					}
+				}
+
+				stringBuilder.WriteString(strings.Join(pathStrings, " -> "))
+			}
+
+			insertIfMissing(srpmsBlockedBy, pkgSRPM, stringBuilder.String())
 
 			return
 		})
@@ -216,6 +257,17 @@ func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
 	name = filepath.Base(node.SrpmPath)
 	if name == "" || name == "<NO_SRPM_PATH>" {
+		name = node.VersionedPkg.Name
+	}
+
+	return
+}
+
+// nodeRPMName returns the name of the RPM providing this node
+func nodeRPMName(node *pkggraph.PkgNode) (name string) {
+	// Prefer the SRPM name if possible, otherwise use the unversioned package name
+	name = filepath.Base(node.RpmPath)
+	if name == "" || name == "<NO_RPM_PATH>" {
 		name = node.VersionedPkg.Name
 	}
 
