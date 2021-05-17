@@ -6464,16 +6464,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "runc",
-          "version": "1.0.0.rc8",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.0.0-rc8.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "runtime-spec",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz"
