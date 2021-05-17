@@ -2,8 +2,8 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.101.2
-Release:        4%{?dist}
+Version:        0.103.2
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,17 +60,24 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/*
 
 %changelog
-* Fri Nov 06 2020 Ruying Chen <v-ruyche@microsoft.com> - 0.101.2-4
-- Systemd supports merged /usr. Update units file location and macro.
+* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-1
+- Updating to 0.103.2 to fix CVE-2021-1252, CVE-2021-1404, CVE-2021-1405
 
-* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.101.2-3
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.0-2
+- Merge the following releases from dev to 1.0 spec
+- v-ruyche@microsoft.com, 0.101.2-4: Systemd supports merged /usr. Update units file location and macro.
+
+* Tue Oct 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.103.0-1
+- Updating to 0.103.0 to fix: CVE-2019-12625, CVE-2019-15961.
+
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.101.2-3
 - License verified.
 - Added %%license macro.
 - Switching to using the %%configure macro.
 - Extended package's summary and description.
 
-* Wed Oct 02 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.101.2-2
+* Wed Oct 02 2019 Mateusz Malisz <mamalisz@microsoft.com> - 0.101.2-2
 - Fix vendor and distribution. Add systemd files to the list.
 
-* Thu Jul 25 2019 Chad Zawistowski <chzawist@microsoft.com> 0.101.2-1
+* Thu Jul 25 2019 Chad Zawistowski <chzawist@microsoft.com> - 0.101.2-1
 - Initial CBL-Mariner import from Azure.

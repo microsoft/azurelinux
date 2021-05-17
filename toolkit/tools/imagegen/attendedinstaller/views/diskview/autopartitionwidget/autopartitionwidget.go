@@ -5,6 +5,7 @@ package autopartitionwidget
 
 import (
 	"fmt"
+	"math"
 
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/customshortcutlist"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/navigationbar"
@@ -132,10 +133,15 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 		targetDiskType     = "path"
 		partitionTableType = "gpt"
 
-		bootPartitionName     = "boot"
+		bootPartitionName     = "esp"
 		bootPartitionFsType   = "fat32"
 		bootPartitionStartMiB = 1
 		bootPartitionEndMiB   = 9
+
+		bootDirPartitionName     = "boot"
+		bootDirPartitionFsType   = "ext4"
+		bootDirPartitionStartMiB = bootPartitionEndMiB
+		bootDirMountPoint        = "/boot"
 
 		rootPartitionName = "rootfs"
 		rootFsType        = "ext4"
@@ -177,6 +183,57 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 		},
 	}
 
+	// If we are creating a read-only root filesystem we will need a space to store the hash tree. This is done in the initramfs.
+	// Since the measurements cannot be stored back onto the read-only disk (they would alter the measurements we just created) a
+	// separate location is needed. /boot is mounted as a new partition, and needs to be made large enough to contain the hash tree
+	// and optionally the forward error correction data.
+	if sysConfig.ReadOnlyVerityRoot.Enable {
+		const (
+			hashBlockSize = 4096
+			hashSize      = 32
+			fecBlockSize  = 255
+			m             = hashBlockSize / hashSize
+		)
+		// Calculate the size of the hash tree. Assume the Merkle tree is a full m-ary tree with m = 128 (4k / sizeof(sha256))
+		totalSize := ap.systemDevices[ap.deviceList.GetCurrentItem()].RawDiskSize
+		l := math.Ceil(float64(totalSize) / hashBlockSize)
+		estimatedHashTreeNodes := math.Ceil((l*m - 1) / (m - 1))
+		estimatedHashTreeSize := estimatedHashTreeNodes * hashSize
+
+		bootSize := estimatedHashTreeSize
+		if sysConfig.ReadOnlyVerityRoot.ErrorCorrectionEnable {
+			// FEC overhead is linear, divide by size of FEC blocks (255 bytes), multiply by extra FEC bytes per block (default is 2)
+			fecBytesPerBlock := uint64(sysConfig.ReadOnlyVerityRoot.ErrorCorrectionEncodingRoots)
+			estimatedFECTreeSize := (totalSize / fecBlockSize) * fecBytesPerBlock
+			bootSize += float64(estimatedFECTreeSize)
+		}
+
+		// Give some extra room to be safe
+		bootSize *= 1.5
+		bootDirEndMiB := bootPartitionEndMiB + (uint64(bootSize) / diskutils.MiB)
+
+		// Create the /boot partition
+		bootDirPartition := configuration.Partition{
+			ID:     bootDirPartitionName,
+			Name:   bootDirPartitionName,
+			Start:  bootDirPartitionStartMiB,
+			End:    bootDirEndMiB,
+			FsType: bootDirPartitionFsType,
+		}
+		bootDirPartitionSetting := configuration.PartitionSetting{
+			ID:         bootDirPartitionName,
+			MountPoint: bootDirMountPoint,
+		}
+
+		// Update the default root partition to move it farther down
+		partitions[1].Start = bootDirEndMiB
+		partitions[1].Flags = append(partitions[1].Flags, configuration.PartitionFlagDeviceMapperRoot)
+
+		// Stick the new partitions in the lists
+		partitions = append(partitions, bootDirPartition)
+		partitionSettings = append(partitionSettings, bootDirPartitionSetting)
+	}
+
 	disk := configuration.Disk{}
 	disk.PartitionTableType = partitionTableType
 	disk.TargetDisk = configuration.TargetDisk{
@@ -191,10 +248,9 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 }
 
 func (ap *AutoPartitionWidget) populateBlockDeviceOptions() {
-	for i, disk := range ap.systemDevices {
+	for _, disk := range ap.systemDevices {
 		formattedSize := diskutils.BytesToSizeAndUnit(disk.RawDiskSize)
 		diskRepresentation := fmt.Sprintf("%s - %s @ %s", disk.Model, formattedSize, disk.DevicePath)
-		currentRune := rune(i + 'a')
-		ap.deviceList.AddItem(diskRepresentation, "", currentRune, nil)
+		ap.deviceList.AddItem(diskRepresentation, "", 0, nil)
 	}
 }

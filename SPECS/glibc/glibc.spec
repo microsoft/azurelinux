@@ -1,10 +1,13 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +33,12 @@ Patch10:        CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch11:        CVE-2018-20796.nopatch
+Patch12:        CVE-2019-7309.patch
+# CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
+Patch13:        CVE-2019-19126.patch
+Patch14:        CVE-2019-25013.patch
+Patch15:        CVE-2021-3326.patch
+Patch16:        CVE-2020-27618.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
@@ -95,16 +104,8 @@ Requires:       %{name} = %{version}-%{release}
 Name Service Cache Daemon
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
 %define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
@@ -303,6 +304,15 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
+- Merge the following releases from 1.0 to dev branch
+- lihl@microsoft.com, 2.28-13: Added patch to resolve CVE-2019-7309, Used autosteup
+- thcrain@microsoft.com, 2.28-14: Patch CVE-2019-19126
+- mamalisz@microsoft.com, 2.28-15: Exclude binaries(such as bash) from requires list.
+- nicolasg@microsoft.com, 2.28-16: Patch CVE-2019-25013
+- thcrain@microsoft.com, 2.28-17: Patch CVE-2021-3326
+- nisamson@microsoft.com, 2.28-18: Patch CVE-2021-27618
+
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
 - Provides glibc-locale-source from glibc-i18n
 - Add back exluded files to glibc-i18n

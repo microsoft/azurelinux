@@ -2,7 +2,7 @@
 Summary:        Download, build, install, upgrade, and uninstall Python packages
 Name:           python-setuptools
 Version:        40.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildRequires:  python2-libs
 BuildRequires:  unzip
 Requires:       python2
 Requires:       python2-libs
+Requires:       python-xml
 Provides:       python2dist(setuptools) = %{version}-%{release}
 Provides:       python2.7dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
@@ -52,6 +53,10 @@ rm -rf %{buildroot}
 %{python2_sitelib}/*
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 40.2.0-7
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 40.2.0-6: Adding explicit runtime dependency on 'python-xml'.
+
 * Fri Jan 15 2021 Ruying Chen <v-ruyche@microsoft.com> - 40.2.0-6
 - Add dist provides.
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Heimdal KDC is a Kerberos 5 Key Distribution Center server
+Documentation=man:kdc(8) info:heimdal http://www.h5l.org/
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/kdc
+PIDFile=/var/run/kdc.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.17
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -95,9 +95,6 @@ make check
 %clean
 rm -rf %{buildroot}/*
 
-
-
-
 %files
 %defattr(-,root,root)
 %license doc/copyright.rst
@@ -125,6 +122,10 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.17-7
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 1.17-4: Fix check tests by adding iana-etc which supplies required /etc/services file
+
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.17-6
 - Provides krb5-libs from krb5
 

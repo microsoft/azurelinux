@@ -1,28 +1,30 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
 Version:        2.0.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
-URL:            https://www.keepalived.org/
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.keepalived.org/
 #Note.          We currently use alternate source location.  Preferred original is here:  https://www.keepalived.org/software/keepalived-%{version}.tar.gz
 #Source0:       https://github.com/acassen/keepalived/archive/v%{version}.zip
 Source0:        %{name}-%{version}.zip
 Source1:        %{name}.service
 
-BuildRequires:  openssl-devel
+BuildRequires:  ipset-devel
 BuildRequires:  iptables-devel
 BuildRequires:  libmnl-devel
-BuildRequires:  ipset-devel
-BuildRequires:  libnl3-devel
 BuildRequires:  libnfnetlink-devel
+BuildRequires:  libnl3-devel
 BuildRequires:  net-snmp-devel
+BuildRequires:  openssl-devel
 BuildRequires:  systemd
 BuildRequires:  unzip
-Requires:       systemd
+
 Requires:       libnl3-devel
+Requires:       net-snmp
+Requires:       systemd
 
 %description
 The main goal of the keepalived project is to add a strong & robust keepalive
@@ -88,19 +90,30 @@ fi
 %{_mandir}/man8/%{name}.8*
 
 %changelog
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.0.10-5
--   Added %%license line automatically
-*   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.10-4
--   Rename libnl to libnl3.
-*   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 2.0.10-3
--   Verified license. Removed sha1. Fixed Source0 URL. URL to https. dded note about alternate source location.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.10-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Feb 15 2019 Ashwin H <ashwinh@vmware.com> 2.0.10-1
--   Updated to version 2.0.10
-*   Wed Sep 12 2018 Ankit Jain <ankitja@vmware.com> 2.0.7-1
--   Updated to version 2.0.7
-*   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.3.5-2
--   Add iptables-devel to BuildRequires
-*   Thu Apr 06 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.3.5-1
--   Initial build.  First version
+* Thu Apr 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.10-6
+- Adding an explicit run-time dependency on 'net-snmp'.
+- Bumping up release number to link against newer version of 'net-snmp' libraries.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.10-5
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.10-4
+- Rename libnl to libnl3.
+
+* Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 2.0.10-3
+- Verified license. Removed sha1. Fixed Source0 URL. URL to https. dded note about alternate source location.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.10-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Feb 15 2019 Ashwin H <ashwinh@vmware.com> 2.0.10-1
+- Updated to version 2.0.10
+
+* Wed Sep 12 2018 Ankit Jain <ankitja@vmware.com> 2.0.7-1
+- Updated to version 2.0.7
+
+* Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.3.5-2
+- Add iptables-devel to BuildRequires
+
+* Thu Apr 06 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.3.5-1
+- Initial build.  First version

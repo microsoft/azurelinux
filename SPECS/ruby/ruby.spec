@@ -34,6 +34,10 @@ BuildRequires:  readline-devel
 BuildRequires:  tzdata
 Requires:       gmp
 Requires:       openssl
+%if %{with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
@@ -74,7 +78,7 @@ autoconf
         --with-vendorarchdir=%{_libdir}/ruby/vendor_ruby \
         --with-rubyhdrdir=%{_includedir} \
         --with-rubyarchhdrdir=%{_includedir} \
-        --with-sitearchhdrdir={_prefix}/local/%{_lib}/ruby/site_ruby/$(_arch) \
+        --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(_arch) \
         --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(_arch) \
         --with-rubygemsdir=%{rubygems_dir} \
         --enable-shared \
@@ -145,13 +149,11 @@ popd
 %check
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test  make check TESTS="-v"
+# Only run stable tests
+sudo -u test make test TESTS="-v"
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
 
 
 %files
@@ -177,6 +179,11 @@ rm -rf %{buildroot}/*
 %{rubygems_dir}/rubygems
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-3
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 2.6.6-3: Adding 'BuildRequires' on 'shadow-utils' and 'sudo' to run the package tests.
+- anphel@microsoft.com, 2.6.6-4: Run "make test" instead of "make check" to avoid unstable tests.
+ 
 * Fri Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
 - Add bindir path to gem installation to install executable at
   system bin directory instead of bin directory under gem home directory

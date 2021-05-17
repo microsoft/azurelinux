@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.23.3
-Release:        3%{?dist}
+Version:        2.23.4
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
@@ -89,55 +89,81 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
-*   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 2.23.3-3
--   Fix check test
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.23.3-2
--   Use new perl package names.
--   Provide git-core.
-*   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.23.3-1
--   Update to version 2.23.3 for fix CVE-2020-11008 and CVE-2020-5260.
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.20.2-2
+* Wed Apr 07 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.23.4-1
+- Update to version 2.23.4 for CVE-2021-21300 fix.
+
+* Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 2.23.3-4
+- Fix check test
+
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.23.3-2
+- Use new perl package names.
+- Provide git-core.
+
+* Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.23.3-1
+- Update to version 2.23.3 for fix CVE-2020-11008 and CVE-2020-5260.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.20.2-2
 - Added %%license line automatically
 
-*   Mon Apr 06 2020 Emre Girgin <mrgirgin@microsoft.com> 2.20.2-1
--   Update to latest version.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.19.0-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> 2.19.0-3
--   Added Requires python2
-*   Thu Oct 04 2018 Dweep Advani <dadvani@vmware.com> 2.19.0-2
--   Using %configure and changing for perl upgrade
-*   Tue Oct 02 2018 Siju Maliakkal <smaliakkal@vmware.com> 2.19.0-1
--   Update to latest version
-*   Tue Jul 31 2018 Ajay Kaher <akaher@vmware.com> 2.14.2-2
--   Excluded the perllocal.pod for aarch64.
-*   Thu Oct 12 2017 Anish Swaminathan <anishs@vmware.com> 2.14.2-1
--   Updated to version 2.14.2, fix CVE-2017-14867
-*   Mon Aug 21 2017 Rui Gu <ruig@vmware.com> 2.9.3-4
--   Fix make check with non-root mode.
-*   Wed May 31 2017 Xiaolin Li <xiaolinl@vmware.com> 2.9.3-3
--   Remove python2 from requires.
-*   Mon Apr 17 2017 Robert Qi <qij@vmware.com> 2.9.3-2
--   Update since perl version got updated.
-*   Mon Apr 10 2017 Danut Moraru <dmoraru@vmware.com> 2.9.3-1
--   Updated to version 2.9.3
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.8.1-7
--   BuildRequires curl-devel.
-*   Fri Aug 19 2016 Alexey Makhalov <amakhalov@vmware.com> 2.8.1-6
--   Add bash completion file
-*   Thu May 26 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.8.1-5
--   Excluded the perllocal.pod log.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.8.1-4
--   GA - Bump release of all rpms
-*   Wed May 18 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.8.1-3
--   Fix if syntax
-*   Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> 2.8.1-2
--   Handling the upgrade scenario.
-*   Fri Apr 15 2016 Anish Swaminathan <anishs@vmware.com> 2.8.1-1
--   Updated to version 2.8.1
-*   Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.7.1-1
--   Updated to version 2.7.1
-*   Wed Jan 13 2016 Anish Swaminathan <anishs@vmware.com> 2.1.2-2
--   Add requires for perl-CGI.
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 2.1.2-1
--   Initial build. First version
+* Mon Apr 06 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.20.2-1
+- Update to latest version.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.19.0-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> - 2.19.0-3
+- Added Requires python2
+
+* Thu Oct 04 2018 Dweep Advani <dadvani@vmware.com> - 2.19.0-2
+- Using %configure and changing for perl upgrade
+
+* Tue Oct 02 2018 Siju Maliakkal <smaliakkal@vmware.com> - 2.19.0-1
+- Update to latest version
+
+* Tue Jul 31 2018 Ajay Kaher <akaher@vmware.com> - 2.14.2-2
+- Excluded the perllocal.pod for aarch64.
+
+* Thu Oct 12 2017 Anish Swaminathan <anishs@vmware.com> - 2.14.2-1
+- Updated to version 2.14.2, fix CVE-2017-14867
+
+* Mon Aug 21 2017 Rui Gu <ruig@vmware.com> - 2.9.3-4
+- Fix make check with non-root mode.
+
+* Wed May 31 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.9.3-3
+- Remove python2 from requires.
+
+* Mon Apr 17 2017 Robert Qi <qij@vmware.com> - 2.9.3-2
+- Update since perl version got updated.
+
+* Mon Apr 10 2017 Danut Moraru <dmoraru@vmware.com> - 2.9.3-1
+- Updated to version 2.9.3
+
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> - 2.8.1-7
+- BuildRequires curl-devel.
+
+* Fri Aug 19 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.8.1-6
+- Add bash completion file
+
+* Thu May 26 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 2.8.1-5
+- Excluded the perllocal.pod log.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.8.1-4
+- GA - Bump release of all rpms
+
+* Wed May 18 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.8.1-3
+- Fix if syntax
+
+* Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> - 2.8.1-2
+- Handling the upgrade scenario.
+
+* Fri Apr 15 2016 Anish Swaminathan <anishs@vmware.com> - 2.8.1-1
+- Updated to version 2.8.1
+
+* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 2.7.1-1
+- Updated to version 2.7.1
+
+* Wed Jan 13 2016 Anish Swaminathan <anishs@vmware.com> - 2.1.2-2
+- Add requires for perl-CGI.
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> - 2.1.2-1
+- Initial build. First version

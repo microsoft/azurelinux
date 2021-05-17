@@ -65,6 +65,99 @@ func TestShouldErrorForMissingFile(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestShouldFailForUntaggedEncryptionDeviceMapperRoot(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	// Copy the current disks, then mangle one by removing the expected dmroot flag
+	badDisks := append([]Disk{}, testConfig.Disks...)
+	badDiskParts := append([]Partition{}, badDisks[0].Partitions...)
+	badDisks[0].Partitions = badDiskParts
+	testConfig.Disks = badDisks
+
+	// Clear the flags for the root
+	testConfig.GetDiskPartByID(testConfig.SystemConfigs[0].GetRootPartitionSetting().ID).Flags = []PartitionFlag{}
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [Partition] 'MyRootfs' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] 'SmallerDisk's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [Partition] 'MyRootfs' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] 'SmallerDisk's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+}
+
+func TestShouldFailDeviceMapperWithNoRootDisks(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	// Clear the disks, add one empty one
+	testConfig.Disks = []Disk{{}}
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a [Disk] [Partition] to match with [PartitionSetting] 'MyRootfs'", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a [Disk] [Partition] to match with [PartitionSetting] 'MyRootfs'", err.Error())
+}
+
+func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	// Clear the partitions, then add a missmatching one
+	testConfig.SystemConfigs = append([]SystemConfig{}, testConfig.SystemConfigs...)
+	testConfig.SystemConfigs[0].PartitionSettings = []PartitionSetting{{ID: "NotRoot", MountPoint: "/not/root"}}
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: failed to parse [SystemConfig]: invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'", err.Error())
+
+}
+
+func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	// Copy the root partition settings
+	ExtraDmRoot := Partition{
+		ID: "MySecondRootfs",
+		Flags: []PartitionFlag{
+			"dmroot",
+		},
+		Start:  uint64(1024),
+		End:    uint64(2048),
+		FsType: "ext4",
+	}
+	ExtraPartitionSetting := PartitionSetting{
+		ID:         "MySecondRootfs",
+		MountPoint: "/OtherRoot",
+	}
+
+	// Copy the disks, then add the extra partition
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, ExtraDmRoot)
+	// Copy the partition settings, then add the extra partition setting
+	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs[0])
+	testConfig.SystemConfigs[0].PartitionSettings = append(testConfig.SystemConfigs[0].PartitionSettings, ExtraPartitionSetting)
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [SystemConfig] 'SmallerDisk' includes two (or more) device mapper root [PartitionSettings] 'MyRootfs' and 'MySecondRootfs', include only one", err.Error())
+
+	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [SystemConfig] 'SmallerDisk' includes two (or more) device mapper root [PartitionSettings] 'MyRootfs' and 'MySecondRootfs', include only one", err.Error())
+
+}
+
 var expectedConfiguration Config = Config{
 	Disks: []Disk{
 		{
@@ -100,7 +193,7 @@ var expectedConfiguration Config = Config{
 			Partitions: []Partition{
 				{
 					ID: "MyBoot",
-					Flags: []string{
+					Flags: []PartitionFlag{
 						"esp",
 						"boot",
 					},
@@ -109,7 +202,10 @@ var expectedConfiguration Config = Config{
 					FsType: "fat32",
 				},
 				{
-					ID:     "MyRootfs",
+					ID: "MyRootfs",
+					Flags: []PartitionFlag{
+						"dmroot",
+					},
 					Start:  uint64(9),
 					End:    uint64(1024),
 					FsType: "ext4",
@@ -126,7 +222,7 @@ var expectedConfiguration Config = Config{
 			Partitions: []Partition{
 				{
 					ID: "MyBootA",
-					Flags: []string{
+					Flags: []PartitionFlag{
 						"boot",
 					},
 					Start:  uint64(3),
@@ -137,10 +233,13 @@ var expectedConfiguration Config = Config{
 					Start:  uint64(9),
 					End:    uint64(1024),
 					FsType: "ext4",
+					Flags: []PartitionFlag{
+						"dmroot",
+					},
 				},
 				{
 					ID: "MyBootB",
-					Flags: []string{
+					Flags: []PartitionFlag{
 						"boot",
 					},
 					Start:  uint64(1024),
@@ -151,6 +250,9 @@ var expectedConfiguration Config = Config{
 					Start:  uint64(1033),
 					End:    uint64(2048),
 					FsType: "ext4",
+					Flags: []PartitionFlag{
+						"dmroot",
+					},
 				},
 				{
 					ID:     "SharedData",
@@ -166,15 +268,17 @@ var expectedConfiguration Config = Config{
 			Name:      "SmallerDisk",
 			IsDefault: true,
 			PartitionSettings: []PartitionSetting{
-				{
-					ID:           "MyBoot",
-					MountPoint:   "/boot",
-					MountOptions: "ro,exec",
+				PartitionSetting{
+					ID:             "MyBoot",
+					MountPoint:     "/boot",
+					MountOptions:   "ro,exec",
+					RdiffBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
-				{
-					ID:         "MyRootfs",
-					MountPoint: "/",
-					RemoveDocs: true,
+				PartitionSetting{
+					ID:               "MyRootfs",
+					MountPoint:       "/",
+					RemoveDocs:       true,
+					OverlayBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
 			},
 			PackageLists: []string{
@@ -212,7 +316,7 @@ var expectedConfiguration Config = Config{
 					Name:                "advancedSecureCoolUser",
 					Password:            "$6$7oFZAqiJ$EqnWLXsSLwX.wrIHDH8iDGou3BgFXxx0NgMJgJ5LSYjGA09BIUwjTNO31LrS2C9890P8SzYkyU6FYsYNihEgp0",
 					PasswordHashed:      true,
-					PasswordExpiresDays: uint64(99999),
+					PasswordExpiresDays: int64(99999),
 					UID:                 "105",
 					PrimaryGroup:        "testgroup",
 					SecondaryGroups: []string{
@@ -239,6 +343,18 @@ var expectedConfiguration Config = Config{
 				Enable:   true,
 				Password: "EncryptPassphrase123",
 			},
+			RemoveRpmDb: false,
+			ReadOnlyVerityRoot: ReadOnlyVerityRoot{
+				Enable:                       false,
+				Name:                         "verity_root_fs",
+				ErrorCorrectionEnable:        true,
+				ErrorCorrectionEncodingRoots: 2,
+				RootHashSignatureEnable:      false,
+				VerityErrorBehavior:          "",
+				TmpfsOverlays:                nil,
+				TmpfsOverlaySize:             "20%",
+			},
+			HidepidDisabled: true,
 		},
 		{
 			Name: "BiggerDiskA",

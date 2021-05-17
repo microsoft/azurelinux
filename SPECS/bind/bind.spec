@@ -9,7 +9,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,8 +41,9 @@ Patch5:         CVE-2020-8622.patch
 # CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
 Patch6:         CVE-2020-8623.nopatch
 Patch7:         CVE-2020-8624.patch
-Patch8:         bind-9.14-config-pkcs11.patch
-Patch9:         bind-9.10-dist-native-pkcs11.patch
+Patch8:         CVE-2020-8625.patch 
+Patch9:         bind-9.14-config-pkcs11.patch
+Patch10:        bind-9.10-dist-native-pkcs11.patch
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
@@ -206,13 +207,14 @@ Summary:        BIND utilities
 %patch4 -p1
 %patch5 -p1
 %patch7 -p1
+%patch8 -p1
 
-%patch8 -p1 -b .config-pkcs11
+%patch9 -p1 -b .config-pkcs11
 cp -r bin/named{,-pkcs11}
 cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
-%patch9 -p1 -b .dist_pkcs11
+%patch10 -p1 -b .dist_pkcs11
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
@@ -544,6 +546,10 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
+* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 9.16.3-5
+- Merge the following releases from 1.0 to dev branch
+- nicolasg@microsoft.com, 9.16.3-3: Fixes CVE-2020-8625
+
 * Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4
 - Fix file path error caused by linting
 - Remove duplicate %files section for bind-license

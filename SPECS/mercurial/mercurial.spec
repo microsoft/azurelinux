@@ -3,16 +3,24 @@
 Summary:        A free, distributed source control management tool.
 Name:           mercurial
 Version:        5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.mercurial-scm.org/release/%{name}-%{version}.tar.gz
+
 BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  python2-devel
+%if %{with_check}
+BuildRequires:  check
+BuildRequires:  python-setuptools
+BuildRequires:  unzip
+BuildRequires:  which
+%endif
+
 Requires:       python2
 
 %description
@@ -39,7 +47,9 @@ EOF
 sed -i '1087,1088d' tests/test-obsolete.t
 sed -i '54,56d' tests/test-clonebundles.t
 sed -i '54i\ \ abort:\ stream:\ not\ a\ Mercurial\ bundle' tests/test-clonebundles.t
-make %{?_smp_mflags} check
+pushd tests
+python2 run-tests.py -t 360
+popd
 
 %post -p /sbin/ldconfig
 
@@ -57,10 +67,12 @@ rm -rf %{buildroot}/*
 %{python2_sitelib}/*
 
 %changelog
-*   Tue May 19 2020 Andrew Phelps <anphel@microsoft.com> 5.4
+*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 5.4-2
+-   Fix check tests
+*   Tue May 19 2020 Andrew Phelps <anphel@microsoft.com> 5.4-1
 -   Update to version 5.4.
-* Sat May 09 00:20:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.8.2-2
-- Added %%license line automatically
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.8.2-2
+-   Added %%license line automatically
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 4.8.2-1
 -   Update to 4.8.2. Removed fixed CVE-2018-17983 patch. License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.7.1-4

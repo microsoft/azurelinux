@@ -21,6 +21,7 @@ import (
 )
 
 const (
+	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
@@ -34,8 +35,17 @@ var (
 	// Every valid line will be of the form: <package>-<version>.<arch> : <Description>
 	packageLookupNameMatchRegex = regexp.MustCompile(`^\s*([^:]+(x86_64|aarch64|noarch))\s*:`)
 
-	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist>  fetcher-cloned-repo
-	listedPackageRegex = regexp.MustCompile(`^\s*(?P<Name>[a-zA-Z0-9_+-]+)\.(?P<Arch>[a-zA-Z0-9_+-]+)\s*(?P<Version>[a-zA-Z0-9._+-]+)\.(?P<Dist>[a-zA-Z0-9_+-]+)\s*fetcher-cloned-repo`)
+	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
+	// For:
+	//
+	//		COOL_package2-extended++.aarch64	1.1b.8_X-22~rc1.cm1		fetcher-cloned-repo
+	//
+	// We'd get:
+	//   - package_name:    COOL_package2-extended++
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22~rc1
+	//   - dist:            cm1
+	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
 )
 
 const (
@@ -243,9 +253,12 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (err error) {
 	const (
-		builtRepoID  = "local-repo"
-		cachedRepoID = "upstream-cache-repo"
-		allRepoIDs   = "*"
+		strictComparisonOperator          = "="
+		lessThanOrEqualComparisonOperator = "<="
+		versionSuffixFormat               = "-%s"
+
+		builtRepoID = "local-repo"
+		allRepoIDs  = "*"
 	)
 
 	for _, pkg := range packagesToClone {
@@ -265,8 +278,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		}
 
 		err = r.chroot.Run(func() (err error) {
-			// Consider the built RPMs first, then the already cached (e.g. toolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cachedRepoID, allRepoIDs}
+			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
 			return r.clonePackage(args, repoOrderList...)
 		})
 
@@ -296,6 +309,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName st
 	}
 
 	err = r.chroot.Run(func() (err error) {
+
+		if !r.usePreviewRepo {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+		}
 
 		stdout, stderr, err := shell.Execute("tdnf", args...)
 		logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
@@ -337,7 +354,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 	repoDir := srcDir
 
 	if !buildpipeline.IsRegularBuild() {
-		// Docker based build don't use overlay so repo folder
+		// Docker based build doesn't use overlay so repo folder
 		// must be explicitely set to the RPMs cache folder
 		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
 	}
@@ -353,7 +370,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 	}
 
 	if !buildpipeline.IsRegularBuild() {
-		// Docker based build don't use overlay so cache repo
+		// Docker based build doesn't use overlay so cache repo
 		// must be explicitely initialized
 		err = r.initializeMountedChrootRepo(cacheRepoDir)
 	}
@@ -385,15 +402,21 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		repoContents.Repo = append(repoContents.Repo, pkg)
 	}
 
+	checkedRepoID := fetcherRepoID
+	// Docker based build doesn't use overlay so cache repo was explicitely initialized
+	if !buildpipeline.IsRegularBuild() {
+		checkedRepoID = cacheRepoID
+	}
+
 	err = r.chroot.Run(func() (err error) {
 		// Disable all repositories except the fetcher repository (the repository with the cloned packages)
 		tdnfArgs := []string{
 			"list",
 			"ALL",
 			"--disablerepo=*",
-			fmt.Sprintf("--enablerepo=%s", fetcherRepoID),
+			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
 		}
-		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, "tdnf", tdnfArgs...)
+		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
 	})
 
 	return

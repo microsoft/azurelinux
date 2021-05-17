@@ -118,6 +118,9 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 		}
 	}
 
+	// Add any packages required by the install tools
+	packageVersionsInConfig = append(packageVersionsInConfig, installutils.GetRequiredPackagesForInstall()...)
+
 	logger.Log.Infof("Cloning: %v", packageVersionsInConfig)
 	err = cloner.Clone(cloneDeps, packageVersionsInConfig...)
 	return

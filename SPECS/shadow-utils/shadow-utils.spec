@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,7 @@ make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
+ln -s useradd %{buildroot}%{_sbindir}/adduser
 # Use group id 100(users) by default
 sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
 # Disable usergroups. Use "users" group by default (see /etc/default/useradd)
@@ -78,8 +79,6 @@ for FUNCTION in FAIL_DELAY               \
 do
     sed -i "s/^${FUNCTION}/# &/" %{buildroot}%{_sysconfdir}/login.defs
 done
-
-sed -i "s/^PASS_MAX_DAYS.*/PASS_MAX_DAYS    90/" %{buildroot}%{_sysconfdir}/login.defs
 
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
@@ -143,6 +142,11 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+- Merge the following releases from 1.0 to dev branch
+- schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
+- lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-10
 - Provide passwd.
 

@@ -14,24 +14,28 @@
         {
             "Name": "ISO initrd",
             "PackageLists": [
+                "packagelists/accessibility-packages.json",
                 "packagelists/iso-initrd-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
             },
             "AdditionalFiles": {
-                "../../out/tools/imager":"/installer/imager",
-                "../../out/tools/liveinstaller":"/installer/liveinstaller",
-                "../assets/efi/grub/grub.cfg":"/installer/efi/grub/grub.cfg",
-                "../assets/efi/grub/grubEncrypt.cfg":"/installer/efi/grub/grubEncrypt.cfg",
-                "../assets/grub2/grub.cfg":"/installer/grub2/grub.cfg",
-                "additionalfiles/iso_initrd/init":"/init",
-                "additionalfiles/iso_initrd/installer/EULA.txt":"/installer/EULA.txt",
-                "additionalfiles/iso_initrd/root/runliveinstaller":"/root/runliveinstaller",
-                "additionalfiles/iso_initrd/usr/lib/mariner/terminfo/mariner-installer":"/usr/lib/mariner/terminfo/m/mariner-installer",
-                "additionalfiles/iso_initrd/usr/lib/systemd/system/getty@.service":"/usr/lib/systemd/system/getty@.service",
-                "additionalfiles/iso_initrd/usr/lib/systemd/system/serial-getty@.service":"/usr/lib/systemd/system/serial-getty@.service",
-                "../manifests/image/local.repo":"/etc/yum.repos.d/mariner-iso.repo"
+                "../../out/tools/imager": "/installer/imager",
+                "../../out/tools/liveinstaller": "/installer/liveinstaller",
+                "../assets/efi/grub/grub.cfg": "/installer/efi/grub/grub.cfg",
+                "../assets/efi/grub/grubEncrypt.cfg": "/installer/efi/grub/grubEncrypt.cfg",
+                "../assets/grub2/grub.cfg": "/installer/grub2/grub.cfg",
+                "additionalfiles/iso_initrd/init": "/init",
+                "additionalfiles/iso_initrd/installer/calamares-EULA.txt": "/etc/calamares/mariner-eula",
+                "additionalfiles/iso_initrd/installer/terminal-EULA.txt": "/installer/EULA.txt",
+                "additionalfiles/iso_initrd/root/asoundrc": "/root/.asoundrc",
+                "additionalfiles/iso_initrd/root/runliveinstaller": "/root/runliveinstaller",
+                "additionalfiles/iso_initrd/root/silence.wav": "/root/silence.wav",
+                "additionalfiles/iso_initrd/usr/lib/mariner/terminfo/mariner-installer": "/usr/lib/mariner/terminfo/m/mariner-installer",
+                "additionalfiles/iso_initrd/usr/lib/systemd/system/getty@.service": "/usr/lib/systemd/system/getty@.service",
+                "additionalfiles/iso_initrd/usr/lib/systemd/system/serial-getty@.service": "/usr/lib/systemd/system/serial-getty@.service",
+                "../manifests/image/local.repo": "/etc/yum.repos.d/mariner-iso.repo"
             },
             "Users": [
                 {

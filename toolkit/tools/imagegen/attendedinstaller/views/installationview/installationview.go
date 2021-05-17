@@ -147,6 +147,8 @@ func (iv *InstallationView) applyConfiguration(sysConfig *configuration.SystemCo
 	sysConfig.IsDefault = true
 	sysConfig.PackageLists = selectedConfig.PackageLists
 	sysConfig.KernelOptions = selectedConfig.KernelOptions
+	sysConfig.KernelCommandLine = selectedConfig.KernelCommandLine
+	sysConfig.ReadOnlyVerityRoot = selectedConfig.ReadOnlyVerityRoot
 	sysConfig.AdditionalFiles = selectedConfig.AdditionalFiles
 	sysConfig.PostInstallScripts = selectedConfig.PostInstallScripts
 }
@@ -157,8 +159,7 @@ func (iv *InstallationView) populateInstallOptions() (err error) {
 	}
 
 	for _, option := range iv.installOptions {
-		currentRune := rune(iv.optionList.GetItemCount() + 'a')
-		iv.optionList.AddItem(option, "", currentRune, nil)
+		iv.optionList.AddItem(option, "", 0, nil)
 	}
 
 	return

@@ -6,52 +6,47 @@
 %global hv_fcopy_daemon hypervfcopyd
 # udev rules prefix
 %global udev_prefix 70
-
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.4.51
+Version:        5.10.28.1
 Release:        2%{?dist}
 License:        GPLv2+
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
-Group:          System/Kernel
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
-
+Group:          System/Kernel
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 # HYPERV KVP DAEMON
-Source1:  hypervkvpd.service
-Source2:  hypervkvp.rules
-
+Source1:        hypervkvpd.service
+Source2:        hypervkvp.rules
+Source3:        hv_set_ifconfig
 # HYPERV VSS DAEMON
-Source101:  hypervvssd.service
-Source102:  hypervvss.rules
-
+Source101:      hypervvssd.service
+Source102:      hypervvss.rules
 # HYPERV FCOPY DAEMON
-Source201:  hypervfcopyd.service
-Source202:  hypervfcopy.rules
-
+Source201:      hypervfcopyd.service
+Source202:      hypervfcopy.rules
+BuildRequires:  gcc
+Requires:       hypervfcopyd = %{version}-%{release}
+Requires:       hypervkvpd = %{version}-%{release}
+Requires:       hypervvssd = %{version}-%{release}
 # Hyper-V is available only on x86 architectures
 # The base empty (a.k.a. virtual) package can not be noarch
 # due to http://www.rpm.org/ticket/78
-ExclusiveArch:  x86_64
-
-Requires:       hypervkvpd = %{version}-%{release}
-Requires:       hypervvssd = %{version}-%{release}
-Requires:       hypervfcopyd = %{version}-%{release}
-BuildRequires:  gcc
 
 %description
 Suite of daemons that are needed when Linux guest
 is running on Windows Host with Hyper-V.
 
-
 %package -n hypervkvpd
-Summary: Hyper-V key value pair (KVP) daemon
-Requires: %{name}-license = %{version}-%{release}
-BuildRequires: systemd, kernel-headers
-Requires(post):   systemd
-Requires(preun):  systemd
+Summary:        Hyper-V key value pair (KVP) daemon
+BuildRequires:  kernel-headers
+BuildRequires:  systemd
+Requires:       %{name}-license = %{version}-%{release}
+Requires(post): systemd
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description -n hypervkvpd
 Hypervkvpd is an implementation of Hyper-V key value pair (KVP)
@@ -60,14 +55,14 @@ kernel driver. After this is done it collects information
 requested by Windows Host about the Linux Guest. It also supports
 IP injection functionality on the Guest.
 
-
 %package -n hypervvssd
-Summary: Hyper-V VSS daemon
-Requires: %{name}-license = %{version}-%{release}
-BuildRequires: systemd, kernel-headers
-Requires(post):   systemd
-Requires(preun):  systemd
+Summary:        Hyper-V VSS daemon
+BuildRequires:  kernel-headers
+BuildRequires:  systemd
+Requires:       %{name}-license = %{version}-%{release}
+Requires(post): systemd
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description -n hypervvssd
 Hypervvssd is an implementation of Hyper-V VSS functionality
@@ -77,14 +72,14 @@ kernel driver. After this is done it waits for instructions
 from Windows Host if to "freeze" or "thaw" the filesystem
 on the Linux Guest.
 
-
 %package -n hypervfcopyd
-Summary: Hyper-V FCOPY daemon
-Requires: %{name}-license = %{version}-%{release}
-BuildRequires: systemd, kernel-headers
-Requires(post):   systemd
-Requires(preun):  systemd
+Summary:        Hyper-V FCOPY daemon
+BuildRequires:  kernel-headers
+BuildRequires:  systemd
+Requires:       %{name}-license = %{version}-%{release}
+Requires(post): systemd
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description -n hypervfcopyd
 Hypervfcopyd is an implementation of file copy service functionality
@@ -93,43 +88,41 @@ a file (over VMBUS) into the Linux Guest. The daemon first registers
 with the kernel driver. After this is done it waits for instructions
 from Windows Host.
 
-
 %package license
-Summary:    License of the Hyper-V daemons suite
-BuildArch:  noarch
+Summary:        License of the Hyper-V daemons suite
+BuildArch:      noarch
 
 %description license
 Contains license of the Hyper-V daemons suite.
 
 %package -n hyperv-tools
-Summary:    Tools for Hyper-V guests
-BuildArch:  noarch
+Summary:        Tools for Hyper-V guests
+BuildArch:      noarch
 
 %description -n hyperv-tools
 Contains tools and scripts useful for Hyper-V guests.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 
 %build
 pushd tools/hv
 
 # HYPERV KVP DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_kvp_daemon.c
+%{__cc} %{optflags} -c hv_kvp_daemon.c
 %{__cc} $RPM_LD_FLAGS  hv_kvp_daemon.o -o %{hv_kvp_daemon}
 
 # HYPERV VSS DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_vss_daemon.c
+%{__cc} %{optflags} -c hv_vss_daemon.c
 %{__cc} $RPM_LD_FLAGS hv_vss_daemon.o -o %{hv_vss_daemon}
 
 # HYPERV FCOPY DAEMON
-%{__cc} $RPM_OPT_FLAGS -c hv_fcopy_daemon.c
+%{__cc} %{optflags} -c hv_fcopy_daemon.c
 %{__cc} $RPM_LD_FLAGS hv_fcopy_daemon.o -o %{hv_fcopy_daemon}
 
 popd
 
 %install
-rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{_sbindir}
 install -p -m 0755 tools/hv/%{hv_kvp_daemon} %{buildroot}%{_sbindir}
@@ -149,7 +142,7 @@ install -p -m 0644 %{SOURCE202} %{buildroot}%{_udevrulesdir}/%{udev_prefix}-hype
 mkdir -p %{buildroot}%{_libexecdir}/%{hv_kvp_daemon}
 install -p -m 0755 tools/hv/hv_get_dhcp_info.sh %{buildroot}%{_libexecdir}/%{hv_kvp_daemon}/hv_get_dhcp_info
 install -p -m 0755 tools/hv/hv_get_dns_info.sh %{buildroot}%{_libexecdir}/%{hv_kvp_daemon}/hv_get_dns_info
-install -p -m 0755 tools/hv/hv_set_ifconfig.sh %{buildroot}%{_libexecdir}/%{hv_kvp_daemon}/hv_set_ifconfig
+install -p -m 0755 %{SOURCE3} %{buildroot}%{_libexecdir}/%{hv_kvp_daemon}/hv_set_ifconfig
 # Directory for pool files
 mkdir -p %{buildroot}%{_sharedstatedir}/hyperv
 
@@ -174,7 +167,6 @@ if [ "$1" -eq "0" ] ; then
     rm -rf %{_sharedstatedir}/hyperv || :
 fi
 
-
 %post -n hypervvssd
 if [ $1 -gt 1 ] ; then
 	# Upgrade
@@ -187,7 +179,6 @@ fi
 %preun -n hypervvssd
 %systemd_preun hypervvssd.service
 
-
 %post -n hypervfcopyd
 if [ $1 -gt 1 ] ; then
 	# Upgrade
@@ -199,7 +190,6 @@ fi
 
 %preun -n hypervfcopyd
 %systemd_preun hypervfcopyd.service
-
 
 %files
 # the base package does not contain any files.
@@ -228,15 +218,48 @@ fi
 %files -n hyperv-tools
 %{_sbindir}/lsvmbus
 
-
 %changelog
-* Tue Sep 01 2020 Chris Co <chrco@microsoft.com> 5.4.51-2
+* Thu Apr 15 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.28.1-2
+- Update to kernel release 5.10.28.1-2
+
+* Thu Apr 08 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-1
+- Update source to 5.10.28.1
+
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 5.10.21.1-1
+- Update source to 5.10.21.1
+
+* Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1
+- Update source to 5.10.13.1
+
+* Wed Jan 20 2021 Chris Co <chrco@microsoft.com> - 5.4.91-1
+- Update source to 5.4.91
+
+* Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 5.4.83-2
+- Update to kernel release 5.4.83-2
+
+* Tue Dec 15 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.4.83-1
+- Update source to 5.4.83
+
+* Fri Dec 04 2020 Chris Co <chrco@microsoft.com> - 5.4.81-1
+- Update source to 5.4.81
+
+* Fri Nov 20 2020 Johnson George <johgeorg@microsoft.com> - 5.4.72-3
+- Added network configure script to support ip injection
+
+* Wed Nov 11 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.72-2
+- Enable Hyper-V daemons package building for Arm64 arch
+
+* Mon Oct 26 2020 Chris Co <chrco@microsoft.com> - 5.4.72-1
+- Update source to 5.4.72
+- Lint spec
+
+* Tue Sep 01 2020 Chris Co <chrco@microsoft.com> - 5.4.51-2
 - Update source hash
 
-* Wed Aug 19 2020 Chris Co <chrco@microsoft.com> 5.4.51-1
+* Wed Aug 19 2020 Chris Co <chrco@microsoft.com> - 5.4.51-1
 - Update source to 5.4.51
 
-* Tue Jun 16 2020 Paul Monson <paulmon@microsoft.com> 5.4.42-1
+* Tue Jun 16 2020 Paul Monson <paulmon@microsoft.com> - 5.4.42-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Update to match version 5.4.42 of the kernel.
 

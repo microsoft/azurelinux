@@ -1,0 +1,13 @@
+[Unit]
+Description=connection tracking daemon for debugging and High Availablity
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# rhbz#1255578 daemon will not start if lock file is left dangling
+ExecStartPre=/bin/rm -f /var/lock/conntrack.lock
+ExecStart=/usr/sbin/conntrackd -C /etc/conntrackd/conntrackd.conf
+
+[Install]
+WantedBy=multi-user.target

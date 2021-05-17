@@ -174,11 +174,11 @@ build_rpm_in_chroot_no_install () {
         srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
-        chroot_and_run_rpmbuild $srpmName 2>&1 | tee $TOOLCHAIN_LOGS/$1.txt
+        chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
         cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
         cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
-        echo NOT installing the package $1
+        echo NOT installing the package $srpmName
     fi
     echo "$1" >> $TOOLCHAIN_BUILD_LIST
 }
@@ -230,6 +230,7 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install libffi
 build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
+build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
@@ -376,6 +377,10 @@ build_rpm_in_chroot_no_install krb5
 chroot_and_install_rpms libssh2
 build_rpm_in_chroot_no_install curl
 
+# python-setuptools needs python-xml
+# python-xml is built by building python2
+chroot_and_install_rpms python-xml
+
 # cracklib needs python-setuptools
 chroot_and_install_rpms python-setuptools
 build_rpm_in_chroot_no_install cracklib
@@ -481,6 +486,7 @@ build_rpm_in_chroot_no_install json-c
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, shadow-utils
 chroot_and_install_rpms libcap
+chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod

@@ -4,7 +4,6 @@
 package hostnameview
 
 import (
-	"crypto/rand"
 	"fmt"
 	"strings"
 
@@ -12,6 +11,7 @@ import (
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
 	"microsoft.com/pkggen/imagegen/configuration"
+	"microsoft.com/pkggen/internal/randomization"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -62,7 +62,6 @@ func (hv *HostNameView) Initialize(backButtonText string, sysConfig *configurati
 		SetFieldWidth(maxHostNameLength).
 		SetAcceptanceFunc(
 			func(textToCheck string, lastChar rune) bool {
-				hv.navBar.ClearUserFeedback()
 
 				if len(textToCheck) > maxHostNameLength {
 					return false
@@ -72,6 +71,7 @@ func (hv *HostNameView) Initialize(backButtonText string, sysConfig *configurati
 					return false
 				}
 
+				hv.navBar.ClearUserFeedback()
 				return true
 			})
 
@@ -229,32 +229,12 @@ func validateFQDN(fqdn string) (err error) {
 func randomHostname(prefix string) (hostname string, err error) {
 	const postfixLength = 12
 
-	postfix, err := randomString(postfixLength, uitext.AlphaNumeric)
+	postfix, err := randomization.RandomString(postfixLength, uitext.AlphaNumeric)
 	if err != nil {
 		return
 	}
 
 	hostname = fmt.Sprintf("%s-%s", prefix, postfix)
 
-	return
-}
-
-// randomString generates a random string of the length specified
-// using the provided legalCharacters.  crypto.rand is more secure
-// than math.rand and does not need to be seeded.
-func randomString(length int, legalCharacters string) (output string, err error) {
-	b := make([]byte, length)
-	_, err = rand.Read(b)
-	if err != nil {
-		return
-	}
-
-	count := byte(len(legalCharacters))
-	for i := range b {
-		idx := b[i] % count
-		b[i] = legalCharacters[idx]
-	}
-
-	output = string(b)
 	return
 }

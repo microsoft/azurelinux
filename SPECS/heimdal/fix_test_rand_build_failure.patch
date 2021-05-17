@@ -1,0 +1,24 @@
+diff -ur heimdal-7.7.0-orig/lib/hcrypto/Makefile.am heimdal-7.7.0/lib/hcrypto/Makefile.am
+--- heimdal-7.7.0-orig/lib/hcrypto/Makefile.am	2019-06-07 06:21:35.000000000 +0000
++++ heimdal-7.7.0/lib/hcrypto/Makefile.am	2020-09-11 22:54:02.955215077 +0000
+@@ -297,7 +297,7 @@
+ 	libtommath/bn_mp_to_unsigned_bin_n.c
+ 
+ 
+-$(libhcrypto_la_OBJECTS): hcrypto-link
++$(libhcrypto_la_OBJECTS) $(test_rand_OBJECTS): hcrypto-link
+ 
+ libhcrypto_la_CPPFLAGS = -DBUILD_HCRYPTO_LIB $(AM_CPPFLAGS)
+ 
+diff -ur heimdal-7.7.0-orig/lib/hx509/Makefile.am heimdal-7.7.0/lib/hx509/Makefile.am
+--- heimdal-7.7.0-orig/lib/hx509/Makefile.am	2019-06-07 06:21:35.000000000 +0000
++++ heimdal-7.7.0/lib/hx509/Makefile.am	2020-09-12 00:13:46.535536094 +0000
+@@ -164,7 +164,7 @@
+ dist_hxtool_SOURCES = hxtool.c
+ nodist_hxtool_SOURCES = hxtool-commands.c hxtool-commands.h
+ 
+-$(hxtool_OBJECTS): hxtool-commands.h hx509_err.h
++$(hxtool_OBJECTS): hxtool-commands.h hx509_err.h $(nodist_include_HEADERS)
+ 
+ hxtool_LDADD = \
+ 	libhx509.la \

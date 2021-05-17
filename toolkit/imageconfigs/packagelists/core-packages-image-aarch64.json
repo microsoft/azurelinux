@@ -1,0 +1,10 @@
+{
+    "packages": [
+        "shim-unsigned",
+        "grub2-efi-binary",
+        "ca-certificates",
+        "core-packages-base-image",
+        "initramfs"
+    ],
+    "_comment": "Install 'initramfs' last to avoid unnecessary regeneration when other packages, such as 'kernel', are installed."
+}

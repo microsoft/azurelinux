@@ -1,13 +1,13 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        31%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
-#Source0:         https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz
+#Source0:       https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz
 Source0:        systemd-%{version}.tar.gz
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
@@ -30,10 +30,17 @@ Patch13:        Backport-FOREACH_STRING-fix-for-gcc9.patch
 Patch14:        Disable-argument-to-mount_cgroup_controllers.patch
 # This commit from upstream fixes an issue caused by using a later version of meson.
 Patch15:        https://github.com/systemd/systemd/commit/8f6b442a78d0b485f044742ad90b2e8271b4e68e.patch
+Patch16:        CVE-2019-3842.patch
+Patch17:        CVE-2019-3843.patch
+Patch18:        CVE-2019-3844.patch
+Patch19:        CVE-2019-6454.patch
+Patch20:        CVE-2019-20386.patch
+Patch21:        CVE-2020-1712.patch
+Patch22:        CVE-2020-13776.patch
 # This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
-Patch16:        CVE-2018-21029.nopatch
+Patch23:        CVE-2018-21029.nopatch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -45,6 +52,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxslt
+BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -56,6 +64,7 @@ Requires:       glib
 Requires:       kmod
 Requires:       libcap
 Requires:       libgcrypt
+Requires:       lz4
 Requires:       pam
 Requires:       xz
 AutoReqProv:    no
@@ -73,7 +82,7 @@ AutoReqProv:    no
 Development headers for developing applications linking to libsystemd
 
 %prep
-%setup -q -n systemd-%{version}
+%autosetup -p1 -n systemd-%{version}
 cat > config.cache << "EOF"
 KILL=/bin/kill
 HAVE_BLKID=1
@@ -81,23 +90,6 @@ BLKID_LIBS="-lblkid"
 BLKID_CFLAGS="-I/usr/include/blkid"
 cc_cv_CFLAGS__flto=no
 EOF
-
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
 
 sed -i "s#\#DefaultTasksMax=512#DefaultTasksMax=infinity#g" src/core/system.conf.in
 
@@ -121,11 +113,12 @@ meson  --prefix %{_prefix}                                            \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
-       -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                           \
-       -Ddbussessionservicedir=%{_datadir}/dbus-1/services       \
-       -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services \
-       -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                               \
-       -Drc-local=%{_sysconfdir}/rc.d/rc.local                                  \
+       -Dlz4=true                                                     \
+       -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
+       -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
+       -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
+       -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                    \
+       -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -249,12 +242,31 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-31
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-- Turn off dependency generators
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-34
+- Merge the following releases from dev to 1.0 spec
+- v-ruyche@microsoft.com, 239-30: Configure to support merged /usr.
+- joschmit@microsoft.com, 239-31: Replace incorrect %%{_lib} usage with %%{_libdir}
+-   Turn off dependency generators
 
-* Mon Nov 02 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-30
-- Configure to support merged /usr.
+* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
+- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+
+* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-32
+- Enable LZ4 so journalctl can read logs from the container host.
+
+* Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31
+- Fix CVE-2019-6454 patch. Add upstream patch info.
+- Fix CVE-2020-1712 patch. Add upstream patch info.
+
+* Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-30
+- Use autosetup
+- Fix CVE-2019-3842
+- Fix CVE-2019-3843
+- Fix CVE-2019-3844
+- Fix CVE-2019-6454
+- Fix CVE-2019-20386
+- Fix CVE-2020-1712
+- Fix CVE-2020-13776
 
 *  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
 -  Reduce kptr_restrict to 1
@@ -269,7 +281,7 @@ rm -rf %{buildroot}/*
 *  Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 239-26
 -  Remove 99-vmware-hotplug.rules.
 
-*  Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 239-25
+*  Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 239-25
 -  Added %%license line automatically
 
 *  Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> 239-24

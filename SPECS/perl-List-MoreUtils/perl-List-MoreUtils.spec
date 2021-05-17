@@ -1,15 +1,15 @@
 # Got the intial spec from Fedora and modified it
-Summary:	Provide the stuff missing in List::Util
-Name:		perl-List-MoreUtils
-Version:	0.428
-Release:        6%{?dist}
-License:	GPL+ or Artistic
+Summary:        Provide the stuff missing in List::Util
+Name:           perl-List-MoreUtils
+Version:        0.428
+Release:        7%{?dist}
+License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
-URL:		http://search.cpan.org/dist/List-MoreUtils/
-Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{version}.tar.gz
-%define sha1 List-MoreUtils=fe63dcadb0e2a6ae3ce981d6913a19e96fc56a98
+URL:            http://search.cpan.org/dist/List-MoreUtils/
+Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Exporter-Tiny
@@ -41,17 +41,24 @@ find %{buildroot} -name 'perllocal.pod' -delete
 # Install required module List::MoreUtils::XS for maketest
 export PERL_MM_USE_DEFAULT=1
 echo "yes" | cpan -a
+cpan local::lib
 cpan -i List::MoreUtils::XS
 make test
 
 %files
-%license LICENSE
+%license ARTISTIC-1.0 GPL-1 LICENSE
 %{perl_vendorlib}/List/
 %{_mandir}/man3/List::MoreUtils.3*
 %{_mandir}/man3/List::MoreUtils::PP.3*
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.428-7
+- Merge the following releases from 1.0 to dev branch
+- pawelwi@microsoft.com, 1.26-4: Adding 'local::lib' perl5 library to fix test dependencies.
+-   Removed %%sha1 macro.
+-   License verified and extended %%license macro to include all license files.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-6
 -   Use new perl package names.
 -   Provide perl(List::MoreUtils*).
