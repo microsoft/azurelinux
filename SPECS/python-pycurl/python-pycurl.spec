@@ -5,12 +5,12 @@
 
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A Python interface to libcurl
 Group:          Development/Languages
 License:        LGPLv2+ or MIT
 URL:            http://pycurl.sourceforge.net/
-Source0:        https://dl.bintray.com/pycurl/pycurl/pycurl-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/p/pycurl/pycurl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  openssl-devel
@@ -118,6 +118,9 @@ rm -rf %{buildroot}
 %doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-7
+- Update source URL
+
 *   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
 -   Disable unreliable multi_timer_test
 *   Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-5

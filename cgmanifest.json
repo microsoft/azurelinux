@@ -5476,7 +5476,7 @@
         "other": {
           "name": "python-pycurl",
           "version": "7.43.0.2",
-          "downloadUrl": "https://dl.bintray.com/pycurl/pycurl/pycurl-7.43.0.2.tar.gz"
+          "downloadUrl": "https://pypi.io/packages/source/p/pycurl/pycurl-7.43.0.2.tar.gz"
         }
       }
     },
