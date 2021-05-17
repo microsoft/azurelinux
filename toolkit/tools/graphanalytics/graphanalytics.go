@@ -195,8 +195,18 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			dependency := n.(*pkggraph.PkgNode)
 
 			// Only consider unresolved or failed build nodes.
-			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuildError {
+			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuild {
 				return
+			}
+
+			if dependency.State == pkggraph.StateBuild {
+				directChildren := pkgGraph.From(dependency.ID())
+				for directChildren.Next() {
+					directChild := directChildren.Node().(*pkggraph.PkgNode)
+					if directChild.State == pkggraph.StateBuild || directChild.State == pkggraph.StateUnresolved {
+						return
+					}
+				}
 			}
 
 			// Skip requirements that come from the same srpm.
@@ -206,12 +216,6 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			}
 
 			dependencyName := nodeDependencyName(dependency)
-			for _, knownDependency := range srpmsBlockedBy[pkgSRPM] {
-				if strings.HasPrefix(knownDependency, dependencyName) {
-					return
-				}
-			}
-
 			stringBuilder.WriteString(dependencyName)
 
 			// Find the path from the blocked node to its blocker.

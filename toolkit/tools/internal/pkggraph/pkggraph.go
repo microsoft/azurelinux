@@ -34,7 +34,6 @@ const (
 	StateUnknown    NodeState = iota        // Unknown state
 	StateMeta       NodeState = iota        // Meta nodes do not represent actual build artifacts, but additional nodes used for managing dependencies
 	StateBuild      NodeState = iota        // A package from a local SRPM which should be built from source
-	StateBuildError NodeState = iota        // A package from a local SRPM which failed to build
 	StateUpToDate   NodeState = iota        // A local RPM is already built and is available
 	StateUnresolved NodeState = iota        // A dependency is not available locally and must be acquired from a remote repo
 	StateCached     NodeState = iota        // A dependency was not available locally, but is now available in the chache
