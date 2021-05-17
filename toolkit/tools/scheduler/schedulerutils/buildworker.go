@@ -61,11 +61,9 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		case pkggraph.TypeBuild:
 			res.UsedCache, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts)
 			if res.Err == nil {
-				for _, node := range req.AncillaryNodes {
-					if node.Type == pkggraph.TypeBuild {
-						node.State = pkggraph.StateUpToDate
-					}
-				}
+				setAncillaryNodesStatus(req, pkggraph.StateBuild)
+			} else {
+				setAncillaryNodesStatus(req, pkggraph.StateBuildError)
 			}
 
 		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta:
@@ -152,4 +150,13 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile str
 	}, buildAttempts, retryDuration)
 
 	return
+}
+
+// setAncillaryNodesStatus sets the NodeState for all of the request's ancillary nodes.
+func setAncillaryNodesStatus(req *BuildRequest, nodeState pkggraph.NodeState) {
+	for _, node := range req.AncillaryNodes {
+		if node.Type == pkggraph.TypeBuild {
+			node.State = nodeState
+		}
+	}
 }
