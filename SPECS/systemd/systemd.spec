@@ -283,7 +283,7 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
+* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.39-33: Use autosetup
 -   Fix CVE-2019-3842
