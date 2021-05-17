@@ -866,7 +866,7 @@
         "other": {
           "name": "CUnit",
           "version": "2.1.3",
-          "downloadUrl": "https://downloads.sourceforge.net/CUnit/CUnit-2.1-3.tar.bz2"
+          "downloadUrl": "https://downloads.sourceforge.net/cunit/CUnit-2.1-3.tar.bz2"
         }
       }
     },
@@ -5345,8 +5345,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/GehirnInc/python-jwt/archive/v1.0.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWTt-1.7.1.tar.gz"
         }
       }
     },
@@ -7016,7 +7016,7 @@
         "other": {
           "name": "sgml-common",
           "version": "0.6.3",
-          "downloadUrl": "ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
+          "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
         }
       }
     },
