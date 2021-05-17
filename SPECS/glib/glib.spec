@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,6 +26,7 @@ BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
 Requires:       libffi
+Requires:       libselinux
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
@@ -134,13 +135,16 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-2
+* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
 - Merge the following releases from 1.0 to dev branch
 - nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
 - thcrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219
 - niontive@microsoft.com, 2.58.0-9: Added patch for CVE-2021-28153
+
+* Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-2
+- Add libselinux as runtime requirement for glib
 
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-1
 - Upgrade to version 2.60.1

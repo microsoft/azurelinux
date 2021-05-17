@@ -1,7 +1,7 @@
 Summary:        Programs for processing and formatting text
 Name:           groff
 Version:        1.22.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/groff
 Group:          Applications/Text
@@ -36,9 +36,18 @@ make
 %install
 install -vdm 755 %{_defaultdocdir}/%{name}-1.22/pdf
 make DESTDIR=%{buildroot} install
+
+# some binaries need alias with 'g' or 'z' prefix
+for file in g{nroff,troff,tbl,pic,eqn,neqn,refer,lookbib,indxbib,soelim} zsoelim; do
+    ln -s ${file#?} %{buildroot}%{_bindir}/${file}
+    ln -s ${file#?}.1.gz %{buildroot}%{_mandir}/man1/${file}.1.gz
+done
+
 rm -rf %{buildroot}%{_infodir}
+
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license LICENSES
@@ -49,6 +58,8 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+*   Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 1.22.3-7
+-   Adding Fedora's symbolic links to provide the same set of file paths.
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-6
 -   Use new perl package names.
 -   Provide groff-base.

@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,7 @@ Provides:       systemd-udev = %{version}-%{release}
 Provides:       udev = %{version}-%{release}
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
+Provides:       system-setup-keyboard = 0.9
 
 %description
 Systemd is an init replacement with better process control and security
@@ -282,7 +283,7 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-38
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.39-33: Use autosetup
 -   Fix CVE-2019-3842
@@ -295,6 +296,9 @@ rm -rf %{buildroot}/*
 - niontive@microsoft.com, 2.39-34: Fix CVE-2019-6454, CVE-2020-1712 patches. Add upstream patch info.
 - henry.beberman@microsoft.com, 2.39-35: Enable LZ4 so journalctl can read logs from the container host.
 - chrco@microsoft.com, 2.39-36: Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+
+* Mon Apr 26 2021 Henry Li <lihl@microsoft.com> - 239-38
+- Provides system-setup-keyboard.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
 - Replace incorrect %%{_lib} usage with %%{_libdir}

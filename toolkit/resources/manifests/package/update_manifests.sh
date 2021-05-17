@@ -64,6 +64,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
+    sed -i '/glib-doc/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
     sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
@@ -75,6 +76,11 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
+    sed -i '/libselinux-devel/d' $TmpPkgGen
+    sed -i '/libselinux-python/d' $TmpPkgGen
+    sed -i '/libselinux-python3/d' $TmpPkgGen
+    sed -i '/libselinux-utils/d' $TmpPkgGen
+    sed -i '/libsepol-devel/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
@@ -271,6 +277,8 @@ generate_pkggen_core () {
         grep "^tdnf-" $TmpPkgGen
         grep "^createrepo_c-" $TmpPkgGen
         grep "^libxml2-" $TmpPkgGen
+        grep "^libsepol-" $TmpPkgGen
+        grep "^libselinux-" $TmpPkgGen
         grep "^glib-" $TmpPkgGen
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen

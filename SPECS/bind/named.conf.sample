@@ -1,0 +1,252 @@
+/*
+ Sample named.conf BIND DNS server 'named' configuration file
+ for the Red Hat BIND distribution.
+
+ See the BIND Administrator's Reference Manual (ARM) for details, in:
+   file:///usr/share/doc/bind-{version}/arm/Bv9ARM.html
+ Also see the BIND Configuration GUI : /usr/bin/system-config-bind and 
+ its manual.
+*/
+
+options
+{
+	// Put files that named is allowed to write in the data/ directory:
+	directory 		"/var/named";		// "Working" directory
+	dump-file 		"data/cache_dump.db";
+        statistics-file 	"data/named_stats.txt";
+        memstatistics-file 	"data/named_mem_stats.txt";
+	secroots-file		"data/named.secroots";
+	recursing-file		"data/named.recursing";
+
+
+	/*
+	  Specify listenning interfaces. You can use list of addresses (';' is
+	  delimiter) or keywords "any"/"none"
+	*/
+	//listen-on port 53	{ any; };
+	listen-on port 53	{ 127.0.0.1; };
+
+	//listen-on-v6 port 53	{ any; };
+	listen-on-v6 port 53	{ ::1; };
+
+	/*
+	  Access restrictions
+
+	  There are two important options:
+	    allow-query { argument; };
+	      - allow queries for authoritative data
+
+	    allow-query-cache { argument; };
+	      - allow queries for non-authoritative data (mostly cached data)
+
+	  You can use address, network address or keywords "any"/"localhost"/"none" as argument
+	  Examples:
+	    allow-query { localhost; 10.0.0.1; 192.168.1.0/8; };
+	    allow-query-cache { ::1; fe80::5c63:a8ff:fe2f:4526; 10.0.0.1; };
+	*/
+
+	allow-query		{ localhost; };
+	allow-query-cache	{ localhost; };
+
+	/* Enable/disable recursion - recursion yes/no;
+
+	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+	 - If you are building a RECURSIVE (caching) DNS server, you need to enable 
+	   recursion. 
+	 - If your recursive DNS server has a public IP address, you MUST enable access 
+	   control to limit queries to your legitimate users. Failing to do so will
+	   cause your server to become part of large scale DNS amplification 
+	   attacks. Implementing BCP38 within your network would greatly
+	   reduce such attack surface 
+	 */
+	recursion yes;
+
+	/* DNSSEC related options. See information about keys ("Trusted keys", bellow) */
+
+	/* Enable serving of DNSSEC related data - enable on both authoritative
+ 	   and recursive servers DNSSEC aware servers */
+	dnssec-enable yes;
+
+	/* Enable DNSSEC validation on recursive servers */
+	dnssec-validation yes;
+
+	/* In Fedora we use /run/named instead of default /var/run/named
+	   so we have to configure paths properly. */
+	pid-file "/run/named/named.pid";
+	session-keyfile "/run/named/session.key";
+
+	managed-keys-directory "/var/named/dynamic";
+
+    /* In Fedora we use system-wide Crypto Policy */
+    /* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
+    include "/etc/crypto-policies/back-ends/bind.config";
+};
+
+logging 
+{
+/*      If you want to enable debugging, eg. using the 'rndc trace' command,
+ *      named will try to write the 'named.run' file in the $directory (/var/named).
+ *      By default, SELinux policy does not allow named to modify the /var/named directory,
+ *      so put the default debug log file in data/ :
+ */
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+/*
+ Views let a name server answer a DNS query differently depending on who is asking.
+
+ By default, if named.conf contains no "view" clauses, all zones are in the 
+ "default" view, which matches all clients.
+
+ Views are processed sequentially. The first match is used so the last view should
+ match "any" - it's fallback and the most restricted view.
+
+ If named.conf contains any "view" clause, then all zones MUST be in a view.
+*/
+
+view "localhost_resolver"
+{
+/* This view sets up named to be a localhost resolver ( caching only nameserver ).
+ * If all you want is a caching-only nameserver, then you need only define this view:
+ */
+	match-clients 		{ localhost; };
+	recursion yes;
+
+	# all views must contain the root hints zone:
+	zone "." IN {
+	        type hint;
+	        file "/var/named/named.ca";
+	};
+
+        /* these are zones that contain definitions for all the localhost
+         * names and addresses, as recommended in RFC1912 - these names should
+	 * not leak to the other nameservers:
+	 */
+	include "/etc/named.rfc1912.zones";
+};
+view "internal"
+{
+/* This view will contain zones you want to serve only to "internal" clients
+   that connect via your directly attached LAN interfaces - "localnets" .
+ */
+	match-clients		{ localnets; };
+	recursion yes;
+
+	zone "." IN {
+	        type hint;
+	        file "/var/named/named.ca";
+	};
+
+        /* these are zones that contain definitions for all the localhost
+         * names and addresses, as recommended in RFC1912 - these names should
+	 * not leak to the other nameservers:
+	 */
+	include "/etc/named.rfc1912.zones";
+
+	// These are your "authoritative" internal zones, and would probably
+	// also be included in the "localhost_resolver" view above :
+
+	/*
+	  NOTE for dynamic DNS zones and secondary zones:
+
+	  DO NOT USE SAME FILES IN MULTIPLE VIEWS!
+
+	  If you are using views and DDNS/secondary zones it is strongly
+	  recommended to read FAQ on ISC site (www.isc.org), section
+	  "Configuration and Setup Questions", questions
+	  "How do I share a dynamic zone between multiple views?" and
+	  "How can I make a server a slave for both an internal and an external
+	   view at the same time?"
+	*/
+
+	zone "my.internal.zone" { 
+		type master;
+		file "my.internal.zone.db";
+	};
+	zone "my.slave.internal.zone" {
+		type slave;
+		file "slaves/my.slave.internal.zone.db";
+		masters { /* put master nameserver IPs here */ 127.0.0.1; } ;
+		// put slave zones in the slaves/ directory so named can update them
+	};	
+	zone "my.ddns.internal.zone" {
+		type master;
+		allow-update { key ddns_key; };
+		file "dynamic/my.ddns.internal.zone.db";
+		// put dynamically updateable zones in the slaves/ directory so named can update them
+	};
+};
+
+key ddns_key
+{
+	algorithm hmac-md5;
+	secret "use /usr/sbin/dnssec-keygen to generate TSIG keys";
+};
+
+view "external"
+{
+/* This view will contain zones you want to serve only to "external" clients
+ * that have addresses that are not match any above view:
+ */
+	match-clients		{ any; };
+
+	zone "." IN {
+	        type hint;
+	        file "/var/named/named.ca";
+	};
+
+	recursion no;
+	// you'd probably want to deny recursion to external clients, so you don't
+        // end up providing free DNS service to all takers
+
+	// These are your "authoritative" external zones, and would probably
+        // contain entries for just your web and mail servers:
+
+	zone "my.external.zone" { 
+		type master;
+		file "my.external.zone.db";
+	};
+};
+
+/* Trusted keys
+
+  This statement contains DNSSEC keys. If you want DNSSEC aware resolver you
+  have to configure at least one trusted key.
+
+  Note that no key written below is valid. Especially root key because root zone
+  is not signed yet.
+*/
+/*
+trusted-keys {
+// Root Key
+"." 257 3 3 "BNY4wrWM1nCfJ+CXd0rVXyYmobt7sEEfK3clRbGaTwSJxrGkxJWoZu6I7PzJu/
+             E9gx4UC1zGAHlXKdE4zYIpRhaBKnvcC2U9mZhkdUpd1Vso/HAdjNe8LmMlnzY3
+             zy2Xy4klWOADTPzSv9eamj8V18PHGjBLaVtYvk/ln5ZApjYghf+6fElrmLkdaz
+             MQ2OCnACR817DF4BBa7UR/beDHyp5iWTXWSi6XmoJLbG9Scqc7l70KDqlvXR3M
+             /lUUVRbkeg1IPJSidmK3ZyCllh4XSKbje/45SKucHgnwU5jefMtq66gKodQj+M
+             iA21AfUVe7u99WzTLzY3qlxDhxYQQ20FQ97S+LKUTpQcq27R7AT3/V5hRQxScI
+             Nqwcz4jYqZD2fQdgxbcDTClU0CRBdiieyLMNzXG3";
+
+// Key for forward zone
+example.com. 257 3 5 "AwEAAaxPMcR2x0HbQV4WeZB6oEDX+r0QM65KbhTjrW1ZaARmPhEZZe
+                      3Y9ifgEuq7vZ/zGZUdEGNWy+JZzus0lUptwgjGwhUS1558Hb4JKUbb
+                      OTcM8pwXlj0EiX3oDFVmjHO444gLkBO UKUf/mC7HvfwYH/Be22GnC
+                      lrinKJp1Og4ywzO9WglMk7jbfW33gUKvirTHr25GL7STQUzBb5Usxt
+                      8lgnyTUHs1t3JwCY5hKZ6CqFxmAVZP20igTixin/1LcrgX/KMEGd/b
+                      iuvF4qJCyduieHukuY3H4XMAcR+xia2 nIUPvm/oyWR8BW/hWdzOvn
+                      SCThlHf3xiYleDbt/o1OTQ09A0=";
+
+// Key for reverse zone.
+2.0.192.IN-ADDRPA.NET. 257 3 5 "AQOnS4xn/IgOUpBPJ3bogzwcxOdNax071L18QqZnQQQA
+                                VVr+iLhGTnNGp3HoWQLUIzKrJVZ3zggy3WwNT6kZo6c0
+                                tszYqbtvchmgQC8CzKojM/W16i6MG/ea fGU3siaOdS0
+                                yOI6BgPsw+YZdzlYMaIJGf4M4dyoKIhzdZyQ2bYQrjyQ
+                                4LB0lC7aOnsMyYKHHYeRv PxjIQXmdqgOJGq+vsevG06
+                                zW+1xgYJh9rCIfnm1GX/KMgxLPG2vXTD/RnLX+D3T3UL
+                                7HJYHJhAZD5L59VvjSPsZJHeDCUyWYrvPZesZDIRvhDD
+                                52SKvbheeTJUm6EhkzytNN2SN96QRk8j/iI8ib";
+};
+*/
