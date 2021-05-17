@@ -127,12 +127,25 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
-func DefaultDefines() map[string]string {
-	const defaultWithCheck = "1"
+func DefaultDefines(runCheck bool) map[string]string {
+	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible
+	withCheckSetting := "0"
+	if runCheck {
+		withCheckSetting = "1"
+	}
 
 	return map[string]string{
-		WithCheckDefine: defaultWithCheck,
+		WithCheckDefine: withCheckSetting,
 	}
+}
+
+// GetInstalledPackages returns a string list of all packages installed on the system
+// in the "[name]-[version]-[release].[distribution].[architecture]" format.
+// Example: tdnf-2.1.0-4.cm1.x86_64
+func GetInstalledPackages() (result []string, err error) {
+	const queryArg = "-qa"
+
+	return executeRpmCommand(rpmProgram, queryArg)
 }
 
 // QuerySPEC queries a SPEC file with queryFormat. Returns the output split by line and trimmed.

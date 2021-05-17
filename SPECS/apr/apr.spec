@@ -1,7 +1,7 @@
 Summary:        The Apache Portable Runtime
 Name:           apr
 Version:        1.6.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache License 2.0
 URL:            https://apr.apache.org/
 Group:          System Environment/Libraries
@@ -10,6 +10,12 @@ Distribution:   Mariner
 Source0:        http://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.gz
 %define sha1    %{name}=ebf4f15fa5003b1490550e260f5a57dc8a2ff0ac
 %define         aprver  1
+
+%if %{with_check}
+# test_serv_by_name test requires /etc/services file from iana-etc package
+BuildRequires:  iana-etc
+%endif
+
 %description
 The Apache Portable Runtime.
 %package        devel
@@ -57,9 +63,10 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig
 
 %changelog
-* Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.5-3
-- Added %%license line automatically
-
+*   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 1.6.5-4
+-   Fix check tests.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.6.5-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.6.5-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> 1.6.5-1

@@ -33,7 +33,7 @@ graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 
-logging_command = --log-file $(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level $(LOG_LEVEL)
+logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
@@ -71,6 +71,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--rpm-dir $(RPMS_DIR) \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
+		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--output $@
 
@@ -95,6 +96,7 @@ endif
 
 graphpkgfetcher_extra_flags :=
 
+graphpkgfetcher_extra_flags :=
 ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 graphpkgfetcher_extra_flags += --disable-upstream-repos
 endif

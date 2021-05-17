@@ -1,8 +1,7 @@
-%define sha1    %{name}-%{version}=6df99e90cb4d59032ab2050ebb426fe065249bd3
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -101,10 +100,15 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-5
+- Merge the following releases from 1.0 to dev branch
+- rachelmenge@microsoft.com, 1.8.3-4: Add ssh brute force prevention to ip4save and ip6save
+-   License verified
+
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.8.3-4
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.3-2

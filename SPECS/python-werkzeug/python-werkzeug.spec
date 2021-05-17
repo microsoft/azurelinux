@@ -4,7 +4,7 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
 Version:        0.14.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -23,6 +23,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  python-requests
+BuildRequires:  python-pip
 BuildRequires:  python3-requests
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -54,9 +55,11 @@ python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 %check
-easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
-$easy_install_2 pytest hypothesis
-LANG=en_US.UTF-8 PYTHONPATH=./  python2 setup.py test
+# Remove unmaintained cache tests. See https://github.com/pallets/werkzeug/pull/1391
+rm -vf tests/contrib/test_cache.py
+rm -vf tests/contrib/cache/test_cache.py
+pip install tox
+LANG=en_US.UTF-8 tox -e py27
 
 %files
 %defattr(-,root,root)
@@ -68,9 +71,10 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python2 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 0.14.1-6
+-   Remove test_cache.py tests. Use tox for tests.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.14.1-5
+-   Added %%license line automatically
 *   Tue Apr 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.14.1-4
 -   Fixed "Source0" tag.
 -   License verified.

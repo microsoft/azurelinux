@@ -1,15 +1,19 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
-Patch0:         glib-CVE-2019-12450.patch
-Patch1:         glib-CVE-2019-13012.patch
+Patch0:         CVE-2019-12450.patch
+Patch1:         CVE-2020-35457.patch
+# CVE-2021-27218 and CVE-2021-27219 are both solved by the patch for the first
+Patch3:         CVE-2021-27218.patch
+Patch4:         CVE-2021-27219.nopatch
+Patch5:         CVE-2021-28153.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -22,7 +26,7 @@ BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
 Requires:       libffi
-Requires:       libseliux
+Requires:       libselinux
 Requires:       pcre-libs
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
@@ -71,7 +75,7 @@ BuildArch:      noarch
 The glib2-doc package includes documentation for the GLib library.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
@@ -109,6 +113,8 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %files devel
 %defattr(-, root, root)
 %{_bindir}/*
+%exclude %{_bindir}/glib-compile-schemas
+%exclude %{_bindir}/gsettings
 %{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
@@ -116,9 +122,8 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/glib-*/*
 %{_includedir}/*
 %{_datadir}/*
-%{_bindir}/glib-compile-schemas
-%{_bindir}/gsettings
-%{_datadir}/glib-2.0/schemas/*
+%exclude %{_datadir}/gtk-doc/html/
+%exclude %{_datadir}/glib-2.0/schemas/
 
 %files schemas
 %defattr(-, root, root)
@@ -130,6 +135,14 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
+- Remove CVE-2019-13012 patch (already in the this version)
+- Exclude doubly-packaged files from devel subpackage
+- Merge the following releases from 1.0 to dev branch
+- nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
+- thcrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219
+- niontive@microsoft.com, 2.58.0-9: Added patch for CVE-2021-28153
+
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-2
 - Add libselinux as runtime requirement for glib
 
@@ -158,53 +171,53 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.58.0-7
 -   Move "Provides:pkgconfig(...)" to glib-devel
 
-* Sat May 09 00:21:11 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.58.0-6
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.58.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.58.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Jul 09 2019 Ankit Jain <ankitja@vmware.com> 2.58.0-4
--   Fix for CVE-2019-13012
+* Tue Jul 09 2019 Ankit Jain <ankitja@vmware.com> - 2.58.0-4
+- Fix for CVE-2019-13012
 
-*   Mon Jun 03 2019 Ankit Jain <ankitja@vmware.com> 2.58.0-3
--   Fix for CVE-2019-12450
+* Mon Jun 03 2019 Ankit Jain <ankitja@vmware.com> - 2.58.0-3
+- Fix for CVE-2019-12450
 
-*   Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> 2.58.0-2
--   glib-devel requires python-xml.
+* Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> - 2.58.0-2
+- glib-devel requires python-xml.
 
-*   Tue Sep 11 2018 Anish Swaminathan <anishs@vmware.com> 2.58.0-1
--   Update version to 2.58.0
+* Tue Sep 11 2018 Anish Swaminathan <anishs@vmware.com> - 2.58.0-1
+- Update version to 2.58.0
 
-*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.52.1-2
--   Requires pcre-libs, BuildRequires libffi-devel.
+* Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.52.1-2
+- Requires pcre-libs, BuildRequires libffi-devel.
 
-*   Wed Apr 12 2017 Danut Moraru <dmoraru@vmware.com> 2.52.1-1
--   Updated to version 2.52.1-1
+* Wed Apr 12 2017 Danut Moraru <dmoraru@vmware.com> - 2.52.1-1
+- Updated to version 2.52.1-1
 
-*   Thu Oct 06 2016 ChangLee <changlee@vmware.com> 2.48.2-2
--   Modified %check
+* Thu Oct 06 2016 ChangLee <changlee@vmware.com> - 2.48.2-2
+- Modified %check
 
-*   Tue Sep 06 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.48.2-1
--   Updated to version 2.48.2-1
+* Tue Sep 06 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 2.48.2-1
+- Updated to version 2.48.2-1
 
-*   Thu Aug 11 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.47.6-3
--   Update glib require for devel to use the same version and release
+* Thu Aug 11 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.47.6-3
+- Update glib require for devel to use the same version and release
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.47.6-2
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.47.6-2
+- GA - Bump release of all rpms
 
-*   Thu Apr 14 2016	Harish Udaiya Kumar<hudaiyakumar@vmware.com> 2.47.6-1
-    Updated to version 2.47.6
+* Thu Apr 14 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 2.47.6-1
+- Updated to version 2.47.6
 
-*   Thu Jan 14 2016 Xiaolin Li <xiaolinl@vmware.com> 2.46.2-1
--   Updated to version 2.46.2
+* Thu Jan 14 2016 Xiaolin Li <xiaolinl@vmware.com> - 2.46.2-1
+- Updated to version 2.46.2
 
-*   Fri Jun 12 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-3
--   Added glib-schemas package
+* Fri Jun 12 2015 Alexey Makhalov <amakhalov@vmware.com> - 2.42.0-3
+- Added glib-schemas package
 
-*   Thu Jun 11 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-2
--   Added more 'Provides: pkgconfig(...)' for base package
+* Thu Jun 11 2015 Alexey Makhalov <amakhalov@vmware.com> - 2.42.0-2
+- Added more 'Provides: pkgconfig(...)' for base package
 
-*   Thu Nov 06 2014 Sharath George <sharathg@vmware.com> 2.42.0-1
--   Initial version
+* Thu Nov 06 2014 Sharath George <sharathg@vmware.com> - 2.42.0-1
+- Initial version

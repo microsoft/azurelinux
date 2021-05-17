@@ -1,59 +1,63 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.17
-Release:        3%{?dist}
-License:        GPLv2 with exceptions and LGPLv2 and BSD
-Group:          Applications/Databases
+Version:        10.3.28
+Release:        1%{?dist}
+License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Url:            https://mariadb.org/
+Group:          Applications/Databases
+URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 BuildRequires:  cmake
-BuildRequires:  pam-devel
-BuildRequires:  openssl-devel
-BuildRequires:  zlib-devel
-BuildRequires:  krb5-devel
-BuildRequires:  e2fsprogs-devel
-BuildRequires:  systemd-devel
 BuildRequires:  curl-devel
+BuildRequires:  e2fsprogs-devel
+BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pam-devel
+BuildRequires:  systemd-devel
+BuildRequires:  zlib-devel
 Conflicts:      mysql
+
 %description
 MariaDB Server is one of the most popular database servers in the world. It’s made by the original developers of MySQL and guaranteed to stay open source. Notable users include Wikipedia, WordPress.com and Google.
 
 MariaDB turns data into structured information in a wide array of applications, ranging from banking to websites. It is an enhanced, drop-in replacement for MySQL. MariaDB is used because it is fast, scalable and robust, with a rich ecosystem of storage engines, plugins and many other tools make it very versatile for a wide variety of use cases.
 
 %package          server
-Summary:          MariaDB server
-Requires:         %{name}-errmsg = %{version}-%{release}
+Summary:        MariaDB server
+Requires:       %{name}-errmsg = %{version}-%{release}
+
 %description      server
 The MariaDB server and related files
 
 %package          server-galera
-Summary:          MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB
-Group:            Applications/Databases
-Requires:         %{name}-server = %{version}-%{release}
+Summary:        MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB
+Group:          Applications/Databases
+Requires:       %{name}-server = %{version}-%{release}
 
 %description      server-galera
 MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB. It is available on Linux only, and only supports the XtraDB/InnoDB storage engines (although there is experimental support for MyISAM - see the wsrep_replicate_myisam system variable).
 
 %package          devel
-Summary:          Development headers for mariadb
-Requires:         %{name} = %{version}-%{release}
+Summary:        Development headers for mariadb
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development headers for developing applications linking to maridb
 
 %package          errmsg
-Summary:          errmsg for mariadb
+Summary:        errmsg for mariadb
 
 %description      errmsg
 errmsg for maridb
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 # Remove PerconaFT from here because of AGPL licence
 rm -rf storage/tokudb/PerconaFT
+# Disable "embedded" directory which only contains "test-connect" test
+sed -i '/ADD_SUBDIRECTORY(unittest\/embedded)/d' ./CMakeLists.txt
 
 %build
 # Disable symbol generation
@@ -63,7 +67,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release                        \
-      -DCMAKE_INSTALL_PREFIX=/usr                       \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}                       \
       -DINSTALL_DOCDIR=share/doc/mariadb-10.2.8         \
       -DINSTALL_DOCREADMEDIR=share/doc/mariadb-10.2.8   \
       -DINSTALL_MANDIR=share/man                        \
@@ -76,8 +80,8 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DINSTALL_SCRIPTDIR=bin                           \
       -DINSTALL_SQLBENCHDIR=share/mysql/bench           \
       -DINSTALL_SUPPORTFILESDIR=share                   \
-      -DMYSQL_DATADIR="%{_var}/lib/mysql"               \
-      -DMYSQL_UNIX_ADDR="%{_var}/lib/mysql/mysqld.sock" \
+      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"               \
+      -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
       -DSKIP_TESTS=ON                                   \
@@ -92,11 +96,11 @@ cd build
 make DESTDIR=%{buildroot} install
 mkdir -p %{buildroot}/%{_libdir}/systemd/system
 
-mv  %{buildroot}/usr/share/systemd/mariadb.service %{buildroot}/%{_libdir}/systemd/system/mariadb.service
-mv  %{buildroot}/usr/share/systemd/mariadb@.service %{buildroot}/%{_libdir}/systemd/system/mariadb@.service
+mv  %{buildroot}%{_datadir}/systemd/mariadb.service %{buildroot}/%{_libdir}/systemd/system/mariadb.service
+mv  %{buildroot}%{_datadir}/systemd/mariadb@.service %{buildroot}/%{_libdir}/systemd/system/mariadb@.service
 rm %{buildroot}/%{_sbindir}/rcmysql
 rm %{buildroot}/%{_libdir}/*.a
-mkdir -p %{buildroot}/%{_var}/lib/mysql
+mkdir -p %{buildroot}/%{_sharedstatedir}/mysql
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable mariadb.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-mariadb.preset
 
@@ -106,16 +110,16 @@ make test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-
 %pre server
 if [ $1 -eq 1 ] ; then
     getent group  mysql  >/dev/null || groupadd -r mysql
     getent passwd mysql  >/dev/null || useradd  -c "mysql" -s /bin/false -g mysql -M -r mysql
 fi
+
 %post server
 /sbin/ldconfig
-chown  mysql:mysql %{_var}/lib/mysql || :
-mysql_install_db --datadir="/var/lib/mysql" --user="mysql" --basedir="/usr" >/dev/null || :
+chown  mysql:mysql %{_sharedstatedir}/mysql || :
+mysql_install_db --datadir="%{_sharedstatedir}/mysql" --user="mysql" --basedir="%{_prefix}" >/dev/null || :
 %systemd_post  mariadb.service
 
 %postun server
@@ -135,6 +139,7 @@ fi
 
 %clean
 rm -rf %{buildroot}
+
 
 %files
 %defattr(-,root,root)
@@ -156,7 +161,6 @@ rm -rf %{buildroot}
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
 %{_bindir}/mariadb_config
-%{_bindir}/test-connect-t
 %{_bindir}/mysql_client_test
 %{_bindir}/mysql_client_test_embedded
 %{_bindir}/mysql_config
@@ -201,13 +205,16 @@ rm -rf %{buildroot}
 %{_mandir}/man1/perror.1.gz
 %{_datadir}/mysql/charsets/*
 %{_datadir}/magic
-%doc COPYING CREDITS
+%{_datadir}/pam_user_map.so
+%{_datadir}/user_map.conf
+%license COPYING
+%doc CREDITS
 
-%exclude /usr/share/mysql/bench
-%exclude /usr/share/mysql/test
-%exclude /usr/data/test/db.opt
-%exclude /usr/share/doc/mariadb-10.2.8/*
-%exclude /etc/init.d/mysql
+%exclude %{_datadir}/mysql/bench
+%exclude %{_datadir}/mysql/test
+%exclude %{_prefix}/data/test/db.opt
+%exclude %{_docdir}/mariadb-10.2.8/*
+%exclude %{_sysconfdir}/init.d/mysql
 
 %files server
 %config(noreplace) %{_sysconfdir}/logrotate.d/mysql
@@ -216,7 +223,7 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/my.cnf.d/enable_encryption.preset
 %config(noreplace) %{_sysconfdir}/my.cnf.d/mysql-clients.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/server.cnf
-%dir %attr(0750,mysql,mysql) %{_var}/lib/mysql
+%dir %attr(0750,mysql,mysql) %{_sharedstatedir}/mysql
 %{_libdir}/mysql/plugin*
 %{_bindir}/aria_chk
 %{_bindir}/aria_dump_log
@@ -288,8 +295,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/replace.1.gz
 %{_mandir}/man1/resolveip.1.gz
 %{_mandir}/man1/resolve_stack_dump.1.gz
-%{_mandir}/man1/tokuftdump.1.gz
-%{_mandir}/man1/tokuft_logprint.1.gz
 %{_mandir}/man1/wsrep_sst_common.1.gz
 %{_mandir}/man1/wsrep_sst_mysqldump.1.gz
 %{_mandir}/man1/wsrep_sst_rsync.1.gz
@@ -319,7 +324,6 @@ rm -rf %{buildroot}
 %doc %{_datadir}/groonga-normalizer-mysql/README.md
 %doc %{_datadir}/groonga/README.md
 
-
 %files server-galera
 %{_bindir}/galera_new_cluster
 %{_bindir}/galera_recovery
@@ -333,8 +337,7 @@ rm -rf %{buildroot}
 %{_libdir}/libmariadb.so
 %{_libdir}/libmariadbd.so
 %{_libdir}/libmysqld.so
-%{_libdir}/pkgconfig/libmariadb.pc
-%{_datadir}/pkgconfig/mariadb.pc
+%{_libdir}/pkgconfig/*mariadb.pc
 
 %files errmsg
 %{_datadir}/mysql/czech/errmsg.sys
@@ -364,31 +367,50 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Fri Apr 02 2021 Nicolas Ontiveros <niontive@microsoft.com> - 10.3.28-1
+- Upgrade to version 10.3.28, which resolves CVE-2021-27928
+
+*   Thu Jan 14 2021 Andrew Phelps <anphel@microsoft.com> 10.3.17-4
+-   Disable failing "test-connect" test and binary "test-connect-t"
+
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 10.3.17-3
 -   Temporarily disable generation of debug symbols.
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 10.3.17-2
 -   Renaming Linux-PAM to pam
+
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 10.3.17-1
 -   Update to version 10.3.17. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 10.3.11-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Wed Jan 23 2019 Ajay Kaher <akaher@vmware.com> 10.3.11-2
 -   Remove PerconaFT from mariadb pkg because of AGPL licence
+
 *   Wed Jan 02 2019 Him Kalyan Bordoloi <bordoloih@vmware.com> 10.3.11-1
 -   Upgrade to version 10.3.11
+
 *   Mon Nov 19 2018 Ajay Kaher <akaher@vmware.com> 10.3.9-3
 -   Enabling for aarch64
+
 *   Mon Oct 22 2018 Ajay Kaher <akaher@vmware.com> 10.3.9-2
 -   Adding BuildArch
+
 *   Thu Sep 06 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 10.3.9-1
 -   Update to version 10.3.9
+
 *   Tue Nov 07 2017 Xiaolin Li <xiaolinl@vmware.com> 10.2.10-1
 -   Update to verion 10.2.10 to address CVE-2017-10378, CVE-2017-10268
+
 *   Wed Sep 06 2017 Xiaolin Li <xiaolinl@vmware.com> 10.2.8-1
 -   Update to 10.2.8 and enable build server.
+
 *   Thu Aug 31 2017 Xiaolin Li <xiaolinl@vmware.com> 10.1.24-3
 -   Fixed make check issue.
+
 *   Fri Aug 25 2017 Dheeraj Shetty <dheerajs@vmware.com> 10.1.24-2
 -   Specify MariaDB conflicts with MySQL
+
 *   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 10.1.24-1
 -   Initial packaging for Photon

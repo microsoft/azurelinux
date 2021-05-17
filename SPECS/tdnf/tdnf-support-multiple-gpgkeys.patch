@@ -62,7 +62,7 @@ index a7712c9..df3316b 100644
 +    ppszTemp = ppszUrlKeyFiles;
 +    while(ppszTemp && *ppszTemp)
 +    {
-+        dwError = AddKeyToKeyRing(*ppszTemp, pKeyring); 
++        dwError = AddKeyToKeyRing(*ppszTemp, pKeyring);
 +        BAIL_ON_TDNF_ERROR(dwError);
 +        ++ppszTemp;
 +    }
@@ -313,7 +313,7 @@ diff --git a/common/configreader.c b/common/configreader.c
 index ba37760..aa8d374 100644
 --- a/common/configreader.c
 +++ b/common/configreader.c
-@@ -654,3 +654,65 @@ error:
+@@ -654,3 +654,64 @@ error:
      goto cleanup;
  }
  
@@ -378,7 +378,6 @@ index ba37760..aa8d374 100644
 +    TDNF_SAFE_FREE_STRINGARRAY(ppszValue);
 +    goto cleanup;
 +}
-+
 diff --git a/common/defines.h b/common/defines.h
 index 39c19ea..8c87874 100644
 --- a/common/defines.h
@@ -457,7 +456,7 @@ index fa26256..17fdf7c 100644
 +    }
 +
 +    dwError = TDNFAllocateString(pszSrc, &pszSrcCopy);
-+    BAIL_ON_TDNF_ERROR(dwError);    
++    BAIL_ON_TDNF_ERROR(dwError);
 +
 +    // Count how many strings are in this array.
 +    pszSrcTemp = pszSrcCopy;
@@ -689,4 +688,3 @@ index 17fdf7c..8617967 100644
 +}
 -- 
 2.25.1
-

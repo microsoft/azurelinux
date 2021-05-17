@@ -1,0 +1,26 @@
+Disable openssl_nist192p tests since OpenSSL no longer supports NIST192 EC
+
+--- a/ecdsa/test_pyecdsa.py	2019-10-07 06:58:12.000000000 -0700
++++ b/ecdsa/test_pyecdsa.py	2021-01-14 15:36:36.588165538 -0800
+@@ -500,8 +500,8 @@
+     # vk: 3:OpenSSL->python  4:python->OpenSSL
+     # sig: 5:OpenSSL->python 6:python->OpenSSL
+ 
+-    def test_from_openssl_nist192p(self):
+-        return self.do_test_from_openssl(NIST192p)
++    # def test_from_openssl_nist192p(self):
++    #     return self.do_test_from_openssl(NIST192p)
+     def test_from_openssl_nist224p(self):
+         return self.do_test_from_openssl(NIST224p)
+     def test_from_openssl_nist256p(self):
+@@ -539,8 +539,8 @@
+         sig = sk.sign(data)
+         self.assertTrue(vk.verify(sig, data))
+ 
+-    def test_to_openssl_nist192p(self):
+-        self.do_test_to_openssl(NIST192p)
++    # def test_to_openssl_nist192p(self):
++    #     self.do_test_to_openssl(NIST192p)
+     def test_to_openssl_nist224p(self):
+         self.do_test_to_openssl(NIST224p)
+     def test_to_openssl_nist256p(self):

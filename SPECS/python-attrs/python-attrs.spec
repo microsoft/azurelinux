@@ -4,7 +4,7 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        18.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Url:            https://pypi.python.org/pypi/attrs
 License:        MIT
 Group:          Development/Languages/Python
@@ -28,6 +28,7 @@ BuildRequires:  python3-xml
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-zope-interface
+BuildRequires:  python3-pip
 %endif
 Requires:       python2
 Requires:       python2-libs
@@ -63,10 +64,9 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 
 %check
-#python2 does not support for tests
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 pytest hypothesis
-python3 setup.py test
+# Tests are only supported with Python3
+pip3 install pytest hypothesis==4.38.0 tox
+LANG=en_US.UTF-8 tox -e py37
 
 %files
 %defattr(-,root,root)
@@ -78,6 +78,8 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+*   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 18.2.0-7
+-   Use tox to run tests.
 *   Wed Jul 08 2020 Henry Beberman <henry.beberman@microsoft.com> 18.2.0-6
 -   Fix typo in BuildRequires for python3-zope-interface
 *   Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> 18.2.0-5

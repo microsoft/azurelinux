@@ -9,6 +9,7 @@ import (
 
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/customshortcutlist"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/navigationbar"
+	"microsoft.com/pkggen/imagegen/attendedinstaller/speakuputils"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
 	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
 	"microsoft.com/pkggen/imagegen/configuration"
@@ -31,8 +32,9 @@ const (
 )
 
 const (
-	terminalUIOption  = iota
-	calamaresUIOption = iota
+	terminalUISpeechOption = iota
+	terminalUINoSpeechOption
+	calamaresUIOption
 )
 
 // InstallerView contains the installer selection UI.
@@ -55,7 +57,7 @@ func New(calamaresInstallFunc func()) *InstallerView {
 		calamaresInstallFunc: calamaresInstallFunc,
 	}
 
-	iv.installerOptions = []string{uitext.InstallerTerminalOption}
+	iv.installerOptions = []string{uitext.InstallerTerminalOption, uitext.InstallerTerminalNoSpeechOption}
 
 	_, err := exec.LookPath(calamaresToolName)
 	if err != nil {
@@ -145,11 +147,23 @@ func (iv *InstallerView) Primitive() tview.Primitive {
 
 // OnShow gets called when the view is shown to the user
 func (iv *InstallerView) OnShow() {
+	err := speakuputils.StartSpeakup()
+	if err != nil {
+		logger.Log.Warnf("Failed to start speakup, continuing")
+		err = nil
+	}
 }
 
 func (iv *InstallerView) onNextButton(nextPage func()) {
 	switch iv.optionList.GetCurrentItem() {
-	case terminalUIOption:
+	case terminalUINoSpeechOption:
+		err := speakuputils.StopSpeakup()
+		if err != nil {
+			logger.Log.Warnf("Failed to stop speakup, continuing")
+			err = nil
+		}
+		fallthrough
+	case terminalUISpeechOption:
 		nextPage()
 	case calamaresUIOption:
 		iv.calamaresInstallFunc()
@@ -164,8 +178,7 @@ func (iv *InstallerView) populateInstallerOptions() (err error) {
 	}
 
 	for _, option := range iv.installerOptions {
-		currentRune := rune(iv.optionList.GetItemCount() + 'a')
-		iv.optionList.AddItem(option, "", currentRune, nil)
+		iv.optionList.AddItem(option, "", 0, nil)
 	}
 
 	return

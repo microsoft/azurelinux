@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2020b
+Version:        2021a
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -29,9 +29,9 @@ ZONEINFO=%{buildroot}%{_datarootdir}/zoneinfo
 install -vdm 755 $ZONEINFO/{posix,right}
 for tz in etcetera southamerica northamerica europe africa antarctica  \
     asia australasia backward; do
-    zic -L /dev/null    -d $ZONEINFO        ${tz}
-    zic -L /dev/null    -d $ZONEINFO/posix  ${tz}
-    zic -L leapseconds  -d $ZONEINFO/right  ${tz}
+    zic -L /dev/null    -d $ZONEINFO        -y "sh yearistype.sh" ${tz}
+    zic -L /dev/null    -d $ZONEINFO/posix  -y "sh yearistype.sh" ${tz}
+    zic -L leapseconds  -d $ZONEINFO/right  -y "sh yearistype.sh" ${tz}
 done
 cp -v zone.tab iso3166.tab zone1970.tab $ZONEINFO
 zic -d $ZONEINFO -p America/New_York
@@ -45,6 +45,10 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Mon Apr 05 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2021a-1
+- Update to version  "2021a".
+- Removed 'pacificnew' and 'systemv' from parsed zone info, since they have been removed from the sources.
+
 * Fri Oct 09 2020 Thomas Crain <thcrain@microsoft.com> - 2020b-1
 - Update to 2020b
 - Update %%install section to reflect removal of deprecated files

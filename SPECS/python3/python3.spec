@@ -2,8 +2,8 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.7
-Release:        11%{?dist}
+Version:        3.7.10
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
+Patch3:         fix_broken_mariner_ssl_tests.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -34,10 +35,10 @@ Provides:       %{_bindir}/python
 Provides:       /bin/python
 Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
-# %if %{with_check}
-# BuildRequires:  iana-etc
-# BuildRequires:  tzdata
-# %endif
+%if %{with_check}
+BuildRequires:  iana-etc
+BuildRequires:  tzdata
+%endif
 
 %description
 The Python 3 package contains a new version of Python development environment.
@@ -127,6 +128,7 @@ Group:          Development/Tools
 Requires:       python3 = %{version}-%{release}
 Provides:       python3dist(setuptools) = %{version}-%{release}
 Provides:       python3.7dist(setuptools) = %{version}-%{release}
+Requires:       python3-xml
 BuildArch:      noarch
 
 %description    setuptools
@@ -141,10 +143,7 @@ Requires:       python3 = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%setup -q -n Python-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%autosetup -p1 -n Python-%{version}
 
 %build
 export OPT="%{optflags} %{openssl_flags}"
@@ -180,10 +179,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
-
 
 %files
 %defattr(-, root, root)
@@ -264,20 +259,30 @@ rm -rf %{buildroot}/*
 %files pip
 %defattr(-,root,root,755)
 %{_libdir}/python3.7/site-packages/pip/*
-%{_libdir}/python3.7/site-packages/pip-19.2.3.dist-info/*
+%{_libdir}/python3.7/site-packages/pip-20.1.1.dist-info/*
 %{_bindir}/pip*
 
 %files setuptools
 %defattr(-,root,root,755)
 %{_libdir}/python3.7/site-packages/pkg_resources/*
 %{_libdir}/python3.7/site-packages/setuptools/*
-%{_libdir}/python3.7/site-packages/setuptools-41.2.0.dist-info/*
+%{_libdir}/python3.7/site-packages/setuptools-47.1.0.dist-info/*
 %{_bindir}/easy_install-3.7
 
 %files test
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
+- Merge the following releases from 1.0 to dev branch
+- thcrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
+- thcrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619
+- pawelw@microsoft.com, 3.7.9-3: Adding explicit runtime dependency on 'python3-xml' for the 'python3-setuptool' subpackage.
+- nisamson@microsoft.com, 3.7.9-4: Patched CVE-2021-3177 with backported patch. Moved to autosetup.
+- thcrain@microsoft.com, 3.7.10-1: Update to 3.7.10, the latest security release for 3.7, to fix CVE-2021-23336
+-   Remove backported patches for CVE-2020-27619, CVE-2021-3177
+- anphel@microsoft.com, 3.7.10-2: Add patch to fix test_ssl tests
+
 * Tue Apr 20 2021 Henry Li <lihl@microsoft.com> - 3.7.7-11
 - Provides python from python3
 

@@ -106,6 +106,7 @@ var (
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
 	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
@@ -176,7 +177,7 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, packList, templateSrcConfig)
+	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
 }
 
@@ -209,7 +210,7 @@ func parsePackListFile(packListFile string) (packList []string, err error) {
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -222,7 +223,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	}
 
 	doCreateAll := func() error {
-		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, packList, templateSrcConfig)
+		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig)
 	}
 
 	if chroot != nil {
@@ -248,7 +249,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 
 	specFiles, err := findSPECFiles(specsDir, packList)
@@ -256,7 +257,7 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 		return
 	}
 
-	specStates, err := calculateSPECsToRepack(specFiles, distTag, outDir, nestedSourcesDir, repackAll, workers)
+	specStates, err := calculateSPECsToRepack(specFiles, distTag, outDir, nestedSourcesDir, repackAll, runCheck, workers)
 	if err != nil {
 		return
 	}
@@ -365,7 +366,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 // calculateSPECsToRepack will check which SPECs should be packed.
 // If the resulting SRPM does not exist, or is older than a modification to
 // one of the files used by the SPEC then it is repacked.
-func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll bool, workers int) (states []*specState, err error) {
+func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool, workers int) (states []*specState, err error) {
 	var wg sync.WaitGroup
 
 	requests := make(chan string, len(specFiles))
@@ -377,7 +378,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, nestedSourcesDir, repackAll)
+		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, nestedSourcesDir, repackAll, runCheck)
 	}
 
 	for _, specFile := range specFiles {
@@ -427,7 +428,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 }
 
 // specsToPackWorker will process a channel of spec files that should be checked if packing is needed.
-func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, nestedSourcesDir, repackAll bool) {
+func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool) {
 	const (
 		queryFormat         = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		queryExclusiveArch  = "%{ARCH}\n[%{EXCLUSIVEARCH}]\n"
@@ -456,7 +457,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		containingDir := filepath.Dir(specFile)
 
 		// Find the SRPM that this SPEC will produce.
-		defines := rpm.DefaultDefines()
+		defines := rpm.DefaultDefines(runCheck)
 		defines[rpm.DistTagDefine] = distTag
 
 		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
@@ -705,7 +706,7 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	// This will only contain signatures that have either been validated or updated by this tool.
 	currentSignatures := make(map[string]string)
 
-	defines := rpm.DefaultDefines()
+	defines := rpm.DefaultDefines(*runCheck)
 	if distTag != "" {
 		defines[rpm.DistTagDefine] = distTag
 	}

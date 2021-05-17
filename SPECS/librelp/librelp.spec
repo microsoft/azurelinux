@@ -1,12 +1,11 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.2.17
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 URL:            https://github.com/rsyslog/librelp
-#Source0:        https://github.com/rsyslog/librelp/archive/v%{version}.tar.gz
+#Source0:       https://github.com/rsyslog/librelp/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-%define sha1 librelp=701d69e7723fe614b96750af8cba5ee9a54085fe
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,25 +42,36 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
+# The tls-basic-brokencert test is marked unstable in upstream source, so disable it.
+# https://github.com/rsyslog/librelp/blob/c22cc7bf7bc42aa714a3ebf284140f5ee3238983/tests/Makefile.am#L43
+sed -i '/tls-basic-brokencert.sh \\/d' ./tests/Makefile.am
+
 make check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/*.so.*
 %{_libdir}/*.la
 %{_libdir}/*.a
+
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.17-8
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 1.2.17-7: Fix check tests.
+
 *   Mon Sep 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.2.17-7
 -   Remove the Valgrind workaround in the check section.
-*   Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
 -   Added %%license line automatically
 *   Wed Mar 11 2020 Christopher Co <chrco@microsoft.com> 1.2.17-5
 -   Updated Source location

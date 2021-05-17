@@ -19,27 +19,33 @@ ignore_list=" \
   kf5 \
   mariner-repos \
   mariner-rpm-macros \
+  shim \
   moby-buildx \
   moby-containerd \
   openjdk8 \
+  python-markupsafe \
   python-nocasedict \
   python-pywbem \
   python-repoze-lru \
+  python-requests \
   python-sphinxcontrib-websupport \
   python-yamlloader \
+  python-zope-interface \
   qt5-rpm-macros \
   runc \
   grub2-efi-binary-signed-aarch64 \
-  grub2-efi-binary-signed-x64 \
+  grub2-efi-binary-signed-x86_64 \
   kernel-signed-aarch64 \
-  kernel-signed-x64"
+  kernel-signed-x86_64 \
+  verity-read-only-root \
+  installkernel"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
 
-[[ -n "$@" ]] || echo "No specs passed to validate"
+[[ $# -eq 0 ]] && echo "No specs passed to validate"
 
-for spec in $@
+for spec in "$@"
 do
   echo Checking "$spec"
 
@@ -62,11 +68,11 @@ do
   version=$(rpmspec --srpm  --define "with_check 0" --qf "%{VERSION}" -q $spec 2>/dev/null )
 
   # Some source files have been renamed, look for a comment and also try that (while manually substituting the name/version)
-  source0alt=$(grep "^#[[:blank:]]*Source0:" $spec | awk '{print $NF}' | sed "s/%{name}/$name/g" | sed "s/%{version}/$version/g" )
+  source0alt=$(grep "^#[[:blank:]]*Source0:" $spec | awk '{print $NF}' | sed "s/%\?%{name}/$name/g" | sed "s/%\?%{version}/$version/g" )
   # Some packages define a %url as well
   # Use ' ' as delimiter to avoid conflict with URL characters
   specurl=$(rpmspec --srpm  --define "with_check 0" --qf "%{URL}" -q $spec 2>/dev/null )
-  [[ -z specurl ]] || source0alt=$(echo $source0alt | sed "s %{url} $specurl g" )
+  [[ -z $specurl ]] || source0alt=$(echo $source0alt | sed "s %\?%{url} $specurl g" )
 
   # Pull the current registration from the cgmanifest file. Every registration should have a url, so if we don't find one
   # that implies the registration is missing.
@@ -84,7 +90,7 @@ do
     else
       # Try a few times to download the source listed in the manifest
       mkdir -p ./cgmanifest_test_dir
-      for i in {1..10}
+      for _ in {1..10}
       do
         wget --quiet -P ./cgmanifest_test_dir $manifesturl && touch ./cgmanifest_test_dir/WORKED && break
         sleep 30

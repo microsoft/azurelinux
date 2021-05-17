@@ -1,0 +1,486 @@
+diff -urN at-3.1.13/config.guess at-3.1.13-aarch64/config.guess
+--- at-3.1.13/config.guess	2011-06-25 07:43:14.000000000 -0500
++++ at-3.1.13-aarch64/config.guess	2013-03-07 19:22:31.804824167 -0600
+@@ -2,9 +2,9 @@
+ # Attempt to guess a canonical system name.
+ #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+ #   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+-#   2011 Free Software Foundation, Inc.
++#   2011, 2012 Free Software Foundation, Inc.
+ 
+-timestamp='2011-05-11'
++timestamp='2012-09-25'
+ 
+ # This file is free software; you can redistribute it and/or modify it
+ # under the terms of the GNU General Public License as published by
+@@ -17,9 +17,7 @@
+ # General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+-# 02110-1301, USA.
++# along with this program; if not, see <http://www.gnu.org/licenses/>.
+ #
+ # As a special exception to the GNU General Public License, if you
+ # distribute this file as part of a program that contains a
+@@ -57,8 +55,8 @@
+ 
+ Originally written by Per Bothner.
+ Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free
+-Software Foundation, Inc.
++2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
++Free Software Foundation, Inc.
+ 
+ This is free software; see the source for copying conditions.  There is NO
+ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+@@ -145,7 +143,7 @@
+ case "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}" in
+     *:NetBSD:*:*)
+ 	# NetBSD (nbsd) targets should (where applicable) match one or
+-	# more of the tupples: *-*-netbsdelf*, *-*-netbsdaout*,
++	# more of the tuples: *-*-netbsdelf*, *-*-netbsdaout*,
+ 	# *-*-netbsdecoff* and *-*-netbsd*.  For targets that recently
+ 	# switched to ELF, *-*-netbsd* would select the old
+ 	# object file format.  This provides both forward
+@@ -202,6 +200,10 @@
+ 	# CPU_TYPE-MANUFACTURER-OPERATING_SYSTEM is used.
+ 	echo "${machine}-${os}${release}"
+ 	exit ;;
++    *:Bitrig:*:*)
++	UNAME_MACHINE_ARCH=`arch | sed 's/Bitrig.//'`
++	echo ${UNAME_MACHINE_ARCH}-unknown-bitrig${UNAME_RELEASE}
++	exit ;;
+     *:OpenBSD:*:*)
+ 	UNAME_MACHINE_ARCH=`arch | sed 's/OpenBSD.//'`
+ 	echo ${UNAME_MACHINE_ARCH}-unknown-openbsd${UNAME_RELEASE}
+@@ -304,7 +306,7 @@
+     arm:RISC*:1.[012]*:*|arm:riscix:1.[012]*:*)
+ 	echo arm-acorn-riscix${UNAME_RELEASE}
+ 	exit ;;
+-    arm:riscos:*:*|arm:RISCOS:*:*)
++    arm*:riscos:*:*|arm*:RISCOS:*:*)
+ 	echo arm-unknown-riscos
+ 	exit ;;
+     SR2?01:HI-UX/MPP:*:* | SR8000:HI-UX/MPP:*:*)
+@@ -792,21 +794,26 @@
+ 	echo ${UNAME_MACHINE}-unknown-bsdi${UNAME_RELEASE}
+ 	exit ;;
+     *:FreeBSD:*:*)
+-	case ${UNAME_MACHINE} in
+-	    pc98)
+-		echo i386-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
++	UNAME_PROCESSOR=`/usr/bin/uname -p`
++	case ${UNAME_PROCESSOR} in
+ 	    amd64)
+ 		echo x86_64-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
+ 	    *)
+-		echo ${UNAME_MACHINE}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
++		echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
+ 	esac
+ 	exit ;;
+     i*:CYGWIN*:*)
+ 	echo ${UNAME_MACHINE}-pc-cygwin
+ 	exit ;;
++    *:MINGW64*:*)
++	echo ${UNAME_MACHINE}-pc-mingw64
++	exit ;;
+     *:MINGW*:*)
+ 	echo ${UNAME_MACHINE}-pc-mingw32
+ 	exit ;;
++    i*:MSYS*:*)
++	echo ${UNAME_MACHINE}-pc-msys
++	exit ;;
+     i*:windows32*:*)
+ 	# uname -m includes "-pc" on this system.
+ 	echo ${UNAME_MACHINE}-mingw32
+@@ -861,6 +868,13 @@
+     i*86:Minix:*:*)
+ 	echo ${UNAME_MACHINE}-pc-minix
+ 	exit ;;
++    aarch64:Linux:*:*)
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
++	exit ;;
++    aarch64_be:Linux:*:*)
++	UNAME_MACHINE=aarch64_be
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
++	exit ;;
+     alpha:Linux:*:*)
+ 	case `sed -n '/^cpu model/s/^.*: \(.*\)/\1/p' < /proc/cpuinfo` in
+ 	  EV5)   UNAME_MACHINE=alphaev5 ;;
+@@ -895,13 +909,16 @@
+ 	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     cris:Linux:*:*)
+-	echo cris-axis-linux-gnu
++	echo ${UNAME_MACHINE}-axis-linux-gnu
+ 	exit ;;
+     crisv32:Linux:*:*)
+-	echo crisv32-axis-linux-gnu
++	echo ${UNAME_MACHINE}-axis-linux-gnu
+ 	exit ;;
+     frv:Linux:*:*)
+-	echo frv-unknown-linux-gnu
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
++	exit ;;
++    hexagon:Linux:*:*)
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     i*86:Linux:*:*)
+ 	LIBC=gnu
+@@ -943,7 +960,7 @@
+ 	test x"${CPU}" != x && { echo "${CPU}-unknown-linux-gnu"; exit; }
+ 	;;
+     or32:Linux:*:*)
+-	echo or32-unknown-linux-gnu
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     padre:Linux:*:*)
+ 	echo sparc-unknown-linux-gnu
+@@ -978,13 +995,13 @@
+ 	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     tile*:Linux:*:*)
+-	echo ${UNAME_MACHINE}-tilera-linux-gnu
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     vax:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-dec-linux-gnu
+ 	exit ;;
+     x86_64:Linux:*:*)
+-	echo x86_64-unknown-linux-gnu
++	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
+     xtensa*:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-unknown-linux-gnu
+@@ -1191,6 +1208,9 @@
+     BePC:Haiku:*:*)	# Haiku running on Intel PC compatible.
+ 	echo i586-pc-haiku
+ 	exit ;;
++    x86_64:Haiku:*:*)
++	echo x86_64-unknown-haiku
++	exit ;;
+     SX-4:SUPER-UX:*:*)
+ 	echo sx4-nec-superux${UNAME_RELEASE}
+ 	exit ;;
+@@ -1246,7 +1266,7 @@
+     NEO-?:NONSTOP_KERNEL:*:*)
+ 	echo neo-tandem-nsk${UNAME_RELEASE}
+ 	exit ;;
+-    NSE-?:NONSTOP_KERNEL:*:*)
++    NSE-*:NONSTOP_KERNEL:*:*)
+ 	echo nse-tandem-nsk${UNAME_RELEASE}
+ 	exit ;;
+     NSR-?:NONSTOP_KERNEL:*:*)
+@@ -1315,11 +1335,11 @@
+     i*86:AROS:*:*)
+ 	echo ${UNAME_MACHINE}-pc-aros
+ 	exit ;;
++    x86_64:VMkernel:*:*)
++	echo ${UNAME_MACHINE}-unknown-esx
++	exit ;;
+ esac
+ 
+-#echo '(No uname command or uname output not recognized.)' 1>&2
+-#echo "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}" 1>&2
+-
+ eval $set_cc_for_build
+ cat >$dummy.c <<EOF
+ #ifdef _SEQUENT_
+diff -urN at-3.1.13/config.sub at-3.1.13-aarch64/config.sub
+--- at-3.1.13/config.sub	2011-06-25 07:43:14.000000000 -0500
++++ at-3.1.13-aarch64/config.sub	2013-03-07 19:22:31.833820844 -0600
+@@ -2,9 +2,9 @@
+ # Configuration validation subroutine script.
+ #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+ #   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+-#   2011 Free Software Foundation, Inc.
++#   2011, 2012 Free Software Foundation, Inc.
+ 
+-timestamp='2011-03-23'
++timestamp='2012-10-10'
+ 
+ # This file is (in principle) common to ALL GNU software.
+ # The presence of a machine in this file suggests that SOME GNU software
+@@ -21,9 +21,7 @@
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+-# 02110-1301, USA.
++# along with this program; if not, see <http://www.gnu.org/licenses/>.
+ #
+ # As a special exception to the GNU General Public License, if you
+ # distribute this file as part of a program that contains a
+@@ -76,8 +74,8 @@
+ GNU config.sub ($timestamp)
+ 
+ Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free
+-Software Foundation, Inc.
++2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
++Free Software Foundation, Inc.
+ 
+ This is free software; see the source for copying conditions.  There is NO
+ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+@@ -125,13 +123,17 @@
+ maybe_os=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\2/'`
+ case $maybe_os in
+   nto-qnx* | linux-gnu* | linux-android* | linux-dietlibc | linux-newlib* | \
+-  linux-uclibc* | uclinux-uclibc* | uclinux-gnu* | kfreebsd*-gnu* | \
++  linux-musl* | linux-uclibc* | uclinux-uclibc* | uclinux-gnu* | kfreebsd*-gnu* | \
+   knetbsd*-gnu* | netbsd*-gnu* | \
+   kopensolaris*-gnu* | \
+   storm-chaos* | os2-emx* | rtmk-nova*)
+     os=-$maybe_os
+     basic_machine=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\1/'`
+     ;;
++  android-linux)
++    os=-linux-android
++    basic_machine=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\1/'`-unknown
++    ;;
+   *)
+     basic_machine=`echo $1 | sed 's/-[^-]*$//'`
+     if [ $basic_machine != $1 ]
+@@ -154,7 +156,7 @@
+ 	-convergent* | -ncr* | -news | -32* | -3600* | -3100* | -hitachi* |\
+ 	-c[123]* | -convex* | -sun | -crds | -omron* | -dg | -ultra | -tti* | \
+ 	-harris | -dolphin | -highlevel | -gould | -cbm | -ns | -masscomp | \
+-	-apple | -axis | -knuth | -cray | -microblaze)
++	-apple | -axis | -knuth | -cray | -microblaze*)
+ 		os=
+ 		basic_machine=$1
+ 		;;
+@@ -223,6 +225,12 @@
+ 	-isc*)
+ 		basic_machine=`echo $1 | sed -e 's/86-.*/86-pc/'`
+ 		;;
++	-lynx*178)
++		os=-lynxos178
++		;;
++	-lynx*5)
++		os=-lynxos5
++		;;
+ 	-lynx*)
+ 		os=-lynxos
+ 		;;
+@@ -247,20 +255,25 @@
+ 	# Some are omitted here because they have special meanings below.
+ 	1750a | 580 \
+ 	| a29k \
++	| aarch64 | aarch64_be \
+ 	| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
+ 	| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] | alpha64pca5[67] \
+ 	| am33_2.0 \
+ 	| arc | arm | arm[bl]e | arme[lb] | armv[2345] | armv[345][lb] | avr | avr32 \
++        | be32 | be64 \
+ 	| bfin \
+ 	| c4x | clipper \
+ 	| d10v | d30v | dlx | dsp16xx \
++	| epiphany \
+ 	| fido | fr30 | frv \
+ 	| h8300 | h8500 | hppa | hppa1.[01] | hppa2.0 | hppa2.0[nw] | hppa64 \
++	| hexagon \
+ 	| i370 | i860 | i960 | ia64 \
+ 	| ip2k | iq2000 \
++	| le32 | le64 \
+ 	| lm32 \
+ 	| m32c | m32r | m32rle | m68000 | m68k | m88k \
+-	| maxq | mb | microblaze | mcore | mep | metag \
++	| maxq | mb | microblaze | microblazeel | mcore | mep | metag \
+ 	| mips | mipsbe | mipseb | mipsel | mipsle \
+ 	| mips16 \
+ 	| mips64 | mips64el \
+@@ -291,7 +304,7 @@
+ 	| pdp10 | pdp11 | pj | pjl \
+ 	| powerpc | powerpc64 | powerpc64le | powerpcle \
+ 	| pyramid \
+-	| rx \
++	| rl78 | rx \
+ 	| score \
+ 	| sh | sh[1234] | sh[24]a | sh[24]aeb | sh[23]e | sh[34]eb | sheb | shbe | shle | sh[1234]le | sh3ele \
+ 	| sh64 | sh64le \
+@@ -300,7 +313,7 @@
+ 	| spu \
+ 	| tahoe | tic4x | tic54x | tic55x | tic6x | tic80 | tron \
+ 	| ubicom32 \
+-	| v850 | v850e \
++	| v850 | v850e | v850e1 | v850e2 | v850es | v850e2v3 \
+ 	| we32k \
+ 	| x86 | xc16x | xstormy16 | xtensa \
+ 	| z8k | z80)
+@@ -315,8 +328,7 @@
+ 	c6x)
+ 		basic_machine=tic6x-unknown
+ 		;;
+-	m6811 | m68hc11 | m6812 | m68hc12 | picochip)
+-		# Motorola 68HC11/12.
++	m6811 | m68hc11 | m6812 | m68hc12 | m68hcs12x | picochip)
+ 		basic_machine=$basic_machine-unknown
+ 		os=-none
+ 		;;
+@@ -329,7 +341,10 @@
+ 	strongarm | thumb | xscale)
+ 		basic_machine=arm-unknown
+ 		;;
+-
++	xgate)
++		basic_machine=$basic_machine-unknown
++		os=-none
++		;;
+ 	xscaleeb)
+ 		basic_machine=armeb-unknown
+ 		;;
+@@ -352,11 +367,13 @@
+ 	# Recognize the basic CPU types with company name.
+ 	580-* \
+ 	| a29k-* \
++	| aarch64-* | aarch64_be-* \
+ 	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
+ 	| avr-* | avr32-* \
++	| be32-* | be64-* \
+ 	| bfin-* | bs2000-* \
+ 	| c[123]* | c30-* | [cjt]90-* | c4x-* \
+ 	| clipper-* | craynv-* | cydra-* \
+@@ -365,12 +382,15 @@
+ 	| f30[01]-* | f700-* | fido-* | fr30-* | frv-* | fx80-* \
+ 	| h8300-* | h8500-* \
+ 	| hppa-* | hppa1.[01]-* | hppa2.0-* | hppa2.0[nw]-* | hppa64-* \
++	| hexagon-* \
+ 	| i*86-* | i860-* | i960-* | ia64-* \
+ 	| ip2k-* | iq2000-* \
++	| le32-* | le64-* \
+ 	| lm32-* \
+ 	| m32c-* | m32r-* | m32rle-* \
+ 	| m68000-* | m680[012346]0-* | m68360-* | m683?2-* | m68k-* \
+-	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* | microblaze-* \
++	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* \
++	| microblaze-* | microblazeel-* \
+ 	| mips-* | mipsbe-* | mipseb-* | mipsel-* | mipsle-* \
+ 	| mips16-* \
+ 	| mips64-* | mips64el-* \
+@@ -400,7 +420,7 @@
+ 	| pdp10-* | pdp11-* | pj-* | pjl-* | pn-* | power-* \
+ 	| powerpc-* | powerpc64-* | powerpc64le-* | powerpcle-* \
+ 	| pyramid-* \
+-	| romp-* | rs6000-* | rx-* \
++	| rl78-* | romp-* | rs6000-* | rx-* \
+ 	| sh-* | sh[1234]-* | sh[24]a-* | sh[24]aeb-* | sh[23]e-* | sh[34]eb-* | sheb-* | shbe-* \
+ 	| shle-* | sh[1234]le-* | sh3ele-* | sh64-* | sh64le-* \
+ 	| sparc-* | sparc64-* | sparc64b-* | sparc64v-* | sparc86x-* | sparclet-* \
+@@ -408,10 +428,11 @@
+ 	| sparcv8-* | sparcv9-* | sparcv9b-* | sparcv9v-* | sv1-* | sx?-* \
+ 	| tahoe-* \
+ 	| tic30-* | tic4x-* | tic54x-* | tic55x-* | tic6x-* | tic80-* \
+-	| tile-* | tilegx-* \
++	| tile*-* \
+ 	| tron-* \
+ 	| ubicom32-* \
+-	| v850-* | v850e-* | vax-* \
++	| v850-* | v850e-* | v850e1-* | v850es-* | v850e2-* | v850e2v3-* \
++	| vax-* \
+ 	| we32k-* \
+ 	| x86-* | x86_64-* | xc16x-* | xps100-* \
+ 	| xstormy16-* | xtensa*-* \
+@@ -711,7 +732,6 @@
+ 	i370-ibm* | ibm*)
+ 		basic_machine=i370-ibm
+ 		;;
+-# I'm not sure what "Sysv32" means.  Should this be sysv3.2?
+ 	i*86v32)
+ 		basic_machine=`echo $1 | sed -e 's/86.*/86-pc/'`
+ 		os=-sysv32
+@@ -769,9 +789,13 @@
+ 		basic_machine=ns32k-utek
+ 		os=-sysv
+ 		;;
+-	microblaze)
++	microblaze*)
+ 		basic_machine=microblaze-xilinx
+ 		;;
++	mingw64)
++		basic_machine=x86_64-pc
++		os=-mingw64
++		;;
+ 	mingw32)
+ 		basic_machine=i386-pc
+ 		os=-mingw32
+@@ -808,10 +832,18 @@
+ 	ms1-*)
+ 		basic_machine=`echo $basic_machine | sed -e 's/ms1-/mt-/'`
+ 		;;
++	msys)
++		basic_machine=i386-pc
++		os=-msys
++		;;
+ 	mvs)
+ 		basic_machine=i370-ibm
+ 		os=-mvs
+ 		;;
++	nacl)
++		basic_machine=le32-unknown
++		os=-nacl
++		;;
+ 	ncr3000)
+ 		basic_machine=i486-ncr
+ 		os=-sysv4
+@@ -1120,13 +1152,8 @@
+ 		basic_machine=t90-cray
+ 		os=-unicos
+ 		;;
+-	# This must be matched before tile*.
+-	tilegx*)
+-		basic_machine=tilegx-unknown
+-		os=-linux-gnu
+-		;;
+ 	tile*)
+-		basic_machine=tile-unknown
++		basic_machine=$basic_machine-unknown
+ 		os=-linux-gnu
+ 		;;
+ 	tx39)
+@@ -1330,15 +1357,15 @@
+ 	      | -nindy* | -vxsim* | -vxworks* | -ebmon* | -hms* | -mvs* \
+ 	      | -clix* | -riscos* | -uniplus* | -iris* | -rtu* | -xenix* \
+ 	      | -hiux* | -386bsd* | -knetbsd* | -mirbsd* | -netbsd* \
+-	      | -openbsd* | -solidbsd* \
++	      | -bitrig* | -openbsd* | -solidbsd* \
+ 	      | -ekkobsd* | -kfreebsd* | -freebsd* | -riscix* | -lynxos* \
+ 	      | -bosx* | -nextstep* | -cxux* | -aout* | -elf* | -oabi* \
+ 	      | -ptx* | -coff* | -ecoff* | -winnt* | -domain* | -vsta* \
+ 	      | -udi* | -eabi* | -lites* | -ieee* | -go32* | -aux* \
+ 	      | -chorusos* | -chorusrdb* | -cegcc* \
+-	      | -cygwin* | -pe* | -psos* | -moss* | -proelf* | -rtems* \
+-	      | -mingw32* | -linux-gnu* | -linux-android* \
+-	      | -linux-newlib* | -linux-uclibc* \
++	      | -cygwin* | -msys* | -pe* | -psos* | -moss* | -proelf* | -rtems* \
++	      | -mingw32* | -mingw64* | -linux-gnu* | -linux-android* \
++	      | -linux-newlib* | -linux-musl* | -linux-uclibc* \
+ 	      | -uxpv* | -beos* | -mpeix* | -udk* \
+ 	      | -interix* | -uwin* | -mks* | -rhapsody* | -darwin* | -opened* \
+ 	      | -openstep* | -oskit* | -conix* | -pw32* | -nonstopux* \
+@@ -1521,6 +1548,9 @@
+ 	c4x-* | tic4x-*)
+ 		os=-coff
+ 		;;
++	hexagon-*)
++		os=-elf
++		;;
+ 	tic54x-*)
+ 		os=-coff
+ 		;;
+@@ -1548,9 +1578,6 @@
+ 		;;
+ 	m68000-sun)
+ 		os=-sunos3
+-		# This also exists in the configure program, but was not the
+-		# default.
+-		# os=-sunos4
+ 		;;
+ 	m68*-cisco)
+ 		os=-aout

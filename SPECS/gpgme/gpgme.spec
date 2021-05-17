@@ -3,7 +3,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.13.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ or LGPLv2+
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Group:          System Environment/Security
@@ -61,7 +61,8 @@ rm -rf %{buildroot}/%{_infodir}
 %postun	-p /sbin/ldconfig
 
 %check
-make check
+cd tests
+make check-TESTS
 
 %files
 %defattr(-,root,root)
@@ -84,6 +85,8 @@ make check
 %{python3_sitearch}/gpg/
 
 %changelog
+*   Tue Nov 10 2020 Andrew Phelps <anphel@microsoft.com> 1.13.1-6
+-   Fix check test.
 *   Thu Aug 20 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.1-5
 -   Resolve file conflicts for shared objects.
 *   Wed May 13 2020 Emre Girgin <mrgirgin@microsoft.com> 1.13.1-4

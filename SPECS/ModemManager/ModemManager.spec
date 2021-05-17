@@ -1,7 +1,7 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.10.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            https://www.freedesktop.org/wiki/Software/ModemManager/
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  libqmi-devel
+%if %{with_check}
+BuildRequires:  dbus-glib
+%endif
 Requires:       glib
 Requires:       gobject-introspection
 Requires:       libqmi
@@ -75,6 +78,10 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.4-4
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 1.10.4-3: Add dbus BuildRequires to fix check tests.
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.4-3
 - Provide ModemManager-glib and ModemManager-glib-devel.
 

@@ -3,7 +3,7 @@
 Summary:       A library for password generation and password quality checking
 Name:          libpwquality
 Version:       1.4.2
-Release:       4%{?dist}
+Release:       6%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/libpwquality/libpwquality/
@@ -84,10 +84,9 @@ mkdir $RPM_BUILD_ROOT%{_secconfdir}/pwquality.conf.d
 
 %find_lang libpwquality
 
-%check
-# Nothing yet
+%post -p /sbin/ldconfig
 
-%ldconfig_scriptlets
+%postun -p /sbin/ldconfig
 
 %files -f libpwquality.lang
 %{!?_licensedir:%global license %%doc}
@@ -114,6 +113,12 @@ mkdir $RPM_BUILD_ROOT%{_secconfdir}/pwquality.conf.d
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.4.2-6
+- Replace %%ldconfig_scriptlets with actual post/postun sections
+
+* Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 1.4.2-5
+- Remove empty check section.
+
 * Mon Jun 29 2020 Paul Monson <paulmon@microsoft.com> 1.4.2-4
 - Only create python3 symbolic link if /usr/bin/python3 does not exist.
 

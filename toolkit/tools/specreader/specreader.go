@@ -46,6 +46,7 @@ var (
 	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
 	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
+	runCheck  = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
 )
@@ -59,13 +60,13 @@ func main() {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
 
-	err := parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *distTag, *output, *workerTar, *workers)
+	err := parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *distTag, *output, *workerTar, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFile, workerTar string, workers int) (err error) {
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFile, workerTar string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -82,7 +83,7 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFil
 
 	doParse := func() error {
 		var parseError error
-		packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, workers)
+		packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, workers, runCheck)
 		return parseError
 	}
 
@@ -159,7 +160,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 }
 
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -185,7 +186,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int) (packa
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir)
+		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, runCheck)
 	}
 
 	for _, specFile := range specFiles {
@@ -245,7 +246,7 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string) {
+func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string, runCheck bool) {
 	const (
 		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
@@ -254,7 +255,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefines()
+	defines := rpm.DefaultDefines(runCheck)
 	defines[rpm.DistTagDefine] = distTag
 
 	for specfile := range requests {

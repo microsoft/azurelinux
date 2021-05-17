@@ -1,0 +1,55 @@
+From 15d0c5593079f0c75b0e3ed9209e549e5d2e7822 Mon Sep 17 00:00:00 2001
+From: Ken Dreyer <ktdreyer@ktdreyer.com>
+Date: Wed, 28 May 2014 15:00:44 -0600
+Subject: [PATCH 1/2] Fedora: add heimdal- prefixes to heimtools cmds
+
+The Fedora Heimdal package renames the klist and kswitch commands in
+/usr/bin to use "heimdal-" prefixes in order to avoid conflicting with
+MIT's utilities.
+
+Add these "heimdal-" names to the heimtools command configuration so
+that heimtools will recognize the commands under the new names as well
+as the old names.
+---
+ kuser/heimtools-commands.in | 2 ++
+ kuser/heimtools.c           | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/kuser/heimtools-commands.in b/kuser/heimtools-commands.in
+index b22a8c5..62388ce 100644
+--- a/kuser/heimtools-commands.in
++++ b/kuser/heimtools-commands.in
+@@ -34,6 +34,7 @@
+ command = {
+ 	name = "klist"
+ 	name = "list"
++	name = "heimdal-klist"
+ 	help = "List kerberos tickets"
+ 	option = {
+ 		long = "cache"
+@@ -136,6 +137,7 @@ command = {
+ command = {
+ 	name = "kswitch"
+ 	name = "switch"
++	name = "heimdal-kswitch"
+ 	help = "Switch default kerberos cache"
+ 	option = {
+ 		long = "type"
+diff --git a/kuser/heimtools.c b/kuser/heimtools.c
+index 70b23d6..c1ef60e 100644
+--- a/kuser/heimtools.c
++++ b/kuser/heimtools.c
+@@ -89,8 +89,8 @@ static int
+ command_alias(const char *name)
+ {
+     const char *aliases[] = {
+-	"kinit", "klist", "kswitch", "kgetcred", "kvno", "kdeltkt",
+-	"kdestroy", "kcpytkt", NULL
++	"kinit", "klist", "heimdal-klist", "kswitch", "heimdal-kswitch",
++	"kgetcred", "kvno", "kdeltkt", "kdestroy", "kcpytkt", NULL
+     }, **p = aliases;
+ 
+     while (*p && strcmp(name, *p) != 0)
+-- 
+1.9.3
+

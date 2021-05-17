@@ -77,14 +77,15 @@ type ManualPartitionWidget struct {
 	pages          *tview.Pages
 
 	// Add partition form elements
-	addPartitionForm *tview.Form
-	formFlex         *tview.Flex
-	formNavBar       *navigationbar.NavigationBar
-	formatDropDown   *tview.DropDown
-	mountPointInput  *tview.InputField
-	nameInput        *tview.InputField
-	sizeUnitDropDown *tview.DropDown
-	sizeInput        *tview.InputField
+	addPartitionForm  *tview.Form
+	formFlex          *tview.Flex
+	formNavBar        *navigationbar.NavigationBar
+	formatInput       *tview.InputField
+	mountPointInput   *tview.InputField
+	nameInput         *tview.InputField
+	sizeUnitInput     *tview.InputField
+	sizeInput         *tview.InputField
+	formSpaceLeftText *tview.TextView
 
 	// Disk state
 	bytesRemaining uint64
@@ -128,37 +129,31 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	mp.addPartitionForm = tview.NewForm().
 		SetButtonsAlign(tview.AlignCenter)
 
-	// Dropdowns do not expose the functions needed to override the list colors.
-	// Alter the defaults now so they are captured by the dropdowns and then restore the style
-	// for future elements.
-	originalStyle := tview.Styles
-	tview.Styles.MoreContrastBackgroundColor = tcell.ColorBlack
-	tview.Styles.PrimitiveBackgroundColor = tcell.ColorWhite
-	tview.Styles.PrimaryTextColor = tcell.ColorGreen
+	mp.formatInput = mp.enumInputBox(validPartitionFormats).
+		SetLabel(uitext.FormDiskFormatLabel).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
-	mp.formatDropDown = tview.NewDropDown().
-		SetLabel(uitext.DiskFormatLabel).
-		SetOptions(validPartitionFormats, nil)
-
-	mp.sizeUnitDropDown = tview.NewDropDown().
-		SetLabel(uitext.DiskSizeUnitLabel).
-		SetOptions(validSizeUnits, nil)
-
-	// Restore the global style
-	tview.Styles = originalStyle
+	mp.sizeUnitInput = mp.enumInputBox(validSizeUnits).
+		SetLabel(uitext.FormDiskSizeUnitLabel).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.nameInput = tview.NewInputField().
-		SetLabel(uitext.DiskNameLabel).
+		SetLabel(uitext.FormDiskNameLabel).
 		SetFieldWidth(maxParittionLabelSize).
-		SetAcceptanceFunc(mp.nameInputValidation)
+		SetAcceptanceFunc(mp.nameInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.mountPointInput = tview.NewInputField().
-		SetLabel(uitext.DiskMountPointLabel).
-		SetAcceptanceFunc(mp.mountPointInputValidation)
+		SetLabel(uitext.FormDiskMountPointLabel).
+		SetAcceptanceFunc(mp.mountPointInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
 
 	mp.sizeInput = tview.NewInputField().
-		SetLabel(fmt.Sprintf("%s %s", uitext.DiskSizeLabel, uitext.DiskSizeLabelMaxHelp)).
-		SetAcceptanceFunc(mp.sizeInputValidation)
+		SetLabel(fmt.Sprintf("%s %s", uitext.FormDiskSizeLabel, uitext.FormDiskSizeLabelMaxHelp)).
+		SetAcceptanceFunc(mp.sizeInputValidation).
+		SetFieldBackgroundColor(tcell.ColorWhite)
+
+	mp.formSpaceLeftText = tview.NewTextView()
 
 	mp.formNavBar = navigationbar.NewNavigationBar().
 		AddButton(uitext.ButtonCancel, func() {
@@ -176,8 +171,8 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 	mp.addPartitionForm.
 		AddFormItem(mp.nameInput).
 		AddFormItem(mp.mountPointInput).
-		AddFormItem(mp.formatDropDown).
-		AddFormItem(mp.sizeUnitDropDown).
+		AddFormItem(mp.formatInput).
+		AddFormItem(mp.sizeUnitInput).
 		AddFormItem(mp.sizeInput).
 		AddFormItem(mp.formNavBar).
 		SetFieldBackgroundColor(tview.Styles.InverseTextColor)
@@ -196,7 +191,8 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 
 	formFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(mp.addPartitionForm, formHeight+mp.formNavBar.GetHeight()+1, 0, true)
+		AddItem(mp.addPartitionForm, formHeight+mp.formNavBar.GetHeight()+1, 0, true).
+		AddItem(mp.formSpaceLeftText, textHeight, 0, true)
 
 	mp.formFlex = uiutils.CenterVerticallyDynamically(formFlex)
 
@@ -228,7 +224,7 @@ func (mp *ManualPartitionWidget) Initialize(backButtonText string, sysConfig *co
 func (mp *ManualPartitionWidget) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 	frontPage, _ := mp.pages.GetFrontPage()
 	if frontPage == addPartitionPage {
-		mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
+		mp.formSpaceLeftText.SetText(mp.spaceLeftText.GetText(stripSpaceTags))
 
 		switch event.Key() {
 		case tcell.KeyUp:
@@ -240,8 +236,6 @@ func (mp *ManualPartitionWidget) HandleInput(event *tcell.EventKey) *tcell.Event
 		}
 	} else {
 		// The front page is the partition table
-		mp.navBar.ClearUserFeedback()
-
 		if mp.navBar.UnfocusedInputHandler(event) {
 			return nil
 		}
@@ -311,11 +305,11 @@ func (mp *ManualPartitionWidget) onPartitionConfirmButton() {
 			// Expand to all available disk space
 			formattedSize = fmt.Sprintf(partitionEntryFormat, mp.bytesRemaining/basePartitionUnit, basePartitionLabel)
 		} else {
-			_, currentUnit := mp.sizeUnitDropDown.GetCurrentOption()
+			currentUnit := mp.sizeUnitInput.GetText()
 			formattedSize = fmt.Sprintf("%s%s", sizeText, currentUnit)
 		}
 
-		_, currentFormat := mp.formatDropDown.GetCurrentOption()
+		currentFormat := mp.formatInput.GetText()
 		mp.addPartitionToTable(mp.nameInput.GetText(), formattedSize, currentFormat, mp.mountPointInput.GetText())
 		mp.pages.HidePage(addPartitionPage)
 		mp.refreshTitle()
@@ -332,15 +326,9 @@ func (mp *ManualPartitionWidget) validateAddPartitionForm() (err error) {
 		return fmt.Errorf(uitext.MountPointAlreadyInUseError)
 	}
 
-	formatIndex, format := mp.formatDropDown.GetCurrentOption()
-	if formatIndex == noSelection {
-		return fmt.Errorf(uitext.NoFormatSelectedError)
-	}
+	format := mp.formatInput.GetText()
 
-	unitIndex, currentUnit := mp.sizeUnitDropDown.GetCurrentOption()
-	if unitIndex == noSelection {
-		return fmt.Errorf(uitext.NoUnitOfSizeSelectedError)
-	}
+	currentUnit := mp.sizeUnitInput.GetText()
 
 	sizeText := mp.sizeInput.GetText()
 	if sizeText == "" {
@@ -378,12 +366,10 @@ func (mp *ManualPartitionWidget) validateAddPartitionForm() (err error) {
 func (mp *ManualPartitionWidget) resetAddPartitionForm() {
 	mp.nameInput.SetText("")
 	mp.mountPointInput.SetText("")
-	mp.formatDropDown.SetCurrentOption(noSelection)
-	mp.sizeUnitDropDown.SetCurrentOption(noSelection)
 	mp.sizeInput.SetText("")
-	mp.formNavBar.SetUserFeedback(mp.spaceLeftText.GetText(stripSpaceTags), tview.Styles.PrimaryTextColor)
+	mp.formSpaceLeftText.SetText(mp.spaceLeftText.GetText(stripSpaceTags))
+	mp.formNavBar.ClearUserFeedback()
 	mp.formNavBar.SetSelectedButton(noSelection)
-
 	mp.addPartitionForm.SetFocus(0)
 	mp.refreshTitle()
 }
@@ -589,6 +575,15 @@ func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 	mp.sysConfig.PartitionSettings = partitionSettings
 	mp.cfg.Disks = []configuration.Disk{disk}
 
+	// Flag the root for use with device mapper
+	if mp.sysConfig.ReadOnlyVerityRoot.Enable {
+		rootDiskPart := mp.cfg.GetDiskPartByID(mp.sysConfig.GetRootPartitionSetting().ID)
+		if rootDiskPart == nil {
+			return fmt.Errorf(uitext.InvalidRootDeviceMapperError)
+		}
+		rootDiskPart.Flags = append(rootDiskPart.Flags, configuration.PartitionFlagDeviceMapperRoot)
+	}
+
 	return
 }
 
@@ -656,10 +651,47 @@ func (mp *ManualPartitionWidget) nameInputValidation(textToCheck string, lastCha
 }
 
 func (mp *ManualPartitionWidget) onNextButton() {
+	mp.navBar.ClearUserFeedback()
 	err := mp.unmarshalPartitionTable()
 	if err != nil {
 		mp.navBar.SetUserFeedback(err.Error(), tview.Styles.TertiaryTextColor)
 	} else {
 		mp.nextPage()
 	}
+}
+
+// enumInputBox returns an input box that only allows values from elements to appear.
+func (mp *ManualPartitionWidget) enumInputBox(elements []string) *tview.InputField {
+	field := tview.NewInputField()
+	index := 0
+	// Initialize text with the first element
+	field.SetText(elements[index])
+
+	field.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		key := event.Key()
+		// Override movement left/right. Leave navigation keys intact. Consume all other input.
+		switch key {
+		case tcell.KeyLeft:
+			if index == 0 {
+				index = len(elements)
+			}
+			index--
+		case tcell.KeyRight:
+			index++
+			if index == len(elements) {
+				index = 0
+			}
+		case tcell.KeyEnter, tcell.KeyEscape,
+			tcell.KeyDown, tcell.KeyTab,
+			tcell.KeyUp, tcell.KeyBacktab:
+			// Navigation keys - pass
+			return event
+		default:
+			mp.formNavBar.SetUserFeedback(uitext.EnumNavigationFeedback, tview.Styles.TertiaryTextColor)
+			return nil
+		}
+		field.SetText(elements[index])
+		return nil
+	})
+	return field
 }

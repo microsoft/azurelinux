@@ -1,7 +1,7 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
 Version:        1.44.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,11 +25,11 @@ Requires:       harfbuzz-devel
 %description
 Pango is a library for laying out and rendering of text, with an emphasis on internationalization. Pango can be used anywhere that text layout is needed, though most of the work on Pango so far has been done in the context of the GTK+ widget toolkit.
 
-%package	devel
-Summary:        Header and development files
-Requires:       %{name} = %{version}-%{release}
+%package    devel
+Summary:    Header and development files
+Requires:   %{name} = %{version}-%{release}
 
-%description	devel
+%description    devel
 It contains the libraries and header files to create applications
 
 %prep
@@ -45,8 +45,9 @@ It contains the libraries and header files to create applications
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-#These tests are known to fail. Hence sending exit 0
-make %{?_smp_mflags} -k check || exit 0
+# Skip test-layout test, which is known to fail
+sed -i 's|test-layout$(EXEEXT) test-font$(EXEEXT)|test-font$(EXEEXT)|g' tests/Makefile
+make -k check
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -66,6 +67,10 @@ make %{?_smp_mflags} -k check || exit 0
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.7-2
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 1.40.4-5: Skip test-layout test.
+
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 1.44.7-1
 - Upgrade to version 1.44.7
 - Switch to meson build and install
@@ -76,12 +81,12 @@ make %{?_smp_mflags} -k check || exit 0
 * Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.40.4-4
 - Added %%license line automatically
 
-*   Mon Apr 20 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.40.4-3
--   Rename "freetype2" to "freetype".
--   Remove sha1 macro.
+* Mon Apr 20 2020 Nicolas Ontiveros <niontive@microsoft.com> - 1.40.4-3
+- Rename "freetype2" to "freetype".
+- Remove sha1 macro.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.40.4-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.40.4-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*       Tue Apr 04 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.40.4-1
--       Initial version
+* Tue Apr 04 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.40.4-1
+- Initial version

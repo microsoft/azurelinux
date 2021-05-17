@@ -51,7 +51,12 @@ var (
 )
 
 var (
-	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
+	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
+	equalToRegex              = regexp.MustCompile(` '?='? `)
+	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
+	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
+	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
+	packageUnavailableRegex   = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
 func main() {
@@ -68,7 +73,7 @@ func main() {
 	srpmName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
 	chrootDir := filepath.Join(*workDir, srpmName)
 
-	defines := rpm.DefaultDefines()
+	defines := rpm.DefaultDefines(*runCheck)
 	defines[rpm.DistTagDefine] = *distTag
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
@@ -123,7 +128,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	defer chroot.Close(noCleanup)
 
 	// Place extra files that will be needed to build into the chroot
-	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile)
+	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile, runCheck)
 	if err != nil {
 		return
 	}
@@ -148,7 +153,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 }
 
 func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
-	// Convert /localrpms into a repository that a package manager can use
+	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
 		return
@@ -304,7 +309,7 @@ func removeLibArchivesFromSystem() (err error) {
 
 		// Skip directories that are meant for device files and kernel virtual filesystems.
 		// These will not contain .la files and are mounted into the safechroot from the host.
-		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != -1 {
+		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != sliceutils.NotFound {
 			return filepath.SkipDir
 		}
 
@@ -323,10 +328,11 @@ func removeLibArchivesFromSystem() (err error) {
 }
 
 // copyFilesIntoChroot copies several required build specific files into the chroot.
-func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string) (srpmFileInChroot string, err error) {
+func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string, runCheck bool) (srpmFileInChroot string, err error) {
 	const (
 		chrootRepoDestDir = "/etc/yum.repos.d"
 		chrootSrpmDestDir = "/root/SRPMS"
+		resolvFilePath    = "/etc/resolv.conf"
 		rpmmacrosDest     = "/usr/lib/rpm/macros.d/macros.override"
 	)
 
@@ -350,6 +356,16 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 			Dest: rpmmacrosDest,
 		}
 		filesToCopy = append(filesToCopy, rpmmacrosCopy)
+	}
+
+	if runCheck {
+		logger.Log.Debug("Enabling network access because we're running package tests.")
+
+		resolvFileCopy := safechroot.FileToCopy{
+			Src:  resolvFilePath,
+			Dest: resolvFilePath,
+		}
+		filesToCopy = append(filesToCopy, resolvFileCopy)
 	}
 
 	err = chroot.AddFiles(filesToCopy...)

@@ -24,6 +24,7 @@ Prepping the Build Environment
         - [specreader](#specreader)
         - [srpmpacker](#srpmpacker)
         - [scheduler](#scheduler)
+        - [validatechroot](#validatechroot)
 
 ## The Makefile
 
@@ -96,5 +97,7 @@ The `specreader` tool scans all the `*.spec` files in a directory and generates 
 The `srpmpacker` tool creates `.src.rpm` files from local specs and sources. The sources can be present locally, or downloaded from a source server. It is responsible for enforcing a matching hash for every source file. This tool runs using the [chroot worker](#Chroot-Worker) to support macros.
 #### scheduler
 The `scheduler` tool takes the output from the `grapher` tool and schedules builds for each local spec file using [pkgworker](###pkgworker) (see [Stage 3: Scheduler](3_package_building.md#stage-3-scheduler)). `scheduler` will skip building any spec if it and all of its dependencies have already been built. The `scheduler` tool bases its decisions on the currently selected image configuration.
+#### validatechroot
+A tool which double checks the worker chroot has all its dependencies correctly installed.
 
 ## Prev: [Intro](0_intro.md), Next: [Local Packages](2_local_packages.md)

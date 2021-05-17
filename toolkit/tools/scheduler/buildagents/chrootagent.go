@@ -53,7 +53,7 @@ func (c *ChrootAgent) BuildPackage(inputFile, logName string, dependencies []str
 	}
 
 	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile, dependencies)
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, c.config.Program, args...)
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
 		builtFiles = strings.Split(lastStdoutLine, delimiter)

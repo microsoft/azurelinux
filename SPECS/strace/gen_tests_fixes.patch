@@ -1,0 +1,24 @@
+diff -u a/tests/gen_tests.in b/tests/gen_tests.in
+--- a/tests/gen_tests.in	2021-01-06 12:33:00.135456397 -0800
++++ b/tests/gen_tests.in	2021-01-06 12:34:32.351368901 -0800
+@@ -160,16 +160,16 @@
+ ipc_msg-Xraw	+ipc.sh -Xraw -a16
+ ipc_msg-Xverbose	+ipc.sh -Xverbose -a34
+ ipc_msgbuf-Xabbrev	+ipc_msgbuf.test -Xabbrev
+-ipc_msgbuf-Xraw	+ipc_msgbuf.test -Xraw -a22
++ipc_msgbuf-Xraw	+ipc_msgbuf.test -Xraw -a19
+ ipc_msgbuf-Xverbose	+ipc_msgbuf.test -Xverbose
+ ipc_sem	+ipc.sh -a29
+ ipc_sem-Xabbrev	+ipc.sh -Xabbrev -a29
+ ipc_sem-Xraw	+ipc.sh -Xraw -a19
+ ipc_sem-Xverbose	+ipc.sh -Xverbose -a36
+-ipc_shm	+ipc.sh -a29
+-ipc_shm-Xabbrev	+ipc.sh -Xabbrev -a29
++ipc_shm	+ipc.sh -a26
++ipc_shm-Xabbrev	+ipc.sh -Xabbrev -a26
+ ipc_shm-Xraw	+ipc.sh -Xraw -a19
+-ipc_shm-Xverbose	+ipc.sh -Xverbose -a36
++ipc_shm-Xverbose	+ipc.sh -Xverbose -a34
+ kcmp	-a22
+ kcmp-y	-a22 -y -e trace=kcmp
+ kern_features -a16

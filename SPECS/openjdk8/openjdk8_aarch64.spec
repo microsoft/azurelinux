@@ -1,22 +1,22 @@
 %define _use_internal_dependency_generator 0
 %global security_hardening none
-%define _jdk_update 181
-%define _jdk_build 13
-%define _repo_ver aarch64-jdk8u%{_jdk_update}-b%{_jdk_build}
+%define _jdk_update 292
+%define _jdk_build 10
+%define _repo_ver aarch64-shenandoah-jdk8u%{_jdk_update}-b%{_jdk_build}
 %define _url_src https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/
 %define bootstrapjdk %{_libdir}/jvm/OpenJDK-1.8.0.181-bootstrap
 Summary:        OpenJDK
 Name:           openjdk8
-Version:        1.8.0.181
-Release:        13%{?dist}
+Version:        1.8.0.292
+Release:        1%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u/
+URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u-shenandoah/
 Source0:        %{_url_src}/archive/%{_repo_ver}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs.patch
+Patch1:         check-system-ca-certs-292.patch
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
@@ -78,7 +78,7 @@ Obsoletes:      openjdk-src <= %{version}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn openjdk-aarch64-jdk8u-%{_repo_ver}
+%setup -n openjdk-aarch64-jdk8u-%{_repo_ver}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
@@ -101,6 +101,8 @@ sh configure \
 	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
+	--with-native-debug-symbols=none \
+	--disable-zip-debug-info \
 	--with-stdc++lib=dynamic
 
 make \
@@ -196,9 +198,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/THIRD_PARTY_README
 %{_libdir}/jvm/OpenJDK-%{version}/lib
 %{_libdir}/jvm/OpenJDK-%{version}/include/
+%{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/extcheck
+%{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/idlj
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jar
+%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jarsigner
 %{_libdir}/jvm/OpenJDK-%{version}/bin/java-rmi.cgi
 %{_libdir}/jvm/OpenJDK-%{version}/bin/javac
@@ -226,6 +231,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsgen
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsimport
 %{_libdir}/jvm/OpenJDK-%{version}/bin/xjc
+%exclude %{_libdir}/jvm/OpenJDK-%{version}/bin/*.debuginfo
 
 %files -n openjre8
 %defattr(-,root,root)
@@ -257,6 +263,10 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+* Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
+- Update to 8u292 to address CVEs.
+- Switch to Shenandoah version of the aarch64 port
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

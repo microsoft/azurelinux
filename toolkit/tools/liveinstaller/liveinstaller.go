@@ -359,7 +359,7 @@ func terminalAttendedInstall(cfg configuration.Config, progress chan int, status
 
 	args.emitProgress = true
 	program, commandArgs := formatImagerCommand(args)
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, program, commandArgs...)
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, false, program, commandArgs...)
 
 	return
 }

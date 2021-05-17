@@ -1,45 +1,51 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        4.4.18
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
-URL:            http://www.gnu.org/software/bash/
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/bash/%{name}-%{version}.tar.gz
-%define sha1    bash=6cf9b3c23930ba8a721fee177d1558e5b7cb6104
+Group:          System Environment/Base
+URL:            https://www.gnu.org/software/bash/
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
 Patch0:         bash-4.4.patch
-Provides:       /bin/sh
-Provides:       /bin/bash
-Provides:       /usr/bin/sh
-Provides:       /usr/bin/bash
+# CVE-2019-18276 has a negligible security impact, 
+# since we don't ship bash with suid.
+# Backporting the patch is non-trivial, as well.
+Patch1:         CVE-2019-18276.nopatch
 BuildRequires:  readline
 Requires:       readline
-Requires(post):    /bin/grep
-Requires(post):    /bin/cp
-Requires(postun):  /bin/grep
-Requires(postun):  /bin/mv
+Requires(post):   /bin/cp
+Requires(post):   /bin/grep
+Requires(postun): /bin/grep
+Requires(postun): /bin/mv
+Provides:       /bin/sh
+Provides:       /bin/bash
+Provides:       %{_bindir}/sh
+Provides:       %{_bindir}/bash
+
 %description
 The package contains the Bourne-Again SHell
 
-%package    devel
-Summary:    Header and development files for bash
-Requires:   %{name} = %{version}
+%package        devel
+Summary:        Header and development files for bash
+Requires:       %{name} = %{version}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %package lang
-Summary: Additional language files for bash
-Group: System Environment/Base
-Requires: bash >= 4.4
+Summary:        Additional language files for bash
+Group:          System Environment/Base
+Requires:       bash >= 4.4
+
 %description lang
 These are the additional language files of bash.
 
 %prep
-%setup -q -n bash-4.4.18
-%patch0 -p1
+%autosetup -p 1
+
 %build
 %configure \
     "CFLAGS=-fPIC %{build_cflags}" \
@@ -48,21 +54,22 @@ These are the additional language files of bash.
     --without-bash-malloc \
     --with-installed-readline
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 ln -s bash %{buildroot}/bin/sh
-install -vdm 755 %{buildroot}/etc
-install -vdm 755 %{buildroot}/etc/profile.d
-install -vdm 755 %{buildroot}/etc/skel
-install -vdm 755 %{buildroot}/usr/share/bash-completion
-install -m 0644 %{SOURCE1} %{buildroot}/usr/share/bash-completion
-rm %{buildroot}/usr/lib/bash/Makefile.inc
+install -vdm 755 %{buildroot}%{_sysconfdir}
+install -vdm 755 %{buildroot}%{_sysconfdir}/profile.d
+install -vdm 755 %{buildroot}%{_sysconfdir}/skel
+install -vdm 755 %{buildroot}%{_datadir}/bash-completion
+install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/bash-completion
+rm %{buildroot}%{_libdir}/bash/Makefile.inc
 
 # Create dircolors
-cat > %{buildroot}/etc/profile.d/dircolors.sh << "EOF"
+cat > %{buildroot}%{_sysconfdir}/profile.d/dircolors.sh << "EOF"
 # Setup for /bin/ls and /bin/grep to support color, the alias is in /etc/bashrc.
-if [ -f "/etc/dircolors" ] ; then
-        eval $(dircolors -b /etc/dircolors)
+if [ -f "%{_sysconfdir}/dircolors" ] ; then
+        eval $(dircolors -b %{_sysconfdir}/dircolors)
 
         if [ -f "$HOME/.dircolors" ] ; then
                 eval $(dircolors -b $HOME/.dircolors)
@@ -75,27 +82,27 @@ if [ $? -eq 0 ]; then
 fi
 EOF
 
-cat > %{buildroot}/etc/profile.d/extrapaths.sh << "EOF"
-if [ -d /usr/local/lib/pkgconfig ] ; then
-        pathappend /usr/local/lib/pkgconfig PKG_CONFIG_PATH
+cat > %{buildroot}%{_sysconfdir}/profile.d/extrapaths.sh << "EOF"
+if [ -d %{_prefix}/local/lib/pkgconfig ] ; then
+        pathappend %{_prefix}/local/lib/pkgconfig PKG_CONFIG_PATH
 fi
-if [ -d /usr/local/bin ]; then
-        pathprepend /usr/local/bin
+if [ -d %{_prefix}/local/bin ]; then
+        pathprepend %{_prefix}/local/bin
 fi
-if [ -d /usr/local/sbin -a $EUID -eq 0 ]; then
-        pathprepend /usr/local/sbin
+if [ -d %{_prefix}/local/sbin -a $EUID -eq 0 ]; then
+        pathprepend %{_prefix}/local/sbin
 fi
 EOF
 
-cat > %{buildroot}/etc/profile.d/readline.sh << "EOF"
+cat > %{buildroot}%{_sysconfdir}/profile.d/readline.sh << "EOF"
 # Setup the INPUTRC environment variable.
 if [ -z "$INPUTRC" -a ! -f "$HOME/.inputrc" ] ; then
-        INPUTRC=/etc/inputrc
+        INPUTRC=%{_sysconfdir}/inputrc
 fi
 export INPUTRC
 EOF
 
-cat > %{buildroot}/etc/profile.d/umask.sh << "EOF"
+cat > %{buildroot}%{_sysconfdir}/profile.d/umask.sh << "EOF"
 # By default, the umask should be set.
 if [ "$(id -gn)" = "$(id -un)" -a $EUID -gt 99 ] ; then
   umask 002
@@ -104,7 +111,7 @@ else
 fi
 EOF
 
-cat > %{buildroot}/etc/profile.d/i18n.sh << "EOF"
+cat > %{buildroot}%{_sysconfdir}/profile.d/i18n.sh << "EOF"
 # Begin /etc/profile.d/i18n.sh
 
 unset LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES \
@@ -112,8 +119,8 @@ unset LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES \
 
 if [ -n "$XDG_CONFIG_HOME" ] && [ -r "$XDG_CONFIG_HOME/locale.conf" ]; then
   . "$XDG_CONFIG_HOME/locale.conf"
-elif [ -r /etc/locale.conf ]; then
-  . /etc/locale.conf
+elif [ -r %{_sysconfdir}/locale.conf ]; then
+  . %{_sysconfdir}/locale.conf
 fi
 
 export LANG="${LANG:-C}"
@@ -134,21 +141,21 @@ export LANG="${LANG:-C}"
 EOF
 
 # bash completion
-cat > %{buildroot}/etc/profile.d/bash_completion.sh << "EOF"
+cat > %{buildroot}%{_sysconfdir}/profile.d/bash_completion.sh << "EOF"
 # check for interactive bash and only bash
 if [ -n "$BASH_VERSION" -a -n "$PS1" ]; then
 
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
+  if [ -f %{_datadir}/bash-completion/bash_completion ]; then
+    . %{_datadir}/bash-completion/bash_completion
   fi
 fi
 
 fi
 EOF
 
-cat > %{buildroot}/etc/bash.bashrc << "EOF"
+cat > %{buildroot}%{_sysconfdir}/bash.bashrc << "EOF"
 # Begin /etc/bash.bashrc
 # Written for Beyond Linux From Scratch
 # by James Robertson <jameswrobertson@earthlink.net>
@@ -187,13 +194,13 @@ fi
 unset RED GREEN NORMAL
 
 if test -n "$SSH_CONNECTION" -a -z "$PROFILEREAD"; then
-     . /etc/profile > /dev/null 2>&1
+     . %{_sysconfdir}/profile > /dev/null 2>&1
 fi
 # End /etc/bash.bashrc
 EOF
 
 
-cat > %{buildroot}/etc/skel/.bash_profile << "EOF"
+cat > %{buildroot}%{_sysconfdir}/skel/.bash_profile << "EOF"
 # Begin ~/.bash_profile
 # Written for Beyond Linux From Scratch
 # by James Robertson <jameswrobertson@earthlink.net>
@@ -221,7 +228,7 @@ fi
 # End ~/.bash_profile
 EOF
 
-cat > %{buildroot}/etc/skel/.bashrc << "EOF"
+cat > %{buildroot}%{_sysconfdir}/skel/.bashrc << "EOF"
 # Begin ~/.bashrc
 # Written for Beyond Linux From Scratch
 # by James Robertson <jameswrobertson@earthlink.net>
@@ -233,14 +240,14 @@ cat > %{buildroot}/etc/skel/.bashrc << "EOF"
 # programs are in /etc/profile.  System wide aliases and functions are
 # in /etc/bashrc.
 
-if [ -f "/etc/bash.bashrc" ] ; then
-  source /etc/bash.bashrc
+if [ -f "%{_sysconfdir}/bash.bashrc" ] ; then
+  source %{_sysconfdir}/bash.bashrc
 fi
 
 # End ~/.bashrc
 EOF
 
-cat > %{buildroot}/etc/skel/.bash_logout << "EOF"
+cat > %{buildroot}%{_sysconfdir}/skel/.bash_logout << "EOF"
 # Begin ~/.bash_logout
 # Written for Beyond Linux From Scratch
 # by James Robertson <jameswrobertson@earthlink.net>
@@ -250,7 +257,7 @@ cat > %{buildroot}/etc/skel/.bash_logout << "EOF"
 # End ~/.bash_logout
 EOF
 
-dircolors -p > %{buildroot}/etc/dircolors
+dircolors -p > %{buildroot}%{_sysconfdir}/dircolors
 %find_lang %{name}
 rm -rf %{buildroot}/%{_infodir}
 
@@ -260,22 +267,22 @@ make  NON_ROOT_USERNAME=nobody %{?_smp_mflags} check
 %post
 if [ $1 -eq 1 ] ; then
     if [ ! -f "/root/.bash_logout" ] ; then
-        cp /etc/skel/.bash_logout /root/.bash_logout
+        cp %{_sysconfdir}/skel/.bash_logout /root/.bash_logout
     fi
-    if [ ! -f /etc/shells ]; then
-        echo "/bin/sh" >> /etc/shells
-        echo "/bin/bash" >> /etc/shells
-        echo "%{_bindir}/sh" >> /etc/shells
-        echo "%{_bindir}/bash" >> /etc/shells
+    if [ ! -f %{_sysconfdir}/shells ]; then
+        echo "/bin/sh" >> %{_sysconfdir}/shells
+        echo "/bin/bash" >> %{_sysconfdir}/shells
+        echo "%{_bindir}/sh" >> %{_sysconfdir}/shells
+        echo "%{_bindir}/bash" >> %{_sysconfdir}/shells
     else
-        grep -q '^/bin/sh$' /etc/shells || \
-        echo "/bin/sh" >> /etc/shells
-        grep -q '^/bin/bash$' /etc/shells || \
-        echo "/bin/bash" >> /etc/shells
-        grep -q '^%{_bindir}/sh$' /etc/shells || \
-        echo "%{_bindir}/sh" >> /etc/shells
-        grep -q '^%{_bindir}/bash$' /etc/shells || \
-        echo "%{_bindir}/bash" >> /etc/shells
+        grep -q '^/bin/sh$' %{_sysconfdir}/shells || \
+        echo "/bin/sh" >> %{_sysconfdir}/shells
+        grep -q '^/bin/bash$' %{_sysconfdir}/shells || \
+        echo "/bin/bash" >> %{_sysconfdir}/shells
+        grep -q '^%{_bindir}/sh$' %{_sysconfdir}/shells || \
+        echo "%{_bindir}/sh" >> %{_sysconfdir}/shells
+        grep -q '^%{_bindir}/bash$' %{_sysconfdir}/shells || \
+        echo "%{_bindir}/bash" >> %{_sysconfdir}/shells
     fi
 fi
 
@@ -285,24 +292,24 @@ if [ $1 -eq 0 ] ; then
         rm -f /root/.bash_logout
     fi
     if [ ! -x /bin/sh ]; then
-        grep -v '^/bin/sh$'  /etc/shells | \
-        grep -v '^/bin/sh$' > /etc/shells.rpm && \
-        mv /etc/shells.rpm /etc/shells
+        grep -v '^/bin/sh$'  %{_sysconfdir}/shells | \
+        grep -v '^/bin/sh$' > %{_sysconfdir}/shells.rpm && \
+        mv %{_sysconfdir}/shells.rpm %{_sysconfdir}/shells
     fi
     if [ ! -x /bin/bash ]; then
-        grep -v '^/bin/bash$'  /etc/shells | \
-        grep -v '^/bin/bash$' > /etc/shells.rpm && \
-        mv /etc/shells.rpm /etc/shells
+        grep -v '^/bin/bash$'  %{_sysconfdir}/shells | \
+        grep -v '^/bin/bash$' > %{_sysconfdir}/shells.rpm && \
+        mv %{_sysconfdir}/shells.rpm %{_sysconfdir}/shells
     fi
     if [ ! -x %{_bindir}/sh ]; then
-        grep -v '^%{_bindir}/sh$'  /etc/shells | \
-        grep -v '^%{_bindir}/sh$' > /etc/shells.rpm && \
-        mv /etc/shells.rpm /etc/shells
+        grep -v '^%{_bindir}/sh$'  %{_sysconfdir}/shells | \
+        grep -v '^%{_bindir}/sh$' > %{_sysconfdir}/shells.rpm && \
+        mv %{_sysconfdir}/shells.rpm %{_sysconfdir}/shells
     fi
     if [ ! -x %{_bindir}/bash ]; then
-        grep -v '^%{_bindir}/bash$'  /etc/shells | \
-        grep -v '^%{_bindir}/bash$' > /etc/shells.rpm && \
-        mv /etc/shells.rpm /etc/shells
+        grep -v '^%{_bindir}/bash$'  %{_sysconfdir}/shells | \
+        grep -v '^%{_bindir}/bash$' > %{_sysconfdir}/shells.rpm && \
+        mv %{_sysconfdir}/shells.rpm %{_sysconfdir}/shells
     fi
 fi
 
@@ -315,7 +322,7 @@ fi
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_defaultdocdir}/%{name}/*
 %{_mandir}/*/*
-/usr/share/bash-completion/
+%{_datadir}/bash-completion/
 
 %files devel
 %{_includedir}/%{name}/*
@@ -325,54 +332,84 @@ fi
 %defattr(-,root,root)
 
 %changelog
-*   Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> 4.4.18-5
--   Don't stomp on CFLAGS.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4
--   Added %%license line automatically
-*   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 4.4.18-3
--   Explicitly provide /usr/bin/sh and /usr/bin/bash
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.4.18-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 24 2018 Sujay G <gsujay@vmware.com> 4.4.18-1
--   Bump bash version to 4.4.18
-*   Fri Jan 26 2018 Alexey Makhalov <amakhalov@vmware.com> 4.4.12-3
--   Run bash_completion only for bash interactive shell
-*   Mon Dec 11 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 4.4.12-2
--   conditionally apply grep color alias
-*   Mon Nov 13 2017 Xiaolin Li <xiaolinl@vmware.com> 4.4.12-1
--   Upstream patch level 12 applied
-*   Mon Oct 02 2017 Kumar Kaushik <kaushikk@vmware.com> 4.4-6
--   Adding security fix for CVE-2017-5932.
-*   Thu Jun 8 2017 Bo Gan <ganb@vmware.com> 4.4-5
--   Fix dependency again
-*   Wed Jun 7 2017 Divya Thaluru <dthaluru@vmware.com>  4.4-4
--   Added /usr/bin/sh and /bin/sh entries in /etc/shells
-*   Sun Jun 4 2017 Bo Gan <ganb@vmware.com> 4.4-3
--   Fix dependency
-*   Thu Feb 2 2017 Divya Thaluru <dthaluru@vmware.com> 4.4-2
--   Modified bash entry in /etc/shells
-*   Fri Jan 13 2017 Dheeraj Shetty <dheerajs@vmware.com> 4.4-1
--   Upgraded version to 4.4
-*   Tue Jan 10 2017 Divya Thaluru <dthaluru@vmware.com> 4.3.30-7
--   Added bash entry to /etc/shells
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 4.3.30-6
--   Add readline requirements
-*   Fri Aug 19 2016 Alexey Makhalov <amakhalov@vmware.com> 4.3.30-5
--   Enable bash completion support
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 4.3.30-4
--   GA - Bump release of all rpms
-*   Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  4.3.30-3
--   Fixing spec file to handle rpm upgrade scenario correctly
-*   Thu Mar 10 2016 Divya Thaluru <dthaluru@vmware.com> 4.3.30-2
--   Adding compile options to load bash.bashrc file and
+* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.18-7
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
+- Nopatch CVE-2019-18276
+
+* Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 4.4.18-5
+- Don't stomp on CFLAGS.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.4.18-4
+- Added %%license line automatically
+
+* Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> - 4.4.18-3
+- Explicitly provide /usr/bin/sh and /usr/bin/bash
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.4.18-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 24 2018 Sujay G <gsujay@vmware.com> - 4.4.18-1
+- Bump bash version to 4.4.18
+
+* Fri Jan 26 2018 Alexey Makhalov <amakhalov@vmware.com> - 4.4.12-3
+- Run bash_completion only for bash interactive shell
+
+* Mon Dec 11 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.4.12-2
+- conditionally apply grep color alias
+
+* Mon Nov 13 2017 Xiaolin Li <xiaolinl@vmware.com> - 4.4.12-1
+- Upstream patch level 12 applied
+
+* Mon Oct 02 2017 Kumar Kaushik <kaushikk@vmware.com> - 4.4-6
+- Adding security fix for CVE-2017-5932.
+
+* Thu Jun 8 2017 Bo Gan <ganb@vmware.com> - 4.4-5
+- Fix dependency again
+
+* Wed Jun 7 2017 Divya Thaluru <dthaluru@vmware.com>  4.4-4
+- Added /usr/bin/sh and /bin/sh entries in /etc/shells
+
+* Sun Jun 4 2017 Bo Gan <ganb@vmware.com> - 4.4-3
+- Fix dependency
+
+* Thu Feb 2 2017 Divya Thaluru <dthaluru@vmware.com> - 4.4-2
+- Modified bash entry in /etc/shells
+
+* Fri Jan 13 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.4-1
+- Upgraded version to 4.4
+
+* Tue Jan 10 2017 Divya Thaluru <dthaluru@vmware.com> - 4.3.30-7
+- Added bash entry to /etc/shells
+
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> - 4.3.30-6
+- Add readline requirements
+
+* Fri Aug 19 2016 Alexey Makhalov <amakhalov@vmware.com> - 4.3.30-5
+- Enable bash completion support
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.3.30-4
+- GA - Bump release of all rpms
+
+* Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  4.3.30-3
+- Fixing spec file to handle rpm upgrade scenario correctly
+
+* Thu Mar 10 2016 Divya Thaluru <dthaluru@vmware.com> - 4.3.30-2
+- Adding compile options to load bash.bashrc file and
     loading source file during non-inetractive non-login shell
-*   Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 4.3.30-1
--   Updated to version 4.3.30
-*   Wed Aug 05 2015 Kumar Kaushik <kaushikk@vmware.com> 4.3-4
--   Adding post unstall section.
-*   Wed Jul 22 2015 Alexey Makhalov <amakhalov@vmware.com> 4.3-3
--   Fix segfault in save_bash_input.
-*   Tue Jun 30 2015 Alexey Makhalov <amakhalov@vmware.com> 4.3-2
--   /etc/profile.d permission fix. Pack /etc files into rpm
-*   Wed Oct 22 2014 Divya Thaluru <dthaluru@vmware.com> 4.3-1
--   Initial version
+
+* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> - 4.3.30-1
+- Updated to version 4.3.30
+
+* Wed Aug 05 2015 Kumar Kaushik <kaushikk@vmware.com> - 4.3-4
+- Adding post unstall section.
+
+* Wed Jul 22 2015 Alexey Makhalov <amakhalov@vmware.com> - 4.3-3
+- Fix segfault in save_bash_input.
+
+* Tue Jun 30 2015 Alexey Makhalov <amakhalov@vmware.com> - 4.3-2
+- /etc/profile.d permission fix. Pack /etc files into rpm
+
+* Wed Oct 22 2014 Divya Thaluru <dthaluru@vmware.com> - 4.3-1
+- Initial version

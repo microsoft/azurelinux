@@ -1,14 +1,17 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        7%{?dist}
-License:        Custom
+Release:        5%{?dist}
+License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-19906.patch
+# CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
+# https://bugzilla.suse.com/show_bug.cgi?id=1180669
+Patch1:         CVE-2020-8032.nopatch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  openssl-devel
@@ -33,18 +36,13 @@ If its use is negotiated, a security layer is inserted between the
 protocol and the connection.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 autoreconf -fi
-./configure \
+%configure \
     CFLAGS="%{optflags} -fPIC" \
     CXXFLAGS="%{optflags}" \
-    --prefix=%{_prefix} \
-    --bindir=%{_bindir} \
-    --libdir=%{_libdir} \
-    --sysconfdir=%{_sysconfdir} \
     --with-plugindir=%{_libdir}/sasl2 \
     --without-dblib \
     --with-saslauthd=/run/saslauthd \
@@ -120,9 +118,6 @@ make %{?_smp_mflags} check
 %preun
 %systemd_preun saslauthd.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -139,6 +134,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-8
+- Merge the following releases from 1.0 to dev branch
+- thcrain@microsoft.com, 2.1.27-5: Add nopatch for CVE-2020-8032, Lint spec
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.1.27-7
 - Provide cyrus-sasl-plain.
 

@@ -1,7 +1,7 @@
 Summary:        Glib networking modules
 Name:           glib-networking
 Version:        2.59.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+ with exceptions
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Group:          System Environment/Development
@@ -11,7 +11,7 @@ Source0:        http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/%{na
 
 Patch0:         CVE-2020-13645.patch
 
-BuildRequires:	nettle-devel
+BuildRequires:	nettle-devel >= 3.7.2
 BuildRequires:	autogen-libopts-devel
 BuildRequires:	libtasn1-devel
 BuildRequires:  gnutls-devel
@@ -23,7 +23,7 @@ BuildRequires:  glib-schemas
 BuildRequires:  meson
 BuildRequires:  gnome-common
 BuildRequires:  ninja-build
-Requires:	nettle
+Requires:	nettle >= 3.7.2
 Requires:	gnutls
 Requires:	libtasn1
 Requires:	openssl
@@ -72,6 +72,8 @@ ninja test
 %defattr(-,root,root)
 
 %changelog
+*   Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 2.59.1-7
+-   Bump release to rebuild with new nettle (3.7.2)
 *   Tue Aug 18 2020 Henry Beberman <hebeberm@microsoft.com> - 2.59.1-6
 -   Backport patch for CVE-2020-13645
 *   Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.59.1-5

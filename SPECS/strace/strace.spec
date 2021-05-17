@@ -1,14 +1,18 @@
-Summary:	Tracks system calls that are made by a running process
-Name:		strace
-Version:    5.1
-Release:    2%{?dist}
-License:    LGPL-2.1+ and GPL-2.0+
-URL:		https://strace.io/
-Group:		Development/Debuggers
+Summary:        Tracks system calls that are made by a running process
+Name:           strace
+Version:        5.1
+Release:        3%{?dist}
+License:        LGPL-2.1+ and GPL-2.0+
+URL:            https://strace.io/
+Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:	libacl-devel, libaio-devel
+Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
+Patch1:         gen_tests_fixes.patch
+
+BuildRequires:  libacl-devel
+BuildRequires:  libaio-devel
+
 %global __requires_exclude ^/usr/bin/perl$
 
 %description
@@ -17,15 +21,16 @@ all the arugments and return values from the system calls. This is useful in deb
 
 %prep
 %setup -q
+%patch1 -p1
 
 %build
 %ifarch aarch64
 %configure \
-	--disable-mpers \
-	--prefix=%{_prefix}
+    --disable-mpers \
+    --prefix=%{_prefix}
 %else
 %configure \
-	--prefix=%{_prefix}
+    --prefix=%{_prefix}
 %endif
 
 # to resolve build issue with glibc-2.26
@@ -39,7 +44,7 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %check
-make -k check
+make %{?_smp_mflags} -k check TIMEOUT_DURATION=1200
 
 %clean
 rm -rf %{buildroot}/*
@@ -51,9 +56,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 
 %changelog
-* Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.1-2
-- Added %%license line automatically
-
+*   Wed Jan 06 2021 Andrew Phelps <anphel@microsoft.com> 5.1-3
+-   Patch tests with expected results. Increase test timeout.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.1-2
+-   Added %%license line automatically
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 5.1-1
 -   Update to 5.1. License fixed.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.25-2

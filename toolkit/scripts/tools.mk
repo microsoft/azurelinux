@@ -29,6 +29,7 @@ go_tool_list = \
 	scheduler \
 	specreader \
 	srpmpacker \
+	validatechroot \
 
 # For each utility "util", create a "out/tools/util" target which references code in "tools/util/"
 go_tool_targets = $(foreach target,$(go_tool_list),$(TOOL_BINS_DIR)/$(target))
@@ -112,7 +113,7 @@ go-test-coverage: $(test_coverage_report)
 
 chroot_worker = $(BUILD_DIR)/worker/worker_chroot.tar.gz
 
-.PHONY: chroot-tools clean-chroot-tools
+.PHONY: chroot-tools clean-chroot-tools validate-chroot
 chroot-tools: $(chroot_worker)
 
 clean: clean-chroot-tools
@@ -120,7 +121,9 @@ clean-chroot-tools:
 	rm -f $(chroot_worker)
 	@echo Verifying no mountpoints present in $(BUILD_DIR)/worker/
 	$(SCRIPTS_DIR)/safeunmount.sh "$(BUILD_DIR)/worker/" && \
-	rm -rf $(BUILD_DIR)/worker
+	$(SCRIPTS_DIR)/safeunmount.sh "$(BUILD_DIR)/validatechroot/" && \
+	rm -rf $(BUILD_DIR)/worker && \
+	rm -rf $(BUILD_DIR)/validatechroot
 
 worker_chroot_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/pkggen_core_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
@@ -139,6 +142,15 @@ worker_chroot_deps := \
 
 $(chroot_worker): $(worker_chroot_deps)
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR)
+
+validate-chroot: $(go-validatechroot) $(chroot_worker)
+	$(go-validatechroot) \
+	--rpm-dir="$(toolchain_rpms_dir)" \
+	--tmp-dir="$(BUILD_DIR)/validatechroot" \
+	--worker-chroot="$(chroot_worker)" \
+	--worker-manifest="$(worker_chroot_manifest)" \
+	--log-file="$(LOGS_DIR)/worker/validate.log" \
+	--log-level="$(LOG_LEVEL)"
 
 ######## MACRO TOOLS ########
 
