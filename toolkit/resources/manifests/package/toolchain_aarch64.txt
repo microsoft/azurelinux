@@ -142,8 +142,8 @@ gtest-debuginfo-1.8.1-5.cm1.aarch64.rpm
 gtest-devel-1.8.1-5.cm1.aarch64.rpm
 gtest-static-1.8.1-5.cm1.aarch64.rpm
 gtk-doc-1.29-6.cm1.noarch.rpm
-gzip-1.9-5.cm1.aarch64.rpm
-gzip-debuginfo-1.9-5.cm1.aarch64.rpm
+gzip-1.9-6.cm1.aarch64.rpm
+gzip-debuginfo-1.9-6.cm1.aarch64.rpm
 integritysetup-2.3.3-2.cm1.aarch64.rpm
 intltool-0.51.0-7.cm1.noarch.rpm
 itstool-2.0.6-3.cm1.noarch.rpm
