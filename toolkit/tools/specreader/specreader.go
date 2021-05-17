@@ -46,7 +46,6 @@ var (
 	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
 	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
-	runCheck  = app.Flag("run-check", "Run the check during package build").Bool()
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
 )
@@ -255,7 +254,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefines(*runCheck)
+	defines := rpm.DefaultDefines()
 	defines[rpm.DistTagDefine] = distTag
 
 	for specfile := range requests {

@@ -1,6 +1,6 @@
 Name:           pygobject3
 Version:        3.36.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 Summary:        Python bindings for GObject Introspection
 
 License:        LGPLv2+
@@ -14,12 +14,12 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
 BuildRequires:  python3-devel
 BuildRequires:  python3-cairo-devel
-BuildRequires:  glib-schemas
+%if %{with_check}
 BuildRequires:  python-setuptools
 BuildRequires:  python3-setuptools
-%if %{with_check}
 BuildRequires:  gobject-introspection-python
 BuildRequires:  python3-test
+BuildRequires:  glib-schemas
 BuildRequires:  dbus
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -94,9 +94,6 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
-* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-3
-- Move python setuptools and glib schemas to non-check BuildRequires
-
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.36.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

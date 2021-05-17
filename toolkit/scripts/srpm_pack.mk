@@ -76,7 +76,6 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
 		--log-level=$(LOG_LEVEL)
 	touch $@
@@ -93,7 +92,6 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list=$(toolchain_spec_list) \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL)
 	touch $@

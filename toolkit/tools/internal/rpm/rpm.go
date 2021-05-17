@@ -127,15 +127,11 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
-func DefaultDefines(runCheck bool) map[string]string {
-	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible
-	withCheckSetting := "0"
-	if runCheck {
-		withCheckSetting = "1"
-	}
+func DefaultDefines() map[string]string {
+	const defaultWithCheck = "1"
 
 	return map[string]string{
-		WithCheckDefine: withCheckSetting,
+		WithCheckDefine: defaultWithCheck,
 	}
 }
 

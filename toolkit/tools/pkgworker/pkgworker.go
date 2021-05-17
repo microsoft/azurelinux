@@ -73,7 +73,7 @@ func main() {
 	srpmName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
 	chrootDir := filepath.Join(*workDir, srpmName)
 
-	defines := rpm.DefaultDefines(*runCheck)
+	defines := rpm.DefaultDefines()
 	defines[rpm.DistTagDefine] = *distTag
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
