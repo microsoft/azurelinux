@@ -1,13 +1,13 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        5.10.28.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -35,6 +35,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
+- Bump release number to match kernel release
+
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Bump release number to match kernel release
 

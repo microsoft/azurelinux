@@ -496,7 +496,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
+* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
