@@ -325,8 +325,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.32",
-          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.xz"
+          "version": "2.36.1",
+          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.36.1.tar.xz"
         }
       }
     },
@@ -1107,6 +1107,16 @@
           "name": "elfutils",
           "version": "0.176",
           "downloadUrl": "https://sourceware.org/elfutils/ftp/0.176/elfutils-0.176.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "eppic",
+          "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
+          "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
         }
       }
     },
@@ -6755,8 +6765,8 @@
         "type": "other",
         "other": {
           "name": "tboot",
-          "version": "1.9.7",
-          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.7.tar.gz"
+          "version": "1.9.12",
+          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.12.tar.gz"
         }
       }
     },
