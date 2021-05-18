@@ -1224,11 +1224,3 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 		}
 	}
 }
-
-// PkgNodeMatch is intended to be used with "Find" for slices of strings.
-func PkgNodeMatch(expected, given interface{}) bool {
-	expectedPkgNode := expected.(*PkgNode)
-	givenPkgNode := given.(*PkgNode)
-
-	return expectedPkgNode.nodeID == givenPkgNode.nodeID
-}

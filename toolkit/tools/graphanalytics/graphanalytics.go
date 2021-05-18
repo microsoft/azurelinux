@@ -174,7 +174,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 
 // printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved indrect build requires.
 func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResults int) {
-	srpmsBlockedBy := make(map[*pkggraph.PkgNode][]*pkggraph.PkgNode)
+	srpmsBlockedByPaths := make(map[string][][]graph.Node)
 
 	for _, node := range pkgGraph.AllNodes() {
 		if node.Type != pkggraph.TypeBuild {
@@ -202,7 +202,11 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 				return
 			}
 
-			insertIfMissingPkgNode(srpmsBlockedBy, node, dependency)
+			// Find the path from the blocked node to its blocker.
+			dependencyPath, _ := graphpath.AStar(node, dependency, pkgGraph, graphpath.NullHeuristic)
+			dependencyPathNodes, _ := dependencyPath.To(dependency.ID())
+
+			insertIfMissingPkgNode(srpmsBlockedByPaths, pkgSRPM, dependencyPathNodes)
 
 			return
 		})
@@ -210,19 +214,15 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 	}
 
 	srpmsBlockedByExpanded := make(map[string][]string)
-	for node, dependencies := range srpmsBlockedBy {
-		pkgSRPM := filepath.Base(node.SrpmPath)
-
-		for _, dependency := range dependencies {
+	for pkgSRPM, dependencies := range srpmsBlockedByPaths {
+		for _, dependencyPathNodes := range dependencies {
 			var pathStrings []string
 			var stringBuilder strings.Builder
 
+			dependency := dependencyPathNodes[len(dependencyPathNodes)-1].(*pkggraph.PkgNode)
+
 			stringBuilder.WriteString(nodeDependencyName(dependency))
 			stringBuilder.WriteString(": ")
-
-			// Find the path from the blocked node to its blocker.
-			dependencyPath, _ := graphpath.AStar(node, dependency, pkgGraph, graphpath.NullHeuristic)
-			dependencyPathNodes, _ := dependencyPath.To(dependency.ID())
 
 			previousPackageName := ""
 			for _, pathNode := range dependencyPathNodes[1:] {
@@ -239,6 +239,8 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 					previousPackageName = packageRPMName
 				}
 			}
+
+			stringBuilder.WriteString(strings.Join(pathStrings, " -> "))
 
 			srpmsBlockedByExpanded[pkgSRPM] = append(srpmsBlockedByExpanded[pkgSRPM], stringBuilder.String())
 		}
@@ -315,8 +317,8 @@ func insertIfMissing(data map[string][]string, key string, value string) {
 
 // insertIfMissingPkgNode appens a value to the key in a map if it is not present.
 // Will alter data.
-func insertIfMissingPkgNode(data map[*pkggraph.PkgNode][]*pkggraph.PkgNode, key *pkggraph.PkgNode, value *pkggraph.PkgNode) {
-	if sliceutils.Find(data[key], value, pkggraph.PkgNodeMatch) == sliceutils.NotFound {
+func insertIfMissingPkgNode(data map[string][][]graph.Node, key string, value []graph.Node) {
+	if sliceutils.Find(data[key], value, finalPathNodeSRPMMatch) == sliceutils.NotFound {
 		data[key] = append(data[key], value)
 	}
 }
@@ -347,4 +349,15 @@ func printSlice(pairList []mapPair, valueDescription string, maxResults int) {
 			logger.Log.Debugf("--> %s", value)
 		}
 	}
+}
+
+// finalPathNodeSRPMMatch checks if two '[]graph.Node' paths finish with the same final SRPM.
+func finalPathNodeSRPMMatch(expected, given interface{}) bool {
+	expectedPath := expected.([]graph.Node)
+	givenPath := given.([]graph.Node)
+
+	expectedPathLastNode := expectedPath[len(expectedPath)-1].(*pkggraph.PkgNode)
+	givenPathLastNode := givenPath[len(givenPath)-1].(*pkggraph.PkgNode)
+
+	return nodeDependencyName(expectedPathLastNode) == nodeDependencyName(givenPathLastNode)
 }
