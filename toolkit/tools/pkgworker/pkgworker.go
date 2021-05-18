@@ -309,7 +309,7 @@ func removeLibArchivesFromSystem() (err error) {
 
 		// Skip directories that are meant for device files and kernel virtual filesystems.
 		// These will not contain .la files and are mounted into the safechroot from the host.
-		if info.IsDir() && sliceutils.Find(dirsToExclude, path) != sliceutils.NotFound {
+		if info.IsDir() && sliceutils.Find(dirsToExclude, path, sliceutils.StringMatch) != sliceutils.NotFound {
 			return filepath.SkipDir
 		}
 

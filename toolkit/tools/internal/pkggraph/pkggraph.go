@@ -31,14 +31,14 @@ type NodeState int
 
 // Valid values for NodeState type
 const (
-	StateUnknown    NodeState = iota        // Unknown state
-	StateMeta       NodeState = iota        // Meta nodes do not represent actual build artifacts, but additional nodes used for managing dependencies
-	StateBuild      NodeState = iota        // A package from a local SRPM which should be built from source
-	StateBuildError NodeState = iota        // A package from a local SRPM which failed to build
-	StateUpToDate   NodeState = iota        // A local RPM is already built and is available
-	StateUnresolved NodeState = iota        // A dependency is not available locally and must be acquired from a remote repo
-	StateCached     NodeState = iota        // A dependency was not available locally, but is now available in the chache
-	StateMAX        NodeState = StateCached // Max allowable state
+	StateUnknown    NodeState = iota            // Unknown state
+	StateMeta       NodeState = iota            // Meta nodes do not represent actual build artifacts, but additional nodes used for managing dependencies
+	StateBuild      NodeState = iota            // A package from a local SRPM which should be built from source
+	StateUpToDate   NodeState = iota            // A local RPM is already built and is available
+	StateUnresolved NodeState = iota            // A dependency is not available locally and must be acquired from a remote repo
+	StateCached     NodeState = iota            // A dependency was not available locally, but is now available in the chache
+	StateBuildError NodeState = iota            // A package from a local SRPM which failed to build
+	StateMAX        NodeState = StateBuildError // Max allowable state
 )
 
 // NodeType indicates the general node type (build, run, goal, remote).
@@ -1223,4 +1223,12 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 			break
 		}
 	}
+}
+
+// PkgNodeMatch is intended to be used with "Find" for slices of strings.
+func PkgNodeMatch(expected, given interface{}) bool {
+	expectedPkgNode := expected.(*PkgNode)
+	givenPkgNode := given.(*PkgNode)
+
+	return expectedPkgNode.nodeID == givenPkgNode.nodeID
 }
