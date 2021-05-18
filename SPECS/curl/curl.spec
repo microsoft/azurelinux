@@ -15,11 +15,6 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
-#%if %{with_check}
-#BuildRequires:  python3
-#BuildRequires:  shadow-utils
-#BuildRequires:  sudo
-#%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -66,12 +61,6 @@ install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-#%check
-#chmod g+w . -R
-#useradd test -G root -m
-
-#sudo -u test make %{?_smp_mflags} check
-
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -99,7 +88,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-2
-- Disable check just for the sake of seeing what the impact is.  Will come back and fix later
+- Disable check to remove circular dependency
 
 * Wed Mar 31 2021 Nicolas Ontiveros <niontive@microsoft.com> - 7.76.0-1
 - Upgrade to version 7.76.0 to fix CVE-2021-22876 and CVE-2021-22890.
