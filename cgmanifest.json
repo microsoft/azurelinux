@@ -105,8 +105,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "azure-iotedge",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -315,8 +315,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.3",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.3/bind-9.16.3.tar.xz"
+          "version": "9.16.15",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
         }
       }
     },
@@ -325,8 +325,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.32",
-          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.xz"
+          "version": "2.36.1",
+          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.36.1.tar.xz"
         }
       }
     },
@@ -357,6 +357,16 @@
           "name": "blobfuse",
           "version": "1.3.6",
           "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bmake",
+          "version": "20201010",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
         }
       }
     },
@@ -585,8 +595,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.0",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.0.tar.gz"
+          "version": "0.103.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.2.tar.gz"
         }
       }
     },
@@ -667,16 +677,6 @@
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "coredns",
-          "version": "1.6.5",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.5.tar.gz"
         }
       }
     },
@@ -884,6 +884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "device-mapper-multipath",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/opensvc/multipath-tools/archive/refs/tags/0.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dhcp",
           "version": "4.4.2",
           "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
@@ -945,8 +955,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.84",
-          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.84.tar.xz"
+          "version": "2.85",
+          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.85.tar.xz"
         }
       }
     },
@@ -995,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/d00eaeea-6d7b-4e73-9d96-c0234ed3b665/0d25d9d1aeaebdeef01d15370d5cd22b/dotnet-runtime-3.1.5-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/692284f9-e1e7-4b31-9191-cd8043441024/ac45c17d4327b1f992b7fe3956a99129/dotnet-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -1005,8 +1015,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-sdk-3.1",
-          "version": "3.1.105",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/37268c18-226d-436b-b13c-4b77b7f42140/17e8a85360206006a557d634d16713cd/dotnet-sdk-3.1.105-linux-x64.tar.gz"
+          "version": "3.1.115",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
         }
       }
     },
@@ -1097,6 +1107,16 @@
           "name": "elfutils",
           "version": "0.176",
           "downloadUrl": "https://sourceware.org/elfutils/ftp/0.176/elfutils-0.176.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "eppic",
+          "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
+          "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
         }
       }
     },
@@ -1505,8 +1525,28 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.7",
-          "downloadUrl": "https://dl.google.com/go/go1.15.7.src.tar.gz"
+          "version": "1.15.11",
+          "downloadUrl": "https://dl.google.com/go/go1.15.11.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-crypto",
+          "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
+          "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-sys",
+          "version": "b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d",
+          "downloadUrl": "https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz"
         }
       }
     },
@@ -1745,8 +1785,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.28.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -1994,16 +2034,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jsonbuilder",
-          "version": "0.2.1",
-          "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "json-glib",
           "version": "1.4.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
@@ -2055,8 +2085,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.28.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2065,8 +2095,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.28.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2075,8 +2105,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.28.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
+          "version": "5.10.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.32.1.tar.gz"
         }
       }
     },
@@ -2175,38 +2205,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.17.13",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.13-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.17.16",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.16-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.18.10",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.10-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210322/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2215,8 +2215,48 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.19.6",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.6-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "version": "1.18.17",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.7",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.19.9",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.20.2",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubernetes",
+          "version": "1.20.5",
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2267,16 +2307,6 @@
           "name": "libarchive",
           "version": "3.4.2",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210310/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2535,8 +2565,8 @@
         "type": "other",
         "other": {
           "name": "libiothsm-std",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -3184,6 +3214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "logrus",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lshw",
           "version": "B.02.18",
           "downloadUrl": "http://www.ezix.org/software/files/lshw-B.02.18.tar.gz"
@@ -3365,8 +3405,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.5.4",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.5.4/source/apache-maven-3.5.4-src.tar.gz"
+          "version": "3.8.1",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.1/source/apache-maven-3.8.1-src.tar.gz"
         }
       }
     },
@@ -3465,8 +3505,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.0.0~rc10+azure",
-          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.tar.xz"
+          "version": "1.0.0~rc94+azure",
+          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc94/runc.tar.xz"
         }
       }
     },
@@ -3545,8 +3585,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.23",
-          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz"
+          "version": "8.0.24",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
         }
       }
     },
@@ -3804,6 +3844,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nvidia-container-runtime",
+          "version": "3.4.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nvme-cli",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.8.1.tar.gz"
@@ -3844,9 +3894,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openjdk8",
-          "version": "1.8.0.181",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u//archive/aarch64-jdk8u181-b13.tar.gz"
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -5104,6 +5164,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pexpect",
+          "version": "4.8.0",
+          "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pip",
           "version": "19.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4e9a93319ae5bb371057786f1590b157341f7542d7d/pip-19.2.tar.gz"
@@ -5147,6 +5217,16 @@
           "name": "python-psycopg2",
           "version": "2.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-2.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ptyprocess",
+          "version": "0.7.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/ptyprocess/ptyprocess-0.7.0.tar.gz"
         }
       }
     },
@@ -6385,8 +6465,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.6",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.xz"
+          "version": "2.6.7",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.7.tar.xz"
         }
       }
     },
@@ -6394,9 +6474,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "runc",
-          "version": "1.0.0.rc8",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.0.0-rc8.tar.gz"
+          "name": "runtime-spec",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz"
         }
       }
     },
@@ -6455,8 +6535,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "version": "15",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15/shim-15.tar.bz2"
         }
       }
     },
@@ -6504,6 +6584,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sos",
+          "version": "4.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "span-lite",
           "version": "0.7.0",
           "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.7.0.tar.gz"
@@ -6515,8 +6605,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.32.3",
-          "downloadUrl": "https://www.sqlite.org/2020/sqlite-autoconf-3320300.tar.gz"
+          "version": "3.34.1",
+          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3340100.tar.gz"
         }
       }
     },
@@ -6675,8 +6765,8 @@
         "type": "other",
         "other": {
           "name": "tboot",
-          "version": "1.9.7",
-          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.7.tar.gz"
+          "version": "1.9.12",
+          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.12.tar.gz"
         }
       }
     },
@@ -6875,8 +6965,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.36",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.36/uClibc-ng-1.0.36.tar.xz"
+          "version": "1.0.37",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.37/uClibc-ng-1.0.37.tar.xz"
         }
       }
     },
@@ -6907,6 +6997,16 @@
           "name": "unzip",
           "version": "6.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "urfave-cli",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
         }
       }
     },

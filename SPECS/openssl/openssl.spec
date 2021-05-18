@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,10 +37,9 @@ Patch14:        openssl-1.1.1-fips-drbg-selftest.patch
 Patch15:        openssl-1.1.1-fips-dh.patch
 Patch16:        openssl-1.1.1-s390x-ecc.patch
 Patch17:        openssl-1.1.1-kdf-selftest.patch
-Patch18:        openssl-1.1.1-rewire-fips-drbg.patch
-Patch19:        openssl-1.1.1-fips-curves.patch
-Patch20:        openssl-1.1.1-sp80056arev3.patch
-Patch21:        openssl-1.1.1-jitterentropy.patch
+Patch18:        openssl-1.1.1-fips-curves.patch
+Patch19:        openssl-1.1.1-sp80056arev3.patch
+Patch20:        openssl-1.1.1-jitterentropy.patch
 BuildRequires:  jitterentropy
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
@@ -128,7 +127,6 @@ cp %{SOURCE4} test/
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-%patch21 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -323,8 +321,11 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon May 10 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
+* Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
 - Use jitterentropy and getrandom() for seeding
+
+* Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
+- Remove FIPS DRBG rewire patch
 
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-1
 - Update to version 1.1.1k
