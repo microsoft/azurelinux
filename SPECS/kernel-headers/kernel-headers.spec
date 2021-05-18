@@ -35,7 +35,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Bump release number to match kernel release
 
 * Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
