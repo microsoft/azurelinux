@@ -1,0 +1,55 @@
+%rust_arches x86_64 aarch64
+%version_no_tilde() %{lua:
+    local sep = rpm.expand('%1')
+    local ver = rpm.expand('%2')
+\
+    if sep == '%1' then
+        sep = '-'
+    end
+\
+    if ver == '%2' then
+        ver = rpm.expand('%version')
+    end
+    ver = ver:gsub('~', sep)
+\
+    print(ver)
+}
+%__crates_url https://crates.io/api/v1/crates/
+%crates_source() %{lua:
+    local crate = rpm.expand('%1')
+    local version = rpm.expand('%2')
+    local url = rpm.expand('%__crates_url')
+\
+    if crate == '%1' then
+        crate = rpm.expand('%real_crate')
+    end
+    if crate == '%real_crate' then
+        crate = rpm.expand('%crate')
+    end
+    if crate == '%crate' then
+        crate = rpm.expand('%name')
+    end
+\
+    if version == '%2' then
+        version = rpm.expand('%version')
+    end
+    version = version:gsub('~', '-')
+\
+    print(url .. crate .. '/' .. version .. '/download#/' .. crate .. '-' .. version .. '.crate')
+}
+
+# If crate not in _build_crates and _module_build is set, we should skip the build
+%__cargo_skip_build %{lua:
+local crate = rpm.expand('%{crate}')
+local build_crate = false
+for w in rpm.expand('%{?_build_crates}'):gmatch('%S+') do
+  if w == crate then
+    build_crate = true
+    break
+  end
+end
+if (rpm.expand('%{defined _module_build}') ~= '0' and not build_crate) then
+  print(1)
+else
+  print(0)
+end}

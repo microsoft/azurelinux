@@ -6,8 +6,8 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        15%{?dist}
-License:        GPL+
+Release:        16%{?dist}
+License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/System
@@ -35,6 +35,8 @@ Source19:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compilea
 Source20:       macros.forge
 Source21:       common.lua
 Source22:       forge.lua
+# macros.rust-srpm is taken from https://pagure.io/fedora-rust/rust2rpm
+Source23:       macros.rust-srpm
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -43,6 +45,7 @@ Provides:       python-srpm-macros
 Provides:       python-rpm-macros
 Provides:       python2-rpm-macros
 Provides:       python3-rpm-macros
+Provides:       rust-srpm-macros
 BuildArch:      noarch
 
 %description
@@ -91,6 +94,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
+%{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.forge
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
@@ -105,6 +109,10 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-16
+- Add Rust SRPM macros from rust2rpm (license: MIT)
+- Add rust-srpm-macros Provides
+
 * Thu Feb 25 2021 Henry Li <lihl@microsoft.com> - 1.0-15
 - Add _smp_build_cpus and relevant macros.
 
