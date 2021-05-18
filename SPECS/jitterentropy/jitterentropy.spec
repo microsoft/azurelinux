@@ -3,7 +3,7 @@ Summary:        Library implementing the jitter entropy source
 Name:           jitterentropy
 Version:        3.0.2
 Release:        1%{?dist}
-License:        BSD or GPLv2
+License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
@@ -19,7 +19,6 @@ The Jitter RNG provides a noise source using the CPU execution timing jitter.
 It does not depend on any system resource other than a high-resolution time stamp.
 It is a small-scale, yet fast entropy source that is viable in almost all environments and on a lot of CPU architectures.
 
-
 %prep
 %autosetup -n %{name}-library-%{version} -p1
 
@@ -28,7 +27,7 @@ export CFLAGS='-DOPENSSL -DOPENSSL_FIPS'
 make
 
 %install
-mkdir -p %{buildroot}/usr/include/
+mkdir -p %{buildroot}%{_includedir}
 make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 # Rename static library to libjitterentropy-openssl
