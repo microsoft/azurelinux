@@ -24,7 +24,6 @@ ignore_list=" \
   python-markupsafe \
   python-requests \
   python-zope-interface \
-  openjdk8 \
   python-nocasedict \
   python-pywbem \
   python-repoze-lru \
