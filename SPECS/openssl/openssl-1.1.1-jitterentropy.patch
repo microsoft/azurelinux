@@ -31,7 +31,7 @@ index 3b9d3e9..b3e0f43 100644
              ret = 0;
 diff --git a/crypto/fips/fips_entropy.c b/crypto/fips/fips_entropy.c
 new file mode 100644
-index 0000000..9f1f6f3
+index 0000000..098dc91
 --- /dev/null
 +++ b/crypto/fips/fips_entropy.c
 @@ -0,0 +1,53 @@
@@ -57,7 +57,7 @@ index 0000000..9f1f6f3
 +
 +ssize_t FIPS_jitter_entropy(unsigned char *buf, size_t buflen)
 +{
-+    ssize_t ent_bytes = 0;
++    ssize_t ent_bytes = -1;
 +    struct rand_data* ec = NULL;
 +
 +    if (buf == NULL || buflen == 0) {
@@ -72,7 +72,7 @@ index 0000000..9f1f6f3
 +    }
 +
 +    /* Allocate entropy collector */
-+    ec = jent_entropy_collector_alloc(1, 1<<5);
++    ec = jent_entropy_collector_alloc(1, JENT_FORCE_FIPS);
 +    if (ec == NULL) {
 +        goto end;
 +    }
@@ -89,11 +89,23 @@ index 0000000..9f1f6f3
 +    return ent_bytes;
 +}
 \ No newline at end of file
+diff --git a/crypto/fips/fips_err.h b/crypto/fips/fips_err.h
+index 3cf8d69..9a9c9a1 100644
+--- a/crypto/fips/fips_err.h
++++ b/crypto/fips/fips_err.h
+@@ -138,6 +138,7 @@ static ERR_STRING_DATA FIPS_str_reasons[] = {
+     {ERR_REASON(FIPS_R_DRBG_NOT_INITIALISED), "drbg not initialised"},
+     {ERR_REASON(FIPS_R_DRBG_STUCK), "drbg stuck"},
+     {ERR_REASON(FIPS_R_ENTROPY_ERROR_UNDETECTED), "entropy error undetected"},
++    {ERR_REASON(FIPS_R_ENTROPY_INIT_FAILED), "entropy init failed"},
+     {ERR_REASON(FIPS_R_ENTROPY_NOT_REQUESTED_FOR_RESEED),
+      "entropy not requested for reseed"},
+     {ERR_REASON(FIPS_R_ENTROPY_SOURCE_STUCK), "entropy source stuck"},
 diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
-index e814246..84c4c03 100644
+index 5ed97cb..2d606a8 100644
 --- a/crypto/rand/rand_unix.c
 +++ b/crypto/rand/rand_unix.c
-@@ -637,6 +637,12 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
+@@ -647,6 +647,12 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
          int attempts = 3;
  
          bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
@@ -106,7 +118,7 @@ index e814246..84c4c03 100644
          while (bytes_needed != 0 && attempts-- > 0) {
              buffer = rand_pool_add_begin(pool, bytes_needed);
              bytes = syscall_random(buffer, bytes_needed, in_post);
-@@ -648,6 +654,24 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
+@@ -658,6 +664,24 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
                  break;
              }
          }
@@ -122,7 +134,7 @@ index e814246..84c4c03 100644
 +                    rand_pool_add_end(pool, bytes, 8 * bytes);
 +                    bytes_needed -= bytes;
 +                    attempts = 3; /* reset counter after successful attempt */
-+                } else if (bytes < 0 && errno != EINTR) {
++                } else if (bytes < 0) {
 +                    break;
 +                }
 +            }
@@ -166,10 +178,10 @@ index abbe81b..be84e08 100644
  # define FIPS_R_ENTROPY_SOURCE_STUCK                      142
  # define FIPS_R_ERROR_INITIALISING_DRBG                   115
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 3fd5d64..5c48ac5 100644
+index 2e47840..e354631 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4631,4 +4631,5 @@ EVP_KDF_vctrl                           6594	1_1_1b	EXIST::FUNCTION:
+@@ -4634,4 +4634,5 @@ EVP_KDF_vctrl                           6594	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_ctrl_str                        6595	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_size                            6596	1_1_1b	EXIST::FUNCTION:
  EVP_KDF_derive                          6597	1_1_1b	EXIST::FUNCTION:

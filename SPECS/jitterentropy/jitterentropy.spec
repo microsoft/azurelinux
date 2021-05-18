@@ -1,7 +1,7 @@
 %define         debug_package %{nil}
 Summary:        Library implementing the jitter entropy source
 Name:           jitterentropy
-Version:        3.0.1
+Version:        3.0.2
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
@@ -42,5 +42,5 @@ mv %{buildroot}/%{_libdir}/lib%{name}.a %{buildroot}/%{_libdir}/lib%{name}-opens
 %{_libdir}/lib%{name}-openssl.a
 
 %changelog
-* Wed Apr 14 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.0.1-1
+* Wed Apr 14 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.0.2-1
 - Original version for CBL-Mariner. License verified.
