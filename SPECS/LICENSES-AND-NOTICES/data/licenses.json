@@ -693,7 +693,6 @@
                 "rsyslog",
                 "ruby",
                 "rubygem-bundler",
-                "runc",
                 "rust",
                 "scons",
                 "sed",

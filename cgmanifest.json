@@ -105,8 +105,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.14",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/516b337a-83f9-4946-b2a6-b2f686e09a76/d0e82549e890c5d852c461319ffd5b31/aspnetcore-runtime-3.1.14-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "azure-iotedge",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -315,8 +315,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.3",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.3/bind-9.16.3.tar.xz"
+          "version": "9.16.15",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
         }
       }
     },
@@ -1005,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-runtime-3.1",
-          "version": "3.1.14",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/4e5f17fa-fa56-40bc-bf3d-fd6abc91d0ad/08bd80f3751c0ac602dd41dc2534265e/dotnet-runtime-3.1.14-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/692284f9-e1e7-4b31-9191-cd8043441024/ac45c17d4327b1f992b7fe3956a99129/dotnet-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -1015,8 +1015,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-sdk-3.1",
-          "version": "3.1.114",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/79c30043-e62b-49e5-ba42-0aea2af1499a/f853a4f12fb4376532826272cdbbdd66/dotnet-sdk-3.1.114-linux-x64.tar.gz"
+          "version": "3.1.115",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
         }
       }
     },
@@ -1527,6 +1527,26 @@
           "name": "golang",
           "version": "1.15.11",
           "downloadUrl": "https://dl.google.com/go/go1.15.11.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-crypto",
+          "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
+          "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-sys",
+          "version": "b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d",
+          "downloadUrl": "https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz"
         }
       }
     },
@@ -2186,7 +2206,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2206,7 +2226,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2226,7 +2246,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.2",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2545,8 +2565,8 @@
         "type": "other",
         "other": {
           "name": "libiothsm-std",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -3194,6 +3214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "logrus",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lshw",
           "version": "B.02.18",
           "downloadUrl": "http://www.ezix.org/software/files/lshw-B.02.18.tar.gz"
@@ -3475,8 +3505,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.0.0~rc10+azure",
-          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.tar.xz"
+          "version": "1.0.0~rc94+azure",
+          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc94/runc.tar.xz"
         }
       }
     },
@@ -6444,9 +6474,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "runc",
-          "version": "1.0.0.rc8",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.0.0-rc8.tar.gz"
+          "name": "runtime-spec",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz"
         }
       }
     },
@@ -6967,6 +6997,16 @@
           "name": "unzip",
           "version": "6.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "urfave-cli",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
         }
       }
     },

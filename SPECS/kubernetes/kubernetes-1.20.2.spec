@@ -10,15 +10,15 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.20.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210428.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210511.tar.gz
 Source1:        kubelet.service
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
@@ -266,6 +266,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Thu May 13 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.20.2-3
+- Update to version  "1.20.2-hotfix.20210511".
+
 * Mon May 03 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.20.2-2
 - Increment release to force republishing using golang 1.15.11.
 
