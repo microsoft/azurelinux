@@ -283,7 +283,7 @@ func sortMap(mapToSort map[string][]string, inverse bool) (pairList []mapPair) {
 	return
 }
 
-// insertIfMissing appens a value to the key in a map if it is not present.
+// insertIfMissing appends a value to the key in a map if it is not present.
 //
 // Will alter data.
 func insertIfMissing(data map[string][]string, key string, value string) {
