@@ -31,7 +31,7 @@ by compress 2.0 and older.
 %autosetup
 
 %build
-make %{?_smp_mflags}
+%make_build
 
 %install
 make PREFIX=%{_prefix} DESTDIR=%{buildroot} install_core
