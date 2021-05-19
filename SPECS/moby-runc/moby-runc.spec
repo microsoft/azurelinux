@@ -1,13 +1,13 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
-Version:        1.0.0~rc94+azure
+Version:        1.0.0~rc95+azure
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://runc.io/
 
 # See generate-sources.sh for creating runc source tarball
-#Source0:       https://github.com/opencontainers/runc/releases/download/v1.0.0-rc94/runc.tar.xz
-Source0:        runc-v1.0.0-rc94.tar.gz
+#Source0:       https://github.com/opencontainers/runc/releases/download/v1.0.0-rc95/runc.tar.xz
+Source0:        runc-v1.0.0-rc95.tar.gz
 #Source1:       https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
@@ -114,6 +114,8 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Wed May 19 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc95+azure-1
+- Update to version 1.0.0~rc95+azure to fix CVE-2021-30465
 * Thu May 13 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc94+azure-1
 - Update to version 1.0.0~rc94+azure
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0~rc10+azure-6
