@@ -156,6 +156,7 @@
                 "moby-engine",
                 "moby-runc",
                 "msgpack",
+                "ncompress",
                 "nlohmann-json",
                 "nmap",
                 "ntopng",
