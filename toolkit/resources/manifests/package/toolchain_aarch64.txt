@@ -38,7 +38,6 @@ cracklib-debuginfo-2.9.7-3.cm1.aarch64.rpm
 cracklib-devel-2.9.7-3.cm1.aarch64.rpm
 cracklib-dicts-2.9.7-3.cm1.aarch64.rpm
 cracklib-lang-2.9.7-3.cm1.aarch64.rpm
-cracklib-python-2.9.7-3.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-devel-0.11.1-6.cm1.aarch64.rpm
@@ -208,7 +207,6 @@ libpwquality-devel-1.4.2-6.cm1.aarch64.rpm
 libselinux-2.9-6.cm1.aarch64.rpm
 libselinux-debuginfo-2.9-6.cm1.aarch64.rpm
 libselinux-devel-2.9-6.cm1.aarch64.rpm
-libselinux-python-2.9-6.cm1.aarch64.rpm
 libselinux-python3-2.9-6.cm1.aarch64.rpm
 libselinux-utils-2.9-6.cm1.aarch64.rpm
 libsepol-3.1-1.cm1.aarch64.rpm
