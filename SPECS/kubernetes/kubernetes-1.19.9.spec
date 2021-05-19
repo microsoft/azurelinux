@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.19.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ URL:            https://mcr.microsoft.com/oss
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
 Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210505.tar.gz
 Source1:        kubelet.service
+Source2:        version-file-%{version}.sh
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)
 Patch0:         CVE-2020-8565.nopatch
 BuildRequires:  flex-devel
@@ -46,14 +47,14 @@ Microsoft Kubernetes %{version}.
 
 %package        client
 Summary:        Client utilities
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 
 %description    client
 Client utilities for Microsoft Kubernetes %{version}.
 
 %package        kubeadm
 Summary:        Bootstrap utilities
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 Requires:       moby-cli
 
 %description    kubeadm
@@ -102,6 +103,10 @@ echo "+++ extract sources from tarball"
 mkdir -p %{_builddir}/%{name}/src
 cd %{_builddir}/%{name}/src
 tar -xof %{_builddir}/%{name}/kubernetes-src.tar.gz
+
+# set version information using version file
+# (see k8s code: hack/lib/version.sh for more detail)
+export KUBE_GIT_VERSION_FILE=%{SOURCE2}
 
 # build host and container image related components
 components_to_build=%{host_components}
@@ -266,6 +271,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Tue May 17 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.19.9-4
+- Manually set version variables.
+
 * Fri May 07 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.19.9-3
 - Update to version  "1.19.9-hotfix.20210505".
 
