@@ -198,15 +198,15 @@ popd
 rm -rf zlib-1.2.11
 touch /logs/status_zlib_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.38
+tar xf file-5.38.tar.gz
+pushd file-5.38
 ./configure --prefix=/usr
 # Note: libmagic issue. --libdir=/usr/lib/x86_64-linux-gnu ?
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.38
 touch /logs/status_file_complete
 
 echo Readline-7.0
@@ -771,9 +771,9 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.7.9
+tar xf Python-3.7.9.tar.xz
+pushd Python-3.7.9
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat \
@@ -785,8 +785,8 @@ chmod -v 755 /usr/lib/libpython3.7m.so
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.7 /usr/bin/pip3
 popd
-rm -rf Python-3.7.4
-touch /logs/status_python374_complete
+rm -rf Python-3.7.9
+touch /logs/status_python379_complete
 
 echo Coreutils-8.30
 tar xf coreutils-8.30.tar.xz

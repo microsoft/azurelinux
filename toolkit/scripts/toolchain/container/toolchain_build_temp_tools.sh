@@ -433,14 +433,14 @@ rm -rf diffutils-3.6
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.38
+tar xf file-5.38.tar.gz
+pushd file-5.38
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.38
 
 touch $LFS/logs/temptoolchain/status_file_complete
 
@@ -540,15 +540,15 @@ rm -rf perl-5.30.3
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.7.9
+tar xf Python-3.7.9.tar.xz
+pushd Python-3.7.9
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.7.4
+rm -rf Python-3.7.9
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

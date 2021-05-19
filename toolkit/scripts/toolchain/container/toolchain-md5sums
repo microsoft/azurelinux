@@ -30,11 +30,11 @@ d010e5b1b66a8755a4cdd96e189eb069  e2fsprogs-1.44.6.tar.gz
 077e4f49320cad82bf17a997068b1db9  elfutils-0.176.tar.bz2
 ca047ae951b40020ac831c28859161b2  expat-2.2.6.tar.bz2
 00fce8de158422f5ccd2666512329bd2  expect5.45.4.tar.gz
-44b0b6983462b18f96403d4d3ad80254  file-5.34.tar.gz
+3217633ed09c7cd35ed8d04191675574  file-5.38.tar.gz
 9936aa8009438ce185bea2694a997fc1  findutils-4.6.0.tar.gz
 e7431ab84d37b2678af71e29355e101d  fixesproto-5.0.tar.bz2
 2882e3179748cc9f9c23ec593d6adc8d  flex-2.6.4.tar.gz
-29105662c7d319720e0088a0ac53f494  fontconfig-2.12.4.tar.bz2
+5470d817f54b7870eee23e045a0afc8b  fontconfig-2.13.91.tar.gz
 36934d00b00555eaacde9f091f392f97  fontsproto-2.1.3.tar.bz2
 2413ac3eaf508ada019c63959ea81a92  freetype-2.8.tar.bz2
 95cf553f50ec9f386b5dfcd67f30180a  gawk-4.2.1.tar.xz
@@ -118,7 +118,7 @@ f6e931e319531b736fadc017f470e68a  pkg-config-0.29.2.tar.gz
 3743beefa3dd6247a73f8f7a32c14c33  popt-1.16.tar.gz
 92f9dda9c870d78a1d93f366bcb0e6cd  presentproto-1.1.tar.bz2
 2b0717a7cb474b3d6dfdeedfbad2eccc  procps-ng-3.3.15.tar.xz
-d33e4aae66097051c2eca45ee3604803  Python-3.7.4.tar.xz
+389d3ed26b4d97c741d9e5423da1f43b  Python-3.7.9.tar.xz
 a46765c8dcacb7114c821baf0df1e797  randrproto-1.5.0.tar.bz2
 205b03a87fc83dab653b628c59b9fc91  readline-7.0.tar.gz
 1b4e5dede5ea51906f1530ca1e21d216  recordproto-1.14.2.tar.bz2
