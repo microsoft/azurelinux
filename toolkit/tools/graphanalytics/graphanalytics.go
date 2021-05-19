@@ -292,7 +292,7 @@ func insertIfMissing(data map[string][]string, key string, value string) {
 	}
 }
 
-// insertIfMissingLastPathNode appens a value to the key in a map if it is not present.
+// insertIfMissingLastPathNode appends a value to the key in a map if it is not present.
 // The function compares last nodes of each stored path with the last node of the new path
 // and inserts the new path only if it introduces a new last node.
 //
