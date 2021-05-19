@@ -3,12 +3,11 @@ Name:           asciidoc
 Version:        9.1.0
 Release:        1%{?dist}
 License:        GPLv2
-URL:            http://asciidoc.org/
+URL:            https://asciidoc.org/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:       https://github.com/%{name}-py/%{name}-py/releases/download/%{version}/%{name}-%{version}.tar.gz
-#Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}-py/%{name}-py/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3
 BuildRequires:  python3-xml
@@ -54,7 +53,7 @@ python3 tests/testasciidoc.py run
 
 %changelog
 *   Wed May 05 2021 Nick Samson <nisamson@microsoft.com> - 9.1.0-1
--   Updated to 9.1.0, removed python2 support
+-   Updated to 9.1.0, removed python2 support, verified license
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
 -   Added %%license line automatically
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 8.6.10-3

@@ -4,7 +4,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          2%{?dist}
+Release:          3%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -188,9 +188,10 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
-- Added %%license line automatically
-
+*   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9.7-3
+-   Removed python2 support
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
+-   Added %%license line automatically
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 2.9.7-1
 -   Increment version to 2.9.7.
 -   Remove CVE-2016-6318 patch as its included in 2.9.7.

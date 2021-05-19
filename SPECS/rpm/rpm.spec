@@ -2,7 +2,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -266,6 +266,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 4.14.2.1-3
+- Removed python-rpm python2 module support
 * Fri Apr 30 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-2
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 4.14.2-11: Patch CVE-2021-20271 and CVE-2021-3421

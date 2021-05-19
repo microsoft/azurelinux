@@ -3,7 +3,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.13.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+ or LGPLv2+
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Group:          System Environment/Security
@@ -85,6 +85,8 @@ make check-TESTS
 %{python3_sitearch}/gpg/
 
 %changelog
+*   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> 1.13.1-7
+-   Removed python2 support
 *   Tue Nov 10 2020 Andrew Phelps <anphel@microsoft.com> 1.13.1-6
 -   Fix check test.
 *   Thu Aug 20 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.1-5

@@ -2,7 +2,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        2.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Public Domain
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
@@ -115,6 +115,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Mon May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9-6
+-   Removed python2 module support
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
