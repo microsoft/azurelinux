@@ -3,7 +3,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,7 @@ BuildRequires:  python2
 %if %{with_check}
 BuildRequires:  python-xml
 %endif
+Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
@@ -69,8 +70,6 @@ mv %{SOURCE7} %{BUILD_CACHE_DIR}
 # Disable symbol generation
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
-
-
 
 sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
 # Exporting SUDO_USER=root bypasses a check in the python bootstrap that
@@ -117,6 +116,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-5
+- Add provides for 'cargo' from the base package
+
 * Tue May 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-4
 - Remove XZ support detection in bootstrap
 
