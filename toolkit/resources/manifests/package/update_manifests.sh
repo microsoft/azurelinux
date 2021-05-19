@@ -63,7 +63,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/freetype2/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
-    sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/glib-doc/d' $TmpPkgGen
     sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen

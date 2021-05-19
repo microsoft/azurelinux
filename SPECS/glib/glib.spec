@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ The GLib package contains a low-level libraries useful for providing data struct
 Summary:        Header files for the glib library
 Group:          Development/Libraries
 Requires:       glib = %{version}-%{release}
+Requires:       glib-schemas = %{version}-%{release}
 Requires:       libffi-devel
 Requires:       pcre-devel
 Requires:       python-xml
@@ -135,6 +136,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
+- Require schemas subpackage from devel subpackage
+
 * Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
