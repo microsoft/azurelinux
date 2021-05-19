@@ -204,26 +204,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.5",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/6827d794-a218-4352-b3b3-a19ec773c975/e3e53bc2f20df220a29c6e09f74d8a00/aspnetcore-runtime-3.1.5-linux-x64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "at",
-          "version": "3.1.23",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "atf",
           "version": "0.20",
           "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
@@ -2767,16 +2747,6 @@
           "name": "liblogging",
           "version": "1.0.6",
           "downloadUrl": "http://download.rsyslog.com/liblogging/liblogging-1.0.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libmaxminddb",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.5.0/libmaxminddb-1.5.0.tar.gz"
         }
       }
     },
