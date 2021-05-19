@@ -105,8 +105,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.14",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/516b337a-83f9-4946-b2a6-b2f686e09a76/d0e82549e890c5d852c461319ffd5b31/aspnetcore-runtime-3.1.14-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "azure-iotedge",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -315,8 +315,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.3",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.3/bind-9.16.3.tar.xz"
+          "version": "9.16.15",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
         }
       }
     },
@@ -325,8 +325,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.32",
-          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.xz"
+          "version": "2.36.1",
+          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.36.1.tar.xz"
         }
       }
     },
@@ -594,6 +594,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "byacc",
+          "version": "1.9.20200330",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cifs-utils",
           "version": "6.8",
           "downloadUrl": "https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.8.tar.bz2"
@@ -724,6 +734,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ceph",
+          "version": "15.2.4",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-15.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cpio",
           "version": "2.13",
           "downloadUrl": "https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2"
@@ -847,6 +867,16 @@
           "name": "cyrus-sasl",
           "version": "2.1.27",
           "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "CUnit",
+          "version": "2.1.3",
+          "downloadUrl": "https://downloads.sourceforge.net/cunit/CUnit-2.1-3.tar.bz2"
         }
       }
     },
@@ -1015,8 +1045,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-runtime-3.1",
-          "version": "3.1.14",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/4e5f17fa-fa56-40bc-bf3d-fd6abc91d0ad/08bd80f3751c0ac602dd41dc2534265e/dotnet-runtime-3.1.14-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/692284f9-e1e7-4b31-9191-cd8043441024/ac45c17d4327b1f992b7fe3956a99129/dotnet-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -1025,8 +1055,8 @@
         "type": "other",
         "other": {
           "name": "dotnet-sdk-3.1",
-          "version": "3.1.114",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/79c30043-e62b-49e5-ba42-0aea2af1499a/f853a4f12fb4376532826272cdbbdd66/dotnet-sdk-3.1.114-linux-x64.tar.gz"
+          "version": "3.1.115",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
         }
       }
     },
@@ -1047,6 +1077,16 @@
           "name": "dstat",
           "version": "0.7.4",
           "downloadUrl": "https://github.com/dstat-real/dstat/archive/v0.7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "docbook5-schemas",
+          "version": "5.1",
+          "downloadUrl": "https://www.docbook.org/xml/5.1/docbook-v5.1-os.zip"
         }
       }
     },
@@ -1117,6 +1157,16 @@
           "name": "elfutils",
           "version": "0.176",
           "downloadUrl": "https://sourceware.org/elfutils/ftp/0.176/elfutils-0.176.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "eppic",
+          "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
+          "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
         }
       }
     },
@@ -1527,6 +1577,26 @@
           "name": "golang",
           "version": "1.15.11",
           "downloadUrl": "https://dl.google.com/go/go1.15.11.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-crypto",
+          "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
+          "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-sys",
+          "version": "b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d",
+          "downloadUrl": "https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz"
         }
       }
     },
@@ -2186,7 +2256,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2196,7 +2266,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.17",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2206,7 +2276,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2216,7 +2286,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.9",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2226,7 +2296,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.2",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2236,7 +2306,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.5",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2327,6 +2397,16 @@
           "name": "libburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "leveldb",
+          "version": "1.22",
+          "downloadUrl": "https://github.com/google/leveldb/archive/1.22/leveldb-1.22.tar.gz"
         }
       }
     },
@@ -2545,8 +2625,8 @@
         "type": "other",
         "other": {
           "name": "libiothsm-std",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -3014,6 +3094,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libstoragemgmt",
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.8.4/libstoragemgmt-1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libunistring",
           "version": "0.9.10",
           "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"
@@ -3204,6 +3294,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "logrus",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lshw",
           "version": "B.02.18",
           "downloadUrl": "http://www.ezix.org/software/files/lshw-B.02.18.tar.gz"
@@ -3277,6 +3377,26 @@
           "name": "lua",
           "version": "5.3.5",
           "downloadUrl": "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lsb-release",
+          "version": "1.4",
+          "downloadUrl": "https://downloads.sourceforge.net/lsb/lsb-release-1.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lutok",
+          "version": "0.4",
+          "downloadUrl": "https://github.com/jmmv/lutok/releases/download/lutok-0.4/lutok-0.4.tar.gz"
         }
       }
     },
@@ -3424,6 +3544,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mailcap",
+          "version": "2.1.49",
+          "downloadUrl": "https://pagure.io/releases/mailcap/mailcap-2.1.49.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "meson",
           "version": "0.56.0",
           "downloadUrl": "https://github.com/mesonbuild/meson/archive/0.56.0/meson-0.56.0.tar.gz"
@@ -3495,8 +3625,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.0.0~rc10+azure",
-          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.tar.xz"
+          "version": "1.0.0~rc95+azure",
+          "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc95/runc.tar.xz"
         }
       }
     },
@@ -3927,6 +4057,16 @@
           "name": "openssh",
           "version": "8.5p1",
           "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.5p1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "oath-toolkit",
+          "version": "2.6.2",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.2.tar.gz"
         }
       }
     },
@@ -4884,6 +5024,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cachetools",
+          "version": "4.1.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-4.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-greenlet",
           "version": "0.4.15",
           "downloadUrl": "https://files.pythonhosted.org/packages/f8/e8/b30ae23b45f69aa3f024b46064c0ac8e5fcb4f22ace0dca8d6f9c8bbe5e7/greenlet-0.4.15.tar.gz"
@@ -4907,6 +5057,16 @@
           "name": "python-hypothesis",
           "version": "3.71.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/65/57/c4e2cc37a7b9de3d57a1cd6c200f931807cfdd9f7e05ef4c67fb9c507d65/hypothesis-3.71.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-cherrypy",
+          "version": "18.6.0",
+          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.0.tar.gz"
         }
       }
     },
@@ -5034,6 +5194,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-execnet",
+          "version": "1.7.1",
+          "downloadUrl": "https://pypi.io/packages/source/e/execnet/execnet-1.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-lxml",
           "version": "4.2.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/ca/63/139b710671c1655aed3b20c1e6776118c62e9f9311152f4c6031e12a0554/lxml-4.2.4.tar.gz"
@@ -5057,6 +5227,16 @@
           "name": "python-mako",
           "version": "1.0.7",
           "downloadUrl": "https://files.pythonhosted.org/packages/eb/f3/67579bb486517c0d49547f9697e36582cd19dafb5df9e687ed8e22de57fa/Mako-1.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-google-auth",
+          "version": "1.20.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-1.20.1.tar.gz"
         }
       }
     },
@@ -5164,6 +5344,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pexpect",
+          "version": "4.8.0",
+          "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pip",
           "version": "19.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4e9a93319ae5bb371057786f1590b157341f7542d7d/pip-19.2.tar.gz"
@@ -5194,6 +5384,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-jwt",
+          "version": "1.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWT-1.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-kubernetes",
+          "version": "11.0.0",
+          "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-psutil",
           "version": "5.6.3",
           "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.6.3.tar.gz"
@@ -5204,9 +5414,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-logutils",
+          "version": "0.3.5",
+          "downloadUrl": "https://pypi.io/packages/source/l/logutils/logutils-0.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-psycopg2",
           "version": "2.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-2.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ptyprocess",
+          "version": "0.7.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/ptyprocess/ptyprocess-0.7.0.tar.gz"
         }
       }
     },
@@ -5284,6 +5514,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-nocasedict",
+          "version": "0.5.0",
+          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/0.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyvmomi",
           "version": "6.7.3",
           "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
@@ -5327,6 +5567,16 @@
           "name": "python-simplejson",
           "version": "3.17.0",
           "downloadUrl": "https://pypi.python.org/packages/source/s/simplejson/simplejson-3.17.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pecan",
+          "version": "1.4.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.4.0.tar.gz"
         }
       }
     },
@@ -5464,9 +5714,59 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pywbem",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/pywbem/pywbem/archive/1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-remoto",
+          "version": "1.2.0",
+          "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-repoze-lru",
+          "version": "0.7",
+          "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-werkzeug",
           "version": "0.14.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/9f/08/a3bb1c045ec602dc680906fc0261c267bed6b3bb4609430aff92c3888ec8/Werkzeug-0.14.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-routes",
+          "version": "2.4.1",
+          "downloadUrl": "https://pypi.io/packages/source/R/Routes/Routes-2.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rsa",
+          "version": "4.6",
+          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.6.tar.gz"
         }
       }
     },
@@ -5527,6 +5827,16 @@
           "name": "qt5-qtdeclarative",
           "version": "5.12.5",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.5/submodules/qtdeclarative-everywhere-src-5.12.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-websupport",
+          "version": "1.1.2",
+          "downloadUrl": " https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -6234,6 +6544,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-yamlloader",
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/Phynix/yamlloader/archive/0.5.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rsyslog",
+          "version": "8.37.0",
+          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.37.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-public_suffix",
           "version": "4.0.6",
           "downloadUrl": "https://rubygems.org/downloads/public_suffix-4.0.6.gem"
@@ -6454,9 +6784,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "runc",
-          "version": "1.0.0.rc8",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.0.0-rc8.tar.gz"
+          "name": "runtime-spec",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz"
         }
       }
     },
@@ -6544,6 +6874,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rdma-core",
+          "version": "31.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v31.0/rdma-core-31.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "shim-unsigned-aarch64",
           "version": "15",
           "downloadUrl": "https://github.com/rhboot/shim/releases/download/15/shim-15.tar.bz2"
@@ -6587,6 +6927,16 @@
           "name": "socat",
           "version": "1.7.3.4",
           "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sos",
+          "version": "4.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.1.tar.gz"
         }
       }
     },
@@ -6734,6 +7084,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sgml-common",
+          "version": "0.6.3",
+          "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "systemd",
           "version": "239",
           "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v239.tar.gz"
@@ -6765,8 +7125,8 @@
         "type": "other",
         "other": {
           "name": "tboot",
-          "version": "1.9.7",
-          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.7.tar.gz"
+          "version": "1.9.12",
+          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.12.tar.gz"
         }
       }
     },
@@ -6997,6 +7357,16 @@
           "name": "unzip",
           "version": "6.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "urfave-cli",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
         }
       }
     },
@@ -7284,9 +7654,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "yasm",
+          "version": "1.3.0",
+          "downloadUrl": " http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "zsh",
           "version": "5.8",
           "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.8/zsh-5.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xmlstarlet",
+          "version": "1.6.1",
+          "downloadUrl": "https://downloads.sourceforge.net/project/xmlstar/xmlstarlet/1.6.1/xmlstarlet-1.6.1.tar.gz"
         }
       }
     },

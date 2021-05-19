@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +28,7 @@ Patch5:         openssl-1.1.1-fips.patch
 Patch6:         openssl-1.1.1-version-override.patch
 Patch7:         openssl-1.1.1-seclevel.patch
 Patch8:         openssl-1.1.1-fips-post-rand.patch
-Patch9:        openssl-1.1.1-evp-kdf.patch
+Patch9:         openssl-1.1.1-evp-kdf.patch
 Patch10:        openssl-1.1.1-ssh-kdf.patch
 Patch11:        openssl-1.1.1-krb5-kdf.patch
 Patch12:        openssl-1.1.1-edk2-build.patch
@@ -37,9 +37,8 @@ Patch14:        openssl-1.1.1-fips-drbg-selftest.patch
 Patch15:        openssl-1.1.1-fips-dh.patch
 Patch16:        openssl-1.1.1-s390x-ecc.patch
 Patch17:        openssl-1.1.1-kdf-selftest.patch
-Patch18:        openssl-1.1.1-rewire-fips-drbg.patch
-Patch19:        openssl-1.1.1-fips-curves.patch
-Patch20:        openssl-1.1.1-sp80056arev3.patch
+Patch18:        openssl-1.1.1-fips-curves.patch
+Patch19:        openssl-1.1.1-sp80056arev3.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -125,7 +124,6 @@ cp %{SOURCE4} test/
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
-%patch20 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -320,6 +318,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
+- Remove FIPS DRBG rewire patch
+
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-1
 - Update to version 1.1.1k
 

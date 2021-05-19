@@ -1,0 +1,60 @@
+diff --git a/libpskc/man/pskc_get_key_algparm_chall_max.3 b/libpskc/man/pskc_get_key_algparm_chall_max.3
+index 6ae79a3..2001320 100644
+--- a/libpskc/man/pskc_get_key_algparm_chall_max.3
++++ b/libpskc/man/pskc_get_key_algparm_chall_max.3
+@@ -15,8 +15,8 @@ output variable indicating whether data was provided or not.
+ Get the PSKC KeyPackage Key AlgorithmParameters ChallengeFormat Max
+ value.  This attribute defines the maximum size of the challenge
+ accepted by the device for CR mode and MUST be included.  If the
+-'Encoding' attribute is set to 'DECIMAL', 'HEXADECIMAL', or
+-'ALPHANUMERIC', this value indicates the maximum number of
++\&'Encoding' attribute is set to 'DECIMAL', 'HEXADECIMAL', or
++\&'ALPHANUMERIC', this value indicates the maximum number of
+ digits/characters.  If the 'Encoding' attribute is set to 'BASE64'
+ or 'BINARY', this value indicates the maximum number of bytes of
+ the unencoded value.
+diff --git a/libpskc/man/pskc_get_key_algparm_chall_min.3 b/libpskc/man/pskc_get_key_algparm_chall_min.3
+index 85009d6..6e51e52 100644
+--- a/libpskc/man/pskc_get_key_algparm_chall_min.3
++++ b/libpskc/man/pskc_get_key_algparm_chall_min.3
+@@ -15,8 +15,8 @@ output variable indicating whether data was provided or not.
+ Get the PSKC KeyPackage Key AlgorithmParameters ChallengeFormat Min
+ value.  This attribute defines the minimum size of the challenge
+ accepted by the device for CR mode and MUST be included.  If the
+-'Encoding' attribute is set to 'DECIMAL', 'HEXADECIMAL', or
+-'ALPHANUMERIC', this value indicates the minimum number of
++\&'Encoding' attribute is set to 'DECIMAL', 'HEXADECIMAL', or
++\&'ALPHANUMERIC', this value indicates the minimum number of
+ digits/characters.  If the 'Encoding' attribute is set to 'BASE64'
+ or 'BINARY', this value indicates the minimum number of bytes of
+ the unencoded value.
+diff --git a/libpskc/man/pskc_get_key_policy_pinmaxlength.3 b/libpskc/man/pskc_get_key_policy_pinmaxlength.3
+index be96a9a..d4ce51e 100644
+--- a/libpskc/man/pskc_get_key_policy_pinmaxlength.3
++++ b/libpskc/man/pskc_get_key_policy_pinmaxlength.3
+@@ -16,9 +16,9 @@ Get the PSKC KeyPackage Key Policy PINPolicy MaxLength value.  This
+ attribute indicates the maximum length of a PIN that can be set to
+ protect this key.  It MUST NOT be possible to set a PIN longer than
+ this value.  If the 'PINFormat' attribute is set to 'DECIMAL',
+-'HEXADECIMAL', or 'ALPHANUMERIC', this value indicates the number
++\&'HEXADECIMAL', or 'ALPHANUMERIC', this value indicates the number
+ of digits/ characters.  If the 'PINFormat' attribute is set to
+-'BASE64' or 'BINARY', this value indicates the number of bytes of
++\&'BASE64' or 'BINARY', this value indicates the number of bytes of
+ the unencoded value.
+ 
+ If \fIpresent\fP is non\-NULL, it will be 0 if the field is not present
+diff --git a/libpskc/man/pskc_get_key_policy_pinminlength.3 b/libpskc/man/pskc_get_key_policy_pinminlength.3
+index c00523d..a5efe53 100644
+--- a/libpskc/man/pskc_get_key_policy_pinminlength.3
++++ b/libpskc/man/pskc_get_key_policy_pinminlength.3
+@@ -16,7 +16,7 @@ Get the PSKC KeyPackage Key Policy PINPolicy MinLength value.  This
+ attribute indicates the minimum length of a PIN that can be set to
+ protect the associated key.  It MUST NOT be possible to set a PIN
+ shorter than this value.  If the 'PINFormat' attribute is set to
+-'DECIMAL', 'HEXADECIMAL', or 'ALPHANUMERIC', this value indicates
++\&'DECIMAL', 'HEXADECIMAL', or 'ALPHANUMERIC', this value indicates
+ the number of digits/ characters.  If the 'PINFormat' attribute is
+ set to 'BASE64' or 'BINARY', this value indicates the number of
+ bytes of the unencoded value.
+ 

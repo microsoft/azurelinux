@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.32.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -325,18 +325,6 @@ install -vdm 755 %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
-# Verify for build-id match
-# We observe different IDs sometimes
-# TODO: debug it
-ID1=`readelf -n vmlinux | grep "Build ID"`
-./scripts/extract-vmlinux arch/x86/boot/bzImage > extracted-vmlinux
-ID2=`readelf -n extracted-vmlinux | grep "Build ID"`
-if [ "$ID1" != "$ID2" ] ; then
-        echo "Build IDs do not match"
-        echo $ID1
-        echo $ID2
-        exit 1
-fi
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
@@ -500,6 +488,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+- Update CONFIG_LD_VERSION for binutils 2.36.1
+- Remove build-id match check
+
+* Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
+- Add CONFIG_AS_HAS_LSE_ATOMICS=y
+
 * Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
 - Update source to 5.10.32.1
 - Address CVE-2021-23133, CVE-2021-29154, CVE-2021-30178
