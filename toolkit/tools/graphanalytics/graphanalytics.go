@@ -59,10 +59,10 @@ func analyzeGraph(inputFile string, maxResults int) (err error) {
 		return
 	}
 
-	//printDirectlyMostUnresolved(pkgGraph, maxResults)
-	//printDirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
+	printDirectlyMostUnresolved(pkgGraph, maxResults)
+	printDirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
 
-	//printIndirectlyMostUnresolved(pkgGraph, maxResults)
+	printIndirectlyMostUnresolved(pkgGraph, maxResults)
 	printIndirectlyClosestToBeingUnblocked(pkgGraph, maxResults)
 
 	return
@@ -77,8 +77,8 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 			continue
 		}
 
-		// Traverse each package (not unresolved) to find all unresolved nodes that are blocking it.
-		if node.State == pkggraph.StateUnresolved {
+		// Traverse each package (not unresolved or failed) to find all unresolved nodes that are blocking it.
+		if node.State == pkggraph.StateUnresolved || node.State == pkggraph.StateBuildError {
 			continue
 		}
 
@@ -99,8 +99,6 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 
 	printTitle("[INDIRECT] Most common unresolved dependencies")
 	printMap(unresolvedPackageDependents, "total dependents", maxResults)
-
-	return
 }
 
 // printDirectlyMostUnresolved will print the top unresolved packages that are directly most blocking.
@@ -130,8 +128,6 @@ func printDirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 
 	printTitle("[DIRECT] Most common unresolved dependencies")
 	printMap(unresolvedPackageDependents, "direct dependents", maxResults)
-
-	return
 }
 
 // printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved direct build requires.
@@ -152,8 +148,11 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 		dependencies := pkgGraph.From(node.ID())
 		for dependencies.Next() {
 			dependency := dependencies.Node().(*pkggraph.PkgNode)
-			// Only consider unresolved build nodes.
-			if dependency.State != pkggraph.StateBuild && dependency.State != pkggraph.StateUnresolved {
+
+			// Only consider blocking nodes.
+			if dependency.State != pkggraph.StateBuild &&
+				dependency.State != pkggraph.StateBuildError &&
+				dependency.State != pkggraph.StateUnresolved {
 				continue
 			}
 
@@ -216,33 +215,10 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 	srpmsBlockedByExpanded := make(map[string][]string)
 	for pkgSRPM, dependencies := range srpmsBlockedByPaths {
 		for _, dependencyPathNodes := range dependencies {
-			var pathStrings []string
-			var stringBuilder strings.Builder
+			// Skip the first node containing the origin.
+			nodesPath := convertNodePathToStringPath(dependencyPathNodes[1:])
 
-			dependency := dependencyPathNodes[len(dependencyPathNodes)-1].(*pkggraph.PkgNode)
-
-			stringBuilder.WriteString(nodeDependencyName(dependency))
-			stringBuilder.WriteString(": ")
-
-			previousPackageName := ""
-			for _, pathNode := range dependencyPathNodes[1:] {
-				packageNode := pathNode.(*pkggraph.PkgNode)
-				packageRPMName := nodeRPMName(packageNode)
-				packageDependencyName := nodeDependencyName(packageNode)
-				if packageRPMName != packageDependencyName {
-					packageRPMName += fmt.Sprintf(" [%s]", packageDependencyName)
-				}
-
-				// Meta nodes, and run nodes may end up having the same name as build nodes and we don't need to see them twice.
-				if previousPackageName != packageRPMName {
-					pathStrings = append(pathStrings, packageRPMName)
-					previousPackageName = packageRPMName
-				}
-			}
-
-			stringBuilder.WriteString(strings.Join(pathStrings, " -> "))
-
-			srpmsBlockedByExpanded[pkgSRPM] = append(srpmsBlockedByExpanded[pkgSRPM], stringBuilder.String())
+			srpmsBlockedByExpanded[pkgSRPM] = append(srpmsBlockedByExpanded[pkgSRPM], nodesPath)
 		}
 	}
 
@@ -360,4 +336,36 @@ func finalPathNodeSRPMMatch(expected, given interface{}) bool {
 	givenPathLastNode := givenPath[len(givenPath)-1].(*pkggraph.PkgNode)
 
 	return nodeDependencyName(expectedPathLastNode) == nodeDependencyName(givenPathLastNode)
+}
+
+// convertNodePathToStringPath converts the graph node slice into a string in the following format:
+//	<last_node>: <first_node> [<optional_node_SRPM_name>] -> <second_node> [<optional_node_SRPM_name>] -> (...) -> <last_node> [<optional_node_SRPM_name>]
+func convertNodePathToStringPath(nodePath []graph.Node) string {
+	var pathStrings []string
+	var stringBuilder strings.Builder
+
+	finalNode := nodePath[len(nodePath)-1].(*pkggraph.PkgNode)
+
+	stringBuilder.WriteString(nodeDependencyName(finalNode))
+	stringBuilder.WriteString(": ")
+
+	previousPackageName := ""
+	for _, pathNode := range nodePath {
+		packageNode := pathNode.(*pkggraph.PkgNode)
+		packageRPMName := nodeRPMName(packageNode)
+		packageDependencyName := nodeDependencyName(packageNode)
+		if packageRPMName != packageDependencyName {
+			packageRPMName += fmt.Sprintf(" [%s]", packageDependencyName)
+		}
+
+		// Meta nodes, and run nodes may end up having the same name as build nodes and we don't need to see them twice.
+		if previousPackageName != packageRPMName {
+			pathStrings = append(pathStrings, packageRPMName)
+			previousPackageName = packageRPMName
+		}
+	}
+
+	stringBuilder.WriteString(strings.Join(pathStrings, " -> "))
+
+	return stringBuilder.String()
 }
