@@ -3744,6 +3744,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ncompress",
+          "version": "5.0",
+          "downloadUrl": "https://github.com/vapier/ncompress/archive/v5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ncurses",
           "version": "6.2",
           "downloadUrl": "ftp://ftp.invisible-island.net/ncurses/ncurses-6.2.tar.gz"
