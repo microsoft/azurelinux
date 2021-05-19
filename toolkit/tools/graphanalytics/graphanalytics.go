@@ -205,7 +205,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			dependencyPath, _ := graphpath.AStar(node, dependency, pkgGraph, graphpath.NullHeuristic)
 			dependencyPathNodes, _ := dependencyPath.To(dependency.ID())
 
-			insertIfMissingPkgNode(srpmsBlockedByPaths, pkgSRPM, dependencyPathNodes)
+			insertIfMissingLastPathNode(srpmsBlockedByPaths, pkgSRPM, dependencyPathNodes)
 
 			return
 		})
@@ -284,6 +284,7 @@ func sortMap(mapToSort map[string][]string, inverse bool) (pairList []mapPair) {
 }
 
 // insertIfMissing appens a value to the key in a map if it is not present.
+//
 // Will alter data.
 func insertIfMissing(data map[string][]string, key string, value string) {
 	if sliceutils.Find(data[key], value, sliceutils.StringMatch) == sliceutils.NotFound {
@@ -291,9 +292,12 @@ func insertIfMissing(data map[string][]string, key string, value string) {
 	}
 }
 
-// insertIfMissingPkgNode appens a value to the key in a map if it is not present.
+// insertIfMissingLastPathNode appens a value to the key in a map if it is not present.
+// The function compares last nodes of each stored path with the last node of the new path
+// and inserts the new path only if it introduces a new last node.
+//
 // Will alter data.
-func insertIfMissingPkgNode(data map[string][][]graph.Node, key string, value []graph.Node) {
+func insertIfMissingLastPathNode(data map[string][][]graph.Node, key string, value []graph.Node) {
 	if sliceutils.Find(data[key], value, finalPathNodeSRPMMatch) == sliceutils.NotFound {
 		data[key] = append(data[key], value)
 	}
