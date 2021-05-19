@@ -6,7 +6,8 @@ License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/vapier/ncompress
-Source0:        https://github.com/vapier/%{name}/archive/v%{version}.tar.gz
+#Source0:       https://github.com/vapier/%{name}/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
@@ -26,7 +27,7 @@ handle the output of older versions though -- i.e. compress 3.0+ is able to deco
 by compress 2.0 and older.
 
 %prep
-%autosetup -q
+%autosetup
 
 %build
 make %{?_smp_mflags}
