@@ -192,7 +192,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			dependency := n.(*pkggraph.PkgNode)
 
 			// Only consider unresolved or failed build nodes.
-			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuild {
+			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuildError {
 				return
 			}
 
