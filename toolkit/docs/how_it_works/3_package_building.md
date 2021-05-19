@@ -75,6 +75,8 @@ The graph contains several types of nodes, with various states. As the graph is 
 >
 > `StateBuild`: Should be built
 >
+> `StateBuildError`: Package had all of its dependencies satisfied but failed to build for other reasons.
+>
 > `StateUpToDate`: Package is already available locally
 
 #### TypeRun

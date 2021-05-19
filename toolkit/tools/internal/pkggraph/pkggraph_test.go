@@ -289,6 +289,7 @@ func TestCreateTestGraph(t *testing.T) {
 func TestNodeStateString(t *testing.T) {
 	assert.Equal(t, "Meta", StateMeta.String())
 	assert.Equal(t, "Build", StateBuild.String())
+	assert.Equal(t, "BuildError", StateBuildError.String())
 	assert.Equal(t, "UpToDate", StateUpToDate.String())
 	assert.Equal(t, "Unresolved", StateUnresolved.String())
 	assert.Equal(t, "Cached", StateCached.String())

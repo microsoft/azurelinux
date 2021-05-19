@@ -4,11 +4,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"gonum.org/v1/gonum/graph"
+	graphpath "gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -74,8 +77,8 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 			continue
 		}
 
-		// Traverse each package (not unresolved) to find all unresolved nodes that are blocking it.
-		if node.State == pkggraph.StateUnresolved {
+		// Traverse each package (not unresolved or failed) to find all unresolved nodes that are blocking it.
+		if node.State == pkggraph.StateUnresolved || node.State == pkggraph.StateBuildError {
 			continue
 		}
 
@@ -96,8 +99,6 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 
 	printTitle("[INDIRECT] Most common unresolved dependencies")
 	printMap(unresolvedPackageDependents, "total dependents", maxResults)
-
-	return
 }
 
 // printDirectlyMostUnresolved will print the top unresolved packages that are directly most blocking.
@@ -127,8 +128,6 @@ func printDirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) {
 
 	printTitle("[DIRECT] Most common unresolved dependencies")
 	printMap(unresolvedPackageDependents, "direct dependents", maxResults)
-
-	return
 }
 
 // printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved direct build requires.
@@ -149,8 +148,11 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 		dependencies := pkgGraph.From(node.ID())
 		for dependencies.Next() {
 			dependency := dependencies.Node().(*pkggraph.PkgNode)
-			// Only consider unresolved build nodes.
-			if dependency.State != pkggraph.StateBuild && dependency.State != pkggraph.StateUnresolved {
+
+			// Only consider blocking nodes.
+			if dependency.State != pkggraph.StateBuild &&
+				dependency.State != pkggraph.StateBuildError &&
+				dependency.State != pkggraph.StateUnresolved {
 				continue
 			}
 
@@ -171,7 +173,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 
 // printDirectlyClosestToBeingUnblocked will print the packages with the fewest unresolved indrect build requires.
 func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResults int) {
-	srpmsBlockedBy := make(map[string][]string)
+	srpmsBlockedByPaths := make(map[string][][]graph.Node)
 
 	for _, node := range pkgGraph.AllNodes() {
 		if node.Type != pkggraph.TypeBuild {
@@ -188,8 +190,8 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 		search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
 			dependency := n.(*pkggraph.PkgNode)
 
-			// Only consider unresolved build nodes.
-			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuild {
+			// Only consider unresolved or failed build nodes.
+			if dependency.State != pkggraph.StateUnresolved && dependency.State != pkggraph.StateBuildError {
 				return
 			}
 
@@ -199,16 +201,29 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 				return
 			}
 
-			dependencyName := nodeDependencyName(dependency)
-			insertIfMissing(srpmsBlockedBy, pkgSRPM, dependencyName)
+			// Find the path from the blocked node to its blocker.
+			dependencyPath, _ := graphpath.AStar(node, dependency, pkgGraph, graphpath.NullHeuristic)
+			dependencyPathNodes, _ := dependencyPath.To(dependency.ID())
+
+			insertIfMissingLastPathNode(srpmsBlockedByPaths, pkgSRPM, dependencyPathNodes)
 
 			return
 		})
 
 	}
 
+	srpmsBlockedByExpanded := make(map[string][]string)
+	for pkgSRPM, dependencies := range srpmsBlockedByPaths {
+		for _, dependencyPathNodes := range dependencies {
+			// Skip the first node containing the origin.
+			nodesPath := convertNodePathToStringPath(dependencyPathNodes[1:])
+
+			srpmsBlockedByExpanded[pkgSRPM] = append(srpmsBlockedByExpanded[pkgSRPM], nodesPath)
+		}
+	}
+
 	printTitle("[INDIRECT] SRPMs closest to being ready to build")
-	printReversedMap(srpmsBlockedBy, "total unmet dependencies", maxResults)
+	printReversedMap(srpmsBlockedByExpanded, "total unmet dependencies", maxResults)
 }
 
 // nodeDependencyName returns a common dependency name for a node that will be shared across similair Meta/Run/Build nodes for the same package.
@@ -216,6 +231,17 @@ func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
 	name = filepath.Base(node.SrpmPath)
 	if name == "" || name == "<NO_SRPM_PATH>" {
+		name = node.VersionedPkg.Name
+	}
+
+	return
+}
+
+// nodeRPMName returns the name of the RPM providing this node
+func nodeRPMName(node *pkggraph.PkgNode) (name string) {
+	// Prefer the SRPM name if possible, otherwise use the unversioned package name
+	name = filepath.Base(node.RpmPath)
+	if name == "" || name == "<NO_RPM_PATH>" {
 		name = node.VersionedPkg.Name
 	}
 
@@ -257,10 +283,22 @@ func sortMap(mapToSort map[string][]string, inverse bool) (pairList []mapPair) {
 	return
 }
 
-// insertIfMissing appens a value to the key in a map if it is not present.
+// insertIfMissing appends a value to the key in a map if it is not present.
+//
 // Will alter data.
 func insertIfMissing(data map[string][]string, key string, value string) {
-	if sliceutils.Find(data[key], value) == -1 {
+	if sliceutils.Find(data[key], value, sliceutils.StringMatch) == sliceutils.NotFound {
+		data[key] = append(data[key], value)
+	}
+}
+
+// insertIfMissingLastPathNode appends a value to the key in a map if it is not present.
+// The function compares last nodes of each stored path with the last node of the new path
+// and inserts the new path only if it introduces a new last node.
+//
+// Will alter data.
+func insertIfMissingLastPathNode(data map[string][][]graph.Node, key string, value []graph.Node) {
+	if sliceutils.Find(data[key], value, finalPathNodeSRPMMatch) == sliceutils.NotFound {
 		data[key] = append(data[key], value)
 	}
 }
@@ -275,7 +313,7 @@ func printReversedMap(data map[string][]string, valueDescription string, maxResu
 // printMap will sort and print the largest entries, using the valueDescription in the format.
 func printMap(data map[string][]string, valueDescription string, maxResults int) {
 	const inverse = false
-	pairList := sortMap(data, false)
+	pairList := sortMap(data, inverse)
 	printSlice(pairList, valueDescription, maxResults)
 }
 
@@ -291,4 +329,47 @@ func printSlice(pairList []mapPair, valueDescription string, maxResults int) {
 			logger.Log.Debugf("--> %s", value)
 		}
 	}
+}
+
+// finalPathNodeSRPMMatch checks if two '[]graph.Node' paths finish with the same final SRPM.
+func finalPathNodeSRPMMatch(expected, given interface{}) bool {
+	expectedPath := expected.([]graph.Node)
+	givenPath := given.([]graph.Node)
+
+	expectedPathLastNode := expectedPath[len(expectedPath)-1].(*pkggraph.PkgNode)
+	givenPathLastNode := givenPath[len(givenPath)-1].(*pkggraph.PkgNode)
+
+	return nodeDependencyName(expectedPathLastNode) == nodeDependencyName(givenPathLastNode)
+}
+
+// convertNodePathToStringPath converts the graph node slice into a string in the following format:
+//	<last_node>: <first_node> [<optional_node_SRPM_name>] -> <second_node> [<optional_node_SRPM_name>] -> (...) -> <last_node> [<optional_node_SRPM_name>]
+func convertNodePathToStringPath(nodePath []graph.Node) string {
+	var pathStrings []string
+	var stringBuilder strings.Builder
+
+	finalNode := nodePath[len(nodePath)-1].(*pkggraph.PkgNode)
+
+	stringBuilder.WriteString(nodeDependencyName(finalNode))
+	stringBuilder.WriteString(": ")
+
+	previousPackageName := ""
+	for _, pathNode := range nodePath {
+		packageNode := pathNode.(*pkggraph.PkgNode)
+		packageRPMName := nodeRPMName(packageNode)
+		packageDependencyName := nodeDependencyName(packageNode)
+		if packageRPMName != packageDependencyName {
+			packageRPMName += fmt.Sprintf(" [%s]", packageDependencyName)
+		}
+
+		// Meta nodes, and run nodes may end up having the same name as build nodes and we don't need to see them twice.
+		if previousPackageName != packageRPMName {
+			pathStrings = append(pathStrings, packageRPMName)
+			previousPackageName = packageRPMName
+		}
+	}
+
+	stringBuilder.WriteString(strings.Join(pathStrings, " -> "))
+
+	return stringBuilder.String()
 }
