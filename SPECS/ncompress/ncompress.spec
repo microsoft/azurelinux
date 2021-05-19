@@ -8,11 +8,12 @@ Distribution:   Mariner
 URL:            https://github.com/vapier/ncompress
 #Source0:       https://github.com/vapier/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
+BuildRequires:  make
 
 %description
+
 This is (N)compress. It is an improved version of compress 4.1.
 
 Compress is a fast, simple LZW file compressor. Compress does not have the highest compression rate,
