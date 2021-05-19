@@ -3,7 +3,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.13.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+ or LGPLv2+
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Group:          System Environment/Security
@@ -37,15 +37,6 @@ BuildRequires:  swig
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-gpg
-%{summary}.
-
-%package -n     python-gpg
-Summary:        GPG bindings for Python
-BuildRequires:  python2-devel
-BuildRequires:  swig
-Requires:       %{name} = %{version}-%{release}
-
-%description -n python-gpg
 %{summary}.
 
 %prep
@@ -93,13 +84,9 @@ make check-TESTS
 %{python3_sitearch}/gpg-*.egg-info
 %{python3_sitearch}/gpg/
 
-
-%files -n python-gpg
-%doc lang/python/README
-%{python_sitearch}/gpg-*.egg-info
-%{python_sitearch}/gpg/
-
 %changelog
+*   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> 1.13.1-7
+-   Removed python2 support
 *   Tue Nov 10 2020 Andrew Phelps <anphel@microsoft.com> 1.13.1-6
 -   Fix check test.
 *   Thu Aug 20 2020 Mateusz Malisz <mamalisz@microsoft.com> 1.13.1-5

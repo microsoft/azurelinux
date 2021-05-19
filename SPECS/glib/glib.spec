@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,7 @@ BuildRequires:  libselinux-devel
 BuildRequires:  meson
 BuildRequires:  pcre-devel
 BuildRequires:  pkg-config
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
@@ -42,7 +42,7 @@ Requires:       glib = %{version}-%{release}
 Requires:       glib-schemas = %{version}-%{release}
 Requires:       libffi-devel
 Requires:       pcre-devel
-Requires:       python-xml
+Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
 Provides:       glib2-devel%{?_isa} = %{version}-%{release}
@@ -136,9 +136,10 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
+- Removed python2 support
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
-
 * Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage

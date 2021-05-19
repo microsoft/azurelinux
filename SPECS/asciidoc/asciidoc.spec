@@ -1,33 +1,30 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
-Version:        8.6.10
-Release:        4%{?dist}
+Version:        9.1.0
+Release:        1%{?dist}
 License:        GPLv2
-URL:            http://asciidoc.org/
+URL:            https://asciidoc.org/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/%{name}/%{name}-py3/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}-py/%{name}-py/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
-BuildRequires:  python2
 Requires:       python3
-Requires:       python-xml
+Requires:       python3-xml
 Requires:       libxslt
 Requires:       docbook-style-xsl
 Requires:       docbook-dtd-xml
-Requires:       python2
 
 %description
 AsciiDoc is a human readable text document format that can be easily converted to other document formats.
 
 %prep
-%setup -q -n %{name}-py3-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 autoreconf -v
@@ -41,23 +38,24 @@ rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
 
 %check
-python tests/testasciidoc.py update
-python tests/testasciidoc.py run
+python3 tests/testasciidoc.py update
+python3 tests/testasciidoc.py run
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license COPYRIGHT
 %{_bindir}/*
 %{_sysconfdir}/*
 %{_mandir}/*
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
-- Added %%license line automatically
-
+*   Wed May 05 2021 Nick Samson <nisamson@microsoft.com> - 9.1.0-1
+-   Updated to 9.1.0, removed python2 support, verified license
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
+-   Added %%license line automatically
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 8.6.10-3
 -   Renaming docbook-xsl to docbook-style-xsl
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 8.6.10-2

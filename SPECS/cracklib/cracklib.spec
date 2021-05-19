@@ -1,11 +1,10 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 # Got this spec from http://downloads.sourceforge.net/cracklib/cracklib-2.9.6.tar.gz
 
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          2%{?dist}
+Release:          3%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -63,21 +62,6 @@ Requires:   cracklib
 The cracklib devel package include the needed library link and
 header files for development.
 
-%package    python
-Summary:    The cracklib python module
-Group:      Development/Languages/Python
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-
-Requires:   cracklib
-Requires:   python2
-Requires:   python2-libs
-
-%description python
-The cracklib python module
-
 %package -n python3-cracklib
 Summary:        The cracklib python module
 Group:          Development/Languages/Python
@@ -121,7 +105,6 @@ CFLAGS="$RPM_OPT_FLAGS" ./configure \
 
 make
 pushd python
-python2 setup.py build
 python3 setup.py build
 popd
 
@@ -137,7 +120,6 @@ ln -s cracklib-format $RPM_BUILD_ROOT/%{_sbindir}/mkdict
 ln -s cracklib-packer $RPM_BUILD_ROOT/%{_sbindir}/packer
 
 pushd python
-python2 setup.py install --skip-build --root %{buildroot}
 python3 setup.py install --skip-build --root %{buildroot}
 popd
 
@@ -192,10 +174,6 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_libdir}/libcrack.so
 %{_libdir}/libcrack.la
 
-%files python
-%defattr(-,root,root)
-%{python2_sitelib}/*
-
 %files -n python3-cracklib
 %defattr(-,root,root)
 %{python3_sitelib}/*
@@ -210,9 +188,10 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
-- Added %%license line automatically
-
+*   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9.7-3
+-   Removed python2 support
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
+-   Added %%license line automatically
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 2.9.7-1
 -   Increment version to 2.9.7.
 -   Remove CVE-2016-6318 patch as its included in 2.9.7.

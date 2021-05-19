@@ -77,7 +77,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-devel/d' $TmpPkgGen
-    sed -i '/libselinux-python/d' $TmpPkgGen
     sed -i '/libselinux-python3/d' $TmpPkgGen
     sed -i '/libselinux-utils/d' $TmpPkgGen
     sed -i '/libsepol-devel/d' $TmpPkgGen
@@ -191,8 +190,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
     sed -i '/perl-Text-Template/d' $TmpPkgGen
-    sed -i '/python2-test/d' $TmpPkgGen
-    sed -i '/python2-tools/d' $TmpPkgGen
     sed -i '/python3-curses/d' $TmpPkgGen
     sed -i '/python3-gpg/d' $TmpPkgGen
     sed -i '/python3-libxml2/d' $TmpPkgGen
@@ -303,8 +300,6 @@ generate_pkggen_core () {
         grep "^ca-certificates-base-" $TmpPkgGen
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
-        grep "^python2-" $TmpPkgGen
-        grep "^python-xml-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
         grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen

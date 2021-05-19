@@ -307,9 +307,6 @@ build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
 # Python2 needs to be installed for RPM and openjdk's dependencies to build
-build_rpm_in_chroot_no_install python2
-rm -vf $FINISHED_RPM_DIR/python2*debuginfo*.rpm
-chroot_and_install_rpms python2
 
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
@@ -356,7 +353,6 @@ build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
 build_rpm_in_chroot_no_install perl-libintl-perl
-build_rpm_in_chroot_no_install python-setuptools
 build_rpm_in_chroot_no_install libgpg-error
 
 # intltool needs perl-XML-Parser
@@ -382,7 +378,7 @@ build_rpm_in_chroot_no_install curl
 chroot_and_install_rpms python-xml
 
 # cracklib needs python-setuptools
-chroot_and_install_rpms python-setuptools
+chroot_and_install_rpms python3-setuptools
 build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib
@@ -414,7 +410,7 @@ build_rpm_in_chroot_no_install libsolv
 chroot_and_install_rpms perl-XML-Parser
 
 # python-xml is built by building python2
-chroot_and_install_rpms python-xml
+chroot_and_install_rpms python3-xml
 
 build_rpm_in_chroot_no_install itstool
 
