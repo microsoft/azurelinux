@@ -96,7 +96,7 @@
         "other": {
           "name": "archivemount",
           "version": "0.9.1",
-          "downloadUrl": "http://www.cybernoia.de/software/archivemount/archivemount-0.9.1.tar.gz"
+          "downloadUrl": "https://www.cybernoia.de/software/archivemount/archivemount-0.9.1.tar.gz"
         }
       }
     },

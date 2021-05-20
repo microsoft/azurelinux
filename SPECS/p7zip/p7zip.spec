@@ -101,13 +101,7 @@ mv %{buildroot}%{_docdir}/p7zip/DOC/* %{buildroot}%{_docdir}/p7zip
 rmdir %{buildroot}%{_docdir}/p7zip/DOC/
 
 %check
-%if ! 0%{?rhel} || 0%{?rhel} >= 7
 make test
-%endif
-# Next test fails, because we don't have X11 envoirment ...
-# Error: Unable to initialize gtk, is DISPLAY set properly?
-#make test_7zG || :
-
 
 %files
 %{_docdir}/p7zip
@@ -125,8 +119,6 @@ make test
 %dir %{_libexecdir}/p7zip/
 %{_libexecdir}/p7zip/7z
 %{_libexecdir}/p7zip/7z.so
-#{_libexecdir}/p7zip/Codecs/
-#{_libexecdir}/p7zip/Formats/
 %{_mandir}/man1/7z.1*
 
 %files doc

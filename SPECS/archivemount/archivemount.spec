@@ -5,8 +5,8 @@ Summary:       FUSE based filesystem for mounting compressed archives
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 License:       LGPLv2+
-URL:           http://www.cybernoia.de/software/archivemount/
-Source0:       http://www.cybernoia.de/software/archivemount/%{name}-%{version}.tar.gz
+URL:           https://www.cybernoia.de/software/archivemount.html
+Source0:       https://www.cybernoia.de/software/archivemount/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: fuse-devel

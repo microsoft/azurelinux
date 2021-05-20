@@ -1,5 +1,3 @@
-%global with_tests     0%{!?_without_tests:1}
-
 Name:           libzip
 Version:        1.7.3
 Release:        5%{?dist}
@@ -19,6 +17,7 @@ BuildRequires:  cmake >= 3.0.2
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
+%if %{with_check}
 BuildRequires:  perl
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(File::Copy)
@@ -30,7 +29,7 @@ BuildRequires:  perl(Symbol)
 BuildRequires:  perl(UNIVERSAL)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
+%endif
 
 %description
 libzip is a C library for reading, creating, and modifying zip archives. Files
@@ -86,14 +85,11 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot} INSTALL='install -p'
 
 %check
-%if %{with_tests}
 make check
-%else
-: Test suite disabled
-%endif
 
-%ldconfig_scriptlets
 
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %license LICENSE
