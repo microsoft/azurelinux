@@ -116,7 +116,7 @@ make check
 
 %changelog
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7.3-5
-- Initial version CBL-Mariner.
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
