@@ -1,21 +1,20 @@
 %define libselinuxver 2.9-1
 %define libsepolver 2.9-1
-
-Summary:       SELinux policy compiler
-Name:          checkpolicy
-Version:       2.9
-Release:       3%{?dist}
-License:       GPLv2
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Url:           https://github.com/SELinuxProject/selinux
-Source0:       %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
-BuildRequires: gcc
-BuildRequires: bison
-BuildRequires: flex
-BuildRequires: flex-devel
-BuildRequires: libsepol-devel >= %{libsepolver}
-BuildRequires: libselinux-devel  >= %{libselinuxver}
+Summary:        SELinux policy compiler
+Name:           checkpolicy
+Version:        2.9
+Release:        3%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/SELinuxProject/selinux
+Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  flex-devel
+BuildRequires:  gcc
+BuildRequires:  libselinux-devel >= %{libselinuxver}
+BuildRequires:  libsepol-devel >= %{libsepolver}
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -35,7 +34,7 @@ Only required for building policies.
 %autosetup -p 1 -n checkpolicy-%{version}
 
 %build
-%set_build_flags
+%{set_build_flags}
 
 make clean
 make LIBDIR="%{_libdir}"
@@ -43,10 +42,10 @@ cd test
 make LIBDIR="%{_libdir}"
 
 %install
-mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
-make LIBDIR="%{_libdir}" DESTDIR="${RPM_BUILD_ROOT}" install
-install test/dismod ${RPM_BUILD_ROOT}%{_bindir}/sedismod
-install test/dispol ${RPM_BUILD_ROOT}%{_bindir}/sedispol
+mkdir -p %{buildroot}%{_bindir}
+make LIBDIR="%{_libdir}" DESTDIR=%{buildroot} install
+install test/dismod %{buildroot}%{_bindir}/sedismod
+install test/dispol %{buildroot}%{_bindir}/sedispol
 
 %files
 %license COPYING
@@ -60,7 +59,7 @@ install test/dispol ${RPM_BUILD_ROOT}%{_bindir}/sedispol
 %{_bindir}/sedispol
 
 %changelog
-* Wed Aug 19 2020 Daniel Burgener <Daniel.Burgener@microsoft.com> 2.9-3
+* Wed Aug 19 2020 Daniel Burgener <Daniel.Burgener@microsoft.com> - 2.9-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified
 
@@ -218,7 +217,6 @@ for detecting this crash.
 -   the same thing for types.  The kernel will override this with type
 -   transition rules and similar.  This is just the default if nothing
 -   specific is given.
-    
 
 * Wed Sep 19 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.11-2
 - Rebuild with fixed libsepol
@@ -325,6 +323,7 @@ for detecting this crash.
 	* Add support for using the last path compnent in type transitions by Eric
 
 * Thu Apr 21 2011 Dan Walsh <dwalsh@redhat.com> - 2.0.24-2
+
 * Fixes for new role_transition class field by Eric Paris.
 
 * Fri Apr 15 2011 Dan Walsh <dwalsh@redhat.com> - 2.0.24-2
@@ -341,21 +340,16 @@ for detecting this crash.
 - Patches from Eric Paris 
 We just use random numbers to make menu selections.  Use #defines and
 names that make some sense instead.
-
 This patch adds support for using the last path component as part of the
 information in making labeling decisions for new objects.  A example
 rule looks like so:
-
 type_transition unconfined_t etc_t:file system_conf_t eric;
-
 This rule says if unconfined_t creates a file in a directory labeled
 etc_t and the last path component is "eric" (no globbing, no matching
 magic, just exact strcmp) it should be labeled system_conf_t.
-
 The kernel and policy representation does not have support for such
 rules in conditionals, and thus policy explicitly notes that fact if
 such a rule is added to a conditional.
-
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.23-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
@@ -648,6 +642,7 @@ such a rule is added to a conditional.
 * Tue Oct 18 2005 Dan Walsh <dwalsh@redhat.com> 1.27.10-1
 - Latest upgrade from NSA
 	* Updated for changes to sepol expand_module and link_modules interfaces.
+
 * Sat Oct 15 2005 Dan Walsh <dwalsh@redhat.com> 1.27.9-2
 - Rebuild to get latest libsepol
 
@@ -703,6 +698,7 @@ such a rule is added to a conditional.
 * Sat Sep 17 2005 Dan Walsh <dwalsh@redhat.com> 1.27.1-1
 - Latest upgrade from NSA
 	* Merged bug fix for role dominance handling from Darrel Goeddel (TCS). 
+
 * Wed Sep 14 2005 Dan Walsh <dwalsh@redhat.com> 1.26-2
 - Rebuild to get latest libsepol
 

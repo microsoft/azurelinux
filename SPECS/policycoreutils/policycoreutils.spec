@@ -2,58 +2,55 @@
 %global libsepolver     %{version}-1
 %global libsemanagever  %{version}-1
 %global libselinuxver   %{version}-1
-%global __python3	/usr/bin/python3
-%global generatorsdir %{_prefix}/lib/systemd/system-generators
-
+%global __python3	%{_bindir}/python3
+%global generatorsdir %{_lib}/systemd/system-generators
 # Disable automatic compilation of Python files in extra directories
 %global _python_bytecompile_extra 0
-
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-Summary:       SELinux policy core utilities
-Name:          policycoreutils
-Version:       2.9
-Release:       6%{?dist}
-License:       GPLv2
-URL:           https://github.com/SELinuxProject/selinux
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Source0:       https://github.com/SELinuxProject/selinux/releases/download/20190315/%{name}-%{version}.tar.gz
-Source1:       https://github.com/SELinuxProject/selinux/releases/download/20190315/selinux-python-%{version}.tar.gz
-Source2:       https://github.com/SELinuxProject/selinux/releases/download/20190315/semodule-utils-%{version}.tar.gz
-Source3:       https://github.com/SELinuxProject/selinux/releases/download/20190315/restorecond-%{version}.tar.gz
-Source5:       selinux-autorelabel
-Source6:       selinux-autorelabel.service
-Source7:       selinux-autorelabel-mark.service
-Source8:       selinux-autorelabel.target
-Source9:       selinux-autorelabel-generator.sh
-
-Obsoletes: policycoreutils < 2.0.61-2
-Conflicts: initscripts < 9.66
-Provides: /sbin/fixfiles
-Provides: /sbin/restorecon
-
-BuildRequires: gcc
-BuildRequires: pam-devel
-BuildRequires: libsepol-devel >= %{libsepolver}
-BuildRequires: libsemanage-devel >= %{libsemanagever}
-BuildRequires: libselinux-devel >= %{libselinuxver}
-BuildRequires: libcap-devel
-BuildRequires: audit-libs >= %{libauditver}
-BuildRequires: gettext
-BuildRequires: audit-devel
-BuildRequires: dbus-devel dbus-glib-devel
-BuildRequires: python3-devel
-BuildRequires: systemd
-BuildRequires: git
-Requires: util-linux
-Requires: grep
-Requires: gawk
-Requires: diffutils
-Requires: rpm
-Requires: sed
-Requires: libsepol >= %{libsepolver}
-Requires: coreutils
-Requires: libselinux-utils >=  %{libselinuxver}
+Summary:        SELinux policy core utilities
+Name:           policycoreutils
+Version:        2.9
+Release:        6%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/SELinuxProject/selinux
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/20190315/%{name}-%{version}.tar.gz
+Source1:        https://github.com/SELinuxProject/selinux/releases/download/20190315/selinux-python-%{version}.tar.gz
+Source2:        https://github.com/SELinuxProject/selinux/releases/download/20190315/semodule-utils-%{version}.tar.gz
+Source3:        https://github.com/SELinuxProject/selinux/releases/download/20190315/restorecond-%{version}.tar.gz
+Source5:        selinux-autorelabel
+Source6:        selinux-autorelabel.service
+Source7:        selinux-autorelabel-mark.service
+Source8:        selinux-autorelabel.target
+Source9:        selinux-autorelabel-generator.sh
+BuildRequires:  audit-devel
+BuildRequires:  audit-libs >= %{libauditver}
+BuildRequires:  dbus-devel
+BuildRequires:  dbus-glib-devel
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  git
+BuildRequires:  libcap-devel
+BuildRequires:  libselinux-devel >= %{libselinuxver}
+BuildRequires:  libsemanage-devel >= %{libsemanagever}
+BuildRequires:  libsepol-devel >= %{libsepolver}
+BuildRequires:  pam-devel
+BuildRequires:  python3-devel
+BuildRequires:  systemd
+Requires:       coreutils
+Requires:       diffutils
+Requires:       gawk
+Requires:       grep
+Requires:       libselinux-utils >= %{libselinuxver}
+Requires:       libsepol >= %{libsepolver}
+Requires:       rpm
+Requires:       sed
+Requires:       util-linux
+Conflicts:      initscripts < 9.66
+Obsoletes:      policycoreutils < 2.0.61-2
+Provides:       /sbin/fixfiles
+Provides:       /sbin/restorecon
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -71,7 +68,7 @@ for basic operation of a SELinux system.  These utilities include
 load_policy to load policies, setfiles to label filesystems, newrole
 to switch roles.
 
-%prep -p /usr/bin/bash
+%prep -p %{_bindir}/bash
 # create selinux/ directory and extract sources
 %autosetup -S git -N -c -n selinux
 %autosetup -S git -N -T -D -a 1 -n selinux
@@ -94,10 +91,10 @@ done
 echo "G"
 
 %build
-%set_build_flags
-export PYTHON=%{__python3}
+%{set_build_flags}
+export PYTHON=python3
 
-make -C policycoreutils LSPP_PRIV=y SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="/usr/sbin" LIBSEPOLA="%{_libdir}/libsepol.a" all
+make -C policycoreutils LSPP_PRIV=y SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
 make -C python SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
 make -C semodule-utils SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
 make -C restorecond SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
@@ -108,15 +105,15 @@ mkdir -p %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_mandir}/man1
 mkdir -p %{buildroot}%{_mandir}/man5
 mkdir -p %{buildroot}%{_mandir}/man8
-%{__mkdir} -p %{buildroot}/%{_usr}/share/doc/%{name}/
+mkdir -p %{buildroot}/%{_usr}/share/doc/%{name}/
 
-make -C policycoreutils LSPP_PRIV=y  DESTDIR="%{buildroot}" SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="/usr/sbin" LIBSEPOLA="%{_libdir}/libsepol.a" install
+make -C policycoreutils LSPP_PRIV=y  DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
 
-make -C python PYTHON=%{__python3} DESTDIR="%{buildroot}" SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
+make -C python PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
 
-make -C semodule-utils PYTHON=%{__python3} DESTDIR="%{buildroot}" SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
+make -C semodule-utils PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
 
-make -C restorecond PYTHON=%{__python3} DESTDIR="%{buildroot}" SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/lib/systemd" install
+make -C restorecond PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/lib/systemd" install
 
 # Fix perms on newrole so that objcopy can process it
 chmod 0755 %{buildroot}%{_bindir}/newrole
@@ -124,15 +121,15 @@ chmod 0755 %{buildroot}%{_bindir}/newrole
 # Systemd
 rm -rf %{buildroot}/%{_sysconfdir}/rc.d/init.d/restorecond
 
-rm -f %{buildroot}/usr/share/man/ru/man8/genhomedircon.8.gz
-rm -f %{buildroot}/usr/share/man/ru/man8/open_init_pty.8*
-rm -f %{buildroot}/usr/share/man/ru/man8/semodule_deps.8.gz
-rm -f %{buildroot}/usr/share/man/man8/open_init_pty.8
-rm -f %{buildroot}/usr/sbin/open_init_pty
-rm -f %{buildroot}/usr/sbin/run_init
-rm -f %{buildroot}/usr/share/man/ru/man8/run_init.8*
-rm -f %{buildroot}/usr/share/man/man8/run_init.8*
-rm -f %{buildroot}/etc/pam.d/run_init*
+rm -f %{buildroot}%{_mandir}/ru/man8/genhomedircon.8.gz
+rm -f %{buildroot}%{_mandir}/ru/man8/open_init_pty.8*
+rm -f %{buildroot}%{_mandir}/ru/man8/semodule_deps.8.gz
+rm -f %{buildroot}%{_mandir}/man8/open_init_pty.8
+rm -f %{buildroot}%{_sbindir}/open_init_pty
+rm -f %{buildroot}%{_sbindir}/run_init
+rm -f %{buildroot}%{_mandir}/ru/man8/run_init.8*
+rm -f %{buildroot}%{_mandir}/man8/run_init.8*
+rm -f %{buildroot}%{_sysconfdir}/pam.d/run_init*
 
 mkdir   -m 755 -p %{buildroot}/%{generatorsdir}
 mkdir   -m 755 -p %{buildroot}/%{_unitdir}
@@ -143,47 +140,49 @@ install -m 755 -p %{SOURCE9} %{buildroot}/%{generatorsdir}/
 install -m 755 -p %{SOURCE5} %{buildroot}/%{_libexecdir}/selinux/
 
 %package python-utils
-Summary:    SELinux policy core python utilities
-Requires:   policycoreutils-python3 = %{version}-%{release}
-BuildArch:  noarch
+Summary:        SELinux policy core python utilities
+Requires:       policycoreutils-python3 = %{version}-%{release}
+BuildArch:      noarch
 
 %description python-utils
 The policycoreutils-python-utils package contains the management tools use to manage
 an SELinux environment.
 
 %package python3
-Summary: SELinux policy core python3 interfaces
-Requires:policycoreutils = %{version}-%{release}
-Requires:libsemanage-python3 >= %{libsemanagever} libselinux-python3
-Requires: python3-audit
-Requires: checkpolicy
-Requires: setools-python3 >= 4.1.1
-BuildArch: noarch
+Summary:        SELinux policy core python3 interfaces
+Requires:       checkpolicy
+Requires:       libselinux-python3
+Requires:       libsemanage-python3 >= %{libsemanagever}
+Requires:       policycoreutils = %{version}-%{release}
+Requires:       python3-audit
+Requires:       setools-python3 >= 4.1.1
+BuildArch:      noarch
 
 %description python3
 The policycoreutils-python3 package contains the interfaces that can be used
 by python 3 in an SELinux environment.
 
 %package devel
-Summary: SELinux policy core policy devel utilities
-Requires: policycoreutils-python-utils
-Requires: make dnf
+Summary:        SELinux policy core policy devel utilities
+Requires:       dnf
+Requires:       make
+Requires:       policycoreutils-python-utils
 
 %description devel
 The policycoreutils-devel package contains the management tools use to develop policy in an SELinux environment.
 
 %package newrole
-Summary: The newrole application for RBAC/MLS
-BuildRequires: libcap-ng-devel
-Requires: policycoreutils = %{version}-%{release}
+Summary:        The newrole application for RBAC/MLS
+BuildRequires:  libcap-ng-devel
+Requires:       policycoreutils = %{version}-%{release}
 
 %description newrole
 RBAC/MLS policy machines require newrole as a way of changing the role
 or level of a logged in user.
 
 %package restorecond
-Summary: SELinux restorecond utilities
-BuildRequires: systemd
+Summary:        SELinux restorecond utilities
+BuildRequires:  systemd
 
 %description restorecond
 The policycoreutils-restorecond package contains the restorecond service.
@@ -231,7 +230,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %{_bindir}/sepolgen
 %{_bindir}/sepolgen-ifgen
 %{_bindir}/sepolgen-ifgen-attr-helper
-%dir  %{_sharedstatedir}/sepolgen
+%dir %{_sharedstatedir}/sepolgen
 %{_sharedstatedir}/sepolgen/perm_map
 %{_bindir}/sepolicy
 %{_mandir}/man8/sepolgen.8*
@@ -354,7 +353,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %dir %{_datadir}/bash-completion
 %{_datadir}/bash-completion/completions/setsebool
 %doc %{_usr}/share/doc/%{name}
-/usr/share/locale/*
+%{_datadir}/locale/*
 
 %post
 %systemd_post selinux-autorelabel-mark.service
@@ -370,9 +369,8 @@ The policycoreutils-restorecond package contains the restorecond service.
 
 %postun restorecond
 %systemd_postun_with_restart restorecond.service
-
 %changelog
-* Fri Aug 21 2020 Daniel Burgener <daburgen@microsoft.com> 2.9-6
+* Fri Aug 21 2020 Daniel Burgener <daburgen@microsoft.com> - 2.9-6
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified
 
@@ -615,7 +613,6 @@ The policycoreutils-restorecond package contains the restorecond service.
 - fixfiles: fix logging about R/O filesystems
 - fixfiles: clarify exclude_dirs()
 - fixfiles: remove (broken) redundant code
-
 
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
@@ -1002,7 +999,6 @@ The policycoreutils-restorecond package contains the restorecond service.
   Fix advanced_item_button_push() to allow to select an application in advanced search menu
   Fix previously_modified_initialize() to show modified changes properly for all selections
 
-
 * Fri Nov 22 2013 Dan Walsh <dwalsh@redhat.com> - 2.2.3-1
 - Update to upstream 
         * Apply polkit check on all dbus interfaces and restrict to active user from Dan Walsh.
@@ -1023,6 +1019,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 * Thu Oct 31 2013 Dan Walsh <dwalsh@redhat.com> - 2.2-2
 - Shift around some of the files to more appropriate packages.
         * semodule_* packages are required for devel.
+
 * Thu Oct 31 2013 Dan Walsh <dwalsh@redhat.com> - 2.2-1
 - Update to upstream 
         * Properly build the swig exception file from Laurent Bigonville.
@@ -1091,13 +1088,11 @@ The policycoreutils-restorecond package contains the restorecond service.
   - Fix lots of bugs.
 - Update Translations.
 
-
 * Fri Oct 4 2013 Dan Walsh <dwalsh@redhat.com> - 2.1.14-85
 - Fixes for fixfiles
   * exclude_from_dirs should apply to all types of restorecon calls
   * fixfiles check now works
   * exit with the correct status
-
 - semanage no longer import selinux
 
 * Wed Oct 2 2013 Dan Walsh <dwalsh@redhat.com> - 2.1.14-84
@@ -1125,7 +1120,6 @@ The policycoreutils-restorecond package contains the restorecond service.
   * Do not prompt for password until you make a change
   * Add user mappings and selinux users page
   * lots of code cleanup
-
 - Verify homedir is owned by user before mounting over it with seunshare
 - Fix fixfiles to handle Relabel properly
 - Fix semanage fcontext -e / command to allow "/"
@@ -1506,7 +1500,6 @@ do not drop capabilities when run as root.
 -
 -  Modify network.py to include interface definitions for newly created port type
 -  Standardize of te_types just like all of the other templates.
-
 -  Change permissive domains creation to raise exception if sepolgen is not ins
 -  get_te_results no longer needs or uses the opts parameter.
 -  The compliler was complaining so I just removed the option.
@@ -1776,7 +1769,6 @@ I pull the policy, policy.xml and file_contexts and file_contexts.homedir
 - Have audit2allow look at the constaint violation and tell the user whether it
 - is because of user,role or level
 
-
 * Wed Jul 11 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.11-3
 - userapps is generating sandbox code in polgengui
 
@@ -1873,7 +1865,6 @@ I pull the policy, policy.xml and file_contexts and file_contexts.homedir
         * update .po files
         * remove empty po files
         * do not fail to install if unable to make load_policy lnk file
-
    - sepolgen
         * Fix dead links to www.nsa.gov/selinux
         * audit.py Dont crash if empty data is passed to sepolgen
@@ -2194,7 +2185,6 @@ and limit memory.
         * fixfiles: pipe everything to cat before sending
         * fixfiles: introduce /etc/selinux/fixfiles_exclude_dirs
         * semodule: support for alternative root paths
-
 2.1.3 2011-08-03
         * semanage: fix indention
         * semodule_package: fix man page typo
@@ -2222,17 +2212,14 @@ and limit memory.
         * open_init_tty man page typos
         * Don't add user site directory to sys.path
         * newrole retain CAP_SETPCAP
-
 2.1.2 2011-08-02
         * seunshare: define _GNU_SOURCE earlier
         * make ignore_enoent do something
         * restorecond: first user logged in is not noticed
         * Repo: update .gitignore
-
 2.1.1 2011-08-01
         * Man page updates
         * restorecon fix for bad inotify assumptions
-
 2.1.0 2011-07-27
         * Release, minor version bump
 
@@ -2764,7 +2751,6 @@ Resolves: 555835
 - Update to upstream
         * Remove non-working OUTFILE from fixfiles from Dan Walsh.
         * Additional exception handling in chcat from Dan Walsh.
-
         * fix sepolgen to read a "type 1403" msg as a policy load by Stephen
           Smalley <sds@tycho.nsa.gov>
         * Add support for Xen ocontexts from Paul Nuzzi.
@@ -3309,7 +3295,6 @@ Resolves: 555835
         * Merged audit2why fix and semanage boolean --on/--off/-1/-0 support from Dan Walsh.
         * Merged a second fixfiles -C fix from Marshall Miller.
 
-
 * Thu Jan 24 2008 Dan Walsh <dwalsh@redhat.com> 2.0.39-1
 - Don't initialize audit2allow for audit2why call.  Use default
 - Update to upstream
@@ -3834,6 +3819,7 @@ Resolves: 555835
 - Update to upstream
         * Merged unicode-to-string fix for seobject audit from Dan Walsh.
         * Merged man page updates to make "apropos selinux" work from Dan Walsh.
+
 * Tue Jan 16 2007 Dan Walsh <dwalsh@redhat.com> 1.33.14-1
         * Merged newrole man page patch from Michael Thompson.
         * Merged patch to fix python unicode problem from Dan Walsh.
@@ -4367,6 +4353,7 @@ Resolves: #208838
         * Merged newrole audit patch from Steve Grubb.
         * Merged seuser -> seuser local rename patch from Ivan Gyurdiev.
         * Merged semanage and semodule access check patches from Joshua Brindle.
+
 * Wed Jan 25 2006 Dan Walsh <dwalsh@redhat.com> 1.29.12-1
 - Add a default of /export/home
 
@@ -4505,6 +4492,7 @@ Resolves: #208838
 - Update to match NSA
 - Add chcat to policycoreutils, adding +/- syntax
 `
+
 * Tue Dec 6 2005 Dan Walsh <dwalsh@redhat.com> 1.27.36-2
 - Require new version of libsemanage
 
@@ -4631,7 +4619,6 @@ Resolves: #208838
         * Merged fixfiles patch from Dan Walsh (Red Hat).
         * Updated semodule for removal of semanage_strerror.
 
-
 * Thu Oct 13 2005 Dan Walsh <dwalsh@redhat.com> 1.27.7-2
 - Fix run_init.pamd and spec file
 
@@ -4755,7 +4742,6 @@ Resolves: #208838
 * Thu May 26 2005 Dan Walsh <dwalsh@redhat.com> 1.23.11-2
 - Fix warning message on reload of booleans
 
-
 * Fri May 20 2005 Dan Walsh <dwalsh@redhat.com> 1.23.11-1
 - Update to match NSA
         * Merged fixfiles and newrole patch from Dan Walsh.
@@ -4794,7 +4780,6 @@ Resolves: #208838
         * Reverted load_policy is_selinux_enabled patch from Dan Walsh.
           Otherwise, an initial policy load cannot be performed using
           load_policy, e.g. for anaconda.
-
 
 * Mon Apr 11 2005 Dan Walsh <dwalsh@redhat.com> 1.23.4-3
 - remove is_selinux_enabled check from load_policy  (Bad idea)
@@ -4915,7 +4900,6 @@ written to.  fails on 64-bit archs
         * Merged updated fixfiles script from Dan Walsh.
 - Fix error handling of restorecon
 
-
 * Mon Feb 7 2005 Dan Walsh <dwalsh@redhat.com> 1.21.12-2
 - Fix sestatus for longer booleans
 
@@ -4942,7 +4926,6 @@ written to.  fails on 64-bit archs
         * Merged semi raw mode for open_init_pty helper from Manoj Srivastava.
         * Rewrote setfiles to use matchpathcon and the new interfaces
           exported by libselinux (>= 1.21.5).
-
 
 * Fri Jan 28 2005 Dan Walsh <dwalsh@redhat.com> 1.21.7-3
 - Fix fixfiles patch
@@ -5031,6 +5014,7 @@ written to.  fails on 64-bit archs
         * Added -l option to setfiles to log changes via syslog.
         * Merged -e option to setfiles to exclude directories.
         * Merged -R option to restorecon for recursive descent.
+
 * Fri Oct 1 2004 Dan Walsh <dwalsh@redhat.com> 1.17.5-6
 - Add -e (exclude directory) switch to setfiles
 - Add syslog to setfiles
@@ -5230,6 +5214,7 @@ written to.  fails on 64-bit archs
 
 * Wed Mar 17 2004 Dan Walsh <dwalsh@redhat.com> 1.9-8
 - Fix restorecon
+
 * Wed Mar 17 2004 Dan Walsh <dwalsh@redhat.com> 1.9-7
 - Read restorecon patch
 

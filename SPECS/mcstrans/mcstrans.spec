@@ -1,24 +1,24 @@
-Summary:       SELinux Translation Daemon
-Name:          mcstrans
-Version:       2.9
-Release:       3%{?dist}
-License:       GPLv2+
-Url:           https://github.com/SELinuxProject/selinux
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Source0:       %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
-Source1:       secolor.conf.8
-BuildRequires: gcc
-BuildRequires: libselinux-devel >= %{version}
-BuildRequires: libcap-devel
-BuildRequires: pcre-devel
-BuildRequires: libsepol-devel
-BuildRequires: systemd
-Requires:      pcre
+Summary:        SELinux Translation Daemon
+Name:           mcstrans
+Version:        2.9
+Release:        3%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/SELinuxProject/selinux
+Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
+Source1:        secolor.conf.8
+BuildRequires:  gcc
+BuildRequires:  libcap-devel
+BuildRequires:  libselinux-devel >= %{version}
+BuildRequires:  libsepol-devel
+BuildRequires:  pcre-devel
+BuildRequires:  systemd
+Requires:       pcre
+Provides:       setransd
+Provides:       libsetrans
+Obsoletes:      libsetrans
 %{?systemd_requires}
-Provides:      setransd
-Provides:      libsetrans
-Obsoletes:     libsetrans
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -38,18 +38,17 @@ from internal representations to user defined representation.
 %autosetup -p 1 -n mcstrans-%{version}
 
 %build
-%set_build_flags
+%{set_build_flags}
 
 make LIBDIR="%{_libdir}" %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_lib}
 mkdir -p %{buildroot}/%{_libdir}
 mkdir -p %{buildroot}%{_usr}/share/mcstrans
 mkdir -p %{buildroot}%{_sysconfdir}/selinux/mls/setrans.d
 
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/lib/systemd" install
+make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/lib/systemd" install
 rm -f %{buildroot}%{_libdir}/*.a
 cp -r share/* %{buildroot}%{_usr}/share/mcstrans/
 # Systemd
@@ -151,6 +150,7 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 * Thu Sep 12 2013 Dan Walsh <dwalsh@redhat.com> - 0.3.4-1
 - Update to latest version/applying patches
 - Move binary to /usr/sbin rather then /sbin
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.3-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 

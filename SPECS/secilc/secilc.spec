@@ -1,3 +1,4 @@
+%global libsepolver %{version}-1
 Summary:        The SELinux CIL Compiler
 Name:           secilc
 Version:        2.9
@@ -8,7 +9,6 @@ Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/selinux
 Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
 Patch0001:      0001-Allow-setting-arguments-to-xmlto-via-environmental-v.patch
-%global libsepolver %{version}-1
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libsepol-devel >= %{libsepolver}
@@ -26,13 +26,13 @@ for more information about the goals and features on the CIL language.
 
 
 %build
-%set_build_flags
+%{set_build_flags}
 # xmlto wants to access a network resource for validation, so skip it
 make %{?_smp_mflags} LIBSEPOL_STATIC=%{_libdir}/libsepol.a XMLARGS="--skip-validation"
 
 
 %install
-make %{?_smp_mflags} DESTDIR="%{buildroot}" SBINDIR="%{buildroot}%{_sbindir}" LIBDIR="%{buildroot}%{_libdir}" install
+make %{?_smp_mflags} DESTDIR=%{buildroot} SBINDIR="%{buildroot}%{_sbindir}" LIBDIR="%{buildroot}%{_libdir}" install
 
 
 %files
@@ -41,7 +41,6 @@ make %{?_smp_mflags} DESTDIR="%{buildroot}" SBINDIR="%{buildroot}%{_sbindir}" LI
 %{_bindir}/secil2conf
 %{_mandir}/man8/secilc.8.gz
 %{_mandir}/man8/secil2conf.8.gz
-
 
 %changelog
 * Fri Oct 09 2020 Thomas Crain <thcrain@microsoft.com> - 2.9-4

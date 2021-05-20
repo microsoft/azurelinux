@@ -1,35 +1,31 @@
 %define libsepolver 2.9-1
 %define libselinuxver 2.9-1
-
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-Summary:      SELinux binary policy manipulation library
-Name:         libsemanage
-Version:      2.9
-Release:      4%{?dist}
-License:      LGPLv2+
-URL:          https://github.com/SELinuxProject/selinux
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-Source0:      %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
-Source1:      semanage.conf
-Patch0001:    0001-libsemanage-Fix-RESOURCE_LEAK-and-USE_AFTER_FREE-cov.patch
-
-BuildRequires: gcc
-BuildRequires: libselinux-devel >= %{libselinuxver}
-BuildRequires: swig
-BuildRequires: libsepol-devel >= %{libsepolver}
-BuildRequires: audit-devel
-BuildRequires: bison
-BuildRequires: flex
-BuildRequires: bzip2
-BuildRequires: python3
-BuildRequires: python3-devel
-
-Requires: bzip2-libs
-Requires: audit-libs
-Requires: libselinux%{?_isa} >= %{libselinuxver}
-
-Provides: libsemanage.so.1
+Summary:        SELinux binary policy manipulation library
+Name:           libsemanage
+Version:        2.9
+Release:        4%{?dist}
+License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/SELinuxProject/selinux
+Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
+Source1:        semanage.conf
+Patch0001:      0001-libsemanage-Fix-RESOURCE_LEAK-and-USE_AFTER_FREE-cov.patch
+BuildRequires:  audit-devel
+BuildRequires:  bison
+BuildRequires:  bzip2
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  libselinux-devel >= %{libselinuxver}
+BuildRequires:  libsepol-devel >= %{libsepolver}
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  swig
+Requires:       audit-libs
+Requires:       bzip2-libs
+Requires:       libselinux%{?_isa} >= %{libselinuxver}
+Provides:       libsemanage.so.1
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -48,17 +44,17 @@ as by programs like load_policy that need to perform specific transformations
 on binary policies such as customizing policy boolean settings.
 
 %package devel
-Summary: Header files and libraries used to build policy manipulation tools
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Header files and libraries used to build policy manipulation tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The semanage-devel package contains the libraries and header files
 needed for developing applications that manipulate binary policies.
 
 %package python3
-Summary: semanage python 3 bindings for libsemanage
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: libselinux-python3
+Summary:        semanage python 3 bindings for libsemanage
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libselinux-python3
 
 %description python3
 The libsemanage-python3 package contains the python 3 bindings for developing
@@ -72,22 +68,21 @@ SELinux management applications.
 make clean
 make %{?_smp_mflags} swigify CFLAGS="%{build_cflags} -Wno-error=strict-overflow"
 make LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" all
-make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=/usr/bin/python3 pywrap
+make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=%{_bindir}/python3 pywrap
 
 %install
-mkdir -p ${RPM_BUILD_ROOT}%{_libdir}
-mkdir -p ${RPM_BUILD_ROOT}%{_includedir}
-mkdir -p ${RPM_BUILD_ROOT}%{_sharedstatedir}/selinux
-mkdir -p ${RPM_BUILD_ROOT}%{_sharedstatedir}/selinux/tmp
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=/usr/bin/python3 install install-pywrap
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}
+mkdir -p %{buildroot}%{_sharedstatedir}/selinux
+mkdir -p %{buildroot}%{_sharedstatedir}/selinux/tmp
+make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=%{_bindir}/python3 install install-pywrap
 
-cp %{SOURCE1} ${RPM_BUILD_ROOT}/etc/selinux/semanage.conf
-ln -sf  %{_libdir}/libsemanage.so.1 ${RPM_BUILD_ROOT}/%{_libdir}/libsemanage.so
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/selinux/semanage.conf
+ln -sf  %{_libdir}/libsemanage.so.1 %{buildroot}/%{_libdir}/libsemanage.so
 
-sed -i '1s%\(#! */usr/bin/python\)\([^3].*\|\)$%\13\2%' %{buildroot}%{_libexecdir}/selinux/semanage_migrate_store
+sed -i '1s%\(#! *%{_bindir}/python\)\([^3].*\|\)$%\13\2%' %{buildroot}%{_libexecdir}/selinux/semanage_migrate_store
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
@@ -522,7 +517,6 @@ Resolves: #952237
 	* throw exceptions in python rather than return
 	* python3 support.
 	* patch for MCS/MLS in user files
-
 2.1.1 2011-08-01
 	* Remove generated files, expand .gitignore
 	* Use -Werror and change a few prototypes to support it
@@ -812,7 +806,6 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Clear errno on non-fatal errors to avoid reporting them upon a
     later error that does not set errno.
   * Improve reporting of system errors, e.g. full filesystem or read-only filesystem from Stephen Smalley.
-
 - Fix segfault in genhomedircon when using bad user names
 
 * Wed Sep 26 2007 Dan Walsh <dwalsh@redhat.com> - 2.0.6-2
@@ -1260,7 +1253,6 @@ invoking the appropriate config tool (or by hardcoding the old value for
    * Added hidden/hidden_proto/hidden_def to src/debug.[hc] and
           src/seusers.[hc].
 
-
 * Thu Nov 3 2005 Dan Walsh <dwalsh@redhat.com> 1.3.41-1
 - Upgrade to latest from NSA
   * Merged interface parse/print, context_to_string interface change,
@@ -1338,7 +1330,6 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Added calls to sepol_policy_file_set_handle interface prior
     to invoking sepol operations on policy files.
   * Updated call to sepol_policydb_from_image to pass the handle.
-
 
 * Tue Oct 18 2005 Dan Walsh <dwalsh@redhat.com> 1.3.20-1
 - Update from NSA
@@ -1459,6 +1450,5 @@ invoking the appropriate config tool (or by hardcoding the old value for
     to libsepol from Jason Tang (Tresys).  
   * Merged relay records patch from Ivan Gyurdiev.
   * Merged key extract patch from Ivan Gyurdiev.
-
 - Initial version
 - Created by Stephen Smalley <sds@epoch.ncsc.mil> 

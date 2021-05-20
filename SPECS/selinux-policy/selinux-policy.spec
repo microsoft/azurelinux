@@ -7,22 +7,25 @@
 %define POLICYVER 31
 %define POLICYCOREUTILSVER 2.9
 %define CHECKPOLICYVER 2.9
-Summary:      SELinux policy
-Name:         selinux-policy
-Version:      2.20200818
-Release:      1%{?dist}
-License:      GPLv2
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-Url:          https://github.com/SELinuxProject/refpolicy
-Source0:      %{url}/releases/download/RELEASE_2_20200818/refpolicy-%{version}.tar.bz2
-Source1:      Makefile.devel
-BuildArch:    noarch
-
-BuildRequires: python3 checkpolicy >= %{CHECKPOLICYVER} m4 policycoreutils-devel >= %{POLICYCOREUTILSVER} bzip2
-BuildRequires: python3-xml
-Requires(pre): policycoreutils >= %{POLICYCOREUTILSVER}
-Requires(pre): coreutils
+Summary:        SELinux policy
+Name:           selinux-policy
+Version:        2.20200818
+Release:        1%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/SELinuxProject/refpolicy
+Source0:        %{url}/releases/download/RELEASE_2_20200818/refpolicy-%{version}.tar.bz2
+Source1:        Makefile.devel
+BuildRequires:  bzip2
+BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
+BuildRequires:  m4
+BuildRequires:  policycoreutils-devel >= %{POLICYCOREUTILSVER}
+BuildRequires:  python3
+BuildRequires:  python3-xml
+Requires(pre):  coreutils
+Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
+BuildArch:      noarch
 
 %description
 SELinux policy describes security properties of system components, to be
@@ -92,9 +95,10 @@ enforced by the kernel when running with SELinux enabled.
 %ghost %{_sharedstatedir}/selinux/refpolicy/active/modules/100/*
 
 %package devel
-Summary: SELinux policy devel
-Requires: m4 checkpolicy >= %{CHECKPOLICYVER}
-Requires: /usr/bin/make
+Summary:        SELinux policy devel
+Requires:       %{_bindir}/make
+Requires:       checkpolicy >= %{CHECKPOLICYVER}
+Requires:       m4
 Requires(post): policycoreutils-devel >= %{POLICYCOREUTILSVER}
 
 %description devel
@@ -110,13 +114,13 @@ SELinux policy development and man page package
 %ghost %{_sharedstatedir}/sepolgen/interface_info
 
 %post devel
-selinuxenabled && /usr/bin/sepolgen-ifgen 2>/dev/null
+selinuxenabled && %{_bindir}/sepolgen-ifgen 2>/dev/null
 exit 0
 
 %package doc
-Summary: SELinux policy documentation
-Requires(pre): selinux-policy = %{version}-%{release}
-Requires: selinux-policy = %{version}-%{release}
+Summary:        SELinux policy documentation
+Requires:       selinux-policy = %{version}-%{release}
+Requires(pre):  selinux-policy = %{version}-%{release}
 
 %description doc
 SELinux policy documentation package
@@ -127,66 +131,63 @@ SELinux policy documentation package
 %doc %{_usr}/share/doc/%{name}
 
 %define makeCmds() \
-%make_build UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 bare \
-%make_build UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 conf
-
-
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 bare \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 conf
 %define installCmds() \
-%make_build UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 base.pp \
-%make_build validate UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 modules \
-make UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install \
-make UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install-appconfig \
-make UNK_PERMS=%4 NAME=%1 TYPE=%2 DISTRO=%{distro} UBAC=n DIRECT_INITRC=%3 MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 SEMODULE="semodule -p %{buildroot} -X 100 " load \
-%{__mkdir} -p %{buildroot}/%{_sysconfdir}/selinux/%1/logins \
-touch %{buildroot}%{_sysconfdir}/selinux/%1/contexts/files/file_contexts.subs \
-install -m0644 config/appconfig-%2/securetty_types %{buildroot}%{_sysconfdir}/selinux/%1/contexts/securetty_types \
-install -m0644 config/file_contexts.subs_dist %{buildroot}%{_sysconfdir}/selinux/%1/contexts/files \
-touch %{buildroot}%{_sysconfdir}/selinux/%1/contexts/files/file_contexts.bin \
-touch %{buildroot}%{_sysconfdir}/selinux/%1/contexts/files/file_contexts.local \
-touch %{buildroot}%{_sysconfdir}/selinux/%1/contexts/files/file_contexts.local.bin \
-rm -f %{buildroot}/%{_usr}/share/selinux/%1/*pp*  \
-rm -rf %{buildroot}%{_sysconfdir}/selinux/%1/contexts/netfilter_contexts  \
-rm -rf %{buildroot}%{_sysconfdir}/selinux/%1/modules/active/policy.kern \
-rm -f %{buildroot}%{_sharedstatedir}/selinux/%1/active/*.linked \
-%nil
-
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 base.pp \
+%make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 modules \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install-appconfig \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 SEMODULE="semodule -p %{buildroot} -X 100 " load \
+mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
+touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
+install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
+install -m0644 config/file_contexts.subs_dist %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files \
+touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.bin \
+touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.local \
+touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.local.bin \
+rm -f %{buildroot}/%{_usr}/share/selinux/%{1}/*pp*  \
+rm -rf %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/netfilter_contexts  \
+rm -rf %{buildroot}%{_sysconfdir}/selinux/%{1}/modules/active/policy.kern \
+rm -f %{buildroot}%{_sharedstatedir}/selinux/%{1}/active/*.linked \
+%{nil}
 %define relabel() \
 . %{_sysconfdir}/selinux/config; \
-FILE_CONTEXT=%{_sysconfdir}/selinux/%1/contexts/files/file_contexts; \
-/usr/sbin/selinuxenabled; \
-if [ $? = 0  -a "${SELINUXTYPE}" = %1 -a -f ${FILE_CONTEXT}.pre ]; then \
+FILE_CONTEXT=%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts; \
+%{_sbindir}/selinuxenabled; \
+if [ $? = 0  -a "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT}.pre ]; then \
      /sbin/fixfiles -C ${FILE_CONTEXT}.pre restore &> /dev/null > /dev/null; \
      rm -f ${FILE_CONTEXT}.pre; \
 fi; \
-if /sbin/restorecon -e /run/media -R /root /var/log /var/run /etc/passwd* /etc/group* /etc/*shadow* 2> /dev/null;then \
+if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null;then \
     continue; \
 fi; \
-
 %define preInstall() \
-if [ -s /etc/selinux/config ]; then \
+if [ -s %{_sysconfdir}/selinux/config ]; then \
      . %{_sysconfdir}/selinux/config; \
-     FILE_CONTEXT=%{_sysconfdir}/selinux/%1/contexts/files/file_contexts; \
-     if [ "${SELINUXTYPE}" = %1 -a -f ${FILE_CONTEXT} ]; then \
+     FILE_CONTEXT=%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts; \
+     if [ "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT} ]; then \
         [ -f ${FILE_CONTEXT}.pre ] || cp -f ${FILE_CONTEXT} ${FILE_CONTEXT}.pre; \
      fi; \
-     touch /etc/selinux/%1/.rebuild; \
+     touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
 fi;
-
 %define postInstall() \
 . %{_sysconfdir}/selinux/config; \
-if [ -e /etc/selinux/%2/.rebuild ]; then \
-   rm /etc/selinux/%2/.rebuild; \
-   /usr/sbin/semodule -B -n -s %2; \
+if [ -e %{_sysconfdir}/selinux/%{2}/.rebuild ]; then \
+   rm %{_sysconfdir}/selinux/%{2}/.rebuild; \
+   %{_sbindir}/semodule -B -n -s %{2}; \
 fi; \
-[ "${SELINUXTYPE}" == "%2" ] && selinuxenabled && load_policy; \
-if [ %1 -eq 1 ]; then \
-   /sbin/restorecon -R /root /var/log /run /etc/passwd* /etc/group* /etc/*shadow* 2> /dev/null; \
+[ "${SELINUXTYPE}" == "%{2}" ] && selinuxenabled && load_policy; \
+if [ %{1} -eq 1 ]; then \
+   /sbin/restorecon -R /root %{_var}/log /run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null; \
 else \
-%relabel %2 \
+%relabel %{2} \
 fi;
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 %prep
-%setup -n refpolicy -q
+%setup -q -n refpolicy
 
 %install
 # Build policy
@@ -222,7 +223,7 @@ install -m 644 doc/example.* %{buildroot}%{_usr}/share/selinux/devel/
 install -m 644 doc/policy.* %{buildroot}%{_usr}/share/selinux/devel/
 
 %post
-if [ ! -s /etc/selinux/config ]; then
+if [ ! -s %{_sysconfdir}/selinux/config ]; then
 # Permissive by default.  Enforcing support will be added in a later phase
 echo "
 # This file controls the state of SELinux on the system.
@@ -235,12 +236,12 @@ SELINUX=permissive
 #     Currently the only supported option is refpolicy
 SELINUXTYPE=refpolicy
 
-" > /etc/selinux/config
+" > %{_sysconfdir}/selinux/config
 
-     ln -sf ../selinux/config /etc/sysconfig/selinux
-     restorecon /etc/selinux/config 2> /dev/null || :
+     ln -sf ../selinux/config %{_sysconfdir}/sysconfig/selinux
+     restorecon %{_sysconfdir}/selinux/config 2> /dev/null || :
 else
-     . /etc/selinux/config
+     . %{_sysconfdir}/selinux/config
 fi
 %postInstall $1 repolicy
 exit 0
@@ -248,10 +249,10 @@ exit 0
 %postun
 if [ $1 = 0 ]; then
      setenforce 0 2> /dev/null
-     if [ ! -s /etc/selinux/config ]; then
-          echo "SELINUX=disabled" > /etc/selinux/config
+     if [ ! -s %{_sysconfdir}/selinux/config ]; then
+          echo "SELINUX=disabled" > %{_sysconfdir}/selinux/config
      else
-          sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+          sed -i 's/^SELINUX=.*/SELINUX=disabled/g' %{_sysconfdir}/selinux/config
      fi
 fi
 exit 0
@@ -262,9 +263,8 @@ exit 0
 %triggerin -- pcre
 selinuxenabled && semodule -nB
 exit 0
-
 %changelog
-* Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> 2.20200818-1
+* Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> - 2.20200818-1
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - Heavy modifications to build from upstream reference policy rather than from fedora selinux policy.
   Fedora's policy and versioning tracks their policy fork specificially, whereas this tracks the upstream
@@ -1434,7 +1434,6 @@ Resolves: rhbz#1683365
 - Allow lvm_t domain to write files to all mls levels
 - Add to su_role_template allow rule for creating netlink_selinux sockets
 
-
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.2-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
@@ -1607,7 +1606,6 @@ Resolves: rhbz#1683365
 - Improve auth_domtrans_chk_passwd() interface to allow also mmaping chkpwd_exec_t binaries.
 - Allow mmap dhcpc_exec_t binaries in sysnet_domtrans_dhcpc interface
 - Improve running xorg with proper SELinux domain even if systemd security feature NoNewPrivileges is used
-
 
 * Tue May 22 2018 Lukas Vrabec <lvrabec@redhat.com> - 3.14.2-19
 - Increase dependency versions of policycoreutils and checkpolicy packages 
@@ -3338,6 +3336,7 @@ Resolves: rhbz#1683365
 - Additional access required for unconfined domains
 - Dontaudit ping attempts to write to nrpe unnamed pipes
 - Allow ifconfig_t to mounton also ifconfig_var_run_t dirs, not just files. Needed for: #ip netns add foo BZ(1340952)
+
 * Mon May 30 2016 Lukas Vrabec <lvrabec@redhat.com> 3.13.1-193
 - Directory Server (389-ds-base) has been updated to use systemd-ask-password. In order to function correctly we need the following added to dirsrv.te
 - Update opendnssec_manage_config() interface to allow caller domain also manage opendnssec_conf_t dirs
@@ -3963,7 +3962,6 @@ Resolves: rhbz#1314372
 - Allow lsm_plugin_t to rw raw_fixed_disk.
 - Allow lsm_plugin_t to read sysfs, read hwdata, rw to scsi_generic_device
 - Allow openhpid to use libsnmp_bc plugin (allow read snmp lib files).
-
 
 * Tue Aug 04 2015 Lukas Vrabec <lvrabec@redhat.com> 3.13.1-139
 - Add header for sslh.if file
@@ -4835,7 +4833,6 @@ Resolves: rhbz#1314372
 - Remove cockpit port, it is now going to use websm port
 - Add getattr to the list of access to dontaudit on unix_stream_sockets
 - Allow sendmail to append dead.letter located in var/spool/nagios/dead.letter.
-
 
 * Tue Aug 12 2014 Lukas Vrabec <lvrabec@redhat.com> 3.13.1-72
 - docker needs to be able to look at everything in /dev
@@ -8141,7 +8138,6 @@ type in docker.te
 - Allow rpcbind_t to read passwd 
 - Allow pyzor running as spamc to manage amavis spool
 
-
 * Tue Oct 16 2012 Miroslav Grepl <mgrepl@redhat.com> 3.11.1-39
 - Add interfaces to read kernel_t proc info
 - Missed this version of exec_all
@@ -8630,7 +8626,6 @@ type in docker.te
 - Allow useradd to delete all file types stored in the users hom
 - rhsmcertd reads the rpm database
 - Add support for lightdm
-
 
 * Mon Jun 25 2012 Miroslav Grepl <mgrepl@redhat.com> 3.11.0-6
 - Add tomcat policy
@@ -9291,6 +9286,7 @@ type in docker.te
 - Add boolean to allow ftp to connect to all ports > 1023
 - Allow sendmain to write to inherited dovecot tmp files
 - setroubleshoot needs to be able to execute rpm to see what version of packages
+
 * Mon Jan 16 2012 Miroslav Grepl <mgrepl@redhat.com> 3.10.0-75
 - Merge systemd patch
 - systemd-tmpfiles wants to relabel /sys/devices/system/cpu/online
@@ -11010,7 +11006,6 @@ Resolves: #582145
 - Allow initrc_t to setattr on milter directories
 - Add procmail_home_t for .procmailrc file
 
-
 * Thu Apr 1 2010 Dan Walsh <dwalsh@redhat.com> 3.7.17-5
 - Fixes for labels during install from livecd
 
@@ -11313,7 +11308,6 @@ Resolves: #582145
 - Fix devicekit_disk_t to getattr on all domains sockets and fifo_files
 - Conflicts seedit (You can not use selinux-policy-targeted and seedit at the same time.)
 
-
 * Thu Sep 10 2009 Dan Walsh <dwalsh@redhat.com> 3.6.31-3
 - Add wordpress/wp-content/uploads label
 - Fixes for sandbox when run from staff_t
@@ -11475,6 +11469,7 @@ Resolves: #582145
 * Sat Jun 20 2009 Dan Walsh <dwalsh@redhat.com> 3.6.18-1
 - Update to upstream
   * cleanup
+
 * Fri Jun 19 2009 Dan Walsh <dwalsh@redhat.com> 3.6.17-1
 - Update to upstream
 - Additional mail ports
@@ -11954,6 +11949,7 @@ Resolves: #582145
 * Sun Sep 21 2008 Dan Walsh <dwalsh@redhat.com> 3.5.8-4
 - Fix transition to nsplugin
 '
+
 * Thu Sep 18 2008 Dan Walsh <dwalsh@redhat.com> 3.5.8-3
 - Fix labeling on new pm*log
 - Allow ssh to bind to all nodes
@@ -12175,7 +12171,6 @@ dirs if the boolean is set
 * Fri Mar 14 2008 Dan Walsh <dwalsh@redhat.com> 3.3.1-20
 - Fix bug in mozilla policy to allow xguest transition
 - This will fix the 
-
 libsemanage.dbase_llist_query: could not find record value
 libsemanage.dbase_llist_query: could not query record value (No such file or
 directory)
@@ -12258,10 +12253,8 @@ directory)
 - Fixes from yum-cron
 - Update to latest upstream
 
-
 * Tue Feb 19 2008 Dan Walsh <dwalsh@redhat.com> 3.2.8-2
 - Fix userdom_list_user_files
-
 
 * Fri Feb 15 2008 Dan Walsh <dwalsh@redhat.com> 3.2.8-1
 - Merge with upstream
@@ -12537,7 +12530,6 @@ directory)
 
 * Tue Sep 18 2007 Dan Walsh <dwalsh@redhat.com> 3.0.8-2
 - Remove hplip_etc_t change back to etc_t.
-
 
 * Mon Sep 17 2007 Dan Walsh <dwalsh@redhat.com> 3.0.8-1
 - Allow cron to search nfs and samba homedirs
@@ -13137,7 +13129,6 @@ Resolves: #217725
 * Wed Oct 18 2006 Dan Walsh <dwalsh@redhat.com> 2.3.19-3
 - Lots of fixes for ricci
 
-
 * Mon Oct 16 2006 Dan Walsh <dwalsh@redhat.com> 2.3.19-2
 - Fix number of cats
 
@@ -13337,7 +13328,7 @@ Resolves: #217725
 
 * Wed Aug 2 2006 Dan Walsh <dwalsh@redhat.com> 2.3.3-18
 - yet more xen rules
- 
+
 * Tue Aug 1 2006 Dan Walsh <dwalsh@redhat.com> 2.3.3-17
 - more xen rules
 
@@ -13388,7 +13379,6 @@ Resolves: #217725
 - Allow prelink to read bin_t symlink
 - allow xfs to read random devices
 - Change gfs to support xattr
-
 
 * Mon Jul 17 2006 Dan Walsh <dwalsh@redhat.com> 2.3.3-2
 - Remove spamassassin_can_network boolean
@@ -13781,7 +13771,6 @@ Resolves: #217725
 * Tue Feb 7 2006 Dan Walsh <dwalsh@redhat.com> 2.2.12-1
 - Update from upstream
 
-
 * Mon Feb 6 2006 Dan Walsh <dwalsh@redhat.com> 2.2.11-2
 - Fix for spamd to use razor port
 
@@ -13867,6 +13856,7 @@ Resolves: #217725
 * Mon Jan 9 2006 Dan Walsh <dwalsh@redhat.com> 2.1.8-1
 - Update to upstream
 - Apply 
+
 * Fri Jan 6 2006 Dan Walsh <dwalsh@redhat.com> 2.1.7-4
 - Add wine and fix hal problems
 
