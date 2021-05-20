@@ -41,6 +41,7 @@ rm -f archivemount.1
 %changelog
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.9.1-4
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- License verified
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

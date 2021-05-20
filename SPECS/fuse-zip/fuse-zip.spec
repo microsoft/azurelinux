@@ -53,6 +53,7 @@ sed -i "s|prefix=/usr/local|prefix=%{_prefix}|" Makefile
 %changelog
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.7.2-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- License verified
 
 * Mon Feb 22 2021 Vasiliy Glazov <vascom2@gmail.com> - 0.7.2-1
 - Update to 0.7.2
