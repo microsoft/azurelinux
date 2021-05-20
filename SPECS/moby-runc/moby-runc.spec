@@ -12,12 +12,12 @@ Source0:        runc-v1.0.0-rc95.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
 Source2:        runtime-spec-v1.0.2.tar.gz
-#Source3:       https://github.com/urfave/cli/archive/v1.22.4.tar.gz
-Source3:        urfave-cli-v1.22.4.tar.gz
+#Source3:       https://github.com/urfave/cli/archive/v2.3.0.tar.gz
+Source3:        urfave-cli-v2.3.0.tar.gz
 # golang sys and crypto sources are git cloned to latest commit.
 # Please look for ./getgosources.sh for more details.
-Source4:        https://github.com/golang/sys/archive/golang-sys-669c56c373c468cbe0f0c12b7939832b26088d33.tar.gz
-Source5:        https://github.com/golang/crypto/archive/golang-crypto-0848c9571904fcbcb24543358ca8b5a7dbfde875.tar.gz
+Source4:        https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz
+Source5:        https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz
 Source6:        NOTICE
 Source7:        LICENSE
 
@@ -61,7 +61,7 @@ runC is a CLI tool for spawning and running containers according to the OCI spec
 %prep
 %setup -q -n %{name}-%{version} -c
 mkdir -p %{OUR_GOPATH}/src/github.com/opencontainers
-ln -sfT %{_topdir}/BUILD/%{name}-%{version}/runc-1.0.0-rc10 %{OUR_GOPATH}/src/github.com/opencontainers/runc
+ln -svfT %{_topdir}/BUILD/%{name}-%{version}/runc %{OUR_GOPATH}/src/github.com/opencontainers/runc
 
 pushd ..
 
@@ -77,8 +77,8 @@ mkdir -p %{OUR_GOPATH}/src/github.com/urfave/
 mkdir -p %{OUR_GOPATH}/src/golang.org/x/
 
 ln -sfT %{_topdir}/BUILD/%{name}-%{version}/runtime-spec-1.0.2 %{OUR_GOPATH}/src/github.com/opencontainers/runtime-spec
-ln -sfT %{_topdir}/BUILD/%{name}-%{version}/logrus-1.4.1 %{OUR_GOPATH}/src/github.com/sirupsen/logrus
-ln -sfT %{_topdir}/BUILD/%{name}-%{version}/cli-1.22.4 %{OUR_GOPATH}/src/github.com/urfave/cli
+ln -sfT %{_topdir}/BUILD/%{name}-%{version}/logrus-1.8.1 %{OUR_GOPATH}/src/github.com/sirupsen/logrus
+ln -sfT %{_topdir}/BUILD/%{name}-%{version}/cli-2.3.0 %{OUR_GOPATH}/src/github.com/urfave/cli
 ln -sfT %{_topdir}/BUILD/%{name}-%{version}/sys-master %{OUR_GOPATH}/src/golang.org/x/sys
 ln -sfT %{_topdir}/BUILD/%{name}-%{version}/crypto-master %{OUR_GOPATH}/src/golang.org/x/crypto
 
