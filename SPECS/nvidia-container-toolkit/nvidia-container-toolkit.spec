@@ -3,7 +3,7 @@ Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.4.2
 Release:        2%{?dist}
-License:        Apache-2.0
+License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/NVIDIA/nvidia-container-runtime
@@ -26,8 +26,7 @@ Provides:       nvidia-container-runtime-hook
 Provides a OCI hook to enable GPU support in containers.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup
 tar -xvf %{SOURCE1}
 
 %build
