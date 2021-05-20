@@ -96,7 +96,7 @@ This package contains the debugging symbols for the library.
 
 %package tools
 Summary:        NVIDIA container runtime library (command-line tools)
-Requires:       %{name}%{_major}%{?_isa} >= %{version}-%{release}
+Requires:       %{name}%{_major}%{?_isa} = %{version}-%{release}
 
 %description tools
 The nvidia-container library provides an interface to configure GNU/Linux
