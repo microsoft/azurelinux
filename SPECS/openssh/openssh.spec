@@ -301,3 +301,44 @@ rm -rf %{buildroot}/*
 
 * Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> - 7.1p2-8
 - openssh-devel requires ncurses-terminfo to provide extra terms
+    for the clients
+
+* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> - 7.1p2-7
+- Required krb5-devel.
+
+* Thu Nov 03 2016 Sharath George <sharathg@vmware.com> - 7.1p2-6
+- Split openssh into client and server rpms.
+
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> - 7.1p2-5
+- Modified %check
+
+* Thu Sep 15 2016 Anish Swaminathan <anishs@vmware.com> - 7.1p2-4
+- Add patch to fix CVE-2016-6515
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 7.1p2-3
+- GA - Bump release of all rpms
+
+* Wed May 04 2016 Anish Swaminathan <anishs@vmware.com> - 7.1p2-2
+- Edit scriptlets.
+
+* Thu Mar 17 2016 Xiaolin Li <xiaolinl@vmware.com> - 7.1p2-1
+- Updated to version 7.1p2
+
+* Fri Feb 05 2016 Anish Swaminathan <anishs@vmware.com> - 6.6p1-6
+- Add pre install scripts in the rpm
+
+* Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com> - 6.6p1-5
+- Change config file attributes.
+
+* Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com> - 6.6p1-4
+- Add systemd to Requires and BuildRequires.
+- Use systemctl to enable/disable service.
+
+* Fri Jul 17 2015 Divya Thaluru <dthaluru@vmware.com> - 6.6p1-3
+- Enabling ssh-keygen service by default and fixed service file to execute only once.
+
+* Tue May 19 2015 Sharath George <sharathg@vmware.com> - 6.6p1-2
+- Bulding ssh server with kerberos 5.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 6.6p1-1
+- Initial build. First version
