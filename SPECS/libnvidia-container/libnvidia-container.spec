@@ -4,13 +4,13 @@ Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.3.3
 Release:        2%{?dist}
-License:        BSD-3-Clause AND Apache-2.0 AND GPL-3.0-or-later AND LGPL-3.0-or-later AND MIT AND GPL-2.0-only
+License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/NVIDIA/libnvidia-container
-#Source0:     https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
+#Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-#Source1:     https://github.com/NVIDIA/nvidia-modprobe/archive/%%{modprobe_version}.tar.gz
+#Source1:       https://github.com/NVIDIA/nvidia-modprobe/archive/%%{modprobe_version}.tar.gz
 Source1:        nvidia-modprobe-%{modprobe_version}.tar.gz
 Patch0:         common.mk.patch
 Patch1:         libtirpc.patch
@@ -36,12 +36,17 @@ tar -C deps/src/nvidia-modprobe-%{modprobe_version} --strip-components=1 -xzf %{
 %patch2 -p1 -d deps/src/nvidia-modprobe-%{modprobe_version}
 touch deps/src/nvidia-modprobe-%{modprobe_version}/.download_stamp
 
-
 %build
 %make_build WITH_LIBELF=yes
 
 %install
-DESTDIR=%{buildroot} make install prefix=%{_prefix} exec_prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} includedir=%{_includedir} docdir=%{_licensedir} WITH_LIBELF=yes
+DESTDIR=%{buildroot} make install prefix=%{_prefix} \
+	exec_prefix=%{_prefix} \
+	bindir=%{_bindir} \
+	libdir=%{_libdir} \
+	includedir=%{_includedir}\
+	docdir=%{_licensedir} \
+	WITH_LIBELF=yes
 
 %package -n %{name}%{_major}
 Summary:        NVIDIA container runtime library
@@ -52,13 +57,6 @@ containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package requires the NVIDIA driver (>= 340.29) to be installed separately.
-
-%post -n %{name}%{_major} -p /sbin/ldconfig
-%postun -n %{name}%{_major} -p /sbin/ldconfig
-
-%files -n %{name}%{_major}
-%license %{_licensedir}/*
-%{_libdir}/lib*.so.*
 
 %package devel
 Summary:        NVIDIA container runtime library (development files)
@@ -71,12 +69,6 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains the files required to compile programs with the library.
 
-%files devel
-%license %{_licensedir}/*
-%{_includedir}/*.h
-%{_libdir}/lib*.so
-%{_libdir}/pkgconfig/*.pc
-
 %package static
 Summary:        NVIDIA container runtime library (static library)
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
@@ -87,10 +79,6 @@ containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package requires the NVIDIA driver (>= 340.29) to be installed separately.
-
-%files static
-%license %{_licensedir}/*
-%{_libdir}/lib*.a
 
 %define debug_package %{nil}
 
@@ -105,10 +93,6 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains the debugging symbols for the library.
 
-%files -n %{name}%{_major}-debuginfo
-%license %{_licensedir}/*
-%{_lib}/debug%{_libdir}/lib*.so.*
-
 %package tools
 Summary:        NVIDIA container runtime library (command-line tools)
 Requires:       %{name}%{_major}%{?_isa} >= %{version}-%{release}
@@ -119,6 +103,27 @@ containers leveraging NVIDIA hardware. The implementation relies on several
 kernel subsystems and is designed to be agnostic of the container runtime.
 
 This package contains command-line tools that facilitate using the library.
+
+%post -n %{name}%{_major} -p /sbin/ldconfig
+%postun -n %{name}%{_major} -p /sbin/ldconfig
+
+%files -n %{name}%{_major}
+%license %{_licensedir}/*
+%{_libdir}/lib*.so.*
+
+%files devel
+%license %{_licensedir}/*
+%{_includedir}/*.h
+%{_libdir}/lib*.so
+%{_libdir}/pkgconfig/*.pc
+
+%files static
+%license %{_licensedir}/*
+%{_libdir}/lib*.a
+
+%files -n %{name}%{_major}-debuginfo
+%license %{_licensedir}/*
+%{_lib}/debug%{_libdir}/lib*.so.*
 
 %files tools
 %license %{_licensedir}/*
