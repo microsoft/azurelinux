@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 7.76.0-2
+- Artificial bump
+
 * Wed Mar 31 2021 Nicolas Ontiveros <niontive@microsoft.com> - 7.76.0-1
 - Upgrade to version 7.76.0 to fix CVE-2021-22876 and CVE-2021-22890.
 
