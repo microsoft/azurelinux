@@ -1,16 +1,5 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
-<<<<<<< HEAD
-Version:        1.0.0~rc10+azure
-Release:        5%{?dist}
-License:        ASL 2.0
-URL:            https://runc.io/
-
-#Source0:       https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.tar.xz
-Source0:        runc-v1.0.0-rc10.tar.xz
-#Source1:       https://github.com/sirupsen/logrus/archive/v1.4.1.tar.gz
-Source1:        logrus-v1.4.1.tar.gz
-=======
 Version:        1.0.0~rc95+azure
 Release:        1%{?dist}
 License:        ASL 2.0
@@ -21,7 +10,6 @@ URL:            https://runc.io/
 Source0:        runc-v1.0.0-rc95.tar.gz
 #Source1:       https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
->>>>>>> 72a8cbdf... update moby (#958)
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
 Source2:        runtime-spec-v1.0.2.tar.gz
 #Source3:       https://github.com/urfave/cli/archive/v1.22.4.tar.gz
@@ -126,15 +114,12 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
-<<<<<<< HEAD
-=======
 * Wed May 19 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc95+azure-1
 - Update to version 1.0.0~rc95+azure to fix CVE-2021-30465
 * Thu May 13 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc94+azure-1
 - Update to version 1.0.0~rc94+azure
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0~rc10+azure-6
 - Increment release to force republishing using golang 1.15.11.
->>>>>>> 72a8cbdf... update moby (#958)
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc10+azure-5
 - Increment release to force republishing using golang 1.15.
 * Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.0.0~rc10+azure-4
