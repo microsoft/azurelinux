@@ -94,6 +94,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "archivemount",
+          "version": "0.9.1",
+          "downloadUrl": "https://www.cybernoia.de/software/archivemount/archivemount-0.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "asciidoc",
           "version": "8.6.10",
           "downloadUrl": "https://github.com/asciidoc/asciidoc-py3/archive/8.6.10.tar.gz"
@@ -1367,6 +1377,16 @@
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fuse-zip",
+          "version": "0.7.2",
+          "downloadUrl": "https://bitbucket.org/agalanin/fuse-zip/downloads/fuse-zip-0.7.2.tar.gz"
         }
       }
     },
@@ -3194,6 +3214,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libzip",
+          "version": "1.7.3",
+          "downloadUrl": "https://libzip.org/download/libzip-1.7.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "linux-firmware",
           "version": "20200316",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20200316.tar.gz"
@@ -4077,6 +4107,16 @@
           "name": "ostree",
           "version": "2019.2",
           "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "p7zip",
+          "version": "16.02",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/p7zip/p7zip_16.02_src_all-norar.tar.bz2/7202a0bd2aa2935576c13314783d5e1d/p7zip_16.02_src_all-norar.tar.bz2"
         }
       }
     },
