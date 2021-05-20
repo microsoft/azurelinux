@@ -26,7 +26,7 @@ Provides:       nvidia-container-runtime-hook
 Provides a OCI hook to enable GPU support in containers.
 
 %prep
-%autosetup
+%autosetup -p1
 tar -xvf %{SOURCE1}
 
 %build
