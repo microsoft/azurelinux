@@ -1,5 +1,6 @@
 %define modprobe_version 450.57
 %define _major 1
+%define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.3.3
@@ -31,10 +32,10 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 %patch0 -p1
 %patch1 -p1
 
-mkdir -p deps/src/nvidia-modprobe-%{modprobe_version}
-tar -C deps/src/nvidia-modprobe-%{modprobe_version} --strip-components=1 -xzf %{SOURCE1}
-%patch2 -p1 -d deps/src/nvidia-modprobe-%{modprobe_version}
-touch deps/src/nvidia-modprobe-%{modprobe_version}/.download_stamp
+mkdir -p %{mod_probe_dir}
+tar -C %{mod_probe_dir} --strip-components=1 -xzf %{SOURCE1}
+%patch2 -p1 -d %{mod_probe_dir}
+touch %{mod_probe_dir}/.download_stamp
 
 %build
 %make_build WITH_LIBELF=yes
