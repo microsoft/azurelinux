@@ -10,7 +10,6 @@ Group:          System Environment/Security
 URL:            https://github.com/smuellerDD/jitterentropy-library
 #Source0:       https://github.com/smuellerDD/%%{name}-library/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-library-%{version}.tar.gz
-Patch0:         makefile.patch
 BuildRequires:  gcc
 BuildRequires:  make
 
@@ -28,7 +27,7 @@ make
 
 %install
 mkdir -p %{buildroot}%{_includedir}
-make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
+make install-static install-includes DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 # Rename static library to libjitterentropy-openssl
 mv %{buildroot}/%{_libdir}/lib%{name}.a %{buildroot}/%{_libdir}/lib%{name}-openssl.a
@@ -37,7 +36,6 @@ mv %{buildroot}/%{_libdir}/lib%{name}.a %{buildroot}/%{_libdir}/lib%{name}-opens
 %doc README.md
 %license COPYING COPYING.bsd COPYING.gplv2
 %{_includedir}/*
-%{_mandir}/man3/*
 %{_libdir}/lib%{name}-openssl.a
 
 %changelog
