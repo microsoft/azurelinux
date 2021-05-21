@@ -322,7 +322,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
-- Use jitterentropy and getrandom() for seeding
+- In FIPS mode, use only jitterentropy
 
 * Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
 - Remove FIPS DRBG rewire patch
