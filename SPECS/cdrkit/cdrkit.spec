@@ -1,7 +1,7 @@
 Summary:        Utilities for writing cds.
 Name:           cdrkit
 Version:        1.1.11
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -17,6 +17,8 @@ Requires:    libcap
 BuildRequires:  cmake
 BuildRequires:  libcap-devel
 BuildRequires:  bzip2-devel
+
+Provides: genisoimage
 
 %description
 The Cdrtools package contains CD recording utilities. These are useful for reading, creating or writing (burning) Compact Discs.
@@ -43,6 +45,8 @@ ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 %{_datadir}/man/*
 
 %changelog
+*   Mon May 17 2021 Muhammad Falak <mwani@microsoft.com> - 1.1.11-9
+-   Add an explicit provides for `genisoimage`
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.1.11-8
 -   Add patch to fix format-security errors.
 *   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.11-7
