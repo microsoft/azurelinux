@@ -735,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "ceph",
-          "version": "15.2.4",
-          "downloadUrl": "https://download.ceph.com/tarballs/ceph-15.2.4.tar.gz"
+          "version": "16.2.0",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
         }
       }
     },
@@ -5765,8 +5765,8 @@
         "type": "other",
         "other": {
           "name": "python-rsa",
-          "version": "4.6",
-          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.6.tar.gz"
+          "version": "4.7.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.7.2.tar.gz"
         }
       }
     },
