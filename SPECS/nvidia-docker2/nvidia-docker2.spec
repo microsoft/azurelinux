@@ -9,7 +9,7 @@ License:        ASL2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/NVIDIA/nvidia-docker
-#Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
+#Source0:       https://github.com/NVIDIA/nvidia-docker/archive/v%%{version}.tar.gz
 Source0:        nvidia-docker-%{version}.tar.gz
 
 Conflicts:      nvidia-docker < 2.0.0
