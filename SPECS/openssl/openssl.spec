@@ -40,7 +40,7 @@ Patch17:        openssl-1.1.1-kdf-selftest.patch
 Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
-BuildRequires:  jitterentropy
+BuildRequires:  jitterentropy-static
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
