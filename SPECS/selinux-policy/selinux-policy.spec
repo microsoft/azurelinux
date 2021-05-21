@@ -151,6 +151,7 @@ rm -rf %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/netfilter_contexts  \
 rm -rf %{buildroot}%{_sysconfdir}/selinux/%{1}/modules/active/policy.kern \
 rm -f %{buildroot}%{_sharedstatedir}/selinux/%{1}/active/*.linked \
 %{nil}
+
 %define relabel() \
 . %{_sysconfdir}/selinux/config; \
 FILE_CONTEXT=%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts; \
@@ -161,7 +162,8 @@ if [ $? = 0  -a "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT}.pre ]; then \
 fi; \
 if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null;then \
     continue; \
-fi; \
+fi;
+
 %define preInstall() \
 if [ -s %{_sysconfdir}/selinux/config ]; then \
      . %{_sysconfdir}/selinux/config; \
@@ -171,6 +173,7 @@ if [ -s %{_sysconfdir}/selinux/config ]; then \
      fi; \
      touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
 fi;
+
 %define postInstall() \
 . %{_sysconfdir}/selinux/config; \
 if [ -e %{_sysconfdir}/selinux/%{2}/.rebuild ]; then \
@@ -183,6 +186,7 @@ if [ %{1} -eq 1 ]; then \
 else \
 %relabel %{2} \
 fi;
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
