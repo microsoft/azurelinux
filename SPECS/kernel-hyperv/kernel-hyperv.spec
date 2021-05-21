@@ -28,6 +28,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3
+BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod

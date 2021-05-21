@@ -70,6 +70,7 @@ Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
 BuildRequires:  openssl
+BuildRequires:  sed
 
 %description
 This package contains the Linux kernel package with kernel signed with the production key
