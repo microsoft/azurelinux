@@ -1,9 +1,9 @@
-# NOTE: this package should be used only by OpenSSL
-# Since OpenSSL has a static link to this package,
-# OpenSSL release must be bumped when this package is updated.
 %define         debug_package %{nil}
 Summary:        Library implementing the jitter entropy source
 Name:           jitterentropy
+# NOTE: this package should be used only by OpenSSL
+# Since OpenSSL has a static link to this package,
+# OpenSSL release must be bumped when this package is updated.
 Version:        3.0.2
 Release:        1%{?dist}
 License:        BSD OR GPLv2
