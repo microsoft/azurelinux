@@ -55,8 +55,7 @@ mv %{buildroot}/%{_libdir}/lib%{name}.a %{buildroot}/%{_libdir}/lib%{name}-opens
 %files
 %doc README.md
 %license COPYING COPYING.bsd COPYING.gplv2
-%{_libdir}/libjitterentropy.so.*
-%{_includedir}/*
+%{_libdir}/libjitterentropy.so.3*
 
 %files devel
 %{_libdir}/libjitterentropy.so
