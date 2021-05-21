@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.32.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -176,6 +176,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3
+BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -488,6 +489,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
+- Bump release number to match kernel-signed update
+
 * Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Remove build-id match check
