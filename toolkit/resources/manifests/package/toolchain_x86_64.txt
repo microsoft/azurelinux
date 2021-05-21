@@ -226,10 +226,10 @@ libtasn1-debuginfo-4.14-2.cm1.x86_64.rpm
 libtasn1-devel-4.14-2.cm1.x86_64.rpm
 libtool-2.4.6-7.cm1.x86_64.rpm
 libtool-debuginfo-2.4.6-7.cm1.x86_64.rpm
-libxml2-2.9.10-7.cm1.x86_64.rpm
-libxml2-debuginfo-2.9.10-7.cm1.x86_64.rpm
-libxml2-devel-2.9.10-7.cm1.x86_64.rpm
-libxml2-python-2.9.10-7.cm1.x86_64.rpm
+libxml2-2.9.10-8.cm1.x86_64.rpm
+libxml2-debuginfo-2.9.10-8.cm1.x86_64.rpm
+libxml2-devel-2.9.10-8.cm1.x86_64.rpm
+libxml2-python-2.9.10-8.cm1.x86_64.rpm
 libxslt-1.1.34-4.cm1.x86_64.rpm
 libxslt-debuginfo-1.1.34-4.cm1.x86_64.rpm
 libxslt-devel-1.1.34-4.cm1.x86_64.rpm
@@ -530,7 +530,7 @@ python3-debuginfo-3.7.10-1.cm1.x86_64.rpm
 python3-devel-3.7.10-1.cm1.x86_64.rpm
 python3-gpg-1.13.1-7.cm1.x86_64.rpm
 python3-libs-3.7.10-1.cm1.x86_64.rpm
-python3-libxml2-2.9.10-7.cm1.x86_64.rpm
+python3-libxml2-2.9.10-8.cm1.x86_64.rpm
 python3-pip-3.7.10-1.cm1.noarch.rpm
 python3-pwquality-1.4.2-6.cm1.x86_64.rpm
 python3-rpm-4.14.2.1-3.cm1.x86_64.rpm

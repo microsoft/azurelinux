@@ -3,7 +3,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,7 @@ Group:          Development/Languages/Python
 Requires:       %{name} = %{version}
 Requires:       python2
 Requires:       python2-libs
+Requires:       python-xml
 
 %description    python
 The libxml2 python module
@@ -38,6 +39,7 @@ Summary:        Python 3 bindings for libxml2.
 Group:          Development/Libraries
 Requires:       %{name} = %{version}
 Requires:       python3
+Requires:       python3-xml
 Provides:       %{name}-python3 = %{version}-%{release}
 
 %description -n python3-libxml2
@@ -109,6 +111,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Fri May 21 2021 Nick Samson <nisamson@microsoft.com> - 2.9.10-8
+- Added explicit requirement on python xml library
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
