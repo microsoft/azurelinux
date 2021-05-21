@@ -422,6 +422,7 @@
                 "irqbalance",
                 "itstool",
                 "jansson",
+                "jitterentropy",
                 "jna",
                 "jq",
                 "json-c",
