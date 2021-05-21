@@ -18,7 +18,7 @@ BuildRequires:  git
 BuildRequires:  glibc-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsepol-devel >= 2.9-1
-BuildRequires:  python3-cython
+BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
