@@ -127,6 +127,7 @@
                 "GSL",
                 "installkernel",
                 "ivykis",
+                "jitterentropy",
                 "jsonbuilder",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
