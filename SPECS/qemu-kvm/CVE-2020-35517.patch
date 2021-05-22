@@ -1,0 +1,119 @@
+From ebf101955ce8f8d72fba103b5151115a4335de2c Mon Sep 17 00:00:00 2001
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 6 Oct 2020 10:58:26 +0100
+Subject: [PATCH] virtiofsd: avoid /proc/self/fd tempdir
+
+In order to prevent /proc/self/fd escapes a temporary directory is
+created where /proc/self/fd is bind-mounted. This doesn't work on
+read-only file systems.
+
+Avoid the temporary directory by bind-mounting /proc/self/fd over /proc.
+This does not affect other processes since we remounted / with MS_REC |
+MS_SLAVE. /proc must exist and virtiofsd does not use it so it's safe to
+do this.
+
+Path traversal can be tested with the following function:
+
+  static void test_proc_fd_escape(struct lo_data *lo)
+  {
+      int fd;
+      int level = 0;
+      ino_t last_ino = 0;
+
+      fd = lo->proc_self_fd;
+      for (;;) {
+          struct stat st;
+
+          if (fstat(fd, &st) != 0) {
+              perror("fstat");
+              return;
+          }
+          if (last_ino && st.st_ino == last_ino) {
+              fprintf(stderr, "inode number unchanged, stopping\n");
+              return;
+          }
+          last_ino = st.st_ino;
+
+          fprintf(stderr, "Level %d dev %lu ino %lu\n", level,
+                  (unsigned long)st.st_dev,
+                  (unsigned long)last_ino);
+          fd = openat(fd, "..", O_PATH | O_DIRECTORY | O_NOFOLLOW);
+          level++;
+      }
+  }
+
+Before and after this patch only Level 0 is displayed. Without
+/proc/self/fd bind-mount protection it is possible to traverse parent
+directories.
+
+Fixes: 397ae982f4df4 ("virtiofsd: jail lo->proc_self_fd")
+Cc: Miklos Szeredi <mszeredi@redhat.com>
+Cc: Jens Freimann <jfreimann@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201006095826.59813-1-stefanha@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Tested-by: Jens Freimann <jfreimann@redhat.com>
+Reviewed-by: Jens Freimann <jfreimann@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 34 +++++++++++---------------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
+
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 477e6ee0b53c..ff53df445100 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2393,8 +2393,6 @@ static void setup_wait_parent_capabilities(void)
+ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
+ {
+     pid_t child;
+-    char template[] = "virtiofsd-XXXXXX";
+-    char *tmpdir;
+ 
+     /*
+      * Create a new pid namespace for *child* processes.  We'll have to
+@@ -2458,33 +2456,23 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
+         exit(1);
+     }
+ 
+-    tmpdir = mkdtemp(template);
+-    if (!tmpdir) {
+-        fuse_log(FUSE_LOG_ERR, "tmpdir(%s): %m\n", template);
+-        exit(1);
+-    }
+-
+-    if (mount("/proc/self/fd", tmpdir, NULL, MS_BIND, NULL) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, %s, MS_BIND): %m\n",
+-                 tmpdir);
++    /*
++     * We only need /proc/self/fd. Prevent ".." from accessing parent
++     * directories of /proc/self/fd by bind-mounting it over /proc. Since / was
++     * previously remounted with MS_REC | MS_SLAVE this mount change only
++     * affects our process.
++     */
++    if (mount("/proc/self/fd", "/proc", NULL, MS_BIND, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, MS_BIND): %m\n");
+         exit(1);
+     }
+ 
+-    /* Now we can get our /proc/self/fd directory file descriptor */
+-    lo->proc_self_fd = open(tmpdir, O_PATH);
++    /* Get the /proc (actually /proc/self/fd, see above) file descriptor */
++    lo->proc_self_fd = open("/proc", O_PATH);
+     if (lo->proc_self_fd == -1) {
+-        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", tmpdir);
++        fuse_log(FUSE_LOG_ERR, "open(/proc, O_PATH): %m\n");
+         exit(1);
+     }
+-
+-    if (umount2(tmpdir, MNT_DETACH) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "umount2(%s, MNT_DETACH): %m\n", tmpdir);
+-        exit(1);
+-    }
+-
+-    if (rmdir(tmpdir) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "rmdir(%s): %m\n", tmpdir);
+-    }
+ }
+ 
+ /*
