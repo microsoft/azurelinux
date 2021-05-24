@@ -2064,16 +2064,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jitterentropy",
-          "version": "3.0.2",
-          "downloadUrl": "https://github.com/smuellerDD/jitterentropy-library/archive/refs/tags/v3.0.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "jna",
           "version": "4.5.2",
           "downloadUrl": "https://github.com/java-native-access/jna/archive/4.5.2/jna-4.5.2.tar.gz"
