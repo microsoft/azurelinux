@@ -147,7 +147,7 @@ export HASHBANGPERL=%{_bindir}/perl
 #       Issue link: https://github.com/openssl/openssl/issues/7048.
 #       For more details please read the comment inside the patch.
 ./config \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib -ljitterentropy-openssl \
+    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
     shared \
     no-aria \
     enable-bf \
