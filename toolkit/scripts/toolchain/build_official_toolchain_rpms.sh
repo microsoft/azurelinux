@@ -266,12 +266,14 @@ build_rpm_in_chroot_no_install perl-DBIx-Simple
 build_rpm_in_chroot_no_install elfutils
 build_rpm_in_chroot_no_install automake
 
-# Need to install perl-Text-Template and perl-Test-Warnings
-# to build openssl
+# Need to install perl-Text-Template, perl-Test-Warnings,
+# and jitterentropy to build openssl
 build_rpm_in_chroot_no_install perl-Test-Warnings
 chroot_and_install_rpms perl-Test-Warnings
 build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
+build_rpm_in_chroot_no_install jitterentropy
+chroot_and_install_rpms jitterentropy
 build_rpm_in_chroot_no_install openssl
 
 build_rpm_in_chroot_no_install wget
