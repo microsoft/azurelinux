@@ -187,9 +187,6 @@ else \
 %relabel %{2} \
 fi;
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 %prep
 %setup -q -n refpolicy
 
