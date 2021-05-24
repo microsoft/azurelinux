@@ -373,11 +373,11 @@ build_rpm_in_chroot_no_install krb5
 chroot_and_install_rpms libssh2
 build_rpm_in_chroot_no_install curl
 
-# python-setuptools needs python-xml
-# python-xml is built by building python2
-chroot_and_install_rpms python-xml
+# python3-setuptools needs python3-xml
+# python3-xml is built by building python3
+chroot_and_install_rpms python3-xml
 
-# cracklib needs python-setuptools
+# cracklib needs python3-setuptools
 chroot_and_install_rpms python3-setuptools
 build_rpm_in_chroot_no_install cracklib
 
@@ -406,11 +406,8 @@ build_rpm_in_chroot_no_install gtest
 
 build_rpm_in_chroot_no_install libsolv
 
-# glib needs perl-XML-Parser, python-xml, gtk-doc, meson, libselinux
+# glib needs perl-XML-Parser, python3-xml, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
-
-# python-xml is built by building python2
-chroot_and_install_rpms python3-xml
 
 build_rpm_in_chroot_no_install itstool
 
@@ -516,7 +513,7 @@ build_rpm_in_chroot_no_install libtasn1
 chroot_and_install_rpms libtasn1
 build_rpm_in_chroot_no_install p11-kit
 
-# asciidoc needs python-xml
+# asciidoc needs python3-xml
 build_rpm_in_chroot_no_install asciidoc
 
 # ca-certificates needs p11-kit and asciidoc
