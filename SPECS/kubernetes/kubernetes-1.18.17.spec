@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.17
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -275,6 +275,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Mon May 24 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.17-5
+- Update to version  "1.18.17-hotfix.20210519".
+
 * Tue May 17 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.17-4
 - Manually set version variables.
 

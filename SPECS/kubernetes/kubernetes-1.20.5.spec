@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.20.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -271,6 +271,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Mon May 24 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.20.5-5
+- Update to version  "1.20.5-hotfix.20210519".
+
 * Tue May 17 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.20.5-4
 - Manually set version variables.
 
