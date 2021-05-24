@@ -16,9 +16,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210505.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210519.tar.gz
 Source1:        kubelet.service
 Source2:        version-file-%{version}.sh
 # CVE-2020-8565 Kubernetes doc on website recommend to not enable debug level logging in production (no patch available)

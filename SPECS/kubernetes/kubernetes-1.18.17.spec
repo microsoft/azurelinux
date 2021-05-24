@@ -16,9 +16,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210505.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210519.tar.gz
 Source1:        kubelet.service
 Source2:        version-file-%{version}.sh
 Source3:        golang-1.15-k8s-1.18-test.patch
