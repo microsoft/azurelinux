@@ -808,7 +808,8 @@
             "origin": "Nvidia",
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "nvidia-container-runtime"
+                "nvidia-container-runtime",
+                "nvidia-container-toolkit"
             ]
         },
         {
