@@ -7154,6 +7154,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "td-agent-bit",
+          "version": "1.7.6",
+          "downloadUrl": "https://fluentbit.io/releases/1.7/fluent-bit-1.7.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tdnf",
           "version": "2.1.0",
           "downloadUrl": "https://github.com/vmware/tdnf/archive/v2.1.0.tar.gz"
