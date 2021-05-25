@@ -28,7 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date from the changelog when the tarball was added.
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
 
