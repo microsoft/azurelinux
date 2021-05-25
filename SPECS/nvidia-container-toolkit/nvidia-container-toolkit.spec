@@ -17,7 +17,7 @@ Source0:        %{name}-%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
 #   5. tar  --sort=name \
-#           --mtime="[changelog_date] 00:00Z" \
+#           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
@@ -26,7 +26,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date from the changelog when the tarball was added. Example: 2021-04-26 00:00Z.
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         nvidia-container-toolkit-1.4.2.patch
 BuildRequires:  golang
