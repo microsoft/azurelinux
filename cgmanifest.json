@@ -1325,8 +1325,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "1.4.1",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.5.2.tar.gz"
         }
       }
     },
