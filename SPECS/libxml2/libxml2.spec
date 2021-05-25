@@ -94,6 +94,9 @@ rm -rf %{buildroot}/*
 %changelog
 * Fri May 21 2021 Nick Samson <nisamson@microsoft.com> - 2.9.10-8
 - Added explicit requirement on python xml library
+- Remove requirement on python2
+- Remove libxml2-python subpackage
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
