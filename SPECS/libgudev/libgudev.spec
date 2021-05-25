@@ -16,7 +16,7 @@ BuildRequires:  gtk-doc
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  which
-Requires:       systemd\
+Requires:       systemd
 Provides:       %{name}1
 
 %description
