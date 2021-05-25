@@ -735,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "ceph",
-          "version": "15.2.4",
-          "downloadUrl": "https://download.ceph.com/tarballs/ceph-15.2.4.tar.gz"
+          "version": "16.2.0",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
         }
       }
     },
@@ -2276,7 +2276,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.17",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2296,7 +2296,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.9",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2316,7 +2316,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.5",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210505/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -3967,6 +3967,26 @@
           "name": "nvidia-container-runtime",
           "version": "3.4.2",
           "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nvidia-container-toolkit",
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nvidia-docker2",
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.6.0.tar.gz"
         }
       }
     },
@@ -5765,8 +5785,8 @@
         "type": "other",
         "other": {
           "name": "python-rsa",
-          "version": "4.6",
-          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.6.tar.gz"
+          "version": "4.7.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.7.2.tar.gz"
         }
       }
     },
