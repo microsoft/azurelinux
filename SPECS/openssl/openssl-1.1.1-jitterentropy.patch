@@ -1,8 +1,8 @@
 diff --git a/crypto/fips/build.info b/crypto/fips/build.info
-index 2859a08..1d97ca7 100644
+index 2859a08..a690d04 100644
 --- a/crypto/fips/build.info
 +++ b/crypto/fips/build.info
-@@ -1,6 +1,6 @@
+@@ -1,11 +1,11 @@
  LIBS=../../libcrypto
  SOURCE[../../libcrypto]=\
 -        fips_aes_selftest.c fips_des_selftest.c fips_hmac_selftest.c \
@@ -10,6 +10,12 @@ index 2859a08..1d97ca7 100644
          fips_rsa_selftest.c fips_sha_selftest.c fips.c fips_dsa_selftest.c \
          fips_post.c fips_drbg_ctr.c fips_drbg_hash.c fips_drbg_hmac.c \
          fips_drbg_lib.c fips_drbg_rand.c fips_drbg_selftest.c fips_rand_lib.c \
+         fips_cmac_selftest.c fips_ecdh_selftest.c fips_ecdsa_selftest.c \
+-        fips_dh_selftest.c fips_kdf_selftest.c fips_ers.c
++        fips_dh_selftest.c fips_kdf_selftest.c fips_ers.c jitterentropy-base.c
+ 
+ PROGRAMS_NO_INST=\
+           fips_standalone_hmac
 diff --git a/crypto/fips/fips.c b/crypto/fips/fips.c
 index 3b9d3e9..b3e0f43 100644
 --- a/crypto/fips/fips.c
@@ -31,14 +37,14 @@ index 3b9d3e9..b3e0f43 100644
              ret = 0;
 diff --git a/crypto/fips/fips_entropy.c b/crypto/fips/fips_entropy.c
 new file mode 100644
-index 0000000..f051c52
+index 0000000..a8943a8
 --- /dev/null
 +++ b/crypto/fips/fips_entropy.c
 @@ -0,0 +1,53 @@
 +# include <openssl/fips.h>
 +
 +#include "crypto/fips.h"
-+#include "jitterentropy.h"
++#include "crypto/jitterentropy.h"
 +
 +static int fips_entropy_init = 0;
 +
@@ -101,234 +107,9 @@ index 3cf8d69..9a9c9a1 100644
      {ERR_REASON(FIPS_R_ENTROPY_NOT_REQUESTED_FOR_RESEED),
       "entropy not requested for reseed"},
      {ERR_REASON(FIPS_R_ENTROPY_SOURCE_STUCK), "entropy source stuck"},
-diff --git a/crypto/fips/jitterentropy-base-user.h b/crypto/fips/jitterentropy-base-user.h
-new file mode 100644
-index 0000000..8b94c1b
---- /dev/null
-+++ b/crypto/fips/jitterentropy-base-user.h
-@@ -0,0 +1,219 @@
-+/*
-+ * Non-physical true random number generator based on timing jitter.
-+ *
-+ * Copyright Stephan Mueller <smueller@chronox.de>, 2013 - 2021
-+ *
-+ * License
-+ * =======
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, and the entire permission notice in its entirety,
-+ *    including the disclaimer of warranties.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote
-+ *    products derived from this software without specific prior
-+ *    written permission.
-+ *
-+ * ALTERNATIVELY, this product may be distributed under the terms of
-+ * the GNU General Public License, in which case the provisions of the GPL are
-+ * required INSTEAD OF the above restrictions.  (This clause is
-+ * necessary due to a potential bad interaction between the GPL and
-+ * the restrictions contained in a BSD-style copyright.)
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
-+
-+#ifndef _JITTERENTROPY_BASE_USER_H
-+#define _JITTERENTROPY_BASE_USER_H
-+
-+/*
-+ * Set the following defines as needed for your environment
-+ */
-+/* Compilation for libgcrypt */
-+#ifndef LIBGCRYPT
-+#undef LIBGCRYPT
-+#endif
-+
-+/* Compilation for OpenSSL */
-+#ifndef OPENSSL
-+#define OPENSSL
-+
-+#include <time.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/types.h>
-+
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
-+
-+/* Timer-less entropy source */
-+#ifdef JENT_CONF_ENABLE_INTERNAL_TIMER
-+#include <pthread.h>
-+#endif /* JENT_CONF_ENABLE_INTERNAL_TIMER */
-+
-+#ifdef LIBGCRYPT
-+#include <config.h>
-+#include "g10lib.h"
-+#endif
-+
-+#ifdef OPENSSL
-+#include <openssl/crypto.h>
-+#ifdef OPENSSL_FIPS
-+#include <openssl/fips.h>
-+#endif
-+#endif
-+
-+#ifdef __MACH__
-+#include <assert.h>
-+#include <CoreServices/CoreServices.h>
-+#include <mach/mach.h>
-+#include <mach/mach_time.h>
-+#include <unistd.h>
-+#endif
-+
-+#ifdef __x86_64__
-+
-+# define DECLARE_ARGS(val, low, high)    unsigned long low, high
-+# define EAX_EDX_VAL(val, low, high)     ((low) | (high) << 32)
-+# define EAX_EDX_RET(val, low, high)     "=a" (low), "=d" (high)
-+
-+static inline void jent_get_nstime(uint64_t *out)
-+{
-+	DECLARE_ARGS(val, low, high);
-+	asm volatile("rdtsc" : EAX_EDX_RET(val, low, high));
-+	*out = EAX_EDX_VAL(val, low, high);
-+}
-+
-+#else /* __x86_64__ */
-+
-+static inline void jent_get_nstime(uint64_t *out)
-+{
-+	/* OSX does not have clock_gettime -- taken from
-+	 * http://developer.apple.com/library/mac/qa/qa1398/_index.html */
-+# ifdef __MACH__
-+	*out = mach_absolute_time();
-+# elif _AIX
-+	/* clock_gettime() on AIX returns a timer value that increments in
-+	 * steps of 1000
-+	 */
-+	uint64_t tmp = 0;
-+	timebasestruct_t aixtime;
-+	read_real_time(&aixtime, TIMEBASE_SZ);
-+	tmp = aixtime.tb_high;
-+	tmp = tmp << 32;
-+	tmp = tmp | aixtime.tb_low;
-+	*out = tmp;
-+# else /* __MACH__ */
-+	/* we could use CLOCK_MONOTONIC(_RAW), but with CLOCK_REALTIME
-+	 * we get some nice extra entropy once in a while from the NTP actions
-+	 * that we want to use as well... though, we do not rely on that
-+	 * extra little entropy */
-+	uint64_t tmp = 0;
-+	struct timespec time;
-+	if (clock_gettime(CLOCK_REALTIME, &time) == 0)
-+	{
-+		tmp = ((uint64_t)time.tv_sec & 0xFFFFFFFF) * 1000000000UL;
-+		tmp = tmp + (uint64_t)time.tv_nsec;
-+	}
-+	*out = tmp;
-+# endif /* __MACH__ */
-+}
-+
-+#endif /* __x86_64__ */
-+
-+static inline void *jent_zalloc(size_t len)
-+{
-+	void *tmp = NULL;
-+#ifdef LIBGCRYPT
-+	/* When using the libgcrypt secure memory mechanism, all precautions
-+	 * are taken to protect our state. If the user disables secmem during
-+	 * runtime, it is his decision and we thus try not to overrule his
-+	 * decision for less memory protection. */
-+#define CONFIG_CRYPTO_CPU_JITTERENTROPY_SECURE_MEMORY
-+	tmp = gcry_xmalloc_secure(len);
-+#elif defined(OPENSSL)
-+	/* Does this allocation implies secure memory use? */
-+	tmp = OPENSSL_malloc(len);
-+#else
-+	/* we have no secure memory allocation! Hence
-+	 * we do not set CONFIG_CRYPTO_CPU_JITTERENTROPY_SECURE_MEMORY */
-+	tmp = malloc(len);
-+#endif /* LIBGCRYPT */
-+	if(NULL != tmp)
-+		memset(tmp, 0, len);
-+	return tmp;
-+}
-+
-+static inline void jent_zfree(void *ptr, unsigned int len)
-+{
-+#ifdef LIBGCRYPT
-+	memset(ptr, 0, len);
-+	gcry_free(ptr);
-+#elif defined(OPENSSL)
-+	OPENSSL_cleanse(ptr, len);
-+	OPENSSL_free(ptr);
-+#else
-+	memset(ptr, 0, len);
-+	free(ptr);
-+#endif /* LIBGCRYPT */
-+}
-+
-+static inline int jent_fips_enabled(void)
-+{
-+#ifdef LIBGCRYPT
-+	return fips_mode();
-+#elif defined(OPENSSL)
-+#ifdef OPENSSL_FIPS
-+	return FIPS_mode();
-+#else
-+	return 0;
-+#endif
-+#else
-+#define FIPS_MODE_SWITCH_FILE "/proc/sys/crypto/fips_enabled"
-+	char buf[2] = "0";
-+	int fd = 0;
-+
-+	if ((fd = open(FIPS_MODE_SWITCH_FILE, O_RDONLY)) >= 0) {
-+		while (read(fd, buf, sizeof(buf)) < 0 && errno == EINTR);
-+		close(fd);
-+	}
-+	if (buf[0] == '1')
-+		return 1;
-+	else
-+		return 0;
-+#endif
-+}
-+
-+static inline void jent_memset_secure(void *s, size_t n)
-+{
-+	memset(s, 0, n);
-+	__asm__ __volatile__("" : : "r" (s) : "memory");
-+}
-+
-+/* --- helpers needed in user space -- */
-+
-+static inline uint64_t rol64(uint64_t x, int n)
-+{
-+	return ( (x << (n&(64-1))) | (x >> ((64-n)&(64-1))) );
-+}
-+
-+#endif /* _JITTERENTROPY_BASE_USER_H */
 diff --git a/crypto/fips/jitterentropy-base.c b/crypto/fips/jitterentropy-base.c
 new file mode 100644
-index 0000000..3822134
+index 0000000..9fb5b96
 --- /dev/null
 +++ b/crypto/fips/jitterentropy-base.c
 @@ -0,0 +1,1458 @@
@@ -383,7 +164,7 @@ index 0000000..3822134
 + * DAMAGE.
 + */
 +
-+#include "jitterentropy.h"
++#include "crypto/jitterentropy.h"
 +
 +#define MAJVERSION 3 /* API / ABI incompatible changes, functional changes that
 +		      * require consumer to be updated (as long as this number
@@ -1790,13 +1571,295 @@ index 0000000..3822134
 +
 +	return ret;
 +}
-diff --git a/crypto/fips/jitterentropy.h b/crypto/fips/jitterentropy.h
+diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
+index 5ed97cb..4c2d54e 100644
+--- a/crypto/rand/rand_unix.c
++++ b/crypto/rand/rand_unix.c
+@@ -634,9 +634,37 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
+     return rand_pool_entropy_available(pool);
+ #  else
+     size_t entropy_available;
++    int in_post;
++
++#ifdef OPENSSL_FIPS
++    if (FIPS_mode()) {
++        /* Use jitter entropy in FIPS mode */
++        for (in_post = fips_in_post(); in_post >= 0; --in_post) {
++            size_t bytes_needed;
++            unsigned char *buffer;
++            ssize_t bytes;
++            /* Maximum allowed number of consecutive unsuccessful attempts */
++            int attempts = 3;
++            
++            bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
++            while (bytes_needed !=0 && attempts-- > 0) {
++                buffer = rand_pool_add_begin(pool, bytes_needed);
++                bytes = FIPS_jitter_entropy(buffer, bytes_needed);
++                if (bytes > 0) {
++                    rand_pool_add_end(pool, bytes, 8 * bytes);
++                    bytes_needed -= bytes;
++                    attempts = 3; /* reset counter after successful attempt */
++                } else if (bytes < 0) {
++                    break;
++                }
++            }
++        }
++        entropy_available = rand_pool_entropy_available(pool);
++        return entropy_available;
++    }
++#endif
+ 
+ #   if defined(OPENSSL_RAND_SEED_GETRANDOM)
+-    int in_post;
+ 
+     for (in_post = fips_in_post(); in_post >= 0; --in_post) {
+     {
+diff --git a/include/crypto/fips.h b/include/crypto/fips.h
+index 564261c..29c4923 100644
+--- a/include/crypto/fips.h
++++ b/include/crypto/fips.h
+@@ -94,6 +94,8 @@ void fips_set_selftest_fail(void);
+ 
+ void FIPS_get_timevec(unsigned char *buf, unsigned long *pctr);
+ 
++ssize_t FIPS_jitter_entropy(unsigned char *buf, size_t buflen);
++
+ #else
+ 
+ # define fips_in_post() 0
+diff --git a/include/crypto/jitterentropy-base-user.h b/include/crypto/jitterentropy-base-user.h
 new file mode 100644
-index 0000000..5eea673
+index 0000000..e0a3477
 --- /dev/null
-+++ b/crypto/fips/jitterentropy.h
-@@ -0,0 +1,227 @@
++++ b/include/crypto/jitterentropy-base-user.h
+@@ -0,0 +1,220 @@
 +/*
++ * Non-physical true random number generator based on timing jitter.
++ *
++ * Copyright Stephan Mueller <smueller@chronox.de>, 2013 - 2021
++ *
++ * License
++ * =======
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, and the entire permission notice in its entirety,
++ *    including the disclaimer of warranties.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote
++ *    products derived from this software without specific prior
++ *    written permission.
++ *
++ * ALTERNATIVELY, this product may be distributed under the terms of
++ * the GNU General Public License, in which case the provisions of the GPL are
++ * required INSTEAD OF the above restrictions.  (This clause is
++ * necessary due to a potential bad interaction between the GPL and
++ * the restrictions contained in a BSD-style copyright.)
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
++ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
++ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
++ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
++ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
++ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
++ * DAMAGE.
++ */
++
++#ifndef _JITTERENTROPY_BASE_USER_H
++#define _JITTERENTROPY_BASE_USER_H
++
++/*
++ * Set the following defines as needed for your environment
++ */
++/* Compilation for libgcrypt */
++#ifndef LIBGCRYPT
++#undef LIBGCRYPT
++#endif
++
++/* Compilation for OpenSSL */
++#ifndef OPENSSL
++#define OPENSSL
++#endif
++
++#include <time.h>
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/types.h>
++
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++
++/* Timer-less entropy source */
++#ifdef JENT_CONF_ENABLE_INTERNAL_TIMER
++#include <pthread.h>
++#endif /* JENT_CONF_ENABLE_INTERNAL_TIMER */
++
++#ifdef LIBGCRYPT
++#include <config.h>
++#include "g10lib.h"
++#endif
++
++#ifdef OPENSSL
++#include <openssl/crypto.h>
++#ifdef OPENSSL_FIPS
++#include <openssl/fips.h>
++#endif
++#endif
++
++#ifdef __MACH__
++#include <assert.h>
++#include <CoreServices/CoreServices.h>
++#include <mach/mach.h>
++#include <mach/mach_time.h>
++#include <unistd.h>
++#endif
++
++#ifdef __x86_64__
++
++# define DECLARE_ARGS(val, low, high)    unsigned long low, high
++# define EAX_EDX_VAL(val, low, high)     ((low) | (high) << 32)
++# define EAX_EDX_RET(val, low, high)     "=a" (low), "=d" (high)
++
++static inline void jent_get_nstime(uint64_t *out)
++{
++	DECLARE_ARGS(val, low, high);
++	asm volatile("rdtsc" : EAX_EDX_RET(val, low, high));
++	*out = EAX_EDX_VAL(val, low, high);
++}
++
++#else /* __x86_64__ */
++
++static inline void jent_get_nstime(uint64_t *out)
++{
++	/* OSX does not have clock_gettime -- taken from
++	 * http://developer.apple.com/library/mac/qa/qa1398/_index.html */
++# ifdef __MACH__
++	*out = mach_absolute_time();
++# elif _AIX
++	/* clock_gettime() on AIX returns a timer value that increments in
++	 * steps of 1000
++	 */
++	uint64_t tmp = 0;
++	timebasestruct_t aixtime;
++	read_real_time(&aixtime, TIMEBASE_SZ);
++	tmp = aixtime.tb_high;
++	tmp = tmp << 32;
++	tmp = tmp | aixtime.tb_low;
++	*out = tmp;
++# else /* __MACH__ */
++	/* we could use CLOCK_MONOTONIC(_RAW), but with CLOCK_REALTIME
++	 * we get some nice extra entropy once in a while from the NTP actions
++	 * that we want to use as well... though, we do not rely on that
++	 * extra little entropy */
++	uint64_t tmp = 0;
++	struct timespec time;
++	if (clock_gettime(CLOCK_REALTIME, &time) == 0)
++	{
++		tmp = ((uint64_t)time.tv_sec & 0xFFFFFFFF) * 1000000000UL;
++		tmp = tmp + (uint64_t)time.tv_nsec;
++	}
++	*out = tmp;
++# endif /* __MACH__ */
++}
++
++#endif /* __x86_64__ */
++
++static inline void *jent_zalloc(size_t len)
++{
++	void *tmp = NULL;
++#ifdef LIBGCRYPT
++	/* When using the libgcrypt secure memory mechanism, all precautions
++	 * are taken to protect our state. If the user disables secmem during
++	 * runtime, it is his decision and we thus try not to overrule his
++	 * decision for less memory protection. */
++#define CONFIG_CRYPTO_CPU_JITTERENTROPY_SECURE_MEMORY
++	tmp = gcry_xmalloc_secure(len);
++#elif defined(OPENSSL)
++	/* Does this allocation implies secure memory use? */
++	tmp = OPENSSL_malloc(len);
++#else
++	/* we have no secure memory allocation! Hence
++	 * we do not set CONFIG_CRYPTO_CPU_JITTERENTROPY_SECURE_MEMORY */
++	tmp = malloc(len);
++#endif /* LIBGCRYPT */
++	if(NULL != tmp)
++		memset(tmp, 0, len);
++	return tmp;
++}
++
++static inline void jent_zfree(void *ptr, unsigned int len)
++{
++#ifdef LIBGCRYPT
++	memset(ptr, 0, len);
++	gcry_free(ptr);
++#elif defined(OPENSSL)
++	OPENSSL_cleanse(ptr, len);
++	OPENSSL_free(ptr);
++#else
++	memset(ptr, 0, len);
++	free(ptr);
++#endif /* LIBGCRYPT */
++}
++
++static inline int jent_fips_enabled(void)
++{
++#ifdef LIBGCRYPT
++	return fips_mode();
++#elif defined(OPENSSL)
++#ifdef OPENSSL_FIPS
++	return FIPS_mode();
++#else
++	return 0;
++#endif
++#else
++#define FIPS_MODE_SWITCH_FILE "/proc/sys/crypto/fips_enabled"
++	char buf[2] = "0";
++	int fd = 0;
++
++	if ((fd = open(FIPS_MODE_SWITCH_FILE, O_RDONLY)) >= 0) {
++		while (read(fd, buf, sizeof(buf)) < 0 && errno == EINTR);
++		close(fd);
++	}
++	if (buf[0] == '1')
++		return 1;
++	else
++		return 0;
++#endif
++}
++
++static inline void jent_memset_secure(void *s, size_t n)
++{
++	memset(s, 0, n);
++	__asm__ __volatile__("" : : "r" (s) : "memory");
++}
++
++/* --- helpers needed in user space -- */
++
++static inline uint64_t rol64(uint64_t x, int n)
++{
++	return ( (x << (n&(64-1))) | (x >> ((64-n)&(64-1))) );
++}
++
++#endif /* _JITTERENTROPY_BASE_USER_H */
+diff --git a/include/crypto/jitterentropy.h b/include/crypto/jitterentropy.h
+new file mode 100644
+index 0000000..078d750
+--- /dev/null
++++ b/include/crypto/jitterentropy.h
+@@ -0,0 +1,227 @@
++﻿/*
 + * Non-physical true random number generator based on timing jitter.
 + *
 + * Copyright Stephan Mueller <smueller@chronox.de>, 2014 - 2021
@@ -1882,7 +1945,7 @@ index 0000000..5eea673
 + * Jitter RNG State Definition Section
 + ***************************************************************************/
 +
-+#include "jitterentropy-base-user.h"
++#include "crypto/jitterentropy-base-user.h"
 +
 +#define SHA3_256_SIZE_DIGEST_BITS	256
 +#define SHA3_256_SIZE_DIGEST		(SHA3_256_SIZE_DIGEST_BITS >> 3)
@@ -2023,62 +2086,6 @@ index 0000000..5eea673
 +/* -- END of statistical test function -- */
 +
 +#endif /* _JITTERENTROPY_H */
-diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
-index 5ed97cb..4c2d54e 100644
---- a/crypto/rand/rand_unix.c
-+++ b/crypto/rand/rand_unix.c
-@@ -634,9 +634,37 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
-     return rand_pool_entropy_available(pool);
- #  else
-     size_t entropy_available;
-+    int in_post;
-+
-+#ifdef OPENSSL_FIPS
-+    if (FIPS_mode()) {
-+        /* Use jitter entropy in FIPS mode */
-+        for (in_post = fips_in_post(); in_post >= 0; --in_post) {
-+            size_t bytes_needed;
-+            unsigned char *buffer;
-+            ssize_t bytes;
-+            /* Maximum allowed number of consecutive unsuccessful attempts */
-+            int attempts = 3;
-+            
-+            bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
-+            while (bytes_needed !=0 && attempts-- > 0) {
-+                buffer = rand_pool_add_begin(pool, bytes_needed);
-+                bytes = FIPS_jitter_entropy(buffer, bytes_needed);
-+                if (bytes > 0) {
-+                    rand_pool_add_end(pool, bytes, 8 * bytes);
-+                    bytes_needed -= bytes;
-+                    attempts = 3; /* reset counter after successful attempt */
-+                } else if (bytes < 0) {
-+                    break;
-+                }
-+            }
-+        }
-+        entropy_available = rand_pool_entropy_available(pool);
-+        return entropy_available;
-+    }
-+#endif
- 
- #   if defined(OPENSSL_RAND_SEED_GETRANDOM)
--    int in_post;
- 
-     for (in_post = fips_in_post(); in_post >= 0; --in_post) {
-     {
-diff --git a/include/crypto/fips.h b/include/crypto/fips.h
-index 564261c..29c4923 100644
---- a/include/crypto/fips.h
-+++ b/include/crypto/fips.h
-@@ -94,6 +94,8 @@ void fips_set_selftest_fail(void);
- 
- void FIPS_get_timevec(unsigned char *buf, unsigned long *pctr);
- 
-+ssize_t FIPS_jitter_entropy(unsigned char *buf, size_t buflen);
-+
- #else
- 
- # define fips_in_post() 0
 diff --git a/include/openssl/fips.h b/include/openssl/fips.h
 index abbe81b..be84e08 100644
 --- a/include/openssl/fips.h
