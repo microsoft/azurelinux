@@ -55,9 +55,10 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 			break; \
 		done && echo "Downloaded $${url}/$${srpm_file}"; \
-	done || ( [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || \
-	( [ "$(SRPM_RELAXED_DOWNLOAD)" == "y" ] && echo "Failed to download $${srpm_file}. Skipping.") || \
-	$(call print_error,Failed to download $${srpm_file}) ); \
+	done || $(call print_error,Failed to download $${srpm_file}) ; \
+	echo "Removing empty (failed) SRPMS: "
+	find $(BUILD_SRPMS_DIR) -type f -empty -delete -print > $(LOGS_DIR)/pkggen/deleted-srpms.log
+	echo "Removed all empty SRPMS. Finished packing."
 	touch $@
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_sources) $(SPECS_DIR) $(go-srpmpacker)
