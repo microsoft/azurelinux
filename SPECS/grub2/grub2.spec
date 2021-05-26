@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -110,6 +110,7 @@ tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
 
 %build
+export PYTHON=%{python3}
 ./bootstrap --no-git --gnulib-srcdir=./gnulib
 %ifarch x86_64
 mkdir build-for-pc
@@ -270,6 +271,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.06~rc1-5
+- Explicitly specify python 3 as the python interpreter for bootstrapping
+
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
 - Bump version to match grub-efi-binary-signed spec
 

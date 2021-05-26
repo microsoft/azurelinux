@@ -1,5 +1,3 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.10
@@ -13,8 +11,6 @@ Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-20388.patch
 Patch1:         CVE-2020-7595.patch
 Patch2:         CVE-2020-24977.patch
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
 BuildRequires:  python3-devel
 Provides:       pkgconfig(libxml-2.0) = %{version}-%{release}
 Provides:       %{name}-tools = %{version}-%{release}
@@ -22,17 +18,6 @@ Provides:       libxml-tools = %{version}-%{release}
 
 %description
 The libxml2 package contains libraries and utilities used for parsing XML files.
-
-%package python
-Summary:        The libxml2 python module
-Group:          Development/Languages/Python
-Requires:       %{name} = %{version}
-Requires:       python2
-Requires:       python2-libs
-Requires:       python-xml
-
-%description    python
-The libxml2 python module
 
 %package -n     python3-libxml2
 Summary:        Python 3 bindings for libxml2.
@@ -95,10 +80,6 @@ rm -rf %{buildroot}/*
 %{_datadir}/gtk-doc/*
 %{_mandir}/man1/*
 
-%files python
-%defattr(-,root,root)
-%{python2_sitelib}/*
-
 %files -n python3-libxml2
 %defattr(-,root,root)
 %{python3_sitelib}/*
@@ -113,6 +94,9 @@ rm -rf %{buildroot}/*
 %changelog
 * Fri May 21 2021 Nick Samson <nisamson@microsoft.com> - 2.9.10-8
 - Added explicit requirement on python xml library
+- Remove requirement on python2
+- Remove libxml2-python subpackage
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.

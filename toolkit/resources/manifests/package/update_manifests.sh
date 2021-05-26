@@ -81,7 +81,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/libselinux-utils/d' $TmpPkgGen
     sed -i '/libsepol-devel/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
-    sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
