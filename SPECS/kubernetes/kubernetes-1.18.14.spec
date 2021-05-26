@@ -10,15 +10,15 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.14
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Microsoft Kubernetes
 URL:            https://mcr.microsoft.com/oss
-#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz
+#Source0:       https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz
 #               Note that only amd64 tarball exist which is OK since kubernetes is built from source
-Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210511.tar.gz
+Source0:        kubernetes-node-linux-amd64-%{version}-hotfix.20210525.tar.gz
 Source1:        kubelet.service
 Source2:        version-file-%{version}.sh
 Source3:        golang-1.15-k8s-1.18-test.patch
@@ -275,6 +275,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Wed May 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.14-8
+- Update to version  "1.18.14-hotfix.20210525".
+
 * Tue May 17 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.18.14-7
 - Manually set version variables.
 
