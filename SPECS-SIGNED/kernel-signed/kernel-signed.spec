@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %ifarch x86_64
 %global buildarch x86_64
 %endif
@@ -8,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.10.28.1
+Version:        5.10.32.1
 Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -66,7 +67,10 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   4. Build this spec
 Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
+Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
+BuildRequires:  openssl
+BuildRequires:  sed
 
 %description
 This package contains the Linux kernel package with kernel signed with the production key
@@ -86,13 +90,16 @@ The kernel package contains the signed Linux kernel.
 
 %build
 # This spec's whole purpose is to inject the signed kernel binary
-# Do not do anything extra.
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
 
 %install
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
+
+# Recalculate sha512hmac for FIPS
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 %triggerin -n kernel -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -139,6 +146,18 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
+- Recalculate sha512hmac on signed kernel binary
+
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+- Update to kernel release 5.10.32.1-3
+
+* Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
+- Bump release number to match kernel release
+
+* Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
+- Update source to 5.10.32.1
+
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Bump release number to match kernel release
 

@@ -157,7 +157,7 @@ index 24f56f5..4a5bb85 100755
 +    ensure_directory(staging_libdir) do
 +      cp("/usr/lib/libruby.so", ".")
 +      cp("/usr/lib/libruby.so.2.6", ".")
-+      cp("/usr/lib/libruby.so.2.6.6", ".")
++      cp("/usr/lib/libruby.so.2.6.7", ".")
 +      cp_r("/usr/lib/ruby", ".")
 +      cp("/usr/lib/pkgconfig/ruby-2.6.pc", "./pkgconfig")
 +    end
@@ -284,7 +284,7 @@ index dc53f99..8fd1bd9 100644
  #BUNDLED_RUBY_VERSION = "2.6.6"
  #BUNDLED_RUBY_SOURCE_SHA256SUM = "364b143def360bac1b74eb56ed60b1a0dca6439b00157ae11ff77d5cd2e92291"
 -BUNDLED_RUBY_VERSION = "2.7.1"
-+BUNDLED_RUBY_VERSION = "2.6.6"
++BUNDLED_RUBY_VERSION = "2.6.7"
 +RUBYGEM_VERSION= "2.6.0"
  BUNDLED_RUBY_SOURCE_SHA256SUM = "d418483bdd0000576c1370571121a6eb24582116db0b7bb2005e90e250eae418"
  

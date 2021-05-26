@@ -4,9 +4,9 @@
 Summary:       Python documentation generator
 Name:          python-sphinx
 Version:       1.7.9
-Release:       10%{?dist}
+Release:       11%{?dist}
 Group:         Development/Tools
-License:       BSD-2-Clause
+License:       BSD
 URL:           https://www.sphinx-doc.org
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -42,6 +42,7 @@ Requires:      python-imagesize
 Requires:      python-requests
 Requires:      python-snowballstemmer
 Requires:      python-typing
+Requires:      python2-sphinxcontrib-websupport
 
 BuildArch:      noarch
 
@@ -81,6 +82,7 @@ Requires:      python3-sphinx-theme-alabaster
 Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-snowballstemmer
+Requires:      python3-sphinxcontrib-websupport
 
 %description -n python3-sphinx
 
@@ -104,6 +106,10 @@ mv %{buildroot}/%{_bindir}/sphinx-quickstart %{buildroot}/%{_bindir}/sphinx-quic
 mv %{buildroot}/%{_bindir}/sphinx-build %{buildroot}/%{_bindir}/sphinx-build3
 mv %{buildroot}/%{_bindir}/sphinx-autogen %{buildroot}/%{_bindir}/sphinx-autogen3
 mv %{buildroot}/%{_bindir}/sphinx-apidoc %{buildroot}/%{_bindir}/sphinx-apidoc3
+ln -sfv sphinx-quickstart3 %{buildroot}%{_bindir}/sphinx-quickstart-3
+ln -sfv sphinx-build3 %{buildroot}%{_bindir}/sphinx-build-3
+ln -sfv sphinx-autogen3 %{buildroot}%{_bindir}/sphinx-autogen-3
+ln -sfv sphinx-apidoc3 %{buildroot}%{_bindir}/sphinx-apidoc-3
 popd
 python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
@@ -127,9 +133,18 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/sphinx-build3
 %{_bindir}/sphinx-autogen3
 %{_bindir}/sphinx-apidoc3
+%{_bindir}/sphinx-quickstart-3
+%{_bindir}/sphinx-build-3
+%{_bindir}/sphinx-autogen-3
+%{_bindir}/sphinx-apidoc-3
 %{python3_sitelib}/*
 
 %changelog
+*   Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.9-11
+-   Add sphinx-*-3 binary symlinks for Fedora compatibility
+-   Add Requires: python(2/3)-sphinxcontrib-websupport
+-   Correct license shortname
+-   License verified
 *   Tue Jun 02 2020 Jon Slobodzian <joslobo@microsoft.com> 1.7.9-10
 -   Add python-typing back.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.7.9-9

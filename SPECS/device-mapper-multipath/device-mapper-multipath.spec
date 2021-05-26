@@ -1,16 +1,14 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
-Version:        0.8.4
-Release:        2%{?dist}
+Version:        0.8.6
+Release:        1%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://christophe.varoqui.free.fr/
-#Source0:       https://git.opensvc.com/?p=multipath-tools/.git;a=snapshot;h=refs/tags/%{version};sf=tgz"
+#Source0:       https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz
 Source0:        multipath-tools-%{version}.tar.gz
-Patch0:         libdmmp-jsonc.patch
-Patch1:         libmpathpersist.patch
 
 BuildRequires:  userspace-rcu-devel
 BuildRequires:  libaio-devel
@@ -47,8 +45,6 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -qn multipath-tools-%{version}
-%patch0 -p1
-%patch1 -p1
 
 %build
 make %{?_smp_mflags}
@@ -101,6 +97,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+*   Thu Apr 29 2021 Andrew Phelps <anphel@microsoft.com> 0.8.6-1
+-   Update to version 0.8.6 for parallel build fix.
+-   Update Source0 URL.
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 0.8.4-2
 -   Update Source0 URL.
 -   Use release tag instead of commit.

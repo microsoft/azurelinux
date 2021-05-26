@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.28.1
+Version:        5.10.32.1
 Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -158,6 +158,10 @@ Patch1129:      CVE-2021-29650.nopatch
 Patch1130:      CVE-2021-30002.nopatch
 # CVE-2021-29648 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1131:      CVE-2021-29648.nopatch
+Patch1132:      CVE-2021-23133.nopatch
+Patch1133:      CVE-2021-29154.nopatch
+# CVE-2021-30178 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1134:      CVE-2021-30178.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -172,6 +176,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3
+BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -321,18 +326,6 @@ install -vdm 755 %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
-# Verify for build-id match
-# We observe different IDs sometimes
-# TODO: debug it
-ID1=`readelf -n vmlinux | grep "Build ID"`
-./scripts/extract-vmlinux arch/x86/boot/bzImage > extracted-vmlinux
-ID2=`readelf -n extracted-vmlinux | grep "Build ID"`
-if [ "$ID1" != "$ID2" ] ; then
-        echo "Build IDs do not match"
-        echo $ID1
-        echo $ID2
-        exit 1
-fi
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
@@ -496,6 +489,20 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
+- Bump release number to match kernel-signed update
+
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+- Update CONFIG_LD_VERSION for binutils 2.36.1
+- Remove build-id match check
+
+* Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
+- Add CONFIG_AS_HAS_LSE_ATOMICS=y
+
+* Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
+- Update source to 5.10.32.1
+- Address CVE-2021-23133, CVE-2021-29154, CVE-2021-30178
+
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Disable CONFIG_EFI_DISABLE_PCI_DMA. It can cause boot issues on some hardware.
 
