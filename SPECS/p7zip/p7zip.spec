@@ -1,7 +1,7 @@
 Summary:        Very high compression ratio file archiver
 Name:           p7zip
 Version:        16.02
-Release:        21%{?dist}
+Release:        22%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
@@ -27,6 +27,11 @@ Patch11:        14-Fix-g++-warning.patch
 Patch12:        gcc10-conversion.patch
 Patch13:        0001-fix-data-null-pointer.patch
 Patch14:        0001-fix-out-of-mem.patch
+# p7zip sources does not include 7-Zips RAR compression code.
+# Refer to p7zip no rar sources tar and patch0 for nonrar cmake.
+# Patch to fix CVE-2018-5996 is for RAR functionality compression bug.
+# It is not vulnerable hence adding nopatch
+Patch15:        CVE-2018-5996.nopatch
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -126,6 +131,9 @@ make test
 %doc contrib/
 
 %changelog
+* Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 16.02-22
+- Add nopatch for CVE-2018-5996
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 16.02-21
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
