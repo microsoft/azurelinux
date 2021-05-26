@@ -9,7 +9,7 @@ Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-22898.patch
-#Patch1:         CVE-2021-22901.patch
+Patch1:         CVE-2021-22901.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
