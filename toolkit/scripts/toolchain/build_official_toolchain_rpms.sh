@@ -316,6 +316,7 @@ chroot_and_install_rpms python3
 
 # openjdk needs fontconfig to build, which needs libxml
 build_rpm_in_chroot_no_install libxml2
+copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
 chroot_and_install_rpms expat
 chroot_and_install_rpms freetype
@@ -409,6 +410,8 @@ build_rpm_in_chroot_no_install libsolv
 # glib needs perl-XML-Parser, python3-xml, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
 
+# itstool needs python3-libxml2
+chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
 # gtk-doc needs itstool
