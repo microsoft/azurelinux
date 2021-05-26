@@ -65,7 +65,7 @@ find %{buildroot} -name '*.la' -delete
 
 %changelog
 *   Tue May 25 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.0.3-1
--   Fix check tests.
+-   Update to version 1.0.3.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.0-4
 -   Added %%license line automatically
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 1.0.0-3
