@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "kubelet.service": "22ea9e0b85aa9db9e1accfb6c21843683425fc1af9c0a2669523e42a455dc57e",
-  "kubernetes-node-linux-amd64-1.19.9-hotfix.20210519.tar.gz": "1054f15a632fdef7b6a9f2502b37cc574bfc776656b4c14f657f3dfd7745cd90",
-  "version-file-1.19.9.sh": "5386f01ec8c3baf118aaf320a78d5582bd3e9ccfb103dd12aff704b07e6fdd34"
+  "kubernetes-node-linux-amd64-1.19.9-hotfix.20210526.tar.gz": "041453b588243363d127629e479bdf02260864974303435a89b4315564f4b245",
+  "version-file-1.19.9.sh": "5b19790e50e5b518152eabbc5620784945a33c518705d43787868e41722e8818"
  }
 }
