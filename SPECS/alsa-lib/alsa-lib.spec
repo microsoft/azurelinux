@@ -48,6 +48,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 * Wed May 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.2-2
 - Replace python2 dependencies with python3
+- License verified
 
 * Thu May 28 2020 Andrew Phelps <anphel@microsoft.com> - 1.2.2-1
 - Update to version 1.2.2 to fix CVE-2009-0035
