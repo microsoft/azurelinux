@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,9 +57,8 @@ sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 # Use group id 100(users) by default
 sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
-# Disable usergroups. Use "users" group by default (see /etc/default/useradd)
-# for all nonroot users.
-sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
+# Enable usergroups. Each user will get their own primary group with a name matching their login name
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB yes/' %{buildroot}%{_sysconfdir}/login.defs
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
                 FAILLOG_ENAB             \
@@ -143,8 +142,11 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 4.6-11
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 4.6-12
 - Add SELinux support
+
+* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+- Enable usergroups for useradd
 
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
 - Add sym link to adduser from useradd and create the file for adduser
