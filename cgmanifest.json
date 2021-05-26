@@ -3155,8 +3155,8 @@
         "type": "other",
         "other": {
           "name": "libwebp",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.0.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.3.tar.gz"
         }
       }
     },
