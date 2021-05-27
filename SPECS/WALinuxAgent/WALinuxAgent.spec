@@ -9,13 +9,12 @@ Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
 #Source0:       https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  python-distro
+BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  systemd
-BuildRequires:  python3-distro
 Requires:       /bin/grep
 Requires:       /bin/sed
 Requires:       iptables
@@ -49,6 +48,10 @@ mkdir -p  %{buildroot}/%{_localstatedir}/log
 mkdir -p -m 0700 %{buildroot}/%{_sharedstatedir}/waagent
 mkdir -p %{buildroot}/%{_localstatedir}/log
 touch %{buildroot}/%{_localstatedir}/log/waagent.log
+# python refers to python2 version on CBL-Mariner hence update to use python3
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
+sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_lib}/systemd/system/waagent.service
 
 %check
 python3 setup.py check && python3 setup.py test
