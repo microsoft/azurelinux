@@ -45,4 +45,3 @@ package-toolkit: go-tools
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
->>>>>>> Allow for SRPM to fail to download.
