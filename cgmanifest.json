@@ -2854,6 +2854,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnvidia-container",
+          "version": "1.3.3",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libpcap",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
@@ -3987,6 +3997,16 @@
           "name": "nvidia-docker2",
           "version": "2.6.0",
           "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nvidia-modprobe",
+          "version": "450.57",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/450.57.tar.gz"
         }
       }
     },
