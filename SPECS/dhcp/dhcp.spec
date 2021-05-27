@@ -1,38 +1,38 @@
-Summary:	    Dynamic host configuration protocol
-Name:		    dhcp
-Version:	    4.4.2
+Summary:        Dynamic host configuration protocol
+Name:           dhcp
+Version:        4.4.2
 Release:        2%{?dist}
 License:        MPLv2.0
-Url:      	    https://www.isc.org/dhcp/
-Source0:  	    ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
+Url:            https://www.isc.org/dhcp/
+Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
 Patch1:         CVE-2021-25217.patch
-Group:		    System Environment/Base
+Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:	systemd
+BuildRequires:  systemd
 %description
 The ISC DHCP package contains both the client and server programs for DHCP. dhclient (the client) is used for connecting to a network which uses DHCP to assign network addresses. dhcpd (the server) is used for assigning network addresses on private networks
 
 %package libs
-Summary:	Libraries for dhcp
+Summary:    Libraries for dhcp
 %description libs
 Libraries for the dhcp.
 
 %package devel
-Summary:	Development Libraries and header files for dhcp
-Requires:	dhcp-libs
+Summary:    Development Libraries and header files for dhcp
+Requires:   dhcp-libs
 %description devel
 Headers and libraries for the dhcp.
 
 %package server
-Summary:	Provides the ISC DHCP server
-Requires:	dhcp-libs
+Summary:    Provides the ISC DHCP server
+Requires:   dhcp-libs
 %description server
 dhcpd is the name of a program that operates as a daemon on a server to provide Dynamic Host Configuration Protocol (DHCP) service to a network. Clients may solicit an IP address (IP) from a DHCP server when they need one
 
 %package client
-Summary:	Provides the ISC DHCP client daemon and dhclient-script
-Requires:	dhcp-libs
+Summary:    Provides the ISC DHCP client daemon and dhclient-script
+Requires:   dhcp-libs
 %description client
 The ISC DHCP Client, dhclient, provides a means for configuring one or more network interfaces using the Dynamic Host Configuration Protocol, BOOTP protocol, or if these protocols fail, by statically assigning an address.
 
@@ -119,8 +119,8 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 #%check
 #Commented out %check due to missing support of ATF.
 
-%post	libs -p /sbin/ldconfig
-%postun	libs -p /sbin/ldconfig
+%post   libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %files libs
 %defattr(-,root,root)
