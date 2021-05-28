@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ Patch16:        openssl-1.1.1-s390x-ecc.patch
 Patch17:        openssl-1.1.1-kdf-selftest.patch
 Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
+Patch20:        openssl-1.1.1-jitterentropy.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -124,13 +125,15 @@ cp %{SOURCE4} test/
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
+%patch20 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
 # want to depend on the uninitialized memory as a source of entropy anyway.
-NEW_RPM_OPT_FLAGS="%{optflags} -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
+# Also add -O0 to enable optimization, which is needed for jitterentropy
+NEW_RPM_OPT_FLAGS="%{optflags} -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS -O0"
 
 export HASHBANGPERL=%{_bindir}/perl
 
@@ -318,6 +321,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
+- In FIPS mode, use only jitterentropy
+
 * Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
 - Remove FIPS DRBG rewire patch
 

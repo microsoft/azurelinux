@@ -1335,8 +1335,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "1.4.1",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.5.2.tar.gz"
         }
       }
     },
@@ -2276,7 +2276,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2286,7 +2286,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.18.17",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2296,7 +2296,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2306,7 +2306,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.19.9",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210526/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2316,7 +2316,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.2",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210511/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2326,7 +2326,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.20.5",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210519/binaries/kubernetes-node-linux-amd64.tar.gz"
+          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210526/binaries/kubernetes-node-linux-amd64.tar.gz"
         }
       }
     },
@@ -2864,6 +2864,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnvidia-container",
+          "version": "1.3.3",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libpcap",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
@@ -3175,8 +3185,8 @@
         "type": "other",
         "other": {
           "name": "libwebp",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.0.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.3.tar.gz"
         }
       }
     },
@@ -4017,6 +4027,16 @@
           "name": "nvidia-docker2",
           "version": "2.6.0",
           "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nvidia-modprobe",
+          "version": "450.57",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/450.57.tar.gz"
         }
       }
     },
@@ -7535,8 +7555,8 @@
         "type": "other",
         "other": {
           "name": "WALinuxAgent",
-          "version": "2.2.52",
-          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/v2.2.52.tar.gz"
+          "version": "2.2.54.2",
+          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.2.54.2.tar.gz"
         }
       }
     },
