@@ -53,7 +53,7 @@ cryptsetup-devel-2.3.3-2.cm1.x86_64.rpm
 cryptsetup-libs-2.3.3-2.cm1.x86_64.rpm
 cryptsetup-reencrypt-2.3.3-2.cm1.x86_64.rpm
 curl-7.76.0-3.cm1.x86_64.rpm
-curl-debuginfo-7.76.0-23cm1.x86_64.rpm
+curl-debuginfo-7.76.0-3.cm1.x86_64.rpm
 curl-devel-7.76.0-3.cm1.x86_64.rpm
 curl-libs-7.76.0-3.cm1.x86_64.rpm
 cyrus-sasl-2.1.27-4.cm1.x86_64.rpm
