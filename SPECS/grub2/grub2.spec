@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,7 @@ Patch1009:      CVE-2020-14310.nopatch
 Patch1010:      CVE-2020-14311.nopatch
 Patch1011:      CVE-2020-27749.nopatch
 Patch1012:      CVE-2021-20225.nopatch
+Patch1013:      remove-shim-lock-verification.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3

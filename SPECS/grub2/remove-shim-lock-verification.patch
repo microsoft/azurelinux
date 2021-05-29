@@ -1,0 +1,27 @@
+diff --git a/grub-core/kern/efi/sb.c b/grub-core/kern/efi/sb.c
+index 96d2377..68e0780 100644
+--- a/grub-core/kern/efi/sb.c
++++ b/grub-core/kern/efi/sb.c
+@@ -142,13 +142,17 @@ shim_lock_verifier_init (grub_file_t io __attribute__ ((unused)),
+ static grub_err_t
+ shim_lock_verifier_write (void *context __attribute__ ((unused)), void *buf, grub_size_t size)
+ {
+-  grub_efi_shim_lock_protocol_t *sl = grub_efi_locate_protocol (&shim_lock_guid, 0);
+ 
+-  if (!sl)
+-    return grub_error (GRUB_ERR_ACCESS_DENIED, N_("shim_lock protocol not found"));
++  // Do not need to do the shim_lock verification here since it will be
++  // done afterwards before kernel image gets loaded
++
++  // grub_efi_shim_lock_protocol_t *sl = grub_efi_locate_protocol (&shim_lock_guid, 0);
++
++  // if (!sl)
++  //   return grub_error (GRUB_ERR_ACCESS_DENIED, N_("shim_lock protocol not found"));
+ 
+-  if (sl->verify (buf, size) != GRUB_EFI_SUCCESS)
+-    return grub_error (GRUB_ERR_BAD_SIGNATURE, N_("bad shim signature"));
++  // if (sl->verify (buf, size) != GRUB_EFI_SUCCESS)
++  //   return grub_error (GRUB_ERR_BAD_SIGNATURE, N_("bad shim signature"));
+ 
+   return GRUB_ERR_NONE;
+ }
