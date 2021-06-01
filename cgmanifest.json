@@ -2284,66 +2284,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kubernetes",
-          "version": "1.18.14",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.14-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.18.17",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.18.17-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.19.7",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.7-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.19.9",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.9-hotfix.20210526/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.20.2",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.2-hotfix.20210525/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kubernetes",
-          "version": "1.20.5",
-          "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210526/binaries/kubernetes-node-linux-amd64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lapack",
           "version": "3.8.0",
           "downloadUrl": "http://www.netlib.org/lapack/lapack-3.8.0.tar.gz"
