@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        1.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,8 @@ Source21:       common.lua
 Source22:       forge.lua
 # macros.rust-srpm is taken from https://pagure.io/fedora-rust/rust2rpm
 Source23:       macros.rust-srpm
+# macros.fonts is taken from the "fontpackages-devel" package.
+Source24:       macros.fonts
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -95,6 +97,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
+%{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
@@ -109,6 +112,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Jun 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-17
+- Adding font macros from the "fontpackages-devel" package.
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-16
 - Add Rust SRPM macros from rust2rpm (license: MIT)
 - Add rust-srpm-macros Provides
