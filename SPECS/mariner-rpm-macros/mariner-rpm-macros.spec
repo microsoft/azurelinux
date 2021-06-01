@@ -97,6 +97,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
+%{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
