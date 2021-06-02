@@ -16,31 +16,12 @@ import (
 
 // CreateRepo will create an RPM repository at repoDir
 func CreateRepo(repoDir string) (err error) {
-	logger.Log.Debugf("Creating RPM repository in (%s)", repoDir)
-
-	err = CleanupRepo(repoDir)
-
-	if err != nil {
-		// This error is not fatal.
-		logger.Log.Debugf("Failed to cleanup repo %s: %v", repoDir, err)
-	}
-
-	// Create a new repodata
-	_, stderr, err := shell.Execute("createrepo", repoDir)
-	if err != nil {
-		logger.Log.Warn(stderr)
-	}
-
-	return
-}
-
-// CleanupRepo will remove RPM repository metadata at repoDir
-func CleanupRepo(repoDir string) (err error) {
 	const (
 		repoDataSubDir = "repodata"
 		repoLockFile   = ".repodata"
 	)
-	logger.Log.Debugf("Cleaning up an RPM repository in (%s)", repoDir)
+
+	logger.Log.Debugf("Creating RPM repository in (%s)", repoDir)
 
 	repoDataPath := filepath.Join(repoDir, repoDataSubDir)
 	repoDataLockPath := filepath.Join(repoDir, repoLockFile)
@@ -52,6 +33,15 @@ func CleanupRepo(repoDir string) (err error) {
 	}
 
 	err = os.Remove(repoDataLockPath)
+	if err != nil && !os.IsNotExist(err) {
+		return
+	}
+
+	// Create a new repodata
+	_, stderr, err := shell.Execute("createrepo", repoDir)
+	if err != nil {
+		logger.Log.Warn(stderr)
+	}
 
 	return
 }

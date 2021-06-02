@@ -41,17 +41,19 @@ ifeq ($(DOWNLOAD_SRPMS),y)
 
 .SILENT: $(STATUS_FLAGS_DIR)/build_srpms.flag
 
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(LOGS_DIR)/pkggen
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm 2>"$(LOGS_DIR)/pkggen/$${spec_file}") && \
+		log_file="$(LOGS_DIR)/pkggen/$$srpm_file.log" && \
+		mkdir -p $(BUILD_SRPMS_DIR) && \
+		cd $(BUILD_SRPMS_DIR) && \
 		for url in $(SRPM_URL_LIST); do \
 			wget $${url}/$${srpm_file} \
-				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
-				-q \
 				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 				$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-				&& \
+				-a $$log_file && \
+			echo "Downloaded SRPM: $$srpm_file" >> $$log_file && \
 			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 			break; \
 		done && echo "Downloaded $${url}/$${srpm_file}"; \
