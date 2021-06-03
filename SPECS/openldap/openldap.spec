@@ -93,7 +93,7 @@ rm -rf %{buildroot}/*
 -   Upgrade to version 2.4.50, which resolves CVE-2020-12243.
 *   Tue May 12 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.4.48-1
 -   Upgrade to version 2.4.48, which fixes CVE-2019-13057 and CVE-2019-13565.
-*   Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.46-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.46-6
 -   Added %%license line automatically
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-5
 -   License verified.

@@ -75,7 +75,7 @@ make %{?_smp_mflags} check
 * Fri Aug 28 2020 Thomas Crain <thcrain@microsoft.com> - 3.4.0-6
 - Add pkg-config provides to devel package
 - License verified
-* Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.4.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.4.0-5
 - Added %%license line automatically
 * Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 3.4.0-4
 - Rename from libnl to libnl3.

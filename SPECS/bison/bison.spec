@@ -52,7 +52,7 @@ make %{?_smp_mflags} check
 - Remove yacc command for compatibility with byacc package
 - Remove sha hash
 - License verified
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> 3.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).

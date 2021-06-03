@@ -56,7 +56,7 @@ make check
 %{_includedir}/
 
 %changelog
-* Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.3.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.3.2-2
 - Added %%license line automatically
 
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 4.3.2-1

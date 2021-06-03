@@ -65,7 +65,7 @@ python2 setup.py test
 /usr/include/python3.7m/greenlet/greenlet.h
 
 %changelog
-* Sat May 09 00:21:02 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.4.15-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.4.15-5
 - Added %%license line automatically
 
 *   Tue Apr 14 2020 Nick Samson <nisamson@microsoft.com> 0.4.15-4

@@ -70,7 +70,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-*   Sat May 09 00:21:24 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.4.4-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.4.4-3
 -   Added %%license line automatically.
 *   Tue Apr 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.4.4-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

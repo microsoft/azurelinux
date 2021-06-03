@@ -106,7 +106,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9.8-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9.8-2
 - Added %%license line automatically
 
 * Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 1.9.8-1

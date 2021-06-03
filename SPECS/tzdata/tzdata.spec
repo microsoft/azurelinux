@@ -47,7 +47,7 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 - Update to version  "2021a".
 - Removed 'pacificnew' and 'systemv' from parsed zone info, since they have been removed from the sources.
 
-* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019c-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2019c-3
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 2019c-2

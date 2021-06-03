@@ -102,7 +102,7 @@ rm -rf %{buildroot}/*
 -   Switch to ninja-build to use LLVM_PARALLEL_LINK_JOBS=1 to reduce
 -   fatal OOM errors during linking phase.
 -   Temporarily disable generation of debug symbols.
-*   Sat May 09 00:21:29 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
 -   Added %%license line automatically
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-1
 -   Update to 8.0.1. URL Fixed. Source0 URL Fixed. License verified.

@@ -75,7 +75,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.7.3-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7.3-4
 - Added %%license line automatically
 
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.7.3-3

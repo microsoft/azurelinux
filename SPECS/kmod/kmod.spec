@@ -60,7 +60,7 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> - 25-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 25-4
 - Added %%license line automatically
 
 *   Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> 25-3

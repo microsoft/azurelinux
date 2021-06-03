@@ -66,7 +66,7 @@ make %{?_smp_mflags} -k check
 * Tue Jan 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.37-3
 - Moved "Provides" for "pkgconfig(*)" to the correct (-devel) subpackage.
 
-* Sat May 09 00:20:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.37-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.37-2
 - Added %%license line automatically
 
 * Fri May 08 2020 Nick Samson <nisamson@microsoft.com> - 1.6.37-1

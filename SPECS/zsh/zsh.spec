@@ -140,7 +140,7 @@ fi
 - Adding a patch to skip globbing test if ran as root.
 - Removing redundant 'sed' and 'chmod' commands in %%install.
 
-* Sat May 09 00:20:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.8-3
 - Added %%license line automatically
 
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 5.8-2

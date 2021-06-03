@@ -102,7 +102,7 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
-* Sat May 09 00:20:55 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-3
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.3.1-2

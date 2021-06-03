@@ -96,7 +96,7 @@ popd
 %{_bindir}/m2r3
 
 %changelog
-* Sat May 09 00:21:14 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 0.2.0-4

@@ -105,7 +105,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/*
 
 %changelog
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.60-14
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.60-14
 - Added %%license line automatically
 
 *   Mon Apr 13 2020 Eric Li <eli@microsoft.com> 1.60-13

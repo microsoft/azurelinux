@@ -82,7 +82,7 @@ make %{?_smp_mflags}  check
 -   Add patches for CVE-2014-8139, CVE-2014-8140, CVE-2014-8141, CVE-2019-13232
 -   Fix detection for CVE-2015-7696, CVE-2015-7697, CVE-2018-18384
 -   Rename CVE-2014-9844 patch to CVE-2016-9844
-*   Sat May 09 00:21:29 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.0-13
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.0-13
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.0-12
 -   Initial CBL-Mariner import from Photon (license: Apache2).
