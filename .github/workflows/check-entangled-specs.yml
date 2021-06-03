@@ -15,6 +15,7 @@ on:
 
 jobs:
   check:
+    name: Spec Entanglement Mismatch Check
     runs-on: ubuntu-latest
 
     steps:
