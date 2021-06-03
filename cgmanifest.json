@@ -7625,8 +7625,8 @@
         "type": "other",
         "other": {
           "name": "zeromq",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/zeromq/libzmq/archive/v4.3.2/libzmq-4.3.2.tar.gz"
+          "version": "4.3.4",
+          "downloadUrl": "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz"
         }
       }
     },
