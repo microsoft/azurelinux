@@ -62,7 +62,7 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.0-5

@@ -56,7 +56,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9.1-3

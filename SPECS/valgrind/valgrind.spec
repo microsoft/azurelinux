@@ -48,7 +48,7 @@ make %{?_smp_mflags} -k check
 %changelog
 *   Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.15.0-3
 -   Fix compilation by disabling -fstack-protector-strong
-*   Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.15.0-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.15.0-2
 -   Added %%license line automaticall
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 3.15.0-1
 -   Update to 3.15.0. Fix Source0 URL. Removed patch fixed upstream. License verified.

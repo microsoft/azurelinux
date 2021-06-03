@@ -58,7 +58,7 @@ python2 setup.py test
 * Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 40.2.0-6
 - Adding explicit runtime dependency on 'python-xml'.
 
-* Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 40.2.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 40.2.0-5
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 40.2.0-4

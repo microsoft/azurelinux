@@ -98,7 +98,7 @@ rm -rf %{buildroot}/*
 *   Thu Mar 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-4
 -   Add ssh brute force prevention to ip4save and ip6save
 -   License verified
-*   Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.3-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

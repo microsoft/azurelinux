@@ -79,7 +79,7 @@ make %{?_smp_mflags} check
 %exclude /usr/share/info/
 
 %changelog
-* Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.18.16-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.18.16-5
 - Added %%license line automatically
 
 *   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 5.18.16-4

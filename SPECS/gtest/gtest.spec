@@ -103,7 +103,7 @@ find %{buildroot} -name '*.la' -delete
 %{_lib64dir}/libgtest_main.a
 
 %changelog
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.1-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.1-5
 - Added %%license line automatically
 
 *    Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 1.8.1-4

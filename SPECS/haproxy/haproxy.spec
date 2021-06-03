@@ -63,7 +63,7 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 *   Tue May 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-5
 -   Fix CVE-2019-14241.
 -   Fix CVE-2020-11100.
-*   Sat May 09 00:20:35 PST 2020 Nick Samson <nisamson@microsoft.com> 1.9.6-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.9.6-4
 -   Added %%license line automatically
 *   Tue Apr 21 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-3
 -   Fix CVE-2019-19330.

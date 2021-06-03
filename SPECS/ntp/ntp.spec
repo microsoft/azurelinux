@@ -177,7 +177,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
-* Sat May 09 00:21:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.8p13-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.8p13-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.2.8p13-2

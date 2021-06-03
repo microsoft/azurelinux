@@ -73,7 +73,7 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/libprotobuf-c.a
 
 %changelog
-* Sat May 09 00:21:08 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-4
 - Added %%license line automatically
 
 *   Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 1.20.2-3
