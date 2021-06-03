@@ -113,9 +113,9 @@ fi
 
 %changelog
 *   Thu Jun 03 2021 Jon Slobodzian <josloboe@microsoft.com> - 0.116-4
--   Patch for CVE 2021-3560
+-   Patch for CVE 2021-3560.  Fix changelog formatting.
 
-*   Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.116-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.116-3
 -   Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 0.116-2
