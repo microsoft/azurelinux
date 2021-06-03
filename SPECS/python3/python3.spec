@@ -289,7 +289,7 @@ make  %{?_smp_mflags} test
 * Wed May 20 2020 Paul Monson <paulmon@microsoft.com> - 3.7.3-8
 - Fix variable use.
 
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.7.3-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.7.3-7
 - Added %%license line automatically
 
 * Wed May 06 2020 Paul Monson <paulmon@microsoft.com> - 3.7.3-6

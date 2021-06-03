@@ -133,7 +133,7 @@ make check
 -   Patch CVE-2020-25637
 *   Fri May 29 2020 Emre Girgin <mrgirgin@microsoft.com> 6.1.0-1
 -   Upgrade to 6.1.0.
-*   Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.7.0-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.7.0-5
 -   Added %%license line automatically
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.7.0-4
 -   Rename libnl to libnl3.

@@ -175,7 +175,7 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 *   Thu May 28 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.4.2-1
 -   Update to version 4.4.2, which fixes CVE-2017-3144 and CVE-2018-5733.
 -   License verified.
-*   Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> 4.3.6-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.3.6-2
 -   Added %%license line automatically
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.3.6-1
 -   Update version to 4.3.6. License verified. URL updated.

@@ -58,7 +58,7 @@ echo "disable dkms.service" > %{buildroot}/usr/lib/systemd/system-preset/50-dkms
 %{_localstatedir}/lib/dkms/dkms_dbversion
 
 %changelog
-* Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.8.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.8.1-3
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 2.8.1-2

@@ -295,7 +295,7 @@ fi
 * Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-8
 - Fix CVE-2020-1711 and CVE-2020-7211.
 
-* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2.0-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.0-7
 - Added %%license line automatically
 
 * Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> - 4.2.0-6

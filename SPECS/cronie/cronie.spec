@@ -120,7 +120,7 @@ make %{?_smp_mflags} check
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
 
 %changelog
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.5.2-2

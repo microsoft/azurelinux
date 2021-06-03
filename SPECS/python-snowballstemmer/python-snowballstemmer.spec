@@ -83,7 +83,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.1-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.1-3

@@ -128,7 +128,7 @@ popd
 %{_bindir}/cftp3
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 19.2.1-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 19.2.1-5
 - Added %%license line automatically
 
 * Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 19.2.1-4

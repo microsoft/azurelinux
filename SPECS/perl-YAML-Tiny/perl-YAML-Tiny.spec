@@ -39,7 +39,7 @@ make test
 %{_mandir}/man3/YAML::Tiny.3*
 
 %changelog
-* Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.73-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.73-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.73-2

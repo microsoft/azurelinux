@@ -58,7 +58,7 @@ make %{?_smp_mflags} check
 
 
 %changelog
-* Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.10.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.10.1-4
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 0.10.1-3

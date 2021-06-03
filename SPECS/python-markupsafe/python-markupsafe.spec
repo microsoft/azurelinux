@@ -66,7 +66,7 @@ python3 setup.py test
 - Remove inline sha1
 - Lint to Mariner style
 
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-4

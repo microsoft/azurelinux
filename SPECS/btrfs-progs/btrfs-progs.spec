@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 %{_libdir}/libbtrfsutil.so
 
 %changelog
-* Sat May 09 00:21:31 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.19-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.19-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.19-2

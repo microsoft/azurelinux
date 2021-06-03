@@ -58,7 +58,7 @@ make %{?_smp_mflags} test
 %changelog
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.45.4-4
 -   Add patch to fix format-security errors. 
-*   Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.45.4-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.45.4-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.45.4-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

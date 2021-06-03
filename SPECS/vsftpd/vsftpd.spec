@@ -85,7 +85,7 @@ fi
 %{_datadir}/*
 
 %changelog
-* Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.0.3-10
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0.3-10
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0.3-9

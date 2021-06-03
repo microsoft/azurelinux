@@ -45,7 +45,7 @@ ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 %changelog
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.1.11-8
 -   Add patch to fix format-security errors.
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.11-7
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.11-7
 -   Added %%license line automatically
 *   Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.1.11-6
 -   Fixed the 'Source0' tags.

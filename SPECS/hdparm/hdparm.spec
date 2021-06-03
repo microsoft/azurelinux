@@ -32,7 +32,7 @@ make DESTDIR=%{buildroot} binprefix=%{_prefix} install
 %changelog
 * Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 9.56-4
 - Update make to explicitly consume cflags and ldflags.
-* Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.56-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.56-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.56-2

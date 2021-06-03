@@ -138,7 +138,7 @@ make %{?_smp_mflags} check
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.44.6-3
 - Don't stomp on CFLAGS.
 
-* Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.44.6-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.44.6-2
 - Added %%license line automatically
 
 * Thu Mar 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.44.6-1

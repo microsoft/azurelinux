@@ -59,7 +59,7 @@ make %{?_smp_mflags} -k check
 %{_datadir}/aclocal/*
 
 %changelog
-* Sat May 09 00:20:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.7-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.7-4
 - Added %%license line automatically
 
 *   Mon Apr 27 2020 Nick Samson <nisamson@microsoft.com> 2.0.7-3
