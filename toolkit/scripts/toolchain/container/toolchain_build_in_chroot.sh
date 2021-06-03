@@ -1071,6 +1071,7 @@ tar xf nss-3.44.tar.gz
 pushd nss-3.44
 patch -Np1 -i ../nss-3.44-standalone-1.patch
 cd nss
+export NSS_DISABLE_GTESTS=1
 # Build with single processor due to errors seen with parallel make
 make -j1 BUILD_OPT=1                    \
     NSPR_INCLUDE_DIR=/usr/include/nspr  \
