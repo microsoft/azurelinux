@@ -7,7 +7,7 @@ Vendor:        Microsoft Corporation
 License:       LGPLv2+
 URL:           https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
 Source0:       https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
-Patch0:        CVE-2021-22898.patch
+Patch0:        CVE-2021-3560.patch
 Distribution:  Mariner
 BuildRequires: autoconf
 BuildRequires: expat-devel
