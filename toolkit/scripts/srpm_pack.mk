@@ -41,6 +41,7 @@ ifeq ($(DOWNLOAD_SRPMS),y)
 
 .SILENT: $(STATUS_FLAGS_DIR)/build_srpms.flag
 
+ifeq($(ALLOW_SRPM_DOWNLOAD_FAIL),y)
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(LOGS_DIR)/pkggen
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
@@ -57,11 +58,32 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 			break; \
 		done && echo "Downloaded $${url}/$${srpm_file}"; \
-	done || $(call print_error,Failed to download $${srpm_file}) ; \
+	done
 	echo "Removing empty (failed) SRPMS: "
 	find $(BUILD_SRPMS_DIR) -type f -empty -delete -print > $(LOGS_DIR)/pkggen/deleted-srpms.log
 	echo "Removed all empty SRPMS. Finished packing."
 	touch $@
+else
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
+	for spec in $(local_specs); do \
+		spec_file=$${spec} && \
+		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
+		for url in $(SRPM_URL_LIST); do \
+			wget $${url}/$${srpm_file} \
+				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
+				--no-verbose \
+				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
+				$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
+				&& \
+			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
+			break; \
+		done || $(call print_error,Loop in $@ failed) ; \
+		{ [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || \
+			$(call print_error,Failed to download $${srpm_file});  } \
+	done || $(call print_error,Loop in $@ failed) ; \
+	touch $@
+endif
+
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_sources) $(SPECS_DIR) $(go-srpmpacker)
 	$(go-srpmpacker) \
