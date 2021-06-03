@@ -1,13 +1,13 @@
 Summary:        library for fast, message-based applications
 Name:           zeromq
-Version:        4.3.2
-Release:        2%{?dist}
+Version:        4.3.4
+Release:        1%{?dist}
 URL:            https://www.zeromq.org
 License:        LGPLv3+
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/zeromq/libzmq/archive/v%{version}/libzmq-%{version}.tar.gz
+Source0:        https://github.com/zeromq/libzmq/releases/download/v%{version}/zeromq-%{version}.tar.gz
 Requires:       libstdc++
 
 %description
@@ -24,12 +24,13 @@ Requires:   %{name} = %{version}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q -n libzmq-%{version}
+%autosetup -n zeromq-%{version} -p1
 %build
 ./autogen.sh
 ./configure \
     --prefix=%{_prefix} \
     --with-libsodium=no \
+    --without-docs \
     --disable-static
 make %{?_smp_mflags}
 
@@ -56,6 +57,8 @@ make check
 %{_includedir}/
 
 %changelog
+*   Thu Jun 03 2021 Nick Samson <nisamson@microsoft.com> - 4.3.4-1
+-   Upgraded to 4.3.4 to address CVE-2021-20236, updated URL
 * Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.3.2-2
 - Added %%license line automatically
 
