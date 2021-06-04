@@ -3195,8 +3195,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.10",
-          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.10.tar.gz"
+          "version": "2.9.12",
+          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz"
         }
       }
     },
