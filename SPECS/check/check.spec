@@ -45,7 +45,7 @@ make %{?_smp_mflags} check
 /usr/share/aclocal/*
 
 %changelog
-* Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.12.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.12.0-4
 - Added %%license line automatically
 
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.12.0-3

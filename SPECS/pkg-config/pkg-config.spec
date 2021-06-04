@@ -46,7 +46,7 @@ make %{?_smp_mflags} check
 %{_docdir}/pkg-config-*/pkg-config-guide.html
 %{_mandir}/man1/pkg-config.1.gz
 %changelog
-* Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.29.2-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.29.2-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.29.2-3

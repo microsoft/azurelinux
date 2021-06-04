@@ -53,7 +53,7 @@ make test
 
 
 %changelog
-* Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.22-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.22-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22-2

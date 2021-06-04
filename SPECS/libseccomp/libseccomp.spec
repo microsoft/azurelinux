@@ -64,7 +64,7 @@ make check
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.4.1-1

@@ -124,9 +124,9 @@ rm -rf %{buildroot}/*
 %changelog
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.17-4
 - Fix check tests by adding iana-etc which supplies required /etc/services file
-* Fri Jul 31 12:53:00 PST 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
+* Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
 - Don't stomp on CPPFLAGS
-* Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.17-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.17-2
 - Added %%license line automatically
 
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.17-1

@@ -76,7 +76,7 @@ ninja test
 -   Bump release to rebuild with new nettle (3.7.2)
 *   Tue Aug 18 2020 Henry Beberman <hebeberm@microsoft.com> - 2.59.1-6
 -   Backport patch for CVE-2020-13645
-*   Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.59.1-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.59.1-5
 -   Added %%license line automatically, updated license line
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.59.1-4
 -   Removing *Requires for "ca-certificates".

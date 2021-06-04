@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.6.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,7 +18,17 @@ Source0:        %{name}-%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
-#   5. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
 
@@ -51,5 +61,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/%{name}
 
 %changelog
-* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.7-1
+* Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.6.7-2
+- Increment release to force republishing using golang 1.15.11.
+* Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.6.7-1
 - Original version for CBL-Mariner.

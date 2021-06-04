@@ -177,7 +177,7 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.25-4

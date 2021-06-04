@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,9 +54,8 @@ sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 # Use group id 100(users) by default
 sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
-# Disable usergroups. Use "users" group by default (see /etc/default/useradd)
-# for all nonroot users.
-sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
+# Enable usergroups. Each user will get their own primary group with a name matching their login name
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB yes/' %{buildroot}%{_sysconfdir}/login.defs
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
                 FAILLOG_ENAB             \
@@ -140,13 +139,16 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+- Enable usergroups for useradd
+
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
 - Add sym link to adduser from useradd and create the file for adduser
 
 * Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9
 - Remove PASS_MAX_DAYS customized value 90 to set default value
 
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-7

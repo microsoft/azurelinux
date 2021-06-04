@@ -67,7 +67,7 @@ python3 setup.py test
 %changelog
 *   Tue Oct 20 2020 Andrew Phelps <anphel@microsoft.com> 2018.10.15-5
 -   Fix check test
-*   Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> 2018.10.15-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2018.10.15-4
 -   Added %%license line automatically
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2018.10.15-3
 -   Removing *Requires for "ca-certificates".

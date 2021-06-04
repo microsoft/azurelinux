@@ -39,7 +39,7 @@ rm -rf %{buildroot}
 %doc %{_mandir}/man8/fping.8*
 
 %changelog
-* Sat May 09 00:20:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2-2
 - Added %%license line automatically
 
 *   Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 4.2-1

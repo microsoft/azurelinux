@@ -54,7 +54,7 @@ install -m 755 scripts/rescan-scsi-bus.sh %{buildroot}/%{_bindir}
 %{_includedir}/scsi/*
 
 %changelog
-* Sat May 09 00:21:08 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.44-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.44-2
 - Added %%license line automatically
 
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.44-1

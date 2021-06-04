@@ -88,7 +88,7 @@ popd
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
-* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 4.5.1-3

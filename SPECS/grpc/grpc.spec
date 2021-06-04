@@ -98,4 +98,4 @@ find %{buildroot} -name '*.cmake' -delete
 - Switch to system provided packages for zlib and openssl.
 
 * Mon Mar 08 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-1
-- Original CBL-Mariner version. License Verified.
+- Original version for CBL-Mariner. License Verified.

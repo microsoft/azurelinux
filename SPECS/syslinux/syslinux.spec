@@ -68,7 +68,7 @@ rm %{buildroot}/%{_bindir}/sha1pass
 %changelog
 * Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 6.04-9
 - Disable hardened ldflags to fix build.
-* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.04-8
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.04-8
 - Added %%license line automatically
 * Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 6.04-7
 - Replace BuildArch with ExclusiveArch

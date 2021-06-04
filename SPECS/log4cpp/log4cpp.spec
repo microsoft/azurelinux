@@ -60,7 +60,7 @@ make DESTDIR=%{buildroot} install
 %_prefix/share/aclocal/*.m4
 
 %changelog
-* Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.3-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.3-6
 - Added %%license line automatically
 
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1.3-5

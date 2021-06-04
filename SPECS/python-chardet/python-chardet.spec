@@ -72,7 +72,7 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 %{_bindir}/chardetect
 
 %changelog
-* Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0.4-4

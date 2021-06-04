@@ -44,7 +44,7 @@ make test
 %{_mandir}/man?/*
 
 %changelog
-* Sat May 09 00:21:07 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.29-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-4
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.29-3

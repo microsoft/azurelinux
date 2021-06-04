@@ -81,7 +81,7 @@ rm -rf %{buildroot}
 %{_includedir}/*
 
 %changelog
-* Sat May 09 00:20:43 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Wed Apr 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.30.1-5
