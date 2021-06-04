@@ -182,13 +182,13 @@ endif
 		$(call print_error,Failed to build: $$(cat $(LOGS_DIR)/pkggen/failures.txt)); } && \
 	touch $@
 
-# use temp tarball to avoid tar warning "file changed as we read it" 
+# use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
 	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
-# use temp tarball to avoid tar warning "file changed as we read it" 
+# use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
 	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
