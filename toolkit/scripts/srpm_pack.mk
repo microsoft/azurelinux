@@ -50,20 +50,20 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 		log_file="$(LOGS_DIR)/pkggen/$$srpm_file.log" && \
 		mkdir -p $(BUILD_SRPMS_DIR) && \
 		cd $(BUILD_SRPMS_DIR) && \
+		touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 		for url in $(SRPM_URL_LIST); do \
 			wget $${url}/$${srpm_file} \
 				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 				$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 				-a $$log_file && \
-			echo "Downloaded SRPM: $$srpm_file" >> $$log_file && \
-			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
 			break; \
 		done && echo "Downloaded $${url}/$${srpm_file}"; \
-	done
+	done ; \
 	echo "Removing empty (failed) SRPMS: "
-	find $(BUILD_SRPMS_DIR) -type f -empty -delete -print > $(LOGS_DIR)/pkggen/deleted-srpms.log
+	find $(BUILD_SRPMS_DIR) -type f -empty -delete -print | tee $(LOGS_DIR)/pkggen/deleted-srpms.log
 	echo "Removed all empty SRPMS. Finished packing."
 	touch $@
+
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
 	for spec in $(local_specs); do \
