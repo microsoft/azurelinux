@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Go test coverage
+    name: Go Test Coverage
     runs-on: ubuntu-18.04
     steps:
 
