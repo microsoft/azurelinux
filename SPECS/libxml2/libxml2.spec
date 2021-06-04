@@ -103,7 +103,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Thu May 27 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.9.12-1
-- Update to version 2.9.12
+- Update to version 2.9.12 to fix CVE-2021-3517 and CVE-2021-3518
 
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4
 - Skip python tests which are known to be broken.
