@@ -119,7 +119,6 @@ gmock-devel-1.8.1-5.cm1.aarch64.rpm
 gmock-static-1.8.1-5.cm1.aarch64.rpm
 gmp-6.1.2-5.cm1.aarch64.rpm
 gmp-debuginfo-6.1.2-5.cm1.aarch64.rpm
-gmp-devel-6.1.2-5.cm1.aarch64.rpm
 gnupg2-2.2.20-3.cm1.aarch64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
