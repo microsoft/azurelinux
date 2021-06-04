@@ -33,8 +33,9 @@ What does the PR accomplish, why was it needed?
 
 ###### Does this affect the toolchain?  <!-- REQUIRED -->
 <!-- Any packages which are included in the toolchain should be carefully considered. Make sure the toolchain builds with these changes if so. -->
-**YES**
-NO
+<!-- Update: manifests/package/toolchain_*.txt, pkggen_core_*.txt, update_manifests.sh -->
+<!-- To validate: make clean; make workplan REBUILD_TOOLCHAIN=y DISABLE_UPSTREAM_REPOS=y CONFIG_FILE="" ... -->
+**YES/NO**
 
 ###### Associated issues  <!-- optional -->
 <!-- Link to Github issues if possible. -->
@@ -45,5 +46,5 @@ NO
 - https://nvd.nist.gov/vuln/detail/CVE-YYYY-XXXX
 
 ###### Test Methodology
-<!-- How as this test validated? i.e. local build, pipeline build etc. -->
+<!-- How was this test validated? i.e. local build, pipeline build etc. -->
 - Pipeline build id: xxxx

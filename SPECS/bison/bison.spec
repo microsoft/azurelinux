@@ -1,17 +1,16 @@
-Summary:	Contains a parser generator
-Name:		bison
-Version:	3.1
-Release:        3%{?dist}
-License:	GPLv3+
-URL:		http://www.gnu.org/software/bison
-Group:		System Environment/Base
+Summary:        Contains a parser generator
+Name:           bison
+Version:        3.1
+Release:        4%{?dist}
+License:        GPLv3+
+URL:            http://www.gnu.org/software/bison
+Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/bison/%{name}-%{version}.tar.xz
-%define sha1 bison=84e5b016fa76f6cd4246131b1ca11a0f926e7922
-BuildRequires:	m4
-Requires:	m4
-BuildRequires:	flex
+Source0:        http://ftp.gnu.org/gnu/bison/%{name}-%{version}.tar.xz
+BuildRequires:  m4
+Requires:       m4
+BuildRequires:  flex
 %description
 This package contains a parser generator
 %prep
@@ -22,13 +21,18 @@ sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
 echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 
 ./configure \
-	--prefix=%{_prefix} \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
+
+# Remove yacc binary/man pages where they conflict with byacc
+rm -f %{buildroot}/%{_bindir}/yacc
+rm -f %{buildroot}/%{_mandir}/man1/yacc*
 
 %check
 make %{?_smp_mflags} check
@@ -42,12 +46,16 @@ make %{?_smp_mflags} check
 %{_datarootdir}/aclocal/*
 %{_mandir}/*/*
 %{_docdir}/bison/*
-%changelog
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.1-3
-- Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+%changelog
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4
+- Remove yacc command for compatibility with byacc package
+- Remove sha hash
+- License verified
+* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> 3.1-3
+- Added %%license line automatically
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 * Tue Sep 18 2018 Tapas Kundu <tkundu@vmware.com> 3.1-1
 - Updated to release 3.1
 * Sun Sep 09 2018 Alexey Makhalov <amakhalov@vmware.com> 3.0.4-4
