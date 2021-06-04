@@ -41,11 +41,12 @@ ifeq ($(DOWNLOAD_SRPMS),y)
 
 .SILENT: $(STATUS_FLAGS_DIR)/build_srpms.flag
 
-ifeq($(ALLOW_SRPM_DOWNLOAD_FAIL),y)
+ifeq ($(ALLOW_SRPM_DOWNLOAD_FAIL),y)
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(LOGS_DIR)/pkggen
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
-		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm 2>"$(LOGS_DIR)/pkggen/$${spec_file}") && \
+		spec_name=$$(basename "$${spec_file}") && \
+		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm 2>"$(LOGS_DIR)/pkggen/$${spec_name}") && \
 		log_file="$(LOGS_DIR)/pkggen/$$srpm_file.log" && \
 		mkdir -p $(BUILD_SRPMS_DIR) && \
 		cd $(BUILD_SRPMS_DIR) && \
