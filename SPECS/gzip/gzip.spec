@@ -42,7 +42,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Oct 20 2020 Andrew Phelps <anphel@microsoft.com> 1.9-5
 - Fix check test
-* Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9-4
 - Added %%license line automatically
 * Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 1.9-3
 - Fixed reference URL. Verified license.

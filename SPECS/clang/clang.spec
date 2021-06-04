@@ -85,7 +85,7 @@ rm -rf %{buildroot}/*
 -   Enable RTTI (runtime type information) so other packages can depend on it.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
 -   Temporarily disable generation of debug symbols.
-*   Sat May 09 00:21:24 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
 -   Added %%license line automatically
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-1
 -   Update to 8.0.1. Fix Source0 URL. License verified.

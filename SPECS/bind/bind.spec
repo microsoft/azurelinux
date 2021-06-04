@@ -95,7 +95,7 @@ fi
 -   CVE-2020-8621, CVE-2020-8622, CVE-2020-8623, CVE-2020-8624
 *   Wed May 27 2020 Daniel McIlvaney <damcilva@microsoft.com> - 9.16.3-1
 -   Update to version 9.16.3, fixes CVE-2018-5743, CVE-2018-5744, CVE-2019-6465, CVE-2019-6467, CVE-2019-6471, CVE-2020-8616, CVE-2020-8617
-*   Sat May 09 00:21:20 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.13.3-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.13.3-4
 -   Added %%license line automatically
 *   Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> 9.13.3-3
 -   Renaming bindutils to bind.

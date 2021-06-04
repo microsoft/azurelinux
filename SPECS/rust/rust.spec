@@ -133,7 +133,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 * Thu May 28 2020 Chris Co <chrco@microsoft.com> - 1.39.0-5
 - Update source checkout and prep steps
 
-* Sat May 09 00:20:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.39.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.39.0-4
 - Added %%license line automatically
 
 * Mon May 4 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.39.0-3

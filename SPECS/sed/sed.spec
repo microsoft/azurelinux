@@ -52,7 +52,7 @@ make check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.5-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.5-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.5-2

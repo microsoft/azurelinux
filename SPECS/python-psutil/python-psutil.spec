@@ -95,7 +95,7 @@ LANG=en_US.UTF-8 make test PYTHON=python%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:46 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 * Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 5.6.3-3

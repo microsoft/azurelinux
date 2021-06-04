@@ -69,7 +69,7 @@ cd ..
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:20:46 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.18.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.18.0-5
 - Added %%license line automatically
 
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 4.18.0-4

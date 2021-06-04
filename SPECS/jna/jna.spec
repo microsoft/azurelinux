@@ -92,7 +92,7 @@ ant
 %changelog
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.5.2-9
 -   Fix libffi static link in configure
-*   Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.5.2-8
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.5.2-8
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 4.5.2-7
 -   Renaming apache-ant to ant

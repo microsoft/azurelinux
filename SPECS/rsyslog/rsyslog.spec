@@ -80,7 +80,7 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %changelog
-* Sat May 09 00:21:21 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.37.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.37.0-4
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.37.0-3

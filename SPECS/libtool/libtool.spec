@@ -79,7 +79,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libltdl.so.7.3.1
 
 %changelog
-* Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.6-4

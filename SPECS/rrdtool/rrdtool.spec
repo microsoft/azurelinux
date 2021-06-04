@@ -79,7 +79,7 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-5
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.7.0-4

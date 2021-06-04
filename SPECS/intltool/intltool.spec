@@ -36,7 +36,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/*
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.51.0-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.51.0-7
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 0.51.0-6

@@ -55,7 +55,7 @@ python tests/testasciidoc.py run
 %{_mandir}/*
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
 - Added %%license line automatically
 
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 8.6.10-3
