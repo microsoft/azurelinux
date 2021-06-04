@@ -146,7 +146,7 @@ fi
 *   Thu May 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.11-4
 -   Remove the ifarch clause around Patch0 to unify the SRPM files accross architectures.
 
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019.11-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2019.11-3
 -   Added %%license line automatically
 
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2019.11-2

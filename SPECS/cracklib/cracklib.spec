@@ -210,7 +210,7 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 2.9.7-1

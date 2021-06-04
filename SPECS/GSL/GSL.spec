@@ -50,7 +50,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/gsl/*
 
 %changelog
-* Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-3
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 2.0.0-2

@@ -48,7 +48,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/xmlto/*
 
 %changelog
-* Sat May 09 00:21:23 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.0.28-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.0.28-5
 - Added %%license line automatically
 
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 0.0.28-4

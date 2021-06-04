@@ -124,7 +124,7 @@ rm -rf %{buildroot}/*
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.66.0-1
 -   Upgrade to version 7.66.0, which fixes CVE-2018-16890 and CVE-2019-3822/3833.
 
-*   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
 -   Added %%license line automatically
 
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.61.1-5

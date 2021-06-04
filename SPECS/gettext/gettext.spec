@@ -63,7 +63,7 @@ make %{?_smp_mflags} check
 -   Remove sha1. License verified.
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 0.19.8.1-3
 -   Disable -Wno-error=format-security to build with hardened cflags
-*   Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> 0.19.8.1-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.19.8.1-2
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 19.8.1-1
 -   Initial CBL-Mariner import from Photon (license: Apache2).

@@ -61,7 +61,7 @@ make test
 * Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.88-3
 - Adding 'local::lib' perl5 library to fix test dependencies.
 
-* Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.88-2
 - Added %%license line automatically
 
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.88-1

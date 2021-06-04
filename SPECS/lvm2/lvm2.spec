@@ -304,7 +304,7 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 -   Remove systemd-bootstrap from Requires, which fixes chroot install issue. 
 *   Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.03.05-4
 -   Use systemd-bootstrap to break circular dependencies. 
-*   Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> 2.03.05-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.03.05-3
 -   Added %%license line automatically
 *   Wed Apr 08 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.03.05-2
 -   Remove thin-provisioning-tools from build requires.

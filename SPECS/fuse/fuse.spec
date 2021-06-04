@@ -71,7 +71,7 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/fuse.pc
 
 %changelog
-* Sat May 09 00:20:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-7
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.9.7-6

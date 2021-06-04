@@ -88,7 +88,7 @@ make %{?_smp_mflags} test
 * Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-4
 - Adding 'local::lib' perl5 library to fix test dependencies.
 
-* Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.26-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.26-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.26-2

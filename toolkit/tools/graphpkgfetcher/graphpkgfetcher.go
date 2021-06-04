@@ -163,6 +163,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	if err != nil {
 		logger.Log.Errorf("Failed to clone %s from RPM repo. Error: %s", node, err)
 	} else {
+		logger.Log.Debugf("Successfully cloned %s.", node)
 		node.State = pkggraph.StateCached
 	}
 	return

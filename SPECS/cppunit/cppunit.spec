@@ -57,7 +57,7 @@ find %{buildroot} -name '*.la' -delete
 %changelog
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.12.1-5
 -   Disable link as-needed to fix compilation errors updated ldflags.
-*   Sat May 09 00:21:26 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.12.1-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).

@@ -62,7 +62,7 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.2-2
 - Added %%license line automatically
 
 *   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 1.6.2-1

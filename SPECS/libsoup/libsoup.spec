@@ -101,7 +101,7 @@ make  check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:21:16 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 2.64.0-4

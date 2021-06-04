@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.32.1
-Release:        7%{?dist}
+Version:        5.10.37.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -267,6 +267,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri May 28 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-1
+- Update source to 5.10.37.1
+
 * Thu May 27 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-7
 - Set lockdown=integrity by default
 

@@ -37,7 +37,7 @@ make DESTDIR=%{buildroot} install
 /usr/share/%{name}/*
 %{_mandir}/man1/*
 %changelog
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.6-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.6-3
 - Added %%license line automatically
 
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 2.0.6-2

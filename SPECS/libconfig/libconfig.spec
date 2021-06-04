@@ -49,7 +49,7 @@ cd ..
 %{_libdir}/cmake/libconfig*/*.cmake
 
 %changelog
-* Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.7.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.2-2
 - Added %%license line automatically
 
 *   Mon Apr 20 2020 Nick Samson <nisamson@microsoft.com> 1.7.2-1

@@ -76,7 +76,7 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
-* Sat May 09 00:21:02 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 2.8.4-4

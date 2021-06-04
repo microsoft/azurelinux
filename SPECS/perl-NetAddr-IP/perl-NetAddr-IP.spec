@@ -36,7 +36,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.079-2

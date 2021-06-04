@@ -48,7 +48,7 @@ touch %{buildroot}%{_localstatedir}/lib/logrotate/logrotate.status
 /var/lib/logrotate/logrotate.status
 
 %changelog
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
 - Added %%license line automatically
 
 *   Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.16.0-1

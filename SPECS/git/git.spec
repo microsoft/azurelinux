@@ -93,7 +93,7 @@ rm -rf %{buildroot}/*
 -   Fix check test
 *   Thu May 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.23.3-1
 -   Update to version 2.23.3 for fix CVE-2020-11008 and CVE-2020-5260.
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.20.2-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.20.2-2
 - Added %%license line automatically
 
 *   Mon Apr 06 2020 Emre Girgin <mrgirgin@microsoft.com> 2.20.2-1

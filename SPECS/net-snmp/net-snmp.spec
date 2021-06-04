@@ -118,7 +118,7 @@ rm -rf %{buildroot}/*
 - Removed %%sha1 macro.
 - Updating whitespaces to fix issues reported by the linter.
 
-* Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 5.8-3

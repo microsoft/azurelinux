@@ -68,7 +68,7 @@ make  %{?_smp_mflags} test
 -   Update to version 3.17.3
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 3.12.1-7
 -   Temporarily disable generation of debug symbols.
-*   Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.12.1-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.12.1-6
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.12.1-5
 -   Initial CBL-Mariner import from Photon (license: Apache2).

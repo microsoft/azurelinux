@@ -47,7 +47,7 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.11-2

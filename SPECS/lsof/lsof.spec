@@ -39,7 +39,7 @@ install -v -m 0644 Lsof.8 %{buildroot}%{_mandir}/man8/lsof.8
 %changelog
 *   Wed Jul 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.93.2-3
 -   Fix license to point to 00README which contains the license. Removes false dependency on /bin/ksh
-*   Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.93.2-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.93.2-2
 -   Added %%license line automatically
 *   Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.93.2-1
 -   Bumping up the version to 4.93.2.

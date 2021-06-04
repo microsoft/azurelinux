@@ -49,7 +49,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 3.1-4
 - Fix test issue by configuring "--with-included-regex". Remove sha1.
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.1-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
