@@ -125,7 +125,7 @@ chroot_and_install_rpms () {
         TERM="$TERM"                       \
         PS1='\u:\w\$ '                     \
         PATH=/bin:/usr/bin:/sbin:/usr/sbin \
-        rpm -i -vh --nodeps $CHROOT_INSTALL_RPM_DIR_IN_CHROOT/*
+        rpm -i -vh --force --nodeps $CHROOT_INSTALL_RPM_DIR_IN_CHROOT/*
 
     chroot_unmount
 }
