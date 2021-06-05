@@ -35,16 +35,16 @@
 %_include_minidebuginfo 1
 %_use_internal_dependency_generator 1
 
+%{!?debug_package:\
 %__os_install_post    \
     %{_rpmconfigdir}/brp-compress \
-    %{!?__debug_package:\
     %{_rpmconfigdir}/brp-strip %{__strip} \
     %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
-    } \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
 %{nil}
+} \
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
 %%install\

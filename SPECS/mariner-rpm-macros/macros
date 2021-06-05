@@ -40,6 +40,7 @@
 %_use_internal_dependency_generator 1
 %_build_id_links alldebug
 
+%{!?debug_package:\
 %__os_install_post    \
     %{_rpmconfigdir}/brp-compress \
     %{_rpmconfigdir}/brp-strip %{__strip} \
@@ -48,6 +49,7 @@
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
 %{nil}
+} \
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
 %%install\

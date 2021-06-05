@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -53,6 +53,8 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri Jun 04 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-4
+- Modify macros so that debug symbols are not stripped when debug_package is disabled.
 * Tue Jun 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-3
 - Add macros.check to support non-fatal check section runs for log collection.
 * Mon Jun 08 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-2
