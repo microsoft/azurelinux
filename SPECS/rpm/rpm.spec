@@ -18,8 +18,6 @@ Patch3:         CVE-2021-20271.patch
 Patch4:         CVE-2021-3421.nopatch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
-BuildRequires:  elfutils-devel
-BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdb-devel
@@ -266,6 +264,7 @@ popd
 - Add patch to define "$RPM_LD_FLAGS" during spec %%build phases
 - Remove %%python3_sitelib redefinition
 - Remove %%clean section
+- Remove duplicate build-time requirements
 
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 4.14.2.1-3
 - Removed python-rpm python2 module support
