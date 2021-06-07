@@ -1,8 +1,7 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,11 +12,10 @@ Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
 Patch1:         python-dist-deps-version-parse.patch
-Patch2:         CVE-2021-20271.patch
+Patch2:         define-RPM_LD_FLAGS.patch
+Patch3:         CVE-2021-20271.patch
 # CVE-2021-20271 patch also patches CVE-2021-3421
-Patch3:         CVE-2021-3421.nopatch
-BuildRequires:  elfutils-devel
-BuildRequires:  file-devel
+Patch4:         CVE-2021-3421.nopatch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
@@ -155,10 +153,6 @@ popd
 %post   build-libs -p /sbin/ldconfig
 %postun build-libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -266,8 +260,15 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-4
+- Add patch to define "$RPM_LD_FLAGS" during spec %%build phases
+- Remove %%python3_sitelib redefinition
+- Remove %%clean section
+- Remove duplicate build-time requirements
+
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 4.14.2.1-3
 - Removed python-rpm python2 module support
+
 * Fri Apr 30 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-2
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 4.14.2-11: Patch CVE-2021-20271 and CVE-2021-3421

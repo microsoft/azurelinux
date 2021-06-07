@@ -1165,6 +1165,7 @@ touch /logs/status_lua_complete
 echo rpm-4.14.2
 tar xjf rpm-4.14.2.tar.bz2
 pushd rpm-4.14.2
+patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
 ./configure --prefix=/usr \
     --enable-posixmutexes \
     --without-selinux \
