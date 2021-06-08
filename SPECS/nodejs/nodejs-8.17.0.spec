@@ -1,7 +1,7 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        8.11.4
-Release:        7%{?dist}
+Version:        8.17.0
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -42,7 +42,7 @@ make %{?_smp_mflags}
 
 %install
 
-make install DESTDIR=$RPM_BUILD_ROOT
+make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT
 rm -fr %{buildroot}%{_libdir}/dtrace/  # No systemtap support.
 install -m 755 -d %{buildroot}%{_libdir}/node_modules/
 install -m 755 -d %{buildroot}%{_datadir}/%{name}
@@ -75,6 +75,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.17.0-1
+-   Update to version 8.17.0
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.11.4-7
 -   Added %%license line automatically
 *   Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 8.11.4-6

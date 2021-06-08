@@ -1,21 +1,21 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        9.11.2
-Release:        7%{?dist}
+Version:        14.17.0
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/nodejs/node
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Patch0:         patch_tls_nodejs9.patch
+Patch0:         patch_tls_nodejs14.patch
 
 BuildRequires:  coreutils >= 8.22, openssl-devel >= 1.0.1
-BuildRequires:  python2
+BuildRequires:  python3
 BuildRequires:  which
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.0.1
-Requires:       python2
+Requires:       python3
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient. The Node.js package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
@@ -42,7 +42,7 @@ make %{?_smp_mflags}
 
 %install
 
-make install DESTDIR=$RPM_BUILD_ROOT
+make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT
 rm -fr %{buildroot}%{_libdir}/dtrace/  # No systemtap support.
 install -m 755 -d %{buildroot}%{_libdir}/node_modules/
 install -m 755 -d %{buildroot}%{_datadir}/%{name}
@@ -69,12 +69,12 @@ make cctest
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_docdir}/node/lldb_commands.py
-%{_docdir}/node/lldbinit
-%{_docdir}/node/gdbinit
+%{_docdir}/*
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
+-   Update to nodejs version 14.17.0
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
 -   Added %%license line automatically
 *   Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 9.11.2-6
