@@ -193,13 +193,6 @@ generate_pkggen_core () {
         grep "^ca-certificates-shared-" $TmpPkgGen
         grep "^ca-certificates-tools-" $TmpPkgGen
         grep "^ca-certificates-base-" $TmpPkgGen
-        grep "^finger-" $TmpPkgGen
-        grep "^tcp_wrappers-" $TmpPkgGen
-        grep "^audit-libs-" $TmpPkgGen
-        grep "^cyrus-sasl-" $TmpPkgGen
-        grep "^libsepol-" $TmpPkgGen
-        grep "^libselinux-" $TmpPkgGen
-        grep "^libsemanage-" $TmpPkgGen
 
     } > "$1"
 }
