@@ -49,7 +49,7 @@ make %{?_smp_mflags} -k check
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.24-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.24-4
 - Added %%license line automatically
 
 *   Wed Apr 08 2020 Joe Schmitt <joschmit@microsoft.com> 4.24-3

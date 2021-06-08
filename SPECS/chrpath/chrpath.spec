@@ -35,7 +35,7 @@ rm -rf %{buildroot}/usr/doc
 %{_mandir}/man1/chrpath.1*
 
 %changelog
-* Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.16-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.16-4
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 0.16-3

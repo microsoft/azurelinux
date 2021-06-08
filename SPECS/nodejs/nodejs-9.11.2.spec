@@ -75,7 +75,7 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-*   Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
 -   Added %%license line automatically
 *   Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 9.11.2-6
 -   Add patch that enables building openssl without TLS versions less 1.2

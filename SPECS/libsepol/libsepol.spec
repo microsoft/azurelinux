@@ -98,7 +98,7 @@ exit 0
 -   Remove unused "systemd-bootstrap" from requires.
 *   Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9-4
 -   Use "systemd-bootstrap" to break circular dependencies.
-*   Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> 2.9-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9-3
 -   Added %%license line automatically
 *   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-2
 -   Add cflags to make to fix gcc9 compatibility.

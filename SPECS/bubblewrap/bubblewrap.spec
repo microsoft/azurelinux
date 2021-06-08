@@ -54,7 +54,7 @@ rm -rf %{buildroot}/*
 * Thu May 21 2020 Ruying Chen <v-ruyche@microsoft.com> - 0.3.0-5
 - Fixed CVE-2019-12439
 
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.3.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.3.0-4
 - Added %%license line automatically
 
 *   Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.com> 0.3.0-3

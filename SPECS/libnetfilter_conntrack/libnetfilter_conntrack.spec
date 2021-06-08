@@ -53,7 +53,7 @@ make %{?_smp_mflags}
 %{_libdir}/*.la
 
 %changelog
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.7-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.7-4
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.7-3

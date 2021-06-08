@@ -59,7 +59,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/gudev-1.0.pc
 
 %changelog
-* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 232-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 232-4
 - Added %%license line automatically
 
 *       Mon Apr 13 2020 Eric Li <eli@microsoft.com> 232-3

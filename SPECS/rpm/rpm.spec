@@ -3,7 +3,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdb-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
 BuildRequires:  nss-devel
 BuildRequires:  popt-devel
@@ -31,6 +32,7 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       libarchive
 Requires:       libdb
+Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
 
@@ -128,7 +130,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
         --with-cap \
         --with-lua \
         --disable-silent-rules \
-        --with-external-db
+        --with-external-db \
+        --with-selinux
 make %{?_smp_mflags}
 
 pushd python
@@ -276,6 +279,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-12
+-   Add SELinux support
+
 * Thu Apr 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 4.14.2-11
 - Patch CVE-2021-20271 and CVE-2021-3421
 
@@ -294,7 +300,7 @@ rm -rf %{buildroot}
 *   Wed May 20 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-7
 -   Add BuildRequires and Requires for zstd support.
 
-*   Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.14.2-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.14.2-6
 -   Added %%license line automatically
 
 *   Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> 4.14.2-5

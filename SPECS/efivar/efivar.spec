@@ -53,7 +53,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 37-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 37-3
 - Added %%license line automatically
 
 *   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 37-2

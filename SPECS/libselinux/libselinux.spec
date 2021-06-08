@@ -11,7 +11,8 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/2019
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  libsepol-devel
-BuildRequires:  pcre-devel, swig
+BuildRequires:  pcre-devel
+BuildRequires:  swig
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 Requires:       pcre-libs
@@ -133,7 +134,7 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9-3
 - Added %%license line automatically
 
 *   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-2

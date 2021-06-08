@@ -45,7 +45,7 @@ PYTHONPATH=%{buildroot}%{python_sitelib} \
 %{python2_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.6-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.6-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.6-3

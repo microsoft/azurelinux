@@ -42,7 +42,7 @@ make %{?_smp_mflags} check
 - Patch CVE-2020-8037
 - Lint to Mariner style
 
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.9.3-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.9.3-2
 - Added %%license line automatically
 
 * Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.co> - 4.9.3-1

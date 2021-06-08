@@ -91,7 +91,7 @@ fi
 %{_docdir}/*
 
 %changelog
-* Sat May 09 00:20:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
 - Added %%license line automatically
 
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.79.1-9

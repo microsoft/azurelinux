@@ -50,7 +50,7 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.19-2

@@ -56,7 +56,7 @@ make install DESTDIR=%{buildroot}
 %{_libdir}/*.la
 
 %changelog
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.0-4
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.2.0-3

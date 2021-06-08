@@ -357,7 +357,7 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-4

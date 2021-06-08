@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,11 +17,6 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
-%if %{with_check}
-BuildRequires:  python3
-BuildRequires:  shadow-utils
-BuildRequires:  sudo
-%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -68,12 +63,6 @@ install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-%check
-chmod g+w . -R
-useradd test -G root -m
-
-sudo -u test make %{?_smp_mflags} check
-
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -100,6 +89,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Fri May 28 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-3
+- Disable check to remove circular dependency
+
 * Wed May 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 7.76.0-2
 - Patch 7.76.0 to fix CVE-2021-22898 and CVE-2021-22901.
 
@@ -132,7 +124,7 @@ rm -rf %{buildroot}/*
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.66.0-1
 -   Upgrade to version 7.66.0, which fixes CVE-2018-16890 and CVE-2019-3822/3833.
 
-*   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
 -   Added %%license line automatically
 
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.61.1-5

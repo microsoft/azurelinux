@@ -60,7 +60,7 @@ make %{?_smp_mflags} check
 /%{_libdir}/libinotifytools.la
 
 %changelog
-* Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.14-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.14-2
 - Added %%license line automatically
 
 *   Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 3.14-1

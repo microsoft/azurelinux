@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,8 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Mon Jun 07 2021 Chris Co <chrco@microsoft.com> - 2.0.21-3
+- Always use -s option in kdumpctl to use kexec file load by default
 * Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-2
 - Update eppic version for compatibility with binutils 2.36.1
 - Add Group and URL

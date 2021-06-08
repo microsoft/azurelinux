@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.32.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 License:        GPLv2+
 Group:          Applications/System
@@ -12,6 +12,7 @@ BuildRequires:  ncurses-devel
 %if %{with_check}
 BuildRequires:  ncurses-term
 %endif
+BuildRequires:  libselinux-devel
 Requires: %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 %description
@@ -51,7 +52,8 @@ autoreconf -fi
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
-    --without-python
+    --without-python \
+    --with-selinux
 make %{?_smp_mflags}
 
 %install
@@ -101,9 +103,10 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com>
-- Added %%license line automatically
-
+*   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 2.32.1-4
+-   Enable SELinux support
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.32.1-3
+-   Added %%license line automatically
 *   Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 2.32.1-2
 -   Rename ncurses-terminfo to ncurses-term.
 *   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 2.32.1-1

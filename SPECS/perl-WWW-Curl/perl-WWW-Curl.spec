@@ -81,7 +81,7 @@ make test
 - License verified.
 - Updated the 'Source0' and 'URL' tags.
 
-* Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.17-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.17-7
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.17-6

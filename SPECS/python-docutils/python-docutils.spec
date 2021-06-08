@@ -139,7 +139,7 @@ popd
 - Follow the Fedora convention of providing a suffix-less binary name
 - License verified
 
-* Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.14-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.14-3
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.14-2

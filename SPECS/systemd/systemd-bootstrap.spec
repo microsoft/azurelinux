@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +56,6 @@ BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  shadow-utils
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
 Requires:       filesystem >= 1.1
@@ -247,6 +246,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-34
+- Remove build dependency on shadow-utils to break circular dependency
+
 * Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
 - Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
 

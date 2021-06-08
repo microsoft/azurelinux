@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ and MIT and BSD and ISC
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
@@ -31,6 +31,7 @@ sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/
     --sysconfdir=/etc   \
     --localstatedir=/var\
     --with-pam          \
+    --with-selinux      \
     --enable-anacron    \
     --enable-pie        \
     --enable-relro
@@ -120,9 +121,10 @@ make %{?_smp_mflags} check
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
 
 %changelog
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
-- Added %%license line automatically
-
+*   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> - 1.5.2-4
+-   Enable SELinux support
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
+-   Added %%license line automatically
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.5.2-2
 -   Renaming Linux-PAM to pam
 *   Wed Mar 18 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.5.2-1
