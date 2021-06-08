@@ -1,7 +1,7 @@
 Summary:	    Dynamic host configuration protocol
 Name:		    dhcp
 Version:	    4.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:      	    https://www.isc.org/dhcp/
 Source0:  	    ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -32,6 +32,7 @@ dhcpd is the name of a program that operates as a daemon on a server to provide 
 %package client
 Summary:	Provides the ISC DHCP client daemon and dhclient-script
 Requires:	dhcp-libs
+Provides:	dhclient
 %description client
 The ISC DHCP Client, dhclient, provides a means for configuring one or more network interfaces using the Dynamic Host Configuration Protocol, BOOTP protocol, or if these protocols fail, by statically assigning an address.
 
@@ -166,6 +167,8 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+*   Tue Jun 08 2021 Muhammad Falak Wani <mwani@microsoft.com> 4.4.2-2
+-   Add an explicit provides for dhclient.
 *   Thu May 28 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.4.2-1
 -   Update to version 4.4.2, which fixes CVE-2017-3144 and CVE-2018-5733.
 -   License verified.
