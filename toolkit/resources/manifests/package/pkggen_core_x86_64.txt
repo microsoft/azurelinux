@@ -165,9 +165,3 @@ p11-kit-trust-0.23.22-1.cm1.x86_64.rpm
 ca-certificates-shared-20200720-14.cm1.noarch.rpm
 ca-certificates-tools-20200720-14.cm1.noarch.rpm
 ca-certificates-base-20200720-14.cm1.noarch.rpm
-finger-0.17-4.cm1.x86_64.rpm
-tcp_wrappers-7.6-9.cm1.x86_64.rpm
-audit-libs-3.0-6.cm1.x86_64.rpm
-libsepol-2.9-5.cm1.x86_64.rpm
-libselinux-2.9-3.cm1.x86_64.rpm
-libsemanage-2.9-4.cm1.x86_64.rpm
