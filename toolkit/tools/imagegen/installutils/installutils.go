@@ -1325,9 +1325,30 @@ func configureUserStartupCommand(installChroot *safechroot.Chroot, user configur
 }
 
 func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.User, homeDir string) (err error) {
+	var (
+		pubKeyData            []string
+		exists                bool
+	)
 	const squashErrors = false
+	const authorizedUsersFilePerms = 0644
+	const authorizedUsersTempFile = "/tmp/authorized_users"
 
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
+	authorizedUsersFile := filepath.Join(homeDir, ".ssh/authorized_users")
+
+	exists, err = file.PathExists(authorizedUsersTempFile)
+	if err != nil {
+		logger.Log.Warnf("Error accessing %s file : %v", authorizedUsersTempFile, err)
+		return
+	}
+	if !exists {
+		logger.Log.Warnf("File %s does not exist. Creating file...", authorizedUsersTempFile)
+		err = file.Create(authorizedUsersTempFile, authorizedUsersFilePerms)
+		if err != nil {
+			logger.Log.Warnf("Failed to create %s file : %v", authorizedUsersTempFile, err)
+			return
+		}
+	}
 
 	for _, pubKey := range user.SSHPubKeyPaths {
 		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), user.Name)
@@ -1342,6 +1363,41 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		if err != nil {
 			return
 		}
+
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), user.Name)
+		pubKeyData, err = file.ReadLines(pubKey)
+		if err != nil {
+			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
+			return
+		}
+
+		// Append to the tmp/authorized_users file
+		for i, s := range pubKeyData {
+			_ = i
+			s += "\n"
+			err = file.Append(s, authorizedUsersTempFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to append to %s : %v", authorizedUsersTempFile, err)
+				return
+			}
+		}
+	}
+
+	fileToCopy := safechroot.FileToCopy{
+		Src:  authorizedUsersTempFile,
+		Dest: authorizedUsersFile,
+	}
+
+	err = installChroot.AddFiles(fileToCopy)
+	if err != nil {
+		return
+	}
+
+	// Clean up temp file
+	err = os.Remove(authorizedUsersTempFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", authorizedUsersTempFile, err)
+		return
 	}
 
 	if len(user.SSHPubKeyPaths) != 0 {
