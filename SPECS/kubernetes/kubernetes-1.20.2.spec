@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.20.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -271,6 +271,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.20.2-6
+- Increment release to force republishing using golang 1.15.13.
+
 * Wed May 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.20.2-5
 - Update to version  "1.20.2-hotfix.20210525".
 
