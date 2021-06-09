@@ -60,6 +60,7 @@ Patch1009:      CVE-2020-14310.nopatch
 Patch1010:      CVE-2020-14311.nopatch
 Patch1011:      CVE-2020-27749.nopatch
 Patch1012:      CVE-2021-20225.nopatch
+# TPM measurement fix
 Patch1013:      remove-shim-lock-verification.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
@@ -271,6 +272,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Thu Jun 03 2021 Henry Li <lihl@microsoft.com> - 2.06~rc1-5
+- Apply remove-shim-lock-verification.patch to remove duplicate TPM measurement
+
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
 - Bump version to match grub-efi-binary-signed spec
 
