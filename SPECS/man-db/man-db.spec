@@ -1,7 +1,7 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
 Version:        2.8.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
@@ -22,6 +22,7 @@ BuildRequires:  libpipeline-devel
 BuildRequires:  gdbm-devel
 BuildRequires:  xz
 BuildRequires:  groff
+Provides:       man-pages-reader = %{version}
 
 %description
 The Man-DB package contains programs for finding and viewing man pages.
@@ -80,6 +81,8 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Wed Jun 09 2021 Muhammad Falak Wani <mwani@microsoft.com> 2.8.4-8
+- Add an explict provides for "man-pages-reader"
 * Thu May 13 2021 Henry Li <lihl@microsoft.com> 2.8.4-7
 - Remove zsoelim man page, which is provided by groff
 
