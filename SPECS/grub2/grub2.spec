@@ -46,6 +46,8 @@ Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
+# TPM measurement fix
+Patch0167:      0167-remove-shim-lock-verification.patch
 # Add nopatches for tooling
 Patch1000:      CVE-2021-3418.nopatch
 Patch1001:      CVE-2020-14372.nopatch
@@ -60,8 +62,6 @@ Patch1009:      CVE-2020-14310.nopatch
 Patch1010:      CVE-2020-14311.nopatch
 Patch1011:      CVE-2020-27749.nopatch
 Patch1012:      CVE-2021-20225.nopatch
-# TPM measurement fix
-Patch1013:      remove-shim-lock-verification.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
