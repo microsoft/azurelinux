@@ -704,6 +704,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "collectd",
+          "version": "5.12.0",
+          "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
@@ -5964,6 +5974,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "re2",
+          "version": "20190801",
+          "downloadUrl": "https://github.com/google/re2/archive/2019-08-01.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "readline",
           "version": "7.0",
           "downloadUrl": "http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz"
@@ -7667,6 +7687,16 @@
           "name": "xz",
           "version": "5.2.4",
           "downloadUrl": "http://tukaani.org/xz/xz-5.2.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "yajl",
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/lloyd/yajl/archive/2.1.0.tar.gz"
         }
       }
     },

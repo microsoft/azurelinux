@@ -23,6 +23,7 @@
                 "catch",
                 "checkpolicy",
                 "chrony",
+                "collectd",
                 "conntrack-tools",
                 "cpprest",
                 "cryptsetup",
@@ -86,6 +87,7 @@
                 "qt5-qttools",
                 "qt5-rpm-macros",
                 "rdma-core",
+                "re2",
                 "secilc",
                 "selinux-policy",
                 "setools",
@@ -97,6 +99,7 @@
                 "websocketpp",
                 "words",
                 "xmlstarlet",
+                "yajl",
                 "yaml-cpp",
                 "yasm",
                 "zipper"
