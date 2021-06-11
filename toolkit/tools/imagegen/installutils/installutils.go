@@ -1326,8 +1326,8 @@ func configureUserStartupCommand(installChroot *safechroot.Chroot, user configur
 
 func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.User, homeDir string) (err error) {
 	var (
-		pubKeyData            []string
-		exists                bool
+		pubKeyData []string
+		exists     bool
 	)
 	const squashErrors = false
 	const authorizedKeysTempFilePerms = 0644
