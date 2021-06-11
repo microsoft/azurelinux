@@ -1,0 +1,30 @@
+diff -rup yajl-2.1.0.orig/test/api/run_tests.sh yajl-2.1.0.new/test/api/run_tests.sh
+--- yajl-2.1.0.orig/test/api/run_tests.sh	2014-03-19 04:58:29.000000000 +0000
++++ yajl-2.1.0.new/test/api/run_tests.sh	2014-04-28 11:27:26.006405320 +0100
+@@ -5,7 +5,7 @@ echo Running api tests:
+ tests=0
+ passed=0
+ 
+-for file in `ls`; do
++for file in `ls ../../build/test/api`; do
+     [ ! -x $file -o -d $file ] && continue
+     tests=`expr 1 + $tests`
+     printf " test(%s): " $file
+diff -rup yajl-2.1.0.orig/test/parsing/run_tests.sh yajl-2.1.0.new/test/parsing/run_tests.sh
+--- yajl-2.1.0.orig/test/parsing/run_tests.sh	2014-03-19 04:58:29.000000000 +0000
++++ yajl-2.1.0.new/test/parsing/run_tests.sh	2014-04-28 11:25:51.239025722 +0100
+@@ -16,11 +16,11 @@ fi
+ # find test binary on both platforms.  allow the caller to force a
+ # particular test binary (useful for non-cmake build systems).
+ if [ -z "$testBin" ]; then
+-    testBin="../build/test/parsing/Release/yajl_test.exe"
++    testBin="../../build/test/parsing/Release/yajl_test.exe"
+     if [ ! -x $testBin ] ; then
+-        testBin="../build/test/parsing/Debug/yajl_test.exe"
++        testBin="../../build/test/parsing/Debug/yajl_test.exe"
+         if [ ! -x $testBin ] ; then
+-            testBin="../build/test/parsing/yajl_test"
++            testBin="../../build/test/parsing/yajl_test"
+             if [  ! -x $testBin ] ; then
+                 ${ECHO} "cannot execute test binary: '$testBin'"
+                 exit 1;
