@@ -12,7 +12,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
 Patch0:         nss-3.44-standalone-1.patch
+Patch1:         CVE-2020-12403.patch
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel
 Requires:       nspr
@@ -55,6 +56,7 @@ This package contains minimal set of shared nss libraries.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 export NSS_FORCE_FIPS=1
@@ -116,6 +118,9 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
+*   Thu Jun 10 2021 Henry Beberman <henry.beberman@microsoft.com> 3.44-6
+-   Patch CVE-2020-12403
+
 *   Wed Jun 02 2021 Andrew Phelps <anphel@microsoft.com> 3.44-5
 -   Set NSS_DISABLE_GTESTS=1 to speed up build
 -   Run tests much faster by limiting to NSS_CYCLES=standard
