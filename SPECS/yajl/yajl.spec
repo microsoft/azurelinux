@@ -23,6 +23,7 @@ Patch4:        %{name}-%{version}-dynlink-binaries.patch
 
 BuildRequires: gcc
 BuildRequires: cmake
+BuildRequires: which
 
 %package devel
 Summary: Libraries, includes, etc to develop with YAJL
