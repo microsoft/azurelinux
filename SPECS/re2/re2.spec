@@ -9,7 +9,8 @@ License:        BSD
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
 URL:            http://github.com/google/%{name}/
-Source0:        https://github.com/google/re2/archive/%{longver}.tar.gz
+# Source0:      https://github.com/google/re2/archive/%{longver}.tar.gz
+Source0:        %{name}-%{longver}.tar.gz
 
 # downstream patch to change soname .0 => .0a
 # This is in response to symbol changes in recent release per
