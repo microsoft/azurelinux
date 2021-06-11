@@ -1,0 +1,202 @@
+.TH "PICOSAT" "1" "Version 936" "PicoSAT" "User Commands"
+.SH "NAME"
+picosat \- Satisfiability (SAT) solver with proof and core support
+.SH "SYNOPSIS"
+.B picosat
+[\fIOPTION\fR]... [\fIFILE\fR]
+.SH "DESCRIPTION"
+.\" Add any additional description here
+.PP
+PicoSAT is a satisfiability (SAT) solver for boolean variables in
+boolean expressions.
+A SAT solver can determine if it is possible to find assignments to boolean
+variables that would make a given set of expressions true.
+If it's satisfiable, it can also show
+a set of assignments that make the expression true.
+Many problems can be broken down into a large SAT problem
+(perhaps with thousands of variables), so SAT solvers have a variety
+of uses.
+.PP
+The \fBpicosat\fP binary is built with options that provide for the greatest
+speed.  A second binary, \fBpicosat.trace\fP, is built with proof and core
+capabilities, which incur some overhead.
+
+.SH "OPTIONS"
+.TP
+.BI \-h
+print this command line option summary and exit
+
+.TP
+.BI \-\-version
+print version and exit
+
+.TP
+.BI \-\-config
+print build configuration and exit
+
+.TP
+.BI \-v
+enable verbose output
+
+.TP
+.BI \-f
+ignore invalid header
+
+.TP
+.BI \-n
+do not print satisfying assignment
+
+.TP
+.BI \-p
+print formula in DIMACS format and exit
+
+.TP
+.BI \-a " <lit>"
+start with an assumption
+
+.TP
+.BI \-l " <limit>"
+set decision limit (no limit per default)
+
+.TP
+.BI \-i " <0|1>"
+force FALSE respectively TRUE as default phase
+
+.TP
+.BI \-s " <seed>"
+set random number generator seed (default 0)
+
+.TP
+.BI \-o " <output>"
+set output file (<stdout> per default)
+
+.TP
+.BI \-t " <trace>"
+generate compact proof trace file (use picosat.trace; see above)
+
+.TP
+.BI \-T " <trace>"
+generate extended proof trace file (use picosat.trace; see above)
+
+.TP
+.BI \-r " <trace>"
+generate reverse unit propagation proof file (use picosat.trace; see above)
+
+.TP
+.BI \-c " <core>"
+generate clausal core file in DIMACS format (use picosat.trace; see above)
+
+.TP
+.BI \-V " <core>"
+generate file listing core variables
+
+.TP
+.BI \-U " <core>"
+generate file listing used variables
+
+.PP
+If no input filename is given, standard input is used.
+
+.SH "CONFORMING TO"
+.PP
+This program uses DIMACS CNF format as input.
+.PP
+Like many SAT solvers, this program requires that its input be in
+conjunctive normal form (CNF or cnf) in DIMACS CNF format.
+CNF is built from these building blocks:
+.TP 3
+*
+.I R term :
+A term is either a boolean variable (e.g., x4)
+or a negated boolean variable (NOT x4, written here as \-x4).
+.TP
+*
+.I R clause :
+A clause is a set of one or more terms, connected with OR
+(written here as |); boolean variables may not repeat  inside a clause.
+.TP
+*
+.I R expression :
+An expression is a set of one or more clauses,
+each connected by AND (written here as &).
+
+.PP
+Any boolean expression can be converted into CNF.
+
+.PP
+DIMACS CNF format is a simple text format for CNF.
+Every line beginning "c" is a comment.
+The first non\-comment line must be of the form:
+.PP
+ p cnf NUMBER_OF_VARIABLES NUMBER_OF_CLAUSES
+.PP
+Each of the non\-comment lines afterwards defines a clause.
+Each of these lines is a space\-separated list of variables;
+a positive value means that corresponding variable
+(so 4 means x4), and a negative value means the negation of that variable
+(so \-5 means \-x5).
+Each line must end in a space and the number 0.
+
+.SH "EXIT STATUS"
+.PP
+The output is a number of lines.
+Most of these will begin with "c" (comment), and give detailed
+technical information.
+The output line beginning with "s" declares whether or not
+it is satisfiable.
+The line "s SATISFIABLE" is produced if it is satisfiable
+(exit status 10),
+and "s UNSATISFIABLE" is produced if it is not satisfiable
+(exit status 20).
+.PP
+If it is satisfiable,
+the output line beginning with "v" declares a set of variable settings
+that satisfy all formulas.
+For example:
+.PP
+  v 1 \-2 \-3 \-4 5 0
+.PP
+Shows that there is a solution with variable 1 true, variables 2, 3, and 4
+false, and variable 5 true.
+
+.SH "EXAMPLE"
+.PP
+An example of CNF is:
+.PP
+  (x1 | \-x5 | x4) &
+  (\-x1 | x5 | x3 | x4) &
+  (\-x3 | x4).
+.PP
+The DIMACS CNF format for the above set of expressions could be:
+.PP
+ c Here is a comment.
+ p cnf 5 3
+ 1 \-5 4 0
+ \-1 5 3 4 0
+ \-3 \-4 0
+.PP
+The "p cnf" line above means that this is SAT problem in CNF format with
+5 variables and 3 clauses.   The first line after it is the first clause,
+meaning x1 | \-x5 | x4.
+.PP
+CNFs with conflicting requirements are not satisfiable.
+For example, the following DIMACS CNF formatted data is not satisfiable,
+because it requires that variable 1 always be true and also always be false:
+.PP
+ c This is not satisfiable.
+ p cnf 2 2
+ \-1 0
+ 1 0
+
+.SH "AUTHORS"
+picosat was written by Armin Biere <biere@jku.at>
+.PP
+This man page was written by David A. Wheeler.
+It is released to the public domain; you may use it in any way you wish.
+
+.SH "SEE ALSO"
+.PP
+\fIpicomus\fP(1), \fIminisat2\fP(1).
+
+.\" This documentation was written by David A. Wheeler in 2010, and
+.\" is released to the public domain.  Anyone can use it, in any way.

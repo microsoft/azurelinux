@@ -1,0 +1,16 @@
+diff --git a/utils/setup-testing.py b/utils/setup-testing.py
+index 7036d44..19793f8 100755
+--- a/utils/setup-testing.py
++++ b/utils/setup-testing.py
+@@ -3,10 +3,7 @@
+ from __future__ import absolute_import, division, print_function, unicode_literals
+ import os
+ import sys
+-if 'develop' in sys.argv:
+-    from setuptools import setup
+-else:
+-    from distutils.core import setup
++from setuptools import setup
+ 
+ if not (sys.version_info[:2] == (2, 7) or sys.version_info[:2] >= (3, 3)):
+     sys.exit("conda is only meant for Python 2.7 or 3.3 and up.  "

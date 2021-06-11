@@ -1,0 +1,63 @@
+diff --git a/_doc/conf.py b/_doc/conf.py
+--- a/_doc/conf.py
++++ b/_doc/conf.py
+@@ -75,7 +75,10 @@
+ if False:
+     try:
+         from ryd.__main__ import RYDCmd
+-        from ruamel.std.pathlib import Path
++        try:
++            from pathlib import Path
++        except ImportError:
++            from pathlib2 import Path
+
+         oldargv = sys.argv
+         for fn in Path('.').glob('*.ryd'):
+diff --git a/_test/roundtrip.py b/_test/roundtrip.py
+--- a/_test/roundtrip.py
++++ b/_test/roundtrip.py
+@@ -7,7 +7,11 @@
+ """
+ import sys
+ import textwrap
+-from ruamel.std.pathlib import Path
++try:
++    from pathlib import Path
++except ImportError:
++    from pathlib2 import Path
++
+
+ enforce = object()
+
+diff --git a/_test/test_api_change.py b/_test/test_api_change.py
+--- a/_test/test_api_change.py
++++ b/_test/test_api_change.py
+@@ -9,7 +9,10 @@
+ import sys
+ import textwrap
+ import pytest
+-from ruamel.std.pathlib import Path
++try:
++    from pathlib import Path
++except ImportError:
++    from pathlib2 import Path
+
+
+ class TestNewAPI:
+diff --git a/_test/test_z_data.py b/_test/test_z_data.py
+--- a/_test/test_z_data.py
++++ b/_test/test_z_data.py
+@@ -6,7 +6,11 @@
+ import pytest  # NOQA
+ import warnings  # NOQA
+
+-from ruamel.std.pathlib import Path
++try:
++    from pathlib import Path
++except ImportError:
++    from pathlib2 import Path
++
+
+ base_path = Path('data')  # that is ruamel.yaml.data
+ PY2 = sys.version_info[0] == 2
+ 

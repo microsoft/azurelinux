@@ -1,0 +1,39 @@
+From 6ad44b54139e9b298a9281d85abf4f940f5d852a Mon Sep 17 00:00:00 2001
+From: Hugo <hugovk@users.noreply.github.com>
+Date: Mon, 20 Jan 2020 18:46:57 +0200
+Subject: [PATCH] Fix imports for Python 3.9
+
+---
+ frozendict/__init__.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/frozendict/__init__.py b/frozendict/__init__.py
+index 399948a..e5b0368 100644
+--- a/frozendict/__init__.py
++++ b/frozendict/__init__.py
+@@ -1,8 +1,12 @@
+-import collections
+ import operator
+ import functools
+ import sys
+ 
++try:
++    # Python 3.3+
++    from collections import Mapping
++except ImportError:
++    from collections.abc import Mapping
+ 
+ try:
+     from collections import OrderedDict
+@@ -13,9 +17,9 @@
+ iteritems = getattr(dict, 'iteritems', dict.items) # py2-3 compatibility
+ 
+ 
+-class frozendict(collections.Mapping):
++class frozendict(Mapping):
+     """
+-    An immutable wrapper around dictionaries that implements the complete :py:class:`collections.Mapping`
++    An immutable wrapper around dictionaries that implements the complete :py:class:`collections.abc.Mapping`
+     interface. It can be used as a drop-in replacement for dictionaries where immutability is desired.
+     """
+ 

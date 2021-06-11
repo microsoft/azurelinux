@@ -56,7 +56,7 @@ python setup.py test
 %{_bindir}/*
 
 %changelog
-*   Tue Dec 22 2020 Rachel Menge <rachelmenge@microsoft.com> 19.2-1
+*   Tue Dec 22 2020 Rachel Menge <rachelmenge@microsoft.com> - 19.2-1
 -   Update to version 19.2 to fix CVE-2019-20916
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 18.0-5

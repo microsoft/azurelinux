@@ -1,0 +1,23 @@
+commit 1f21cf4dd33e4d62f3dca93294bfa5508a2591ab
+Author: rpm-build <rpm-build>
+Date:   Sat Mar 30 20:59:05 2019 -0600
+
+    [PATCH] Drop fs path encoding manipulation under python2
+
+diff --git a/conda/activate.py b/conda/activate.py
+index e515c0e..3632a61 100644
+--- a/conda/activate.py
++++ b/conda/activate.py
+@@ -63,11 +63,7 @@ class _Activator(object):
+     def __init__(self, arguments=None):
+         self._raw_arguments = arguments
+ 
+-        if PY2:
+-            self.environ = {ensure_fs_path_encoding(k): ensure_fs_path_encoding(v)
+-                            for k, v in iteritems(os.environ)}
+-        else:
+-            self.environ = os.environ.copy()
++        self.environ = os.environ.copy()
+ 
+     # Once Python2 dies odargs can become kwargs again since dicts are ordered since 3.6.
+     def get_export_unset_vars(self, odargs):

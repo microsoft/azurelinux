@@ -1,0 +1,20 @@
+diff -up conda-4.8.4/tests/core/test_solve.py.32bit conda-4.8.4/tests/core/test_solve.py
+--- conda-4.8.4/tests/core/test_solve.py.32bit	2020-08-06 15:02:52.000000000 -0600
++++ conda-4.8.4/tests/core/test_solve.py	2020-08-07 19:12:28.240154100 -0600
+@@ -284,14 +284,14 @@ def test_cuda_fail_1(tmpdir):
+     if sys.platform == "darwin":
+         plat = "osx-64"
+     elif sys.platform == "linux":
+-        plat = "linux-64"
++        plat = "linux-%s" % platform.architecture()[0][0:2]
+     elif sys.platform == "win32":
+         if platform.architecture()[0] == "32bit":
+             plat = "win-32"
+         else:
+             plat = "win-64"
+     else:
+-        plat = "linux-64"
++        plat = "linux-%s" % platform.architecture()[0][0:2]
+ 
+     assert str(exc.value).strip() == dals("""The following specifications were found to be incompatible with your system:
+ 

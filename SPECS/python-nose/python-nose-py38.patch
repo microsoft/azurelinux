@@ -1,0 +1,62 @@
+diff --git a/nose/config.py b/nose/config.py
+index 125eb55..ad01e61 100644
+--- a/nose/config.py
++++ b/nose/config.py
+@@ -139,7 +139,7 @@ class ConfiguredDefaultsOptionParser(object):
+ 
+ 
+ class Config(object):
+-    """nose configuration.
++    r"""nose configuration.
+ 
+     Instances of Config are used throughout nose to configure
+     behavior, including plugin lists. Here are the default values for
+diff --git a/nose/ext/dtcompat.py b/nose/ext/dtcompat.py
+index 332cf08..b5698c5 100644
+--- a/nose/ext/dtcompat.py
++++ b/nose/ext/dtcompat.py
+@@ -683,7 +683,7 @@ class DocTestParser:
+ 
+     # This regular expression finds the indentation of every non-blank
+     # line in a string.
+-    _INDENT_RE = re.compile('^([ ]*)(?=\S)', re.MULTILINE)
++    _INDENT_RE = re.compile(r'^([ ]*)(?=\S)', re.MULTILINE)
+ 
+     def _min_indent(self, s):
+         "Return the minimum indentation of any non-blank line in `s`"
+@@ -1018,7 +1018,7 @@ class DocTestFinder:
+         if lineno is not None:
+             if source_lines is None:
+                 return lineno+1
+-            pat = re.compile('(^|.*:)\s*\w*("|\')')
++            pat = re.compile(r'(^|.*:)\s*\w*("|\')')
+             for lineno in range(lineno, len(source_lines)):
+                 if pat.match(source_lines[lineno]):
+                     return lineno
+@@ -1427,11 +1427,11 @@ class OutputChecker:
+         # blank line, unless the DONT_ACCEPT_BLANKLINE flag is used.
+         if not (optionflags & DONT_ACCEPT_BLANKLINE):
+             # Replace <BLANKLINE> in want with a blank line.
+-            want = re.sub('(?m)^%s\s*?$' % re.escape(BLANKLINE_MARKER),
++            want = re.sub(r'(?m)^%s\s*?$' % re.escape(BLANKLINE_MARKER),
+                           '', want)
+             # If a line in got contains only spaces, then remove the
+             # spaces.
+-            got = re.sub('(?m)^\s*?$', '', got)
++            got = re.sub(r'(?m)^\s*?$', '', got)
+             if got == want:
+                 return True
+ 
+diff --git a/nose/inspector.py b/nose/inspector.py
+index a6c4a3e..ad22c0c 100644
+--- a/nose/inspector.py
++++ b/nose/inspector.py
+@@ -107,7 +107,7 @@ def tbsource(tb, context=6):
+ 
+     
+ def find_inspectable_lines(lines, pos):
+-    """Find lines in home that are inspectable.
++    r"""Find lines in home that are inspectable.
+     
+     Walk back from the err line up to 3 lines, but don't walk back over
+     changes in indent level.

@@ -1,0 +1,39 @@
+From 32d8c0665ea044f9682a89633d75442d1a4d2dc4 Mon Sep 17 00:00:00 2001
+From: Ned Batchelder <ned@nedbatchelder.com>
+Date: Thu, 5 Dec 2019 16:37:48 -0500
+Subject: [PATCH] Fix the context tests
+
+CoverageData.lines() returns a list, but in no guaranteed order.
+Set-ify everything to get the correct comparison.
+---
+ tests/test_pytest_cov.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_pytest_cov.py b/tests/test_pytest_cov.py
+index e79e9aa..3be8278 100644
+--- a/tests/test_pytest_cov.py
++++ b/tests/test_pytest_cov.py
+@@ -1934,12 +1934,12 @@ def test_cov_and_no_cov(testdir):
+ 
+ 
+ def find_labels(text, pattern):
+-    all_labels = collections.defaultdict(list)
++    all_labels = collections.defaultdict(set)
+     lines = text.splitlines()
+     for lineno, line in enumerate(lines, start=1):
+         labels = re.findall(pattern, line)
+         for label in labels:
+-            all_labels[label].append(lineno)
++            all_labels[label].add(lineno)
+     return all_labels
+ 
+ 
+@@ -2007,7 +2007,7 @@ def test_contexts(testdir, opts):
+         if context == '':
+             continue
+         data.set_query_context(context)
+-        actual = data.lines(test_context_path)
++        actual = set(data.lines(test_context_path))
+         assert line_data[label] == actual, "Wrong lines for context {!r}".format(context)
+ 
+ 
