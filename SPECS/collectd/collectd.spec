@@ -3,7 +3,7 @@ Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
 Release:        5%{?dist}
-License:        GPLv2
+License:        GPLv2 and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://collectd.org/
