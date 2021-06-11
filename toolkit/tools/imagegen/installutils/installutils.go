@@ -1330,22 +1330,22 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		exists                bool
 	)
 	const squashErrors = false
-	const authorizedUsersFilePerms = 0644
-	const authorizedUsersTempFile = "/tmp/authorized_users"
+	const authorizedKeysTempFilePerms = 0644
+	const authorizedKeysTempFile = "/tmp/authorized_keys"
 
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedUsersFile := filepath.Join(homeDir, ".ssh/authorized_users")
+	authorizedKeysFile := filepath.Join(homeDir, ".ssh/authorized_keys")
 
-	exists, err = file.PathExists(authorizedUsersTempFile)
+	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
-		logger.Log.Warnf("Error accessing %s file : %v", authorizedUsersTempFile, err)
+		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
 		return
 	}
 	if !exists {
-		logger.Log.Warnf("File %s does not exist. Creating file...", authorizedUsersTempFile)
-		err = file.Create(authorizedUsersTempFile, authorizedUsersFilePerms)
+		logger.Log.Warnf("File %s does not exist. Creating file...", authorizedKeysTempFile)
+		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
 		if err != nil {
-			logger.Log.Warnf("Failed to create %s file : %v", authorizedUsersTempFile, err)
+			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
 			return
 		}
 	}
@@ -1375,17 +1375,17 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		for i, s := range pubKeyData {
 			_ = i
 			s += "\n"
-			err = file.Append(s, authorizedUsersTempFile)
+			err = file.Append(s, authorizedKeysTempFile)
 			if err != nil {
-				logger.Log.Warnf("Failed to append to %s : %v", authorizedUsersTempFile, err)
+				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
 				return
 			}
 		}
 	}
 
 	fileToCopy := safechroot.FileToCopy{
-		Src:  authorizedUsersTempFile,
-		Dest: authorizedUsersFile,
+		Src:  authorizedKeysTempFile,
+		Dest: authorizedKeysFile,
 	}
 
 	err = installChroot.AddFiles(fileToCopy)
@@ -1394,9 +1394,9 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	}
 
 	// Clean up temp file
-	err = os.Remove(authorizedUsersTempFile)
+	err = os.Remove(authorizedKeysTempFile)
 	if err != nil {
-		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", authorizedUsersTempFile, err)
+		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", authorizedKeysTempFile, err)
 		return
 	}
 
