@@ -1342,12 +1342,13 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		return
 	}
 	if !exists {
-		logger.Log.Warnf("File %s does not exist. Creating file...", authorizedKeysTempFile)
+		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
 		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
 		if err != nil {
 			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
 			return
 		}
+		defer cleanupExtraFiles(authorizedKeysTempFile)
 	}
 
 	for _, pubKey := range user.SSHPubKeyPaths {
@@ -1372,10 +1373,9 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		}
 
 		// Append to the tmp/authorized_users file
-		for i, s := range pubKeyData {
-			_ = i
-			s += "\n"
-			err = file.Append(s, authorizedKeysTempFile)
+		for _, sshkey := range pubKeyData {
+			sshkey += "\n"
+			err = file.Append(sshkey, authorizedKeysTempFile)
 			if err != nil {
 				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
 				return
@@ -1390,13 +1390,6 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 
 	err = installChroot.AddFiles(fileToCopy)
 	if err != nil {
-		return
-	}
-
-	// Clean up temp file
-	err = os.Remove(authorizedKeysTempFile)
-	if err != nil {
-		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", authorizedKeysTempFile, err)
 		return
 	}
 
@@ -1430,6 +1423,15 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		}
 	}
 
+	return
+}
+
+func cleanupExtraFiles(fileName string) (err error) {
+	err = os.Remove(fileName)
+	if err != nil {
+		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", fileName, err)
+		return
+	}
 	return
 }
 
