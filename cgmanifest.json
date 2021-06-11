@@ -3905,8 +3905,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "8.11.4",
-          "downloadUrl": "https://nodejs.org/download/release/v8.11.4/node-v8.11.4.tar.xz"
+          "version": "8.17.0",
+          "downloadUrl": "https://nodejs.org/download/release/v8.17.0/node-v8.17.0.tar.xz"
         }
       }
     },
@@ -3915,8 +3915,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "9.11.2",
-          "downloadUrl": "https://nodejs.org/download/release/v9.11.2/node-v9.11.2.tar.xz"
+          "version": "14.17.0",
+          "downloadUrl": "https://nodejs.org/download/release/v14.17.0/node-v14.17.0.tar.xz"
         }
       }
     },
