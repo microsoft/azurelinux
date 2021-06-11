@@ -1,26 +1,23 @@
 %global longver 2019-08-01
 %global shortver %(echo %{longver}|sed 's|-||g')
-
+Summary:        C++ fast alternative to backtracking RE engines
 Name:           re2
 Version:        %{shortver}
 Release:        9%{?dist}
-Summary:        C++ fast alternative to backtracking RE engines
 License:        BSD
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://github.com/google/%{name}/
 Source0:        %{name}-%{longver}.tar.gz
-
 # downstream patch to change soname .0 => .0a
 # This is in response to symbol changes in recent release per
 # https://bugzilla.redhat.com/show_bug.cgi?id=1672014#c10
 # TODO: poke upstream on their policy/intentions regarding maintaining
 # stable ABI, or at least get them to bump soname appropriately so we
 # won't have to handle it ourselves downsream via this patch indefinitely.
-Patch1: re2-soname.patch
-
-BuildRequires: make
+Patch1:         re2-soname.patch
 BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 RE2 is a C++ library providing a fast, safe, thread-friendly alternative to
@@ -54,8 +51,8 @@ you will need to install %{name}-devel.
 # http://groups.google.com/forum/?fromgroups=#!topic/re2-dev/bkUDtO5l6Lo
 # The RPM macro for the linker flags does not exist on EPEL
 %{!?__global_ldflags: %global __global_ldflags -Wl,-z,relro}
-CXXFLAGS="${CXXFLAGS:-%optflags} -pthread"
-LDFLAGS="${LDFLAGS:-%__global_ldflags} -pthread"
+CXXFLAGS="${CXXFLAGS:-%{optflags}} -pthread"
+LDFLAGS="${LDFLAGS:-%{__global_ldflags}} -pthread"
 
 %make_build \
   CXXFLAGS="$CXXFLAGS"\
@@ -180,4 +177,3 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 
 * Sat Oct 20 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> 0.0.0-1
 - RPM release for Fedora 18
-

@@ -1,11 +1,11 @@
-Summary:       Yet Another JSON Library (YAJL)
-Name:          yajl
-Version:       2.1.0
-Release:       17%{?dist}
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-License:       ISC
-URL:           http://lloyd.github.com/yajl/
+Summary:        Yet Another JSON Library (YAJL)
+Name:           yajl
+Version:        2.1.0
+Release:        17%{?dist}
+License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://lloyd.github.com/yajl/
 #
 # NB, upstream does not provide pre-built tar.gz downloads. Instead
 # they make you use the 'on the fly' generated tar.gz from GITHub's
@@ -15,19 +15,18 @@ URL:           http://lloyd.github.com/yajl/
 #
 #   https://github.com/lloyd/yajl/releases/tag/2.1.0
 #
-Source0:       %{name}-%{version}.tar.gz
-Patch1:        %{name}-%{version}-pkgconfig-location.patch
-Patch2:        %{name}-%{version}-pkgconfig-includedir.patch
-Patch3:        %{name}-%{version}-test-location.patch
-Patch4:        %{name}-%{version}-dynlink-binaries.patch
-
-BuildRequires: gcc
-BuildRequires: cmake
-BuildRequires: which
+Source0:        %{name}-%{version}.tar.gz
+Patch1:         %{name}-%{version}-pkgconfig-location.patch
+Patch2:         %{name}-%{version}-pkgconfig-includedir.patch
+Patch3:         %{name}-%{version}-test-location.patch
+Patch4:         %{name}-%{version}-dynlink-binaries.patch
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  which
 
 %package devel
-Summary: Libraries, includes, etc to develop with YAJL
-Requires: %{name} = %{version}-%{release}
+Summary:        Libraries, includes, etc to develop with YAJL
+Requires:       %{name} = %{version}-%{release}
 
 %description
 Yet Another JSON Library. YAJL is a small event-driven
@@ -56,13 +55,12 @@ make VERBOSE=1 %{?_smp_mflags}
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 cd build
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 
 # No static libraries
-rm -f $RPM_BUILD_ROOT%{_libdir}/libyajl_s.a
+rm -f %{buildroot}%{_libdir}/libyajl_s.a
 
 
 %check
@@ -90,7 +88,6 @@ cd test
 %{_includedir}/yajl/yajl_version.h
 %{_libdir}/libyajl.so
 %{_libdir}/pkgconfig/yajl.pc
-
 
 %changelog
 * Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-17

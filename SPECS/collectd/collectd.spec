@@ -1,214 +1,212 @@
 %global __provides_exclude_from ^%{_libdir}/collectd/.*\\.so$
-%undefine _strict_symbol_defs_build
-
-Summary:          Statistics collection daemon for filling RRD files
-Name:             collectd
-Version:          5.12.0
-Release:          5%{?dist}
-License:          GPLv2
-Vendor:           Microsoft Corporation
-Distribution:     Mariner
-URL:              https://collectd.org/
-Source:           https://github.com/collectd/collectd/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
-Source1:          collectd-httpd.conf
-Source2:          collectd.service
-Source91:         apache.conf
-Source92:         email.conf
-Source93:         mysql.conf
-Source94:         nginx.conf
-Source95:         sensors.conf
-Source96:         snmp.conf
-Source97:         rrdtool.conf
-Source98:         onewire.conf
-
-Patch0:           %{name}-include-collectd.d.patch
-Patch1:           %{name}-gcc11.patch
-
-BuildRequires:    perl
-BuildRequires:    perl(ExtUtils::MakeMaker)
-BuildRequires:    perl(ExtUtils::Embed)
-BuildRequires:    libgcrypt-devel
-Requires(post):   systemd
-Requires(preun):  systemd
+Summary:        Statistics collection daemon for filling RRD files
+Name:           collectd
+Version:        5.12.0
+Release:        5%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://collectd.org/
+Source:         https://github.com/collectd/collectd/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Source1:        collectd-httpd.conf
+Source2:        collectd.service
+Source91:       apache.conf
+Source92:       email.conf
+Source93:       mysql.conf
+Source94:       nginx.conf
+Source95:       sensors.conf
+Source96:       snmp.conf
+Source97:       rrdtool.conf
+Source98:       onewire.conf
+Patch0:         %{name}-include-collectd.d.patch
+Patch1:         %{name}-gcc11.patch
+BuildRequires:  libgcrypt-devel
+BuildRequires:  perl
+BuildRequires:  perl(ExtUtils::Embed)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+Requires(post): systemd
 Requires(postun): systemd
+Requires(preun): systemd
+%undefine _strict_symbol_defs_build
 
 %description
 collectd is a daemon which collects system performance statistics periodically
 and provides mechanisms to store the values in a variety of ways,
 for example in RRD files.
 
-
-
 %package apache
-Summary:       Apache plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Apache plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description apache
 This plugin collects data provided by Apache's 'mod_status'.
 
-
 %package ascent
-Summary:       Ascent plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
-BuildRequires: libxml2-devel
+Summary:        Ascent plugin for collectd
+BuildRequires:  curl-devel
+BuildRequires:  libxml2-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description ascent
 This plugin collects data about an Ascent server,
 a free server for the "World of Warcraft" game.
 
-
 %package bind
-Summary:       Bind plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
-BuildRequires: libxml2-devel
+Summary:        Bind plugin for collectd
+BuildRequires:  curl-devel
+BuildRequires:  libxml2-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description bind
 This plugin retrieves statistics from the BIND dns server.
 
-
 %package ceph
-Summary:       Ceph plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: yajl-devel
+Summary:        Ceph plugin for collectd
+BuildRequires:  yajl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description ceph
 This plugin collects data from Ceph.
 
-
 %package chrony
-Summary:       Chrony plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Chrony plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description chrony
 Chrony plugin for collectd
 
-
 %package -n collectd-utils
-Summary:       Collectd utilities
-Requires:      libcollectdclient = %{version}-%{release}
-Requires:      %{name} = %{version}-%{release}
+Summary:        Collectd utilities
+Requires:       %{name} = %{version}-%{release}
+Requires:       libcollectdclient = %{version}-%{release}
+
 %description -n collectd-utils
 Collectd utilities
 
-
 %package curl
-Summary:       Curl plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
+Summary:        Curl plugin for collectd
+BuildRequires:  curl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description curl
 This plugin reads webpages with curl
 
-
 %package curl_json
-Summary:       Curl JSON plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
-BuildRequires: yajl-devel
+Summary:        Curl JSON plugin for collectd
+BuildRequires:  curl-devel
+BuildRequires:  yajl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description curl_json
 This plugin retrieves JSON data via curl.
 
-
 %package curl_xml
-Summary:       Curl XML plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
-BuildRequires: libxml2-devel
+Summary:        Curl XML plugin for collectd
+BuildRequires:  curl-devel
+BuildRequires:  libxml2-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description curl_xml
 This plugin retrieves XML data via curl.
 
-
 %package disk
-Summary:       Disk plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: systemd-devel
+Summary:        Disk plugin for collectd
+BuildRequires:  systemd-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description disk
 This plugin collects statistics of harddisk and, where supported, partitions.
 
-
 %package dns
-Summary:       DNS traffic analysis plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: libpcap-devel
+Summary:        DNS traffic analysis plugin for collectd
+BuildRequires:  libpcap-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description dns
 This plugin collects DNS traffic data.
 
-
 %package drbd
-Summary:       DRBD plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        DRBD plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description drbd
 This plugin collects data from DRBD.
 
-
 %package email
-Summary:       Email plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Email plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description email
 This plugin collects data provided by spamassassin.
 
 %package hugepages
-Summary:       Hugepages plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Hugepages plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description hugepages
 This plugin collects statistics about hugepage usage.
 
 %package infiniband
-Summary:       Collect metrics about infiniband ports
+Summary:        Collect metrics about infiniband ports
 
 %description infiniband
 Collect metrics about infiniband ports
 
 %package iptables
-Summary:       Iptables plugin for collectd
-Requires:      collectd = %{version}-%{release}
-BuildRequires: iptables-devel
+Summary:        Iptables plugin for collectd
+BuildRequires:  iptables-devel
+Requires:       collectd = %{version}-%{release}
+
 %description iptables
 This plugin collects data from iptables counters.
 
-
 %package ipvs
-Summary:       IPVS plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        IPVS plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description ipvs
 This plugin collects data from IPVS.
 
-
 %package -n libcollectdclient
-Summary:       Collectd client library
+Summary:        Collectd client library
+
 %description -n libcollectdclient
 Collectd client library.
 
-
 %package -n libcollectdclient-devel
-Summary:       Development files for libcollectdclient
-Requires:      libcollectdclient = %{version}-%{release}
+Summary:        Development files for libcollectdclient
+Requires:       libcollectdclient = %{version}-%{release}
+
 %description -n libcollectdclient-devel
 Development files for libcollectdclient.
 
-
 %package log_logstash
-Summary:       Logstash plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: yajl-devel
+Summary:        Logstash plugin for collectd
+BuildRequires:  yajl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description log_logstash
 This plugin formats messages as JSON events for Logstash
 
-
 %package lua
-Summary:       Lua plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: lua-devel
+Summary:        Lua plugin for collectd
+BuildRequires:  lua-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description lua
 The Lua plugin embeds a Lua interpreter into collectd and exposes the
 application programming interface (API) to Lua scripts.
 
-
 %package mcelog
-Summary:       Mcelog plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Mcelog plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description mcelog
 This plugin monitors machine check exceptions reported by mcelog and generates
 appropriate notifications when machine check exceptions are detected.
 
 %package mdevents
-Summary:       Get events from RAID arrays in syslog
+Summary:        Get events from RAID arrays in syslog
 
 %description mdevents
 This plugin, named mdevents, is responsible for gathering the events
@@ -220,106 +218,108 @@ collectd notification or not.
 Mdevents needs the syslog and mdadm to be present on a platform that
 collectd is launched.
 
-
 %package netlink
-Summary:       Netlink plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: iproute libmnl-devel
+Summary:        Netlink plugin for collectd
+BuildRequires:  iproute
+BuildRequires:  libmnl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description netlink
 This plugin uses a netlink socket to query the Linux kernel
 about statistics of various interface and routing aspects.
 
-
 %package nginx
-Summary:       Nginx plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Nginx plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description nginx
 This plugin collects data provided by Nginx.
 
-
 %package openldap
-Summary:       OpenLDAP plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: openldap
+Summary:        OpenLDAP plugin for collectd
+BuildRequires:  openldap
+Requires:       %{name} = %{version}-%{release}
+
 %description openldap
 This plugin for collectd reads monitoring information
 from OpenLDAP's cn=Monitor subtree.
 
-
 %package ovs_events
-Summary:       Open vSwitch events plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: yajl-devel
+Summary:        Open vSwitch events plugin for collectd
+BuildRequires:  yajl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description ovs_events
 This plugin monitors the link status of Open vSwitch (OVS) connected
 interfaces, dispatches the values to collectd and sends notifications
 whenever a link state change occurs in the OVS database.
 
-
 %package ovs_stats
-Summary:       Open vSwitch stats plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: yajl-devel
+Summary:        Open vSwitch stats plugin for collectd
+BuildRequires:  yajl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description ovs_stats
 This plugin collects statictics of OVS connected bridges and interfaces.
 
 %package -n perl-Collectd
-Summary:       Perl bindings for collectd
-Requires:      %{name} = %{version}-%{release}
-Requires:      perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Summary:        Perl bindings for collectd
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 %description -n perl-Collectd
 This package contains the Perl bindings and plugin for collectd.
 
-
 %package pinba
-Summary:       Pinba plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: protobuf-c-devel
+Summary:        Pinba plugin for collectd
+BuildRequires:  protobuf-c-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description pinba
 This plugin receives profiling information from Pinba,
 an extension for the PHP interpreter.
 
-
 %package postgresql
-Summary:       PostgreSQL plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: postgresql-devel
+Summary:        PostgreSQL plugin for collectd
+BuildRequires:  postgresql-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description postgresql
 PostgreSQL querying plugin. This plugins provides data of issued commands,
 called handlers and database traffic.
 
-
 %package python
-Summary:       Python plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: python3-devel
+Summary:        Python plugin for collectd
+BuildRequires:  python3-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description python
 The Python plugin embeds a Python interpreter into Collectd and exposes the
 application programming interface (API) to Python-scripts.
 
-
 %package rrdcached
-Summary:       RRDCacheD plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: rrdtool-devel
+Summary:        RRDCacheD plugin for collectd
+BuildRequires:  rrdtool-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description rrdcached
 This plugin uses the RRDtool accelerator daemon, rrdcached(1),
 to store values to RRD files in an efficient manner.
 
-
 %package rrdtool
-Summary:       RRDTool plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: rrdtool-devel
+Summary:        RRDTool plugin for collectd
+BuildRequires:  rrdtool-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description rrdtool
 This plugin for collectd provides rrdtool support.
 
-
 %ifnarch ppc sparc sparc64
 %package sensors
-Summary:       Libsensors module for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: lm-sensors-devel
+Summary:        Libsensors module for collectd
+BuildRequires:  lm-sensors-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
@@ -327,99 +327,101 @@ lm_sensors.
 
 
 %package smart
-Summary:       SMART plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: libatasmart-devel
+Summary:        SMART plugin for collectd
+BuildRequires:  libatasmart-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description smart
 This plugin for collectd collects SMART statistics,
 notably load cycle count, temperature and bad sectors.
 
-
 %package snmp
-Summary:       SNMP module for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: net-snmp-devel
+Summary:        SNMP module for collectd
+BuildRequires:  net-snmp-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description snmp
 This plugin for collectd provides querying of net-snmp.
 
-
 %package snmp_agent
-Summary:       SNMP AgentX plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: net-snmp-devel
+Summary:        SNMP AgentX plugin for collectd
+BuildRequires:  net-snmp-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description snmp_agent
 This plugin is an AgentX subagent that receives and handles queries
 from a SNMP master agent and returns the data collected by read plugins.
 
-
 %package synproxy
-Summary:       Synproxy plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Synproxy plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description synproxy
 This plugin provides statistics for Linux SYNPROXY available since 3.12
 
-
-
 %ifnarch ppc sparc sparc64
 %package virt
-Summary:       Libvirt plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: libvirt-devel
-BuildRequires: libxml2-devel
+Summary:        Libvirt plugin for collectd
+BuildRequires:  libvirt-devel
+BuildRequires:  libxml2-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description virt
 This plugin collects information from virtualized guests.
 %endif
 
 
 %package web
-Summary:       Contrib web interface to viewing rrd files
-Requires:      %{name} = %{version}-%{release}
-Requires:      collectd-rrdtool = %{version}-%{release}
-Requires:      perl-HTML-Parser, perl-Regexp-Common, rrdtool-perl, httpd
+Summary:        Contrib web interface to viewing rrd files
+Requires:       %{name} = %{version}-%{release}
+Requires:       collectd-rrdtool = %{version}-%{release}
+Requires:       httpd
+Requires:       perl-HTML-Parser
+Requires:       perl-Regexp-Common
+Requires:       rrdtool-perl
+
 %description web
 This package will allow for a simple web interface to view rrd files created by
 collectd.
 
-
 %package write_http
-Summary:       HTTP output plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: curl-devel
+Summary:        HTTP output plugin for collectd
+BuildRequires:  curl-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description write_http
 This plugin can send data to Redis.
 
-
 %package write_kafka
-Summary:       Kafka output plugin for collectd
-Requires:      %{name} = %{version}-%{release}
-BuildRequires: librdkafka-devel
+Summary:        Kafka output plugin for collectd
+BuildRequires:  librdkafka-devel
+Requires:       %{name} = %{version}-%{release}
+
 %description write_kafka
 This sends values to Kafka, a distributed messaging system.
 
-
 %package write_sensu
-Summary:       Sensu output plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        Sensu output plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description write_sensu
 This plugin can send data to Sensu.
 
 %package write_syslog
-Summary:       syslog output plugin for collectd
-Group:         System Environment/Daemons
-Requires:      %{name} = %{version}-%{release}
-
-Provides: %{name}-write-syslog = %{version}-%{release}
+Summary:        syslog output plugin for collectd
+Group:          System Environment/Daemons
+Requires:       %{name} = %{version}-%{release}
+Provides:       %{name}-write-syslog = %{version}-%{release}
 
 %description write_syslog
 This plugin can send data to syslog.
 
-
 %package write_tsdb
-Summary:       OpenTSDB output plugin for collectd
-Requires:      %{name} = %{version}-%{release}
+Summary:        OpenTSDB output plugin for collectd
+Requires:       %{name} = %{version}-%{release}
+
 %description write_tsdb
 This plugin can send data to OpenTSDB.
-
 
 %prep
 %autosetup -v -p1
@@ -510,7 +512,7 @@ make %{?_smp_mflags}
 
 %install
 rm -rf contrib/SpamAssassin
-make install DESTDIR="%{buildroot}"
+make install DESTDIR=%{buildroot}
 
 install -Dp -m0644 src/collectd.conf %{buildroot}%{_sysconfdir}/collectd.conf
 install -Dp -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/collectd.service
@@ -560,7 +562,7 @@ EOF
 done
 
 # *.la files shouldn't be distributed.
-rm -f %{buildroot}/%{_libdir}/{collectd/,}*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 
 %ifnarch s390 s390x
@@ -573,14 +575,11 @@ make check
 %post
 %systemd_post collectd.service
 
-
 %preun
 %systemd_preun collectd.service
 
-
 %postun
 %systemd_postun_with_restart collectd.service
-
 
 %files
 %license COPYING
@@ -693,16 +692,15 @@ make check
 %dir %{_datadir}/collectd/
 %{_datadir}/collectd/types.db
 
-%doc %{_mandir}/man1/collectd.1*
-%doc %{_mandir}/man1/collectdmon.1*
-%doc %{_mandir}/man5/collectd.conf.5*
-%doc %{_mandir}/man5/collectd-exec.5*
-%doc %{_mandir}/man5/collectd-threshold.5*
-%doc %{_mandir}/man5/collectd-unixsock.5*
-%doc %{_mandir}/man5/types.db.5*
+%{_mandir}/man1/collectd.1*
+%{_mandir}/man1/collectdmon.1*
+%{_mandir}/man5/collectd.conf.5*
+%{_mandir}/man5/collectd-exec.5*
+%{_mandir}/man5/collectd-threshold.5*
+%{_mandir}/man5/collectd-unixsock.5*
+%{_mandir}/man5/types.db.5*
 %{_mandir}/man5/collectd-java.5*
 %{_mandir}/man3/Collectd::Unixsock.3*
-
 
 %files -n libcollectdclient-devel
 %dir %{_includedir}/collectd/
@@ -716,11 +714,9 @@ make check
 %{_libdir}/pkgconfig/libcollectdclient.pc
 %{_libdir}/libcollectdclient.so
 
-
 %files -n libcollectdclient
 %{_libdir}/libcollectdclient.so.1
 %{_libdir}/libcollectdclient.so.1.1.0
-
 
 %files -n collectd-utils
 %{_bindir}/collectd-nagios
@@ -730,108 +726,83 @@ make check
 %{_mandir}/man1/collectd-nagios.1*
 %{_mandir}/man1/collectd-tg.1*
 
-
 %files apache
 %{_libdir}/collectd/apache.so
 %config(noreplace) %{_sysconfdir}/collectd.d/apache.conf
 
-
 %files ascent
 %{_libdir}/collectd/ascent.so
-
 
 %files bind
 %{_libdir}/collectd/bind.so
 
-
 %files ceph
 %{_libdir}/collectd/ceph.so
-
 
 %files chrony
 %{_libdir}/collectd/chrony.so
 
-
 %files curl
 %{_libdir}/collectd/curl.so
-
 
 %files curl_json
 %{_libdir}/collectd/curl_json.so
 
-
 %files curl_xml
 %{_libdir}/collectd/curl_xml.so
 
-
 %files disk
 %{_libdir}/collectd/disk.so
-
 
 %files dns
 %{_libdir}/collectd/dns.so
 %config(noreplace) %{_sysconfdir}/collectd.d/dns.conf
 
-
 %files drbd
 %{_libdir}/collectd/drbd.so
-
 
 %files email
 %{_libdir}/collectd/email.so
 %config(noreplace) %{_sysconfdir}/collectd.d/email.conf
-%doc %{_mandir}/man5/collectd-email.5*
-
+%{_mandir}/man5/collectd-email.5*
 
 %files hugepages
 %{_libdir}/collectd/hugepages.so
 
-
 %files infiniband
 %{_libdir}/collectd/infiniband.so
-
 
 %files iptables
 %{_libdir}/collectd/iptables.so
 
-
 %files ipvs
 %{_libdir}/collectd/ipvs.so
 
-
 %files log_logstash
 %{_libdir}/collectd/log_logstash.so
-
 
 %files lua
 %{_mandir}/man5/collectd-lua*
 %{_libdir}/collectd/lua.so
 
-
 %files mcelog
 %{_libdir}/collectd/mcelog.so
-
 
 %files mdevents
 %{_libdir}/collectd/mdevents.so
 
-
 %files netlink
 %{_libdir}/collectd/netlink.so
-
 
 %files nginx
 %{_libdir}/collectd/nginx.so
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
 
-
 %files openldap
 %{_libdir}/collectd/openldap.so
 
-
 %files ovs_events
 %{_libdir}/collectd/ovs_events.so
-
 
 %files ovs_stats
 %{_libdir}/collectd/ovs_stats.so
@@ -842,32 +813,26 @@ make check
 %{perl_vendorlib}/Collectd.pm
 %{perl_vendorlib}/Collectd/
 %config(noreplace) %{_sysconfdir}/collectd.d/perl.conf
-%doc %{_mandir}/man5/collectd-perl.5*
-
+%{_mandir}/man5/collectd-perl.5*
 
 %files pinba
 %{_libdir}/collectd/pinba.so
-
 
 %files postgresql
 %{_libdir}/collectd/postgresql.so
 %config(noreplace) %{_sysconfdir}/collectd.d/postgresql.conf
 %{_datadir}/collectd/postgresql_default.conf
 
-
 %files python
 %{_libdir}/collectd/python.so
-%doc %{_mandir}/man5/collectd-python.5*
-
+%{_mandir}/man5/collectd-python.5*
 
 %files rrdcached
 %{_libdir}/collectd/rrdcached.so
 
-
 %files rrdtool
 %{_libdir}/collectd/rrdtool.so
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
-
 
 %ifnarch ppc sparc sparc64
 %files sensors
@@ -879,20 +844,16 @@ make check
 %files smart
 %{_libdir}/collectd/smart.so
 
-
 %files snmp
 %{_libdir}/collectd/snmp.so
 %config(noreplace) %{_sysconfdir}/collectd.d/snmp.conf
-%doc %{_mandir}/man5/collectd-snmp.5*
-
+%{_mandir}/man5/collectd-snmp.5*
 
 %files snmp_agent
 %{_libdir}/collectd/snmp_agent.so
 
-
 %files synproxy
 %{_libdir}/collectd/synproxy.so
-
 
 %ifnarch ppc sparc sparc64
 %files virt
@@ -906,14 +867,11 @@ make check
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/collectd.conf
 %config(noreplace) %{_sysconfdir}/collection.conf
 
-
 %files write_http
 %{_libdir}/collectd/write_http.so
 
-
 %files write_kafka
 %{_libdir}/%{name}/write_kafka.so
-
 
 %files write_sensu
 %{_libdir}/collectd/write_sensu.so
@@ -923,7 +881,6 @@ make check
 
 %files write_tsdb
 %{_libdir}/collectd/write_tsdb.so
-
 
 %changelog
 * Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.0-5
