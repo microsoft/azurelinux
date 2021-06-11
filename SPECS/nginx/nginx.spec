@@ -1,7 +1,7 @@
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
-Version:        1.16.1
-Release:        4%{?dist}
+Version:        1.20.1
+Release:        1%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,8 +10,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-Patch0:         CVE-2019-20372.patch
-Patch1:         CVE-2009-4487.nopatch
+Patch0:         CVE-2009-4487.nopatch
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
@@ -79,6 +78,9 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_lib}/systemd/system/nginx.service
 %{_var}/log/nginx
 
 %changelog
+* Fri Jun 11 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.20.1-1
+- Update to version 1.20.1 to resolve CVE-2021-23017
+
 * Tue Nov 17 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.1-4
 - nopatch for CVE-2009-4487
 
