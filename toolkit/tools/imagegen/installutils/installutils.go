@@ -1348,7 +1348,6 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
 			return
 		}
-		defer os.Remove(authorizedKeysTempFile)
 	} else {
 		err = os.Truncate(authorizedKeysTempFile, 0)
 		if err != nil {
@@ -1356,6 +1355,7 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 			return
 		}
 	}
+	defer os.Remove(authorizedKeysTempFile)
 
 	for _, pubKey := range user.SSHPubKeyPaths {
 		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), user.Name)
