@@ -1,16 +1,16 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
 Version:        2.0.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        IJG
 URL:            http://sourceforge.net/projects/libjpeg-turbo
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version}.tar.gz
-%define sha1    libjpeg-turbo=6d74b609294b6bae5a7cde035f7d6b80d60ebb77
 Patch0:         CVE-2018-20330.patch
 Patch1:         CVE-2018-19664.patch
+Patch2:         CVE-2020-17541.patch
 %ifarch x86_64
 BuildRequires:  nasm
 %endif
@@ -26,9 +26,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 mkdir build
@@ -62,9 +60,10 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
-- Added %%license line automatically
-
+*   Fri Jun 11 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.0.0-7
+-   Patch CVE-2020-17541
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.0-5
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Mar 04 2019 Keerthana K <keerthanak@vmware.com> 2.0.0-4
