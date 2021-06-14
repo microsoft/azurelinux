@@ -18,6 +18,7 @@ Patch5:         rsa.patch
 Patch6:         app_main.patch
 Patch7:         app_fips_init_lcl.patch
 Patch8:         drbg.patch
+Patch9:         acvp_dsa.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc

@@ -1,6 +1,14 @@
---- a/app/app_dsa.c	2021-02-19 05:30:47.000000000 -0800
-+++ b/app/app_dsa.c	2021-03-19 12:52:58.498642333 -0700
-@@ -27,8 +27,42 @@
+--- ./app/app_dsa.c	2021-02-19 05:30:47.000000000 -0800
++++ ./app/app_dsa_mariner.c	2021-06-14 10:10:05.079067349 -0700
+@@ -12,6 +12,7 @@
+ #include <openssl/evp.h>
+ #include <openssl/bn.h>
+ #include <openssl/dsa.h>
++#include <openssl/err.h>
+ 
+ #include "app_lcl.h"
+ #include "safe_lib.h"
+@@ -27,8 +28,42 @@
  static int dsa_current_keygen_tg = 0;
  static int dsa_current_siggen_tg = 0;
  
@@ -44,7 +52,7 @@
      group_dsa = NULL;
      if (group_p) BN_free(group_p);
      group_p = NULL;
-@@ -71,7 +105,7 @@
+@@ -71,7 +106,7 @@
              /* Free the global "group" variables before re-allocating */
              app_dsa_cleanup();
  
@@ -53,7 +61,7 @@
              if (!group_dsa) {
                  printf("Failed to allocate DSA strcut\n");
                  return 1;
-@@ -79,7 +113,7 @@
+@@ -79,7 +114,7 @@
              L = tc->l;
              N = tc->n;
  
@@ -62,7 +70,7 @@
                                        NULL, NULL, NULL, NULL) <= 0) {
                  printf("Parameter Generation error\n");
                  return 1;
-@@ -120,8 +154,8 @@
+@@ -120,8 +155,8 @@
          tc->y_len = BN_bn2bin(pub_key, tc->y);
  #if OPENSSL_VERSION_NUMBER >= 0x10100000L
          if (tmp_pub_key && tmp_priv_key) {
@@ -73,7 +81,7 @@
          }
  #endif
          break;
-@@ -164,7 +198,7 @@
+@@ -164,7 +199,7 @@
  
          switch (tc->pqg) {
          case ACVP_DSA_PROBABLE:
@@ -82,7 +90,7 @@
              if (!dsa) {
                  printf("Failed to allocate DSA strcut\n");
                  return 1;
-@@ -172,16 +206,16 @@
+@@ -172,16 +207,16 @@
              L = tc->l;
              N = tc->n;
  
@@ -103,7 +111,7 @@
                  return 1;
              }
  
-@@ -199,16 +233,16 @@
+@@ -199,16 +234,16 @@
              else
                  r = 1;
  
@@ -126,7 +134,7 @@
              if (!dsa) {
                  printf("Failed to allocate DSA strcut\n");
                  return 1;
-@@ -216,9 +250,9 @@
+@@ -216,9 +251,9 @@
              L = tc->l;
              N = tc->n;
  
@@ -139,7 +147,7 @@
              BN_bin2bn(tc->p, tc->p_len, p);
              BN_bin2bn(tc->q, tc->q_len, q);
              BN_bin2bn(tc->g, tc->g_len, g);
-@@ -230,11 +264,11 @@
+@@ -230,11 +265,11 @@
              DSA_set0_pqg(dsa, BN_dup(p), BN_dup(q), BN_dup(g));
  #endif
  
@@ -153,7 +161,7 @@
                  return 1;
              }
  
-@@ -251,11 +285,11 @@
+@@ -251,11 +286,11 @@
                  r = 1;
              }
  
@@ -170,7 +178,7 @@
              tc->result = r;
              break;
          default:
-@@ -302,15 +336,15 @@
+@@ -302,15 +337,15 @@
              break;
          }
  
@@ -189,7 +197,7 @@
              return 1;
          }
          L = tc->l;
-@@ -354,8 +388,8 @@
+@@ -354,8 +389,8 @@
          n = tc->msglen;
          r = FIPS_dsa_verify(dsa, (const unsigned char *)tc->msg, n, md, sig);
  
@@ -200,7 +208,7 @@
          /* return result, 0 is failure, 1 is pass */
          tc->result = r;
          break;
-@@ -402,7 +436,7 @@
+@@ -402,7 +437,7 @@
              /* Free the global "group" variables before re-allocating */
              app_dsa_cleanup(); 
  
@@ -209,7 +217,7 @@
              if (!group_dsa) {
                  printf("Failed to allocate DSA strcut\n");
                  return 1;
-@@ -410,7 +444,7 @@
+@@ -410,7 +445,7 @@
              L = tc->l;
              N = tc->n;
  
@@ -218,7 +226,7 @@
                                        NULL, NULL, NULL, NULL) <= 0) {
                  printf("Parameter Generation error\n");
                  return 1;
-@@ -460,11 +494,11 @@
+@@ -460,11 +495,11 @@
          tc->s_len = BN_bn2bin(sig_s, tc->s);
  #if OPENSSL_VERSION_NUMBER >= 0x10100000L
          if (tmp_r && tmp_s) {
@@ -233,9 +241,47 @@
          break;
  
      case ACVP_DSA_MODE_PQGGEN:
-@@ -510,11 +544,11 @@
+@@ -505,16 +540,47 @@
  
+         switch (tc->gen_pq) {
+         case ACVP_DSA_UNVERIFIABLE:
+-            printf("DSA Parameter Generation2 error for %d, not supported\n", tc->gen_pq);
+-            return 1;
++            printf("P value: %s\n", tc->p);
++
++            dsa = DSA_new();
+ 
++            p = BN_new();
++            q = BN_new();
++            g = BN_new();
++            BN_bin2bn(tc->p, tc->p_len, p);
++            BN_bin2bn(tc->q, tc->q_len, q);
++
++            tmp_p = BN_dup(p);
++            tmp_q = BN_dup(q);
++            tmp_g = BN_dup(g);
++            DSA_set0_pqg(dsa, tmp_p, tmp_q, tmp_g);
++
++            L = tc->l;
++            N = tc->n;
++            if (FIPS_dsa_builtin_paramgen2(dsa, L, N, md,
++                                      NULL, 0, 0, NULL,
++                                      NULL, NULL, NULL) <= 0) {
++                ERR_print_errors_fp(stdout);
++                printf("DSA Parameter Generation2 error for %d\n", tc->gen_pq);
++                DSA_free(dsa);
++                return 1;
++            }
++
++            DSA_get0_pqg(dsa, NULL, NULL, &tmp_g1);
++            tc->g_len = BN_bn2bin(tmp_g1, tc->g);
++
++            BN_free(p);
++            BN_free(q);
++            BN_free(g);
++            DSA_free(dsa);
              break;
++
          case ACVP_DSA_CANONICAL:
 -            dsa = FIPS_dsa_new();
 +            dsa = DSA_new();
@@ -249,7 +295,7 @@
              BN_bin2bn(tc->p, tc->p_len, p);
              BN_bin2bn(tc->q, tc->q_len, q);
  
-@@ -529,11 +563,11 @@
+@@ -529,11 +595,11 @@
  #endif
              L = tc->l;
              N = tc->n;
@@ -263,7 +309,7 @@
                  return 1;
              }
  #if OPENSSL_VERSION_NUMBER <= 0x10100000L
-@@ -542,22 +576,22 @@
+@@ -542,22 +608,22 @@
              DSA_get0_pqg(dsa, NULL, NULL, &tmp_g1);
              tc->g_len = BN_bn2bin(tmp_g1, tc->g);
  #endif
@@ -293,7 +339,7 @@
                  return 1;
              }
  
-@@ -579,7 +613,7 @@
+@@ -579,7 +645,7 @@
              memcpy_s(tc->seed, DSA_MAX_SEED, &seed, EVP_MD_size(md));
              tc->seedlen = EVP_MD_size(md);
              tc->counter = counter;
