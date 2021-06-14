@@ -704,7 +704,7 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	const (
 		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = 0644
+		machineIDFilePerms = 0444
 	)
 
 	ReportAction("Configuring machine id")
