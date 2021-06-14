@@ -17,6 +17,7 @@ Patch4:         kas.patch
 Patch5:         rsa.patch
 Patch6:         app_main.patch
 Patch7:         app_fips_init_lcl.patch
+Patch8:         drbg.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -67,7 +68,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Wed Mar 17 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
-- Patch aes_app, dsa_app, ecdsa_app, kas_app, and rsa_app.
+- Patch aes_app, dsa_app, ecdsa_app, kas_app, drbg_app and rsa_app.
 
 * Mon Feb 08 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-1
 - Original version for CBL-Mariner. License verified.
