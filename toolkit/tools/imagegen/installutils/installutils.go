@@ -1348,7 +1348,13 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
 			return
 		}
-		defer cleanupExtraFiles(authorizedKeysTempFile)
+		defer os.Remove(authorizedKeysTempFile)
+	} else {
+		err = os.Truncate(authorizedKeysTempFile, 0)
+		if err != nil {
+			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
+			return
+		}
 	}
 
 	for _, pubKey := range user.SSHPubKeyPaths {
@@ -1423,15 +1429,6 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		}
 	}
 
-	return
-}
-
-func cleanupExtraFiles(fileName string) (err error) {
-	err = os.Remove(fileName)
-	if err != nil {
-		logger.Log.Warnf("Failed to cleanup file (%s). Error: %s", fileName, err)
-		return
-	}
 	return
 }
 
