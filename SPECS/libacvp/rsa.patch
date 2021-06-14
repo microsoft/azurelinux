@@ -1,7 +1,10 @@
 --- a/app/app_rsa.c	2021-02-19 05:30:47.000000000 -0800
-+++ b/app/app_rsa.c	2021-03-23 08:12:23.805998155 -0700
-@@ -13,295 +13,7 @@
++++ b/app/app_rsa.c	2021-06-13 20:10:59.703297518 -0700
+@@ -11,297 +11,10 @@
+ #include <openssl/evp.h>
+ #include <openssl/bn.h>
  #include <openssl/rsa.h>
++#include <openssl/err.h>
  #include "app_lcl.h"
  #include "safe_lib.h"
 -#ifdef ACVP_NO_RUNTIME
@@ -167,7 +170,7 @@
 -        rv = ACVP_INVALID_ARG;
 -        goto err;
 -    }
- 
+-
 -    /*
 -     * Set the message digest to the appropriate sha
 -     */
@@ -280,7 +283,7 @@
 -            tc->sig_len = siglen;
 -        }
 -    }
--
+ 
 -    /* Success */
 -    rv = 0;
 -
@@ -296,7 +299,79 @@
  int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
      if (!test_case) {
          return -1;
-@@ -650,7 +362,6 @@
+@@ -424,10 +137,11 @@
+ 
+ int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
+     const EVP_MD *tc_md = NULL;
+-    int pad_mode;
++    int siglen, pad_mode;
+     BIGNUM *bn_e = NULL, *e = NULL, *n = NULL;
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000L
+     BIGNUM  *tmp_e = NULL, *tmp_n = NULL;
++    const BIGNUM  *tmp_e1 = NULL, *tmp_n1 = NULL;
+ #endif
+     ACVP_RSA_SIG_TC    *tc;
+     RSA *rsa = NULL;
+@@ -631,8 +345,56 @@
+         }
+ 
+     } else {
+-        rv = 1;
+-        goto err;
++        if (!RSA_X931_generate_key_ex(rsa, tc->modulo, bn_e, NULL)) {
++            printf("\nError: Issue with keygen during siggen handling\n");
++            goto err;
++        }
++
++        RSA_get0_key(rsa, &tmp_n1, &tmp_e1, NULL);
++        e = BN_dup(tmp_e1);
++        n = BN_dup(tmp_n1);
++
++        tc->e_len = BN_bn2bin(e, tc->e);
++        tc->n_len = BN_bn2bin(n, tc->n);
++
++        if (tc->msg && tc_md) {
++            siglen = RSA_size(rsa);
++
++            pk = EVP_PKEY_new();
++            if (pk == NULL)
++                goto err;
++
++            EVP_PKEY_set1_RSA(pk, rsa);
++
++            pctx = EVP_PKEY_CTX_new(pk, NULL);
++
++            s = OPENSSL_malloc(siglen);
++            if (s == NULL) {
++                goto err;
++            }
++
++            mdhash = OPENSSL_malloc(EVP_MD_size(tc_md));
++            if (mdhash == NULL) {
++                goto err;
++            }
++
++            EVP_Digest(tc->msg, tc->msg_len, mdhash, &md_len, tc_md, NULL);
++
++            EVP_PKEY_sign_init(pctx);
++            EVP_PKEY_CTX_set_rsa_padding(pctx, pad_mode);
++            if (pad_mode == RSA_PKCS1_PSS_PADDING) {
++                EVP_PKEY_CTX_set_rsa_pss_saltlen(pctx, salt_len);
++            }
++
++            EVP_PKEY_CTX_set_signature_md(pctx, tc_md);
++
++            if (EVP_PKEY_sign(pctx, tc->signature, &siglen, mdhash, md_len) <= 0) {
++                ERR_print_errors_fp(stdout);
++                goto err;
++            }
++
++            tc->sig_len = siglen;
++        }
+     }
+ end:
+     /* Success */
+@@ -650,7 +412,6 @@
  
      return rv;
  }
