@@ -7,6 +7,8 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 
+spec_dir_exceptions = { "kubernetes-1.18.14", "kubernetes-1.18.17", "kubernetes-1.19.7", "kubernetes-1.19.9", "kubernetes-1.20.2", "kubernetes-1.20.5" }
+
 # Expected Schema:
 # class LicenseCollection:
 #     header: str
@@ -37,7 +39,6 @@ def deserialize_json(json_file):
 
 
 def get_missing_specs(spec_directories, license_collection):
-    spec_dir_exceptions = { "kubernetes-1.18.14", "kubernetes-1.18.17", "kubernetes-1.19.7", "kubernetes-1.19.9", "kubernetes-1.20.2", "kubernetes-1.20.5" }
     specs_in_json = set()
     for license in license_collection.licenses:
         for spec in license.specs:
