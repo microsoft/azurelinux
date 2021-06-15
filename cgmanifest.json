@@ -704,6 +704,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "collectd",
+          "version": "5.12.0",
+          "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
@@ -1595,8 +1605,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.11",
-          "downloadUrl": "https://dl.google.com/go/go1.15.11.src.tar.gz"
+          "version": "1.15.13",
+          "downloadUrl": "https://dl.google.com/go/go1.15.13.src.tar.gz"
         }
       }
     },
@@ -1855,8 +1865,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.37.1.tar.gz"
+          "version": "5.10.42.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.42.1.tar.gz"
         }
       }
     },
@@ -2155,8 +2165,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.37.1.tar.gz"
+          "version": "5.10.42.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.42.1.tar.gz"
         }
       }
     },
@@ -2165,8 +2175,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.37.1.tar.gz"
+          "version": "5.10.42.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.42.1.tar.gz"
         }
       }
     },
@@ -2175,8 +2185,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.37.1.tar.gz"
+          "version": "5.10.42.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.42.1.tar.gz"
         }
       }
     },
@@ -3865,8 +3875,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.16.1",
-          "downloadUrl": "https://nginx.org/download/nginx-1.16.1.tar.gz"
+          "version": "1.20.1",
+          "downloadUrl": "https://nginx.org/download/nginx-1.20.1.tar.gz"
         }
       }
     },
@@ -3905,8 +3915,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "8.11.4",
-          "downloadUrl": "https://nodejs.org/download/release/v8.11.4/node-v8.11.4.tar.xz"
+          "version": "8.17.0",
+          "downloadUrl": "https://nodejs.org/download/release/v8.17.0/node-v8.17.0.tar.xz"
         }
       }
     },
@@ -3915,8 +3925,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "9.11.2",
-          "downloadUrl": "https://nodejs.org/download/release/v9.11.2/node-v9.11.2.tar.xz"
+          "version": "14.17.0",
+          "downloadUrl": "https://nodejs.org/download/release/v14.17.0/node-v14.17.0.tar.xz"
         }
       }
     },
@@ -4695,8 +4705,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.6",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.6/postgresql-12.6.tar.bz2"
+          "version": "12.7",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.7/postgresql-12.7.tar.bz2"
         }
       }
     },
@@ -5957,6 +5967,16 @@
           "name": "rapidjson",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "re2",
+          "version": "20190801",
+          "downloadUrl": "https://github.com/google/re2/archive/2019-08-01.tar.gz"
         }
       }
     },
@@ -7667,6 +7687,16 @@
           "name": "xz",
           "version": "5.2.4",
           "downloadUrl": "http://tukaani.org/xz/xz-5.2.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "yajl",
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/lloyd/yajl/archive/2.1.0.tar.gz"
         }
       }
     },
