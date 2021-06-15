@@ -1,7 +1,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        6.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPL
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
@@ -10,6 +10,7 @@ Patch0:         CVE-2019-3886.nopatch
 # The fix for this CVE is already in 6.1.0.
 Patch1:         CVE-2017-1000256.nopatch
 Patch2:         CVE-2020-25637.patch
+Patch3:         CVE-2020-10701.patch
 Group:          Virtualization/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -128,6 +129,8 @@ make check
 %{_mandir}/*
 
 %changelog
+*   Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> 6.1.0-3
+-   Patch CVE-2020-10701
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 6.1.0-2
 -   Use autosetup
 -   Patch CVE-2020-25637
