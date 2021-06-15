@@ -165,3 +165,4 @@ p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
 ca-certificates-shared-20200720-14.cm1.noarch.rpm
 ca-certificates-tools-20200720-14.cm1.noarch.rpm
 ca-certificates-base-20200720-14.cm1.noarch.rpm
+libselinux-2.9-3.cm1.aarch64.rpm
