@@ -23,7 +23,7 @@ Patch4:         CVE-2013-0222.nopatch
 Patch5:         CVE-2013-0223.nopatch
 Requires:       gmp
 BuildRequires:  libselinux-devel
-BuildRequires:  libselinux
+Requires:  libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 
