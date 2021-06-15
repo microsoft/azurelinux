@@ -27,6 +27,8 @@ Requires:       cracklib
 Requires:       pam
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
+BuildRequires:  libselinux
+BuildRequires:  libsemanage
 
 %description
 The Shadow package contains programs for handling passwords
