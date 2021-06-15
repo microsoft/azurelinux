@@ -18,3 +18,12 @@
      case ACVP_DSA_PROBABLE:
      case ACVP_DSA_PROVABLE:
          break;
+@@ -1163,6 +1174,8 @@
+             int diff = 0;
+             strcmp_s("canonical", 9, gmode, &diff);
+             if (!diff) gpq = ACVP_DSA_CANONICAL;
++            strcmp_s("unverifiable", 12, gmode, &diff);
++            if (!diff) gpq = ACVP_DSA_UNVERIFIABLE;
+         }
+         if (pqmode) {
+             int diff = 0;
