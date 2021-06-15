@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 600,
+            "MaxSize": 1500,
             "Artifacts": [
                 {
                     "Name": "cblmariner-gen2",
@@ -58,6 +58,9 @@
             ],
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "KernelCommandLine": {
+                "ExtraCommandLine": "console=ttyS0"
             },
             "Hostname": "cbl-mariner"
         }
