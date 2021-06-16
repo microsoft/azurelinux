@@ -6,7 +6,7 @@ License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
-URL:            http://www.gnu.org/software/grep
+URL:            https://www.gnu.org/software/grep
 Source0:        http://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
 Patch0:         grep-3.31-man-fix-gs.patch
 Patch1:         grep-3.31-help-align.patch
