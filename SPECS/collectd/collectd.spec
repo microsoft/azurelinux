@@ -2,7 +2,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -265,7 +265,7 @@ This plugin collects statictics of OVS connected bridges and interfaces.
 %package -n perl-Collectd
 Summary:        Perl bindings for collectd
 Requires:       %{name} = %{version}-%{release}
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl
 
 %description -n perl-Collectd
 This package contains the Perl bindings and plugin for collectd.
@@ -376,9 +376,7 @@ Summary:        Contrib web interface to viewing rrd files
 Requires:       %{name} = %{version}-%{release}
 Requires:       collectd-rrdtool = %{version}-%{release}
 Requires:       httpd
-Requires:       perl-HTML-Parser
-Requires:       perl-Regexp-Common
-Requires:       rrdtool-perl
+Requires:       perl
 
 %description web
 This package will allow for a simple web interface to view rrd files created by
@@ -883,6 +881,9 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Tue Jun 15 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.0-6
+- Update Requires to perl package
+
 * Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.0-5
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
