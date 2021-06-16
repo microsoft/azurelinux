@@ -47,7 +47,7 @@ https://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz
 http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.30-i18n-1.patch
 https://ftp.gnu.org/gnu/diffutils/diffutils-3.6.tar.xz
 https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2
-ftp://ftp.astron.com/pub/file/file-5.38.tar.gz
+ftp://ftp.astron.com/pub/file/file-5.34.tar.gz
 http://ftp.gnu.org/gnu/gawk/gawk-4.2.1.tar.xz
 http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz
 http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz

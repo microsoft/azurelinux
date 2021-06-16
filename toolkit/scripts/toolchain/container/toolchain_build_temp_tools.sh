@@ -433,14 +433,14 @@ rm -rf diffutils-3.6
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.38
-tar xf file-5.38.tar.gz
-pushd file-5.38
+echo File-5.34
+tar xf file-5.34.tar.gz
+pushd file-5.34
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.38
+rm -rf file-5.34
 
 touch $LFS/logs/temptoolchain/status_file_complete
 

@@ -198,15 +198,15 @@ popd
 rm -rf zlib-1.2.11
 touch /logs/status_zlib_complete
 
-echo File-5.38
-tar xf file-5.38.tar.gz
-pushd file-5.38
+echo File-5.34
+tar xf file-5.34.tar.gz
+pushd file-5.34
 ./configure --prefix=/usr
 # Note: libmagic issue. --libdir=/usr/lib/x86_64-linux-gnu ?
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.38
+rm -rf file-5.34
 touch /logs/status_file_complete
 
 echo Readline-7.0
