@@ -118,34 +118,34 @@ popd
 rm -rf libxcb-1.12
 
 # freetype 2
-echo freetype-2.8
-tar xf freetype-2.8.tar.bz2
-pushd freetype-2.8
+echo freetype-2.9.1
+tar xf freetype-2.9.1.tar.gz
+pushd freetype-2.9.1
 sed -ri "s:.*(AUX_MODULES.*valid):\1:" modules.cfg
 sed -r "s:.*(#.*SUBPIXEL_RENDERING) .*:\1:" \
     -i include/freetype/config/ftoption.h
 ./configure --prefix=/usr --disable-static
 make
 make install
-install -v -m755 -d /usr/share/doc/freetype-2.8
-cp -v -R docs/*     /usr/share/doc/freetype-2.8
+install -v -m755 -d /usr/share/doc/freetype-2.9.1
+cp -v -R docs/*     /usr/share/doc/freetype-2.9.1
 popd
-rm -rf freetype-2.8
+rm -rf freetype-2.9.1
 
 # fontconfig
-echo fontconfig-2.12.4
-tar xf fontconfig-2.12.4.tar.bz2
-pushd fontconfig-2.12.4
+echo fontconfig-2.13.91
+tar xf fontconfig-2.13.91.tar.gz
+pushd fontconfig-2.13.91
 rm -f src/fcobjshash.h
 ./configure --prefix=/usr        \
             --sysconfdir=/etc    \
             --localstatedir=/var \
             --disable-docs       \
-            --docdir=/usr/share/doc/fontconfig-2.12.4
+            --docdir=/usr/share/doc/fontconfig-2.13.91
 make
 make install
 popd
-rm -rf fontconfig-2.12.4
+rm -rf fontconfig-2.13.91
 
 # Xorg Libraries
 echo Xorg Libraries
