@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch17:        openssl-1.1.1-kdf-selftest.patch
 Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
+Patch21:        openssl-1.1.1-seed.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -126,6 +127,7 @@ cp %{SOURCE4} test/
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -321,8 +323,13 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-4
+- In FIPS mode, use jitterentropy for DRBG nonce.
+- In FIPS mode, concatenate Linux RNG with personalization string during DRBG instantiation
+- In FIPS mode, concatenate Linux RNG with additional input string during DRBG reseed 
+
 * Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
-- In FIPS mode, use only jitterentropy
+- In FIPS mode, use only jitterentropy for entropy pool
 
 * Tue May 11 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-2
 - Remove FIPS DRBG rewire patch
