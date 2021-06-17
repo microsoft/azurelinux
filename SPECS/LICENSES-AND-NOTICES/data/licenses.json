@@ -165,6 +165,7 @@
                 "msgpack",
                 "nlohmann-json",
                 "nmap",
+                "node-problem-detector",
                 "ntopng",
                 "omi",
                 "pcaudiolib",
