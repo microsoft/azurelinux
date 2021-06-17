@@ -122,7 +122,7 @@ rm -rf %{buildroot}
 %doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
-*   Wed Jun 16 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0-2-7
+*   Wed Jun 16 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-7
 -   Add patch to fix libcurl package test issue
 *   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
 -   Disable unreliable multi_timer_test
