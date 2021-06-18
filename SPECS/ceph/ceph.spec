@@ -1,7 +1,10 @@
+#disable debuginfo because ceph-debuginfo rpm is too large
+%define debug_package %{nil}
+
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -52,10 +55,6 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 %{!?python3_version: %global python3_version 3}
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
-
-# disable dwz which compresses the debuginfo
-%global _find_debuginfo_dwz_opts %{nil}
 
 
 #################################################################################
@@ -1796,6 +1795,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+*   Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
+-   Disable debuginfo because ceph-debuginfo rpm is too large
+
 *   Fri May 21 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-1
 -   Update package version to fix CVE-2020-25660, CVE-2020-25678 and CVE-2020-27781
 
