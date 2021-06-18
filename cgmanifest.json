@@ -3925,16 +3925,6 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "8.17.0",
-          "downloadUrl": "https://nodejs.org/download/release/v8.17.0/node-v8.17.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nodejs",
           "version": "14.17.0",
           "downloadUrl": "https://nodejs.org/download/release/v14.17.0/node-v14.17.0.tar.xz"
         }
