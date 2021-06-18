@@ -214,7 +214,7 @@ GIT_AUTHOR_DATE=2000-01-01T01:01:01 GIT_COMMITTER_DATE=2000-01-01T01:01:01 \
 git commit -m "Dummy commit just to satisfy bazel" &> /dev/null
 
 # workaround for boo#1183836
-CC=gcc CXX=g++ bazel build \
+CC=gcc CXX=g++ bazel --batch build \
     -c dbg \
     --color=no \
     --copt="-fsigned-char" \
