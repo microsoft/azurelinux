@@ -1,0 +1,8 @@
+# Ignore the following warnings in envoy-proxy-source package.
+addFilter("envoy-proxy-source.* files-duplicate")
+addFilter("envoy-proxy-source.* hidden-file-or-dir")
+addFilter("envoy-proxy-source.* non-executable-script")
+addFilter("envoy-proxy-source.* pem-certificate")
+addFilter("envoy-proxy-source.* script-without-shebang")
+addFilter("envoy-proxy-source.* suse-filelist-forbidden-fhs23")
+addFilter("envoy-proxy-source.* zero-length")

@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.15.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
+Provides:       go = %{version}-%{release}
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
@@ -115,6 +116,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.15.7-2
+- Provides go from golang
+
 * Wed Feb 03 2021 Andrew Phelps <anphel@microsoft.com> - 1.15.7-1
 - Updated to version 1.15.7 to fix CVE-2021-3114
 

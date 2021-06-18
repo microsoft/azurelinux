@@ -1,0 +1,43 @@
+From 985ab6187924735a335a8ddb7b5e9c042e47cd81 Mon Sep 17 00:00:00 2001
+From: Michal Rostecki <mrostecki@opensuse.org>
+Date: Fri, 11 Sep 2020 00:24:03 +0200
+Subject: [PATCH 3/3] build: Add explicit requirement on rules_cc
+
+Signed-off-by: Michal Rostecki <mrostecki@opensuse.org>
+---
+ bazel/repositories.bzl         | 1 +
+ bazel/repository_locations.bzl | 6 ++++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/bazel/repositories.bzl b/bazel/repositories.bzl
+index 415455e58..29a8682c3 100644
+--- a/bazel/repositories.bzl
++++ b/bazel/repositories.bzl
+@@ -153,6 +153,7 @@ def envoy_dependencies(skip_targets = []):
+     _repository_impl("bazel_toolchains")
+     _repository_impl("bazel_compdb")
+     _repository_impl("envoy_build_tools")
++    _repository_impl("rules_cc")
+ 
+     # Unconditional, since we use this only for compiler-agnostic fuzzing utils.
+     _org_llvm_releases_compiler_rt()
+diff --git a/bazel/repository_locations.bzl b/bazel/repository_locations.bzl
+index 5591fbb78..ef9078f0e 100644
+--- a/bazel/repository_locations.bzl
++++ b/bazel/repository_locations.bzl
+@@ -244,6 +244,12 @@ REPOSITORY_LOCATIONS = dict(
+         sha256 = "a8d6b1b354d371a646d2f7927319974e0f9e52f73a2452d2b3877118169eb6bb",
+         urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.23.3/rules_go-v0.23.3.tar.gz"],
+     ),
++    rules_cc = dict(
++        sha256 = "9d48151ea71b3e225adfb6867e6d2c7d0dce46cbdc8710d9a9a628574dfd40a0",
++        strip_prefix = "rules_cc-818289e5613731ae410efb54218a4077fb9dbb03",
++        # 2020-05-13
++        urls = ["https://github.com/bazelbuild/rules_cc/archive/818289e5613731ae410efb54218a4077fb9dbb03.tar.gz"],
++    ),
+     rules_foreign_cc = dict(
+         sha256 = "3184c244b32e65637a74213fc448964b687390eeeca42a36286f874c046bba15",
+         strip_prefix = "rules_foreign_cc-7bc4be735b0560289f6b86ab6136ee25d20b65b7",
+-- 
+2.28.0
+
