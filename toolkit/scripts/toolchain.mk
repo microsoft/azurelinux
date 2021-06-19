@@ -22,7 +22,6 @@ raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
 	$(shell find $(SCRIPTS_DIR)/toolchain -name *.sh) \
-	$(shell find $(SCRIPTS_DIR)/toolchain/SCRIPTS ) \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
 
 TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
