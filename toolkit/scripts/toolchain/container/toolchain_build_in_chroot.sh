@@ -1162,9 +1162,10 @@ popd
 rm -rf lua-5.3.5
 touch /logs/status_lua_complete
 
-echo rpm-4.14.2
-tar xjf rpm-4.14.2.tar.bz2
-pushd rpm-4.14.2
+echo rpm-4.16.1.3
+tar xjf rpm-4.16.1.3.tar.gz
+mv rpm-rpm-4.16.1.3 rpm-4.16.1.3
+pushd rpm-4.16.1.3
 ./configure --prefix=/usr \
     --enable-posixmutexes \
     --without-selinux \
@@ -1177,7 +1178,7 @@ make install
 install -d /var/lib/rpm
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf rpm-4.14.2
+rm -rf rpm-4.16.1.3
 touch /logs/status_rpm_complete
 
 # Cleanup
