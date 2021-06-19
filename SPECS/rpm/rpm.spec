@@ -1,5 +1,6 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%global sover 9
 Summary:        Package manager
 Name:           rpm
 Version:        4.16.1.3
@@ -206,14 +207,18 @@ rm -rf %{buildroot}
 
 %files libs
 %defattr(-,root,root)
-%{_libdir}/librpmio.so.*
-%{_libdir}/librpm.so.*
+%{_libdir}/librpmio.so.%{sover}
+%{_libdir}/librpmio.so.%{sover}.*
+%{_libdir}/librpm.so.%{sover}
+%{_libdir}/librpm.so.%{sover}.*
 %{_libdir}/rpm/macros
 %{_libdir}/rpm/rpmrc
 %{_libdir}/rpm/platform/*
 
 %files build-libs
-%{_libdir}/librpmbuild.so*
+%{_libdir}/librpmbuild.so.%{sover}
+%{_libdir}/librpmbuild.so.%{sover}.*
+
 
 %files build
 %{_bindir}/rpmbuild
@@ -262,7 +267,8 @@ rm -rf %{buildroot}
 %{_libdir}/librpmio.so
 %{_libdir}/librpm.so
 %{_libdir}/librpmsign.so
-%{_libdir}/librpmsign.so.*
+%{_libdir}/librpmsign.so.%{sover}
+%{_libdir}/librpmsign.so.%{sover}.*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -278,6 +284,7 @@ rm -rf %{buildroot}
 %changelog
 * Wed Jun 23 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.16.1.3-1
 - Update to 4.16.1.3 release.
+- Add sover to .so files to guard against accidental bumps.
 
 * Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-12
 - Add SELinux support
