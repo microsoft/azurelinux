@@ -6065,8 +6065,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.14.2",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.14.2-release.tar.gz"
+          "version": "4.16.1-3",
+            "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/refs/tags/rpm-4.16.1.3.tar.gz"
         }
       }
     },
