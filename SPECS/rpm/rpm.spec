@@ -2,20 +2,17 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Package manager
 Name:           rpm
-Version:        4.14.2
-Release:        12%{?dist}
+Version:        4.16.1.3
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
+Source0:        https://github.com/rpm-software-management/rpm/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
-Patch1:         CVE-2021-20271.patch
-# CVE-2021-20271 patch also patches CVE-2021-3421
-Patch2:         CVE-2021-3421.nopatch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
@@ -279,8 +276,11 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-*   Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-12
--   Add SELinux support
+* Wed Jun 23 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.16.1.3-1
+- Update to 4.16.1.3 release.
+
+* Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-12
+- Add SELinux support
 
 * Thu Apr 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 4.14.2-11
 - Patch CVE-2021-20271 and CVE-2021-3421
