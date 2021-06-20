@@ -637,7 +637,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
 | PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
-| REBUILD_DEP_CHAINS            | y                                                                                                      | Append --rebuild-missing-dep-chains to graphoptimizer package list if set to 'y'
+| REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 
 ---
 
