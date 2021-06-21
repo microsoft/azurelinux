@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 URL:            http://www.netfilter.org/projects/iptables
 Group:          System Environment/Security
@@ -18,6 +18,7 @@ BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd
 Requires:       systemd
+Requires:       iana-etc
 %description
 The next part of this chapter deals with firewalls. The principal
 firewall tool for Linux is Iptables. You will need to install
@@ -95,6 +96,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-5
+-   Add dependency on iana-etc
 *   Thu Mar 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-4
 -   Add ssh brute force prevention to ip4save and ip6save
 -   License verified
