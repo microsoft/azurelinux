@@ -62,7 +62,7 @@ make check
 * Thu Jun 03 2021 Nick Samson <nisamson@microsoft.com> - 4.3.4-1
 - Upgraded to 4.3.4 to address CVE-2021-20236, updated URL
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.3.2-2
+* Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.3.2-2
 - Added %%license line automatically
 
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 4.3.2-1
