@@ -3,16 +3,15 @@
 
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.6.1
-Release:        8%{?dist}
+Version:        3.14.0
+Release:        1%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://developers.google.com/protocol-buffers/
-#Source0:       https://github.com/protocolbuffers/protobuf/archive/v%{version}.tar.gz
+#Source0:       https://github.com/protocolbuffers/protobuf/archive/v%%{version}/%%{name}-%%{version}-all.tar.gz
 Source0:        protobuf-%{version}.tar.gz
-Source1:        protobuf-m2-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -84,10 +83,6 @@ Requires:       openjre8 >= 1.8.0.45
 This contains protobuf java package.
 
 %prep
-mkdir /root/.m2
-pushd /root/.m2
-tar xf %{SOURCE1} --no-same-owner
-popd
 %setup
 autoreconf -iv
 
@@ -157,6 +152,9 @@ popd
 %{_libdir}/java/protobuf/*.jar
 
 %changelog
+* Mon Jun 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.14.0-1
+- Updating to version 3.14.0 to satisfy requirements from 'grpc' and 'collectd'.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6.1-8
 - Added %%license line automatically
 

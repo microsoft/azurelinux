@@ -56,13 +56,13 @@ The grpc-plugins package contains the grpc plugins.
 %build
 mkdir -p cmake/build
 cd cmake/build
-cmake ../.. -DgRPC_INSTALL=ON \
-   -DBUILD_SHARED_LIBS=ON \
-   -DCMAKE_BUILD_TYPE=Release             \
-   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
-   -DgRPC_CARES_PROVIDER:STRING='package' \
+cmake ../.. -DgRPC_INSTALL=ON                \
+   -DBUILD_SHARED_LIBS=ON                    \
+   -DCMAKE_BUILD_TYPE=Release                \
+   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
+   -DgRPC_CARES_PROVIDER:STRING='package'    \
    -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
-   -DgRPC_SSL_PROVIDER:STRING='package'   \
+   -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
 
