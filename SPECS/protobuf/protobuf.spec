@@ -1,6 +1,14 @@
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
+# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
+%define sources_generation 0
+%define m2_cache_tarball_name %{name}-%{version}-m2.tar.gz
+
+%if ! 0%{?sources_generation}
+%define offline_build -o
+%endif
+
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.14.0
@@ -12,6 +20,11 @@ Distribution:   Mariner
 URL:            https://developers.google.com/protocol-buffers/
 #Source0:       https://github.com/protocolbuffers/protobuf/archive/v%%{version}/%%{name}-%%{version}-all.tar.gz
 Source0:        protobuf-%{version}.tar.gz
+# In order to re-generate this source after a version update, switch "sources_generation" to 1
+# and make sure network is enabled during the build. The tarballs will be inside the built 'maven-cached-sources' subpackage.
+%if ! 0%{?sources_generation}
+Source1:        %{m2_cache_tarball_name}
+%endif
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -23,6 +36,18 @@ BuildRequires:  unzip
 
 %description
 Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data. You can find protobuf's documentation on the Google Developers site.
+
+%if 0%{?sources_generation}
+
+%package cached-sources
+Summary:    NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
+
+%description cached-sources
+%{summary}
+This is an artificial package to ease generation of cached sources for
+the regular builds when the "sources_generation" macro is set to 0.
+
+%endif
 
 %package        devel
 Summary:        Development files for protobuf
@@ -83,6 +108,17 @@ Requires:       openjre8 >= 1.8.0.45
 This contains protobuf java package.
 
 %prep
+
+%if ! 0%{?sources_generation}
+
+# Setup maven .m2 cache directory
+mkdir /root/.m2
+pushd /root/.m2
+tar xf %{SOURCE1} --no-same-owner
+popd
+
+%endif
+
 %setup
 autoreconf -iv
 
@@ -96,10 +132,23 @@ python2 setup.py build
 python3 setup.py build
 popd
 pushd java
-mvn package -o
+mvn package %{?offline_build}
 popd
 
 %install
+%if 0%{?sources_generation}
+
+echo "Compressing cached repositories."
+tar --sort=name \
+    --mtime="2021-04-26 00:00Z" \
+    --owner=0 --group=0 --numeric-owner \
+    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    -C /root/.m2 \
+    -cpvz -f %{m2_cache_tarball_name} repository
+mv /root/.m2/%{m2_cache_tarball_name} %{buildroot}%{_prefix}
+
+%endif
+
 export JAVA_HOME=$(find /usr/lib/jvm -name "OpenJDK*")
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 make DESTDIR=%{buildroot} install
@@ -124,6 +173,13 @@ popd
 %{_libdir}/libprotobuf-lite.so.*
 %{_libdir}/libprotobuf.so.*
 %{_libdir}/libprotoc.so.*
+
+%if 0%{?sources_generation}
+
+%files cached-sources
+%{_prefix}/%{m2_cache_tarball_name}
+
+%endif
 
 %files devel
 %defattr(-,root,root)
@@ -154,6 +210,7 @@ popd
 %changelog
 * Mon Jun 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.14.0-1
 - Updating to version 3.14.0 to satisfy requirements from 'grpc' and 'collectd'.
+- Adding steps for re-building Maven cache.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6.1-8
 - Added %%license line automatically

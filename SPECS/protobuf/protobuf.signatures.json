@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "protobuf-3.14.0.tar.gz": "d0f5f605d0d656007ce6c8b5a82df3037e1d8fe8b121ed42e536f569dec16113"
+  "protobuf-3.14.0.tar.gz": "d0f5f605d0d656007ce6c8b5a82df3037e1d8fe8b121ed42e536f569dec16113",
+  "protobuf-3.14.0-m2.tar.gz": "205cd04bea8506bdf512cd7918cc7907aa81ed145d848cd5e0e890adff35b3fd"
  }
 }
