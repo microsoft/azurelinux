@@ -14,7 +14,6 @@ BuildRequires:  pkgconfig(freetype)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(icu-uc)
 Requires:       glib
-
 %if %{with_check}
 BuildRequires:  python3-devel
 %endif
