@@ -13,7 +13,6 @@
 
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
-  byacc \
   initramfs \
   kf5 \
   mariner-repos \
@@ -24,11 +23,6 @@ ignore_list=" \
   python-markupsafe \
   python-requests \
   python-zope-interface \
-  python-nocasedict \
-  python-pywbem \
-  python-repoze-lru \
-  python-sphinxcontrib-websupport \
-  python-yamlloader \
   qt5-rpm-macros \
   runc \
   grub2-efi-binary-signed-aarch64 \
