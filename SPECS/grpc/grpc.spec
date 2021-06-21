@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,16 +17,18 @@ Source0:        %{name}-%{version}.tar.gz
 #  popd
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
-BuildRequires:  git
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  zlib-devel
+BuildRequires:  git
 BuildRequires:  openssl-devel
+BuildRequires:  protobuf-devel
+BuildRequires:  zlib-devel
 
-Requires:       zlib
-Requires:       openssl
 Requires:       c-ares
+Requires:       openssl
+Requires:       protobuf
+Requires:       zlib
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -34,6 +36,7 @@ gRPC is a modern, open source, high-performance remote procedure call (RPC) fram
 %package devel
 Summary:        Development files for grpc
 Requires:       %{name} = %{version}-%{release}
+Requires:       protobuf-devel
 
 %description devel
 The grpc-devel package contains the header files and libraries
@@ -57,9 +60,10 @@ cmake ../.. -DgRPC_INSTALL=ON \
    -DBUILD_SHARED_LIBS=ON \
    -DCMAKE_BUILD_TYPE=Release             \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
-   -DgRPC_ZLIB_PROVIDER:STRING='package'  \
+   -DgRPC_CARES_PROVIDER:STRING='package' \
+   -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
    -DgRPC_SSL_PROVIDER:STRING='package'   \
-   -DgRPC_CARES_PROVIDER:STRING='package' 
+   -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
 
 %install
@@ -77,7 +81,6 @@ find %{buildroot} -name '*.cmake' -delete
 %exclude %{_bindir}/acountry
 %exclude %{_bindir}/ahost
 %exclude %{_bindir}/adig
-%exclude %{_bindir}/protoc*
 
 %files devel
 %{_includedir}/*
@@ -91,6 +94,9 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Mon Jun 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-4
+- Switch to system package for protobuf dependency.
+
 * Wed Apr 28 2021 Nick Samson <nick.samson@microsoft.com> - 1.35.0-3
 - Switch to system package for c-ares dependency.
 
