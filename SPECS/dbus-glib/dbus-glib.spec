@@ -3,25 +3,25 @@ Name:           dbus-glib
 Version:        0.110
 Release:        4%{?dist}
 License:        AFL OR GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://dbus.freedesktop.org/doc/dbus-glib/
 Source0:        https://dbus.freedesktop.org/releases/dbus-glib/%{name}-%{version}.tar.gz
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildRequires:  glib-devel
 BuildRequires:  dbus-devel
-Requires:       glib
+BuildRequires:  glib-devel
 Requires:       dbus
+Requires:       glib
 
 %description
 The D-Bus GLib package contains GLib interfaces to the D-Bus API.
 
-%package    devel
-Summary:    Libraries and headers for the D-Bus GLib bindings
-Requires:   glib-devel
-Requires:   dbus-devel
-Requires:   %{name} = %{version}
-Provides:   pkgconfig(dbus-glib-1)
+%package        devel
+Summary:        Libraries and headers for the D-Bus GLib bindings
+Requires:       %{name} = %{version}
+Requires:       dbus-devel
+Requires:       glib-devel
+Provides:       pkgconfig(dbus-glib-1)
 
 %description devel
 Headers and static libraries for the D-Bus GLib bindings
@@ -70,7 +70,7 @@ Headers and static libraries for the D-Bus GLib bindings
 - License verified- corrected to "AFL OR GPLv2+" from "AFL AND GPLv2+"
 - Fix test suite by compiling unit tests, assertions during %%with_check builds
 - Use configure/make macros
-- Spec linted 
+- Spec linted
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.110-3
 - Added %%license line automatically
