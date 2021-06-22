@@ -9,10 +9,6 @@
 %define offline_build -o
 %endif
 
-%if (! %{with_check}) && (! 0%{?sources_generation})
-%define skip_tests -DskipTests
-%endif
-
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.14.0
@@ -138,7 +134,7 @@ python3 setup.py build
 popd
 
 pushd java
-mvn package %{?offline_build} %{?skip_tests}
+mvn package %{?offline_build}
 popd
 
 %install
