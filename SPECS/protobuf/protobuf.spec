@@ -9,6 +9,10 @@
 %define offline_build -o
 %endif
 
+%if (! %{with_check}) && (! 0%{?sources_generation})
+%define skip_tests -DskipTests
+%endif
+
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.14.0
@@ -127,28 +131,17 @@ autoreconf -iv
 export JAVA_HOME=$(find /usr/lib/jvm -name "OpenJDK*")
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 make %{?_smp_mflags}
+
 pushd python
 python2 setup.py build
 python3 setup.py build
 popd
+
 pushd java
-mvn package %{?offline_build}
+mvn package %{?offline_build} %{?skip_tests}
 popd
 
 %install
-%if 0%{?sources_generation}
-
-echo "Compressing cached repositories."
-tar --sort=name \
-    --mtime="2021-04-26 00:00Z" \
-    --owner=0 --group=0 --numeric-owner \
-    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -C /root/.m2 \
-    -cpvz -f %{m2_cache_tarball_name} repository
-mv /root/.m2/%{m2_cache_tarball_name} %{buildroot}%{_prefix}
-
-%endif
-
 export JAVA_HOME=$(find /usr/lib/jvm -name "OpenJDK*")
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 make DESTDIR=%{buildroot} install
@@ -162,6 +155,19 @@ install -vdm755 %{buildroot}%{_libdir}/java/protobuf
 install -vm644 core/target/protobuf-java-3.6.1.jar %{buildroot}%{_libdir}/java/protobuf
 install -vm644 util/target/protobuf-java-util-3.6.1.jar %{buildroot}%{_libdir}/java/protobuf
 popd
+
+%if 0%{?sources_generation}
+
+echo "Compressing cached repositories."
+tar --sort=name \
+    --mtime="2021-04-26 00:00Z" \
+    --owner=0 --group=0 --numeric-owner \
+    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    -C /root/.m2 \
+    -cpvz -f %{m2_cache_tarball_name} repository
+mv %{m2_cache_tarball_name} %{buildroot}%{_prefix}
+
+%endif
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
