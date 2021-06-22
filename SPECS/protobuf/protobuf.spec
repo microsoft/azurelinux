@@ -9,6 +9,10 @@
 %define offline_build -o
 %endif
 
+%if ! %{with_check}
+%define skip_tests -DskipTests
+%endif
+
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.14.0
@@ -134,7 +138,7 @@ python3 setup.py build
 popd
 
 pushd java
-mvn package %{?offline_build}
+mvn package %{?offline_build} %{?skip_tests}
 popd
 
 %install
@@ -146,7 +150,7 @@ python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 popd
 pushd java
-mvn install %{?offline_build}
+mvn install %{?offline_build} %{?skip_tests}
 install -vdm755 %{buildroot}%{_libdir}/java/protobuf
 install -vm644 core/target/protobuf-java-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
 install -vm644 util/target/protobuf-java-util-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
