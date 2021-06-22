@@ -75,19 +75,13 @@ find %{buildroot} -name '*.cmake' -delete
 %files
 %license LICENSE
 %{_libdir}/*.so.*
-%{_lib64dir}/*.so.*
 %{_datadir}/grpc/roots.pem
-%exclude %{_datadir}/pkgconfig/zlib.pc
-%exclude %{_bindir}/acountry
-%exclude %{_bindir}/ahost
-%exclude %{_bindir}/adig
 
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
 %{_lib64dir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_lib64dir}/pkgconfig/*.pc
 
 %files plugins
 %license LICENSE
