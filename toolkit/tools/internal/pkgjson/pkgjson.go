@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	
 
 	"microsoft.com/pkggen/internal/versioncompare"
 
