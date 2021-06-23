@@ -134,8 +134,9 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 
 %changelog
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 7.0.3-3
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License Verified
 - Define _vpath_builddir as the current build directory
-
 
 * Mon May 03 2021 Vitaly Zaitsev <vitaly@easycoding.org> - 7.0.3-2
 - Fixed RHBZ#1956521.

@@ -261,10 +261,12 @@ fdupes %{buildroot}%{src_install_dir}
 %{src_install_dir}
 
 %changelog
-* Tue Jun 15 2021 Henry Li <lihl@microsoft.com>  1.14.4-3.4
+* Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.14.4-3.4
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
-- Use CBL-Mariner supported build dependencies
+- Use gcc-c++ for BR
+- Use ninja-build for BR
+- Use golang for BR
 - Change package name from envoy-proxy to envoy
 - Use gcc instead of gcc10, which is not supported in CBL-Mariner
 - Use bazel batch mode to build

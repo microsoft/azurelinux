@@ -51,7 +51,7 @@ cp LICENSE README.md ..
 %{_datadir}/%{name}
 
 %changelog
-* Mon Jun 21 2021 Henry Li <lihl@microsoft.com>   20200113-1.7
+* Mon Jun 21 2021 Henry Li <lihl@microsoft.com> - 20200113-1.7
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
 - Fix Source URL

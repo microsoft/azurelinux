@@ -101,6 +101,11 @@ popd
 
 
 %changelog
+* Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 4.2-6
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- License Verified
+- Disable building docs
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 

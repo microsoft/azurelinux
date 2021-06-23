@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           patchelf
 Version:        0.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A utility for patching ELF binaries
 
 License:        GPLv3+
@@ -54,6 +54,10 @@ rm -rf %{buildroot}/usr/share/doc/%{name}
 %{_mandir}/man1/patchelf.1*
 
 %changelog
+* Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 0.12-3
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- License Verified
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 

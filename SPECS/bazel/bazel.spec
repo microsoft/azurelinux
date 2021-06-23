@@ -87,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Wed Jun 09 2021 Henry Li <lihl@microsoft.com>   2.2.0-2
+* Wed Jun 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-2
 - Remove distro condition checks that do not apply for CBL-Mariner
 
 * Thu Jul 16 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com>   2.2.0-1
