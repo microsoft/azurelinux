@@ -51,7 +51,7 @@ touch %{buildroot}/%{_localstatedir}/log/waagent.log
 # python refers to python2 version on CBL-Mariner hence update to use python3
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
-sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_lib}/systemd/system/waagent.service
+sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_libdir}/systemd/system/waagent.service
 
 %check
 python3 setup.py check && python3 setup.py test
@@ -74,10 +74,12 @@ python3 setup.py check && python3 setup.py test
 %config %{_sysconfdir}/waagent.conf
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
-%{_lib}/python3.7/site-packages/*
+%{python3_sitelib}/*
 
 %changelog
 * Mon Jun 21 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.54.2-1
+- Fix incorrect %%{_lib} macro usage
+- Use python3 macros
 - Merge the following releases from 1.0 to the dev spec:
 - schalam@microsoft.com, 2.2.54.2-1: Upgrade to version 2.2.54.2 which has Mariner distro support.
 

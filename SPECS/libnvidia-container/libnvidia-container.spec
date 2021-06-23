@@ -4,7 +4,7 @@
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.3.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -124,13 +124,16 @@ This package contains command-line tools that facilitate using the library.
 
 %files -n %{name}%{_major}-debuginfo
 %license %{_licensedir}/*
-%{_lib}/debug%{_libdir}/lib*.so.*
+%{_libdir}/debug%{_libdir}/lib*.so.*
 
 %files tools
 %license %{_licensedir}/*
 %{_bindir}/*
 
 %changelog
+* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com. - 1.3.3-3
+- Fix improper usage of %%{_lib} macro
+
 * Fri Apr 23 2021 joseph knierman <joknierm@microsoft.com> - 1.3.3-2
 - License verified
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
