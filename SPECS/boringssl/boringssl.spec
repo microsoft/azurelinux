@@ -24,6 +24,8 @@ Version:        20200921
 Release:        1.2
 Summary:        An SSL/TLS protocol implementation
 License:        OpenSSL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Sources
 URL:            https://boringssl.googlesource.com/boringssl/
 #Source0:       https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz

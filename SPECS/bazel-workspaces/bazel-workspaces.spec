@@ -22,6 +22,8 @@ Version:        20200113
 Release:        1.7
 Summary:        Bazel workspaces for libraries packaged in openSUSE
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Tools/Building
 Url:            https://github.com/kubic-project/bazel-workspaces
 #Source0:       https://github.com/kubic-project/%{name}/archive/%{commit}.tar.gz

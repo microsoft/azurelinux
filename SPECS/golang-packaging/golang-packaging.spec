@@ -21,6 +21,8 @@ Version:        15.0.15
 Release:        1.4
 Summary:        A toolchain to help packaging golang
 License:        GPL-3.0-only
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Languages/Golang
 URL:            https://github.com/openSUSE/%{name}
 #Source0:       https://github.com/openSUSE/%{name}/archive/refs/tags/v%{version}.tar.gz

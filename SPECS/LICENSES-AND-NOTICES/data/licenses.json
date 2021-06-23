@@ -35,7 +35,10 @@
                 "dwz",
                 "ebtables",
                 "extra-cmake-modules",
+                "fdupes",
+                "fmt",
                 "fribidi",
+                "gcovr",
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
@@ -69,6 +72,7 @@
                 "mozjs60",
                 "open-vm-tools",
                 "openssl",
+                "patchelf",
                 "p11-kit",
                 "perl-JSON",
                 "pkgconf",
@@ -205,6 +209,10 @@
             "specs": [
                 "ant",
                 "ant-contrib",
+                "bazel-workspaces",
+                "boringssl",
+                "envoy",
+                "golang-packaging",
                 "jna"
             ]
         },
@@ -751,6 +759,13 @@
             "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
             "specs": [
                 "ceph"
+            ]
+        },
+        {
+            "origin": "Vincent Batts Open Source",
+            "license": "????",
+            "specs": [
+                "bazel"
             ]
         }
     ]

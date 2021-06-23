@@ -26,6 +26,8 @@ Version:        1.14.4
 Release:        3.4
 Summary:        L7 proxy and communication bus
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.envoyproxy.io/
 #Source0:       https://github.com/envoyproxy/envoy/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
