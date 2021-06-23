@@ -412,7 +412,7 @@ fi;
 %dir /run/named
 
 %files libs
-%{_libdir}/*so.*
+%{_libdir}/*-%{version}*.so
 %exclude %{_libdir}/libdns-pkcs11*
 %exclude %{_libdir}/libns-pkcs11*
 
@@ -533,6 +533,9 @@ fi;
 
 %changelog
 * Mon Jun 21 2021 Thomas Crain <thcrain@microsoft.com> - 9.16.15-1
+- Update patches for a new version
+- Remove unprovided soname version of libraries
+- Include versioned library names in libs subpackage
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 9.16.15-1: Update version to 9.16.15 to fix CVE-2021-25215
 
