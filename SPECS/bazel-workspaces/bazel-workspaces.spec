@@ -15,15 +15,17 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+%define commit  7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6
 
 Name:           bazel-workspaces
 Version:        20200113
-Release:        1.6
+Release:        1.7
 Summary:        Bazel workspaces for libraries packaged in openSUSE
 License:        Apache-2.0
 Group:          Development/Tools/Building
 Url:            https://github.com/kubic-project/bazel-workspaces
-Source:         %{name}-%{version}.tar.xz
+#Source0:       https://github.com/kubic-project/%{name}/archive/%{commit}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  fdupes
 BuildArch:      noarch
 
@@ -32,14 +34,16 @@ Bazel workspaces for libraries packaged in openSUSE which allow to link those
 libraries dynamically to software build by Bazel.
 
 %prep
-%setup -q
+%setup -q -c -n %{name}-%{version}
 
 %build
 
 %install
+cd %{name}-%{commit}
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -R * %{buildroot}%{_datadir}/%{name}
 rm -f %{buildroot}%{_datadir}/%{name}/{LICENSE,README.md}
+cp LICENSE README.md ..
 
 %files
 %license LICENSE
@@ -47,6 +51,11 @@ rm -f %{buildroot}%{_datadir}/%{name}/{LICENSE,README.md}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Jun 21 2021 Henry Li <lihl@microsoft.com>   20200113-1.7
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- License Verified
+- Fix Source URL
+
 * Mon Jan 13 2020 mrostecki@opensuse.org
 - Update to version 20200113:
   * Add workspace for re2

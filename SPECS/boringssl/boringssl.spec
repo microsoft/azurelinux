@@ -26,7 +26,8 @@ Summary:        An SSL/TLS protocol implementation
 License:        OpenSSL
 Group:          Development/Sources
 URL:            https://boringssl.googlesource.com/boringssl/
-Source:         %{name}-%{version}.tar.xz
+#Source0:       https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Patch0:         0002-crypto-Fix-aead_test-build-on-aarch64.patch
 Patch1:         0003-enable-s390x-builds.patch
 Patch2:         0004-fix-alignment-for-ppc64le.patch
@@ -72,7 +73,11 @@ BuildArch:      noarch
 Source files for BoringSSL implementation
 
 %prep
-%autosetup -p1
+%setup -q -c -n %{name}-%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 %cmake \
@@ -133,6 +138,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com>   20200921-1.2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
+- Fix Source URL
 - Change build requirement from ninja to ninja-build
 - Modify location of shared library files
 - Add _binaries_in_noarch_packages_terminate_build definition to resolve arch dependent binary error 

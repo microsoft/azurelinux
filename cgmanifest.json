@@ -396,7 +396,7 @@
         "other": {
           "name": "bazel-workspaces",
           "version": "20200113",
-          "downloadUrl": "https://github.com/kubic-project/bazel-workspaces"
+          "downloadUrl": "https://github.com/kubic-project/bazel-workspaces/archive/7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6.tar.gz"
         }
       }
     },
@@ -516,7 +516,7 @@
         "other": {
           "name": "boringssl",
           "version": "20200921",
-          "downloadUrl": "https://boringssl.googlesource.com/boringssl/"
+          "downloadUrl": "https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz"
         }
       }
     },
