@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -111,8 +112,6 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 		overlayWorkDir = "/overlaywork"
 		rpmDirName     = "RPMS"
 	)
-
-	var builtRPMs []string
 
 	srpmBaseName := filepath.Base(srpmFile)
 
