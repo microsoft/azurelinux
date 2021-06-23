@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -10,6 +10,10 @@ Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
+Patch2:         CVE-2020-13950.patch
+Patch3:         CVE-2020-35452.patch
+Patch4:         CVE-2021-26690.patch
+Patch5:         CVE-2021-30641.patch
 
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100: CVE-1999-0236.nopatch
@@ -68,6 +72,10 @@ The httpd-tools of httpd.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 %configure \
@@ -192,6 +200,9 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-4
+-   CVE-2020-13950 CVE-2021-26690 CVE-2021-30641 and CVE-2020-35452 fixes
+
 *   Tue Oct 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.46-3
 -   Mark CVE-2007-0086 as nopatch
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.46-2
