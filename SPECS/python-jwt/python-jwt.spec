@@ -19,7 +19,7 @@ encrypted JSON objects.}
 
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -36,8 +36,11 @@ Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 1.4.0
-BuildRequires:  python3-pytest
 Requires:       python3-cryptography >= 1.4.0
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-atomicwrites
+%endif
 %{?python_provide:%python_provide python3-%{pkgname}}
 
 %description -n python3-%{pkgname} %{common_description}
@@ -56,7 +59,10 @@ rm setup.cfg
 %{?with_python3:python3 setup.py install --skip-build --root=%{buildroot}}
 
 %check
-%{?with_python3:PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose tests}
+pip3 install pluggy>=0.7 more-itertools>=4.0.0 attrs==19.1.0 pytest==4.0.1
+PATH=%{buildroot}%{_bindir}:${PATH} \
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    python%{python3_version} -m pytest -v
 
 %if %{with python3}
 %files -n python3-%{pkgname}
@@ -69,6 +75,9 @@ rm setup.cfg
 %endif
 
 %changelog
+* Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-9
+- Pass check section
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.7.1-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update Source0 to a full url instead of a macro.
