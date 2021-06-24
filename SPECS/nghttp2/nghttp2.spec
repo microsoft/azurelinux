@@ -17,14 +17,17 @@ BuildRequires:  openssl-devel
 BuildRequires:  systemd
 BuildRequires:  zlib-devel
 
+Provides:       libnghttp2 = %{version}-%{release}
+
 %description
 Implementation of the Hypertext Transfer Protocol version 2 in C.
 
 %package devel
 Summary:        Header files for nghttp2
 
-Requires:       %{name} = %{version}-%{release}
 Provides:       libnghttp2-devel = %{version}-%{release}
+
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 These are the header files of nghttp2.
@@ -59,8 +62,8 @@ rm %{buildroot}/%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 1.41.0-2
-- Provides libnghttp2-devel from nghttp2-devel
+* Wed Jun 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-2
+- Adding 'Provides' for 'libhttpng2*' subpackages to align with other naming for the package.
 
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-1
 - Upgrading to 1.41.0 to fix CVE-2020-11080.
