@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -14,6 +14,7 @@ Patch2:         CVE-2020-13950.patch
 Patch3:         CVE-2020-35452.patch
 Patch4:         CVE-2021-26690.patch
 Patch5:         CVE-2021-30641.patch
+Patch6:         CVE-2021-26691.patch
 
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100: CVE-1999-0236.nopatch
@@ -76,6 +77,7 @@ The httpd-tools of httpd.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 %configure \
@@ -200,6 +202,9 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5
+-   CVE-2021-26691 fix
+
 *   Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-4
 -   CVE-2020-13950 CVE-2021-26690 CVE-2021-30641 and CVE-2020-35452 fixes
 
