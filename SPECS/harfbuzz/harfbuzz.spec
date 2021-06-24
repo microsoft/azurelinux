@@ -64,7 +64,7 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
 
 %changelog
-* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
+* Thu Jun 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
 - Fix pkgconfig(freetype2) dependency (incorrect pkgconfig name)
 
 * Mon Jun 21 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-2
