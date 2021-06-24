@@ -79,7 +79,7 @@ make DESTDIR=%{buildroot} install
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-4
 - Added %%license line automatically
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.20.2-3
+* Fri Mar 06 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.3.1-3
 - Fixed Source URL. Verified license. Fixed URL. Fixed Source URL.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.1-2
