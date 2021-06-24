@@ -3,20 +3,19 @@ Name:           protobuf-c
 Version:        1.3.2
 Release:        1%{?dist}
 License:        BSD-3-Clause
-Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Libraries
 URL:            https://github.com/protobuf-c/protobuf-c
 Source0:        https://github.com/protobuf-c/protobuf-c/releases/download/v%{version}/%{name}-%{version}.tar.gz
-%define         sha1 protobuf-c=37cbb1e8dc07d8819328f2cac9aec757c8d51756
-BuildRequires:  protobuf >= 2.6.0
-BuildRequires:  protobuf-devel >= 2.6.0
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  libtool
-BuildRequires:  libstdc++
 BuildRequires:  curl
+BuildRequires:  libstdc++
+BuildRequires:  libtool
 BuildRequires:  make
+BuildRequires:  protobuf >= 2.6.0
+BuildRequires:  protobuf-devel >= 2.6.0
 BuildRequires:  unzip
 Requires:       protobuf
 
@@ -41,7 +40,7 @@ Requires:       protobuf-c = %{version}-%{release}
 The protobuf-c-static package contains static protobuf-c libraries.
 
 %prep
-%setup
+%setup -q
 autoreconf -iv
 
 %build
@@ -75,6 +74,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 * Thu Jun 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-1
 - Updating to version 1.3.2-1 compatible with the 3.14.0 version of 'protobuf'.
+- Removed the 'sha1' macro.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-4
 - Added %%license line automatically
