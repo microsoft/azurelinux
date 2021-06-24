@@ -26,7 +26,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
 Url:            https://github.com/kubic-project/bazel-workspaces
-#Source0:       https://github.com/kubic-project/%{name}/archive/%{commit}.tar.gz
+# There are no official source tarball releases for this version. The source tarbll is grabbed from this 
+# following commit based on the changelog history
+#Source0:       https://github.com/kubic-project/%{name}/archive/7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  fdupes
 BuildArch:      noarch
