@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format - C implementation
 Name:           protobuf-c
-Version:        1.3.1
-Release:        4%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -73,16 +73,23 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/libprotobuf-c.a
 
 %changelog
+* Thu Jun 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-1
+- Updating to version 1.3.2-1 compatible with the 3.14.0 version of 'protobuf'.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-4
 - Added %%license line automatically
 
-*   Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 1.20.2-3
--   Fixed Source URL. Verified license. Fixed URL. Fixed Source URL.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Sep 19 2018 Tapas Kundu <tkundu@vmware.com> 1.3.1-1
--   Updated to release 1.3.1
-*   Thu Mar 30 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.2.1-2
--   Fix protobuf-c-static requires
-*   Sat Mar 18 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.2.1-1
--   Initial packaging for Photon
+* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.20.2-3
+- Fixed Source URL. Verified license. Fixed URL. Fixed Source URL.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Sep 19 2018 Tapas Kundu <tkundu@vmware.com> 1.3.1-1
+- Updated to release 1.3.1
+
+* Thu Mar 30 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.2.1-2
+- Fix protobuf-c-static requires
+
+* Sat Mar 18 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.2.1-1
+- Initial packaging for Photon
