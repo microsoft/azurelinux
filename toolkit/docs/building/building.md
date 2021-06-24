@@ -6,7 +6,7 @@
    - [Toolchain Stage](#toolchain-stage)
      - [Populate Toolchain](#populate-toolchain)
      - [Rebuild Toolchain](#rebuild-toolchain)
-   - [Package Stage](#package-stage)  
+   - [Package Stage](#package-stage)
      - [Rebuild All Packages](#rebuild-all-packages)
      - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
    - [Image Stage](#image-stage)
@@ -70,11 +70,11 @@
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)  
+The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)
 
 However, to test-drive CBL-Mariner, building an ISO, VHD or VHDX _**is** currently_ required.  There are two approaches.  The fastest way to achieve this is through the [Quick Start Instructions](../quick_start/quickstart.md). This is recommended for anyone that just wants to run CBL-Mariner.  The second, approach is to build a custom CBL-Mariner based image.  This is recommended for developers that want to experiment with CBL-Mariner in a focused environment and is usually faster and easier than working with full CBL-Mariner builds.  To work in a more focused environment, refer to the tutorial in the [CBL-MarinerDemo](https://github.com/microsoft/CBL-MarinerDemo) repository.
 
-The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages: 
+The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
 - **Toolchain** This stage builds several compilers and tools needed in the subsequent package build stage.  Building is serialized in this stage.
 
@@ -117,7 +117,7 @@ Alternate branches are not generally buildable because community builds require 
 
 The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
 
-For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt. 
+For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt.
 
 ### **Populate Toolchain**
 
@@ -141,7 +141,7 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y SOURCE_URL=https://cblma
 
 After the toolchain is built or populated, package building is possible.  The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
 
-The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.  
+The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
 
 Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
@@ -177,7 +177,7 @@ Note that the image build commands in [Build Images](#build-images) will **autom
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.  
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 All images are generated in the `out/images` folder.
 
@@ -637,6 +637,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
 | PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
+| REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 
 ---
 
