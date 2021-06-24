@@ -1,7 +1,0 @@
-{
-    "packages": [
-        "core-packages-container",
-        "nghttp2",
-        "envoy"
-    ]
-}
