@@ -31,7 +31,7 @@ Group:          System/Management
 URL:            https://github.com/weaveworks/kured
 #Source0:       https://github.com/weaveworks/kured/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Source1:        vendor.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         systemctl-path.patch
 Patch1:         kured-imagePullPolicy.patch
 BuildRequires:  fdupes
@@ -62,16 +62,19 @@ This package contains the yaml file requried to download and run the
 kured container in a kubernetes cluster.
 
 %prep
-%setup -qa1
+%setup -q
 %patch0 -p1
 %patch1 -p1
 
 %build
+# create vendor folder from the vendor tarball and set vendor mode
+tar -xf %{SOURCE1} --no-same-owner
+
 # Build the binary.
 export VERSION=%{version}
 export COMMIT=%{commit}
 go build \
-   -mod vendor -buildmode=pie \
+   -mod vendor -v -buildmode=pie \
    -ldflags "-s -w -X main.gitCommit=$COMMIT -X main.version=$VERSION" \
    -o %{name} cmd/kured/*go
 

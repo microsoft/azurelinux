@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "kured-1.6.1.tar.gz": "0f307782e8dae3a99233d8889232aaa0fdb6d1585bc87fe99804d0f00060a0f6",
-  "vendor.tar.gz": "fcbc619a7075f7b61503cebe92c26204d7600f9c8afb71075756a4b48ac1524c"
+  "kured-1.6.1-vendor.tar.gz": "fcbc619a7075f7b61503cebe92c26204d7600f9c8afb71075756a4b48ac1524c",
+  "kured-1.6.1.tar.gz": "0f307782e8dae3a99233d8889232aaa0fdb6d1585bc87fe99804d0f00060a0f6"
  }
 }
