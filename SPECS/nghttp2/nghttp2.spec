@@ -62,7 +62,7 @@ rm %{buildroot}/%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-2
+* Wed Jun 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-2
 - Adding 'Provides' for 'libhttpng2*' subpackages to align with other naming for the package.
 
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-1
