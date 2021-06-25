@@ -90,8 +90,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
-*   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
--   CVE-2021-22897 fix
+* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
+- CVE-2021-22897 fix
 
 * Fri May 28 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-3
 - Disable check to remove circular dependency
