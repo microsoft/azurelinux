@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-22898.patch
 Patch1:         CVE-2021-22901.patch
+Patch2:         CVE-2021-22897.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -89,6 +90,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+*   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
+-   CVE-2021-22897 fix
+
 * Fri May 28 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-3
 - Disable check to remove circular dependency
 
