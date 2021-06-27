@@ -7,6 +7,8 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 
+spec_dir_exceptions = { "kubernetes-1.18.14", "kubernetes-1.18.17", "kubernetes-1.19.7", "kubernetes-1.19.9", "kubernetes-1.20.2", "kubernetes-1.20.5" }
+
 # Expected Schema:
 # class LicenseCollection:
 #     header: str
@@ -48,6 +50,7 @@ def get_missing_specs(spec_directories, license_collection):
 
     specs_not_in_json = specs_in_dir - specs_in_json 
     specs_not_in_dir =  specs_in_json - specs_in_dir
+    specs_not_in_dir -= spec_dir_exceptions
     return specs_not_in_json, specs_not_in_dir
 
 

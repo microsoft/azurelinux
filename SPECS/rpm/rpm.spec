@@ -3,7 +3,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,11 +16,13 @@ Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
 Patch1:         CVE-2021-20271.patch
 # CVE-2021-20271 patch also patches CVE-2021-3421
 Patch2:         CVE-2021-3421.nopatch
+Patch3:         CVE-2021-20266.patch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdb-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
 BuildRequires:  nss-devel
 BuildRequires:  popt-devel
@@ -31,6 +33,7 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       libarchive
 Requires:       libdb
+Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
 
@@ -128,7 +131,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
         --with-cap \
         --with-lua \
         --disable-silent-rules \
-        --with-external-db
+        --with-external-db \
+        --with-selinux
 make %{?_smp_mflags}
 
 pushd python
@@ -276,8 +280,14 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Thu Apr 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 4.14.2-11
-- Patch CVE-2021-20271 and CVE-2021-3421
+*   Thu Jun 24 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.14.2-13
+-   Patch CVE-2021-20266
+
+*   Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> - 4.14.2-12
+-   Add SELinux support
+
+*   Thu Apr 01 2021 Nicolas Ontiveros <niontive@microsoft.com> - 4.14.2-11
+-   Patch CVE-2021-20271 and CVE-2021-3421
 
 *   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-10
 -   Add a vendor definition so rpm will search /usr/lib/rpm/<vendor> for macros.

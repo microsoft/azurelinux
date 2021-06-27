@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,12 +60,12 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  shadow-utils
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
 Requires:       filesystem >= 1.1
@@ -136,6 +136,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
        -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                     \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
+       -Dselinux=true                                                 \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -270,6 +271,10 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-37
+- Enable SELinux support
+- Remove unused BuildRequires shadow-utils
+
 * Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-36
 - Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
 

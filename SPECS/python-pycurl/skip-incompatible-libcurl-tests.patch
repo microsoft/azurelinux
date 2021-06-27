@@ -1,0 +1,76 @@
+diff -urN a/tests/failonerror_test.py b/tests/failonerror_test.py
+--- a/tests/failonerror_test.py	2021-06-16 13:54:20.634340403 -0700
++++ b/tests/failonerror_test.py	2021-06-16 13:56:19.337945639 -0700
+@@ -21,6 +21,8 @@
+     # not sure what the actual min is but 7.26 is too old
+     # and does not include status text, only the status code
+     @util.min_libcurl(7, 38, 0)
++    # no longer supported by libcurl: https://github.com/curl/curl/issues/6615
++    @util.removed_in_libcurl(7, 75, 0)
+     def test_failonerror(self):
+         self.curl.setopt(pycurl.URL, 'http://%s:8380/status/403' % localhost)
+         sio = util.BytesIO()
+@@ -41,6 +43,8 @@
+     # not sure what the actual min is but 7.26 is too old
+     # and does not include status text, only the status code
+     @util.min_libcurl(7, 38, 0)
++    # no longer supported by libcurl: https://github.com/curl/curl/issues/6615
++    @util.removed_in_libcurl(7, 75, 0)
+     def test_failonerror_status_line_invalid_utf8_python2(self):
+         self.curl.setopt(pycurl.URL, 'http://%s:8380/status_invalid_utf8' % localhost)
+         sio = util.BytesIO()
+@@ -61,6 +65,8 @@
+     # not sure what the actual min is but 7.26 is too old
+     # and does not include status text, only the status code
+     @util.min_libcurl(7, 38, 0)
++    # no longer supported by libcurl: https://github.com/curl/curl/issues/6615
++    @util.removed_in_libcurl(7, 75, 0)
+     def test_failonerror_status_line_invalid_utf8_python3(self):
+         self.curl.setopt(pycurl.URL, 'http://%s:8380/status_invalid_utf8' % localhost)
+         sio = util.BytesIO()
+diff -urN a/tests/option_constants_test.py b/tests/option_constants_test.py
+--- a/tests/option_constants_test.py	2021-06-16 13:54:32.058302421 -0700
++++ b/tests/option_constants_test.py	2021-06-16 13:57:26.629721761 -0700
+@@ -164,9 +164,16 @@
+     def test_sslversion_options(self):
+         curl = pycurl.Curl()
+         curl.setopt(curl.SSLVERSION, curl.SSLVERSION_DEFAULT)
++        curl.setopt(curl.SSLVERSION, curl.SSLVERSION_TLSv1)
++        curl.close()
++
++    # SSLVERSION_SSLv* return CURLE_BAD_FUNCTION_ARGUMENT with curl-7.77.0
++    @util.removed_in_libcurl(7, 77, 0)
++    @util.only_ssl
++    def test_legacy_sslversion_options(self):
++        curl = pycurl.Curl()
+         curl.setopt(curl.SSLVERSION, curl.SSLVERSION_SSLv2)
+         curl.setopt(curl.SSLVERSION, curl.SSLVERSION_SSLv3)
+-        curl.setopt(curl.SSLVERSION, curl.SSLVERSION_TLSv1)
+         curl.close()
+ 
+     @util.min_libcurl(7, 34, 0)
+diff -urN a/tests/util.py b/tests/util.py
+--- a/tests/util.py	2021-06-16 13:54:05.910389353 -0700
++++ b/tests/util.py	2021-06-16 13:58:05.345592928 -0700
+@@ -122,6 +122,21 @@
+ 
+     return decorator
+ 
++def removed_in_libcurl(major, minor, patch):
++    import nose.plugins.skip
++
++    def decorator(fn):
++        @functools.wraps(fn)
++        def decorated(*args, **kwargs):
++            if not pycurl_version_less_than(major, minor, patch):
++                raise nose.plugins.skip.SkipTest('libcurl >= %d.%d.%d' % (major, minor, patch))
++
++            return fn(*args, **kwargs)
++
++        return decorated
++
++    return decorator
++
+ def only_ssl(fn):
+     import nose.plugins.skip
+     import pycurl

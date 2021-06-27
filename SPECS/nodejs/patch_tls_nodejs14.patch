@@ -1,0 +1,20 @@
+diff -Naur a/src/node_crypto.cc b/src/node_crypto.cc
+--- a/src/node_crypto.cc	2021-05-11 11:47:49.000000000 -0700
++++ b/src/node_crypto.cc	2021-06-07 15:35:30.941141552 -0700
+@@ -604,6 +604,8 @@
+       min_version = 0;
+       max_version = MAX_SUPPORTED_VERSION;
+       method = TLS_client_method();
++// TLS1 and TSL1.1 are disabled in openssl
++#if 0
+     } else if (sslmethod == "TLSv1_method") {
+       min_version = TLS1_VERSION;
+       max_version = TLS1_VERSION;
+@@ -626,6 +628,7 @@
+       min_version = TLS1_1_VERSION;
+       max_version = TLS1_1_VERSION;
+       method = TLS_client_method();
++#endif
+     } else if (sslmethod == "TLSv1_2_method") {
+       min_version = TLS1_2_VERSION;
+       max_version = TLS1_2_VERSION;

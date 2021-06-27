@@ -3,7 +3,7 @@
 Summary:        Run a subprocess in a pseudo terminal
 Name:           python-%{srcname}
 Version:        0.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,7 +11,8 @@ URL:            https://github.com/pexpect/ptyprocess
 Source0:        https://pypi.io/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 %if %{with_check}
-BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
 %endif
 
 %description
@@ -36,6 +37,7 @@ python3 setup.py build
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 
 %check
+pip3 install pytest
 python3 -m pytest -v
 
 %files -n python3-ptyprocess
@@ -45,6 +47,9 @@ python3 -m pytest -v
 %{python3_sitelib}/ptyprocess-*.egg-info
 
 %changelog
+* Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-2
+- Fix package test by using pip to install test requirements
+
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Updated to latest package version
