@@ -1,0 +1,160 @@
+parameters:
+  - name: operationModes
+    type: object
+
+jobs:
+  - ${{ each operationMode in parameters.operationModes }}:
+    - job:
+      displayName: ${{ format('load/{0}', operationMode) }}
+      dependsOn: unit_tests
+      strategy:
+        matrix:
+          test-pod-2000:
+            POD_COUNT_PER_DEPLOYMENT: 20
+        maxParallel: 1
+      timeoutInMinutes: 360
+      cancelTimeoutInMinutes: 30
+      workspace:
+        clean: all
+      variables:
+      - name: HOME
+        value: $(System.DefaultWorkingDirectory)
+      - name: GOPATH
+        value: $(HOME)/go
+      - name: perf-tests.repo.path
+        value: $(GOPATH)/src/k8s.io/perf-tests
+      - group: aad-pod-identity-load
+      - name: OPERATION_MODE
+        value: ${{ format('{0}', operationMode) }}
+      steps:
+        - task: GoTool@0
+          inputs:
+            version: 1.15
+
+        - bash: |
+            git clone -b $(checkout.branch) $(checkout.repo) $(perf-tests.repo.path)
+          displayName: Checkout $(checkout.repo) @ $(checkout.branch)
+
+        - template: build-images.yml
+
+        - script: |
+            az account set -s=$(LOAD_TEST_SUBSCRIPTION_ID)
+          displayName: "Set subscription for load tests"
+
+        - script: |
+            export RESOURCE_GROUP="pi-load-e2e-$(openssl rand -hex 6)"
+            echo "##vso[task.setvariable variable=RESOURCE_GROUP]${RESOURCE_GROUP}"
+          displayName: "Generate resource group name"
+
+        - template: deploy-aks-cluster.yml
+
+        - script: |
+            # Create assigned identity to be used for test
+            POD_IDENTITY_CLIENT_ID=$(az identity create -n ${POD_IDENTITY_ID_NAME} -g MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_${LOCATION} --query clientId -otsv)
+            echo "##vso[task.setvariable variable=POD_IDENTITY_CLIENT_ID]${POD_IDENTITY_CLIENT_ID}"
+
+            if [[ $OPERATION_MODE == "managed" ]]; then
+              VMSS_NAME=$(az vmss list -g MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_$(LOCATION) --query "[].name" -o tsv)
+              echo "Assigning /subscriptions/$(LOAD_TEST_SUBSCRIPTION_ID)/resourcegroups/MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_$(LOCATION)/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${POD_IDENTITY_ID_NAME} to ${VMSS_NAME}"
+
+              # Assign user assigned identity to the VMSS
+              az vmss identity assign -g MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_$(LOCATION) -n $VMSS_NAME \
+                --identities /subscriptions/$(LOAD_TEST_SUBSCRIPTION_ID)/resourcegroups/MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_$(LOCATION)/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${POD_IDENTITY_ID_NAME} >> /dev/null
+            fi
+          displayName: "Create and assign identity to AKS cluster"
+          workingDirectory: "$(System.DefaultWorkingDirectory)"
+
+        - script: |
+            echo "Installing helm..."
+            curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+          displayName: "Install helm"
+
+        - script: |
+            kubectl wait --for=condition=ready node --all
+            kubectl wait pod -n kube-system --for=condition=Ready --all
+            kubectl get nodes -owide
+            kubectl cluster-info
+          displayName: "Check cluster's health"
+
+        - script: |
+            export REGISTRY="${REGISTRY:-$(REGISTRY_NAME).azurecr.io/k8s/aad-pod-identity}"
+
+            # substitute aad-pod-identity variables
+            helm install pi manifest_staging/charts/aad-pod-identity --namespace $NAMESPACE --wait --timeout=10m -v=5 --debug \
+              --set operationMode=${OPERATION_MODE} \
+              --set image.repository=${REGISTRY} \
+              --set mic.tag=${IMAGE_VERSION} \
+              --set nmi.tag=${IMAGE_VERSION} \
+              --set enableScaleFeatures=true
+
+            envsubst < test/load/azureidentity-template.yml > test/load/azureidentity.yml
+            envsubst < test/load/azureidentitybinding-template.yml > test/load/azureidentitybinding.yml
+            envsubst < test/load/config-deployment-template.yml > test/load/config.yml
+            envsubst < test/load/deployment-template.yml > test/load/deployment.yml
+
+            kubectl -n $NAMESPACE wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/component=nmi
+            if [[ "${OPERATION_MODE:-}" == "standard" ]]; then
+              kubectl -n $NAMESPACE wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/component=mic
+            fi
+          displayName: "Deploy aad-pod-identity"
+          workingDirectory: "$(system.defaultWorkingDirectory)"
+          env:
+            NAMESPACE: "kube-system"
+            SUBSCRIPTION_ID: $(LOAD_TEST_SUBSCRIPTION_ID)
+            POD_IDENTITY_RESOURCE_GROUP: $(NODE_RESOURCE_GROUP)
+
+        - script: |
+            echo "--- CONFIG ---"
+            cat test/load/config.yml
+            echo "--- DEPLOYMENT ---"
+            cat test/load/deployment.yml
+            echo "--- AZURE IDENTITY ---"
+            cat test/load/azureidentity.yml
+            echo "--- AZURE IDENTITY BINDING ---"
+            cat test/load/azureidentitybinding.yml
+          workingDirectory: "$(system.defaultWorkingDirectory)"
+          displayName: "Get yaml"
+
+        - script: |
+            let NODE_COUNT=${AGENT_COUNT}*${NODE_POOL_COUNT}
+            ./run-e2e.sh cluster-loader2 \
+              --nodes=${NODE_COUNT} \
+              --provider=local \
+              --report-dir="$(perf-tests.repo.path)/_artifacts" \
+              --masterip=${MASTERIP} \
+              --master-internal-ip=${MASTERINTERNALIP} \
+              --testconfig="$(system.defaultWorkingDirectory)/test/load/config.yml"
+          workingDirectory: "$(perf-tests.repo.path)"
+          displayName: "Run clusterloader2 test"
+
+        - script: |
+            echo "--- GET NODES ---"
+            kubectl get nodes
+            echo "--- GET NS ---"
+            kubectl get ns
+            echo "--- GET PODS ---"
+            kubectl get pods --all-namespaces
+            echo "--- TOP PODS ---"
+            kubectl top pods -n kube-system
+          workingDirectory: "$(perf-tests.repo.path)"
+          condition: succeededOrFailed()
+          displayName: "Get stats"
+
+        - script: |
+            echo "--- MIC LOGS ---"
+            kubectl logs -n kube-system -l app.kubernetes.io/component=mic --tail 5000
+            echo "--- NMI LOGS ---"
+            kubectl logs -n kube-system -l app.kubernetes.io/component=nmi --tail 5000
+          workingDirectory: "$(perf-tests.repo.path)"
+          condition: succeededOrFailed()
+          displayName: "Get logs"
+
+        - template: publish-load-test-result.yml
+
+        - script: |
+            az aks delete -g ${RESOURCE_GROUP} -n ${RESOURCE_GROUP} --yes --no-wait
+            az group delete -g ${RESOURCE_GROUP} --yes --no-wait
+          displayName: "Delete resource group"
+          condition: always()
+
+        - template: cleanup-images.yml

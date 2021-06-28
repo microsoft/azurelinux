@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aad-pod-id-nmi-service-account
+  namespace: kube-system
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: azureidentitybindings.aadpodidentity.k8s.io
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzureIdentityBinding
+    plural: azureidentitybindings
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: azureidentities.aadpodidentity.k8s.io
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzureIdentity
+    singular: azureidentity
+    plural: azureidentities
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: azurepodidentityexceptions.aadpodidentity.k8s.io
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzurePodIdentityException
+    singular: azurepodidentityexception
+    plural: azurepodidentityexceptions
+  scope: Namespaced
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: aad-pod-id-nmi-role
+rules:
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+- apiGroups: ["aadpodidentity.k8s.io"]
+  resources: ["azureidentitybindings", "azureidentities", "azurepodidentityexceptions"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: aad-pod-id-nmi-binding
+  labels:
+    k8s-app: aad-pod-id-nmi-binding
+subjects:
+- kind: ServiceAccount
+  name: aad-pod-id-nmi-service-account
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: aad-pod-id-nmi-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    component: nmi
+    tier: node
+    k8s-app: aad-pod-id
+  name: nmi
+  namespace: kube-system
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      component: nmi
+      tier: node
+  template:
+    metadata:
+      labels:
+        component: nmi
+        tier: node
+    spec:
+      serviceAccountName: aad-pod-id-nmi-service-account
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      volumes:
+      - hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
+        name: iptableslock
+      - name: kubelet-config
+        hostPath:
+          path: /etc/default/kubelet
+      containers:
+      - name: nmi
+        image: "mcr.microsoft.com/oss/azure/aad-pod-identity/nmi:v1.7.0"
+        imagePullPolicy: Always
+        args:
+          - "--node=$(NODE_NAME)"
+          - "--operation-mode=managed"
+          - "--forceNamespaced"
+          - "--http-probe-port=8085"
+        env:
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          runAsUser: 0
+          capabilities:
+            add:
+            - NET_ADMIN
+        volumeMounts:
+        - mountPath: /run/xtables.lock
+          name: iptableslock
+        - name: kubelet-config
+          mountPath: /etc/default/kubelet
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      nodeSelector:
+        kubernetes.io/os: linux

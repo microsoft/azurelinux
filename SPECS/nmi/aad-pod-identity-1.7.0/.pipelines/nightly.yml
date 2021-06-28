@@ -1,0 +1,33 @@
+trigger: none
+
+schedules:
+  - cron: "0 0 * * *"
+    always: true
+    displayName: "Nightly Build & Test"
+    branches:
+      include:
+        - master
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - template: unit-tests-template.yml
+  - template: e2e-tests-template.yml
+    parameters:
+      clusterConfigs:
+        - "aks"
+        # File names in test/e2e/cluster_configs without file extension
+        - "vmss"
+        - "vmas"
+  - template: soak-tests-template.yml
+    parameters:
+      clusterConfigs:
+        - "pi-vmas-e2e-daily"
+        - "pi-vmss-e2e-daily"
+        - "pi-aks-e2e-daily"
+  - template: load-tests-template.yml
+    parameters:
+      operationModes:
+        - "managed"
+        - "standard"

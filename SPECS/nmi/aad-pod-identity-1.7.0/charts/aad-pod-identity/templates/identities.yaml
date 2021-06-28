@@ -1,0 +1,28 @@
+{{- if not (empty .Values.azureIdentities) -}}
+apiVersion: v1
+kind: List
+items:
+{{- range .Values.azureIdentities }}
+  - apiVersion: "aadpodidentity.k8s.io/v1"
+    kind: AzureIdentity
+    metadata:
+      name: {{ .name }}
+      namespace: {{ default $.Release.Namespace .namespace }}
+      labels:
+        {{- include "aad-pod-identity.labels" $ | nindent 8 }}
+    spec:
+      type: {{ .type }}
+      resourceID: {{ required "resourceID is required!" .resourceID }}
+      clientID: {{ required "clientID is required!" .clientID }}
+  - apiVersion: "aadpodidentity.k8s.io/v1"
+    kind: AzureIdentityBinding
+    metadata:
+      name: {{ .binding.name }}
+      namespace: {{ default $.Release.Namespace .namespace }}
+      labels:
+        {{- include "aad-pod-identity.labels" $ | nindent 8 }}
+    spec:
+      azureIdentity: {{ .name }}
+      selector: {{ required "binding.selector is required!" .binding.selector }}
+{{- end }}
+{{- end -}}

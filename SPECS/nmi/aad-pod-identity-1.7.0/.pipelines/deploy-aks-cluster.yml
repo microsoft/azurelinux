@@ -1,0 +1,57 @@
+steps:
+  - script: |
+      az group create --name ${RESOURCE_GROUP} --location $(LOCATION)
+
+      if [[ ${LARGE_CLUSTER:-} == "true" ]]; then
+        az aks create \
+          -g ${RESOURCE_GROUP} \
+          -n ${RESOURCE_GROUP} \
+          --node-count $(AGENT_COUNT) \
+          --nodepool-name nodepool1 \
+          --node-vm-size Standard_DS2_v2 \
+          --location ${LOCATION} \
+          --service-principal $(AZURE_CLIENT_ID) \
+          --client-secret $(AZURE_CLIENT_SECRET) \
+          --no-ssh-key \
+          --load-balancer-sku standard \
+          --network-plugin azure \
+          --max-pods ${MAX_PODS} \
+          --load-balancer-managed-outbound-ip-count 6
+
+          MASTERIP=$(az aks show \
+            -g ${RESOURCE_GROUP} \
+            -n ${RESOURCE_GROUP} \
+            --query 'fqdn' -o tsv)
+          echo "##vso[task.setvariable variable=MASTERIP]${MASTERIP}"
+          echo "##vso[task.setvariable variable=MASTERINTERNALIP]${MASTERIP}"
+      else
+        az aks create \
+          --resource-group ${RESOURCE_GROUP} \
+          --name ${RESOURCE_GROUP} \
+          --max-pods ${MAX_PODS} \
+          --service-principal $(AZURE_CLIENT_ID) \
+          --client-secret $(AZURE_CLIENT_SECRET) \
+          --network-plugin azure \
+          --generate-ssh-keys > /dev/null
+      fi
+
+      # store kubeconfig to ~/.kube/config
+      az aks get-credentials \
+        --resource-group ${RESOURCE_GROUP} \
+        --name ${RESOURCE_GROUP}
+
+      # set NODE_RESOURCE_GROUP for e2e test config
+      export NODE_RESOURCE_GROUP="MC_${RESOURCE_GROUP}_${RESOURCE_GROUP}_$(LOCATION)"
+      echo "##vso[task.setvariable variable=NODE_RESOURCE_GROUP]${NODE_RESOURCE_GROUP}"
+
+      AKS_CLUSTER_VERSION=$(az aks show -g ${RESOURCE_GROUP} -n ${RESOURCE_GROUP} --query 'kubernetesVersion' -o tsv)
+      # set AKS_CLUSTER_VERSION for e2e test config
+      echo "##vso[task.setvariable variable=AKS_CLUSTER_VERSION]${AKS_CLUSTER_VERSION}"
+    displayName: "Deploy an AKS cluster "
+
+  - script: |
+      echo "Installing kubectl..."
+      curl -LO https://storage.googleapis.com/kubernetes-release/release/v${AKS_CLUSTER_VERSION}/bin/linux/amd64/kubectl
+      chmod +x kubectl
+      sudo mv kubectl /usr/local/bin/
+    displayName: "Install kubectl"

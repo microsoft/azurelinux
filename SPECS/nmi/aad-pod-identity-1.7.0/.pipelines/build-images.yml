@@ -1,0 +1,29 @@
+steps:
+  - script: |
+      az login \
+        --service-principal \
+        -u=$(AZURE_CLIENT_ID) \
+        -p=$(AZURE_CLIENT_SECRET) \
+        -t=$(AZURE_TENANT_ID) > /dev/null
+      az account set -s=$(SUBSCRIPTION_ID)
+    displayName: "az login"
+
+  - script: |
+      if [[ -n "${IMAGE_VERSION:-}" ]]; then
+        echo "Image version: ${IMAGE_VERSION}"
+        exit 0
+      fi
+
+      # Generate image version
+      if [[ -n "${OPERATION_MODE:-}" ]]; then
+        IMAGE_VERSION="$(git describe --tags --always --dirty)-$(OPERATION_MODE)"
+      else
+        IMAGE_VERSION="$(git describe --tags --always --dirty)-$(CLUSTER_CONFIG)"
+      fi
+      export IMAGE_VERSION
+      echo "##vso[task.setvariable variable=IMAGE_VERSION]${IMAGE_VERSION}"
+      echo "Image version: ${IMAGE_VERSION}"
+
+      az acr login -n $(REGISTRY_NAME)
+      make images push
+    displayName: "Build and push MIC, NMI and identity-validator images"

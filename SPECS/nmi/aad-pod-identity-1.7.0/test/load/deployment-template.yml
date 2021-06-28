@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Name}}
+  labels:
+    group: {{.Group}}
+    aadpodidbinding: loadtest
+spec:
+  replicas: {{.Replicas}}
+  selector:
+    matchLabels:
+      name: {{.Name}}
+  template:
+    metadata:
+      labels:
+        name: {{.Name}}
+        group: {{.Group}}
+        aadpodidbinding: loadtest
+    spec:
+      terminationGracePeriodSeconds: 0
+      initContainers:
+        - name: init
+          image: mcr.microsoft.com/azure-cli
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - az login --identity --allow-no-subscriptions && az login -i -u $POD_IDENTITY_CLIENT_ID --allow-no-subscriptions
+      containers:
+      - image: k8s.gcr.io/pause-amd64:3.1
+        imagePullPolicy: IfNotPresent
+        name: {{.Name}}
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 900
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 900

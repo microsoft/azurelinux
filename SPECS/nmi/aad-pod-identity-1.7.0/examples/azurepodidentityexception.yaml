@@ -1,0 +1,8 @@
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzurePodIdentityException
+metadata:
+  name: test-exception
+spec:
+  podLabels:
+    foo: bar
+    app: custom

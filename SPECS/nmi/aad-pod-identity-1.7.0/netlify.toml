@@ -1,0 +1,10 @@
+[build]
+base = "website/"
+publish = "/public"
+
+[context.deploy-preview]
+command = "make preview-build"
+
+[context.deploy-preview.environment]
+HUGO_VERSION = "0.75.1"
+HUGO_ENABLEGITINFO = "true"

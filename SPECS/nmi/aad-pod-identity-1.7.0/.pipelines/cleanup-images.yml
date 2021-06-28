@@ -1,0 +1,12 @@
+steps:
+  - script: |
+      # Allow errors in case the images do not exist
+      set +e
+      az account set -s=$(SUBSCRIPTION_ID)
+      az acr login -n $(REGISTRY_NAME)
+      az acr repository delete --name $(REGISTRY_NAME) --image k8s/aad-pod-identity/mic:${IMAGE_VERSION} --yes || true
+      az acr repository delete --name $(REGISTRY_NAME) --image k8s/aad-pod-identity/nmi:${IMAGE_VERSION} --yes || true
+      az acr repository delete --name $(REGISTRY_NAME) --image k8s/aad-pod-identity/identityvalidator:${IMAGE_VERSION} --yes || true
+      az acr repository delete --name $(REGISTRY_NAME) --image k8s/aad-pod-identity/demo:${IMAGE_VERSION} --yes || true
+    condition: always()
+    displayName: "Cleanup"

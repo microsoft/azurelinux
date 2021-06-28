@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-aad1-sp
+type: Opaque
+data:
+  certificate: CERTIFICATE
+  password: PASSWORD
+---
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentity
+metadata:
+  name: demo-aad1
+spec:
+  type: 2
+  tenantID: TENANT_ID
+  clientID: CLIENT_ID
+  clientPassword: {"name":"demo-aad1-sp","namespace":"default"}

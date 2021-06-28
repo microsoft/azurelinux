@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aad-id-client-pod
+  labels:
+    app: aad-id-client
+    platform: cli
+    aadpodidbinding:  client-principal-pod-binding
+spec:
+  containers:
+  - name: main-container
+    image: vplauzon/aad-pod-id-client
+    env:
+    - name: RESOURCE
+      value: <Application Id>
+    - name: SERVICE_URL
+      value: http://aad-id-service

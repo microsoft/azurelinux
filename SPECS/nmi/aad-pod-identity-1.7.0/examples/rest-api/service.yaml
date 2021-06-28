@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aad-id-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: aad-id-service
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aad-id-service-pod
+  labels:
+    app: aad-id-service
+    platform: csharp
+spec:
+  containers:
+  - name: api-container
+    image: vplauzon/aad-pod-id-svc
+    ports:
+    - containerPort: 80
+    env:
+    - name: TENANT_ID
+      value: <ID of TENANT owning the identities>
+    - name: APPLICATION_ID
+      value: <Application Id>

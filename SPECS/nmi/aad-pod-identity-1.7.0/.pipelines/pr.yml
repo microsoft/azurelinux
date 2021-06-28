@@ -1,0 +1,22 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - docs/*
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - template: unit-tests-template.yml
+  - template: e2e-tests-template.yml
+    parameters:
+      clusterConfigs:
+        - "aks"
+        # File names in test/e2e/cluster_configs without file extension
+        - "vmss"
+        - "vmas"

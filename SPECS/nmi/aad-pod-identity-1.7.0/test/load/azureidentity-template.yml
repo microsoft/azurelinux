@@ -1,0 +1,8 @@
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentity
+metadata:
+  name: {{.Name}}
+spec:
+  type: 0
+  resourceID: /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$POD_IDENTITY_RESOURCE_GROUP/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$POD_IDENTITY_ID_NAME
+  clientID: $POD_IDENTITY_CLIENT_ID

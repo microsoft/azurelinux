@@ -1,0 +1,93 @@
+name: pi-deployment
+automanagedNamespaces: 100
+tuningSets:
+  - name: Uniform5qps
+    qpsLoad:
+      qps: 500
+steps:
+  - name: Starting measurements
+    measurements:
+      - Identifier: ResourceUsageSummary
+        Method: ResourceUsageSummary
+        Params:
+          action: start
+      - Identifier: PodStartupLatency
+        Method: PodStartupLatency
+        Params:
+          action: start
+          labelSelector: group = deployment
+          threshold: 40m
+  - name: Starting measurement for waiting for pods
+    measurements:
+      - Identifier: WaitForRunningDeployments
+        Method: WaitForControlledPodsRunning
+        Params:
+          action: start
+          apiVersion: apps/v1
+          kind: Deployment
+          labelSelector: group = deployment
+          operationTimeout: 360m
+  - name: Creating objects
+    phases:
+      - namespaceRange:
+          min: 1
+          max: 100
+        replicasPerNamespace: 1
+        tuningSet: Uniform5qps
+        objectBundle:
+          - basename: pi
+            objectTemplatePath: azureidentity.yml
+          - basename: pi
+            objectTemplatePath: azureidentitybinding.yml
+          - basename: deployment
+            objectTemplatePath: deployment.yml
+            templateFillMap:
+              Replicas: $POD_COUNT_PER_DEPLOYMENT
+              Group: deployment
+  - name: Waiting for pods to be running
+    measurements:
+      - Identifier: WaitForRunningDeployments
+        Method: WaitForControlledPodsRunning
+        Params:
+          action: gather
+  - name: Collecting measurements
+    measurements:
+      - Identifier: ResourceUsageSummary
+        Method: ResourceUsageSummary
+        Params:
+          action: gather
+  - name: Wait 2min
+    measurements:
+      - Identifier: Wait
+        Method: Sleep
+        Params:
+          duration: 2m
+  - name: Deleting objects
+    phases:
+      - namespaceRange:
+          min: 1
+          max: 100
+        replicasPerNamespace: 0
+        tuningSet: Uniform5qps
+        objectBundle:
+          - basename: pi
+            objectTemplatePath: azureidentity.yml
+          - basename: pi
+            objectTemplatePath: azureidentitybinding.yml
+          - basename: deployment
+            objectTemplatePath: deployment.yml
+  - measurements:
+      - Identifier: WaitForRunningDeployments
+        Method: WaitForControlledPodsRunning
+        Params:
+          action: gather
+  - measurements:
+      - Identifier: ResourceUsageSummary
+        Method: ResourceUsageSummary
+        Params:
+          action: gather
+  - measurements:
+      - Identifier: PodStartupLatency
+        Method: PodStartupLatency
+        Params:
+          action: gather
