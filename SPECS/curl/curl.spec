@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-22898.patch
 Patch1:         CVE-2021-22901.patch
+Patch2:         CVE-2021-22897.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -17,11 +18,6 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
-%if %{with_check}
-BuildRequires:  python3
-BuildRequires:  shadow-utils
-BuildRequires:  sudo
-%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -68,12 +64,6 @@ install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-%check
-chmod g+w . -R
-useradd test -G root -m
-
-sudo -u test make %{?_smp_mflags} check
-
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -100,6 +90,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
+- CVE-2021-22897 fix
+
+* Fri May 28 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-3
+- Disable check to remove circular dependency
+
 * Wed May 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 7.76.0-2
 - Patch 7.76.0 to fix CVE-2021-22898 and CVE-2021-22901.
 

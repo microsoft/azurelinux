@@ -3,16 +3,20 @@
 Summary:        Unicode-aware Pure Python Expect-like module
 Name:           python-%{modname}
 Version:        4.8.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pexpect/pexpect
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
+# sys_executable.patch fixes package tests on systems without a /usr/bin/python executable
+# Upstream link: https://github.com/pexpect/pexpect/pull/629
+Patch0:         sys_executable.patch
 BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  man-db
 BuildRequires:  openssl
+BuildRequires:  python3-pip
 %endif
 
 %description
@@ -34,7 +38,6 @@ pty module.
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-ptyprocess
-BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
 Requires:       python3-ptyprocess
 
@@ -55,7 +58,7 @@ compiled.  It should work on any platform that supports the standard Python
 pty module.
 
 %prep
-%autosetup -n %{modname}-%{version}
+%autosetup -p1 -n %{modname}-%{version}
 
 %build
 python3 setup.py build
@@ -75,7 +78,9 @@ export INPUTRC=$PWD/.inputrc
 
 python3 ./tools/display-sighandlers.py
 python3 ./tools/display-terminalinfo.py
-TRAVIS=true py.test-3 --verbose
+
+pip3 install pytest
+TRAVIS=true python3 -m pytest -v
 
 %files -n python3-%{modname}
 %license LICENSE
@@ -84,6 +89,10 @@ TRAVIS=true py.test-3 --verbose
 %{python3_sitelib}/%{modname}-*.egg-info
 
 %changelog
+* Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-10
+- Fix package tests by using pip to install testing requirements
+- Fix package tests by taking sys_executable patch from upstream
+
 * Tue May 11 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-9
 - Remove /usr/bin/man dependency, replace with check-time man-db dependency
 

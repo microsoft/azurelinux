@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,7 +47,6 @@ code. It is incompatible with Python 2.x releases.
 Summary:        The libraries for python runtime
 Group:          Applications/System
 Requires:       bzip2-libs
-Requires:       coreutils
 Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
@@ -255,6 +254,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> 3.7.10-3
+- Remove coreutils dependency to remove circular dependency with libselinux
+
 * Wed Apr 28 2021 Andrew Phelps <anphel@microsoft.com> - 3.7.10-2
 - Add patch to fix test_ssl tests.
 
@@ -343,8 +345,7 @@ make  %{?_smp_mflags} test
 - Add python3-test package.
 
 * Fri Jun 30 2017 Dheeraj Shetty <dheerajs@vmware.com> - 3.6.1-5
-- Remove the imaplib tests.
-
+- Remove the imaplib tests.  
 * Mon Jun 05 2017 Xiaolin Li <xiaolinl@vmware.com> - 3.6.1-4
 - Added pip, setuptools, xml, and curses sub packages.
 

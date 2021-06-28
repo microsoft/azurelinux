@@ -38,6 +38,7 @@ IMAGE_CACHE_SUMMARY             ?=
 INITRD_CACHE_SUMMARY            ?=
 PACKAGE_ARCHIVE                 ?=
 PACKAGE_BUILD_RETRIES           ?= 1
+REBUILD_DEP_CHAINS              ?= y
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))

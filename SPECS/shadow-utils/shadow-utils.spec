@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,9 +22,13 @@ Source11:       system-session
 Patch1:         chkname-allowcase.patch
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  libsemanage-devel
 BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       pam
+Requires:       libselinux
+Requires:       libsemanage
 
 %description
 The Shadow package contains programs for handling passwords
@@ -43,7 +47,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
 
 %build
 %configure --sysconfdir=%{_sysconfdir} --with-libpam \
-           --with-libcrack --with-group-name-max-length=32
+           --with-libcrack --with-group-name-max-length=32 \
+           --with-selinux
 make %{?_smp_mflags}
 
 %install
@@ -139,6 +144,12 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
+* Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
+- Fix issue with undocumented libselinux and libsemanage requirements
+
+* Wed May 26 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-12
+- Add SELinux support
+
 * Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
 - Enable usergroups for useradd
 

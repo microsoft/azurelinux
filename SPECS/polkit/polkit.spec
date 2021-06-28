@@ -1,7 +1,7 @@
 Summary:       A toolkit for defining and handling authorizations.
 Name:          polkit
 Version:       0.116
-Release:       4%{?dist}
+Release:       5%{?dist}
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 License:       LGPLv2+
@@ -40,6 +40,9 @@ header files and libraries for polkit
 
 %prep
 %autosetup -p1
+# Disable polkitbackend tests, which fail since dbus is not available in the worker chroot
+sed -i 's/polkitbackend//g' test/Makefile.am
+sed -i 's/polkitbackend//g' test/Makefile.in
 
 %build
 %configure \
@@ -64,7 +67,7 @@ session  include        system-session
 EOF
 
 %check
-# Disable check. It requires dbus - not available in chroot/container.
+make check
 
 %pre
 getent group polkitd > /dev/null || groupadd -fg 27 polkitd &&
@@ -112,6 +115,9 @@ fi
 %{_datadir}/gettext/its/polkit.loc
 
 %changelog
+*   Thu Jun 03 2021 Andrew Phelps <anphel@microsoft.com> - 0.116-5
+-   Enable check tests (with exception of unsupported "polkitbackend" tests)
+
 *   Thu Jun 03 2021 Jon Slobodzian <josloboe@microsoft.com> - 0.116-4
 -   Patch for CVE 2021-3560.  Fix changelog formatting.
 

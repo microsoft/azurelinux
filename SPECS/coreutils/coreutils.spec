@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.30
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,8 @@ Patch4:         CVE-2013-0222.nopatch
 # CVE-2013-0223 is fixed in coreutils-8.30-i18n-1.patch
 Patch5:         CVE-2013-0223.nopatch
 Requires:       gmp
+Requires:       libselinux
+BuildRequires:  libselinux-devel
 Conflicts:      toybox
 Provides:       sh-utils
 
@@ -93,6 +95,12 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> 8.30-10
+- Fix issue with undocumented libselinux requirement
+
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 8.30-9
+- Enable SELinux support
+
 * Fri Jan 22 2021 Andrew Phelps <anphel@microsoft.com> 8.30-8
 - Fix check test
 

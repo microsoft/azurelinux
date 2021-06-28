@@ -5,7 +5,7 @@
 
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A Python interface to libcurl
 Group:          Development/Languages
 License:        LGPLv2+ or MIT
@@ -13,17 +13,20 @@ URL:            http://pycurl.sourceforge.net/
 Source0:        https://dl.bintray.com/pycurl/pycurl/pycurl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Patch0:         skip-incompatible-libcurl-tests.patch
 BuildRequires:  openssl-devel
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  curl-devel
-
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 %if %{with_check}
-BuildRequires: python-setuptools, vsftpd, curl-libs
-BuildRequires: python3-setuptools, python3-xml
+BuildRequires:  python-setuptools
+BuildRequires:  vsftpd
+BuildRequires:  curl-libs
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
 %endif
 
 %description
@@ -60,6 +63,7 @@ Documentation and examples for pycurl
 
 %prep
 %setup -q -n pycurl-%{version}
+%patch0 -p1
 rm -f doc/*.xml_validity
 #chmod a-x examples/*
 
@@ -118,6 +122,8 @@ rm -rf %{buildroot}
 %doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+*   Wed Jun 16 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-7
+-   Add patch to fix libcurl package test issue
 *   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
 -   Disable unreliable multi_timer_test
 *   Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-5
