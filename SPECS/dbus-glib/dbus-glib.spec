@@ -31,10 +31,10 @@ Headers and static libraries for the D-Bus GLib bindings
 
 %build
 %configure \
-    %if %{with_check}
+%if %{with_check}
     --enable-tests \
     --enable-asserts \
-    %endif
+%endif
     --disable-static \
     --disable-gtk-doc
 %make_build
