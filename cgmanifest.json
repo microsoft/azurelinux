@@ -3394,7 +3394,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libxau",
+          "name": "libXau",
           "version": "1.0.8",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.8.tar.bz2"
         }
