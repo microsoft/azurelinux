@@ -2644,6 +2644,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdmx",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libdmx-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdnet",
           "version": "1.12",
           "downloadUrl": "https://github.com/dugsong/libdnet/archive/libdnet-1.12.tar.gz"
@@ -2724,6 +2734,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libfontenc",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libFS",
+          "version": "1.0.7",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libFS-1.0.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgcrypt",
           "version": "1.8.7",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
@@ -2767,6 +2797,16 @@
           "name": "libgudev",
           "version": "232",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libICE",
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.9.tar.bz2"
         }
       }
     },
@@ -3014,6 +3054,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libpciaccess",
+          "version": "0.13.5",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libpciaccess-0.13.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libpipeline",
           "version": "1.5.0",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz"
@@ -3157,6 +3207,16 @@
           "name": "libsigc++20",
           "version": "2.10.0",
           "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/2.10.0/libsigcplusplus-2.10.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libSM",
+          "version": "1.2.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.2.tar.bz2"
         }
       }
     },
@@ -3334,79 +3394,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libXext",
-          "version": "1.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXext-1.3.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libFS",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libFS-1.0.7.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libICE",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.9.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libSM",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXScrnSaver",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXt",
-          "version": "1.1.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXt-1.1.5.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXmu",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXpm",
-          "version": "3.5.12",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.12.tar.bz2"
+          "name": "libxau",
+          "version": "1.0.8",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.8.tar.bz2"
         }
       }
     },
@@ -3424,29 +3414,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libXfixes",
-          "version": "5.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfixes-5.0.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXcomposite",
-          "version": "0.4.4",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXrender",
-          "version": "0.9.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXrender-0.9.10.tar.bz2"
+          "name": "libxcb",
+          "version": "1.12",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.12.tar.bz2"
         }
       }
     },
@@ -3474,9 +3444,19 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libfontenc",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+          "name": "libXext",
+          "version": "1.3.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXext-1.3.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXfixes",
+          "version": "5.0.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfixes-5.0.3.tar.bz2"
         }
       }
     },
@@ -3524,6 +3504,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxkbfile",
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.0.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXmu",
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXpm",
+          "version": "3.5.12",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.12.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXrandr",
           "version": "1.5.1",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXrandr-1.5.1.tar.bz2"
@@ -3534,9 +3544,49 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libXrender",
+          "version": "0.9.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXrender-0.9.10.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXres",
           "version": "1.0.7",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXres-1.0.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXScrnSaver",
+          "version": "1.2.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxshmfence",
+          "version": "1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxshmfence-1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXt",
+          "version": "1.1.5",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXt-1.1.5.tar.bz2"
         }
       }
     },
@@ -3587,66 +3637,6 @@
           "name": "libXxf86vm",
           "version": "1.1.4",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXxf86vm-1.1.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libdmx",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libdmx-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libpciaccess",
-          "version": "0.13.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libpciaccess-0.13.5.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxkbfile",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.0.9.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxshmfence",
-          "version": "1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxshmfence-1.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxau",
-          "version": "1.0.8",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.8.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxcb",
-          "version": "1.12",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.12.tar.bz2"
         }
       }
     },
