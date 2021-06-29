@@ -3,9 +3,9 @@ Name:           libusb
 Version:        1.0.24
 Release:        1%{?dist}
 License:        LGPLv2+
-Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
 URL:            https://libusb.info/
 Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  systemd-devel
