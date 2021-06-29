@@ -1,3 +1,6 @@
+%global sover_major 11
+%global sover_minor 1
+
 Summary:        C/C++ configuration file library
 Name:           libconfig
 Version:        1.7.3
@@ -7,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://hyperrealm.github.io/libconfig/
-Source0:       https://github.com/hyperrealm/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/hyperrealm/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  texinfo
 
@@ -43,7 +46,8 @@ cd ..
 %files
 %license COPYING.LIB
 %doc AUTHORS ChangeLog README
-%{_libdir}/libconfig*.so.*
+%{_libdir}/libconfig*.so.%{sover_major}
+%{_libdir}/libconfig*.so.%{sover_major}.%{sover_minor}*
 
 %files devel
 %{_includedir}/libconfig*

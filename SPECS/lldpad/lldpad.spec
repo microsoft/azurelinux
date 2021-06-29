@@ -10,14 +10,15 @@ URL:            https://github.com/intel/openlldp
 #Source0:       https://github.com/intel/openlldp/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.pkgupdate.tar.gz
 Patch0:         remove-lldp-ethertype-use-linux-5.3-header-instead.patch
-BuildRequires: libconfig-devel
-BuildRequires: libnl3-devel
-BuildRequires: readline-devel
-BuildRequires: systemd
-BuildRequires: kernel-headers
-Requires:      systemd
-Requires:      libconfig
-Requires:      libnl3
+BuildRequires:  kernel-headers
+BuildRequires:  libconfig-devel
+BuildRequires:  libnl3-devel
+BuildRequires:  readline-devel
+BuildRequires:  systemd
+Requires:       libconfig
+Requires:       libnl3
+Requires:       systemd
+
 
 %description
 The lldpad package comes with utilities to manage an LLDP interface with support for reading and configuring TLVs. TLVs and interfaces are individual controlled allowing flexible configuration for TX only, RX only, or TX/RX modes per TLV.
@@ -35,7 +36,7 @@ sed -i "s/u8 arglen;/u8 arglen = 0;/g" lldp_util.c
 
 %install
 %make_install
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 mkdir -p %{buildroot}/lib/systemd/system
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 mv %{buildroot}/%{_libdir}/systemd/system/lldpad.service \
@@ -45,9 +46,11 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 
 %preun
 %systemd_preun lldpad.socket
+
 %post
 /sbin/ldconfig
 %systemd_post lldpad.socket
+
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart lldpad.socket
@@ -57,7 +60,7 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 %license COPYING
 %{_sbindir}/*
 %{_libdir}/liblldp_clif.so.*
-/etc/bash_completion.d/*
+%{_sysconfdir}/bash_completion.d/*
 %dir %{_sharedstatedir}/%{name}
 %{_mandir}/man8/*
 %{_includedir}/*
@@ -65,7 +68,6 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 %{_libdir}/liblldp_clif.so
 /lib/systemd/system/lldpad.service
 /lib/systemd/system/lldpad.socket
-
 
 %changelog
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.1-18

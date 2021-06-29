@@ -3,10 +3,10 @@ Name:           libstoragemgmt
 Version:        1.8.4
 Release:        8%{?dist}
 License:        LGPLv2+
-URL:            https://github.com/libstorage/libstoragemgmt
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/libstorage/libstoragemgmt/releases/download/%{version}/%{name}-%{version}.tar.gz
+URL:            https://github.com/libstorage/libstoragemgmt
+Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
 BuildRequires:  gcc
@@ -244,112 +244,112 @@ getent passwd libstoragemgmt >/dev/null || \
 %post smis-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %postun smis-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post netapp-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %postun netapp-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post targetd-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %postun targetd-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post nstor-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %postun nstor-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post megaraid-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 %postun megaraid-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post hpsa-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 %postun hpsa-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post arcconf-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 %postun arcconf-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post nfs-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 %postun nfs-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post local-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 %postun local-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %files
