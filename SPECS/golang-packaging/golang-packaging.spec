@@ -26,7 +26,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Golang
 URL:            https://github.com/openSUSE/%{name}
 #Source0:       https://github.com/openSUSE/%{name}/archive/refs/tags/v%{version}.tar.gz
-SOurce0:        %{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  rpm
 BuildRequires:  xz

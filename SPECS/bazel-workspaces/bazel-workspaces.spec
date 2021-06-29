@@ -34,7 +34,7 @@ BuildRequires:  fdupes
 BuildArch:      noarch
 
 %description
-Bazel workspaces for libraries packaged in openSUSE which allow to link those
+Bazel workspaces for libraries packaged in CBL-Mariner which allow to link those
 libraries dynamically to software build by Bazel.
 
 %prep

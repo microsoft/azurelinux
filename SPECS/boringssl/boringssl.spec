@@ -41,7 +41,7 @@ BuildRequires:  go
 BuildRequires:  libunwind-devel
 BuildRequires:  ninja-build
 BuildRequires:  patchelf
-ExclusiveArch:  %{ix86} x86_64 aarch64 s390x ppc64le %arm
+ExclusiveArch:  x86_64 aarch64
 
 %description
 BoringSSL is an implementation of the Secure Sockets Layer (SSL) and
@@ -144,6 +144,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 - Change build requirement from ninja to ninja-build
 - Modify location of shared library files
 - Add _binaries_in_noarch_packages_terminate_build definition to resolve arch dependent binary error 
+- Remove unsupported architectures in CBL-Mariner from ExclusiveArch list
 
 * Mon May 17 2021 mrostecki@suse.com
 - Update to version 20200921 (fixes bsc#1183836, bsc#1181866):
