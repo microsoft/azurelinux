@@ -4124,9 +4124,169 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/corba/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/jaxp/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/jaxws/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/langtools/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8",
+          "version": "1.8.0.212",
+          "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/nashorn/archive/jdk8u212-b04.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openjdk8_aarch64",
           "version": "1.8.0.292",
           "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/corba/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/hotspot/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/jaxp/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/jaxws/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/langtools/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/jdk/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.181",
+          "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/nashorn/archive/aarch64-jdk8u181-b13.tar.bz2"
         }
       }
     },
