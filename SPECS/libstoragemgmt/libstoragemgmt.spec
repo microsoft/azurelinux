@@ -1,19 +1,14 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
-%bcond_with     test
-
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.8.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/libstorage/libstoragemgmt
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/libstorage/libstoragemgmt/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
-Requires:       python3-%{name}
 BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -27,20 +22,19 @@ BuildRequires:  openssl-devel
 BuildRequires:  glib-devel
 BuildRequires:  systemd
 BuildRequires:  bash-completion
-BuildRequires:  libconfig
+BuildRequires:  libconfig-devel
 BuildRequires:  systemd-devel
 BuildRequires:  procps-ng
 BuildRequires:  sqlite-devel
 BuildRequires:  python3-six
 BuildRequires:  python3-devel
 BuildRequires:  python3-pywbem
-
 %{?systemd_requires}
 BuildRequires:  systemd 
 BuildRequires:  systemd-devel
-
 BuildRequires:  chrpath
 BuildRequires:  valgrind
+Requires:       python3-%{name}
 
 %description
 The libStorageMgmt library will provide a vendor agnostic open source storage
@@ -209,8 +203,6 @@ plugin selection for locally managed storage.
 %make_build
 
 %install
-rm -rf %{buildroot}
-
 %make_install
 
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
@@ -222,14 +214,12 @@ install -m 644 tools/udev/90-scsi-ua.rules \
 install -m 755 tools/udev/scan-scsi-target \
     %{buildroot}/%{_udevrulesdir}/../scan-scsi-target
 
-%if 0%{with test}
 %check
 if ! make check
 then
   cat test-suite.log || true
   exit 1
 fi
-%endif
 
 %pre
 getent group libstoragemgmt >/dev/null || groupadd -r libstoragemgmt
@@ -536,6 +526,10 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-8
+- Use libconfig-devel at build-time instead of libconfig
+- Remove %%bcond_with test line
+
 * Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-7
 - Remove manual placement of bash-completion file, now that this package has bash-completion.pc available to it
 

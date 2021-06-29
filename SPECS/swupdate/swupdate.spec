@@ -1,19 +1,19 @@
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
 Version:        2019.11
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 URL:            https://sbabic.github.io/swupdate/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/sbabic/swupdate/archive/%{version}.tar.gz
+#Source0:       https://github.com/sbabic/swupdate/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        .config
 
 BuildRequires:  curl-devel
 BuildRequires:  json-c-devel
-BuildRequires:  libconfig
+BuildRequires:  libconfig-devel
 BuildRequires:  systemd-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  zeromq-devel
@@ -139,6 +139,9 @@ fi
 
 
 %changelog
+* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2019.11-7
+- Use libconfig-devel at build-time, instead of libconfig
+
 *   Fri Sep 25 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.11-6
 -   Disable debug symbol stripping in .config, and create the debuginfo package.
 
