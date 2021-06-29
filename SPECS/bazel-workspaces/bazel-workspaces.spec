@@ -20,7 +20,7 @@
 Name:           bazel-workspaces
 Version:        20200113
 Release:        1.7
-Summary:        Bazel workspaces for libraries packaged in openSUSE
+Summary:        Bazel workspaces for libraries packaged in CBL-Mariner
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
