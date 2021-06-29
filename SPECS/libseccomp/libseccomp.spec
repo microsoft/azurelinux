@@ -1,14 +1,13 @@
-Summary:       Enhanced seccomp library
-Name:          libseccomp
-Version:       2.4.1
-Release:       3%{?dist}
-License:       LGPLv2
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Group:         System Environment/Libraries
-URL:           https://github.com/seccomp/libseccomp/wiki
-Source0:       https://github.com/seccomp/libseccomp/releases/download/v%{version}/%{name}-%{version}.tar.gz
-
+Summary:        Enhanced seccomp library
+Name:           libseccomp
+Version:        2.4.1
+Release:        3%{?dist}
+License:        LGPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://github.com/seccomp/libseccomp/wiki
+Source0:        https://github.com/seccomp/libseccomp/releases/download/v%{version}/%{name}-%{version}.tar.gz
 %if %{with_check}
 BuildRequires: which
 %endif
@@ -20,13 +19,13 @@ is designed to abstract away the underlying BPF based syscall filter language
 and present a more conventional function-call based filtering interface that
 should be familiar to, and easily adopted by application developers.
 
-%package    devel
-Summary:    Development files used to build applications with libseccomp support
-Group:      Development/Libraries
-Provides:   pkgconfig(libseccomp) = %{version}-%{release}
-Provides:   %{name}-static = %{version}-%{release}
+%package        devel
+Summary:        Development files used to build applications with libseccomp support
+Group:          Development/Libraries
+Provides:       pkgconfig(libseccomp) = %{version}-%{release}
+Provides:       %{name}-static = %{version}-%{release}
 
-%description devel
+%description    devel
 The libseccomp-devel package contains the libraries and header files
 needed for developing secure applications.
 
@@ -48,9 +47,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license LICENSE
-%doc LICENSE
-%doc CREDITS
-%doc README.md
+%doc CREDITS README.md
 %{_libdir}/libseccomp.so.*
 
 %files devel
