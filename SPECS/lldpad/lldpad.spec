@@ -19,7 +19,6 @@ Requires:       libconfig
 Requires:       libnl3
 Requires:       systemd
 
-
 %description
 The lldpad package comes with utilities to manage an LLDP interface with support for reading and configuring TLVs. TLVs and interfaces are individual controlled allowing flexible configuration for TX only, RX only, or TX/RX modes per TLV.
 

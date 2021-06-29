@@ -1,6 +1,5 @@
 %global sover_major 11
 %global sover_minor 1
-
 Summary:        C/C++ configuration file library
 Name:           libconfig
 Version:        1.7.3
