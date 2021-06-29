@@ -3424,6 +3424,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxcrypt",
+          "version": "4.4.17",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXcursor",
           "version": "1.1.14",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXcursor-1.1.14.tar.bz2"
@@ -3637,16 +3647,6 @@
           "name": "libXxf86vm",
           "version": "1.1.4",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXxf86vm-1.1.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxcrypt",
-          "version": "4.4.17",
-          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
         }
       }
     },
@@ -4555,16 +4555,6 @@
         "type": "other",
         "other": {
           "name": "openjdk8",
-          "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "openjdk8",
           "version": "1.8.0.212",
           "downloadUrl": "http://hg.openjdk.java.net/jdk8u/jdk8u/archive/jdk8u212-b04.tar.bz2"
         }
@@ -4644,9 +4634,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openjdk8_aarch64",
+          "name": "openjdk8",
           "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -4727,6 +4717,16 @@
           "name": "openjdk8_aarch64",
           "version": "1.8.0.181",
           "downloadUrl": "http://hg.openjdk.java.net/aarch64-port/jdk8u/nashorn/archive/aarch64-jdk8u181-b13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openjdk8_aarch64",
+          "version": "1.8.0.292",
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -6634,9 +6634,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "redis",
-          "version": "5.0.5",
-          "downloadUrl": "http://download.redis.io/releases/redis-5.0.5.tar.gz"
+          "name": "recordproto",
+          "version": "1.14.2",
+          "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
         }
       }
     },
@@ -6644,9 +6644,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "recordproto",
-          "version": "1.14.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
+          "name": "redis",
+          "version": "5.0.5",
+          "downloadUrl": "http://download.redis.io/releases/redis-5.0.5.tar.gz"
         }
       }
     },
