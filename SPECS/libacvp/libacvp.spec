@@ -20,6 +20,7 @@ Patch7:         app_fips_init_lcl.patch
 Patch8:         drbg.patch
 Patch9:         acvp_dsa.patch
 Patch10:        app_aes.patch
+Patch11:        acvp.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -45,7 +46,7 @@ and the library itself.
 ./configure \
     --prefix=%{_prefix} \
     --enable-offline \
-    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP" \
+    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -O0 -g" \
     LIBS="-ldl"
 make clean
 make CC=gcc
