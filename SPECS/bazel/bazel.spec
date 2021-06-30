@@ -36,10 +36,9 @@ ln -s /usr/bin/python3 /usr/bin/python
 env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 
 %install
-%{__mkdir_p} %{buildroot}/%{_bindir}
-%{__mkdir_p} %{buildroot}/%{bashcompdir}
-%{__cp} output/bazel %{buildroot}/%{_bindir}/bazel-real
-%{__cp} ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
+mkdir -p %{buildroot}/%{_bindir}
+cp output/bazel %{buildroot}/%{_bindir}/bazel-real
+cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 
 %clean
 rm -rf %{buildroot}

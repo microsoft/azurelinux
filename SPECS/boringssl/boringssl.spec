@@ -21,7 +21,7 @@
 %define src_install_dir /usr/src/%{name}
 Name:           boringssl
 Version:        20200921
-Release:        1.2
+Release:        1.2%{?dist}
 Summary:        An SSL/TLS protocol implementation
 License:        OpenSSL
 Vendor:         Microsoft Corporation

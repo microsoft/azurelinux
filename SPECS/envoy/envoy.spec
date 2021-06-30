@@ -23,7 +23,7 @@
 
 Name:           envoy
 Version:        1.14.4
-Release:        3.4
+Release:        3.4%{?dist}
 Summary:        L7 proxy and communication bus
 License:        Apache-2.0
 Vendor:         Microsoft Corporation

@@ -19,7 +19,7 @@
 
 Name:           bazel-workspaces
 Version:        20200113
-Release:        1.7
+Release:        1.7%{?dist}
 Summary:        Bazel workspaces for libraries packaged in CBL-Mariner
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
