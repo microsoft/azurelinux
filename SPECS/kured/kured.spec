@@ -24,7 +24,7 @@
 %global debug_package %{nil}
 Name:           kured
 Version:        1.6.1
-Release:        1.6
+Release:        1.6%{?dist}
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 License:        Apache-2.0
 Group:          System/Management
@@ -115,6 +115,8 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 - Use golang as build dependency
 - Remove {?ext_man}, which is not supported in CBL-Mariner
 - Add %global debug_package %{nil} to resolve empty file error
+- Use self-built go vendor source
+- Add -v to the go build step
 
 * Tue Feb  2 2021 kukuk@suse.com
 - Update to version 1.6.1:
