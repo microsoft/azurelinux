@@ -27,6 +27,8 @@ Version:        1.6.1
 Release:        1.6%{?dist}
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System/Management
 URL:            https://github.com/weaveworks/kured
 #Source0:       https://github.com/weaveworks/kured/archive/refs/tags/%{version}.tar.gz
