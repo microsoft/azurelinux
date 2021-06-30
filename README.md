@@ -50,6 +50,29 @@ You can try out CBL-Mariner with the following ISO: [x86_64 ISO](https://osrelea
 1. *[Optional]* Shut down VM and adjust boot order to place Hard Drive first. Otherwise if Network boot occurs, your VM will attempt to PXE boot with a timeout of about 2 minutes before trying the next boot option.
 1. When prompted sign in to your CBL-Mariner system using the user name and password provisioned through the Installer.
 
+### Verify ISO via Checksum
+We also provide the ISO checksum in a file and GPG signature of that file so you can independently verify the contents.
+
+Steps:
+1. Install `gpg` onto your system.
+   - On Ubuntu, you can run: `sudo apt-get install gpg`
+1. Download Mariner RPM key from the GitHub repo: [Mariner RPM key](https://github.com/microsoft/CBL-Mariner/blob/1.0-stable/SPECS/mariner-repos/MICROSOFT-RPM-GPG-KEY)
+1. Import the Mariner RPM key into gpg: `gpg --import <path to key>`
+1. Download [ISO Checksum](https://osrelease.download.prss.microsoft.com/pr/download/Mariner-1.0-x86_64.iso.sha256) and [ISO Checksum Signature](https://osrelease.download.prss.microsoft.com/pr/download/Mariner-1.0-x86_64.iso.sha256.gpg) files.
+1. Verify the checksum file's signature is associated with this checksum file using gpg: `gpg --verify <path to checksum signature file> <path to checksum file>`
+   - Sample output:
+   ```bash
+   $ gpg --verify Mariner-1.0-x86_64.iso.sha256.gpg Mariner-1.0-x86_64.iso.sha256
+   gpg: Signature made Sun 20 Jun 2021 12:19:54 AM UTC
+   gpg:                using RSA key 0CD9FED33135CE90
+   gpg: Good signature from "Mariner RPM Release Signing <marinerrpmprod@microsoft.com>" [unknown]
+   gpg: WARNING: This key is not certified with a trusted signature!
+   gpg:          There is no indication that the signature belongs to the owner.
+   Primary key fingerprint: 2BC9 4FFF 7015 A5F2 8F15  37AD 0CD9 FED3 3135 CE90
+   ```
+   The important part is checking that you have a good signature from the Mariner RPM key imported earlier. Depending on your installed certificates, you might get a warning about the key itself not certified with a trusted signature.
+1. Verify that the output of `sha256sum <path to ISO File>` matches the SHA256 checksum found in the checksum file.
+
 # Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
