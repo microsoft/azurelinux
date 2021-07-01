@@ -203,7 +203,7 @@ ln -sf nosetests-3.1 %{buildroot}%{_mandir}/man1/nosetests.1
 
 * Mon May 19 2014 Bohuslav Kabrda <bkabrda@redhat.com> - 1.3.2-2
 - Add patch for issue https://github.com/nose-devs/nose/pull/811,
-which makes tests of python-billiard and python-falcon fail with Python 3.4
+  which makes tests of python-billiard and python-falcon fail with Python 3.4
 
 * Sat May 03 2014 Orion Poplawski <orion@cora.nwra.com> - 1.3.2-1
 - Update to 1.3.2 for Python 3.4 suport
@@ -265,9 +265,9 @@ which makes tests of python-billiard and python-falcon fail with Python 3.4
 
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 0.11.3-5
 - add support for building without docs, to avoid a circular build-time
-dependency between this and python-sphinx; disable docs subpackage for now
+  dependency between this and python-sphinx; disable docs subpackage for now
 - add (apparently) missing BR on python-coverage (appears to be needed
-for %%check)
+  for %%check)
 - cherrypick upstream compatibility fixes for 2.7
 
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 0.11.3-4

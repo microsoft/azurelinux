@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Use bitbucket sources so we can run the tests
 # Source0:        https://bitbucket.org/ruamel/yaml/get/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
-Source0:        https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml/code/ruamel-yaml-code-44504659794e463523ff8d0b40bac18dfe3b52f8.zip
+Source0:        https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml/code/ruamel-yaml-code-%{commit}.zip
 # Works with pytest 2.7
 Patch0:         python-ruamel-yaml-pytest27.patch
 
@@ -51,7 +51,7 @@ ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
 It is a derivative of Kirill Simonov’s PyYAML 3.11
 
 %prep
-%autosetup -n ruamel-yaml-code-44504659794e463523ff8d0b40bac18dfe3b52f8 -p1
+%autosetup -n ruamel-yaml-code-%{commit} -p1
 rm -rf %{pypi_name}.egg-info
 
 %build

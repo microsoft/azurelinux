@@ -20,9 +20,6 @@ Patch1:         conda_gateways_disk_create.patch
 Patch2:         setup.patch
 # Use system cpuinfo
 Patch3:         conda-cpuinfo.patch
-# Fix tests on 32bit
-# https://github.com/conda/conda/pull/9759
-Patch4:         conda-32bit.patch
 
 Patch10001:     0001-Fix-toolz-imports.patch
 Patch10003:     0003-Drop-fs-path-encoding-manipulation-under-python2.patch

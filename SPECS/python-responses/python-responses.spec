@@ -45,7 +45,6 @@ A utility library for mocking out the requests Python library.
 %install
 %py3_install
 
-# skipping tests due to missing dependencies: python-pytest-localserver
 %check
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \

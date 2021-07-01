@@ -64,7 +64,7 @@ users can write C code to manipulate R objects directly.
 
 %package     core-devel
 Summary:     Core files for development of R packages
-Requires:  %{name}-core
+Requires:    %{name}-core
 
 %description core-devel
 Install R-core-devel if you are going to develop or compile R packages.
