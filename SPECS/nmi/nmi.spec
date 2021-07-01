@@ -9,8 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/Azure/aad-pod-identity
-#Source0:       https://github.com/coredns/coredns/archive/v%%{version}.tar.gz
-Source0:        aad-pod-identity-%{version}.tar.gz
+#Source0:       https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         modify-go-build-option.patch
 
@@ -20,22 +20,26 @@ BuildRequires:  golang >= 1.15
 NMI is the resource that is used when your pods look to use their identity.
 
 %prep
-%setup -q -c -n aad-pod-identity-%{version}
-cd aad-pod-identity-1.7.0
+%setup -q -c -n %{name}-%{version}
+pushd aad-pod-identity-%{version}
 %patch0 -p1
+popd
 
 %build
-cd aad-pod-identity-%{version}
+pushd aad-pod-identity-%{version}
+
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
 
 make build-nmi
+popd
 
 %install
-cd aad-pod-identity-1.7.0
-install -m 755 -d %{buildroot}/bin
-install -m 755 ./bin/aad-pod-identity/nmi %{buildroot}/bin
+mkdir -p %{buildroot}/bin
+pushd aad-pod-identity-%{version}
+cp ./bin/aad-pod-identity/nmi %{buildroot}/bin
 cp LICENSE ..
+popd
 
 %clean
 rm -rf %{buildroot}/*
