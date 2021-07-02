@@ -29,13 +29,11 @@ Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
 
 BuildArch:      noarch
 
-BuildRequires:  bash-completion
+BuildRequires:  bash-completion-devel
 %global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '/etc/bash_completion.d')
 BuildRequires:  sed
 
 Requires:       python%{python3_pkgversion}-conda = %{version}-%{release}
-# Removed upstream in favour of calling "conda activate" in version 4.4.0
-Obsoletes:      conda-activate < 4.4
 
 %?python_enable_dependency_generator
 
@@ -107,13 +105,6 @@ sed -r -i '1 {/#![/]usr[/]bin[/]env/d}' conda/_vendor/appdirs.py
 # Use Fedora's cpuinfo since it supports more arches
 rm conda/_vendor/cpuinfo.py
 
-# Replaced by cytools, byte compilation fails under python3.7
-%if 0%{?fedora} || 0%{?rhel} >= 8
-# EPEL does not have new enough cytoolz
-# We need to keep __init__.py which does the dispatch between vendored and non-vendored
-rm conda/_vendor/toolz/[a-zA-Z]*
-%endif
-
 # Use system versions
 # TODO - urllib3 - results in test failures: https://github.com/conda/conda/issues/9512
 #rm -r conda/_vendor/{distro.py,frozendict.py,tqdm,urllib3}
@@ -122,9 +113,6 @@ rm -r conda/_vendor/{distro.py,frozendict.py,tqdm}
 find conda -name \*.py | xargs sed -i -e 's/^\( *\)from .*_vendor\.\(\(distro\|frozendict\|tqdm\).*\) import/\1from \2 import/'
 
 %ifnarch x86_64
-# Tests on 32-bit
-cp -a tests/data/conda_format_repo/linux-{64,32}
-sed -i -e s/linux-64/linux-32/ tests/data/conda_format_repo/linux-32/*json
 # Tests on non-x86_64
 cp -a tests/data/conda_format_repo/{linux-64,%{python3_platform}}
 sed -i -e s/linux-64/%{python3_platform}/ tests/data/conda_format_repo/%{python3_platform}/*json
@@ -150,7 +138,6 @@ EOF
 
 mkdir -p %{buildroot}%{_localstatedir}/cache/conda/pkgs/cache
 
-# install does not create the directory on EL7
 install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/etc/profile.d/conda.{sh,csh}
 sed -r -i '1i CONDA_EXE=%{_bindir}/conda' %{buildroot}/etc/profile.d/conda.sh
 sed -r -i -e '1i set _CONDA_EXE=%{_bindir}/conda\nset _CONDA_ROOT=' \
@@ -176,7 +163,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 # test_cli.py::TestRun.test_run_returns_zero_errorlevel
 
 # test_ProgressiveFetchExtract_prefers_conda_v2_format, test_subdir_data_prefers_conda_to_tar_bz2,
-# test_use_only_tar_bz2 fail in F31 koji, but not with mock --enablerepo=local. Let's disable
+# test_use_only_tar_bz2 fail, but not with mock --enablerepo=local. Let's disable
 # them for now.
 # tests/core/test_initialize.py tries to unlink /usr/bin/python3 and fails when python is a release candidate
 # tests/core/test_solve.py::test_cuda_fail_1 fails on non-x86_64

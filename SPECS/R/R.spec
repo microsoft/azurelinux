@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
-URL:            http://www.r-project.org
+URL:            https://www.r-project.org
 Source0:        https://cran.r-project.org/src/base/R-4/R-%{version}.tar.gz
 
 BuildRequires:  build-essential
@@ -64,7 +64,7 @@ users can write C code to manipulate R objects directly.
 
 %package     core-devel
 Summary:     Core files for development of R packages
-Requires:    %{name}-core
+Requires:    %{name}-core = %{version}-%{release}
 
 %description core-devel
 Install R-core-devel if you are going to develop or compile R packages.
