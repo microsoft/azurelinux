@@ -8,8 +8,7 @@ License:        MIT
 URL:            https://github.com/pytest-dev/pytest-xdist
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel

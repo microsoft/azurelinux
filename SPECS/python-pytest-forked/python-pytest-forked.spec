@@ -8,8 +8,7 @@ License:        MIT
 URL:            https://github.com/pytest-dev/pytest-forked
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-py

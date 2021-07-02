@@ -21,7 +21,7 @@ License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/async_generator
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/ce/b6/6fa6b3b598a03cba5e80f829e0dadbb49d7645f523d209b2fb7ea0bbb02a/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 

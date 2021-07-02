@@ -9,7 +9,7 @@ License:        LGPLv2+ and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://nose.readthedocs.org/en/latest/
-Source0:        http://pypi.python.org/packages/source/n/nose/nose-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/n/nose/nose-%{version}.tar.gz
 # Make compatible with coverage 4.1
 # https://github.com/nose-devs/nose/pull/1004
 Patch0:         python-nose-coverage4.patch

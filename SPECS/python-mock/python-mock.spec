@@ -11,7 +11,8 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.voidspace.org.uk/python/mock/
-Source0:        https://github.com/testing-cabal/%{mod_name}/archive/refs/tags/%{version}.tar.gz
+#Source0:        https://github.com/testing-cabal/mock/archive/refs/tags/%{version}.tar.gz
+Source0:        mock-%{version}.tar.gz
 
 BuildArch:      noarch
 

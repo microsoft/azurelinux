@@ -5046,7 +5046,7 @@
         "other": {
           "name": "python-async-generator",
           "version": "1.10",
-          "downloadUrl": "https://github.com/python-trio/async_generator/archive/v1.10/async_generator-1.10.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/ce/b6/6fa6b3b598a03cba5e80f829e0dadbb49d7645f523d209b2fb7ea0bbb02a/async_generator-1.10.tar.gz"
         }
       }
     },
@@ -5677,7 +5677,7 @@
         "other": {
           "name": "python-nose",
           "version": "1.3.7",
-          "downloadUrl": "http://pypi.python.org/packages/source/n/nose/nose-1.3.7.tar.gz"
+          "downloadUrl": "https://pypi.python.org/packages/source/n/nose/nose-1.3.7.tar.gz"
         }
       }
     },
@@ -5907,7 +5907,7 @@
         "other": {
           "name": "python-pytest-forked",
           "version": "1.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-forked/python-pytest-forked-1.3.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/pytest-forked-1.3.0.tar.gz"
         }
       }
     },
@@ -5917,7 +5917,7 @@
         "other": {
           "name": "python-pytest-mock",
           "version": "3.5.1",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-mock/archive/v3.5.1/pytest-mock-3.5.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/24/1b/ddad49c762bddfe3cb61c8ba61349701afd584b84ff4189721bcba624598/pytest-mock-3.5.1.tar.gz"
         }
       }
     },
@@ -5927,7 +5927,7 @@
         "other": {
           "name": "python-pytest-xdist",
           "version": "2.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-xdist/python-pytest-xdist-2.1.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/pytest-xdist-2.1.0.tar.gz"
         }
       }
     },
@@ -6017,7 +6017,7 @@
         "other": {
           "name": "python-ruamel-yaml",
           "version": "0.16.6",
-          "downloadUrl": "https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml/code/ruamel-yaml-code-44504659794e463523ff8d0b40bac18dfe3b52f8.zip"
+          "downloadUrl": "https://files.pythonhosted.org/packages/6a/6c/7b461053ce5be0d7c8b12dcae9a7c10e8012238a00f6fcd98643ee66d2de/ruamel.yaml.clib-0.1.2.tar.gz"
         }
       }
     },
@@ -6027,7 +6027,7 @@
         "other": {
           "name": "python-ruamel-yaml-clib",
           "version": "0.1.2",
-          "downloadUrl": "https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml-clib/code/ruamel-yaml-clib-code-955989c1f022b95ca1f92bf0abd761ef8aa0b940.zip"
+          "downloadUrl": "https://files.pythonhosted.org/packages/6a/6c/7b461053ce5be0d7c8b12dcae9a7c10e8012238a00f6fcd98643ee66d2de/ruamel.yaml.clib-0.1.2.tar.gz"
         }
       }
     },
@@ -6137,7 +6137,7 @@
         "other": {
           "name": "python-toolz",
           "version": "0.11.1",
-          "downloadUrl": "https://github.com/pytoolz/toolz/archive/0.11.1.tar.gz#/toolz-0.11.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/toolz-0.11.1.tar.gz"
         }
       }
     },

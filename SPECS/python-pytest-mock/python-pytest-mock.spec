@@ -9,7 +9,7 @@ License:        MIT
 URL:            https://github.com/pytest-dev/pytest-mock/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/pytest-dev/pytest-mock/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/24/1b/ddad49c762bddfe3cb61c8ba61349701afd584b84ff4189721bcba624598/%{pypi_name}-3.5.1.tar.gz
 BuildArch:      noarch
 
 %description
