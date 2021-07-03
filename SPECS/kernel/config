@@ -1864,7 +1864,8 @@ CONFIG_DMA_SHARED_BUFFER=y
 # CONFIG_MHI_BUS is not set
 # end of Bus devices
 
-CONFIG_CONNECTOR=m
+CONFIG_CONNECTOR=y
+CONFIG_PROC_EVENTS=y
 # CONFIG_GNSS is not set
 # CONFIG_MTD is not set
 # CONFIG_OF is not set
