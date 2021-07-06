@@ -16,17 +16,16 @@
 #
 
 %define commit  7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6
-
+Summary:        Bazel workspaces for libraries packaged in CBL-Mariner
 Name:           bazel-workspaces
 Version:        20200113
 Release:        1.7%{?dist}
-Summary:        Bazel workspaces for libraries packaged in CBL-Mariner
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
-Url:            https://github.com/kubic-project/bazel-workspaces
-# There are no official source tarball releases for this version. The source tarbll is grabbed from this 
+URL:            https://github.com/kubic-project/bazel-workspaces
+# There are no official source tarball releases for this version. The source tarbll is grabbed from this
 # following commit based on the changelog history
 #Source0:       https://github.com/kubic-project/%{name}/archive/7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -38,7 +37,7 @@ Bazel workspaces for libraries packaged in CBL-Mariner which allow to link those
 libraries dynamically to software build by Bazel.
 
 %prep
-%setup -q -c -n %{name}-%{version}
+%setup -q -c
 
 %build
 
@@ -55,6 +54,7 @@ cp LICENSE README.md ..
 %{_datadir}/%{name}
 
 %changelog
+#FIXME: First changelog entry header failed to parse
 * Mon Jun 21 2021 Henry Li <lihl@microsoft.com> - 20200113-1.7
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
@@ -64,10 +64,12 @@ cp LICENSE README.md ..
 - Update to version 20200113:
   * Add workspace for re2
   * Add workspace for OpenSSL
+
 * Mon Nov  4 2019 mrostecki@opensuse.org
 - Update to version 20191105:
   * googletest: Separate gtest_main and gmock_main from gtest and
     gmock
+
 * Mon Nov  4 2019 mrostecki@opensuse.org
 - Update to version 20191104:
   * googletest: Define separate gtest and gmock libraries
@@ -76,16 +78,20 @@ cp LICENSE README.md ..
   * nanopb: Fix library name
   * Add workspace for grpc
   * Add workspace for nanopb
+
 * Fri Oct 11 2019 mrostecki@opensuse.org
 - Update to version 20191011:
   * Add workspace for msgpack
+
 * Thu Oct 10 2019 mrostecki@opensuse.org
 - Update to version 20191010:
   * sql-parser: Fix headers directory
+
 * Thu Oct 10 2019 mrostecki@opensuse.org
 - Update to version 20191010:
   * Add workspace for http-parser
   * Add workspace for sql-parser
+
 * Thu Sep 26 2019 mrostecki@opensuse.org
 - Update to version 20190926:
   * jwt_verify_lib: Fix the library name
@@ -107,5 +113,6 @@ cp LICENSE README.md ..
   * Add workspace for c-ares
   * Add workspace for rapidjson
   * Add workspace for libprotobuf-mutator
+
 * Fri Sep 20 2019 Michał Rostecki <mrostecki@opensuse.org>
 - Initial release

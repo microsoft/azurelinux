@@ -1,34 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%{?python_enable_dependency_generator}
-
 %bcond_with  docs
-
+Summary:        A code coverage report generator using GNU gcov
 Name:           gcovr
 Version:        4.2
 Release:        6%{?dist}
-Summary:        A code coverage report generator using GNU gcov
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://gcovr.com/
 Source0:        https://github.com/gcovr/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-
+BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+Requires:       %{py3_dist Jinja2}
+# for gcov
+Requires:       gcc
+BuildArch:      noarch
+%{?python_enable_dependency_generator}
 %if %{with docs}
-BuildRequires:  %{py3_dist lxml}
 BuildRequires:  %{py3_dist Jinja2}
 BuildRequires:  %{py3_dist Sphinx}
+BuildRequires:  %{py3_dist lxml}
 BuildRequires:  %{py3_dist sphinx_rtd_theme}
 BuildRequires:  %{py3_dist sphinxcontrib-autoprogram} >= 0.1.5
 %endif
-BuildRequires: make
-
-# for gcov
-Requires:       gcc
-Requires:       %{py3_dist Jinja2}
-
-BuildArch:      noarch
 
 %description
 Gcovr provides a utility for managing the use of the GNU gcov utility
@@ -169,7 +163,6 @@ popd
 * Thu Feb  2 2017 Neal Gompa <ngompa13@gmail.com> - 3.3-2
 - Address review comments (#1418804)
 - Switch to Python 3
-
 
 * Thu Feb  2 2017 Neal Gompa <ngompa13@gmail.com> - 3.3-1
 - Initial package

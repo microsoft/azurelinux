@@ -18,11 +18,11 @@
 %define _binaries_in_noarch_packages_terminate_build 0
 %define sover 1
 %define libname libboringssl%{sover}
-%define src_install_dir /usr/src/%{name}
+%define src_install_dir %{_prefix}/src/%{name}
+Summary:        An SSL/TLS protocol implementation
 Name:           boringssl
 Version:        20200921
 Release:        1.2%{?dist}
-Summary:        An SSL/TLS protocol implementation
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -107,9 +107,9 @@ find %{buildroot}%{src_install_dir} -type f \( -name "*.a" -o -name "*.lib" -o -
 # Fix non-executable-script warning.
 find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec chmod +x "{}" +
 # Fix env-script-interpreter error.
-find %{buildroot}%{src_install_dir} -type f -name "*.pl" -exec sed -i 's|#!.*/usr/bin/env perl|#!/usr/bin/perl|' "{}" +
-find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*/usr/bin/env python.*|#!/usr/bin/python3|' "{}" +
-find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec sed -i 's|#!.*/usr/bin/env bash|#!/bin/bash|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.pl" -exec sed -i 's|#!.*%{_bindir}/env perl|#!/usr/bin/perl|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*%{_bindir}/env python.*|#!/usr/bin/python3|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec sed -i 's|#!.*%{_bindir}/env bash|#!/bin/bash|' "{}" +
 
 # To avoid conflicts with openssl development files, change all includes from
 # openssl to boringssl.
@@ -381,13 +381,16 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
   * Make TLS 1.3 split handshakes work with early data.
   * Split half-RTT tickets out into a separate TLS 1.3 state.
   * Use BCryptGenRandom when building as Windows UWP app.
+
 * Thu May 28 2020 Jan Engelhardt <jengelh@inai.de>
 - Rectify groups.
+
 * Wed May 27 2020 Michał Rostecki <mrostecki@suse.com>
 - Remove patch for enabling shared linking - it was enabled
   upstream.
   * 0001-add-soversion-option.patch
 - Add boringssl-source subpackage.
+
 * Wed May 27 2020 mrostecki@suse.com
 - Update to version 20200122:
   * Define EVP compatibility constants for X448 and Ed448.
@@ -602,9 +605,11 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
   * Add EVP_PKEY support for X25519.
   * Make EVP_PKEY_bits return 253 for Ed25519.
   * Make SSL_get_servername work in the early callback.
+
 * Tue Mar 10 2020 Guillaume GARDET <guillaume.gardet@opensuse.org>
 - Fix arm build:
   * 0005-fix-alignment-for-arm.patch
+
 * Wed Dec  4 2019 Klaus Kämpf <kkaempf@suse.com>
 - fix s390x and ppc64le build
   * 0003-enable-s390x-builds.patch
@@ -613,8 +618,10 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
     to 0001-add-soversion-option.patch
 - rename 0001-crypto-Fix-aead_test-build-on-aarch64.patch
     to 0002-crypto-Fix-aead_test-build-on-aarch64.patch
+
 * Thu Oct 17 2019 Richard Brown <rbrown@suse.com>
 - Remove obsolete Groups tag (fate#326485)
+
 * Mon Oct 14 2019 Martin Pluskal <mpluskal@suse.com>
 - Update to version 20190916:
   * Revert "Fix VS build when assembler is enabled"
@@ -660,8 +667,10 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
   * delocate: translate uleb128 and sleb128 directives
   * Integrate SIKE with TLS key exchange.
   * Convert ecdsa_p224_key.pem to PKCS#8.
+
 * Wed Sep  4 2019 Guillaume GARDET <guillaume.gardet@opensuse.org>
 - Re-enable build on aarch64
+
 * Tue Sep  3 2019 Martin Pluskal <mpluskal@suse.com>
 - Update to version 20190523:
   * Disable RDRAND on AMD chips before Zen.
@@ -863,11 +872,14 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 - Update dependencies
 - Bump soversion
 - Limit building only to supported architectures
+
 * Fri Aug 30 2019 Martin Pluskal <mpluskal@suse.com>
 - Disable lto to fix build failure
+
 * Thu Apr 25 2019 Michał Rostecki <mrostecki@opensuse.org>
 - Add patch which fixes build on aarch64.
   * 0001-crypto-Fix-aead_test-build-on-aarch64.patch
+
 * Thu Apr 25 2019 dmueller@suse.com
 - Update to version 20181228:
   * Use thread-local storage for PRNG states if fork-unsafe buffering is enabled.
@@ -1062,18 +1074,23 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
   * shim: don't clear environment when invoking handshaker.
   * Switch the default TLS 1.3 variant to tls13_rfc.
   * Switch to Clang 6.0's fuzzer support.
+
 * Tue Dec 11 2018 Jan Engelhardt <jengelh@inai.de>
 - Trim redundant wording. Use multi-file find -exec invocation.
+
 * Fri Nov 16 2018 Michał Rostecki <mrostecki@suse.de>
 - To avoid conflicts with openssl development files, change all
   includes from openssl to boringssl.
+
 * Fri Nov  9 2018 Martin Pluskal <mpluskal@suse.com>
 - Use optflags when building
 - Do not create empty package
+
 * Thu Nov  8 2018 Michał Rostecki <mrostecki@suse.de>
 - Update to version 20181026:
   * Automatically disable assembly with MSAN.
   * Switch the default TLS 1.3 variant to tls13_rfc.
+
 * Wed Nov  7 2018 Michał Rostecki <mrostecki@suse.de>
 - Update to version 20181106:
   * Make SSL_get_current_cipher valid during QUIC callbacks.
@@ -1087,6 +1104,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
   * Serialize SSL configuration in handoff and check it on application.
   * Don't overflow state->calls on 16TiB RAND_bytes calls.
 - Use tar_scm service for fetching sources and versioning.
+
 * Wed Nov  7 2018 Michał Rostecki <mrostecki@suse.de>
 - Initial release - 0.0.0+git7499.6ec9e4
 - Add add-soversion-option.patch - required to build libraries with

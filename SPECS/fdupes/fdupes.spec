@@ -1,36 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Place rpm-macros into proper location.
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; /bin/echo $d)
-
-
+Summary:        Finds duplicate files in a given set of directories
 Name:           fdupes
 Version:        2.1.1
 Release:        3%{?dist}
-Summary:        Finds duplicate files in a given set of directories
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/adrianlopezroche/%{name}
 Source0:        https://github.com/adrianlopezroche/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.%{name}
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
+BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pcre2-devel
-BuildRequires: make
 
 %description
 FDUPES is a program for identifying duplicate files residing within specified
 directories.
 
-
 %prep
 %autosetup -p 1
 
 # From README.
-%{__cat} << EOF > LICENSE
+cat << EOF > LICENSE
 FDUPES Copyright (c) 1999-2019 Adrian Lopez
 
 Permission is hereby granted, free of charge, to any person
@@ -80,7 +75,6 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{macrosdir}/macros.%{name}
 %{_mandir}/man7/%{name}*.7*
 %{_bindir}/%{name}
 %{macrosdir}/macros.fdupes
-
 
 %changelog
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com> - 2.1.1-3

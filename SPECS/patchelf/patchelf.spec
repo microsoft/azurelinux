@@ -1,25 +1,22 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# hardening breaks the set-interpreter-long test on i686, x86_64, ppc64le, s390x
-%undefine _hardened_build
-
+Summary:        A utility for patching ELF binaries
 Name:           patchelf
 Version:        0.12
 Release:        3%{?dist}
-Summary:        A utility for patching ELF binaries
-
 License:        GPLv3+
-URL:            http://nixos.org/patchelf.html
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://nixos.org/patchelf.html
 Source0:        https://github.com/NixOS/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  make
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  coreutils
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  libacl-devel
 BuildRequires:  libattr-devel
+BuildRequires:  make
+# hardening breaks the set-interpreter-long test on i686, x86_64, ppc64le, s390x
+%global _hardened_build 1
 
 %description
 PatchELF is a simple utility for modifying an existing ELF executable
@@ -45,7 +42,7 @@ make install DESTDIR=%{buildroot}
 
 # the docs get put in a funny place, so delete and include in the
 # standard way in the docs section below
-rm -rf %{buildroot}/usr/share/doc/%{name}
+rm -rf %{buildroot}%{_docdir}/%{name}
 
 %files
 %license COPYING
@@ -57,6 +54,7 @@ rm -rf %{buildroot}/usr/share/doc/%{name}
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 0.12-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
+- Enable hardened build
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

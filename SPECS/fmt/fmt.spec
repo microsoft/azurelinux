@@ -1,14 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%undefine __cmake_in_source_build
-
 %bcond_with doc
+Summary:        Small, safe and fast formatting library for C++
 Name:           fmt
 Version:        7.0.3
 Release:        3%{?dist}
-Summary:        Small, safe and fast formatting library for C++
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/fmtlib/%{name}
 Source0:        %{url}/archive/%{version}.tar.gz
 # See https://github.com/fmtlib/fmt/issues/443 and https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/LVKYLDLJVWAVJE4MQVKDO6PYZRD5MCP6/
@@ -19,10 +16,13 @@ Patch5:         doc-_templates-layout-stripped-download-links.patch
 Patch6:         doc-index-removed-GitHub-iframe.patch
 Patch7:         doc-build-use-sphinx-build-3.patch
 Patch8:         doc-build-use-python3.patch
-
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
+# This package replaces the old name of cppformat
+Provides:       cppformat = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      cppformat < %{?epoch:%{epoch}:}%{version}-%{release}
+%undefine __cmake_in_source_build
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  cmake3
 %else
@@ -32,20 +32,16 @@ BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  nodejs-less
 %if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires:  python%{python3_version_nodots}-sphinx
 BuildRequires:  python%{python3_version_nodots}-breathe
+BuildRequires:  python%{python3_version_nodots}-sphinx
 %else
-BuildRequires:  python3-sphinx
 BuildRequires:  python3-breathe
+BuildRequires:  python3-sphinx
 %endif
 %else
 Provides:       %{name}-doc = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      %{name}-doc < %{?epoch:%{epoch}:}%{version}-%{release}
 %endif
-
-# This package replaces the old name of cppformat
-Provides:       cppformat = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      cppformat < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description
 C++ Format is an open-source formatting library for C++. It can be used as a
@@ -53,8 +49,8 @@ safe alternative to printf or as a fast alternative to IOStreams.
 
 %package        devel
 Summary:        Development files for %{name}
+License:        BSD
 Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
 # This package replaces the old name of cppformat
 Provides:       cppformat-devel = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      cppformat-devel < %{?epoch:%{epoch}:}%{version}-%{release}
@@ -66,11 +62,10 @@ This package contains the header file for using %{name}.
 %package        doc
 Summary:        Documentation files for %{name}
 License:        Python
-BuildArch:      noarch
-
 # This package replaces the old name of cppformat
 Provides:       cppformat-doc = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      cppformat-doc < %{?epoch:%{epoch}:}%{version}-%{release}
+BuildArch:      noarch
 
 %description    doc
 This package contains documentation for developer documentation for %{name}.
@@ -88,7 +83,7 @@ sed -i "s/'--clean-css',//" doc/build.py
 %define _vpath_builddir .
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%cmake3                                       \
+%{cmake3}                                       \
 %else
 %cmake                                        \
 %endif
@@ -128,7 +123,7 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 
 %if %{with doc}
 %files doc
-%doc %{_datadir}/doc/%{name}
+%doc %{_docdir}/%{name}
 %license doc/python-license.txt
 %endif
 
