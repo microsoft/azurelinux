@@ -296,7 +296,7 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
 - Include tools to build and remove unpackaged_files_terminate_build
 
 * Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4

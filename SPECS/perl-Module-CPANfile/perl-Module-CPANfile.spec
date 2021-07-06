@@ -69,7 +69,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1004-8
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1004-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
 

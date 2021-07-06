@@ -66,7 +66,7 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %{_includedir}/%{name}/
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.0.7-3
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.0.7-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
 

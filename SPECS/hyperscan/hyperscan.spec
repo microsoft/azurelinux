@@ -89,7 +89,7 @@ needed for developing Hyperscan applications.
 %{_includedir}/hs/
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.0-2
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

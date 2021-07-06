@@ -145,7 +145,7 @@ make test
 %{_bindir}/cpanm
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7044-9
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7044-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
 

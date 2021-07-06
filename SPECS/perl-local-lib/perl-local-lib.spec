@@ -102,7 +102,7 @@ make test
 %{_sysconfdir}/profile.d/*
 
 %changelog
-* Fri Jul 2 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.000024-9
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.000024-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
 
