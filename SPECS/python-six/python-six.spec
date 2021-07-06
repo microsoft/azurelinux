@@ -73,7 +73,7 @@ python3 test_six.py
 
 %changelog
 *   Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-5
--   Adding and additional "Provides" for "python2-six" as it's the name expected by some packages.
+-   Adding an additional "Provides" for "python2-six" as it's the name expected by some packages.
 -   Removed the "sha1" macro.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.0-4
 -   Added %%license line automatically
