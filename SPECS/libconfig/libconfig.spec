@@ -1,9 +1,9 @@
-%global sover_major 11
-%global sover_minor 1
+%define sover_major 11
+
 Summary:        C/C++ configuration file library
 Name:           libconfig
 Version:        1.7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,7 +46,7 @@ cd ..
 %license COPYING.LIB
 %doc AUTHORS ChangeLog README
 %{_libdir}/libconfig*.so.%{sover_major}
-%{_libdir}/libconfig*.so.%{sover_major}.%{sover_minor}*
+%{_libdir}/libconfig*.so.%{sover_major}.*
 
 %files devel
 %{_includedir}/libconfig*
@@ -56,6 +56,9 @@ cd ..
 %{_libdir}/pkgconfig/libconfig*.pc
 
 %changelog
+* Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.3-2
+- Removing minor version number from the %%files section.
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.3-1
 - Upgrade to latest release and update license location
 - Use release version of the source tarball
