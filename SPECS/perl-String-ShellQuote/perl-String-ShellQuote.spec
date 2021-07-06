@@ -3,7 +3,7 @@ Version:        1.04
 Release:        30%{?dist}
 Summary:        Perl module for quoting strings for passing through the shell
 License:        (GPL+ OR Artistic) and GPLv2+
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/String-ShellQuote

@@ -3,7 +3,7 @@ Version:        2.000024
 Release:        9%{?dist}
 Summary:        Create and use a local lib/ for perl modules
 License:        GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            https://metacpan.org/release/local-lib

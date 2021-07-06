@@ -3,7 +3,7 @@ Version:        1.016
 Release:        8%{?dist}
 Summary:        Change directory temporarily for a limited scope
 License:        ASL 2.0
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/File-pushd

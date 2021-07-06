@@ -3,7 +3,7 @@ Summary:	Verify requirements in a CPAN::Meta object
 Version:	0.014
 Release:	12%{?dist}
 License:	GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:		https://metacpan.org/release/CPAN-Meta-Check

@@ -4,7 +4,7 @@ Version:        5.4.0
 Release:        2%{?dist}
 Summary:        High-performance regular expression matching library
 License:        BSD
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.hyperscan.io/

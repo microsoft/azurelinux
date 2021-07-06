@@ -8,7 +8,7 @@ Summary:        Get, unpack, build and install CPAN modules
 ## at build-time only
 # fatunpack:    GPL+
 License:        GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/App-cpanminus

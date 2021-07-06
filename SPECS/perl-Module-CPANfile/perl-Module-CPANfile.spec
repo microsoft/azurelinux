@@ -3,7 +3,7 @@ Version:        1.1004
 Release:        8%{?dist}
 Summary:        Parse cpanfile
 License:        GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-CPANfile

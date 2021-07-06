@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 # aapl/ and some headers from src/ are the LGPLv2+
 License:        MIT AND LGPLv2+
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.colm.net/open-source/colm/

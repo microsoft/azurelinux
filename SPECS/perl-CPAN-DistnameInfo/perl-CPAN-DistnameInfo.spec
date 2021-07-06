@@ -3,7 +3,7 @@ Version:        0.12
 Release:        19%{?dist}
 Summary:        Extract distribution name and version from a distribution filename
 License:        GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/CPAN-DistnameInfo

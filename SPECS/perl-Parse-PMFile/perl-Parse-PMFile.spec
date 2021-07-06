@@ -3,7 +3,7 @@ Version:        0.42
 Release:        4%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Parse-PMFile
