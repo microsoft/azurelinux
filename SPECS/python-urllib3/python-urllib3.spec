@@ -2,7 +2,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        1.25.9
+Version:        1.26.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -98,6 +98,9 @@ ulimit -n $nofiles
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jul 06 2021 Henry Li <lihl@microsoft.com> - 1.26.5-1
+- Update to version 1.26.5
+
 * Wed Dec 23 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.25.9-1
 - Updated to version 1.25.9
 
