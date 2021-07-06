@@ -5514,6 +5514,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pyelftools",
+          "version": "0.27",
+          "downloadUrl": "https://github.com/eliben/pyelftools/archive/v0.27/pyelftools-0.27.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pygobject3",
           "version": "3.30.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/00/17/198a9d0eb0e89b5c7d2a9b4437eb40d62702ab771030cd79fc7141cb0d30/PyGObject-3.30.1.tar.gz"

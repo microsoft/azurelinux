@@ -86,6 +86,7 @@
                 "perl-String-ShellQuote",
                 "policycoreutils",
                 "pugixml",
+                "pyelftools",
                 "python-google-auth",
                 "python-jwt",
                 "python-kubernetes",
