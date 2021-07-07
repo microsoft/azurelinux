@@ -2665,8 +2665,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.39.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.39.1.tar.gz"
+          "version": "0.43.1",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
         }
       }
     },
