@@ -17,12 +17,8 @@ Source0:        https://github.com/%{project_owner}/%{github_name}/archive/v%{ve
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with tests}
-BuildRequires:  python3-coverage
-BuildRequires:  python3-async-generator >= 1.3
-BuildRequires:  python3-hypothesis >= 5.7.1
-%endif
 %if %{with_check}
+BuildRequires:  python3-async-generator >= 1.3
 BuildRequires:  python3-pip
 %endif
 
@@ -55,6 +51,7 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     codecov>=2.0.15 \
     coverage>=4.5.3 \
+    hypothesis \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     py>=1.8.0 \
