@@ -2665,8 +2665,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.39.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.39.1.tar.gz"
+          "version": "0.43.1",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
         }
       }
     },
@@ -6395,7 +6395,7 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.25.9",
+          "version": "1.26.5",
           "downloadUrl": "https://github.com/shazow/urllib3/archive/1.25.9/urllib3-1.25.9.tar.gz"
         }
       }
