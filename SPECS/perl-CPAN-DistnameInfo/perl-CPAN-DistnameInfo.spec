@@ -16,8 +16,10 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Tests:
+%if %{with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Test::More)
+%endif
 Requires:       perl
 
 %description

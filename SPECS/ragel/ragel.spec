@@ -4,7 +4,7 @@ Release:        4%{?dist}
 Summary:        Finite state machine compiler
 # aapl/ is the LGPLv2+
 License:        MIT AND LGPLv2+
-Group: 		Development/Libraries
+Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.colm.net/open-source/%{name}/

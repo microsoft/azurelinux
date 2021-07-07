@@ -101,7 +101,6 @@ Requires:       perl-YAML
 # XXX: Keep Provides: cpanminus to allow `yum install cpanminus' instead of
 # longer `yum install perl-App-cpanminus'.
 Provides:       cpanminus = %{version}-%{release}
-Obsoletes:      cpanminus <= 1.2002
 
 # Filter under-specified dependencies
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(App::cpanminus\\)$

@@ -1,34 +1,36 @@
-Name:		perl-CPAN-Meta-Check
-Summary:	Verify requirements in a CPAN::Meta object
-Version:	0.014
-Release:	12%{?dist}
-License:	GPL+ OR Artistic
+Name:           perl-CPAN-Meta-Check
+Summary:        Verify requirements in a CPAN::Meta object
+Version:        0.014
+Release:        12%{?dist}
+License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		https://metacpan.org/release/CPAN-Meta-Check
-Source0:	http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
-BuildArch:	noarch
+URL:            https://metacpan.org/release/CPAN-Meta-Check
+Source0:        http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
+BuildArch:      noarch
 # Build
-BuildRequires:	make
-BuildRequires:	perl
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  make
+BuildRequires:  perl
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Module
-BuildRequires:	perl(base)
-BuildRequires:	perl(CPAN::Meta::Prereqs) >= 2.132830
-BuildRequires:	perl(CPAN::Meta::Requirements) >= 2.121
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(Module::Metadata) >= 1.000023
-BuildRequires:	perl(strict)
-BuildRequires:	perl(warnings)
+BuildRequires:  perl(base)
+BuildRequires:  perl(CPAN::Meta::Prereqs) >= 2.132830
+BuildRequires:  perl(CPAN::Meta::Requirements) >= 2.121
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(Module::Metadata) >= 1.000023
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
 # Test
-BuildRequires:	perl(CPAN::Meta) >= 2.120920
-BuildRequires:	perl(Env)
-BuildRequires:	perl(lib)
-BuildRequires:	perl(Test::More) >= 0.88
+%if %{with_check}
+BuildRequires:  perl(CPAN::Meta) >= 2.120920
+BuildRequires:  perl(Env)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::More) >= 0.88
+%endif
 
 # Runtime
-Requires:	perl
+Requires:       perl
 
 %description
 This module verifies if requirements described in a CPAN::Meta object are

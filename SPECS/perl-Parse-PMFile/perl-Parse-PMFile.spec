@@ -23,10 +23,12 @@ BuildRequires:  perl(JSON::PP) >= 2.00
 BuildRequires:  perl(Safe)
 BuildRequires:  perl(version) >= 0.83
 # Tests
+%if %{with_check}
 BuildRequires:  perl(File::Temp) >= 0.19
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Opcode)
 BuildRequires:  perl(Test::More) >= 0.88
+%endif
 Requires:       perl
 Requires:       perl(JSON::PP) >= 2.00
 Requires:       perl(version) >= 0.83

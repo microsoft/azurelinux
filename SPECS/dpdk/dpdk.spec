@@ -102,8 +102,6 @@ as L2 and L3 forwarding.
 %define docdir  %{_docdir}/%{name}
 %define incdir %{_includedir}/%{name}
 %define pmddir %{_libdir}/%{name}-pmds
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 %prep
 %setup -q -n dpdk-stable-%{version}

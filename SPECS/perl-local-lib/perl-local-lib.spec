@@ -29,6 +29,7 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Glob)
 # Tests only
+%if %{with_check}
 BuildRequires:  perl(base)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Data::Dumper)
@@ -39,6 +40,7 @@ BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More)
+%endif
 Requires:       perl
 Requires:       perl(Carp)
 Requires:       perl(Carp::Heavy)
