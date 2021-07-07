@@ -163,7 +163,7 @@ libffi-3.2.1-12.cm1.aarch64.rpm
 libtasn1-4.14-2.cm1.aarch64.rpm
 p11-kit-0.23.22-1.cm1.aarch64.rpm
 p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
-ca-certificates-shared-20200720-14.cm1.noarch.rpm
-ca-certificates-tools-20200720-14.cm1.noarch.rpm
-ca-certificates-base-20200720-14.cm1.noarch.rpm
+ca-certificates-shared-20200720-15.cm1.noarch.rpm
+ca-certificates-tools-20200720-15.cm1.noarch.rpm
+ca-certificates-base-20200720-15.cm1.noarch.rpm
 libselinux-2.9-3.cm1.aarch64.rpm
