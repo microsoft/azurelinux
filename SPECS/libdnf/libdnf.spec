@@ -7,7 +7,7 @@
 
 Name:           libdnf
 Version:        %{libdnf_major_version}.%{libdnf_minor_version}.%{libdnf_micro_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -15,6 +15,7 @@ Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2021-3445.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -85,7 +86,7 @@ Requires:       python3-%{name} = %{version}-%{release}
 Python 3 bindings for the hawkey library.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # Allows cmake to find libsolv.
@@ -176,6 +177,9 @@ popd
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Tue Jul 06 2021 Henry Li <lihl@microsoft.com> 0.43.1-2
+- Patch CVE-2021-3445
+
 * Mon Aug 17 2020 Emre Girgin <mrgirgin@microsoft.com> 0.43.1-1
 - Updating to version 0.43.1.
 
