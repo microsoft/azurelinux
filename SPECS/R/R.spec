@@ -94,14 +94,14 @@ TZ="Europe/Paris" make check -k -i
 %license COPYING
 %{_bindir}/R
 %{_bindir}/Rscript
-%{_exec_prefix}/lib64/R/*
+%{_lib64dir}/R/*
 %{_mandir}/man1/R*
-%exclude %dir %{_exec_prefix}/lib64/R/include/*
-%exclude %{_usrsrc}/debug/usr/bin/R*
-%exclude %dir %{_exec_prefix}/lib/debug/usr/lib64/R*
+%exclude %dir %{_lib64dir}/R/include/*
+%exclude %{_exec_prefix}/src/debug/R*
+%exclude %dir %{_libdir}/debug/usr/lib64/R*
 
 %files core-devel
-%{_exec_prefix}/lib64/R/include/*
+%{_lib64dir}/R/include/*
 
 %changelog
 * Wed Jun 16 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.1.0-1

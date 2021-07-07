@@ -10,8 +10,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.python.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz
 
-Patch0: https://github.com/slezica/python-frozendict/pull/30/commits/6ad44b54139e9b298a9281d85abf4f940f5d852a.patch
-Patch1: https://github.com/slezica/python-frozendict/pull/30/commits/24e65b1f197a8c0dcca82a6ada53a8a29445c21c.patch
+# https://github.com/slezica/python-frozendict/pull/30/commits/6ad44b54139e9b298a9281d85abf4f940f5d852a.patch
+Patch0:         fix_imports_for_python3_9.patch
+# https://github.com/slezica/python-frozendict/pull/30/commits/24e65b1f197a8c0dcca82a6ada53a8a29445c21c.patch
+Patch1:         import_from_abc_first.patch
 
 BuildArch:      noarch
 

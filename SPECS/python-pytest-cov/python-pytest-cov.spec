@@ -24,11 +24,6 @@ BuildRequires:  python%{python3_pkgversion}-coverage >= 4.4
 # For tests
 %if %{with_check}
 BuildRequires:  python3-pip
-BuildRequires:  python%{python3_pkgversion}-fields
-BuildRequires:  python%{python3_pkgversion}-process-tests
-BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-virtualenv
-BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 %endif
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
@@ -54,8 +49,12 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
-    execnet
+    execnet \
+    six \
+    fields \
+    virtualenv \
+    process-tests \
+    pytest-xdist
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v \
