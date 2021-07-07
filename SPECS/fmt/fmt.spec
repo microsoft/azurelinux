@@ -7,7 +7,8 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fmtlib/%{name}
-Source0:        %{url}/archive/%{version}.tar.gz
+#Source0:        %{url}/archive/%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 # See https://github.com/fmtlib/fmt/issues/443 and https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/LVKYLDLJVWAVJE4MQVKDO6PYZRD5MCP6/
 Patch1:         doc-build-removed-all-pip-internet-stuff.patch
 Patch3:         doc-build-do-not-create-virtual-environment.patch
@@ -132,6 +133,7 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License Verified
 - Define _vpath_builddir as the current build directory
+- Fix Source0 URL
 
 * Mon May 03 2021 Vitaly Zaitsev <vitaly@easycoding.org> - 7.0.3-2
 - Fixed RHBZ#1956521.

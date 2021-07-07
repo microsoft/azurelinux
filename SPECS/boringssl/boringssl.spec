@@ -107,9 +107,9 @@ find %{buildroot}%{src_install_dir} -type f \( -name "*.a" -o -name "*.lib" -o -
 # Fix non-executable-script warning.
 find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec chmod +x "{}" +
 # Fix env-script-interpreter error.
-find %{buildroot}%{src_install_dir} -type f -name "*.pl" -exec sed -i 's|#!.*%{_bindir}/env perl|#!/usr/bin/perl|' "{}" +
-find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*%{_bindir}/env python.*|#!/usr/bin/python3|' "{}" +
-find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec sed -i 's|#!.*%{_bindir}/env bash|#!/bin/bash|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.pl" -exec sed -i 's|#!.*/usr/bin/env perl|#!%{_bindir}/perl|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*/usr/bin/env python.*|#!%[_bindir]/python3|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec sed -i 's|#!.*/usr/bin/env bash|#!/bin/bash|' "{}" +
 
 # To avoid conflicts with openssl development files, change all includes from
 # openssl to boringssl.

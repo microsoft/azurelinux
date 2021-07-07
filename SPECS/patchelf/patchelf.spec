@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://nixos.org/patchelf.html
 Source0:        https://github.com/NixOS/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         disable-set-interpreter-long-test.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  coreutils
@@ -16,7 +17,7 @@ BuildRequires:  libacl-devel
 BuildRequires:  libattr-devel
 BuildRequires:  make
 # hardening breaks the set-interpreter-long test on i686, x86_64, ppc64le, s390x
-%global _hardened_build 1
+# Apply patch to disable set-interpreter-test
 
 %description
 PatchELF is a simple utility for modifying an existing ELF executable
@@ -24,7 +25,7 @@ or library.  It can change the dynamic loader ("ELF interpreter")
 of an executable and change the RPATH of an executable or library.
 
 %prep
-%setup -q
+%autosetup -p1
 
 # package ships elf.h - delete to use glibc-headers one
 rm src/elf.h
@@ -55,6 +56,7 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
 - Enable hardened build
+- Add patch to disable set-interpreter-long test
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

@@ -59,7 +59,6 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 %config %{_sysconfdir}/rpm/macros.go
 
 %changelog
-#FIXME: First changelog entry header failed to parse
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com>  15.0.15-1.4
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified

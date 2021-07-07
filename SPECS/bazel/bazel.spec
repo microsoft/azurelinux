@@ -29,7 +29,7 @@ A fast, scalable, multi-language and extensible build system.
 %build
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}

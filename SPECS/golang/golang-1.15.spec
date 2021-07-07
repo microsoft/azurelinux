@@ -32,17 +32,17 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-patch -Np1 --ignore-whitespace < %{_prefix}/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
+patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
 
 %build
 # Build go 1.4 bootstrap
-pushd %{_prefix}/src/mariner/BUILD/go-bootstrap/src
+pushd /usr/src/mariner/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v %{_prefix}/src/mariner/BUILD/go-bootstrap %{_libdir}/golang
+mv -v /usr/src/mariner/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
 # Build current go version
