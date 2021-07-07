@@ -734,6 +734,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "colm",
+          "version": "0.13.0.7",
+          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "compositeproto",
           "version": "0.4.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/compositeproto-0.4.2.tar.bz2"
@@ -1137,6 +1147,16 @@
           "name": "dotnet-sdk-3.1",
           "version": "3.1.115",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dpdk",
+          "version": "18.11.2",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
         }
       }
     },
@@ -1967,6 +1987,16 @@
           "name": "hyperv-daemons",
           "version": "5.10.42.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.42.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hyperscan",
+          "version": "5.4.0",
+          "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.0.tar.gz"
         }
       }
     },
@@ -4914,6 +4944,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-App-cpanminus",
+          "version": "1.7044",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7044.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2012",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2012.tar.gz"
@@ -4937,6 +4977,26 @@
           "name": "perl-common-sense",
           "version": "3.74",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-CPAN-DistnameInfo",
+          "version": "0.12",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GB/GBARR/CPAN-DistnameInfo-0.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-CPAN-Meta-Check",
+          "version": "0.014",
+          "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
         }
       }
     },
@@ -4997,6 +5057,16 @@
           "name": "perl-File-HomeDir",
           "version": "1.004",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.004.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-File-pushd",
+          "version": "1.016",
+          "downloadUrl": "http://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-pushd-1.016.tar.gz"
         }
       }
     },
@@ -5074,9 +5144,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-local-lib",
+          "version": "2.000024",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000024.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Module-Build",
           "version": "0.4224",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-0.4224.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-CPANfile",
+          "version": "1.1004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/Module-CPANfile-1.1004.tar.gz"
         }
       }
     },
@@ -5134,9 +5224,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Parse-PMFile",
+          "version": "0.42",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-0.42.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Path-Class",
           "version": "0.37",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class-0.37.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-String-ShellQuote",
+          "version": "1.04",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROSCH/String-ShellQuote-1.04.tar.gz"
         }
       }
     },
@@ -5397,6 +5507,16 @@
           "name": "pyasn1-modules",
           "version": "0.2.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pyelftools",
+          "version": "0.27",
+          "downloadUrl": "https://github.com/eliben/pyelftools/archive/v0.27/pyelftools-0.27.tar.gz"
         }
       }
     },
@@ -6567,6 +6687,16 @@
           "name": "qt5-qttools",
           "version": "5.12.5",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ragel",
+          "version": "7.0.0.12",
+          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.0.12.tar.gz"
         }
       }
     },
