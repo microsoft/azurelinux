@@ -3,14 +3,13 @@
 
 Name:           python-six
 Version:        1.11.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python 2 and 3 compatibility utilities
 License:        MIT
 Group:          Development/Languages/Python
 Url:            https://pypi.org/project/six/
 #Source0:       https://pypi.python.org/packages/source/s/six/six-%{version}.tar.gz
 Source0:        six-%{version}.tar.gz
-%define sha1    six=3647372a0e104e7b53bd477762392024e1083ac0
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -26,6 +25,8 @@ BuildRequires:  curl-devel
 %endif
 Requires:       python2
 Requires:       python2-libs
+
+Provides:       python2-six = %{version}-%{release}
 
 BuildArch:      noarch
 
@@ -71,6 +72,9 @@ python3 test_six.py
 %{python3_sitelib}/*
 
 %changelog
+*   Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-5
+-   Adding an additional "Provides" for "python2-six" as it's the name expected by some packages.
+-   Removed the "sha1" macro.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.0-4
 -   Added %%license line automatically
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-3

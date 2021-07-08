@@ -1,44 +1,44 @@
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
 Version:        2019.11
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
-URL:            https://sbabic.github.io/swupdate/
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/sbabic/swupdate/archive/%{version}.tar.gz
+Group:          System Environment/Base
+URL:            https://sbabic.github.io/swupdate/
+#Source0:       https://github.com/sbabic/swupdate/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        .config
 
 BuildRequires:  curl-devel
 BuildRequires:  json-c-devel
-BuildRequires:  libconfig
-BuildRequires:  systemd-devel
 BuildRequires:  libarchive-devel
+BuildRequires:  libconfig-devel
+BuildRequires:  systemd-devel
 BuildRequires:  zeromq-devel
 Requires:       curl
 Requires:       json-c
+Requires:       libarchive
 Requires:       libconfig
 Requires:       systemd
-Requires:       libarchive
 Requires:       zeromq
 
 %description
 SWUpdate is a Linux Update agent with the goal to provide an efficient and safe way to update an embedded system.
 SWUpdate supports local and remote updates, multiple update strategies.
 
-%package tools
-Summary: swupdate tools
-Group: System Environment/Base
+%package        tools
+Summary:        swupdate tools
+Group:          System Environment/Base
 
-%description tools
+%description    tools
 Supporter tools for SWUpdate
 
-%package devel
-Summary: Development Libraries for swupdate
-Group: Development/Libraries
-Requires: swupdate = %{version}-%{release}
+%package        devel
+Summary:        Development Libraries for swupdate
+Group:          Development/Libraries
+Requires:       swupdate = %{version}-%{release}
 
 %description devel
 This package contains symbolic links, header files,
@@ -139,21 +139,24 @@ fi
 
 
 %changelog
-*   Fri Sep 25 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.11-6
--   Disable debug symbol stripping in .config, and create the debuginfo package.
+* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2019.11-7
+- Use libconfig-devel at build-time, instead of libconfig
 
-*   Tue Jun 09 2020 Daniel McIlvaney <damcilva@microsoft.com> 2019.11-5
--   Use Grub on aarch64 systems to abstract firmware (no longer require U-Boot)
+* Fri Sep 25 2020 Emre Girgin <mrgirgin@microsoft.com> - 2019.11-6
+- Disable debug symbol stripping in .config, and create the debuginfo package.
 
-*   Thu May 28 2020 Emre Girgin <mrgirgin@microsoft.com> 2019.11-4
--   Remove the ifarch clause around Patch0 to unify the SRPM files accross architectures.
+* Tue Jun 09 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2019.11-5
+- Use Grub on aarch64 systems to abstract firmware (no longer require U-Boot)
 
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 2019.11-3
--   Added %%license line automatically
+* Thu May 28 2020 Emre Girgin <mrgirgin@microsoft.com> - 2019.11-4
+- Remove the ifarch clause around Patch0 to unify the SRPM files accross architectures.
 
-*   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2019.11-2
--   License verified.
--   Fixed 'Source0' tag.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2019.11-3
+- Added %%license line automatically
 
-*   Fri Dec 27 2019 Emre Girgin <mrgirgin@microsoft.com> 2019.11-1
--   Original version for CBL-Mariner.
+* Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2019.11-2
+- License verified.
+- Fixed 'Source0' tag.
+
+* Fri Dec 27 2019 Emre Girgin <mrgirgin@microsoft.com> - 2019.11-1
+- Original version for CBL-Mariner.
