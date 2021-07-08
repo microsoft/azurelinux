@@ -51,7 +51,7 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     codecov>=2.0.15 \
     coverage>=4.5.3 \
-    hypothesis \
+    hypothesis==4.38.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     py>=1.8.0 \

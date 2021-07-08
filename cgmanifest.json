@@ -6017,7 +6017,7 @@
         "other": {
           "name": "python-ruamel-yaml",
           "version": "0.16.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/6a/6c/7b461053ce5be0d7c8b12dcae9a7c10e8012238a00f6fcd98643ee66d2de/ruamel.yaml.clib-0.1.2.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/ruamel.yaml-0.16.6.tar.gz"
         }
       }
     },

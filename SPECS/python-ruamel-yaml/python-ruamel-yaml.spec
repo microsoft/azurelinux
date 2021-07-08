@@ -1,6 +1,5 @@
 %global pypi_name ruamel.yaml
 %global srcname ruamel-yaml
-%global commit 44504659794e463523ff8d0b40bac18dfe3b52f8
 %global debug_package %{nil}
 
 Summary:        YAML 1.2 loader/dumper package for Python
@@ -8,12 +7,11 @@ Name:           python-%{srcname}
 Version:        0.16.6
 Release:        6%{?dist}
 License:        MIT
-URL:            https://bitbucket.org/ruamel/yaml
+URL:            https://pypi.org/project/ruamel.yaml/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Use bitbucket sources so we can run the tests
-# Source0:        https://bitbucket.org/ruamel/yaml/get/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/ruamel.yaml-0.16.6.tar.gz
+# Repository lives on https://sourceforge.net/projects/ruamel-yaml/; however, the snapshot is an unreliable link
+Source0:        https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/%{pypi_name}-%{version}.tar.gz
 
 %description
 ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
@@ -23,29 +21,23 @@ It is a derivative of Kirill Simonov’s PyYAML 3.11
 Summary:        YAML 1.2 loader/dumper package for Python
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-typing
 # For tests
 %if %{with_check}
 BuildRequires:  python3-pip
-%endif
-
-# typing was added in Python 3.5
-%if %{python3_pkgversion} == 34
-BuildRequires:  python%{python3_pkgversion}-typing
 %endif
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 
 Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
 Requires:       python%{python3_pkgversion}-setuptools
-%if %{python3_pkgversion} == 34
 Requires:       python%{python3_pkgversion}-typing
-%endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
 ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
 It is a derivative of Kirill Simonov’s PyYAML 3.11
 
 %prep
-%autosetup -n ruamel.yaml-0.16.6 -p1
+%autosetup -n %{pypi_name}-%{version} -p1
 rm -rf %{pypi_name}.egg-info
 
 %build
@@ -55,15 +47,7 @@ rm -rf %{pypi_name}.egg-info
 %{__python3} setup.py install --single-version-externally-managed --skip-build --root %{buildroot}
 
 %check
-pip3 install atomicwrites>=1.3.0 \
-    attrs>=19.1.0 \
-    more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    wheel
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} setup.py test
+# tests not included in the pypi source 
 
 
 %files -n python%{python3_pkgversion}-%{srcname}
