@@ -9,15 +9,13 @@ Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
 #Source0:       https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.4.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         Use-mariner-container.patch
 
-BuildRequires:  golang >= 1.13
-BuildRequires:  helm
-BuildRequires:  ca-certificates
-BuildRequires:  openssl
-BuildRequires:  cmake
-BuildRequires:  moby-cli
-BuildRequires:  moby-engine
-BuildRequires:  sudo
+#BuildRequires:  golang >= 1.13
+#BuildRequires:  helm
+#BuildRequires:  ca-certificates
+#BuildRequires:  openssl
+#BuildRequires:  cmake
 
 %description
 This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway 
@@ -27,12 +25,13 @@ to act as the ingress for an AKS cluster.
 %autosetup -p1
 
 %build
-sudo dockerd
+chmod u+x ./scripts/build.sh
 mkdir build && cd build
 cmake ..
 cmake --build . --target appgw-ingress
 
 %install
+mkdir -p %{buildroot}%{_bindir}
 cp bin/appgw-ingress %{buildroot}%{_bindir}/
 
 %files
