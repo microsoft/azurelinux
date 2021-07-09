@@ -227,7 +227,7 @@ func (pkgVer *PackageVer) validatedIntervals() error {
 	if (comparisonResult == versioncompare.LessThan && (conditionUpperBound(c1) || (conditionEquals(c1) && !conditionUpperBound(c2)))) ||
 		(comparisonResult == versioncompare.EqualTo && (!conditionCanEqual(c1) || !conditionCanEqual(c2))) ||
 		(comparisonResult == versioncompare.GreatherThan && (conditionUpperBound(c2) || (conditionEquals(c2) && !conditionUpperBound(c1)))) {
-		return fmt.Errorf("version bounds (%s) don't overlap", pkgVer.String())
+		return fmt.Errorf("version bounds (%s) don't overlap", pkgVer)
 	}
 
 	return nil
