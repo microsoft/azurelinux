@@ -20,6 +20,7 @@ import (
 	"microsoft.com/pkggen/internal/rpm"
 	"microsoft.com/pkggen/internal/safechroot"
 
+	"github.com/jinzhu/copier"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
 	"microsoft.com/pkggen/internal/logger"
@@ -518,8 +519,10 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 				}
 			}
 		}
-		if nameMatch == false {
-			processedPkgList = append(processedPkgList, pkg)
+		if !nameMatch {
+			var processPkg pkgjson.PackageVer
+			copier.Copy(&processPkg, pkg)
+			processedPkgList = append(processedPkgList, &processPkg)
 		}
 	}
 	return

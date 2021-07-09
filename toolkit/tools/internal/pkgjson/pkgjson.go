@@ -13,6 +13,15 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 )
 
+var knownConditions = map[string]bool{
+	"":   true,
+	"=":  true,
+	"<":  true,
+	"<=": true,
+	">":  true,
+	">=": true,
+}
+
 // PackageRepo contains an array of SRPMs and relational dependencies
 type PackageRepo struct {
 	Repo []*Package `json:"Repo"`
@@ -77,12 +86,20 @@ func (pkgVer *PackageVer) IsImplicitPackage() bool {
 // structure considers valid.
 func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 	var (
-		v1, v2                         *versioncompare.TolerantVersion
-		c1, c2                         string
 		lowerBound, upperBound         *versioncompare.TolerantVersion
 		lowerCond, upperCond           string
 		lowerInclusive, upperInclusive bool
 	)
+
+	c1 := pkgVer.Condition
+	c2 := pkgVer.SCondition
+	v1 := versioncompare.New(pkgVer.Version)
+	v2 := versioncompare.New(pkgVer.SVersion)
+
+	if err = pkgVer.validatedIntervals(); err != nil {
+		err = fmt.Errorf("invalid intervals for '%s': %v", pkgVer.Name, err)
+		return
+	}
 
 	switch {
 	case pkgVer.Version == "" && pkgVer.SVersion == "":
@@ -91,18 +108,13 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 		upperBound = versioncompare.NewMax()
 		upperInclusive = true
 		lowerInclusive = true
-	case pkgVer.Version == "" && pkgVer.SVersion != "":
-		fallthrough
-	case pkgVer.SVersion == "" && pkgVer.Version != "":
-		fallthrough
-	case pkgVer.Version == pkgVer.SVersion && pkgVer.Condition == pkgVer.SCondition:
+	case pkgVer.Version == "" && pkgVer.SVersion != "",
+		pkgVer.Version != "" && pkgVer.SVersion == "",
+		pkgVer.Version == pkgVer.SVersion && pkgVer.Condition == pkgVer.SCondition:
 		// Only one version set, or duplicated version data
-		if pkgVer.Version != "" {
-			v1 = versioncompare.New(pkgVer.Version)
-			c1 = pkgVer.Condition
-		} else {
-			v1 = versioncompare.New(pkgVer.SVersion)
-			c1 = pkgVer.SCondition
+		if pkgVer.Version == "" {
+			v1 = v2
+			c1 = c2
 		}
 
 		switch c1 {
@@ -110,35 +122,25 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 			lowerInclusive = true
 			fallthrough
 		case ">":
-			lowerBound, lowerCond = v1, c1
-			upperBound, upperCond = versioncompare.NewMax(), "<="
+			lowerBound = v1
+			upperBound = versioncompare.NewMax()
 			upperInclusive = true
 		case "<=":
 			upperInclusive = true
 			fallthrough
 		case "<":
-			lowerBound, lowerCond = versioncompare.NewMin(), ">="
-			upperBound, upperCond = v1, c1
+			lowerBound = versioncompare.NewMin()
+			upperBound = v1
 			lowerInclusive = true
-		case "":
-			fallthrough
-		case "=":
-			lowerBound, lowerCond = v1, "="
-			upperBound, upperCond = v1, "="
+		case "", "=":
+			lowerBound = v1
+			upperBound = v1
 			lowerInclusive = true
 			upperInclusive = true
-		default:
-			err = fmt.Errorf("can't handle single interval for %s", pkgVer)
-			return
 		}
 	case pkgVer.Version != "" && pkgVer.SVersion != "":
 		// Explicit version information for both (duplicate version data is handled above)
-		v1 = versioncompare.New(pkgVer.Version)
-		c1 = pkgVer.Condition
-		v2 = versioncompare.New(pkgVer.SVersion)
-		c2 = pkgVer.SCondition
-
-		if v1.Compare(v2) < 0 {
+		if v1.Compare(v2) == versioncompare.LessThan {
 			lowerBound, lowerCond = v1, c1
 			upperBound, upperCond = v2, c2
 		} else {
@@ -146,23 +148,31 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 			upperBound, upperCond = v1, c1
 		}
 
-		if !(upperCond == "<" || upperCond == "<=") {
-			err = fmt.Errorf("%s has invalid upper conditional for interval", pkgVer)
-			return
-		}
-		if !(lowerCond == ">" || lowerCond == ">=") {
-			err = fmt.Errorf("%s has invalid lower conditional for interval", pkgVer)
-			return
-		}
-
-		if upperCond == "<=" {
-			upperInclusive = true
-		}
-		if lowerCond == ">=" {
+		switch {
+		case conditionEquals(lowerCond):
 			lowerInclusive = true
+			upperInclusive = true
+			upperBound = lowerBound
+		case conditionEquals(upperCond):
+			lowerInclusive = true
+			upperInclusive = true
+			lowerBound = upperBound
+		case conditionUpperBound(lowerCond):
+			upperBound = lowerBound
+			lowerBound = versioncompare.NewMin()
+			upperInclusive = conditionCanEqual(lowerCond)
+			lowerInclusive = true
+		case conditionLowerBound(upperCond):
+			lowerBound = upperBound
+			upperBound = versioncompare.NewMax()
+			lowerInclusive = conditionCanEqual(upperCond)
+			upperInclusive = true
+		default:
+			upperInclusive = conditionCanEqual(upperCond)
+			lowerInclusive = conditionCanEqual(lowerCond)
 		}
 	default:
-		err = fmt.Errorf("unhandled interval state for %s", pkgVer)
+		err = fmt.Errorf("unexpected conditions interval: %s", pkgVer)
 		return
 	}
 
@@ -174,6 +184,53 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 	}
 
 	return
+}
+
+func (pkgVer *PackageVer) validatedIntervals() error {
+	c1 := pkgVer.Condition
+	c2 := pkgVer.SCondition
+
+	if _, known := knownConditions[c1]; !known {
+		return fmt.Errorf("unknown condition (%s)", c1)
+	}
+
+	if _, known := knownConditions[c2]; !known {
+		return fmt.Errorf("unknown condition (%s)", c2)
+	}
+
+	if pkgVer.Version == "" && c1 != "" {
+		return fmt.Errorf("invalid empty version and condition (%s) combination", c1)
+	}
+
+	if pkgVer.SVersion == "" && c2 != "" {
+		return fmt.Errorf("invalid empty version and condition (%s) combination", c2)
+	}
+
+	if (pkgVer.Version == "" && c1 == "") ||
+		(pkgVer.SVersion == "" && c2 == "") {
+		return nil
+	}
+
+	sameDirection := conditionsHaveSameDirection(c1, c2)
+	if sameDirection {
+		if conditionEquals(c1) && pkgVer.Version != pkgVer.SVersion {
+			return fmt.Errorf("found contradicting package version requirements: %s", pkgVer)
+		}
+
+		return nil
+	}
+
+	v1 := versioncompare.New(pkgVer.Version)
+	v2 := versioncompare.New(pkgVer.SVersion)
+
+	comparisonResult := v1.Compare(v2)
+	if (comparisonResult == versioncompare.LessThan && (conditionUpperBound(c1) || (conditionEquals(c1) && !conditionUpperBound(c2)))) ||
+		(comparisonResult == versioncompare.EqualTo && (!conditionCanEqual(c1) || !conditionCanEqual(c2))) ||
+		(comparisonResult == versioncompare.GreatherThan && (conditionUpperBound(c2) || (conditionEquals(c2) && !conditionUpperBound(c1)))) {
+		return fmt.Errorf("version bounds (%s) don't overlap", pkgVer)
+	}
+
+	return nil
 }
 
 // String outputs an interval in interval notation
@@ -316,4 +373,31 @@ func (interval *PackageVerInterval) Satisfies(queryInterval *PackageVerInterval)
 	superset = queryInterval.LowerBound.Compare(interval.LowerBound) < 0 && queryInterval.UpperBound.Compare(interval.UpperBound) > 0
 
 	return queryUpperValid || queryLowerValid || superset
+}
+
+// conditionCanEqual checks if the input condition allows "equal to" versions.
+func conditionCanEqual(condition string) bool {
+	return condition == "" || strings.Contains(condition, "=")
+}
+
+// conditionEqual checks if the input condition "equal to" versions.
+func conditionEquals(condition string) bool {
+	return condition == "" || condition == "="
+}
+
+// conditionsHaveSameDirection checks if both conditions are either the same
+// or create the same boundary direction (greater, equal, or lesser).
+func conditionsHaveSameDirection(firstCondition, secondCondition string) bool {
+	return (firstCondition == secondCondition) ||
+		(firstCondition != "" && secondCondition != "" && firstCondition[0] == secondCondition[0])
+}
+
+// conditionLowerBound checks if the input condition is of the ">" or ">=" variation.
+func conditionLowerBound(condition string) bool {
+	return strings.Contains(condition, ">")
+}
+
+// conditionUpperBound checks if the input condition is of the "<" or "<=" variation.
+func conditionUpperBound(condition string) bool {
+	return strings.Contains(condition, "<")
 }
