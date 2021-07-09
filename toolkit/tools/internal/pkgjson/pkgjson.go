@@ -198,17 +198,17 @@ func (pkgVer *PackageVer) validatedIntervals() error {
 		return fmt.Errorf("unknown condition (%s)", c2)
 	}
 
-	if (pkgVer.Version == "" && c1 == "") ||
-		(pkgVer.SVersion == "" && c2 == "") {
-		return nil
-	}
-
 	if pkgVer.Version == "" && c1 != "" {
 		return fmt.Errorf("invalid empty version and condition (%s) combination", c1)
 	}
 
 	if pkgVer.SVersion == "" && c2 != "" {
 		return fmt.Errorf("invalid empty version and condition (%s) combination", c2)
+	}
+
+	if (pkgVer.Version == "" && c1 == "") ||
+		(pkgVer.SVersion == "" && c2 == "") {
+		return nil
 	}
 
 	sameDirection := conditionsHaveSameDirection(c1, c2)

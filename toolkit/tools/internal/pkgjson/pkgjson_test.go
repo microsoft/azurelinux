@@ -765,3 +765,17 @@ func TestShouldFailIntervalCreationSecondConditionWithoutVersion(t *testing.T) {
 
 	assert.Error(t, err)
 }
+
+func TestShouldFailIntervalCreationFirstConditionEmptySecondConditionWithoutVersion(t *testing.T) {
+	packageVersion := &PackageVer{Version: "", Condition: "", SVersion: "", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationFirstConditionWithoutVersionSecondConditionEmpty(t *testing.T) {
+	packageVersion := &PackageVer{Version: "", Condition: ">", SVersion: "", SCondition: ""}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
