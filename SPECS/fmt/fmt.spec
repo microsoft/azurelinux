@@ -7,7 +7,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fmtlib/%{name}
-#Source0:        %{url}/archive/%{version}.tar.gz
+#Source0:        %%{url}/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # See https://github.com/fmtlib/fmt/issues/443 and https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/LVKYLDLJVWAVJE4MQVKDO6PYZRD5MCP6/
 Patch1:         doc-build-removed-all-pip-internet-stuff.patch
