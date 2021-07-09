@@ -11,7 +11,6 @@ Distribution:   Mariner
 URL:            https://bazel.io/
 Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{version}/%{name}-%{version}-dist.zip
 Patch0:         fix-bazel-version-check.patch
-BuildRequires:  bash-completion-devel
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
 BuildRequires:  openjdk8
@@ -29,7 +28,7 @@ A fast, scalable, multi-language and extensible build system.
 %build
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
