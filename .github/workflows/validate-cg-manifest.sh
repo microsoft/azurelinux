@@ -47,15 +47,14 @@ for spec in "$@"
 do
   echo Checking "$spec"
 
-  # Get the source0 for the package, it apears to always occur last in the list of sources
-  source0=$(rpmspec --srpm  --define "with_check 0" --qf "[%{SOURCE}\n]" -q $spec  2>/dev/null | tail -1)
-  if [[ -z $source0 ]]
+  # Ensure spec can be parsed
+  name=$(rpmspec --srpm  --define "with_check 0" --qf "%{NAME}" -q $spec 2>/dev/null )
+  if [[ -z $name ]] 
   then
-    echo "    No source file listed for $name:$version, skipping"
+    echo "    Was not able to parse $spec, skipping"
     continue
   fi
 
-  name=$(rpmspec --srpm  --define "with_check 0" --qf "%{NAME}" -q $spec 2>/dev/null )
   # Some specs don't make sense to add, ignore them
   if echo $ignore_list | grep -w "$name" > /dev/null
   then
@@ -64,6 +63,14 @@ do
   fi
 
   version=$(rpmspec --srpm  --define "with_check 0" --qf "%{VERSION}" -q $spec 2>/dev/null )
+
+  # Get the source0 for the package, it apears to always occur last in the list of sources
+  source0=$(rpmspec --srpm  --define "with_check 0" --qf "[%{SOURCE}\n]" -q $spec  2>/dev/null | tail -1)
+  if [[ -z $source0 ]]
+  then
+    echo "    No source file listed for $name:$version, skipping"
+    continue
+  fi
 
   # Some source files have been renamed, look for a comment and also try that (while manually substituting the name/version)
   source0alt=$(grep "^#[[:blank:]]*Source0:" $spec | awk '{print $NF}' | sed "s/%\?%{name}/$name/g" | sed "s/%\?%{version}/$version/g" )
