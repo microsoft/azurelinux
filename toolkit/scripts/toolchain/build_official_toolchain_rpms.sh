@@ -363,7 +363,7 @@ build_rpm_in_chroot_no_install cracklib
 chroot_and_install_rpms cracklib
 
 build_rpm_in_chroot_no_install cmake
-build_rpm_in_chroot_no_install pam
+#build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
 # libxslt needs libxml2, libgcrypt
@@ -372,8 +372,8 @@ chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
 # docbook-style-xsl needs pam
-chroot_and_install_rpms pam
-build_rpm_in_chroot_no_install docbook-style-xsl
+#chroot_and_install_rpms pam
+#build_rpm_in_chroot_no_install docbook-style-xsl
 
 # gtest needs cmake
 chroot_and_install_rpms cmake
@@ -421,7 +421,7 @@ build_rpm_in_chroot_no_install createrepo_c
 
 # ca-certificates requires libxslt
 chroot_and_install_rpms docbook-dtd-xml
-chroot_and_install_rpms docbook-style-xsl
+#chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 build_rpm_in_chroot_no_install itstool
 
@@ -442,7 +442,7 @@ chroot_and_install_rpms ninja-build
 chroot_and_install_rpms gettext
 build_rpm_in_chroot_no_install meson
 
-build_rpm_in_chroot_no_install libpwquality
+#build_rpm_in_chroot_no_install libpwquality
 build_rpm_in_chroot_no_install json-c
 build_rpm_in_chroot_no_install libsepol
 
@@ -454,6 +454,15 @@ build_rpm_in_chroot_no_install libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install rpm
+
+# PAM requires libselinux-devel
+build_rpm_in_chroot_no_install pam
+chroot_and_install_rpms pam
+# libpwquality requires pam
+build_rpm_in_chroot_no_install libpwquality
+# docbook-style-xsl needs pam
+build_rpm_in_chroot_no_install docbook-style-xsl
+chroot_and_install_rpms docbook-style-xsl
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
 chroot_and_install_rpms libcap
@@ -467,7 +476,7 @@ build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
 # lvm2 requires libselinux, libsepol, ncurses, systemd-bootstrap, libaio,
-chroot_and_install_rpms libselinux
+#chroot_and_install_rpms libselinux
 chroot_and_install_rpms libsepol
 chroot_and_install_rpms ncurses
 chroot_and_install_rpms systemd-bootstrap
