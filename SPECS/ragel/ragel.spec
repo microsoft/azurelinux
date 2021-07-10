@@ -1,6 +1,6 @@
 Name:           ragel
 Version:        7.0.0.12
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Finite state machine compiler
 # aapl/ is the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -17,9 +17,6 @@ BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  colm-devel = 0.13.0.7
-
-# Unfortunately, upstream doesn't exist and not possible to find version
-Provides:       bundled(aapl)
 
 %description
 Ragel compiles executable finite state machines from regular languages.
@@ -73,6 +70,9 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %{_includedir}/%{name}/
 
 %changelog
+* Sat Jul 10 2021 Henry Li <lihl@microsoft.com> - 7.0.0.12-5
+- Remove Provides bundled(aapl)
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.0.0.12-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

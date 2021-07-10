@@ -6515,7 +6515,7 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.26.5",
+          "version": "1.25.9",
           "downloadUrl": "https://github.com/shazow/urllib3/archive/1.25.9/urllib3-1.25.9.tar.gz"
         }
       }
