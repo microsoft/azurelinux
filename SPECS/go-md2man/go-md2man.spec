@@ -50,6 +50,7 @@ cp go-md2man-2.0.0/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE.
 %changelog
 * Fri Jun 18 2021 Henry Li <lihl@microsoft.com> - 2.0.0-6
 - Provides go-go-md2man.
+- Fix linting errors.
 
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 2.0.0-5
 - Increment release to force republishing using golang 1.15.
