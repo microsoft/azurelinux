@@ -1,14 +1,14 @@
 %define         debug_package %{nil}
 Summary:        Microsoft aspnetcore runtime
 Name:           aspnetcore-runtime-3.1
-Version:        3.1.15
+Version:        3.1.16
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/dotnet/aspnetcore
-Source0:        https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz
+Source0:        https://download.visualstudio.microsoft.com/download/pr/c20a5ac5-5174-46b8-a875-b916a416050d/b2ddd212a183260569178d880899bd94/aspnetcore-runtime-3.1.16-linux-x64.tar.gz
 Requires:       dotnet-runtime-3.1
 ExclusiveArch:  x86_64
 
@@ -35,6 +35,9 @@ cp -r shared/Microsoft.AspNetCore.App %{buildroot}%{_libdir}/dotnet/shared
 %{_libdir}/dotnet/shared/Microsoft.AspNetCore.App
 
 %changelog
+* Mon Jul 12 2021 Henry Li <lihl@microosft.com> - 3.1.16-1
+- Update version to 3.1.16
+
 * Wed May 12 2021 Andrew Phelps <anphel@microosft.com> - 3.1.15-1
 - Update version to 3.1.15
 
