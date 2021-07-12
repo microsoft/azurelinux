@@ -22,10 +22,10 @@
 # Project upstream commit.
 %define commit 685f328
 %global debug_package %{nil}
+Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
 Version:        1.6.1
 Release:        1.6%{?dist}
-Summary:        Kubernetes daemonset to perform safe automatic node reboots
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,19 @@ Group:          System/Management
 URL:            https://github.com/weaveworks/kured
 #Source0:       https://github.com/weaveworks/kured/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/weaveworks/kured/archive/refs/tags/%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         systemctl-path.patch
 Patch1:         kured-imagePullPolicy.patch
@@ -127,6 +140,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   - Improve coordinated reboot output
   - Add more logs into gates
   - Added support for time wrap in timewindow.Contains
+
 * Tue Nov 24 2020 kukuk@suse.com
 - Update to version 1.5.1:
   * rename annotation-ttl to lock-ttl in all places, follow-up to #213
@@ -149,6 +163,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   * Bump helm chart version
   * Remove quote for parameter alert-filter-regexp
   * Release helper
+
 * Mon Sep 21 2020 kukuk@suse.com
 - Update to version 1.5.0:
   * Prepare 1.5.0 release
@@ -156,6 +171,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   * Bump helm/chart-testing-action from v1.0.0-rc.2 to v1.0.0
   * Add dependabot
   * Prepare for k8s release 1.19 (Aug 25)
+
 * Fri Aug 14 2020 kukuk@suse.com
 - Update to version 1.4.5:
   * document how releases are town wrt Helm bits
@@ -171,6 +187,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   * bump and fix
   * split matchLabels template
   * restructured and improved service
+
 * Tue Jun 30 2020 dmueller@suse.com
 - Update to version 1.4.3:
   * bump and fix
@@ -184,23 +201,29 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   * prepare chart-release for 1.4.1
   * Revert #139
 - use obs-service for regenerating vendor.tar.gz
+
 * Tue Jun 30 2020 Thorsten Kukuk <kukuk@suse.com>
 - Update to version 1.4.2
   - Adding --annotation-ttl for automatic unlock
 - Refresh vendor.tar.xz
+
 * Mon May 18 2020 Thorsten Kukuk <kukuk@suse.com>
 - kured-imagePullPolicy.patch: always update the image
+
 * Sun May 17 2020 Thorsten Kukuk <kukuk@suse.com>
 - systemctl-path.patch: last systemd update removed symlinks
   from /bin ...
+
 * Mon May 11 2020 Thorsten Kukuk <kukuk@suse.com>
 - Update to version 1.4.0
   - Updated kubectl, client-go, etc to k8s 1.17 (#127, #135)
   - Update to go 1.13 (#130)
   - print node id when commanding reboot (#134)
+
 * Wed Apr 22 2020 Dominique Leuenberger <dimstar@opensuse.org>
 - Fix build-dependency: we require golang(API) 1.12, not the exact
   go package version 1.12.
+
 * Mon Mar  2 2020 Thorsten Kukuk <kukuk@suse.com>
 - Update to version 1.3.0
   - Update k8s client tools to 1.15.x
@@ -210,30 +233,39 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 - Remove kured-telemetrics.patch, chances that upstream accepts
   any third party code are nearly zero.
 - Update vendor.tar.xz
+
 * Mon Jun 24 2019 kukuk@suse.de
 - k8s-1.14.diff: kubernetes 1.14.1 support from git
+
 * Wed Jun  5 2019 kukuk@suse.de
 - Fix path to image in manifest
+
 * Wed May 22 2019 kukuk@suse.de
 - Update to version 1.2.0
   - support newer kubernetes versions
 - Adjust kured-telemetrics.patch
 - Update vendor.tar.gz with recent versions
+
 * Sat Apr  6 2019 kukuk@suse.de
 - Enable building on s390x
+
 * Thu Mar 28 2019 Jan Engelhardt <jengelh@inai.de>
 - Combine %%setup calls.
+
 * Thu Mar 28 2019 kukuk@suse.de
 - kured-telemetrics.patch: add hooks for telemetrics data
 - Renamed kured-yaml to kured-k8s-yaml to follow new policy
+
 * Thu Feb 28 2019 kukuk@suse.de
 - Change path in yaml file to point to official container image
+
 * Fri Jan 18 2019 kukuk@suse.de
 - Create a correct yaml file to download and run the kured container
   image in a kubernetes cluster
 - Create new subpackage containing only the yaml file, so that
   people using the container don't need to install the not needed
   full package.
+
 * Thu Nov 15 2018 Jeff Kowalczyk <jkowalczyk@suse.com>
 - Update to kured 1.1.0
 - Upstream bumped dependency on go1.10 via dependency k8s.io/client-go 0.9.0
@@ -255,6 +287,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
     between client and server, so this should work on 1.11.x and 1.13.x.
   * Tested in minikube on 1.11.4, 1.12.1 & 1.13.0-alpha.2
   * Tested in production on 1.11.2 & 1.12.2
+
 * Thu Sep 13 2018 jkowalczyk@suse.com
 - Remove hardcoded GOARCH=amd64 and GOOS=linux
 - Revise go build arg -ldflags and add -buildmode=pie
@@ -266,6 +299,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   'golang.org/x/net/context' to the standard library as 'context'.
   https://golang.org/doc/go1.7#context
 - Bump release number
+
 * Wed Sep 12 2018 jkowalczyk@suse.com
 - Initial packaging of upstream master branch @ 5731b98 (tagged 1.0.0 + 24)
 - Include 24 commits since release 1.0.0 updating kubernetes version support

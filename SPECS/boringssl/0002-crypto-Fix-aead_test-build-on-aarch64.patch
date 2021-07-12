@@ -1,0 +1,49 @@
+From d16b362b228ebee5c16ae6c214a50348e9e963b9 Mon Sep 17 00:00:00 2001
+From: Michal Rostecki <mrostecki@opensuse.org>
+Date: Thu, 25 Apr 2019 16:11:28 +0200
+Subject: [PATCH] crypto: Fix aead_test build on aarch64
+
+aarch64 does not allow allignments larger than 16 bytes.
+
+Before this change, `aead_test.cc` build on aarch64 was failing with the
+following errors:
+
+aead_test.cc:543:54: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t key[EVP_AEAD_MAX_KEY_LENGTH + 1];
+aead_test.cc:544:58: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t nonce[EVP_AEAD_MAX_NONCE_LENGTH + 1];
+aead_test.cc:545:39: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t plaintext[32 + 1];
+aead_test.cc:546:32: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t ad[32 + 1];
+aead_test.cc:564:75: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t ciphertext[sizeof(plaintext) + EVP_AEAD_MAX_OVERHEAD];
+aead_test.cc:572:45: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t out[sizeof(ciphertext)];
+aead_test.cc:586:50: error: requested alignment 64 is larger than 16 [-Werror=attributes]
+   alignas(64) uint8_t key[EVP_AEAD_MAX_KEY_LENGTH];
+                                                  ^
+
+Signed-off-by: Michal Rostecki <mrostecki@opensuse.org>
+Change-Id: Iac2c6810fa260ad214abde8db733793ac914acda
+---
+ src/crypto/cipher_extra/aead_test.cc | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+Index: boringssl-20200122/src/crypto/cipher_extra/aead_test.cc
+===================================================================
+--- boringssl-20200122.orig/src/crypto/cipher_extra/aead_test.cc
++++ boringssl-20200122/src/crypto/cipher_extra/aead_test.cc
+@@ -29,6 +29,12 @@
+ #include "../test/test_util.h"
+ #include "../test/wycheproof_util.h"
+ 
++#if defined(OPENSSL_AARCH64)
++#define ALIGN_BYTES 16
++#else
++#define ALIGN_BYTES 64
++#endif
++
+ 
+ struct KnownAEAD {
+   const char name[40];

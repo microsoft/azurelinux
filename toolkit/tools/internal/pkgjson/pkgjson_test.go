@@ -41,7 +41,6 @@ func TestIntervalPrint(t *testing.T) {
 	assert.Equal(t, "(1,MAX_VER]", i2.String())
 	assert.Equal(t, "[1,MAX_VER]", i3.String())
 	assert.Equal(t, "(1,2)", i4.String())
-
 }
 
 func TestBasicIntervalSVersion(t *testing.T) {
@@ -279,21 +278,6 @@ func TestSubsetInvalid(t *testing.T) {
 	assert.False(t, interval1.Contains(&interval3))
 }
 
-func TestInvalidRange(t *testing.T) {
-	p1 := &PackageVer{Version: "1", Condition: "<=", SVersion: "2", SCondition: "<="}
-	p2 := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: ">="}
-	p3 := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: ">="}
-	p4 := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: "<="}
-	_, err := p1.Interval()
-	assert.Error(t, err)
-	_, err = p2.Interval()
-	assert.Error(t, err)
-	_, err = p3.Interval()
-	assert.Error(t, err)
-	_, err = p4.Interval()
-	assert.Error(t, err)
-}
-
 func TestIntervalEquality(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: "<="}
 	p2 := &PackageVer{Version: "2", Condition: "<=", SVersion: "1", SCondition: ">="}
@@ -366,4 +350,432 @@ func TestIntervalCompareWithHigherExclusion(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, -1, intervalLow.Compare(&intervalHigh))
 	assert.Equal(t, 1, intervalHigh.Compare(&intervalLow))
+}
+
+func TestShouldPassEqualEqualConditionSameVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "1", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldPassLesserEqualEqualConditionSameVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "1", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldPassGreaterEqualEqualConditionSameVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">=", SVersion: "1", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldPassEqualLesserEqualConditionSameVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "1", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldPassEqualGreaterEqualConditionSameVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "1", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldPassGreaterEqualGreaterEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: ">=", SVersion: "1", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterGreaterEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: ">", SVersion: "1", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.False(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterEqualGreaterConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: ">=", SVersion: "1", SCondition: ">"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterGreaterConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: ">", SVersion: "1", SCondition: ">"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.False(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassLesserEqualLesserEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<=", SVersion: "1", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserEqualLesserConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<=", SVersion: "1", SCondition: "<"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.False(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserLesserEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<", SVersion: "1", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserLesserConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<", SVersion: "1", SCondition: "<"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.False(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserEqualEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<=", SVersion: "1", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.LowerBound.String())
+	assert.Equal(t, "1", interval.UpperBound.String())
+}
+
+func TestShouldPassLesserEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "<", SVersion: "1", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.LowerBound.String())
+	assert.Equal(t, "1", interval.UpperBound.String())
+}
+
+func TestShouldPassEqualGreaterEqualConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "=", SVersion: "1", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, "2", interval.UpperBound.String())
+}
+
+func TestShouldPassEqualGreaterConditionDecreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: "=", SVersion: "1", SCondition: ">"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, "2", interval.UpperBound.String())
+}
+
+func TestShouldPassGreaterEqualGreaterEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterGreaterEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">", SVersion: "2", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterEqualGreaterConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: ">"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.False(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassGreaterGreaterConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">", SVersion: "2", SCondition: ">"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.False(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, versioncompare.NewMax(), interval.UpperBound)
+}
+
+func TestShouldPassLesserEqualLesserEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "2", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserEqualLesserConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "2", SCondition: "<"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserLesserEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<", SVersion: "2", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.False(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassLesserLesserConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<", SVersion: "2", SCondition: "<"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.False(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, versioncompare.NewMin(), interval.LowerBound)
+}
+
+func TestShouldPassEqualLesserEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: "<="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.LowerBound.String())
+	assert.Equal(t, "1", interval.UpperBound.String())
+}
+
+func TestShouldPassEqualLesserConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: "<"}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "1", interval.LowerBound.String())
+	assert.Equal(t, "1", interval.UpperBound.String())
+}
+
+func TestShouldPassGreaterEqualEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, "2", interval.UpperBound.String())
+}
+
+func TestShouldPassGreaterEqualConditionIncreasingVersionInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">", SVersion: "2", SCondition: "="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.LowerInclusive)
+	assert.True(t, interval.UpperInclusive)
+	assert.Equal(t, "2", interval.LowerBound.String())
+	assert.Equal(t, "2", interval.UpperBound.String())
+}
+
+func TestShouldPassBarelyOverlappingDisjointConditionsInterval(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "1", SCondition: ">="}
+	interval, err := packageVersion.Interval()
+
+	assert.NoError(t, err)
+	assert.True(t, interval.UpperInclusive)
+	assert.True(t, interval.LowerInclusive)
+	assert.Equal(t, "1", interval.UpperBound.String())
+	assert.Equal(t, "1", interval.LowerBound.String())
+}
+
+func TestShouldFailIntervalCreationForFirstSmallerLessEqualSecondLargerGreaterEqual(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "2", SCondition: ">="}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstLargerGreaterEqualSecondSmallerLessEqual(t *testing.T) {
+	packageVersion := &PackageVer{Version: "2", Condition: ">=", SVersion: "1", SCondition: "<="}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstSameGreaterEqualSecondSameLess(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">=", SVersion: "1", SCondition: "<"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstSameLessEqualSecondSameGreater(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "<=", SVersion: "1", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstSmallerEqualSecondLargerGreaterEqual(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: ">="}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstSameEqualSecondSameLess(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "1", SCondition: "<"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstSameEqualSecondSameGreater(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "1", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationForFirstEqualSecondLargerEqual(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "=", SVersion: "2", SCondition: "="}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationUnkownFirstCondition(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: "?", SVersion: "2", SCondition: "="}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationUnkownSecondCondition(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">", SVersion: "2", SCondition: "?"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationFirstConditionWithoutVersion(t *testing.T) {
+	packageVersion := &PackageVer{Version: "", Condition: ">", SVersion: "2", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationSecondConditionWithoutVersion(t *testing.T) {
+	packageVersion := &PackageVer{Version: "1", Condition: ">", SVersion: "", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationFirstConditionEmptySecondConditionWithoutVersion(t *testing.T) {
+	packageVersion := &PackageVer{Version: "", Condition: "", SVersion: "", SCondition: ">"}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
+}
+
+func TestShouldFailIntervalCreationFirstConditionWithoutVersionSecondConditionEmpty(t *testing.T) {
+	packageVersion := &PackageVer{Version: "", Condition: ">", SVersion: "", SCondition: ""}
+	_, err := packageVersion.Interval()
+
+	assert.Error(t, err)
 }

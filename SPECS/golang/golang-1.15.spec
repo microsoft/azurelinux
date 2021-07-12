@@ -1,4 +1,4 @@
-%global goroot          /usr/lib/golang
+%global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
 %global gohostarch      arm64
@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.15.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
+Provides:       go = %{version}-%{release}
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
@@ -31,7 +32,7 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
+patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
@@ -41,8 +42,8 @@ mv -v go go-bootstrap
 pushd /usr/src/mariner/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v /usr/src/mariner/BUILD/go-bootstrap /usr/lib/golang
-export GOROOT=/usr/lib/golang
+mv -v /usr/src/mariner/BUILD/go-bootstrap %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -115,6 +116,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.15.7-2
+- Provides go from golang
+- Apply linting
+
 * Wed Feb 03 2021 Andrew Phelps <anphel@microsoft.com> - 1.15.7-1
 - Updated to version 1.15.7 to fix CVE-2021-3114
 
