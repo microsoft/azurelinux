@@ -1,7 +1,9 @@
+%bcond_with qemu
+
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        6.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +16,7 @@ Patch0:         CVE-2019-3886.nopatch
 Patch1:         CVE-2017-1000256.nopatch
 Patch2:         CVE-2020-25637.patch
 
+BuildRequires:  bash-completion
 BuildRequires:  cyrus-sasl
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
@@ -31,7 +34,10 @@ BuildRequires:  python3-devel
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
 BuildRequires:  systemd-devel
+BuildRequires:  systemtap-sdt-devel
 
+Requires:       %{name}-client  = %{version}-%{release}
+Requires:       %{name}-libs    = %{version}-%{release}
 Requires:       cyrus-sasl
 Requires:       device-mapper
 Requires:       e2fsprogs
@@ -50,12 +56,37 @@ Requires:       systemd
 %description
 Libvirt is collection of software that provides a convenient way to manage virtual machines and other virtualization functionality, such as storage and network interface management. These software pieces include an API library, a daemon (libvirtd), and a command line utility (virsh).  An primary goal of libvirt is to provide a single way to manage multiple different virtualization providers/hypervisors. For example, the command 'virsh list --all' can be used to list the existing virtual machines for any supported hypervisor (KVM, Xen, VMWare ESX, etc.) No need to learn the hypervisor specific tools!
 
-%package docs
-Summary:        libvirt docs
-Group:          Development/Tools
+%package admin
+Summary: Set of tools to control libvirt daemon
 
-%description docs
-The contains libvirt package doc files.
+Requires: %{name}-bash-completion = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: readline
+
+%description admin
+The client side utilities to control the libvirt daemon.
+
+%package bash-completion
+Summary: Bash completion script
+
+%description bash-completion
+Bash completion script stub.
+
+%package client
+Summary: Client side utilities of the libvirt library
+
+Requires: %{name}-bash-completion = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+# Needed by libvirt-guests.sh script.
+Requires: gettext
+# Needed by virt-pki-validate script.
+Requires: gnutls-utils
+Requires: ncurses
+Requires: readline
+
+%description client
+The client binaries needed to access the virtualization
+capabilities of recent versions of Linux (and other OSes).
 
 %package devel
 Summary:        libvirt devel
@@ -66,6 +97,24 @@ Requires:       libtirpc-devel
 
 %description devel
 This contains development tools and libraries for libvirt.
+
+%package docs
+Summary:        libvirt docs
+Group:          Development/Tools
+
+%description docs
+The contains libvirt package doc files.
+
+%package libs
+Summary: Client side libraries
+# So remote clients can access libvirt over SSH tunnel
+Requires: cyrus-sasl
+# Needed by default sasl.conf - no onerous extra deps, since
+# 100's of other things on a system already pull in krb5-libs
+Requires: cyrus-sasl-gssapi
+
+%description libs
+Shared libraries for accessing the libvirt daemon.
 
 %prep
 %autosetup -p1
@@ -80,8 +129,9 @@ cd %{_vpath_builddir}
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
-    --with-udev=no \
-    --with-pciaccess=no
+    --with-macvtap \
+    --with-pciaccess=no \
+    --with-udev=no
 
 make %{?_smp_mflags}
 
@@ -90,15 +140,35 @@ cd %{_vpath_builddir}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
+%find_lang %{name}
+
+%ifarch x86_64
+mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
+   %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes-64.stp
+
+%if 0%{with qemu}
+mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
+   %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes-64.stp
+%endif
+%endif
+
 %check
 cd %{_vpath_builddir}
 make check
 
+%preun client
+
+%systemd_preun libvirt-guests.service
+
+%post client
+%systemd_post libvirt-guests.service
+
+%postun client
+%systemd_postun libvirt-guests.service
+
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/*
-%{_libdir}/libvirt*.so.*
 %{_libdir}/libvirt/storage-file/libvirt_storage_file_fs.so
 %{_libdir}/libvirt/storage-backend/*
 %{_libdir}/libvirt/connection-driver/*.so
@@ -114,6 +184,35 @@ make check
 %{_sysconfdir}/libvirt/qemu/*
 %{_sysconfdir}/logrotate.d/*
 %{_sysconfdir}/sysconfig/*
+
+%files admin
+%{_bindir}/virt-admin
+%{_datadir}/bash-completion/completions/virt-admin
+
+%files bash-completion
+%{_datadir}/bash-completion/completions/vsh
+
+%files client
+#%%{_mandir}/man1/virsh.1*
+#%%{_mandir}/man1/virt-xml-validate.1*
+#%%{_mandir}/man1/virt-pki-validate.1*
+#%%{_mandir}/man1/virt-host-validate.1*
+%{_bindir}/virsh
+%{_bindir}/virt-xml-validate
+%{_bindir}/virt-pki-validate
+%{_bindir}/virt-host-validate
+
+%{_datadir}/bash-completion/completions/virsh
+%{_datadir}/systemtap/tapset/libvirt_probes*.stp
+%{_datadir}/systemtap/tapset/libvirt_functions.stp
+
+%if 0%{with qemu}
+%{_datadir}/systemtap/tapset/libvirt_qemu_probes*.stp
+%endif
+
+%{_unitdir}/libvirt-guests.service
+%config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
+%attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
 
 %files devel
 %{_includedir}/libvirt/*
@@ -133,7 +232,50 @@ make check
 %{_datadir}/locale/*
 %{_mandir}/*
 
+%files libs
+%license COPYING COPYING.LESSER
+%config(noreplace) %{_sysconfdir}/libvirt/libvirt.conf
+%config(noreplace) %{_sysconfdir}/libvirt/libvirt-admin.conf
+%{_libdir}/libvirt.so.*
+%{_libdir}/libvirt-qemu.so.*
+%{_libdir}/libvirt-lxc.so.*
+%{_libdir}/libvirt-admin.so.*
+%dir %{_datadir}/libvirt/
+%dir %{_datadir}/libvirt/schemas/
+%dir %attr(0755, root, root) %{_localstatedir}/lib/libvirt/
+
+%{_datadir}/libvirt/schemas/basictypes.rng
+%{_datadir}/libvirt/schemas/capability.rng
+%{_datadir}/libvirt/schemas/cputypes.rng
+%{_datadir}/libvirt/schemas/domain.rng
+%{_datadir}/libvirt/schemas/domainbackup.rng
+%{_datadir}/libvirt/schemas/domaincaps.rng
+%{_datadir}/libvirt/schemas/domaincheckpoint.rng
+%{_datadir}/libvirt/schemas/domaincommon.rng
+%{_datadir}/libvirt/schemas/domainsnapshot.rng
+%{_datadir}/libvirt/schemas/interface.rng
+%{_datadir}/libvirt/schemas/network.rng
+%{_datadir}/libvirt/schemas/networkcommon.rng
+%{_datadir}/libvirt/schemas/networkport.rng
+%{_datadir}/libvirt/schemas/nodedev.rng
+%{_datadir}/libvirt/schemas/nwfilter.rng
+%{_datadir}/libvirt/schemas/nwfilter_params.rng
+%{_datadir}/libvirt/schemas/nwfilterbinding.rng
+%{_datadir}/libvirt/schemas/secret.rng
+%{_datadir}/libvirt/schemas/storagecommon.rng
+%{_datadir}/libvirt/schemas/storagepool.rng
+%{_datadir}/libvirt/schemas/storagepoolcaps.rng
+%{_datadir}/libvirt/schemas/storagevol.rng
+
+%{_datadir}/libvirt/cpu_map/*.xml
+
+%{_datadir}/libvirt/test-screenshot.png
+
 %changelog
+*   Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-3
+-    Extending with subpackages using Fedora 33 spec (license: MIT).
+-    Added subpackages: 'libvirt-admin', 'libvirt-bash-completion', 'libvirt-client', 'libvirt-libs'.
+
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-2
 -   Use autosetup
 -   Patch CVE-2020-25637
