@@ -35,7 +35,10 @@
                 "dwz",
                 "ebtables",
                 "extra-cmake-modules",
+                "fdupes",
+                "fmt",
                 "fribidi",
+                "gcovr",
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
@@ -69,6 +72,7 @@
                 "mozjs60",
                 "open-vm-tools",
                 "openssl",
+                "patchelf",
                 "p11-kit",
                 "perl-JSON",
                 "pkgconf",
@@ -105,6 +109,7 @@
                 "azure-iot-sdk-c",
                 "azure-iotedge",
                 "azure-storage-cpp",
+                "bazel",
                 "bpftrace",
                 "blobfuse",
                 "bmon",
@@ -205,6 +210,10 @@
             "specs": [
                 "ant",
                 "ant-contrib",
+                "bazel-workspaces",
+                "boringssl",
+                "envoy",
+                "golang-packaging",
                 "jna"
             ]
         },

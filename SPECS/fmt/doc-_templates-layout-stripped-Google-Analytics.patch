@@ -1,0 +1,23 @@
+diff --git a/doc/_templates/layout.html b/doc/_templates/layout.html
+index 333a606c..8ff160de 100644
+--- a/doc/_templates/layout.html
++++ b/doc/_templates/layout.html
+@@ -5,15 +5,6 @@
+ <meta name="keywords" content="C++, formatting, printf, string, library">
+ <meta name="author" content="Victor Zverovich">
+ <link rel="stylesheet" href="_static/fmt.css">
+-{# Google Analytics #}
+-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-20116650-4"></script>
+-<script>
+-  window.dataLayer = window.dataLayer || [];
+-  function gtag(){dataLayer.push(arguments);}
+-  gtag('js', new Date());
+-
+-  gtag('config', 'UA-20116650-4');
+-</script>
+ {% endblock %}
+ 
+ {%- macro searchform(classes, button) %}
+-- 
+2.26.2
+

@@ -384,6 +384,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bazel",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bazel-workspaces",
+          "version": "20200113",
+          "downloadUrl": "https://github.com/kubic-project/bazel-workspaces/archive/7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bc",
           "version": "1.07.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz"
@@ -487,6 +507,16 @@
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "boringssl",
+          "version": "20200921",
+          "downloadUrl": "https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz"
         }
       }
     },
@@ -1234,6 +1264,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "envoy",
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "erlang",
           "version": "22.0.7",
           "downloadUrl": "https://github.com/erlang/otp/archive/OTP-22.0.7/otp-OTP-22.0.7.tar.gz"
@@ -1334,6 +1374,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fdupes",
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.1/fdupes-2.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "file",
           "version": "5.38",
           "downloadUrl": "ftp://ftp.astron.com/pub/file/file-5.38.tar.gz"
@@ -1387,6 +1437,16 @@
           "name": "fluent-bit",
           "version": "1.4.1",
           "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fmt",
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/fmtlib/fmt/archive/7.0.3.tar.gz"
         }
       }
     },
@@ -1477,6 +1537,16 @@
           "name": "gcc",
           "version": "9.1.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gcovr",
+          "version": "4.2",
+          "downloadUrl": "https://github.com/gcovr/gcovr/archive/4.2/gcovr-4.2.tar.gz"
         }
       }
     },
@@ -1657,6 +1727,16 @@
           "name": "golang",
           "version": "1.15.7",
           "downloadUrl": "https://dl.google.com/go/go1.15.7.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-packaging",
+          "version": "15.0.15",
+          "downloadUrl": "https://github.com/openSUSE/golang-packaging/archive/refs/tags/v15.0.15.tar.gz"
         }
       }
     },
@@ -4177,6 +4257,16 @@
           "name": "patch",
           "version": "2.7.6",
           "downloadUrl": "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "patchelf",
+          "version": "0.12",
+          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.12/patchelf-0.12.tar.gz"
         }
       }
     },
