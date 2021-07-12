@@ -115,8 +115,8 @@
         "type": "other",
         "other": {
           "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.16",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/c20a5ac5-5174-46b8-a875-b916a416050d/b2ddd212a183260569178d880899bd94/aspnetcore-runtime-3.1.16-linux-x64.tar.gz"
+          "version": "3.1.15",
+          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
