@@ -10,6 +10,7 @@
             "origin": "Fedora",
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
+                "augeas",
                 "ant-contrib",
                 "at",
                 "atf",
@@ -64,6 +65,7 @@
                 "libkcapi",
                 "libpwquality",
                 "libstoragemgmt",
+                "libvirt",
                 "libxcrypt",
                 "mokutil",
                 "mozjs60",
@@ -84,6 +86,7 @@
                 "qt5-qttools",
                 "qt5-rpm-macros",
                 "rdma-core",
+                "sanlock",
                 "sgml-common",
                 "squashfs-tools",
                 "uclibc-ng",
@@ -91,6 +94,7 @@
                 "websocketpp",
                 "words",
                 "xmlstarlet",
+                "yajl",
                 "yaml-cpp",
                 "yasm",
                 "zipper"
