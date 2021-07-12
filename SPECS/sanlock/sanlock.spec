@@ -29,16 +29,16 @@ Requires(preun):    systemd-units
 The sanlock daemon manages leases for applications on hosts using shared storage.
 
 %prep
-%autosetup -q
+%autosetup
 
 %build
 %{set_build_flags}
 # upstream does not require configure
 # upstream does not support _smp_mflags
-CFLAGS=%{optflags} make -C wdmd
-CFLAGS=%{optflags} make -C src
-CFLAGS=%{optflags} make -C python PY_VERSION=3
-CFLAGS=%{optflags} make -C reset
+make -C wdmd
+make -C src
+make -C python PY_VERSION=3
+make -C reset
 
 %install
 make -C src \
@@ -57,7 +57,7 @@ make -C reset \
 
 
 install -D -m 0644 init.d/sanlock.service.native %{buildroot}/%{_unitdir}/sanlock.service
-install -D -m 0755 init.d/wdmd %{buildroot}%{_lib}/systemd/systemd-wdmd
+install -D -m 0755 init.d/wdmd %{buildroot}%{_libdir}/systemd/systemd-wdmd
 install -D -m 0644 init.d/wdmd.service.native %{buildroot}/%{_unitdir}/wdmd.service
 install -D -m 0644 init.d/sanlk-resetd.service %{buildroot}/%{_unitdir}/sanlk-resetd.service
 
@@ -139,7 +139,7 @@ common sanlock lockspace.
 %doc init.d/sanlock
 %doc init.d/sanlock.service
 %doc init.d/wdmd.service
-%{_lib}/systemd/systemd-wdmd
+%{_libdir}/systemd/systemd-wdmd
 %{_unitdir}/sanlock.service
 %{_unitdir}/wdmd.service
 %{_sbindir}/sanlock
