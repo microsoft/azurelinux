@@ -6824,6 +6824,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sanlock",
+          "version": "3.8.1",
+          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "scons",
           "version": "3.0.1",
           "downloadUrl": "http://downloads.sourceforge.net/scons/scons-3.0.1.tar.gz"
