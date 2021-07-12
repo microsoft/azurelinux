@@ -1,4 +1,5 @@
 %bcond_with qemu
+%bcond_with libxl
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
@@ -16,6 +17,7 @@ Patch0:         CVE-2019-3886.nopatch
 Patch1:         CVE-2017-1000256.nopatch
 Patch2:         CVE-2020-25637.patch
 
+BuildRequires:  augeas
 BuildRequires:  bash-completion
 BuildRequires:  cyrus-sasl
 BuildRequires:  device-mapper-devel
@@ -33,8 +35,10 @@ BuildRequires:  python-docutils
 BuildRequires:  python3-devel
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
+BuildRequires:  sanlock-devel
 BuildRequires:  systemd-devel
 BuildRequires:  systemtap-sdt-devel
+BuildRequires:  yajl-devel
 
 Requires:       %{name}-client  = %{version}-%{release}
 Requires:       %{name}-libs    = %{version}-%{release}
@@ -116,6 +120,26 @@ Requires: cyrus-sasl-gssapi
 %description libs
 Shared libraries for accessing the libvirt daemon.
 
+%package nss
+Summary: Libvirt plugin for Name Service Switch
+Requires: libvirt-daemon-driver-network = %{version}-%{release}
+
+%package lock-sanlock
+Summary: Sanlock lock manager plugin for QEMU driver
+
+Requires: sanlock
+#for virt-sanlock-cleanup require augeas
+Requires: augeas
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+
+%description lock-sanlock
+Includes the Sanlock lock manager plugin for the QEMU
+driver
+
+%description nss
+Libvirt plugin for NSS for translating domain names into IP addresses.
+
 %prep
 %autosetup -p1
 
@@ -130,8 +154,11 @@ cd %{_vpath_builddir}
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
     --with-macvtap \
+    --with-nss-plugin \
     --with-pciaccess=no \
-    --with-udev=no
+    --with-udev=no \
+    --with-sanlock \
+    --with-yajl
 
 make %{?_smp_mflags}
 
@@ -146,10 +173,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
    %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes-64.stp
 
-%if 0%{with qemu}
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
    %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes-64.stp
-%endif
 %endif
 
 %check
@@ -203,12 +228,9 @@ make check
 %{_bindir}/virt-host-validate
 
 %{_datadir}/bash-completion/completions/virsh
-%{_datadir}/systemtap/tapset/libvirt_probes*.stp
 %{_datadir}/systemtap/tapset/libvirt_functions.stp
-
-%if 0%{with qemu}
+%{_datadir}/systemtap/tapset/libvirt_probes*.stp
 %{_datadir}/systemtap/tapset/libvirt_qemu_probes*.stp
-%endif
 
 %{_unitdir}/libvirt-guests.service
 %config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
@@ -271,10 +293,36 @@ make check
 
 %{_datadir}/libvirt/test-screenshot.png
 
+%files lock-sanlock
+%if 0%{with qemu}
+%config(noreplace) %{_sysconfdir}/libvirt/qemu-sanlock.conf
+%endif
+%if 0%{with libxl}
+%config(noreplace) %{_sysconfdir}/libvirt/libxl-sanlock.conf
+%endif
+
+%attr(0755, root, root) %{_libdir}/libvirt/lock-driver/sanlock.so
+%{_datadir}/augeas/lenses/libvirt_sanlock.aug
+%{_datadir}/augeas/lenses/tests/test_libvirt_sanlock.aug
+%dir %attr(0770, root, sanlock) %{_localstatedir}/lib/libvirt/sanlock
+%{_sbindir}/virt-sanlock-cleanup
+%{_mandir}/man8/virt-sanlock-cleanup.8*
+%attr(0755, root, root) %{_libexecdir}/libvirt_sanlock_helper
+
+%files nss
+%{_libdir}/libnss_libvirt.so.2
+%{_libdir}/libnss_libvirt_guest.so.2
+
 %changelog
 *   Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-3
 -    Extending with subpackages using Fedora 33 spec (license: MIT).
--    Added subpackages: 'libvirt-admin', 'libvirt-bash-completion', 'libvirt-client', 'libvirt-libs'.
+-    Added subpackages:
+      - 'libvirt-admin',
+      - 'libvirt-bash-completion',
+      - 'libvirt-client',
+      - 'libvirt-libs',
+      - 'libvirt-lock-sanlock',
+      - 'libvirt-nss'.
 
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-2
 -   Use autosetup
