@@ -1,6 +1,10 @@
 %bcond_with qemu
 %bcond_with libxl
 
+# Force QEMU to run as non-root
+%define qemu_user  qemu
+%define qemu_group  qemu
+
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        6.1.0
@@ -19,18 +23,22 @@ Patch2:         CVE-2020-25637.patch
 
 BuildRequires:  augeas
 BuildRequires:  bash-completion
-BuildRequires:  cyrus-sasl
+BuildRequires:  cyrus-sasl-devel
+BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  gnutls-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libnl3-devel
+BuildRequires:  libpciaccess-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt
+BuildRequires:  numad
 BuildRequires:  parted
+BuildRequires:  polkit
 BuildRequires:  python-docutils
 BuildRequires:  python3-devel
 BuildRequires:  readline-devel
@@ -117,6 +125,46 @@ Requires: cyrus-sasl
 # 100's of other things on a system already pull in krb5-libs
 Requires: cyrus-sasl-gssapi
 
+%package daemon
+Summary: Server side daemon and supporting files for libvirt library
+
+Requires: %{name}-libs = %{version}-%{release}
+
+# (client invokes 'nc' against the UNIX socket on the server)
+Requires: /usr/bin/nc
+
+%ifarch x86_64
+# For virConnectGetSysinfo
+Requires: dmidecode
+%endif
+
+# for modprobe of pci devices
+Requires: module-init-tools
+
+# for /sbin/ip & /sbin/tc
+Requires: iproute
+
+Requires: polkit >= 0.112
+
+Requires: numad
+
+# libvirtd depends on 'messagebus' service
+Requires: dbus
+
+# For uid creation during pre
+Requires(pre): shadow-utils
+
+# For service management
+Requires(post): systemd-units
+Requires(post): systemd-sysv
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+
+%description daemon
+Server side daemon required to manage the virtualization capabilities
+of recent versions of Linux. Requires a hypervisor specific sub-RPM
+for specific drivers.
+
 %description libs
 Shared libraries for accessing the libvirt daemon.
 
@@ -153,11 +201,18 @@ cd %{_vpath_builddir}
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
+    --with-driver-modules \
+    --with-libvirtd \
     --with-macvtap \
     --with-nss-plugin \
-    --with-pciaccess=no \
-    --with-udev=no \
+    --with-numad \
+    --with-pciaccess \
+    --with-polkit \
+    --with-qemu-user=%{qemu_user} \
+    --with-qemu-group=%{qemu_group} \
     --with-sanlock \
+    --with-sasl \
+    --with-udev \
     --with-yajl
 
 make %{?_smp_mflags}
@@ -168,6 +223,9 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %find_lang %{name}
+
+# Copied into libvirt-docs subpackage eventually
+mv $RPM_BUILD_ROOT%{_datadir}/doc/libvirt libvirt-docs
 
 %ifarch x86_64
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
@@ -191,19 +249,87 @@ make check
 %postun client
 %systemd_postun libvirt-guests.service
 
+%pre daemon
+# 'libvirt' group is just to allow password-less polkit access to
+# libvirtd. The uid number is irrelevant, so we use dynamic allocation
+# described at the above link.
+getent group libvirt >/dev/null || groupadd -r libvirt
+
+exit 0
+
+%post daemon
+
+%systemd_post virtlockd.socket virtlockd-admin.socket
+%systemd_post virtlogd.socket virtlogd-admin.socket
+%systemd_post libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket
+%systemd_post libvirtd-tcp.socket libvirtd-tls.socket
+%systemd_post libvirtd.service
+
+# request daemon restart in posttrans
+mkdir -p %{_localstatedir}/lib/rpm-state/libvirt || :
+touch %{_localstatedir}/lib/rpm-state/libvirt/restart || :
+
+%preun daemon
+%systemd_preun libvirtd.service
+%systemd_preun libvirtd-tcp.socket libvirtd-tls.socket
+%systemd_preun libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket
+%systemd_preun virtlogd.socket virtlogd-admin.socket virtlogd.service
+%systemd_preun virtlockd.socket virtlockd-admin.socket virtlockd.service
+
+%postun daemon
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+    /bin/systemctl reload-or-try-restart virtlockd.service >/dev/null 2>&1 || :
+    /bin/systemctl reload-or-try-restart virtlogd.service >/dev/null 2>&1 || :
+fi
+
+%posttrans daemon
+if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
+    # See if user has previously modified their install to
+    # tell libvirtd to use --listen
+    grep -E '^LIBVIRTD_ARGS=.*--listen' /etc/sysconfig/libvirtd 1>/dev/null 2>&1
+    if test $? = 0
+    then
+        # Then lets keep honouring --listen and *not* use
+        # systemd socket activation, because switching things
+        # might confuse mgmt tool like puppet/ansible that
+        # expect the old style libvirtd
+        /bin/systemctl mask libvirtd.socket >/dev/null 2>&1 || :
+        /bin/systemctl mask libvirtd-ro.socket >/dev/null 2>&1 || :
+        /bin/systemctl mask libvirtd-admin.socket >/dev/null 2>&1 || :
+        /bin/systemctl mask libvirtd-tls.socket >/dev/null 2>&1 || :
+        /bin/systemctl mask libvirtd-tcp.socket >/dev/null 2>&1 || :
+    else
+        # Old libvirtd owns the sockets and will delete them on
+        # shutdown. Can't use a try-restart as libvirtd will simply
+        # own the sockets again when it comes back up. Thus we must
+        # do this particular ordering, so that we get libvirtd
+        # running with socket activation in use
+        /bin/systemctl is-active libvirtd.service 1>/dev/null 2>&1
+        if test $? = 0
+        then
+            /bin/systemctl stop libvirtd.service >/dev/null 2>&1 || :
+
+            /bin/systemctl try-restart libvirtd.socket >/dev/null 2>&1 || :
+            /bin/systemctl try-restart libvirtd-ro.socket >/dev/null 2>&1 || :
+            /bin/systemctl try-restart libvirtd-admin.socket >/dev/null 2>&1 || :
+
+            /bin/systemctl start libvirtd.service >/dev/null 2>&1 || :
+        fi
+    fi
+fi
+rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
+
 %files
 %defattr(-,root,root)
 %{_bindir}/*
 %{_libdir}/libvirt/storage-file/libvirt_storage_file_fs.so
 %{_libdir}/libvirt/storage-backend/*
 %{_libdir}/libvirt/connection-driver/*.so
-%{_libdir}/libvirt/lock-driver/*.so
-%{_libdir}/sysctl.d/60-libvirtd.conf
 %{_libdir}/systemd/system/*
 %{_libexecdir}/*
 %{_sbindir}/*
 
-%config(noreplace)%{_sysconfdir}/sasl2/libvirt.conf
 %config(noreplace)%{_sysconfdir}/libvirt/*.conf
 %{_sysconfdir}/libvirt/nwfilter/*
 %{_sysconfdir}/libvirt/qemu/*
@@ -234,7 +360,85 @@ make check
 
 %{_unitdir}/libvirt-guests.service
 %config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
-%attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
+%attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh%files daemon
+
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/
+
+%{_unitdir}/libvirtd.service
+%{_unitdir}/libvirtd.socket
+%{_unitdir}/libvirtd-ro.socket
+%{_unitdir}/libvirtd-admin.socket
+%{_unitdir}/libvirtd-tcp.socket
+%{_unitdir}/libvirtd-tls.socket
+%{_unitdir}/virtproxyd.service
+%{_unitdir}/virtproxyd.socket
+%{_unitdir}/virtproxyd-ro.socket
+%{_unitdir}/virtproxyd-admin.socket
+%{_unitdir}/virtproxyd-tcp.socket
+%{_unitdir}/virtproxyd-tls.socket
+%{_unitdir}/virt-guest-shutdown.target
+%{_unitdir}/virtlogd.service
+%{_unitdir}/virtlogd.socket
+%{_unitdir}/virtlogd-admin.socket
+%{_unitdir}/virtlockd.service
+%{_unitdir}/virtlockd.socket
+%{_unitdir}/virtlockd-admin.socket
+%config(noreplace) %{_sysconfdir}/sysconfig/libvirtd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtlogd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtlockd
+%config(noreplace) %{_sysconfdir}/libvirt/libvirtd.conf
+%config(noreplace) %{_sysconfdir}/libvirt/virtproxyd.conf
+%config(noreplace) %{_sysconfdir}/libvirt/virtlogd.conf
+%config(noreplace) %{_sysconfdir}/libvirt/virtlockd.conf
+%config(noreplace) %{_sysconfdir}/sasl2/libvirt.conf
+%config(noreplace) %{_libdir}/sysctl.d/60-libvirtd.conf
+
+%config(noreplace) %{_sysconfdir}/logrotate.d/libvirtd
+%dir %{_datadir}/libvirt/
+
+%ghost %dir %{_rundir}/libvirt/
+
+%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/images/
+%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/filesystems/
+%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/boot/
+%dir %attr(0711, root, root) %{_localstatedir}/cache/libvirt/
+
+
+%dir %attr(0755, root, root) %{_libdir}/libvirt/
+%dir %attr(0755, root, root) %{_libdir}/libvirt/connection-driver/
+%dir %attr(0755, root, root) %{_libdir}/libvirt/lock-driver
+%attr(0755, root, root) %{_libdir}/libvirt/lock-driver/lockd.so
+
+%{_datadir}/augeas/lenses/libvirtd.aug
+%{_datadir}/augeas/lenses/tests/test_libvirtd.aug
+%{_datadir}/augeas/lenses/virtlogd.aug
+%{_datadir}/augeas/lenses/tests/test_virtlogd.aug
+%{_datadir}/augeas/lenses/virtlockd.aug
+%{_datadir}/augeas/lenses/tests/test_virtlockd.aug
+%{_datadir}/augeas/lenses/virtproxyd.aug
+%{_datadir}/augeas/lenses/tests/test_virtproxyd.aug
+%{_datadir}/augeas/lenses/libvirt_lockd.aug
+%if 0%{with qemu}
+%{_datadir}/augeas/lenses/tests/test_libvirt_lockd.aug
+%endif
+
+%{_datadir}/polkit-1/actions/org.libvirt.unix.policy
+%{_datadir}/polkit-1/actions/org.libvirt.api.policy
+%{_datadir}/polkit-1/rules.d/50-libvirt.rules
+
+%dir %attr(0700, root, root) %{_localstatedir}/log/libvirt/
+
+%attr(0755, root, root) %{_libexecdir}/libvirt_iohelper
+
+%attr(0755, root, root) %{_sbindir}/libvirtd
+%attr(0755, root, root) %{_sbindir}/virtproxyd
+%attr(0755, root, root) %{_sbindir}/virtlogd
+%attr(0755, root, root) %{_sbindir}/virtlockd
+
+%{_mandir}/man8/libvirtd.8*
+%{_mandir}/man8/virtlogd.8*
+%{_mandir}/man8/virtlockd.8*
+%{_mandir}/man7/virkey*.7*
 
 %files devel
 %{_includedir}/libvirt/*
@@ -248,11 +452,8 @@ make check
 %{_datadir}/libvirt/api/libvirt-lxc-api.xml
 
 %files docs
-%{_datadir}/augeas/lenses/*
-%{_datadir}/libvirt/*
-%{_docdir}/libvirt/*
-%{_datadir}/locale/*
-%{_mandir}/*
+%doc AUTHORS ChangeLog NEWS README README.md
+%doc libvirt-docs/*
 
 %files libs
 %license COPYING COPYING.LESSER
@@ -320,6 +521,7 @@ make check
       - 'libvirt-admin',
       - 'libvirt-bash-completion',
       - 'libvirt-client',
+      - 'libvirt-daemon',
       - 'libvirt-libs',
       - 'libvirt-lock-sanlock',
       - 'libvirt-nss'.
