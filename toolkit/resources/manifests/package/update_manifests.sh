@@ -192,6 +192,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-curses/d' $TmpPkgGen
     sed -i '/python3-gpg/d' $TmpPkgGen
     sed -i '/python3-libxml2/d' $TmpPkgGen
+    sed -i '/python3-magic/d' $TmpPkgGen
     sed -i '/python3-pip/d' $TmpPkgGen
     sed -i '/python3-pwquality/d' $TmpPkgGen
     sed -i '/python3-rpm/d' $TmpPkgGen

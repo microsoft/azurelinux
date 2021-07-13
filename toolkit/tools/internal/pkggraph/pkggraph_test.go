@@ -590,7 +590,7 @@ func TestConditionalLookupMulti(t *testing.T) {
 		Version:    "3",
 		SCondition: ">",
 		SVersion:   "3"})
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	assert.Nil(t, lu)
 }
 

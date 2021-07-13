@@ -1,0 +1,71 @@
+From 47c30871e5c56a2d6578fedd89e52b10e5580558 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Klaus=20K=C3=A4mpf?= <kkaempf@suse.de>
+Date: Wed, 4 Dec 2019 08:19:54 +0100
+Subject: [PATCH 3/4] enable s390x builds
+
+similar to the aarch64 patch, covering
+- recognition of architecture
+- adapting memory alignment
+---
+ CMakeLists.txt                       | 2 ++
+ src/crypto/cipher_extra/aead_test.cc | 2 ++
+ src/crypto/poly1305/poly1305_test.cc | 9 +++++++--
+ src/include/openssl/base.h           | 3 +++
+ 4 files changed, 14 insertions(+), 2 deletions(-)
+
+Index: boringssl-20200122/CMakeLists.txt
+===================================================================
+--- boringssl-20200122.orig/CMakeLists.txt
++++ boringssl-20200122/CMakeLists.txt
+@@ -93,6 +93,8 @@ elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUA
+   set(ARCH "generic")
+ elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc64le")
+   set(ARCH "ppc64le")
++elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "s390x")
++  set(ARCH "s390x")
+ else()
+   message(FATAL_ERROR "Unknown processor:" ${CMAKE_SYSTEM_PROCESSOR})
+ endif()
+Index: boringssl-20200122/src/crypto/cipher_extra/aead_test.cc
+===================================================================
+--- boringssl-20200122.orig/src/crypto/cipher_extra/aead_test.cc
++++ boringssl-20200122/src/crypto/cipher_extra/aead_test.cc
+@@ -31,6 +31,8 @@
+ 
+ #if defined(OPENSSL_AARCH64)
+ #define ALIGN_BYTES 16
++#elif defined(OPENSSL_S390X)
++#define ALIGN_BYTES 8
+ #else
+ #define ALIGN_BYTES 64
+ #endif
+Index: boringssl-20200122/src/crypto/poly1305/poly1305_test.cc
+===================================================================
+--- boringssl-20200122.orig/src/crypto/poly1305/poly1305_test.cc
++++ boringssl-20200122/src/crypto/poly1305/poly1305_test.cc
+@@ -25,6 +25,11 @@
+ #include "../test/file_test.h"
+ #include "../test/test_util.h"
+ 
++#if defined(OPENSSL_S390X)
++#define ALIGN_BYTES 8
++#else
++#define ALIGN_BYTES 16
++#endif
+ 
+ static void TestSIMD(unsigned excess, const std::vector<uint8_t> &key,
+                      const std::vector<uint8_t> &in,
+Index: boringssl-20200122/src/include/openssl/base.h
+===================================================================
+--- boringssl-20200122.orig/src/include/openssl/base.h
++++ boringssl-20200122/src/include/openssl/base.h
+@@ -99,6 +99,9 @@ extern "C" {
+ #elif (defined(__PPC64__) || defined(__powerpc64__)) && defined(_LITTLE_ENDIAN)
+ #define OPENSSL_64_BIT
+ #define OPENSSL_PPC64LE
++#elif defined(__S390X__) || defined(__s390x__)
++#define OPENSSL_64_BIT
++#define OPENSSL_S390X
+ #elif defined(__mips__) && !defined(__LP64__)
+ #define OPENSSL_32_BIT
+ #define OPENSSL_MIPS
