@@ -156,31 +156,44 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 -   Add microsoft and microsoft-preview repo configuration packages.  
 -   These repos offer Mariner packages produced by partner teams within Microsoft on 
 -   behalf of the Mariner team but are released on an independent cadence from Mariner.
+
 *   Fri Feb 19 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-13
 -   Add extras repo.
 -   Add extras-preview repo.
+
 *   Fri Jan 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12
 -   Adding a set of repos with the UI components.
+
 *   Thu Oct 01 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0-11
 -   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
+
 *   Mon Sep 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-10
 -   Adding configuration to access the preview repository.
 -   Removing redundant 'Provides'.
+
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
+
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
 -   Adding Metadata Key and Updating to Prod GPG Key.
+
 *   Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
 -   Fixing distro name.
+
 *   Fri Jul 17 2020 Andrew Phelps <anphel@microsoft.com> 1.0-6
 -   Set sslverify=1 in [mariner-official-base] and [mariner-official-update]
+
 *   Wed Nov 27 2019 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-5
 -   Removing outdated repository configuration
+
 *   Fri Nov 22 2019 Andrew Phelps <anphel@microsoft.com> 1.0-4
 -   Use $releasever and $basearch variables
+
 *   Tue Oct 29 2019 Andrew Phelps <anphel@microsoft.com> 1.0-3
 -   Separate repo configs for official-base and official-update
+
 *   Wed Oct 23 2019 Andrew Phelps <anphel@microsoft.com> 1.0-2
 -   Add mariner-official.repo
+
 *   Wed Sep 04 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-1
 -   Original version for CBL-Mariner.
