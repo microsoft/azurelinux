@@ -84,7 +84,7 @@ cp %{SOURCE1} .
 %systemd_postun numad.service
 
 %changelog
-* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5-32
+* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5+20150602.aec1497e2b-32
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Changed release to a simple integer.
 - Switched versioning to use Fedora's guidelines for snapshots.
