@@ -1884,6 +1884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hwdata",
+          "version": "0.341",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyperv-daemons",
           "version": "5.10.28.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
@@ -2917,6 +2927,16 @@
           "name": "libpcap",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpciaccess",
+          "version": "0.16",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
         }
       }
     },
@@ -7567,6 +7587,16 @@
           "name": "xmlto",
           "version": "0.0.28",
           "downloadUrl": "http://releases.pagure.org/xmlto/xmlto-0.0.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-util-macros",
+          "version": "1.19.2",
+          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.19.2.tar.bz2"
         }
       }
     },
