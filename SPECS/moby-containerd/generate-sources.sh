@@ -15,7 +15,11 @@ git fetch --tags origin ${CONTAINERD_COMMIT}
 git checkout ${CONTAINERD_COMMIT}
 cd /build/
 
-tar -C /build/containerd-src -czf ./moby-containerd-${VERSION}.tar.gz .
+tar --sort=name \
+    --mtime="2021-04-26 00:00Z" \
+    --owner=0 --group=0 --numeric-owner \
+    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    -C /build/containerd-src -czf ./moby-containerd-${VERSION}.tar.gz .
 rm -rf /build/containerd-src
 
 echo "sources generated successfully @ /build/moby-containerd-${VERSION}.tar.gz"
