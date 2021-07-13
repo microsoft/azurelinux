@@ -1,4 +1,3 @@
-%bcond_with qemu
 %bcond_with libxl
 
 # Force QEMU to run as non-root
@@ -21,6 +20,7 @@ Patch0:         CVE-2019-3886.nopatch
 Patch1:         CVE-2017-1000256.nopatch
 Patch2:         CVE-2020-25637.patch
 
+BuildRequires:  /usr/bin/qemu-img
 BuildRequires:  augeas
 BuildRequires:  bash-completion
 BuildRequires:  cyrus-sasl-devel
@@ -28,6 +28,7 @@ BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  gnutls-devel
+BuildRequires:  libacl-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libnl3-devel
 BuildRequires:  libpciaccess-devel
@@ -36,6 +37,7 @@ BuildRequires:  libssh2-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt
+BuildRequires:  numactl-devel
 BuildRequires:  numad
 BuildRequires:  parted
 BuildRequires:  polkit
@@ -48,8 +50,16 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  yajl-devel
 
-Requires:       %{name}-client  = %{version}-%{release}
-Requires:       %{name}-libs    = %{version}-%{release}
+Requires:       %{name}-client               =  %{version}-%{release}
+Requires:       %{name}-daemon-driver-interface = %{version}-%{release}
+Requires:       %{name}-daemon-driver-network = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nodedev = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nwfilter = %{version}-%{release}
+Requires:       %{name}-daemon-driver-qemu = %{version}-%{release}
+Requires:       %{name}-daemon-driver-secret = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage = %{version}-%{release}
+Requires:       %{name}-daemon-driver-vbox   =  %{version}-%{release}
+Requires:       %{name}-libs                 =  %{version}-%{release}
 Requires:       cyrus-sasl
 Requires:       device-mapper
 Requires:       e2fsprogs
@@ -100,31 +110,6 @@ Requires: readline
 The client binaries needed to access the virtualization
 capabilities of recent versions of Linux (and other OSes).
 
-%package devel
-Summary:        libvirt devel
-Group:          Development/Tools
-
-Requires:       %{name} = %{version}-%{release}
-Requires:       libtirpc-devel
-
-%description devel
-This contains development tools and libraries for libvirt.
-
-%package docs
-Summary:        libvirt docs
-Group:          Development/Tools
-
-%description docs
-The contains libvirt package doc files.
-
-%package libs
-Summary: Client side libraries
-# So remote clients can access libvirt over SSH tunnel
-Requires: cyrus-sasl
-# Needed by default sasl.conf - no onerous extra deps, since
-# 100's of other things on a system already pull in krb5-libs
-Requires: cyrus-sasl-gssapi
-
 %package daemon
 Summary: Server side daemon and supporting files for libvirt library
 
@@ -165,12 +150,107 @@ Server side daemon required to manage the virtualization capabilities
 of recent versions of Linux. Requires a hypervisor specific sub-RPM
 for specific drivers.
 
+%package daemon-driver-qemu
+Summary: QEMU driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: /usr/bin/qemu-img
+# For image compression
+Requires: gzip
+Requires: bzip2
+Requires: lzop
+Requires: xz
+    %if 0%{?fedora} || 0%{?rhel} > 7
+Requires: systemd-container
+    %endif
+
+%description daemon-driver-qemu
+The qemu driver plugin for the libvirtd daemon, providing
+an implementation of the hypervisor driver APIs using
+QEMU
+
+%package daemon-driver-secret
+Summary: Secret driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+
+%description daemon-driver-secret
+The secret driver plugin for the libvirtd daemon, providing
+an implementation of the secret key APIs.
+
+%package daemon-driver-storage-core
+Summary: Storage driver plugin including base backends for the libvirtd daemon
+
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: nfs-utils
+# For mkfs
+Requires: util-linux
+Requires: /usr/bin/qemu-img
+
+%description daemon-driver-storage-core
+The storage driver plugin for the libvirtd daemon, providing
+an implementation of the storage APIs using files, local disks, LVM, SCSI,
+iSCSI, and multipath storage.
+
+%package daemon-driver-vbox
+Summary: VirtualBox driver plugin for the libvirtd daemon
+
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+
+%description daemon-driver-vbox
+The vbox driver plugin for the libvirtd daemon, providing
+an implementation of the hypervisor driver APIs using
+VirtualBox
+
+%package daemon-vbox
+Summary: Server side daemon & driver required to run VirtualBox guests
+
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-daemon-driver-vbox = %{version}-%{release}
+Requires: %{name}-daemon-driver-interface = %{version}-%{release}
+Requires: %{name}-daemon-driver-network = %{version}-%{release}
+Requires: %{name}-daemon-driver-nodedev = %{version}-%{release}
+Requires: %{name}-daemon-driver-nwfilter = %{version}-%{release}
+Requires: %{name}-daemon-driver-secret = %{version}-%{release}
+Requires: %{name}-daemon-driver-storage = %{version}-%{release}
+
+%description daemon-vbox
+Server side daemon and driver required to manage the virtualization
+capabilities of VirtualBox
+
+%package devel
+Summary:        libvirt devel
+Group:          Development/Tools
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       libtirpc-devel
+
+%description devel
+This contains development tools and libraries for libvirt.
+
+%package docs
+Summary:        libvirt docs
+Group:          Development/Tools
+
+%description docs
+The contains libvirt package doc files.
+
+%package libs
+Summary: Client side libraries
+# So remote clients can access libvirt over SSH tunnel
+Requires: cyrus-sasl
+# Needed by default sasl.conf - no onerous extra deps, since
+# 100's of other things on a system already pull in krb5-libs
+Requires: cyrus-sasl-gssapi
+
 %description libs
 Shared libraries for accessing the libvirt daemon.
 
 %package nss
 Summary: Libvirt plugin for Name Service Switch
-Requires: libvirt-daemon-driver-network = %{version}-%{release}
+Requires: %{name}-daemon-driver-network = %{version}-%{release}
 
 %package lock-sanlock
 Summary: Sanlock lock manager plugin for QEMU driver
@@ -205,9 +285,11 @@ cd %{_vpath_builddir}
     --with-libvirtd \
     --with-macvtap \
     --with-nss-plugin \
+    --with-numactl \
     --with-numad \
     --with-pciaccess \
     --with-polkit \
+    --with-qemu \
     --with-qemu-user=%{qemu_user} \
     --with-qemu-group=%{qemu_group} \
     --with-sanlock \
@@ -225,7 +307,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}
 
 # Copied into libvirt-docs subpackage eventually
-mv $RPM_BUILD_ROOT%{_datadir}/doc/libvirt libvirt-docs
+mv %{buildroot}%{_datadir}/doc/libvirt libvirt-docs
 
 %ifarch x86_64
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
@@ -320,6 +402,21 @@ if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
 fi
 rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 
+%pre daemon-driver-qemu
+# We want soft static allocation of well-known ids, as disk images
+# are commonly shared across NFS mounts by id rather than name; see
+# https://fedoraproject.org/wiki/Packaging:UsersAndGroups
+getent group kvm >/dev/null || groupadd -f -g 36 -r kvm
+getent group qemu >/dev/null || groupadd -f -g 107 -r qemu
+if ! getent passwd qemu >/dev/null; then
+  if ! getent passwd 107 >/dev/null; then
+    useradd -r -u 107 -g qemu -G kvm -d / -s /usr/sbin/nologin -c "qemu user" qemu
+  else
+    useradd -r -g qemu -G kvm -d / -s /usr/sbin/nologin -c "qemu user" qemu
+  fi
+fi
+exit 0
+
 %files
 %defattr(-,root,root)
 %{_bindir}/*
@@ -360,7 +457,9 @@ rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 
 %{_unitdir}/libvirt-guests.service
 %config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
-%attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh%files daemon
+%attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
+
+%files daemon
 
 %dir %attr(0700, root, root) %{_sysconfdir}/libvirt/
 
@@ -418,9 +517,7 @@ rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 %{_datadir}/augeas/lenses/virtproxyd.aug
 %{_datadir}/augeas/lenses/tests/test_virtproxyd.aug
 %{_datadir}/augeas/lenses/libvirt_lockd.aug
-%if 0%{with qemu}
 %{_datadir}/augeas/lenses/tests/test_libvirt_lockd.aug
-%endif
 
 %{_datadir}/polkit-1/actions/org.libvirt.unix.policy
 %{_datadir}/polkit-1/actions/org.libvirt.api.policy
@@ -440,6 +537,67 @@ rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 %{_mandir}/man8/virtlockd.8*
 %{_mandir}/man7/virkey*.7*
 
+%files daemon-driver-qemu
+%config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
+%{_datadir}/augeas/lenses/virtqemud.aug
+%{_datadir}/augeas/lenses/tests/test_virtqemud.aug
+%{_unitdir}/virtqemud.service
+%{_unitdir}/virtqemud.socket
+%{_unitdir}/virtqemud-ro.socket
+%{_unitdir}/virtqemud-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtqemud
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/qemu/
+%dir %attr(0700, root, root) %{_localstatedir}/log/libvirt/qemu/
+%config(noreplace) %{_sysconfdir}/libvirt/qemu.conf
+%config(noreplace) %{_sysconfdir}/libvirt/qemu-lockd.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/libvirtd.qemu
+%ghost %dir %{_rundir}/libvirt/qemu/
+%dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/
+%dir %attr(0750, %{qemu_user}, %{qemu_group}) %{_localstatedir}/cache/libvirt/qemu/
+%{_datadir}/augeas/lenses/libvirtd_qemu.aug
+%{_datadir}/augeas/lenses/tests/test_libvirtd_qemu.aug
+%{_libdir}/%{name}/connection-driver/libvirt_driver_qemu.so
+%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/swtpm/
+%dir %attr(0711, root, root) %{_localstatedir}/log/swtpm/libvirt/qemu/
+%{_bindir}/virt-qemu-run
+%{_mandir}/man1/virt-qemu-run.1*
+
+%files daemon-driver-secret
+%config(noreplace) %{_sysconfdir}/libvirt/virtsecretd.conf
+%{_datadir}/augeas/lenses/virtsecretd.aug
+%{_datadir}/augeas/lenses/tests/test_virtsecretd.aug
+%{_unitdir}/virtsecretd.service
+%{_unitdir}/virtsecretd.socket
+%{_unitdir}/virtsecretd-ro.socket
+%{_unitdir}/virtsecretd-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtsecretd
+%{_libdir}/%{name}/connection-driver/libvirt_driver_secret.so
+
+%files daemon-driver-storage-core
+%config(noreplace) %{_sysconfdir}/libvirt/virtstoraged.conf
+%{_datadir}/augeas/lenses/virtstoraged.aug
+%{_datadir}/augeas/lenses/tests/test_virtstoraged.aug
+%{_unitdir}/virtstoraged.service
+%{_unitdir}/virtstoraged.socket
+%{_unitdir}/virtstoraged-ro.socket
+%{_unitdir}/virtstoraged-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtstoraged
+%attr(0755, root, root) %{_libexecdir}/libvirt_parthelper
+%{_libdir}/%{name}/connection-driver/libvirt_driver_storage.so
+%{_libdir}/%{name}/storage-backend/libvirt_storage_backend_fs.so
+%{_libdir}/%{name}/storage-file/libvirt_storage_file_fs.so
+
+%files daemon-driver-vbox
+%config(noreplace) %{_sysconfdir}/libvirt/virtvboxd.conf
+%{_datadir}/augeas/lenses/virtvboxd.aug
+%{_datadir}/augeas/lenses/tests/test_virtvboxd.aug
+%{_unitdir}/virtvboxd.service
+%{_unitdir}/virtvboxd.socket
+%{_unitdir}/virtvboxd-ro.socket
+%{_unitdir}/virtvboxd-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtvboxd
+%{_libdir}/%{name}/connection-driver/libvirt_driver_vbox.so
+
 %files devel
 %{_includedir}/libvirt/*
 %{_libdir}/libvirt*.so
@@ -453,9 +611,9 @@ rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 
 %files docs
 %doc AUTHORS ChangeLog NEWS README README.md
-%doc libvirt-docs/*
+%doc %{_vpath_builddir}/libvirt-docs/*
 
-%files libs
+%files libs -f %{_vpath_builddir}/%{name}.lang
 %license COPYING COPYING.LESSER
 %config(noreplace) %{_sysconfdir}/libvirt/libvirt.conf
 %config(noreplace) %{_sysconfdir}/libvirt/libvirt-admin.conf
@@ -495,9 +653,7 @@ rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 %{_datadir}/libvirt/test-screenshot.png
 
 %files lock-sanlock
-%if 0%{with qemu}
 %config(noreplace) %{_sysconfdir}/libvirt/qemu-sanlock.conf
-%endif
 %if 0%{with libxl}
 %config(noreplace) %{_sysconfdir}/libvirt/libxl-sanlock.conf
 %endif
