@@ -32,12 +32,10 @@ Requires:	%{name} = %{version}
 It contains the libraries and header files to create applications
 
 %package -n python3-newt
-%{?python_provide:%python_provide python3-newt}
-# Remove before F30
+Summary:  Python 3 bindings for newt
 Provides: %{name}-python3 = %{version}-%{release}
 Provides: %{name}-python3%{?_isa} = %{version}-%{release}
 Provides: snack = %{version}-%{release}
-Summary: Python 3 bindings for newt
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-newt
@@ -83,6 +81,7 @@ make %{?_smp_mflags} test
 
 %changelog
 * Tue Jul 13 2021 Muhammad Falak R Wani <mwani@microsoft.com> 0.52.21-2
+- Extend using Fedora 32 spec (license: MIT)
 - Enable python3-newt
 
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 0.52.21-1
