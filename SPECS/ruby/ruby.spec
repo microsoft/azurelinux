@@ -46,6 +46,9 @@ Provides:       %{name}-libs = %{version}-%{release}
 Provides:       rubygems = %{version}-%{release}
 Provides:       rubygems-devel = %{version}-%{release}
 Provides:       ruby(rubygems) = %{version}-%{release}
+# TODO: When moving to Ruby 3.X for Mariner 2.0 release, these gemified stdlib
+# provides should be versioned according to the gem version.
+# More info: https://stdgems.org/
 Provides:       rubygem(bigdecimal) = %{version}-%{release}
 Provides:       rubygem(io-console) = %{version}-%{release}
 Provides:       rubygem(psych) = %{version}-%{release}
