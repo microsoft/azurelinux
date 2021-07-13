@@ -72,8 +72,17 @@ Summary:  CBL-Mariner Microsoft repository.
 Group:    System Envrionment/Base
 Requires: %{name} = %{version}-%{release}
 
+%description microsoft
+%{summary}
+
+%package microsoft-preview
+Summary:  CBL-Mariner Microsoft Preview repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
 %description microsoft-preview
 %{summary}
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
