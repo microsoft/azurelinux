@@ -29,7 +29,7 @@ A fast, scalable, multi-language and extensible build system.
 %build
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk --verbose_failures" ./compile.sh
+EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
@@ -47,7 +47,6 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue Jul 13 2021 Henry Li <lihl@microsoft.com> - 2.2.0-2
-- Add --verbose_failures to EXTRA_BAZEL_ARGS
 - Apply patch to resolve jni build error on aarch64
 
 * Wed Jun 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-1
