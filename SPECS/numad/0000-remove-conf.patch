@@ -1,0 +1,22 @@
+diff -rup numad-0.5git/numad.8 numad-0.5git-new/numad.8
+--- numad-0.5git/numad.8	2015-06-02 13:16:31.000000000 +0200
++++ numad-0.5git-new/numad.8	2019-03-26 09:20:45.887766101 +0100
+@@ -98,8 +98,7 @@ Sets the time interval that numad waits
+ <\fImin_interval\fP> is 5 seconds.  Setting a <\fImax_interval\fP> of zero will
+ cause the daemon to exit.  (This is the normal mechanism to terminate the
+ daemon.)  A bigger <\fImax_interval\fP> will decrease numad overhead but also
+-decrease responsiveness to changing loads.  The default numad max_interval can
+-be changed in the numad.conf file.
++decrease responsiveness to changing loads.
+ .TP
+ \fB\-K\fR <\fI0|1\fP>
+ This option controls whether numad keeps interleaved memory spread across NUMA
+@@ -210,8 +209,6 @@ numad can manage.
+ .LP
+ \fI/usr/bin/numad\fP
+ .br
+-\fI/etc/numad.conf\fP
+-.br
+ \fI/var/log/numad.log\fP
+ .br
+ \fI/var/run/numad.pid\fP
