@@ -10,6 +10,19 @@ Group:          System Environment/Libraries
 URL:            https://github.com/Azure/aad-pod-identity
 #Source0:       https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%{version}.tar.gz -O aad-pod-identity-%%{version}.tar.gz
+#   2. tar -xf aad-pod-identity-%%{version}.tar.gz
+#   3. cd aad-pod-identity-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         modify-go-build-option.patch
 BuildRequires:  golang >= 1.15
