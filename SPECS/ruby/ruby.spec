@@ -5,7 +5,7 @@
 %global io_console_version 0.5.6
 %global psych_version      3.1.0
 %global irb_version        1.2.6
-%global json_version       2.3.0 
+%global json_version       2.3.0
 %global gem_dir %{_libdir}/ruby/gems
 Summary:        Ruby
 Name:           ruby
