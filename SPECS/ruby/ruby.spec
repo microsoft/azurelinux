@@ -91,8 +91,8 @@ autoconf
 %install
 %make_install
 
-# The following install steps are taken from the Fedora spec (license: MIT) and modified for Mariner
-# https://src.fedoraproject.org/rpms/ruby
+# The following install steps are taken from the Fedora 34 spec (license: MIT) and modified for Mariner
+# https://src.fedoraproject.org/rpms/ruby/tree/f34
 
 # Move macros file into proper place and replace the %%{name} macro, since it
 # would be wrongly evaluated during build of other packages.
@@ -189,7 +189,7 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Mon Jul 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-4
-- Add attribution for parts of the install script taken from Fedora (license: MIT)
+- Add attribution for parts of the install script taken from Fedora 34 (license: MIT)
 - Add provides for rubygem(json), and install json gem into the gemdir
 - Modernize spec with macros
 
