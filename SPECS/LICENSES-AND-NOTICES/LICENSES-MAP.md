@@ -10,3 +10,4 @@ The CBL-Mariner SPEC files originated from a variety of sources with varying lic
 | Nvidia | [ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0) | nvidia-container-runtime |
 | Magnus Edenhill Open Source | [Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING) | librdkafka |
 | Ceph Source | [LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt) | ceph |
+| Numad source | [LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt) | numad |

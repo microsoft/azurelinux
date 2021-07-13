@@ -1,25 +1,47 @@
-Name: numad
-Version: 0.5
-Release: 32.20150602git%{?dist}
-Summary: NUMA user daemon
-License: LGPLv2
+# Use only 7-10 first characters of the git commit hash!
+%define git_short_commit_date 20150602
+%define git_short_commit aec1497e2b
+
+Summary:        NUMA user daemon
+Name:           numad
+# Following Fedora's guidelines regarding snapshots versioning:
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning/#_snapshots
+# Using "+" instead of "^" because our version of RPM errors-out on the "^" symbol.
+Version:        0.5+%{git_short_commit_date}.%{git_short_commit}
+Release:        32%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: https://pagure.io/numad
+URL:            https://pagure.io/numad
+Source0:        %{name}-%{version}.tar.xz
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-#   git clone https://pagure.io/numad.git numad-0.5git
-#   tar --exclude-vcs -cJf numad-0.5git.tar.xz numad-0.5git/
-Source0: %{name}-%{version}git.tar.xz
-Patch0: 0000-remove-conf.patch
+#   git clone -n https://pagure.io/numad.git numad-%%{version}
+#   pushd numad-%%{version}
+#   git checkout %%{git_short_commit}
+#   popd
+#   tar --sort=name \
+#       --mtime="2021-04-26 00:00Z" \
+#       --owner=0 --group=0 --numeric-owner \
+#       --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#       --exclude-vcs -cJf numad-%%{version}.tar.xz numad-%%{version}
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source1:        LICENSE.PTR
+Patch0:         0000-remove-conf.patch
 
-Requires: systemd-units
+BuildRequires:  gcc
+BuildRequires:  systemd-units
+
+Requires:       systemd-units
 Requires(post): systemd-units
 Requires(preun): systemd-units
-BuildRequires:  gcc
-BuildRequires: systemd-units
 
-ExcludeArch: s390 %{arm}
+ExcludeArch:    s390 %{arm}
 
 %description
 Numad, a daemon for NUMA (Non-Uniform Memory Architecture) systems,
@@ -27,26 +49,30 @@ that monitors NUMA characteristics and manages placement of processes
 and memory to minimize memory latency and thus provide optimum performance.
 
 %prep
-%setup -q -n %{name}-%{version}git
-%patch0 -p1
+%autosetup -p1
 
 %build
-make CFLAGS="$RPM_OPT_FLAGS -std=gnu99" LDFLAGS="$RPM_LD_FLAGS -lpthread -lrt -lm"
+%make_build
 
 %install
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
-mkdir -p %{buildroot}%{_unitdir}
-mkdir -p %{buildroot}%{_mandir}/man8/
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_sysconfdir}/logrotate.d
+install -d %{buildroot}%{_unitdir}
+install -d %{buildroot}%{_mandir}/man8/
+
 install -p -m 644 numad.service %{buildroot}%{_unitdir}/
 install -p -m 644 numad.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-make install prefix=%{buildroot}/usr
+
+make install prefix=%{buildroot}%{_prefix}
+
+cp %{SOURCE1} .
 
 %files
+%license LICENSE.PTR
 %{_bindir}/numad
 %{_unitdir}/numad.service
 %config(noreplace) %{_sysconfdir}/logrotate.d/numad
-%doc %{_mandir}/man8/numad.8.gz
+%{_mandir}/man8/numad.8.gz
 
 %post
 %systemd_post numad.service
@@ -58,9 +84,12 @@ make install prefix=%{buildroot}/usr
 %systemd_postun numad.service
 
 %changelog
-* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5-32.20150602git
+* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5-32
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Using the '%%make_build' macro instead of 'make'.
+- Changed release to a simple integer.
+- Switched versioning to use Fedora's guidelines for snapshots.
+- Added git commit hash to better track source version.
+- Using '%%autosetup' and the '%%make_build' macro instead of 'make'.
 - License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.5-31.20150602git

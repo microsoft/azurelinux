@@ -3984,6 +3984,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "numad",
+          "version": "0.5",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "numpy",
           "version": "1.16.6",
           "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.16.6/numpy-1.16.6.tar.gz"

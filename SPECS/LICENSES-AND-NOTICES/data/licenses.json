@@ -756,6 +756,13 @@
             "specs": [
                 "ceph"
             ]
+        },
+        {
+            "origin": "Numad source",
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
+            ]
         }
     ]
 }
