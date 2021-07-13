@@ -44,9 +44,9 @@ Requires:       postgresql >= 10.5
 Python 3 version.
 
 %package doc
-Summary:	Documentation for psycopg python PostgreSQL database adapter
-%{?with_python2:Provides: python2-%{srcname}-doc = %{version}-%{release}}
-%{?with_python3:Provides: python3-%{srcname}-doc = %{version}-%{release}}
+Summary:  Documentation for psycopg python PostgreSQL database adapter
+Provides: python2-%{srcname}-doc = %{version}-%{release}
+Provides: python3-%{srcname}-doc = %{version}-%{release}
 
 %description doc
 Documentation and example files for the psycopg python PostgreSQL
@@ -110,6 +110,7 @@ rm -r /home/postgres/data &>/dev/null ||:
 
 %changelog
 * Tue Jul 13 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.7.5-6
+- Extend using Fedora 32 spec (license: MIT)
 - Enable subpackage python-psycopg2-doc
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.7.5-5
