@@ -40,7 +40,9 @@ cp LICENSE ..
 popd
 
 %check
+pushd aad-pod-identity-%{version}
 make unit-test
+popd
 
 %files
 %defattr(-,root,root)
