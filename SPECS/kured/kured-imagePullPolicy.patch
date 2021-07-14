@@ -1,0 +1,12 @@
+diff -urN kured-1.4.0.old/kured-ds.yaml kured-1.4.0/kured-ds.yaml
+--- kured-1.4.0.old/kured-ds.yaml	2020-04-30 18:07:30.000000000 +0200
++++ kured-1.4.0/kured-ds.yaml	2020-05-18 09:20:34.176054210 +0200
+@@ -32,7 +32,7 @@
+           image: docker.io/weaveworks/kured
+                  # If you find yourself here wondering why there is no
+                  # :latest tag on Docker Hub,see the FAQ in the README
+-          imagePullPolicy: IfNotPresent
++          imagePullPolicy: Always
+           securityContext:
+             privileged: true # Give permission to nsenter /proc/1/ns/mnt
+           env:
