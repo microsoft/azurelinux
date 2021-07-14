@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Summary:        A language for data analysis and graphics
 Name:           R
 Version:        4.1.0
@@ -78,9 +80,11 @@ Install R-core-devel if you are going to develop or compile R packages.
 
 %install
 %make_install
+%ifarch x86_64
 pushd %{buildroot}%{_lib64dir}/R
 ln -s %{_includedir}/R include 
 popd
+%endif
 
 %check
 # Tests do not all pass  
@@ -94,14 +98,25 @@ TZ="Europe/Paris" make check -k -i
 %license COPYING
 %{_bindir}/R
 %{_bindir}/Rscript
-%{_lib64dir}/R/*
 %{_mandir}/man1/R*
+%ifarch x86_64
+%{_lib64dir}/R/*
 %exclude %dir %{_lib64dir}/R/include/*
 %exclude %{_exec_prefix}/src/debug/R*
 %exclude %dir %{_libdir}/debug/usr/lib64/R*
+%endif
+%ifarch aarch64
+%{_libdir}/R/*
+%exclude %dir %{_libdir}/R/include/*
+%endif
 
 %files core-devel
+%ifarch x86_64
 %{_lib64dir}/R/include/*
+%endif
+%ifarch aarch64
+%{_libdir}/R/include/*
+%endif
 
 %changelog
 * Wed Jun 16 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.1.0-1
