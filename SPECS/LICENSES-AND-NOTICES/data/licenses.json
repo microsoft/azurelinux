@@ -215,7 +215,8 @@
                 "boringssl",
                 "envoy",
                 "golang-packaging",
-                "jna"
+                "jna",
+                "kured"
             ]
         },
         {

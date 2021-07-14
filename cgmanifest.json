@@ -2444,6 +2444,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kured",
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kyua",
           "version": "0.13",
           "downloadUrl": "https://github.com/jmmv/kyua/releases/download/kyua-0.13/kyua-0.13.tar.gz"
