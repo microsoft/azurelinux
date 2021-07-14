@@ -1,0 +1,12 @@
+diff -urN kured-1.4.0.old/cmd/kured/main.go kured-1.4.0/cmd/kured/main.go
+--- kured-1.4.0.old/cmd/kured/main.go	2020-04-30 18:07:30.000000000 +0200
++++ kured-1.4.0/cmd/kured/main.go	2020-05-17 14:13:01.956576943 +0200
+@@ -261,7 +261,7 @@
+ 	}
+ 
+ 	// Relies on hostPID:true and privileged:true to enter host mount space
+-	rebootCmd := newCommand("/usr/bin/nsenter", "-m/proc/1/ns/mnt", "/bin/systemctl", "reboot")
++	rebootCmd := newCommand("/usr/bin/nsenter", "-m/proc/1/ns/mnt", "/usr/bin/systemctl", "reboot")
+ 	if err := rebootCmd.Run(); err != nil {
+ 		log.Fatalf("Error invoking reboot command: %v", err)
+ 	}
