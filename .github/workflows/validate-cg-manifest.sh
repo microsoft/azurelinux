@@ -51,7 +51,7 @@ do
   name=$(rpmspec --srpm  --define "with_check 0" --qf "%{NAME}" -q $spec 2>/dev/null )
   if [[ -z $name ]] 
   then
-    echo "    Was not able to parse $spec, skipping"
+    echo "    Not able to parse $spec, skipping"
     continue
   fi
 
