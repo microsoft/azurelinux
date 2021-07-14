@@ -51,6 +51,8 @@ BuildRequires:  systemtap-sdt-devel
 BuildRequires:  yajl-devel
 
 Requires:       %{name}-client               =  %{version}-%{release}
+Requires:       %{name}-daemon-config-network = %{version}-%{release}
+Requires:       %{name}-daemon-config-nwfilter = %{version}-%{release}
 Requires:       %{name}-daemon-driver-interface = %{version}-%{release}
 Requires:       %{name}-daemon-driver-network = %{version}-%{release}
 Requires:       %{name}-daemon-driver-nodedev = %{version}-%{release}
@@ -150,6 +152,71 @@ Server side daemon required to manage the virtualization capabilities
 of recent versions of Linux. Requires a hypervisor specific sub-RPM
 for specific drivers.
 
+%package daemon-config-network
+Summary: Default configuration files for the libvirtd daemon
+
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-daemon-driver-network = %{version}-%{release}
+
+%description daemon-config-network
+Default configuration files for setting up NAT based networking
+
+%package daemon-config-nwfilter
+Summary: Network filter configuration files for the libvirtd daemon
+
+Requires: libvirt-daemon = %{version}-%{release}
+Requires: libvirt-daemon-driver-nwfilter = %{version}-%{release}
+
+%description daemon-config-nwfilter
+Network filter configuration files for cleaning guest traffic
+
+%package daemon-driver-interface
+Summary: Interface driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: netcf-libs >= 0.2.2
+
+%description daemon-driver-interface
+The interface driver plugin for the libvirtd daemon, providing
+an implementation of the network interface APIs using the
+netcf library
+
+%package daemon-driver-network
+Summary: Network driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: dnsmasq
+Requires: radvd
+Requires: iptables
+
+%description daemon-driver-network
+The network driver plugin for the libvirtd daemon, providing
+an implementation of the virtual network APIs using the Linux
+bridge capabilities.
+
+%package daemon-driver-nodedev
+Summary: Nodedev driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: systemd
+
+%description daemon-driver-nodedev
+The nodedev driver plugin for the libvirtd daemon, providing
+an implementation of the node device APIs using the udev
+capabilities.
+
+%package daemon-driver-nwfilter
+Summary: Nwfilter driver plugin for the libvirtd daemon
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
+Requires: iptables
+Requires: ebtables
+
+%description daemon-driver-nwfilter
+The nwfilter driver plugin for the libvirtd daemon, providing
+an implementation of the firewall APIs using the ebtables,
+iptables and ip6tables capabilities
+
 %package daemon-driver-qemu
 Summary: QEMU driver plugin for the libvirtd daemon
 Requires: %{name}-daemon = %{version}-%{release}
@@ -160,9 +227,7 @@ Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
-    %if 0%{?fedora} || 0%{?rhel} > 7
 Requires: systemd-container
-    %endif
 
 %description daemon-driver-qemu
 The qemu driver plugin for the libvirtd daemon, providing
@@ -203,6 +268,23 @@ Requires: %{name}-libs = %{version}-%{release}
 The vbox driver plugin for the libvirtd daemon, providing
 an implementation of the hypervisor driver APIs using
 VirtualBox
+
+%package daemon-kvm
+Summary: Server side daemon & driver required to run KVM guests
+
+Requires: %{name}-daemon = %{version}-%{release}
+Requires: %{name}-daemon-driver-qemu = %{version}-%{release}
+Requires: %{name}-daemon-driver-interface = %{version}-%{release}
+Requires: %{name}-daemon-driver-network = %{version}-%{release}
+Requires: %{name}-daemon-driver-nodedev = %{version}-%{release}
+Requires: %{name}-daemon-driver-nwfilter = %{version}-%{release}
+Requires: %{name}-daemon-driver-secret = %{version}-%{release}
+Requires: %{name}-daemon-driver-storage = %{version}-%{release}
+Requires: qemu-kvm
+
+%description daemon-kvm
+Server side daemon and driver required to manage the virtualization
+capabilities of the KVM hypervisor
 
 %package daemon-vbox
 Summary: Server side daemon & driver required to run VirtualBox guests
@@ -284,6 +366,7 @@ cd %{_vpath_builddir}
     --with-driver-modules \
     --with-libvirtd \
     --with-macvtap \
+    --with-network \
     --with-nss-plugin \
     --with-numactl \
     --with-numad \
@@ -295,16 +378,40 @@ cd %{_vpath_builddir}
     --with-sanlock \
     --with-sasl \
     --with-udev \
-    --with-yajl
+    --with-yajl \
+    --without-firewalld-zone \
+    --without-login-shell \
+    --without-lxc
 
 make %{?_smp_mflags}
 
 %install
 cd %{_vpath_builddir}
-make DESTDIR=%{buildroot} install
+%make_install DESTDIR=%{buildroot} SYSTEMD_UNIT_DIR=%{_unitdir} V=1
+
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%find_lang %{name}
+install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/lib/libvirt/dnsmasq/
+
+# We don't want to install /etc/libvirt/qemu/networks in the main %%files list
+# because if the admin wants to delete the default network completely, we don't
+# want to end up re-incarnating it on every RPM upgrade.
+install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/
+cp $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/qemu/networks/default.xml \
+   $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/default.xml
+# libvirt saves this file with mode 0600
+chmod 0600 $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/qemu/networks/default.xml
+
+# nwfilter files are installed in /usr/share/libvirt and copied to /etc in %%post
+# to avoid verification errors on changed files in /etc
+install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/libvirt/nwfilter/
+cp -a $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/nwfilter/*.xml \
+    $RPM_BUILD_ROOT%{_datadir}/libvirt/nwfilter/
+# libvirt saves these files with mode 600
+chmod 600 $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/nwfilter/*.xml
+
+# Strip auto-generated UUID - we need it generated per-install
+sed -i -e "/<uuid>/d" $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/default.xml
 
 # Copied into libvirt-docs subpackage eventually
 mv %{buildroot}%{_datadir}/doc/libvirt libvirt-docs
@@ -316,6 +423,8 @@ mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
    %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes-64.stp
 %endif
+
+%find_lang %{name}
 
 %check
 cd %{_vpath_builddir}
@@ -402,6 +511,70 @@ if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
 fi
 rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
 
+%post daemon-config-network
+if test $1 -eq 1 && test ! -f %{_sysconfdir}/libvirt/qemu/networks/default.xml ; then
+    # see if the network used by default network creates a conflict,
+    # and try to resolve it
+    # NB: 192.168.122.0/24 is used in the default.xml template file;
+    # do not modify any of those values here without also modifying
+    # them in the template.
+    orig_sub=122
+    sub=${orig_sub}
+    nl='
+'
+    routes="${nl}$(ip route show | cut -d' ' -f1)${nl}"
+    case ${routes} in
+      *"${nl}192.168.${orig_sub}.0/24${nl}"*)
+        # there was a match, so we need to look for an unused subnet
+        for new_sub in $(seq 124 254); do
+          case ${routes} in
+          *"${nl}192.168.${new_sub}.0/24${nl}"*)
+            ;;
+          *)
+            sub=$new_sub
+            break;
+            ;;
+          esac
+        done
+        ;;
+      *)
+        ;;
+    esac
+
+    UUID=`/usr/bin/uuidgen`
+    sed -e "s/${orig_sub}/${sub}/g" \
+        -e "s,</name>,</name>\n  <uuid>$UUID</uuid>," \
+         < %{_datadir}/libvirt/networks/default.xml \
+         > %{_sysconfdir}/libvirt/qemu/networks/default.xml
+    ln -s ../default.xml %{_sysconfdir}/libvirt/qemu/networks/autostart/default.xml
+    # libvirt saves this file with mode 0600
+    chmod 0600 %{_sysconfdir}/libvirt/qemu/networks/default.xml
+
+    # Make sure libvirt picks up the new network defininiton
+    mkdir -p %{_localstatedir}/lib/rpm-state/libvirt || :
+    touch %{_localstatedir}/lib/rpm-state/libvirt/restart || :
+fi
+
+%posttrans daemon-config-network
+if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
+    /bin/systemctl try-restart libvirtd.service >/dev/null 2>&1 || :
+fi
+rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
+
+%post daemon-config-nwfilter
+cp %{_datadir}/libvirt/nwfilter/*.xml %{_sysconfdir}/libvirt/nwfilter/
+# libvirt saves these files with mode 600
+chmod 600 %{_sysconfdir}/libvirt/nwfilter/*.xml
+# Make sure libvirt picks up the new nwfilter defininitons
+mkdir -p %{_localstatedir}/lib/rpm-state/libvirt || :
+touch %{_localstatedir}/lib/rpm-state/libvirt/restart || :
+
+%posttrans daemon-config-nwfilter
+if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
+    /bin/systemctl try-restart libvirtd.service >/dev/null 2>&1 || :
+fi
+rm -rf %{_localstatedir}/lib/rpm-state/libvirt || :
+
 %pre daemon-driver-qemu
 # We want soft static allocation of well-known ids, as disk images
 # are commonly shared across NFS mounts by id rather than name; see
@@ -434,6 +607,7 @@ exit 0
 %{_sysconfdir}/sysconfig/*
 
 %files admin
+%{_mandir}/man1/virt-admin.1*
 %{_bindir}/virt-admin
 %{_datadir}/bash-completion/completions/virt-admin
 
@@ -441,10 +615,10 @@ exit 0
 %{_datadir}/bash-completion/completions/vsh
 
 %files client
-#%%{_mandir}/man1/virsh.1*
-#%%{_mandir}/man1/virt-xml-validate.1*
-#%%{_mandir}/man1/virt-pki-validate.1*
-#%%{_mandir}/man1/virt-host-validate.1*
+%{_mandir}/man1/virsh.1*
+%{_mandir}/man1/virt-xml-validate.1*
+%{_mandir}/man1/virt-pki-validate.1*
+%{_mandir}/man1/virt-host-validate.1*
 %{_bindir}/virsh
 %{_bindir}/virt-xml-validate
 %{_bindir}/virt-pki-validate
@@ -537,6 +711,70 @@ exit 0
 %{_mandir}/man8/virtlockd.8*
 %{_mandir}/man7/virkey*.7*
 
+%files daemon-config-network
+%dir %{_datadir}/libvirt/networks/
+%{_datadir}/libvirt/networks/default.xml
+%ghost %{_sysconfdir}/libvirt/qemu/networks/default.xml
+%ghost %{_sysconfdir}/libvirt/qemu/networks/autostart/default.xml
+
+%files daemon-config-nwfilter
+%dir %{_datadir}/libvirt/nwfilter/
+%{_datadir}/libvirt/nwfilter/*.xml
+%ghost %{_sysconfdir}/libvirt/nwfilter/*.xml
+
+%files daemon-driver-interface
+%config(noreplace) %{_sysconfdir}/libvirt/virtinterfaced.conf
+%{_datadir}/augeas/lenses/virtinterfaced.aug
+%{_datadir}/augeas/lenses/tests/test_virtinterfaced.aug
+%{_unitdir}/virtinterfaced.service
+%{_unitdir}/virtinterfaced.socket
+%{_unitdir}/virtinterfaced-ro.socket
+%{_unitdir}/virtinterfaced-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtinterfaced
+%{_libdir}/%{name}/connection-driver/libvirt_driver_interface.so
+
+%files daemon-driver-network
+%config(noreplace) %{_sysconfdir}/libvirt/virtnetworkd.conf
+%{_datadir}/augeas/lenses/virtnetworkd.aug
+%{_datadir}/augeas/lenses/tests/test_virtnetworkd.aug
+%{_unitdir}/virtnetworkd.service
+%{_unitdir}/virtnetworkd.socket
+%{_unitdir}/virtnetworkd-ro.socket
+%{_unitdir}/virtnetworkd-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtnetworkd
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/qemu/
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/qemu/networks/
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/qemu/networks/autostart
+%ghost %dir %{_rundir}/libvirt/network/
+%dir %attr(0700, root, root) %{_localstatedir}/lib/libvirt/network/
+%dir %attr(0755, root, root) %{_localstatedir}/lib/libvirt/dnsmasq/
+%attr(0755, root, root) %{_libexecdir}/libvirt_leaseshelper
+%{_libdir}/%{name}/connection-driver/libvirt_driver_network.so
+
+%files daemon-driver-nodedev
+%config(noreplace) %{_sysconfdir}/libvirt/virtnodedevd.conf
+%{_datadir}/augeas/lenses/virtnodedevd.aug
+%{_datadir}/augeas/lenses/tests/test_virtnodedevd.aug
+%{_unitdir}/virtnodedevd.service
+%{_unitdir}/virtnodedevd.socket
+%{_unitdir}/virtnodedevd-ro.socket
+%{_unitdir}/virtnodedevd-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtnodedevd
+%{_libdir}/%{name}/connection-driver/libvirt_driver_nodedev.so
+
+%files daemon-driver-nwfilter
+%config(noreplace) %{_sysconfdir}/libvirt/virtnwfilterd.conf
+%{_datadir}/augeas/lenses/virtnwfilterd.aug
+%{_datadir}/augeas/lenses/tests/test_virtnwfilterd.aug
+%{_unitdir}/virtnwfilterd.service
+%{_unitdir}/virtnwfilterd.socket
+%{_unitdir}/virtnwfilterd-ro.socket
+%{_unitdir}/virtnwfilterd-admin.socket
+%attr(0755, root, root) %{_sbindir}/virtnwfilterd
+%dir %attr(0700, root, root) %{_sysconfdir}/libvirt/nwfilter/
+%ghost %dir %{_rundir}/libvirt/network/
+%{_libdir}/%{name}/connection-driver/libvirt_driver_nwfilter.so
+
 %files daemon-driver-qemu
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
@@ -587,6 +825,8 @@ exit 0
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_fs.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_fs.so
 
+%files daemon-kvm
+
 %files daemon-driver-vbox
 %config(noreplace) %{_sysconfdir}/libvirt/virtvboxd.conf
 %{_datadir}/augeas/lenses/virtvboxd.aug
@@ -597,6 +837,8 @@ exit 0
 %{_unitdir}/virtvboxd-admin.socket
 %attr(0755, root, root) %{_sbindir}/virtvboxd
 %{_libdir}/%{name}/connection-driver/libvirt_driver_vbox.so
+
+%files daemon-vbox
 
 %files devel
 %{_includedir}/libvirt/*
