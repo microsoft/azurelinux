@@ -4,13 +4,14 @@
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
 Version:        2.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://bazel.io/
 Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{version}/%{name}-%{version}-dist.zip
 Patch0:         fix-bazel-version-check.patch
+Patch1:         fix-jni-build-error.patch
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
 BuildRequires:  openjdk8
@@ -45,5 +46,8 @@ rm -rf %{buildroot}
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Tue Jul 13 2021 Henry Li <lihl@microsoft.com> - 2.2.0-2
+- Apply patch to resolve jni build error on aarch64
+
 * Wed Jun 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-1
 - Original version for CBL-Mariner
