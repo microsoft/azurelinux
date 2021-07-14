@@ -3974,6 +3974,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nmi",
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs",
           "version": "8.11.4",
           "downloadUrl": "https://nodejs.org/download/release/v8.11.4/node-v8.11.4.tar.xz"

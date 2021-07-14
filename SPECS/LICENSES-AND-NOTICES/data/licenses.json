@@ -164,6 +164,7 @@
                 "ncompress",
                 "nlohmann-json",
                 "nmap",
+                "nmi",
                 "ntopng",
                 "oath-toolkit",
                 "omi",
