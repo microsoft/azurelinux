@@ -1,9 +1,9 @@
-%bcond_with gluster
-%bcond_with iscsi
-
 # Force QEMU to run as non-root
 %define qemu_user  qemu
 %define qemu_group  qemu
+
+%bcond_with gluster
+%bcond_with iscsi
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
@@ -21,27 +21,20 @@ Patch0:         CVE-2019-3886.nopatch
 Patch1:         CVE-2017-1000256.nopatch
 Patch2:         CVE-2020-25637.patch
 
-BuildRequires:  /usr/bin/qemu-img
+BuildRequires:  %{_bindir}/qemu-img
 BuildRequires:  augeas
 BuildRequires:  bash-completion
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
-%if 0%{with gluster}
-BuildRequires:  glusterfs-api-devel >= 3.4.1
-BuildRequires:  glusterfs-devel >= 3.4.1
-%endif
 BuildRequires:  gnutls-devel
-%if 0%{with iscsi}
-BuildRequires:  iscsi-initiator-utils
-%endif
 BuildRequires:  libacl-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libnl3-devel
+BuildRequires:  libpciaccess-devel
 BuildRequires:  librados2-devel
 BuildRequires:  librbd1-devel
-BuildRequires:  libpciaccess-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  libtirpc-devel
@@ -61,7 +54,15 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  yajl-devel
 
-Requires:       %{name}-client               =  %{version}-%{release}
+%if 0%{with gluster}
+BuildRequires:  glusterfs-api-devel >= 3.4.1
+BuildRequires:  glusterfs-devel >= 3.4.1
+%endif
+%if 0%{with iscsi}
+BuildRequires:  iscsi-initiator-utils
+%endif
+
+Requires:       %{name}-client = %{version}-%{release}
 Requires:       %{name}-daemon-config-network = %{version}-%{release}
 Requires:       %{name}-daemon-config-nwfilter = %{version}-%{release}
 Requires:       %{name}-daemon-driver-interface = %{version}-%{release}
@@ -71,8 +72,8 @@ Requires:       %{name}-daemon-driver-nwfilter = %{version}-%{release}
 Requires:       %{name}-daemon-driver-qemu = %{version}-%{release}
 Requires:       %{name}-daemon-driver-secret = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage = %{version}-%{release}
-Requires:       %{name}-daemon-driver-vbox   =  %{version}-%{release}
-Requires:       %{name}-libs                 =  %{version}-%{release}
+Requires:       %{name}-daemon-driver-vbox = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       cyrus-sasl
 Requires:       device-mapper
 Requires:       e2fsprogs
@@ -92,71 +93,62 @@ Requires:       systemd
 Libvirt is collection of software that provides a convenient way to manage virtual machines and other virtualization functionality, such as storage and network interface management. These software pieces include an API library, a daemon (libvirtd), and a command line utility (virsh).  An primary goal of libvirt is to provide a single way to manage multiple different virtualization providers/hypervisors. For example, the command 'virsh list --all' can be used to list the existing virtual machines for any supported hypervisor (KVM, Xen, VMWare ESX, etc.) No need to learn the hypervisor specific tools!
 
 %package admin
-Summary: Set of tools to control libvirt daemon
+Summary:        Set of tools to control libvirt daemon
 
-Requires: %{name}-bash-completion = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: readline
+Requires:       %{name}-bash-completion = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       readline
 
 %description admin
 The client side utilities to control the libvirt daemon.
 
 %package bash-completion
-Summary: Bash completion script
+Summary:        Bash completion script
 
 %description bash-completion
 Bash completion script stub.
 
 %package client
-Summary: Client side utilities of the libvirt library
+Summary:        Client side utilities of the libvirt library
 
-Requires: %{name}-bash-completion = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires:       %{name}-bash-completion = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 # Needed by libvirt-guests.sh script.
-Requires: gettext
+Requires:       gettext
 # Needed by virt-pki-validate script.
-Requires: gnutls-utils
-Requires: ncurses
-Requires: readline
+Requires:       gnutls-utils
+Requires:       ncurses
+Requires:       readline
 
 %description client
 The client binaries needed to access the virtualization
 capabilities of recent versions of Linux (and other OSes).
 
 %package daemon
-Summary: Server side daemon and supporting files for libvirt library
-
-Requires: %{name}-libs = %{version}-%{release}
+Summary:        Server side daemon and supporting files for libvirt library
 
 # (client invokes 'nc' against the UNIX socket on the server)
-Requires: /usr/bin/nc
-
-%ifarch x86_64
-# For virConnectGetSysinfo
-Requires: dmidecode
-%endif
-
-# for modprobe of pci devices
-Requires: module-init-tools
-
-# for /sbin/ip & /sbin/tc
-Requires: iproute
-
-Requires: polkit >= 0.112
-
-Requires: numad
-
+Requires:       %{_bindir}/nc
+Requires:       %{name}-libs = %{version}-%{release}
 # libvirtd depends on 'messagebus' service
-Requires: dbus
-
-# For uid creation during pre
-Requires(pre): shadow-utils
-
+Requires:       dbus
+# for /sbin/ip & /sbin/tc
+Requires:       iproute
+# for modprobe of pci devices
+Requires:       module-init-tools
+Requires:       numad
+Requires:       polkit >= 0.112
+Requires(post): systemd-sysv
 # For service management
 Requires(post): systemd-units
-Requires(post): systemd-sysv
-Requires(preun): systemd-units
 Requires(postun): systemd-units
+# For uid creation during pre
+Requires(pre):  shadow-utils
+Requires(preun): systemd-units
+%ifarch x86_64
+# For virConnectGetSysinfo
+Requires:       dmidecode
+%endif
 
 %description daemon
 Server side daemon required to manage the virtualization capabilities
@@ -164,28 +156,29 @@ of recent versions of Linux. Requires a hypervisor specific sub-RPM
 for specific drivers.
 
 %package daemon-config-network
-Summary: Default configuration files for the libvirtd daemon
+Summary:        Default configuration files for the libvirtd daemon
 
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-daemon-driver-network = %{version}-%{release}
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-daemon-driver-network = %{version}-%{release}
 
 %description daemon-config-network
 Default configuration files for setting up NAT based networking
 
 %package daemon-config-nwfilter
-Summary: Network filter configuration files for the libvirtd daemon
+Summary:        Network filter configuration files for the libvirtd daemon
 
-Requires: libvirt-daemon = %{version}-%{release}
-Requires: libvirt-daemon-driver-nwfilter = %{version}-%{release}
+Requires:       libvirt-daemon = %{version}-%{release}
+Requires:       libvirt-daemon-driver-nwfilter = %{version}-%{release}
 
 %description daemon-config-nwfilter
 Network filter configuration files for cleaning guest traffic
 
 %package daemon-driver-interface
-Summary: Interface driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: netcf-libs >= 0.2.2
+Summary:        Interface driver plugin for the libvirtd daemon
+
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       netcf-libs >= 0.2.2
 
 %description daemon-driver-interface
 The interface driver plugin for the libvirtd daemon, providing
@@ -193,12 +186,13 @@ an implementation of the network interface APIs using the
 netcf library
 
 %package daemon-driver-network
-Summary: Network driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: dnsmasq
-Requires: radvd
-Requires: iptables
+Summary:        Network driver plugin for the libvirtd daemon
+
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       dnsmasq
+Requires:       iptables
+Requires:       radvd
 
 %description daemon-driver-network
 The network driver plugin for the libvirtd daemon, providing
@@ -206,10 +200,11 @@ an implementation of the virtual network APIs using the Linux
 bridge capabilities.
 
 %package daemon-driver-nodedev
-Summary: Nodedev driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: systemd
+Summary:        Nodedev driver plugin for the libvirtd daemon
+
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       systemd
 
 %description daemon-driver-nodedev
 The nodedev driver plugin for the libvirtd daemon, providing
@@ -217,11 +212,12 @@ an implementation of the node device APIs using the udev
 capabilities.
 
 %package daemon-driver-nwfilter
-Summary: Nwfilter driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: iptables
-Requires: ebtables
+Summary:        Nwfilter driver plugin for the libvirtd daemon
+
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       ebtables
+Requires:       iptables
 
 %description daemon-driver-nwfilter
 The nwfilter driver plugin for the libvirtd daemon, providing
@@ -229,16 +225,17 @@ an implementation of the firewall APIs using the ebtables,
 iptables and ip6tables capabilities
 
 %package daemon-driver-qemu
-Summary: QEMU driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: /usr/bin/qemu-img
+Summary:        QEMU driver plugin for the libvirtd daemon
+
+Requires:       %{_bindir}/qemu-img
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       bzip2
 # For image compression
-Requires: gzip
-Requires: bzip2
-Requires: lzop
-Requires: xz
-Requires: systemd-container
+Requires:       gzip
+Requires:       lzop
+Requires:       systemd-container
+Requires:       xz
 
 %description daemon-driver-qemu
 The qemu driver plugin for the libvirtd daemon, providing
@@ -246,28 +243,30 @@ an implementation of the hypervisor driver APIs using
 QEMU
 
 %package daemon-driver-secret
-Summary: Secret driver plugin for the libvirtd daemon
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Summary:        Secret driver plugin for the libvirtd daemon
+
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description daemon-driver-secret
 The secret driver plugin for the libvirtd daemon, providing
 an implementation of the secret key APIs.
 
 %package daemon-driver-storage
-Summary: Storage driver plugin including all backends for the libvirtd daemon
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-daemon-driver-storage-disk = %{version}-%{release}
-Requires: %{name}-daemon-driver-storage-logical = %{version}-%{release}
-Requires: %{name}-daemon-driver-storage-scsi = %{version}-%{release}
+Summary:        Storage driver plugin including all backends for the libvirtd daemon
+
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-disk = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-logical = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
 %if 0%{with iscsi}
-Requires: %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
 %endif
-Requires: %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 %if 0%{with gluster}
-Requires: %{name}-daemon-driver-storage-gluster = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
 %endif
-Requires: %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
@@ -275,14 +274,14 @@ an implementation of the storage APIs using LVM, iSCSI,
 parted and more.
 
 %package daemon-driver-storage-core
-Summary: Storage driver plugin including base backends for the libvirtd daemon
+Summary:        Storage driver plugin including base backends for the libvirtd daemon
 
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: nfs-utils
+Requires:       %{_bindir}/qemu-img
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       nfs-utils
 # For mkfs
-Requires: util-linux
-Requires: /usr/bin/qemu-img
+Requires:       util-linux
 
 %description daemon-driver-storage-core
 The storage driver plugin for the libvirtd daemon, providing
@@ -290,11 +289,12 @@ an implementation of the storage APIs using files, local disks, LVM, SCSI,
 iSCSI, and multipath storage.
 
 %package daemon-driver-storage-disk
-Summary: Storage driver plugin for disk
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: parted
-Requires: device-mapper
+Summary:        Storage driver plugin for disk
+
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       device-mapper
+Requires:       parted
 
 %description daemon-driver-storage-disk
 The storage driver backend adding implementation of the storage APIs for block
@@ -302,11 +302,12 @@ volumes using the host disks.
 
 %if 0%{with gluster}
 %package daemon-driver-storage-gluster
-Summary: Storage driver plugin for gluster
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: glusterfs-client >= 2.0.1
-Requires: /usr/sbin/gluster
+Summary:        Storage driver plugin for gluster
+
+Requires:       %{_sbindir}/gluster
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       glusterfs-client >= 2.0.1
 
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
@@ -315,10 +316,11 @@ volumes using libgfapi.
 
 %if 0%{with iscsi}
 %package daemon-driver-storage-iscsi
-Summary: Storage driver plugin for iscsi
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
-Requires: iscsi-initiator-utils
+Summary:        Storage driver plugin for iscsi
+
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       iscsi-initiator-utils
 
 %description daemon-driver-storage-iscsi
 The storage driver backend adding implementation of the storage APIs for iscsi
@@ -326,48 +328,52 @@ volumes using the host iscsi stack.
 %endif
 
 %package daemon-driver-storage-logical
-Summary: Storage driver plugin for lvm volumes
-Requires: libvirt-daemon-driver-storage-core = %{version}-%{release}
-Requires: libvirt-libs = %{version}-%{release}
-Requires: lvm2
+Summary:        Storage driver plugin for lvm volumes
+
+Requires:       libvirt-daemon-driver-storage-core = %{version}-%{release}
+Requires:       libvirt-libs = %{version}-%{release}
+Requires:       lvm2
 
 %description daemon-driver-storage-logical
 The storage driver backend adding implementation of the storage APIs for block
 volumes using lvm.
 
 %package daemon-driver-storage-mpath
-Summary: Storage driver plugin for multipath volumes
-Requires: libvirt-daemon-driver-storage-core = %{version}-%{release}
-Requires: libvirt-libs = %{version}-%{release}
-Requires: device-mapper
+Summary:        Storage driver plugin for multipath volumes
+
+Requires:       device-mapper
+Requires:       libvirt-daemon-driver-storage-core = %{version}-%{release}
+Requires:       libvirt-libs = %{version}-%{release}
 
 %description daemon-driver-storage-mpath
 The storage driver backend adding implementation of the storage APIs for
 multipath storage using device mapper.
 
 %package daemon-driver-storage-rbd
-Summary: Storage driver plugin for rbd
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Summary:        Storage driver plugin for rbd
+
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description daemon-driver-storage-rbd
 The storage driver backend adding implementation of the storage APIs for rbd
 volumes using the ceph protocol.
 
 %package daemon-driver-storage-scsi
-Summary: Storage driver plugin for local scsi devices
-Requires: %{name}-daemon-driver-storage-core = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Summary:        Storage driver plugin for local scsi devices
+
+Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description daemon-driver-storage-scsi
 The storage driver backend adding implementation of the storage APIs for scsi
 host devices.
 
 %package daemon-driver-vbox
-Summary: VirtualBox driver plugin for the libvirtd daemon
+Summary:        VirtualBox driver plugin for the libvirtd daemon
 
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description daemon-driver-vbox
 The vbox driver plugin for the libvirtd daemon, providing
@@ -375,33 +381,33 @@ an implementation of the hypervisor driver APIs using
 VirtualBox
 
 %package daemon-kvm
-Summary: Server side daemon & driver required to run KVM guests
+Summary:        Server side daemon & driver required to run KVM guests
 
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-daemon-driver-qemu = %{version}-%{release}
-Requires: %{name}-daemon-driver-interface = %{version}-%{release}
-Requires: %{name}-daemon-driver-network = %{version}-%{release}
-Requires: %{name}-daemon-driver-nodedev = %{version}-%{release}
-Requires: %{name}-daemon-driver-nwfilter = %{version}-%{release}
-Requires: %{name}-daemon-driver-secret = %{version}-%{release}
-Requires: %{name}-daemon-driver-storage = %{version}-%{release}
-Requires: qemu-kvm
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-daemon-driver-interface = %{version}-%{release}
+Requires:       %{name}-daemon-driver-network = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nodedev = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nwfilter = %{version}-%{release}
+Requires:       %{name}-daemon-driver-qemu = %{version}-%{release}
+Requires:       %{name}-daemon-driver-secret = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage = %{version}-%{release}
+Requires:       qemu-kvm
 
 %description daemon-kvm
 Server side daemon and driver required to manage the virtualization
 capabilities of the KVM hypervisor
 
 %package daemon-vbox
-Summary: Server side daemon & driver required to run VirtualBox guests
+Summary:        Server side daemon & driver required to run VirtualBox guests
 
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-daemon-driver-vbox = %{version}-%{release}
-Requires: %{name}-daemon-driver-interface = %{version}-%{release}
-Requires: %{name}-daemon-driver-network = %{version}-%{release}
-Requires: %{name}-daemon-driver-nodedev = %{version}-%{release}
-Requires: %{name}-daemon-driver-nwfilter = %{version}-%{release}
-Requires: %{name}-daemon-driver-secret = %{version}-%{release}
-Requires: %{name}-daemon-driver-storage = %{version}-%{release}
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-daemon-driver-interface = %{version}-%{release}
+Requires:       %{name}-daemon-driver-network = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nodedev = %{version}-%{release}
+Requires:       %{name}-daemon-driver-nwfilter = %{version}-%{release}
+Requires:       %{name}-daemon-driver-secret = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage = %{version}-%{release}
+Requires:       %{name}-daemon-driver-vbox = %{version}-%{release}
 
 %description daemon-vbox
 Server side daemon and driver required to manage the virtualization
@@ -425,28 +431,30 @@ Group:          Development/Tools
 The contains libvirt package doc files.
 
 %package libs
-Summary: Client side libraries
+Summary:        Client side libraries
+
 # So remote clients can access libvirt over SSH tunnel
-Requires: cyrus-sasl
+Requires:       cyrus-sasl
 # Needed by default sasl.conf - no onerous extra deps, since
 # 100's of other things on a system already pull in krb5-libs
-Requires: cyrus-sasl-gssapi
+Requires:       cyrus-sasl-gssapi
 
 %description libs
 Shared libraries for accessing the libvirt daemon.
 
 %package nss
-Summary: Libvirt plugin for Name Service Switch
-Requires: %{name}-daemon-driver-network = %{version}-%{release}
+Summary:        Libvirt plugin for Name Service Switch
+
+Requires:       %{name}-daemon-driver-network = %{version}-%{release}
 
 %package lock-sanlock
-Summary: Sanlock lock manager plugin for QEMU driver
+Summary:        Sanlock lock manager plugin for QEMU driver
 
-Requires: sanlock
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 #for virt-sanlock-cleanup require augeas
-Requires: augeas
-Requires: %{name}-daemon = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires:       augeas
+Requires:       sanlock
 
 %description lock-sanlock
 Includes the Sanlock lock manager plugin for the QEMU
@@ -510,30 +518,30 @@ cd %{_vpath_builddir}
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
-install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/lib/libvirt/dnsmasq/
+install -d -m 0755 %{buildroot}%{_datadir}/lib/libvirt/dnsmasq/
 
 # We don't want to install /etc/libvirt/qemu/networks in the main %%files list
 # because if the admin wants to delete the default network completely, we don't
 # want to end up re-incarnating it on every RPM upgrade.
-install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/
-cp $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/qemu/networks/default.xml \
-   $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/default.xml
+install -d -m 0755 %{buildroot}%{_datadir}/libvirt/networks/
+cp %{buildroot}%{_sysconfdir}/libvirt/qemu/networks/default.xml \
+   %{buildroot}%{_datadir}/libvirt/networks/default.xml
 # libvirt saves this file with mode 0600
-chmod 0600 $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/qemu/networks/default.xml
+chmod 0600 %{buildroot}%{_sysconfdir}/libvirt/qemu/networks/default.xml
 
 # nwfilter files are installed in /usr/share/libvirt and copied to /etc in %%post
 # to avoid verification errors on changed files in /etc
-install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/libvirt/nwfilter/
-cp -a $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/nwfilter/*.xml \
-    $RPM_BUILD_ROOT%{_datadir}/libvirt/nwfilter/
+install -d -m 0755 %{buildroot}%{_datadir}/libvirt/nwfilter/
+cp -a %{buildroot}%{_sysconfdir}/libvirt/nwfilter/*.xml \
+    %{buildroot}%{_datadir}/libvirt/nwfilter/
 # libvirt saves these files with mode 600
-chmod 600 $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/nwfilter/*.xml
+chmod 600 %{buildroot}%{_sysconfdir}/libvirt/nwfilter/*.xml
 
 # Strip auto-generated UUID - we need it generated per-install
-sed -i -e "/<uuid>/d" $RPM_BUILD_ROOT%{_datadir}/libvirt/networks/default.xml
+sed -i -e "/<uuid>/d" %{buildroot}%{_datadir}/libvirt/networks/default.xml
 
 # Copied into libvirt-docs subpackage eventually
-mv %{buildroot}%{_datadir}/doc/libvirt libvirt-docs
+mv %{buildroot}%{_docdir}/libvirt libvirt-docs
 
 %ifarch x86_64
 mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_probes.stp \
@@ -544,10 +552,10 @@ mv %{buildroot}%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
 %endif
 
 # We're building with '--without-libxl'
-rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/libvirtd.libxl
+rm -rf %{buildroot}%{_sysconfdir}/logrotate.d/libvirtd.libxl
 
 # We're building with '--without-lxc'
-rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/libvirtd.lxc
+rm -rf %{buildroot}%{_sysconfdir}/logrotate.d/libvirtd.lxc
 
 %find_lang %{name}
 
@@ -603,7 +611,7 @@ fi
 if [ -f %{_localstatedir}/lib/rpm-state/libvirt/restart ]; then
     # See if user has previously modified their install to
     # tell libvirtd to use --listen
-    grep -E '^LIBVIRTD_ARGS=.*--listen' /etc/sysconfig/libvirtd 1>/dev/null 2>&1
+    grep -E '^LIBVIRTD_ARGS=.*--listen' %{_sysconfdir}/sysconfig/libvirtd 1>/dev/null 2>&1
     if test $? = 0
     then
         # Then lets keep honouring --listen and *not* use
@@ -666,7 +674,7 @@ if test $1 -eq 1 && test ! -f %{_sysconfdir}/libvirt/qemu/networks/default.xml ;
         ;;
     esac
 
-    UUID=`/usr/bin/uuidgen`
+    UUID=`%{_bindir}/uuidgen`
     sed -e "s/${orig_sub}/${sub}/g" \
         -e "s,</name>,</name>\n  <uuid>$UUID</uuid>," \
          < %{_datadir}/libvirt/networks/default.xml \
@@ -708,9 +716,9 @@ getent group kvm >/dev/null || groupadd -f -g 36 -r kvm
 getent group qemu >/dev/null || groupadd -f -g 107 -r qemu
 if ! getent passwd qemu >/dev/null; then
   if ! getent passwd 107 >/dev/null; then
-    useradd -r -u 107 -g qemu -G kvm -d / -s /usr/sbin/nologin -c "qemu user" qemu
+    useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin -c "qemu user" qemu
   else
-    useradd -r -g qemu -G kvm -d / -s /usr/sbin/nologin -c "qemu user" qemu
+    useradd -r -g qemu -G kvm -d / -s %{_sbindir}/nologin -c "qemu user" qemu
   fi
 fi
 exit 0
@@ -786,7 +794,6 @@ exit 0
 %dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/filesystems/
 %dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/boot/
 %dir %attr(0711, root, root) %{_localstatedir}/cache/libvirt/
-
 
 %dir %attr(0755, root, root) %{_libdir}/libvirt/
 %dir %attr(0755, root, root) %{_libdir}/libvirt/connection-driver/
@@ -1050,31 +1057,31 @@ exit 0
 
 %changelog
 *   Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-3
--    Extending with subpackages using Fedora 33 spec (license: MIT).
--    Added subpackages:
-      - 'libvirt-admin',
-      - 'libvirt-bash-completion',
-      - 'libvirt-client',
-      - 'libvirt-daemon',
-      - 'libvirt-daemon-config-network',
-      - 'libvirt-daemon-config-nwfilter',
-      - 'libvirt-daemon-driver-interface',
-      - 'libvirt-daemon-driver-network',
-      - 'libvirt-daemon-driver-nodedev',
-      - 'libvirt-daemon-driver-nwfilter',
-      - 'libvirt-daemon-driver-qemu',
-      - 'libvirt-daemon-driver-secret',
-      - 'libvirt-daemon-driver-storage',
-      - 'libvirt-daemon-driver-storage-core',
-      - 'libvirt-daemon-driver-storage-disk',
-      - 'libvirt-daemon-driver-storage-logical',
-      - 'libvirt-daemon-driver-storage-mpath',
-      - 'libvirt-daemon-driver-storage-rbd',
-      - 'libvirt-daemon-driver-storage-scsi',
-      - 'libvirt-daemon-kvm',
-      - 'libvirt-libs',
-      - 'libvirt-lock-sanlock',
-      - 'libvirt-nss'.
+-   Extending with subpackages using Fedora 33 spec (license: MIT).
+-   Added subpackages:
+    - 'libvirt-admin',
+    - 'libvirt-bash-completion',
+    - 'libvirt-client',
+    - 'libvirt-daemon',
+    - 'libvirt-daemon-config-network',
+    - 'libvirt-daemon-config-nwfilter',
+    - 'libvirt-daemon-driver-interface',
+    - 'libvirt-daemon-driver-network',
+    - 'libvirt-daemon-driver-nodedev',
+    - 'libvirt-daemon-driver-nwfilter',
+    - 'libvirt-daemon-driver-qemu',
+    - 'libvirt-daemon-driver-secret',
+    - 'libvirt-daemon-driver-storage',
+    - 'libvirt-daemon-driver-storage-core',
+    - 'libvirt-daemon-driver-storage-disk',
+    - 'libvirt-daemon-driver-storage-logical',
+    - 'libvirt-daemon-driver-storage-mpath',
+    - 'libvirt-daemon-driver-storage-rbd',
+    - 'libvirt-daemon-driver-storage-scsi',
+    - 'libvirt-daemon-kvm',
+    - 'libvirt-libs',
+    - 'libvirt-lock-sanlock',
+    - 'libvirt-nss'.
 
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-2
 -   Use autosetup
