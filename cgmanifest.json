@@ -246,7 +246,7 @@
         "other": {
           "name": "augeas",
           "version": "1.12.0",
-          "downloadUrl": "https://download.augeas.net/augeas-1.12.0.tar.gz"
+          "downloadUrl": "http://download.augeas.net/augeas-1.12.0.tar.gz"
         }
       }
     },
@@ -4105,7 +4105,7 @@
         "type": "other",
         "other": {
           "name": "numad",
-          "version": "0.5",
+          "version": "0.5+20150602.aec1497e2b",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
         }
       }
