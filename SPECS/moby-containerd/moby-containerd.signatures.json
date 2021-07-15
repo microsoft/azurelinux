@@ -4,6 +4,6 @@
   "NOTICE": "2fdaf93393511be4091774d401986e318fc3f335352f8276758832e605f8758e",
   "containerd.service": "2449216ee019ebfcb5756a5ab701558425c7d444bab05e82d6ddabe3e0b097ef",
   "containerd.toml": "167fb1035c983638e56f4a20bb8e6bfe1fd280c8ca9ee00a7c7358a5ca3be9f5",
-  "moby-containerd-1.3.4+azure.tar.gz": "10cc5c901d1e74e457bd0bed606bb03ef39563ebce0d62e14793372055108ae3"
+  "moby-containerd-1.4.4+azure.tar.gz": "ec4b32f9a66bb9aa26f825c9cd333123732905c96c792a06efdabcae83cd1925"
  }
 }
