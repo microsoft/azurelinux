@@ -1,5 +1,6 @@
 %global pkgname util-macros
 %global debug_package %{nil}
+
 Summary:        X.Org X11 Autotools macros
 Name:           xorg-x11-util-macros
 Version:        1.19.2
@@ -10,12 +11,12 @@ Distribution:   Mariner
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/util/%{pkgname}-%{version}.tar.bz2
 
-Provides:       pkgconfig(xorg-macros) = %{version}-%{release}
-
 Requires:       autoconf
 Requires:       automake
 Requires:       libtool
 Requires:       pkg-config
+
+Provides:       pkgconfig(xorg-macros) = %{version}-%{release}
 
 BuildArch:      noarch
 
