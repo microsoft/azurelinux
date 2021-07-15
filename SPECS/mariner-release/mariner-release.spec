@@ -20,8 +20,8 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}%{_lib}
 
-echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}/etc/mariner-release
-echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}/etc/mariner-release
+echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
+echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="Mariner"

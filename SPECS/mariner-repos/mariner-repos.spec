@@ -66,8 +66,8 @@ Requires:       %{name} = %{version}-%{release}
 %{summary}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-export REPO_DIRECTORY="$RPM_BUILD_ROOT/etc/yum.repos.d"
+rm -rf %{buildroot}
+export REPO_DIRECTORY="%{buildroot}%{_sysconfdir}/yum.repos.d"
 install -d -m 755 $REPO_DIRECTORY
 install -m 644 %{SOURCE2} $REPO_DIRECTORY
 install -m 644 %{SOURCE3} $REPO_DIRECTORY
@@ -77,14 +77,14 @@ install -m 644 %{SOURCE6} $REPO_DIRECTORY
 install -m 644 %{SOURCE7} $REPO_DIRECTORY
 install -m 644 %{SOURCE8} $REPO_DIRECTORY
 
-export RPM_GPG_DIRECTORY="$RPM_BUILD_ROOT/etc/pki/rpm-gpg"
+export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
 install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %posttrans
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
