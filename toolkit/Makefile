@@ -117,7 +117,7 @@ BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
 ifeq ($(BUILD_NUMBER),)
         BUILD_NUMBER = non-git
 endif
-RELEASE_MAJOR_ID   ?= 1.0
+RELEASE_MAJOR_ID   ?= 2.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
 ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
