@@ -45,7 +45,7 @@ Development files for iSNS
 
 %build
 %configure --enable-shared --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
 make install DESTDIR=%{buildroot}

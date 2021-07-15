@@ -1063,6 +1063,7 @@ exit 0
     - 'libvirt-daemon-driver-storage',
     - 'libvirt-daemon-driver-storage-core',
     - 'libvirt-daemon-driver-storage-disk',
+    - 'libvirt-daemon-driver-storage-iscsi',
     - 'libvirt-daemon-driver-storage-logical',
     - 'libvirt-daemon-driver-storage-mpath',
     - 'libvirt-daemon-driver-storage-rbd',

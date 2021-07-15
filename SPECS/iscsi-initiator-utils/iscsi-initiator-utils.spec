@@ -1,10 +1,10 @@
 %global __provides_exclude_from ^(%{python2_sitearch}/.*\\.so|%{python3_sitearch}/.*\\.so)$
 
 # Use only 7-10 first characters of the git commit hash!
-%global git_commit			      4440e57a59c7f1c23bbfdcb10844017f478918b6
-%global git_short_commit		  4440e57a59
+%global git_commit            4440e57a59c7f1c23bbfdcb10844017f478918b6
+%global git_short_commit      4440e57a59
 %global git_short_commit_date 20191114
-%global open_iscsi_build	    0
+%global open_iscsi_build      0
 %global open_iscsi_version    2.1
 
 Summary:        iSCSI daemon and utility programs
@@ -196,19 +196,19 @@ popd
 %systemd_post iscsi.service iscsi-shutdown.service iscsid.service iscsid.socket
 
 if [ $1 -eq 1 ]; then
-	if [ ! -f %{_sysconfdir}/iscsi/initiatorname.iscsi ]; then
-		echo "InitiatorName=`%{_sbindir}/iscsi-iname`" > %{_sysconfdir}/iscsi/initiatorname.iscsi
-	fi
-	# enable socket activation and persistant session startup by default
-	/bin/systemctl enable iscsi.service >/dev/null 2>&1 || :
-	/bin/systemctl enable iscsid.socket >/dev/null 2>&1 || :
+  if [ ! -f %{_sysconfdir}/iscsi/initiatorname.iscsi ]; then
+    echo "InitiatorName=`%{_sbindir}/iscsi-iname`" > %{_sysconfdir}/iscsi/initiatorname.iscsi
+  fi
+  # enable socket activation and persistant session startup by default
+  /bin/systemctl enable iscsi.service >/dev/null 2>&1 || :
+  /bin/systemctl enable iscsid.socket >/dev/null 2>&1 || :
 fi
 
 %post iscsiuio
 %systemd_post iscsiuio.service iscsiuio.socket
 
 if [ $1 -eq 1 ]; then
-	/bin/systemctl enable iscsiuio.socket >/dev/null 2>&1 || :
+  /bin/systemctl enable iscsiuio.socket >/dev/null 2>&1 || :
 fi
 
 %preun
