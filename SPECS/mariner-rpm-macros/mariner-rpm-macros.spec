@@ -112,7 +112,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Thu Jul 8 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+* Thu Jul 08 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Version update for 2.0.
 
 * Tue Jun 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-17
