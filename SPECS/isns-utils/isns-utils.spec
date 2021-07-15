@@ -84,7 +84,8 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 
 
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{_sbindir}/isnsd
 %{_sbindir}/isnsadm
 %{_sbindir}/isnsdd

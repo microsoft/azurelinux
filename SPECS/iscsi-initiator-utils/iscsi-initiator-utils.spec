@@ -8,9 +8,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-# Disable python2 build by default
-%bcond_with python2
-
 Summary: iSCSI daemon and utility programs
 Name: iscsi-initiator-utils
 Version: 6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
@@ -63,7 +60,6 @@ Requires(postun): systemd
 # Old NetworkManager expects the dispatcher scripts in a different place
 Conflicts: NetworkManager < 1.20
 
-%global _hardened_build 1
 %global __provides_exclude_from ^(%{python2_sitearch}/.*\\.so|%{python3_sitearch}/.*\\.so)$
 
 %description
@@ -88,19 +84,6 @@ Requires: %{name} = %{version}-%{release}
 %description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-%if %{with python2}
-%package -n python2-%{name}
-%{?python_provide:%python_provide python2-%{name}}
-Summary: Python %{python2_version} bindings to %{name}
-Requires: %{name} = %{version}-%{release}
-BuildRequires: python2-devel
-BuildRequires: python2-setuptools
-
-%description -n python2-%{name}
-The %{name}-python2 package contains Python %{python2_version} bindings to the
-libiscsi interface for interacting with %{name}
-%endif # with python2
 
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-%{name}}
@@ -130,20 +113,23 @@ autoreconf --install
 %{configure}
 cd ..
 
+# Faking Doxygen's existence. No config option to disable its usage.
+cat << EOF >> %{_bindir}/doxygen
+#!/bin/bash
+if [[ -n "$1" ]]; then
+  echo "Pretending to be 'doxygen' for '$1'."
+fi
+EOF
+chmod +x %{_bindir}/doxygen
+
 %{__make} OPTFLAGS="%{optflags} %{?__global_ldflags}"
 pushd libiscsi
-%if %{with python2}
-%py2_build
-%endif # with python2
 %py3_build
-touch -r libiscsi.doxy html/*
 popd
 
 
 %install
 %{__make} DESTDIR=%{?buildroot} install_programs install_doc install_etc install_libopeniscsiusr
-# upstream makefile doesn't get everything the way we like it
-#rm $RPM_BUILD_ROOT%{_sbindir}/iscsi_discovery
 rm $RPM_BUILD_ROOT%{_mandir}/man8/iscsi_discovery.8
 rm $RPM_BUILD_ROOT%{_mandir}/man8/iscsi_fw_login.8
 %{__install} -pm 755 usr/iscsistart $RPM_BUILD_ROOT%{_sbindir}
@@ -188,14 +174,8 @@ touch $RPM_BUILD_ROOT/var/lock/iscsi/lock
 %{__install} -d $RPM_BUILD_ROOT%{_includedir}
 %{__install} -pm 644 libiscsi/libiscsi.h $RPM_BUILD_ROOT%{_includedir}
 
-%if %{with python2}
-%{__install} -d $RPM_BUILD_ROOT%{python2_sitearch}
-%endif # with python2
 %{__install} -d $RPM_BUILD_ROOT%{python3_sitearch}
 pushd libiscsi
-%if %{with python2}
-%py2_install
-%endif # with python2
 %py3_install
 popd
 
@@ -258,8 +238,8 @@ fi
 
 
 %files
-%doc README
 %license COPYING
+%doc README
 %dir %{_sharedstatedir}/iscsi
 %dir %{_sharedstatedir}/iscsi/nodes
 %dir %{_sharedstatedir}/iscsi/isns
@@ -304,14 +284,8 @@ fi
 %{_mandir}/man8/iscsiuio.8.gz
 
 %files devel
-%doc libiscsi/html
 %{_libdir}/libiscsi.so
 %{_includedir}/libiscsi.h
-
-%if %{with python2}
-%files -n python2-%{name}
-%{python2_sitearch}/*
-%endif # with python2
 
 %files -n python3-%{name}
 %{python3_sitearch}/*
@@ -321,7 +295,7 @@ fi
 - Changed release to a simple integer.
 - Switched versioning to closer follow Fedora's guidelines for snapshots.
 - Using '%%autosetup' and the '%%make_build' macro instead of 'make'.
-- Removed BR on 'doxygen'.
+- Removed BR on 'doxygen' and Python 2 bits.
 - Added the '%%license' macro.
 - License verified.
 
