@@ -1,7 +1,7 @@
 # Use only 7-10 first characters of the git commit hash!
-%define git_commit aec1497e2b29f57997ae27351ac01abc25026387
-%define git_short_commit %(c=%{git_commit}; echo ${c:0:10})
-%define git_short_commit_date 20150602
+%define git_commit              aec1497e2b29f57997ae27351ac01abc25026387
+%define git_short_commit        aec1497e2b
+%define git_short_commit_date   20150602
 
 Summary:        NUMA user daemon
 Name:           numad
