@@ -174,8 +174,8 @@ install -pm 644 etc/systemd/iscsiuio.socket %{buildroot}%{_unitdir}
 install -d %{buildroot}%{_libexecdir}
 install -pm 755 etc/systemd/iscsi-mark-root-nodes %{buildroot}%{_libexecdir}
 
-install -d %{buildroot}%{_lib}/NetworkManager/dispatcher.d
-install -pm 755 %{SOURCE4} %{buildroot}%{_lib}/NetworkManager/dispatcher.d
+install -d %{buildroot}%{_libdir}/NetworkManager/dispatcher.d
+install -pm 755 %{SOURCE4} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d
 
 install -d %{buildroot}%{_tmpfilesdir}
 install -pm 644 %{SOURCE5} %{buildroot}%{_tmpfilesdir}/iscsi.conf
@@ -265,7 +265,7 @@ fi
 %{_unitdir}/iscsid.service
 %{_unitdir}/iscsid.socket
 %{_libexecdir}/iscsi-mark-root-nodes
-%{_lib}/NetworkManager
+%{_libdir}/NetworkManager
 %{_tmpfilesdir}/iscsi.conf
 %dir %{_sysconfdir}/iscsi
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/iscsi/iscsid.conf
