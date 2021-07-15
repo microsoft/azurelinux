@@ -2154,6 +2154,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "iscsi-initiator-utils",
+          "version": "6.2.1.0+20191114.4440e57a59",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/4440e57a59c7f1c23bbfdcb10844017f478918b6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isns-utils",
+          "version": "0.97",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.97.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "itstool",
           "version": "2.0.6",
           "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.6.tar.bz2"

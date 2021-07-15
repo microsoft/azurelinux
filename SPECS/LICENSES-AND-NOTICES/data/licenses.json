@@ -46,6 +46,8 @@
                 "hyperv-daemons",
                 "ipmitool",
                 "ipv6calc",
+                "iscsi-initiator-utils",
+                "isns-utils",
                 "javapackages-tools",
                 "jemalloc",
                 "kde-settings",
