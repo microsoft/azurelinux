@@ -1,20 +1,23 @@
+# Use only 7-10 first characters of the git commit hash!
+%global git_commit			      4440e57a59c7f1c23bbfdcb10844017f478918b6
+%global git_short_commit		  %(c=%{git_commit}; echo ${c:0:10})
+%global git_short_commit_date 20191114
+%global open_iscsi_version    2.1
+%global open_iscsi_build	    0
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global open_iscsi_version	2.1
-%global open_iscsi_build	0
-%global commit0			4440e57a59c7f1c23bbfdcb10844017f478918b6
-%global shortcommit0		%(c=%{commit0}; echo ${c:0:7})
 
 # Disable python2 build by default
 %bcond_with python2
 
 Summary: iSCSI daemon and utility programs
 Name: iscsi-initiator-utils
-Version: 6.%{open_iscsi_version}.%{open_iscsi_build}
-Release: 3.git%{shortcommit0}%{?dist}
+Version: 6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
+Release: 4%{?dist}
 License: GPLv2+
 URL: http://www.open-iscsi.org
-Source0: https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{shortcommit0}.tar.gz
+Source0: https://github.com/open-iscsi/open-iscsi/archive/%{git_commit}.tar.gz#/open-iscsi-%{version}.tar.gz
 Source4: 04-iscsi
 Source5: iscsi-tmpfiles.conf
 
@@ -48,7 +51,7 @@ Patch0024: fix-libpath.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1774746
 Patch1000: 0001-configuration-support-for-CHAP-algorithms-rebased.patch
 
-BuildRequires: flex bison doxygen kmod-devel systemd-units
+BuildRequires: flex bison kmod-devel systemd-units
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel
 BuildRequires: isns-utils-devel
 BuildRequires: systemd-devel
@@ -68,27 +71,6 @@ The iscsi package provides the server daemon for the iSCSI protocol,
 as well as the utility programs used to manage it. iSCSI is a protocol
 for distributed disk access using SCSI commands sent over Internet
 Protocol networks.
-
-# I don't think we're ready to expose these just yet
-# For now just add the needed library to the base package
-
-#%package -n libopeniscsiusr
-#Summary: library providing access to Open-iSCSI initiator functionality
-#Group: Development/Libraries
-#License: BSD
-
-#%description -n libopeniscsiusr
-#The libopeniscsiusr library provides a C API for access to the Open-iSCSI
-#initiator. It is used by the Open-iSCSI command line tools.
-
-#%package -n libopeniscsiusr-devel
-#Summary: Development files for libopeniscsiusr
-#Group: Development/Libraries
-#Requires: libopeniscsiusr = %{version}-%{release}
-
-#%description -n libopeniscsiusr-devel
-#The libopeniscsiusr-devel package contains libraries and header files for
-#developing applications that use libopeniscsiusr.
 
 %package iscsiuio
 Summary: Userspace configuration daemon required for some iSCSI hardware
@@ -132,7 +114,7 @@ The %{name}-python3 package contains Python %{python3_version} bindings to the
 libiscsi interface for interacting with %{name}
 
 %prep
-%autosetup -p1 -n open-iscsi-%{commit0}
+%autosetup -p1 -n open-iscsi-%{git_commit}
 
 # change exec_prefix, there's no easy way to override
 %{__sed} -i -e 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
@@ -277,6 +259,7 @@ fi
 
 %files
 %doc README
+%license COPYING
 %dir %{_sharedstatedir}/iscsi
 %dir %{_sharedstatedir}/iscsi/nodes
 %dir %{_sharedstatedir}/iscsi/isns
@@ -313,17 +296,6 @@ fi
 %exclude %{_includedir}/libopeniscsiusr_session.h
 %exclude %{_libdir}/pkgconfig/libopeniscsiusr.pc
 
-# %files -n libopeniscsiusr
-# %{_libdir}/libopeniscsiusr.so.*
-#
-# %files -n libopeniscsiusr-devel
-# %{_libdir}/libopeniscsiusr.so
-# %{_includedir}/libopeniscsiusr.h
-# %{_includedir}/libopeniscsiusr_common.h
-# %{_includedir}/libopeniscsiusr_iface.h
-# %{_includedir}/libopeniscsiusr_session.h
-# %{_libdir}/pkgconfig/libopeniscsiusr.pc
-
 %files iscsiuio
 %{_sbindir}/iscsiuio
 %{_unitdir}/iscsiuio.service
@@ -345,7 +317,16 @@ fi
 %{python3_sitearch}/*
 
 %changelog
+* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.2.1.0+20191114.4440e57a59-4
+- Changed release to a simple integer.
+- Switched versioning to closer follow Fedora's guidelines for snapshots.
+- Using '%%autosetup' and the '%%make_build' macro instead of 'make'.
+- Removed BR on 'doxygen'.
+- Added the '%%license' macro.
+- License verified.
+
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 6.2.1.0-3.git4440e57
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add fix-libpath.patch to fix installation path to /usr/lib instead of /usr/lib64
 
 * Sun Mar 01 2020 Adam Williamson <awilliam@redhat.com> - 6.2.1.0-2.git4440e57
