@@ -3,7 +3,6 @@
 %define qemu_group  qemu
 
 %bcond_with gluster
-%bcond_with iscsi
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
@@ -29,6 +28,7 @@ BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  gnutls-devel
+BuildRequires:  iscsi-initiator-utils
 BuildRequires:  libacl-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libnl3-devel
@@ -57,9 +57,6 @@ BuildRequires:  yajl-devel
 %if 0%{with gluster}
 BuildRequires:  glusterfs-api-devel >= 3.4.1
 BuildRequires:  glusterfs-devel >= 3.4.1
-%endif
-%if 0%{with iscsi}
-BuildRequires:  iscsi-initiator-utils
 %endif
 
 Requires:       %{name}-client = %{version}-%{release}
@@ -261,9 +258,7 @@ Requires:       %{name}-daemon-driver-storage-logical = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
-%if 0%{with iscsi}
 Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
-%endif
 %if 0%{with gluster}
 Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
 %endif
@@ -314,7 +309,6 @@ The storage driver backend adding implementation of the storage APIs for gluster
 volumes using libgfapi.
 %endif
 
-%if 0%{with iscsi}
 %package daemon-driver-storage-iscsi
 Summary:        Storage driver plugin for iscsi
 
@@ -325,7 +319,6 @@ Requires:       iscsi-initiator-utils
 %description daemon-driver-storage-iscsi
 The storage driver backend adding implementation of the storage APIs for iscsi
 volumes using the host iscsi stack.
-%endif
 
 %package daemon-driver-storage-logical
 Summary:        Storage driver plugin for lvm volumes
@@ -494,9 +487,7 @@ cd %{_vpath_builddir}
 %if 0%{with gluster}
     --with-storage-gluster \
 %endif
-%if 0%{with iscsi}
     --with-storage-iscsi \
-%endif
     --with-storage-lvm \
     --with-storage-mpath \
     --with-storage-rbd \
@@ -954,10 +945,8 @@ exit 0
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_gluster.so
 %endif
 
-%if 0%{with iscsi}
 %files daemon-driver-storage-iscsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_iscsi.so
-%endif
 
 %files daemon-driver-storage-logical
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_logical.so
