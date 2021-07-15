@@ -32,7 +32,7 @@ This is an ingress controller that can be run on Azure Kubernetes Service (AKS) 
 to act as the ingress for an AKS cluster. 
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 rm -rf vendor
