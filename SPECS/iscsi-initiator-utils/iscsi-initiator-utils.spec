@@ -302,7 +302,7 @@ fi
 %{python3_sitearch}/*
 
 %changelog
-* Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.2.1.0+20191114.4440e57a59-4
+* Thu Jul 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.2.1.0+20191114.4440e57a59-4
 - Changed release to a simple integer.
 - Switched versioning to closer follow Fedora's guidelines for snapshots.
 - Removed BR on 'doxygen' and Python 2 bits.

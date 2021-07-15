@@ -1,8 +1,7 @@
+Summary:        The iSNS daemon and utility programs
 Name:           isns-utils
 Version:        0.97
 Release:        10%{?dist}
-Summary:        The iSNS daemon and utility programs
-
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,12 +9,16 @@ URL:            https://github.com/open-iscsi/open-isns
 Source0:        https://github.com/open-iscsi/open-isns/archive/v%{version}.tar.gz#/open-isns-%{version}.tar.gz
 Source1:        isnsd.service
 
+BuildRequires:  automake
 BuildRequires:  gcc
-BuildRequires:  openssl-devel automake pkgconfig systemd-devel systemd
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
+BuildRequires:  openssl-devel
+BuildRequires:  pkg-config
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
 
+Requires(post): systemd-units
+Requires(postun): systemd-units
+Requires(preun): systemd-units
 
 %description
 The iSNS package contains the daemon and tools to setup a iSNS server,
@@ -24,27 +27,25 @@ allows automated discovery, management and configuration of iSCSI and
 Fibre Channel devices (using iFCP gateways) on a TCP/IP network.
 
 %package libs
-Summary: Shared library files for iSNS
+Summary:        Shared library files for iSNS
 
 %description libs
 Shared library files for iSNS
 
 %package devel
-Summary: Development files for iSNS
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Development files for iSNS
+
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 Development files for iSNS
 
-
 %prep
-%setup -q -n open-isns-%{version}
-
+%autosetup -n open-isns-%{version}
 
 %build
 %configure --enable-shared --disable-static
 make %{?_smp_mflags}
-
 
 %install
 make install DESTDIR=%{buildroot}
@@ -56,32 +57,26 @@ rm %{buildroot}%{_unitdir}/isnsd.service
 rm %{buildroot}%{_unitdir}/isnsd.socket
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 
-
 %post
 %systemd_post isnsd.service
-
 
 %postun
 %systemd_postun isnsd.service
 
-
 %preun
 %systemd_preun isnsd.service
-
 
 %triggerun -- isns-utils < 0.91-7
 # Save the current service runlevel info
 # User must manually run systemd-sysv-convert --apply httpd
 # to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save isnsd >/dev/null 2>&1 ||:
+%{_bindir}/systemd-sysv-convert --save isnsd >/dev/null 2>&1 ||:
 
 # Run these because the SysV package being removed won't do them
 /sbin/chkconfig --del isnsd >/dev/null 2>&1 || :
 /bin/systemctl try-restart isnsd.service >/dev/null 2>&1 || :
 
-
 %ldconfig_scriptlets -n %{name}-libs
-
 
 %files
 %license COPYING
@@ -93,7 +88,7 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %{_mandir}/man8/*
 %{_unitdir}/isnsd.service
 %dir %{_sysconfdir}/isns
-%dir %{_var}/lib/isns
+%dir %{_sharedstatedir}/isns
 %config(noreplace) %{_sysconfdir}/isns/*
 
 %files libs
@@ -104,8 +99,13 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %{_includedir}/libisns/*.h
 %{_libdir}/libisns.so
 
-
 %changelog
+* Thu Jul 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.97-11
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Added the '%%license' macro.
+- Using '%%autosetup' and the '%%make_build' macro instead of 'make'.
+- License verified.
+
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.97-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
