@@ -1,0 +1,28 @@
+diff -rup yajl-2.1.0.orig/reformatter/CMakeLists.txt yajl-2.1.0.new/reformatter/CMakeLists.txt
+--- yajl-2.1.0.orig/reformatter/CMakeLists.txt	2014-03-19 04:58:29.000000000 +0000
++++ yajl-2.1.0.new/reformatter/CMakeLists.txt	2014-04-28 11:36:11.909478329 +0100
+@@ -26,7 +26,7 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_BINARY_
+ 
+ ADD_EXECUTABLE(json_reformat ${SRCS})
+ 
+-TARGET_LINK_LIBRARIES(json_reformat yajl_s)
++TARGET_LINK_LIBRARIES(json_reformat yajl)
+ 
+ # In some environments, we must explicitly link libm (like qnx,
+ # thanks @shahbag)
+Only in yajl-2.1.0.new/reformatter: CMakeLists.txt.orig
+Only in yajl-2.1.0.new/src: CMakeLists.txt~
+Only in yajl-2.1.0.new/test/api: run_tests.sh~
+Only in yajl-2.1.0.new/test/parsing: run_tests.sh~
+diff -rup yajl-2.1.0.orig/verify/CMakeLists.txt yajl-2.1.0.new/verify/CMakeLists.txt
+--- yajl-2.1.0.orig/verify/CMakeLists.txt	2014-03-19 04:58:29.000000000 +0000
++++ yajl-2.1.0.new/verify/CMakeLists.txt	2014-04-28 11:36:11.909478329 +0100
+@@ -26,7 +26,7 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_BINARY_
+ 
+ ADD_EXECUTABLE(json_verify ${SRCS})
+ 
+-TARGET_LINK_LIBRARIES(json_verify yajl_s)
++TARGET_LINK_LIBRARIES(json_verify yajl)
+ 
+ # copy in the binary
+ GET_TARGET_PROPERTY(binPath json_verify LOCATION)

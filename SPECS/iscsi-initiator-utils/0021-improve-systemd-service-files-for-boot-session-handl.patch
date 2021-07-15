@@ -1,0 +1,130 @@
+From 77150edd697669467ff9f8775b93bd9d7a34cadf Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 28 Oct 2019 10:20:56 -0700
+Subject: [PATCH] improve systemd service files for boot session handling
+
+---
+ etc/systemd/iscsi-mark-root-nodes  |  6 +++++-
+ etc/systemd/iscsi-onboot.service   | 15 +++++++++++++++
+ etc/systemd/iscsi-shutdown.service |  1 +
+ etc/systemd/iscsi.service          | 11 ++++-------
+ etc/systemd/iscsid.service         |  4 +---
+ etc/systemd/iscsiuio.service       |  1 -
+ 6 files changed, 26 insertions(+), 12 deletions(-)
+ create mode 100644 etc/systemd/iscsi-onboot.service
+
+diff --git a/etc/systemd/iscsi-mark-root-nodes b/etc/systemd/iscsi-mark-root-nodes
+index c693707..9d48805 100755
+--- a/etc/systemd/iscsi-mark-root-nodes
++++ b/etc/systemd/iscsi-mark-root-nodes
+@@ -9,7 +9,11 @@ while read t num p target flash; do
+   portal=${p%,*}
+   transport=${t%:}
+ 
+-  $ISCSIADM -m node -p $portal -T $target -o update -n node.startup -v onboot
++  # use session number to find the iface name in use
++  num=${num#[}; num=${num%]}
++  iface=$(iscsiadm -m session -r $num | grep iface.iscsi_ifacename | cut -d= -f2)
++
++  $ISCSIADM -m node -p $portal -T $target -I $iface -o update -n node.startup -v onboot
+ 
+   start_iscsid=1
+ 
+diff --git a/etc/systemd/iscsi-onboot.service b/etc/systemd/iscsi-onboot.service
+new file mode 100644
+index 0000000..42ced68
+--- /dev/null
++++ b/etc/systemd/iscsi-onboot.service
+@@ -0,0 +1,15 @@
++[Unit]
++Description=Special handling of early boot iSCSI sessions
++Documentation=man:iscsiadm(8) man:iscsid(8)
++DefaultDependencies=no
++RefuseManualStart=true
++Before=iscsi.service
++After=systemd-remount-fs.service
++ConditionDirectoryNotEmpty=/sys/class/iscsi_session
++
++[Service]
++Type=oneshot
++ExecStart=-/usr/libexec/iscsi-mark-root-nodes
++
++[Install]
++WantedBy=sysinit.target
+diff --git a/etc/systemd/iscsi-shutdown.service b/etc/systemd/iscsi-shutdown.service
+index 69c1c77..caee933 100644
+--- a/etc/systemd/iscsi-shutdown.service
++++ b/etc/systemd/iscsi-shutdown.service
+@@ -11,4 +11,5 @@ RefuseManualStop=yes
+ [Service]
+ Type=oneshot
+ RemainAfterExit=true
++ExecStart=-/usr/bin/true
+ ExecStop=-/usr/sbin/iscsiadm -m node --logoutall=all
+diff --git a/etc/systemd/iscsi.service b/etc/systemd/iscsi.service
+index eadfcec..175cb2c 100644
+--- a/etc/systemd/iscsi.service
++++ b/etc/systemd/iscsi.service
+@@ -1,21 +1,18 @@
+ [Unit]
+ Description=Login and scanning of iSCSI devices
+-Documentation=man:iscsid(8) man:iscsiadm(8)
++Documentation=man:iscsiadm(8) man:iscsid(8)
+ DefaultDependencies=no
+-Conflicts=shutdown.target
+-After=systemd-remount-fs.service network.target iscsid.service iscsiuio.service
+ Before=remote-fs-pre.target
++After=network.target network-online.target iscsid.service iscsiuio.service systemd-remount-fs.service
+ Wants=remote-fs-pre.target iscsi-shutdown.service
+-ConditionDirectoryNotEmpty=|/var/lib/iscsi/nodes
+-ConditionDirectoryNotEmpty=|/sys/class/iscsi_session
++ConditionDirectoryNotEmpty=/var/lib/iscsi/nodes
+ 
+ [Service]
+ Type=oneshot
+ RemainAfterExit=true
+-ExecStart=-/usr/libexec/iscsi-mark-root-nodes
+ ExecStart=-/usr/sbin/iscsiadm -m node --loginall=automatic
+ ExecReload=-/usr/sbin/iscsiadm -m node --loginall=automatic
+ SuccessExitStatus=21
+ 
+ [Install]
+-WantedBy=sysinit.target
++WantedBy=remote-fs.target
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 8d50cf0..28402fb 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -1,8 +1,7 @@
+ [Unit]
+ Description=Open-iSCSI
+-Documentation=man:iscsid(8) man:iscsiadm(8)
++Documentation=man:iscsid(8) man:iscsiuio(8) man:iscsiadm(8)
+ DefaultDependencies=no
+-Conflicts=shutdown.target
+ After=network.target iscsiuio.service
+ Before=remote-fs-pre.target
+ 
+@@ -10,7 +9,6 @@ Before=remote-fs-pre.target
+ Type=notify
+ NotifyAccess=main
+ ExecStart=/usr/sbin/iscsid -f
+-ExecStop=/usr/sbin/iscsiadm -k 0 2
+ KillMode=mixed
+ Restart=on-failure
+ 
+diff --git a/etc/systemd/iscsiuio.service b/etc/systemd/iscsiuio.service
+index 8620cde..fc0be93 100644
+--- a/etc/systemd/iscsiuio.service
++++ b/etc/systemd/iscsiuio.service
+@@ -2,7 +2,6 @@
+ Description=iSCSI UserSpace I/O driver
+ Documentation=man:iscsiuio(8)
+ DefaultDependencies=no
+-Conflicts=shutdown.target
+ Requires=iscsid.service
+ BindTo=iscsid.service
+ After=network.target
+-- 
+2.21.0
+

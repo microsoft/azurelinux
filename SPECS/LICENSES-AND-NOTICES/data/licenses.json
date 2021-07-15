@@ -10,10 +10,10 @@
             "origin": "Fedora",
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
-                "ant-contrib",
                 "at",
                 "atf",
                 "attr",
+                "augeas",
                 "autoconf213",
                 "babeltrace2",
                 "bmake",
@@ -42,9 +42,12 @@
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
+                "hwdata",
                 "hyperv-daemons",
                 "ipmitool",
                 "ipv6calc",
+                "iscsi-initiator-utils",
+                "isns-utils",
                 "javapackages-tools",
                 "jemalloc",
                 "kde-settings",
@@ -65,15 +68,17 @@
                 "libisoburn",
                 "libisofs",
                 "libkcapi",
+                "libpciaccess",
                 "libpwquality",
                 "libstoragemgmt",
+                "libvirt",
                 "libxcrypt",
                 "mokutil",
                 "mozjs60",
                 "open-vm-tools",
                 "openssl",
-                "patchelf",
                 "p11-kit",
+                "patchelf",
                 "perl-JSON",
                 "pkgconf",
                 "pugixml",
@@ -88,6 +93,7 @@
                 "qt5-qttools",
                 "qt5-rpm-macros",
                 "rdma-core",
+                "sanlock",
                 "sgml-common",
                 "squashfs-tools",
                 "uclibc-ng",
@@ -95,6 +101,8 @@
                 "websocketpp",
                 "words",
                 "xmlstarlet",
+                "xorg-x11-util-macros",
+                "yajl",
                 "yaml-cpp",
                 "yasm",
                 "zipper"
@@ -762,6 +770,13 @@
             "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
             "specs": [
                 "ceph"
+            ]
+        },
+        {
+            "origin": "Numad source",
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
             ]
         }
     ]

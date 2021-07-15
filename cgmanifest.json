@@ -244,6 +244,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "augeas",
+          "version": "1.12.0",
+          "downloadUrl": "http://download.augeas.net/augeas-1.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "auoms",
           "version": "2.2.5",
           "downloadUrl": "https://github.com/microsoft/OMS-Auditd-Plugin/archive/v2.2.5-0.tar.gz"
@@ -1954,6 +1964,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hwdata",
+          "version": "0.341",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyperv-daemons",
           "version": "5.10.28.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
@@ -2127,6 +2147,26 @@
           "name": "irqbalance",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "iscsi-initiator-utils",
+          "version": "6.2.1.0+20191114.4440e57a59",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/4440e57a59c7f1c23bbfdcb10844017f478918b6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isns-utils",
+          "version": "0.97",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.97.tar.gz"
         }
       }
     },
@@ -2997,6 +3037,16 @@
           "name": "libpcap",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpciaccess",
+          "version": "0.16",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
         }
       }
     },
@@ -4067,6 +4117,16 @@
           "name": "numactl",
           "version": "2.0.13",
           "downloadUrl": "https://github.com/numactl/numactl/releases/download/v2.0.13/numactl-2.0.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "numad",
+          "version": "0.5+20150602.aec1497e2b",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
         }
       }
     },
@@ -6924,6 +6984,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sanlock",
+          "version": "3.8.1",
+          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "scons",
           "version": "3.0.1",
           "downloadUrl": "http://downloads.sourceforge.net/scons/scons-3.0.1.tar.gz"
@@ -7654,9 +7724,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-util-macros",
+          "version": "1.19.2",
+          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.19.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xz",
           "version": "5.2.4",
           "downloadUrl": "http://tukaani.org/xz/xz-5.2.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "yajl",
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/lloyd/yajl/archive/refs/tags/2.1.0.tar.gz"
         }
       }
     },
