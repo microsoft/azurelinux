@@ -1,0 +1,29 @@
+From 4142125fa296d21a307fb2370b2d4d7e8487f22c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 16 Oct 2019 23:17:20 -0700
+Subject: [PATCH] fix upstream build breakage of iscsiuio LDFLAGS
+
+---
+ iscsiuio/configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/iscsiuio/configure.ac b/iscsiuio/configure.ac
+index b41df0e..a856cc5 100644
+--- a/iscsiuio/configure.ac
++++ b/iscsiuio/configure.ac
+@@ -67,10 +67,10 @@ AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
+ AC_ARG_WITH([systemd],
+ 	    AS_HELP_STRING([--without-systemd], [Build without systemd]),
+     [case "${withval}" in
+-     yes) LDFLAGS="`pkg-config --libs libsystemd`" ;;
++     yes) LDFLAGS="${LDFLAGS} `pkg-config --libs libsystemd`" ;;
+      no)  CFLAGS="${CFLAGS} -DNO_SYSTEMD" ;;
+      *)   AC_MSG_ERROR([bad value $withval for --with-systemd]) ;;
+-     esac],[LDFLAGS="`pkg-config --libs libsystemd`"])
++     esac],[LDFLAGS="${LDFLAGS} `pkg-config --libs libsystemd`"])
+ 
+ AC_CONFIG_COMMANDS([default],[[
+     if [ -n "$SOURCE_DATE_EPOCH" ] ; then
+-- 
+2.21.0
+
