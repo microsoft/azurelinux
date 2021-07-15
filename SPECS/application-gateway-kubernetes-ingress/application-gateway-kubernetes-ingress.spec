@@ -1,4 +1,7 @@
 %global debug_package %{nil}
+# The commit corresponds to the project release version
+# Can be obtained by git rev-parse --short HEAD
+%define COMMIT 0e9dc17c
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
@@ -39,11 +42,9 @@ rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 
 export VERSION=%{version}
-export COMMIT=0e9dc17c
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
-export DATE=2021-07-14-18:05T+0000
 
-go build -ldflags "-s -X $VERSION_PATH.Version=$VERSION -X $VERSION_PATH.BuildDate=$DATE -X $VERSION_PATH.GitCommit=$COMMIT" -mod=vendor -v -o appgw-ingress ./cmd/appgw-ingress
+go build -ldflags "-s -X $VERSION_PATH.Version=$VERSION -X $VERSION_PATH.GitCommit=$COMMIT" -mod=vendor -v -o appgw-ingress ./cmd/appgw-ingress
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -58,3 +59,4 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %changelog
 * Mon Jul 12 2021 Henry Li <lihl@microsoft.com> - 1.4.0-1
 - Original version for CBL-Mariner.
+- License Verified.
