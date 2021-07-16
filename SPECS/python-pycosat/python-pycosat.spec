@@ -5,17 +5,15 @@ PicoSAT is a popular SAT solver written by Armin Biere in pure C. This \
 package provides efficient Python bindings to picosat on the C level, i.e. \
 when importing pycosat, the picosat solver becomes part of the Python process \
 itself.
-
 Summary:        %{sum}
 Name:           python-%{srcname}
 Version:        0.6.3
 Release:        15%{?dist}
 License:        MIT
-URL:            https://github.com/ContinuumIO/pycosat
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/ContinuumIO/pycosat
 Source0:        https://github.com/ContinuumIO/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
-
 BuildRequires:  gcc
 BuildRequires:  picosat-devel
 
@@ -23,17 +21,16 @@ BuildRequires:  picosat-devel
 %{pkgdesc}
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{sum}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 %{pkgdesc}
-
 
 %prep
 %setup -q -n %{srcname}-%{version}
@@ -58,7 +55,7 @@ pip3 install atomicwrites>=1.3.0 \
     pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v 
+    python%{python3_version} -m pytest -v
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
@@ -68,6 +65,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.6.3-15
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.3-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

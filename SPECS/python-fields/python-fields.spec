@@ -1,13 +1,12 @@
 %global srcname fields
-
 Summary:        Container class boilerplate killer
 Name:           python-%{srcname}
 Version:        5.0.0
 Release:        9%{?dist}
 License:        BSD
-URL:            https://github.com/ionelmc/python-fields
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/ionelmc/python-fields
 Source0:        https://github.com/ionelmc/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Compatibility with python-sphinx >= 1.3, already applied upstream
 Patch0:         %{name}-5.0.0-sphinx-1.3.patch
@@ -34,8 +33,8 @@ BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 HTML API documentation for the '%{srcname}' Python module.
 
 %package -n     python%{python3_pkgversion}-%{srcname}
-Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-sphinx
@@ -95,8 +94,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.0.0-9
-- Update cgmanifest and license info
-- Update check section
+- Update check section to use pytest module
+- License verified
 
 * Sun Oct 18 2020 Steve Laughman <steve.laughman@microsoft.com> - 5.0.0-8
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

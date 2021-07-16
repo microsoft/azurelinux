@@ -6,53 +6,44 @@
 %global eggname async_generator
 # package name fragment
 %global pkgname async-generator
-
 %global _description \
 This library generally tries hard to match the semantics of Python 3.6's native\
 async generators in every detail (PEP 525), with additional support for yield\
 from and for returning non-None values from an async generator (under the\
 theory that these may well be added to native async generators one day).
-
 Summary:        Async generators and context managers
 Name:           python-%{pkgname}
 Version:        1.10
 Release:        10%{?dist}
 License:        MIT or ASL 2.0
-URL:            https://github.com/python-trio/async_generator
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/python-trio/async_generator
 Source0:        https://files.pythonhosted.org/packages/ce/b6/6fa6b3b598a03cba5e80f829e0dadbb49d7645f523d209b2fb7ea0bbb02a/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
-
 %description %{_description}
 
-
 %package -n python%{python3_pkgversion}-%{pkgname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
-
 
 %description -n python%{python3_pkgversion}-%{pkgname} %{_description}
-
 
 %prep
 %autosetup -n %{srcname}-%{version}
 rm -r %{eggname}.egg-info
 
-
 %build
 %py3_build
 
-
 %install
 %py3_install
-
 
 %check
 pip3 install atomicwrites>=1.3.0 \
@@ -60,8 +51,8 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 
-python%{python3_version} -m pytest -v 
+    pytest-cov>=2.7.1
+python%{python3_version} -m pytest -v
 
 %files -n python%{python3_pkgversion}-%{pkgname}
 %license LICENSE LICENSE.MIT LICENSE.APACHE2
@@ -69,10 +60,10 @@ python%{python3_version} -m pytest -v
 %{python3_sitelib}/%{libname}
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
-
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.10-10
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.10-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

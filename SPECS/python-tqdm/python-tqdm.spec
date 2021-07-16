@@ -1,28 +1,25 @@
 %global srcname tqdm
-
-Summary:        Fast, Extensible Progress Meter
-Name:           python-%{srcname}
-Version:        4.50.2
-Release:        2%{?dist}
-License:        MPLv2.0 and MIT
-URL:            https://github.com/tqdm/tqdm
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-
-BuildArch:      noarch
-
 %global _description \
 tqdm (read taqadum, تقدّم) means "progress" in Arabic.\
 \
 Instantly make your loops show a smart progress meter - just wrap any iterable\
 with "tqdm(iterable)", and you are done!
+Summary:        Fast, Extensible Progress Meter
+Name:           python-%{srcname}
+Version:        4.50.2
+Release:        2%{?dist}
+License:        MPLv2.0 AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/tqdm/tqdm
+Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description %{_description}
 
 %package -n python3-%{srcname}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
+Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
@@ -53,6 +50,7 @@ mv -v %{buildroot}%{python3_sitelib}/%{srcname}/%{srcname}.1 %{buildroot}%{_mand
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.50.2-2
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- License verified
 
 * Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 4.50.2-1
 - Update to 4.50.2

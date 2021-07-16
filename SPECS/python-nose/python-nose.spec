@@ -1,11 +1,12 @@
 %global modname nose
-
+%global _description %{expand:
+A deprecated test runner for Python.
+See https://fedoraproject.org/wiki/Changes/DeprecateNose}
 Summary:        Deprecated test runner for Python
 Name:           python-%{modname}
 Version:        1.3.7
 Release:        31%{?dist}
-BuildArch:      noarch
-License:        LGPLv2+ and Public Domain
+License:        LGPLv2+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://nose.readthedocs.org/en/latest/
@@ -27,31 +28,24 @@ Patch3:         python-nose-readunicode.patch
 Patch4:         python-nose-py36.patch
 # Remove a SyntaxWarning (other projects may treat it as error)
 Patch5:         python-nose-py38.patch
-
 BuildRequires:  dos2unix
+BuildArch:      noarch
 
-%global _description %{expand:
-A deprecated test runner for Python.
-
-See https://fedoraproject.org/wiki/Changes/DeprecateNose}
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{modname}
+%{?python_provide:%python_provide python3-%{modname}}
 Summary:        %{summary}
+BuildRequires:  python3-coverage >= 3.4-1
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-coverage >= 3.4-1
 Requires:       python3-setuptools
-%{?python_provide:%python_provide python3-%{modname}}
 Conflicts:      python-%{modname} < %{version}-%{release}
-Obsoletes:      python-%{modname}-docs < 1.3.7-30
-
 # This package is deprecated, no new packages in Fedora can depend on it
 # https://fedoraproject.org/wiki/Changes/DeprecateNose
 # Contact the change owners for help migrating to pytest
 
-%description -n python3-%{modname} %_description
+%description -n python3-%{modname} %{_description}
 
 %prep
 %autosetup -p1 -n %{modname}-%{version}
@@ -71,8 +65,8 @@ ln -sf nosetests-3 %{buildroot}%{_bindir}/nosetests
 ln -sf nosetests-3.1 %{buildroot}%{_mandir}/man1/nosetests.1
 
 %check
-%{__python3} setup.py build_tests
-%{__python3} selftest.py
+python3 setup.py build_tests
+python3 selftest.py
 
 %files -n python3-%{modname}
 %license lgpl.txt
@@ -89,6 +83,7 @@ ln -sf nosetests-3.1 %{buildroot}%{_mandir}/man1/nosetests.1
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.3.7-31
 - Initial CBL-Mariner version imported from Fedora 32 (license: MIT)
+- License verified
 
 * Fri Jan 31 2020 Miro Hrončok <mhroncok@redhat.com> - 1.3.7-30
 - Deprecate the package

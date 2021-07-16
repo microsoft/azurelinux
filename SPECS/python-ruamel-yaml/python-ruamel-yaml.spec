@@ -1,15 +1,14 @@
 %global pypi_name ruamel.yaml
 %global srcname ruamel-yaml
 %global debug_package %{nil}
-
 Summary:        YAML 1.2 loader/dumper package for Python
 Name:           python-%{srcname}
 Version:        0.16.6
 Release:        6%{?dist}
 License:        MIT
-URL:            https://pypi.org/project/ruamel.yaml/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pypi.org/project/ruamel.yaml/
 # Repository lives on https://sourceforge.net/projects/ruamel-yaml/; however, the snapshot is an unreliable link
 Source0:        https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/%{pypi_name}-%{version}.tar.gz
 
@@ -18,19 +17,18 @@ ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
 It is a derivative of Kirill Simonov’s PyYAML 3.11
 
 %package -n     python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 Summary:        YAML 1.2 loader/dumper package for Python
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-typing
+Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
+Requires:       python%{python3_pkgversion}-setuptools
+Requires:       python%{python3_pkgversion}-typing
 # For tests
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
-
-Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
-Requires:       python%{python3_pkgversion}-setuptools
-Requires:       python%{python3_pkgversion}-typing
 
 %description -n python%{python3_pkgversion}-%{srcname}
 ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
@@ -44,10 +42,10 @@ rm -rf %{pypi_name}.egg-info
 %py3_build
 
 %install
-%{__python3} setup.py install --single-version-externally-managed --skip-build --root %{buildroot}
+python3 setup.py install --single-version-externally-managed --skip-build --root %{buildroot}
 
 %check
-# tests not included in the pypi source 
+# tests not included in the pypi source
 
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -60,6 +58,7 @@ rm -rf %{pypi_name}.egg-info
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.16.6-6
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.6-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

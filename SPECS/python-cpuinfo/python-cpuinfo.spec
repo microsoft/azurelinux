@@ -1,21 +1,20 @@
 %global srcname cpuinfo
 %global sum Getting CPU info
-
 Summary:        %{sum}
 Name:           python-%{srcname}
 Version:        7.0.0
 Release:        4%{?dist}
 License:        MIT
-URL:            https://github.com/workhorsy/py-cpuinfo
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/workhorsy/py-cpuinfo
 Source0:        https://files.pythonhosted.org/packages/source/p/py-%{srcname}/py-%{srcname}-%{version}.tar.gz
-BuildArch:      noarch
 # https://github.com/workhorsy/py-cpuinfo/issues/55
 # ExclusiveArch:  %%{ix86} x86_64 %%{power64} s390x noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -33,8 +32,8 @@ These approaches are used for getting info:
     Querying x86 CPUID register
 
 %package -n python3-%{srcname}
-Summary:        %{sum}
 %{?python_provide:%python_provide python3-%{srcname}}
+Summary:        %{sum}
 
 %description -n python3-%{srcname}
 Py-cpuinfo gets CPU info with pure Python. Py-cpuinfo should work without
@@ -81,8 +80,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 7.0.0-4
-- Update cgmanifest and license info
 - Update check section to use pytest
+- License verified
 
 * Sun Oct 18 2020 Steve Laughman <steve.laughman@microsoft.com> - 7.0.0-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

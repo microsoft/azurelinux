@@ -1,13 +1,12 @@
 %global srcname pytest-cov
-
 Summary:        Pytest plugin for coverage reporting
 Name:           python-%{srcname}
 Version:        2.10.1
 Release:        3%{?dist}
 License:        MIT
-URL:            https://pypi.python.org/pypi/pytest-cov
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pypi.python.org/pypi/pytest-cov
 #Source0:       https://github.com/pytest-dev/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -17,15 +16,15 @@ Py.test plugin for coverage reporting with support for both centralised and
 distributed testing, including subprocesses and multiprocessing for Python.
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        Pytest plugin for coverage reporting
+BuildRequires:  python%{python3_pkgversion}-coverage >= 4.4
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-coverage >= 4.4
 # For tests
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 Py.test plugin for coverage reporting with support for both centralised and
@@ -58,23 +57,7 @@ pip3 install atomicwrites>=1.3.0 \
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v \
-    -k "not test_dist_missing_data and not test_subprocess_with_path_aliasing and not test_dist_combine_racecondition and not central_subprocess and not dist_subprocess and not test_cover_looponfail " \
-    --deselect=tests/test_pytest_cov.py::test_central_coveragerc[branch2x] \
-    --deselect=tests/test_pytest_cov.py::test_central_coveragerc[branch1c] \
-    --deselect=tests/test_pytest_cov.py::test_central_coveragerc[branch1a] \
-    --deselect=tests/test_pytest_cov.py::test_central_coveragerc[nobranch] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch2x-nodist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch2x-xdist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch1c-nodist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch1c-xdist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch1a-nodist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[branch1a-xdist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[nobranch-nodist] \
-    --deselect=tests/test_pytest_cov.py::test_central_with_path_aliasing[nobranch-xdist] \
-    --deselect=tests/test_pytest_cov.py::test_show_missing_coveragerc[branch2x] \
-    --deselect=tests/test_pytest_cov.py::test_show_missing_coveragerc[branch1c] \
-    --deselect=tests/test_pytest_cov.py::test_show_missing_coveragerc[branch1a] \
-    --deselect=tests/test_pytest_cov.py::test_show_missing_coveragerc[nobranch] 
+    -k "not test_dist_missing_data and not test_subprocess_with_path_aliasing and not test_dist_combine_racecondition and not central_subprocess and not dist_subprocess and not test_cover_looponfail "
 
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -84,7 +67,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.10.1-3
-- Update cgmanifest and license info
+- Update check section to use pytest module
+- License verified
 
 * Mon Dec 07 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.10.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
@@ -197,8 +181,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Fri Nov 06 2015 Robert Kuska <rkuska@redhat.com> - 2.2.0-2
 - Rebuilt for Python3.5 rebuild
-
 - Skip tests for a python3 rebuild as it seems to be env failure
+
 * Mon Oct 5 2015 Orion Poplawski <orion@cora.nwra.com> - 2.2.0-1
 - Update to 2.2.0
 

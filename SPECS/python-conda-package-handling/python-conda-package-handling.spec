@@ -1,16 +1,14 @@
 %global srcname conda-package-handling
 %global pkgname conda_package_handling
-
 Summary:        Create and extract conda packages of various formats
 Name:           python-%{srcname}
 Version:        1.7.2
 Release:        3%{?dist}
 License:        BSD
-URL:            https://github.com/conda/conda-package-handling
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/conda/conda-package-handling
 Source0:        https://github.com/conda/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
-
 BuildRequires:  gcc
 BuildRequires:  libarchive-devel
 
@@ -18,10 +16,11 @@ BuildRequires:  libarchive-devel
 Create and extract conda packages of various formats.
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{summary}
+BuildRequires:  python%{python3_pkgversion}-Cython
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-Cython
 BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  python%{python3_pkgversion}-tqdm
 Requires:       python%{python3_pkgversion}-six
@@ -29,7 +28,6 @@ Requires:       python%{python3_pkgversion}-tqdm
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 Create and extract conda packages of various formats.
@@ -70,6 +68,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.7.2-3
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

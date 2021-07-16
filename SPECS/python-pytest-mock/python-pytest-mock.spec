@@ -1,14 +1,13 @@
 %global pypi_name pytest-mock
 %global file_name pytest_mock
-
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 Name:           python-%{pypi_name}
 Version:        3.5.1
 Release:        3%{?dist}
 License:        MIT
-URL:            https://github.com/pytest-dev/pytest-mock/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/pytest-dev/pytest-mock/
 Source0:        https://files.pythonhosted.org/packages/24/1b/ddad49c762bddfe3cb61c8ba61349701afd584b84ff4189721bcba624598/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -18,16 +17,15 @@ patching API provided by the mock package, but with the benefit of not having
 to worry about undoing patches at the end of a test.
 
 %package -n     python3-%{pypi_name}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
-
-BuildRequires:  python3-devel
+BuildRequires:  python%{python3_pkgversion}-pytest-asyncio
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
-BuildRequires:  python%{python3_pkgversion}-pytest-asyncio
+BuildRequires:  python3-devel
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-%{?python_provide:%python_provide python3-%{pypi_name}}
 
 %description -n python3-%{pypi_name}
 This plugin installs a mocker fixture which is a thin-wrapper around the
@@ -52,7 +50,7 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 
+    pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v tests \
@@ -68,6 +66,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.5.1-3
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

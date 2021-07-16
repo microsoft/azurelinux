@@ -1,28 +1,4 @@
 %global pypi_name pytest-xdist
-
-Summary:        py.test plugin for distributed testing and loop-on-failing modes
-Name:           python-%{pypi_name}
-Version:        2.1.0
-Release:        3%{?dist}
-License:        MIT
-URL:            https://github.com/pytest-dev/pytest-xdist
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source0:        https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/%{pypi_name}-%{version}.tar.gz
-BuildArch:      noarch
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-execnet >= 1.1
-BuildRequires:  python3-filelock
-BuildRequires:  python3-psutil >= 3.0.0
-BuildRequires:  python3-pytest-forked
-BuildRequires:  python3-py
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-setuptools_scm
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
-
 %global _description %{expand:
 The pytest-xdist plugin extends py.test with some unique test execution modes:
 * test run parallelization: if you have multiple CPUs or hosts you can use
@@ -36,15 +12,36 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
   again a full run is performed.
 * Multi-Platform coverage: you can specify different Python interpreters or
   different platforms and run tests in parallel on all of them.}
+Summary:        py.test plugin for distributed testing and loop-on-failing modes
+Name:           python-%{pypi_name}
+Version:        2.1.0
+Release:        3%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/pytest-dev/pytest-xdist
+Source0:        https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/%{pypi_name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-execnet >= 1.1
+BuildRequires:  python3-filelock
+BuildRequires:  python3-psutil >= 3.0.0
+BuildRequires:  python3-py
+BuildRequires:  python3-pytest-forked
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
-%description %_description
+%description %{_description}
 
 %package -n     python3-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
-
+Summary:        %{summary}
 Requires:       python3-py
-%description -n python3-%{pypi_name} %_description
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -78,8 +75,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.1.0-3
-- Update cgmanifest and license info
-- Update check section
+- Update check section to use pytest module
+- License verified
 
 * Mon Dec 07 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.1.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

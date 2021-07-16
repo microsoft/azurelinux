@@ -1,23 +1,20 @@
 %global srcname responses
-
 Summary:        Reusable django app for collecting and visualizing network topology
 Name:           python-%{srcname}
 Version:        0.10.15
 Release:        4%{?dist}
 License:        ASL 2.0
-URL:            https://github.com/getsentry/responses
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/getsentry/responses
 Source0:        %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
-
-BuildArch:      noarch
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-requests
-BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-coverage
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-mock
+BuildRequires:  python%{python3_pkgversion}-requests
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-six
+BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -26,8 +23,8 @@ BuildRequires:  python3-pip
 A utility library for mocking out the requests Python library.
 
 %package -n python%{python3_pkgversion}-%{srcname}
-Summary:        %{sum}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+Summary:        %{sum}
 %if %{undefined __pythondist_requires}
 Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-six
@@ -66,6 +63,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.10.15-4
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.15-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

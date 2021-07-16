@@ -1,13 +1,12 @@
 %global srcname process-tests
-
 Summary:        Tools for testing processes
 Name:           python-%{srcname}
 Version:        2.0.2
 Release:        10%{?dist}
 License:        BSD
-URL:            https://github.com/ionelmc/python-process-tests
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/ionelmc/python-process-tests
 Source0:        https://pypi.python.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -15,10 +14,10 @@ BuildArch:      noarch
 Tools for testing processes.
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        Tools for testing processes
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 Tools for testing processes for Python 3.
@@ -27,10 +26,10 @@ Tools for testing processes for Python 3.
 %setup -q -n %{srcname}-%{version}
 
 %build
-%{py3_build}
+%py3_build
 
 %install
-%{py3_install}
+%py3_install
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %doc README.rst
@@ -40,8 +39,8 @@ Tools for testing processes for Python 3.
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.0.2-10
-- Update cgmanifest and license info
-- Change source to match other python rpms
+- Change source to match python sources
+- License verified
 
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.0.2-9
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

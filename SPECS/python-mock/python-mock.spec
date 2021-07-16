@@ -2,7 +2,6 @@
 # Some people may have not fixed their imports
 
 %global mod_name mock
-
 Summary:        A Python Mocking and Patching Library for Testing
 Name:           python-mock
 Version:        3.0.5
@@ -12,12 +11,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.voidspace.org.uk/python/mock/
 #Source0:        https://github.com/testing-cabal/mock/archive/refs/tags/%{version}.tar.gz
-Source0:        mock-%{version}.tar.gz
-
-BuildArch:      noarch
-
+Source0:        %{mod_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -30,9 +27,9 @@ arguments they were called with. You can also specify return values and set
 needed attributes in the normal way.
 
 %package -n python3-mock
-Summary:        A Python Mocking and Patching Library for Testing
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{mod_name}}
-Requires:    python3-six >= 1.9.0
+Summary:        A Python Mocking and Patching Library for Testing
+Requires:       python3-six >= 1.9.0
 
 %description -n python3-mock
 Mock is a Python module that provides a core mock class. It removes the need
@@ -41,14 +38,11 @@ action, you can make assertions about which methods / attributes were used and
 arguments they were called with. You can also specify return values and set
 needed attributes in the normal way.
 
-
 %prep
 %setup -q -n %{mod_name}-%{version}
 
-
 %build
-%{py3_build}
-
+%py3_build
 
 %check
 pip3 install atomicwrites>=1.3.0 \
@@ -63,8 +57,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v mock/tests
 
 %install
-%{py3_install}
-
+%py3_install
 
 %files -n python3-mock
 %license LICENSE.txt
@@ -72,10 +65,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*.egg-info/
 %{python3_sitelib}/%{mod_name}
 
-
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.0.5-9
 - Initial CBL-Mariner version imported from Fedora 32 (license: MIT)
+- License verified
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

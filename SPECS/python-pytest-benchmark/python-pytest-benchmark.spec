@@ -1,23 +1,3 @@
-%global srcname pytest-benchmark
-
-Summary:        A py.test fixture for benchmarking code
-Name:           python-%{srcname}
-Version:        3.2.3
-Release:        6%{?dist}
-License:        BSD
-URL:            https://pytest-benchmark.readthedocs.io
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source:         https://github.com/ionelmc/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-BuildArch:      noarch
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-cpuinfo
-BuildRequires:  python3-xml
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
-
 %global _description\
 This plugin provides a benchmark fixture. This fixture is a callable object\
 that will benchmark any function passed to it.\
@@ -29,16 +9,34 @@ Notable features and goals:\
   - Comparison and regression tracking\
   - Exhausive statistics\
   - JSON export
+%global srcname pytest-benchmark
+Summary:        A py.test fixture for benchmarking code
+Name:           python-%{srcname}
+Version:        3.2.3
+Release:        6%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pytest-benchmark.readthedocs.io
+Source:         https://github.com/ionelmc/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+BuildRequires:  python3-cpuinfo
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
+BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
-%description %_description
+%description %{_description}
 
 %package -n python3-%{srcname}
-Summary:        %summary
 %{?python_provide:%python_provide python3-%{srcname}}
-Requires:       python3-pytest
+Summary:        %{summary}
 Requires:       python3-cpuinfo
+Requires:       python3-pytest
 
-%description -n python3-%{srcname} %_description
+%description -n python3-%{srcname} %{_description}
 
 %prep
 %autosetup -n %{srcname}-%{version}
@@ -50,7 +48,7 @@ Requires:       python3-cpuinfo
 %py3_install
 
 %check
-# Skip test_commit_info_error due to possible misalignment with git 
+# Skip test_commit_info_error due to possible misalignment with git
 # Similar to https://github.com/ionelmc/pytest-benchmark/issues/143
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
@@ -64,7 +62,7 @@ pip3 install atomicwrites>=1.3.0 \
     mock \
     aspectlib \
     pygal \
-    pytest-xdist 
+    pytest-xdist
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v tests -k "not test_commit_info_error"
@@ -83,6 +81,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.2.3-6
 - Update cgmanifest and license info
+- License verified
 
 * Sun Oct 18 2020 Steve Laughman <steve.laughman@microsoft.com> - 3.2.3-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

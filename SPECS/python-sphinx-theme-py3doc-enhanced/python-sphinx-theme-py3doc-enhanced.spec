@@ -1,46 +1,36 @@
-%{!?python3_pkgversion: %global python3_pkgversion 3}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
 %global pypi_name sphinx_py3doc_enhanced_theme
 %global srcname sphinx-py3doc-enhanced-theme
 %global pkgname sphinx-theme-py3doc-enhanced
 %global desc Theme based on the theme of https://docs.python.org/3/ with some responsive\
 enhancements.
-
 Summary:        Theme based on the theme of https://docs.python.org/3/
 Name:           python-%{pkgname}
 Version:        2.3.2
 Release:        20%{?dist}
 License:        BSD
-URL:            https://pypi.python.org/pypi/sphinx_py3doc_enhanced_theme
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pypi.python.org/pypi/sphinx_py3doc_enhanced_theme
 Source0:        https://pypi.io/packages/source/s/%{pypi_name}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
-%desc
+%{desc}
 
 %package -n     python%{python3_pkgversion}-%{pkgname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
 Summary:        %{summary}
-BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-xml
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
 Provides:       python%{python3_pkgversion}-%{pypi_name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n python%{python3_pkgversion}-%{pkgname}
-%desc
+%{desc}
 
 %prep
-%setup -qn %{srcname}-%{version}
+%setup -q -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -56,7 +46,7 @@ Provides:       python%{python3_pkgversion}-%{pypi_name} = %{version}-%{release}
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.3.2-20
-- Update cgmanifest and license info
+- License verified
 
 * Sun Oct 18 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.3.2-19
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

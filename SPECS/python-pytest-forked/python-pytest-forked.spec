@@ -1,37 +1,35 @@
 %global pypi_name pytest-forked
-
-Summary:        py.test plugin for running tests in isolated forked subprocesses
-Name:           python-%{pypi_name}
-Version:        1.3.0
-Release:        3%{?dist}
-License:        MIT
-URL:            https://github.com/pytest-dev/pytest-forked
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source0:        https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/%{pypi_name}-%{version}.tar.gz
-BuildArch:      noarch
-BuildRequires:  python3-devel
-BuildRequires:  python3-py
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-setuptools_scm
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
-
 %global _description %{expand:
 The pytest-forked plugin extends py.test by adding an option to run tests in
 isolated forked subprocesses. This is useful if you have tests involving C or
 C++ libraries that might crash the process. To use the plugin, simply use the
 --forked argument when invoking py.test.}
+Summary:        py.test plugin for running tests in isolated forked subprocesses
+Name:           python-%{pypi_name}
+Version:        1.3.0
+Release:        3%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/pytest-dev/pytest-forked
+Source0:        https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/%{pypi_name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-py
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
-%description %_description
+%description %{_description}
 
 %package -n     python3-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
-
+Summary:        %{summary}
 Requires:       python3-py
-%description -n python3-%{pypi_name} %_description
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
@@ -48,10 +46,10 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 
+    pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v 
+    python%{python3_version} -m pytest -v
 
 %files -n python3-%{pypi_name}
 %doc example/boxed.txt README.rst
@@ -60,7 +58,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.3.0-3
-- Update cgmanifest and license info
+- Update check section to use pytest module
+- License verified
 
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.3.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

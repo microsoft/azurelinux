@@ -3,9 +3,9 @@ Name:           picosat
 Version:        965
 Release:        13%{?dist}
 License:        MIT
-URL:            http://fmv.jku.at/picosat/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            http://fmv.jku.at/picosat/
 Source0:        http://fmv.jku.at/picosat/%{name}-%{version}.tar.gz
 # Thanks to David Wheeler for the man page.
 Source1:        picosat.1
@@ -16,14 +16,12 @@ Source3:        picomus.1
 # This patch has not been sent upstream.  It is specific to Fedora's build of
 # two distinct binaries, one with trace support and one without.
 Patch0:         %{name}-trace.patch
-
+BuildRequires:  R-core-devel
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  R-core-devel
-
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       bzip2
 Requires:       gzip
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 PicoSAT solves the SAT problem, which is the classical NP complete
@@ -58,8 +56,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Headers and other development files for PicoSAT.
 
 %prep
-%setup -q
-%patch0
+%autosetup
 
 %build
 # The configure script is NOT autoconf-generated and chooses its own CFLAGS,
@@ -67,7 +64,7 @@ Headers and other development files for PicoSAT.
 
 # Build the version with R support
 sed -e "s/@CC@/gcc/" \
-    -e "s|@CFLAGS@|$RPM_OPT_FLAGS -D_GNU_SOURCE=1 -DNDEBUG -DRCODE -I/usr/lib64/R/include|" \
+    -e "s|@CFLAGS@|%{optflags} -D_GNU_SOURCE=1 -DNDEBUG -DRCODE -I/usr/lib64/R/include|" \
     -e "s|-Xlinker libpicosat.so|-Xlinker libpicosat.so.0 $RPM_LD_FLAGS -L/usr/lib64/R/lib |" \
     -e "s/libpicosat/libpicosat-R/g" \
     -e "s/-lpicosat/-lpicosat-R/g" \
@@ -77,7 +74,7 @@ sed -e "s/@CC@/gcc/" \
 
 # Build the version with trace support
 sed -e "s/@CC@/gcc/" \
-    -e "s|@CFLAGS@|$RPM_OPT_FLAGS -D_GNU_SOURCE=1 -DNDEBUG -DTRACE|" \
+    -e "s|@CFLAGS@|%{optflags} -D_GNU_SOURCE=1 -DNDEBUG -DTRACE|" \
     -e "s|-Xlinker libpicosat.so|-Xlinker libpicosat.so.0 $RPM_LD_FLAGS|" \
     -e "s/libpicosat/libpicosat-trace/g" \
     -e "s/-lpicosat/-lpicosat-trace/g" \
@@ -90,7 +87,7 @@ mv picosat picosat.trace
 # Note that picomus needs trace support, so we don't rebuild it.
 rm -f *.o *.s config.h
 sed -e "s/@CC@/gcc/" \
-    -e "s|@CFLAGS@|$RPM_OPT_FLAGS -D_GNU_SOURCE=1 -DNDEBUG|" \
+    -e "s|@CFLAGS@|%{optflags} -D_GNU_SOURCE=1 -DNDEBUG|" \
     -e "s|-Xlinker libpicosat.so|-Xlinker libpicosat.so.0 $RPM_LD_FLAGS|" \
     -e "s/@TARGETS@/libpicosat.so picosat picomcs picogcnf/" \
   makefile.in > makefile
@@ -153,6 +150,7 @@ cp -p %{SOURCE1} %{SOURCE2} %{SOURCE3}  %{buildroot}%{_mandir}/man1
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 965-13
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 965-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

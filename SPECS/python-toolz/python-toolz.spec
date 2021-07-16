@@ -25,17 +25,14 @@ problems with relatively simple code. This code can be easy to understand\
 without sacrificing performance. Toolz enables this approach, commonly\
 associated with functional programming, within a natural Pythonic style\
 suitable for most developers.
-
-
-
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
 Version:        0.11.1
 Release:        3%{?dist}
 License:        BSD
-URL:            http://github.com/pytoolz/toolz/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/pytoolz/toolz/
 Source0:        https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -43,11 +40,11 @@ BuildArch:      noarch
 %{desc}
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        A functional standard library for Python %{python3_version}
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-nose
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+BuildRequires:  python%{python3_pkgversion}-setuptools
 
 %description -n python%{python3_pkgversion}-%{srcname}
 %{desc}
@@ -72,6 +69,7 @@ nosetests-%{python3_version}
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.11.1-3
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

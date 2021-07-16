@@ -2,21 +2,19 @@
 %global srcname pytest_asyncio
 %global project_owner pytest-dev
 %global github_name pytest-asyncio
-
 %bcond_without  tests
 Summary:        Pytest support for asyncio
 Name:           python3-%{pypi_name}
 Version:        0.14.0
 Release:        3%{?dist}
 License:        ASL 2.0
-URL:            https://pypi.python.org/pypi/pytest-asyncio
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pypi.python.org/pypi/pytest-asyncio
 Source0:        https://github.com/%{project_owner}/%{github_name}/archive/v%{version}/%{github_name}-%{version}.tar.gz
-
-BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-async-generator >= 1.3
 BuildRequires:  python3-pip
@@ -30,9 +28,8 @@ asyncio code is usually written in the form of coroutines, which makes it
 slightly more difficult to test using normal testing tools. pytest-asyncio
 provides useful fixtures and markers to make testing easier.
 
-
 %prep
-%setup -qn %{github_name}-%{version}
+%setup -q -n %{github_name}-%{version}
 
 # Don't treat all warnings as errors, there are DeprecationWarnings on 3.8
 sed -i '/filterwarnings = error/d' setup.cfg
@@ -71,10 +68,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 %{python3_sitelib}/%{srcname}/
 
-
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.14.0-3
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

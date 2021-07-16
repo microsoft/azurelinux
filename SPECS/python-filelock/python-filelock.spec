@@ -1,13 +1,12 @@
 %global srcname filelock
-
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
 Version:        3.0.12
 Release:        10%{?dist}
 License:        Unlicense
-URL:            https://github.com/benediktschmitt/py-filelock
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/benediktschmitt/py-filelock
 #Source0:       https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -28,10 +27,10 @@ BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 %{summary}
 
 %package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
@@ -55,7 +54,7 @@ rm docs/build/html/.buildinfo
 install -p -m0644 -D docs/build/man/py-%{srcname}.1 %{buildroot}%{_mandir}/man1/py-%{srcname}.1
 
 %check
-%{__python3} test.py
+python%{python3_version} test.py
 
 %files doc
 %license LICENSE
@@ -71,8 +70,8 @@ install -p -m0644 -D docs/build/man/py-%{srcname}.1 %{buildroot}%{_mandir}/man1/
 
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.0.12-10
+- Remove python2 support
 - License verified
-- Removed Python2 support
 
 * Mon Dec 07 2020 Steve Laughman <steve.laughman@microsoft.com> - 3.0.12-9
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

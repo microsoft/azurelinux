@@ -1,32 +1,28 @@
 %global srcname frozendict
-
+%global _description %{expand:
+frozendict is an immutable wrapper around dictionaries that implements
+the complete mapping interface. It can be used as a drop-in
+replacement for dictionaries where immutability is desired.}
 Summary:        An immutable dictionary
 Name:           python-%{srcname}
 Version:        1.2
 Release:        19%{?dist}
 License:        MIT
-URL:            https://pypi.python.org/pypi/frozendict
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pypi.python.org/pypi/frozendict
 Source0:        https://pypi.python.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz
-
 # https://github.com/slezica/python-frozendict/pull/30/commits/6ad44b54139e9b298a9281d85abf4f940f5d852a.patch
 Patch0:         fix_imports_for_python3_9.patch
 # https://github.com/slezica/python-frozendict/pull/30/commits/24e65b1f197a8c0dcca82a6ada53a8a29445c21c.patch
 Patch1:         import_from_abc_first.patch
-
 BuildArch:      noarch
-
-%global _description %{expand:
-frozendict is an immutable wrapper around dictionaries that implements
-the complete mapping interface. It can be used as a drop-in
-replacement for dictionaries where immutability is desired.}
 
 %description %{_description}
 
 %package -n python3-%{srcname}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
+Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
@@ -50,6 +46,7 @@ BuildRequires:  python3-setuptools
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.2-19
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
