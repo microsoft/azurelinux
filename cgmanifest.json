@@ -4014,6 +4014,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nftables",
+          "version": "1.2.16",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nghttp2",
           "version": "1.41.0",
           "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"

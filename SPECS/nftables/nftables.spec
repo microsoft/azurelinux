@@ -2,9 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           nftables
 Version:        0.9.3
-Release:        4%{?dist}
-# Upstream released a 0.100 version, then 0.4. Need Epoch to get back on track.
-Epoch:          1
+Release:        5%{?dist}
 Summary:        Netfilter Tables userspace utillites
 
 License:        GPLv2
@@ -31,11 +29,6 @@ Patch12: 0012-scanner-fix-indesc_list-stack-to-be-in-the-correct-o.patch
 Patch13: 0013-scanner-remove-parser_state-indesc_idx.patch
 Patch14: 0014-scanner-use-list_is_first-from-scanner_pop_indesc.patch
 
-
-#BuildRequires: autogen
-#BuildRequires: autoconf
-#BuildRequires: automake
-#BuildRequires: libtool
 BuildRequires:  gcc
 BuildRequires: flex
 BuildRequires: bison
@@ -54,7 +47,7 @@ Netfilter Tables userspace utilities.
 
 %package        devel
 Summary:        Development library for nftables / libnftables
-Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig
 
 %description devel
@@ -62,7 +55,7 @@ Development tools and static libraries and header files for the libnftables libr
 
 %package -n     python3-nftables
 Summary:        Python module providing an interface to libnftables
-Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-nftables}
 
 %description -n python3-nftables
@@ -75,7 +68,7 @@ The nftables python module provides an interface to libnftables via ctypes.
 #./autogen.sh
 %configure --disable-silent-rules --with-xtables --with-json \
 	--enable-python --with-python-bin=%{__python3}
-make %{?_smp_mflags}
+%make_build
 
 %install
 %make_install
@@ -136,6 +129,11 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{python3_sitelib}/nftables/
 
 %changelog
+* Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.3-5
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Dropped the epoch number.
+- License verified.
+
 * Thu Jan 28 2021 Phil Sutter <psutter@redhat.com> - 1:0.9.3-4
 - scanner: use list_is_first() from scanner_pop_indesc()
 - scanner: remove parser_state->indesc_idx

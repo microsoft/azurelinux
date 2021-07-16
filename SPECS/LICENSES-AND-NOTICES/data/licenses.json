@@ -79,6 +79,7 @@
                 "libxcrypt",
                 "mokutil",
                 "mozjs60",
+                "nftables",
                 "open-vm-tools",
                 "openssl",
                 "p11-kit",
