@@ -112,6 +112,7 @@
             "origin": "Microsoft",
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
+                "application-gateway-kubernetes-ingress",
                 "aspnetcore-runtime-3.1",
                 "auoms",
                 "azure-iot-sdk-c",
