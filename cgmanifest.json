@@ -1024,6 +1024,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "desktop-file-utils",
+          "version": "0.24",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.24.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dhcp",
           "version": "4.4.2",
           "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"

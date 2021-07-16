@@ -28,6 +28,7 @@
                 "cryptsetup",
                 "CUnit",
                 "Cython",
+                "desktop-file-utils",
                 "dnf",
                 "dpdk",
                 "docbook5-schemas",
