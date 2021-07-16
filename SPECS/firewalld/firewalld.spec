@@ -1,3 +1,5 @@
+%bcond_with missing_dependencies
+
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        0.9.4
@@ -82,13 +84,16 @@ are required by other packages that add firewalld configuration files.
 Summary:        Firewall panel applet
 
 Requires:       %{name} = %{version}-%{release}
-Requires:       NetworkManager-libnm
-Requires:       dbus-x11
 Requires:       firewall-config = %{version}-%{release}
+Requires:       python3-gobject
+
+%if 0%{with missing_dependencies}
+Requires:       dbus-x11
 Requires:       hicolor-icon-theme
 Requires:       libnotify
-Requires:       python3-gobject
+Requires:       NetworkManager-libnm
 Requires:       python3-qt5-base
+%endif
 
 %description -n firewall-applet
 The firewall panel applet provides a status information of firewalld and also
@@ -98,11 +103,14 @@ the firewall settings.
 Summary:        Firewall configuration application
 
 Requires:       %{name} = %{version}-%{release}
+Requires:       python3-gobject
+
+%if 0%{with missing_dependencies}
 Requires:       NetworkManager-libnm
 Requires:       dbus-x11
 Requires:       gtk3
 Requires:       hicolor-icon-theme
-Requires:       python3-gobject
+%endif
 
 %description -n firewall-config
 The firewall configuration application provides an configuration interface for
@@ -294,6 +302,7 @@ fi
 - Updated to version 0.9.4 to drop dependency on 'python3-slip-dbus' and 'python3-decorator'.
 - Added the '%%license' macro.
 - Using '%%make*' macros for building and installation.
+- Temporarily disable run-time requires for unused subpackages.
 - License verified.
 
 * Fri Jan 15 2021 Eric Garver <eric@garver.life> - 0.8.6-1

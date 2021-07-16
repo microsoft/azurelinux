@@ -2,7 +2,7 @@
 %define qemu_user  qemu
 %define qemu_group  qemu
 
-%bcond_with gluster
+%bcond_with missing_dependencies
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
@@ -27,6 +27,8 @@ BuildRequires:  cyrus-sasl-devel
 BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
+BuildRequires:  glusterfs-api-devel >= 3.4.1
+BuildRequires:  glusterfs-devel >= 3.4.1
 BuildRequires:  gnutls-devel
 BuildRequires:  iscsi-initiator-utils
 BuildRequires:  libacl-devel
@@ -53,11 +55,6 @@ BuildRequires:  sanlock-devel
 BuildRequires:  systemd-devel
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  yajl-devel
-
-%if 0%{with gluster}
-BuildRequires:  glusterfs-api-devel >= 3.4.1
-BuildRequires:  glusterfs-devel >= 3.4.1
-%endif
 
 Requires:       %{name}-client = %{version}-%{release}
 Requires:       %{name}-daemon-config-network = %{version}-%{release}
@@ -175,7 +172,9 @@ Summary:        Interface driver plugin for the libvirtd daemon
 
 Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
+%if 0%{with missing_dependencies}
 Requires:       netcf-libs >= 0.2.2
+%endif
 
 %description daemon-driver-interface
 The interface driver plugin for the libvirtd daemon, providing
@@ -189,7 +188,10 @@ Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       dnsmasq
 Requires:       iptables
+
+%if 0%{with missing_dependencies}
 Requires:       radvd
+%endif
 
 %description daemon-driver-network
 The network driver plugin for the libvirtd daemon, providing
@@ -230,9 +232,12 @@ Requires:       %{name}-libs = %{version}-%{release}
 Requires:       bzip2
 # For image compression
 Requires:       gzip
+Requires:       xz
+
+%if 0%{with missing_dependencies}
 Requires:       lzop
 Requires:       systemd-container
-Requires:       xz
+%endif
 
 %description daemon-driver-qemu
 The qemu driver plugin for the libvirtd daemon, providing
@@ -259,9 +264,7 @@ Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
-%if 0%{with gluster}
 Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
-%endif
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
@@ -295,7 +298,6 @@ Requires:       parted
 The storage driver backend adding implementation of the storage APIs for block
 volumes using the host disks.
 
-%if 0%{with gluster}
 %package daemon-driver-storage-gluster
 Summary:        Storage driver plugin for gluster
 
@@ -307,7 +309,6 @@ Requires:       glusterfs-client >= 2.0.1
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
 volumes using libgfapi.
-%endif
 
 %package daemon-driver-storage-iscsi
 Summary:        Storage driver plugin for iscsi
@@ -484,9 +485,7 @@ cd %{_vpath_builddir}
     --with-sanlock \
     --with-sasl \
     --with-storage-disk \
-%if 0%{with gluster}
     --with-storage-gluster \
-%endif
     --with-storage-iscsi \
     --with-storage-lvm \
     --with-storage-mpath \
@@ -939,11 +938,9 @@ exit 0
 %files daemon-driver-storage-disk
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_disk.so
 
-%if 0%{with gluster}
 %files daemon-driver-storage-gluster
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_gluster.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_gluster.so
-%endif
 
 %files daemon-driver-storage-iscsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_iscsi.so
@@ -1063,6 +1060,7 @@ exit 0
     - 'libvirt-daemon-driver-storage',
     - 'libvirt-daemon-driver-storage-core',
     - 'libvirt-daemon-driver-storage-disk',
+    - 'libvirt-daemon-driver-storage-gluster',
     - 'libvirt-daemon-driver-storage-iscsi',
     - 'libvirt-daemon-driver-storage-logical',
     - 'libvirt-daemon-driver-storage-mpath',
@@ -1072,6 +1070,7 @@ exit 0
     - 'libvirt-libs',
     - 'libvirt-lock-sanlock',
     - 'libvirt-nss'.
+- Temporarily disable run-time requires for unused subpackages.
 
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-2
 -   Use autosetup
