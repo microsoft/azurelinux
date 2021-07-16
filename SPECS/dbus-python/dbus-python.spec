@@ -19,8 +19,8 @@ BuildRequires:  dbus-glib-devel
 BuildRequires:  libtool
 
 %if %{with_check}
-BuildRequires: dbus-x11
-BuildRequires: python3-gobject
+BuildRequires:  dbus-x11
+BuildRequires:  python3-gobject
 %endif
 
 %description

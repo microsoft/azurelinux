@@ -1,62 +1,61 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Netfilter Tables userspace utillites
 Name:           nftables
 Version:        0.9.3
 Release:        5%{?dist}
-Summary:        Netfilter Tables userspace utillites
-
 License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://netfilter.org/projects/nftables/
 Source0:        %{url}/files/%{name}-%{version}.tar.bz2
 Source1:        nftables.service
 Source2:        nftables.conf
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=1834853
 Patch0:         nftables-fix_json_events.patch
+Patch1:         0001-tests-json_echo-Fix-for-Python3.patch
+Patch2:         0002-tests-json_echo-Support-testing-host-binaries.patch
+Patch3:         0003-tests-monitor-Support-running-individual-test-cases.patch
+Patch4:         0004-tests-monitor-Support-testing-host-s-nft-binary.patch
+Patch5:         0005-tests-py-Support-testing-host-binaries.patch
+Patch6:         0006-tests-monitor-use-correct-nft-value-in-EXIT-trap.patch
+Patch7:         0007-scanner-incorrect-error-reporting-after-file-inclusi.patch
+Patch8:         0008-scanner-move-the-file-descriptor-to-be-in-the-input_.patch
+Patch9:         0009-scanner-move-indesc-list-append-in-scanner_push_inde.patch
+Patch10:        0010-scanner-remove-parser_state-indescs-static-array.patch
+Patch11:        0011-Inclusion-depth-was-computed-incorrectly-for-glob-in.patch
+Patch12:        0012-scanner-fix-indesc_list-stack-to-be-in-the-correct-o.patch
+Patch13:        0013-scanner-remove-parser_state-indesc_idx.patch
+Patch14:        0014-scanner-use-list_is_first-from-scanner_pop_indesc.patch
 
-Patch1: 0001-tests-json_echo-Fix-for-Python3.patch
-Patch2: 0002-tests-json_echo-Support-testing-host-binaries.patch
-Patch3: 0003-tests-monitor-Support-running-individual-test-cases.patch
-Patch4: 0004-tests-monitor-Support-testing-host-s-nft-binary.patch
-Patch5: 0005-tests-py-Support-testing-host-binaries.patch
-Patch6: 0006-tests-monitor-use-correct-nft-value-in-EXIT-trap.patch
-Patch7: 0007-scanner-incorrect-error-reporting-after-file-inclusi.patch
-Patch8: 0008-scanner-move-the-file-descriptor-to-be-in-the-input_.patch
-Patch9: 0009-scanner-move-indesc-list-append-in-scanner_push_inde.patch
-Patch10: 0010-scanner-remove-parser_state-indescs-static-array.patch
-Patch11: 0011-Inclusion-depth-was-computed-incorrectly-for-glob-in.patch
-Patch12: 0012-scanner-fix-indesc_list-stack-to-be-in-the-correct-o.patch
-Patch13: 0013-scanner-remove-parser_state-indesc_idx.patch
-Patch14: 0014-scanner-use-list_is_first-from-scanner_pop_indesc.patch
-
+BuildRequires:  asciidoc
+BuildRequires:  bison
+BuildRequires:  flex
 BuildRequires:  gcc
-BuildRequires: flex
-BuildRequires: bison
-BuildRequires: libmnl-devel
-BuildRequires: gmp-devel
-BuildRequires: readline-devel
-BuildRequires: libnftnl-devel
-BuildRequires: systemd
-BuildRequires: asciidoc
-BuildRequires: iptables-devel
-BuildRequires: jansson-devel
-BuildRequires: python3-devel
+BuildRequires:  gmp-devel
+BuildRequires:  iptables-devel
+BuildRequires:  jansson-devel
+BuildRequires:  libmnl-devel
+BuildRequires:  libnftnl-devel
+BuildRequires:  python3-devel
+BuildRequires:  readline-devel
+BuildRequires:  systemd
 
 %description
 Netfilter Tables userspace utilities.
 
 %package        devel
 Summary:        Development library for nftables / libnftables
+
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkgconfig
+Requires:       pkg-config
 
 %description devel
 Development tools and static libraries and header files for the libnftables library.
 
 %package -n     python3-nftables
-Summary:        Python module providing an interface to libnftables
-Requires:       %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-nftables}
+Summary:        Python module providing an interface to libnftables
+
+Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-nftables
 The nftables python module provides an interface to libnftables via ctypes.
@@ -67,34 +66,34 @@ The nftables python module provides an interface to libnftables via ctypes.
 %build
 #./autogen.sh
 %configure --disable-silent-rules --with-xtables --with-json \
-	--enable-python --with-python-bin=%{__python3}
+	--enable-python --with-python-bin=python3
 %make_build
 
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # Don't ship static lib (for now at least)
-rm -f $RPM_BUILD_ROOT/%{_libdir}/libnftables.a
+rm -f %{buildroot}/%{_libdir}/libnftables.a
 
-chmod 644 $RPM_BUILD_ROOT/%{_mandir}/man8/nft*
+chmod 644 %{buildroot}/%{_mandir}/man8/nft*
 
-mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
-cp -a %{SOURCE1} $RPM_BUILD_ROOT/%{_unitdir}/
+mkdir -p %{buildroot}/%{_unitdir}
+cp -a %{SOURCE1} %{buildroot}/%{_unitdir}/
 
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/
-chmod 600 $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/nftables.conf
+mkdir -p %{buildroot}/%{_sysconfdir}/sysconfig
+cp -a %{SOURCE2} %{buildroot}/%{_sysconfdir}/sysconfig/
+chmod 600 %{buildroot}/%{_sysconfdir}/sysconfig/nftables.conf
 
-mkdir -m 700 -p $RPM_BUILD_ROOT/%{_sysconfdir}/nftables
-chmod 600 $RPM_BUILD_ROOT/%{_sysconfdir}/nftables/*.nft
-chmod 700 $RPM_BUILD_ROOT/%{_sysconfdir}/nftables
+mkdir -m 700 -p %{buildroot}/%{_sysconfdir}/nftables
+chmod 600 %{buildroot}/%{_sysconfdir}/nftables/*.nft
+chmod 700 %{buildroot}/%{_sysconfdir}/nftables
 
 # make nftables.py use the real library file name
 # to avoid nftables-devel package dependency
-sofile=$(readlink $RPM_BUILD_ROOT/%{_libdir}/libnftables.so)
+sofile=$(readlink %{buildroot}/%{_libdir}/libnftables.so)
 sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
-	$RPM_BUILD_ROOT/%{python3_sitelib}/nftables/nftables.py
+	%{buildroot}/%{python3_sitelib}/nftables/nftables.py
 
 %post
 %systemd_post nftables.service
