@@ -4015,8 +4015,8 @@
         "type": "other",
         "other": {
           "name": "nftables",
-          "version": "1.2.16",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+          "version": "0.9.3",
+          "downloadUrl": "https://netfilter.org/projects/nftables//files/nftables-0.9.3.tar.bz2"
         }
       }
     },
