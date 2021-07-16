@@ -3,10 +3,10 @@ Distribution:   Mariner
 Summary: A firewall daemon with D-Bus interface providing a dynamic firewall
 Name: firewalld
 Version: 0.8.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL:     http://www.firewalld.org
 License: GPLv2+
-Source0: https://github.com/firewalld/firewalld/releases/download/v%{version}/firewalld-%{version}.tar.gz
+Source0: https://github.com/firewalld/firewalld/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1: FedoraServer.xml
 Source2: FedoraWorkstation.xml
 Patch0: firewalld-0.2.6-MDNS-default.patch
@@ -186,7 +186,8 @@ if [ ! -e %{_datadir}/polkit-1/actions/org.fedoraproject.FirewallD1.policy ]; th
 fi
 
 %files -f %{name}.lang
-%doc COPYING README
+%license COPYING
+%doc README
 %{_sbindir}/firewalld
 %{_bindir}/firewall-cmd
 %{_bindir}/firewall-offline-cmd
@@ -276,6 +277,11 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-2
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Added the '%%license' macro.
+- License verified.
+
 * Fri Jan 15 2021 Eric Garver <eric@garver.life> - 0.8.6-1
 - rebase package to v0.8.6
 

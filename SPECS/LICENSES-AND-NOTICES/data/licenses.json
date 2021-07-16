@@ -37,6 +37,7 @@
                 "ebtables",
                 "extra-cmake-modules",
                 "fdupes",
+                "firewalld",
                 "fmt",
                 "fribidi",
                 "gcovr",

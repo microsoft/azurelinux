@@ -1434,6 +1434,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "firewalld",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.8.6/firewalld-0.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "flannel",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
