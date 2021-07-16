@@ -1,0 +1,111 @@
+commit 499a006a7d6bb154f9e1ab430e4c9e231ba6096a
+Author: Lee Duncan <lduncan@suse.com>
+Date:   Tue Jan 28 16:36:56 2020 -0800
+
+    Updates to support gcc -fno-common option.
+    
+    This meant cleaning up the definition of some
+    global variables, so that they were only defined
+    in one place and refered to as external elsewhere.
+
+diff --git a/include/iscsi_err.h b/include/iscsi_err.h
+index ed000dd..04a8723 100644
+--- a/include/iscsi_err.h
++++ b/include/iscsi_err.h
+@@ -4,7 +4,7 @@
+ #ifndef _ISCSI_ERR_
+ #define _ISCSI_ERR_
+ 
+-enum {
++enum iscsi_error_list {
+ 	ISCSI_SUCCESS			= 0,
+ 	/* Generic error */
+ 	ISCSI_ERR			= 1,
+@@ -73,7 +73,9 @@ enum {
+ 
+ 	/* Always last. Indicates end of error code space */
+ 	ISCSI_MAX_ERR_VAL,
+-} iscsi_err;
++};
++
++extern enum iscsi_error_list iscsi_err;
+ 
+ extern void iscsi_err_print_msg(int err);
+ extern char *iscsi_err_to_str(int err);
+diff --git a/iscsiuio/configure.ac b/iscsiuio/configure.ac
+index b41df0e..8099f09 100644
+--- a/iscsiuio/configure.ac
++++ b/iscsiuio/configure.ac
+@@ -78,7 +78,7 @@ AC_CONFIG_COMMANDS([default],[[
+     else
+         echo 'char *build_date = "'`date`'";' > src/unix/build_date.c
+     fi
+-    echo 'char *build_date;'> src/unix/build_date.h
++    echo 'extern char *build_date;'> src/unix/build_date.h
+ ]],[[]])
+ 
+ AC_PREFIX_DEFAULT()
+diff --git a/iscsiuio/src/uip/uip.h b/iscsiuio/src/uip/uip.h
+index 1180ab5..9d9428a 100644
+--- a/iscsiuio/src/uip/uip.h
++++ b/iscsiuio/src/uip/uip.h
+@@ -70,8 +70,8 @@ struct uip_stack;
+ typedef u16_t uip_ip4addr_t[2];
+ typedef u16_t uip_ip6addr_t[8];
+ 
+-const uip_ip6addr_t all_zeroes_addr6;
+-const uip_ip4addr_t all_zeroes_addr4;
++extern const uip_ip6addr_t all_zeroes_addr6;
++extern const uip_ip4addr_t all_zeroes_addr4;
+ 
+ #define ETH_BUF(buf) ((struct uip_eth_hdr *)buf)
+ #define VLAN_ETH_BUF(buf) ((struct uip_vlan_eth_hdr *)buf)
+diff --git a/usr/iscsi_err.c b/usr/iscsi_err.c
+index 23c61fc..4a057d5 100644
+--- a/usr/iscsi_err.c
++++ b/usr/iscsi_err.c
+@@ -21,6 +21,8 @@
+ #include "iscsi_err.h"
+ #include "log.h"
+ 
++enum iscsi_error_list iscsi_err;
++
+ static char *iscsi_err_msgs[] = {
+ 	/* 0 */ "",
+ 	/* 1 */ "unknown error",
+diff --git a/usr/log.c b/usr/log.c
+index f29b54b..6e16e7c 100644
+--- a/usr/log.c
++++ b/usr/log.c
+@@ -33,6 +33,7 @@
+ 
+ char *log_name;
+ int log_level = 0;
++struct logarea *la = NULL;
+ 
+ static int log_stop_daemon = 0;
+ static void (*log_func)(int prio, void *priv, const char *fmt, va_list ap);
+diff --git a/usr/log.h b/usr/log.h
+index 486a08e..c548791 100644
+--- a/usr/log.h
++++ b/usr/log.h
+@@ -64,7 +64,7 @@ struct logarea {
+ 	union semun semarg;
+ };
+ 
+-struct logarea *la;
++extern struct logarea *la;
+ 
+ extern int log_init(char *program_name, int size,
+ 	void (*func)(int prio, void *priv, const char *fmt, va_list ap),
+diff -up open-iscsi-4440e57a59c7f1c23bbfdcb10844017f478918b6/usr/iscsi_ipc.h.me open-iscsi-4440e57a59c7f1c23bbfdcb10844017f478918b6/usr/iscsi_ipc.h
+--- open-iscsi-4440e57a59c7f1c23bbfdcb10844017f478918b6/usr/iscsi_ipc.h.me	2020-02-24 16:26:12.571078646 +0100
++++ open-iscsi-4440e57a59c7f1c23bbfdcb10844017f478918b6/usr/iscsi_ipc.h	2020-02-24 16:29:18.619824160 +0100
+@@ -162,6 +162,6 @@ struct iscsi_ipc {
+ 			 char *host_stats);
+ };
+ 
+-struct iscsi_ipc *ipc;
++extern struct iscsi_ipc *ipc;
+ 
+ #endif /* ISCSI_IPC_H */

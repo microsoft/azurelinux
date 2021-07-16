@@ -1,0 +1,11 @@
+diff -rup yajl-2.1.0.orig/src/yajl.pc.cmake yajl-2.1.0.new/src/yajl.pc.cmake
+--- yajl-2.1.0.orig/src/yajl.pc.cmake	2014-03-19 04:58:29.000000000 +0000
++++ yajl-2.1.0.new/src/yajl.pc.cmake	2014-04-28 11:12:23.505791003 +0100
+@@ -1,6 +1,6 @@
+ prefix=${CMAKE_INSTALL_PREFIX}
+ libdir=${dollar}{prefix}/lib${LIB_SUFFIX}
+-includedir=${dollar}{prefix}/include/yajl
++includedir=${dollar}{prefix}/include
+ 
+ Name: Yet Another JSON Library
+ Description: A Portable JSON parsing and serialization library in ANSI C
