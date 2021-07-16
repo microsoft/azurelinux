@@ -216,6 +216,7 @@ Summary:        Development Libraries
 License:        GPLv2 OR LGPLv3+
 
 Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-api = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       libacl-devel
 
