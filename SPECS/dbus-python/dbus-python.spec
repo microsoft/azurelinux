@@ -1,44 +1,44 @@
+Summary:        D-Bus Python Bindings
+Name:           dbus-python
+Version:        1.2.16
+Release:        3%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: D-Bus Python Bindings
-Name:    dbus-python
-Version: 1.2.16
-Release: 3%{?dist}
-
-License: MIT
-URL:     https://www.freedesktop.org/wiki/Software/DBusBindings/
-Source0: https://dbus.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
-
+URL:            https://www.freedesktop.org/wiki/Software/DBusBindings/
+Source0:        https://dbus.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 # borrow centos7 patch to use sitearch properly
-Patch0: 0001-Move-python-modules-to-architecture-specific-directo.patch
+Patch0:         0001-Move-python-modules-to-architecture-specific-directo.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1788491
-Patch1: python39.patch
+Patch1:         python39.patch
 
-BuildRequires: dbus-devel
-BuildRequires: dbus-glib-devel
-# for %%check
-# BuildRequires: dbus-x11
-# BuildRequires: python3-gobject
-# autoreconf and friends
-BuildRequires: autoconf-archive automake libtool
+BuildRequires:  autoconf-archive
+BuildRequires:  automake
+BuildRequires:  dbus-devel
+BuildRequires:  dbus-glib-devel
+BuildRequires:  libtool
 
-%global _description\
+%if %{with_check}
+BuildRequires: dbus-x11
+BuildRequires: python3-gobject
+%endif
+
+%description
 D-Bus python bindings for use with python programs.
 
-%description %_description
-
 %package -n python3-dbus
-Summary: D-Bus bindings for python3
 %{?python_provide:%python_provide python3-dbus}
-BuildRequires: python3-devel
+Summary:        D-Bus bindings for python3
+
+BuildRequires:  python3-devel
 # for py3_build
-BuildRequires: python3dist(setuptools)
+BuildRequires:  python3dist(setuptools)
 
 %description -n python3-dbus
 %{summary}.
 
 %package devel
-Summary: Libraries and headers for dbus-python
+Summary:        Libraries and headers for dbus-python
 
 %description devel
 Headers and static libraries for hooking up custom mainloops to the dbus python
@@ -51,9 +51,9 @@ bindings.
 autoreconf -vif
 
 %build
-%set_build_flags
+%{set_build_flags}
 %py3_build
-%configure PYTHON="%{__python3}"
+%configure PYTHON="python3"
 %make_build
 
 %install
@@ -61,8 +61,8 @@ autoreconf -vif
 %make_install
 
 # unpackaged files
-rm -fv  $RPM_BUILD_ROOT%{python3_sitearch}/*.la
-rm -rfv $RPM_BUILD_ROOT%{_datadir}/doc/dbus-python/
+rm -fv  %{buildroot}%{python3_sitearch}/*.la
+rm -rfv %{buildroot}%{_docdir}/dbus-python/
 
 %check
 make check -k || (cat test-suite.log && false)
