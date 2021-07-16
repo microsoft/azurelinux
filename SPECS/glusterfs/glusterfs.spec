@@ -80,11 +80,6 @@ Distribution:   Mariner
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without server
 %{?_without_server:%global _without_server --without-server}
 
-# syslog
-# if you wish to build rpms without syslog logging, compile like this
-# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
-%{?_without_syslog:%global _without_syslog --disable-syslog}
-
 # disable syslog forcefully as rhel <= 6 doesn't have rsyslog or rsyslog-mmcount
 # Fedora deprecated syslog, see
 #  https://fedoraproject.org/wiki/Changes/NoDefaultSyslog
@@ -105,7 +100,6 @@ Distribution:   Mariner
 ##-----------------------------------------------------------------------------
 ## All %%global definitions should be placed here and keep them sorted
 ##
-
 
 %global _with_firewalld --enable-firewalld
 
@@ -143,17 +137,6 @@ Distribution:   Mariner
 
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-# We do not want to generate useless provides and requires for xlator
-# .so files to be set for glusterfs packages.
-# Filter all generated:
-#
-# TODO: RHEL5 does not have a convenient solution
-%if ( 0%{?rhel} == 6 )
-# filter_setup exists in RHEL6 only
-%filter_provides_in %{_libdir}/glusterfs/%{version}/
-%global __filter_from_req %{?__filter_from_req} | grep -v -P '^(?!lib).*\.so.*$'
-%filter_setup
-%else
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
 %global __provides_exclude_from ^%{_libdir}/glusterfs/%{version}/.*$
@@ -193,10 +176,10 @@ Requires:         %{name}-libs = %{version}-%{release}
 %{?systemd_requires}
 Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if 0%{?_with_asan:1} && !( 0%{?rhel} && 0%{?rhel} < 7 )
+%if 0%{?_with_asan:1}
 BuildRequires:    libasan
 %endif
-%if 0%{?_with_tsan:1} && !( 0%{?rhel} && 0%{?rhel} < 7 )
+%if 0%{?_with_tsan:1}
 BuildRequires:    libtsan
 %endif
 BuildRequires:    bison flex
@@ -205,17 +188,11 @@ BuildRequires:    ncurses-devel readline-devel
 BuildRequires:    libxml2-devel openssl-devel
 BuildRequires:    libaio-devel libacl-devel
 BuildRequires:    python%{_pythonver}-devel
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-BuildRequires:    python-ctypes
-%endif
 %if ( ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} ) )
 BuildRequires:    libtirpc-devel
 %endif
 BuildRequires:    rpcgen
 BuildRequires:    userspace-rcu-devel >= 0.7
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-BuildRequires:    automake
-%endif
 BuildRequires:    libuuid-devel
 %if ( 0%{?_with_cmocka:1} )
 BuildRequires:    libcmocka-devel >= 1.0.1
@@ -359,14 +336,7 @@ Requires:         %{name}-server%{?_isa} = %{version}-%{release}
 Requires:         python%{_pythonver}
 Requires:         python%{_pythonver}-prettytable
 Requires:         python%{_pythonver}-gluster = %{version}-%{release}
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-Requires:         python-requests
-%else
 Requires:         python%{_pythonver}-requests
-%endif
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-Requires:         python-argparse
-%endif
 %{?systemd_requires}
 
 %description events
@@ -585,18 +555,11 @@ Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 %if (0%{?_with_firewalld:1})
 # we install firewalld rules, so we need to have the directory owned
-%if ( 0%{!?rhel} )
-# not on RHEL because firewalld-filesystem appeared in 7.3
-# when EL7 rpm gets weak dependencies we can add a Suggests:
 Requires:         firewalld-filesystem
-%endif
 %endif
 
 Requires:         rpcbind
 
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-Requires:         python-argparse
-%endif
 Requires:         python%{_pythonver}-pyxattr
 %if (0%{?_with_valgrind:1})
 Requires:         valgrind
