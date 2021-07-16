@@ -1,15 +1,14 @@
-Summary: Utilities for manipulating .desktop files
-Name: desktop-file-utils
-Version: 0.24
-Release: 2%{?dist}
+Summary:        Utilities for manipulating .desktop files
+Name:           desktop-file-utils
+Version:        0.24
+Release:        2%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: https://www.freedesktop.org/software/desktop-file-utils
-Source0: https://www.freedesktop.org/software/desktop-file-utils/releases/%{name}-%{version}.tar.xz
-License: GPLv2+
-
+URL:            https://www.freedesktop.org/software/desktop-file-utils
+Source0:        https://www.freedesktop.org/software/desktop-file-utils/releases/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
-BuildRequires: glib2-devel
+BuildRequires:  glib2-devel
 
 %description
 .desktop files are used to describe an application for inclusion in
@@ -19,7 +18,6 @@ http://www.freedesktop.org/standards/, and desktop-file-install
 which installs a desktop file to the standard directory, optionally
 fixing it up in the process.
 
-
 %prep
 %autosetup -p1
 
@@ -28,7 +26,7 @@ fixing it up in the process.
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+make install DESTDIR=%{buildroot} INSTALL="install -p"
 
 %transfiletriggerin -- %{_datadir}/applications
 update-desktop-database &> /dev/null || :
