@@ -1674,6 +1674,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glusterfs",
+          "version": "7.9",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gmp",
           "version": "6.1.2",
           "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz"

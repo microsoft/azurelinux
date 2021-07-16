@@ -5,8 +5,6 @@ Distribution:   Mariner
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
 
-%global _hardened_build 1
-
 %global _for_fedora_koji_builds 1
 
 # uncomment and add '%' to use the %%dev for pre-releases
@@ -176,9 +174,9 @@ Version:          @PACKAGE_VERSION@
 Release:          0.@PACKAGE_RELEASE@%{?dist}.2
 %endif
 License:          GPLv2 or LGPLv3+
-URL:              http://docs.gluster.org/
+URL:              https://docs.gluster.org/
 %if ( 0%{_for_fedora_koji_builds} )
-Source0:          http://download.gluster.org/pub/gluster/%{name}/LATEST/%{version}%{?dev}/%{name}-%{version}%{?dev}.tar.gz
+Source0:          https://download.gluster.org/pub/gluster/%{name}/7/%{version}/%{name}-%{version}.tar.gz
 Source1:          glusterd.sysconfig
 Source2:          glusterfsd.sysconfig
 Source7:          glusterfsd.service
@@ -962,7 +960,6 @@ exit 0
 ## All %%files should be placed here and keep them sorted by groups
 ##
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING-GPLV2 COPYING-LGPLV3
 %doc ChangeLog INSTALL README.md THANKS COMMITMENT
 %{_mandir}/man8/*gluster*.8*
@@ -1349,7 +1346,9 @@ exit 0
 
 %changelog
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-3
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
+- License verified.
 
 * Tue Mar 09 2021  Henry Li <lihl[at]microsoft.com> - 7.9-2
 - Remove conditions that don't apply to CBL-Mariner

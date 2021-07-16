@@ -117,10 +117,11 @@ firewalld.
 %configure --enable-sysconfig --enable-rpmmacros PYTHON="python3 %{py3_shbang_opts}"
 # Enable the make line if there are patches affecting man pages to
 # regenerate them
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
+
 desktop-file-install --delete-original \
   --dir %{buildroot}%{_sysconfdir}/xdg/autostart \
   %{buildroot}%{_sysconfdir}/xdg/autostart/firewall-applet.desktop
@@ -292,6 +293,7 @@ fi
 * Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Added the '%%license' macro.
+- Using '%%make*' macros for building and installation.
 - License verified.
 
 * Fri Jan 15 2021 Eric Garver <eric@garver.life> - 0.8.6-1

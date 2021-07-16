@@ -41,6 +41,7 @@
                 "fmt",
                 "fribidi",
                 "gcovr",
+                "gluster",
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
