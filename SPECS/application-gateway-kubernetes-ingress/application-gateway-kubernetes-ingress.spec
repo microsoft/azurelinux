@@ -1,7 +1,4 @@
 %global debug_package %{nil}
-# The commit corresponds to the project release version
-# Can be obtained by git rev-parse --short HEAD
-%define COMMIT 0e9dc17c
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
@@ -44,7 +41,7 @@ tar -xf %{SOURCE1} --no-same-owner
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
 
-go build -ldflags "-s -X $VERSION_PATH.Version=$VERSION -X $VERSION_PATH.GitCommit=$COMMIT" -mod=vendor -v -o appgw-ingress ./cmd/appgw-ingress
+go build -ldflags "-s -X $VERSION_PATH.Version=$VERSION" -mod=vendor -v -o appgw-ingress ./cmd/appgw-ingress
 
 %install
 mkdir -p %{buildroot}%{_bindir}
