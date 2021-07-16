@@ -1,0 +1,60 @@
+From 4b0bda894a39df53d4369bab5d9e8799788d6047 Mon Sep 17 00:00:00 2001
+From: Laurent Fasnacht <fasnacht@protonmail.ch>
+Date: Mon, 10 Feb 2020 10:17:28 +0000
+Subject: [PATCH] scanner: remove parser_state->indesc_idx
+
+Now that we have a proper stack implementation, we don't need an
+additional counter for the number of buffer state pushed.
+
+Signed-off-by: Laurent Fasnacht <fasnacht@protonmail.ch>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+(cherry picked from commit 4a7a152105be6513a096f6a502b6eabe4d9befc3)
+Signed-off-by: Phil Sutter <psutter@redhat.com>
+---
+ include/parser.h | 1 -
+ src/scanner.l    | 6 ------
+ 2 files changed, 7 deletions(-)
+
+diff --git a/include/parser.h b/include/parser.h
+index 66db92d8d7720..636d1c8810e48 100644
+--- a/include/parser.h
++++ b/include/parser.h
+@@ -15,7 +15,6 @@
+ 
+ struct parser_state {
+ 	struct input_descriptor		*indesc;
+-	unsigned int			indesc_idx;
+ 	struct list_head		indesc_list;
+ 
+ 	struct list_head		*msgs;
+diff --git a/src/scanner.l b/src/scanner.l
+index 6852c19c4179b..b0545a9a63f30 100644
+--- a/src/scanner.l
++++ b/src/scanner.l
+@@ -673,12 +673,10 @@ static void scanner_push_indesc(struct parser_state *state,
+ 		list_add(&indesc->list, &state->indesc->list);
+ 
+ 	state->indesc = indesc;
+-	state->indesc_idx++;
+ }
+ 
+ static void scanner_pop_indesc(struct parser_state *state)
+ {
+-	state->indesc_idx--;
+ 	if (!list_empty(&state->indesc_list)) {
+ 		state->indesc = list_entry(state->indesc->list.prev,
+ 					   struct input_descriptor, list);
+@@ -968,10 +966,6 @@ void scanner_destroy(struct nft_ctx *nft)
+ {
+ 	struct parser_state *state = yyget_extra(nft->scanner);
+ 
+-	do {
+-		yypop_buffer_state(nft->scanner);
+-	} while (state->indesc_idx--);
+-
+ 	input_descriptor_list_destroy(state);
+ 	yylex_destroy(nft->scanner);
+ }
+-- 
+2.28.0
+

@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "nftables-0.9.3.tar.bz2": "956b915ce2a7aeaff123e49006be7a0690a0964e96c062703181a36e2e5edb78",
+  "nftables.conf": "0f50a7e6957b016cd40ba984548f2d9a7520b76ff3bb171f328c728e85114f6d",
+  "nftables.service": "d47968b6e62e545602b0a18d60abb79a22cd375b09b51e0f629b392ec35e065b"
+ }
+}
