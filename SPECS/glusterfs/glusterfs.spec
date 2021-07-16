@@ -140,7 +140,6 @@ Distribution:   Mariner
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
 %global __provides_exclude_from ^%{_libdir}/glusterfs/%{version}/.*$
-%endif
 
 
 ##-----------------------------------------------------------------------------

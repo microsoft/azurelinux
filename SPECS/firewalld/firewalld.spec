@@ -1,7 +1,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
-Version:        0.8.6
-Release:        2%{?dist}
+Version:        0.9.4
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,10 +62,8 @@ firewall with a D-Bus interface.
 Summary:        Python3 bindings for firewalld
 
 Requires:       python3-dbus
-Requires:       python3-decorator
 Requires:       python3-gobject-base
 Requires:       python3-nftables
-Requires:       python3-slip-dbus
 
 Obsoletes:      python-firewall < 0.5.2-2
 Obsoletes:      python2-firewall < 0.5.2-2
@@ -210,6 +208,7 @@ fi
 %{_datadir}/zsh/site-functions/_firewalld
 %{_libdir}/firewalld/icmptypes/*.xml
 %{_libdir}/firewalld/ipsets/README
+%{_libdir}/firewalld/policies/*.xml
 %{_libdir}/firewalld/services/*.xml
 %{_libdir}/firewalld/zones/*.xml
 %{_libdir}/firewalld/helpers/*.xml
@@ -290,8 +289,9 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
-* Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-2
+* Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.4-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Updated to version 0.9.4 to drop dependency on 'python3-slip-dbus' and 'python3-decorator'.
 - Added the '%%license' macro.
 - Using '%%make*' macros for building and installation.
 - License verified.

@@ -1435,8 +1435,8 @@
         "type": "other",
         "other": {
           "name": "firewalld",
-          "version": "0.8.6",
-          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.8.6/firewalld-0.8.6.tar.gz"
+          "version": "0.9.4",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.9.4/firewalld-0.9.4.tar.gz"
         }
       }
     },
