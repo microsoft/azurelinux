@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.4.4+azure
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -13,6 +13,7 @@ Group: Tools/Container
 %define vernum %(echo "%{version}" | cut -d+ -f1)
 #Source0: https://github.com/containerd/containerd/archive/v%{vernum}.tar.gz
 Source0: moby-containerd-%{version}.tar.gz
+Patch0: CVE-2021-21334.patch
 Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
@@ -68,7 +69,7 @@ used directly by developers or end-users.
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
+%autosetup -n %{name}-%{version} -c
 mkdir -p %{OUR_GOPATH}/src/github.com/containerd
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/containerd/containerd
 
@@ -133,6 +134,8 @@ fi
 %{_mandir}/*/*
 
 %changelog
+*   Fri Jul 16 2021 Mariner Autopatcher <cblmargh@microsoft.com> 1.4.4+azure-2
+-   Added patch file(s) CVE-2021-21334.patch
 * Mon Jul 12 2021 Andrew Phelps <anphel@microsoft.com> 1.4.4+azure-1
 - Update to version 1.4.4+azure
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.3.4+azure-3
