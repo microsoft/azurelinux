@@ -28,6 +28,7 @@
                 "cryptsetup",
                 "CUnit",
                 "Cython",
+                "dbus-python",
                 "desktop-file-utils",
                 "dnf",
                 "dpdk",

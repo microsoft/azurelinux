@@ -1014,6 +1014,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dbus-python",
+          "version": "1.2.16",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"

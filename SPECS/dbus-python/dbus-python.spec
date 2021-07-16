@@ -3,12 +3,11 @@ Distribution:   Mariner
 Summary: D-Bus Python Bindings
 Name:    dbus-python
 Version: 1.2.16
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: MIT
-URL:     http://www.freedesktop.org/wiki/Software/DBusBindings/
-Source0: http://dbus.freedesktop.org/releases/dbus-python/%{name}-%{version}.tar.gz
-Source1: http://dbus.freedesktop.org/releases/dbus-python/%{name}-%{version}.tar.gz.asc
+URL:     https://www.freedesktop.org/wiki/Software/DBusBindings/
+Source0: https://dbus.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 
 # borrow centos7 patch to use sitearch properly
 Patch0: 0001-Move-python-modules-to-architecture-specific-directo.patch
@@ -81,6 +80,10 @@ make check -k || (cat test-suite.log && false)
 %{_libdir}/pkgconfig/dbus-python.pc
 
 %changelog
+* Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.16-3
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
+
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.16-2
 - Remove buildrequires for check
 
