@@ -18,18 +18,13 @@ BuildRequires:  dbus-devel
 BuildRequires:  dbus-glib-devel
 BuildRequires:  libtool
 
-%if %{with_check}
-BuildRequires:  dbus-x11
-BuildRequires:  python3-gobject
-%endif
-
 %description
 D-Bus python bindings for use with python programs.
 
 %package -n python3-dbus
-%{?python_provide:%python_provide python3-dbus}
 Summary:        D-Bus bindings for python3
 
+%{?python_provide:%python_provide python3-dbus}
 BuildRequires:  python3-devel
 # for py3_build
 BuildRequires:  python3dist(setuptools)
@@ -51,9 +46,9 @@ bindings.
 autoreconf -vif
 
 %build
-%{set_build_flags}
+%set_build_flags
 %py3_build
-%configure PYTHON="python3"
+%configure PYTHON="%{__python3}"
 %make_build
 
 %install
