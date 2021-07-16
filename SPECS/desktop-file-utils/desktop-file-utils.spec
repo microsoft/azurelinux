@@ -23,10 +23,13 @@ fixing it up in the process.
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%make_install INSTALL="install -p"
+
+# We don't support the 'emacs' bits.
+rm %{buildroot}%{_datadir}/emacs/site-lisp/desktop-entry-mode.el
 
 %transfiletriggerin -- %{_datadir}/applications
 update-desktop-database &> /dev/null || :
@@ -46,6 +49,7 @@ update-desktop-database &> /dev/null || :
 %changelog
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.24-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Using '%%make*' macros for building and installation.
 - License verified.
 - Remove emacs dependency and support.
 

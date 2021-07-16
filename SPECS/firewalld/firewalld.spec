@@ -1,108 +1,120 @@
+Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
+Name:           firewalld
+Version:        0.8.6
+Release:        2%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: A firewall daemon with D-Bus interface providing a dynamic firewall
-Name: firewalld
-Version: 0.8.6
-Release: 2%{?dist}
-URL:     http://www.firewalld.org
-License: GPLv2+
-Source0: https://github.com/firewalld/firewalld/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Source1: FedoraServer.xml
-Source2: FedoraWorkstation.xml
-Patch0: firewalld-0.2.6-MDNS-default.patch
-BuildArch: noarch
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: desktop-file-utils
-BuildRequires: gettext
-BuildRequires: intltool
-# glib2-devel is needed for gsettings.m4
-BuildRequires: glib2, glib2-devel
-BuildRequires: systemd-units
-BuildRequires: docbook-style-xsl
-BuildRequires: libxslt
-BuildRequires: iptables, ebtables, ipset
-BuildRequires: python3-devel
-Requires: iptables, ebtables, ipset
-Suggests: iptables-nft
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-Requires: firewalld-filesystem = %{version}-%{release}
-Requires: python3-firewall  = %{version}-%{release}
-Obsoletes: firewalld-selinux < 0.4.4.2-2
-Conflicts: selinux-policy < 3.14.1-28
-Conflicts: cockpit-ws < 173-2
+URL:            https://www.firewalld.org
+Source0:        https://github.com/firewalld/firewalld/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1:        FedoraServer.xml
+Source2:        FedoraWorkstation.xml
+Patch0:         firewalld-0.2.6-MDNS-default.patch
 
-Provides: variant_config(Server)
-Provides: variant_config(Workstation)
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  desktop-file-utils
+BuildRequires:  docbook-style-xsl
+BuildRequires:  ebtables
+BuildRequires:  gettext
+# glib2-devel is needed for gsettings.m4
+BuildRequires:  glib2
+BuildRequires:  glib2-devel
+BuildRequires:  intltool
+BuildRequires:  ipset
+BuildRequires:  iptables
+BuildRequires:  libxslt
+BuildRequires:  python3-devel
+BuildRequires:  systemd-units
+
+Requires:       ebtables
+Requires:       firewalld-filesystem = %{version}-%{release}
+Requires:       ipset
+Requires:       iptables
+Requires:       python3-firewall = %{version}-%{release}
+Requires(post): systemd
+Requires(postun): systemd
+Requires(preun): systemd
+
+Suggests:       iptables-nft
+
+Conflicts:      cockpit-ws < 173-2
+Conflicts:      selinux-policy < 3.14.1-28
 
 # Remove old config subpackages
-Obsoletes: firewalld-config-standard <= 0.3.15
-Obsoletes: firewalld-config-cloud <= 0.3.15
-Obsoletes: firewalld-config-server <= 0.3.15
-Obsoletes: firewalld-config-workstation <= 0.3.15
+Obsoletes:      firewalld-config-standard <= 0.3.15
+Obsoletes:      firewalld-config-cloud <= 0.3.15
+Obsoletes:      firewalld-config-server <= 0.3.15
+Obsoletes:      firewalld-config-workstation <= 0.3.15
+Obsoletes:      firewalld-selinux < 0.4.4.2-2
+
+Provides:       variant_config(Server)
+Provides:       variant_config(Workstation)
+
+BuildArch:      noarch
 
 %description
-firewalld is a firewall service daemon that provides a dynamic customizable 
+firewalld is a firewall service daemon that provides a dynamic customizable
 firewall with a D-Bus interface.
 
 %package -n python3-firewall
-Summary: Python3 bindings for firewalld
-
 %{?python_provide:%python_provide python3-firewall}
+Summary:        Python3 bindings for firewalld
 
-Obsoletes: python-firewall < 0.5.2-2
-Obsoletes: python2-firewall < 0.5.2-2
-Requires: python3-dbus
-Requires: python3-slip-dbus
-Requires: python3-decorator
-Requires: python3-gobject-base
-Requires: python3-nftables
+Requires:       python3-dbus
+Requires:       python3-decorator
+Requires:       python3-gobject-base
+Requires:       python3-nftables
+Requires:       python3-slip-dbus
+
+Obsoletes:      python-firewall < 0.5.2-2
+Obsoletes:      python2-firewall < 0.5.2-2
 
 %description -n python3-firewall
 Python3 bindings for firewalld.
 
 %package -n firewalld-filesystem
-Summary: Firewalld directory layout and rpm macros
+Summary:        Firewalld directory layout and rpm macros
 
 %description -n firewalld-filesystem
 This package provides directories and rpm macros which
 are required by other packages that add firewalld configuration files.
 
 %package -n firewall-applet
-Summary: Firewall panel applet
-Requires: %{name} = %{version}-%{release}
-Requires: firewall-config = %{version}-%{release}
-Requires: hicolor-icon-theme
-Requires: python3-qt5-base
-Requires: python3-gobject
-Requires: libnotify
-Requires: NetworkManager-libnm
-Requires: dbus-x11
+Summary:        Firewall panel applet
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       NetworkManager-libnm
+Requires:       dbus-x11
+Requires:       firewall-config = %{version}-%{release}
+Requires:       hicolor-icon-theme
+Requires:       libnotify
+Requires:       python3-gobject
+Requires:       python3-qt5-base
 
 %description -n firewall-applet
-The firewall panel applet provides a status information of firewalld and also 
+The firewall panel applet provides a status information of firewalld and also
 the firewall settings.
 
 %package -n firewall-config
-Summary: Firewall configuration application
-Requires: %{name} = %{version}-%{release}
-Requires: hicolor-icon-theme
-Requires: gtk3
-Requires: python3-gobject
-Requires: NetworkManager-libnm
-Requires: dbus-x11
+Summary:        Firewall configuration application
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       NetworkManager-libnm
+Requires:       dbus-x11
+Requires:       gtk3
+Requires:       hicolor-icon-theme
+Requires:       python3-gobject
 
 %description -n firewall-config
-The firewall configuration application provides an configuration interface for 
+The firewall configuration application provides an configuration interface for
 firewalld.
 
 %prep
 %autosetup -p1
 
 %build
-%configure --enable-sysconfig --enable-rpmmacros PYTHON="%{__python3} %{py3_shbang_opts}"
+%configure --enable-sysconfig --enable-rpmmacros PYTHON="python3 %{py3_shbang_opts}"
 # Enable the make line if there are patches affecting man pages to
 # regenerate them
 make %{?_smp_mflags}
@@ -116,9 +128,9 @@ desktop-file-install --delete-original \
   --dir %{buildroot}%{_datadir}/applications \
   %{buildroot}%{_datadir}/applications/firewall-config.desktop
 
-install -d -m 755 %{buildroot}%{_prefix}/lib/firewalld/zones/
-install -c -m 644 %{SOURCE1} %{buildroot}%{_prefix}/lib/firewalld/zones/FedoraServer.xml
-install -c -m 644 %{SOURCE2} %{buildroot}%{_prefix}/lib/firewalld/zones/FedoraWorkstation.xml
+install -d -m 755 %{buildroot}%{_libdir}/firewalld/zones/
+install -c -m 644 %{SOURCE1} %{buildroot}%{_libdir}/firewalld/zones/FedoraServer.xml
+install -c -m 644 %{SOURCE2} %{buildroot}%{_libdir}/firewalld/zones/FedoraWorkstation.xml
 
 # standard firewalld.conf
 mv %{buildroot}%{_sysconfdir}/firewalld/firewalld.conf \
@@ -139,7 +151,7 @@ sed -i 's|^DefaultZone=.*|DefaultZone=FedoraWorkstation|g' \
 rm -f %{buildroot}%{_datadir}/polkit-1/actions/org.fedoraproject.FirewallD1.policy
 
 # remove file mistakenly added to upstream dist tarball
-rm -f %{buildroot}%{_datadir}/man/man1/firewallctl.1
+rm -f %{buildroot}%{_mandir}/man1/firewallctl.1
 
 %find_lang %{name} --all-name
 
@@ -150,7 +162,7 @@ rm -f %{buildroot}%{_datadir}/man/man1/firewallctl.1
 %systemd_preun firewalld.service
 
 %postun
-%systemd_postun_with_restart firewalld.service 
+%systemd_postun_with_restart firewalld.service
 
 %posttrans
 # If we don't yet have a symlink or existing file for firewalld.conf,
@@ -158,7 +170,7 @@ rm -f %{buildroot}%{_datadir}/man/man1/firewallctl.1
 # at the same time, so they are in sync.
 
 # Import /etc/os-release to get the variant definition
-. /etc/os-release || :
+. %{_sysconfdir}/os-release || :
 
 if [ ! -e %{_sysconfdir}/firewalld/firewalld.conf ]; then
     case "$VARIANT_ID" in
@@ -195,11 +207,11 @@ fi
 %{_datadir}/bash-completion/completions/firewall-cmd
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_firewalld
-%{_prefix}/lib/firewalld/icmptypes/*.xml
-%{_prefix}/lib/firewalld/ipsets/README
-%{_prefix}/lib/firewalld/services/*.xml
-%{_prefix}/lib/firewalld/zones/*.xml
-%{_prefix}/lib/firewalld/helpers/*.xml
+%{_libdir}/firewalld/icmptypes/*.xml
+%{_libdir}/firewalld/ipsets/README
+%{_libdir}/firewalld/services/*.xml
+%{_libdir}/firewalld/zones/*.xml
+%{_libdir}/firewalld/helpers/*.xml
 %attr(0750,root,root) %dir %{_sysconfdir}/firewalld
 %ghost %config(noreplace) %{_sysconfdir}/firewalld/firewalld.conf
 %config(noreplace) %{_sysconfdir}/firewalld/firewalld-standard.conf
@@ -247,12 +259,12 @@ fi
 %{python3_sitelib}/firewall/server/__pycache__/*.py*
 
 %files -n firewalld-filesystem
-%dir %{_prefix}/lib/firewalld
-%dir %{_prefix}/lib/firewalld/helpers
-%dir %{_prefix}/lib/firewalld/icmptypes
-%dir %{_prefix}/lib/firewalld/ipsets
-%dir %{_prefix}/lib/firewalld/services
-%dir %{_prefix}/lib/firewalld/zones
+%dir %{_libdir}/firewalld
+%dir %{_libdir}/firewalld/helpers
+%dir %{_libdir}/firewalld/icmptypes
+%dir %{_libdir}/firewalld/ipsets
+%dir %{_libdir}/firewalld/services
+%dir %{_libdir}/firewalld/zones
 %{_rpmconfigdir}/macros.d/macros.firewalld
 
 %files -n firewall-applet
