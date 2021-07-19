@@ -1024,9 +1024,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dbus-python",
+          "version": "1.2.16",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "desktop-file-utils",
+          "version": "0.24",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.24.tar.xz"
         }
       }
     },
@@ -1434,6 +1454,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "firewalld",
+          "version": "0.9.4",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.9.4/firewalld-0.9.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "flannel",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
@@ -1657,6 +1687,16 @@
           "name": "glibmm24",
           "version": "2.56.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.56/glibmm-2.56.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "glusterfs",
+          "version": "7.9",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
         }
       }
     },
@@ -3977,6 +4017,16 @@
           "name": "nfs-utils",
           "version": "2.3.3",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/nfs-utils/2.3.3/nfs-utils-2.3.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nftables",
+          "version": "0.9.3",
+          "downloadUrl": "https://netfilter.org/projects/nftables//files/nftables-0.9.3.tar.bz2"
         }
       }
     },

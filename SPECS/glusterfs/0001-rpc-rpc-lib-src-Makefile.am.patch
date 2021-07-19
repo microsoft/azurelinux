@@ -1,0 +1,12 @@
+--- glusterfs-8.0/rpc/rpc-lib/src/Makefile.am.orig	2020-07-22 08:09:31.315980869 -0400
++++ glusterfs-8.0/rpc/rpc-lib/src/Makefile.am	2020-07-22 08:10:12.203980869 -0400
+@@ -2,8 +2,7 @@
+ 
+ libgfrpc_la_SOURCES = auth-unix.c rpcsvc-auth.c rpcsvc.c auth-null.c \
+ 	rpc-transport.c xdr-rpc.c xdr-rpcclnt.c rpc-clnt.c auth-glusterfs.c \
+-	rpc-drc.c $(CONTRIBDIR)/sunrpc/xdr_sizeof.c  rpc-clnt-ping.c \
+-        autoscale-threads.c mgmt-pmap.c
++	rpc-drc.c rpc-clnt-ping.c autoscale-threads.c mgmt-pmap.c
+ 
+ EXTRA_DIST = libgfrpc.sym
+ 
