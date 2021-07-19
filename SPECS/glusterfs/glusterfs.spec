@@ -1230,6 +1230,8 @@ exit 0
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
+- Removed conditions that don't apply in CBL0Mariner.
+- Disabled Python byte compilation.
 - Using '%%make*' macros for building and installation.
 - License verified.
 
