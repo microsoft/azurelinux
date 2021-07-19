@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "version": "1.10.11",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -4395,8 +4395,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.0",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.0/node-v14.17.0.tar.xz"
+          "version": "14.17.2",
+          "downloadUrl": "https://nodejs.org/download/release/v14.17.2/node-v14.17.2.tar.xz"
         }
       }
     },
