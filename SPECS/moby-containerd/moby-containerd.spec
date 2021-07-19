@@ -17,7 +17,7 @@ Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
-Patch0:  1.4-Use-chmod-path-for-checking-symlink.patch
+Patch0:  CVE-2021-32760.patch
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
