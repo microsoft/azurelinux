@@ -1,7 +1,7 @@
 Summary:        Utilities for manipulating .desktop files
 Name:           desktop-file-utils
 Version:        0.24
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
