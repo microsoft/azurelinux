@@ -22,8 +22,7 @@ BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       python3-setuptools
-# This creates a cyclic dependency when installing. Comment out for now
-#Requires:       python3-ruamel-yaml
+Requires:       python3-ruamel-yaml
 
 %description -n python3-%{pname}
 It is the C based reader/scanner and emitter for ruamel.yaml.
@@ -49,7 +48,6 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.1.2-7
 - Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
-- Comment out requires python3-ruamel-yaml
 - License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.2-6
