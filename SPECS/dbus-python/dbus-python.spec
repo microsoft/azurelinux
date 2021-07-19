@@ -76,10 +76,10 @@ make check -k || (cat test-suite.log && false)
 
 %changelog
 * Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.16-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
 
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.16-2
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove buildrequires for check
 
 * Tue Feb 11 2020 Leigh Scott <leigh123linux@gmail.com> - 1.2.16-1
