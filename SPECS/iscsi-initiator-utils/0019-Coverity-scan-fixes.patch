@@ -1,0 +1,123 @@
+From 44bb05de04c0f8819c1fdae8f567dd802a8444e8 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 5 Jun 2019 09:08:39 -0700
+Subject: [PATCH] Coverity scan fixes
+
+---
+ iscsiuio/src/unix/libs/qedi.c |  2 +-
+ iscsiuio/src/unix/main.c      | 12 ++++++++++--
+ libopeniscsiusr/idbm.c        | 11 +++++------
+ usr/idbm.c                    | 10 ++++------
+ usr/iscsid.c                  |  2 +-
+ 5 files changed, 21 insertions(+), 16 deletions(-)
+
+diff --git a/iscsiuio/src/unix/libs/qedi.c b/iscsiuio/src/unix/libs/qedi.c
+index 3414cb5..a359700 100644
+--- a/iscsiuio/src/unix/libs/qedi.c
++++ b/iscsiuio/src/unix/libs/qedi.c
+@@ -1023,7 +1023,7 @@ static int qedi_read(nic_t *nic, packet_t *pkt)
+ 
+ 	LOG_DEBUG(PFX "%s:hw_prod %d bd_prod %d, rx_pkt_idx %d, rxlen %d",
+ 		  nic->log_name, hw_prod, bd_prod, rx_bd->rx_pkt_index, len);
+-	LOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %d",
++	LOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %lu",
+ 		  nic->log_name, sw_cons, bd_cons, QEDI_NUM_RX_BD);
+ 
+ 	if (bd_cons != bd_prod) {
+diff --git a/iscsiuio/src/unix/main.c b/iscsiuio/src/unix/main.c
+index 5e3f66c..4c50890 100644
+--- a/iscsiuio/src/unix/main.c
++++ b/iscsiuio/src/unix/main.c
+@@ -341,7 +341,10 @@ int main(int argc, char *argv[])
+ 
+ 			/* parent: wait for child msg then exit */
+ 			close(pipefds[1]);
+-			read(pipefds[0], msgbuf, sizeof(msgbuf));
++			if (read(pipefds[0], msgbuf, sizeof(msgbuf)) < 0) {
++				fprintf(stderr, "ERR: Waiting for child process failed\n");
++				exit(1);
++			}
+ 			exit(0);
+ 		}
+ 
+@@ -387,6 +390,9 @@ int main(int argc, char *argv[])
+ 	sigaddset(&set, SIGTERM);
+ 	sigaddset(&set, SIGUSR1);
+ 	rc = pthread_sigmask(SIG_SETMASK, &set, NULL);
++	if (rc != 0) {
++		LOG_ERR("Failed to set thread signal mask");
++	}
+ 
+ 	/*  Spin off the signal handling thread */
+ 	pthread_attr_init(&attr);
+@@ -416,7 +422,9 @@ int main(int argc, char *argv[])
+ 	if (!foreground) {
+ 		/* signal parent they can go away now */
+ 		close(pipefds[0]);
+-		write(pipefds[1], "ok\n", 3);
++		if (write(pipefds[1], "ok\n", 3) < 0) {
++			LOG_ERR("Failed to signal parent process of completed initialization");
++		}
+ 		close(pipefds[1]);
+ 	}
+ 
+diff --git a/libopeniscsiusr/idbm.c b/libopeniscsiusr/idbm.c
+index d020e6c..342aab5 100644
+--- a/libopeniscsiusr/idbm.c
++++ b/libopeniscsiusr/idbm.c
+@@ -287,12 +287,11 @@ int _idbm_lock(struct iscsi_context *ctx)
+ 		return 0;
+ 	}
+ 
+-	if (access(LOCK_DIR, F_OK) != 0) {
+-		if (mkdir(LOCK_DIR, 0660) != 0) {
+-			_error(ctx, "Could not open %s: %d %s", LOCK_DIR, errno,
+-				_strerror(errno, strerr_buff));
+-			return LIBISCSI_ERR_IDBM;
+-		}
++	if (((mkdir(LOCK_DIR, 0660) != 0) && (errno != EEXIST)) ||
++	    (access(LOCK_DIR, F_OK) != 0)) {
++		_error(ctx, "Could not open %s: %d %s", LOCK_DIR, errno,
++			_strerror(errno, strerr_buff));
++		return LIBISCSI_ERR_IDBM;
+ 	}
+ 
+ 	fd = open(LOCK_FILE, O_RDWR | O_CREAT, 0666);
+diff --git a/usr/idbm.c b/usr/idbm.c
+index 3184c77..0c6870c 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -1339,12 +1339,10 @@ int idbm_lock(void)
+ 		return 0;
+ 	}
+ 
+-	if (access(LOCK_DIR, F_OK) != 0) {
+-		if (mkdir(LOCK_DIR, 0660) != 0) {
+-			log_error("Could not open %s: %s", LOCK_DIR,
+-				  strerror(errno));
+-			return ISCSI_ERR_IDBM;
+-		}
++	if (((mkdir(LOCK_DIR, 0660) != 0) && (errno != EEXIST)) ||
++	    (access(LOCK_DIR, F_OK) != 0)) {
++		log_error("Could not open %s: %s", LOCK_DIR, strerror(errno));
++		return ISCSI_ERR_IDBM;
+ 	}
+ 
+ 	fd = open(LOCK_FILE, O_RDWR | O_CREAT, 0666);
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index 8f1c597..96a6452 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -489,8 +489,8 @@ int main(int argc, char *argv[])
+ 				log_close(log_pid);
+ 				exit(ISCSI_ERR);
+ 			}
++			close(fd);
+ 		}
+-		close(fd);
+ 
+ 		if ((control_fd = ipc->ctldev_open()) < 0) {
+ 			log_close(log_pid);
+-- 
+2.21.0
+

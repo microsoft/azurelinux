@@ -154,6 +154,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "application-gateway-kubernetes-ingress",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apr",
           "version": "1.6.5",
           "downloadUrl": "http://archive.apache.org/dist/apr/apr-1.6.5.tar.gz"
@@ -237,6 +247,16 @@
           "name": "audit",
           "version": "3.0",
           "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0-alpha8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "augeas",
+          "version": "1.12.0",
+          "downloadUrl": "http://download.augeas.net/augeas-1.12.0.tar.gz"
         }
       }
     },
@@ -384,6 +404,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bazel",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bazel-workspaces",
+          "version": "20200113",
+          "downloadUrl": "https://github.com/kubic-project/bazel-workspaces/archive/7c8f2656c458e1fc3c5177f1ab92a6f8563c0ca6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bc",
           "version": "1.07.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz"
@@ -487,6 +527,16 @@
           "name": "boost",
           "version": "1.66.0",
           "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "boringssl",
+          "version": "20200921",
+          "downloadUrl": "https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz"
         }
       }
     },
@@ -974,9 +1024,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dbus-python",
+          "version": "1.2.16",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "desktop-file-utils",
+          "version": "0.24",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.24.tar.xz"
         }
       }
     },
@@ -1234,6 +1304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "envoy",
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "erlang",
           "version": "22.0.7",
           "downloadUrl": "https://github.com/erlang/otp/archive/OTP-22.0.7/otp-OTP-22.0.7.tar.gz"
@@ -1334,6 +1414,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fdupes",
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.1/fdupes-2.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "file",
           "version": "5.38",
           "downloadUrl": "ftp://ftp.astron.com/pub/file/file-5.38.tar.gz"
@@ -1364,6 +1454,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "firewalld",
+          "version": "0.9.4",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.9.4/firewalld-0.9.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "flannel",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
@@ -1387,6 +1487,16 @@
           "name": "fluent-bit",
           "version": "1.4.1",
           "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fmt",
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/fmtlib/fmt/archive/7.0.3.tar.gz"
         }
       }
     },
@@ -1484,6 +1594,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gcovr",
+          "version": "4.2",
+          "downloadUrl": "https://github.com/gcovr/gcovr/archive/4.2/gcovr-4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gdb",
           "version": "8.3",
           "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.xz"
@@ -1574,6 +1694,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glusterfs",
+          "version": "7.9",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gmp",
           "version": "6.1.2",
           "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz"
@@ -1657,6 +1787,16 @@
           "name": "golang",
           "version": "1.15.7",
           "downloadUrl": "https://dl.google.com/go/go1.15.7.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang-packaging",
+          "version": "15.0.15",
+          "downloadUrl": "https://github.com/openSUSE/golang-packaging/archive/refs/tags/v15.0.15.tar.gz"
         }
       }
     },
@@ -1874,6 +2014,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hwdata",
+          "version": "0.341",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyperv-daemons",
           "version": "5.10.28.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
@@ -2047,6 +2197,26 @@
           "name": "irqbalance",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "iscsi-initiator-utils",
+          "version": "6.2.1.0+20191114.4440e57a59",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/4440e57a59c7f1c23bbfdcb10844017f478918b6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isns-utils",
+          "version": "0.97",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.97.tar.gz"
         }
       }
     },
@@ -2357,6 +2527,16 @@
           "name": "kubernetes",
           "version": "1.20.5",
           "downloadUrl": "https://kubernetesartifacts.azureedge.net/kubernetes/v1.20.5-hotfix.20210428/binaries/kubernetes-node-linux-amd64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kured",
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.6.1.tar.gz"
         }
       }
     },
@@ -2907,6 +3087,16 @@
           "name": "libpcap",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpciaccess",
+          "version": "0.16",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
         }
       }
     },
@@ -3834,6 +4024,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nftables",
+          "version": "0.9.3",
+          "downloadUrl": "https://netfilter.org/projects/nftables//files/nftables-0.9.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nghttp2",
           "version": "1.41.0",
           "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"
@@ -3877,6 +4077,16 @@
           "name": "nmap",
           "version": "7.90",
           "downloadUrl": "https://nmap.org/dist/nmap-7.90.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nmi",
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.7.0.tar.gz"
         }
       }
     },
@@ -3967,6 +4177,16 @@
           "name": "numactl",
           "version": "2.0.13",
           "downloadUrl": "https://github.com/numactl/numactl/releases/download/v2.0.13/numactl-2.0.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "numad",
+          "version": "0.5+20150602.aec1497e2b",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
         }
       }
     },
@@ -4177,6 +4397,16 @@
           "name": "patch",
           "version": "2.7.6",
           "downloadUrl": "https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "patchelf",
+          "version": "0.12",
+          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.12/patchelf-0.12.tar.gz"
         }
       }
     },
@@ -6814,6 +7044,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sanlock",
+          "version": "3.8.1",
+          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "scons",
           "version": "3.0.1",
           "downloadUrl": "http://downloads.sourceforge.net/scons/scons-3.0.1.tar.gz"
@@ -7544,9 +7784,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-util-macros",
+          "version": "1.19.2",
+          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.19.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xz",
           "version": "5.2.4",
           "downloadUrl": "http://tukaani.org/xz/xz-5.2.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "yajl",
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/lloyd/yajl/archive/refs/tags/2.1.0.tar.gz"
         }
       }
     },

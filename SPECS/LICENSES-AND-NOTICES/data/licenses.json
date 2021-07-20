@@ -10,10 +10,10 @@
             "origin": "Fedora",
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
-                "ant-contrib",
                 "at",
                 "atf",
                 "attr",
+                "augeas",
                 "autoconf213",
                 "babeltrace2",
                 "bmake",
@@ -28,6 +28,8 @@
                 "cryptsetup",
                 "CUnit",
                 "Cython",
+                "dbus-python",
+                "desktop-file-utils",
                 "dnf",
                 "dpdk",
                 "docbook5-schemas",
@@ -35,13 +37,21 @@
                 "dwz",
                 "ebtables",
                 "extra-cmake-modules",
+                "fdupes",
+                "firewalld",
+                "fmt",
                 "fribidi",
+                "gcovr",
+                "glusterfs",
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
+                "hwdata",
                 "hyperv-daemons",
                 "ipmitool",
                 "ipv6calc",
+                "iscsi-initiator-utils",
+                "isns-utils",
                 "javapackages-tools",
                 "jemalloc",
                 "kde-settings",
@@ -62,14 +72,18 @@
                 "libisoburn",
                 "libisofs",
                 "libkcapi",
+                "libpciaccess",
                 "libpwquality",
                 "libstoragemgmt",
+                "libvirt",
                 "libxcrypt",
                 "mokutil",
                 "mozjs60",
+                "nftables",
                 "open-vm-tools",
                 "openssl",
                 "p11-kit",
+                "patchelf",
                 "perl-JSON",
                 "pkgconf",
                 "pugixml",
@@ -84,6 +98,7 @@
                 "qt5-qttools",
                 "qt5-rpm-macros",
                 "rdma-core",
+                "sanlock",
                 "sgml-common",
                 "squashfs-tools",
                 "uclibc-ng",
@@ -91,6 +106,8 @@
                 "websocketpp",
                 "words",
                 "xmlstarlet",
+                "xorg-x11-util-macros",
+                "yajl",
                 "yaml-cpp",
                 "yasm",
                 "zipper"
@@ -100,11 +117,13 @@
             "origin": "Microsoft",
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
+                "application-gateway-kubernetes-ingress",
                 "aspnetcore-runtime-3.1",
                 "auoms",
                 "azure-iot-sdk-c",
                 "azure-iotedge",
                 "azure-storage-cpp",
+                "bazel",
                 "bpftrace",
                 "blobfuse",
                 "bmon",
@@ -159,6 +178,7 @@
                 "ncompress",
                 "nlohmann-json",
                 "nmap",
+                "nmi",
                 "ntopng",
                 "oath-toolkit",
                 "omi",
@@ -205,7 +225,12 @@
             "specs": [
                 "ant",
                 "ant-contrib",
-                "jna"
+                "bazel-workspaces",
+                "boringssl",
+                "envoy",
+                "golang-packaging",
+                "jna",
+                "kured"
             ]
         },
         {
@@ -751,6 +776,13 @@
             "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
             "specs": [
                 "ceph"
+            ]
+        },
+        {
+            "origin": "Numad source",
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
             ]
         }
     ]

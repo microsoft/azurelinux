@@ -1,0 +1,114 @@
+From 0b525f027dea51037ac2d8ddb8e67c365c4f199f Mon Sep 17 00:00:00 2001
+From: Laurent Fasnacht <fasnacht@protonmail.ch>
+Date: Mon, 10 Feb 2020 05:17:35 -0500
+Subject: [PATCH] Inclusion depth was computed incorrectly for glob includes.
+
+Signed-off-by: Laurent Fasnacht <fasnacht@protonmail.ch>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+(cherry picked from commit 6a28519008b239ac6985f8df46427459f6b5c624)
+Signed-off-by: Phil Sutter <psutter@redhat.com>
+---
+ include/nftables.h |  2 ++
+ src/scanner.l      | 20 ++++++++++++++------
+ 2 files changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/include/nftables.h b/include/nftables.h
+index 07726e4dd5a40..3556728de6f9b 100644
+--- a/include/nftables.h
++++ b/include/nftables.h
+@@ -176,6 +176,7 @@ enum input_descriptor_types {
+  *
+  * @location:		location, used for include statements
+  * @f:			file descriptor
++ * @depth:		include depth of the descriptor
+  * @type:		input descriptor type
+  * @name:		name describing the input
+  * @union:		buffer or file descriptor, depending on type
+@@ -187,6 +188,7 @@ enum input_descriptor_types {
+ struct input_descriptor {
+ 	struct list_head		list;
+ 	FILE				*f;
++	unsigned int			depth;
+ 	struct location			location;
+ 	enum input_descriptor_types	type;
+ 	const char			*name;
+diff --git a/src/scanner.l b/src/scanner.l
+index 998ebff389451..dc20cd3d79d43 100644
+--- a/src/scanner.l
++++ b/src/scanner.l
+@@ -693,7 +693,8 @@ static void scanner_pop_buffer(yyscan_t scanner)
+ 
+ static void scanner_push_file(struct nft_ctx *nft, void *scanner,
+ 			      FILE *f, const char *filename,
+-			      const struct location *loc)
++			      const struct location *loc,
++			      const struct input_descriptor *parent_indesc)
+ {
+ 	struct parser_state *state = yyget_extra(scanner);
+ 	struct input_descriptor *indesc;
+@@ -709,19 +710,25 @@ static void scanner_push_file(struct nft_ctx *nft, void *scanner,
+ 	indesc->type	= INDESC_FILE;
+ 	indesc->name	= xstrdup(filename);
+ 	indesc->f	= f;
++	if (!parent_indesc) {
++		indesc->depth = 1;
++	} else {
++		indesc->depth = parent_indesc->depth + 1;
++	}
+ 	init_pos(indesc);
+ 
+ 	scanner_push_indesc(state, indesc);
+ }
+ 
+ static int include_file(struct nft_ctx *nft, void *scanner,
+-			const char *filename, const struct location *loc)
++			const char *filename, const struct location *loc,
++			const struct input_descriptor *parent_indesc)
+ {
+ 	struct parser_state *state = yyget_extra(scanner);
+ 	struct error_record *erec;
+ 	FILE *f;
+ 
+-	if (state->indesc_idx == MAX_INCLUDE_DEPTH) {
++	if (parent_indesc && parent_indesc->depth == MAX_INCLUDE_DEPTH) {
+ 		erec = error(loc, "Include nested too deeply, max %u levels",
+ 			     MAX_INCLUDE_DEPTH);
+ 		goto err;
+@@ -733,7 +740,7 @@ static int include_file(struct nft_ctx *nft, void *scanner,
+ 			     filename, strerror(errno));
+ 		goto err;
+ 	}
+-	scanner_push_file(nft, scanner, f, filename, loc);
++	scanner_push_file(nft, scanner, f, filename, loc, parent_indesc);
+ 	return 0;
+ err:
+ 	erec_queue(erec, state->msgs);
+@@ -744,6 +751,7 @@ static int include_glob(struct nft_ctx *nft, void *scanner, const char *pattern,
+ 			const struct location *loc)
+ {
+ 	struct parser_state *state = yyget_extra(scanner);
++	struct input_descriptor *indesc = state->indesc;
+ 	struct error_record *erec = NULL;
+ 	bool wildcard = false;
+ 	glob_t glob_data;
+@@ -804,7 +812,7 @@ static int include_glob(struct nft_ctx *nft, void *scanner, const char *pattern,
+ 			if (len == 0 || path[len - 1] == '/')
+ 				continue;
+ 
+-			ret = include_file(nft, scanner, path, loc);
++			ret = include_file(nft, scanner, path, loc, indesc);
+ 			if (ret != 0)
+ 				goto err;
+ 		}
+@@ -841,7 +849,7 @@ err:
+ int scanner_read_file(struct nft_ctx *nft, const char *filename,
+ 		      const struct location *loc)
+ {
+-	return include_file(nft, nft->scanner, filename, loc);
++	return include_file(nft, nft->scanner, filename, loc, NULL);
+ }
+ 
+ static bool search_in_include_path(const char *filename)
+-- 
+2.28.0
+

@@ -1,0 +1,658 @@
+From d3daa7a2bc3f5bca874d3efd072b34a657c4d492 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Sun, 24 Nov 2019 13:51:09 -0800
+Subject: [PATCH] configuration support for CHAP algorithms
+
+Introduces support for preference lists in configuration files, and uses
+that for the 'node.session.auth.chap_algs' setting.
+
+This is also re-used for discovery authentication, rather than have two
+different configurations.
+---
+ etc/iscsid.conf               |   7 ++
+ libopeniscsiusr/default.c     |   3 +
+ libopeniscsiusr/idbm.c        |  95 +++++++++++++++++++++++++
+ libopeniscsiusr/idbm.h        |   9 +++
+ libopeniscsiusr/idbm_fields.h |   1 +
+ usr/auth.c                    |  64 ++++++++++++-----
+ usr/auth.h                    |   3 +
+ usr/config.h                  |   1 +
+ usr/idbm.c                    | 126 ++++++++++++++++++++++++++++++----
+ usr/idbm.h                    |   2 +
+ usr/idbm_fields.h             |   1 +
+ usr/initiator.h               |   1 +
+ usr/initiator_common.c        |   2 +
+ usr/login.c                   |  11 +++
+ 14 files changed, 294 insertions(+), 32 deletions(-)
+
+diff --git a/etc/iscsid.conf b/etc/iscsid.conf
+index 70985afd..58f60404 100644
+--- a/etc/iscsid.conf
++++ b/etc/iscsid.conf
+@@ -57,6 +57,13 @@ node.leading_login = No
+ # to CHAP. The default is None.
+ #node.session.auth.authmethod = CHAP
+ 
++# To configure which CHAP algorithms to enable set
++# node.session.auth.chap_algs to a comma seperated list.
++# The algorithms should be listen with most prefered first.
++# Valid values are MD5, SHA1, SHA256, and SHA3-256.
++# The default is MD5.
++#node.session.auth.chap_algs = SHA3-256,SHA256,SHA1,MD5
++
+ # To set a CHAP username and password for initiator
+ # authentication by the target(s), uncomment the following lines:
+ #node.session.auth.username = username
+diff --git a/libopeniscsiusr/default.c b/libopeniscsiusr/default.c
+index d01d8928..d3b3da35 100644
+--- a/libopeniscsiusr/default.c
++++ b/libopeniscsiusr/default.c
+@@ -78,6 +78,9 @@ void _default_node(struct iscsi_node *node)
+ 	node->session.initial_login_retry_max = DEF_INITIAL_LOGIN_RETRIES_MAX;
+ 	node->session.reopen_max = DEF_SESSION_REOPEN_MAX;
+ 	node->session.auth.authmethod = 0;
++	/* TYPE_INT_LIST fields should be initialized to ~0 to indicate unset values */
++	memset(node->session.auth.chap_algs, ~0, sizeof(node->session.auth.chap_algs));
++	node->session.auth.chap_algs[0] = ISCSI_AUTH_CHAP_ALG_MD5;
+ 	node->session.auth.password_length = 0;
+ 	node->session.auth.password_in_length = 0;
+ 	node->session.err_tmo.abort_timeout = DEF_ABORT_TIMEO;
+diff --git a/libopeniscsiusr/idbm.c b/libopeniscsiusr/idbm.c
+index d020e6ce..05cb7f9f 100644
+--- a/libopeniscsiusr/idbm.c
++++ b/libopeniscsiusr/idbm.c
+@@ -73,6 +73,7 @@
+ #define TYPE_INT32	6
+ #define TYPE_INT64	7
+ #define TYPE_BOOL	8
++#define TYPE_INT_LIST	9
+ #define MAX_KEYS	256   /* number of keys total(including CNX_MAX) */
+ #define NAME_MAXVAL	128   /* the maximum length of key name */
+ #define VALUE_MAXVAL	256   /* the maximum length of 223 bytes in the RFC. */
+@@ -248,6 +249,39 @@ do { \
+ 	_n++; \
+ } while(0)
+ 
++#define ARRAY_LEN(x) ( sizeof(x) / sizeof((x)[0]) )
++
++/* Options list type, rather than matching a single value this populates an
++ * array with a list of values in user specified order.
++ * Requires a table matching config strings to values.
++ **/
++#define _rec_int_list(_key, _recs, _org, _name, _show, _tbl, _n, _mod) \
++do {\
++	_recs[_n].type = TYPE_INT_LIST; \
++	_strncpy(_recs[_n].name, _key, NAME_MAXVAL); \
++	for (unsigned int _i = 0; _i < ARRAY_LEN(_org->_name); _i++) { \
++		if (_org->_name[_i] != ~0UL) { \
++			for (unsigned int _j = 0; _j < ARRAY_LEN(_tbl); _j++) { \
++				if (_tbl[_j].value == _org->_name[_i]) { \
++					strcat(_recs[_n].value, _tbl[_j].name); \
++					strcat(_recs[_n].value, ","); \
++					break; \
++				} \
++			} \
++		} \
++	} \
++	/* delete traling ',' */ \
++	if (strrchr(_recs[_n].value, ',')) \
++		*strrchr(_recs[_n].value, ',') = '\0'; \
++	_recs[_n].data = &_org->_name; \
++	_recs[_n].data_len = sizeof(_org->_name); \
++	_recs[_n].visible = _show; \
++	_recs[_n].opts[0] = (void *)&_tbl; \
++	_recs[_n].numopts = ARRAY_LEN(_tbl); \
++	_recs[_n].can_modify = _mod; \
++	_n++; \
++} while(0)
++
+ enum modify_mode {
+ 	_CANNOT_MODIFY,
+ 	_CAN_MODIFY,
+@@ -558,6 +592,11 @@ void _idbm_node_print(struct iscsi_node *node, FILE *f, bool show_secret)
+ 	_idbm_recs_free(recs);
+ }
+ 
++struct int_list_tbl {
++	const char *name;
++	unsigned int value;
++};
++
+ static int _idbm_rec_update_param(struct iscsi_context *ctx,
+ 				  struct idbm_rec *recs, char *name,
+ 				  char *value, int line_number)
+@@ -565,8 +604,14 @@ static int _idbm_rec_update_param(struct iscsi_context *ctx,
+ 	int rc = LIBISCSI_OK;
+ 	int i = 0;
+ 	int j = 0;
++	int k = 0;
+ 	int passwd_done = 0;
+ 	char passwd_len[8];
++	struct int_list_tbl *tbl = NULL;
++	char *tmp_value;
++	int *tmp_data;
++	bool *found;
++	char *token;
+ 
+ 	assert(ctx != NULL);
+ 	assert(recs != NULL);
+@@ -643,6 +688,47 @@ static int _idbm_rec_update_param(struct iscsi_context *ctx,
+ 				else
+ 					goto unknown_value;
+ 				goto updated;
++			case TYPE_INT_LIST:
++				if (!recs[i].data)
++					continue;
++				tbl = (void *)recs[i].opts[0];
++				/* strsep is destructive, make a copy to work with */
++				tmp_value = strdup(value);
++				k = 0;
++				tmp_data = malloc(recs[i].data_len);
++				memset(tmp_data, ~0, recs[i].data_len);
++				found = calloc(recs[i].numopts, sizeof(bool));
++next_token:			while ((token = strsep(&tmp_value, ", \n"))) {
++					if (!strlen(token))
++						continue;
++					if ((k * (int)sizeof(int)) >= (recs[i].data_len)) {
++						_warn(ctx, "Too many values set for '%s'"
++						      ", continuing without processing them all",
++						      recs[i].name);
++						break;
++					}
++					for (j = 0; j < recs[i].numopts; j++) {
++						if (!strcmp(token, tbl[j].name)) {
++							if ((found[j])) {
++								_warn(ctx, "Ignoring repeated value '%s'"
++								      " for '%s'", token, recs[i].name);
++								goto next_token;
++							}
++							((unsigned *)tmp_data)[k++] = tbl[j].value;
++							found[j] = true;
++							goto next_token;
++						}
++					}
++					_warn(ctx, "Ignoring unknown value '%s'"
++					      " for '%s'", token, recs[i].name);
++				}
++				memcpy(recs[i].data, tmp_data, recs[i].data_len);
++				free(tmp_value);
++				free(tmp_data);
++				tmp_value = NULL;
++				tmp_data = NULL;
++				token = NULL;
++				goto updated;
+ 			default:
+ unknown_value:
+ 				_error(ctx, "Got unknown data type %d "
+@@ -882,6 +968,13 @@ void _idbm_free(struct idbm *db)
+ 	free(db);
+ }
+ 
++static struct int_list_tbl chap_algs[] = {
++	{ "MD5", ISCSI_AUTH_CHAP_ALG_MD5 },
++	{ "SHA1", ISCSI_AUTH_CHAP_ALG_SHA1 },
++	{ "SHA256", ISCSI_AUTH_CHAP_ALG_SHA256 },
++	{ "SHA3-256", ISCSI_AUTH_CHAP_ALG_SHA3_256 },
++};
++
+ static void _idbm_node_rec_link(struct iscsi_node *node, struct idbm_rec *recs)
+ {
+ 	int num = 0;
+@@ -944,6 +1037,8 @@ static void _idbm_node_rec_link(struct iscsi_node *node, struct idbm_rec *recs)
+ 	_rec_uint32(SESSION_PASSWORD_IN_LEN, recs, node,
+ 		    session.auth.password_in_length, IDBM_HIDE, num,
+ 		    _CAN_MODIFY);
++	_rec_int_list(SESSION_CHAP_ALGS, recs, node, session.auth.chap_algs,
++		IDBM_SHOW, chap_algs, num, _CAN_MODIFY);
+ 	_rec_int64(SESSION_REPLACEMENT_TMO, recs, node,
+ 		   session.tmo.replacement_timeout, IDBM_SHOW, num,
+ 		   _CAN_MODIFY);
+diff --git a/libopeniscsiusr/idbm.h b/libopeniscsiusr/idbm.h
+index 3fd0864a..cc90388b 100644
+--- a/libopeniscsiusr/idbm.h
++++ b/libopeniscsiusr/idbm.h
+@@ -48,6 +48,14 @@ enum iscsi_auth_method {
+ 	ISCSI_AUTH_METHOD_CHAP,
+ };
+ 
++enum iscsi_chap_algs {
++	ISCSI_AUTH_CHAP_ALG_MD5 = 5,
++	ISCSI_AUTH_CHAP_ALG_SHA1 = 6,
++	ISCSI_AUTH_CHAP_ALG_SHA256 = 7,
++	ISCSI_AUTH_CHAP_ALG_SHA3_256 = 8,
++	AUTH_CHAP_ALG_MAX_COUNT = 5,
++};
++
+ enum iscsi_startup_type {
+ 	ISCSI_STARTUP_MANUAL,
+ 	ISCSI_STARTUP_AUTOMATIC,
+@@ -92,6 +100,7 @@ struct iscsi_auth_config {
+ 	char					username_in[AUTH_STR_MAX_LEN];
+ 	unsigned char				password_in[AUTH_STR_MAX_LEN];
+ 	uint32_t				password_in_length;
++	unsigned int				chap_algs[AUTH_CHAP_ALG_MAX_COUNT];
+ };
+ 
+ /* all TCP options go in this structure.
+diff --git a/libopeniscsiusr/idbm_fields.h b/libopeniscsiusr/idbm_fields.h
+index 29a2090c..8bf17b02 100644
+--- a/libopeniscsiusr/idbm_fields.h
++++ b/libopeniscsiusr/idbm_fields.h
+@@ -120,6 +120,7 @@
+ #define SESSION_USERNAME_IN	"node.session.auth.username_in"
+ #define SESSION_PASSWORD_IN	"node.session.auth.password_in"
+ #define SESSION_PASSWORD_IN_LEN	"node.session.auth.password_in_length"
++#define SESSION_CHAP_ALGS	"node.session.auth.chap_algs"
+ #define SESSION_REPLACEMENT_TMO	"node.session.timeo.replacement_timeout"
+ #define SESSION_ABORT_TMO	"node.session.err_timeo.abort_timeout"
+ #define SESSION_LU_RESET_TMO	"node.session.err_timeo.lu_reset_timeout"
+diff --git a/usr/auth.c b/usr/auth.c
+index 5c819c28..a222c531 100644
+--- a/usr/auth.c
++++ b/usr/auth.c
+@@ -1806,7 +1806,7 @@ acl_chk_chap_alg_list(unsigned int option_count, const int *option_list)
+ 	return 0;
+ }
+ 
+-static int
++int
+ acl_set_chap_alg_list(struct iscsi_acl *client, unsigned int option_count,
+ 		      const int *option_list)
+ {
+@@ -1819,22 +1819,54 @@ acl_set_chap_alg_list(struct iscsi_acl *client, unsigned int option_count,
+ }
+ 
+ int
+-acl_init_chap_digests(int *value_list) {
++acl_init_chap_digests(int *value_list, unsigned *chap_algs, int conf_count) {
+ 	EVP_MD_CTX *context = EVP_MD_CTX_new();
+ 	int i = 0;
+ 
+-	if (EVP_DigestInit_ex(context, EVP_sha3_256(), NULL)) {
+-		value_list[i++] = AUTH_CHAP_ALG_SHA3_256;
+-	}
+-	if (EVP_DigestInit_ex(context, EVP_sha256(), NULL)) {
+-		value_list[i++] = AUTH_CHAP_ALG_SHA256;
+-	}
+-	if (EVP_DigestInit_ex(context, EVP_sha1(), NULL)) {
+-		value_list[i++] = AUTH_CHAP_ALG_SHA1;
+-	}
+-	if (EVP_DigestInit_ex(context, EVP_md5(), NULL)) {
+-		value_list[i++] = AUTH_CHAP_ALG_MD5;
++	for (int j = 0; j < conf_count; j++) {
++		switch (chap_algs[j]) {
++		case AUTH_CHAP_ALG_MD5:
++			if (EVP_DigestInit_ex(context, EVP_md5(), NULL)) {
++				value_list[i++] = AUTH_CHAP_ALG_MD5;
++			} else {
++				log_warning("Ignoring CHAP algorthm request for "
++				            "MD5 due to crypto lib configuration");
++			}
++			break;
++		case AUTH_CHAP_ALG_SHA1:
++			if (EVP_DigestInit_ex(context, EVP_sha1(), NULL)) {
++				value_list[i++] = AUTH_CHAP_ALG_SHA1;
++			} else {
++				log_warning("Ignoring CHAP algorthm request for "
++				            "SHA1 due to crypto lib configuration");
++			}
++			break;
++		case AUTH_CHAP_ALG_SHA256:
++			if (EVP_DigestInit_ex(context, EVP_sha256(), NULL)) {
++				value_list[i++] = AUTH_CHAP_ALG_SHA256;
++			} else {
++				log_warning("Ignoring CHAP algorthm request for "
++				            "SHA256 due to crypto lib configuration");
++			}
++			break;
++		case AUTH_CHAP_ALG_SHA3_256:
++			if (EVP_DigestInit_ex(context, EVP_sha3_256(), NULL)) {
++				value_list[i++] = AUTH_CHAP_ALG_SHA3_256;
++			} else {
++				log_warning("Ignoring CHAP algorthm request for "
++				            "SHA3-256 due to crypto lib configuration");
++			}
++			break;
++		case ~0:
++			/* unset value in array, just ignore */
++			break;
++		default:
++			log_warning("Ignoring unknown CHAP algorithm request "
++				    "'%d'", chap_algs[j]);
++			break;
++		}
+ 	}
++
+ 	return i;
+ }
+ 
+@@ -1926,12 +1958,6 @@ acl_init(int node_type, int buf_desc_count, struct auth_buffer_desc *buff_desc)
+ 		return AUTH_STATUS_ERROR;
+ 	}
+ 
+-	if (acl_set_chap_alg_list(client, acl_init_chap_digests(value_list),
+-					value_list) != AUTH_STATUS_NO_ERROR) {
+-		client->phase = AUTH_PHASE_ERROR;
+-		return AUTH_STATUS_ERROR;
+-	}
+-
+ 	return AUTH_STATUS_NO_ERROR;
+ }
+ 
+diff --git a/usr/auth.h b/usr/auth.h
+index f6dbbe4b..16cdb242 100644
+--- a/usr/auth.h
++++ b/usr/auth.h
+@@ -271,6 +271,9 @@ extern int acl_send_transit_bit(struct iscsi_acl *client, int *value);
+ extern int acl_set_user_name(struct iscsi_acl *client, const char *username);
+ extern int acl_set_passwd(struct iscsi_acl *client,
+ 			  const unsigned char *pw_data, unsigned int pw_len);
++extern int acl_set_chap_alg_list(struct iscsi_acl *client, unsigned int option_count,
++		      const int *option_list);
++extern int acl_init_chap_digests(int *value_list, unsigned int *chap_algs, int count);
+ extern int acl_set_auth_rmt(struct iscsi_acl *client, int auth_rmt);
+ extern int acl_set_ip_sec(struct iscsi_acl *client, int ip_sec);
+ extern int acl_get_dbg_status(struct iscsi_acl *client, int *value);
+diff --git a/usr/config.h b/usr/config.h
+index 250879db..79059ec3 100644
+--- a/usr/config.h
++++ b/usr/config.h
+@@ -58,6 +58,7 @@ struct iscsi_auth_config {
+ 	char username_in[AUTH_STR_MAX_LEN];
+ 	unsigned char password_in[AUTH_STR_MAX_LEN];
+ 	unsigned int password_in_length;
++	unsigned int chap_algs[AUTH_CHAP_ALG_MAX_COUNT];
+ };
+ 
+ /* all per-connection timeouts go in this structure.
+diff --git a/usr/idbm.c b/usr/idbm.c
+index be4d4e36..e08301c6 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -50,6 +50,8 @@
+ 
+ static struct idbm *db;
+ 
++#define ARRAY_LEN(x) ( sizeof(x) / sizeof((x)[0]) )
++
+ #define __recinfo_str(_key, _info, _rec, _name, _show, _n, _mod) do { \
+ 	_info[_n].type = TYPE_STR; \
+ 	strlcpy(_info[_n].name, _key, NAME_MAXVAL); \
+@@ -164,6 +166,42 @@ static struct idbm *db;
+ 	_n++; \
+ } while(0)
+ 
++#define __recinfo_int_list(_key,_info,_rec,_name,_show,_tbl,_n,_mod) do { \
++	_info[_n].type = TYPE_INT_LIST; \
++	strlcpy(_info[_n].name, _key, NAME_MAXVAL); \
++	for(int _i = 0; _i < ARRAY_LEN(_rec->_name); _i++) { \
++		if (_rec->_name[_i] != ~0) { \
++			for (int _j = 0; _j < ARRAY_LEN(_tbl); _j++) { \
++				if (_tbl[_j].value == _rec->_name[_i]) { \
++					strcat(_info[_n].value, _tbl[_j].name); \
++					strcat(_info[_n].value, ","); \
++					break; \
++				} \
++			} \
++		} \
++	} \
++	/* delete trailing ',' */ \
++	if (strrchr(_info[_n].value, ',')) \
++		*strrchr(_info[_n].value, ',') = '\0'; \
++	_info[_n].data = &_rec->_name; \
++	_info[_n].data_len = sizeof(_rec->_name); \
++	_info[_n].visible = _show; \
++	_info[_n].opts[0] = (void *)&_tbl; \
++	_info[_n].numopts = ARRAY_LEN(_tbl); \
++	_info[_n].can_modify = _mod; \
++	_n++; \
++} while (0)
++
++static struct int_list_tbl {
++	const char *name;
++	int value;
++} chap_algs [] = {
++	{ "MD5", AUTH_CHAP_ALG_MD5 },
++	{ "SHA1", AUTH_CHAP_ALG_SHA1 },
++	{ "SHA256", AUTH_CHAP_ALG_SHA256 },
++	{ "SHA3-256", AUTH_CHAP_ALG_SHA3_256 },
++};
++
+ static int idbm_remove_disc_to_node_link(node_rec_t *rec, char *portal);
+
+ static void
+@@ -196,6 +234,10 @@ idbm_recinfo_discovery(discovery_rec_t *r, recinfo_t *ri)
+ 		__recinfo_int(DISC_ST_PASSWORD_IN_LEN, ri, r,
+ 			u.sendtargets.auth.password_in_length, IDBM_HIDE,
+ 			num, 1);
++		/* reusing SESSION_CHAP_ALGS */
++		__recinfo_int_list(SESSION_CHAP_ALGS, ri, r,
++				   u.sendtargets.auth.chap_algs,
++				   IDBM_SHOW, chap_algs, num, 1);
+ 		__recinfo_int(DISC_ST_LOGIN_TMO, ri, r,
+ 			u.sendtargets.conn_timeo.login_timeout,
+ 			IDBM_SHOW, num, 1);
+@@ -428,6 +470,8 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
+ 		      session.auth.password_in, IDBM_MASKED, num, 1);
+ 	__recinfo_int(SESSION_PASSWORD_IN_LEN, ri, r,
+ 		      session.auth.password_in_length, IDBM_HIDE, num, 1);
++	__recinfo_int_list(SESSION_CHAP_ALGS, ri, r,
++			   session.auth.chap_algs, IDBM_SHOW, chap_algs, num, 1);
+ 	__recinfo_int(SESSION_REPLACEMENT_TMO, ri, r,
+ 		      session.timeo.replacement_timeout,
+ 		      IDBM_SHOW, num, 1);
+@@ -933,6 +977,9 @@ idbm_discovery_setup_defaults(discovery_rec_t *rec, discovery_type_e type)
+ 		rec->u.sendtargets.auth.authmethod = 0;
+ 		rec->u.sendtargets.auth.password_length = 0;
+ 		rec->u.sendtargets.auth.password_in_length = 0;
++		/* TYPE_INT_LIST fields should be initialized to ~0 to indicate unset values */
++		memset(rec->u.sendtargets.auth.chap_algs, ~0, sizeof(rec->u.sendtargets.auth.chap_algs));
++		rec->u.sendtargets.auth.chap_algs[0] = AUTH_CHAP_ALG_MD5;
+ 		rec->u.sendtargets.conn_timeo.login_timeout=15;
+ 		rec->u.sendtargets.conn_timeo.auth_timeout = 45;
+ 		rec->u.sendtargets.conn_timeo.active_timeout=30;
+@@ -966,59 +1013,109 @@ int idbm_rec_update_param(recinfo_t *info, char *name, char *value,
+ 	int i;
+ 	int passwd_done = 0;
+ 	char passwd_len[8];
++	char *tmp_value, *token;
++	bool *found;
++	int *tmp_data;
+ 
+ setup_passwd_len:
+ 	for (i=0; i<MAX_KEYS; i++) {
+ 		if (!strcmp(name, info[i].name)) {
+-			int j;
++			int j,k;
++			struct int_list_tbl *tbl;
+ 
+ 			log_debug(7, "updated '%s', '%s' => '%s'", name,
+ 				  info[i].value, value);
+ 			/* parse recinfo by type */
+-			if (info[i].type == TYPE_INT) {
++			switch (info[i].type) {
++			case TYPE_INT:
+ 				if (!info[i].data)
+ 					continue;
+ 
+ 				*(int*)info[i].data =
+ 					strtoul(value, NULL, 10);
+ 				goto updated;
+-			} else if (info[i].type == TYPE_UINT8) {
++			case TYPE_UINT8:
+ 				if (!info[i].data)
+ 					continue;
+ 
+ 				*(uint8_t *)info[i].data =
+ 					strtoul(value, NULL, 10);
+ 				goto updated;
+-			} else if (info[i].type == TYPE_UINT16) {
++			case TYPE_UINT16:
+ 				if (!info[i].data)
+ 					continue;
+ 
+ 				*(uint16_t *)info[i].data =
+ 					strtoul(value, NULL, 10);
+ 				goto updated;
+-			} else if (info[i].type == TYPE_UINT32) {
++			case TYPE_UINT32:
+ 				if (!info[i].data)
+ 					continue;
+ 
+ 				*(uint32_t *)info[i].data =
+ 					strtoul(value, NULL, 10);
+ 				goto updated;
+-			} else if (info[i].type == TYPE_STR) {
++			case TYPE_STR:
+ 				if (!info[i].data)
+ 					continue;
+ 
+ 				strlcpy((char*)info[i].data,
+ 					value, info[i].data_len);
+ 				goto updated;
+-			}
+-			for (j=0; j<info[i].numopts; j++) {
+-				if (!strcmp(value, info[i].opts[j])) {
+-					if (!info[i].data)
++			case TYPE_INT_O:
++				for (j=0; j<info[i].numopts; j++) {
++					if (!strcmp(value, info[i].opts[j])) {
++						if (!info[i].data)
++							continue;
++
++						*(int*)info[i].data = j;
++						goto updated;
++					}
++				}
++			case TYPE_INT_LIST:
++				if (!info[i].data)
++					continue;
++				tbl = (void *)info[i].opts[0];
++				/* strsep is destructive, make a copy to work with */
++				tmp_value = strdup(value);
++				k = 0;
++				tmp_data = malloc(info[i].data_len);
++				memset(tmp_data, ~0, info[i].data_len);
++				found = calloc(info[i].numopts, sizeof(bool));
++
++next_token:			while ((token = strsep(&tmp_value, ", \n"))) {
++					if (!strlen(token))
+ 						continue;
+-
+-					*(int*)info[i].data = j;
+-					goto updated;
++					if ((k * (int)sizeof(int)) >= (info[i].data_len)) {
++						log_warning("Too many values set for '%s'"
++						            ", continuing without processing them all",
++						            info[i].name);
++						break;
++					}
++					for (j = 0; j < info[i].numopts; j++) {
++						if (!strcmp(token, tbl[j].name)) {
++							if ((found[j])) {
++								log_warning("Ignoring repeated "
++								            "value '%s' "
++								            "for '%s'", token,
++								            info[i].name);
++								goto next_token;
++							}
++							((int*)tmp_data)[k++] = tbl[j].value;
++							found[j] = true;
++							goto next_token;
++						}
++					}
++					log_warning("Ignoring unknown value '%s'"
++					            " for '%s'", token, info[i].name);
+ 				}
++				memcpy(info[i].data, tmp_data, info[i].data_len);
++				free(tmp_value);
++				free(tmp_data);
++				tmp_value = NULL;
++				tmp_data = NULL;
++				token = NULL;
++				goto updated;
+ 			}
+ 			if (line_number) {
+ 				log_warning("config file line %d contains "
+@@ -3021,6 +3118,9 @@ void idbm_node_setup_defaults(node_rec_t *rec)
+ 	rec->session.initial_login_retry_max = DEF_INITIAL_LOGIN_RETRIES_MAX;
+ 	rec->session.reopen_max = DEF_SESSION_REOPEN_MAX;
+ 	rec->session.auth.authmethod = 0;
++	/* TYPE_INT_LIST fields should be initialized to ~0 to indicate unset values */
++	memset(rec->session.auth.chap_algs, ~0, sizeof(rec->session.auth.chap_algs));
++	rec->session.auth.chap_algs[0] = AUTH_CHAP_ALG_MD5;
+ 	rec->session.auth.password_length = 0;
+ 	rec->session.auth.password_in_length = 0;
+ 	rec->session.err_timeo.abort_timeout = DEF_ABORT_TIMEO;
+diff --git a/usr/idbm.h b/usr/idbm.h
+index 18c50255..46cd82ac 100644
+--- a/usr/idbm.h
++++ b/usr/idbm.h
+@@ -45,6 +45,8 @@
+ #define TYPE_UINT8	3
+ #define TYPE_UINT16	4
+ #define TYPE_UINT32	5
++#define TYPE_INT_LIST	6
++
+ #define MAX_KEYS	256   /* number of keys total(including CNX_MAX) */
+ #define NAME_MAXVAL	128   /* the maximum length of key name */
+ #define VALUE_MAXVAL	256   /* the maximum length of 223 bytes in the RFC. */
+diff --git a/usr/idbm_fields.h b/usr/idbm_fields.h
+index 142c7ae6..4a967fc0 100644
+--- a/usr/idbm_fields.h
++++ b/usr/idbm_fields.h
+@@ -30,6 +30,7 @@
+ #define SESSION_USERNAME_IN	"node.session.auth.username_in"
+ #define SESSION_PASSWORD_IN	"node.session.auth.password_in"
+ #define SESSION_PASSWORD_IN_LEN	"node.session.auth.password_in_length"
++#define SESSION_CHAP_ALGS	"node.session.auth.chap_algs"
+ #define SESSION_REPLACEMENT_TMO	"node.session.timeo.replacement_timeout"
+ #define SESSION_ABORT_TMO	"node.session.err_timeo.abort_timeout"
+ #define SESSION_LU_RESET_TMO	"node.session.err_timeo.lu_reset_timeout"
+diff --git a/usr/initiator.h b/usr/initiator.h
+index eccafb90..6a49ea6e 100644
+--- a/usr/initiator.h
++++ b/usr/initiator.h
+@@ -243,6 +243,7 @@ typedef struct iscsi_session {
+ 	char username_in[AUTH_STR_MAX_LEN];
+ 	uint8_t password_in[AUTH_STR_MAX_LEN];
+ 	int password_in_length;
++	unsigned int chap_algs[AUTH_CHAP_ALG_MAX_COUNT];
+ 	iscsi_conn_t conn[ISCSI_CONN_MAX];
+ 	uint64_t param_mask;
+ 
+diff --git a/usr/initiator_common.c b/usr/initiator_common.c
+index 790f13de..81da8fdb 100644
+--- a/usr/initiator_common.c
++++ b/usr/initiator_common.c
+@@ -94,6 +94,8 @@ int iscsi_setup_authentication(struct iscsi_session *session,
+ 		memcpy(session->password_in, auth_cfg->password_in,
+ 		       session->password_in_length);
+ 
++	memcpy(session->chap_algs, auth_cfg->chap_algs, sizeof(auth_cfg->chap_algs));
++
+ 	if (session->password_length || session->password_in_length) {
+ 		/* setup the auth buffers */
+ 		session->auth_buffers[0].address = &session->auth_client_block;
+diff --git a/usr/login.c b/usr/login.c
+index d7dad211..1251e61c 100644
+--- a/usr/login.c
++++ b/usr/login.c
+@@ -1262,6 +1262,17 @@ check_for_authentication(iscsi_session_t *session,
+ 		goto end;
+ 	}
+ 
++	int value_list[AUTH_CHAP_ALG_MAX_COUNT];
++
++	if (acl_set_chap_alg_list(auth_client,
++				acl_init_chap_digests(value_list,
++					session->chap_algs,
++					AUTH_CHAP_ALG_MAX_COUNT),
++				value_list) != AUTH_STATUS_NO_ERROR) {
++		log_error("Couldn't set CHAP algorithm list");
++		goto end;
++	}
++
+ 	if (acl_set_ip_sec(auth_client, 1) != AUTH_STATUS_NO_ERROR) {
+ 		log_error("Couldn't set IPSec");
+ 		goto end;

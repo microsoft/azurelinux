@@ -5,7 +5,7 @@
 Summary:        Python-PostgreSQL Database Adapter
 Name:           python-psycopg2
 Version:        2.7.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Url:            https://pypi.python.org/pypi/psycopg2
 License:        LGPL with exceptions or ZPL
 Group:          Development/Languages/Python
@@ -42,6 +42,15 @@ Requires:       postgresql >= 10.5
 
 %description -n python3-psycopg2
 Python 3 version.
+
+%package doc
+Summary:  Documentation for psycopg python PostgreSQL database adapter
+Provides: python2-%{srcname}-doc = %{version}-%{release}
+Provides: python3-%{srcname}-doc = %{version}-%{release}
+
+%description doc
+Documentation and example files for the psycopg python PostgreSQL
+database adapter.
 
 %prep
 %setup -q -n psycopg2-%{version}
@@ -95,7 +104,15 @@ rm -r /home/postgres/data &>/dev/null ||:
 %defattr(-,root,root,-)
 %{python3_sitelib}/*
 
+%files doc
+%license LICENSE
+%doc doc
+
 %changelog
+* Tue Jul 13 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.7.5-6
+- Extend using Fedora 32 spec (license: MIT)
+- Enable subpackage python-psycopg2-doc
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.7.5-5
 - Make python byte compilation errors non-fatal due to python2 errors.
 

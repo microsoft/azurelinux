@@ -1,0 +1,41 @@
+From c96c7da272e33a34770c4de4e3e50f7ed264672e Mon Sep 17 00:00:00 2001
+From: Phil Sutter <phil@nwl.cc>
+Date: Wed, 13 May 2020 16:29:51 +0200
+Subject: JSON: Improve performance of json_events_cb()
+
+The function tries to insert handles into JSON input for echo option.
+Yet there may be nothing to do if the given netlink message doesn't
+contain a handle, e.g. if it is an 'add element' command. Calling
+seqnum_to_json() is pointless overhead in that case, and if input is
+large this overhead is significant. Better wait with that call until
+after checking if the message is relevant at all.
+
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+Acked-by: Eric Garver <eric@garver.life>
+---
+ src/parser_json.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+Index: nftables-0.9.3/src/parser_json.c
+===================================================================
+--- nftables-0.9.3.orig/src/parser_json.c
++++ nftables-0.9.3/src/parser_json.c
+@@ -3838,12 +3838,15 @@ static uint64_t handle_from_nlmsg(const
+ }
+ int json_events_cb(const struct nlmsghdr *nlh, struct netlink_mon_handler *monh)
+ {
+-	json_t *tmp, *json = seqnum_to_json(nlh->nlmsg_seq);
+ 	uint64_t handle = handle_from_nlmsg(nlh);
++	json_t *tmp, *json;
+ 	void *iter;
+ 
+-	/* might be anonymous set, ignore message */
+-	if (!json || !handle)
++	if (!handle)
++		return MNL_CB_OK;
++
++	json = seqnum_to_json(nlh->nlmsg_seq);
++	if (!json)
+ 		return MNL_CB_OK;
+ 
+ 	tmp = json_object_get(json, "add");
