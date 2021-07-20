@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,15 @@ BuildRequires:  xz-devel
 Requires:       device-mapper
 Requires:       xz
 
+# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
+# inside the default package and adding these 'Provides' to make installation more user-friendly
+# for people used to other distributions.
+Provides:       %{name}-common = %{version}-%{release}
+Provides:       %{name}-tools = %{version}-%{release}
+Provides:       %{name}-tools-efi = %{version}-%{release}
+Provides:       %{name}-tools-extra = %{version}-%{release}
+Provides:       %{name}-tools-minimal = %{version}-%{release}
+
 %description
 The GRUB package contains the GRand Unified Bootloader.
 
@@ -77,6 +86,11 @@ Summary:        GRUB Library for BIOS
 Group:          System Environment/Programming
 Requires:       %{name} = %{version}
 
+# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
+# inside the default package and adding these 'Provides' to make installation more user-friendly
+# for people used to other distributions.
+Provides:       %{name}-pc-modules = %{version}-%{release}
+
 %description pc
 Additional library files for grub
 %endif
@@ -85,6 +99,19 @@ Additional library files for grub
 Summary:        GRUB Library for UEFI
 Group:          System Environment/Programming
 Requires:       %{name} = %{version}
+
+# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
+# inside the default package and adding these 'Provides' to make installation more user-friendly
+# for people used to other distributions.
+Provides:       %{name}-efi-modules = %{version}-%{release}
+
+%ifarch x86_64
+Provides:       %{name}-efi-x64-modules = %{version}-%{release}
+%endif
+
+%ifarch aarch64
+Provides:       %{name}-efi-aa64-modules = %{version}-%{release}
+%endif
 
 %description efi
 Additional library files for grub
@@ -99,6 +126,13 @@ Unsigned GRUB UEFI image
 %package efi-binary
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
+
+# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
+# inside the default package and adding these 'Provides' to make installation more user-friendly
+# for people used to other distributions.
+%ifarch x86_64
+Provides:       %{name}-efi-x64 = %{version}-%{release}
+%endif
 
 %description efi-binary
 GRUB UEFI bootloader binaries
@@ -271,6 +305,20 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Tue Jul 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06~rc1-6
+- License verified.
+- Adding 'Provides' for:
+  - 'grub2-common',
+  - 'grub2-efi-aa64-modules',
+  - 'grub2-efi-modules',
+  - 'grub2-efi-x64',
+  - 'grub2-efi-x64-modules',
+  - 'grub2-pc-modules',
+  - 'grub2-tools',
+  - 'grub2-tools-efi',
+  - 'grub2-tools-extra',
+  - 'grub2-tools-minimal'.
+
 * Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.06~rc1-5
 - Explicitly specify python 3 as the python interpreter for bootstrapping
 

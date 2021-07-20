@@ -10,7 +10,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06~rc1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,13 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 
+# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
+# inside the default package and adding these 'Provides' to make installation more user-friendly
+# for people used to other distributions.
+%ifarch x86_64
+Provides:       grub2-efi-x64 = %{version}-%{release}
+%endif
+
 %description -n grub2-efi-binary
 This package contains the GRUB EFI image signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
@@ -54,6 +61,10 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Tue Jul 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06~rc1-6
+- Update release to be aligned with unsigned version.
+- Adding 'Provides' for 'grub2-efi-x64'.
+
 * Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.06~rc1-5
 - Update release to be aligned with unsigned version
 
