@@ -1,0 +1,25 @@
+From 24e65b1f197a8c0dcca82a6ada53a8a29445c21c Mon Sep 17 00:00:00 2001
+From: Hugo van Kemenade <hugovk@users.noreply.github.com>
+Date: Thu, 23 Jan 2020 07:52:06 +0200
+Subject: [PATCH] Try .abc first
+
+---
+ frozendict/__init__.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/frozendict/__init__.py b/frozendict/__init__.py
+index e5b0368..4d76bc7 100644
+--- a/frozendict/__init__.py
++++ b/frozendict/__init__.py
+@@ -4,9 +4,9 @@
+ 
+ try:
+     # Python 3.3+
+-    from collections import Mapping
+-except ImportError:
+     from collections.abc import Mapping
++except ImportError:
++    from collections import Mapping
+ 
+ try:
+     from collections import OrderedDict

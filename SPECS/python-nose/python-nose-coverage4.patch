@@ -1,0 +1,21 @@
+diff -up nose-1.3.7/nose/plugins/cover.py.coverage4 nose-1.3.7/nose/plugins/cover.py
+--- nose-1.3.7/nose/plugins/cover.py.coverage4	2015-04-04 03:28:20.000000000 -0600
++++ nose-1.3.7/nose/plugins/cover.py	2016-11-09 16:16:32.832927855 -0700
+@@ -187,7 +187,7 @@ class Coverage(Plugin):
+                     for name, module in sys.modules.items()
+                     if self.wantModuleCoverage(name, module)]
+         log.debug("Coverage report will cover modules: %s", modules)
+-        self.coverInstance.report(modules, file=stream)
++        self.coverInstance.report(modules, file=stream, show_missing=True)
+ 
+         import coverage
+         if self.coverHtmlDir:
+@@ -207,7 +207,7 @@ class Coverage(Plugin):
+         # make sure we have minimum required coverage
+         if self.coverMinPercentage:
+             f = StringIO.StringIO()
+-            self.coverInstance.report(modules, file=f)
++            self.coverInstance.report(modules, file=f, show_missing=True)
+ 
+             multiPackageRe = (r'-------\s\w+\s+\d+\s+\d+(?:\s+\d+\s+\d+)?'
+                               r'\s+(\d+)%\s+\d*\s{0,1}$')
