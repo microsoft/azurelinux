@@ -18,7 +18,7 @@ Azure CBL-Mariner release files such as yum configs and other %{_sysconfdir}/ re
 %install
 rm -rf %{buildroot}
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}%{_lib}
+install -d %{buildroot}/%{_lib}
 
 echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
 echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
@@ -31,7 +31,7 @@ DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
-cat > %{buildroot}%{_lib}/os-release << EOF
+cat > %{buildroot}/%{_lib}/os-release << EOF
 NAME="Common Base Linux Mariner"
 VERSION="%{mariner_release_version}"
 ID=mariner
@@ -60,7 +60,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/mariner-release
 %config(noreplace) %{_sysconfdir}/lsb-release
-%config(noreplace) %{_lib}/os-release
+%config(noreplace) /%{_lib}/os-release
 %config(noreplace) %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
