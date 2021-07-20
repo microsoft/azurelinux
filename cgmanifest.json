@@ -585,8 +585,8 @@
         "type": "other",
         "other": {
           "name": "bubblewrap",
-          "version": "0.3.0",
-          "downloadUrl": "https://github.com/containers/bubblewrap/releases/download/v0.3.0/bubblewrap-0.3.0.tar.xz"
+          "version": "0.4.1",
+          "downloadUrl": "https://github.com/containers/bubblewrap/releases/download/v0.4.1/bubblewrap-0.4.1.tar.xz"
         }
       }
     },
