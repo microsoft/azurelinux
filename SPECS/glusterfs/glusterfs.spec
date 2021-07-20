@@ -545,7 +545,6 @@ License:        GPLv2 OR LGPLv3+
 
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description thin-arbiter
 This package provides a tie-breaker functionality to GlusterFS
@@ -1232,6 +1231,7 @@ exit 0
 - Removed conditions that don't apply in CBL0Mariner.
 - Disabled Python byte compilation.
 - Using '%%make*' macros for building and installation.
+- Removing invalid run-time requires from 'thin-arbiter' to 'server'.
 - License verified.
 
 * Tue Mar 09 2021  Henry Li <lihl[at]microsoft.com> - 7.9-2
