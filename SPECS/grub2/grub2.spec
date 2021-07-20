@@ -127,13 +127,6 @@ Unsigned GRUB UEFI image
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
 
-# Some distros split 'grub2' into more subpackages. For now we're bundling it all together
-# inside the default package and adding these 'Provides' to make installation more user-friendly
-# for people used to other distributions.
-%ifarch x86_64
-Provides:       %{name}-efi-x64 = %{version}-%{release}
-%endif
-
 %description efi-binary
 GRUB UEFI bootloader binaries
 
@@ -311,7 +304,6 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
   - 'grub2-common',
   - 'grub2-efi-aa64-modules',
   - 'grub2-efi-modules',
-  - 'grub2-efi-x64',
   - 'grub2-efi-x64-modules',
   - 'grub2-pc-modules',
   - 'grub2-tools',
