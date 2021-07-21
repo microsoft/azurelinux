@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch22:        CVE-2020-13776.patch
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch23:        CVE-2018-21029.nopatch
+Patch24:        CVE-2021-33910.patch
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
 Patch101:       101-Portabled-fix-inspect-on-image-attached-as-directory.patch
@@ -271,6 +272,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-38
+- CVE-2021-33910 fix
+
 * Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-37
 - Enable SELinux support
 - Remove unused BuildRequires shadow-utils
