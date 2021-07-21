@@ -73,6 +73,7 @@
                 "libisoburn",
                 "libisofs",
                 "libkcapi",
+                "liblognorm",
                 "libpciaccess",
                 "libpwquality",
                 "libstoragemgmt",

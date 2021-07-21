@@ -2954,6 +2954,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblognorm",
+          "version": "2.0.3",
+          "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmaxminddb",
           "version": "1.5.0",
           "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.5.0/libmaxminddb-1.5.0.tar.gz"
