@@ -170,6 +170,9 @@ install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
 
+%check
+meson test -C build
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
