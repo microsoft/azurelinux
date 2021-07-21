@@ -2,7 +2,7 @@
 Summary:        Fast samples-based log normalization library
 Name:           liblognorm
 Version:        2.0.3
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
