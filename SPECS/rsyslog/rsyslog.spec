@@ -14,17 +14,17 @@ Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
 Source4:        http://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{version}.tar.gz
 BuildRequires:  autogen
-BuildRequires:  liblognorm-devel
-BuildRequires:  postgresql-devel
-BuildRequires:  net-snmp-devel
-BuildRequires:  librdkafka-devel
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libestr-devel
 BuildRequires:  libfastjson-devel
 BuildRequires:  libgcrypt-devel
+BuildRequires:  liblognorm-devel
+BuildRequires:  librdkafka-devel
 BuildRequires:  librelp-devel
+BuildRequires:  net-snmp-devel
+BuildRequires:  postgresql-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 Requires:       gnutls
@@ -37,7 +37,7 @@ Provides:       %{name}-crypto = %{version}-%{release}
 Provides:       %{name}-elasticsearch = %{version}-%{release}
 Provides:       %{name}-gnutls = %{version}-%{release}
 Provides:       %{name}-gssapi = %{version}-%{release}
-Provides:       %{name}-kafka= %{version}-%{release}
+Provides:       %{name}-kafka = %{version}-%{release}
 Provides:       %{name}-mmaudit = %{version}-%{release}
 Provides:       %{name}-mmjsonparse = %{version}-%{release}
 Provides:       %{name}-mmkubernetes = %{version}-%{release}
@@ -60,9 +60,9 @@ HTML documentation for %{name}
 
 %prep
 # Unpack the code source tarball
-%setup
+%setup -q
 # Unpack the documentation tarball in the folder created above 
-%setup -a 4 -T -D
+%setup -q -a 4 -T -D
 # Remove documentation sources
 rm -rf sources
 # Move prebuilt documentation files to a documentation folder

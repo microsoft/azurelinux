@@ -8,8 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.liblognorm.com
 Source0:        https://www.liblognorm.com/files/download/%{name}-%{version}.tar.gz
-BuildRequires:  gcc
 BuildRequires:  chrpath
+BuildRequires:  gcc
 BuildRequires:  libestr-devel
 BuildRequires:  libfastjson-devel
 BuildRequires:  pcre-devel
@@ -86,14 +86,13 @@ rm %{buildroot}%{htmldir}/{objects.inv,.buildinfo}
 %files utils
 %{_bindir}/lognormalizer
 
-
 %changelog
-* Mon Jul 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.3-11
+* Tue Jul 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.3-11
 - License verified
 - Spec linted
 
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 2.0.3-10
-- Initial CBL-Mariner import from Fedora 32
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Explicit require python3-sphinx instead of unversioned.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-9
