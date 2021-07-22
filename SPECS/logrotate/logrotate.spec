@@ -5,13 +5,11 @@ Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
 URL:            https://github.com/logrotate/logrotate/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
-Group:          System Environment/Base
-
 BuildRequires:  popt-devel
 BuildRequires:  systemd-devel
-
 Requires:       popt
 Requires:       systemd
 
