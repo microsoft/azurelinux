@@ -3,21 +3,21 @@ Name:           logrotate
 Version:        3.18.1
 Release:        1%{?dist}
 License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/logrotate/logrotate/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Group:          System Environment/Base
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 BuildRequires:  popt-devel
 BuildRequires:  systemd-devel
 
-Requires:       systemd
 Requires:       popt
+Requires:       systemd
 
 %description
-The logrotate utility is designed to simplify the administration of log 
-files on a system which generates a lot of log files. Logrotate allows 
+The logrotate utility is designed to simplify the administration of log
+files on a system which generates a lot of log files. Logrotate allows
 for the automatic rotation compression, removal and mailing of log files.
 Logrotate can be set to handle a log file daily, weekly, monthly or when
 the log file gets to a certain size.
@@ -33,9 +33,6 @@ make %{?_smp_mflags}
 
 # Remove hardening options that are not supported by our current systemd version.
 sed -i -E '/ProtectClock=true|ProtectHostname=true|ProtectKernelLogs=true/d' examples/logrotate.service
-
-%check
-make -s check
 
 %install
 make DESTDIR=%{buildroot} install
@@ -57,19 +54,19 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sysconfdir}/logrotate.d
+%dir %{_localstatedir}/lib/logrotate
 %{_sbindir}/logrotate
 %{_unitdir}/logrotate.{service,timer}
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/{b,w}tmp
 %{_mandir}/man5/logrotate.conf.5.gz
 %{_mandir}/man8/logrotate.8.gz
-%{_localstatedir}/lib/logrotate/logrotate.status
+%ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
 *   Wed Jul 21 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.18.1-1
 -   Update to version 3.18.1
 -   Add default logrotate systemd service and logrotate.conf
--   Add check section
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
 -   Added %%license line automatically
 *   Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.16.0-1
