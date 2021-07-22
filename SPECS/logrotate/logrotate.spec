@@ -25,8 +25,7 @@ the log file gets to a certain size.
 
 %build
 ./autogen.sh
-./configure \
-   --prefix=%{_prefix}
+./configure --prefix=%{_prefix} --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
 make %{?_smp_mflags}
 
 # Remove hardening options that are not supported by our current systemd version.
