@@ -28,6 +28,9 @@ the log file gets to a certain size.
 ./configure --prefix=%{_prefix} --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
 make %{?_smp_mflags}
 
+# Disable dateext since it can cause rotation to fail if run twice in a day
+sed -i 's/dateext/#dateext/' examples/logrotate.conf
+
 # Remove hardening options that are not supported by our current systemd version.
 sed -i -E '/ProtectClock=true|ProtectHostname=true|ProtectKernelLogs=true/d' examples/logrotate.service
 
