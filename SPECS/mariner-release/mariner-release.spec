@@ -67,7 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
-*   Fri Jul 23 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-20
+*   Fri Jul 23 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-20
 -   Updating version for July update
 *   Fri Jun 25 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-19
 -   Updating version for June update
