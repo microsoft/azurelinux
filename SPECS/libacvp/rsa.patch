@@ -1,5 +1,5 @@
---- a/app/app_rsa.c	2021-02-19 05:30:47.000000000 -0800
-+++ b/app/app_rsa.c	2021-07-22 19:52:45.549826111 -0700
+--- ./app/app_rsa.c	2021-02-19 05:30:47.000000000 -0800
++++ ./app/app_rsa_mariner.c	2021-07-23 04:04:12.095996658 -0700
 @@ -11,11 +11,9 @@
  #include <openssl/evp.h>
  #include <openssl/bn.h>
@@ -386,15 +386,20 @@
      }
  end:
      /* Success */
-@@ -642,6 +428,7 @@
+@@ -641,7 +427,11 @@
+ err:
      if (mdhash) free(mdhash);
      if (s) free(s);
-     if (pctx) EVP_PKEY_CTX_free(pctx);
-+    if (mctx) EVP_MD_CTX_free(mctx);
+-    if (pctx) EVP_PKEY_CTX_free(pctx);
++    if (mctx) {
++        EVP_MD_CTX_free(mctx);  // Also frees pctx
++    } else {
++        if (pctx) EVP_PKEY_CTX_free(pctx);
++    }
      if (pk) EVP_PKEY_free(pk);
      if (bn_e) BN_free(bn_e);
      if (rsa) RSA_free(rsa);
-@@ -650,7 +437,6 @@
+@@ -650,7 +440,6 @@
  
      return rv;
  }
