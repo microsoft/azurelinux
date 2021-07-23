@@ -7,13 +7,13 @@
 +static size_t drbg_test_pers(DRBG_CTX *dctx,
 +                             unsigned char **pout,
 +                             size_t pers_len) {
-+    return 1;
++    return pers_len;
 +}
 +
 +static size_t drbg_test_adin(DRBG_CTX *dctx,
 +                             unsigned char **pout,
 +                             size_t adin_len) {
-+    return 1;
++    return adin_len;
 +}
 +
  static size_t drbg_test_entropy(DRBG_CTX *dctx,
