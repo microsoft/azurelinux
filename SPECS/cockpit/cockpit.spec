@@ -86,6 +86,5 @@ make check
 %{_sbindir}/remotectl
 
 %changelog
-#FIXME: Bad date in this changelog header
-* Fri July 23 2021 Shane Guan <shaneguan@microsoft.com> 248-1
+* Fri Jul 23 2021 Shane Guan <shaneguan@microsoft.com> 248-1
 - Initial version of cockpit package
