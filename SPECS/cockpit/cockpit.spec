@@ -63,6 +63,9 @@ EOF
 chmod -R go+rx %{buildroot}/usr/share/cockpit
 chmod o+rx %{buildroot}/etc/cockpit
 
+%check
+make check
+
 %files
 # %defattr(-,root,root)
 /usr/share/cockpit
