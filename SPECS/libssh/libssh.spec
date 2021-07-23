@@ -1,42 +1,37 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A library implementing the SSH protocol
 Name:           libssh
 Version:        0.9.5
 Release:        1%{?dist}
-Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://www.libssh.org
-
 Source0:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz
 Source1:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz.asc
 Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
 Source3:        libssh_client.config
 Source4:        libssh_server.config
-
-BuildRequires:  cmake
 BuildRequires:  build-essential
+BuildRequires:  cmake
 BuildRequires:  gnupg2
-BuildRequires:  openssl-devel
-# BuildRequires:  pkgconfig
-BuildRequires:  zlib-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcmocka-devel
-BuildRequires:  pam_wrapper
-BuildRequires:  socket_wrapper
+BuildRequires:  nmap-ncat
 BuildRequires:  nss_wrapper
-BuildRequires:  uid_wrapper
 BuildRequires:  openssh-clients
 BuildRequires:  openssh-server
-BuildRequires:  nmap-ncat
-
+BuildRequires:  openssl-devel
+BuildRequires:  pam_wrapper
+BuildRequires:  socket_wrapper
+BuildRequires:  uid_wrapper
+# BuildRequires:  pkgconfig
+BuildRequires:  zlib-devel
 Requires:       %{name}-config = %{version}-%{release}
-
 Recommends:     crypto-policies
-
 %ifarch aarch64 ppc64 ppc64le s390x x86_64
-Provides: libssh_threads.so.4()(64bit)
+Provides:       libssh_threads.so.4()(64bit)
 %else
-Provides: libssh_threads.so.4
+Provides:       libssh_threads.so.4
 %endif
 
 %description
@@ -57,8 +52,8 @@ applications that use %{name}.
 
 %package config
 Summary:        Configuration files for %{name}
-BuildArch:      noarch
 Obsoletes:      %{name} < 0.9.0-3
+BuildArch:      noarch
 
 %description config
 The %{name}-config package provides the default configuration files for %{name}.
@@ -100,7 +95,7 @@ pushd %{buildroot}%{_libdir}
 for i in libssh.so*;
 do
     _target="${i}"
-    _link_name="${i%libssh*}libssh_threads${i##*libssh}"
+    _link_name="${i%{libssh}*}libssh_threads${i##*libssh}"
     if [ -L "${i}" ]; then
         _target="$(readlink ${i})"
     fi
@@ -125,7 +120,7 @@ popd
 %files devel
 %{_includedir}/libssh/
 # own this to avoid dep on cmake -- rex
-%dir  %{_libdir}/cmake/
+%dir %{_libdir}/cmake/
 %{_libdir}/cmake/libssh/
 %{_libdir}/pkgconfig/libssh.pc
 %{_libdir}/libssh.so
