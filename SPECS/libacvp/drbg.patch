@@ -1,6 +1,25 @@
 --- a/app/app_drbg.c	2021-02-19 05:30:47.000000000 -0800
-+++ b/app/app_drbg.c	2021-06-14 07:39:39.845111831 -0700
-@@ -179,7 +179,7 @@
++++ b/app/app_drbg.c	2021-07-23 04:27:43.911969800 -0700
+@@ -24,6 +24,18 @@
+     size_t noncelen;
+ } DRBG_TEST_ENT;
+ 
++static size_t drbg_test_pers(DRBG_CTX *dctx,
++                             unsigned char **pout,
++                             size_t pers_len) {
++    return 1;
++}
++
++static size_t drbg_test_adin(DRBG_CTX *dctx,
++                             unsigned char **pout,
++                             size_t adin_len) {
++    return 1;
++}
++
+ static size_t drbg_test_entropy(DRBG_CTX *dctx,
+                                 unsigned char **pout,
+                                 int entropy,
+@@ -179,7 +191,7 @@
               * permitted, with the following exception: for ctrDRBG with no df, the
               * bit length must equal the seed length.
               **/
@@ -9,3 +28,22 @@
          }
  
          switch (tc->mode) {
+@@ -317,11 +329,13 @@
+ 
+     FIPS_drbg_set_app_data(drbg_ctx, &entropy_nonce);
+ 
+-    fips_rc = FIPS_drbg_set_callbacks(drbg_ctx,
+-                                      drbg_test_entropy,
+-                                      0, 0,
+-                                      drbg_test_nonce,
+-                                      0);
++    fips_rc = FIPS_drbg_set_all_callbacks(drbg_ctx,
++                                       drbg_test_pers, 0,
++                                       drbg_test_adin, 0,
++                                       drbg_test_entropy,
++                                       0, 0,
++                                       drbg_test_nonce,
++                                       0);
+     if (!fips_rc) {
+         printf("ERROR: failed to Set callback DRBG ctx\n");
+         long l = 9;
