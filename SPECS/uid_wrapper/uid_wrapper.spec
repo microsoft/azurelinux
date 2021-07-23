@@ -1,27 +1,22 @@
+Summary:        A wrapper for privilege separation
 Name:           uid_wrapper
 Version:        1.2.7
 Release:        3%{?dist}
-
-Summary:        A wrapper for privilege separation
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://cwrap.org/
-
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
 Source2:        uid_wrapper.keyring
-
 Patch0:         0001-pkg-config-Fix-installation-path.patch
 Patch1:         uid_wrapper-1.2.7-cmake-config-fix-installation-path.patch
-
-BuildRequires:  gcc
 BuildRequires:  cmake
+BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel >= 1.1.0
-
 Recommends:     cmake
-Recommends:     pkgconfig
+Recommends:     pkg-config
 
 %description
 Some projects like a file server need privilege separation to be able to switch

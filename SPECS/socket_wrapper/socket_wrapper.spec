@@ -1,24 +1,20 @@
+Summary:        A library passing all socket communications through Unix sockets
 Name:           socket_wrapper
 Version:        1.2.4
 Release:        1%{?dist}
-
 License:        BSD
-Summary:        A library passing all socket communications through Unix sockets
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://cwrap.org/
-
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
 Source2:        socket_wrapper.keyring
-
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel >= 1.1.0
-
 Recommends:     cmake
-Recommends:     pkgconfig
+Recommends:     pkg-config
 
 %description
 socket_wrapper aims to help client/server software development teams willing to

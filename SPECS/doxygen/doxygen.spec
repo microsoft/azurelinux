@@ -1,23 +1,21 @@
+%global debug_package %{nil}
+Summary:        Automated C, C++, and Java Documentation Generator
 Name:           doxygen
 Version:        1.8.17
 Release:        2%{?dist}
-Summary:        Automated C, C++, and Java Documentation Generator
 License:        GPL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Tools/Doc Generators
-Url:            http://www.doxygen.nl/
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+URL:            https://www.doxygen.nl/
 Source0:        http://doxygen.nl/files/%{name}-%{version}.src.tar.gz
-
-%global debug_package %{nil}
-
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  flex
 BuildRequires:  gcc
+BuildRequires:  python-defusedxml
 BuildRequires:  python3
 BuildRequires:  python3-xml
-BuildRequires:  python-defusedxml
 Obsoletes:      doxygen-doc
 
 %description

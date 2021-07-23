@@ -1,25 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A wrapper for the user, group and hosts NSS API
 Name:           nss_wrapper
 Version:        1.1.11
 Release:        1%{?dist}
-
 License:        BSD
-Summary:        A wrapper for the user, group and hosts NSS API
-Url:            https://cwrap.org/
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
 Source2:        nss_wrapper.keyring
-
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel
 # BuildRequires:  perl-generators
-
 Recommends:     cmake
-Recommends:     pkgconfig
+Recommends:     pkg-config
 
 %description
 There are projects which provide daemons needing to be able to create, modify
@@ -64,7 +60,7 @@ popd
 pushd obj
 make DESTDIR=%{buildroot} install
 
-sed -i '1 s|/usr/bin/env\ perl|/usr/bin/perl|' %{buildroot}%{_bindir}/nss_wrapper.pl
+sed -i '1 s|%{_bindir}/env\ perl|%{_bindir}/perl|' %{buildroot}%{_bindir}/nss_wrapper.pl
 
 popd
 
