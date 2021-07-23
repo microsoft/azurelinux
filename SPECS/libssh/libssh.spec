@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.libssh.org
+URL:            https://www.libssh.org
 Source0:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz
 Source1:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz.asc
 Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
