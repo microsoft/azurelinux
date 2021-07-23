@@ -1175,7 +1175,7 @@
         "type": "other",
         "other": {
           "name": "doxygen",
-          "version": "1.1.5",
+          "version": "1.8.17",
           "downloadUrl": "http://doxygen.nl/files/doxygen-1.8.17.src.tar.gz"
         }
       }
