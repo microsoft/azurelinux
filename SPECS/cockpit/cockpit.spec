@@ -1,10 +1,9 @@
 Summary:        A package to provide cockpit for mariner
 Name:           cockpit
 Version:        248
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/cockpit-project/cockpit
-Group:          Applications/Text
 Vendor:         Microsoft
 Distribution:   Mariner
 Source0:        https://github.com/cockpit-project/cockpit/releases/download/248/cockpit-248.tar.xz
@@ -68,6 +67,8 @@ make check
 
 %files
 # %defattr(-,root,root)
+%license COPYING
+%license COPYING.node
 /usr/share/cockpit
 /etc/cockpit
 /etc/pam.d/cockpit
@@ -85,10 +86,8 @@ make check
 /usr/lib/security/pam_ssh_add.so
 /usr/libexec/cockpit-*
 /usr/sbin/remotectl
-# %files
-# %license LICENSE
 
-# %changelog
-# * Fri July 09 2021 Shane Guan <shaneguan@microsoft.com> 1.0.0-1
-# - Initial version of cockpit package
+%changelog
+* Fri July 23 2021 Shane Guan <shaneguan@microsoft.com> 248-1
+- Initial version of cockpit package
 
