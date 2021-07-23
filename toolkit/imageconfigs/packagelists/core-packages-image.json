@@ -3,6 +3,8 @@
         "shim",
         "grub2-efi-binary",
         "ca-certificates",
+        "cronie",
+        "logrotate",
         "core-packages-base-image",
         "initramfs"
     ],
