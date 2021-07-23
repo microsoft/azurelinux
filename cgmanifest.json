@@ -724,6 +724,86 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "doxygen",
+          "version": "1.1.5",
+          "downloadUrl": "http://doxygen.nl/files/doxygen-1.8.17.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libssh",
+          "version": "0.9.5",
+          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nss_wrapper",
+          "version": "1.1.11",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/nss_wrapper-1.1.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pam_wrapper",
+          "version": "1.1.3",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/pam_wrapper-1.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "socket_wrapper",
+          "version": "1.2.4",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/socket_wrapper-1.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uid_wrapper",
+          "version": "1.2.7",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cmocka",
+          "version": "1.1.5",
+          "downloadUrl": "https://cmocka.org/files/1.1/cmocka-1.1.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cockpit",
+          "version": "248",
+          "downloadUrl": "https://github.com/cockpit-project/cockpit/releases/download/248/cockpit-248.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "collectd",
           "version": "5.12.0",
           "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
