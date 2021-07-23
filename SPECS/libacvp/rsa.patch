@@ -1,6 +1,6 @@
 --- a/app/app_rsa.c	2021-02-19 05:30:47.000000000 -0800
-+++ b/app/app_rsa.c	2021-06-13 20:10:59.703297518 -0700
-@@ -11,297 +11,10 @@
++++ b/app/app_rsa.c	2021-07-22 19:52:45.549826111 -0700
+@@ -11,11 +11,9 @@
  #include <openssl/evp.h>
  #include <openssl/bn.h>
  #include <openssl/rsa.h>
@@ -10,19 +10,13 @@
 -#ifdef ACVP_NO_RUNTIME
 -#include "app_fips_lcl.h" /* All regular OpenSSL headers must come before here */
 -#include <openssl/ossl_typ.h>
--
--BIGNUM *group_n = NULL;
--RSA *group_rsa = NULL;
--int rsa_current_tg = 0;
--
--void app_rsa_cleanup(void) {
--    if (group_rsa) RSA_free(group_rsa);
--    group_rsa = NULL;
--    if (group_n) BN_free(group_n);
--    group_n = NULL;
--}
--
--int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
+ 
+ BIGNUM *group_n = NULL;
+ RSA *group_rsa = NULL;
+@@ -29,280 +27,6 @@
+ }
+ 
+ int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
 -    /*
 -     * custom crypto module handler
 -     * to be filled in -
@@ -283,7 +277,7 @@
 -            tc->sig_len = siglen;
 -        }
 -    }
- 
+-
 -    /* Success */
 -    rv = 0;
 -
@@ -296,10 +290,11 @@
 -    return rv;
 -}
 -#else
- int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
+-int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
      if (!test_case) {
          return -1;
-@@ -424,10 +137,11 @@
+     }
+@@ -424,10 +148,11 @@
  
  int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
      const EVP_MD *tc_md = NULL;
@@ -312,56 +307,76 @@
  #endif
      ACVP_RSA_SIG_TC    *tc;
      RSA *rsa = NULL;
-@@ -631,8 +345,56 @@
+@@ -437,6 +162,7 @@
+     int md_type;
+     EVP_PKEY_CTX *pctx = NULL;
+     EVP_PKEY *pk = NULL;
++    EVP_MD_CTX *mctx = NULL;
+ 
+     if (!test_case) {
+         printf("\nError: test case not found in RSA SigGen handler\n");
+@@ -631,8 +357,68 @@
          }
  
      } else {
 -        rv = 1;
 -        goto err;
-+        if (!RSA_X931_generate_key_ex(rsa, tc->modulo, bn_e, NULL)) {
-+            printf("\nError: Issue with keygen during siggen handling\n");
-+            goto err;
-+        }
++        if (rsa_current_tg != tc->tg_id) {
++            rsa_current_tg = tc->tg_id;
 +
-+        RSA_get0_key(rsa, &tmp_n1, &tmp_e1, NULL);
-+        e = BN_dup(tmp_e1);
-+        n = BN_dup(tmp_n1);
++            /* Free the group objects before re-allocation */
++            if (group_rsa) RSA_free(group_rsa);
++            group_rsa = NULL;
++            if (group_n) BN_free(group_n);
++            group_n = NULL;
++
++            group_rsa = RSA_new();
++
++            if (!RSA_X931_generate_key_ex(group_rsa, tc->modulo, bn_e, NULL)) {
++                goto err;
++            }
++
++            RSA_get0_key(group_rsa, &tmp_n1, &tmp_e1, NULL);
++            e = BN_dup(tmp_e1);
++            n = BN_dup(tmp_n1);
++            group_n = BN_dup(n);
++        } else {
++            e = BN_dup(bn_e);
++            n = BN_dup(group_n);
++        }
 +
 +        tc->e_len = BN_bn2bin(e, tc->e);
 +        tc->n_len = BN_bn2bin(n, tc->n);
 +
 +        if (tc->msg && tc_md) {
-+            siglen = RSA_size(rsa);
++            siglen = RSA_size(group_rsa);
 +
 +            pk = EVP_PKEY_new();
 +            if (pk == NULL)
 +                goto err;
 +
-+            EVP_PKEY_set1_RSA(pk, rsa);
++            EVP_PKEY_set1_RSA(pk, group_rsa);
 +
-+            pctx = EVP_PKEY_CTX_new(pk, NULL);
++            mctx = EVP_MD_CTX_new();
 +
 +            s = OPENSSL_malloc(siglen);
 +            if (s == NULL) {
 +                goto err;
 +            }
 +
-+            mdhash = OPENSSL_malloc(EVP_MD_size(tc_md));
-+            if (mdhash == NULL) {
++            if (EVP_DigestSignInit(mctx, &pctx, tc_md, NULL, pk) <= 0)
++                goto err;
++            
++            EVP_PKEY_CTX_set_rsa_padding(pctx, pad_mode);
++            if (pad_mode == RSA_PKCS1_PSS_PADDING) {
++                EVP_PKEY_CTX_set_rsa_pss_saltlen(pctx, 0);
++            }
++
++            if (EVP_DigestSignUpdate(mctx, tc->msg, tc->msg_len) <= 0) {
 +                goto err;
 +            }
 +
-+            EVP_Digest(tc->msg, tc->msg_len, mdhash, &md_len, tc_md, NULL);
-+
-+            EVP_PKEY_sign_init(pctx);
-+            EVP_PKEY_CTX_set_rsa_padding(pctx, pad_mode);
-+            if (pad_mode == RSA_PKCS1_PSS_PADDING) {
-+                EVP_PKEY_CTX_set_rsa_pss_saltlen(pctx, salt_len);
-+            }
-+
-+            EVP_PKEY_CTX_set_signature_md(pctx, tc_md);
-+
-+            if (EVP_PKEY_sign(pctx, tc->signature, &siglen, mdhash, md_len) <= 0) {
++            if (EVP_DigestSignFinal(mctx, tc->signature, &siglen) <= 0) {
 +                ERR_print_errors_fp(stdout);
 +                goto err;
 +            }
@@ -371,7 +386,15 @@
      }
  end:
      /* Success */
-@@ -650,7 +412,6 @@
+@@ -642,6 +428,7 @@
+     if (mdhash) free(mdhash);
+     if (s) free(s);
+     if (pctx) EVP_PKEY_CTX_free(pctx);
++    if (mctx) EVP_MD_CTX_free(mctx);
+     if (pk) EVP_PKEY_free(pk);
+     if (bn_e) BN_free(bn_e);
+     if (rsa) RSA_free(rsa);
+@@ -650,7 +437,6 @@
  
      return rv;
  }
