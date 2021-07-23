@@ -394,7 +394,7 @@ index cab1657..3f04344 100644
      int (*rand_seed_cb) (DRBG_CTX *ctx, const void *buf, int num);
      int (*rand_add_cb) (DRBG_CTX *ctx,
 diff --git a/crypto/rand/drbg_lib.c b/crypto/rand/drbg_lib.c
-index 5d7a1d7..eca848f 100644
+index 5d7a1d7..0d37757 100644
 --- a/crypto/rand/drbg_lib.c
 +++ b/crypto/rand/drbg_lib.c
 @@ -202,6 +202,12 @@ static RAND_DRBG *rand_drbg_new(int secure,
@@ -439,7 +439,7 @@ index 5d7a1d7..eca848f 100644
  
      if (perslen > drbg->max_perslen) {
          RANDerr(RAND_F_RAND_DRBG_INSTANTIATE,
-@@ -350,6 +369,33 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
+@@ -350,6 +369,29 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
          }
      }
  
@@ -448,10 +448,6 @@ index 5d7a1d7..eca848f 100644
 +        if (drbg->get_pers != NULL) {
 +            tmp_pers = pers;
 +            perslen = drbg->get_pers(drbg, &pers, perslen);
-+            if (perslen == 0 || pers == NULL) {
-+                RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_RETRIEVING_PERS);
-+                goto end;
-+            }
 +            if (tmp_pers != pers) {
 +                pers_alloc = 1;
 +            }
@@ -461,7 +457,7 @@ index 5d7a1d7..eca848f 100644
 +             * callback is overriden for DRBG testing
 +             */
 +            perslen = rand_drbg_get_pers(drbg, &pers, perslen);
-+            if (perslen == 0) {
++            if (perslen == 0 || pers == NULL) {
 +                RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_RETRIEVING_PERS);
 +                goto end;
 +            }
@@ -473,7 +469,7 @@ index 5d7a1d7..eca848f 100644
      if (!drbg->meth->instantiate(drbg, entropy, entropylen,
                           nonce, noncelen, pers, perslen)) {
          RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_INSTANTIATING_DRBG);
-@@ -368,6 +414,17 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
+@@ -368,6 +410,17 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
      }
  
   end:
@@ -491,7 +487,7 @@ index 5d7a1d7..eca848f 100644
      if (entropy != NULL && drbg->cleanup_entropy != NULL)
          drbg->cleanup_entropy(drbg, entropy, entropylen);
      if (nonce != NULL && drbg->cleanup_nonce != NULL)
-@@ -414,6 +471,10 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -414,6 +467,10 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
  {
      unsigned char *entropy = NULL;
      size_t entropylen = 0;
@@ -502,7 +498,7 @@ index 5d7a1d7..eca848f 100644
  
      if (drbg->state == DRBG_ERROR) {
          RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_IN_ERROR_STATE);
-@@ -443,6 +504,33 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -443,6 +500,29 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
          goto end;
      }
  
@@ -511,10 +507,6 @@ index 5d7a1d7..eca848f 100644
 +        if (drbg->get_adin != NULL) {
 +            tmp_adin = adin;
 +            adinlen = drbg->get_adin(drbg, &adin, adinlen);
-+            if (adinlen == 0 || adin == NULL) {
-+                RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_ERROR_RETRIEVING_ADDITIONAL_INPUT);
-+                goto end;
-+            }
 +            if (tmp_adin != adin) {
 +                adin_alloc = 1;
 +            }
@@ -536,7 +528,7 @@ index 5d7a1d7..eca848f 100644
      if (!drbg->meth->reseed(drbg, entropy, entropylen, adin, adinlen))
          goto end;
  
-@@ -458,6 +546,17 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -458,6 +538,17 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
      }
  
   end:
@@ -554,7 +546,7 @@ index 5d7a1d7..eca848f 100644
      if (entropy != NULL && drbg->cleanup_entropy != NULL)
          drbg->cleanup_entropy(drbg, entropy, entropylen);
      if (drbg->state == DRBG_READY)
-@@ -693,6 +792,40 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
+@@ -693,6 +784,40 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
      return ret;
  }
  
