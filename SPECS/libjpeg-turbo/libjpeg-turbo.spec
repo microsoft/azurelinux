@@ -1,7 +1,7 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
 Version:        2.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,10 +11,12 @@ Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version
 Patch0:         CVE-2018-20330.patch
 Patch1:         CVE-2018-19664.patch
 BuildRequires:  cmake
-Provides:       libjpeg = 6b-47
 %ifarch x86_64
 BuildRequires:  nasm
 %endif
+Provides:       libjpeg = 6b-47
+Provides:       turbojpeg = %{name}-%{release}
+Provides:       %{name}-utils = %{name}-%{release}
 
 %description
 libjpeg-turbo is a fork of the original IJG libjpeg which uses SIMD to accelerate baseline JPEG compression and decompression. libjpeg is a library that implements JPEG image encoding, decoding and transcoding.
@@ -24,29 +26,29 @@ Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
 Provides:       libjpeg-devel = 6b-47
 Provides:       libjpeg-devel%{?_isa} = 6b-47
+Provides:       turbojpeg-devel = %{version}-%{release}
 
 %description    devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 mkdir build
-cd build
+pushd build
 %cmake -DCMAKE_SKIP_RPATH:BOOL=YES \
-         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES \
-         -DENABLE_STATIC:BOOL=NO ..
-make %{?_smp_mflags}
+       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES \
+       -DENABLE_STATIC:BOOL=NO ..
+%make_build
+popd
 
 %install
-cd build
-make DESTDIR=%{buildroot} install
+pushd build
+%make_install
+popd
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -62,6 +64,9 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jul 23 Thomas Crain <thcrain@microsoft.com. - 2.0.0-8
+- Add provides for turbojpeg, turbojpeg-devel packages, utils subpackage
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.0-7
 - Provide libjpeg and libjpeg-devel along with an isa version of libjpeg-devel.
 
