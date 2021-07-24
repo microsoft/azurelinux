@@ -52,6 +52,7 @@ abidiff-name-check: mariner-container $(BUILT_PACKAGES_FILE)
 mariner-container: ensurecmd-docker
 	docker build $(ABIDIFF_DOCKERFILE_DIR) -t $(ABIDIFF_CONTAINER_NAME)
 
+# ensurecmd-%: makes sure that the wildcard is an available command. e.g. ensurecmd-cat will make fail if cat is not installed.
 .PHONY: ensurecmd-%
 ensurecmd-%:
 	which $* || $(call print_error, $* command line utility has to be installed for this command to succeed.)
