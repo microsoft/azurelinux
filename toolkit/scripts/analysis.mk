@@ -11,9 +11,14 @@ BUILT_PACKAGES_FILE=$(LOGS_DIR)/pkggen/built-packages.txt
 ABIDIFF_CONTAINER_NAME=mariner-abidiff
 ABIDIFF_DOCKERFILE_DIR=$(SCRIPTS_DIR)/abidiff
 ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER=$(RPMS_DIR)/abidiff
-ABIDIFF_OUTPUT_FOLDER=$(LOGS_DIR)/abidiff
-#TODO P1: Add clean
+ABIDIFF_OUTPUT_FOLDER=$(BUILD_DIR)/abidiff
 
+clean: clean-abidiff
+
+clean-abidiff:
+	rm -rf $(BUILD_SUMMARY_FILE)
+	rm -rf $(BUILT_PACKAGES_FILE)
+	docker rm -t $(ABIDIFF_CONTAINER_NAME)
 
 .PHONY: built-packages-summary
 built-packages-summary: $(BUILT_PACKAGES_FILE)
@@ -45,11 +50,13 @@ fake-built-packages-list:
 
 # abidiff-name-check: runs check in a mariner container. Each failed package will be listed in $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER).
 .PHONY: abidiff-name-check
-abidiff-name-check: mariner-container $(BUILT_PACKAGES_FILE)
+abidiff-name-check: abidiff-container $(BUILT_PACKAGES_FILE)
 	docker run -v "$(RPMS_DIR):/abidiff/rpms" -i $(ABIDIFF_CONTAINER_NAME) <$(BUILT_PACKAGES_FILE)
-	ls $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER)/failed* || $(call print_error, $@ failed - see $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER) for list of failed files.)
+	2>/dev/null ls $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER)/failed* && mv $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER) $(ABIDIFF_OUTPUT_FOLDER)
+	2>/dev/null ls $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER)/failed* && $(call print_error, $@ failed - see $(ABIDIFF_INTERMEDIATE_OUTPUT_FOLDER) for list of failed files.)
 
-mariner-container: ensurecmd-docker
+.PHONY: abidiff-container
+abidiff-container: ensurecmd-docker
 	docker build $(ABIDIFF_DOCKERFILE_DIR) -t $(ABIDIFF_CONTAINER_NAME)
 
 # ensurecmd-%: makes sure that the wildcard is an available command. e.g. ensurecmd-cat will make fail if cat is not installed.
