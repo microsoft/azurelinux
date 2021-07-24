@@ -1,5 +1,5 @@
 diff --git a/crypto/fips/fips_drbg_lib.c b/crypto/fips/fips_drbg_lib.c
-index 1c6ff1b..4d3a65c 100644
+index 1c6ff1b..f603a6c 100644
 --- a/crypto/fips/fips_drbg_lib.c
 +++ b/crypto/fips/fips_drbg_lib.c
 @@ -58,6 +58,7 @@
@@ -138,17 +138,13 @@ index 1c6ff1b..4d3a65c 100644
  
      if (perslen > dctx->max_pers) {
          r = FIPS_R_PERSONALISATION_STRING_TOO_LONG;
-@@ -240,6 +346,18 @@ int FIPS_drbg_instantiate(DRBG_CTX *dctx,
+@@ -240,6 +346,14 @@ int FIPS_drbg_instantiate(DRBG_CTX *dctx,
  
      }
  
 +    tmp_pers = pers;
 +
 +    perslen = fips_get_pers(dctx, &pers, perslen);
-+    if (perslen == 0) {
-+        r = FIPS_R_ERROR_RETRIEVING_PERS;
-+        goto end;
-+    }
 +
 +    if (tmp_pers != pers) {
 +        pers_alloc = 1;
@@ -157,7 +153,7 @@ index 1c6ff1b..4d3a65c 100644
      if (!dctx->instantiate(dctx,
                             entropy, entlen, nonce, noncelen, pers, perslen)) {
          r = FIPS_R_ERROR_INSTANTIATING_DRBG;
-@@ -251,6 +369,8 @@ int FIPS_drbg_instantiate(DRBG_CTX *dctx,
+@@ -251,6 +365,8 @@ int FIPS_drbg_instantiate(DRBG_CTX *dctx,
          dctx->reseed_counter = 1;
  
   end:
@@ -166,7 +162,7 @@ index 1c6ff1b..4d3a65c 100644
  
      if (entropy && dctx->cleanup_entropy)
          fips_cleanup_entropy(dctx, entropy, entlen);
-@@ -272,8 +392,9 @@ static int drbg_reseed(DRBG_CTX *dctx,
+@@ -272,8 +388,9 @@ static int drbg_reseed(DRBG_CTX *dctx,
                         const unsigned char *adin, size_t adinlen, int hcheck)
  {
      unsigned char *entropy = NULL;
@@ -177,17 +173,13 @@ index 1c6ff1b..4d3a65c 100644
  
  #if 0
      FIPSerr(FIPS_F_DRBG_RESEED, FIPS_R_NOT_INSTANTIATED);
-@@ -314,6 +435,18 @@ static int drbg_reseed(DRBG_CTX *dctx,
+@@ -314,6 +431,14 @@ static int drbg_reseed(DRBG_CTX *dctx,
          goto end;
      }
  
 +    tmp_adin = adin;
 +
 +    adinlen = fips_get_adin(dctx, &adin, adinlen);
-+    if (adinlen == 0) {
-+        r = FIPS_R_ERROR_RETRIEVING_ADIN;
-+        goto end;
-+    }
 +
 +    if (tmp_adin != adin) {
 +        adin_alloc = 1;
@@ -196,7 +188,7 @@ index 1c6ff1b..4d3a65c 100644
      if (!dctx->reseed(dctx, entropy, entlen, adin, adinlen))
          goto end;
  
-@@ -322,6 +455,9 @@ static int drbg_reseed(DRBG_CTX *dctx,
+@@ -322,6 +447,9 @@ static int drbg_reseed(DRBG_CTX *dctx,
          dctx->reseed_counter = 1;
   end:
  
@@ -206,7 +198,7 @@ index 1c6ff1b..4d3a65c 100644
      if (entropy && dctx->cleanup_entropy)
          fips_cleanup_entropy(dctx, entropy, entlen);
  
-@@ -462,7 +598,7 @@ int FIPS_drbg_set_callbacks(DRBG_CTX *dctx,
+@@ -462,7 +590,7 @@ int FIPS_drbg_set_callbacks(DRBG_CTX *dctx,
  {
      if (dctx->status != DRBG_STATUS_UNINITIALISED)
          return 0;
@@ -215,7 +207,7 @@ index 1c6ff1b..4d3a65c 100644
      dctx->get_entropy = get_entropy;
      dctx->cleanup_entropy = cleanup_entropy;
      dctx->get_nonce = get_nonce;
-@@ -470,12 +606,51 @@ int FIPS_drbg_set_callbacks(DRBG_CTX *dctx,
+@@ -470,12 +598,51 @@ int FIPS_drbg_set_callbacks(DRBG_CTX *dctx,
      return 1;
  }
  
@@ -272,7 +264,7 @@ index 1c6ff1b..4d3a65c 100644
                                   int (*rand_seed_cb) (DRBG_CTX *ctx,
                                                        const void *buf,
                                                        int num),
-@@ -485,8 +660,6 @@ int FIPS_drbg_set_rand_callbacks(DRBG_CTX *dctx,
+@@ -485,8 +652,6 @@ int FIPS_drbg_set_rand_callbacks(DRBG_CTX *dctx,
  {
      if (dctx->status != DRBG_STATUS_UNINITIALISED)
          return 0;
@@ -402,7 +394,7 @@ index cab1657..3f04344 100644
      int (*rand_seed_cb) (DRBG_CTX *ctx, const void *buf, int num);
      int (*rand_add_cb) (DRBG_CTX *ctx,
 diff --git a/crypto/rand/drbg_lib.c b/crypto/rand/drbg_lib.c
-index 5d7a1d7..21928e3 100644
+index 5d7a1d7..0d37757 100644
 --- a/crypto/rand/drbg_lib.c
 +++ b/crypto/rand/drbg_lib.c
 @@ -202,6 +202,12 @@ static RAND_DRBG *rand_drbg_new(int secure,
@@ -418,7 +410,25 @@ index 5d7a1d7..21928e3 100644
          drbg->get_entropy = rand_crngt_get_entropy;
          drbg->cleanup_entropy = rand_crngt_cleanup_entropy;
  #else
-@@ -298,6 +304,10 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
+@@ -216,8 +222,17 @@ static RAND_DRBG *rand_drbg_new(int secure,
+         drbg->reseed_interval = master_reseed_interval;
+         drbg->reseed_time_interval = master_reseed_time_interval;
+     } else {
++#ifdef OPENSSL_FIPS
++        if (FIPS_mode()) {
++            drbg->get_pers = rand_drbg_get_pers;
++            drbg->get_adin = rand_drbg_get_adin;
++            drbg->cleanup_pers = rand_drbg_cleanup_pers;
++            drbg->cleanup_adin = rand_drbg_cleanup_adin;
++        }
++#endif
+         drbg->get_entropy = rand_drbg_get_entropy;
+         drbg->cleanup_entropy = rand_drbg_cleanup_entropy;
++
+         /*
+          * Do not provide nonce callbacks, the child DRBGs will
+          * obtain their nonce using random bits from the parent.
+@@ -298,6 +313,10 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
      size_t min_entropy = drbg->strength;
      size_t min_entropylen = drbg->min_entropylen;
      size_t max_entropylen = drbg->max_entropylen;
@@ -429,7 +439,7 @@ index 5d7a1d7..21928e3 100644
  
      if (perslen > drbg->max_perslen) {
          RANDerr(RAND_F_RAND_DRBG_INSTANTIATE,
-@@ -350,6 +360,26 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
+@@ -350,6 +369,29 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
          }
      }
  
@@ -438,17 +448,20 @@ index 5d7a1d7..21928e3 100644
 +        if (drbg->get_pers != NULL) {
 +            tmp_pers = pers;
 +            perslen = drbg->get_pers(drbg, &pers, perslen);
-+            if (perslen == 0) {
-+                RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_RETRIEVING_PERS);
-+                goto end;
-+            }
 +            if (tmp_pers != pers) {
 +                pers_alloc = 1;
 +            }
 +        } else {
-+            // FIPS mode requires LRNG concatenation of pers
-+            RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_NO_LRNG_CONCAT);
-+            goto end;
++            /* 
++             * FIPS mode requires LRNG concatenation unless 
++             * callback is overriden for DRBG testing
++             */
++            perslen = rand_drbg_get_pers(drbg, &pers, perslen);
++            if (perslen == 0 || pers == NULL) {
++                RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_RETRIEVING_PERS);
++                goto end;
++            }
++            pers_alloc = 1;
 +        }
 +    }
 +#endif
@@ -456,20 +469,25 @@ index 5d7a1d7..21928e3 100644
      if (!drbg->meth->instantiate(drbg, entropy, entropylen,
                           nonce, noncelen, pers, perslen)) {
          RANDerr(RAND_F_RAND_DRBG_INSTANTIATE, RAND_R_ERROR_INSTANTIATING_DRBG);
-@@ -368,6 +398,12 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
+@@ -368,6 +410,17 @@ int RAND_DRBG_instantiate(RAND_DRBG *drbg,
      }
  
   end:
 + #ifdef OPENSSL_FIPS
 +    if (FIPS_mode()) {
-+        if (pers != NULL && drbg->cleanup_pers != NULL && pers_alloc)
-+            drbg->cleanup_pers(drbg, pers, perslen);
++        if (pers != NULL && pers_alloc) {
++            if (drbg->cleanup_pers != NULL) {
++                drbg->cleanup_pers(drbg, pers, perslen);
++            } else {
++                rand_drbg_cleanup_pers(drbg, pers, perslen);
++            }
++        }
 +    }
 + #endif
      if (entropy != NULL && drbg->cleanup_entropy != NULL)
          drbg->cleanup_entropy(drbg, entropy, entropylen);
      if (nonce != NULL && drbg->cleanup_nonce != NULL)
-@@ -414,6 +450,10 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -414,6 +467,10 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
  {
      unsigned char *entropy = NULL;
      size_t entropylen = 0;
@@ -480,7 +498,7 @@ index 5d7a1d7..21928e3 100644
  
      if (drbg->state == DRBG_ERROR) {
          RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_IN_ERROR_STATE);
-@@ -443,6 +483,26 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -443,6 +500,29 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
          goto end;
      }
  
@@ -489,17 +507,20 @@ index 5d7a1d7..21928e3 100644
 +        if (drbg->get_adin != NULL) {
 +            tmp_adin = adin;
 +            adinlen = drbg->get_adin(drbg, &adin, adinlen);
-+            if (adinlen == 0 || adin == NULL) {
-+                RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_ERROR_RETRIEVING_ADDITIONAL_INPUT);
-+                goto end;
-+            }
 +            if (tmp_adin != adin) {
 +                adin_alloc = 1;
 +            }
 +        } else {
-+            // FIPS mode requires LRNG concatenation of adin
-+            RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_ERROR_NO_LRNG_CONCAT);
-+            goto end;
++            /* 
++             * FIPS mode requires LRNG concatenation unless 
++             * callback is overriden for DRBG testing
++             */
++            adinlen = rand_drbg_get_adin(drbg, &adin, adinlen);
++            if (adinlen == 0 || adin == NULL) {
++                RANDerr(RAND_F_RAND_DRBG_RESEED, RAND_R_ERROR_RETRIEVING_ADDITIONAL_INPUT);
++                goto end;
++            }
++            adin_alloc = 1;
 +        }
 +    }
 +#endif
@@ -507,20 +528,25 @@ index 5d7a1d7..21928e3 100644
      if (!drbg->meth->reseed(drbg, entropy, entropylen, adin, adinlen))
          goto end;
  
-@@ -458,6 +518,12 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
+@@ -458,6 +538,17 @@ int RAND_DRBG_reseed(RAND_DRBG *drbg,
      }
  
   end:
 +#ifdef OPENSSL_FIPS
 +    if (FIPS_mode()) {
-+        if (adin != NULL && drbg->cleanup_adin != NULL && adin_alloc)
-+            drbg->cleanup_adin(drbg, adin, adinlen);
++        if (adin != NULL && adin_alloc) {
++            if (drbg->cleanup_adin != NULL) {
++                drbg->cleanup_adin(drbg, adin, adinlen);
++            } else {
++                rand_drbg_cleanup_adin(drbg, adin, adinlen);
++            }
++        }
 +    }
 +#endif
      if (entropy != NULL && drbg->cleanup_entropy != NULL)
          drbg->cleanup_entropy(drbg, entropy, entropylen);
      if (drbg->state == DRBG_READY)
-@@ -693,6 +759,40 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
+@@ -693,6 +784,40 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
      return ret;
  }
  

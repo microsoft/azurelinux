@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -16,6 +16,8 @@ Source5:        mariner-ui.repo
 Source6:        mariner-ui-preview.repo
 Source7:        mariner-extras.repo
 Source8:        mariner-extras-preview.repo
+Source9:        mariner-microsoft.repo
+Source10:       mariner-microsoft-preview.repo
 
 Requires(post):  gpgme
 Requires(post):  rpm
@@ -65,6 +67,23 @@ Requires: %{name} = %{version}-%{release}
 %description extras-preview
 %{summary}
 
+%package microsoft
+Summary:  CBL-Mariner Microsoft repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description microsoft
+%{summary}
+
+%package microsoft-preview
+Summary:  CBL-Mariner Microsoft Preview repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description microsoft-preview
+%{summary}
+
+
 %install
 rm -rf $RPM_BUILD_ROOT
 export REPO_DIRECTORY="$RPM_BUILD_ROOT/etc/yum.repos.d"
@@ -76,6 +95,8 @@ install -m 644 %{SOURCE5} $REPO_DIRECTORY
 install -m 644 %{SOURCE6} $REPO_DIRECTORY
 install -m 644 %{SOURCE7} $REPO_DIRECTORY
 install -m 644 %{SOURCE8} $REPO_DIRECTORY
+install -m 644 %{SOURCE9} $REPO_DIRECTORY
+install -m 644 %{SOURCE10} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="$RPM_BUILD_ROOT/etc/pki/rpm-gpg"
 
@@ -103,6 +124,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) /etc/yum.repos.d/mariner-official-base.repo
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
+%config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
 
 %files preview
 %defattr(-,root,root,-)
@@ -124,32 +146,54 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-extras-preview.repo
 
+%files microsoft-preview
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
+
 %changelog
+*   Tue Jul 23 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
+-   Added microsoft repo configuration package to image automatically.
+-   Add microsoft-preview repo configuration packages.  
+-   These repos offer Mariner packages produced by partner teams within Microsoft on 
+-   behalf of the Mariner team but are released on an independent cadence from Mariner.
+
 *   Fri Feb 19 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-13
 -   Add extras repo.
 -   Add extras-preview repo.
+
 *   Fri Jan 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12
 -   Adding a set of repos with the UI components.
+
 *   Thu Oct 01 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0-11
 -   Change %%post scriptlet to %%posttrans in order to ensure it runs after %%postun during an upgrade.
+
 *   Mon Sep 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-10
 -   Adding configuration to access the preview repository.
 -   Removing redundant 'Provides'.
+
 *   Tue Aug 11 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-9
 -   Enable GPG Check and Import
+
 *   Mon Aug 10 2020 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.0-8
 -   Adding Metadata Key and Updating to Prod GPG Key.
+
 *   Fri Jul 31 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
 -   Fixing distro name.
+
 *   Fri Jul 17 2020 Andrew Phelps <anphel@microsoft.com> 1.0-6
 -   Set sslverify=1 in [mariner-official-base] and [mariner-official-update]
+
 *   Wed Nov 27 2019 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-5
 -   Removing outdated repository configuration
+
 *   Fri Nov 22 2019 Andrew Phelps <anphel@microsoft.com> 1.0-4
 -   Use $releasever and $basearch variables
+
 *   Tue Oct 29 2019 Andrew Phelps <anphel@microsoft.com> 1.0-3
 -   Separate repo configs for official-base and official-update
+
 *   Wed Oct 23 2019 Andrew Phelps <anphel@microsoft.com> 1.0-2
 -   Add mariner-official.repo
+
 *   Wed Sep 04 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-1
 -   Original version for CBL-Mariner.
