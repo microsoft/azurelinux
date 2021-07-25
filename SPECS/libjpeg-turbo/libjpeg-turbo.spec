@@ -15,8 +15,8 @@ BuildRequires:  cmake
 BuildRequires:  nasm
 %endif
 Provides:       libjpeg = 6b-47
-Provides:       turbojpeg = %{name}-%{release}
-Provides:       %{name}-utils = %{name}-%{release}
+Provides:       turbojpeg = %{version}-%{release}
+Provides:       %{name}-utils = %{version}-%{release}
 
 %description
 libjpeg-turbo is a fork of the original IJG libjpeg which uses SIMD to accelerate baseline JPEG compression and decompression. libjpeg is a library that implements JPEG image encoding, decoding and transcoding.
@@ -64,7 +64,7 @@ popd
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Jul 23 Thomas Crain <thcrain@microsoft.com. - 2.0.0-8
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com. - 2.0.0-8
 - Add provides for turbojpeg, turbojpeg-devel packages, utils subpackage
 
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.0-7
