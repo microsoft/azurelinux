@@ -39,7 +39,7 @@ another program was doing at the moment it crashed.
 %autosetup -p1
 
 %build
-%configure --with-python=%{_python3}
+%configure --with-python=%{python3}
 %make_build
 
 %install
