@@ -112,7 +112,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Tue Jun 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-18
+* Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-18
 - Adding the '_metainfodir' macro.
 
 * Tue Jun 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-17
