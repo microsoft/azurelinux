@@ -124,7 +124,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) /etc/yum.repos.d/mariner-official-base.repo
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
-%config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
 
 %files preview
 %defattr(-,root,root,-)
@@ -146,14 +145,17 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-extras-preview.repo
 
+%files microsoft
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
+
 %files microsoft-preview
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
 
 %changelog
-*   Tue Jul 23 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
--   Added microsoft repo configuration package to image automatically.
--   Add microsoft-preview repo configuration packages.  
+*   Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
+-   Add microsoft and microsoft-preview repo configuration packages.  
 -   These repos offer Mariner packages produced by partner teams within Microsoft on 
 -   behalf of the Mariner team but are released on an independent cadence from Mariner.
 
