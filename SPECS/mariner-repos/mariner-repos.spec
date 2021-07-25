@@ -124,11 +124,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) /etc/yum.repos.d/mariner-official-base.repo
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
-%ifarch x86_64
-# Remove the arch check when content is available in the Microsoft Aarch64 RPM Repo.  
-# For now only add the Microsoft repo to the x86_64 images
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
-%endif
 
 %files preview
 %defattr(-,root,root,-)
