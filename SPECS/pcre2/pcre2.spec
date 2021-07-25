@@ -1,12 +1,12 @@
+Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
 Version:        10.34
-Release:        1%{?dist}
-Summary:        A library for Perl-compatible regular expressions
+Release:        2%{?dist}
 License:        BSD-3-Clause
-Group:          Development/Libraries/C and C++
-URL:            https://www.pcre.org/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Libraries/C and C++
+URL:            https://www.pcre.org/
 Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
 BuildRequires:  libgcc
 BuildRequires:  pkg-config
@@ -18,12 +18,11 @@ BuildRequires:  gcc
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  bzip2-devel
-%if %{with pcre2_enables_readline}
 BuildRequires:  readline-devel
-%endif
-
-Requires: %{name}-tools
-Requires: %{name}-doc
+Requires:       %{name}-tools = %{version}-%{release}
+Requires:       %{name}-doc = %{version}-%{release}
+Requires:       libpcre2-8-0 = %{version}-%{release}
+Requires:       libpcre2-posix2 = %{version}-%{release}
 
 %description
 The PCRE2 library is a set of functions that implement regular
@@ -36,13 +35,13 @@ API.
 %package        devel
 Summary:        A library for Perl-compatible regular expressions
 Group:          Development/Libraries/C and C++
-Requires:       libpcre2-16-0 = %{version}
-Requires:       libpcre2-32-0 = %{version}
-Requires:       libpcre2-8-0 = %{version}
-Requires:       libpcre2-posix2 = %{version}
+Requires:       libpcre2-16-0 = %{version}-%{release}
+Requires:       libpcre2-32-0 = %{version}-%{release}
+Requires:       libpcre2-8-0 = %{version}-%{release}
+Requires:       libpcre2-posix2 = %{version}-%{release}
 Requires:       libstdc++-devel
 
-%description devel
+%description    devel
 The PCRE2 library is a set of functions that implement regular
 expression pattern matching using the same syntax and semantics
 as Perl 5.
@@ -53,7 +52,7 @@ API.
 %package        devel-static
 Summary:        A library for Perl-compatible regular expressions
 Group:          Development/Libraries/C and C++
-Requires:       pcre2-devel = %{version}
+Requires:       pcre2-devel = %{version}-%{release}
 
 %description devel-static
 The PCRE2 library is a set of functions that implement regular
@@ -65,7 +64,7 @@ API.
 
 This package contains static versions of the PCRE2 libraries.
 
-%package -n libpcre2-8-0
+%package -n     libpcre2-8-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
 
@@ -80,9 +79,10 @@ API.
 This PCRE2 library variant supports 8-bit and UTF-8 strings.
 (See also libpcre2-16 and libpcre2-32)
 
-%package -n libpcre2-16-0
+%package -n     libpcre2-16-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+Provides:       %{name}-utf16 = %{version}-%{release}
 
 %description -n libpcre2-16-0
 The PCRE2 library is a set of functions that implement regular
@@ -97,6 +97,7 @@ libpcre2-16 supports 16-bit and UTF-16 strings.
 %package -n libpcre2-32-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+Provides:       %{name}-utf32 = %{version}-%{release}
 
 %description -n libpcre2-32-0
 The PCRE2 library is a set of functions that implement regular
@@ -169,22 +170,9 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
        --enable-pcre2grep-libz \
        --enable-pcre2grep-libbz2 \
        --disable-pcre2test-libedit \
-%if %{with pcre2_enables_readline}
        --enable-pcre2test-libreadline \
-%else
-       --disable-pcre2test-libreadline \
-%endif
        --enable-unicode
-%if 0%{?do_profiling}
-  make %{?_smp_mflags} CFLAGS="%{optflags} %{cflags_profile_generate}" V=1
-  export LANG=POSIX
-  # do not run profiling in parallel for reproducible builds (boo#1040589 boo#1102408)
-  make CFLAGS="%{optflags} %{cflags_profile_generate}" check
-  make %{?_smp_mflags} clean
-  make %{?_smp_mflags} CFLAGS="%{optflags} %{cflags_profile_feedback}" V=1
-%else
-  make %{?_smp_mflags} CFLAGS="%{optflags}"
-%endif
+%make_build
 
 %install
 %make_install
@@ -197,14 +185,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 export LANG=POSIX
 make check -j1
 
-%post -n libpcre2-8-0 -p /sbin/ldconfig
-%postun -n libpcre2-8-0 -p /sbin/ldconfig
-%post -n libpcre2-16-0 -p /sbin/ldconfig
-%postun -n libpcre2-16-0 -p /sbin/ldconfig
-%post -n libpcre2-32-0 -p /sbin/ldconfig
-%postun -n libpcre2-32-0 -p /sbin/ldconfig
-%post -n libpcre2-posix2 -p /sbin/ldconfig
-%postun -n libpcre2-posix2 -p /sbin/ldconfig
+%ldconfig_scriptlets -n libpcre2-8-0
+%ldconfig_scriptlets -n libpcre2-16-0
+%ldconfig_scriptlets -n libpcre2-32-0
+%ldconfig_scriptlets -n libpcre2-posix2
 
 %files
 
@@ -254,6 +238,11 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 10.34-2
+- Unconditionally build with readline support
+- Add compatibility provides for pcre2-utf{16,32}
+- Require libpcre2-8-0, libpcre2-posix2 from base package
+
 * Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> - 10.34-1
 - Update to version 10.34
 
