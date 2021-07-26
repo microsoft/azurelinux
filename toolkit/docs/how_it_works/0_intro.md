@@ -22,7 +22,7 @@ Image generation is discussed in detail [here](4_image_generation.md). The image
 ## In Depth Explanations
 ### [1. Initial Prep](1_initial_prep.md)
 - Makefiles, Go Tooling, Toolchain, Chroots
-### [2. Local Packages](2_local_pacakges.md)
+### [2. Local Packages](2_local_packages.md)
 - Local Spec Files, Creating Local SRPMs
 ### [3. Package Building](3_package_building.md)
 - Dependency Graphing, Downloading Dependencies, Building Packages
