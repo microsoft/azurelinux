@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        0.1
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,10 @@ Requires:       libtool
 Requires:       lz4
 Requires:       mariner-release
 Requires:       mariner-repos
+%ifarch x86_64
+# Temporarily exclude aarch64 from including the microsoft repo until content is available in the repo
+Requires:       mariner-repos-microsoft
+%endif
 Requires:       mariner-rpm-macros
 Requires:       ncurses-libs
 Requires:       net-tools
@@ -90,6 +94,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Sat Jul 24 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.1-23
+- Include new Microsoft repo for x86_64 architectures (temporarily exclude from aarch64)
+
 * Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.1-22
 - Remove bootloader packages to reduce disk footprint in core images.
 

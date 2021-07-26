@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch22:        CVE-2020-13776.patch
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch23:        CVE-2018-21029.nopatch
+Patch24:        CVE-2021-33910.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -246,6 +247,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-35
+- CVE-2021-33910 fix
+
 * Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-34
 - Remove build dependency on shadow-utils to break circular dependency
 
