@@ -1,7 +1,7 @@
 Summary:        A library passing all socket communications through Unix sockets
 Name:           socket_wrapper
 Version:        1.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,6 +73,10 @@ popd
 %{_mandir}/man1/socket_wrapper.1*
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.2.4-2
+- Replace ldconfig_scriptlets with the expanded form
+- Replace gpgv2 with gpg
+
 * Tue Mar 24 2020 Andreas Schneider <asn@redhat.com> - 1.2.4-1
 - Update to version 1.2.4
   * https://gitlab.com/cwrap/socket_wrapper/-/blob/master/CHANGELOG

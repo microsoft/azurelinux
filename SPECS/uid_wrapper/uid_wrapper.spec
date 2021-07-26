@@ -1,7 +1,7 @@
 Summary:        A wrapper for privilege separation
 Name:           uid_wrapper
 Version:        1.2.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,6 +74,10 @@ popd
 %{_mandir}/man1/uid_wrapper.1*
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.2.7-4
+- Replace ldconfig_scriptlets with the expanded form
+- Replace gpgv2 with gpg
+
 * Tue Mar 03 2020 Anderson Sasaki <ansasaki@redhat.com> - 1.2.7-3
 - Fix invalid library path in cmake configuration file (bz#1809275)
 

@@ -1,7 +1,7 @@
 Summary:        A library implementing the SSH protocol
 Name:           libssh
 Version:        0.9.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -132,6 +132,10 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 0.9.5-2
+- Replace ldconfig_scriptlets with the expanded form
+- Replace gpgv2 with gpg
+
 * Thu Sep 10 2020 Anderson Sasaki <ansasaki@redhat.com> - 0.9.5-1
 - Update to version 0.9.5
   https://www.libssh.org/2020/09/10/libssh-0-9-5/

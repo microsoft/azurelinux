@@ -1,7 +1,7 @@
 Summary:        An elegant unit testing framework for C with support for mock objects
 Name:           cmocka
 Version:        1.1.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -130,6 +130,9 @@ popd
 %{_libdir}/cmake/cmocka/cmocka-config.cmake
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.5.4
+- Replace ldconfig_scriptlets with the expanded form
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 

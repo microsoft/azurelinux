@@ -1,7 +1,7 @@
 Summary:        A wrapper for the user, group and hosts NSS API
 Name:           nss_wrapper
 Version:        1.1.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,10 @@ popd
 %{_mandir}/man1/nss_wrapper.1*
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.11-2
+- Replace ldconfig_scriptlets with the expanded form
+- Replace gpgv2 with gpg
+
 * Thu Apr 02 2020 Andreas Schneider <asn@redhat.com> - 1.1.11-1
 - Update to version 1.1.11
   https://gitlab.com/cwrap/nss_wrapper/-/blob/master/CHANGELOG

@@ -3,7 +3,7 @@
 Summary:       SpiderMonkey JavaScript library
 Name:          mozjs%{major}
 Version:       60.9.0
-Release:       9%{?dist}
+Release:       10%{?dist}
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 License:       MPLv2.0 and MPLv1.1 and BSD and GPLv2+ and GPLv3+ and LGPLv2+ and AFL and ASL 2.0
@@ -129,6 +129,8 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+*   Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 60.9.0-10
+-   Replace ldconfig_scriptlets with the expanded form
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 60.9.0-9
 -   Fix calls to python2 in check section
 *   Thu May 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 60.9.0-8

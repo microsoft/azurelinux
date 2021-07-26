@@ -1,7 +1,7 @@
 Summary:        A tool to test PAM applications and PAM modules
 Name:           pam_wrapper
 Version:        1.1.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,10 +133,14 @@ popd
 %doc obj/doc/html
 
 %files -n python3-libpamtest
-# %{python3_sitearch}/pypamtest.so
 %{_lib}/python3.7/site-packages/pypamtest.so
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.3-4
+- Replace ldconfig_scriptlets with the expanded form
+- Replace gpgv2 with gpg
+- on our build system, python3 packages are located in %{_lib}/python3.7
+
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 
