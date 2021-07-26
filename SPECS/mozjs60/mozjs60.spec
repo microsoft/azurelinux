@@ -130,7 +130,7 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 
 %changelog
 *   Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 60.9.0-10
--   Replace ldconfig_scriptlets with the expanded form
+-   Make a symlink to /run/shm called /dev/shm so this spec will work on WSL.
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 60.9.0-9
 -   Fix calls to python2 in check section
 *   Thu May 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 60.9.0-8
