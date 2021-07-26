@@ -56,7 +56,7 @@ Summary:        openscap python
 Group:          Development/Libraries
 Requires:       openscap = %{version}-%{release}
 
-%description python
+%description -n python3-%{name}
 Python 3 bindings for %{name}.
 
 %prep
@@ -90,7 +90,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_prefix}/src/debug
 %exclude %{_libdir}/debug
 %{_bindir}/*
-#%{_libexecdir}/*
+#%%{_libexecdir}/*
 %{_mandir}/man8/*
 %{_datadir}/openscap/*
 %{_libdir}/libopenscap_sce.so.*
@@ -108,9 +108,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/perl5/*
 %{_datadir}/perl5/vendor_perl/openscap_pm.pm
 
-%files python
+%files -n python3-%{name}
 %defattr(-,root,root)
-%{_libdir}/python2.7/*
+%{python3_sitelib}/*
 
 %changelog
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
