@@ -1,7 +1,7 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
 Version:        2.4.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,7 @@ should be familiar to, and easily adopted by application developers.
 %package        devel
 Summary:        Development files used to build applications with libseccomp support
 Group:          Development/Libraries
-Provides:       pkgconfig(libseccomp) = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-static = %{version}-%{release}
 
 %description    devel
@@ -30,7 +30,7 @@ The libseccomp-devel package contains the libraries and header files
 needed for developing secure applications.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure
@@ -48,7 +48,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %license LICENSE
 %doc CREDITS README.md
-%{_libdir}/libseccomp.so.*
+%{_libdir}/libseccomp.so.2*
 
 %files devel
 %{_includedir}/seccomp.h
@@ -60,6 +60,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.1-4
+- Remove pkgconfig provides (no longer necessary)
+- Require base package from devel subpackage
+- Include libseccomp soname version in %%file section
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.1-3
 - Provide libseccomp-static from devel subpackage
 - Version the pkgconfig provides

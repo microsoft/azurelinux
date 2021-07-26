@@ -1,0 +1,14 @@
+diff --git a/conda/__init__.py b/conda/__init__.py
+index 342f3ce..debf943 100644
+--- a/conda/__init__.py
++++ b/conda/__init__.py
+@@ -35,8 +35,7 @@ __copyright__ = "Copyright (c) 2012, Anaconda, Inc."
+ __summary__ = __doc__
+ __url__ = "https://github.com/conda/conda"
+ 
+-if os.getenv('CONDA_ROOT') is None:
+-    os.environ[str('CONDA_ROOT')] = sys.prefix
++os.environ['CONDA_ROOT'] = '/usr/share/conda'
+ 
+ CONDA_PACKAGE_ROOT = abspath(dirname(__file__))
+ 

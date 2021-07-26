@@ -1,0 +1,69 @@
+From acf7c4e073030a69712172b133076101e2b7d81f Mon Sep 17 00:00:00 2001
+From: Tomas Orsava <torsava@redhat.com>
+Date: Mon, 12 Dec 2016 12:09:47 +0100
+Subject: [PATCH] Patch for compatibility with Python 3.6
+
+Python 3.6 returns a ModuleNotFoundError instead of the previous ImportError.
+---
+ functional_tests/test_loader.py           |  2 +-
+ functional_tests/test_withid_failures.rst | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/functional_tests/test_loader.py b/functional_tests/test_loader.py
+index 81aaa7b..3f82122 100644
+--- a/functional_tests/test_loader.py
++++ b/functional_tests/test_loader.py
+@@ -369,7 +369,7 @@ class TestNoseTestLoader(unittest.TestCase):
+         assert res.errors, "Expected errors but got none"
+         assert not res.failures, res.failures
+         err = res.errors[0][0].test.exc_class
+-        assert err is ImportError, \
++        assert issubclass(err, ImportError), \
+             "Expected import error, got %s" % err
+ 
+     def test_load_nonsense_name(self):
+diff --git a/functional_tests/test_withid_failures.rst b/functional_tests/test_withid_failures.rst
+index cf09d4f..cb20886 100644
+--- a/functional_tests/test_withid_failures.rst
++++ b/functional_tests/test_withid_failures.rst
+@@ -7,16 +7,16 @@
+     >>> support = os.path.join(os.path.dirname(__file__), 'support', 'id_fails')
+     >>> argv = [__file__, '-v', '--with-id', '--id-file', idfile, support]
+     >>> run(argv=argv, plugins=[TestId()]) # doctest: +ELLIPSIS
+-    #1 Failure: ImportError (No module ...apackagethatdoesntexist...) ... ERROR
++    #1 Failure: ... (No module ...apackagethatdoesntexist...) ... ERROR
+     #2 test_b.test ... ok
+     #3 test_b.test_fail ... FAIL
+     <BLANKLINE>
+     ======================================================================
+-    ERROR: Failure: ImportError (No module ...apackagethatdoesntexist...)
++    ERROR: Failure: ... (No module ...apackagethatdoesntexist...)
+     ----------------------------------------------------------------------
+     Traceback (most recent call last):
+     ...
+-    ImportError: No module ...apackagethatdoesntexist...
++    ...: No module ...apackagethatdoesntexist...
+     <BLANKLINE>
+     ======================================================================
+     FAIL: test_b.test_fail
+@@ -35,14 +35,14 @@ Addressing failures works (sometimes).
+     >>> argv.append('1')
+     >>> _junk = sys.modules.pop('test_a', None) # 2.3 requires
+     >>> run(argv=argv, plugins=[TestId()]) #doctest: +ELLIPSIS
+-    #1 Failure: ImportError (No module ...apackagethatdoesntexist...) ... ERROR
++    #1 Failure: ... (No module ...apackagethatdoesntexist...) ... ERROR
+     <BLANKLINE>
+     ======================================================================
+-    ERROR: Failure: ImportError (No module ...apackagethatdoesntexist...)
++    ERROR: Failure: ... (No module ...apackagethatdoesntexist...)
+     ----------------------------------------------------------------------
+     Traceback (most recent call last):
+     ...
+-    ImportError: No module ...apackagethatdoesntexist...
++    ...: No module ...apackagethatdoesntexist...
+     <BLANKLINE>
+     ----------------------------------------------------------------------
+     Ran 1 test in ...s
+-- 
+2.11.0
+
