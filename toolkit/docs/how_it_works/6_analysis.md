@@ -25,6 +25,6 @@ The artifacts are available in the SODIFF_OUTPUT_FOLDER, which is built/sodiff b
 The results of sodiff check are:
     - summary.txt file, containing a list of source rpm names (without the extension part) of packages that need to be rebuilt due to .so version change,
     - sodiff.log file, updated throughout the build with names of packages that are currently processed (use `tail -f` to track progress of the check).
-    - Files following a naming format: "require_$SOFILE", where $SOFILE is a full name of a SO file with updated version. It contains a list of packages that depend on that file.
+    - Files following a naming format: `require_$SOFILE`, where `$SOFILE` is a full name of a .so file with updated version. It contains a list of packages that depend on that file.
 
 ## Prev: [Miscellaneous Topics](5_misc.md)
