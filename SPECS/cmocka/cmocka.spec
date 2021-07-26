@@ -130,6 +130,7 @@ popd
 %{_libdir}/cmake/cmocka/cmocka-config.cmake
 
 %changelog
+#FIXME: First changelog entry header failed to parse
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.5.4
 - Replace ldconfig_scriptlets with the expanded form
 

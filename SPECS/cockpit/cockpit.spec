@@ -86,5 +86,3 @@ make check
 %{_sbindir}/remotectl
 
 %changelog
-* Fri Jul 23 2021 Shane Guan <shaneguan@microsoft.com> 248-1
-- Initial version of cockpit package

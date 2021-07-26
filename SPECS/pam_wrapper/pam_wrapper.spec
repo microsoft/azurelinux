@@ -136,7 +136,7 @@ popd
 %{_lib}/python3.7/site-packages/pypamtest.so
 
 %changelog
-* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.3-4
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.1.3-4
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
 - on our build system, python3 packages are located in %{_lib}/python3.7

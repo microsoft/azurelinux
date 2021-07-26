@@ -132,7 +132,7 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
-* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 0.9.5-2
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 0.9.5-2
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
 
