@@ -40,20 +40,20 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
 
 %build
 %configure \
-                --host=ia64-linux \
-                --build=i686 \
-                --target=ia64-linux \
-                --sbindir=/sbin \
-                --with-sys-location="unknown" \
-                --with-logfile=%{_var}/log/net-snmpd.log \
-                --with-persistent-directory=%{_sharedstatedir}/net-snmp \
-                --with-perl-modules="INSTALLDIRS=vendor" \
-                --with-sys-contact="root@localhost" \
-                --with-defaults \
-                --with-systemd \
-                --disable-static \
-                --with-x=no \
-                --enable-as-needed
+    --host=ia64-linux \
+    --build=i686 \
+    --target=ia64-linux \
+    --sbindir=/sbin \
+    --with-sys-location="unknown" \
+    --with-logfile=%{_var}/log/net-snmpd.log \
+    --with-persistent-directory=%{_sharedstatedir}/net-snmp \
+    --with-perl-modules="INSTALLDIRS=vendor" \
+    --with-sys-contact="root@localhost" \
+    -with-defaults \
+    --with-systemd \
+    --disable-static \
+    --with-x=no \
+    --enable-as-needed
 %make_build
 
 %install
