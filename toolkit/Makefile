@@ -179,7 +179,7 @@ include $(SCRIPTS_DIR)/imggen.mk
 include $(SCRIPTS_DIR)/toolkit.mk
 
 # Analyze build process and its artifacts with:
-# built-packages-summary build-summary fake-built-packages-list abidiff-name-check
+# built-packages-summary build-summary fake-built-packages-list clean-sodiff sodiff-check
 
 include $(SCRIPTS_DIR)/analysis.mk
 
