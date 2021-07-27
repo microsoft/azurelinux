@@ -196,3 +196,6 @@ end
         echo "$RPM_BUILD_NCPUS";)
 
 %_smp_mflags "-j%{_smp_build_ncpus}"
+
+# A directory for appdata metainfo.
+%_metainfodir %{_datadir}/metainfo
