@@ -55,7 +55,7 @@ This package contains minimal set of shared pcre libraries.
 mv -v %{buildroot}%{_libdir}/libpcre.so.* %{buildroot}/lib &&
 ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
 ln -sfv $(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
-find %{buildroot} -type f -name "*.la" -print -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %make_build check

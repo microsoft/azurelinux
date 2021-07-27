@@ -11,7 +11,7 @@ Source0:        https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}
 Patch0:         dtc-disable-warning.patch
 BuildRequires:  bison
 BuildRequires:  flex
-BuildRequires:  gcc 
+BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  swig
 Provides:       libfdt = %{name}-%{version}

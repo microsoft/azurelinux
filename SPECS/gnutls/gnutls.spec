@@ -60,7 +60,7 @@ developing applications that use gnutls.
 %install
 %make_install
 rm %{buildroot}%{_infodir}/*
-find %{buildroot} -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 chmod 755 %{buildroot}%{_sysconfdir}/%{name}

@@ -39,7 +39,7 @@ The libraries and header files needed for libcap_ng development.
 
 %install
 %make_install
-find %{buildroot} -type f -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %make_build check
