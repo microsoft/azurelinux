@@ -86,3 +86,5 @@ make check
 %{_sbindir}/remotectl
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
+- Initial commit to Mariner 1.0.

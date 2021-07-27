@@ -1176,7 +1176,7 @@
         "other": {
           "name": "doxygen",
           "version": "1.8.17",
-          "downloadUrl": "http://doxygen.nl/files/doxygen-1.8.17.src.tar.gz"
+          "downloadUrl": "https://sourceforge.net/projects/doxygen/files/rel-1.8.17/doxygen-1.8.17.src.tar.gz"
         }
       }
     },
