@@ -11,12 +11,12 @@ Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version
 Patch0:         CVE-2018-20330.patch
 Patch1:         CVE-2018-19664.patch
 BuildRequires:  cmake
-%ifarch x86_64
-BuildRequires:  nasm
-%endif
 Provides:       libjpeg = 6b-47
 Provides:       turbojpeg = %{version}-%{release}
 Provides:       %{name}-utils = %{version}-%{release}
+%ifarch x86_64
+BuildRequires:  nasm
+%endif
 
 %description
 libjpeg-turbo is a fork of the original IJG libjpeg which uses SIMD to accelerate baseline JPEG compression and decompression. libjpeg is a library that implements JPEG image encoding, decoding and transcoding.
@@ -64,39 +64,39 @@ popd
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com. - 2.0.0-8
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.0-8
 - Add provides for turbojpeg, turbojpeg-devel packages, utils subpackage
 
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.0-7
 - Provide libjpeg and libjpeg-devel along with an isa version of libjpeg-devel.
 
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Mar 04 2019 Keerthana K <keerthanak@vmware.com> 2.0.0-4
--   Update BuildRequires nasm only for x86_64.
+* Mon Mar 04 2019 Keerthana K <keerthanak@vmware.com> - 2.0.0-4
+- Update BuildRequires nasm only for x86_64.
 
-*   Wed Feb 06 2019 Sujay G <gsujay@vmware.com> 2.0.0-3
--   Added patch to fix CVE-2018-19664
+* Wed Feb 06 2019 Sujay G <gsujay@vmware.com> - 2.0.0-3
+- Added patch to fix CVE-2018-19664
 
-*   Thu Jan 10 2019 Sujay G <gsujay@vmware.com> 2.0.0-2
--   Added patch to fix CVE-2018-20330
+* Thu Jan 10 2019 Sujay G <gsujay@vmware.com> - 2.0.0-2
+- Added patch to fix CVE-2018-20330
 
-*   Sun Sep 20 2018 Bo Gan <ganb@vmware.com> 2.0.0-1
--   Update to 2.0.0
--   cmake build system
+* Sun Sep 20 2018 Bo Gan <ganb@vmware.com> - 2.0.0-1
+- Update to 2.0.0
+- cmake build system
 
-*   Mon Dec 11 2017 Xiaolin Li <xiaolinl@vmware.com> 1.5.2-2
--   Fix CVE-2017-15232
+* Mon Dec 11 2017 Xiaolin Li <xiaolinl@vmware.com> - 1.5.2-2
+- Fix CVE-2017-15232
 
-*   Wed Aug 09 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.2-1
--   Updated to version 1.5.2
+* Wed Aug 09 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.5.2-1
+- Updated to version 1.5.2
 
-*   Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5.1-1
--   Updated to version 1.5.1
+* Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 1.5.1-1
+- Updated to version 1.5.1
 
-*   Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> 1.5.0-1
--   Initial version
+* Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> - 1.5.0-1
+- Initial version

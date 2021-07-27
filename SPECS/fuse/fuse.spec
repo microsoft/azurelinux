@@ -3,10 +3,10 @@ Name:           fuse
 Version:        2.9.7
 Release:        8%{?dist}
 License:        GPL+
-URL:            https://github.com/libfuse/libfuse
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Base
+URL:            https://github.com/libfuse/libfuse
 Source0:        https://github.com/libfuse/libfuse/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         fuse-types.patch
 Patch1:         fuse-prevent-silent-truncation.patch
@@ -47,10 +47,10 @@ It contains the libraries and header files to create fuse applications.
 mkdir -p %{buildroot}%{_libdir}/%{name}
 %make_install
 
-install -v -m755 -d /usr/share/doc/%{name}-%{version} &&
+install -v -m755 -d %{_docdir}/%{name}-%{version} &&
 install -v -m644 doc/{how-fuse-works,kernel.txt} \
-    /usr/share/doc/%{name}-%{version}
-find %{buildroot} -type f -name '*.la' -delete -print
+    %{_docdir}/%{name}-%{version}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %defattr(-, root, root)

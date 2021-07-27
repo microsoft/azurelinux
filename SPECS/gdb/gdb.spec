@@ -24,11 +24,11 @@ Requires:       ncurses
 Requires:       python3
 Requires:       xz-libs
 Provides:       %{name}-headless = %{version}-%{release}
+Provides:       %{name}-gdbserver = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
 %endif
-Provides:       %{name}-gdbserver = %{version}-%{release}
 
 %description
 GDB, the GNU Project debugger, allows you to see what is going on
@@ -84,7 +84,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 
 %changelog
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-5
-- Add compatibility provides for gdbserver subpackage 
+- Add compatibility provides for gdbserver subpackage
 - Use make macros throughout
 
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-4

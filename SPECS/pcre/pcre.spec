@@ -48,14 +48,14 @@ This package contains minimal set of shared pcre libraries.
     --enable-pcregrep-libbz2          \
     --enable-pcretest-libreadline     \
     --with-match-limit-recursion=16000
-%make_build 
+%make_build
 
 %install
 %make_install
 mv -v %{buildroot}%{_libdir}/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
+ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
 ln -sfv $(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
-find %{buildroot} -name '*.la' -print -delete
+find %{buildroot} -type f -name "*.la" -print -delete
 
 %check
 %make_build check

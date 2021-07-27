@@ -8,19 +8,19 @@ Distribution:   Mariner
 Group:          Development/Libraries/C and C++
 URL:            https://www.pcre.org/
 Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
-BuildRequires:  libgcc
-BuildRequires:  pkg-config
-BuildRequires:  zlib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bzip2-devel
 BuildRequires:  coreutils
 BuildRequires:  gcc
+BuildRequires:  libgcc
 BuildRequires:  libtool
 BuildRequires:  make
-BuildRequires:  bzip2-devel
+BuildRequires:  pkg-config
 BuildRequires:  readline-devel
-Requires:       %{name}-tools = %{version}-%{release}
+BuildRequires:  zlib-devel
 Requires:       %{name}-doc = %{version}-%{release}
+Requires:       %{name}-tools = %{version}-%{release}
 Requires:       libpcre2-8-0 = %{version}-%{release}
 Requires:       libpcre2-posix2 = %{version}-%{release}
 
@@ -177,7 +177,7 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 %install
 %make_install
 mkdir -p %{buildroot}/%{_defaultdocdir}
-mv %{buildroot}%{_datadir}/doc/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
+mv %{buildroot}%{_docdir}/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
 #empty dependecy_libs
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -198,32 +198,32 @@ make check -j1
 %{_libdir}/libpcre2-8.so.*
 
 %files -n libpcre2-16-0
-%doc LICENCE
+%license LICENCE
 %{_libdir}/libpcre2-16.so.*
 
 %files -n libpcre2-32-0
-%doc LICENCE
+%license LICENCE
 %{_libdir}/libpcre2-32.so.*
 
 %files -n libpcre2-posix2
-%doc LICENCE
+%license LICENCE
 %{_libdir}/libpcre2-posix.so.*
 
 %files tools
-%doc LICENCE
+%license LICENCE
 %{_bindir}/pcre2grep
 %{_bindir}/pcre2test
 %{_mandir}/man1/pcre2grep.1.gz
 %{_mandir}/man1/pcre2test.1.gz
 
 %files doc
-%license COPYING
-%doc AUTHORS ChangeLog LICENCE NEWS README
+%license COPYING LICENCE
+%doc AUTHORS ChangeLog NEWS README
 %doc doc/html doc/*.txt
 %doc %{_defaultdocdir}/pcre2-doc
 
 %files devel
-%doc LICENCE
+%license LICENCE
 %{_bindir}/pcre2-config
 %{_includedir}/*
 %{_libdir}/*.so
@@ -256,4 +256,3 @@ make check -j1
 
 * Thu Feb 13 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 10.32-1
 - Original version for CBL-Mariner.
-

@@ -11,18 +11,17 @@ URL:            https://net-snmp.sourceforge.io/
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1:        snmpd.service
 Source2:        snmptrapd.service
-
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  systemd
-%if %{with_check}
-BuildRequires:  net-tools
-%endif
 Requires:       systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       %{name}-utils = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
 Provides:       %{name}-agent-libs = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  net-tools
+%endif
 
 %description
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.

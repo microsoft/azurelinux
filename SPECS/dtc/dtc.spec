@@ -2,17 +2,17 @@ Summary:        Device Tree Compiler
 Name:           dtc
 Version:        1.5.1
 Release:        4%{?dist}
-License:        BSD or GPLv2+
+License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://devicetree.org/
 Source0:        https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
 Patch0:         dtc-disable-warning.patch
+BuildRequires:  bison
+BuildRequires:  flex
 BuildRequires:  gcc 
 BuildRequires:  make
-BuildRequires:  flex
-BuildRequires:  bison
 BuildRequires:  swig
 Provides:       libfdt = %{name}-%{version}
 Provides:       python3-libfdt = %{name}-%{version}
@@ -40,11 +40,11 @@ sed -i 's/python2/python3/' pylibfdt/setup.py
 sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
 
 %build
-%make_build CC="gcc $RPM_OPT_FLAGS $RPM_LD_FLAGS"
+%make_build CC="gcc %{optflags} %{ldflags}"
 
 %install
 %make_install \
-    PREFIX=%{buildroot}/usr \
+    PREFIX=%{buildroot}%{_prefix} \
     LIBDIR=%{_libdir} \
     BINDIR=%{_bindir} \
     INCLUDEDIR=%{_includedir}

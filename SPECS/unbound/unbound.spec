@@ -15,9 +15,9 @@ Patch0:         CVE-2020-12662.patch
 Patch1:         CVE-2020-12663.nopatch
 Patch2:         CVE-2020-28935.patch
 BuildRequires:  expat-devel
-BuildRequires:  systemd
 BuildRequires:  python3-devel
 BuildRequires:  swig
+BuildRequires:  systemd
 Requires:       systemd
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
@@ -29,8 +29,8 @@ Unbound is a validating, recursive, and caching DNS resolver.
 %package        devel
 Summary:        unbound development libs and headers
 Group:          Development/Libraries
-Requires:       expat-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       expat-devel
 
 %description    devel
 Development files for unbound dns server

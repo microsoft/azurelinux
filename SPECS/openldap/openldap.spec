@@ -4,10 +4,10 @@ Name:           openldap
 Version:        2.4.57
 Release:        4%{?dist}
 License:        OpenLDAP
-URL:            https://www.openldap.org/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.openldap.org/
 # Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%{name}-%{version}.tgz
 Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/%{name}-%{version}.tgz
 Patch0:         openldap-2.4.40-gssapi-1.patch
@@ -50,7 +50,7 @@ export CPPFLAGS="-D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
 
 %install
 %make_install
-find %{buildroot}/%{_libdir} -type f -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 %check

@@ -3,6 +3,8 @@ Name:           libcap-ng
 Version:        0.7.9
 Release:        4%{?dist}
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://people.redhat.com/sgrubb/libcap-ng
 Source0:        https://people.redhat.com/sgrubb/libcap-ng/%{name}-%{version}.tar.gz
@@ -37,7 +39,7 @@ The libraries and header files needed for libcap_ng development.
 
 %install
 %make_install
-find %{buildroot} -name '*.la' -delete -print
+find %{buildroot} -type f -name '*.la' -delete -print
 
 %check
 %make_build check
@@ -93,4 +95,3 @@ find %{buildroot} -name '*.la' -delete -print
 
 * Fri Aug 28 2015 Divya Thaluru <dthaluru@vmware.com> - 0.7.7-1
 - Initial version
-

@@ -2,11 +2,11 @@ Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
 Release:        5%{?dist}
-License:        GPLv3+ and LGPLv2+
+License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://www.gnutls.org
 Group:          System Environment/Libraries
+URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
 Patch0:         CVE-2020-24659.patch
 Patch1:         CVE-2021-20231.patch
@@ -17,10 +17,6 @@ BuildRequires:  guile-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
-%if %{with_check}
-BuildRequires:  net-tools
-BuildRequires:  which
-%endif
 Requires:       autogen-libopts
 Requires:       gc
 Requires:       gmp
@@ -30,6 +26,10 @@ Requires:       nettle >= 3.7.2
 Requires:       openssl
 Provides:       %{name}-utils = %{version}-%{release}
 Provides:       %{name}-c++ = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  net-tools
+BuildRequires:  which
+%endif
 
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
@@ -60,7 +60,7 @@ developing applications that use gnutls.
 %install
 %make_install
 rm %{buildroot}%{_infodir}/*
-find %{buildroot}%{_libdir} -name '*.la' -delete -print
+find %{buildroot} -name '*.la' -delete -print
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 chmod 755 %{buildroot}%{_sysconfdir}/%{name}

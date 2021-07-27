@@ -3,10 +3,10 @@ Name:           boost
 Version:        1.66.0
 Release:        4%{?dist}
 License:        Boost
-URL:            https://www.boost.org/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
 BuildRequires:  bzip2-devel
 

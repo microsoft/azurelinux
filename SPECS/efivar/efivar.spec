@@ -30,7 +30,7 @@ It contains the libraries and header files to create applications
     libdir=%{_libdir} \
     bindir=%{_bindir} \
     CFLAGS="%{build_cflags} -Wno-error=address-of-packed-member"
-    
+
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
