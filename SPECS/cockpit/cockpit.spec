@@ -7,7 +7,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
-Source0:        https://github.com/cockpit-project/cockpit/releases/download/248/cockpit-248.tar.xz
+Source0:        https://github.com/cockpit-project/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  e2fsprogs-devel
@@ -22,8 +22,6 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
-# BuildRequires: libxslt-devel
-# BuildRequires: glib-networking
 BuildRequires:  sed
 BuildRequires:  systemd-devel >= 235
 BuildRequires:  which
@@ -64,7 +62,6 @@ chmod o+rx %{buildroot}%{_sysconfdir}/cockpit
 make check
 
 %files
-# %defattr(-,root,root)
 %license COPYING
 %license COPYING.node
 %{_datadir}/cockpit
@@ -73,18 +70,19 @@ make check
 %{_datadir}/metainfo/*cockpit*.xml
 %{_datadir}/polkit-1/actions/org.cockpit-project.cockpit-bridge.policy
 %{_datadir}/pixmaps/cockpit*.png
-%{_lib}/tmpfiles.d/cockpit-tempfiles.conf
+%{_libdir}/tmpfiles.d/cockpit-tempfiles.conf
 /lib/systemd/system/cockpit*.socket
 /lib/systemd/system/cockpit*.service
 /lib/systemd/system/system-cockpithttps.slice
 %{_sysconfdir}/issue.d/cockpit.issue
 %{_sysconfdir}/motd.d/cockpit
 %{_bindir}/cockpit-bridge
-%{_lib}/security/pam_cockpit_cert.so
-%{_lib}/security/pam_ssh_add.so
+%{_libdir}/security/pam_cockpit_cert.so
+%{_libdir}/security/pam_ssh_add.so
 %{_libexecdir}/cockpit-*
 %{_sbindir}/remotectl
 
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
 - Initial commit to Mariner 1.0.
+- Original version for CBL-Mariner.
