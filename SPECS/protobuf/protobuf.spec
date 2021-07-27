@@ -100,7 +100,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com. - 3.17.3-1
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
 - Upgrade to latest upstream version, using upstream release tarball
 - Add soname version to %%file packaging
 - Remove protobuf-m2-%{version}.tar.gz source tarball (no longer needed with java removal)
