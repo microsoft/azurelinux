@@ -2,16 +2,15 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Networking/Other
-URL:            http://net-snmp.sourceforge.net/
-Source0:        http://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
+URL:            https://net-snmp.sourceforge.io/
+Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1:        snmpd.service
 Source2:        snmptrapd.service
-
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  systemd
@@ -21,6 +20,8 @@ BuildRequires:  net-tools
 Requires:       systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       %{name}-utils = %{version}-%{release}
+Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-agent-libs = %{version}-%{release}
 
 %description
  Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
@@ -28,7 +29,7 @@ Provides:       %{name}-utils = %{version}-%{release}
 %package devel
 Summary:        The includes and static libraries from the Net-SNMP package.
 Group:          Development/Libraries
-Requires:       net-snmp = %{version}
+Requires:       %{name} = %{version}
 
 %description devel
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
@@ -38,24 +39,24 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
 
 %build
 %configure \
-                --host=ia64-linux \
-                --build=i686 \
-                --target=ia64-linux \
-                --sbindir=/sbin \
-                --with-sys-location="unknown" \
-                --with-logfile=%{_var}/log/net-snmpd.log \
-                --with-persistent-directory=%{_sharedstatedir}/net-snmp \
-                --with-perl-modules="INSTALLDIRS=vendor" \
-                --with-sys-contact="root@localhost" \
-                --with-defaults \
-                --with-systemd \
-                --disable-static \
-                --with-x=no \
-                --enable-as-needed
-make
+    --host=ia64-linux \
+    --build=i686 \
+    --target=ia64-linux \
+    --sbindir=/sbin \
+    --with-sys-location="unknown" \
+    --with-logfile=%{_var}/log/net-snmpd.log \
+    --with-persistent-directory=%{_sharedstatedir}/net-snmp \
+    --with-perl-modules="INSTALLDIRS=vendor" \
+    --with-sys-contact="root@localhost" \
+    -with-defaults \
+    --with-systemd \
+    --disable-static \
+    --with-x=no \
+    --enable-as-needed
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 mkdir -p %{buildroot}/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/lib/systemd/system/snmpd.service
 install -m 0644 %{SOURCE2} %{buildroot}/lib/systemd/system/snmptrapd.service
@@ -79,10 +80,6 @@ popd
 %systemd_postun_with_restart snmpd.service
 %systemd_postun_with_restart snmptrapd.service
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %license COPYING
 %doc NEWS README ChangeLog
@@ -104,6 +101,10 @@ rm -rf %{buildroot}/*
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-5
+- Add provides for libs, agent-libs subpackages from base package
+- Minor linting (https source, updated URL, make macros)
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-4
 - Fix man pages being doubly-listed in devel subpackage
 - Merge the following releases from dev to 1.0 spec

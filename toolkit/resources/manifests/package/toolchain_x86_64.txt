@@ -302,10 +302,10 @@ pam-devel-1.3.1-5.cm2.x86_64.rpm
 pam-lang-1.3.1-5.cm2.x86_64.rpm
 patch-2.7.6-7.cm2.x86_64.rpm
 patch-debuginfo-2.7.6-7.cm2.x86_64.rpm
-pcre-8.44-2.cm2.x86_64.rpm
-pcre-debuginfo-8.44-2.cm2.x86_64.rpm
-pcre-devel-8.44-2.cm2.x86_64.rpm
-pcre-libs-8.44-2.cm2.x86_64.rpm
+pcre-8.44-3.cm2.x86_64.rpm
+pcre-debuginfo-8.44-3.cm2.x86_64.rpm
+pcre-devel-8.44-3.cm2.x86_64.rpm
+pcre-libs-8.44-3.cm2.x86_64.rpm
 perl-5.32.0-463.cm2.x86_64.rpm
 perl-Archive-Tar-2.36-463.cm2.noarch.rpm
 perl-Attribute-Handlers-1.01-463.cm2.noarch.rpm
