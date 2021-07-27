@@ -4,7 +4,7 @@
 # Contains:
 #	- Generate list of built packages
 #	- Run check for ABI changes of built packages.
-#       - Run check for .so files version change of built packages.
+#	- Run check for .so files version change of built packages.
 
 # Requires DNF on Mariner / yum and yum-utils on Ubuntu.
 
@@ -12,6 +12,7 @@ SODIFF_OUTPUT_FOLDER=$(BUILD_DIR)/sodiff
 RPM_BUILD_LOGS_DIR=$(LOGS_DIR)/pkggen/rpmbuilding
 BUILD_SUMMARY_FILE=$(SODIFF_OUTPUT_FOLDER)/build-summary.csv
 BUILT_PACKAGES_FILE=$(SODIFF_OUTPUT_FOLDER)/built-packages.txt
+SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-official-update.repo mariner-microsoft.repo"
 SODIFF_REPO_FILE=$(SCRIPTS_DIR)/sodiff/sodiff.repo
 SODIFF_SCRIPT=$(SCRIPTS_DIR)/sodiff/mariner-sodiff.sh
 
@@ -21,6 +22,7 @@ clean-sodiff:
 	rm -rf $(BUILD_SUMMARY_FILE)
 	rm -rf $(BUILT_PACKAGES_FILE)
 	rm -rf $(SODIFF_OUTPUT_FOLDER)
+	rm -rf $(SODIFF_REPO_FILE)
 
 .PHONY: built-packages-summary
 built-packages-summary: $(BUILT_PACKAGES_FILE)
@@ -49,10 +51,13 @@ fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
 	touch $(BUILD_SUMMARY_FILE)
 	find $(RPMS_DIR) -type f -name '*.rpm' -exec basename {} \; > $(BUILT_PACKAGES_FILE)
 
+$(SODIFF_REPO_FILE):
+	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
+
 # sodiff-check: runs check in a mariner container. Each failed package will be listed in $(SODIFF_OUTPUT_FOLDER).
 .SILENT .PHONY: sodiff-check
 
-sodiff-check: $(BUILT_PACKAGES_FILE)
+sodiff-check: $(BUILT_PACKAGES_FILE) | $(SODIFF_REPO_FILE)
 	<$(BUILT_PACKAGES_FILE) $(SODIFF_SCRIPT) $(RPMS_DIR)/ $(SODIFF_REPO_FILE) $(RELEASE_MAJOR_ID) $(SODIFF_OUTPUT_FOLDER)
-	( file -b $(SODIFF_OUTPUT_FOLDER)/sodiff.txt | grep -q empty ) || ( cat $(SODIFF_OUTPUT_FOLDER)/summary.txt ; $(call print_error, $@ failed - see $(SODIFF_OUTPUT_FOLDER) for list of failed files.) )
+	( file -b $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt | grep -q empty ) || ( echo "SRPM files that need to be updated due to sodiff:"; cat $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt ; $(call print_error,$@ failed - see $(SODIFF_OUTPUT_FOLDER)/ for a list of failed files.) )
 	echo "SODIFF finished - no changes detected."

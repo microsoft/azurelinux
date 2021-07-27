@@ -57,11 +57,11 @@ for rpmpackage in $(cat); do
                 # This means it's a new version of a preexisting SO.
 
                 # Log which packages depend on this functionality
-                $DNF_COMMAND repoquery $common_options --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' > "$sodiff_out_dir"/"require_${sofile}"
+                $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' > "$sodiff_out_dir"/"require_${sofile}"
             fi
         fi
     done
 done
 
 # Obtain a list of unique packages to be updated
-2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff.txt || true
+cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-summary.txt || true
