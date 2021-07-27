@@ -16,7 +16,7 @@ require (
 	github.com/rivo/tview v0.0.0-20200219135020-0ba8301b415c
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.4.0
-	github.com/ulikunitz/xz v0.5.7
+	github.com/ulikunitz/xz v0.5.8
 	golang.org/x/sys v0.0.0-20200509044756-6aff5f38e54f
 	gonum.org/v1/gonum v0.6.2
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
