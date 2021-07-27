@@ -90,7 +90,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_prefix}/src/debug
 %exclude %{_libdir}/debug
 %{_bindir}/*
-#%%{_libexecdir}/*
 %{_mandir}/man8/*
 %{_datadir}/openscap/*
 %{_libdir}/libopenscap_sce.so.*
@@ -115,7 +114,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
 - Add provides for scanner subpackage from base package
-- Remove openscap-python subpackage
+- Remove openscap-python python2 subpackage
 - Add python3-openscap subpackage
 
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.3.1-6

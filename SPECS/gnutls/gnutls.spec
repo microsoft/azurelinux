@@ -17,6 +17,10 @@ BuildRequires:  guile-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
+%if %{with_check}
+BuildRequires:  net-tools
+BuildRequires:  which
+%endif
 Requires:       autogen-libopts
 Requires:       gc
 Requires:       gmp
@@ -26,10 +30,6 @@ Requires:       nettle >= 3.7.2
 Requires:       openssl
 Provides:       %{name}-utils = %{version}-%{release}
 Provides:       %{name}-c++ = %{version}-%{release}
-%if %{with_check}
-BuildRequires:  net-tools
-BuildRequires:  which
-%endif
 
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
