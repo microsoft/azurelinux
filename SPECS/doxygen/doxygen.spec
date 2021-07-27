@@ -2,13 +2,13 @@
 Summary:        Automated C, C++, and Java Documentation Generator
 Name:           doxygen
 Version:        1.8.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Doc Generators
 URL:            https://www.doxygen.nl/
-Source0:        http://doxygen.nl/files/%{name}-%{version}.src.tar.gz
+Source0:        https://sourceforge.net/projects/%{name}/files/rel-%{version}/%{name}-%{version}.src.tar.gz
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  flex
@@ -49,6 +49,9 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 
 %changelog
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.8.17-3
+- Update download link to one that works.
+
 * Wed Dec 16 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.17-2
 - Remove buildarch
 

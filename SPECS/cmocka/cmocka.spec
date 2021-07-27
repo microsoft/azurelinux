@@ -130,8 +130,7 @@ popd
 %{_libdir}/cmake/cmocka/cmocka-config.cmake
 
 %changelog
-#FIXME: First changelog entry header failed to parse
-* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> 1.1.5.4
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.1.5-4
 - Replace ldconfig_scriptlets with the expanded form
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.5-3
