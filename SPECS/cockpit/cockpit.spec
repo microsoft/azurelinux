@@ -2,7 +2,7 @@ Summary:        A package to provide cockpit for mariner
 Name:           cockpit
 Version:        248
 Release:        1%{?dist}
-License:        LGPLv2+, MIT
+License:        LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
