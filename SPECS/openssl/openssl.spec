@@ -21,25 +21,26 @@ Source4:        ideatest.c
 Patch0:         openssl-1.1.1-no-html.patch
 # CVE only applies when Apache HTTP Server version 2.4.37 or less.
 Patch1:         CVE-2019-0190.nopatch
-Patch2:         openssl-1.1.1-ec-curves.patch
-Patch3:         openssl-1.1.1-no-brainpool.patch
-Patch4:         openssl-1.1.1-fips.patch
-Patch5:         openssl-1.1.1-version-override.patch
-Patch6:         openssl-1.1.1-seclevel.patch
-Patch7:         openssl-1.1.1-fips-post-rand.patch
-Patch8:         openssl-1.1.1-evp-kdf.patch
-Patch9:        openssl-1.1.1-ssh-kdf.patch
-Patch10:        openssl-1.1.1-krb5-kdf.patch
-Patch11:        openssl-1.1.1-edk2-build.patch
-Patch12:        openssl-1.1.1-fips-crng-test.patch
-Patch13:        openssl-1.1.1-fips-drbg-selftest.patch
-Patch14:        openssl-1.1.1-fips-dh.patch
-Patch15:        openssl-1.1.1-s390x-ecc.patch
-Patch16:        openssl-1.1.1-kdf-selftest.patch
-Patch17:        openssl-1.1.1-fips-curves.patch
-Patch18:        openssl-1.1.1-sp80056arev3.patch
-Patch19:        openssl-1.1.1-jitterentropy.patch
-Patch20:        openssl-1.1.1-drbg-seed.patch
+Patch2:         0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+Patch3:         openssl-1.1.1-ec-curves.patch
+Patch4:         openssl-1.1.1-no-brainpool.patch
+Patch5:         openssl-1.1.1-fips.patch
+Patch6:         openssl-1.1.1-version-override.patch
+Patch7:         openssl-1.1.1-seclevel.patch
+Patch8:         openssl-1.1.1-fips-post-rand.patch
+Patch9:         openssl-1.1.1-evp-kdf.patch
+Patch10:        openssl-1.1.1-ssh-kdf.patch
+Patch11:        openssl-1.1.1-krb5-kdf.patch
+Patch12:        openssl-1.1.1-edk2-build.patch
+Patch13:        openssl-1.1.1-fips-crng-test.patch
+Patch14:        openssl-1.1.1-fips-drbg-selftest.patch
+Patch15:        openssl-1.1.1-fips-dh.patch
+Patch16:        openssl-1.1.1-s390x-ecc.patch
+Patch17:        openssl-1.1.1-kdf-selftest.patch
+Patch18:        openssl-1.1.1-fips-curves.patch
+Patch19:        openssl-1.1.1-sp80056arev3.patch
+Patch20:        openssl-1.1.1-jitterentropy.patch
+Patch21:        openssl-1.1.1-drbg-seed.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -126,6 +127,7 @@ cp %{SOURCE4} test/
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -320,7 +322,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Wed Jul 28 2021 Daniel Mihai <dmihai@microsoft.com> - 1.1.1k-6
-- Remove no-tls1 and no-tls1_1 from the build config
+- Enable support for TLS 1 and TLS 1.1
 
 * Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
 - In FIPS mode, perform Linux RNG concatenation even if adin/pers functions
