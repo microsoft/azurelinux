@@ -1,3 +1,4 @@
+%define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
 Summary:        A tool to test PAM applications and PAM modules
 Name:           pam_wrapper
 Version:        1.1.3
@@ -129,13 +130,12 @@ popd
 %doc obj/doc/html
 
 %files -n python3-libpamtest
-%{_libdir}/python3.7/site-packages/pypamtest.so
+%{python3_sitearch}/pypamtest.so
 
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.1.3-4
 - Replace ldconfig_scriptlets with the expanded form
 - Remove redundant gpgv check
-- on our build system, python3 packages are located in %{_libdir}/python3.7
 - License verified.
 
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
