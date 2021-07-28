@@ -82,6 +82,5 @@ make check
 
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
-- Initial commit to Mariner 1.0.
 - Original version for CBL-Mariner.
 - License verified.

@@ -58,5 +58,4 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 - Remove buildarch
 
 * Mon Apr 06 2020 Anirudh Gopal <angop@microsoft.com> 1.8.17-1
-- Initial commit to Mariner 1.0.
 - Original version for CBL-Mariner.
