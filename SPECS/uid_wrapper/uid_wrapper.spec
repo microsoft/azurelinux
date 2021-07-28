@@ -7,13 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        uid_wrapper.keyring
 Patch0:         0001-pkg-config-Fix-installation-path.patch
 Patch1:         uid_wrapper-1.2.7-cmake-config-fix-installation-path.patch
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel >= 1.1.0
 Recommends:     cmake
 Recommends:     pkg-config
@@ -33,7 +30,6 @@ This package doesn't have a devel package cause this project is for
 development/testing.
 
 %prep
-gpgv --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build

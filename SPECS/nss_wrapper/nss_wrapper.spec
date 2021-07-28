@@ -7,13 +7,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        nss_wrapper.keyring
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel
-# BuildRequires:  perl-generators
 Recommends:     cmake
 Recommends:     pkg-config
 
@@ -41,7 +37,6 @@ This package doesn't have a devel package cause this project is for
 development/testing.
 
 %prep
-gpgv --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build

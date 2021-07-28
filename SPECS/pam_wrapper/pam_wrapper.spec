@@ -7,13 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        pam_wrapper.keyring
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  git
-BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel
 BuildRequires:  pam-devel
 BuildRequires:  python3-devel
@@ -67,7 +64,6 @@ library, which simplifies testing of modules. This subpackage includes
 the header files for libpamtest
 
 %prep
-gpgv --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -S git
 
 

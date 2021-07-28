@@ -7,13 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cmocka.org
 Source0:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz
-Source1:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz.asc
-Source2:        cmocka.keyring
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  gnupg2
 
 %description
 There are a variety of C unit testing frameworks available however many of them
