@@ -56,7 +56,7 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
 %make_build
 
 %install
-%make_install
+make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/lib/systemd/system/snmpd.service
 install -m 0644 %{SOURCE2} %{buildroot}/lib/systemd/system/snmptrapd.service
