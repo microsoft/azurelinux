@@ -123,9 +123,9 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
-*   Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 60.9.0-10
--   Make a symlink to /run/shm called /dev/shm so this spec will work on WSL.
--   Spec linting.
+* Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 60.9.0-10
+- Make a symlink to /run/shm called /dev/shm so this spec will work on WSL.
+- Spec linting.
 
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 60.9.0-9
 -   Fix calls to python2 in check section
