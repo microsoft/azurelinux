@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "07:00"
+      timezone: "America/Los_Angeles"
+    reviewers:
+      - "microsoft/cbl-mariner-devs"
+    target-branch: "1.0-dev"
+
+  - package-ecosystem: "gomod"
+    directory: "toolkit/tools"
+    schedule:
+      interval: "daily"
+      time: "07:00"
+      timezone: "America/Los_Angeles"
+    reviewers:
+      - "microsoft/cbl-mariner-devs"
+    target-branch: "1.0-dev"
