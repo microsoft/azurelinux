@@ -129,7 +129,7 @@ popd
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 0.9.5-2
 - Replace ldconfig_scriptlets with the expanded form
-- Replace gpgv2 with gpg
+- Remove redundant gpgv check
 - Fixed the typo in the creation of the libssh_threads.so symlinks
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License veriifed.
