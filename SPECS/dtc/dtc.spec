@@ -40,7 +40,7 @@ sed -i 's/python2/python3/' pylibfdt/setup.py
 sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
 
 %build
-%make_build CC="gcc %{optflags} %{ldflags}"
+%make_build CC="gcc %{optflags} $LDFLAGS"
 
 %install
 %make_install \

@@ -48,7 +48,7 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
     --with-persistent-directory=%{_sharedstatedir}/net-snmp \
     --with-perl-modules="INSTALLDIRS=vendor" \
     --with-sys-contact="root@localhost" \
-    -with-defaults \
+    --with-defaults \
     --with-systemd \
     --disable-static \
     --with-x=no \
