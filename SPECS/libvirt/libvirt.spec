@@ -3,6 +3,7 @@
 %define qemu_group  qemu
 
 %bcond_with missing_dependencies
+%bcond_with glusterfs
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
@@ -27,8 +28,10 @@ BuildRequires:  cyrus-sasl-devel
 BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  e2fsprogs-devel
+%if 0%{with glusterfs}
 BuildRequires:  glusterfs-api-devel >= 3.4.1
 BuildRequires:  glusterfs-devel >= 3.4.1
+%endif
 BuildRequires:  gnutls-devel
 BuildRequires:  iscsi-initiator-utils
 BuildRequires:  libacl-devel
@@ -264,7 +267,9 @@ Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
+%if 0%{with glusterfs}
 Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
+%endif
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
@@ -298,6 +303,7 @@ Requires:       parted
 The storage driver backend adding implementation of the storage APIs for block
 volumes using the host disks.
 
+%if 0%{with glusterfs}
 %package daemon-driver-storage-gluster
 Summary:        Storage driver plugin for gluster
 
@@ -309,6 +315,7 @@ Requires:       glusterfs-client >= 2.0.1
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
 volumes using libgfapi.
+%endif
 
 %package daemon-driver-storage-iscsi
 Summary:        Storage driver plugin for iscsi
@@ -485,7 +492,9 @@ cd %{_vpath_builddir}
     --with-sanlock \
     --with-sasl \
     --with-storage-disk \
+%if 0%{with glusterfs}
     --with-storage-gluster \
+%endif
     --with-storage-iscsi \
     --with-storage-lvm \
     --with-storage-mpath \
@@ -938,9 +947,11 @@ exit 0
 %files daemon-driver-storage-disk
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_disk.so
 
+%if 0%{with glusterfs}
 %files daemon-driver-storage-gluster
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_gluster.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_gluster.so
+%endif
 
 %files daemon-driver-storage-iscsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_iscsi.so
@@ -1060,7 +1071,6 @@ exit 0
     - 'libvirt-daemon-driver-storage',
     - 'libvirt-daemon-driver-storage-core',
     - 'libvirt-daemon-driver-storage-disk',
-    - 'libvirt-daemon-driver-storage-gluster',
     - 'libvirt-daemon-driver-storage-iscsi',
     - 'libvirt-daemon-driver-storage-logical',
     - 'libvirt-daemon-driver-storage-mpath',
@@ -1070,6 +1080,7 @@ exit 0
     - 'libvirt-libs',
     - 'libvirt-lock-sanlock',
     - 'libvirt-nss'.
+- Temporarily disable 'libvirt-daemon-driver-storage-gluster' subpackage build.
 - Temporarily disable run-time requires for unused subpackages.
 
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-2
