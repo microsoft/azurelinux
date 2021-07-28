@@ -3,7 +3,7 @@ Summary:        Automated C, C++, and Java Documentation Generator
 Name:           doxygen
 Version:        1.8.17
 Release:        3%{?dist}
-License:        GPL
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Doc Generators
@@ -51,9 +51,12 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.8.17-3
 - Update download link to one that works.
+- Update license tag to match the actual license
+- License verified.
 
 * Wed Dec 16 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.17-2
 - Remove buildarch
 
 * Mon Apr 06 2020 Anirudh Gopal <angop@microsoft.com> 1.8.17-1
-- Initial version bringup for Mariner
+- Initial commit to Mariner 1.0.
+- Original version for CBL-Mariner.

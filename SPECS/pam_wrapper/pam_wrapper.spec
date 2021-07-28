@@ -140,12 +140,14 @@ popd
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
 - on our build system, python3 packages are located in %{_lib}/python3.7
+- License verified.
 
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 
 * Mon Jan 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.1.3-2
 - Remove python2 support
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
 * Thu Mar 26 2020 Andreas Schneider <asn@redhat.com> - 1.1.3-1
 - Update to version 1.1.3

@@ -1,9 +1,8 @@
-%define _unpackaged_files_terminate_build 0
 Summary:        A package to provide cockpit for mariner
 Name:           cockpit
 Version:        248
 Release:        1%{?dist}
-License:        MIT
+License:        LGPLv2+, MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
@@ -62,8 +61,7 @@ chmod o+rx %{buildroot}%{_sysconfdir}/cockpit
 make check
 
 %files
-%license COPYING
-%license COPYING.node
+%license COPYING COPYING.node
 %{_datadir}/cockpit
 %{_sysconfdir}/cockpit
 %{_sysconfdir}/pam.d/cockpit
@@ -86,3 +84,4 @@ make check
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
 - Initial commit to Mariner 1.0.
 - Original version for CBL-Mariner.
+- License verified.

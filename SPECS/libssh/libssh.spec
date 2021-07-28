@@ -24,7 +24,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam_wrapper
 BuildRequires:  socket_wrapper
 BuildRequires:  uid_wrapper
-# BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
 Requires:       %{name}-config = %{version}-%{release}
 Recommends:     crypto-policies
@@ -95,7 +94,7 @@ pushd %{buildroot}%{_libdir}
 for i in libssh.so*;
 do
     _target="${i}"
-    _link_name="${i%{libssh}*}libssh_threads${i##*libssh}"
+    _link_name="libssh_threads${i##*libssh}"
     if [ -L "${i}" ]; then
         _target="$(readlink ${i})"
     fi
@@ -135,6 +134,9 @@ popd
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 0.9.5-2
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
+- Fixed the typo in the creation of the libssh_threads.so symlinks
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License veriifed.
 
 * Thu Sep 10 2020 Anderson Sasaki <ansasaki@redhat.com> - 0.9.5-1
 - Update to version 0.9.5

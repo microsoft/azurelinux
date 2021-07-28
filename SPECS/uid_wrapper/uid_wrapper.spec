@@ -77,6 +77,8 @@ popd
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.2.7-4
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Tue Mar 03 2020 Anderson Sasaki <ansasaki@redhat.com> - 1.2.7-3
 - Fix invalid library path in cmake configuration file (bz#1809275)

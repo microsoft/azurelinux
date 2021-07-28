@@ -87,6 +87,8 @@ popd
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 1.1.11-2
 - Replace ldconfig_scriptlets with the expanded form
 - Replace gpgv2 with gpg
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Apr 02 2020 Andreas Schneider <asn@redhat.com> - 1.1.11-1
 - Update to version 1.1.11
