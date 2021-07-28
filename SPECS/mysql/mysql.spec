@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.24
+Version:        8.0.26
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -18,7 +18,7 @@ BuildRequires:  zlib-devel
 %description
 MySQL is a free, widely used SQL engine. It can be used as a fast database as well as a rock-solid DBMS using a modular engine architecture.
 
-%package devel
+%package        devel
 Summary:        Development headers for mysql
 Requires:       %{name} = %{version}-%{release}
 
@@ -41,14 +41,13 @@ cmake . \
       -DCMAKE_CXX_FLAGS=-fPIC \
       -DWITH_EMBEDDED_SERVER=OFF \
       -DFORCE_INSOURCE_BUILD=1
-
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 %check
-make test
+%make_build test
 
 %files
 %defattr(-,root,root)
@@ -76,6 +75,9 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Jul 27 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.26-1
+- Upgrade to 8.0.26 to fix 31 CVEs
+
 * Sat Apr 24 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.24-1
 - Upgrade to 8.0.24 to fix 30 CVEs
 - Update source URL
