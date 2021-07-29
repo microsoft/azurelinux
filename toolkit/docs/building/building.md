@@ -6,7 +6,7 @@
    - [Toolchain Stage](#toolchain-stage)
      - [Populate Toolchain](#populate-toolchain)
      - [Rebuild Toolchain](#rebuild-toolchain)
-   - [Package Stage](#package-stage)  
+   - [Package Stage](#package-stage)
      - [Rebuild All Packages](#rebuild-all-packages)
      - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
    - [Image Stage](#image-stage)
@@ -70,11 +70,11 @@
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)  
+The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)
 
 However, to test-drive CBL-Mariner, building an ISO, VHD or VHDX _**is** currently_ required.  There are two approaches.  The fastest way to achieve this is through the [Quick Start Instructions](../quick_start/quickstart.md). This is recommended for anyone that just wants to run CBL-Mariner.  The second, approach is to build a custom CBL-Mariner based image.  This is recommended for developers that want to experiment with CBL-Mariner in a focused environment and is usually faster and easier than working with full CBL-Mariner builds.  To work in a more focused environment, refer to the tutorial in the [CBL-MarinerDemo](https://github.com/microsoft/CBL-MarinerDemo) repository.
 
-The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages: 
+The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
 - **Toolchain** This stage builds several compilers and tools needed in the subsequent package build stage.  Building is serialized in this stage.
 
@@ -117,7 +117,7 @@ Alternate branches are not generally buildable because community builds require 
 
 The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
 
-For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt. 
+For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt.
 
 ### **Populate Toolchain**
 
@@ -141,7 +141,7 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y SOURCE_URL=https://cblma
 
 After the toolchain is built or populated, package building is possible.  The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
 
-The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.  
+The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
 
 Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
@@ -174,7 +174,7 @@ Note that the image build commands in [Build Images](#build-images) will **autom
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.  
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 All images are generated in the `out/images` folder.
 
@@ -379,7 +379,13 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `REPO_LIST=...`
 
-> List of RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: Repos earlier in the list are higher priority.
+> List of RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
+>
+> - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
+> - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivallent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
+> - `mariner-ui.repo` and `mariner-ui-preview.repo` - CBL-Mariner repository containing packages related to any UI components. The preview version serves the same purpose as the official preview repo.
+> - `mariner-extras.repo` and `mariner-extras-preview.repo` - CBL-Mariner repository containing proprietory RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
+>
 
 #### Build Enable/Disable Flags
 
@@ -523,15 +529,17 @@ By default the build system will pull the highest possible version of external p
 
 ### Build Summaries
 
-The build system supports this behavior through summary files, a JSON representation of packages consumed during a build. By referencing these summary files, the build system can consume the exact same version of external packages later on.
+The build system supports this behavior through summary files, a JSON representation of packages consumed during a build. By referencing these summary files, the build system can consume the exact same version of packages later on.
 
 Since the summary files are regenerated every build, if you wish to reproduce a build, you should save the summary files to another location for future use.
 
 | Type of Build                 | Summary File Location                                                                                  | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| Package Build                 | `$(PKGBUILD_DIR)/graph_external_deps.json`                                                             | Generated every package build. Can be saved and used later with the `$(PACKAGE_CACHE_SUMMARY)` variable to reproduce a package build.
-| Image Build                   | `$(IMAGEGEN_DIR)/{imagename}/image_deps.json`                                                          | Generated every image build. Can be saved and used later with the `$(IMAGE_CACHE_SUMMARY)` variable to reproduce an image build.
-| Initrd Build                  | `$(IMAGEGEN_DIR)/iso_initrd/image_deps.json`                                                           | Generated every initrd and ISO build. Can be saved and used later with the `$(INITRD_CACHE_SUMMARY)` variable to reproduce an initrd build.
+| Package Build                 | `$(PKGBUILD_DIR)/graph_external_deps.json`                                                             | Generated every package build. Can be saved and used later with the `PACKAGE_CACHE_SUMMARY` variable to reproduce a package build. Contains **only the external** packages required to build the local packages.
+| Image Build                   | `$(IMAGEGEN_DIR)/{imagename}/image_deps.json`                                                          | Generated every image build. Can be saved and used later with the `IMAGE_CACHE_SUMMARY` variable to reproduce an image build. Contains **all (both external and local)** packages required to build the image.
+| Initrd Build                  | `$(IMAGEGEN_DIR)/iso_initrd/image_deps.json`                                                           | Generated every initrd and ISO build. Can be saved and used later with the `INITRD_CACHE_SUMMARY` variable to reproduce an initrd build. Contains **all (both external and local)** packages required to build the image. However, unless you modified the initrd image packages JSON or have your own version of its PMC packages locally, all the required packages are external.
+
+**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
 
 ### Building From Summaries
 
@@ -540,7 +548,7 @@ To reproduce a build, there are four constraints:
 1. The local SPEC files must be the same. That is, you cannot reproduce a build having modified any of the local SPEC files since when the summary files were generated.
 2. What is being built must be the same. That is, if the summary files were generated from an image build then the reproduced build must be building the exact same image configuration.
 3. The toolkit version must be the same. That is, if the summary files were generated from a `1.0` toolkit, then the reproduced build must be done using the `1.0` toolkit.
-4. The builds must be from clean. Both the build that generated the summary files and the reproduced build must be done from a clean state, otherwise there may be leftover files that affect the summary files.
+4. The builds must be from clean. Both the build that generated the summary files and the reproduced build must be done from a clean state, otherwise there may be leftover files that affect the summary files. The only exception is the mentioned case of using external packages not present in the PMC repository - in this case you'll need to pre-populate the local cache with these packages after cleaning your repository, but before running the build.
 
 If the above constraints are met then a build can be reproduced from summary files.
 
@@ -573,7 +581,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | Image config file to build.
+| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) to build.
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
@@ -629,6 +637,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
+| REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 
 ---
 

@@ -60,17 +60,21 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
--   Use new perl package names.
--   Provide perl(Types::Serialiser*).
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
+- Use new perl package names.
+- Provide perl(Types::Serialiser*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0-5
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.0-3
--   Consuming perl version upgrade of 5.28.0
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0-2
--   GA - Bump release of all rpms
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.0-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.0-3
+- Consuming perl version upgrade of 5.28.0
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0-2
+- GA - Bump release of all rpms
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.0-1
+- Initial version.

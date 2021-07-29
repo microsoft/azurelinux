@@ -286,7 +286,9 @@ func umount(path string) (err error) {
 }
 
 // PackageNamesFromSingleSystemConfig goes through the packageslist field in the systemconfig and extracts the list of packages
-// from each of the packagelists
+// from each of the packagelists.
+// NOTE: the package list contains the versions restrictions for the packages, if present, in the form "[package][condition][version]".
+//       Example: gcc=9.1.0
 // - systemConfig is the systemconfig field from the config file
 // Since kernel is not part of the packagelist, it is added separately from KernelOptions.
 func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig) (finalPkgList []string, err error) {
@@ -354,9 +356,15 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 
 		packages := make([]*pkgjson.PackageVer, 0, len(packagesToInstall))
 		for _, pkg := range packagesToInstall {
-			packages = append(packages, &pkgjson.PackageVer{
-				Name: pkg,
-			})
+			var packageVer *pkgjson.PackageVer
+
+			packageVer, err = pkgjson.PackagesListEntryToPackageVer(pkg)
+			if err != nil {
+				logger.Log.Errorf("Failed to parse packages list from system config \"%s\".", systemCfg.Name)
+				return
+			}
+
+			packages = append(packages, packageVer)
 		}
 
 		packageList = append(packageList, packages...)
@@ -696,7 +704,7 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	const (
 		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = 0644
+		machineIDFilePerms = 0444
 	)
 
 	ReportAction("Configuring machine id")
@@ -1317,9 +1325,37 @@ func configureUserStartupCommand(installChroot *safechroot.Chroot, user configur
 }
 
 func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.User, homeDir string) (err error) {
+	var (
+		pubKeyData []string
+		exists     bool
+	)
 	const squashErrors = false
+	const authorizedKeysTempFilePerms = 0644
+	const authorizedKeysTempFile = "/tmp/authorized_keys"
 
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
+	authorizedKeysFile := filepath.Join(homeDir, ".ssh/authorized_keys")
+
+	exists, err = file.PathExists(authorizedKeysTempFile)
+	if err != nil {
+		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
+		return
+	}
+	if !exists {
+		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
+		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
+		if err != nil {
+			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
+			return
+		}
+	} else {
+		err = os.Truncate(authorizedKeysTempFile, 0)
+		if err != nil {
+			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
+			return
+		}
+	}
+	defer os.Remove(authorizedKeysTempFile)
 
 	for _, pubKey := range user.SSHPubKeyPaths {
 		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), user.Name)
@@ -1334,6 +1370,33 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		if err != nil {
 			return
 		}
+
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), user.Name)
+		pubKeyData, err = file.ReadLines(pubKey)
+		if err != nil {
+			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
+			return
+		}
+
+		// Append to the tmp/authorized_users file
+		for _, sshkey := range pubKeyData {
+			sshkey += "\n"
+			err = file.Append(sshkey, authorizedKeysTempFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+				return
+			}
+		}
+	}
+
+	fileToCopy := safechroot.FileToCopy{
+		Src:  authorizedKeysTempFile,
+		Dest: authorizedKeysFile,
+	}
+
+	err = installChroot.AddFiles(fileToCopy)
+	if err != nil {
+		return
 	}
 
 	if len(user.SSHPubKeyPaths) != 0 {

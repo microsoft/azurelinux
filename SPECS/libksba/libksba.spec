@@ -46,15 +46,20 @@ make %{?_smp_mflags} -k check
 %exclude %{_datadir}/info/dir
 
 %changelog
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.3.5-4
--   Provide libksba-devel for base package
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.5-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.5-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*	Tue	Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
--	Udpated to version 1.3.5
-*   Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2
--   BuildRequired libgpg-error-devel.
-*   Wed Jul 27 2016 Kumar Kaushik <kaushikk@vmware.com> 1.3.4-1
--   Initial Build.
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.3.5-4
+- Provide libksba-devel for base package
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.5-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.5-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue	Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
+- Udpated to version 1.3.5
+
+* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2
+- BuildRequired libgpg-error-devel.
+
+* Wed Jul 27 2016 Kumar Kaushik <kaushikk@vmware.com> 1.3.4-1
+- Initial Build.

@@ -1,4 +1,3 @@
-%define _unpackaged_files_terminate_build 0
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
 # machine_arch maps between rpm and dpdk arch name, often same as _target_cpu
@@ -26,11 +25,11 @@
 %endif
 %bcond_without examples
 # Add option to build without tools
-%bcond_with tools
+%bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Epoch:          2
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -103,8 +102,6 @@ as L2 and L3 forwarding.
 %define docdir  %{_docdir}/%{name}
 %define incdir %{_includedir}/%{name}
 %define pmddir %{_libdir}/%{name}-pmds
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 %prep
 %setup -q -n dpdk-stable-%{version}
@@ -297,6 +294,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
+- Include tools to build and remove unpackaged_files_terminate_build
+
 * Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4
 - Build without tools subpackage and dependencies.
 - Set _unpackaged_files_terminate_build since tools are not being packaged.

@@ -46,14 +46,16 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
--   Use new perl package names.
--   Change perl_vendorlib to perl_vendorarch directory for packaging.
--   Provide perl(NetAddr::IP*).
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
+- Use new perl package names.
+- Change perl_vendorlib to perl_vendorarch directory for packaging.
+- Provide perl(NetAddr::IP*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.079-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.079-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Sep 27 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 4.079-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.079-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Sep 27 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 4.079-1
+- Initial version.

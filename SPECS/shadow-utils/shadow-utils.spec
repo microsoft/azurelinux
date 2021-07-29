@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        11%{?dist}
+Release:        14%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,11 +22,15 @@ Source11:       system-session
 Patch1:         chkname-allowcase.patch
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  libsemanage-devel
 BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       pam
 Provides:       /sbin/nologin
 Provides:       passwd = %{version}-%{release}
+Requires:       libselinux
+Requires:       libsemanage
 
 %description
 The Shadow package contains programs for handling passwords
@@ -45,7 +49,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
 
 %build
 %configure --sysconfdir=%{_sysconfdir} --with-libpam \
-           --with-libcrack --with-group-name-max-length=32
+           --with-libcrack --with-group-name-max-length=32 \
+           --with-selinux
 make %{?_smp_mflags}
 
 %install
@@ -56,9 +61,8 @@ sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 # Use group id 100(users) by default
 sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
-# Disable usergroups. Use "users" group by default (see /etc/default/useradd)
-# for all nonroot users.
-sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
+# Enable usergroups. Each user will get their own primary group with a name matching their login name
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB yes/' %{buildroot}%{_sysconfdir}/login.defs
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
                 FAILLOG_ENAB             \
@@ -142,10 +146,23 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-14
 - Merge the following releases from 1.0 to dev branch
 - schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
 - lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser
+- JOSLOBO 7/26/21: Bump version number to resolve merge conflict.
+
+* Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
+- Fix issue with undocumented libselinux and libsemanage requirements
+
+* Wed May 26 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-12
+- Add SELinux support
+
+* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
+- Enable usergroups for useradd
+
+* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
+- Add sym link to adduser from useradd and create the file for adduser
 
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-10
 - Provide passwd.
@@ -153,7 +170,7 @@ make %{?_smp_mflags} check
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-9
 - Provide /sbin/nologin.
 
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-7

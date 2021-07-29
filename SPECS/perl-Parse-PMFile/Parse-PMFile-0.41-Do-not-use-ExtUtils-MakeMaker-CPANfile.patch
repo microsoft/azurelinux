@@ -1,0 +1,32 @@
+From 76f72eb15b44af89a089d30b14d5f5d4d6829f7a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 1 Jun 2018 09:28:17 +0200
+Subject: [PATCH] Do not use ExtUtils::MakeMaker::CPANfile
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The Makefile.PL works as well as with plain ExtUtils::MakeMaker.
+rpmbuild does not read dependencies from META, thus cpanfile content
+is irrelevant when building an RPM package.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index a4faee1..b4bb0d8 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,6 +1,6 @@
+ use strict;
+ use warnings;
+-use ExtUtils::MakeMaker::CPANfile;
++use ExtUtils::MakeMaker;
+ 
+ my %params = (
+     NAME          => 'Parse::PMFile',
+-- 
+2.14.4
+

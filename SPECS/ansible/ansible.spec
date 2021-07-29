@@ -1,7 +1,7 @@
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.9.12
+Version:        2.9.18
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -41,6 +41,9 @@ python2 setup.py test
 %{python2_sitelib}/*
 
 %changelog
+* Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.9.18-1
+- Upgrade to version 2.9.18, which resolves CVE-2021-20191 and CVE-2021-20178
+
 * Wed Dec 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.9.12-1
 - Upgrade to version 2.9.12, which resolves CVE-2020-10744
 

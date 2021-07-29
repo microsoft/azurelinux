@@ -163,20 +163,27 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
--   Use new perl package names.
--   Provide perl(DB*)
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.641-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.641-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.641-1
--   Update to version 1.641
-*   Mon Apr 3 2017 Robert Qi <qij@vmware.com> 1.636-1
--   Upgraded to 1.636
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.634-2
--   GA - Bump release of all rpms
-*   Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.634-1
--   Upgrade version
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.633-1
--   Initial version.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
+- Use new perl package names.
+- Provide perl(DB*)
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.641-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.641-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.641-1
+- Update to version 1.641
+
+* Mon Apr 3 2017 Robert Qi <qij@vmware.com> 1.636-1
+- Upgraded to 1.636
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.634-2
+- GA - Bump release of all rpms
+
+* Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.634-1
+- Upgrade version
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.633-1
+- Initial version.

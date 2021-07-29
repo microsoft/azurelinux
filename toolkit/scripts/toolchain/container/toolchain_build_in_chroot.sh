@@ -57,14 +57,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.10.28.1 API Headers
-tar xf kernel-5.10.28.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.28.1
+echo Linux-5.10.52.1 API Headers
+tar xf kernel-5.10.52.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.52.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.28.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.52.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -235,9 +235,9 @@ popd
 rm -rf m4-1.4.18
 touch /logs/status_m4_complete
 
-echo Binutils-2.32
-tar xf binutils-2.32.tar.xz
-pushd binutils-2.32
+echo Binutils-2.36.1
+tar xf binutils-2.36.1.tar.xz
+pushd binutils-2.36.1
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
@@ -251,11 +251,10 @@ cd build
              --with-system-zlib
 #             --enable-install-libiberty
 # libiberty.a used to be in binutils. Now it is in GCC.
-# --enable-install-libiberty
 make -j$(nproc) tooldir=/usr
 make tooldir=/usr install
 popd
-rm -rf binutils-2.32
+rm -rf binutils-2.36.1
 touch /logs/status_binutils_complete
 
 echo GMP-6.1.2
@@ -772,9 +771,9 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.7.10
+tar xf Python-3.7.10.tar.xz
+pushd Python-3.7.10
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat \
@@ -786,8 +785,8 @@ chmod -v 755 /usr/lib/libpython3.7m.so
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.7 /usr/bin/pip3
 popd
-rm -rf Python-3.7.4
-touch /logs/status_python374_complete
+rm -rf Python-3.7.10
+touch /logs/status_python3710_complete
 
 echo Coreutils-8.30
 tar xf coreutils-8.30.tar.xz
@@ -1072,6 +1071,7 @@ tar xf nss-3.44.tar.gz
 pushd nss-3.44
 patch -Np1 -i ../nss-3.44-standalone-1.patch
 cd nss
+export NSS_DISABLE_GTESTS=1
 # Build with single processor due to errors seen with parallel make
 make -j1 BUILD_OPT=1                    \
     NSPR_INCLUDE_DIR=/usr/include/nspr  \

@@ -70,7 +70,7 @@ popd
 %{_bindir}/jsonschema3
 
 %changelog
-*   Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.6.0-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.6.0-5
 -   Added %%license line automatically
 *   Wed May 06 2020 Paul Monson <paulmon@microsoft.com> 2.6.0-4
 -   Restore python-vcversioner to enable build without internet access.

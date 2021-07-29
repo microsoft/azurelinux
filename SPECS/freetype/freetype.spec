@@ -60,29 +60,29 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 - Add enable-fretype-config to configuration
 - Add /usr/bin/freetype-config to freetype-devel
 
-* Sat May 09 00:21:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
 - Added %%license line automatically
 
-*   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9.1-3
--   Rename freetype2 to freetype.
--   Update URL.
--   Remove sha1 macro.
--   Update Source0.
+* Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.9.1-3
+- Rename freetype2 to freetype.
+- Update URL.
+- Remove sha1 macro.
+- Update Source0.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.9.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.9.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*	Wed Sep 12 2018 Sujay G <gsujay@vmware.com> 2.9.1-1
--	version bump to 2.9.1
+* Wed Sep 12 2018 Sujay G <gsujay@vmware.com> 2.9.1-1
+- version bump to 2.9.1
 
-*       Thu Jun 14 2018 Tapas Kundu <tkundu@vmware.com> 2.7.1-4
--       CVE-2018-6942
+* Thu Jun 14 2018 Tapas Kundu <tkundu@vmware.com> 2.7.1-4
+- CVE-2018-6942
 
-*       Mon May 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.1-3
--       CVE-2017-8287
+* Mon May 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.1-3
+- CVE-2017-8287
 
-*       Fri Apr 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.1-2
--       CVE-2017-7857, CVE-2017-7858 and CVE-2017-7864
+* Fri Apr 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.1-2
+- CVE-2017-7857, CVE-2017-7858 and CVE-2017-7864
 
-*       Fri Nov 11 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.7.1-1
--       Initial version
+* Fri Nov 11 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.7.1-1
+- Initial version

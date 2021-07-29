@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.28.1
-Release:        5%{?dist}
+Version:        5.10.52.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
+Source3:        cbl-mariner-ca-20210127.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -28,6 +29,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3
+BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
@@ -113,6 +115,9 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE3} certs/mariner.pem
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=x86_64 %{?_smp_mflags}
 make -C tools perf
 
@@ -141,18 +146,6 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
-# Verify for build-id match
-# We observe different IDs sometimes
-# TODO: debug it
-ID1=`readelf -n vmlinux | grep "Build ID"`
-./scripts/extract-vmlinux arch/x86/boot/bzImage > extracted-vmlinux
-ID2=`readelf -n extracted-vmlinux | grep "Build ID"`
-if [ "$ID1" != "$ID2" ] ; then
-        echo "Build IDs do not match"
-        echo $ID1
-        echo $ID2
-        exit 1
-fi
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 # Restrict the permission on System.map-X file
@@ -165,7 +158,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=integrity
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -274,8 +267,54 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
-- Replace incorrect %%{_lib} usage with %%{_libdir}
+* Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
+- Update source to 5.10.52.1
+
+* Mon Jul 19 2021 Chris Co <chrco@microsoft.com> - 5.10.47.1-2
+- Enable CONFIG_CONNECTOR and CONFIG_PROC_EVENTS
+
+* Tue Jul 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.47.1-1
+- Update source to 5.10.47.1
+
+* Wed Jun 30 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-4
+- Bump release number to match kernel release
+
+* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.42.1-3
+- Enable CONFIG_IOSCHED_BFQ and CONFIG_BFQ_GROUP_IOSCHED configs
+
+* Wed Jun 16 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-2
+- Enable CONFIG_CROSS_MEMORY_ATTACH
+
+* Tue Jun 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.42.1-1
+- Update source to 5.10.42.1
+
+* Thu Jun 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-2
+- Bump release number to match kernel release
+
+* Fri May 28 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-1
+- Update source to 5.10.37.1
+
+* Thu May 27 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-7
+- Set lockdown=integrity by default
+
+* Wed May 26 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-6
+- Add Mariner cert into the trusted kernel keyring
+
+* Tue May 25 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.32.1-5
+- Bump release number to match kernel release
+
+* Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
+- Bump release number to match kernel-signed update
+
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+- Update CONFIG_LD_VERSION for binutils 2.36.1
+- Remove build-id match check
+
+* Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
+- Bump release number to match kernel release
+
+* Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
+- Update source to 5.10.32.1
 
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Bump release number to match kernel release

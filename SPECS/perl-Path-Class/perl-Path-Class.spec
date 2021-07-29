@@ -47,18 +47,22 @@ make test
 %{_mandir}/man?/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.37-6
--   Use new perl package names.
--   Build with NO_PACKLIST option.
--   Provide perl(Path::Class*).
-* Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.37-5
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.37-6
+- Use new perl package names.
+- Build with NO_PACKLIST option.
+- Provide perl(Path::Class*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.37-5
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.37-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 0.37-3
--   Consuming perl version upgrade of 5.28.0
-*   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.37-2
--   Fix arch
-*   Wed Apr 19 2017 Xiaolin Li <xiaolinl@vmware.com> 0.37-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.37-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 0.37-3
+- Consuming perl version upgrade of 5.28.0
+
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.37-2
+- Fix arch
+
+* Wed Apr 19 2017 Xiaolin Li <xiaolinl@vmware.com> 0.37-1
+- Initial version.

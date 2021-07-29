@@ -60,11 +60,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Update to version 1.1.9
 - Remove sha1 macro
 
-* Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.1-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
 * Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 1.1.1-1
 - Initial version

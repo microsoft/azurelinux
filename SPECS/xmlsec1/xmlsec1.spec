@@ -108,15 +108,15 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 * Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.26-5
 - Added %%license line automatically
 
-*   Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.2.26-4
--   License verified.
--   Fixed Source0 tag.
+* Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.2.26-4
+- License verified.
+- Fixed Source0 tag.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.26-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.26-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Sep 25 2018 Alexey Makhalov <amakhalov@vmware.com> 1.2.26-2
--   Fix requires.
+* Tue Sep 25 2018 Alexey Makhalov <amakhalov@vmware.com> 1.2.26-2
+- Fix requires.
 
-*   Mon Jul 02 2018 Ankit Jain <ankitja@vmware.com> 1.2.26-1
--   Initial version
+* Mon Jul 02 2018 Ankit Jain <ankitja@vmware.com> 1.2.26-1
+- Initial version

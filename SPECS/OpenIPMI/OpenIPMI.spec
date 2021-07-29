@@ -187,24 +187,24 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 2.0.25-6
 - Provides python3-openipmi from OpenIPMI-python
 
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.25-5
 - Added %%license line automatically
 
-*   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.25-4
--   Rename openipmi to OpenIPMI.
--   Remove sha1 macro.
+* Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.0.25-4
+- Rename openipmi to OpenIPMI.
+- Remove sha1 macro.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.25-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.25-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.0.25-2
--   Added BuildRequires python2-devel
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.0.25-2
+- Added BuildRequires python2-devel
 
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 2.0.25-1
--   Upgrade to 2.0.25
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 2.0.25-1
+- Upgrade to 2.0.25
 
-*   Fri Sep 15 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-2
--   openipmi-devel requires ncurses-devel
+* Fri Sep 15 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-2
+- openipmi-devel requires ncurses-devel
 
-*   Mon Sep 11 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-1
--   Initial build.  First version
+* Mon Sep 11 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-1
+- Initial build.  First version

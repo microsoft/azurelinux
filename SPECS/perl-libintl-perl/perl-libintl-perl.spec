@@ -198,22 +198,30 @@ make test
 %{_mandir}/man?/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.29-5
--   Use new perl package names.
--   Provide perl(Locale::*).
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.29-4
--   Added %%license line automatically
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.29-3
--   Renaming perl-libintl to perl-libintl-perl
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.29-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.29-1
--   Update to version 1.29
-*   Mon Apr 03 2017 Rongrong Qiu <rqiu@vmware.com> 1.26-1
--   upgrade for 2.0
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.24-2
--   GA - Bump release of all rpms
-*   Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.24-1
--   Upgraded to version 1.24
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.23-1
--   Initial version.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.29-5
+- Use new perl package names.
+- Provide perl(Locale::*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-4
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.29-3
+- Renaming perl-libintl to perl-libintl-perl
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.29-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.29-1
+- Update to version 1.29
+
+* Mon Apr 03 2017 Rongrong Qiu <rqiu@vmware.com> 1.26-1
+- upgrade for 2.0
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.24-2
+- GA - Bump release of all rpms
+
+* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.24-1
+- Upgraded to version 1.24
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.23-1
+- Initial version.

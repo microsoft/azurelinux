@@ -201,6 +201,8 @@ cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d
 chmod +x $LFS/usr/lib/rpm/brp*
 cp /etc/resolv.conf $LFS/etc/
 
+chroot_and_print_installed_rpms
+
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
 copy_rpm_subpackage mariner-check-macros
@@ -226,7 +228,6 @@ build_rpm_in_chroot_no_install gettext
 build_rpm_in_chroot_no_install sqlite
 build_rpm_in_chroot_no_install nspr
 build_rpm_in_chroot_no_install expat
-build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install libffi
 build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
@@ -235,7 +236,6 @@ build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
-build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install findutils
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
@@ -343,6 +343,9 @@ chroot_and_install_rpms openjdk8
 cp -v $CHROOT_RPMS_DIR_ARCH/openjre8* $FINISHED_RPM_DIR
 chroot_and_install_rpms openjre8
 
+# PCRE needs to be installed (above) for grep to build with perl regexp support
+build_rpm_in_chroot_no_install grep
+
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
@@ -396,10 +399,6 @@ build_rpm_in_chroot_no_install libxslt
 # docbook-style-xsl needs pam
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
-
-# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
-cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
-build_rpm_in_chroot_no_install shadow-utils
 
 # gtest needs cmake
 chroot_and_install_rpms cmake
@@ -480,7 +479,15 @@ build_rpm_in_chroot_no_install createrepo_c
 build_rpm_in_chroot_no_install libpwquality
 build_rpm_in_chroot_no_install json-c
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, shadow-utils
+# util-linux, rpm, libsemanage and shadow-utils require libselinux
+chroot_and_install_rpms libselinux
+build_rpm_in_chroot_no_install util-linux
+build_rpm_in_chroot_no_install rpm
+
+# rebuild pam with selinux support
+build_rpm_in_chroot_no_install pam
+
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, shadow-utils
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
@@ -488,6 +495,7 @@ chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
 chroot_and_install_rpms shadow-utils
+chroot_and_install_rpms meson
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
@@ -511,6 +519,53 @@ chroot_and_install_rpms intltool
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
 build_rpm_in_chroot_no_install libtasn1
+
+build_rpm_in_chroot_no_install golang-1.15
+build_rpm_in_chroot_no_install groff
+
+# libtiprc needs krb5
+chroot_and_install_rpms krb5
+build_rpm_in_chroot_no_install libtirpc
+build_rpm_in_chroot_no_install rpcsvc-proto
+
+# libnsl2 needs libtirpc and rpcsvc-proto
+chroot_and_install_rpms libtirpc
+chroot_and_install_rpms rpcsvc-proto
+build_rpm_in_chroot_no_install libnsl2
+
+build_rpm_in_chroot_no_install finger
+
+# tcp_wrappers needs libnsl2, finger
+chroot_and_install_rpms libnsl2
+chroot_and_install_rpms finger
+build_rpm_in_chroot_no_install tcp_wrappers
+
+build_rpm_in_chroot_no_install cyrus-sasl
+
+# openldap needs groff, cyrus-sasl
+chroot_and_install_rpms groff
+chroot_and_install_rpms cyrus-sasl
+build_rpm_in_chroot_no_install openldap
+
+build_rpm_in_chroot_no_install libcap-ng
+
+# audit needs systemd, golang, openldap, tcp_wrappers and libcap-ng
+chroot_and_install_rpms systemd
+chroot_and_install_rpms golang
+chroot_and_install_rpms openldap
+chroot_and_install_rpms tcp_wrappers
+chroot_and_install_rpms libcap-ng
+build_rpm_in_chroot_no_install audit
+
+# libsemanage requires libaudit
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install libsemanage
+
+# shadow-utils requires libsemanage
+chroot_and_install_rpms libsemanage
+# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
+cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
+build_rpm_in_chroot_no_install shadow-utils
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1

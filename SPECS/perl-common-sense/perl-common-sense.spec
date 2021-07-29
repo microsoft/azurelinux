@@ -72,19 +72,24 @@ rm -rf %{buildroot}
 %{_mandir}/man3/common::sense.3*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
--   Use new perl package names.
--   Provide perl(common::sense).
-* Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.74-5
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
+- Use new perl package names.
+- Provide perl(common::sense).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.74-5
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.74-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 3.74-3
--   Consuming perl version upgrade of 5.28.0
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.74-2
--   GA - Bump release of all rpms
-*   Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.74-1
--   Upgraded to version 3.74
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 3.73-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.74-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 3.74-3
+- Consuming perl version upgrade of 5.28.0
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.74-2
+- GA - Bump release of all rpms
+
+* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.74-1
+- Upgraded to version 3.74
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 3.73-1
+- Initial version.

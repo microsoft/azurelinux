@@ -2,9 +2,9 @@ Summary:        One-time password components
 Name:           oath-toolkit
 Version:        2.6.2
 Release:        7%{?dist}
-License:        GPLv3+
+License:        GPLv3+ and LGPLv2+
 URL:            https://www.nongnu.org/oath-toolkit/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
@@ -199,6 +199,7 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.6.2-7
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

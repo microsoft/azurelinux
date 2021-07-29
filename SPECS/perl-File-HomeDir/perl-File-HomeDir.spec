@@ -75,20 +75,27 @@ make test
 %{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-5
--   Use new perl package names.
--   Provide perl(File::HomeDir*).
-*   Thu Sep 10 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-4
--   Switch to new perl man page extension.
-*   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> 1.004-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.004-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.004-1
--   Update to version 1.004
-*   Tue Aug 08 2017 Chang Lee <changlee@vmware.com> 1.00-3
--   Add perl-File-Which for make check
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.00-2
--   GA - Bump release of all rpms
-*   Thu Mar 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.00-1
--   Initial version.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-5
+- Use new perl package names.
+- Provide perl(File::HomeDir*).
+
+* Thu Sep 10 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-4
+- Switch to new perl man page extension.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.004-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.004-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.004-1
+- Update to version 1.004
+
+* Tue Aug 08 2017 Chang Lee <changlee@vmware.com> 1.00-3
+- Add perl-File-Which for make check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.00-2
+- GA - Bump release of all rpms
+
+* Thu Mar 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.00-1
+- Initial version.

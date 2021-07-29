@@ -2,7 +2,7 @@
 
 Summary: Industry-standard container runtime
 Name: moby-containerd
-Version: 1.3.4+azure
+Version: 1.4.4+azure
 Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -17,6 +17,7 @@ Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
+Patch0:  CVE-2021-32760.patch
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
@@ -69,6 +70,7 @@ used directly by developers or end-users.
 
 %prep
 %setup -q -n %{name}-%{version} -c
+%patch0 -p1
 mkdir -p %{OUR_GOPATH}/src/github.com/containerd
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/containerd/containerd
 
@@ -133,6 +135,12 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> 1.4.4+azure-2
+- CVE-2021-32760 fix
+* Mon Jul 12 2021 Andrew Phelps <anphel@microsoft.com> 1.4.4+azure-1
+- Update to version 1.4.4+azure
+* Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.3.4+azure-3
+- Increment release to force republishing using golang 1.15.13.
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.3.4+azure-2
 - Increment release to force republishing using golang 1.15.
 * Thu Jun 11 2020 Andrew Phelps <anphel@microsoft.com> 1.3.4+azure-1

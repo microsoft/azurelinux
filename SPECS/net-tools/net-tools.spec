@@ -119,41 +119,41 @@ rm -rf %{buildroot}/*
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.60-14
 - Added %%license line automatically
 
-*   Mon Apr 13 2020 Eric Li <eli@microsoft.com> 1.60-13
--   Update Source0: and delete sha1. Verified license. Fixed URL.
+* Mon Apr 13 2020 Eric Li <eli@microsoft.com> 1.60-13
+- Update Source0: and delete sha1. Verified license. Fixed URL.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.60-12
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.60-12
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 1.60-11
--   Added conflicts toybox
+* Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 1.60-11
+- Added conflicts toybox
 
-*   Wed Dec 14 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-10
--   Fix compilation issue with linux-4.9
+* Wed Dec 14 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-10
+- Fix compilation issue with linux-4.9
 
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-9
--   Remove iputils deps.
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-9
+- Remove iputils deps.
 
-*   Tue Oct 04 2016 ChangLee <changLee@vmware.com> 1.60-8
--   Modified %check
+* Tue Oct 04 2016 ChangLee <changLee@vmware.com> 1.60-8
+- Modified %check
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.60-7
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.60-7
+- GA - Bump release of all rpms
 
-*   Thu Feb 4 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-6
--   Apply all patches from 1.60-26ubuntu1.
+* Thu Feb 4 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-6
+- Apply all patches from 1.60-26ubuntu1.
 
-*   Fri Jan 22 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-5
--   Added net-tools-1.60-manydevs.patch
+* Fri Jan 22 2016 Alexey Makhalov <amakhalov@vmware.com> 1.60-5
+- Added net-tools-1.60-manydevs.patch
 
-*   Fri Nov 6 2015 Alexey Makhalov <amakhalov@vmware.com> 1.60-4
--   Added ipv6 support. Include hostname and dnshostname.
+* Fri Nov 6 2015 Alexey Makhalov <amakhalov@vmware.com> 1.60-4
+- Added ipv6 support. Include hostname and dnshostname.
 
-*   Thu Oct 22 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.60-3
--   Added changes to replace inetutils with net-tools
+* Thu Oct 22 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.60-3
+- Added changes to replace inetutils with net-tools
 
-*   Thu Jul 30 2015 Divya Thaluru <dthaluru@vmware.com> 1.60-2
--   Disable building with parallel threads
+* Thu Jul 30 2015 Divya Thaluru <dthaluru@vmware.com> 1.60-2
+- Disable building with parallel threads
 
-*   Mon Jul 13 2015 Divya Thaluru <dthaluru@vmware.com> 1.60-1
--   Initial build. First version
+* Mon Jul 13 2015 Divya Thaluru <dthaluru@vmware.com> 1.60-1
+- Initial build. First version

@@ -8,8 +8,8 @@
 %{!?_export_dir:%global _export_dir /bind9-export/}
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.3
-Release:        5%{?dist}
+Version:        9.16.15
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,20 +33,19 @@ Source14:       setup-named-softhsm.sh
 Source15:       named-chroot.files
 # CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
 Patch0:         CVE-2019-6470.nopatch
-Patch1:         CVE-2020-8618.patch
-Patch2:         CVE-2020-8619.patch
-Patch3:         CVE-2020-8620.patch
-Patch4:         CVE-2020-8621.patch
-Patch5:         CVE-2020-8622.patch
 # CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
-Patch6:         CVE-2020-8623.nopatch
-Patch7:         CVE-2020-8624.patch
-Patch8:         CVE-2020-8625.patch 
-Patch9:         bind-9.14-config-pkcs11.patch
-Patch10:        bind-9.10-dist-native-pkcs11.patch
+Patch1:         CVE-2020-8623.nopatch
+Group:          Development/Tools
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Requires:       openssl
+Requires:       libuv
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
+Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
+Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
+BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
 BuildRequires:  libuv-devel
@@ -546,11 +545,14 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
+* Tue Jul 27 2021 Jon Slobodzian <joslobo@microsoft.com> - 9.16.15-1 
+- Update version to 9.16.15 to fix CVE-2021-25215
+
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 9.16.3-5
 - Merge the following releases from 1.0 to dev branch
 - nicolasg@microsoft.com, 9.16.3-3: Fixes CVE-2020-8625
 
-* Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4
+* Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4 
 - Fix file path error caused by linting
 - Remove duplicate %files section for bind-license
 - Remove named.conf from main package, which is already provided by bind-utils
@@ -560,6 +562,9 @@ fi;
   bind-pkcs11-utils, bind-pkcs11-devel, bind-dnssec-utils, bind-dnssec-doc,
   bind-python3-bind and bind-chroot packages
 
+*   Mon Mar 01 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 9.16.3-3
+-   Fixes CVE-2020-8625
+
 *   Fri Sep 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 9.16.3-2
 -   Fixes CVE-2020-8618, CVE-2020-8619, CVE-2020-8620,
 -   CVE-2020-8621, CVE-2020-8622, CVE-2020-8623, CVE-2020-8624
@@ -567,7 +572,7 @@ fi;
 *   Wed May 27 2020 Daniel McIlvaney <damcilva@microsoft.com> - 9.16.3-1
 -   Update to version 9.16.3, fixes CVE-2018-5743, CVE-2018-5744, CVE-2019-6465, CVE-2019-6467, CVE-2019-6471, CVE-2020-8616, CVE-2020-8617
 
-*   Sat May 09 00:21:20 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.13.3-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.13.3-4
 -   Added %%license line automatically
 
 *   Fri May  1 2020 Emre Girgin <mrgirgin@microsoft.com> 9.13.3-3

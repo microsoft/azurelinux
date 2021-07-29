@@ -1,13 +1,15 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.90
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://nmap.org/
 Source0:        https://nmap.org/dist/%{name}-%{version}.tar.bz2
+## https://github.com/nmap/nmap/commit/f6b40614e4a8131394792d590965f8af3c635323.patch
+Patch0:         nmap-unix_crash.patch
 BuildRequires:  binutils
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
@@ -58,8 +60,11 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
-* Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.90-2
-- Remove zenmap/ndiff from configuration
+* Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.90-3
+- Remove zenmap/ndiff from configuration (JOSLOBO 7/26/21: Bumped version for Merge)
+
+* Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 7.90-2 (merge from 1.0 branch)
+- nmap-unix_crash.patch fix for crash with unix sockets.
 
 * Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> - 7.90-1
 - Add nmap spec

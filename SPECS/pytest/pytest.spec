@@ -106,30 +106,30 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.8.2-7
 - Disable auto dependency generator.
 
-* Sat May 09 00:21:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.8.2-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.8.2-6
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-5
--   Renaming python-pytest to pytest
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-5
+- Renaming python-pytest to pytest
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-4
--   Renaming python-Twisted to python-twisted
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 3.8.2-4
+- Renaming python-Twisted to python-twisted
 
-*   Mon Apr 20 2020 Eric Li <eli@microsoft.com> 3.8.2-3
--   Update Source0:, add #Source0, and delete sha1. License verified.
+* Mon Apr 20 2020 Eric Li <eli@microsoft.com> 3.8.2-3
+- Update Source0:, add #Source0, and delete sha1. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.8.2-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.8.2-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Oct 09 2018 Tapas Kundu <tkundu@vmware.com> 3.8.2-1
--   Updated to release 3.8.2
--   Removed buildrequires from subpackage.
+* Tue Oct 09 2018 Tapas Kundu <tkundu@vmware.com> 3.8.2-1
+- Updated to release 3.8.2
+- Removed buildrequires from subpackage.
 
-*   Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 3.0.7-3
--   Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+* Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 3.0.7-3
+- Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
 
-*   Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-2
--   Use python2 instead of python and rename the scripts in bin directory
+* Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-2
+- Use python2 instead of python and rename the scripts in bin directory
 
-*   Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-1
--   Initial
+* Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-1
+- Initial

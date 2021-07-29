@@ -35,6 +35,17 @@ Obsoletes:      %{name} < %{version}-%{release}
 
 Python 3 version.
 
+%package -n python3-%{name}
+Summary:       C extensions for Python 3
+BuildRequires: python3
+BuildRequires: python3-devel
+BuildRequires: python3-libs
+BuildRequires: python3-xml
+Requires:      python3
+
+%description -n python3-%{name}
+Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
+
 %prep
 %setup -n %{upname}-%{version}
 

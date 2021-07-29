@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ and MIT and BSD and ISC
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
@@ -31,6 +31,7 @@ sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/
     --sysconfdir=/etc   \
     --localstatedir=/var\
     --with-pam          \
+    --with-selinux      \
     --enable-anacron    \
     --enable-pie        \
     --enable-relro
@@ -120,45 +121,48 @@ make %{?_smp_mflags} check
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.2-4
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.2-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
-* Sat May 09 00:21:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
+* Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> - 1.5.2-4
+- Enable SELinux support
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.5.2-3
 - Added %%license line automatically
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.5.2-2
--   Renaming Linux-PAM to pam
-*   Wed Mar 18 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.5.2-1
--   Update to 1.5.2. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.5.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Apr 24 2017 Bo Gan <ganb@vmware.com> 1.5.1-1
--   Update to 1.5.1
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-13
--   BuildRequires Linux-PAM-devel
-*   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 1.5.0-12
--   Modified %check
-*   Mon Aug 29 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-11
--   Fixed pam configuration for crond
-*   Thu Aug 4 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-10
--   Added logic to not replace conf files in upgrade scenario
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.0-9
--   GA - Bump release of all rpms
-*   Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-8
--   Fixing spec file to handle rpm upgrade scenario correctly
-*   Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-7
--   Add run-parts command.
-*   Fri Mar 04 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-6
--   Add folders to sysconfdir.
-*   Mon Feb 08 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-5
--   Change default sysconfdir.
-*   Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-4
--   Add systemd to Requires and BuildRequires.
--   Use systemctl to enable/disable service.
-*   Mon Nov 30 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-3
--   Symlink cron.service to crond.service.
--   And move the /usr/etc/pam.d/crond to /etc/pam.d/crond
-*   Thu Nov 12 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-2
--   Add crond to systemd service.
-*   Wed Jun 17 2015 Divya Thaluru <dthaluru@vmware.com> 1.5.0-1
--   Initial build. First version
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.5.2-2
+- Renaming Linux-PAM to pam
+* Wed Mar 18 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.5.2-1
+- Update to 1.5.2. License verified.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.5.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Mon Apr 24 2017 Bo Gan <ganb@vmware.com> 1.5.1-1
+- Update to 1.5.1
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-13
+- BuildRequires Linux-PAM-devel
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> 1.5.0-12
+- Modified %check
+* Mon Aug 29 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-11
+- Fixed pam configuration for crond
+* Thu Aug 4 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-10
+- Added logic to not replace conf files in upgrade scenario
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.0-9
+- GA - Bump release of all rpms
+* Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-8
+- Fixing spec file to handle rpm upgrade scenario correctly
+* Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-7
+- Add run-parts command.
+* Fri Mar 04 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-6
+- Add folders to sysconfdir.
+* Mon Feb 08 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-5
+- Change default sysconfdir.
+* Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-4
+- Add systemd to Requires and BuildRequires.
+- Use systemctl to enable/disable service.
+* Mon Nov 30 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-3
+- Symlink cron.service to crond.service.
+- And move the /usr/etc/pam.d/crond to /etc/pam.d/crond
+* Thu Nov 12 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-2
+- Add crond to systemd service.
+* Wed Jun 17 2015 Divya Thaluru <dthaluru@vmware.com> 1.5.0-1
+- Initial build. First version

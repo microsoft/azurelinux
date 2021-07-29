@@ -34,7 +34,7 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/*/*
 
 %changelog
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 530-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 530-2
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 530-2

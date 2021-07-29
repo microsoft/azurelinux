@@ -31,7 +31,7 @@ mv *.ttf %{buildroot}%{_fontdir}/
 %{_fontdir}/*.ttf
 
 %changelog
-* Sat May 09 00:20:57 PST 2020 Nick Samson <nisamson@microsoft.com> - 20120503-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20120503-2
 - Added %%license line automatically
 
 * Wed Apr 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 20120503-1

@@ -165,20 +165,20 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 * Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.7.0-6
 - Build with lua, python3, and ruby support.
 
-* Sat May 09 00:21:18 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-5
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.7.0-4
--   Rename freetype2-devel to freetype-devel.
+* Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.7.0-4
+- Rename freetype2-devel to freetype-devel.
 
-*   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 1.7.0-3
--   Verified license. Removed sha1. Fixed Source0 URL and URL.
+* Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 1.7.0-3
+- Verified license. Removed sha1. Fixed Source0 URL and URL.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 1.7.0-1
--   Updated to version 1.7.0
+* Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 1.7.0-1
+- Updated to version 1.7.0
 
-*   Wed Apr 5 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.6.0-1
--   Initial version
+* Wed Apr 5 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.6.0-1
+- Initial version

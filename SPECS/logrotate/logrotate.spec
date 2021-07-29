@@ -1,56 +1,74 @@
 Summary:        Logrotate
 Name:           logrotate
-Version:        3.16.0
-Release:        2%{?dist}
+Version:        3.18.1
+Release:        1%{?dist}
 License:        GPLv2
-URL:            https://github.com/logrotate/logrotate/
-#Source0:       %{url}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
+Group:          System Environment/Base
+URL:            https://github.com/logrotate/logrotate/
+Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  popt-devel
-
-Requires:   popt
+BuildRequires:  systemd-devel
+Requires:       popt
+Requires:       systemd
 
 %description
-The logrotate utility is designed to simplify the administration of log files on a system which generates a lot of log files. Logrotate allows for the automatic rotation compression, removal and mailing of log files. Logrotate can be set to handle a log file daily, weekly, monthly or when the log file gets to a certain size.
+The logrotate utility is designed to simplify the administration of log
+files on a system which generates a lot of log files. Logrotate allows
+for the automatic rotation compression, removal and mailing of log files.
+Logrotate can be set to handle a log file daily, weekly, monthly or when
+the log file gets to a certain size.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./autogen.sh
-./configure \
-   --prefix=%{_prefix}
-# logrotate code has misleading identation and GCC 6.3 does not like it.
-make %{?_smp_mflags} CFLAGS="-Wno-error=misleading-indentation -g -O2"
+./configure --prefix=%{_prefix} --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
+make %{?_smp_mflags}
+
+# Disable dateext since it can cause rotation to fail if run twice in a day
+sed -i 's/dateext/#dateext/' examples/logrotate.conf
+
+# Remove hardening options that are not supported by our current systemd version.
+sed -i -E '/ProtectClock=true|ProtectHostname=true|ProtectKernelLogs=true/d' examples/logrotate.service
 
 %install
 make DESTDIR=%{buildroot} install
 install -vd %{buildroot}%{_sysconfdir}/logrotate.d
-install -vd %{buildroot}%{_sysconfdir}/cron.daily
 install -vd %{buildroot}%{_localstatedir}/lib/logrotate
+install -vd %{buildroot}%{_unitdir}
 touch %{buildroot}%{_localstatedir}/lib/logrotate/logrotate.status
+install -p -m 644 examples/logrotate.conf %{buildroot}%{_sysconfdir}/logrotate.conf
+install -p -m 644 examples/logrotate.{service,timer} %{buildroot}%{_unitdir}/
+install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 
-%post -p /sbin/ldconfig
+%post
+%systemd_post logrotate.{service,timer}
 
-%postun -p /sbin/ldconfig
+%postun
+%systemd_preun logrotate.{service,timer}
 
 %files
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sysconfdir}/logrotate.d
+%dir %{_localstatedir}/lib/logrotate
 %{_sbindir}/logrotate
+%{_unitdir}/logrotate.{service,timer}
+%config(noreplace) %{_sysconfdir}/logrotate.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/{b,w}tmp
 %{_mandir}/man5/logrotate.conf.5.gz
 %{_mandir}/man8/logrotate.8.gz
-/var/lib/logrotate/logrotate.status
+%ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
-* Sat May 09 00:21:41 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
-- Added %%license line automatically
-
+*   Wed Jul 21 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.18.1-1
+-   Update to version 3.18.1
+-   Add default logrotate systemd service and logrotate.conf
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
+-   Added %%license line automatically
 *   Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.16.0-1
 -   Updated to 3.16.0.
 -   License verified.

@@ -6,7 +6,7 @@ Release:        7%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 # Source0:      https://files.pythonhosted.org/packages/ca/63/139b710671c1655aed3b20c1e6776118c62e9f9311152f4c6031e12a0554/lxml-%{version}.tar.gz
@@ -61,7 +61,8 @@ rm -rf %{buildroot}
 %changelog
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> 4.2.4-7
 -   Remove python2 support.
-*   Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-6
+-   License verified.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.4-6
 -   Added %%license line automatically
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 4.2.4-5
 -   Renaming cython to Cython

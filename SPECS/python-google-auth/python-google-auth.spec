@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        Google Auth Python Library
 License:        ASL 2.0
 URL:            https://github.com/googleapis/google-auth-library-python
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.python.org/packages/source/g/%{library}/%{library}-%{version}.tar.gz
 
@@ -54,6 +54,7 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.20.1-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Wed Jul 29 2020 Jason Montleon <jmontleo@redhat.com> - 1:1.20.0-1
 - Update to 1.20.0 (#1858426)

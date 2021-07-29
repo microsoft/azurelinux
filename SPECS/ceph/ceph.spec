@@ -1,14 +1,16 @@
+#disable debuginfo because ceph-debuginfo rpm is too large
+%define debug_package %{nil}
+
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        15.2.4
+Version:        16.2.0
 Release:        2%{?dist}
-License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT
+License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 
-%global _python_bytecompile_extra 1
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -70,14 +72,17 @@ Requires(post): binutils
 Requires:       systemd
 
 BuildRequires:  cryptsetup
+BuildRequires:  cryptsetup-devel
 BuildRequires:  expat-devel
 BuildRequires:  fuse-devel
 BuildRequires:  gcc
 BuildRequires:  gdbm
 BuildRequires:  gperf
+BuildRequires:  icu-devel
 BuildRequires:  keyutils-devel
 BuildRequires:  leveldb-devel > 1.2
 BuildRequires:  libaio-devel
+BuildRequires:  lua-devel
 BuildRequires:  util-linux-libs
 BuildRequires:  libcap-ng-devel
 BuildRequires:  curl-devel
@@ -1071,6 +1076,8 @@ exit 0
 %{_bindir}/ceph-syn
 %{_bindir}/cephfs-data-scan
 %{_bindir}/cephfs-journal-tool
+%{_bindir}/cephfs-mirror
+%{_bindir}/cephfs-top
 %{_bindir}/cephfs-table-tool
 %{_bindir}/rados
 %{_bindir}/radosgw-admin
@@ -1079,6 +1086,8 @@ exit 0
 %{_bindir}/rbd-replay-many
 %{_bindir}/rbdmap
 %{_sbindir}/mount.ceph
+%{_unitdir}/cephfs-mirror@.service
+%{_unitdir}/cephfs-mirror.target
 %if %{with lttng}
 %{_bindir}/rbd-replay-prep
 %endif
@@ -1101,6 +1110,9 @@ exit 0
 %{_mandir}/man8/rbd-replay-many.8*
 %{_mandir}/man8/rbd-replay-prep.8*
 %{_mandir}/man8/rgw-orphan-list.8*
+%{_mandir}/man8/cephfs-mirror.8*
+%{_mandir}/man8/cephfs-top.8*
+%{python3_sitelib}/cephfs_top-*.egg-info
 %dir %{_datadir}/ceph/
 %{_datadir}/ceph/known_hosts_drop.ceph.com
 %{_datadir}/ceph/id_rsa_drop.ceph.com
@@ -1116,6 +1128,8 @@ exit 0
 %{_udevrulesdir}/50-rbd.rules
 %attr(3770,ceph,ceph) %dir %{_localstatedir}/log/ceph/
 %attr(750,ceph,ceph) %dir %{_localstatedir}/lib/ceph/
+%exclude %{_includedir}/libcephsqlite.h
+%exclude %{_libdir}/libcephsqlite.so
 
 %pre common
 CEPH_GROUP_ID=167
@@ -1235,6 +1249,8 @@ fi
 %{_datadir}/ceph/mgr/insights
 %{_datadir}/ceph/mgr/iostat
 %{_datadir}/ceph/mgr/localpool
+%{_datadir}/ceph/mgr/mds_autoscaler
+%{_datadir}/ceph/mgr/mirroring
 %{_datadir}/ceph/mgr/orchestrator
 %{_datadir}/ceph/mgr/osd_perf_query
 %{_datadir}/ceph/mgr/osd_support
@@ -1244,6 +1260,8 @@ fi
 %{_datadir}/ceph/mgr/rbd_support
 %{_datadir}/ceph/mgr/restful
 %{_datadir}/ceph/mgr/selftest
+%{_datadir}/ceph/mgr/snap_schedule
+%{_datadir}/ceph/mgr/stats
 %{_datadir}/ceph/mgr/status
 %{_datadir}/ceph/mgr/telegraf
 %{_datadir}/ceph/mgr/telemetry
@@ -1324,6 +1342,7 @@ fi
 %files fuse
 %{_bindir}/ceph-fuse
 %{_mandir}/man8/ceph-fuse.8*
+%{_mandir}/man8/mount.fuse.ceph.8*
 %{_sbindir}/mount.fuse.ceph
 %{_unitdir}/ceph-fuse@.service
 %{_unitdir}/ceph-fuse.target
@@ -1402,6 +1421,8 @@ fi
 %{_bindir}/radosgw-es
 %{_bindir}/radosgw-object-expirer
 %{_bindir}/rgw-orphan-list
+%{_bindir}/rgw-gap-list
+%{_bindir}/rgw-gap-list-comparator
 %{_libdir}/libradosgw.so*
 %{_mandir}/man8/radosgw.8*
 %dir %{_localstatedir}/lib/ceph/radosgw
@@ -1436,6 +1457,7 @@ fi
 %files osd
 %{_bindir}/ceph-clsinfo
 %{_bindir}/ceph-bluestore-tool
+%{_bindir}/ceph-erasure-code-tool
 %{_bindir}/ceph-objectstore-tool
 %{_bindir}/ceph-osdomap-tool
 %{_bindir}/ceph-osd
@@ -1556,6 +1578,7 @@ fi
 %if %{with lttng}
 %{_libdir}/librbd_tp.so.*
 %endif
+%{_libdir}/ceph/librbd/libceph_*.so*
 
 %post -n librbd1 -p /sbin/ldconfig
 
@@ -1616,6 +1639,7 @@ fi
 %{_includedir}/cephfs/libcephfs.h
 %{_includedir}/cephfs/ceph_ll_client.h
 %{_libdir}/libcephfs.so
+%{_includedir}/cephfs/metrics/Types.h
 
 %files -n python%{python3_pkgversion}-cephfs
 %{python3_sitearch}/cephfs.cpython*.so
@@ -1784,8 +1808,15 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
+- Disable debuginfo because ceph-debuginfo rpm is too large
+
+* Fri May 21 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-1
+- Update package version to fix CVE-2020-25660, CVE-2020-25678 and CVE-2020-27781
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 15.2.4-2
 - Include python bytecompiled files in the resulting package.
 
-*   Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 15.2.4-1
--   Initial CBL-Mariner import from Ceph source (license: LGPLv2.1)
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 15.2.4-1
+- Initial CBL-Mariner import from Ceph source (license: LGPLv2.1)
+- License verified

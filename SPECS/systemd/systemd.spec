@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        39%{?dist}
+Release:        40%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch22:        CVE-2020-13776.patch
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch23:        CVE-2018-21029.nopatch
+Patch24:        CVE-2021-33910.patch
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
 Patch101:       101-Portabled-fix-inspect-on-image-attached-as-directory.patch
@@ -60,12 +61,12 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  shadow-utils
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
@@ -154,6 +155,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
        -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                     \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
+       -Dselinux=true                                                 \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -185,6 +187,9 @@ ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
+
+%check
+meson test -C build
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -283,6 +288,12 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Jul 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 239-40
+- Merge from 1.0 to dev branch
+
+* Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-38 (on 1.0 branch)
+- CVE-2021-33910 fix
+
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.39-33: Use autosetup
@@ -299,6 +310,10 @@ rm -rf %{buildroot}/*
 
 * Mon Apr 26 2021 Henry Li <lihl@microsoft.com> - 239-38
 - Provides system-setup-keyboard.
+
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-37 (on 1.0 branch)
+- Enable SELinux support
+- Remove unused BuildRequires shadow-utils
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
 - Replace incorrect %%{_lib} usage with %%{_libdir}

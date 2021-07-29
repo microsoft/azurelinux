@@ -41,7 +41,7 @@ make DESTDIR=%{buildroot} install
 %exclude %{_infodir}/dir
 
 %changelog
-* Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.0-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.0-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.0-2

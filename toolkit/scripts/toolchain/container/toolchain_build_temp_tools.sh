@@ -16,9 +16,9 @@ touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
-echo Binutils-2.32 - Pass 1
-tar xf binutils-2.32.tar.xz
-pushd binutils-2.32
+echo Binutils-2.36.1 - Pass 1
+tar xf binutils-2.36.1.tar.xz
+pushd binutils-2.36.1
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -31,7 +31,7 @@ make -j$(nproc)
 mkdir -v /tools/lib && ln -sv lib /tools/lib64
 make install
 popd
-rm -rf binutils-2.32
+rm -rf binutils-2.36.1
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
@@ -113,14 +113,14 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.28.1 API Headers
-tar xf kernel-5.10.28.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.28.1
+echo Linux-5.10.52.1 API Headers
+tar xf kernel-5.10.52.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.52.1
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.28.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.52.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -182,9 +182,9 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
-echo Binutils-2.32 - Pass 2
-tar xf binutils-2.32.tar.xz
-pushd binutils-2.32
+echo Binutils-2.36.1 - Pass 2
+tar xf binutils-2.36.1.tar.xz
+pushd binutils-2.36.1
 mkdir -v build
 cd build
 CC=$LFS_TGT-gcc                  \
@@ -202,7 +202,7 @@ make -C ld clean
 make -C ld LIB_PATH=/usr/lib:/lib
 cp -v ld/ld-new /tools/bin
 popd
-rm -rf binutils-2.32
+rm -rf binutils-2.36.1
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
@@ -540,15 +540,15 @@ rm -rf perl-5.30.3
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.7.10
+tar xf Python-3.7.10.tar.xz
+pushd Python-3.7.10
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.7.4
+rm -rf Python-3.7.10
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

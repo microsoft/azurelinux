@@ -10,7 +10,7 @@ Version:        1.1.2
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz
 Source0:        %{pkgname}-%{version}.tar.gz
@@ -93,4 +93,5 @@ tox
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.0-1
-- Original CBL-Mariner version.
+- Original version for CBL-Mariner.
+- License verified.

@@ -57,18 +57,24 @@ make test
 
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-5
--   Use new perl package names.
--   Provide perl(File::Which).
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-4
--   Switch to new perl man page extension.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.22-1
--   Update to version 1.22
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.21-2
--   GA - Bump release of all rpms
-*   Thu Mar 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.21-1
--   Initial version.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-5
+- Use new perl package names.
+- Provide perl(File::Which).
+
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.22-4
+- Switch to new perl man page extension.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.22-1
+- Update to version 1.22
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.21-2
+- GA - Bump release of all rpms
+
+* Thu Mar 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.21-1
+- Initial version.

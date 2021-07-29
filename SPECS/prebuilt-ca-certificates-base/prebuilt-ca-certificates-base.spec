@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 Version:        20200720
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,12 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_datadir}/pki/ca-trust-legacy/*
 
 %changelog
+* Wed Jul 07 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-15
+- Making 'Release' match with 'ca-certificates'.
+
+* Thu Jun 03 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-14
+- Making 'Release' match with 'ca-certificates'.
+
 * Fri Mar 12 2021 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20200720-13
 - Making 'Release' match with 'ca-certificates'.
 

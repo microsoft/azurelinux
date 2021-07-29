@@ -47,25 +47,35 @@ make %{?_smp_mflags} check
 %{_datadir}/aclocal/*
 
 %changelog
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 2.5.1-5
--   Provide pkgconfig(libassuan).
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.5.1-4
--   Provide libassuan-devel
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.1-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.5.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Keerthana K <keerthanak@vmware.com> 2.5.1-1
--   Update to version 2.5.1
-*   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 2.4.3-1
--   Upgrade version to 2.4.3
-*   Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.4.2-3
--   BuildRequired libgpg-error-devel.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.2-2
--   GA - Bump release of all rpms
-*   Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 2.4.2-1
--   Updated to version 2.4.2
-*   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 2.2.0-2
--   Updated group.
-*   Tue Dec 30 2014 Divya Thaluru <dthaluru@vmware.com> 2.2.0-1
--   Initial version
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 2.5.1-5
+- Provide pkgconfig(libassuan).
+
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.5.1-4
+- Provide libassuan-devel
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.1-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.5.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Keerthana K <keerthanak@vmware.com> 2.5.1-1
+- Update to version 2.5.1
+
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 2.4.3-1
+- Upgrade version to 2.4.3
+
+* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.4.2-3
+- BuildRequired libgpg-error-devel.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.2-2
+- GA - Bump release of all rpms
+
+* Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 2.4.2-1
+- Updated to version 2.4.2
+
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 2.2.0-2
+- Updated group.
+
+* Tue Dec 30 2014 Divya Thaluru <dthaluru@vmware.com> 2.2.0-1
+- Initial version

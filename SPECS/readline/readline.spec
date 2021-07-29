@@ -98,27 +98,32 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/readline.3.gz
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 7.0-5
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.0-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.0-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Sun Jun 04 2017 Bo Gan <ganb@vmware.com> 7.0-2
--       Fix dependency
-*       Fri Jan 13 2017 Dheeraj Shetty <dheerajs@vmware.com> 7.0-1
--       Updated to version 7.0
-*       Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 6.3-6
--       Move docs and man to the devel package
-*       Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
--       Modified %check
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.3-4
--	GA - Bump release of all rpms
-*	Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 6.3-3
--	Adding ncurses to run time require package
-*   	Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 6.3-2
--   	Update according to UsrMove.
-*	Wed Oct 22 2014 Divya Thaluru <dthaluru@vmware.com> 6.3-1
--	Initial build.	First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.0-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Sun Jun 04 2017 Bo Gan <ganb@vmware.com> 7.0-2
+- Fix dependency
+
+* Fri Jan 13 2017 Dheeraj Shetty <dheerajs@vmware.com> 7.0-1
+- Updated to version 7.0
+
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 6.3-6
+- Move docs and man to the devel package
+
+* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
+- Modified %check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.3-4
+- GA - Bump release of all rpms
+
+* Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 6.3-3
+- Adding ncurses to run time require package
+
+* Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 6.3-2
+- Update according to UsrMove.
+
+* Wed Oct 22 2014 Divya Thaluru <dthaluru@vmware.com> 6.3-1
+- Initial build.	First version

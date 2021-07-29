@@ -101,14 +101,14 @@ rm -rf %{buildroot}
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.28-5
 - Create utils subpackage.
 
-* Sat May 09 00:20:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.3.28-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.3.28-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.3.28-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.3.28-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.28-2
--   Aarch64 support
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.28-2
+- Aarch64 support
 
-*	Thu Oct 27 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.28-1
--	Initial build. First version
+* Thu Oct 27 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.28-1
+- Initial build. First version

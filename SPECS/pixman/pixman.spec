@@ -57,7 +57,7 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May 09 00:21:02 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.36.0-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.36.0-2
 - Added %%license line automatically
 
 *   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 0.36.0-1

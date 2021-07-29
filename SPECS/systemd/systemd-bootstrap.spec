@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch22:        CVE-2020-13776.patch
 # DoT is only enabled when systemd is build against gnutls.
 # Furthermore, strict mode DoT is not supported before v243.
 Patch23:        CVE-2018-21029.nopatch
+Patch24:        CVE-2021-33910.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -56,7 +57,6 @@ BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  shadow-utils
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
 Requires:       filesystem >= 1.1
@@ -242,11 +242,17 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-34
+* Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-35
+- CVE-2021-33910 fix
+
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-34 (from dev branch)
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 239-30: Configure to support merged /usr.
 - joschmit@microsoft.com, 239-31: Replace incorrect %%{_lib} usage with %%{_libdir}
 -   Turn off dependency generators
+
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-34 (from 1.0 branch)
+- Remove build dependency on shadow-utils to break circular dependency
 
 * Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
 - Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194

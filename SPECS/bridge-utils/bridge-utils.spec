@@ -27,7 +27,7 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man8/*
 
 %changelog
-* Sat May 09 00:20:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6-4
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.6-3

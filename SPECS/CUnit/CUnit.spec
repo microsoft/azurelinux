@@ -4,7 +4,7 @@ Name:           CUnit
 Version:        2.1.3
 Release:        23%{?dist}
 Summary:        Unit testing framework for C
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        LGPLv2+
 URL:            http://cunit.sourceforge.net/
@@ -53,12 +53,12 @@ done
 %postun -p /sbin/ldconfig
 
 %files
+%license %{_defaultdocdir}/%{name}/COPYING
 %{_datadir}/%{name}/
 %{_libdir}/libcunit.so.*
 %dir %{_docdir}/%{name}
 %{_docdir}/%{name}/AUTHORS
 %{_docdir}/%{name}/ChangeLog
-%{_docdir}/%{name}/COPYING
 %{_docdir}/%{name}/NEWS
 %{_docdir}/%{name}/README
 %{_docdir}/%{name}/TODO
@@ -74,6 +74,7 @@ done
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.1.3-23
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.3-22
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

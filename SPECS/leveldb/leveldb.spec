@@ -6,7 +6,7 @@ Version:        1.22
 Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
@@ -69,7 +69,7 @@ mkdir -p %{buildroot}%{_libdir}/pkgconfig
 cp -a %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
 
 %check
-%ctest
+ctest -V %{?_smp_mflags}
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -91,6 +91,7 @@ cp -a %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.22-3
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- License verified
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.22-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

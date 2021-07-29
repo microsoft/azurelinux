@@ -23,16 +23,22 @@ Requires:       perl-DBIx-Simple
 Requires:       perl-DBD-SQLite
 Requires:       perl-File-HomeDir
 
+AutoReq:        no
+
 %description
 The Groff package contains programs for processing
 and formatting text.
+
 %prep
 %setup -q
+
 %build
 PAGE=letter ./configure \
     --prefix=%{_prefix} \
-    --with-grofferdir=%{_datadir}/%{name}/%{version}/groffer
+    --with-grofferdir=%{_datadir}/%{name}/%{version}/groffer \
+    --without-x
 make
+
 %install
 install -vdm 755 %{_defaultdocdir}/%{name}-1.22/pdf
 make DESTDIR=%{buildroot} install
@@ -46,6 +52,7 @@ done
 rm -rf %{buildroot}%{_infodir}
 
 %post	-p /sbin/ldconfig
+
 %postun	-p /sbin/ldconfig
 
 %files
@@ -60,18 +67,29 @@ rm -rf %{buildroot}%{_infodir}
 %changelog
 *   Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 1.22.3-7
 -   Adding Fedora's symbolic links to provide the same set of file paths.
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-6
+
+*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-6 (from dev branch)
 -   Use new perl package names.
 -   Provide groff-base.
+
+*   Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> 1.22.3-6 (from 1.0 branch)
+-   Ensure build without X11 support
+-   Don't automatically add requirements when built in the toolchain
+
 *   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
 -   Nopatch CVE-2000-0803.nopatch
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
 -   Added %%license line automatically
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22.3-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.22.3-2
 -   GA - Bump release of all rpms
+
 *   Tue Feb 23 2016 Xiaolin Li <xiaolinl@vmware.com> 1.22.3-1
 -   Updated to version 1.22.3
+
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.22.2-1
 -   Initial build. First version

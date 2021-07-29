@@ -82,7 +82,7 @@ LANG=en_US.UTF-8 tox -e py37
 -   Use tox to run tests.
 *   Wed Jul 08 2020 Henry Beberman <henry.beberman@microsoft.com> 18.2.0-6
 -   Fix typo in BuildRequires for python3-zope-interface
-*   Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> 18.2.0-5
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 18.2.0-5
 -   Added %%license line automatically
 *   Fri Apr 24 2020 Nick Samson <nisamson@microsoft.com> 18.2.0-4
 -   Updated Source0, license verified. Removed %%define sha1

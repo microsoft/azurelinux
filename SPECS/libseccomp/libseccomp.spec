@@ -71,7 +71,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Modernize spec with macros
 - Remove libtool archive files
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.1-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 * Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.4.1-1

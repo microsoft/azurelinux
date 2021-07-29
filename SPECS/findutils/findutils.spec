@@ -62,7 +62,7 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.6.0-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6.0-7
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.6.0-6

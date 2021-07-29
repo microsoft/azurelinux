@@ -6,7 +6,7 @@ Name:           rdma-core
 Version:        31.0
 Release:        2%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
@@ -617,7 +617,7 @@ fi
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 31.0-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT). License verified.
 
 * Wed Aug 19 2020 Honggang Li <honli@redhat.com> - 31.0-1
 - Rebase to upstream release v31.0

@@ -1,3 +1,4 @@
+%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 # what it's called on pypi
 %global srcname PyJWT
 # what it's imported as
@@ -6,9 +7,9 @@
 %global eggname %{srcname}
 # package name fragment
 %global pkgname %{libname}
+%global python3_version 3.7
 
 %bcond_without  python3
-%bcond_with     python2
 
 %global common_description %{expand:
 A Python implementation of JSON Web Token draft 01. This library provides a
@@ -18,7 +19,7 @@ encrypted JSON objects.}
 
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -27,39 +28,23 @@ URL:            https://github.com/jpadilla/pyjwt
 Source0:        https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
-
 %description %{common_description}
 
-
-%if %{with python2}
-%package -n python2-%{pkgname}
-Summary:        %{summary}
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-cryptography >= 1.4.0
-BuildRequires:  python2-pytest
-Requires:       python2-cryptography >= 1.4.0
-%{?python_provide:%python_provide python2-%{pkgname}}
-
-
-%description -n python2-%{pkgname} %{common_description}
-%endif
-
-
 %if %{with python3}
-%package -n python%{python3_pkgversion}-%{pkgname}
+%package -n python3-%{pkgname}
 Summary:        %{summary}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-cryptography >= 1.4.0
-BuildRequires:  python%{python3_pkgversion}-pytest
-Requires:       python%{python3_pkgversion}-cryptography >= 1.4.0
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
-
-
-%description -n python%{python3_pkgversion}-%{pkgname} %{common_description}
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-cryptography >= 1.4.0
+Requires:       python3-cryptography >= 1.4.0
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-atomicwrites
 %endif
+%{?python_provide:%python_provide python3-%{pkgname}}
 
+%description -n python3-%{pkgname} %{common_description}
+%endif
 
 %prep
 %autosetup -n %{srcname}-%{version}
@@ -67,42 +52,32 @@ rm -rf %{eggname}.egg-info
 # prevent pullng in `addopts` for pytest run later
 rm setup.cfg
 
-
 %build
-%{?with_python2:%py2_build}
-%{?with_python3:%py3_build}
-
+%{?with_python3:python3 setup.py build}
 
 %install
-%{?with_python2:%py2_install}
-%{?with_python3:%py3_install}
-
+%{?with_python3:python3 setup.py install --skip-build --root=%{buildroot}}
 
 %check
-%{?with_python2:PYTHONPATH=%{buildroot}%{python2_sitelib} py.test-%{python2_version} --verbose tests}
-%{?with_python3:PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose tests}
-
-
-%if %{with python2}
-%files -n python2-%{pkgname}
-%doc README.rst AUTHORS
-%license LICENSE
-%{python2_sitelib}/%{libname}
-%{python2_sitelib}/%{eggname}-%{version}-py%{python2_version}.egg-info
-%endif
-
+pip3 install pluggy>=0.7 more-itertools>=4.0.0 attrs==19.1.0 pytest==4.0.1
+PATH=%{buildroot}%{_bindir}:${PATH} \
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    python%{python3_version} -m pytest -v
 
 %if %{with python3}
-%files -n python%{python3_pkgversion}-%{pkgname}
+%files -n python3-%{pkgname}
 %doc README.rst AUTHORS
 %license LICENSE
 %{python3_sitelib}/%{libname}
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
+#%{python3_sitelib}/%{eggname}-%{version}-py3.7.egg-info
 %{_bindir}/pyjwt
 %endif
 
-
 %changelog
+* Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-9
+- Pass check section
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.7.1-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update Source0 to a full url instead of a macro.

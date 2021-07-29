@@ -81,6 +81,7 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 11.0.0-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 11.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

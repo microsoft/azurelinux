@@ -101,25 +101,34 @@ popd
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.6-5
 - Added %%license line automatically
 
-*   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.6-4
--   Update Source0 with valid URL.
--   Remove sha1 macro.
--   License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.6-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Jan 14 2019 Tapas Kundu <tkundu@vmware.com>1.3.6-2
--   Fix make check
-*   Wed Sep 12 2018 Tapas Kundu <tkundu@vmware.com> 1.3.6-1
--   Updated to version 1.3.6
-*   Wed Sep 20 2017 Bo Gan <ganb@vmware.com> 1.2.1-6
--   Fix build and make check issues
-*   Wed Sep 13 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.1-5
--   Update make check for bug 1900401
-*   Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-4
--   Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
-*   Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.2.1-3
--   Removed erroneous line
-*   Tue May 16 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.1-2
--   Add requires python-greenlet and python3-greenlet
-*   Thu Mar 02 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-1
--   Initial packaging for Photon
+* Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.6-4
+- Update Source0 with valid URL.
+- Remove sha1 macro.
+- License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.6-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Jan 14 2019 Tapas Kundu <tkundu@vmware.com>1.3.6-2
+- Fix make check
+
+* Wed Sep 12 2018 Tapas Kundu <tkundu@vmware.com> 1.3.6-1
+- Updated to version 1.3.6
+
+* Wed Sep 20 2017 Bo Gan <ganb@vmware.com> 1.2.1-6
+- Fix build and make check issues
+
+* Wed Sep 13 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.1-5
+- Update make check for bug 1900401
+
+* Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-4
+- Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+
+* Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.2.1-3
+- Removed erroneous line
+
+* Tue May 16 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.1-2
+- Add requires python-greenlet and python3-greenlet
+
+* Thu Mar 02 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-1
+- Initial packaging for Photon

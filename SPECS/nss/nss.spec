@@ -12,7 +12,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
 Patch0:         nss-3.44-standalone-1.patch
+Patch1:         CVE-2020-12403.patch
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel
 Provides:       %{name}-tools = %{version}-%{release}
@@ -62,9 +63,11 @@ This package contains minimal set of shared nss libraries.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 export NSS_FORCE_FIPS=1
+export NSS_DISABLE_GTESTS=1
 cd nss
 # -j is not supported by nss
 make VERBOSE=1 BUILD_OPT=1 \
@@ -93,7 +96,7 @@ install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 %check
 pushd nss/tests
 export USE_64=1
-HOST=localhost DOMSUF=localdomain BUILD_OPT=1 ./all.sh
+HOST=localhost DOMSUF=localdomain BUILD_OPT=1 NSS_CYCLES=standard ./all.sh
 popd
 
 %post   -p /sbin/ldconfig
@@ -122,12 +125,26 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-4
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-7
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 3.44-3: Fix check tests
 - niontive@microsoft.com, 3.44-4: Enable FIPS mode
+- (JOSLOBO 7/26/21: Dash Rolled from Merge)
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3
+*   Thu Jun 10 2021 Henry Beberman <henry.beberman@microsoft.com> 3.44-6
+-   Patch CVE-2020-12403
+
+*   Wed Jun 02 2021 Andrew Phelps <anphel@microsoft.com> 3.44-5
+-   Set NSS_DISABLE_GTESTS=1 to speed up build
+-   Run tests much faster by limiting to NSS_CYCLES=standard
+
+*   Wed Mar 03 2021 Nicolas Ontiveros <niontive@microsoft.com> 3.44-4
+-   Enable FIPS mode
+
+*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.44-3 (from 1.0 branch)
+-   Fix check tests
+
+*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3 (from dev branch)
 -   Provide nss-tools, -util, -static, -softokn, -softokn-devel
 -   Provide nss-pkcs11-devel, -pkcs11-devel-static
 

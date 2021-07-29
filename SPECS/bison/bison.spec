@@ -51,10 +51,11 @@ make %{?_smp_mflags} check
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4
 - Remove yacc command for compatibility with byacc package
 - Remove sha hash
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> 3.1-3
+- License verified
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
-- Initial import from Photon (license: dual Apache2/GPL2).
+- Initial CBL-Mariner import from Photon (license: Apache2).
 * Tue Sep 18 2018 Tapas Kundu <tkundu@vmware.com> 3.1-1
 - Updated to release 3.1
 * Sun Sep 09 2018 Alexey Makhalov <amakhalov@vmware.com> 3.0.4-4

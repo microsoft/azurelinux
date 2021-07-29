@@ -10,7 +10,9 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/2019
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  libsepol-devel
-BuildRequires:  pcre-devel, swig
+BuildRequires:  pcre-devel
+BuildRequires:  swig
+BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 Requires:       pcre-libs
 Requires:       libsepol
@@ -115,38 +117,53 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-*   Mon May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9-6
--   Removed python2 module support
+* Mon May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9-6
+- Removed python2 module support
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-4
--   Provide python3-libselinux for -python3 subpackage
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9-3
--   Added %%license line automatically
-*   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-2
--   Add -Wno-error=strict-overflow to resolve build break with gcc9
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-1
--   Update to 2.9. Fix Source0 URL. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.8-2
--   Added BuildRequires python2-devel
-*   Fri Aug 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 2.8-1
--   Update to version 2.8 to get it to build with gcc 7.3
-*   Thu Aug 24 2017 Alexey Makhalov <amakhalov@vmware.com> 2.6-4
--   Fix compilation issue for glibc-2.26
-*   Wed May 31 2017 Xiaolin Li <xiaolinl@vmware.com> 2.6-3
--   Include pytho3 packages.
-*   Mon May 22 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.6-2
--   Include python subpackage.
-*   Wed May 03 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.6-1
--   Upgraded to version 2.6
-*   Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 2.5-3
--   Remove pcre requires and add requires on pcre-libs
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.5-2
--   GA - Bump release of all rpms
-*   Fri Jan 22 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-1
--   Updated to version 2.5
-*   Wed Feb 25 2015 Divya Thaluru <dthaluru@vmware.com> 2.4-1
--   Initial build.  First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.9-4
+- Provide python3-libselinux for -python3 subpackage
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.9-3
+- Added %%license line automatically
+
+* Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-2
+- Add -Wno-error=strict-overflow to resolve build break with gcc9
+
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.9-1
+- Update to 2.9. Fix Source0 URL. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.8-2
+- Added BuildRequires python2-devel
+
+* Fri Aug 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 2.8-1
+- Update to version 2.8 to get it to build with gcc 7.3
+
+* Thu Aug 24 2017 Alexey Makhalov <amakhalov@vmware.com> 2.6-4
+- Fix compilation issue for glibc-2.26
+
+* Wed May 31 2017 Xiaolin Li <xiaolinl@vmware.com> 2.6-3
+- Include pytho3 packages.
+
+* Mon May 22 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.6-2
+- Include python subpackage.
+
+* Wed May 03 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.6-1
+- Upgraded to version 2.6
+
+* Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 2.5-3
+- Remove pcre requires and add requires on pcre-libs
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.5-2
+- GA - Bump release of all rpms
+
+* Fri Jan 22 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-1
+- Updated to version 2.5
+
+* Wed Feb 25 2015 Divya Thaluru <dthaluru@vmware.com> 2.4-1
+- Initial build.  First version

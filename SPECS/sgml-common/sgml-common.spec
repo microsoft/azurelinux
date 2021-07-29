@@ -12,7 +12,7 @@ BuildArch: 		noarch
 #page you could get complete ISO 8879 listing as was on the
 #old page - only part of it is included in sgml-common package.
 URL: 			http://www.w3.org/2003/entities/
-Vendor: 		Microsoft
+Vendor: 		Microsoft Corporation
 Distribution: 	Mariner
 Source0: 		ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
 # Following 4 from openjade/pubtext - same maintainer as in SGML-common, so up2date:
@@ -68,15 +68,15 @@ done
 %configure
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR="$RPM_BUILD_ROOT" htmldir='%{_datadir}/doc' INSTALL='install -p'
-mkdir $RPM_BUILD_ROOT%{_sysconfdir}/xml
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sgml/docbook
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/sgml/docbook
+rm -rf %{buildroot}
+make install DESTDIR="%{buildroot}" htmldir='%{_datadir}/doc' INSTALL='install -p'
+mkdir %{buildroot}%{_sysconfdir}/xml
+mkdir -p %{buildroot}%{_sysconfdir}/sgml/docbook
+mkdir -p %{buildroot}%{_datadir}/sgml/docbook
 # Touch SGML catalog
-touch $RPM_BUILD_ROOT%{_sysconfdir}/sgml/catalog
+touch %{buildroot}%{_sysconfdir}/sgml/catalog
 # Create an empty XML catalog.
-XMLCATALOG=$RPM_BUILD_ROOT%{_sysconfdir}/xml/catalog
+XMLCATALOG=%{buildroot}%{_sysconfdir}/xml/catalog
 %{_bindir}/xmlcatalog --noout --create $XMLCATALOG
 # ...and add xml.xsd in it
 for type in system uri ; do
@@ -117,23 +117,23 @@ done
 
 # Also create the common DocBook catalog
 %{_bindir}/xmlcatalog --noout --create \
-	$RPM_BUILD_ROOT%{_sysconfdir}/sgml/docbook/xmlcatalog
+	%{buildroot}%{_sysconfdir}/sgml/docbook/xmlcatalog
 ln -sf %{_sysconfdir}/sgml/docbook/xmlcatalog\
-	$RPM_BUILD_ROOT%{_datadir}/sgml/docbook/xmlcatalog
+	%{buildroot}%{_datadir}/sgml/docbook/xmlcatalog
 
-rm -f $RPM_BUILD_ROOT%{_datadir}/sgml/xml.dcl
+rm -f %{buildroot}%{_datadir}/sgml/xml.dcl
 install -p -m0644 %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} \
-	$RPM_BUILD_ROOT%{_datadir}/sgml
-rm -rf $RPM_BUILD_ROOT%{_datadir}/xml/*
+	%{buildroot}%{_datadir}/sgml
+rm -rf %{buildroot}%{_datadir}/xml/*
 install -p -m0644 %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE8} \
-	$RPM_BUILD_ROOT%{_datadir}/xml
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man5
-install -p -m0644 %{SOURCE9} $RPM_BUILD_ROOT%{_mandir}/man1
-install -p -m0644 %{SOURCE10} $RPM_BUILD_ROOT%{_mandir}/man5
+	%{buildroot}%{_datadir}/xml
+mkdir -p %{buildroot}%{_mandir}/man1
+mkdir -p %{buildroot}%{_mandir}/man5
+install -p -m0644 %{SOURCE9} %{buildroot}%{_mandir}/man1
+install -p -m0644 %{SOURCE10} %{buildroot}%{_mandir}/man5
 
 # remove installed doc file and prepare installation with %%doc
-rm $RPM_BUILD_ROOT%{_datadir}/doc/*.html
+rm %{buildroot}%{_datadir}/doc/*.html
 rm -rf __dist_doc/html/
 mkdir -p __dist_doc/html/
 cp -p doc/HTML/*.html __dist_doc/html/

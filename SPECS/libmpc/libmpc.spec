@@ -45,23 +45,32 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so.*
 
 %changelog
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1.0-6
--   Provide libmpc-devel
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.0-5
--   Added %%license line automatically
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1.0-4
--   Renaming mpc to libmpc
-*   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.1.0-3
--   Add #Source0. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 1.1.0-1
--   Update to version 1.1.0
-*   Mon Oct 03 2016 ChangLee <changLee@vmware.com> 1.0.3-3
--   Modified check
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0.3-2
--   GA - Bump release of all rpms
-*   Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  1.0.3-1
--   Update version.
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.0.2-1
--   Initial build. First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1.0-6
+- Provide libmpc-devel
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.0-5
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1.0-4
+- Renaming mpc to libmpc
+
+* Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.1.0-3
+- Add #Source0. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 1.1.0-1
+- Update to version 1.1.0
+
+* Mon Oct 03 2016 ChangLee <changLee@vmware.com> 1.0.3-3
+- Modified check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.0.3-2
+- GA - Bump release of all rpms
+
+* Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  1.0.3-1
+- Update version.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.0.2-1
+- Initial build. First version
