@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.103.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +17,8 @@ BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 Requires:       openssl
 Requires:       zlib
+Provides:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-lib = %{version}-%{release}
 
 %description
 ClamAV® is an open source (GPL) anti-virus engine used in a variety of situations
@@ -27,21 +27,19 @@ of utilities including a flexible and scalable multi-threaded daemon, a command
 line scanner and an advanced tool for automatic database updates.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure
-
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -60,6 +58,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-2
+- Add provides for devel, lib subpackages
+- Use make macros throughout
+
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-1
 - Updating to 0.103.2 to fix CVE-2021-1252, CVE-2021-1404, CVE-2021-1405
 

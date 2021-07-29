@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.10.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,23 +15,34 @@ Patch0:         CVE-2020-12662.patch
 Patch1:         CVE-2020-12663.nopatch
 Patch2:         CVE-2020-28935.patch
 BuildRequires:  expat-devel
+BuildRequires:  python3-devel
+BuildRequires:  swig
 BuildRequires:  systemd
 Requires:       systemd
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
+Provides:       %{name}-libs = %{version}-%{release}
 
 %description
 Unbound is a validating, recursive, and caching DNS resolver.
 
-%package    devel
+%package        devel
 Summary:        unbound development libs and headers
 Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 Requires:       expat-devel
 
-%description devel
+%description    devel
 Development files for unbound dns server
 
-%package    docs
+%package -n     python3-%{name}
+Summary:        Python 3 bindings for %{name}
+Requires:       %{name} = %{version}-%{release}
+
+%description -n python3-%{name}
+Python 3 bindings for %{name}
+
+%package        docs
 Summary:        unbound docs
 Group:          Documentation
 
@@ -42,24 +53,22 @@ unbound dns server docs
 %autosetup -p1 -n %{name}-release-%{version}
 
 %build
-./configure \
-    --prefix=%{_prefix} \
-    --bindir=%{_bindir} \
-    --libdir=%{_libdir} \
-    --sysconfdir=%{_sysconfdir} \
+%configure \
     --with-conf-file=%{_sysconfdir}/%{name}/unbound.conf \
-    --disable-static
-
-make
+    --disable-static \
+    --with-pythonmodule \
+    --with-pyunbound \
+    PYTHON=%{python3}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 install -vdm755 %{buildroot}%{_unitdir}
 install -pm 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
 %check
-make check
+%make_build check
 
 %pre
 getent group unbound >/dev/null || groupadd -r unbound
@@ -67,12 +76,7 @@ getent passwd unbound >/dev/null || \
 useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 -c "Unbound DNS resolver" unbound
 
-%post
-    /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
-
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -87,10 +91,17 @@ rm -rf %{buildroot}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
 
+%files -n python3-%{name}
+%{python3_sitelib}/*
+
 %files docs
 %{_mandir}/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-5
+- Add provides for libs subpackage from base package
+- Add python3 modules subpackage
+
 *  Mon Dec 21 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.10.0-4
 -  Fix CVE-2020-28935.
 

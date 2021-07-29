@@ -1,15 +1,14 @@
-Summary:	Boost
-Name:		boost
-Version:	1.66.0
-Release:        3%{?dist}
-License:	Boost Software License V1
-URL:		http://www.boost.org/
-Group:		System Environment/Security
+Summary:        Boost
+Name:           boost
+Version:        1.66.0
+Release:        4%{?dist}
+License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
-%define sha1 boost=b6b284acde2ad7ed49b44e856955d7b1ea4e9459
-BuildRequires:	bzip2-devel
+Group:          System Environment/Security
+URL:            https://www.boost.org/
+Source0:        https://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
+BuildRequires:  bzip2-devel
 
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
@@ -19,6 +18,7 @@ linear algebra, pseudorandom number generation, multithreading, image processing
 Summary:        Development files for boost
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
+Provides:       %{name}-signals = %{version}-%{release}
 
 %description    devel
 The boost-devel package contains libraries, header files and documentation
@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%setup -qn boost_1_66_0
+%autosetup -n %{name}_1_66_0
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -42,11 +42,7 @@ The boost-static package contains boost static libraries.
 %install
 ./b2 install threading=multi
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -63,22 +59,34 @@ rm -rf %{buildroot}/*
 %{_libdir}/libboost_*.a
 
 %changelog
-* Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.66.0-3
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.66.0-4
+- Add signals subpackage provide from the devel subpackage
+- License verified, changed to use short name
+- Lint spec
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.66.0-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.66.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Sep 11 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 1.66.0-1
--   Update to version 1.66.0
-*   Thu Apr 06 2017 Anish Swaminathan <anishs@vmware.com> 1.63.0-1
--   Upgraded to version 1.63.0
-*   Thu Mar 23 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.60.0-3
--   Build static libs in additon to shared.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.60.0-2
--   GA - Bump release of all rpms
-*   Wed Apr 27 2016 Xiaolin Li <xiaolinl@vmware.com> 1.60.0-1
--   Update to version 1.60.0.
-*   Thu Oct 01 2015 Xiaolin Li <xiaolinl@vmware.com> 1.56.0-2
-_   Move header files to devel package.
-*   Tue Feb 10 2015 Divya Thaluru <dthaluru@vmware.com> 1.56.0-1
--   Initial build. First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.66.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Sep 11 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 1.66.0-1
+- Update to version 1.66.0
+
+* Thu Apr 06 2017 Anish Swaminathan <anishs@vmware.com> - 1.63.0-1
+- Upgraded to version 1.63.0
+
+* Thu Mar 23 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.60.0-3
+- Build static libs in additon to shared.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.60.0-2
+- GA - Bump release of all rpms
+
+* Wed Apr 27 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.60.0-1
+- Update to version 1.60.0.
+
+* Thu Oct 01 2015 Xiaolin Li <xiaolinl@vmware.com> - 1.56.0-2
+- Move header files to devel package.
+
+* Tue Feb 10 2015 Divya Thaluru <dthaluru@vmware.com> - 1.56.0-1
+- Initial build. First version

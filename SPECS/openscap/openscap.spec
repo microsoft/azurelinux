@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,13 +20,14 @@ BuildRequires:  libxslt-devel
 BuildRequires:  pcre-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  popt-devel
-BuildRequires:  python2-devel
+BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
 BuildRequires:  swig
 BuildRequires:  util-linux-devel
 Requires:       curl
 Requires:       popt
 Provides:       %{name}-engine-sce = %{version}-%{release}
+Provides:       %{name}-scanner = %{version}-%{release}
 Provides:       %{name}-utils = %{version}-%{release}
 
 %description
@@ -50,33 +51,31 @@ Requires:       perl-interpreter
 %description perl
 Perl scripts.
 
-%package python
+%package -n python3-%{name}
 Summary:        openscap python
 Group:          Development/Libraries
-BuildRequires:  python2-devel
 Requires:       openscap = %{version}-%{release}
 
-%description python
-Python bindings.
+%description -n python3-%{name}
+Python 3 bindings for %{name}.
 
 %prep
-%setup -q
+%autosetup
 mkdir build
 
 %build
 cd build
 %cmake -DENABLE_PERL=ON \
        -DENABLE_SCE=ON \
-       -DPYTHON_EXECUTABLE:STRING=python2 \
-       -DPYTHON_VERSION_MAJOR:STRING=$(python2 -c "import sys; print(sys.version_info.major)") \
-       -DPYTHON_VERSION_MINOR:STRING=$(python2 -c "import sys; print(sys.version_info.minor)") \
+       -DPYTHON_EXECUTABLE:STRING=%{python3} \
+       -DPYTHON_VERSION_MAJOR:STRING=$(%{python3} -c "import sys; print(sys.version_info.major)") \
+       -DPYTHON_VERSION_MINOR:STRING=$(%{python3} -c "import sys; print(sys.version_info.minor)") \
        ..
-make %{?_smp_flags}
+%make_build
 
 %install
 cd build
 %make_install
-#make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 #%check
@@ -91,7 +90,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_prefix}/src/debug
 %exclude %{_libdir}/debug
 %{_bindir}/*
-#%{_libexecdir}/*
 %{_mandir}/man8/*
 %{_datadir}/openscap/*
 %{_libdir}/libopenscap_sce.so.*
@@ -109,46 +107,51 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/perl5/*
 %{_datadir}/perl5/vendor_perl/openscap_pm.pm
 
-%files python
+%files -n python3-%{name}
 %defattr(-,root,root)
-%{_libdir}/python2.7/*
+%{python3_sitelib}/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
+- Add provides for scanner subpackage from base package
+- Remove openscap-python python2 subpackage
+- Add python3-openscap subpackage
+
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.3.1-6
 - Provide openscap-engine-sce and openscap-utils.
 
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-5
--   Use new perl package names.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.3.1-5
+- Use new perl package names.
 
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.3.1-4
--   Explicitly set python verison.
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 1.3.1-4
+- Explicitly set python verison.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-3
+- Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.3.1-2
--   Renaming XML-Parser to perl-XML-Parser
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.3.1-2
+- Renaming XML-Parser to perl-XML-Parser
 
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.3.1-1
--   Update to 1.3.1. Remove probe directory. License fixed.
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.3.1-1
+- Update to 1.3.1. Remove probe directory. License fixed.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.17-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.17-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 1.2.17-1
--   Update to 1.2.17
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 1.2.17-1
+- Update to 1.2.17
 
-*   Thu Aug 10 2017 Rongrong Qiu <rqiu@vmware.com> 1.2.14-3
--   Disable make check which need per-XML-XPATH for bug 1900358
+* Thu Aug 10 2017 Rongrong Qiu <rqiu@vmware.com> - 1.2.14-3
+- Disable make check which need per-XML-XPATH for bug 1900358
 
-*   Fri May 5 2017 Alexey Makhalov <amakhalov@vmware.com> 1.2.14-2
--   Remove BuildRequires XML-XPath.
+* Fri May 5 2017 Alexey Makhalov <amakhalov@vmware.com> - 1.2.14-2
+- Remove BuildRequires XML-XPath.
 
-*   Mon Mar 27 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.14-1
--   Update to latest version.
+* Mon Mar 27 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.2.14-1
+- Update to latest version.
 
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.10-2
--   BuildRequires curl-devel.
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.2.10-2
+- BuildRequires curl-devel.
 
-*   Tue Sep 6 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.10-1
--   Initial build. First version
+* Tue Sep 6 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.2.10-1
+- Initial build. First version

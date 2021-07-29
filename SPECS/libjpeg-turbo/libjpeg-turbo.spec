@@ -1,7 +1,7 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
 Version:        2.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,8 @@ Patch0:         CVE-2018-20330.patch
 Patch1:         CVE-2018-19664.patch
 BuildRequires:  cmake
 Provides:       libjpeg = 6b-47
+Provides:       turbojpeg = %{version}-%{release}
+Provides:       %{name}-utils = %{version}-%{release}
 %ifarch x86_64
 BuildRequires:  nasm
 %endif
@@ -24,29 +26,29 @@ Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
 Provides:       libjpeg-devel = 6b-47
 Provides:       libjpeg-devel%{?_isa} = 6b-47
+Provides:       turbojpeg-devel = %{version}-%{release}
 
 %description    devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 mkdir build
-cd build
+pushd build
 %cmake -DCMAKE_SKIP_RPATH:BOOL=YES \
-         -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES \
-         -DENABLE_STATIC:BOOL=NO ..
-make %{?_smp_mflags}
+       -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES \
+       -DENABLE_STATIC:BOOL=NO ..
+%make_build
+popd
 
 %install
-cd build
-make DESTDIR=%{buildroot} install
+pushd build
+%make_install
+popd
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -62,36 +64,39 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.0-8
+- Add provides for turbojpeg, turbojpeg-devel packages, utils subpackage
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.0-7
 - Provide libjpeg and libjpeg-devel along with an isa version of libjpeg-devel.
 
-* Sat May 09 00:20:53 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-6
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Mar 04 2019 Keerthana K <keerthanak@vmware.com> 2.0.0-4
--   Update BuildRequires nasm only for x86_64.
+* Mon Mar 04 2019 Keerthana K <keerthanak@vmware.com> - 2.0.0-4
+- Update BuildRequires nasm only for x86_64.
 
-*   Wed Feb 06 2019 Sujay G <gsujay@vmware.com> 2.0.0-3
--   Added patch to fix CVE-2018-19664
+* Wed Feb 06 2019 Sujay G <gsujay@vmware.com> - 2.0.0-3
+- Added patch to fix CVE-2018-19664
 
-*   Thu Jan 10 2019 Sujay G <gsujay@vmware.com> 2.0.0-2
--   Added patch to fix CVE-2018-20330
+* Thu Jan 10 2019 Sujay G <gsujay@vmware.com> - 2.0.0-2
+- Added patch to fix CVE-2018-20330
 
-*   Sun Sep 20 2018 Bo Gan <ganb@vmware.com> 2.0.0-1
--   Update to 2.0.0
--   cmake build system
+* Sun Sep 20 2018 Bo Gan <ganb@vmware.com> - 2.0.0-1
+- Update to 2.0.0
+- cmake build system
 
-*   Mon Dec 11 2017 Xiaolin Li <xiaolinl@vmware.com> 1.5.2-2
--   Fix CVE-2017-15232
+* Mon Dec 11 2017 Xiaolin Li <xiaolinl@vmware.com> - 1.5.2-2
+- Fix CVE-2017-15232
 
-*   Wed Aug 09 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.2-1
--   Updated to version 1.5.2
+* Wed Aug 09 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.5.2-1
+- Updated to version 1.5.2
 
-*   Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5.1-1
--   Updated to version 1.5.1
+* Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 1.5.1-1
+- Updated to version 1.5.1
 
-*   Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> 1.5.0-1
--   Initial version
+* Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> - 1.5.0-1
+- Initial version

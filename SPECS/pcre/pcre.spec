@@ -1,7 +1,7 @@
 Summary:        Grep for perl compatible regular expressions
 Name:           pcre
 Version:        8.44
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,13 +22,13 @@ The PCRE package contains Perl Compatible Regular Expression libraries. These ar
 Summary:        Headers and static lib for pcre development
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Provides:       pkgconfig(libpcre)
+Provides:       %{name}-static = %{version}-%{release}
 
 %description    devel
 Install this package if you want do compile applications using the pcre
 library.
 
-%package libs
+%package        libs
 Summary:        Libraries for pcre
 Group:          System Environment/Libraries
 
@@ -36,32 +36,31 @@ Group:          System Environment/Libraries
 This package contains minimal set of shared pcre libraries.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-./configure --prefix=%{_prefix}                     \
-            --docdir=%{_docdir}/pcre-%{version} \
-            --enable-unicode-properties       \
-            --enable-pcre16                   \
-            --enable-pcre32                   \
-            --enable-pcregrep-libz            \
-            --enable-pcregrep-libbz2          \
-            --enable-pcretest-libreadline     \
-            --with-match-limit-recursion=16000 \
-            --disable-static
-make %{?_smp_mflags}
+%configure \
+    --docdir=%{_docdir}/pcre-%{version} \
+    --enable-unicode-properties       \
+    --enable-pcre16                   \
+    --enable-pcre32                   \
+    --enable-pcregrep-libz            \
+    --enable-pcregrep-libbz2          \
+    --enable-pcretest-libreadline     \
+    --with-match-limit-recursion=16000
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-mv -v %{buildroot}/usr/lib/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
-ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
+%make_install
+mv -v %{buildroot}%{_libdir}/libpcre.so.* %{buildroot}/lib &&
+ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
+ln -sfv $(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -81,7 +80,7 @@ make %{?_smp_mflags} check
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 %{_libdir}/*.so
-%{_libdir}/*.la
+%{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 
@@ -90,59 +89,64 @@ make %{?_smp_mflags} check
 %{_libdir}/libpcre.so.*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-3
+- Remove *.la files from devel subpackage
+- Build static libraries, add compatibility provides for static subpackage
+- Remove manual pkgconfig provides
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Thu Oct 29 2020 Joe Schmitt <joschmit@microsoft.com> - 8.44-1
 - Update to version 8.44 to fix CVE-2020-14155.
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 8.42-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.42-4
 - Added %%license line automatically
 
-*   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 8.42-3
--   Update URL.
--   Update Source0 with valid URL.
--   Remove sha1 macro.
--   License verified.
+* Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> - 8.42-3
+- Update URL.
+- Update Source0 with valid URL.
+- Remove sha1 macro.
+- License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.42-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 8.42-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Sep 11 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 8.42-1
--   Update to version 8.42
+* Tue Sep 11 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 8.42-1
+- Update to version 8.42
 
-*   Wed Dec 20 2017 Xiaolin Li <xiaolinl@vmware.com> 8.41-1
--   Update to version 8.41
+* Wed Dec 20 2017 Xiaolin Li <xiaolinl@vmware.com> - 8.41-1
+- Update to version 8.41
 
-*   Wed Jul 19 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 8.40-4
--   Added fix for CVE-2017-11164 by adding stack recursion limit
+* Wed Jul 19 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 8.40-4
+- Added fix for CVE-2017-11164 by adding stack recursion limit
 
-*   Wed May 24 2017 Divya Thaluru <dthaluru@vmware.com> 8.40-3
--   Added fixes for CVE-2017-7244, CVE-2017-7245, CVE-2017-7246, CVE-2017-7186
+* Wed May 24 2017 Divya Thaluru <dthaluru@vmware.com> - 8.40-3
+- Added fixes for CVE-2017-7244, CVE-2017-7245, CVE-2017-7246, CVE-2017-7186
 
-*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 8.40-2
--   Added -libs subpackage
+* Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> - 8.40-2
+- Added -libs subpackage
 
-*   Mon Apr 03 2017 Robert Qi <qij@vmware.com> 8.40-1
--   Update to 8.40
+* Mon Apr 03 2017 Robert Qi <qij@vmware.com> - 8.40-1
+- Update to 8.40
 
-*   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 8.39-2
--   Modified %check
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> - 8.39-2
+- Modified %%check
 
-*   Fri Sep 9 2016 Xiaolin Li <xiaolinl@vmware.com> 8.39-1
--   Update to version 8.39
+* Fri Sep 9 2016 Xiaolin Li <xiaolinl@vmware.com> - 8.39-1
+- Update to version 8.39
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 8.38-3
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 8.38-3
+- GA - Bump release of all rpms
 
-*   Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com>  8.38-2
--   Add upstream fixes patch
+* Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com>  8.38-2
+- Add upstream fixes patch
 
-*   Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 8.38-1
--   Updated to version 8.38
+* Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> - 8.38-1
+- Updated to version 8.38
 
-*   Mon Nov 30 2015 Sharath George <sharathg@vmware.com> 8.36-2
-    Add symlink for libpcre.so.1
+* Mon Nov 30 2015 Sharath George <sharathg@vmware.com> - 8.36-2
+- Add symlink for libpcre.so.1
 
-*   Thu Nov 06 2014 Sharath George <sharathg@vmware.com> 8.36-1
-    Initial version
+* Thu Nov 06 2014 Sharath George <sharathg@vmware.com> - 8.36-1
+- Initial version
