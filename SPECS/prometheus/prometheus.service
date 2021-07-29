@@ -1,0 +1,23 @@
+[Unit]
+Description=Prometheus service monitoring system and time series database
+Documentation=https://prometheus.io/docs/introduction/overview/ man:prometheus(1)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+EnvironmentFile=/etc/sysconfig/prometheus
+User=prometheus
+Group=prometheus
+ExecStart=/usr/bin/prometheus \
+          --config.file=${CONFIG_FILE} \
+          --storage.tsdb.path=${STORAGE_TSDB_PATH} \
+          --web.console.libraries=${WEB_CONSOLE_LIBRARIES_PATH} \
+          --web.console.templates=${WEB_CONSOLE_TEMPLATES_PATH} \
+          --web.listen-address=${WEB_LISTEN_ADDRESS}
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
