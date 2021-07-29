@@ -319,7 +319,6 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %clean
 rm -rf %{buildroot}
 
-
 %changelog
 * Wed Jul 28 2021 Daniel Mihai <dmihai@microsoft.com> - 1.1.1k-6
 - Enable support for TLS 1 and TLS 1.1
