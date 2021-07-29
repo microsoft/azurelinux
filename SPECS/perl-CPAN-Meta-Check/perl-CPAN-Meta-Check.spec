@@ -1,7 +1,7 @@
 Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
 Version:        0.014
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -47,6 +47,11 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %check
+# Install required module Test::Deep for make test
+export PERL_MM_USE_DEFAULT=1
+echo "yes" | cpan -a
+cpan local::lib
+cpan -i Test::Deep
 make test
 
 %files
@@ -56,6 +61,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Wed Jul 28 2021 Andrew Phelps <anphel@microsoft.com> - 0.014-13
+- Fix check test
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.014-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
