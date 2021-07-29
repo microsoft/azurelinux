@@ -62,7 +62,7 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
-* Tue Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Updating version and distrotag for future looking 2.0 branch.  Formatting fixes.
 - Remove %%clean section, buildroot cleaning step (both automatically done by RPM)
 
