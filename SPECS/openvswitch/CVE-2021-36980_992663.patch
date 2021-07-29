@@ -1,0 +1,94 @@
+From 9926637a80d0d243dbf9c49761046895e9d1a8e2 Mon Sep 17 00:00:00 2001
+From: Ilya Maximets <i.maximets@ovn.org>
+Date: Tue, 16 Feb 2021 23:27:30 +0100
+Subject: [PATCH] ofp-actions: Fix use-after-free while decoding RAW_ENCAP.
+
+While decoding RAW_ENCAP action, decode_ed_prop() might re-allocate
+ofpbuf if there is no enough space left.  However, function
+'decode_NXAST_RAW_ENCAP' continues to use old pointer to 'encap'
+structure leading to write-after-free and incorrect decoding.
+
+  ==3549105==ERROR: AddressSanitizer: heap-use-after-free on address
+  0x60600000011a at pc 0x0000005f6cc6 bp 0x7ffc3a2d4410 sp 0x7ffc3a2d4408
+  WRITE of size 2 at 0x60600000011a thread T0
+    #0 0x5f6cc5 in decode_NXAST_RAW_ENCAP lib/ofp-actions.c:4461:20
+    #1 0x5f0551 in ofpact_decode ./lib/ofp-actions.inc2:4777:16
+    #2 0x5ed17c in ofpacts_decode lib/ofp-actions.c:7752:21
+    #3 0x5eba9a in ofpacts_pull_openflow_actions__ lib/ofp-actions.c:7791:13
+    #4 0x5eb9fc in ofpacts_pull_openflow_actions lib/ofp-actions.c:7835:12
+    #5 0x64bb8b in ofputil_decode_packet_out lib/ofp-packet.c:1113:17
+    #6 0x65b6f4 in ofp_print_packet_out lib/ofp-print.c:148:13
+    #7 0x659e3f in ofp_to_string__ lib/ofp-print.c:1029:16
+    #8 0x659b24 in ofp_to_string lib/ofp-print.c:1244:21
+    #9 0x65a28c in ofp_print lib/ofp-print.c:1288:28
+    #10 0x540d11 in ofctl_ofp_parse utilities/ovs-ofctl.c:2814:9
+    #11 0x564228 in ovs_cmdl_run_command__ lib/command-line.c:247:17
+    #12 0x56408a in ovs_cmdl_run_command lib/command-line.c:278:5
+    #13 0x5391ae in main utilities/ovs-ofctl.c:179:9
+    #14 0x7f6911ce9081 in __libc_start_main (/lib64/libc.so.6+0x27081)
+    #15 0x461fed in _start (utilities/ovs-ofctl+0x461fed)
+
+Fix that by getting a new pointer before using.
+
+Credit to OSS-Fuzz.
+
+Fuzzer regression test will fail only with AddressSanitizer enabled.
+
+Reported-at: https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=27851
+Fixes: f839892a206a ("OF support and translation of generic encap and decap")
+Acked-by: William Tu <u9012063@gmail.com>
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+ lib/ofp-actions.c                                       | 2 ++
+ tests/automake.mk                                       | 3 ++-
+ tests/fuzz-regression-list.at                           | 1 +
+ tests/fuzz-regression/ofp_print_fuzzer-6540965472632832 | 0
+ 4 files changed, 5 insertions(+), 1 deletion(-)
+ create mode 100644 tests/fuzz-regression/ofp_print_fuzzer-6540965472632832
+
+diff --git a/lib/ofp-actions.c b/lib/ofp-actions.c
+index ddef3b0c878..11b841732df 100644
+--- a/lib/ofp-actions.c
++++ b/lib/ofp-actions.c
+@@ -4346,6 +4346,7 @@ decode_NXAST_RAW_ENCAP(const struct nx_action_encap *nae,
+ {
+     struct ofpact_encap *encap;
+     const struct ofp_ed_prop_header *ofp_prop;
++    const size_t encap_ofs = out->size;
+     size_t props_len;
+     uint16_t n_props = 0;
+     int err;
+@@ -4373,6 +4374,7 @@ decode_NXAST_RAW_ENCAP(const struct nx_action_encap *nae,
+         }
+         n_props++;
+     }
++    encap = ofpbuf_at_assert(out, encap_ofs, sizeof *encap);
+     encap->n_props = n_props;
+     out->header = &encap->ofpact;
+     ofpact_finish_ENCAP(out, &encap);
+diff --git a/tests/automake.mk b/tests/automake.mk
+index 2d5f7d1a6ef..e199bcc4ad3 100644
+--- a/tests/automake.mk
++++ b/tests/automake.mk
+@@ -139,7 +139,8 @@ FUZZ_REGRESSION_TESTS = \
+ 	tests/fuzz-regression/ofp_print_fuzzer-5722747668791296 \
+ 	tests/fuzz-regression/ofp_print_fuzzer-6285128790704128 \
+ 	tests/fuzz-regression/ofp_print_fuzzer-6470117922701312 \
+-	tests/fuzz-regression/ofp_print_fuzzer-6502620041576448
++	tests/fuzz-regression/ofp_print_fuzzer-6502620041576448 \
++	tests/fuzz-regression/ofp_print_fuzzer-6540965472632832
+ $(srcdir)/tests/fuzz-regression-list.at: tests/automake.mk
+ 	$(AM_V_GEN)for name in $(FUZZ_REGRESSION_TESTS); do \
+             basename=`echo $$name | sed 's,^.*/,,'`; \
+diff --git a/tests/fuzz-regression-list.at b/tests/fuzz-regression-list.at
+index e3173fb88f0..2347c690eff 100644
+--- a/tests/fuzz-regression-list.at
++++ b/tests/fuzz-regression-list.at
+@@ -21,3 +21,4 @@ TEST_FUZZ_REGRESSION([ofp_print_fuzzer-5722747668791296])
+ TEST_FUZZ_REGRESSION([ofp_print_fuzzer-6285128790704128])
+ TEST_FUZZ_REGRESSION([ofp_print_fuzzer-6470117922701312])
+ TEST_FUZZ_REGRESSION([ofp_print_fuzzer-6502620041576448])
++TEST_FUZZ_REGRESSION([ofp_print_fuzzer-6540965472632832])
+diff --git a/tests/fuzz-regression/ofp_print_fuzzer-6540965472632832 b/tests/fuzz-regression/ofp_print_fuzzer-6540965472632832
+new file mode 100644
+index 00000000000..e69de29bb2d

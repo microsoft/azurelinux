@@ -3,13 +3,19 @@
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
 Version:        2.12.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-36980_38744b.patch
+Patch1: CVE-2021-36980_65c61b.patch
+Patch2: CVE-2021-36980_6d6731.patch
+Patch3: CVE-2021-36980_77cccc.patch
+Patch4: CVE-2021-36980_8ce8dc.patch
+Patch5: CVE-2021-36980_992663.patch
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng
 BuildRequires:  libcap-ng-devel
@@ -289,6 +295,11 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/ovn-trace.8.gz
 
 %changelog
+*   Thu Jul 29 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.12.3-3
+-   Added patch file(s) CVE-2021-36980_38744b.patch,
+-   CVE-2021-36980_65c61b.patch, CVE-2021-36980_6d6731.patch,
+-   CVE-2021-36980_77cccc.patch, CVE-2021-36980_8ce8dc.patch,
+-   CVE-2021-36980_992663.patch
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-2
 - Don't include static libraries in openvswitch package
 
