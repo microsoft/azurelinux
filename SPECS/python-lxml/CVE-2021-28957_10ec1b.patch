@@ -1,0 +1,22 @@
+From 10ec1b4e9f93713513a3264ed6158af22492f270 Mon Sep 17 00:00:00 2001
+From: Kevin Chung <kchung@nyu.edu>
+Date: Sat, 20 Mar 2021 02:49:25 -0400
+Subject: [PATCH] Add formaction attribute to defs.link_attrs
+
+---
+ src/lxml/html/defs.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/lxml/html/defs.py b/src/lxml/html/defs.py
+index 1b3a75b36..2058ea330 100644
+--- a/src/lxml/html/defs.py
++++ b/src/lxml/html/defs.py
+@@ -23,6 +23,8 @@
+     'usemap',
+     # Not standard:
+     'dynsrc', 'lowsrc',
++    # HTML5 formaction
++    'formaction'
+     ])
+ 
+ # Not in the HTML 4 spec:

@@ -1,0 +1,87 @@
+From a5f9cb52079dc57477c460dbe6ba0f775e14a999 Mon Sep 17 00:00:00 2001
+From: Stefan Behnel <stefan_ml@behnel.de>
+Date: Sun, 21 Mar 2021 15:11:30 +0100
+Subject: [PATCH] Prepare release of lxml 4.6.3.
+
+---
+ CHANGES.txt          | 11 +++++++++++
+ doc/main.txt         | 10 +++++++---
+ src/lxml/__init__.py |  2 +-
+ 3 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/CHANGES.txt b/CHANGES.txt
+index e3b771401..22f4d450b 100644
+--- a/CHANGES.txt
++++ b/CHANGES.txt
+@@ -2,6 +2,17 @@
+ lxml changelog
+ ==============
+ 
++4.6.3 (2021-03-21)
++==================
++
++Bugs fixed
++----------
++
++* A vulnerability (CVE-2021-28957) was discovered in the HTML Cleaner by Kevin Chung,
++  which allowed JavaScript to pass through.  The cleaner now removes the HTML5
++  ``formaction`` attribute.
++
++
+ 4.6.2 (2020-11-26)
+ ==================
+ 
+diff --git a/doc/main.txt b/doc/main.txt
+index d42c66a33..ead457d6f 100644
+--- a/doc/main.txt
++++ b/doc/main.txt
+@@ -159,8 +159,8 @@ Index <http://pypi.python.org/pypi/lxml/>`_ (PyPI).  It has the source
+ that compiles on various platforms.  The source distribution is signed
+ with `this key <pubkey.asc>`_.
+ 
+-The latest version is `lxml 4.6.2`_, released 2020-11-26
+-(`changes for 4.6.2`_).  `Older versions <#old-versions>`_
++The latest version is `lxml 4.6.3`_, released 2021-03-21
++(`changes for 4.6.3`_).  `Older versions <#old-versions>`_
+ are listed below.
+ 
+ Please take a look at the
+@@ -256,7 +256,9 @@ See the websites of lxml
+ ..
+    and the `latest in-development version <http://lxml.de/dev/>`_.
+ 
+-.. _`PDF documentation`: lxmldoc-4.6.2.pdf
++.. _`PDF documentation`: lxmldoc-4.6.3.pdf
++
++* `lxml 4.6.3`_, released 2021-03-21 (`changes for 4.6.3`_)
+ 
+ * `lxml 4.6.2`_, released 2020-11-26 (`changes for 4.6.2`_)
+ 
+@@ -280,6 +282,7 @@ See the websites of lxml
+ 
+ * `older releases <http://lxml.de/4.3/#old-versions>`_
+ 
++.. _`lxml 4.6.3`: /files/lxml-4.6.3.tgz
+ .. _`lxml 4.6.2`: /files/lxml-4.6.2.tgz
+ .. _`lxml 4.6.1`: /files/lxml-4.6.1.tgz
+ .. _`lxml 4.6.0`: /files/lxml-4.6.0.tgz
+@@ -291,6 +294,7 @@ See the websites of lxml
+ .. _`lxml 4.4.1`: /files/lxml-4.4.1.tgz
+ .. _`lxml 4.4.0`: /files/lxml-4.4.0.tgz
+ 
++.. _`changes for 4.6.3`: /changes-4.6.3.html
+ .. _`changes for 4.6.2`: /changes-4.6.2.html
+ .. _`changes for 4.6.1`: /changes-4.6.1.html
+ .. _`changes for 4.6.0`: /changes-4.6.0.html
+diff --git a/src/lxml/__init__.py b/src/lxml/__init__.py
+index ed50c4bbf..c569544b6 100644
+--- a/src/lxml/__init__.py
++++ b/src/lxml/__init__.py
+@@ -1,6 +1,6 @@
+ # this is a package
+ 
+-__version__ = "4.6.2"
++__version__ = "4.6.3"
+ 
+ 
+ def get_include():

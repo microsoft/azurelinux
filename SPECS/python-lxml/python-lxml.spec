@@ -2,7 +2,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
@@ -12,6 +12,8 @@ Distribution:   Mariner
 # Source0:      https://files.pythonhosted.org/packages/ca/63/139b710671c1655aed3b20c1e6776118c62e9f9311152f4c6031e12a0554/lxml-%{version}.tar.gz
 Source0:        lxml-%{version}.tar.gz
 Patch0:         lxml-make-check-fix.patch
+Patch1: CVE-2021-28957_a5f9cb.patch
+Patch2: CVE-2021-28957_10ec1b.patch
 
 BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
@@ -35,6 +37,8 @@ Python 3 version.
 %prep
 %setup -q -n lxml-%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
 %build
 python3 setup.py build
@@ -59,6 +63,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Fri Jul 30 2021 Mariner Autopatcher <cblmargh@microsoft.com> 4.2.4-8
+-   Added patch file(s) CVE-2021-28957_a5f9cb.patch,
+-   CVE-2021-28957_10ec1b.patch
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> 4.2.4-7
 -   Remove python2 support.
 -   License verified.
