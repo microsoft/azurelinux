@@ -114,16 +114,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.15",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "at",
           "version": "3.1.23",
           "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
@@ -1127,26 +1117,6 @@
           "name": "dosfstools",
           "version": "4.1",
           "downloadUrl": "http://github.com/dosfstools/dosfstools/releases/download/v4.1/dosfstools-4.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dotnet-runtime-3.1",
-          "version": "3.1.15",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/692284f9-e1e7-4b31-9191-cd8043441024/ac45c17d4327b1f992b7fe3956a99129/dotnet-runtime-3.1.15-linux-x64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dotnet-sdk-3.1",
-          "version": "3.1.115",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
         }
       }
     },
