@@ -1,0 +1,19 @@
+From 0d8a3127e35886ce9284810a7f2438bff6b43cbc Mon Sep 17 00:00:00 2001
+From: Bob Aman <bob@sporkmonger.com>
+Date: Fri, 2 Jul 2021 21:10:39 -0700
+Subject: [PATCH] Adding note about ReDoS vulnerability
+
+---
+ CHANGELOG.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 53de839..4a9f866 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,4 +1,5 @@
+ # Addressable 2.8.0
++- fixes ReDoS vulnerability in Addressable::Template#match
+ - no longer replaces `+` with spaces in queries for non-http(s) schemes
+ - fixed encoding ipv6 literals
+ - the `:compacted` flag for `normalized_query` now dedupes parameters
