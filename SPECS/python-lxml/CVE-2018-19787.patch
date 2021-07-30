@@ -1,0 +1,67 @@
+From 6be1d081b49c97cfd7b3fbd934a193b668629109 Mon Sep 17 00:00:00 2001
+From: Stefan Behnel <stefan_ml@behnel.de>
+Date: Sun, 9 Sep 2018 16:44:17 +0200
+Subject: [PATCH] Fix: make the cleaner also remove javascript URLs that use
+ escaping.
+
+---
+ src/lxml/html/clean.py             | 5 +++--
+ src/lxml/html/tests/test_clean.txt | 6 +++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/lxml/html/clean.py b/src/lxml/html/clean.py
+index adc3f450e..11da2958e 100644
+--- a/src/lxml/html/clean.py
++++ b/src/lxml/html/clean.py
+@@ -8,9 +8,10 @@
+ import copy
+ try:
+     from urlparse import urlsplit
++    from urllib import unquote_plus
+ except ImportError:
+     # Python 3
+-    from urllib.parse import urlsplit
++    from urllib.parse import urlsplit, unquote_plus
+ from lxml import etree
+ from lxml.html import defs
+ from lxml.html import fromstring, XHTML_NAMESPACE
+@@ -482,7 +483,7 @@ def _kill_elements(self, doc, condition, iterate=None):
+ 
+     def _remove_javascript_link(self, link):
+         # links like "j a v a s c r i p t:" might be interpreted in IE
+-        new = _substitute_whitespace('', link)
++        new = _substitute_whitespace('', unquote_plus(link))
+         if _is_javascript_scheme(new):
+             # FIXME: should this be None to delete?
+             return ''
+diff --git a/src/lxml/html/tests/test_clean.txt b/src/lxml/html/tests/test_clean.txt
+index c78ab4f13..2824f64ce 100644
+--- a/src/lxml/html/tests/test_clean.txt
++++ b/src/lxml/html/tests/test_clean.txt
+@@ -18,7 +18,7 @@
+ ...   <body onload="evil_function()">
+ ...     <!-- I am interpreted for EVIL! -->
+ ...     <a href="javascript:evil_function()">a link</a>
+-...     <a href="j\x01a\x02v\x03a\x04s\x05c\x06r\x07i\x0Ep t:evil_function()">a control char link</a>
++...     <a href="j\x01a\x02v\x03a\x04s\x05c\x06r\x07i\x0Ep t%20:evil_function()">a control char link</a>
+ ...     <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgidGVzdCIpOzwvc2NyaXB0Pg==">data</a>
+ ...     <a href="#" onclick="evil_function()">another link</a>
+ ...     <p onclick="evil_function()">a paragraph</p>
+@@ -51,7 +51,7 @@
+   <body onload="evil_function()">
+     <!-- I am interpreted for EVIL! -->
+     <a href="javascript:evil_function()">a link</a>
+-    <a href="javascrip t:evil_function()">a control char link</a>
++    <a href="javascrip t%20:evil_function()">a control char link</a>
+     <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgidGVzdCIpOzwvc2NyaXB0Pg==">data</a>
+     <a href="#" onclick="evil_function()">another link</a>
+     <p onclick="evil_function()">a paragraph</p>
+@@ -84,7 +84,7 @@
+   <body onload="evil_function()">
+     <!-- I am interpreted for EVIL! -->
+     <a href="javascript:evil_function()">a link</a>
+-    <a href="javascrip%20t:evil_function()">a control char link</a>
++    <a href="javascrip%20t%20:evil_function()">a control char link</a>
+     <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgidGVzdCIpOzwvc2NyaXB0Pg==">data</a>
+     <a href="#" onclick="evil_function()">another link</a>
+     <p onclick="evil_function()">a paragraph</p>
