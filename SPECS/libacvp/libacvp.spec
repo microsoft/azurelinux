@@ -1,7 +1,7 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,7 +11,6 @@ URL:            https://github.com/cisco/libacvp
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         app_fips_lcl.patch
 Patch1:         dsa.patch
-Patch2:         aes.patch
 Patch3:         ecdsa.patch
 Patch4:         kas.patch
 Patch5:         rsa.patch
@@ -69,6 +68,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
+* Fri Jul 23 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-3
+- Additional bug fixes
+
 * Fri Jul 23 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-2
 - Additional bug fixes
 
