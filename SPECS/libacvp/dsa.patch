@@ -196,7 +196,7 @@
 +            DSA_set0_pqg(dsa, BN_dup(p), BN_dup(q), BN_dup(g));
 +
 +            if (FIPS_dsa_builtin_paramgen2(dsa, L, N, md,
-+                                      tc->seed, tc->seedlen, 0, NULL,
++                                      tc->seed, tc->seedlen, -1, NULL,
 +                                      NULL, &h2, NULL) < 0) {
 +                printf("Parameter Generation error\n");
 +                DSA_free(dsa);
@@ -296,16 +296,16 @@
 +            g = BN_new();
 +            BN_bin2bn(tc->p, tc->p_len, p);
 +            BN_bin2bn(tc->q, tc->q_len, q);
-+
+ 
 +            tmp_p = BN_dup(p);
 +            tmp_q = BN_dup(q);
 +            tmp_g = BN_dup(g);
 +            DSA_set0_pqg(dsa, tmp_p, tmp_q, tmp_g);
- 
++
 +            L = tc->l;
 +            N = tc->n;
 +            if (FIPS_dsa_builtin_paramgen2(dsa, L, N, md,
-+                                      NULL, 0, 0, NULL,
++                                      NULL, 0, -1, NULL,
 +                                      NULL, NULL, NULL) <= 0) {
 +                ERR_print_errors_fp(stdout);
 +                printf("DSA Parameter Generation2 error for %d\n", tc->gen_pq);
