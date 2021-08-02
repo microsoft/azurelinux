@@ -13,12 +13,14 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  gcc
 BuildRequires:  gettext >= 0.19.7
 BuildRequires:  glib-devel
+BuildRequires:  glib-networking
 BuildRequires:  gnutls-devel >= 3.4.3
 BuildRequires:  json-glib-devel
 BuildRequires:  krb5-devel >= 1.11
 BuildRequires:  libssh-devel >= 0.8.5
 BuildRequires:  make
 BuildRequires:  openssl-devel
+BuildRequires:  openssh
 BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
 BuildRequires:  /usr/bin/python3
