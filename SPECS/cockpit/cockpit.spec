@@ -21,6 +21,7 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
+BuildRequires:  /usr/bin/python3
 BuildRequires:  sed
 BuildRequires:  systemd-devel >= 235
 BuildRequires:  which

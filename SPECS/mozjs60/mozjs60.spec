@@ -61,7 +61,6 @@ popd
 rm -rf ../../modules/zlib
 
 %build
-if test -h /dev/shm; then mkdir -pv $(readlink /dev/shm); fi
 # Enable LTO
 export AR=%{_bindir}/gcc-ar
 export RANLIB=%{_bindir}/gcc-ranlib
