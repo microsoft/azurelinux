@@ -129,7 +129,7 @@ popd
 %changelog
 * Fri Jul 30 2021 Thomas Crain <thcrain@microsoft.com> - 20.3.0-1
 - Upgrade to version 20.3.0 to fix CVE-2020-10108, CVE-2020-10109
-- Use %autosetup instead of %setup & %patch
+- Use %%autosetup instead of %%setup and %%patch
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 19.2.1-5
 - Added %%license line automatically
