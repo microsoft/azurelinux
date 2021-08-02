@@ -4,7 +4,8 @@ Version: 4.4
 Release: 1%{?dist}
 License: GPLv2+
 URL: https://github.com/plougher/squashfs-tools
-Source0: https://github.com/plougher/squashfs-tools/archive/refs/tags/%{name}-%{version}.tar.gz
+# source0: https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz
+Source0: %{name}-%{version}.tar.gz
 Source1: mksquashfs.1
 Source2: unsquashfs.1
 
