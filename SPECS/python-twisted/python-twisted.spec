@@ -3,13 +3,13 @@
 
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
-Version:        19.2.1
-Release:        5%{?dist}
+Version:        20.3.0
+Release:        1%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Url:            https://twistedmatrix.com
+URL:            https://twistedmatrix.com
 Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{version}.tar.bz2
 Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
@@ -38,6 +38,7 @@ Requires:       python-incremental
 Requires:       python-constantly
 Requires:       python-hyperlink
 Requires:       python-attrs
+
 %description
 Twisted is an event-driven networking engine written in Python and licensed under the open source ​MIT license. Twisted runs on Python 2 and an ever growing subset also works with Python 3.
 
@@ -59,9 +60,7 @@ Requires:       python3-attrs
 Python 3 version.
 
 %prep
-%setup -q -n Twisted-%{version}
-%patch0 -p1
-%patch1 -p1
+%autosetup -p 1 -n Twisted-%{version}
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -128,48 +127,71 @@ popd
 %{_bindir}/cftp3
 
 %changelog
+* Fri Jul 30 2021 Thomas Crain <thcrain@microsoft.com> - 20.3.0-1
+- Upgrade to version 20.3.0 to fix CVE-2020-10108, CVE-2020-10109
+- Use %%autosetup instead of %%setup and %%patch
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 19.2.1-5
 - Added %%license line automatically
 
 * Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 19.2.1-4
 - Renaming python-zope.interface to python-zope-interface
+
 * Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 19.2.1-3
 - Renaming python-pyOpenSSL to pyOpenSSL
+
 * Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 19.2.1-2
 - Renaming python-Twisted to python-twisted
+
 * Thu Mar 19 2020 Paul Monson <paulmon@microsoft.com> 19.2.1-1
 - Update to 19.2.1. Fix Source0 URL. License verified.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 18.7.0-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Tue Oct 30 2018 Tapas Kundu <tkundu@vmware.com> 18.7.0-2
 - Moved build requires from subpackage
 - Added attrs package in requires.
+
 * Thu Sep 13 2018 Tapas Kundu <tkundu@vmware.com> 18.7.0-1
 - Upgraded to release 18.7.0
+
 * Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 17.5.0-3
 - Remove BuildArch
+
 * Mon Sep 11 2017 Dheeraj Shetty <dheerajs@vmware.com> 17.5.0-2
 - Added python-automat, python-hyperlink and its python3 version to the
 - requires.
+
 * Tue Aug 29 2017 Dheeraj Shetty <dheerajs@vmware.com> 17.5.0-1
 - Upgrade version
+
 * Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 17.1.0-6
 - Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+
 * Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 17.1.0-5
 - Adding python3 scripts to bin directory
+
 * Tue May 09 2017 Rongrong Qiu <rqiu@vmware.com> 17.1.0-4
 - Added python-constantly to the requires.
+
 * Mon Mar 27 2017 Xiaolin Li <xiaolinl@vmware.com> 17.1.0-3
 - Added python-netaddr and python-incremental to the requires.
+
 * Thu Mar 23 2017 Xiaolin Li <xiaolinl@vmware.com> 17.1.0-2
 - Change requires
+
 * Wed Mar 01 2017 Xiaolin Li <xiaolinl@vmware.com> 17.1.0-1
 - Added python3 package and updated to version 17.1.0.
+
 * Mon Oct 10 2016 ChangLee <changlee@vmware.com> 15.5.0-3
 - Modified %check
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 15.5.0-2
 - GA - Bump release of all rpms
+
 * Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 15.5.0-1
 - Upgrade version
+
 * Tue Oct 27 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
