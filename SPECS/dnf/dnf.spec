@@ -19,6 +19,7 @@ BuildRequires:  gettext
 BuildRequires:  systemd
 BuildRequires:  bash-completion
 BuildRequires:  python3-sphinx
+BuildRequires:  sudo
 Requires:       python3
 Requires:       python3-%{name}
 
