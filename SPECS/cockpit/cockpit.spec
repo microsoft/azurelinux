@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
 Source0:        https://github.com/cockpit-project/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
+BuildRequires:  %{_bindir}/python3
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  e2fsprogs-devel
@@ -19,11 +20,10 @@ BuildRequires:  json-glib-devel
 BuildRequires:  krb5-devel >= 1.11
 BuildRequires:  libssh-devel >= 0.8.5
 BuildRequires:  make
-BuildRequires:  openssl-devel
 BuildRequires:  openssh
+BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
-BuildRequires:  /usr/bin/python3
 BuildRequires:  sed
 BuildRequires:  sudo
 BuildRequires:  systemd-devel >= 235
@@ -86,27 +86,27 @@ sudo -u test make check
 %{_libdir}/security/pam_ssh_add.so
 %{_libexecdir}/cockpit-*
 %{_sbindir}/remotectl
-/usr/share/locale/ca/LC_MESSAGES/cockpit.mo
-/usr/share/locale/cs/LC_MESSAGES/cockpit.mo
-/usr/share/locale/de/LC_MESSAGES/cockpit.mo
-/usr/share/locale/es/LC_MESSAGES/cockpit.mo
-/usr/share/locale/fi/LC_MESSAGES/cockpit.mo
-/usr/share/locale/fr/LC_MESSAGES/cockpit.mo
-/usr/share/locale/he/LC_MESSAGES/cockpit.mo
-/usr/share/locale/it/LC_MESSAGES/cockpit.mo
-/usr/share/locale/ja/LC_MESSAGES/cockpit.mo
-/usr/share/locale/ko/LC_MESSAGES/cockpit.mo
-/usr/share/locale/nb_NO/LC_MESSAGES/cockpit.mo
-/usr/share/locale/nl/LC_MESSAGES/cockpit.mo
-/usr/share/locale/pl/LC_MESSAGES/cockpit.mo
-/usr/share/locale/pt_BR/LC_MESSAGES/cockpit.mo
-/usr/share/locale/ru/LC_MESSAGES/cockpit.mo
-/usr/share/locale/sk/LC_MESSAGES/cockpit.mo
-/usr/share/locale/sv/LC_MESSAGES/cockpit.mo
-/usr/share/locale/tr/LC_MESSAGES/cockpit.mo
-/usr/share/locale/uk/LC_MESSAGES/cockpit.mo
-/usr/share/locale/zh_CN/LC_MESSAGES/cockpit.mo
-/usr/share/locale/zh_TW/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/ca/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/cs/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/de/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/es/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/fi/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/fr/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/he/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/it/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/ja/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/ko/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/nb_NO/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/nl/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/pl/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/pt_BR/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/ru/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/sk/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/sv/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/tr/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/uk/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/zh_CN/LC_MESSAGES/cockpit.mo
+%{_datadir}/locale/zh_TW/LC_MESSAGES/cockpit.mo
 
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
