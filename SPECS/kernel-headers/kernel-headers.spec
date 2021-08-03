@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        5.10.52.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
+Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 BuildArch:      noarch
 
 %description
@@ -16,6 +17,7 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%patch0 -p1
 
 %build
 make mrproper
@@ -35,6 +37,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
+- Add patch to fix CDROM eject errors
+
 * Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
 - Update source to 5.10.52.1
 
