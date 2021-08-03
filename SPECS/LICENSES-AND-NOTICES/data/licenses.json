@@ -29,6 +29,7 @@
                 "cpprest",
                 "cryptsetup",
                 "CUnit",
+                "dbus-python",
                 "dnf",
                 "docbook5-schemas",
                 "dos2unix",
@@ -846,6 +847,13 @@
             "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
             "specs": [
                 "ceph"
+            ]
+        },
+        {
+            "origin": "rpm-software-management",
+            "license": "[GPLv2+](https://github.com/rpm-software-management/dnf-plugins-core/blob/master/COPYING)",
+            "specs": [
+                "dnf-plugins-core"
             ]
         }
     ]
