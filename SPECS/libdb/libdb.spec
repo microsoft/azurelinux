@@ -1,11 +1,10 @@
 Summary:	The Berkley DB database library for C
 Name:		libdb
 Version:	5.3.28
-Release:        4%{?dist}
+Release:    5%{?dist}
 License:	BSD and LGPLv2 and Sleepycat
 URL:		https://oss.oracle.com/berkeley-db.html
 Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
-%define sha1 db=fa3f8a41ad5101f43d08bc0efb6241c9b6fc1ae9
 Group:		System/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +28,7 @@ The package contains the DB doc files
 
 %prep
 %setup -q -n db-%{version}
+
 %build
 cd build_unix
 ../dist/configure \
@@ -67,12 +67,13 @@ rm -rf %{buildroot}
 %{_includedir}/*
 
 %changelog
+* Tue Aug 03 2021 Nicolas guibourge <nicolasg@microsoft.com> - 5.3.28-5
+- Nopatch CVE-2017-3604 to CVE-2017-3617 and CVE-2020-2981
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.3.28-4
 - Added %%license line automatically
-
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.3.28-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.28-2
--   Aarch64 support
-*	Thu Oct 27 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.28-1
--	Initial build. First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.3.28-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 5.3.28-2
+- Aarch64 support
+* Thu Oct 27 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.28-1
+- Initial build. First version
