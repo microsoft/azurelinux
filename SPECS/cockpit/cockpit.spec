@@ -25,6 +25,7 @@ BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
 BuildRequires:  /usr/bin/python3
 BuildRequires:  sed
+BuildRequires:  sudo
 BuildRequires:  systemd-devel >= 235
 BuildRequires:  which
 BuildRequires:  zlib-devel
@@ -61,7 +62,10 @@ chmod -R go+rx %{buildroot}%{_datadir}/cockpit
 chmod o+rx %{buildroot}%{_sysconfdir}/cockpit
 
 %check
-make check
+# These tests cannot be run as root
+chmod g+w . -R
+useradd test -G root -m
+sudo -u test make check
 
 %files
 %license COPYING COPYING.node
@@ -82,6 +86,27 @@ make check
 %{_libdir}/security/pam_ssh_add.so
 %{_libexecdir}/cockpit-*
 %{_sbindir}/remotectl
+/usr/share/locale/ca/LC_MESSAGES/cockpit.mo
+/usr/share/locale/cs/LC_MESSAGES/cockpit.mo
+/usr/share/locale/de/LC_MESSAGES/cockpit.mo
+/usr/share/locale/es/LC_MESSAGES/cockpit.mo
+/usr/share/locale/fi/LC_MESSAGES/cockpit.mo
+/usr/share/locale/fr/LC_MESSAGES/cockpit.mo
+/usr/share/locale/he/LC_MESSAGES/cockpit.mo
+/usr/share/locale/it/LC_MESSAGES/cockpit.mo
+/usr/share/locale/ja/LC_MESSAGES/cockpit.mo
+/usr/share/locale/ko/LC_MESSAGES/cockpit.mo
+/usr/share/locale/nb_NO/LC_MESSAGES/cockpit.mo
+/usr/share/locale/nl/LC_MESSAGES/cockpit.mo
+/usr/share/locale/pl/LC_MESSAGES/cockpit.mo
+/usr/share/locale/pt_BR/LC_MESSAGES/cockpit.mo
+/usr/share/locale/ru/LC_MESSAGES/cockpit.mo
+/usr/share/locale/sk/LC_MESSAGES/cockpit.mo
+/usr/share/locale/sv/LC_MESSAGES/cockpit.mo
+/usr/share/locale/tr/LC_MESSAGES/cockpit.mo
+/usr/share/locale/uk/LC_MESSAGES/cockpit.mo
+/usr/share/locale/zh_CN/LC_MESSAGES/cockpit.mo
+/usr/share/locale/zh_TW/LC_MESSAGES/cockpit.mo
 
 %changelog
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 248-1
