@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -323,6 +323,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
+- In FIPS mode, perform Linux RNG concatenation even if adin/pers functions
+- aren't defined in given DRBG
+
 * Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-4
 - In FIPS mode, use jitterentropy for DRBG nonce.
 - In FIPS mode, concatenate Linux RNG with personalization string during DRBG instantiation

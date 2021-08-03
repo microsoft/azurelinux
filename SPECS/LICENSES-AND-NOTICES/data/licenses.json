@@ -128,7 +128,6 @@
             "origin": "Microsoft",
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
-                "aspnetcore-runtime-3.1",
                 "auoms",
                 "azure-iot-sdk-c",
                 "azure-iotedge",
@@ -374,8 +373,6 @@
                 "docbook-dtd-xml",
                 "docbook-style-xsl",
                 "dosfstools",
-                "dotnet-runtime-3.1",
-                "dotnet-sdk-3.1",
                 "dracut",
                 "dstat",
                 "e2fsprogs",

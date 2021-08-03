@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "version": "1.10.11",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -107,16 +107,6 @@
           "name": "asciidoc",
           "version": "8.6.10",
           "downloadUrl": "https://github.com/asciidoc/asciidoc-py3/archive/8.6.10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "aspnetcore-runtime-3.1",
-          "version": "3.1.15",
-          "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/8aaf94dc-ce57-4d00-9d2d-70e8b760619e/2979ffe47a37c1aa5d931ee1953613f3/aspnetcore-runtime-3.1.15-linux-x64.tar.gz"
         }
       }
     },
@@ -2015,8 +2005,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.47.1.tar.gz"
+          "version": "5.10.52.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
         }
       }
     },
@@ -2345,8 +2335,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.47.1.tar.gz"
+          "version": "5.10.52.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
         }
       }
     },
@@ -2355,8 +2345,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.47.1.tar.gz"
+          "version": "5.10.52.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
         }
       }
     },
@@ -2365,8 +2355,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.47.1.tar.gz"
+          "version": "5.10.52.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
         }
       }
     },
@@ -3845,8 +3835,8 @@
         "type": "other",
         "other": {
           "name": "logrotate",
-          "version": "3.16.0",
-          "downloadUrl": "https://github.com/logrotate/logrotate//archive/3.16.0.tar.gz"
+          "version": "3.18.1",
+          "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.18.1/logrotate-3.18.1.tar.gz"
         }
       }
     },
@@ -4265,8 +4255,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.24",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
+          "version": "8.0.26",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.26.tar.gz"
         }
       }
     },
@@ -4435,8 +4425,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.0",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.0/node-v14.17.0.tar.xz"
+          "version": "14.17.2",
+          "downloadUrl": "https://nodejs.org/download/release/v14.17.2/node-v14.17.2.tar.xz"
         }
       }
     },
@@ -6555,8 +6545,8 @@
         "type": "other",
         "other": {
           "name": "python-twisted",
-          "version": "19.2.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/T/Twisted/Twisted-19.2.1.tar.bz2"
+          "version": "20.3.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/T/Twisted/Twisted-20.3.0.tar.bz2"
         }
       }
     },
@@ -7925,8 +7915,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.3",
-          "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+          "version": "4.4",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz"
         }
       }
     },

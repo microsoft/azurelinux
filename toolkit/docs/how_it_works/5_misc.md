@@ -1,6 +1,6 @@
 Miscellaneous Topics
 ===
-## Prev: [Image Generation](4_image_generation.md)
+## Prev: [Image Generation](4_image_generation.md), Next: [Build Analysis](6_analysis.md)
 - [Chroot](#chroot)
 - [Makefile Advanced Components](#makefile-advanced-components)
     - [Config Tracking](#Config-Tracking)
@@ -128,7 +128,7 @@ For each entry in `$(go_tool_list)` the define `go_util_rule` is parsed and exec
 > ```
 
 ##### `$(TOOL_BINS_DIR)/%`
-Assuming local tool rebuilding is enabled with `REBUILD_TOOLS=y` (by default the go executables are pre-built as part of the toolkit) this target will match any go executable of the form `./out/tools/tool1, ./out/tools/tool2, ...`. 
+Assuming local tool rebuilding is enabled with `REBUILD_TOOLS=y` (by default the go executables are pre-built as part of the toolkit) this target will match any go executable of the form `./out/tools/tool1, ./out/tools/tool2, ...`.
 ```makefile
 $(TOOL_BINS_DIR)/%: $(go_common_files)
     cd $(TOOLS_DIR)/$* && \
@@ -142,4 +142,4 @@ Each go tool will run a self test when it is built, if test files are available.
 ##### `$(go_common_files)`
 This variable tracks all shared files which may be used by any go tool. Shared packages are found in `./tools/internal/` while the `./tools/go.mod` and `./tools/go.sum` files track external dependencies for the go tools. If any of these files change all the go tools will rebuild.
 
-## Prev: [Image Generation](4_image_generation.md)
+## Prev: [Image Generation](4_image_generation.md), Next: [Build Analysis](6_analysis.md)

@@ -455,6 +455,9 @@ chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install rpm
 
+# rebuild pam with selinux support
+build_rpm_in_chroot_no_install pam
+
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4

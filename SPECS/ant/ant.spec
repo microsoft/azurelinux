@@ -3,8 +3,8 @@
 %define _libdir %{_prefix}/lib
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.9
-Release:        2%{?dist}
+Version:        1.10.11
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -118,6 +118,9 @@ bootstrap/bin/ant -v run-tests
 %{_bindir}/runant.pl
 
 %changelog
+*   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.10.11-1
+-   Update to version 1.10.11 to fix CVE-2021-36373 and CVE-2021-36374
+
 * Wed Nov 18 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-2
 - Add runtime requires on which. It is used to find the java executable when ant runs.
 

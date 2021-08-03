@@ -1,6 +1,6 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        14.17.0
+Version:        14.17.2
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
@@ -73,6 +73,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
+-   Update to version 14.17.2 to fix CVE-2021-22918
 *   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
 -   Update to nodejs version 14.17.0
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7

@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,10 @@ Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-22898.patch
 Patch1:         CVE-2021-22901.patch
 Patch2:         CVE-2021-22897.patch
+Patch3:         CVE-2021-22922.nopatch
+Patch4:         CVE-2021-22923.nopatch
+Patch5:         CVE-2021-22924.patch
+Patch6:         CVE-2021-22925.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -45,6 +49,10 @@ This package contains minimal set of shared curl libraries.
 %autosetup -p1
 
 %build
+# CVE-2021-22922 and CVE-2021-22923 are vulnerabilities when curl's metalink
+# feature. We do not build with "--with-libmetalink" option and are therefore
+# not affected by these CVEs, but I am placing this comment here as a reminder
+# to leave metalink disabled.
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -90,6 +98,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Jul 21 2021 Chris Co <chrco@microsoft.com> - 7.76.0-5
+- Address CVE-2021-22922, CVE-2021-22923, CVE-2021-22924, CVE-2021-22925
+
 * Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
 - CVE-2021-22897 fix
 
