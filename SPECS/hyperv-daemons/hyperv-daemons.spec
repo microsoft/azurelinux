@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.10.52.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Source102:      hypervvss.rules
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
 Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
+Patch1:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -106,6 +107,7 @@ Contains tools and scripts useful for Hyper-V guests.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 pushd tools/hv
@@ -221,6 +223,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
+- Add patch to fix VDSO in HyperV
+
 * Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
 - Add patch to fix CDROM eject errors
 

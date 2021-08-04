@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        5.10.52.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
+Patch1:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 BuildArch:      noarch
 
 %description
@@ -18,6 +19,7 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -37,6 +39,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
+- Add patch to fix VDSO in HyperV
+
 * Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
 - Add patch to fix CDROM eject errors
 
