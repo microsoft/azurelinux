@@ -6625,7 +6625,7 @@
         "type": "other",
         "other": {
           "name": "qt5-qtbase",
-          "version": "5.12.5",
+          "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.5.tar.xz"
         }
       }
@@ -6635,7 +6635,7 @@
         "type": "other",
         "other": {
           "name": "qt5-qtdeclarative",
-          "version": "5.12.5",
+          "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qtdeclarative-everywhere-src-5.12.5.tar.xz"
         }
       }
@@ -6645,7 +6645,7 @@
         "type": "other",
         "other": {
           "name": "qt5-qtsvg",
-          "version": "5.12.5",
+          "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.5.tar.xz"
         }
       }
@@ -6655,7 +6655,7 @@
         "type": "other",
         "other": {
           "name": "qt5-qttools",
-          "version": "5.12.5",
+          "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qttools-everywhere-src-5.12.5.tar.xz"
         }
       }
