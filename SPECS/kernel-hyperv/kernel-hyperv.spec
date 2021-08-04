@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.42.1
-Release:        3%{?dist}
+Version:        5.10.52.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
+Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -90,6 +91,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%patch0 -p1
 
 %build
 make mrproper
@@ -267,6 +269,21 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
+- Add patch to fix CDROM eject errors
+
+* Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
+- Update source to 5.10.52.1
+
+* Mon Jul 19 2021 Chris Co <chrco@microsoft.com> - 5.10.47.1-2
+- Enable CONFIG_CONNECTOR and CONFIG_PROC_EVENTS
+
+* Tue Jul 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.47.1-1
+- Update source to 5.10.47.1
+
+* Wed Jun 30 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-4
+- Bump release number to match kernel release
+
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.42.1-3
 - Enable CONFIG_IOSCHED_BFQ and CONFIG_BFQ_GROUP_IOSCHED configs
 

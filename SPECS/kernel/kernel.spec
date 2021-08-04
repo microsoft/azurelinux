@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.42.1
-Release:        3%{?dist}
+Version:        5.10.52.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
+Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -175,6 +176,10 @@ Patch1143:      CVE-2021-3501.nopatch
 Patch1144:      CVE-2021-3506.nopatch
 Patch1145:      CVE-2020-25672.nopatch
 Patch1146:      CVE-2021-33200.nopatch
+Patch1147:      CVE-2021-34693.nopatch
+Patch1148:      CVE-2021-33624.nopatch
+Patch1149:      CVE-2021-35039.nopatch
+Patch1150:      CVE-2021-33909.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -275,6 +280,7 @@ This package contains common device tree blobs (dtb)
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%patch0 -p1
 
 %build
 make mrproper
@@ -505,6 +511,23 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
+- Add patch to fix CDROM eject errors
+
+* Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
+- Update source to 5.10.52.1
+- Address CVE-2021-35039, CVE-2021-33909
+
+* Mon Jul 19 2021 Chris Co <chrco@microsoft.com> - 5.10.47.1-2
+- Enable CONFIG_CONNECTOR and CONFIG_PROC_EVENTS
+
+* Tue Jul 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.47.1-1
+- Update source to 5.10.47.1
+- Address CVE-2021-34693, CVE-2021-33624
+
+* Wed Jun 30 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-4
+- Enable legacy mcelog config
+
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.42.1-3
 - Enable CONFIG_IOSCHED_BFQ and CONFIG_BFQ_GROUP_IOSCHED configs
 
@@ -516,11 +539,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVE-2021-33200
 
 * Thu Jun 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-2
-- Address CVE-2020-25672 
+- Address CVE-2020-25672
 
 * Fri May 28 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-1
 - Update source to 5.10.37.1
-- Address CVE-2021-23134, CVE-2021-29155, CVE-2021-31829, CVE-2021-31916, 
+- Address CVE-2021-23134, CVE-2021-29155, CVE-2021-31829, CVE-2021-31916,
   CVE-2021-32399, CVE-2021-33033, CVE-2021-33034, CVE-2021-3483
   CVE-2021-3501, CVE-2021-3506
 

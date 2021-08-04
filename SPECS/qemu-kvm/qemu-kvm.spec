@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,7 @@ Patch35:        CVE-2021-20181.patch
 Patch36:        CVE-2021-20221.patch
 Patch37:        CVE-2021-3527.patch
 Patch38:        CVE-2020-27661.nopatch
+Patch39:        CVE-2021-3546.patch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
@@ -117,6 +118,7 @@ This package provides a command line tool for manipulating disk images.
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1
+%patch39 -p1
 
 # Remove invalid flag exposed by binutils 2.36.1
 sed -i "/LDFLAGS_NOPIE/d" configure
@@ -216,6 +218,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Tue Jul 06 2021 Henry Li <lihl@microsoft.com> - 4.2.0-34
+- Patch CVE-2021-3546
+
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-33
 - Mark CVE-2020-27661 as nopatch
 

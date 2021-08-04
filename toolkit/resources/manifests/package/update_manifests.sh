@@ -84,7 +84,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
-    sed -ri '/mariner-repos-(extras|ui)/d' $TmpPkgGen
+    sed -ri '/mariner-repos-(extras|ui|microsoft)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-D/d' $TmpPkgGen

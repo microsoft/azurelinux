@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.42.1
-Release:        1%{?dist}
+Version:        5.10.52.1
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Source102:      hypervvss.rules
 # HYPERV FCOPY DAEMON
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
+Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -104,6 +105,7 @@ Contains tools and scripts useful for Hyper-V guests.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%patch0 -p1
 
 %build
 pushd tools/hv
@@ -219,6 +221,15 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
+- Add patch to fix CDROM eject errors
+
+* Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
+- Update source to 5.10.52.1
+
+* Tue Jul 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.47.1-1
+- Update source to 5.10.47.1
+
 * Tue Jun 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.42.1-1
 - Update source to 5.10.42.1
 
