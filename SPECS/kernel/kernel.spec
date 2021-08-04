@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.52.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
+Patch1:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -281,6 +282,7 @@ This package contains common device tree blobs (dtb)
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -511,6 +513,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
+- Add patch to fix VDSO in HyperV
+
 * Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
 - Add patch to fix CDROM eject errors
 
