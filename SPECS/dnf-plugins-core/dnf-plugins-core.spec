@@ -223,7 +223,7 @@ ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yumdownloader
 
 %changelog
 * Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.22-2
-- Initial CBL-Mariner import from rpm-software-management (license: GPLv2+)
+- Initial CBL-Mariner import from rpm-software-management (license: GPLv2+). License verified.
 
 * Mon Jun 14 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.0.22-1
 - [repomanage] Allow running only with metadata

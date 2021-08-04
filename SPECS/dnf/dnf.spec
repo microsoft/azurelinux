@@ -19,7 +19,6 @@ BuildRequires:  gettext
 BuildRequires:  systemd
 BuildRequires:  bash-completion
 BuildRequires:  python3-sphinx
-BuildRequires:  sudo
 Requires:       python3
 Requires:       python3-%{name}
 
@@ -56,7 +55,7 @@ Systemd units that can periodically download package upgrades and apply them.
 
 %prep
 %setup -q
-sudo sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
+sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
 mkdir build
 cd build
 %cmake .. -DPYTHON_DESIRED:FILEPATH="3" -DWITH_MAN=0

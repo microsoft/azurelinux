@@ -62,6 +62,8 @@ pip3 install xml
 make check -k || (cat test-suite.log && false)
 
 %files -n python3-dbus
+%doc NEWS
+%license COPYING
 %{_libdir}/python3.7/site-packages/*.so
 %{_libdir}/python3.7/site-packages/dbus/
 
@@ -72,7 +74,7 @@ make check -k || (cat test-suite.log && false)
 
 %changelog
 * Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.16-6
-- Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- Initial CBL-Mariner import from Fedora 34 (license: MIT). License verified.
 - Removed GPG signature, pkgconfig for BuildRequires
 
 * Sun Jun 13 2021 David King <amigadave@amigadave.com> - 1.2.16-5
