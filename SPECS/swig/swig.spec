@@ -1,10 +1,11 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
-Version:        3.0.12
-Release:        5%{?dist}
+Version:        4.0.2
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://swig.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
+#Source0:       https://github.com/swig/swig/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -57,6 +58,9 @@ make %{?_smp_mflags} check
 %{_libdir}/ccache
 
 %changelog
+* Wed Aug 04 2021 Henry Beberman <henry.beberman@microsoft.com> 4.0.2-1
+- Update to version 4.0.2
+- License Verified.
 * Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 3.0.12-5
 - Fix check tests. Remove sha1.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.0.12-4
