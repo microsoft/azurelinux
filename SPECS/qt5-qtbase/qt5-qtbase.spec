@@ -41,8 +41,8 @@
 
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
-Version:      5.12.5
-Release:      5%{?dist}
+Version:      5.12.11
+Release:      1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -529,7 +529,7 @@ fi
 %license LICENSE.FDL
 %license LICENSE.GPL*
 %license LICENSE.LGPL*
-%license LICENSE.QT-LICENSE-AGREEMENT-4.0
+%license LICENSE.QT-LICENSE-AGREEMENT-4.2
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -762,6 +762,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Wed Aug 4 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.12.11-1
+- Move to version 5.12.11 to address CVE-2015-9541, CVE-2020-0570 and CVE-2020-13962.
+
 * Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-5
 - Added explicit 'Requires' on 'icu'.
 - Bumping up release to re-compile against the new version of the 'icu' libraries.
