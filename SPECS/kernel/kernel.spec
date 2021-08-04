@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.52.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
+Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -279,6 +280,7 @@ This package contains common device tree blobs (dtb)
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%patch0 -p1
 
 %build
 make mrproper
@@ -509,6 +511,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Fri Jul 30 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-2
+- Add patch to fix CDROM eject errors
+
 * Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
 - Update source to 5.10.52.1
 - Address CVE-2021-35039, CVE-2021-33909
