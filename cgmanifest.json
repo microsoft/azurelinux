@@ -7516,18 +7516,8 @@
         "type": "other",
         "other": {
           "name": "swig",
-          "version": "3.0.12",
-          "downloadUrl": "http://downloads.sourceforge.net/project/swig/swig/swig-3.0.12/swig-3.0.12.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "swig",
           "version": "4.0.2",
-          "downloadUrl": "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz"
+          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.0.2.tar.gz"
         }
       }
     },
