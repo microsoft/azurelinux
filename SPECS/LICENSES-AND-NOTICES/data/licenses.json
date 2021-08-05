@@ -89,6 +89,7 @@
                 "perl-JSON",
                 "picosat",
                 "pkgconf",
+                "prometheus",
                 "pugixml",
                 "pycairo",
                 "python-async-generator",

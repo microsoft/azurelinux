@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        39%{?dist}
+Release:        40%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -142,7 +142,7 @@ meson  --prefix %{_prefix}                                            \
        -Drootprefix=                                                  \
        -Drootlibdir=/lib                                              \
        -Dsplit-usr=false                                               \
-       -Dsysusers=false                                               \
+       -Dsysusers=true                                               \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
@@ -251,6 +251,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/tmpfiles.d
 /lib/*.so*
 %{_libdir}/modprobe.d/systemd.conf
+%{_libdir}/sysusers.d/*
 %{_bindir}/*
 %{_sbindir}/*
 /sbin/*
@@ -283,6 +284,10 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 239-40
+- Enable building systemd-sysusers
+- Ship systemd-sysusers and related conf files from systemd package 
+
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.39-33: Use autosetup
