@@ -4,12 +4,12 @@ Name:           python-lxml
 Version:        4.6.3
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
-License:        BSD and GPLv2+
-URL:            https://lxml.de
+License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-# Source0:      https://files.pythonhosted.org/packages/ca/63/139b710671c1655aed3b20c1e6776118c62e9f9311152f4c6031e12a0554/lxml-%{version}.tar.gz
+URL:            https://lxml.de
+# Source0:      https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-%{version}.tar.gz
 Source0:        lxml-%{version}.tar.gz
 
 BuildRequires:  libxslt
@@ -47,6 +47,7 @@ make test
 
 %clean
 rm -rf %{buildroot}
+
 
 %files
 %defattr(-,root,root,-)
