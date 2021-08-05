@@ -59,10 +59,10 @@ rm -rf %{buildroot}
 %changelog
 *   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1
 -   Update to 4.6.3 to fix CVEs
-    Remove lxml-make-check-fix.patch which is no longer applicable
-    Fix CVE-2018-19787
-    Fix CVE-2020-27783
-    Fix CVE-2021-28957
+-   Remove lxml-make-check-fix.patch which is no longer applicable
+-   Fix CVE-2018-19787
+-   Fix CVE-2020-27783
+-   Fix CVE-2021-28957
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> 4.2.4-7
 -   Remove python2 support.
 -   License verified.
