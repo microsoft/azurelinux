@@ -114,9 +114,9 @@ openssl-debuginfo-1.1.1k-5.cm1.x86_64.rpm
 libcap-2.26-2.cm1.x86_64.rpm
 libcap-devel-2.26-2.cm1.x86_64.rpm
 libcap-ng-0.7.9-3.cm1.x86_64.rpm
-libdb-5.3.28-4.cm1.x86_64.rpm
-libdb-devel-5.3.28-4.cm1.x86_64.rpm
-libdb-docs-5.3.28-4.cm1.x86_64.rpm
+libdb-5.3.28-5.cm1.x86_64.rpm
+libdb-devel-5.3.28-5.cm1.x86_64.rpm
+libdb-docs-5.3.28-5.cm1.x86_64.rpm
 rpm-4.14.2-13.cm1.x86_64.rpm
 rpm-build-4.14.2-13.cm1.x86_64.rpm
 rpm-build-libs-4.14.2-13.cm1.x86_64.rpm
