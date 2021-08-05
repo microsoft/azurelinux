@@ -24,13 +24,13 @@
 %define machine_tmpl power8
 %define machine power8
 %endif
-%bcond_without examples
-# Add option to build without tools
+# Add option to build with examples, tools subpackages
+%bcond_with examples
 %bcond_with tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Epoch:          2
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -297,6 +297,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Thu Aug 05 2021 Thomas Crain <thcrain@microsoft.com> - 2:18.11.2-5
+- Disable examples subpackage by default
+
 * Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4
 - Build without tools subpackage and dependencies.
 - Set _unpackaged_files_terminate_build since tools are not being packaged.
