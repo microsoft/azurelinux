@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.13
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,8 +93,11 @@ rm -rf %{buildroot}/*
 %{_bindir}/etcd-dump-*
 
 %changelog
-* Thu Aug 05 2021 Tom Fay <tomfay@microsoft.com> - 3.4.13-4
-- Add etcd-tools package.
+*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.13-5
+-   Increment release to force republishing using golang 1.16.7.
+
+*   Thu Aug 05 2021 Tom Fay <tomfay@microsoft.com> - 3.4.13-4
+-   Add etcd-tools package.
 
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.4.13-3
 -   Increment release to force republishing using golang 1.15.13.
