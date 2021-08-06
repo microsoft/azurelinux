@@ -255,6 +255,7 @@ func (mp *ManualPartitionWidget) HandleInput(event *tcell.EventKey) *tcell.Event
 			return tcell.NewEventKey(tcell.KeyTab, 0, tcell.ModNone)
 		case tcell.KeyEsc:
 			mp.pages.HidePage(addPartitionPage)
+			mp.refreshTitle()
 		}
 	} else {
 		// The front page is the partition table
