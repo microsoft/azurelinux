@@ -6205,7 +6205,7 @@
         "type": "other",
         "other": {
           "name": "python-psutil",
-          "version": "5.6.3",
+          "version": "5.6.7",
           "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.6.7.tar.gz"
         }
       }
