@@ -974,6 +974,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dbus-python",
+          "version": "1.2.16",
+          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
@@ -1057,6 +1067,16 @@
           "name": "dnf",
           "version": "4.2.18",
           "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.2.18.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dnf-plugins-core",
+          "version": "4.0.22",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/refs/tags/4.0.22.tar.gz"
         }
       }
     },

@@ -4,7 +4,7 @@
 
 Name:           dnf
 Version:        4.2.18
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python 3 version of the DNF package manager.
 License:        GPLv2+ or GPL
 URL:            https://github.com/rpm-software-management/dnf
@@ -55,6 +55,7 @@ Systemd units that can periodically download package upgrades and apply them.
 
 %prep
 %setup -q
+sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
 mkdir build
 cd build
 %cmake .. -DPYTHON_DESIRED:FILEPATH="3" -DWITH_MAN=0
@@ -85,6 +86,14 @@ rm -f %{buildroot}%{confdir}/%{name}-strict.conf
 %check
 cd build
 ctest -VV
+
+%post automatic
+%systemd_post dnf-automatic-notifyonly.timer
+%systemd_post dnf-makecache.timer
+
+%postun automatic
+%systemd_preun dnf-automatic-notifyonly.timer
+%systemd_preun dnf-makecache.timer
 
 %files -f %{name}.lang
 %{_bindir}/%{name}
@@ -140,6 +149,9 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> 4.2.18-3
+- Edit dnf-automatic.conf and start dnf-automatic-notifyonly timer.
+
 * Sun Apr 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 4.2.18-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT). Added 'Distribution' and 'Vendor' tags.
 - Fixed "Source0" tag.
