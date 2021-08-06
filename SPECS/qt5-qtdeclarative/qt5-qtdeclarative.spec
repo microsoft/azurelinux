@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtDeclarative component
 Name:         qt5-qtdeclarative
-Version:      5.12.5
-Release:      3%{?dist}
+Version:      5.12.11
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -141,6 +141,9 @@ popd
 
 
 %changelog
+* Wed Aug 4 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.12.11-1
+- Move to version 5.12.11.
+
 * Mon Mar 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-3
 - Fix missing python3 global
 - Remove multilib patch
