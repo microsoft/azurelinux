@@ -310,9 +310,14 @@ func (mp *ManualPartitionWidget) Primitive() tview.Primitive {
 	return mp.pages
 }
 
-// SetSystemDeviceIndex updates the system device used
+// SetSystemDeviceIndex updates the system device used.
+// Panics if the space label cannot be updated.
 func (mp *ManualPartitionWidget) SetSystemDeviceIndex(index int) {
 	mp.deviceIndex = index
+
+	err := mp.updateSpaceLabel()
+	logger.PanicOnError(err, "Failed to update space label")
+
 	mp.flex.SetTitle(fmt.Sprintf(uitext.DiskAdvanceTitleFmt, mp.systemDevices[mp.deviceIndex].DevicePath))
 }
 
