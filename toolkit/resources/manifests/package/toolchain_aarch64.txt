@@ -2,11 +2,11 @@ alsa-lib-1.2.2-1.cm1.aarch64.rpm
 alsa-lib-debuginfo-1.2.2-1.cm1.aarch64.rpm
 alsa-lib-devel-1.2.2-1.cm1.aarch64.rpm
 asciidoc-8.6.10-4.cm1.noarch.rpm
-audit-3.0-7.cm1.aarch64.rpm
-audit-debuginfo-3.0-7.cm1.aarch64.rpm
-audit-devel-3.0-7.cm1.aarch64.rpm
-audit-libs-3.0-7.cm1.aarch64.rpm
-audit-python-3.0-7.cm1.aarch64.rpm
+audit-3.0-8.cm1.aarch64.rpm
+audit-debuginfo-3.0-8.cm1.aarch64.rpm
+audit-devel-3.0-8.cm1.aarch64.rpm
+audit-libs-3.0-8.cm1.aarch64.rpm
+audit-python-3.0-8.cm1.aarch64.rpm
 autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
 bash-4.4.18-6.cm1.aarch64.rpm
