@@ -152,7 +152,8 @@ export OPT="%{optflags} %{openssl_flags}"
     --enable-shared \
     --with-system-expat \
     --with-system-ffi \
-    --with-dbmliborder=gdbm:ndbm
+    --with-dbmliborder=gdbm:ndbm \
+    --with-ensurepip=yes
 make %{?_smp_mflags}
 
 %install
@@ -278,7 +279,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Wed Apr 28 2021 Andrew Phelps <anphel@microsoft.com> - 3.7.10-2
 - Add patch to fix test_ssl tests.
 
-* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
 - thcrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619

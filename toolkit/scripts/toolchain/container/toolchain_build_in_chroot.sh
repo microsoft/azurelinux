@@ -771,9 +771,9 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.10
-tar xf Python-3.7.10.tar.xz
-pushd Python-3.7.10
+echo Python-3.7.4
+tar xf Python-3.7.4.tar.xz
+pushd Python-3.7.4
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat \
@@ -785,8 +785,8 @@ chmod -v 755 /usr/lib/libpython3.7m.so
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.7 /usr/bin/pip3
 popd
-rm -rf Python-3.7.10
-touch /logs/status_python3710_complete
+rm -rf Python-3.7.4
+touch /logs/status_python374_complete
 
 echo Coreutils-8.30
 tar xf coreutils-8.30.tar.xz
