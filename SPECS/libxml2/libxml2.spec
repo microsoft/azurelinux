@@ -99,15 +99,12 @@ rm -rf %{buildroot}/*
 - Remove requirement on python2
 - Remove libxml2-python subpackage
 
-* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4
-- Skip python tests which are known to be broken.
-
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
 - anphel@microsoft.com, 2.9.10-4: Skip python tests which are known to be broken.
 
-* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4 (from 1.0 branch)
+* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4
 - Skip python tests which are known to be broken.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-6

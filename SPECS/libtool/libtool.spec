@@ -85,13 +85,10 @@ make %{?_smp_mflags} check
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.4.6-6
 - Provide libtool-ltdl-devel%%{?_isa}
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
-- Added %%license line automatically
-
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.6-6
 - Add explicit provides for libtool-ltdl, libtool-ltdl-devel
 
-* Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.6-4

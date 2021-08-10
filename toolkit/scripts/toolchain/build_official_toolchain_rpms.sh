@@ -306,8 +306,6 @@ chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
-# Python2 needs to be installed for RPM and openjdk's dependencies to build
-
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
@@ -425,6 +423,7 @@ build_rpm_in_chroot_no_install gtk-doc
 
 # p11-kit, libtasn1 and glib need gtk-doc
 chroot_and_install_rpms gtk-doc
+build_rpm_in_chroot_no_install libtasn1
 
 # ninja-build requires gtest
 chroot_and_install_rpms gtest
@@ -478,7 +477,11 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libpwquality
 build_rpm_in_chroot_no_install json-c
+build_rpm_in_chroot_no_install libsepol
 
+# libselinux requires libsepol
+chroot_and_install_rpms libsepol
+build_rpm_in_chroot_no_install libselinux
 # util-linux, rpm, libsemanage and shadow-utils require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
@@ -487,19 +490,20 @@ build_rpm_in_chroot_no_install rpm
 # rebuild pam with selinux support
 build_rpm_in_chroot_no_install pam
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, shadow-utils
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
-chroot_and_install_rpms shadow-utils
 chroot_and_install_rpms meson
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
-# lvm2 requires ncurses, systemd-bootstrap, libaio,
+# lvm2 requires libselinux, libsepol, ncurses, systemd-bootstrap, libaio,
+chroot_and_install_rpms libselinux
+chroot_and_install_rpms libsepol
 chroot_and_install_rpms ncurses
 chroot_and_install_rpms systemd-bootstrap
 chroot_and_install_rpms libaio
@@ -514,11 +518,11 @@ chroot_and_install_rpms libpwquality
 chroot_and_install_rpms json-c
 build_rpm_in_chroot_no_install cryptsetup
 
-# systemd needs intltool, util-linux
+# systemd needs intltool, gperf, util-linux
 chroot_and_install_rpms intltool
+chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
-build_rpm_in_chroot_no_install libtasn1
 
 build_rpm_in_chroot_no_install golang-1.15
 build_rpm_in_chroot_no_install groff

@@ -4,8 +4,6 @@ Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
 Release:        7%{?dist}
-Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
-Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

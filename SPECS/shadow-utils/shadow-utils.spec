@@ -146,11 +146,8 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-14
-- Merge the following releases from 1.0 to dev branch
-- schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
-- lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser
-- JOSLOBO 7/26/21: Bump version number to resolve merge conflict.
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 4.6-14
+- Dash Rolled for Merge from 1.0 branch
 
 * Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
 - Fix issue with undocumented libselinux and libsemanage requirements
@@ -160,6 +157,11 @@ make %{?_smp_mflags} check
 
 * Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
 - Enable usergroups for useradd
+
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 
+- Merge the following releases from 1.0 to dev branch
+- schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
+- lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser
 
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
 - Add sym link to adduser from useradd and create the file for adduser

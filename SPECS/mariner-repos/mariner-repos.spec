@@ -154,13 +154,12 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
 
 %changelog
-* Thu Jul 08 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
-- Version update for 2.0.  Formatting changes.
 
-* Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
+* Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Add microsoft and microsoft-preview repo configuration packages.  
 - These repos offer Mariner packages produced by partner teams within Microsoft on 
 - behalf of the Mariner team but are released on an independent cadence from Mariner.
+- Version update for 2.0.  Formatting changes.
 
 * Fri Feb 19 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-13
 - Add extras repo.

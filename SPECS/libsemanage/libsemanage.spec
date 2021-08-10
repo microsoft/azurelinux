@@ -107,6 +107,7 @@ sed -i '1s%\(#! *%{_bindir}/python\)\([^3].*\|\)$%\13\2%' %{buildroot}%{_libexec
 %files python3
 %{python3_sitelib}/*.so
 %{python3_sitelib}/semanage.py*
+%{python3_sitelib}/__pycache__/semanage.cpython*.pyc
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog

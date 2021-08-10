@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.8.4
@@ -10,22 +9,6 @@ URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
-=======
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
-Summary:        Storage array management library
-Name:           libstoragemgmt
-Version:        1.8.4
-Release:        6%{?dist}
-License:        LGPLv2+
-URL:            https://github.com/libstorage/libstoragemgmt
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Source0:        https://github.com/libstorage/libstoragemgmt/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch1:         0001-change-run-dir.patch
-
-Requires:       python3-%{name}
->>>>>>> 1.0
 BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -39,33 +22,19 @@ BuildRequires:  openssl-devel
 BuildRequires:  glib-devel
 BuildRequires:  systemd
 BuildRequires:  bash-completion
-<<<<<<< HEAD
 BuildRequires:  libconfig-devel
-=======
-BuildRequires:  libconfig
->>>>>>> 1.0
 BuildRequires:  systemd-devel
 BuildRequires:  procps-ng
 BuildRequires:  sqlite-devel
 BuildRequires:  python3-six
 BuildRequires:  python3-devel
 BuildRequires:  python3-pywbem
-<<<<<<< HEAD
 %{?systemd_requires}
 BuildRequires:  systemd 
 BuildRequires:  systemd-devel
 BuildRequires:  chrpath
 BuildRequires:  valgrind
 Requires:       python3-%{name}
-=======
-
-%{?systemd_requires}
-BuildRequires:  systemd 
-BuildRequires:  systemd-devel
-
-BuildRequires:  chrpath
-BuildRequires:  valgrind
->>>>>>> 1.0
 
 %description
 The libStorageMgmt library will provide a vendor agnostic open source storage
@@ -234,11 +203,6 @@ plugin selection for locally managed storage.
 %make_build
 
 %install
-<<<<<<< HEAD
-=======
-rm -rf %{buildroot}
-
->>>>>>> 1.0
 %make_install
 
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
@@ -250,12 +214,6 @@ install -m 644 tools/udev/90-scsi-ua.rules \
 install -m 755 tools/udev/scan-scsi-target \
     %{buildroot}/%{_udevrulesdir}/../scan-scsi-target
 
-<<<<<<< HEAD
-=======
-mkdir -p %{buildroot}/%{_datadir}/bash-completion/completions/
-mv %{buildroot}/etc/bash_completion.d/lsmcli %{buildroot}/%{_datadir}/bash-completion/completions/
-
->>>>>>> 1.0
 %check
 if ! make check
 then
@@ -286,184 +244,112 @@ getent passwd libstoragemgmt >/dev/null || \
 %post smis-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 %postun smis-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post netapp-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 %postun netapp-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post targetd-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 %postun targetd-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post nstor-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 %postun nstor-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post megaraid-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 %postun megaraid-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post hpsa-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 %postun hpsa-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post arcconf-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 %postun arcconf-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post nfs-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 %postun nfs-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
 %post local-plugin
 if [ $1 -eq 1 ]; then
     # New install.
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 %postun local-plugin
 if [ $1 -eq 0 ]; then
     # Remove
-<<<<<<< HEAD
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-=======
-    /usr/bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
->>>>>>> 1.0
 fi
 
 %files
@@ -640,7 +526,6 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
-<<<<<<< HEAD
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-8
 - Use libconfig-devel at build-time instead of libconfig
 - Remove %%bcond_with test line
@@ -650,11 +535,7 @@ fi
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
-=======
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
-- Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
 - License verified
->>>>>>> 1.0
 
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-5
 - Second attempt - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

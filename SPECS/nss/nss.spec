@@ -125,82 +125,84 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-7
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 3.44-7
+- Dash Rolled for Merge from 1.0 branch
+
+* Thu Jun 10 2021 Henry Beberman <henry.beberman@microsoft.com> 3.44-6
+- Patch CVE-2020-12403
+
+* Wed Jun 02 2021 Andrew Phelps <anphel@microsoft.com> 3.44-5
+- Set NSS_DISABLE_GTESTS=1 to speed up build
+- Run tests much faster by limiting to NSS_CYCLES=standard
+
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-4
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 3.44-3: Fix check tests
 - niontive@microsoft.com, 3.44-4: Enable FIPS mode
-- (JOSLOBO 7/26/21: Dash Rolled from Merge)
 
-*   Thu Jun 10 2021 Henry Beberman <henry.beberman@microsoft.com> 3.44-6
--   Patch CVE-2020-12403
+* Wed Mar 03 2021 Nicolas Ontiveros <niontive@microsoft.com> 3.44-4
+- Enable FIPS mode
 
-*   Wed Jun 02 2021 Andrew Phelps <anphel@microsoft.com> 3.44-5
--   Set NSS_DISABLE_GTESTS=1 to speed up build
--   Run tests much faster by limiting to NSS_CYCLES=standard
+* Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.44-3 (from 1.0 branch)
+- Fix check tests
 
-*   Wed Mar 03 2021 Nicolas Ontiveros <niontive@microsoft.com> 3.44-4
--   Enable FIPS mode
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3 (from dev branch)
+- Provide nss-tools, -util, -static, -softokn, -softokn-devel
+- Provide nss-pkcs11-devel, -pkcs11-devel-static
 
-*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.44-3 (from 1.0 branch)
--   Fix check tests
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.44-2
+- Added %%license line automatically
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 3.44-3 (from dev branch)
--   Provide nss-tools, -util, -static, -softokn, -softokn-devel
--   Provide nss-pkcs11-devel, -pkcs11-devel-static
+* Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 3.44-1
+- Update version to 3.44. License verified.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.44-2
--   Added %%license line automatically
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.39-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 3.44-1
--   Update version to 3.44. License verified.
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 3.39-1
+- Upgrade to 3.39.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.39-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Thu Dec 07 2017 Alexey Makhalov <amakhalov@vmware.com> 3.31-5
+- Add static libcrmf.a library to devel package
 
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 3.39-1
--   Upgrade to 3.39.
+* Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 3.31-4
+- Aarch64 support
 
-*   Thu Dec 07 2017 Alexey Makhalov <amakhalov@vmware.com> 3.31-5
--   Add static libcrmf.a library to devel package
+* Fri Jul 07 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.31-3
+- Fix buildrequires.
 
-*   Tue Nov 14 2017 Alexey Makhalov <amakhalov@vmware.com> 3.31-4
--   Aarch64 support
+* Thu Jun 29 2017 Xiaolin Li <xiaolinl@vmware.com> 3.31-2
+- Fix check.
 
-*   Fri Jul 07 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.31-3
--   Fix buildrequires.
+* Tue Jun 20 2017 Xiaolin Li <xiaolinl@vmware.com> 3.31-1
+- Upgrade to 3.31.
 
-*   Thu Jun 29 2017 Xiaolin Li <xiaolinl@vmware.com> 3.31-2
--   Fix check.
+* Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.30.1-1
+- Update to 3.30.1
 
-*   Tue Jun 20 2017 Xiaolin Li <xiaolinl@vmware.com> 3.31-1
--   Upgrade to 3.31.
+* Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 3.25-4
+- Added libs subpackage to reduce tdnf dependent tree
 
-*   Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.30.1-1
--   Update to 3.30.1
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 3.25-3
+- Use sqlite-libs as runtime dependency
 
-*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 3.25-4
--   Added libs subpackage to reduce tdnf dependent tree
+* Mon Oct 04 2016 ChangLee <changLee@vmware.com> 3.25-2
+- Modified %check
 
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 3.25-3
--   Use sqlite-libs as runtime dependency
+* Tue Jul 05 2016 Anish Swaminathan <anishs@vmware.com> 3.25-1
+- Upgrade to 3.25
 
-*   Mon Oct 04 2016 ChangLee <changLee@vmware.com> 3.25-2
--   Modified %check
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.21-2
+- GA - Bump release of all rpms
 
-*   Tue Jul 05 2016 Anish Swaminathan <anishs@vmware.com> 3.25-1
--   Upgrade to 3.25
+* Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 3.21
+- Updated to version 3.21
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.21-2
--   GA - Bump release of all rpms
+* Tue Aug 04 2015 Kumar Kaushik <kaushikk@vmware.com> 3.19-2
+- Version update. Firefox requirement.
 
-*   Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 3.21
--   Updated to version 3.21
+* Fri May 29 2015 Alexey Makhalov <amakhalov@vmware.com> 3.19-1
+- Version update. Firefox requirement.
 
-*   Tue Aug 04 2015 Kumar Kaushik <kaushikk@vmware.com> 3.19-2
--   Version update. Firefox requirement.
-
-*   Fri May 29 2015 Alexey Makhalov <amakhalov@vmware.com> 3.19-1
--   Version update. Firefox requirement.
-
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 3.15.4-1
--   Initial build. First version
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 3.15.4-1
+- Initial build. First version
