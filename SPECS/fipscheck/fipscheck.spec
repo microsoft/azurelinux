@@ -1,19 +1,17 @@
+Summary:        A library for integrity verification of FIPS validated modules
+Name:           fipscheck
+Version:        1.5.0
+Release:        9%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary:	A library for integrity verification of FIPS validated modules
-Name:		fipscheck
-Version:	1.5.0
-Release:	9%{?dist}
-License:	BSD
 # This is a Red Hat maintained package which is specific to
 # our distribution.
-URL:		https://pagure.io/fipscheck
-Source0:	https://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
-
-BuildRequires:	gcc
-BuildRequires:	openssl-devel >= 1.0.0
-
-Requires:      %{name}-lib%{?_isa} = %{version}-%{release}
+URL:            https://pagure.io/fipscheck
+Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
+BuildRequires:  gcc
+BuildRequires:  openssl-devel >= 1.0.0
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description
 FIPSCheck is a library for integrity verification of FIPS validated
@@ -21,53 +19,48 @@ modules. The package also provides helper binaries for creation and
 verification of the HMAC-SHA256 checksum files.
 
 %package lib
-Summary:	Library files for %{name}
-
-Requires:	%{_bindir}/fipscheck
+Summary:        Library files for %{name}
+Requires:       %{_bindir}/fipscheck
 
 %description lib
 This package contains the FIPSCheck library.
 
 %package devel
-Summary:	Development files for %{name}
-
-Requires:	%{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        Development files for %{name}
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains development files for %{name}.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure --disable-static
 
-make %{?_smp_mflags}
+%make_build
 
 # Add generation of HMAC checksums of the final stripped binaries
 %define __spec_install_post \
     %{?__debug_package:%{__debug_install_post}} \
     %{__arch_install_post} \
-    %{__os_install_post} \
-    $RPM_BUILD_ROOT%{_bindir}/fipshmac -d $RPM_BUILD_ROOT%{_libdir}/fipscheck $RPM_BUILD_ROOT%{_bindir}/fipscheck $RPM_BUILD_ROOT%{_libdir}/libfipscheck.so.1.2.1 \
-    ln -s libfipscheck.so.1.2.1.hmac $RPM_BUILD_ROOT%{_libdir}/fipscheck/libfipscheck.so.1.hmac \
+    %__os_install_post \
+    %{buildroot}%{_bindir}/fipshmac -d %{buildroot}%{_libdir}/fipscheck %{buildroot}%{_bindir}/fipscheck %{buildroot}%{_libdir}/libfipscheck.so.1.2.1 \
+    ln -s libfipscheck.so.1.2.1.hmac %{buildroot}%{_libdir}/fipscheck/libfipscheck.so.1.hmac \
 %{nil}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
-find $RPM_BUILD_ROOT -type f -name "*.la" -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/fipscheck
+mkdir -p %{buildroot}%{_libdir}/fipscheck
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc ChangeLog README NEWS AUTHORS
 %{_bindir}/fipscheck
@@ -86,8 +79,8 @@ mkdir -p $RPM_BUILD_ROOT%{_libdir}/fipscheck
 %{_mandir}/man3/*
 
 %changelog
-* Tue Aug 03 2021 Bala <balakumaran.kannan@microsoft.com> 1.5.0-9
-- Initial CBL-Mariner import from Fedora (license: BSD)
+* Tue Aug 03 2021 Bala <balakumaran.kannan@microsoft.com> - 1.5.0-9
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
