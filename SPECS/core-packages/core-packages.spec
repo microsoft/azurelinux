@@ -22,6 +22,8 @@ Requires:       cracklib-dicts
 Requires:       cryptsetup
 Requires:       dbus
 Requires:       dnf
+Requires:       dnf-automatic
+Requires:       dnf-utils
 Requires:       file
 Requires:       gdbm
 Requires:       iana-etc

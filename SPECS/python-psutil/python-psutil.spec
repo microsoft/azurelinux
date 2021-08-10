@@ -4,8 +4,8 @@
 %{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
 Summary:        A library for retrieving information onrunning processes and system utilization
 Name:           python-psutil
-Version:        5.6.3
-Release:        4%{?dist}
+Version:        5.6.7
+Release:        1%{?dist}
 Url:            https://pypi.python.org/pypi/psutil
 License:        BSD
 Group:          Development/Languages/Python
@@ -95,7 +95,10 @@ LANG=en_US.UTF-8 make test PYTHON=python%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
+* Thu Aug 05 2021 Nicolas Guibourge <nicolasg@microsoft.com> 5.6.7-1
+- Update to 5.6.7 to fix CVE-2019-18874
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.6.3-4
 - Added %%license line automatically
 
 * Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 5.6.3-3

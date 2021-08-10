@@ -1,17 +1,16 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.2.4
-Release:        7%{?dist}
+Version:        4.6.3
+Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
-License:        BSD and GPLv2+
-URL:            https://lxml.de
+License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-# Source0:      https://files.pythonhosted.org/packages/ca/63/139b710671c1655aed3b20c1e6776118c62e9f9311152f4c6031e12a0554/lxml-%{version}.tar.gz
+URL:            https://lxml.de
+# Source0:      https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-%{version}.tar.gz
 Source0:        lxml-%{version}.tar.gz
-Patch0:         lxml-make-check-fix.patch
 
 BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
@@ -34,7 +33,6 @@ Python 3 version.
 
 %prep
 %setup -q -n lxml-%{version}
-%patch0 -p1
 
 %build
 python3 setup.py build
@@ -50,6 +48,7 @@ make test
 %clean
 rm -rf %{buildroot}
 
+
 %files
 %defattr(-,root,root,-)
 
@@ -59,6 +58,12 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1
+-   Update to 4.6.3 to fix CVEs
+-   Remove lxml-make-check-fix.patch which is no longer applicable
+-   Fix CVE-2018-19787
+-   Fix CVE-2020-27783
+-   Fix CVE-2021-28957
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> 4.2.4-7
 -   Remove python2 support.
 -   License verified.

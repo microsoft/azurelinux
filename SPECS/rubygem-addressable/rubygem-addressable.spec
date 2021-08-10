@@ -3,7 +3,7 @@
 %global gem_name addressable
 Summary:        an alternative implementation to the URI implementation that is part of Ruby's standard library
 Name:           rubygem-addressable
-Version:        2.7.0
+Version:        2.8.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 %{gemdir}
 
 %changelog
+* Thu Aug 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2.8.0-1
+- Move to 2.8.0 to fix CVE-2021-32740
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 2.7.0-1
 - License verified
 - Original version for CBL-Mariner

@@ -1,7 +1,7 @@
 Summary:      Qt5 - Support for rendering and displaying SVG
 Name:         qt5-qtsvg
-Version:      5.12.5
-Release:      3%{?dist}
+Version:      5.12.11
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -82,6 +82,9 @@ popd
 
 
 %changelog
+* Wed Aug 4 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.12.11-1
+- Move to version 5.12.11.
+
 * Mon Mar 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-3
 - Update Vendor and Distribution tags
 

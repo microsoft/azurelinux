@@ -1,0 +1,52 @@
+From 380ae714f641a73a30f86ae8f5a2e05ac063b37f Mon Sep 17 00:00:00 2001
+From: leigh123linux <leigh123linux@googlemail.com>
+Date: Tue, 23 Feb 2016 07:32:08 +0000
+Subject: [PATCH] Move python modules to architecture-specific directory
+
+This is because dbus-python gets dragged in as a dependency of other
+things people want to be multilib-compatible.  As is the Python
+modules conflict.
+---
+ Makefile.am | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index fd480d4..0859994 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -155,7 +155,8 @@ test_dbus_py_test_la_SOURCES = \
+ 
+ # === dbus package ===
+ 
+-nobase_python_PYTHON = \
++dbuspydir = $(pyexecdir)
++nobase_dbuspy_DATA = \
+     dbus/bus.py \
+     dbus/connection.py \
+     dbus/_compat.py \
+@@ -175,12 +176,12 @@ nobase_python_PYTHON = \
+     dbus/types.py
+ 
+ if !HAVE_PYTHON_3
+-nobase_python_PYTHON += \
++nobase_dbuspy_DATA += \
+     dbus/gobject_service.py \
+     $(NULL)
+ endif
+ 
+-check_py_sources = $(nobase_python_PYTHON)
++check_py_sources = $(nobase_dbuspy_DATA)
+ include $(top_srcdir)/tools/check-coding-style.mk
+ 
+ # === Devel stuff ===
+@@ -416,7 +417,7 @@ uninstall-local: uninstall-local-sphinx
+ if ENABLE_DOCUMENTATION
+ all: doc/_build/.stamp
+ 
+-doc/_build/.stamp: $(nobase_python_PYTHON) \
++doc/_build/.stamp: $(nobase_dbuspy_DATA) \
+ 			_dbus_bindings.la \
+ 			_dbus_glib_bindings.la \
+ 			$(sphinx_sources) \
+-- 
+2.17.0

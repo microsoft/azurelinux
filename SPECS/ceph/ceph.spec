@@ -1,10 +1,20 @@
-#disable debuginfo because ceph-debuginfo rpm is too large
-%define debug_package %{nil}
+# Disable debuginfo because ceph-debuginfo rpm is too large
+%global debug_package %{nil}
+
+# Also strip embedded debug symbols to reduce size
+%global __os_install_post \
+    %{_rpmconfigdir}/brp-compress \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
+    %{nil}
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -42,8 +52,6 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 %bcond_with selinux
 %bcond_with tcmalloc
 %bcond_with mgr_diskprediction
-
-%define debug_package %{nil}
 
 %if %{with selinux}
 %{!?_selinux_policy_version: %global _selinux_policy_version 0.0.0}
@@ -1795,6 +1803,10 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+*   Thu Jul 22 2021 Andrew Phelps <anphel@microsoft.com> 16.2.0-3
+-   Set __os_install_post to reduce package size
+-   Remove duplicate line to disable debug_package
+
 *   Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
 -   Disable debuginfo because ceph-debuginfo rpm is too large
 
