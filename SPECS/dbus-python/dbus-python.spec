@@ -4,7 +4,7 @@
 Summary:        D-Bus Python Bindings
 Name:           dbus-python
 Version:        1.2.16
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,9 +15,9 @@ Source0:        http://dbus.freedesktop.org/releases/dbus-python/%{name}-%{versi
 Patch0: 0001-Move-python-modules-to-architecture-specific-directo.patch
 
 BuildRequires: gnupg2
-BuildRequires: glib-devel>=2.42.2
-BuildRequires: dbus>=1.8.6
-BuildRequires: dbus-devel>=1.8.6
+BuildRequires: glib-devel >= 2.42.2
+BuildRequires: dbus >= 1.8.6
+BuildRequires: dbus-devel >= 1.8.6
 %if %{with_check}
 BuildRequires: python3-pip
 %endif
@@ -73,6 +73,9 @@ make check -k || (cat test-suite.log && false)
 %exclude %{_libdir}/python3.7/site-packages/*.la
 
 %changelog
+* Tue Aug 10 2021 Andrew Phelps <anphel@microsoft.com> - 1.2.16-7
+- Add required spaces between BuildRequires version qualifiers.
+
 * Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.16-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT). License verified.
 - Removed GPG signature, pkgconfig for BuildRequires
