@@ -37,6 +37,7 @@
                 "ebtables",
                 "extra-cmake-modules",
                 "fuse-zip",
+				"fipscheck",
                 "gnu-efi",
                 "hardening-check",
                 "heimdal",
