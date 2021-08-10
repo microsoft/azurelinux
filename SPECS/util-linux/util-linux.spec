@@ -1,13 +1,14 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.32.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 License:        GPLv2+
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.32/%{name}-%{version}.tar.xz
+Patch0: CVE-2021-37600.patch
 BuildRequires:  ncurses-devel
 %if %{with_check}
 BuildRequires:  ncurses-term
@@ -40,7 +41,7 @@ Group: Development/Libraries
 These are library files of util-linux.
 
 %prep
-%setup -q
+%autosetup
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
 %build
 autoreconf -fi
@@ -103,6 +104,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+*   Tue Aug 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.32.1-5
+-   Added patch file(s) CVE-2021-37600.patch
 *   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 2.32.1-4
 -   Enable SELinux support
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.32.1-3
