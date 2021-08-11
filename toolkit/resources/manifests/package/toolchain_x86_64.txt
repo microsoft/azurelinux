@@ -360,7 +360,7 @@ python2-libcap-ng-0.7.9-3.cm1.x86_64.rpm
 python2-libs-2.7.18-7.cm1.x86_64.rpm
 python2-test-2.7.18-7.cm1.x86_64.rpm
 python2-tools-2.7.18-7.cm1.x86_64.rpm
-python3-audit-3.0-7.cm1.x86_64.rpm
+python3-audit-3.0-8.cm1.x86_64.rpm
 python3-cracklib-2.9.7-2.cm1.x86_64.rpm
 python3-gpg-1.13.1-6.cm1.x86_64.rpm
 python3-libcap-ng-0.7.9-3.cm1.x86_64.rpm
