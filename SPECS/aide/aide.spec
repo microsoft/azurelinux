@@ -84,6 +84,7 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %changelog
 * Fri Aug 06 2021 Bala <balakumaran.kannan@microsoft.com> - 0.16-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
+- License verified
 
 * Wed Jun 24 2020 Radovan Sroka <rsroka@redhat.com> 0.16-14
 - AIDE breaks when setting report_ignore_e2fsattrs
