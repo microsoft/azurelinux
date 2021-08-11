@@ -559,7 +559,7 @@ python3-debuginfo-3.7.10-3.cm2.aarch64.rpm
 python3-devel-3.7.10-3.cm2.aarch64.rpm
 python3-gpg-1.13.1-7.cm2.aarch64.rpm
 python3-libs-3.7.10-3.cm2.aarch64.rpm
-python3-libxml2-2.9.10-8.cm2.aarch64.rpm
+python3-libxml2-2.9.12-1.cm2.aarch64.rpm
 python3-magic-5.38-2.cm2.noarch.rpm
 python3-pip-3.7.10-3.cm2.noarch.rpm
 python3-pwquality-1.4.2-6.cm2.aarch64.rpm
