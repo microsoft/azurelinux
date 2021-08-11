@@ -58,7 +58,7 @@ rm -rf %{gopath_flannel_folder}/*
 %{_bindir}/flanneld
 
 %changelog
-* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.12.0-3
+* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.12.0-4
 - Increment release to force republishing using golang 1.16.7.
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 0.12.0-3
 - Increment release to force republishing using golang 1.15.13.

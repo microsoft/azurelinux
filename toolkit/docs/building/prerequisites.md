@@ -16,7 +16,7 @@ sudo apt -y install make tar wget curl rpm qemu-utils golang-1.16-go genisoimage
 # Recommended but not required: `pigz` for faster compression operations.
 sudo apt -y install pigz
 
-# Fix go 1.15 link
+# Fix go 1.16 link
 sudo ln -vsf /usr/lib/go-1.16/bin/go /usr/bin/go
 
 # Install Docker.
