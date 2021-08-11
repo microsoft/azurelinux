@@ -176,12 +176,12 @@ libcap-ng-0.7.9-3.cm2.aarch64.rpm
 libdb-5.3.28-5.cm2.aarch64.rpm
 libdb-devel-5.3.28-5.cm2.aarch64.rpm
 libdb-docs-5.3.28-5.cm2.aarch64.rpm
-rpm-4.14.2-13.cm2.aarch64.rpm
-rpm-build-4.14.2-13.cm2.aarch64.rpm
-rpm-build-libs-4.14.2-13.cm2.aarch64.rpm
-rpm-devel-4.14.2-13.cm2.aarch64.rpm
-rpm-lang-4.14.2-13.cm2.aarch64.rpm
-rpm-libs-4.14.2-13.cm2.aarch64.rpm
+rpm-4.14.2.1-4.cm2.aarch64.rpm
+rpm-build-4.14.2.1-4.cm2.aarch64.rpm
+rpm-build-libs-4.14.2.1-4.cm2.aarch64.rpm
+rpm-devel-4.14.2.1-4.cm2.aarch64.rpm
+rpm-lang-4.14.2.1-4.cm2.aarch64.rpm
+rpm-libs-4.14.2.1-4.cm2.aarch64.rpm
 cpio-2.13-2.cm2.aarch64.rpm
 cpio-lang-2.13-2.cm2.aarch64.rpm
 e2fsprogs-libs-1.45.6-1.cm2.aarch64.rpm
@@ -236,5 +236,5 @@ python3-devel-3.7.10-3.cm2.aarch64.rpm
 python3-libs-3.7.10-3.cm2.aarch64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-xml-3.7.10-3.cm2.aarch64.rpm
-systemd-rpm-macros-239-39.cm2.noarch.rpm
+systemd-rpm-macros-239-40.cm2.noarch.rpm
 which-2.21-7.cm2.aarch64.rpm
