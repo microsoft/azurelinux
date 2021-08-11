@@ -1,0 +1,25 @@
+From 1c9143d0c1f979c3daf10e1c37b5b1e916c22a1c Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 27 Jul 2021 11:58:31 +0200
+Subject: [PATCH] sys-utils/ipcutils: be careful when call calloc() for uint64
+ nmembs
+
+Fix: https://github.com/karelzak/util-linux/issues/1395
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ sys-utils/ipcutils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sys-utils/ipcutils.c b/sys-utils/ipcutils.c
+index e784c4dcb9..18868cfd38 100644
+--- a/sys-utils/ipcutils.c
++++ b/sys-utils/ipcutils.c
+@@ -218,7 +218,7 @@ static void get_sem_elements(struct sem_data *p)
+ {
+ 	size_t i;
+ 
+-	if (!p || !p->sem_nsems || p->sem_perm.id < 0)
++	if (!p || !p->sem_nsems || p->sem_nsems > SIZE_MAX || p->sem_perm.id < 0)
+ 		return;
+ 
+ 	p->elements = xcalloc(p->sem_nsems, sizeof(struct sem_elem));
