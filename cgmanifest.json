@@ -8145,8 +8145,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+          "version": "2.4.6",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
         }
       }
     },
