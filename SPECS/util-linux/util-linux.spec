@@ -115,7 +115,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-*   Tue Aug 10 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.32.1-5
+*   Tue Aug 10 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.32.1-5
 -   Adding a patch to fix CVE-2021-37600.
 
 *   Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 2.32.1-4
