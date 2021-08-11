@@ -704,9 +704,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cmocka",
+          "version": "1.1.5",
+          "downloadUrl": "https://cmocka.org/files/1.1/cmocka-1.1.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cni",
           "version": "0.7.5",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cockpit",
+          "version": "248",
+          "downloadUrl": "https://github.com/cockpit-project/cockpit/releases/download/248/cockpit-248.tar.xz"
         }
       }
     },
@@ -1137,6 +1157,16 @@
           "name": "dosfstools",
           "version": "4.1",
           "downloadUrl": "http://github.com/dosfstools/dosfstools/releases/download/v4.1/dosfstools-4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "doxygen",
+          "version": "1.8.17",
+          "downloadUrl": "https://sourceforge.net/projects/doxygen/files/rel-1.8.17/doxygen-1.8.17.src.tar.gz"
         }
       }
     },
@@ -3274,6 +3304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libssh",
+          "version": "0.9.5",
+          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libssh2",
           "version": "1.9.0",
           "downloadUrl": "https://www.libssh2.org/download/libssh2-1.9.0.tar.gz"
@@ -4444,6 +4484,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nss_wrapper",
+          "version": "1.1.11",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/nss_wrapper-1.1.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ntopng",
           "version": "4.2",
           "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
@@ -4857,6 +4907,16 @@
           "name": "pam",
           "version": "1.3.1",
           "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.3.1/Linux-PAM-1.3.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pam_wrapper",
+          "version": "1.1.3",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/pam_wrapper-1.1.3.tar.gz"
         }
       }
     },
@@ -7824,6 +7884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "socket_wrapper",
+          "version": "1.2.4",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/socket_wrapper-1.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sos",
           "version": "4.1",
           "downloadUrl": "https://github.com/sosreport/sos/archive/4.1.tar.gz"
@@ -8207,6 +8277,16 @@
           "name": "uclibc-ng",
           "version": "1.0.37",
           "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.37/uClibc-ng-1.0.37.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uid_wrapper",
+          "version": "1.2.7",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.7.tar.gz"
         }
       }
     },
