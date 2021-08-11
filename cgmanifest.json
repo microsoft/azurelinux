@@ -1434,6 +1434,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fipscheck",
+          "version": "1.5.0",
+          "downloadUrl": "https://releases.pagure.org/fipscheck/fipscheck-1.5.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fixesproto",
           "version": "5.0",
           "downloadUrl": "https://www.x.org/pub/individual/proto/fixesproto-5.0.tar.bz2"
