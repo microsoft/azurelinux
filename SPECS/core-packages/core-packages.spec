@@ -98,7 +98,7 @@ Requires:       zlib
 
 %changelog
 * Wed Aug 11 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1-25
-- Add check-restart to the base image.
+- Add check-restart to the base image
 
 * Wed Aug 11 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1-24
 - Add dnf-automatic and dnf-utils to the base image.
