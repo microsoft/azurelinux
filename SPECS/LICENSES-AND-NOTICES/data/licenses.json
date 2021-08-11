@@ -36,6 +36,7 @@
                 "dpdk",
                 "ebtables",
                 "extra-cmake-modules",
+                "fipscheck",
                 "fuse-zip",
                 "gnu-efi",
                 "hardening-check",
