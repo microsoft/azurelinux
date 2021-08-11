@@ -25,18 +25,10 @@ Cython is an optimising static compiler for both the Python programming language
 %description %{_description}
 
 %package -n python3-%{name}
-Summary:        %{summary}
+Summary:       C extensions for Python 3
 %{?python_provide:%python_provide python3-%{name}}
 Provides:       %{name} = %{version}-%{release}
 Provides:       %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:      %{name} < %{version}-%{release}
-
-%description -n python3-%{name} %{_description}
-
-Python 3 version.
-
-%package -n python3-%{name}
-Summary:       C extensions for Python 3
 BuildRequires: python3
 BuildRequires: python3-devel
 BuildRequires: python3-libs

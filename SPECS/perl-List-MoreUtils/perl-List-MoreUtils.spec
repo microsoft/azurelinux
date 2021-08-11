@@ -64,9 +64,6 @@ make test
 - Removed %%sha1 macro.
 - License verified and extended %%license macro to include all license files.
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.428-4
-- Added %%license line automatically
-
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.428-6
 - Use new perl package names.
 - Provide perl(List::MoreUtils*).

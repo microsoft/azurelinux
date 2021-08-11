@@ -3,29 +3,29 @@ Name:           device-mapper-multipath
 Version:        0.8.6
 Release:        1%{?dist}
 License:        GPLv2
+Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:          System Environment/Base
 URL:            http://christophe.varoqui.free.fr/
 #Source0:       https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz
 Source0:        multipath-tools-%{version}.tar.gz
-Patch0:         libdmmp-jsonc.patch
-Patch1:         libmpathpersist.patch
-BuildRequires:  device-mapper-devel
-BuildRequires:  json-c-devel
-BuildRequires:  libaio-devel
-BuildRequires:  ncurses-devel
-BuildRequires:  readline-devel
-BuildRequires:  systemd-devel
 BuildRequires:  userspace-rcu-devel
-Requires:       device-mapper
-Requires:       kpartx = %{version}-%{release}
-Requires:       libaio
-Requires:       libselinux
-Requires:       libsepol
-Requires:       ncurses
-Requires:       readline
-Requires:       userspace-rcu
+BuildRequires:  libaio-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  readline-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  systemd-devel
+BuildRequires:  json-c-devel
+
+Requires:   userspace-rcu
+Requires:   libaio
+Requires:   device-mapper
+Requires:   libselinux
+Requires:   libsepol
+Requires:   readline
+Requires:   ncurses
+Requires:   kpartx = %{version}-%{release}
+
 
 %description
 Device-mapper-multipath provides tools to manage multipath devices by
@@ -46,9 +46,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q -n multipath-tools-%{version}
-%patch0 -p1
-%patch1 -p1
+%setup -qn multipath-tools-%{version}
 
 %build
 make %{?_smp_mflags}

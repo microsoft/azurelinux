@@ -35,11 +35,8 @@ Source15:       named-chroot.files
 Patch0:         CVE-2019-6470.nopatch
 # CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
 Patch1:         CVE-2020-8623.nopatch
-Group:          Development/Tools
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Requires:       openssl
-Requires:       libuv
+Patch9:         bind-9.14-config-pkcs11.patch
+Patch10:        bind-9.10-dist-native-pkcs11.patch
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
@@ -199,14 +196,7 @@ Summary:        BIND utilities
 %{summary}.
 
 %prep
-%setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch7 -p1
-%patch8 -p1
+%autosetup -p1
 
 %patch9 -p1 -b .config-pkcs11
 cp -r bin/named{,-pkcs11}
