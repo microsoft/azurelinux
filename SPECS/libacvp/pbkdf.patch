@@ -1,16 +1,159 @@
 diff --git a/app/app_kdf.c b/app/app_kdf.c
-index 1728527..602dfea 100644
+index 1728527..ea7acbc 100644
 --- a/app/app_kdf.c
 +++ b/app/app_kdf.c
-@@ -11,6 +11,7 @@
+@@ -11,6 +11,9 @@
  #ifdef OPENSSL_KDF_SUPPORT
  #include <openssl/evp.h>
  #include <openssl/bn.h>
 +#include <openssl/kdf.h>
++#include <openssl/tls1.h>
++#include <openssl/ssl3.h>
  #include "app_lcl.h"
  # include "app_fips_lcl.h"
  
-@@ -76,10 +77,91 @@ int app_kdf135_ssh_handler(ACVP_TEST_CASE *test_case) {
+@@ -19,6 +22,41 @@
+ #define TLS_MD_KEY_EXPANSION_CONST              "key expansion"
+ #define TLS_MD_KEY_EXPANSION_CONST_SIZE         13
+ 
++static int tls1_PRF(const EVP_MD *md,
++                    const void *seed1, size_t seed1_len,
++                    const void *seed2, size_t seed2_len,
++                    const void *seed3, size_t seed3_len,
++                    const void *seed4, size_t seed4_len,
++                    const void *seed5, size_t seed5_len,
++                    const unsigned char *sec, size_t slen,
++                    unsigned char *out, size_t olen)
++{
++    EVP_PKEY_CTX *pctx = NULL;
++    int ret = 0;
++
++    if (md == NULL) {
++        return 0;
++    }
++    pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_TLS1_PRF, NULL);
++    if (pctx == NULL || EVP_PKEY_derive_init(pctx) <= 0
++        || EVP_PKEY_CTX_set_tls1_prf_md(pctx, md) <= 0
++        || EVP_PKEY_CTX_set1_tls1_prf_secret(pctx, sec, (int)slen) <= 0
++        || EVP_PKEY_CTX_add1_tls1_prf_seed(pctx, seed1, (int)seed1_len) <= 0
++        || EVP_PKEY_CTX_add1_tls1_prf_seed(pctx, seed2, (int)seed2_len) <= 0
++        || EVP_PKEY_CTX_add1_tls1_prf_seed(pctx, seed3, (int)seed3_len) <= 0
++        || EVP_PKEY_CTX_add1_tls1_prf_seed(pctx, seed4, (int)seed4_len) <= 0
++        || EVP_PKEY_CTX_add1_tls1_prf_seed(pctx, seed5, (int)seed5_len) <= 0
++        || EVP_PKEY_derive(pctx, out, &olen) <= 0) {
++        goto err;
++    }
++
++    ret = 1;
++
++ err:
++    EVP_PKEY_CTX_free(pctx);
++    return ret;
++}
++
+ int app_kdf135_srtp_handler(ACVP_TEST_CASE *test_case) {
+     if (!test_case) {
+         return -1;
+@@ -55,10 +93,96 @@ int app_kdf108_handler(ACVP_TEST_CASE *test_case) {
+ }
+ 
+ int app_kdf135_tls_handler(ACVP_TEST_CASE *test_case) {
++    int rc = 1;
++    ACVP_KDF135_TLS_TC *tc = NULL;
++    const EVP_MD *md = NULL;
++
+     if (!test_case) {
+-        return -1;
++        return rc;
+     }
+-    return 1; 
++
++    tc = test_case->tc.kdf135_tls;
++    if (!tc) return rc;
++
++    switch (tc->md) {
++    case ACVP_SHA1:
++        md = EVP_sha1();
++        break;
++    case ACVP_SHA224:
++        md = EVP_sha224();
++        break;
++    case ACVP_SHA256:
++        md = EVP_sha256();
++        break;
++    case ACVP_SHA384:
++        md = EVP_sha384();
++        break;
++    case ACVP_SHA512:
++        md = EVP_sha512();
++        break;
++    case ACVP_SHA512_224:
++        md = EVP_sha512_224();
++        break;
++    case ACVP_SHA512_256:
++        md = EVP_sha512_256();
++        break;
++    case ACVP_SHA3_224:
++        md = EVP_sha3_224();
++        break;
++    case ACVP_SHA3_256:
++        md = EVP_sha3_256();
++        break;
++    case ACVP_SHA3_384:
++        md = EVP_sha3_384();
++        break;
++    case ACVP_SHA3_512:
++        md = EVP_sha3_512();
++        break;
++    default:
++        printf("Error: Unsupported hash algorithm requested by ACVP server\n");
++        return ACVP_NO_CAP;
++    }
++
++    //
++    // Generate master secret
++    //
++
++    rc = tls1_PRF(md,
++                  TLS_MD_MASTER_SECRET_CONST,
++                  TLS_MD_MASTER_SECRET_CONST_SIZE,
++                  tc->ch_rnd, tc->ch_rnd_len,
++                  NULL, 0,
++                  tc->sh_rnd, tc->sh_rnd_len,
++                  NULL, 0,
++                  tc->pm_secret, tc->pm_len,
++                  tc->msecret1, SSL3_MASTER_SECRET_SIZE);
++    if (rc <= 0) {
++        printf("Unable to generate master secret\n");
++        goto err;
++    }
++
++    //
++    // Generate key block
++    //
++
++    rc = tls1_PRF(md,
++                 TLS_MD_KEY_EXPANSION_CONST,
++                 TLS_MD_KEY_EXPANSION_CONST_SIZE,
++                 tc->s_rnd, tc->s_rnd_len,
++                 NULL, 0,
++                 tc->c_rnd, tc->c_rnd_len,
++                 NULL, 0,
++                 tc->msecret1, SSL3_MASTER_SECRET_SIZE,
++                 tc->kblock1, tc->kb_len);
++    if (rc <= 0) {
++        printf("Unable to generate key block\n");
++        goto err;
++    }
++
++    rc = 0;
++
++err:
++    return rc;
+ }
+ 
+ int app_kdf135_snmp_handler(ACVP_TEST_CASE *test_case) {
+@@ -76,10 +200,95 @@ int app_kdf135_ssh_handler(ACVP_TEST_CASE *test_case) {
  }
  
  int app_pbkdf_handler(ACVP_TEST_CASE *test_case) {
@@ -99,8 +242,12 @@ index 1728527..602dfea 100644
 +
 +    rc = 0;
 +err:
-+    return rc;
 +
++    if (kctx != NULL) {
++        EVP_KDF_CTX_free(kctx);
++    }
++
++    return rc;
  }
  
  #endif // OPENSSL_KDF_SUPPORT
