@@ -3,7 +3,7 @@
 %global libsemanagever  %{version}-1
 %global libselinuxver   %{version}-1
 %global __python3	%{_bindir}/python3
-%global generatorsdir %{_lib}/systemd/system-generators
+%global generatorsdir   %{_libdir}/systemd/system-generators
 # Disable automatic compilation of Python files in extra directories
 %global _python_bytecompile_extra 0
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}

@@ -35,7 +35,6 @@ developed by the OASIS consortium.
 %setup -c -T 
 mkdir 5.0
 mkdir 5.1
-mv %{SOURCE2} .
 
 #Unzip Docbook 5.0 specification
 cd 5.0

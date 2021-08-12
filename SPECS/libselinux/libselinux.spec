@@ -12,7 +12,6 @@ Distribution:   Mariner
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre-devel
 BuildRequires:  swig
-#BuildRequires:  python3-devel
 Requires:       pcre-libs
 Requires:       libsepol
 

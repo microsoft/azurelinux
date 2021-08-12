@@ -124,7 +124,7 @@ This package contains command-line tools that facilitate using the library.
 
 %files -n %{name}%{_major}-debuginfo
 %license %{_licensedir}/*
-%{_lib}/debug%{_libdir}/lib*.so.*
+%{_libdir}/debug%{_libdir}/lib*.so.*
 
 %files tools
 %license %{_licensedir}/*

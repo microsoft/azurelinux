@@ -19,6 +19,7 @@ BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-Pod-Parser
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.30
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
