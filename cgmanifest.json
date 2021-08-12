@@ -14,6 +14,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "aide",
+          "version": "0.16",
+          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.16/aide-0.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "alsa-lib",
           "version": "1.2.2",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"
