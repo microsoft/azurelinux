@@ -1,19 +1,19 @@
 %define debug_package %{nil}
 
+Summary:        Create new systemd timer to check for system restart
 Name:           check-restart
 Version:        1.0.0
 Release:        1%{?dist}
-Summary:        Create new systemd timer to check for system restart 
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Source0:        check-restart.service
 Source1:        check-restart.sh
 Source2:        check-restart.timer
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 BuildRequires:  systemd
-Requires:       systemd
 Requires:       dnf-utils
+Requires:       systemd
 
 %description
 Creates a systemd service and timer that check if system needs to be restarted due to recent version updates
