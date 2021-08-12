@@ -34,7 +34,9 @@ fi
 echo > "$sodiff_log_file"
 
 # Get packages from stdin
-for rpmpackage in $(cat); do
+pkgs=`cat`
+
+for rpmpackage in $pkgs; do
     package_path=$(find "$rpms_folder" -name "$rpmpackage" -type f)
     package_provides=`2>/dev/null rpm -qP "$package_path" | grep -E '[.]so[(.]' `
     echo "Processing ${rpmpackage}..." >> "$sodiff_log_file"
@@ -64,4 +66,26 @@ for rpmpackage in $(cat); do
 done
 
 # Obtain a list of unique packages to be updated
-cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-summary.txt || true
+cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt || true
+
+# Remove packages that have been dash-rolled already.
+
+echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
+for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
+    # Remove version and release
+    package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
+    # Find a highest version of package built during this run
+    highest_build_ver_pkg=$(grep -F "$package" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -V | head -n 1)
+
+    # Make sure that the highest version is higher than one that needs to be dash-rolled
+    if ! [[ "$package" == "$highest_build_ver_pkg" ]]; then
+        # Check if the version of built package is newer than a published one
+        newest_pkg=$(echo -e "${package}\n${highest_build_ver_pkg}" | sort -V | head -n 1)
+        if ! [[ "$newest_pkg" == "$highest_build_ver_pkg" ]]; then
+            echo "$package" >> "$sodiff_out_dir"/sodiff-summary.txt
+        fi
+    fi
+
+done
+
+rm "$sodiff_out_dir"/sodiff-built-packages.txt
