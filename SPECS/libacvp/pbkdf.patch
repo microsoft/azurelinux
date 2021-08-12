@@ -1,5 +1,5 @@
 diff --git a/app/app_kdf.c b/app/app_kdf.c
-index 1728527..ea7acbc 100644
+index 1728527..4fec891 100644
 --- a/app/app_kdf.c
 +++ b/app/app_kdf.c
 @@ -11,6 +11,9 @@
@@ -65,8 +65,7 @@ index 1728527..ea7acbc 100644
      if (!test_case) {
 -        return -1;
 +        return rc;
-     }
--    return 1; 
++    }
 +
 +    tc = test_case->tc.kdf135_tls;
 +    if (!tc) return rc;
@@ -126,7 +125,8 @@ index 1728527..ea7acbc 100644
 +    if (rc <= 0) {
 +        printf("Unable to generate master secret\n");
 +        goto err;
-+    }
+     }
+-    return 1; 
 +
 +    //
 +    // Generate key block
@@ -153,7 +153,233 @@ index 1728527..ea7acbc 100644
  }
  
  int app_kdf135_snmp_handler(ACVP_TEST_CASE *test_case) {
-@@ -76,10 +200,95 @@ int app_kdf135_ssh_handler(ACVP_TEST_CASE *test_case) {
+@@ -68,18 +192,319 @@ int app_kdf135_snmp_handler(ACVP_TEST_CASE *test_case) {
+     return 1;
+ }
+ 
++int doSSHKDF(const EVP_MD *md,
++             char *input_key,
++             size_t input_key_len,
++             char *xcghash,
++             size_t xcghash_len,
++             char *session_id,
++             size_t session_id_len,
++             int action,
++             unsigned char *out,
++             size_t out_len) {
++    int ret = 0;
++    EVP_KDF_CTX *kctx;
++
++    if ((kctx = EVP_KDF_CTX_new_id(EVP_KDF_SSHKDF)) == NULL) {
++        printf("EVP_KDF_CTX_new_id failed \n");
++        goto err;
++    }
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_MD, md) <= 0) {
++        printf("EVP_KDF_CTRL_SET_MD failed \n");
++        goto err;
++    }
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_KEY, input_key,
++                     sizeof(input_key)) <= 0) {
++        printf("EVP_KDF_CTRL_SET_KEY failed \n");
++        goto err;
++    }
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SSHKDF_XCGHASH, xcghash,
++                     sizeof(xcghash)) <= 0) {
++        printf("EVP_KDF_CTRL_SET_SSHKDF_XCGHASH failed \n");
++        goto err;
++    }
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SSHKDF_SESSION_ID, session_id,
++                     sizeof(session_id)) <= 0) {
++        printf("EVP_KDF_CTRL_SET_SSHKDF_SESSION_ID failed \n");
++        goto err;
++    }
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SSHKDF_TYPE, action) <= 0) {
++        printf("EVP_KDF_CTRL_SET_SSHKDF_TYPE failed \n");
++        goto err;
++    }
++    if (EVP_KDF_derive(kctx, out, out_len) <= 0) {
++        printf("EVP_KDF_derive failed\n");
++        goto err;
++    }
++
++    ret = 1;
++
++err:
++    EVP_KDF_CTX_free(kctx);
++
++    return ret;
++}
++
+ int app_kdf135_ssh_handler(ACVP_TEST_CASE *test_case) {
++    int rc = 1;
++    ACVP_KDF135_SSH_TC *tc = NULL;
++    const EVP_MD *md = NULL;
++
+     if (!test_case) {
+-        return -1;
++        return 1;
+     }
+-    return 1;
++
++    tc = test_case->tc.kdf135_ssh;
++    if (!tc) return rc;
++
++    switch (tc->sha_type) {
++    case ACVP_SHA1:
++        md = EVP_sha1();
++        break;
++    case ACVP_SHA224:
++        md = EVP_sha224();
++        break;
++    case ACVP_SHA256:
++        md = EVP_sha256();
++        break;
++    case ACVP_SHA384:
++        md = EVP_sha384();
++        break;
++    case ACVP_SHA512:
++        md = EVP_sha512();
++        break;
++    case ACVP_SHA512_224:
++        md = EVP_sha512_224();
++        break;
++    case ACVP_SHA512_256:
++        md = EVP_sha512_256();
++        break;
++    case ACVP_SHA3_224:
++        md = EVP_sha3_224();
++        break;
++    case ACVP_SHA3_256:
++        md = EVP_sha3_256();
++        break;
++    case ACVP_SHA3_384:
++        md = EVP_sha3_384();
++        break;
++    case ACVP_SHA3_512:
++        md = EVP_sha3_512();
++        break;
++    default:
++        printf("Error: Unsupported hash algorithm requested by ACVP server\n");
++        return ACVP_NO_CAP;
++    }
++    
++    //
++    // Initial IV client
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'A',
++                  tc->cs_init_iv,
++                  tc->iv_len);
++    if (rc <= 0) {
++        printf("Unable to get initial IV client\n");
++        goto err;
++    }
++
++    //
++    // Encryption key client
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'C',
++                  tc->cs_encrypt_key,
++                  tc->e_key_len);
++    if (rc <= 0) {
++        printf("Unable to get encryption key client\n");
++        goto err;
++    }
++
++    //
++    // Integrity key client
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'E',
++                  tc->cs_integrity_key,
++                  tc->i_key_len);
++    if (rc <= 0) {
++        printf("Unable to get integrity key client\n");
++        goto err;
++    }
++
++    //
++    // Initial IV server
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'B',
++                  tc->sc_init_iv,
++                  tc->iv_len);
++    if (rc <= 0) {
++        printf("Unable to get initial IV server\n");
++        goto err;
++    }
++    
++    //
++    // Encryption key server
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'D',
++                  tc->sc_encrypt_key,
++                  tc->e_key_len);
++    if (rc <= 0) {
++        printf("Unable to get encryption key server\n");
++        goto err;
++    }
++
++    //
++    // Integrity key server
++    //
++
++    rc = doSSHKDF(md,
++                  tc->shared_secret_k,
++                  (size_t)tc->shared_secret_len,
++                  tc->hash_h,
++                  (size_t)tc->hash_len,
++                  tc->session_id,
++                  tc->session_id_len,
++                  (int)'F',
++                  tc->sc_integrity_key,
++                  tc->i_key_len);
++    if (rc <= 0) {
++        printf("Unable to get integrity key server\n");
++        goto err;
++    }
++    
++    rc = 0;
++err:
++    return rc;
  }
  
  int app_pbkdf_handler(ACVP_TEST_CASE *test_case) {
