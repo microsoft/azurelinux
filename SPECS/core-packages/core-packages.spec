@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        0.1
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,6 +96,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Aug 11 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1-24
+- Add dnf-automatic and dnf-utils to the base image.
+
 * Sat Jul 24 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.1-23
 - Include new Microsoft repo for x86_64 architectures (temporarily exclude from aarch64)
 
