@@ -11,6 +11,9 @@ Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{ve
 
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
+%if %{with_check}
+BuildRequires:  cmocka
+%endif
 
 Requires:       json-c
 Requires:       openssl
@@ -34,6 +37,9 @@ The libraries and header files needed for TSS2 development.
 
 %build
 %configure \
+%if %{with_check}
+    --enable-unit \
+%endif
     --disable-static \
     --disable-doxygen-doc \
     --with-udevrulesdir=%{_sysconfdir}/udev/rules.d
@@ -42,6 +48,9 @@ The libraries and header files needed for TSS2 development.
 
 %install
 %make_install
+
+%check
+make -j$(nproc) check
 
 %post
 /sbin/ldconfig
@@ -93,6 +102,7 @@ fi
 * Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.6-1
 - Updating to version 2.4.6 to fix CVE-2020-24455.
 - Updated spec to use 'make' build and install macros, and '%%autosetup'.
+- Enabled running unit tests.
 
 * Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-1
 - Update to 2.4.0.
