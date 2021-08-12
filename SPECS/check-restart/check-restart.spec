@@ -1,5 +1,4 @@
 %define debug_package %{nil}
-
 Summary:        Create new systemd timer to check for system restart
 Name:           check-restart
 Version:        1.0.0
@@ -10,7 +9,6 @@ Distribution:   Mariner
 Source0:        check-restart.service
 Source1:        check-restart.sh
 Source2:        check-restart.timer
-
 BuildRequires:  systemd
 Requires:       dnf-utils
 Requires:       systemd
