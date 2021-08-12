@@ -13,6 +13,7 @@ Distribution:   Mariner
 
 BuildRequires:  systemd
 Requires:       systemd
+Requires:       dnf-utils
 
 %description
 Creates a systemd service and timer that check if system needs to be restarted due to recent version updates
@@ -41,4 +42,4 @@ install -m644 %{SOURCE1} %{buildroot}%{_bindir}/%{name}.sh
 
 %changelog
 * Mon Aug 02 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
-- Initial version of the check-restart package
+- Original version for CBL-Mariner.
