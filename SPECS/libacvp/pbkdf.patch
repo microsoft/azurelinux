@@ -1,0 +1,140 @@
+diff --git a/app/app_kdf.c b/app/app_kdf.c
+index 1728527..602dfea 100644
+--- a/app/app_kdf.c
++++ b/app/app_kdf.c
+@@ -11,6 +11,7 @@
+ #ifdef OPENSSL_KDF_SUPPORT
+ #include <openssl/evp.h>
+ #include <openssl/bn.h>
++#include <openssl/kdf.h>
+ #include "app_lcl.h"
+ # include "app_fips_lcl.h"
+ 
+@@ -76,10 +77,91 @@ int app_kdf135_ssh_handler(ACVP_TEST_CASE *test_case) {
+ }
+ 
+ int app_pbkdf_handler(ACVP_TEST_CASE *test_case) {
++    int rc = 1;
++    ACVP_PBKDF_TC *tc = NULL;
++    EVP_KDF_CTX *kctx = NULL;
++    const EVP_MD *md = NULL;
++
+     if (!test_case) {
+-        return -1;
++        return 1;
+     }
+-    return 1;
++
++    tc = test_case->tc.pbkdf;
++    if (!tc) return rc;
++
++    switch (tc->hmac_type) {
++    case ACVP_HMAC_ALG_SHA1:
++        md = EVP_sha1();
++        break;
++    case ACVP_HMAC_ALG_SHA224:
++        md = EVP_sha224();
++        break;
++    case ACVP_HMAC_ALG_SHA256:
++        md = EVP_sha256();
++        break;
++    case ACVP_HMAC_ALG_SHA384:
++        md = EVP_sha384();
++        break;
++    case ACVP_HMAC_ALG_SHA512:
++        md = EVP_sha512();
++        break;
++    case ACVP_HMAC_ALG_SHA512_224:
++        md = EVP_sha512_224();
++        break;
++    case ACVP_HMAC_ALG_SHA512_256:
++        md = EVP_sha512_256();
++        break;
++    case ACVP_HMAC_ALG_SHA3_224:
++        md = EVP_sha3_224();
++        break;
++    case ACVP_HMAC_ALG_SHA3_256:
++        md = EVP_sha3_256();
++        break;
++    case ACVP_HMAC_ALG_SHA3_384:
++        md = EVP_sha3_384();
++        break;
++    case ACVP_HMAC_ALG_SHA3_512:
++        md = EVP_sha3_512();
++        break;
++    default:
++        printf("Error: Unsupported hash algorithm requested by ACVP server\n");
++        return ACVP_NO_CAP;
++    }
++
++    if ((kctx = EVP_KDF_CTX_new_id(EVP_KDF_PBKDF2)) == NULL) {
++        printf("EVP_KDF_CTX_new_id error\n");
++        goto err;
++    }
++
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_PASS, tc->password, (size_t)tc->pw_len) <=0) {
++        printf("EVP_KDF_CTRL_SET_PASS error\n");
++        goto err;
++    }
++
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SALT, tc->salt, (size_t)tc->salt_len) <= 0) {
++        printf("EVP_KDF_CTRL_SET_SALT error\n");
++        goto err;
++    }
++
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_ITER, tc->iterationCount) <= 0) {
++        printf("EVP_KDF_CTRL_SET_ITER error\n");
++        goto err;
++    }
++
++    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_MD, md) <= 0) {
++        printf("EVP_KDF_CTRL_SET_MD error\n");
++        goto err;
++    }
++
++    if (EVP_KDF_derive(kctx, tc->key, tc->key_len) <= 0) {
++        printf("EVP_KDF_derive error\n");
++        goto err;
++    }
++
++    rc = 0;
++err:
++    return rc;
++
+ }
+ 
+ #endif // OPENSSL_KDF_SUPPORT
+diff --git a/app/app_main.c b/app/app_main.c
+index 4acfef6..af88c69 100755
+--- a/app/app_main.c
++++ b/app/app_main.c
+@@ -1477,7 +1477,6 @@ static int enable_kdf(ACVP_CTX *ctx) {
+     //rv = acvp_cap_kdf108_set_parm(ctx, ACVP_KDF108_MODE_COUNTER, ACVP_KDF108_REQUIRES_EMPTY_IV, 0);
+     //CHECK_ENABLE_CAP_RV(rv);
+ 
+-#if 0 //Not supported by openSSL currently
+     /*
+      * PBKDF
+      */
+@@ -1511,7 +1510,6 @@ static int enable_kdf(ACVP_CTX *ctx) {
+     CHECK_ENABLE_CAP_RV(rv);
+     rv = acvp_cap_pbkdf_set_domain(ctx, ACVP_PBKDF_SALT_LEN, 128, 4096, 8);
+     CHECK_ENABLE_CAP_RV(rv);
+-#endif
+ 
+ end:
+ 
+diff --git a/src/acvp_capabilities.c b/src/acvp_capabilities.c
+index cb126d0..fd455b3 100644
+--- a/src/acvp_capabilities.c
++++ b/src/acvp_capabilities.c
+@@ -1862,8 +1862,7 @@ static ACVP_RESULT acvp_validate_prereq_val(ACVP_CIPHER cipher, ACVP_PREREQ_ALG
+         }
+         break;
+     case ACVP_PBKDF:
+-        if (pre_req == ACVP_PREREQ_DRBG ||
+-            pre_req == ACVP_PREREQ_HMAC) {
++        if (pre_req == ACVP_PREREQ_SHA) {
+             return ACVP_SUCCESS;
+         }
+         break;

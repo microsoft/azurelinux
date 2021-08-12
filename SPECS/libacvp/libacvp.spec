@@ -1,7 +1,7 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
 Version:        1.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,8 @@ URL:            https://github.com/cisco/libacvp
 # Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         openssl.patch
+Patch1:         rsa-keygen.patch
+Patch2:         pbkdf.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -35,7 +37,7 @@ and the library itself.
 ./configure \
     --prefix=%{_prefix} \
     --enable-offline \
-    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -O0 -g" \
+    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -DOPENSSL_KDF_SUPPORT -O0 -g" \
     LIBS="-ldl"
 make clean
 make CC=gcc
@@ -58,6 +60,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
+* Fri Jul 30 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-2
+- Update to version 1.3.0
+
 * Fri Jul 30 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
 - Add patch to support OpenSSL ACVP testing.

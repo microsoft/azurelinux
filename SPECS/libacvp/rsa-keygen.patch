@@ -1,0 +1,21 @@
+diff --git a/app/app_main.c b/app/app_main.c
+index 4acfef6..12f8d1a 100755
+--- a/app/app_main.c
++++ b/app/app_main.c
+@@ -2170,7 +2170,6 @@ static int enable_rsa(ACVP_CTX *ctx) {
+     /*
+      * Enable RSA keygen...
+      */
+-#ifdef NOT_SUPPORTED_BY_OPENSSL
+     rv = acvp_cap_rsa_keygen_enable(ctx, ACVP_RSA_KEYGEN, &app_rsa_keygen_handler);
+     CHECK_ENABLE_CAP_RV(rv);
+     rv = acvp_cap_set_prereq(ctx, ACVP_RSA_KEYGEN, ACVP_PREREQ_SHA, value);
+@@ -2195,7 +2194,7 @@ static int enable_rsa(ACVP_CTX *ctx) {
+     rv = acvp_cap_rsa_keygen_set_primes(ctx, ACVP_RSA_KEYGEN_B34, 3072,
+                                         ACVP_RSA_PRIME_HASH_ALG, ACVP_SHA256);
+     CHECK_ENABLE_CAP_RV(rv);
+-#endif
++    
+     /*
+      * Enable siggen
+      */
