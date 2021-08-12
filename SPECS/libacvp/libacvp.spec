@@ -12,6 +12,7 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         openssl.patch
 Patch1:         rsa-keygen.patch
 Patch2:         pbkdf.patch
+Patch3:         kas.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
