@@ -9,7 +9,7 @@ Subject: [PATCH] libsemanage: Fix RESOURCE_LEAK and USE_AFTER_FREE coverity
  1 file changed, 8 insertions(+), 13 deletions(-)
 
 diff --git a/libsemanage/src/direct_api.c b/libsemanage/src/direct_api.c
-index c58961be..8e4d116d 100644
+index 9a4e79385b69..393ec9faf92d 100644
 --- a/libsemanage/src/direct_api.c
 +++ b/libsemanage/src/direct_api.c
 @@ -1028,7 +1028,7 @@ static int semanage_direct_write_langext(semanage_handle_t *sh,
@@ -21,7 +21,7 @@ index c58961be..8e4d116d 100644
  
  cleanup:
  	if (fp != NULL) fclose(fp);
-@@ -2177,7 +2177,6 @@ cleanup:
+@@ -2185,7 +2185,6 @@ cleanup:
  	semanage_module_info_destroy(sh, modinfo);
  	free(modinfo);
  
@@ -29,7 +29,7 @@ index c58961be..8e4d116d 100644
  	return status;
  }
  
-@@ -2342,16 +2341,6 @@ static int semanage_direct_get_module_info(semanage_handle_t *sh,
+@@ -2350,16 +2349,6 @@ static int semanage_direct_get_module_info(semanage_handle_t *sh,
  	free(tmp);
  	tmp = NULL;
  
@@ -46,7 +46,7 @@ index c58961be..8e4d116d 100644
  	/* lookup enabled/disabled status */
  	ret = semanage_module_get_path(sh,
  				       *modinfo,
-@@ -2395,7 +2384,13 @@ cleanup:
+@@ -2403,7 +2392,13 @@ cleanup:
  		free(modinfos);
  	}
  
@@ -62,5 +62,4 @@ index c58961be..8e4d116d 100644
  }
  
 -- 
-2.23.0.rc1
-
+2.32.0
