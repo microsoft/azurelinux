@@ -187,6 +187,7 @@ Patch1153:      CVE-2021-35477.nopatch
 Patch1154:      CVE-2021-28691.nopatch
 Patch1155:      CVE-2021-3564.nopatch
 Patch1156:      CVE-2020-25639.nopatch
+Patch1157:      CVE-2021-29657.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -519,10 +520,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Wed Aug 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
+* Thu Aug 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
 - Update source to 5.10.57.1
-- Address CVE-2021-37576, CVE-2021-3455, CVE-2021-35477, CVE-2021-28691,
-  CVE-2021-3564, CVE-2020-25639
+- Address CVE-2021-37576, CVE-2021-34556, CVE-2021-35477, CVE-2021-28691,
+  CVE-2021-3564, CVE-2020-25639, CVE-2021-29657
 
 * Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
 - Add patch to fix VDSO in HyperV
