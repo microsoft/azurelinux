@@ -655,8 +655,8 @@
         "type": "other",
         "other": {
           "name": "checkpolicy",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/checkpolicy-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/checkpolicy-3.2.tar.gz"
         }
       }
     },
@@ -3399,8 +3399,8 @@
         "type": "other",
         "other": {
           "name": "libselinux",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libselinux-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libselinux-3.2.tar.gz"
         }
       }
     },
@@ -3409,8 +3409,8 @@
         "type": "other",
         "other": {
           "name": "libsemanage",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsemanage-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libsemanage-3.2.tar.gz"
         }
       }
     },
@@ -3419,8 +3419,8 @@
         "type": "other",
         "other": {
           "name": "libsepol",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20200710/libsepol-3.1.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libsepol-3.2.tar.gz"
         }
       }
     },
@@ -4259,8 +4259,8 @@
         "type": "other",
         "other": {
           "name": "mcstrans",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/mcstrans-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/mcstrans-3.2.tar.gz"
         }
       }
     },
@@ -5509,8 +5509,8 @@
         "type": "other",
         "other": {
           "name": "policycoreutils",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/policycoreutils-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/selinux-3.2.tar.gz"
         }
       }
     },
@@ -8090,8 +8090,8 @@
         "type": "other",
         "other": {
           "name": "secilc",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/secilc-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/secilc-3.2.tar.gz"
         }
       }
     },
@@ -8120,8 +8120,8 @@
         "type": "other",
         "other": {
           "name": "setools",
-          "version": "4.2.2",
-          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.2.2/setools-4.2.2.tar.bz2"
+          "version": "4.4.0",
+          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.4.0/setools-4.4.0.tar.bz2"
         }
       }
     },
