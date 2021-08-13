@@ -19,3 +19,304 @@ index 4acfef6..12f8d1a 100755
      /*
       * Enable siggen
       */
+diff --git a/app/app_rsa.c b/app/app_rsa.c
+index 6a96f03..ab1c688 100644
+--- a/app/app_rsa.c
++++ b/app/app_rsa.c
+@@ -27,10 +27,99 @@ void app_rsa_cleanup(void) {
+ }
+ 
+ int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
++    int rc = 1;
++    ACVP_RSA_KEYGEN_TC *tc = NULL;
++    BIGNUM *e = NULL, *p = NULL, *q = NULL;
++    RSA *rsa = NULL;
++
+     if (!test_case) {
+-        return -1;
++        printf("\nError: test case not found in RSA KeyGen handler\n");
++        goto err;
++    }
++
++    tc = test_case->tc.rsa_keygen;
++
++    if (!tc) {
++        printf("\nError: test case not found in RSA SigGen handler\n");
++        goto err;
+     }
+-    return 1;
++
++    rsa = RSA_new();
++
++    if (tc->test_type == ACVP_RSA_TEST_TYPE_KAT) {
++        // Get e, p, and q values
++        e = BN_bin2bn(tc->e, tc->e_len, NULL);
++        if (e == NULL) {
++            printf("\nUnable to get e\n");
++            goto err;
++        }
++
++        p = BN_bin2bn(tc->p, tc->p_len, NULL);
++        if (p == NULL) {
++            printf("\nUnable to get p\n");
++            goto err;
++        }
++
++        q = BN_bin2bn(tc->q, tc->q_len, NULL);
++        if (q == NULL) {
++            printf("\nUnable to get q\n");
++            goto err;
++        }
++
++        if (RSA_set0_factors(rsa, p, q) <= 0) {
++            printf("\nUnable to set p/q\n");
++            goto err;
++        }
++
++        if (!RSA_X931_derive_ex(rsa, NULL, NULL, NULL, NULL,
++                            NULL, NULL, NULL, NULL, NULL, NULL, e, NULL)) {
++            printf("Unable to derive key\n");
++            tc->kat_rc = ACVP_TEST_DISPOSITION_FAIL;
++            rc = 0;
++            goto err;
++        }
++
++        if (RSA_check_key_ex(rsa, NULL) <= 0) {
++            tc->kat_rc = ACVP_TEST_DISPOSITION_FAIL;
++        }
++
++        tc->kat_rc = ACVP_TEST_DISPOSITION_PASS;
++
++    } else if (tc->test_type == ACVP_RSA_TEST_TYPE_GDT) {
++        /* only support 0x10001 */
++        e = BN_new();
++        if (!BN_set_word(e, RSA_F4)) {
++            printf("Error converting e to BN\n");
++            goto err;
++        }
++
++        if (RSA_X931_generate_key_ex(rsa, tc->modulo, e, NULL) <= 0) {
++            printf("Unable to generate key\n");
++            goto err;
++        }
++        
++        //
++        // Obtain RSA values p, q, n, e and d
++        //
++
++        tc->p_len = BN_bn2bin(RSA_get0_p(rsa), tc->p);
++        tc->q_len = BN_bn2bin(RSA_get0_q(rsa), tc->q);
++        tc->e_len = BN_bn2bin(RSA_get0_e(rsa), tc->e);
++        tc->n_len = BN_bn2bin(RSA_get0_n(rsa), tc->n);
++        tc->d_len = BN_bn2bin(RSA_get0_d(rsa), tc->d);
++    } else {
++        printf("\nError: test case not found in RSA SigGen handler\n");
++        goto err;
++    }
++
++    rc = 0;
++err:
++
++    if (rsa != NULL) {
++        RSA_free(rsa);
++    }
++
++    return rc;
+ }
+ 
+ static const unsigned char sha1_bin[] = {
+diff --git a/include/acvp/acvp.h b/include/acvp/acvp.h
+index d00d39e..e9fc24f 100644
+--- a/include/acvp/acvp.h
++++ b/include/acvp/acvp.h
+@@ -653,6 +653,14 @@ typedef enum acvp_cmac_testtype {
+     ACVP_CMAC_TEST_TYPE_AFT
+ } ACVP_CMAC_TESTTYPE;
+ 
++/*! @struct ACVP_RSA_TESTTYPE */
++typedef enum acvp_rsa_testtype {
++    ACVP_RSA_TEST_TYPE_NONE = 0,
++    ACVP_RSA_TEST_TYPE_KAT,
++    ACVP_RSA_TEST_TYPE_AFT,
++    ACVP_RSA_TEST_TYPE_GDT
++} ACVP_RSA_TESTTYPE;
++
+ /*! @struct ACVP_PBKDF_TESTTYPE */
+ typedef enum acvp_pbkdf_testtype {
+     ACVP_PBKDF_TEST_TYPE_NONE = 0,
+@@ -1076,6 +1084,7 @@ typedef struct acvp_cmac_tc_t {
+  * passed between libacvp and the crypto module.
+  */
+ typedef struct acvp_rsa_keygen_tc_t {
++    ACVP_RSA_TESTTYPE test_type;
+     unsigned int tc_id;    /* Test case id */
+     ACVP_HASH_ALG hash_alg;
+     ACVP_RSA_PRIME_TEST_TYPE prime_test;
+@@ -1127,6 +1136,8 @@ typedef struct acvp_rsa_keygen_tc_t {
+     int xp_len;
+     int xp1_len;
+     int xp2_len;
++
++    int kat_rc;
+ } ACVP_RSA_KEYGEN_TC;
+ 
+ /*!
+diff --git a/src/acvp_rsa_keygen.c b/src/acvp_rsa_keygen.c
+index e359626..0161cd1 100644
+--- a/src/acvp_rsa_keygen.c
++++ b/src/acvp_rsa_keygen.c
+@@ -27,6 +27,11 @@ static ACVP_RESULT acvp_rsa_output_tc(ACVP_CTX *ctx, ACVP_RSA_KEYGEN_TC *stc, JS
+     ACVP_RESULT rv = ACVP_SUCCESS;
+     char *tmp = NULL;
+ 
++    if (stc->test_type == ACVP_RSA_TEST_TYPE_KAT) {
++        json_object_set_boolean(tc_rsp, "testPassed", stc->kat_rc);
++        return rv;
++    }
++
+     tmp = calloc(ACVP_RSA_EXP_LEN_MAX + 1, sizeof(char));
+     if (!tmp) {
+         ACVP_LOG_ERR("Unable to malloc in acvp_kdf135 tpm_output_tc");
+@@ -186,7 +191,10 @@ static ACVP_RESULT acvp_rsa_keygen_init_tc(ACVP_CTX *ctx,
+                                            int bitlen1,
+                                            int bitlen2,
+                                            int bitlen3,
+-                                           int bitlen4) {
++                                           int bitlen4,
++                                           const char *p,
++                                           const char *q,
++                                           ACVP_RSA_TESTTYPE test_type) {
+     memzero_s(stc, sizeof(ACVP_RSA_KEYGEN_TC));
+     ACVP_RESULT rv = ACVP_SUCCESS;
+     stc->info_gen_by_server = info_gen_by_server;
+@@ -197,6 +205,7 @@ static ACVP_RESULT acvp_rsa_keygen_init_tc(ACVP_CTX *ctx,
+     stc->hash_alg = hash_alg;
+     stc->pub_exp_mode = pub_exp_mode;
+     stc->key_format = key_format;
++    stc->test_type = test_type;
+ 
+     stc->e = calloc(ACVP_RSA_EXP_BYTE_MAX, sizeof(unsigned char));
+     if (!stc->e) { return ACVP_MALLOC_FAIL; }
+@@ -215,6 +224,20 @@ static ACVP_RESULT acvp_rsa_keygen_init_tc(ACVP_CTX *ctx,
+         return rv;
+     }
+ 
++    if (test_type == ACVP_RSA_TEST_TYPE_KAT) {
++        rv = acvp_hexstr_to_bin(p, stc->p, ACVP_RSA_EXP_BYTE_MAX, &(stc->p_len));
++        if (rv != ACVP_SUCCESS) {
++            ACVP_LOG_ERR("Hex conversion failure (p)");
++            return rv;
++        }
++
++        rv = acvp_hexstr_to_bin(q, stc->q, ACVP_RSA_EXP_BYTE_MAX, &(stc->q_len));
++        if (rv != ACVP_SUCCESS) {
++            ACVP_LOG_ERR("Hex conversion failure (q)");
++            return rv;
++        }
++    }
++
+     stc->seed = calloc(ACVP_RSA_SEEDLEN_MAX, sizeof(unsigned char));
+     if (!stc->seed) { return ACVP_MALLOC_FAIL; }
+ 
+@@ -311,9 +334,11 @@ ACVP_RESULT acvp_rsa_keygen_kat_handler(ACVP_CTX *ctx, JSON_Object *obj) {
+     ACVP_RSA_PRIME_TEST_TYPE prime_test = 0;
+     ACVP_RSA_PUB_EXP_MODE pub_exp_mode = 0;
+     ACVP_RSA_KEY_FORMAT key_format = 0;
++    ACVP_RSA_TESTTYPE testtype;
+     const char *e_str = NULL, *alg_str = NULL, *mode_str, *hash_alg_str = NULL,
+                *seed = NULL, *pub_exp_mode_str = NULL, *key_format_str = NULL,
+-               *rand_pq_str = NULL, *prime_test_str = NULL;
++               *rand_pq_str = NULL, *prime_test_str = NULL, *test_type_str = NULL,
++               *p_str = NULL, *q_str = NULL;
+     int bitlen1 = 0, bitlen2 = 0, bitlen3 = 0, bitlen4 = 0;
+ 
+     if (!ctx) {
+@@ -372,6 +397,7 @@ ACVP_RESULT acvp_rsa_keygen_kat_handler(ACVP_CTX *ctx, JSON_Object *obj) {
+ 
+     for (i = 0; i < g_cnt; i++) {
+         int tgId = 0;
++        int diff = 0;
+         groupval = json_array_get_value(groups, i);
+         groupobj = json_value_get_object(groupval);
+ 
+@@ -493,11 +519,35 @@ ACVP_RESULT acvp_rsa_keygen_kat_handler(ACVP_CTX *ctx, JSON_Object *obj) {
+             }
+         }
+ 
++        test_type_str = json_object_get_string(groupobj, "testType");
++        if (!test_type_str) {
++            ACVP_LOG_ERR("Server JSON missing 'testType'");
++            rv = ACVP_MISSING_ARG;
++            goto err;
++        }
++
++        strcmp_s("KAT", 3, test_type_str, &diff);
++        if (!diff) {
++            testtype = ACVP_RSA_TEST_TYPE_KAT;
++            goto test_type_found;
++        } 
++
++        strcmp_s("GDT", 3, test_type_str, &diff);
++        if (!diff) {
++            testtype = ACVP_RSA_TEST_TYPE_GDT;
++        } else {
++            ACVP_LOG_ERR("invalid 'testType' in server JSON.");
++            rv = ACVP_UNSUPPORTED_OP;
++            goto err;
++        }
++
++test_type_found:
+         ACVP_LOG_VERBOSE("    Test group: %d", i);
+         ACVP_LOG_VERBOSE("  infoGenByServer: %s", info_gen_by_server ? "true" : "false");
+         ACVP_LOG_VERBOSE("       pubExpMode: %s", pub_exp_mode_str);
+         ACVP_LOG_VERBOSE("        keyFormat: %s", key_format_str);
+         ACVP_LOG_VERBOSE("           modulo: %d", mod);
++        ACVP_LOG_VERBOSE("         testType: %s", test_type_str);
+ 
+         tests = json_object_get_array(groupobj, "tests");
+         t_cnt = json_array_get_count(tests);
+@@ -573,11 +623,43 @@ ACVP_RESULT acvp_rsa_keygen_kat_handler(ACVP_CTX *ctx, JSON_Object *obj) {
+                     json_value_free(r_tval);
+                     goto err;
+                 }
++            } else {   // Info not generated by server
++                if (testtype == ACVP_RSA_TEST_TYPE_KAT) {
++                    e_str = json_object_get_string(testobj, "e");
++                    if (!e_str) {
++                        ACVP_LOG_ERR("Server JSON missing 'e'");
++                        rv = ACVP_MISSING_ARG;
++                        json_value_free(r_tval);
++                        goto err;
++                    }
++                    if (strnlen_s(e_str, ACVP_RSA_EXP_LEN_MAX + 1)
++                        > ACVP_RSA_EXP_LEN_MAX) {
++                        ACVP_LOG_ERR("'e' too long, max allowed=(%d)",
++                                    ACVP_RSA_EXP_LEN_MAX);
++                        rv = ACVP_INVALID_ARG;
++                        json_value_free(r_tval);
++                        goto err;
++                    }
++                    p_str = json_object_get_string(testobj, "p");
++                    if (!p_str) {
++                        ACVP_LOG_ERR("Server JSON missing 'p'");
++                        rv = ACVP_MISSING_ARG;
++                        json_value_free(r_tval);
++                        goto err;
++                    }
++                    q_str = json_object_get_string(testobj, "q");
++                    if (!q_str) {
++                        ACVP_LOG_ERR("Server JSON missing 'q'");
++                        rv = ACVP_MISSING_ARG;
++                        json_value_free(r_tval);
++                        goto err;
++                    } 
++                }
+             }
+ 
+             rv = acvp_rsa_keygen_init_tc(ctx, &stc, tc_id, info_gen_by_server, hash_alg, key_format,
+                                          pub_exp_mode, mod, prime_test, rand_pq, e_str, seed, seed_len,
+-                                         bitlen1, bitlen2, bitlen3, bitlen4);
++                                         bitlen1, bitlen2, bitlen3, bitlen4, p_str, q_str, testtype);
+ 
+             /* Process the current test vector... */
+             if (rv == ACVP_SUCCESS) {
