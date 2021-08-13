@@ -75,7 +75,6 @@ for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # Remove version and release
     package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
     # Find a highest version of package built during this run and remove .$ARCH.rpm ending
-    grep -F "$package_stem" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -V
     highest_build_ver_pkg=$(grep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
 
     # Check if versions differ
