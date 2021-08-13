@@ -1,10 +1,9 @@
-%global selinux_ver 2.9-1
-%global __python3	%{_bindir}/python3
-%define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
+%global libselinux_ver 3.2-1
+%global libsepol_ver 3.2-1
 Summary:        Policy analysis tools for SELinux
 Name:           setools
-Version:        4.2.2
-Release:        2%{?setools_pre_ver:.%{setools_pre_ver}}%{?dist}
+Version:        4.4.0
+Release:        1%{?dist}
 # binaries are GPL and libraries are LGPL.  See COPYING.
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -16,8 +15,8 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glibc-devel
-BuildRequires:  libselinux-devel
-BuildRequires:  libsepol-devel >= 2.9-1
+BuildRequires:  libselinux-devel >=  %{libselinux_ver}
+BuildRequires:  libsepol-devel >= %{libsepol_ver}
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -29,13 +28,13 @@ BuildRequires:  swig
 SETools is a collection of graphical tools, command-line tools, and
 Python modules designed to facilitate SELinux policy analysis.
 
-%package     console
+%package        console
 Summary:        Policy analysis command-line tools for SELinux
 License:        GPLv2
-Requires:       libselinux >= %{selinux_ver}
-Requires:       setools-python3 = %{version}-%{release}
+Requires:       libselinux >= %{libselinux_ver}
+Requires:       %{name}-python3 = %{version}-%{release}
 
-%description console
+%description    console
 SETools is a collection of graphical tools, command-line tools, and
 libraries designed to facilitate SELinux policy analysis.
 
@@ -45,27 +44,27 @@ This package includes the following console tools:
   seinfo       List policy components.
   sesearch     Search rules (allow, type_transition, etc.)
 
-%package     python3
+%package        python3
 Summary:        Policy analysis tools for SELinux
 License:        GPLv2 AND LGPLv2+
 Requires:       python3-setuptools
 Recommends:     libselinux-python3
-Obsoletes:      setools-libs < 4.0.0
+Provides:       python3-%{name} = %{version}-%{release}
+Obsoletes:      %{name}-libs < 4.0.0
 
 %description python3
 SETools is a collection of graphical tools, command-line tools, and
 Python 3 modules designed to facilitate SELinux policy analysis.
 
 %prep
-%setup -q -n %{name}
+%autosetup -n %{name}
 
 %build
-python3 setup.py build_ext
-python3 setup.py build
-
+%python3 setup.py build_ext
+%python3 setup.py build
 
 %install
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install --prefix=%{_prefix}
 
 # Remove unpackaged files.  These are tools for which the dependencies
 # are not yet available on mariner (python3-networkx)
@@ -92,6 +91,13 @@ rm -rf %{buildroot}/%{_mandir}/man1/apol*
 %{python3_sitearch}/setools-*
 
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.0-1
+- Upgrade to latest upstream
+- Update version of libselinux/libsepol dependencies
+- Add python3-setools provides to python3 subpackage
+- Lint spec
+- License verified
+
 * Tue Sep 01 2020 Daniel Burgener <daburgen@microsoft.com> - 4.2.2-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified
