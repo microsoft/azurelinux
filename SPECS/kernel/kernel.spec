@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.52.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -181,6 +181,7 @@ Patch1147:      CVE-2021-34693.nopatch
 Patch1148:      CVE-2021-33624.nopatch
 Patch1149:      CVE-2021-35039.nopatch
 Patch1150:      CVE-2021-33909.nopatch
+Patch1151: CVE-2021-38202.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -513,6 +514,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+*   Fri Aug 13 2021 Mariner Autopatcher <cblmargh@microsoft.com> 5.10.52.1-4
+-   Added patch file(s) CVE-2021-38202.patch
 * Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
 - Add patch to fix VDSO in HyperV
 

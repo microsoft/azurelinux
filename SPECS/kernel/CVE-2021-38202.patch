@@ -1,0 +1,28 @@
+From 7b08cf62b1239a4322427d677ea9363f0ab677c6 Mon Sep 17 00:00:00 2001
+From: Chuck Lever <chuck.lever@oracle.com>
+Date: Fri, 25 Jun 2021 11:12:49 -0400
+Subject: [PATCH] NFSD: Prevent a possible oops in the nfs_dirent() tracepoint
+
+The double copy of the string is a mistake, plus __assign_str()
+uses strlen(), which is wrong to do on a string that isn't
+guaranteed to be NUL-terminated.
+
+Fixes: 6019ce0742ca ("NFSD: Add a tracepoint to record directory entry encoding")
+Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+---
+ fs/nfsd/trace.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/nfsd/trace.h b/fs/nfsd/trace.h
+index 10cc3aaf1089e3..adaec43548d11f 100644
+--- a/fs/nfsd/trace.h
++++ b/fs/nfsd/trace.h
+@@ -408,7 +408,6 @@ TRACE_EVENT(nfsd_dirent,
+ 		__entry->ino = ino;
+ 		__entry->len = namlen;
+ 		memcpy(__get_str(name), name, namlen);
+-		__assign_str(name, name);
+ 	),
+ 	TP_printk("fh_hash=0x%08x ino=%llu name=%.*s",
+ 		__entry->fh_hash, __entry->ino,
