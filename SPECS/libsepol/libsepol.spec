@@ -8,6 +8,9 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
+%if %{with_check}
+BuildRequires:  cunit-devel
+%endif
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -90,6 +93,7 @@ exit 0
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream and update source URL format
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
+- Remove cunit source, switch to check-time build requirement on cunit
 - Bump libsepol sover to 2
 - Lint spec
 - License verified
