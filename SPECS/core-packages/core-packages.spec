@@ -59,6 +59,10 @@ Requires:       libtool
 Requires:       lz4
 Requires:       mariner-release
 Requires:       mariner-repos
+%ifarch x86_64
+# Temporarily exclude aarch64 from including the microsoft repo until content is available in the repo
+Requires:       mariner-repos-microsoft
+%endif
 Requires:       mariner-rpm-macros
 Requires:       ncurses-libs
 Requires:       net-tools
@@ -80,10 +84,6 @@ Requires:       vim
 Requires:       wget
 Requires:       xz
 Requires:       zlib
-%ifarch x86_64
-# Temporarily exclude aarch64 from including the microsoft repo until content is available in the repo
-Requires:       mariner-repos-microsoft
-%endif
 
 %description    container
 %{summary}
