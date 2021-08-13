@@ -1,14 +1,14 @@
 %global libsepolver %{version}-1
 Summary:        The SELinux CIL Compiler
 Name:           secilc
-Version:        2.9
-Release:        4%{?dist}
+Version:        3.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/SELinuxProject/selinux
-Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
-Patch0001:      0001-Allow-setting-arguments-to-xmlto-via-environmental-v.patch
+URL:            https://github.com/SELinuxProject/selinux/wiki
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         Allow-setting-arguments-to-xmlto-via-environmental-v.patch
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libsepol-devel >= %{libsepolver}
@@ -22,18 +22,15 @@ http://github.com/SELinuxProject/cil/wiki/
 for more information about the goals and features on the CIL language.
 
 %prep
-%autosetup -p 1 -n secilc-%{version}
-
+%autosetup -p1
 
 %build
 %{set_build_flags}
 # xmlto wants to access a network resource for validation, so skip it
-make %{?_smp_mflags} LIBSEPOL_STATIC=%{_libdir}/libsepol.a XMLARGS="--skip-validation"
-
+%make_build LIBSEPOL_STATIC=%{_libdir}/libsepol.a XMLARGS="--skip-validation" CFLAGS="%{build_cflags} -fno-semantic-interposition"
 
 %install
-make %{?_smp_mflags} DESTDIR=%{buildroot} SBINDIR="%{buildroot}%{_sbindir}" LIBDIR="%{buildroot}%{_libdir}" install
-
+%make_install SBINDIR="%{buildroot}%{_sbindir}" LIBDIR="%{buildroot}%{_libdir}"
 
 %files
 %license COPYING
@@ -43,6 +40,13 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} SBINDIR="%{buildroot}%{_sbindir}" LIBD
 %{_mandir}/man8/secil2conf.8.gz
 
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+- Upgrade to latest upstream version and rebase patch
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
+- Update source URL to new format
+- Lint spec
+- License verified
+
 * Fri Oct 09 2020 Thomas Crain <thcrain@microsoft.com> - 2.9-4
 - Add missing %libsepolver definition
 
