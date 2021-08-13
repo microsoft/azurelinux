@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
 Source0:        https://github.com/cockpit-project/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:  %{_bindir}/python3
+BuildRequires:  python3
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  e2fsprogs-devel
