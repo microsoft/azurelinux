@@ -5,12 +5,12 @@
 %define polyinstatiate n
 %define monolithic n
 %define POLICYVER 31
-%define POLICYCOREUTILSVER 2.9
-%define CHECKPOLICYVER 2.9
+%define POLICYCOREUTILSVER 3.2
+%define CHECKPOLICYVER 3.2
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        2.20200818
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -264,7 +264,11 @@ exit 0
 %triggerin -- pcre
 selinuxenabled && semodule -nB
 exit 0
+
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 2.20200818-2
+- Update versions on checkpolicy, policycoreutils dependencies
+
 * Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> - 2.20200818-1
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - Heavy modifications to build from upstream reference policy rather than from fedora selinux policy.
