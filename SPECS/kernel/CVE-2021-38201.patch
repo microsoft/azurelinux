@@ -1,0 +1,37 @@
+From 6d1c0f3d28f98ea2736128ed3e46821496dc3a8c Mon Sep 17 00:00:00 2001
+From: Anna Schumaker <Anna.Schumaker@Netapp.com>
+Date: Wed, 9 Jun 2021 17:07:29 -0400
+Subject: [PATCH] sunrpc: Avoid a KASAN slab-out-of-bounds bug in
+ xdr_set_page_base()
+
+This seems to happen fairly easily during READ_PLUS testing on NFS v4.2.
+I found that we could end up accessing xdr->buf->pages[pgnr] with a pgnr
+greater than the number of pages in the array. So let's just return
+early if we're setting base to a point at the end of the page data and
+let xdr_set_tail_base() handle setting up the buffer pointers instead.
+
+Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
+Fixes: 8d86e373b0ef ("SUNRPC: Clean up helpers xdr_set_iov() and xdr_set_page_base()")
+Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+---
+ net/sunrpc/xdr.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/net/sunrpc/xdr.c b/net/sunrpc/xdr.c
+index 3964ff74ee518d..ca10ba2626f27c 100644
+--- a/net/sunrpc/xdr.c
++++ b/net/sunrpc/xdr.c
+@@ -1230,10 +1230,9 @@ static unsigned int xdr_set_page_base(struct xdr_stream *xdr,
+ 	void *kaddr;
+ 
+ 	maxlen = xdr->buf->page_len;
+-	if (base >= maxlen) {
+-		base = maxlen;
+-		maxlen = 0;
+-	} else
++	if (base >= maxlen)
++		return 0;
++	else
+ 		maxlen -= base;
+ 	if (len > maxlen)
+ 		len = maxlen;
