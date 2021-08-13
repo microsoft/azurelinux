@@ -846,7 +846,7 @@ index aacaac1..2e879e6 100644
              goto err;
          }
 diff --git a/app/app_kdf.c b/app/app_kdf.c
-index 1728527..4b679ac 100644
+index 1728527..4fec891 100644
 --- a/app/app_kdf.c
 +++ b/app/app_kdf.c
 @@ -11,6 +11,9 @@
@@ -1116,9 +1116,9 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
-+                  (size_t)t->hash_len,
++                  (size_t)tc->hash_len,
 +                  tc->session_id,
 +                  tc->session_id_len,
 +                  (int)'A',
@@ -1135,7 +1135,7 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
@@ -1154,7 +1154,7 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
@@ -1173,7 +1173,7 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
@@ -1192,7 +1192,7 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
@@ -1211,7 +1211,7 @@ index 1728527..4b679ac 100644
 +
 +    rc = doSSHKDF(md,
 +                  tc->shared_secret_k,
-+                  (size_t)shared_secret_len,
++                  (size_t)tc->shared_secret_len,
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
