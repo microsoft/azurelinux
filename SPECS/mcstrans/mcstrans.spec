@@ -1,23 +1,23 @@
 Summary:        SELinux Translation Daemon
 Name:           mcstrans
-Version:        2.9
-Release:        3%{?dist}
+Version:        3.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/SELinuxProject/selinux
-Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
+URL:            https://github.com/SELinuxProject/selinux/wiki
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        secolor.conf.8
 BuildRequires:  gcc
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel >= %{version}
-BuildRequires:  libsepol-devel
+BuildRequires:  libsepol-devel >= %{version}
 BuildRequires:  pcre-devel
 BuildRequires:  systemd
 Requires:       pcre
-Provides:       setransd
-Provides:       libsetrans
-Obsoletes:      libsetrans
+Provides:       setransd = %{version}-%{release}
+Provides:       libsetrans = %{version}-%{release}
+Obsoletes:      libsetrans <= %{version}-%{release}
 %{?systemd_requires}
 
 %description
@@ -39,18 +39,18 @@ from internal representations to user defined representation.
 
 %build
 %{set_build_flags}
-
-make LIBDIR="%{_libdir}" %{?_smp_mflags}
+%make_build LIBDIR="%{_libdir}" CFLAGS="%{build_cflags} -fno-semantic-interposition"
 
 %install
 mkdir -p %{buildroot}/%{_lib}
-mkdir -p %{buildroot}/%{_libdir}
-mkdir -p %{buildroot}%{_usr}/share/mcstrans
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_datadir}/mcstrans
 mkdir -p %{buildroot}%{_sysconfdir}/selinux/mls/setrans.d
 
-make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/usr/lib/systemd" install
+%make_install LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/usr/lib/systemd"
 rm -f %{buildroot}%{_libdir}/*.a
-cp -r share/* %{buildroot}%{_usr}/share/mcstrans/
+cp -r share/* %{buildroot}%{_datadir}/mcstrans/
+
 # Systemd
 rm -rf %{buildroot}/%{_sysconfdir}/rc.d/init.d/mcstrans
 install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
@@ -76,18 +76,24 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 %{_sbindir}/mcstransd
 %{_unitdir}/mcstrans.service
 %dir %{_sysconfdir}/selinux/mls/setrans.d
-
-%dir %{_usr}/share/mcstrans
+%dir %{_datadir}/mcstrans
 
 %defattr(0644,root,root,0755)
-%dir %{_usr}/share/mcstrans/util
-%dir %{_usr}/share/mcstrans/examples
-%{_usr}/share/mcstrans/examples/*
+%dir %{_datadir}/mcstrans/util
+%dir %{_datadir}/mcstrans/examples
+%{_datadir}/mcstrans/examples/*
 
 %defattr(0755,root,root,0755)
-%{_usr}/share/mcstrans/util/*
+%{_datadir}/mcstrans/util/*
 
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+- Upgrade to latest upstream version
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
+- Update source URL to new format
+- Lint spec
+- License verified
+
 * Thu Aug 27 2020 Daniel Burgener <daburgen@microsoft.com> - 2.9-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified
@@ -278,9 +284,9 @@ Resolves: #218173
 
 * Mon May 15 2006 Dan Walsh <dwalsh@redhat.com> 0.1.4-1
 - Add patch from sgrubb
-- 	Fix 64 bit size problems
-- 	Increase the open file limit
--	Make sure maximum size is not exceeded
+- Fix 64 bit size problems
+- Increase the open file limit
+- Make sure maximum size is not exceeded
 
 * Fri May 12 2006 Dan Walsh <dwalsh@redhat.com> 0.1.3-1
 - Move initscripts to /etc/rc.d/init.d
