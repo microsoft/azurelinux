@@ -10,9 +10,6 @@ URL:            https://github.com/cisco/libacvp
 # Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         openssl.patch
-Patch1:         rsa-keygen.patch
-Patch2:         pbkdf.patch
-Patch3:         kas.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -61,8 +58,8 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
-* Fri Jul 30 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-2
-- Update to version 1.3.0
+* Fri Aug 13 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-2
+- Add KAS, KDF, and RSA KeyGen support for OpenSSL
 
 * Fri Jul 30 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
