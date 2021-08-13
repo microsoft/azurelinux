@@ -232,9 +232,9 @@ libsemanage-2.9-4.cm2.aarch64.rpm
 libsemanage-debuginfo-2.9-4.cm2.aarch64.rpm
 libsemanage-devel-2.9-4.cm2.aarch64.rpm
 libsemanage-python3-2.9-4.cm2.aarch64.rpm
-libsepol-3.1-1.cm2.aarch64.rpm
-libsepol-debuginfo-3.1-1.cm2.aarch64.rpm
-libsepol-devel-3.1-1.cm2.aarch64.rpm
+libsepol-3.2-1.cm2.aarch64.rpm
+libsepol-debuginfo-3.2-1.cm2.aarch64.rpm
+libsepol-devel-3.2-1.cm2.aarch64.rpm
 libsolv-0.7.7-4.cm2.aarch64.rpm
 libsolv-debuginfo-0.7.7-4.cm2.aarch64.rpm
 libsolv-devel-0.7.7-4.cm2.aarch64.rpm
