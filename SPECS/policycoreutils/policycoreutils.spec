@@ -113,7 +113,7 @@ make -C python PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR=
 
 make -C semodule-utils PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
 
-make -C restorecond PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/lib/systemd" install
+make -C restorecond PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/usr/lib/systemd" install
 
 # Fix perms on newrole so that objcopy can process it
 chmod 0755 %{buildroot}%{_bindir}/newrole
@@ -210,6 +210,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %dir %{python3_sitelib}/sepolicy
 %{python3_sitelib}/sepolicy/templates
 %dir %{python3_sitelib}/sepolicy/help
+%{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/sepolicy/help/*
 %{python3_sitelib}/sepolicy/__init__.py*
 %{python3_sitelib}/sepolicy/booleans.py*

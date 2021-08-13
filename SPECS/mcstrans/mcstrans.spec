@@ -48,7 +48,7 @@ mkdir -p %{buildroot}/%{_libdir}
 mkdir -p %{buildroot}%{_usr}/share/mcstrans
 mkdir -p %{buildroot}%{_sysconfdir}/selinux/mls/setrans.d
 
-make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/lib/systemd" install
+make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" SBINDIR="%{_sbindir}" SYSTEMDDIR="/usr/lib/systemd" install
 rm -f %{buildroot}%{_libdir}/*.a
 cp -r share/* %{buildroot}%{_usr}/share/mcstrans/
 # Systemd

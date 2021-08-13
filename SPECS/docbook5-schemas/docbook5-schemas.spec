@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://www.docbook.org/xml/%{version}/docbook-v%{version}-os.zip
 Source0:        %{name}-%{version}.zip
-
+Source1:        https://www.docbook.org/xml/5.0/docbook-5.0.zip
 
 Provides: docbook5-dtd = %{version}-%{release}
 Provides: docbook5-rng = %{version}-%{release}

@@ -174,7 +174,7 @@ sudo -u test make test TESTS="-v"
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.so.2.6*
+%{_libdir}/*.so.2.7*
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/ruby/*
 %{_datadir}/ri/*
