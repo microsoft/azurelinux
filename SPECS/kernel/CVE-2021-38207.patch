@@ -1,0 +1,33 @@
+From c364df2489b8ef2f5e3159b1dff1ff1fdb16040d Mon Sep 17 00:00:00 2001
+From: Esben Haabendal <esben@geanix.com>
+Date: Fri, 18 Jun 2021 12:52:33 +0200
+Subject: [PATCH] net: ll_temac: Fix TX BD buffer overwrite
+
+Just as the initial check, we need to ensure num_frag+1 buffers available,
+as that is the number of buffers we are going to use.
+
+This fixes a buffer overflow, which might be seen during heavy network
+load. Complete lockup of TEMAC was reproducible within about 10 minutes of
+a particular load.
+
+Fixes: 84823ff80f74 ("net: ll_temac: Fix race condition causing TX hang")
+Cc: stable@vger.kernel.org # v5.4+
+Signed-off-by: Esben Haabendal <esben@geanix.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
+index 9797aa3221d10b..cc482ee36501e9 100644
+--- a/drivers/net/ethernet/xilinx/ll_temac_main.c
++++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
+@@ -861,7 +861,7 @@ temac_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 		smp_mb();
+ 
+ 		/* Space might have just been freed - check again */
+-		if (temac_check_tx_bd_space(lp, num_frag))
++		if (temac_check_tx_bd_space(lp, num_frag + 1))
+ 			return NETDEV_TX_BUSY;
+ 
+ 		netif_wake_queue(ndev);
