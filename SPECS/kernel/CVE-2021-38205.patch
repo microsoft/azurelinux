@@ -1,0 +1,33 @@
+From d0d62baa7f505bd4c59cd169692ff07ec49dde37 Mon Sep 17 00:00:00 2001
+From: YueHaibing <yuehaibing@huawei.com>
+Date: Wed, 19 May 2021 10:47:04 +0800
+Subject: [PATCH] net: xilinx_emaclite: Do not print real IOMEM pointer
+
+Printing kernel pointers is discouraged because they might leak kernel
+memory layout.  This fixes smatch warning:
+
+drivers/net/ethernet/xilinx/xilinx_emaclite.c:1191 xemaclite_of_probe() warn:
+ argument 4 to %08lX specifier is cast from pointer
+
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ drivers/net/ethernet/xilinx/xilinx_emaclite.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/xilinx/xilinx_emaclite.c b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
+index d9d58a7dabee87..b06377fe72938c 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_emaclite.c
++++ b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
+@@ -1189,9 +1189,8 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
+ 	}
+ 
+ 	dev_info(dev,
+-		 "Xilinx EmacLite at 0x%08lX mapped to 0x%08lX, irq=%d\n",
+-		 (unsigned long __force)ndev->mem_start,
+-		 (unsigned long __force)lp->base_addr, ndev->irq);
++		 "Xilinx EmacLite at 0x%08lX mapped to 0x%p, irq=%d\n",
++		 (unsigned long __force)ndev->mem_start, lp->base_addr, ndev->irq);
+ 	return 0;
+ 
+ error:
