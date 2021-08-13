@@ -223,11 +223,11 @@ libpkgconf-devel-1.7.0-3.cm2.aarch64.rpm
 libpwquality-1.4.2-6.cm2.aarch64.rpm
 libpwquality-debuginfo-1.4.2-6.cm2.aarch64.rpm
 libpwquality-devel-1.4.2-6.cm2.aarch64.rpm
-libselinux-2.9-6.cm2.aarch64.rpm
-libselinux-debuginfo-2.9-6.cm2.aarch64.rpm
-libselinux-devel-2.9-6.cm2.aarch64.rpm
-libselinux-python3-2.9-6.cm2.aarch64.rpm
-libselinux-utils-2.9-6.cm2.aarch64.rpm
+libselinux-3.2-1.cm2.aarch64.rpm
+libselinux-debuginfo-3.2-1.cm2.aarch64.rpm
+libselinux-devel-3.2-1.cm2.aarch64.rpm
+libselinux-python3-3.2-1.cm2.aarch64.rpm
+libselinux-utils-3.2-1.cm2.aarch64.rpm
 libsemanage-2.9-4.cm2.aarch64.rpm
 libsemanage-debuginfo-2.9-4.cm2.aarch64.rpm
 libsemanage-devel-2.9-4.cm2.aarch64.rpm

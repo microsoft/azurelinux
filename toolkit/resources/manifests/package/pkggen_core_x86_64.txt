@@ -228,7 +228,7 @@ p11-kit-trust-0.23.22-2.cm2.x86_64.rpm
 ca-certificates-shared-20200720-15.cm2.noarch.rpm
 ca-certificates-tools-20200720-15.cm2.noarch.rpm
 ca-certificates-base-20200720-15.cm2.noarch.rpm
-libselinux-2.9-6.cm2.x86_64.rpm
+libselinux-3.2-1.cm2.x86_64.rpm
 dwz-0.13-4.cm2.x86_64.rpm
 unzip-6.0-19.cm2.x86_64.rpm
 python3-3.7.10-3.cm2.x86_64.rpm
