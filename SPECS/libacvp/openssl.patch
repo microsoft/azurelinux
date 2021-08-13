@@ -846,7 +846,7 @@ index aacaac1..2e879e6 100644
              goto err;
          }
 diff --git a/app/app_kdf.c b/app/app_kdf.c
-index 1728527..4fec891 100644
+index 1728527..e05fb3e 100644
 --- a/app/app_kdf.c
 +++ b/app/app_kdf.c
 @@ -11,6 +11,9 @@
@@ -1005,11 +1005,11 @@ index 1728527..4fec891 100644
  }
  
 +int doSSHKDF(const EVP_MD *md,
-+             char *input_key,
++             unsigned char *input_key,
 +             size_t input_key_len,
-+             char *xcghash,
++             unsigned char *xcghash,
 +             size_t xcghash_len,
-+             char *session_id,
++             unsigned char *session_id,
 +             size_t session_id_len,
 +             int action,
 +             unsigned char *out,
@@ -1026,17 +1026,17 @@ index 1728527..4fec891 100644
 +        goto err;
 +    }
 +    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_KEY, input_key,
-+                     sizeof(input_key)) <= 0) {
++                     input_key_len) <= 0) {
 +        printf("EVP_KDF_CTRL_SET_KEY failed \n");
 +        goto err;
 +    }
 +    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SSHKDF_XCGHASH, xcghash,
-+                     sizeof(xcghash)) <= 0) {
++                     xcghash_len) <= 0) {
 +        printf("EVP_KDF_CTRL_SET_SSHKDF_XCGHASH failed \n");
 +        goto err;
 +    }
 +    if (EVP_KDF_ctrl(kctx, EVP_KDF_CTRL_SET_SSHKDF_SESSION_ID, session_id,
-+                     sizeof(session_id)) <= 0) {
++                     session_id_len) <= 0) {
 +        printf("EVP_KDF_CTRL_SET_SSHKDF_SESSION_ID failed \n");
 +        goto err;
 +    }
@@ -1120,10 +1120,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'A',
 +                  tc->cs_init_iv,
-+                  tc->iv_len);
++                  (size_t)tc->iv_len);
 +    if (rc <= 0) {
 +        printf("Unable to get initial IV client\n");
 +        goto err;
@@ -1139,10 +1139,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'C',
 +                  tc->cs_encrypt_key,
-+                  tc->e_key_len);
++                  (size_t)tc->e_key_len);
 +    if (rc <= 0) {
 +        printf("Unable to get encryption key client\n");
 +        goto err;
@@ -1158,10 +1158,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'E',
 +                  tc->cs_integrity_key,
-+                  tc->i_key_len);
++                  (size_t)tc->i_key_len);
 +    if (rc <= 0) {
 +        printf("Unable to get integrity key client\n");
 +        goto err;
@@ -1177,10 +1177,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'B',
 +                  tc->sc_init_iv,
-+                  tc->iv_len);
++                  (size_t)tc->iv_len);
 +    if (rc <= 0) {
 +        printf("Unable to get initial IV server\n");
 +        goto err;
@@ -1196,10 +1196,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'D',
 +                  tc->sc_encrypt_key,
-+                  tc->e_key_len);
++                  (size_t)tc->e_key_len);
 +    if (rc <= 0) {
 +        printf("Unable to get encryption key server\n");
 +        goto err;
@@ -1215,10 +1215,10 @@ index 1728527..4fec891 100644
 +                  tc->hash_h,
 +                  (size_t)tc->hash_len,
 +                  tc->session_id,
-+                  tc->session_id_len,
++                  (size_t)tc->session_id_len,
 +                  (int)'F',
 +                  tc->sc_integrity_key,
-+                  tc->i_key_len);
++                  (size_t)tc->i_key_len);
 +    if (rc <= 0) {
 +        printf("Unable to get integrity key server\n");
 +        goto err;
@@ -1397,7 +1397,7 @@ index 3d3943f..21ddfab 100755
       * Enable siggen
       */
 diff --git a/app/app_rsa.c b/app/app_rsa.c
-index 55987b7..ab1c688 100644
+index 55987b7..8b08502 100644
 --- a/app/app_rsa.c
 +++ b/app/app_rsa.c
 @@ -11,11 +11,9 @@
@@ -1413,10 +1413,11 @@ index 55987b7..ab1c688 100644
  
  BIGNUM *group_n = NULL;
  RSA *group_rsa = NULL;
-@@ -29,284 +27,99 @@ void app_rsa_cleanup(void) {
+@@ -28,285 +26,238 @@ void app_rsa_cleanup(void) {
+     group_n = NULL;
  }
  
- int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
+-int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
 -    /*
 -     * custom crypto module handler
 -     * to be filled in -
@@ -1424,20 +1425,31 @@ index 55987b7..ab1c688 100644
 -     * and all the other params registered for
 -     * in this example app.
 -     */
--
-+    int rc = 1;
-     ACVP_RSA_KEYGEN_TC *tc = NULL;
++int fips_pkey_signature_test(EVP_PKEY *pkey,
++                             const unsigned char *tbs, int tbslen,
++                             const unsigned char *kat, unsigned int katlen,
++                             const EVP_MD *digest, unsigned int flags,
++                             const char *fail_str)
++{
++    int ret = 0;
++    unsigned char sigtmp[256], *sig = sigtmp;
++    size_t siglen = sizeof(sigtmp);
++    EVP_MD_CTX *mctx;
++    EVP_PKEY_CTX *pctx;
+ 
+-    ACVP_RSA_KEYGEN_TC *tc = NULL;
 -    int rv = 1;
-+    BIGNUM *e = NULL, *p = NULL, *q = NULL;
-     RSA *rsa = NULL;
+-    RSA *rsa = NULL;
 -#if OPENSSL_VERSION_NUMBER <= 0x10100000L
 -    BIGNUM *p = NULL, *q = NULL, *n = NULL, *d = NULL;
 -#else
 -    const BIGNUM *p1 = NULL, *q1 = NULL, *n1 = NULL, *d1 = NULL;
 -#endif
 -    BIGNUM *e = NULL;
++    if (digest == NULL)
++        digest = EVP_sha256();
  
-     if (!test_case) {
+-    if (!test_case) {
 -        printf("Missing test_case\n");
 -        return 1;
 -    }
@@ -1448,19 +1460,26 @@ index 55987b7..ab1c688 100644
 -        printf("Rsa_new failure\n");
 -        return 1;
 -    }
--
++    mctx = EVP_MD_CTX_new();
+ 
 -    e = FIPS_bn_new();
 -    if (!e) {
 -        printf("Failed to allocate BN for e\n");
-+        printf("\nError: test case not found in RSA KeyGen handler\n");
-         goto err;
+-        goto err;
++    if ((EVP_PKEY_id(pkey) == EVP_PKEY_RSA)
++        && (RSA_size(EVP_PKEY_get0_RSA(pkey)) > sizeof(sigtmp))) {
++        sig = OPENSSL_malloc(RSA_size(EVP_PKEY_get0_RSA(pkey)));
++        siglen = RSA_size(EVP_PKEY_get0_RSA(pkey));
      }
 -    BN_bin2bn(tc->e, tc->e_len, e);
 -    if (!tc->e_len) {
 -        printf("Error converting e to BN\n");
 -        goto err;
--    }
--
++    if (!sig || ! mctx) {
++        EVP_MD_CTX_free(mctx);
++        return 0;
+     }
+ 
 -    /*
 -     * IMPORTANT: Placeholder! The RSA keygen vector
 -     * sets will fail if this handler is left as is.
@@ -1471,8 +1490,17 @@ index 55987b7..ab1c688 100644
 -    if (!FIPS_rsa_x931_generate_key_ex(rsa, tc->modulo, e, NULL)) {
 -        printf("\nError: Issue with key generation\n");
 -        goto err;
--    }
--
++    if (tbslen == -1)
++        tbslen = strlen((char *)tbs);
++
++    if (EVP_DigestSignInit(mctx, &pctx, digest, NULL, pkey) <= 0)
++        goto error;
++
++    if (flags == EVP_MD_CTX_FLAG_PAD_PSS) {
++        EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_PSS_PADDING);
++        EVP_PKEY_CTX_set_rsa_pss_saltlen(pctx, 0);
+     }
+ 
 -#if OPENSSL_VERSION_NUMBER <= 0x10100000L
 -    p = rsa->p;
 -    q = rsa->q;
@@ -1485,12 +1513,16 @@ index 55987b7..ab1c688 100644
 -#else
 -    RSA_get0_key(rsa, &n1, NULL, &d1);
 -    RSA_get0_factors(rsa, &p1, &q1);
--
++    if (EVP_DigestSignUpdate(mctx, tbs, tbslen) <= 0)
++        goto error;
+ 
 -    tc->p_len = BN_bn2bin(p1, tc->p);
 -    tc->q_len = BN_bn2bin(q1, tc->q);
 -    tc->n_len = BN_bn2bin(n1, tc->n);
 -    tc->d_len = BN_bn2bin(d1, tc->d);
 -#endif
++    if (EVP_DigestSignFinal(mctx, sig, &siglen) <= 0)
++        goto error;
  
 -    rv = 0;
 -err:
@@ -1498,8 +1530,12 @@ index 55987b7..ab1c688 100644
 -    if (e) BN_free(e);
 -    return rv;
 -}
--
--
++    if (kat && ((siglen != katlen) || memcmp(kat, sig, katlen)))
++        goto error;
+ 
++    if (EVP_DigestVerifyInit(mctx, &pctx, digest, NULL, pkey) <= 0)
++        goto error;
+ 
 -int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
 -    const EVP_MD *tc_md = NULL;
 -    int siglen, pad_mode;
@@ -1511,43 +1547,92 @@ index 55987b7..ab1c688 100644
 -    ACVP_RSA_SIG_TC    *tc;
 -    RSA *rsa = NULL;
 -    int salt_len = -1;
--
++    if (flags == EVP_MD_CTX_FLAG_PAD_PSS) {
++        EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_PSS_PADDING);
++        EVP_PKEY_CTX_set_rsa_pss_saltlen(pctx, 0);
++    }
+ 
 -    int rv = 1;
--
++    if (EVP_DigestVerifyUpdate(mctx, tbs, tbslen) <= 0)
++        goto error;
+ 
 -    if (!test_case) {
 -        printf("\nError: test case not found in RSA SigGen handler\n");
 -        goto err;
--    }
--
--    tc = test_case->tc.rsa_sig;
-+    tc = test_case->tc.rsa_keygen;
- 
-     if (!tc) {
-         printf("\nError: test case not found in RSA SigGen handler\n");
-         goto err;
++    ret = EVP_DigestVerifyFinal(mctx, sig, siglen);
++
++ error:
++    if (sig != sigtmp)
++        OPENSSL_free(sig);
++    EVP_MD_CTX_free(mctx);
++    if (ret <= 0) {
++        if (fail_str)
++            ERR_add_error_data(2, "Type=", fail_str);
++        return 0;
      }
++    return 1;
++}
+ 
+-    tc = test_case->tc.rsa_sig;
++int fips_check_rsa(RSA *rsa)
++{
++    const unsigned char tbs[] = "RSA Pairwise Check Data";
++    unsigned char *ctbuf = NULL, *ptbuf = NULL;
++    int len, ret = 0;
++    EVP_PKEY *pk;
+ 
+-    if (!tc) {
+-        printf("\nError: test case not found in RSA SigGen handler\n");
++    if ((pk = EVP_PKEY_new()) == NULL)
+         goto err;
+-    }
  
 -    /*
 -     * Make an RSA object and set a new BN exponent to use to generate a key
 -     */
--
++    EVP_PKEY_set1_RSA(pk, rsa);
+ 
 -    rsa = FIPS_rsa_new();
 -    if (!rsa) {
 -        printf("\nError: Issue with RSA obj in RSA Sig\n");
--        goto err;
++    /* Perform pairwise consistency signature test */
++    if (!fips_pkey_signature_test(pk, tbs, -1,
++                                  NULL, 0, EVP_sha256(),
++                                  EVP_MD_CTX_FLAG_PAD_PKCS1, NULL)
++        || !fips_pkey_signature_test(pk, tbs, -1, NULL, 0, EVP_sha256(),
++                                     EVP_MD_CTX_FLAG_PAD_PSS, NULL))
++        goto err;
++    /* Now perform pairwise consistency encrypt/decrypt test */
++    ctbuf = OPENSSL_malloc(RSA_size(rsa));
++    if (!ctbuf)
+         goto err;
 -    }
--
+ 
 -    bn_e = BN_new();
 -    if (!bn_e || !BN_set_word(bn_e, 0x10001)) {
 -        printf("\nError: Issue with exponent in RSA Sig\n");
--        goto err;
++    len =
++        RSA_public_encrypt(sizeof(tbs) - 1, tbs, ctbuf, rsa,
++                           RSA_PKCS1_PADDING);
++    if (len <= 0)
+         goto err;
 -    }
--
++    /* Check ciphertext doesn't match plaintext */
++    if ((len == (sizeof(tbs) - 1)) && !memcmp(tbs, ctbuf, len))
++        goto err;
++    ptbuf = OPENSSL_malloc(RSA_size(rsa));
+ 
 -    if (!tc->modulo) {
 -        printf("\nError: Issue with modulo in RSA Sig\n");
--        goto err;
++    if (!ptbuf)
++        goto err;
++    len = RSA_private_decrypt(len, ctbuf, ptbuf, rsa, RSA_PKCS1_PADDING);
++    if (len != (sizeof(tbs) - 1))
++        goto err;
++    if (memcmp(ptbuf, tbs, len))
+         goto err;
 -    }
--
+ 
 -    /*
 -     * Set the pad mode and generate a key given the respective sigType
 -     */
@@ -1566,9 +1651,33 @@ index 55987b7..ab1c688 100644
 -    default:
 -        printf("\nError: sigType not supported\n");
 -        rv = ACVP_INVALID_ARG;
--        goto err;
--    }
--
++    ret = 1;
++
++    if (!ptbuf)
++        goto err;
++
++ err:
++    if (ctbuf)
++        OPENSSL_free(ctbuf);
++    if (ptbuf)
++        OPENSSL_free(ptbuf);
++    if (pk)
++        EVP_PKEY_free(pk);
++
++    return ret;
++}
++
++int app_rsa_keygen_handler(ACVP_TEST_CASE *test_case) {
++    int rc = 1;
++    ACVP_RSA_KEYGEN_TC *tc = NULL;
++    BIGNUM *e = NULL, *p = NULL, *q = NULL;
++    RSA *rsa = NULL;
++
++    if (!test_case) {
++        printf("\nError: test case not found in RSA KeyGen handler\n");
+         goto err;
+     }
+ 
 -    /*
 -     * Set the message digest to the appropriate sha
 -     */
@@ -1602,9 +1711,12 @@ index 55987b7..ab1c688 100644
 -    case ACVP_HASH_ALG_MAX:
 -    default:
 -        printf("\nError: hashAlg not supported for RSA SigGen\n");
--        goto err;
--    }
-+    rsa = RSA_new();
++    tc = test_case->tc.rsa_keygen;
++
++    if (!tc) {
++        printf("\nError: test case not found in RSA SigGen handler\n");
+         goto err;
+     }
  
 -    /*
 -     * If we are verifying, set RSA to the given public key
@@ -1614,6 +1726,8 @@ index 55987b7..ab1c688 100644
 -        e = BN_new();
 -        if (!e) {
 -            printf("\nBN alloc failure (e)\n");
++    rsa = RSA_new();
++
 +    if (tc->test_type == ACVP_RSA_TEST_TYPE_KAT) {
 +        // Get e, p, and q values
 +        e = BN_bin2bn(tc->e, tc->e_len, NULL);
@@ -1641,16 +1755,20 @@ index 55987b7..ab1c688 100644
 -        tmp_n = BN_dup(n);
 -        RSA_set0_key(rsa, tmp_n, tmp_e, NULL);
 -#endif
--
++        q = BN_bin2bn(tc->q, tc->q_len, NULL);
++        if (q == NULL) {
++            printf("\nUnable to get q\n");
++            goto err;
++        }
+ 
 -        tc->ver_disposition = FIPS_rsa_verify(rsa, tc->msg, tc->msg_len, tc_md, 
 -                                              pad_mode, salt_len, NULL, tc->signature, 
 -                                              tc->sig_len);
 -    } else {
 -        if (rsa_current_tg != tc->tg_id) {
 -            rsa_current_tg = tc->tg_id;
-+        q = BN_bin2bn(tc->q, tc->q_len, NULL);
-+        if (q == NULL) {
-+            printf("\nUnable to get q\n");
++        if (RSA_set0_factors(rsa, p, q) <= 0) {
++            printf("\nUnable to set p/q\n");
 +            goto err;
 +        }
  
@@ -1659,15 +1777,16 @@ index 55987b7..ab1c688 100644
 -            group_rsa = NULL;
 -            if (group_n) BN_free(group_n);
 -            group_n = NULL;
-+        if (RSA_set0_factors(rsa, p, q) <= 0) {
-+            printf("\nUnable to set p/q\n");
++        if (!RSA_X931_derive_ex(rsa, NULL, NULL, NULL, NULL,
++                            NULL, NULL, NULL, NULL, NULL, NULL, e, NULL)) {
++            printf("Unable to derive key\n");
++            tc->kat_rc = ACVP_TEST_DISPOSITION_FAIL;
++            rc = 0;
 +            goto err;
 +        }
  
 -            group_rsa = RSA_new();
-+        if (!RSA_X931_derive_ex(rsa, NULL, NULL, NULL, NULL,
-+                            NULL, NULL, NULL, NULL, NULL, NULL, e, NULL)) {
-+            printf("Unable to derive key\n");
++        if (RSA_check_key_ex(rsa, NULL) <= 0) {
 +            tc->kat_rc = ACVP_TEST_DISPOSITION_FAIL;
 +            rc = 0;
 +            goto err;
@@ -1689,8 +1808,10 @@ index 55987b7..ab1c688 100644
 -        } else {
 -            e = BN_dup(bn_e);
 -            n = BN_dup(group_n);
-+        if (RSA_check_key_ex(rsa, NULL) <= 0) {
++        if (fips_check_rsa(rsa) <= 0) {
 +            tc->kat_rc = ACVP_TEST_DISPOSITION_FAIL;
++            rc = 0;
++            goto err;
          }
 -        tc->e_len = BN_bn2bin(e, tc->e);
 -        tc->n_len = BN_bn2bin(n, tc->n);
@@ -1758,7 +1879,7 @@ index 55987b7..ab1c688 100644
  }
  
  static const unsigned char sha1_bin[] = {
-@@ -424,10 +237,11 @@ static const unsigned char *digestinfo_nn_encoding(int nid, unsigned int *len)
+@@ -424,10 +375,11 @@ static const unsigned char *digestinfo_nn_encoding(int nid, unsigned int *len)
  
  int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
      const EVP_MD *tc_md = NULL;
@@ -1771,7 +1892,7 @@ index 55987b7..ab1c688 100644
  #endif
      ACVP_RSA_SIG_TC    *tc;
      RSA *rsa = NULL;
-@@ -437,6 +251,7 @@ int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
+@@ -437,6 +389,7 @@ int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
      int md_type;
      EVP_PKEY_CTX *pctx = NULL;
      EVP_PKEY *pk = NULL;
@@ -1779,7 +1900,7 @@ index 55987b7..ab1c688 100644
  
      if (!test_case) {
          printf("\nError: test case not found in RSA SigGen handler\n");
-@@ -631,8 +446,68 @@ int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
+@@ -631,8 +584,68 @@ int app_rsa_sig_handler(ACVP_TEST_CASE *test_case) {
          }
  
      } else {
@@ -1850,7 +1971,7 @@ index 55987b7..ab1c688 100644
      }
  end:
      /* Success */
-@@ -641,7 +516,11 @@ end:
+@@ -641,7 +654,11 @@ end:
  err:
      if (mdhash) free(mdhash);
      if (s) free(s);
@@ -1863,7 +1984,7 @@ index 55987b7..ab1c688 100644
      if (pk) EVP_PKEY_free(pk);
      if (bn_e) BN_free(bn_e);
      if (rsa) RSA_free(rsa);
-@@ -650,7 +529,6 @@ err:
+@@ -650,7 +667,6 @@ err:
  
      return rv;
  }
@@ -1872,7 +1993,7 @@ index 55987b7..ab1c688 100644
  int app_rsa_decprim_handler(ACVP_TEST_CASE *test_case) {
      BIGNUM *e = NULL, *n1 = NULL, *ct = NULL;
 diff --git a/include/acvp/acvp.h b/include/acvp/acvp.h
-index d00d39e..e9fc24f 100644
+index d00d39e..12c9bc4 100644
 --- a/include/acvp/acvp.h
 +++ b/include/acvp/acvp.h
 @@ -653,6 +653,14 @@ typedef enum acvp_cmac_testtype {
@@ -1890,6 +2011,19 @@ index d00d39e..e9fc24f 100644
  /*! @struct ACVP_PBKDF_TESTTYPE */
  typedef enum acvp_pbkdf_testtype {
      ACVP_PBKDF_TEST_TYPE_NONE = 0,
+@@ -989,9 +997,9 @@ typedef struct acvp_kdf135_ssh_tc_t {
+     unsigned int e_key_len;          /**< Expected length of encrypt keys (in bytes) */
+     unsigned int i_key_len;          /**< Expected length of integrity keys (in bytes) */
+     unsigned int iv_len;             /**< Expected length of initial IV (in bytes) */
+-    char *shared_secret_k;           /**< Shared secret (K) */
+-    char *hash_h;                    /**< Provided hash (H) */
+-    char *session_id;                /**< Session ID */
++    unsigned char *shared_secret_k;           /**< Shared secret (K) */
++    unsigned char *hash_h;                    /**< Provided hash (H) */
++    unsigned char *session_id;                /**< Session ID */
+     unsigned char *cs_init_iv;       /**< Initial IV, client to server
+                                           ---User supplied--- */
+     unsigned char *sc_init_iv;       /**< Initial IV, server to client,
 @@ -1076,6 +1084,7 @@ typedef struct acvp_cmac_tc_t {
   * passed between libacvp and the crypto module.
   */
@@ -2047,6 +2181,28 @@ index 601395e..9e8b1eb 100644
              ACVP_LOG_ERR("Server JSON invalid 'hashAlg'");
              rv = ACVP_INVALID_ARG;
              goto err;
+diff --git a/src/acvp_kdf135_ssh.c b/src/acvp_kdf135_ssh.c
+index cb3c222..118c0b0 100644
+--- a/src/acvp_kdf135_ssh.c
++++ b/src/acvp_kdf135_ssh.c
+@@ -465,14 +465,14 @@ static ACVP_RESULT acvp_kdf135_ssh_init_tc(ACVP_KDF135_SSH_TC *stc,
+     if (!stc->session_id) { return ACVP_MALLOC_FAIL; }
+ 
+     // Convert from hex string to binary
+-    rv = acvp_hexstr_to_bin(shared_secret_k, (unsigned char *)stc->shared_secret_k,
++    rv = acvp_hexstr_to_bin(shared_secret_k, stc->shared_secret_k,
+                             shared_secret_len, NULL);
+     if (rv != ACVP_SUCCESS) return rv;
+ 
+-    rv = acvp_hexstr_to_bin(hash_h, (unsigned char *)stc->hash_h, hash_len, NULL);
++    rv = acvp_hexstr_to_bin(hash_h, stc->hash_h, hash_len, NULL);
+     if (rv != ACVP_SUCCESS) return rv;
+ 
+-    rv = acvp_hexstr_to_bin(session_id, (unsigned char *)stc->session_id, session_id_len, NULL);
++    rv = acvp_hexstr_to_bin(session_id, stc->session_id, session_id_len, NULL);
+     if (rv != ACVP_SUCCESS) return rv;
+ 
+     // Allocate answer buffers
 diff --git a/src/acvp_rsa_keygen.c b/src/acvp_rsa_keygen.c
 index e359626..0161cd1 100644
 --- a/src/acvp_rsa_keygen.c
