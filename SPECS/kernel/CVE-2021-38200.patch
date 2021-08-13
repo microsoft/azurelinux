@@ -1,0 +1,60 @@
+From 60b7ed54a41b550d50caf7f2418db4a7e75b5bdc Mon Sep 17 00:00:00 2001
+From: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Date: Thu, 17 Jun 2021 13:55:06 -0400
+Subject: [PATCH] powerpc/perf: Fix crash in perf_instruction_pointer() when
+ ppmu is not set
+
+On systems without any specific PMU driver support registered, running
+perf record causes Oops.
+
+The relevant portion from call trace:
+
+  BUG: Kernel NULL pointer dereference on read at 0x00000040
+  Faulting instruction address: 0xc0021f0c
+  Oops: Kernel access of bad area, sig: 11 [#1]
+  BE PAGE_SIZE=4K PREEMPT CMPCPRO
+  SAF3000 DIE NOTIFICATION
+  CPU: 0 PID: 442 Comm: null_syscall Not tainted 5.13.0-rc6-s3k-dev-01645-g7649ee3d2957 #5164
+  NIP:  c0021f0c LR: c00e8ad8 CTR: c00d8a5c
+  NIP perf_instruction_pointer+0x10/0x60
+  LR  perf_prepare_sample+0x344/0x674
+  Call Trace:
+    perf_prepare_sample+0x7c/0x674 (unreliable)
+    perf_event_output_forward+0x3c/0x94
+    __perf_event_overflow+0x74/0x14c
+    perf_swevent_hrtimer+0xf8/0x170
+    __hrtimer_run_queues.constprop.0+0x160/0x318
+    hrtimer_interrupt+0x148/0x3b0
+    timer_interrupt+0xc4/0x22c
+    Decrementer_virt+0xb8/0xbc
+
+During perf record session, perf_instruction_pointer() is called to
+capture the sample IP. This function in core-book3s accesses
+ppmu->flags. If a platform specific PMU driver is not registered, ppmu
+is set to NULL and accessing its members results in a crash. Fix this
+crash by checking if ppmu is set.
+
+Fixes: 2ca13a4cc56c ("powerpc/perf: Use regs->nip when SIAR is zero")
+Cc: stable@vger.kernel.org # v5.11+
+Reported-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+Link: https://lore.kernel.org/r/1623952506-1431-1-git-send-email-atrajeev@linux.vnet.ibm.com
+---
+ arch/powerpc/perf/core-book3s.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+index 16d4d1b6a1ffb5..51622411a7ccd8 100644
+--- a/arch/powerpc/perf/core-book3s.c
++++ b/arch/powerpc/perf/core-book3s.c
+@@ -2254,7 +2254,7 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ 	bool use_siar = regs_use_siar(regs);
+ 	unsigned long siar = mfspr(SPRN_SIAR);
+ 
+-	if (ppmu->flags & PPMU_P10_DD1) {
++	if (ppmu && (ppmu->flags & PPMU_P10_DD1)) {
+ 		if (siar)
+ 			return siar;
+ 		else
