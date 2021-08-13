@@ -36,7 +36,8 @@ ignore_list=" \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
   verity-read-only-root \
-  installkernel"
+  installkernel \
+  check-restart"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/

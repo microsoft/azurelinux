@@ -140,6 +140,7 @@
                 "bmon",
                 "bond",
                 "ccache",
+                "check-restart",
                 "clamav",
                 "cloud-hypervisor",
                 "cloud-init-vmware-guestinfo",
