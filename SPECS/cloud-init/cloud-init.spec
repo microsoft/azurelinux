@@ -148,6 +148,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/cloud
 
 %changelog
+*   Fri Aug 13 2021 Jiri Appl <jiria@microsoft.com> 21.2-0
+-   Update to 21.2
 *   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 19.1-6
 -   Fix check tests
 *   Mon Oct 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 19.1-5
