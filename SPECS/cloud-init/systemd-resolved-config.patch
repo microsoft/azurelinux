@@ -1,12 +1,13 @@
-diff -uNr cloud-init-18.3/cloudinit/config/cc_resolv_conf.py cloud-init-18.3-new/cloudinit/config/cc_resolv_conf.py
---- cloud-init-18.3/cloudinit/config/cc_resolv_conf.py	2018-06-20 05:49:26.000000000 +0530
-+++ cloud-init-18.3-new/cloudinit/config/cc_resolv_conf.py	2018-09-20 20:33:38.368316711 +0530
-@@ -55,10 +55,10 @@
+diff --git a/cloudinit/config/cc_resolv_conf.py b/cloudinit/config/cc_resolv_conf.py
+index 466dad03..f12ba20f 100644
+--- a/cloudinit/config/cc_resolv_conf.py
++++ b/cloudinit/config/cc_resolv_conf.py
+@@ -55,10 +55,10 @@ LOG = logging.getLogger(__name__)
  
  frequency = PER_INSTANCE
  
--distros = ['fedora', 'opensuse', 'rhel', 'sles']
-+distros = ['fedora', 'opensuse', 'rhel', 'sles', 'mariner']
+-distros = ['alpine', 'fedora', 'opensuse', 'rhel', 'sles']
++distros = ['alpine', 'fedora', 'mariner', 'opensuse', 'rhel', 'sles']
  
  
 -def generate_resolv_conf(template_fn, params, target_fname="/etc/resolv.conf"):
@@ -14,15 +15,15 @@ diff -uNr cloud-init-18.3/cloudinit/config/cc_resolv_conf.py cloud-init-18.3-new
      flags = []
      false_flags = []
  
-@@ -104,12 +104,13 @@
+@@ -104,12 +104,13 @@ def handle(name, cfg, cloud, log, _args):
      if "resolv_conf" not in cfg:
-         log.warn("manage_resolv_conf True but no parameters provided!")
+         log.warning("manage_resolv_conf True but no parameters provided!")
  
 -    template_fn = cloud.get_template_filename('resolv.conf')
 +    template_fn = cloud.get_template_filename('systemd.resolved.conf')
      if not template_fn:
--        log.warn("No template found, not rendering /etc/resolv.conf")
-+        log.warn("No template found, not rendering /etc/systemd/resolved.conf")
+-        log.warning("No template found, not rendering /etc/resolv.conf")
++        log.warning("No template found, not rendering /etc/systemd/resolved.conf")
          return
  
      generate_resolv_conf(template_fn=template_fn, params=cfg["resolv_conf"])
@@ -30,9 +31,11 @@ diff -uNr cloud-init-18.3/cloudinit/config/cc_resolv_conf.py cloud-init-18.3-new
      return
  
  # vi: ts=4 expandtab
-diff -uNr cloud-init-18.3/templates/systemd.resolved.conf.tmpl cloud-init-18.3-new/templates/systemd.resolved.conf.tmpl
---- cloud-init-18.3/templates/systemd.resolved.conf.tmpl	1970-01-01 05:30:00.000000000 +0530
-+++ cloud-init-18.3-new/templates/systemd.resolved.conf.tmpl	2018-09-20 20:35:54.672313067 +0530
+diff --git a/templates/systemd.resolved.conf.tmpl b/templates/systemd.resolved.conf.tmpl
+new file mode 100644
+index 00000000..fca50d37
+--- /dev/null
++++ b/templates/systemd.resolved.conf.tmpl
 @@ -0,0 +1,15 @@
 +## template:jinja
 +# Your system has been configured with 'manage-resolv-conf' set to true.
