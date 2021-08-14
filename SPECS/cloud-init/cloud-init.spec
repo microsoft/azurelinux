@@ -1,8 +1,8 @@
 %define python3_sitelib /usr/lib/python3.7/site-packages
 
 Name:           cloud-init
-Version:        19.1
-Release:        6%{?dist}
+Version:        21.2
+Release:        0%{?dist}
 Summary:        Cloud instance init scripts
 Group:          System Environment/Base
 License:        GPLv3
@@ -22,8 +22,6 @@ Patch5:         makecheck.patch
 Patch6:         systemd-resolved-config.patch
 Patch7:         cloud-init-azureds.patch
 Patch8:         ds-identity.patch
-Patch9:         CVE-2020-8631.patch
-Patch10:        CVE-2020-8632.patch
 
 BuildRequires:  python3
 BuildRequires:  python3-libs
