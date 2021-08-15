@@ -1,0 +1,39 @@
+From d00d8da5869a2608e97cfede094dfc5e11462a46 Mon Sep 17 00:00:00 2001
+From: Xie Yongji <xieyongji@bytedance.com>
+Date: Tue, 25 May 2021 20:56:22 +0800
+Subject: [PATCH] virtio_console: Assure used length from device is limited
+
+The buf->len might come from an untrusted device. This
+ensures the value would not exceed the size of the buffer
+to avoid data corruption or loss.
+
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Link: https://lore.kernel.org/r/20210525125622.1203-1-xieyongji@bytedance.com
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/char/virtio_console.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+index 59dfd9c421a1ea..7eaf303a7a86f9 100644
+--- a/drivers/char/virtio_console.c
++++ b/drivers/char/virtio_console.c
+@@ -475,7 +475,7 @@ static struct port_buffer *get_inbuf(struct port *port)
+ 
+ 	buf = virtqueue_get_buf(port->in_vq, &len);
+ 	if (buf) {
+-		buf->len = len;
++		buf->len = min_t(size_t, len, buf->size);
+ 		buf->offset = 0;
+ 		port->stats.bytes_received += len;
+ 	}
+@@ -1709,7 +1709,7 @@ static void control_work_handler(struct work_struct *work)
+ 	while ((buf = virtqueue_get_buf(vq, &len))) {
+ 		spin_unlock(&portdev->c_ivq_lock);
+ 
+-		buf->len = len;
++		buf->len = min_t(size_t, len, buf->size);
+ 		buf->offset = 0;
+ 
+ 		handle_control_message(vq->vdev, portdev, buf);
