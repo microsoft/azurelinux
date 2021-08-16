@@ -2485,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.17",
-          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.17/krb5-1.17.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.18/krb5-1.18.tar.gz"
         }
       }
     },
@@ -4927,6 +4927,16 @@
           "name": "procps-ng",
           "version": "3.3.15",
           "downloadUrl": "http://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "prometheus",
+          "version": "2.24.1",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.24.1.tar.gz"
         }
       }
     },
@@ -7506,18 +7516,8 @@
         "type": "other",
         "other": {
           "name": "swig",
-          "version": "3.0.12",
-          "downloadUrl": "http://downloads.sourceforge.net/project/swig/swig/swig-3.0.12/swig-3.0.12.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "swig",
           "version": "4.0.2",
-          "downloadUrl": "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz"
+          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.0.2.tar.gz"
         }
       }
     },

@@ -111,7 +111,7 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
-* Fri Aug 06 2021 Henry Li <lihl@microsoft.com> - 8.0.0-3
+* Mon Aug 16 2021 Henry Li <lihl@microsoft.com> - 8.0.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
 - Use golang as BR
