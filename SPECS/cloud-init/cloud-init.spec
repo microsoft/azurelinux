@@ -2,7 +2,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.2
-Release:        0%{?dist}
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -143,7 +143,7 @@ rm -rf %{buildroot}
 %dir %{_sharedstatedir}/cloud
 
 %changelog
-* Fri Aug 13 2021 Jiri Appl <jiria@microsoft.com> - 21.2-0
+* Fri Aug 13 2021 Jiri Appl <jiria@microsoft.com> - 21.2-1
 - Update to 21.2
 
 *   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 19.1-6
