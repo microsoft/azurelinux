@@ -7925,6 +7925,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vitess",
+          "version": "8.0.0",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v8.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vnstat",
           "version": "2.6",
           "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.6.tar.gz"
