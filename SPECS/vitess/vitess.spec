@@ -10,6 +10,7 @@ License:        MIT and ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/vitessio/vitess
+#Source0:       https://github.com/vitessio/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -31,7 +32,7 @@ Patch0:         0001-Add-context-to-k8s-calls.patch
 Patch1:         0001-Fix-for-newer-azure-storage-blob.patch
 # Fix unit test error
 Patch2:         0001-Fix-unit-test-error.patch
-
+Patch3:         update-go-module-version.patch
 BuildRequires: golang
 
 %description
@@ -46,12 +47,18 @@ with an atomic cutover step that takes only a few seconds.
 
 %prep
 %setup -q
-#%patch0 -p1
-#%patch1 -p1
+%patch0 -p1
+%patch1 -p1
 %patch2 -p1
-#sed -i "s|github.com/coreos/etcd|go.etcd.io/etcd|" $(find . -iname "*.go" -type f)
-#sed -i "s|gotest.tools|gotest.tools/v3|" $(find . -iname "*.go" -type f)
-#sed -i "s|github.com/minio/minio-go|github.com/minio/minio-go/v6|" $(find . -iname "*.go" -type f)
+%patch3 -p1
+
+# sed in Mariner does not work on a group of files; use for-loop to apply
+# to apply to individual file
+for i in $(find . -iname "*.go" -type f); do
+  sed -i "s|github.com/coreos/etcd|go.etcd.io/etcd|" $i
+  sed -i "s|gotest.tools|gotest.tools/v3|" $i
+done
+
 rm -rf go/trace/plugin_datadog.go
 mv go/README.md README-go.md
 
@@ -110,7 +117,8 @@ go check -t go/cmd \
 - Use golang as BR
 - Use prebuilt vendor source for building
 - Remove unsupported macros in Mariner
-- Remove patch0 and patch1
+- Use for loop to apply sed changes
+- Apply patch to use new versions to dependent golang modules
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
