@@ -1,0 +1,400 @@
+#
+# /etc/login.defs - Configuration control definitions for the shadow package.
+#
+#       $Id$
+#
+
+#
+# Delay in seconds before being allowed another attempt after a login failure
+# Note: When PAM is used, some modules may enforce a minimum delay (e.g.
+#       pam_unix(8) enforces a 2s delay)
+#
+# FAIL_DELAY            3
+
+#
+# Enable logging and display of /var/log/faillog login(1) failure info.
+#
+# FAILLOG_ENAB          yes
+
+#
+# Enable display of unknown usernames when login(1) failures are recorded.
+#
+LOG_UNKFAIL_ENAB        no
+
+#
+# Enable logging of successful logins
+#
+LOG_OK_LOGINS           no
+
+#
+# Enable logging and display of /var/log/lastlog login(1) time info.
+#
+# LASTLOG_ENAB          yes
+
+#
+# Enable checking and display of mailbox status upon login.
+#
+# Disable if the shell startup files already check for mail
+# ("mailx -e" or equivalent).
+#
+# MAIL_CHECK_ENAB               yes
+
+#
+# Enable additional checks upon password changes.
+#
+# OBSCURE_CHECKS_ENAB   yes
+
+#
+# Enable checking of time restrictions specified in /etc/porttime.
+#
+# PORTTIME_CHECKS_ENAB  yes
+
+#
+# Enable setting of ulimit, umask, and niceness from passwd(5) gecos field.
+#
+# QUOTAS_ENAB           yes
+
+#
+# Enable "syslog" logging of su(1) activity - in addition to sulog file logging.
+# SYSLOG_SG_ENAB does the same for newgrp(1) and sg(1).
+#
+SYSLOG_SU_ENAB          yes
+SYSLOG_SG_ENAB          yes
+
+#
+# If defined, either full pathname of a file containing device names or
+# a ":" delimited list of device names.  Root logins will be allowed only
+# from these devices.
+#
+# CONSOLE               /etc/securetty
+#CONSOLE        console:tty01:tty02:tty03:tty04
+
+#
+# If defined, all su(1) activity is logged to this file.
+#
+#SULOG_FILE     /var/log/sulog
+
+#
+# If defined, ":" delimited list of "message of the day" files to
+# be displayed upon login.
+#
+# MOTD_FILE     /etc/motd
+#MOTD_FILE      /etc/motd:/usr/lib/news/news-motd
+
+#
+# If defined, this file will be output before each login(1) prompt.
+#
+#ISSUE_FILE     /etc/issue
+
+#
+# If defined, file which maps tty line to TERM environment parameter.
+# Each line of the file is in a format similar to "vt100  tty01".
+#
+#TTYTYPE_FILE   /etc/ttytype
+
+#
+# If defined, login(1) failures will be logged here in a utmp format.
+# last(1), when invoked as lastb(1), will read /var/log/btmp, so...
+#
+# FTMP_FILE     /var/log/btmp
+
+#
+# If defined, name of file whose presence will inhibit non-root
+# logins.  The content of this file should be a message indicating
+# why logins are inhibited.
+#
+# NOLOGINS_FILE /etc/nologin
+
+#
+# If defined, the command name to display when running "su -".  For
+# example, if this is defined as "su" then ps(1) will display the
+# command as "-su".  If not defined, then ps(1) will display the
+# name of the shell actually being run, e.g. something like "-sh".
+#
+SU_NAME         su
+
+#
+# *REQUIRED*
+#   Directory where mailboxes reside, _or_ name of file, relative to the
+#   home directory.  If you _do_ define both, MAIL_DIR takes precedence.
+#
+MAIL_DIR        /var/mail
+#MAIL_FILE      .mail
+
+#
+# If defined, file which inhibits all the usual chatter during the login
+# sequence.  If a full pathname, then hushed mode will be enabled if the
+# user's name or shell are found in the file.  If not a full pathname, then
+# hushed mode will be enabled if the file exists in the user's home directory.
+#
+HUSHLOGIN_FILE  .hushlogin
+#HUSHLOGIN_FILE /etc/hushlogins
+
+#
+# If defined, either a TZ environment parameter spec or the
+# fully-rooted pathname of a file containing such a spec.
+#
+#ENV_TZ         TZ=CST6CDT
+#ENV_TZ         /etc/tzname
+
+#
+# If defined, an HZ environment parameter spec.
+#
+# for Linux/x86
+# ENV_HZ                HZ=100
+# For Linux/Alpha...
+#ENV_HZ         HZ=1024
+
+#
+# *REQUIRED*  The default PATH settings, for superuser and normal users.
+#
+# (they are minimal, add the rest in the shell startup files)
+ENV_SUPATH      PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ENV_PATH        PATH=/bin:/usr/bin
+
+#
+# Terminal permissions
+#
+#       TTYGROUP        Login tty will be assigned this group ownership.
+#       TTYPERM         Login tty will be set to this permission.
+#
+# If you have a write(1) program which is "setgid" to a special group
+# which owns the terminals, define TTYGROUP as the number of such group
+# and TTYPERM as 0620.  Otherwise leave TTYGROUP commented out and
+# set TTYPERM to either 622 or 600.
+#
+TTYGROUP        tty
+TTYPERM         0600
+
+#
+# Login configuration initializations:
+#
+#       ERASECHAR       Terminal ERASE character ('\010' = backspace).
+#       KILLCHAR        Terminal KILL character ('\025' = CTRL/U).
+#       ULIMIT          Default "ulimit" value.
+#
+# The ERASECHAR and KILLCHAR are used only on System V machines.
+# The ULIMIT is used only if the system supports it.
+# (now it works with setrlimit too; ulimit is in 512-byte units)
+#
+# Prefix these values with "0" to get octal, "0x" to get hexadecimal.
+#
+ERASECHAR       0177
+KILLCHAR        025
+#ULIMIT         2097152
+
+# Default initial "umask" value used by login(1) on non-PAM enabled systems.
+# Default "umask" value for pam_umask(8) on PAM enabled systems.
+# UMASK is also used by useradd(8) and newusers(8) to set the mode for new
+# home directories.
+# 022 is the default value, but 027, or even 077, could be considered
+# for increased privacy. There is no One True Answer here: each sysadmin
+# must make up their mind.
+UMASK           022
+
+#
+# Password aging controls:
+#
+#       PASS_MAX_DAYS   Maximum number of days a password may be used.
+#       PASS_MIN_DAYS   Minimum number of days allowed between password changes.
+#       PASS_MIN_LEN    Minimum acceptable password length.
+#       PASS_WARN_AGE   Number of days warning given before a password expires.
+#
+PASS_MAX_DAYS   99999
+PASS_MIN_DAYS   0
+# PASS_MIN_LEN  5
+PASS_WARN_AGE   7
+
+#
+# If "yes", the user must be listed as a member of the first gid 0 group
+# in /etc/group (called "root" on most Linux systems) to be able to "su"
+# to uid 0 accounts.  If the group doesn't exist or is empty, no one
+# will be able to "su" to uid 0.
+#
+# SU_WHEEL_ONLY no
+
+#
+# If compiled with cracklib support, sets the path to the dictionaries
+#
+# CRACKLIB_DICTPATH     /usr/share/cracklib/pw_dict
+
+#
+# Min/max values for automatic uid selection in useradd(8)
+#
+UID_MIN                  1000
+UID_MAX                 60000
+# System accounts
+SYS_UID_MIN               101
+SYS_UID_MAX               999
+# Extra per user uids
+SUB_UID_MIN                100000
+SUB_UID_MAX             600100000
+SUB_UID_COUNT               65536
+
+#
+# Min/max values for automatic gid selection in groupadd(8)
+#
+GID_MIN                  1000
+GID_MAX                 60000
+# System accounts
+SYS_GID_MIN               101
+SYS_GID_MAX               999
+# Extra per user group ids
+SUB_GID_MIN                100000
+SUB_GID_MAX             600100000
+SUB_GID_COUNT               65536
+
+#
+# Max number of login(1) retries if password is bad
+#
+LOGIN_RETRIES           5
+
+#
+# Max time in seconds for login(1)
+#
+LOGIN_TIMEOUT           60
+
+#
+# Maximum number of attempts to change password if rejected (too easy)
+#
+# PASS_CHANGE_TRIES     5
+
+#
+# Warn about weak passwords (but still allow them) if you are root.
+#
+# PASS_ALWAYS_WARN      yes
+
+#
+# Number of significant characters in the password for crypt().
+# Default is 8, don't change unless your crypt() is better.
+# Ignored if MD5_CRYPT_ENAB set to "yes".
+#
+#PASS_MAX_LEN           8
+
+#
+# Require password before chfn(1)/chsh(1) can make any changes.
+#
+# CHFN_AUTH             yes
+
+#
+# Which fields may be changed by regular users using chfn(1) - use
+# any combination of letters "frwh" (full name, room number, work
+# phone, home phone).  If not defined, no changes are allowed.
+# For backward compatibility, "yes" = "rwh" and "no" = "frwh".
+#
+CHFN_RESTRICT           rwh
+
+#
+# Password prompt (%s will be replaced by user name).
+#
+# XXX - it doesn't work correctly yet, for now leave it commented out
+# to use the default which is just "Password: ".
+#LOGIN_STRING           "%s's Password: "
+
+#
+# Only works if compiled with MD5_CRYPT defined:
+# If set to "yes", new passwords will be encrypted using the MD5-based
+# algorithm compatible with the one used by recent releases of FreeBSD.
+# It supports passwords of unlimited length and longer salt strings.
+# Set to "no" if you need to copy encrypted passwords to other systems
+# which don't understand the new algorithm.  Default is "no".
+#
+# Note: If you use PAM, it is recommended to use a value consistent with
+# the PAM modules configuration.
+#
+# This variable is deprecated. You should use ENCRYPT_METHOD instead.
+#
+#MD5_CRYPT_ENAB no
+
+#
+# Only works if compiled with ENCRYPTMETHOD_SELECT defined:
+# If set to MD5, MD5-based algorithm will be used for encrypting password
+# If set to SHA256, SHA256-based algorithm will be used for encrypting password
+# If set to SHA512, SHA512-based algorithm will be used for encrypting password
+# If set to DES, DES-based algorithm will be used for encrypting password (default)
+# Overrides the MD5_CRYPT_ENAB option
+#
+# Note: If you use PAM, it is recommended to use a value consistent with
+# the PAM modules configuration.
+#
+# ENCRYPT_METHOD SHA512
+
+#
+# Only works if ENCRYPT_METHOD is set to SHA256 or SHA512.
+#
+# Define the number of SHA rounds.
+# With a lot of rounds, it is more difficult to brute-force the password.
+# However, more CPU resources will be needed to authenticate users if
+# this value is increased.
+#
+# If not specified, the libc will choose the default number of rounds (5000).
+# The values must be within the 1000-999999999 range.
+# If only one of the MIN or MAX values is set, then this value will be used.
+# If MIN > MAX, the highest value will be used.
+#
+# SHA_CRYPT_MIN_ROUNDS 5000
+# SHA_CRYPT_MAX_ROUNDS 5000
+
+#
+# List of groups to add to the user's supplementary group set
+# when logging in from the console (as determined by the CONSOLE
+# setting).  Default is none.
+#
+# Use with caution - it is possible for users to gain permanent
+# access to these groups, even when not logged in from the console.
+# How to do it is left as an exercise for the reader...
+#
+#CONSOLE_GROUPS         floppy:audio:cdrom
+
+#
+# Should login be allowed if we can't cd to the home directory?
+# Default is no.
+#
+DEFAULT_HOME    yes
+
+#
+# If this file exists and is readable, login environment will be
+# read from it.  Every line should be in the form name=value.
+#
+# ENVIRON_FILE  /etc/environment
+
+#
+# If defined, this command is run when removing a user.
+# It should remove any at/cron/print jobs etc. owned by
+# the user to be removed (passed as the first argument).
+#
+#USERDEL_CMD    /usr/sbin/userdel_local
+
+#
+# Enable setting of the umask group bits to be the same as owner bits
+# (examples: 022 -> 002, 077 -> 007) for non-root users, if the uid is
+# the same as gid, and username is the same as the primary group name.
+#
+# This also enables userdel(8) to remove user groups if no members exist.
+#
+USERGROUPS_ENAB yes
+
+#
+# If set to a non-zero number, the shadow utilities will make sure that
+# groups never have more than this number of users on one line.
+# This permits to support split groups (groups split into multiple lines,
+# with the same group ID, to avoid limitation of the line length in the
+# group file).
+#
+# 0 is the default value and disables this feature.
+#
+#MAX_MEMBERS_PER_GROUP  0
+
+#
+# If useradd(8) should create home directories for users by default (non
+# system users only).
+# This option is overridden with the -M or -m flags on the useradd(8)
+# command-line.
+#
+#CREATE_HOME     yes
+
+#
+# Force use shadow, even if shadow passwd & shadow group files are
+# missing.
+#
+#FORCE_SHADOW    yes
