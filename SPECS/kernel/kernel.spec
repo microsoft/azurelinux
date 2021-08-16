@@ -201,6 +201,11 @@ Patch1164:      CVE-2021-38208.nopatch
 Patch1165:      CVE-2021-38200.nopatch
 # CVE-2021-38203 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1166:      CVE-2021-38203.nopatch
+Patch1167:      CVE-2021-38160.nopatch
+Patch1168:      CVE-2021-3679.nopatch
+Patch1169:      CVE-2021-38198.nopatch
+Patch1170:      CVE-2021-38209.nopatch
+Patch1171:      CVE-2021-3655.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -538,7 +543,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVE-2021-37576, CVE-2021-34556, CVE-2021-35477, CVE-2021-28691,
   CVE-2021-3564, CVE-2020-25639, CVE-2021-29657, CVE-2021-38199,
   CVE-2021-38201, CVE-2021-38202, CVE-2021-38207, CVE-2021-38204,
-  CVE-2021-38206, CVE-2021-38208, CVE-2021-38200, CVE-2021-38203
+  CVE-2021-38206, CVE-2021-38208, CVE-2021-38200, CVE-2021-38203,
+  CVE-2021-38160, CVE-2021-3679, CVE-2021-38198, CVE-2021-38209,
+  CVE-2021-3655
 
 * Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
 - Add patch to fix VDSO in HyperV
