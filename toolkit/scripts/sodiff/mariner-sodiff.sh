@@ -34,7 +34,9 @@ fi
 echo > "$sodiff_log_file"
 
 # Get packages from stdin
-for rpmpackage in $(cat); do
+pkgs=`cat`
+
+for rpmpackage in $pkgs; do
     package_path=$(find "$rpms_folder" -name "$rpmpackage" -type f)
     package_provides=`2>/dev/null rpm -qP "$package_path" | grep -E '[.]so[(.]' `
     echo "Processing ${rpmpackage}..." >> "$sodiff_log_file"
@@ -55,7 +57,6 @@ for rpmpackage in $(cat); do
             if ! [[ $sos_found -eq 0 ]] ; then
                 # Generic version of SO was found.
                 # This means it's a new version of a preexisting SO.
-
                 # Log which packages depend on this functionality
                 $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' > "$sodiff_out_dir"/"require_${sofile}"
             fi
@@ -64,4 +65,25 @@ for rpmpackage in $(cat); do
 done
 
 # Obtain a list of unique packages to be updated
-cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-summary.txt || true
+2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
+
+echo > "$sodiff_out_dir"/sodiff-summary.txt
+# Remove packages that have been dash-rolled already.
+
+echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
+for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
+    # Remove version and release
+    package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
+    # Find a highest version of package built during this run and remove .$ARCH.rpm ending
+    highest_build_ver_pkg=$(grep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
+
+    # Check if versions differ
+    if [[ "$package" == "$highest_build_ver_pkg" ]]; then
+        # They do not: the version is not dash-rolled - report.
+        echo "$highest_build_ver_pkg" >> "$sodiff_out_dir"/sodiff-summary.txt
+    fi
+    # else:
+    # the version is higher(dash-rolled) (guaranteed as we are not releasing older packages).
+done
+
+rm "$sodiff_out_dir"/sodiff-built-packages.txt
