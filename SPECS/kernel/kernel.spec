@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.52.1
-Release:        3%{?dist}
+Version:        5.10.57.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -181,6 +181,31 @@ Patch1147:      CVE-2021-34693.nopatch
 Patch1148:      CVE-2021-33624.nopatch
 Patch1149:      CVE-2021-35039.nopatch
 Patch1150:      CVE-2021-33909.nopatch
+Patch1151:      CVE-2021-37576.nopatch
+Patch1152:      CVE-2021-34556.nopatch
+Patch1153:      CVE-2021-35477.nopatch
+Patch1154:      CVE-2021-28691.nopatch
+Patch1155:      CVE-2021-3564.nopatch
+Patch1156:      CVE-2020-25639.nopatch
+Patch1157:      CVE-2021-29657.nopatch
+Patch1158:      CVE-2021-38199.nopatch
+# CVE-2021-38201 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1159:      CVE-2021-38201.nopatch
+# CVE-2021-38202  - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1160:      CVE-2021-38202.nopatch
+Patch1161:      CVE-2021-38207.nopatch
+Patch1162:      CVE-2021-38204.nopatch
+Patch1163:      CVE-2021-38206.nopatch
+Patch1164:      CVE-2021-38208.nopatch
+# CVE-2021-38200 - Introducing commit not in stable tree / powerpc not supported.
+Patch1165:      CVE-2021-38200.nopatch
+# CVE-2021-38203 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1166:      CVE-2021-38203.nopatch
+Patch1167:      CVE-2021-38160.nopatch
+Patch1168:      CVE-2021-3679.nopatch
+Patch1169:      CVE-2021-38198.nopatch
+Patch1170:      CVE-2021-38209.nopatch
+Patch1171:      CVE-2021-3655.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -513,6 +538,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Aug 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
+- Update source to 5.10.57.1
+- Address CVE-2021-37576, CVE-2021-34556, CVE-2021-35477, CVE-2021-28691,
+  CVE-2021-3564, CVE-2020-25639, CVE-2021-29657, CVE-2021-38199,
+  CVE-2021-38201, CVE-2021-38202, CVE-2021-38207, CVE-2021-38204,
+  CVE-2021-38206, CVE-2021-38208, CVE-2021-38200, CVE-2021-38203,
+  CVE-2021-38160, CVE-2021-3679, CVE-2021-38198, CVE-2021-38209,
+  CVE-2021-3655
+
 * Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
 - Add patch to fix VDSO in HyperV
 
