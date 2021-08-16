@@ -2485,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.17",
-          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.17/krb5-1.17.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.18/krb5-1.18.tar.gz"
         }
       }
     },
