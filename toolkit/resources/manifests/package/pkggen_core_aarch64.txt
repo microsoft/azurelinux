@@ -204,7 +204,7 @@ glib-2.60.1-5.cm2.aarch64.rpm
 libltdl-2.4.6-7.cm2.aarch64.rpm
 libltdl-devel-2.4.6-7.cm2.aarch64.rpm
 pcre-libs-8.44-3.cm2.aarch64.rpm
-krb5-1.17-7.cm2.aarch64.rpm
+krb5-1.18-1.cm2.aarch64.rpm
 lua-5.3.5-11.cm2.aarch64.rpm
 lua-libs-5.3.5-11.cm2.aarch64.rpm
 mariner-rpm-macros-2.0-2.cm2.noarch.rpm

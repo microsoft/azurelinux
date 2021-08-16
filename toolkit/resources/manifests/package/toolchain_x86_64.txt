@@ -155,10 +155,10 @@ kernel-headers-5.10.28.1-6.cm2.noarch.rpm
 kmod-25-6.cm2.x86_64.rpm
 kmod-debuginfo-25-6.cm2.x86_64.rpm
 kmod-devel-25-6.cm2.x86_64.rpm
-krb5-1.17-7.cm2.x86_64.rpm
-krb5-debuginfo-1.17-7.cm2.x86_64.rpm
-krb5-devel-1.17-7.cm2.x86_64.rpm
-krb5-lang-1.17-7.cm2.x86_64.rpm
+krb5-1.18-1.cm2.x86_64.rpm
+krb5-debuginfo-1.18-1.cm2.x86_64.rpm
+krb5-devel-1.18-1.cm2.x86_64.rpm
+krb5-lang-1.18-1.cm2.x86_64.rpm
 libaio-0.3.112-3.cm2.x86_64.rpm
 libaio-debuginfo-0.3.112-3.cm2.x86_64.rpm
 libaio-devel-0.3.112-3.cm2.x86_64.rpm
