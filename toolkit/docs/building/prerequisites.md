@@ -1,9 +1,9 @@
 
 # Build Requirements
 
-CBL-Mariner is currently tested to build from the Desktop version of Ubuntu 18.04. It may build in other Ubuntu versions or editions, or even other distributions.
+CBL-Mariner is currently tested to build from the Desktop version of Ubuntu 18.04. CBL-Mariner may build in other Ubuntu versions, or even other distributions, but other versions are currently unsupported.
 
-The following pre-requisites are required to build CBL-Mariner on Ubuntu 18.04
+The following pre-requisites are required to build CBL-Mariner on Ubuntu 18.04:
 
 
 ```bash
