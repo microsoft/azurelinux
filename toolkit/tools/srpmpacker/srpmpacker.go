@@ -181,7 +181,26 @@ func main() {
 	logger.PanicOnError(err)
 }
 
+// removeDuplicateStrings will remove duplicate entries from a string slice
+func removeDuplicateStrings(packList []string) (deduplicatedPackList []string) {
+	var (
+		packListSet = make(map[string]struct{})
+		exists      = struct{}{}
+	)
+
+	for _, entry := range packList {
+		packListSet[entry] = exists
+	}
+
+	for entry := range packListSet {
+		deduplicatedPackList = append(deduplicatedPackList, entry)
+	}
+
+	return
+}
+
 // parsePackListFile will parse a list of packages to pack if one is specified.
+// Duplicate list entries in the file will be removed.
 func parsePackListFile(packListFile string) (packList []string, err error) {
 	if packListFile == "" {
 		return
@@ -204,6 +223,8 @@ func parsePackListFile(packListFile string) (packList []string, err error) {
 	if len(packList) == 0 {
 		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
 	}
+
+	packList = removeDuplicateStrings(packList)
 
 	return
 }
