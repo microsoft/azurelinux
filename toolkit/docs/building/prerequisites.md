@@ -1,9 +1,10 @@
 
 # Build Requirements
 
-## Requirements were validated on `Desktop Ubuntu 18.04`
+CBL-Mariner is currently tested to build from the Desktop version of Ubuntu 18.04. It may build in other Ubuntu versions or editions, or even other distributions.
 
-Requirements for building images with a toolkit:
+The following pre-requisites are required to build CBL-Mariner on Ubuntu 18.04
+
 
 ```bash
 # Add a backports repo in order to install the latest version of Go.
