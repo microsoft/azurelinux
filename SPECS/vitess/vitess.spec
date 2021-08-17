@@ -46,11 +46,7 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
