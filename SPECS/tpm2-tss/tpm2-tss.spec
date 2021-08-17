@@ -12,7 +12,7 @@ Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{ve
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
 %if %{with_check}
-BuildRequires:  cmocka
+BuildRequires:  libcmocka-devel
 %endif
 
 Requires:       json-c
