@@ -60,6 +60,8 @@ Libraries and headers for libsubid
 %patch0 -p1
 %patch1 -p1
 
+autoreconf -fiv
+
 sed -i 's/groups$(EXEEXT) //' src/Makefile.in
 find man -name Makefile.in -exec sed -i 's/groups\.1 / /' {} \;
 sed -i -e 's@#ENCRYPT_METHOD DES@ENCRYPT_METHOD SHA512@' \
@@ -69,7 +71,6 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
 
 %build
-autoreconf -fiv
 %configure \
     --sysconfdir=%{_sysconfdir} \
     --with-libpam \
@@ -170,10 +171,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_mandir}/zh_CN
 %exclude %{_mandir}/zh_TW
 %config(noreplace) %{_sysconfdir}/pam.d/*
-	
+
 %files subid
 %{_libdir}/libsubid.so.3*
- 
+
 %files subid-devel
 %{_includedir}/shadow/subid.h
 %{_libdir}/libsubid.so
