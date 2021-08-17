@@ -64,7 +64,7 @@ Python 3 modules designed to facilitate SELinux policy analysis.
 %python3 setup.py build
 
 %install
-%py3_install --prefix=%{_prefix}
+%{py3_install} --prefix=%{_prefix}
 
 # Remove unpackaged files.  These are tools for which the dependencies
 # are not yet available on mariner (python3-networkx)
