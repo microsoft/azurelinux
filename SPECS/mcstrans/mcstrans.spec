@@ -68,10 +68,10 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 %license COPYING
 %{_mandir}/man8/mcs.8.gz
 %{_mandir}/man8/mcstransd.8.gz
-%{_mandir}/man8/setrans.conf.8.gz
+%{_mandir}/man5/setrans.conf.5.gz
 %{_mandir}/ru/man8/mcs.8.gz
 %{_mandir}/ru/man8/mcstransd.8.gz
-%{_mandir}/ru/man8/setrans.conf.8.gz
+%{_mandir}/ru/man5/setrans.conf.5.gz
 %{_mandir}/man8/secolor.conf.8.gz
 %{_sbindir}/mcstransd
 %{_unitdir}/mcstrans.service
