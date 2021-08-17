@@ -45,8 +45,8 @@ Requires:       sed
 Requires:       util-linux
 Conflicts:      initscripts < 9.66
 Obsoletes:      policycoreutils < 2.0.61-2
-Provides:       /sbin/fixfiles = %{version}-%{release}
-Provides:       /sbin/restorecon = %{version}-%{release}
+Provides:       /sbin/fixfiles
+Provides:       /sbin/restorecon
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
