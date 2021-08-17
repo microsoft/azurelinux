@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch0:         Allow-setting-arguments-to-xmlto-via-environmental-v.patch
+Patch0:         Allow-setting-arguments-to-xmlto-via-environmental-var.patch
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libsepol-devel >= %{libsepolver}
