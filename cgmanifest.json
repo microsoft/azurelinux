@@ -2014,6 +2014,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "helm",
+          "version": "3.4.1",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "http-parser",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
