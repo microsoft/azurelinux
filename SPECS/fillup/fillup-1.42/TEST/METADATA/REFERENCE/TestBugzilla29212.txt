@@ -1,0 +1,10 @@
+## Path: "This is the value of metadata variable: A2aa222aaaaa"
+## Description: "This is the value of metadata variable: B2bb222bbbbb"
+## Default: "This is the value of metadata variable: D1dd111ddddd"
+## Config: "This is the value of metadata variable: E2ee222eeeee"
+## ServiceRestart: "This is the value of metadata variable: G1gg111ggggg"
+## Command: "This is the value of metadata variable: H2hh222hhhhh"
+#
+# This is a comment for automatically generated basefile
+#
+TESTVARIABLE=ShiftRegister of basefile

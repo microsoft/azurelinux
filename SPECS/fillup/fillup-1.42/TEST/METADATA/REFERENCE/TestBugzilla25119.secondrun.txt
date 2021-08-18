@@ -1,0 +1,7 @@
+## Path:       Network/WWW/Apache
+## Type:       yesno
+## Default:    yes
+#
+# enable the PHP module (yes|no)
+#
+HTTPD_SEC_MOD_PHP=yes

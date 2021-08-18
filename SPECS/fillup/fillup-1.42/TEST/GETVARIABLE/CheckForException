@@ -1,0 +1,7 @@
+fgrep Exception TestStderr.txt > Stderr.txt
+if test -s ./Stderr.txt
+then
+    mv ./Stderr.txt DIFFERENCE/Test$1.stderrtxt
+else
+    rm -f ./Stderr.txt
+fi

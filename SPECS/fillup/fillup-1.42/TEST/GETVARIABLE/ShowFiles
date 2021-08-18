@@ -1,0 +1,5 @@
+for filename in "$@"; do
+	echo "--- $filename ---"
+	cat $filename
+done
+echo "--- < end > ---"

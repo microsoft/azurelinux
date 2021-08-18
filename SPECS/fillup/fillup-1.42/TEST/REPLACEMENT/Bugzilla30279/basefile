@@ -1,0 +1,269 @@
+## Path:	Network/WWW/Apache2
+## Description:	Configuration for Apache 2
+
+## Type:	string
+## Default:	""
+## ServiceRestart: apache2
+#
+# Which config file do you want to use?
+# (if not set, /etc/apache2/httpd.conf is used.)
+#
+APACHE_HTTPD_CONF=""
+
+## Type:	list(prefork,worker,leader,metuxmpm)
+## Default:	""
+## Command:	/usr/sbin/apache2-reconfigure-mpm
+#
+# MPM (multi-processing module) to use.
+#
+# Needed to determine with which MPM apache will run, as well as
+# against which header files modules will be built. 
+#
+# If not set, the system will simply pick one of the installed MPMs.
+#
+APACHE_MPM=""
+
+## Type:	string
+## Default:	""
+## ServiceReload: apache2
+#
+# email address of the server administrator (ServerAdmin directive)
+# This address is added to the server's responses if APACHE_SERVERSIGNATURE 
+# is set to "email". 
+#
+# If empty ("") it defaults to webmaster@$FQHOSTNAME, where FQHOSTNAME is
+# taken from /etc/HOSTNAME. 
+#
+# Note that ServerAdmin directives inside VirtualHost statements are not
+# changed, even not the one in the stock SSL virtual host block. 
+#
+APACHE_SERVERADMIN=""
+
+## Type:	string
+## Default:	""
+## ServiceReload: apache2
+#
+# ServerName gives the name and port that the server uses to identify itself.
+# This can often be determined automatically, but we recommend you specify
+# it explicitly to prevent problems during startup.
+#
+# If this is not set to valid DNS name for your host, server-generated
+# redirections will not work.  See also the UseCanonicalName directive.
+#
+# If your host doesn't have a registered DNS name, enter its IP address here.
+# You will have to access it by its address anyway, and this will make 
+# redirections work in a sensible way.
+#
+APACHE_SERVERNAME=""
+
+## Type:	string
+## Default:	""
+## ServiceRestart: apache2
+#
+# Here you can name files, separated by spaces, that should be Include'd from 
+# httpd.conf. 
+#
+# This allows you to add e.g. VirtualHost statements without touching 
+# /etc/httpd/httpd.conf itself, which makes upgrading easier. 
+#
+APACHE_CONF_INCLUDE_FILES=""
+
+## Type:	string
+## Default:	""
+## ServiceRestart: apache2
+#
+# Here you can name directories, separated by spaces, that should be Include'd 
+# from httpd.conf. 
+#
+# All files contained in these directories will be recursively included by apache.
+# If a pattern like *.conf is appended, apache will use it.
+#
+# Examples: "/etc/apache2/my_conf/"
+#           "/etc/apache2/virtual_hosts/*.conf"
+#           "local/*.conf /srv/www/virtual/"
+#
+APACHE_CONF_INCLUDE_DIRS=""
+
+## Type:	string
+## Default:	"access actions alias auth auth_dbm autoindex cgi dir env expires include log_config mime negotiation setenvif ssl suexec userdir"
+## ServiceRestart: apache2
+#
+# [It might look silly to not simply edit httpd.conf for the LoadModule statements.
+# However, since the LoadModule statements might need an absolute path to the modules,
+# switching between MPMs can be quite a hassle. It's easier to just give the names here.]
+#
+# * list of all modules shipped with the base distribution: 
+#
+#    access actions alias asis auth auth_anon auth_dbm auth_digest auth_ldap
+#    autoindex cache case_filter case_filter_in cern_meta cgi charset_lite
+#    dav dav_fs deflate dir disk_cache echo env expires ext_filter file_cache
+#    headers imap include info ldap log_config logio mem_cache mime mime_magic
+#    negotiation proxy proxy_connect proxy_ftp proxy_http rewrite setenvif
+#    speling ssl status suexec unique_id userdir usertrack vhost_alias 
+#
+#   see http://httpd.apache.org/docs-2.0/mod/ !
+#
+# * It pays to use IfDefine statements... like
+#    <IfModule mod_xyz.c>
+#        ....
+#    </IfModule>
+#
+# * In the APACHE_MODULES variable, you can use mod_xyz or just xyz syntax.
+#   You may also name an absolute path if you like.
+#
+# * NOTE ON MOD_SSL: before you can enable this module, you need a server certificate. 
+#   A test certificate can be created by entering 
+#   'cd /usr/share/doc/packages/apache2; ./certificate.sh' as root.
+#   Also, you need to set the ServerName inside the <VirtualHost _default_:443> 
+#   block to the fully qualified domain name (see /etc/HOSTNAME).
+#
+# * if your server certificate is protected by a passphrase you should increase the
+#   APACHE_START_TIMEOUT (see above)
+#
+#
+# EXAMPLES:
+#
+# fairly minimal
+# APACHE_MODULES="access alias auth dir log_config mime setenvif"
+#
+# apache's default installation
+# APACHE_MODULES="access actions alias asis auth autoindex cgi dir imap include log_config mime negotiation setenvif status userdir"
+# your settings
+APACHE_MODULES="access actions alias auth auth_dbm autoindex cgi dir env expires include log_config mime negotiation setenvif ssl suexec userdir"
+
+## Type:	string
+## Default:	""
+## ServiceRestart: apache2
+#
+# Additional server flags:
+#
+# Put here any server flags ("Defines") that you want to hand over to 
+# httpd at start time, or other command line flags.
+#
+# Background: Any directives within an <IfDefine flag>...</IfDefine>
+#             section are only processed if the flag is defined.
+#
+# This could be -D SSL, for example. Or -DSTATUS.
+# (it does not matter whether you "-D flag1 -D flag2" or simply "flag1 flag2")
+#
+# Specifying such flags here is equivalent to giving them on the commandline.
+# (e.g. rcapache2 start -DReverseProxy)
+#
+APACHE_SERVER_FLAGS=""
+
+## Type:	string
+## Default:	"/srv/www/htdocs"
+## ServiceReload: apache2
+#
+# DocumentRoot: Where the web pages (of the default virtual host) are located 
+#
+# If empty, the default is used.
+#
+APACHE_DOCUMENT_ROOT=""
+
+## Type:	integer
+## Default:	2
+#
+# timeout during server startup (seconds)
+# after this time, the start script decides wether the httpd process started without error.
+#
+# Increase it, if you use mod_ssl and your certificate is passphrase protected!
+#
+APACHE_START_TIMEOUT="2"
+
+## Type:	list(on,off,email)
+## Default:	"on"
+## ServiceReload: apache2
+#
+# Configures the footer on server-generated documents 
+# This correlates to the ServerSignature directive. 
+#
+APACHE_SERVERSIGNATURE="on"
+
+## Type:	list(debug,info,notice,warn,error,crit,alert,emerg)
+## Default:	"warn"
+## ServiceReload: apache2
+#
+# LogLevel: Control the number of messages logged to the error_log.
+#
+APACHE_LOGLEVEL="warn"
+
+## Type:	string
+## Default:	"/var/log/apache2/access_log combined"
+## ServiceRestart: apache2
+#
+# The location and format of the access logfile (Common Logfile Format).
+# If you do not define any access logfiles within a <VirtualHost>
+# container, they will be logged here.  Contrarywise, if you *do*
+# define per-<VirtualHost> access logfiles, transactions will be
+# logged therein and *not* in this file.
+#
+# Simply set it to empty, if you configure it yourself somewhere else.
+# 
+# Examples:
+#
+# If you would like to have agent and referer logfiles:
+#
+# APACHE_ACCESS_LOG="/var/log/apache2/referer_log referer, /var/log/apache2/agent_log agent"
+#   corresponds to 
+# CustomLog /var/log/apache2/referer_log referer
+# CustomLog /var/log/apache2/agent_log   agent
+#
+# If you prefer a single logfile with access, agent, and referer information
+# (Combined Logfile Format):
+#
+# APACHE_ACCESS_LOG="/var/log/apache2/access_log combined"
+#   corresponds to 
+# CustomLog /var/log/apache2/access_log combined
+#
+APACHE_ACCESS_LOG="/var/log/apache2/access_log combined"
+
+## Type:	list(On,Off,DNS)
+## Default:	"Off"
+## ServiceReload: apache2
+#
+# UseCanonicalName: Determines how Apache constructs self-referencing 
+# URLs and the SERVER_NAME and SERVER_PORT variables.
+# When set "Off", Apache will use the Hostname and Port supplied
+# by the client.  When set "On", Apache will use the value of the
+# ServerName directive.
+#
+APACHE_USE_CANONICAL_NAME="off"
+
+## Type:	list(Major,Minor,Minimal,ProductOnly,OS,Full)
+## Default:	"OS"
+## ServiceReload: apache2
+#
+# How much information the server response header field contains about the server.
+# (installed modules, versions, etc.)
+# see http://httpd.apache.org/docs-2.0/mod/core.html#servertokens
+#
+APACHE_SERVERTOKENS="OS"
+
+## Type:	list(on,off)
+## Default:	"off"
+## ServiceReload: apache2
+#
+# If mod_status is used, include extended information about the server, like 
+# CPU usage, in the status report. It is a server-wide setting, and it can cost
+# some performance!
+#
+APACHE_EXTENDED_STATUS="off"
+
+## Type:	list(on,off)
+## Default:	"off"
+## ServiceRestart: apache2
+#
+# Enable buffered logging
+#
+APACHE_BUFFERED_LOGS="off"
+
+## Type:	integer
+## Default:	300
+## ServiceReload: apache2
+#
+# Timeout: The number of seconds before receives and sends time out.
+# It is a server wide setting.
+#
+APACHE_TIMEOUT="300"
+

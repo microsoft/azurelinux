@@ -1,0 +1,4 @@
+echo "#" >> $1
+echo "# This is a comment for a variable definition" >> $1
+echo "#" >> $1
+echo "$2=$3" >> $1

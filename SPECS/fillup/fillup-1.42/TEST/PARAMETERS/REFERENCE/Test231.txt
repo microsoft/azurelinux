@@ -1,0 +1,36 @@
+
+usage: fillup [options] <base file> <additional file> <output file>
+  valid options are:
+      -h, --help               this message
+      -e, --ignoreeof          end of file allowed anywhere
+      -i, --ignoreDefinites    dont write variables to the output if they are only defined in basefile
+      -q, --quiet              no output to screen
+      -s, --suppress           suppress output of comments
+      -t, --trailing           save trailing comments at end of file
+      -v, --verbose            maximum output to screen
+      -V, --version            print fillup version and exit
+      -nometadata, --nometadata no metadata information merged: keep fillup 1.10 functionalty
+      -f | --forbidden <file>  use <file> to forbid changes for given variables
+      -c | --char <char>       use <char> as comment marker
+      -l | --quote <char>      use <char> as quoting marker
+      -d | --delim <char>      use <char> as delimiter
+      -n, --num                check for max comment lines
+      -p, --put                check for substitution (put)
+      -g, --get                check for extraction (get)
+      -m, --maintain           check for maintaining the basefile
+      -x, --exchange           check for exchange
+      -r, --remove             check for removal within basefile
+      -a, --arguments          check for passed arguments
+
+Please refer also to the related manpage.
+Within the options section, there are hints
+to options which are not/no longer supported.
+
+parameter Delimiter is set
+=
+parameter Maintain is set
+parameter CommentMarker is set to
+#
+parameter QuotingMarker is set to
+"
+parameter Help is set

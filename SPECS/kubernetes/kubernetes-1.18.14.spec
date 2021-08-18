@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.14
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,7 +31,7 @@ BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
-Requires:       cni
+Requires:       cni-plugins
 Requires:       cri-tools
 Requires:       ebtables
 Requires:       ethtool

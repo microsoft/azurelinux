@@ -1,0 +1,14 @@
+parameter Delimiter is set
+=
+parameter Exchange is set
+parameter Parameters is set
+parameter CommentMarker is set to
+#
+parameter QuotingMarker is set to
+"
+parameter BaseFile is set to
+infile
+parameter AdditionalFile is set to
+addfile
+parameter OutputFile is set to
+outfile

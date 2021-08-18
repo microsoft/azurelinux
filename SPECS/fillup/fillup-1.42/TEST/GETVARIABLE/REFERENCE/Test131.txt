@@ -1,0 +1,16 @@
+#
+# This is a trailing comment
+#
+
+#
+# This is normally the end of the file
+#
+
+#
+# This is a header for addfile
+#
+
+#
+# This is a comment for a variable definition
+#
+PATH=/local

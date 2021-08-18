@@ -1,0 +1,6 @@
+if test -s ./TestDifference.txt
+then
+    mv ./TestDifference.txt DIFFERENCE/Test$1.txt
+else
+    rm -f ./TestDifference.txt
+fi

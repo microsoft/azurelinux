@@ -1,0 +1,14 @@
+[Unit]
+Description=CNI DHCP service socket
+Documentation=https://github.com/containernetworking/plugins/tree/master/plugins/ipam/dhcp
+PartOf=cni-dhcp.service
+
+[Socket]
+ListenStream=/run/cni/dhcp.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=root
+RemoveOnStop=true
+
+[Install]
+WantedBy=sockets.target

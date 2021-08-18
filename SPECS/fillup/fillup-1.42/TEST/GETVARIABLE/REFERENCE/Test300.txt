@@ -1,0 +1,18 @@
+#
+# This is a header for basefile
+#
+
+#
+# This is a comment for a variable definition
+# The variable is also within that comment
+# LANGUAGE=foo
+
+## Path: /tmp
+## Description: temporary files are located there
+## Type: not specified
+## Default: none
+#
+# This is a comment for a variable definition
+# The variable is also within that comment
+# PATH=/var/log
+PATH=/tmp

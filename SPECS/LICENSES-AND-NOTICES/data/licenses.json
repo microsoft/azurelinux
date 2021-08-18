@@ -306,7 +306,7 @@
                 "cloud-init",
                 "cloud-utils-growpart",
                 "cmake",
-                "cni",
+                "cni-plugins",
                 "core-packages",
                 "coreutils",
                 "cpio",

@@ -1,0 +1,12 @@
+ 
+## Path:        d2-d4/d7-d5/c2-c4/c7-c6/Ng1-f3/Ng8-f6/Nb1-c3/d5xc4/e2-e4
+## Description: D15 of encyclopaedia
+## Description: To avoid the Geller Gambit white normally plays
+##            : the normal move 5.a4. This guarantees the recapture
+##              of the gambited pawn on c4 at the cost of a tempo.
+## Type:        pawn on c4 is additional piece
+## Default:     with initiative for white
+## Description: Occupying centre immediately or gambiting a pawn
+#
+GAMBIT=NO_GAMBIT
+ 

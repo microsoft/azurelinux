@@ -1,0 +1,16 @@
+#
+# This is a header for basefile
+#
+
+#
+# This is a comment for a variable definition
+# The variable is also within that comment
+# LANGUAGE=foo
+#
+# This is a header for addfile
+#
+
+#
+# This is a comment for a variable definition
+#
+PATH=/local

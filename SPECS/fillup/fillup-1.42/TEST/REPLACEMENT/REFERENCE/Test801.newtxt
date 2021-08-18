@@ -1,0 +1,18 @@
+###########################################################
+#                                                         #
+#              This is a fillup header                    #
+#                                                         #
+###########################################################
+
+###########################################################
+#                                                         #
+#              This is a fillup header                    #
+#                                                         #
+###########################################################
+
+# CAUTHOR_0=NO_LONGER_USED_VALUE
+CAUTHOR_0=USED_VALUE
+CAUTHOR_0= OVERWRITTEN_VARIABLE
+# CAUTHOR= BASE_VARIABLE
+CAUTHOR= BASE_VARIABLE_VALUE
+# CAUTHOR= BASE_VARIABLE_POSTCOMMENT

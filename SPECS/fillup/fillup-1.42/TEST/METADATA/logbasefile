@@ -1,0 +1,30 @@
+<basefile variable block>: <106>
+<\n\t   \n## Path:        d2-d4/d7-d5/c2-c4/c7-c6/Ng1-f3/Ng8-f6/Nb1-c3/d5xc4/e2-e4
+##
+GAMBIT=GELLER_GAMBIT
+>
+<basefile metadata Path>: <0>
+<>
+<basefile metadata Description>: <0>
+<>
+<basefile metadata Type>: <0>
+<>
+<basefile metadata Default>: <0>
+<>
+
+<addfile variable block>: <42>
+<\n\t   \n##
+GAMBIT=QUEENS_GAMBIT_ACCEPTED
+>
+<addfile metadata Path>: <0>
+<>
+
+<addfile metadata Description>: <0>
+<>
+
+<addfile metadata Type>: <0>
+<>
+
+<addfile metadata Default>: <0>
+<>
+

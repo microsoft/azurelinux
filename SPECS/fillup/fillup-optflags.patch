@@ -1,0 +1,41 @@
+--- SRC/Makefile.orig
++++ SRC/Makefile
+@@ -37,7 +37,7 @@ ARCHIVE   = ${PROJDIR}/ARCHIVE
+ WARNINGS = -Wall -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes
+ # WARNINGS = -Wunused -Wswitch -Wformat -Wreturn-type -Wimplicit -Wmissing-prototypes -Wmissing-declarations
+ 
+-DEFINES   = 
++DEFINES   = -D_GNU_SOURCE 
+ 
+ # LINUX system
+ OPTISPLUS = 
+@@ -46,24 +46,23 @@ INC       = -I/usr/include
+ COMPILER  = -DGCC=1
+ 
+ # Set OPTIS to the following values
+-OPTIS = $(OPTISPLUS) -O2 -fforce-addr -finline-functions -fno-function-cse \
+-	-fkeep-inline-functions
++OPTIS = $(OPTISPLUS) -O2
+ 
+ ifeq ($(COMPILE_OPTION),DEBUG)
+   # compile for debugging
+-  COMPILE  = gcc -fsigned-char -DDEBUG -ansi -g -c ${WARNINGS} -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
++  COMPILE  = gcc -DDEBUG -std=gnu99 -g -c $(OPTIS) ${WARNINGS} -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
+   LINK	   = gcc -g
+ endif
+ 
+ ifeq ($(COMPILE_OPTION),OPTIMIZE)
+   # compile with all optimizations
+-  COMPILE  = gcc -fsigned-char -ansi -c $(OPTIS) $(WARNINGS) -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
+-  LINK	   = gcc -O -s
++  COMPILE  = gcc -std=gnu99  -c $(OPTIS) $(WARNINGS) -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
++  LINK	   = gcc
+ endif
+ 
+ ifeq ($(COMPILE_OPTION),PROFILE)
+   # compile for use with "gprof"
+-  COMPILE  = gcc -fsigned-char -ansi -pg -c ${WARNINGS} -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
++  COMPILE  = gcc -ansi -pg -c ${WARNINGS} -I${SRC} -I${INC} ${COMPILER} ${SYS} ${DEFINES}
+   LINK	   = gcc -pg
+ endif
+ 

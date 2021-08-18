@@ -1,0 +1,4 @@
+echo "#" > $1
+echo "# This is a header for $1" >> $1
+echo "#" >> $1
+echo "" >> $1

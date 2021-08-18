@@ -1,0 +1,8 @@
+# 
+# this is the first comment
+# 
+VAR_1=47
+# 
+# this is the second comment
+# 
+VAR_2=94

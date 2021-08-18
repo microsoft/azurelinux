@@ -1,0 +1,71 @@
+<basefile variable block>: <329>
+< 
+#########################################################
+#
+# This is an example of a multiple defined variable but 
+# metadata information is not included at first appearence.
+# Therefore correct metadata will be seen as part of comment
+#
+########################################################
+GAMBIT=QUEENS_GAMBIT_ACCEPTED
+>
+<basefile metadata Path>: <0>
+<>
+<basefile metadata Description>: <0>
+<>
+<basefile metadata Type>: <0>
+<>
+<basefile metadata Default>: <0>
+<>
+<basefile metadata Config>: <0>
+<>
+<basefile metadata ServiceReload>: <0>
+<>
+<basefile metadata ServiceRestart>: <0>
+<>
+<basefile metadata Command>: <0>
+<>
+<basefile metadata PreSaveCommand>: <0>
+<>
+
+<addfile variable block>: <253>
+< 
+## Path:        d2-d4/d7-d5/c2-c4/c7-c6/Ng1-f3/Ng8-f6/Nb1-c3/d5xc4/e2-e4
+## Description: a variation of Queens gambit accepted
+## Type:        forced line, if black holds the pawn on c4
+## Default:     with initiative for white
+#
+GAMBIT=GELLER_GAMBIT
+>
+<addfile metadata Path>: <75>
+< 
+## Path:        d2-d4/d7-d5/c2-c4/c7-c6/Ng1-f3/Ng8-f6/Nb1-c3/d5xc4/e2-e4
+>
+
+<addfile metadata Description>: <54>
+<## Description: a variation of Queens gambit accepted
+>
+
+<addfile metadata Type>: <59>
+<## Type:        forced line, if black holds the pawn on c4
+>
+
+<addfile metadata Default>: <42>
+<## Default:     with initiative for white
+>
+
+<addfile metadata Config>: <0>
+<>
+
+<addfile metadata ServiceReload>: <0>
+<>
+
+<addfile metadata ServiceRestart>: <0>
+<>
+
+<addfile metadata Command>: <0>
+<>
+
+<addfile metadata PreSaveCommand>: <0>
+<>
+

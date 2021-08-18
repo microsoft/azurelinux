@@ -1,0 +1,8 @@
+echo "#" >> $1
+echo "# This is a trailing comment" >> $1
+echo "#" >> $1
+echo "" >> $1
+echo "#" >> $1
+echo "# This is normally the end of the file" >> $1
+echo "#" >> $1
+echo "" >> $1

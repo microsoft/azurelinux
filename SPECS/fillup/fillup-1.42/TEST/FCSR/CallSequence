@@ -1,0 +1,29 @@
+#!/bin/bash
+COMMAND=$1
+SHIFTREGISTER=$2
+OPTIONS=$3
+rm -f basefile addfile outfile ref-outfile ref-removed
+echo "---------------------------"
+echo "Creating basefile"
+./CreateBasefile $SHIFTREGISTER > basefile
+echo "---\/--- basefile ----\/---"
+cat basefile
+echo "---/\--- basefile ----/\---"
+echo "Creating addfile"
+./CreateAddfile  $SHIFTREGISTER > addfile
+echo "---\/---- addfile ----\/---"
+cat addfile
+echo "---/\---- addfile ----/\---"
+echo "Creating reference outfile for TestCase $SHIFTREGISTER"
+./CreateOutfile  $SHIFTREGISTER > ref-outfile
+echo "Creating reference basefile.new for TestCase $SHIFTREGISTER "
+./CreateRemoved  $SHIFTREGISTER > ref-removed
+echo "---------------------------"
+echo "Calling $COMMAND $OPTIONS basefile addfile outfile"
+$COMMAND $OPTIONS basefile addfile outfile
+echo "---------------------------"
+echo "---\/---- outfile ----\/---"
+cat outfile
+echo "---/\---- outfile ----/\---"
+echo "---------------------------"
+

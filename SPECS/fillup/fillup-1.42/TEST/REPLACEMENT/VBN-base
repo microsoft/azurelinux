@@ -1,0 +1,5 @@
+#
+# a VariableBlockName
+# the delimiter does not follow the variable name
+#
+test "$rc_done"= = = -a -e /etc/rc.status   # basefile

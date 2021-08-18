@@ -1,0 +1,16 @@
+#
+# This is a header for basefile
+#
+
+#
+# This is a comment for a variable definition
+#
+LANGUAGE=foo
+#
+# This is a trailing comment
+#
+
+#
+# This is normally the end of the file
+#
+

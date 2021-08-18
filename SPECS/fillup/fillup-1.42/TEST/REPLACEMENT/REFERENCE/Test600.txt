@@ -1,0 +1,11 @@
+
+#
+# [5] Baudelaire Charles, (1821,1867)
+#
+BAUTHOR=Baudelaire
+
+
+#
+# [13] Eichendorff, Joseph Freiherr von (1788 - 1857)
+#
+EAUTHOR=Eichendorff

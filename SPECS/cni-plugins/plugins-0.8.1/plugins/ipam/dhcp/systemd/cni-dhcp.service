@@ -1,0 +1,11 @@
+[Unit]
+Description=CNI DHCP service
+Documentation=https://github.com/containernetworking/plugins/tree/master/plugins/ipam/dhcp
+After=network.target cni-dhcp.socket
+Requires=cni-dhcp.socket
+
+[Service]
+ExecStart=/opt/cni/bin/dhcp daemon
+
+[Install]
+WantedBy=multi-user.target

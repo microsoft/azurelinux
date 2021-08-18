@@ -1,0 +1,67 @@
+parameter Delimiter is set
+=
+parameter Verbose is set
+parameter Maintain is set
+parameter Parameters is set
+parameter CommentMarker is set to
+#
+parameter QuotingMarker is set to
+"
+parameter BaseFile is set to
+infile
+parameter AdditionalFile is set to
+addfile
+parameter OutputFile is set to
+outfile
+
+
+##################################
+ VariableBlockNo: 0
+~~~~~~~~~~~~ metadata info ~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##################################
+
+ VariableName:    
+##################################
+ Classifier:      TrailingCommentBlock
+##################################
+ VariableBlock:
+ 
+##################################
+
+
+<<<List>>> VariableName:    
+
+~~~~~~~~~~~~ metadata info ~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+##################################
+ VariableBlockNo: 0
+~~~~~~~~~~~~ metadata info ~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##################################
+
+ VariableName:    
+##################################
+ Classifier:      TrailingCommentBlock
+##################################
+ VariableBlock:
+ 
+##################################
+
+
+<<<List>>> VariableName:    
+
+~~~~~~~~~~~~ metadata info ~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Evaluating base file:    ->  Ignored  -  TrailingCommentBlock
+Evaluating additional file:    ->  Ignored  -  TrailingCommentBlock
+
+Now the output file is displayed

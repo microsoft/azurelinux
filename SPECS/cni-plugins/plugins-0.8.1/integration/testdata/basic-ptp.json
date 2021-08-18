@@ -1,0 +1,11 @@
+{
+    "cniVersion": "0.3.0",
+    "name": "basic-ptp",
+    "type": "ptp",
+    "ipMasq": true,
+    "mtu": 512,
+    "ipam": {
+        "type": "host-local",
+        "subnet": "10.1.2.0/24"
+    }
+}
