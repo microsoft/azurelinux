@@ -141,6 +141,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
+# CVE-2020-24742 is not applicable to v5.12.11 (already fixed in this version)
 Patch81: CVE-2020-24742.nopatch
 
 ## upstream patches
