@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        8.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Requires:       ncurses
 Requires:       python3
 Requires:       xz-libs
 Provides:       %{name}-headless = %{version}-%{release}
+Provides:       %{name}-gdbserver = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
@@ -38,11 +39,11 @@ another program was doing at the moment it crashed.
 %autosetup -p1
 
 %build
-%configure --with-python=%{_bindir}/python3
-make %{?_smp_mflags}
+%configure --with-python=%{python3}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm %{buildroot}%{_infodir}/dir
 
@@ -65,7 +66,7 @@ rm %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
-make %{?_smp_mflags} check TESTS="gdb.base/default.exp"
+%make_build check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -82,6 +83,10 @@ make %{?_smp_mflags} check TESTS="gdb.base/default.exp"
 %{_mandir}/*/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-5
+- Add compatibility provides for gdbserver subpackage
+- Use make macros throughout
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-4
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 8.3-3: Patch CVE-2019-1010180

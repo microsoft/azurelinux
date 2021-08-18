@@ -16,9 +16,8 @@ BuildArch:      noarch
 Azure CBL-Mariner release files such as yum configs and other %{_sysconfdir}/ release related files
 
 %install
-rm -rf %{buildroot}
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}/%{_lib}
+install -d %{buildroot}/%{_libdir}
 
 echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
 echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
@@ -31,7 +30,7 @@ DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
-cat > %{buildroot}/%{_lib}/os-release << EOF
+cat > %{buildroot}/%{_libdir}/os-release << EOF
 NAME="Common Base Linux Mariner"
 VERSION="%{mariner_release_version}"
 ID=mariner
@@ -53,21 +52,19 @@ cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
 Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
 EOF
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/mariner-release
 %config(noreplace) %{_sysconfdir}/lsb-release
-%config(noreplace) /%{_lib}/os-release
+%config(noreplace) %{_libdir}/os-release
 %config(noreplace) %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
-* Tue May 18 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Updating version and distrotag for future looking 2.0 branch.  Formatting fixes.
+- Remove %%clean section, buildroot cleaning step (both automatically done by RPM)
 
 * Wed Apr 27 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-16
 - Updating version for April update

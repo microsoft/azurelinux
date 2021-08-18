@@ -1,7 +1,7 @@
 Summary:        The lm_sensors package provides user-space support for the hardware monitoring drivers in the Linux kernel.
 Name:           lm-sensors
 Version:        3.5.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Requires:       perl
 # which is required by this package.
 Conflicts:      kernel-hyperv
 Provides:       lm_sensors = %{version}-%{release}
+Provides:       %{name}-libs = %{version}-%{release}
 
 %description
 The lm_sensors package provides user-space support for the hardware monitoring drivers in the Linux kernel.
@@ -29,7 +30,7 @@ This is useful for monitoring the temperature of the CPU and adjusting the perfo
 %package   devel
 Summary:        lm-sensors devel
 Group:          Development/Libraries
-Requires:       lm-sensors = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Provides:       lm_sensors-devel = %{version}-%{release}
 
 %description devel
@@ -38,7 +39,7 @@ lm-sensors devel
 %package   doc
 Summary:        lm-sensors docs
 Group:          Development/Libraries
-Requires:       lm-sensors = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description doc
 Documentation for lm-sensors.
@@ -47,8 +48,7 @@ Documentation for lm-sensors.
 %setup -q -n %{name}-3-5-0
 
 %build
-
-make all %{?_smp_mflags}
+%make_build all
 
 %install
 mkdir -p %{buildroot}%{_libdir}
@@ -58,8 +58,8 @@ make PREFIX=%{buildroot}%{_prefix}        \
      MANDIR=%{buildroot}%{_mandir} install &&
 
 install -v -m755 -d %{buildroot}%{_docdir}/%{name}-%{version} &&
-cp -rv              README INSTALL doc/* \
-                    %{buildroot}%{_docdir}/%{name}-%{version}
+cp -rv README INSTALL doc/* \
+     %{buildroot}%{_docdir}/%{name}-%{version}
 
 %check
 
@@ -68,10 +68,6 @@ cp -rv              README INSTALL doc/* \
 
 %postun
 /sbin/modprobe -r i2c-dev
-
-%clean
-rm -rf %{buildroot}/*
-
 
 %files
 %defattr(-,root,root)
@@ -92,29 +88,32 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.5.0-9
+- Add provides for libs subpackages from base package
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-8
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-7
 - Provide lm_sensors and lm_sensors-devel.
 
-*   Thu Jun 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.5.0-6
--   Removing runtime dependency on a specific kernel package.
+* Thu Jun 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.0-6
+- Removing runtime dependency on a specific kernel package.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.5.0-5
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.5.0-5
+- Added %%license line automatically
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 3.5.0-4
--   Renaming linux to kernel
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> - 3.5.0-4
+- Renaming linux to kernel
 
-*   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 3.5.0-3
--   Update Source0 with valid URL.
--   Remove sha1 macro.
--   Fix changelog styling
--   License verified.
+* Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-3
+- Update Source0 with valid URL.
+- Remove sha1 macro.
+- Fix changelog styling
+- License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.5.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Jun 20 2019 Tapas Kundu <tkundu@vmware.com> 3.5.0-1
--   Initial packaging with Photon OS.
+* Thu Jun 20 2019 Tapas Kundu <tkundu@vmware.com> - 3.5.0-1
+- Initial packaging with Photon OS.
