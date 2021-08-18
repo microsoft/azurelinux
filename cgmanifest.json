@@ -834,8 +834,8 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cni",
-          "version": "0.7.5",
+          "name": "cni-plugins",
+          "version": "0.8.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
         }
       }
