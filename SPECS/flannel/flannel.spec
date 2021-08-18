@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/coreos/flannel
-#Source0:       https://github.com/coreos/flannel/archive/v0.12.0.tar.gz
+#Source0:       https://github.com/coreos/flannel/archive/v0.14.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
