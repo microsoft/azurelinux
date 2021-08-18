@@ -202,7 +202,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/shadow/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/tcp_wrappers-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/unzip/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
@@ -278,7 +277,6 @@ generate_pkggen_core () {
         grep "^createrepo_c-" $TmpPkgGen
         grep "^libxml2-" $TmpPkgGen
         grep "^libsepol-" $TmpPkgGen
-        grep "^libselinux-" $TmpPkgGen
         grep "^glib-" $TmpPkgGen
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
@@ -308,7 +306,6 @@ generate_pkggen_core () {
         grep "^which-" $TmpPkgGen
         grep "^cyrus-sasl-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
-
     } > "$1"
 }
 
