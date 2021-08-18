@@ -65,7 +65,7 @@ load_policy to load policies, setfiles to label filesystems, newrole
 to switch roles.
 
 %prep
-%autosetup
+%autosetup -n selinux-%{version}
 
 %build
 %{set_build_flags}
