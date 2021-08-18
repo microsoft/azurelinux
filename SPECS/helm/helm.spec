@@ -67,4 +67,4 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 - Add ca-certificates temporarily
 
 * Thu Oct 17 2019 Andrew Phelps <anphel@microsoft.com> 2.14.3-1
-- Original version for Mariner
+- Original version for CBL-Mariner
