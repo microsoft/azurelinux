@@ -92,7 +92,7 @@ func (m *Makefile) Save(w io.StringWriter) (err error) {
 				return
 			}
 
-			// dependencyList will be a space seperated list of targets
+			// dependencyList will be a space separated list of targets
 			dependencyList = fmt.Sprintf("%s %s", dependencyList, dependencyAsTarget)
 			logger.Log.Tracef("\tDependency of %s -> %s", currentNodeAsTarget, dependencyAsTarget)
 		}
