@@ -50,7 +50,7 @@ mkdir build && cd build
 %{_bindir}/tini-static
 
 %changelog
-* Wed Aug 18 2021 Tom Fay <tomfay@microsoft.com> 0.19.0-4
+* Wed Aug 18 2021 Tom Fay <tomfay@microsoft.com> - 0.19.0-4
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - License verified
 
