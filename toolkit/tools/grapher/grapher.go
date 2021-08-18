@@ -68,7 +68,7 @@ func main() {
 }
 
 // addUnresolvedPackage adds an unresolved node to the graph representing the
-// packaged described in the PackgetVer structure. Returns an error if the node
+// package described in the PackgetVer structure. Returns an error if the node
 // could not be created.
 func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (newRunNode *pkggraph.PkgNode, err error) {
 	logger.Log.Debugf("Adding unresolved %s", pkgVer)
