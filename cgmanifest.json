@@ -895,8 +895,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.11.1.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
         }
       }
     },
@@ -1475,8 +1475,8 @@
         "type": "other",
         "other": {
           "name": "flannel",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.14.0.tar.gz"
         }
       }
     },
