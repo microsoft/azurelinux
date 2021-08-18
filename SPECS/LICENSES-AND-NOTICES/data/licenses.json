@@ -130,6 +130,7 @@
                 "squashfs-tools",
                 "uclibc-ng",
                 "uuid",
+                "vitess",
                 "websocketpp",
                 "words",
                 "xmlstarlet",

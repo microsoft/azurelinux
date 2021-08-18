@@ -1,0 +1,31 @@
+From 08038850a258d6de250cf9d864d6118616f5562c Mon Sep 17 00:00:00 2001
+From: zouyu <zouy.fnst@cn.fujitsu.com>
+Date: Tue, 27 Oct 2020 12:00:48 +0800
+Subject: [PATCH] Fix unit test error
+
+Signed-off-by: zouyu <zouy.fnst@cn.fujitsu.com>
+---
+ go/netutil/netutil_test.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/go/netutil/netutil_test.go b/go/netutil/netutil_test.go
+index 193237bec5..d5df468299 100644
+--- a/go/netutil/netutil_test.go
++++ b/go/netutil/netutil_test.go
+@@ -17,6 +17,7 @@ limitations under the License.
+ package netutil
+ 
+ import (
++	"fmt"
+ 	"math/rand"
+ 	"net"
+ 	"reflect"
+@@ -56,7 +57,7 @@ func testUniformity(t *testing.T, size int, margin float64) {
+ 	rand.Seed(1)
+ 	data := make([]*net.SRV, size)
+ 	for i := 0; i < size; i++ {
+-		data[i] = &net.SRV{Target: string('a' + i), Weight: 1}
++		data[i] = &net.SRV{Target: fmt.Sprintf("%c", 'a'+i), Weight: 1}
+ 	}
+ 	checkDistribution(t, data, margin)
+ }

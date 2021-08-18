@@ -2495,8 +2495,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.17",
-          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.17/krb5-1.17.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.18/krb5-1.18.tar.gz"
         }
       }
     },
@@ -7928,6 +7928,16 @@
           "name": "vim",
           "version": "8.1.1667",
           "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "vitess",
+          "version": "8.0.0",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v8.0.0.tar.gz"
         }
       }
     },
