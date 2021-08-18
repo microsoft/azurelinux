@@ -2,16 +2,19 @@
 
 Summary:        CRI tools
 Name:           cri-tools
-Version:        1.11.1
-Release:        9%{?dist}
+Version:        1.22.0
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         no-git-in-build.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
+BuildRequires:  glib-devel
+BuildRequires:  glibc-devel
 BuildRequires:  golang
 
 %description
@@ -20,49 +23,40 @@ crictl: CLI for kubelet CRI.
 critest: validation test suites for kubelet CRI.
 
 %prep
-%setup -qn %{name}-%{version}
+%autosetup -p1
 
 %build
+export VERSION="v%{version}"
 make %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
-mkdir -p %{buildroot}%{_datadir}/%{name}
-mkdir -p %{buildroot}/usr/bin
-mkdir -p %{buildroot}/usr/lib/.build-id
-mkdir -p %{buildroot}/usr/share/doc/cri-tools
-mkdir -p %{buildroot}/usr/share/licenses/cri-tools
-mkdir -p %{buildroot}/man/man1
+install -d %{buildroot}%{_bindir}
+install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/crictl
+install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/critest
 
-make install DESTDIR=%{buildroot}
-cp /usr/local/bin/crictl %{buildroot}/usr/bin
-cp /usr/local/bin/critest %{buildroot}/usr/bin
-cp CHANGELOG.md %{buildroot}/usr/share/doc/cri-tools
-cp LICENSE %{buildroot}/usr/share/licenses/cri-tools
-cp CHANGELOG.md %{buildroot}/usr/share/doc/cri-tools
-cp CONTRIBUTING.md %{buildroot}/usr/share/doc/cri-tools
-cp OWNERS %{buildroot}/usr/share/doc/cri-tools
-cp README.md %{buildroot}/usr/share/doc/cri-tools
-cp code-of-conduct.md %{buildroot}/usr/share/doc/cri-tools
-cp docs/validation.md %{buildroot}/usr/share/doc/cri-tools
-cp docs/roadmap.md %{buildroot}/usr/share/doc/cri-tools
+install -d %{buildroot}%{_docdir}/%{name}
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./CHANGELOG.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./CONTRIBUTING.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./OWNERS
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./README.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./code-of-conduct.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/validation.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/roadmap.md
+install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 
 %files
 %defattr(-,root,root)
 %license LICENSE
-%{_datadir}/%{name}
-/usr/bin
-/usr/share/doc/*
-/usr/share/licenses/*
-/man/man1/
+%{_bindir}/*
+%{_datadir}/doc/%{name}
 
 %clean
 rm -rf %{buildroot}/*
 
 %changelog
-*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.11.1-9
--   Increment release to force republishing using golang 1.16.7.
+*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.22.0-1
+-   Move to version 1.22.0 and build using golang 1.16.7.
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.11.1-8
 -   Increment release to force republishing using golang 1.15.13.
 *   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.11.1-7
