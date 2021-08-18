@@ -266,6 +266,9 @@ fi
 %{_bindir}/pause
 
 %changelog
+* Wed Aug 18 2021 Henry Li <lihl@microsoft.com> - 1.19.7-4
+- Use cni-plugins as runtime requirement
+
 * Fri Apr 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.19.7-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

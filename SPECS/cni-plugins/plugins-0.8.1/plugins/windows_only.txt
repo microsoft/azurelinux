@@ -1,4 +1,0 @@
-plugins/ipam/host-local
-plugins/main/windows/win-bridge
-plugins/main/windows/win-overlay
-plugins/meta/flannel

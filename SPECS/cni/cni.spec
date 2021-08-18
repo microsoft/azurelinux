@@ -55,7 +55,8 @@ Summary:        Container Network Interface - networking for Linux containers
 License:        Apache-2.0
 Group:          System/Management
 URL:            https://github.com/containernetworking/cni
-Source0:         %{name}-%{version}.tar.xz
+#Source0:       https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Source1:        99-loopback.conf
 Source2:        build.sh
 BuildRequires:  systemd-rpm-macros

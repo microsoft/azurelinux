@@ -5,8 +5,8 @@ Release:        1%{?dist}
 License:        ASL 2.0
 # cni moved to https://github.com/containernetworking/cni/issues/667#issuecomment-491693752
 URL:            https://github.com/containernetworking/plugins
-#Source0:       https://github.com/containernetworking/plugins/archive/v0.8.1.tar.gz
-Source0:        plugins-%{version}.tar.gz
+#Source0:       https://github.com/containernetworking/plugins/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

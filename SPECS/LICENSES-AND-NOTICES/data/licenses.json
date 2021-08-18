@@ -255,7 +255,9 @@
                 "ant-contrib",
                 "bazel-workspaces",
                 "boringssl",
+                "cni",
                 "envoy",
+                "fillup",
                 "golang-packaging",
                 "jna",
                 "kured"
