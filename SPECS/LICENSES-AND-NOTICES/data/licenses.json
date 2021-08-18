@@ -173,6 +173,7 @@
                 "go-md2man",
                 "grpc",
                 "GSL",
+                "helm",
                 "installkernel",
                 "ivykis",
                 "jsonbuilder",
