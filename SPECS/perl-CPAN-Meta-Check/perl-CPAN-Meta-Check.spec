@@ -1,36 +1,36 @@
-Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
+Name:           perl-CPAN-Meta-Check
 Version:        0.014
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPL+ OR Artistic
-Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Libraries
 URL:            https://metacpan.org/release/CPAN-Meta-Check
 Source0:        http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
-BuildArch:      noarch
 # Build
 BuildRequires:  make
 BuildRequires:  perl
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Module
 BuildRequires:  perl(base)
 BuildRequires:  perl(CPAN::Meta::Prereqs) >= 2.132830
 BuildRequires:  perl(CPAN::Meta::Requirements) >= 2.121
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Module::Metadata) >= 1.000023
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+# Runtime
+Requires:       perl
+BuildArch:      noarch
 # Test
 %if %{with_check}
 BuildRequires:  perl(CPAN::Meta) >= 2.120920
 BuildRequires:  perl(Env)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(lib)
 %endif
 
-# Runtime
-Requires:       perl
 
 %description
 This module verifies if requirements described in a CPAN::Meta object are
@@ -47,6 +47,11 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %check
+# Install required module Test::Deep for make test
+export PERL_MM_USE_DEFAULT=1
+echo "yes" | cpan -a
+cpan local::lib
+cpan -i Test::Deep
 make test
 
 %files
@@ -56,6 +61,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Wed Jul 28 2021 Andrew Phelps <anphel@microsoft.com> - 0.014-13
+- Fix check test
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.014-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

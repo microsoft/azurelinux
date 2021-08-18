@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.52.1
-Release:        3%{?dist}
+Version:        5.10.57.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -223,6 +223,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Thu Aug 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
+- Update source to 5.10.57.1
+
 * Tue Aug 03 2021 Chris Co <chrco@microsoft.com> - 5.10.52.1-3
 - Add patch to fix VDSO in HyperV
 
