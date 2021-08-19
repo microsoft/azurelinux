@@ -33,7 +33,8 @@ BuildRequires:  libsemanage-devel >= %{libsemanagever}
 BuildRequires:  libsepol-devel >= %{libsepolver}
 BuildRequires:  pam-devel
 BuildRequires:  python3-devel
-BuildRequires:  systemd
+BuildRequires:  pkgconf
+BuildRequires:  systemd-devel
 Requires:       coreutils
 Requires:       diffutils
 Requires:       gawk
