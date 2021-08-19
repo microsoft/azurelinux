@@ -1,10 +1,11 @@
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
+%global _python_bytecompile_extra 1
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -1803,6 +1804,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 16.2.0-3
+- Enable python byte compilation for directories outside of %%python3_site{lib,arch}
+
 * Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
 - Disable debuginfo because ceph-debuginfo rpm is too large
 
