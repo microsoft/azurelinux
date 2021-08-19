@@ -108,7 +108,7 @@ make %{?_smp_mflags} check
 -   Don't stomp on CFLAGS.
 *   Tue May 26 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.6-14
 -   Fix CVE-2019-12900. This was erroneously named CVE-2019-1353 before, which is not even related to bzip2.
-*   Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.6-13
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.6-13
 -   Added %%license line automatically
 *   Wed Apr 22 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.6-12
 -   Fix CVE-2019-1353.

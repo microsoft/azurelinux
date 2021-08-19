@@ -80,7 +80,7 @@ fi
 /usr/share/doc/pgbouncer/*
 
 %changelog
-* Sat May 09 00:21:33 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
 - Added %%license line automatically
 
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-1

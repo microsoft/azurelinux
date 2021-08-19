@@ -55,19 +55,24 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
--   Use new perl package names.
--   Provide perl(JSON::XS).
-* Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 1:3.04-3
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
+- Use new perl package names.
+- Provide perl(JSON::XS).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1:3.04-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.04-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 3.04-1
--   Update to version 3.04
-*   Wed Apr 05 2017 Robert Qi <qij@vmware.com> 3.03-1
--   Add build requires for perl-Canary-Stability, and pass NO_PACKLIST to Makefile.PL.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.01-2
--   GA - Bump release of all rpms
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 3.01-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.04-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 3.04-1
+- Update to version 3.04
+
+* Wed Apr 05 2017 Robert Qi <qij@vmware.com> 3.03-1
+- Add build requires for perl-Canary-Stability, and pass NO_PACKLIST to Makefile.PL.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.01-2
+- GA - Bump release of all rpms
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 3.01-1
+- Initial version.

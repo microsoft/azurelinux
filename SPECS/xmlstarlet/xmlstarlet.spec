@@ -6,7 +6,7 @@ Version:        1.6.1
 Release:        16%{?dist}
 License:        MIT
 URL:            http://xmlstar.sourceforge.net/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://downloads.sourceforge.net/project/xmlstar/%{name}/%{version}/%{name}-%{version}.tar.gz
 
@@ -43,9 +43,9 @@ make %{?_smp_mflags}
 
 %install
 rm -fr %{buildroot}
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 # Avoid name kludging in autotools
-mv $RPM_BUILD_ROOT%{_bindir}/xml $RPM_BUILD_ROOT%{_bindir}/xmlstarlet
+mv %{buildroot}%{_bindir}/xml %{buildroot}%{_bindir}/xmlstarlet
 
 
 %check
@@ -62,6 +62,7 @@ make check
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.6.1-16
 * Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

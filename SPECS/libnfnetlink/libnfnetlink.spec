@@ -51,7 +51,7 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
-* Sat May 09 00:21:29 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.1-4
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.1-3

@@ -37,7 +37,7 @@ rm -vf %{buildroot}%{_mandir}/man5/passwd.5
 %{_mandir}/man8/*
 
 %changelog
-* Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.16-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.16-4
 - Added %%license line automatically and updated licenses.
 
 *   Wed Apr 15 2020 Nick Samson <nisamson@microsoft.com> 4.16-3

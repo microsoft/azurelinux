@@ -4,9 +4,9 @@ Version:        1.3.0
 Release:        13%{?dist}
 License:        BSD and (GPLv2+ or Artistic or LGPLv2+) and LGPLv2
 URL:            https://yasm.tortall.net/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://www.tortall.net/projects/%{name}/releases/%{name}-%{version}.tar.gz
+Source0:        https://www.tortall.net/projects/%{name}/releases/%{name}-%{version}.tar.gz
 Patch1:         0001-Update-elf-objfmt.c.patch
 
 BuildRequires:  gcc
@@ -76,6 +76,7 @@ make install DESTDIR=%{buildroot}
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.3.0-13
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- License verified
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

@@ -40,7 +40,7 @@ make  %{?_smp_mflags}  check
 %{_mandir}/*/*
 
 %changelog
-* Sat May 09 00:21:28 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.4.18-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.4.18-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.18-3

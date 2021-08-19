@@ -4,7 +4,7 @@
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        1.7.9
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,7 @@ Requires:       python-imagesize
 Requires:       python-jinja2
 Requires:       python-pygments
 Requires:       python-requests
+Requires:       python-setuptools
 Requires:       python-six
 Requires:       python-snowballstemmer
 Requires:       python-sphinx-theme-alabaster
@@ -79,6 +80,7 @@ Requires:       python3-jinja2
 Requires:       python3-libs
 Requires:       python3-pygments
 Requires:       python3-requests
+Requires:       python3-setuptools
 Requires:       python3-six
 Requires:       python3-snowballstemmer
 Requires:       python3-sphinx-theme-alabaster
@@ -156,6 +158,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Aug 10 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.7.9-15
+- Merged change from 1.0 branch and bumped dash number 
+-   Mon Jun 14 2021 Tom Fay <tomfay@microsoft.com> - 1.7.9-12
+-   Add python*-setuptools as a runtime dependency.
+-   Clean spec.
+
 * Mon Feb 15 2021 Henry Li <lihl@microsoft.com> - 1.7.9-14
 - Provides python-sphinx-locale, python-sphinx-doc.
 
@@ -167,60 +175,60 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 - Reserve unversioned sphinx-* binaries for python3.
 - Rename python2 sphinx-* binaries to sphinx-*-2.
 
-*   Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.9-11
--   Add sphinx-*-3 binary symlinks for Fedora compatibility
--   Add Requires: python(2/3)-sphinxcontrib-websupport
--   Correct license shortname
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.9-11
+- Add sphinx-*-3 binary symlinks for Fedora compatibility
+- Add Requires: python(2/3)-sphinxcontrib-websupport
+- Correct license shortname
 
-*   Tue Jun 02 2020 Jon Slobodzian <joslobo@microsoft.com> 1.7.9-10
--   Add python-typing back.
+* Tue Jun 02 2020 Jon Slobodzian <joslobo@microsoft.com> 1.7.9-10
+- Add python-typing back.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.7.9-9
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.7.9-9
+- Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-8
--   Renaming python-pytest to pytest
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-8
+- Renaming python-pytest to pytest
 
-*   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-7
--   Renaming python-babel to babel
+* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-7
+- Renaming python-babel to babel
 
-*   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-6
--   Renaming python-Pygments to python-pygments
+* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-6
+- Renaming python-Pygments to python-pygments
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-5
--   Renaming python-alabaster to python-sphinx-theme-alabaster
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.7.9-5
+- Renaming python-alabaster to python-sphinx-theme-alabaster
 
-*   Mon Apr 13 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.7.9-4
--   Remove python-typing from BuildRequires and Requires.
+* Mon Apr 13 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.7.9-4
+- Remove python-typing from BuildRequires and Requires.
 
-*   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 1.7.9-3
--   Update URL.
--   Update Source0 with valid URL.
--   Remove sha1 macro.
--   License verified.
+* Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 1.7.9-3
+- Update URL.
+- Update Source0 with valid URL.
+- Remove sha1 macro.
+- License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.9-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.9-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 1.7.9-1
--   Update to version 1.7.9
+* Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 1.7.9-1
+- Update to version 1.7.9
 
-*   Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 1.5.3-5
--   Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+* Wed Jun 07 2017 Xiaolin Li <xiaolinl@vmware.com> 1.5.3-5
+- Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
 
-*   Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.3-4
--   Keep the original python2 scripts and rename the python3 scripts
+* Thu Jun 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.3-4
+- Keep the original python2 scripts and rename the python3 scripts
 
-*   Wed Apr 26 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.3-3
--   BuildRequires and Requires python-babel, python-docutils, python-jinja2,
-    python-Pygments, python-six, python-alabaster, python-imagesize,
-    python-requests and python-snowballstemmer. Adding python3 version
+* Wed Apr 26 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5.3-3
+- BuildRequires and Requires python-babel, python-docutils, python-jinja2,
+  python-Pygments, python-six, python-alabaster, python-imagesize,
+  python-requests and python-snowballstemmer. Adding python3 version
 
-*   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.3-2
--   Fix arch
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.3-2
+- Fix arch
 
-*   Thu Mar 30 2017 Sarah Choi <sarahc@vmware.com> 1.5.3-1
--   Upgrade version to 1.5.3
+* Thu Mar 30 2017 Sarah Choi <sarahc@vmware.com> 1.5.3-1
+- Upgrade version to 1.5.3
 
-*   Fri Dec 16 2016 Dheeraj Shetty <dheerajs@vmware.com> 1.5.1-1
--   Initial
+* Fri Dec 16 2016 Dheeraj Shetty <dheerajs@vmware.com> 1.5.1-1
+- Initial

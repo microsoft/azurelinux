@@ -60,17 +60,17 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Mon Feb 08 2021 Henry Li <lihl@microsoft.com> - 1.12.1-6
 - Add cppunit as Requires for cppunit-devel
 
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.12.1-5
--   Disable link as-needed to fix compilation errors updated ldflags.
+* Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.12.1-5
+- Disable link as-needed to fix compilation errors updated ldflags.
 
-*   Sat May 09 00:21:26 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
+- Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.12.1-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.12.1-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 1.12.1-2
--   Use standard configure macros
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 1.12.1-2
+- Use standard configure macros
 
-*   Sun Mar 26 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.12.1-1
--   Initial version of cppunit for Photon.
+* Sun Mar 26 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.12.1-1
+- Initial version of cppunit for Photon.

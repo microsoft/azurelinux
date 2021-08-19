@@ -84,23 +84,23 @@ make  %{?_smp_mflags} check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.14-2
 - Added %%license line automatically
 
-*   Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 2.0.14-1
--   Update to 2.0.14. License verified.
+* Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 2.0.14-1
+- Update to 2.0.14. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.13-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.13-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*       Wed May 03 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.0.13-2
--       Adding glibc-iconv to Requires section
+* Wed May 03 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.0.13-2
+- Adding glibc-iconv to Requires section
 
-*       Wed Jan 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.0.13-1
--       Bumped to latest version 2.0.13 to handle CVE-2016-8606
+* Wed Jan 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.0.13-1
+- Bumped to latest version 2.0.13 to handle CVE-2016-8606
 
-*       Thu Oct 06 2016 ChangLee <changlee@vmware.com> 2.0.11-3
--       Modified %check
+* Thu Oct 06 2016 ChangLee <changlee@vmware.com> 2.0.11-3
+- Modified %check
 
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.0.11-2
--	GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.0.11-2
+- GA - Bump release of all rpms
 
-*	Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 2.0.11-1
--	Initial build. First version
+* Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 2.0.11-1
+- Initial build. First version

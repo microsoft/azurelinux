@@ -21,6 +21,7 @@ BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdb-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
 BuildRequires:  nss-devel
 BuildRequires:  popt-devel
@@ -30,6 +31,7 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       libarchive
 Requires:       libdb
+Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
 
@@ -122,7 +124,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
         --with-cap \
         --with-lua \
         --disable-silent-rules \
-        --with-external-db
+        --with-external-db \
+        --with-selinux
 make %{?_smp_mflags}
 
 pushd python
@@ -300,7 +303,7 @@ popd
 * Wed May 20 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.14.2-7
 - Add BuildRequires and Requires for zstd support.
 
-* Sat May 09 00:20:45 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.14.2-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.14.2-6
 - Added %%license line automatically
 
 * Wed May 06 2020 Emre Girgin <mrgirgin@microsoft.com> - 4.14.2-5

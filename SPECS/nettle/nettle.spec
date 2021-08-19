@@ -65,7 +65,7 @@ make %{?_smp_mflags} check
 %changelog
 * Mon Apr 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.7.2-1
 - Update to 3.7.2 for CVE-2021-20305
-* Sat May 09 00:20:58 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.4.1-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.4.1-2
 - Added %%license line automatically
 * Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 3.4.1-1
 - Update to 3.4.1. Licence verified.

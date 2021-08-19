@@ -12,6 +12,7 @@ on:
 
 jobs:
   spec-lint:
+    name: Spec Linting
     runs-on: ubuntu-latest
 
     steps:

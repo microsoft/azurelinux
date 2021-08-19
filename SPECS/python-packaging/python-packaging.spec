@@ -89,7 +89,7 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:20:36 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 17.1-5

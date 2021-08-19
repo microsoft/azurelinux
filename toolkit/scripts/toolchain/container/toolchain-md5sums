@@ -10,7 +10,7 @@ a42bce1f10e92be5f3f5c1c5c4798b06  aarch64-jdk8u181-b13-langtools.tar.bz2
 53f38e7591fa57c3d2cee682be668e5b  automake-1.16.1.tar.xz
 518e2c187cc11a17040f0915dddce54e  bash-4.4.18.tar.gz
 1a05fb01fa1d5198894c931cf925c025  bigreqsproto-1.1.2.tar.bz2
-0d174cdaf85721c5723bf52355be41e6  binutils-2.32.tar.xz
+628d490d976d8957279bbbff06cf29d4  binutils-2.36.1.tar.xz
 db7e431785ad96870bfa570a15cab079  bison-3.1.tar.xz
 6a5ac7e89b791aae556de0f745916f7f  bzip2-1.0.6-install_docs-1.patch
 00b516f4704d4a7cb50a1d97e6e8e15b  bzip2-1.0.6.tar.gz
@@ -34,9 +34,9 @@ ca047ae951b40020ac831c28859161b2  expat-2.2.6.tar.bz2
 9936aa8009438ce185bea2694a997fc1  findutils-4.6.0.tar.gz
 e7431ab84d37b2678af71e29355e101d  fixesproto-5.0.tar.bz2
 2882e3179748cc9f9c23ec593d6adc8d  flex-2.6.4.tar.gz
-29105662c7d319720e0088a0ac53f494  fontconfig-2.12.4.tar.bz2
+5470d817f54b7870eee23e045a0afc8b  fontconfig-2.13.91.tar.gz
 36934d00b00555eaacde9f091f392f97  fontsproto-2.1.3.tar.bz2
-2413ac3eaf508ada019c63959ea81a92  freetype-2.8.tar.bz2
+3adb0e35d3c100c456357345ccfa8056  freetype-2.9.1.tar.gz
 95cf553f50ec9f386b5dfcd67f30180a  gawk-4.2.1.tar.xz
 6069ae3737cf02bf2cb44a391ef0e937  gcc-9.1.0.tar.xz
 988dc82182121c7570e0cb8b4fcd5415  gdbm-1.18.1.tar.gz
@@ -59,7 +59,7 @@ bc62e7df6f75357b6dd1ec34600dbeaf  jdk8u212-b04-langtools.tar.bz2
 d0272e7a6107c64dae62b80ca7ec65e2  jdk8u212-b04-nashorn.tar.bz2
 befd51c2b53a442e1fa6644bba89a95a  jdk8u212-b04.tar.bz2
 94afc90c1f7bef4a27fdd59ece39c878  kbproto-1.0.7.tar.bz2
-e0c6f0946012317df6dc4a56b82410e3  kernel-5.10.28.1.tar.gz
+a983fcd3083df9e3d28cc27b49d9bc2a  kernel-5.10.52.1.tar.gz
 d953ed6b47694dadf0e6042f8f9ff451  libarchive-3.4.2.tar.gz
 968ac4d42a1a71754313527be2ab5df3  libcap-2.26.tar.xz
 ba983eba5a9f05d152a0725b8e863151  libdmx-1.1.3.tar.bz2

@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.5p1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,6 +26,7 @@ BuildRequires:  systemd
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
+BuildRequires:  libselinux-devel
 Requires:       openssh-clients = %{version}-%{release}
 Requires:       openssh-server = %{version}-%{release}
 
@@ -67,6 +68,7 @@ tar xf %{SOURCE1} --no-same-owner
     --with-md5-passwords \
     --with-privsep-path=%{_sharedstatedir}/sshd \
     --with-pam \
+    --with-selinux \
     --with-maintype=man \
     --enable-strip=no \
     --with-kerberos5=%{_prefix}
@@ -183,6 +185,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-3
+- Add SELinux support
+
 * Fri Mar 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.5p1-2
 - Update default sshd_config to align more closely with other cloud images
 

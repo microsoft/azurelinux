@@ -63,7 +63,7 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:31 PST 2020 Nick Samson <nisamson@microsoft.com> - 17.5.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 17.5.0-4
 - Added %%license line automatically
 
 *   Fri Apr 24 2020 Andrew Phelps <anphel@microsoft.com> 17.5.0-3

@@ -1,0 +1,12 @@
+diff -Naur a/pkg/util/helpers_linux.go b/pkg/util/helpers_linux.go
+--- a/pkg/util/helpers_linux.go	2021-05-14 17:05:59.000000000 -0700
++++ b/pkg/util/helpers_linux.go	2021-06-15 12:26:43.919828110 -0700
+@@ -57,6 +58,8 @@
+ 		return getDebianVersion(osReleaseMap), nil
+ 	case "rhel":
+ 		return getDebianVersion(osReleaseMap), nil
++	case "mariner":
++		return getDebianVersion(osReleaseMap), nil
+ 	default:
+ 		return "", fmt.Errorf("Unsupported ID in /etc/os-release: %q", osReleaseMap["ID"])
+ 	}

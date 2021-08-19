@@ -27,7 +27,7 @@ make %{?_smp_mflags} -k test
 %{_bindir}/*
 %{_datadir}/*
 %changelog
-* Sat May 09 00:21:14 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.13.03-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.13.03-5
 - Added %%license line automatically
 
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 2.13.03-4

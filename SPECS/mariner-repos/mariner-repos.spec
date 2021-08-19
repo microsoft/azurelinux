@@ -16,6 +16,8 @@ Source5:        mariner-ui.repo
 Source6:        mariner-ui-preview.repo
 Source7:        mariner-extras.repo
 Source8:        mariner-extras-preview.repo
+Source9:        mariner-microsoft.repo
+Source10:       mariner-microsoft-preview.repo
 
 Requires(post):  gpgme
 Requires(post):  rpm
@@ -65,6 +67,23 @@ Requires:       %{name} = %{version}-%{release}
 %description extras-preview
 %{summary}
 
+%package microsoft
+Summary:  CBL-Mariner Microsoft repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description microsoft
+%{summary}
+
+%package microsoft-preview
+Summary:  CBL-Mariner Microsoft Preview repository.
+Group:    System Envrionment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description microsoft-preview
+%{summary}
+
+
 %install
 rm -rf %{buildroot}
 export REPO_DIRECTORY="%{buildroot}%{_sysconfdir}/yum.repos.d"
@@ -76,6 +95,8 @@ install -m 644 %{SOURCE5} $REPO_DIRECTORY
 install -m 644 %{SOURCE6} $REPO_DIRECTORY
 install -m 644 %{SOURCE7} $REPO_DIRECTORY
 install -m 644 %{SOURCE8} $REPO_DIRECTORY
+install -m 644 %{SOURCE9} $REPO_DIRECTORY
+install -m 644 %{SOURCE10} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -124,8 +145,20 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extras-preview.repo
 
+%files microsoft
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
+
+%files microsoft-preview
+%defattr(-,root,root,-)
+%config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
+
 %changelog
-* Thu Jul 08 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+
+* Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+- Add microsoft and microsoft-preview repo configuration packages.  
+- These repos offer Mariner packages produced by partner teams within Microsoft on 
+- behalf of the Mariner team but are released on an independent cadence from Mariner.
 - Version update for 2.0.  Formatting changes.
 
 * Fri Feb 19 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-13

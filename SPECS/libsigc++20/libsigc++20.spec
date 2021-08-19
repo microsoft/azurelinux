@@ -45,7 +45,7 @@ make %{?_smp_mflags} check
 %{_datadir}/*
 
 %changelog
-* Sat May 09 00:20:34 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.10.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.10.0-6
 - Added %%license line automatically
 
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.10.0-5

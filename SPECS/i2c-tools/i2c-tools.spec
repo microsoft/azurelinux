@@ -50,7 +50,7 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 %{_libdir}/libi2c.so
 
 %changelog
-* Sat May 09 00:21:01 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.1-2

@@ -97,7 +97,7 @@ rm -rf $RPM_BUILD_ROOT
 -   Removing the Conflict reference to azure-iot-sdk-c-public-preview.
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2020.02.04.1-5
 -   Add -Wno-error to cflags to fix compilation with updated -Werror default.
-*   Sat May 09 00:20:46 PST 2020 Nick Samson <nisamson@microsoft.com> - 2020.02.04.1-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2020.02.04.1-4
 -   Added %%license line automatically
 *   Mon May 04 2020 Eric Li <eli@microsoft.com> 2020.02.04.1-3
 -   Add #Source0: and license verified.

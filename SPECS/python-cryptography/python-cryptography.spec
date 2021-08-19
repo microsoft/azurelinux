@@ -105,7 +105,7 @@ python3 setup.py test
 *   Wed Jan 20 2021 Henry Beberman <henry.beberman@microsoft.com> 2.3.1-4
 -   Patch CVE-2020-25659
 -   License verified
-*   Sat May 09 00:20:51 PST 2020 Nick Samson <nisamson@microsoft.com> 2.3.1-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.3.1-3
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.3.1-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

@@ -102,48 +102,38 @@ fi
 %{_docdir}/*
 
 %changelog
-* Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.79.1-13
-- Symlink versioned stylesheets to unversioned %%{_datadir}/sgml/docbook/xsl-stylesheets.
-- Add runtime requirement on docbook-dtd-xml since the xsl stylesheets reference the DTD schema.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
+- Added %%license line automatically
 
-* Tue Dec 01 2020 Joe Schmitt <joschmit@microsoft.com> - 1.79.1-12
-- Provide docbook-xsl-stylesheets.
+* Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.79.1-9
+- Renaming docbook-xsl to docbook-style-xsl
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.79.1-11
--   Provide docbook-xsl
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.79.1-8
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.79.1-10
--   Added %%license line automatically
+* Fri Jan 18 2019 Tapas Kundu <tkundu@vmware.com> 1.79.1-7
+- Removed saxon jar files while installing
 
-*   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.79.1-9
--   Renaming docbook-xsl to docbook-style-xsl
+* Tue Dec 04 2018 Ashwin H<ashwinh@vmware.com> 1.79.1-6
+- emove windows installers
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.79.1-8
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Aug 18 2017 Rongrong Qiu <rqiu@vmware.com> 1.79.1-5
+- Update make check for bug 1635477
 
-*       Fri Jan 18 2019 Tapas Kundu <tkundu@vmware.com> 1.79.1-7
--       Removed saxon jar files while installing
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.79.1-4
+- Fix arch
 
-*	Tue Dec 04 2018 Ashwin H<ashwinh@vmware.com> 1.79.1-6
--       Remove windows installers
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.79.1-3
+- GA - Bump release of all rpms
 
-*	Fri Aug 18 2017 Rongrong Qiu <rqiu@vmware.com> 1.79.1-5
--	Update make check for bug 1635477
+* Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  1.79.1-2
+- Fixing spec file to handle rpm upgrade scenario correctly
 
-*	Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.79.1-4
--	Fix arch
+* Thu Feb 25 2016 Kumar Kaushik <kaushikk@vmware.com> 1.79.1-1
+- Updated version.
 
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.79.1-3
--	GA - Bump release of all rpms
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 1.78.1-2
+- Updated group.
 
-*       Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  1.79.1-2
--	Fixing spec file to handle rpm upgrade scenario correctly
-
-*       Thu Feb 25 2016 Kumar Kaushik <kaushikk@vmware.com> 1.79.1-1
--       Updated version.
-
-*       Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 1.78.1-2
--       Updated group.
-
-*	Mon Nov 24 2014 Divya Thaluru <dthaluru@vmware.com> 1.78.1-1
--	Initial build. First version
+* Mon Nov 24 2014 Divya Thaluru <dthaluru@vmware.com> 1.78.1-1
+- Initial build. First version

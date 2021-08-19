@@ -41,7 +41,7 @@ make %{?_smp_mflags} -k check
 %exclude /usr/src
 
 %changelog
-* Sat May 09 00:21:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.8.21-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.8.21-4
 - Added %%license line automatically
 
 *   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 4.8.21-3

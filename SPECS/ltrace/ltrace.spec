@@ -52,7 +52,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/*
 %{_datadir}
 %changelog
-* Sat May 09 00:21:21 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.7.3-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.3-6
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.7.3-5

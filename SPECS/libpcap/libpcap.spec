@@ -68,7 +68,7 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7/*
 
 %changelog
-* Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.9.1-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9.1-2
 - Added %%license line automatically
 
 *   Fri May 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.9.1-1

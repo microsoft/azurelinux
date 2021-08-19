@@ -1,11 +1,9 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define pkgname pywbem
-%bcond_without python2
+
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
 Version:        1.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,60 +53,13 @@ and DSP0201. The CIM/WBEM infrastructure is used for a wide variety of systems
 management tasks supported by systems running WBEM servers. See WBEM Standards
 for more information about WBEM.
 
-%if %{with python2}
-%package -n python2-%{pkgname}
-Summary:        Python2 WBEM Client and Provider Interface
-BuildRequires:  PyYAML
-BuildRequires:  python-pbr
-BuildRequires:  python-pip
-BuildRequires:  python-ply
-BuildRequires:  python-setuptools
-BuildRequires:  python2-devel
-Requires:       PyYAML
-Requires:       python-ply
-Requires:       python-requests
-Requires:       python-xml
-Requires:       python2
-Requires:       python2-nocasedict
-Requires:       python2-yamlloader
-AutoReqProv:    no
-Provides:       python2dist(pywbem) = %{version}-%{release}
-Provides:       python2.7dist(pyweb) = %{version}-%{release}
-BuildArch:      noarch
-
-%description -n python2-%{pkgname}
-A WBEM client allows issuing operations to a WBEM server, using the CIM
-operations over HTTP (CIM-XML) protocol defined in the DMTF standards DSP0200
-and DSP0201. The CIM/WBEM infrastructure is used for a wide variety of systems
-management tasks supported by systems running WBEM servers. See WBEM Standards
-for more information about WBEM.
-%endif
-
 %prep
 %setup -q -n %{pkgname}-%{version}
-rm -rf ../p2dir
-cp -a . ../p2dir
 
 %build
-
-%if %{with python2}
-pushd ../p2dir
-PBR_VERSION="%{version}" CFLAGS="%{build_cflags}" python2 setup.py build
-popd
-%endif
-
 PBR_VERSION="%{version}" CFLAGS="%{build_cflags}" python3 setup.py build
 
 %install
-%if %{with python2}
-pushd ../p2dir
-env PYTHONPATH=%{buildroot}/%{python2_sitelib} \
-    PBR_VERSION="%{version}" \
-    python2 setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
-rm -rf %{buildroot}%{_bindir}/*.bat
-popd
-%endif
-
 env PYTHONPATH=%{buildroot}/%{python3_sitelib} \
     PBR_VERSION="%{version}" \
     python3 setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
@@ -122,15 +73,10 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 %{_bindir}/mof_compiler
 %doc README.rst
 
-%if %{with python2}
-%files -n python2-%{pkgname}
-%license LICENSE.txt
-%{python2_sitelib}/*.egg-info
-%{python2_sitelib}/pywbem
-%{python2_sitelib}/pywbem_mock
-%endif
-
 %changelog
+* Fri Aug 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.1-4
+- Remove python2
+
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0.1-3
 - Disable auto dependency generator.
 
