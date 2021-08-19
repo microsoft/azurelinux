@@ -1,11 +1,12 @@
+%global debug_package %{nil}
+
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni
-Version:        0.7.5
-Release:        8%{?dist}
+Version:        0.9.1
+Release:        1%{?dist}
 License:        ASL 2.0
-# cni moved to https://github.com/containernetworking/cni/issues/667#issuecomment-491693752
 URL:            https://github.com/containernetworking/plugins
-#Source0:       https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz
+#Source0:       https://github.com/containernetworking/plugins/archive/refs/tags/v0.9.1.tar.gz
 Source0:        %{name}-v%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -20,14 +21,16 @@ The CNI (Container Network Interface) project consists of a specification and li
 %setup -n plugins-%{version}
 
 %build
-./build.sh
+./build_linux.sh
 
 %install
 install -vdm 755 %{buildroot}%{_default_cni_plugins_dir}
 install -vpm 0755 -t %{buildroot}%{_default_cni_plugins_dir} bin/*
 
-%check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+# running this requires sudo and some debugging 
+# (miss cnitools which are not part of the src tarball)
+# %check
+# ./test_linux.sh
 
 %post
 
@@ -39,8 +42,8 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
-*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.7.5-8
--   Increment release to force republishing using golang 1.16.7.
+*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.9.1-1
+-   Move to version 0.9.1 and build using golang 1.16.7.
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 0.7.5-7
 -   Increment release to force republishing using golang 1.15.13.
 *   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.7.5-6

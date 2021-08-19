@@ -725,8 +725,8 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "0.7.5",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
+          "version": "0.9.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/refs/tags/v0.9.1.tar.gz"
         }
       }
     },
@@ -1476,7 +1476,7 @@
         "other": {
           "name": "flannel",
           "version": "0.14.0",
-          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.14.0.tar.gz"
+          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },

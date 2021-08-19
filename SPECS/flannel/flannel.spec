@@ -9,8 +9,8 @@ License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            https://github.com/coreos/flannel
-#Source0:       https://github.com/coreos/flannel/archive/v0.14.0.tar.gz
+URL:            https://github.com/flannel-io/flannel
+#Source0:       https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc

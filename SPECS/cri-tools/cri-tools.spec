@@ -31,11 +31,11 @@ make %{?_smp_mflags}
 
 
 %install
-install -d %{buildroot}%{_bindir}
+install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/crictl
 install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/critest
 
-install -d %{buildroot}%{_docdir}/%{name}
+install -m 755 -d %{buildroot}%{_docdir}/%{name}
 install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./CHANGELOG.md
 install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./CONTRIBUTING.md
 install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./OWNERS
