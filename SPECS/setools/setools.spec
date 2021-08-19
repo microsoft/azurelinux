@@ -68,22 +68,27 @@ Python 3 modules designed to facilitate SELinux policy analysis.
 
 # Remove unpackaged files.  These are tools for which the dependencies
 # are not yet available on mariner (python3-networkx)
-rm -rf %{buildroot}/%{_bindir}/sedta
-rm -rf %{buildroot}/%{_bindir}/seinfoflow
-rm -rf %{buildroot}/%{_mandir}/man1/sedta*
-rm -rf %{buildroot}/%{_mandir}/man1/seinfoflow*
-rm -rf %{buildroot}/%{_bindir}/apol
-rm -rf %{buildroot}/%{python3_sitearch}/setoolsgui
-rm -rf %{buildroot}/%{_mandir}/man1/apol*
+rm -rf %{buildroot}%{_bindir}/sedta
+rm -rf %{buildroot}%{_bindir}/seinfoflow
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/sedta*
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/seinfoflow*
+rm -rf %{buildroot}%{_bindir}/apol
+rm -rf %{buildroot}%{python3_sitearch}/setoolsgui
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
 
 %files console
 %license COPYING COPYING.GPL COPYING.LGPL
+%{_bindir}/sechecker
 %{_bindir}/sediff
 %{_bindir}/seinfo
 %{_bindir}/sesearch
+%{_mandir}/man1/sechecker*
 %{_mandir}/man1/sediff*
+%{_mandir}/ru/man1/sediff*
 %{_mandir}/man1/seinfo*
+%{_mandir}/ru/man1/seinfo*
 %{_mandir}/man1/sesearch*
+%{_mandir}/ru/man1/sesearch*
 
 %files python3
 %license COPYING COPYING.GPL COPYING.LGPL
