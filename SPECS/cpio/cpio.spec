@@ -24,9 +24,6 @@ Requires: %{name} = %{version}-%{release}
 %description lang
 These are the additional language files of cpio
 
-# Adjust the fuzz factor for patch command
-%global _default_patch_fuzz 2
-
 %prep
 %setup -q
 %patch0 -p1
@@ -67,7 +64,6 @@ make %{?_smp_mflags} check
 %changelog
 * Wed Aug 18 2021 Muhammad Falak <mwani@microsoft.com> 2.13-3
 - Fix CVE-2021-38185
-- Adjust fuzz factor for `patch` as 2 which is the typical default.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-2
 - Added %%license line automatically
