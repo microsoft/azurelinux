@@ -1712,7 +1712,7 @@ func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuratio
 	logger.Log.Debugf("Adding ExtraCommandLine('%s') to '%s'", kernelCommandline.ExtraCommandLine, grubPath)
 	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
+		logger.Log.Warnf("Failed to append extra parameters to grub.cfg: %v", err)
 	}
 
 	return
@@ -1902,9 +1902,9 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 // ExtractPartitionArtifacts scans through the SystemConfig and generates all the partition-based artifacts specified.
 // - setupChrootDirPath is the path to the setup root dir where the build takes place
 // - workDirPath is the directory to place the artifacts
-// - diskIndex is the index of the disk this is added to the parition artifact generated
+// - diskIndex is the index of the disk this is added to the paritition artifact generated
 // - disk configuration settings for the disk
-// - systemConfig system configration corresponding to the disk configuration
+// - systemConfig system configuration corresponding to the disk configuration
 // - partIDToDevPathMap is a map of partition IDs to partition device paths
 // - mountPointToOverlayMap is a map of mountpoints to the overlay details for this mount if any
 func ExtractPartitionArtifacts(setupChrootDirPath, workDirPath string, diskIndex int, disk configuration.Disk, systemConfig configuration.SystemConfig, partIDToDevPathMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
@@ -2074,7 +2074,7 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {
 		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
 		if err != nil {
-			// This is non-fatal, as there is no guarentee the image has gpg agent started.
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
 		}
 

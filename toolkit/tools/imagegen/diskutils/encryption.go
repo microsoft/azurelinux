@@ -46,7 +46,7 @@ func AddDefaultKeyfile(keyFileDir, devPath string, encrypt configuration.RootEnc
 
 	_, stderr, err := shell.ExecuteWithStdin(encrypt.Password, "cryptsetup", "luksAddKey", devPath, fullKeyPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to add keyfile to encrypted devce: %v", stderr)
+		logger.Log.Warnf("Unable to add keyfile to encrypted device: %v", stderr)
 		return
 	}
 

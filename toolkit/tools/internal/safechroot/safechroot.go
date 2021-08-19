@@ -150,7 +150,7 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 //   mount inside the chroot.
 // - extraMountPoints is an optional slice of additional mount points that should be created inside the chroot,
 //   they will automatically be unmounted on a Chroot Close.
-// This call will block until the chroot initializes succesfully.
+// This call will block until the chroot initializes sucessfully.
 // Only one Chroot will initialize at a given time.
 func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) (err error) {
 	// On failed initialization, cleanup all chroot files

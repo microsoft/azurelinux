@@ -68,7 +68,7 @@ func main() {
 }
 
 // addUnresolvedPackage adds an unresolved node to the graph representing the
-// packged described in the PackgetVer structure. Returns an error if the node
+// package described in the PackgetVer structure. Returns an error if the node
 // could not be created.
 func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (newRunNode *pkggraph.PkgNode, err error) {
 	logger.Log.Debugf("Adding unresolved %s", pkgVer)
@@ -134,7 +134,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 		}
 	}
 
-	// A "run" node has an implicit dependency on its coresponding "build" node, encode that here.
+	// A "run" node has an implicit dependency on its corresponding "build" node, encode that here.
 	// SetEdge panics on error, and does not support looping edges.
 	newEdge := g.NewEdge(newRunNode, newBuildNode)
 	defer func() {

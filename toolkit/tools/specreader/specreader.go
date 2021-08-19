@@ -185,7 +185,7 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 		providerList[i].BuildRequires = condensePackageVersionArray(buildRequiresList, specfile)
 	}
 
-	// Submit the result to the main thread, the defered function will clear the semaphore.
+	// Submit the result to the main thread, the deferred function will clear the semaphore.
 	ch <- providerList
 }
 

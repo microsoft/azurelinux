@@ -265,7 +265,7 @@ func (v *VerityDevice) CleanupVerityDevice() (err error) {
 }
 
 // SwitchDeviceToReadOnly switches the root device linear map to read only
-// Will also re-mount the moint point to respect this.
+// Will also re-mount the moount point to respect this.
 // - mountPointOrDevice is either the location of the mount, or the device which was mounted (mount command will take either)
 // - mountArgs are any special mount options used which should continue to be used
 func (v *VerityDevice) SwitchDeviceToReadOnly(mountPointOrDevice, mountArgs string) (err error) {

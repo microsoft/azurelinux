@@ -43,8 +43,8 @@ var (
 	outputGraphFile = exe.OutputFlag(app, "Path to save the optimized DOT graph file.")
 
 	pkgsToBuild         = app.Flag("packages", "Space seperated list of top-level packages that should be built. Omit for all packages.").String()
-	pkgsToRebuild       = app.Flag("rebuild-packages", "Space seperated list of base package names packages that should be rebuilt.").String()
-	pkgsToIgnore        = app.Flag("ignore-packages", "Space seperated list of base package names that should never be rebuilt (ie name of spec file).").String()
+	pkgsToRebuild       = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
+	pkgsToIgnore        = app.Flag("ignore-packages", "Space separated list of base package names that should never be rebuilt (ie name of spec file).").String()
 	imageConfig         = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
 	baseDirPath         = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 	rpmDir              = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()

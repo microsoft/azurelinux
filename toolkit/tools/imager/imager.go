@@ -170,7 +170,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
 
-	// Create Parition to Mountpoint map
+	// Create Partition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
 	if diffDiskBuild {
 		mountPointToOverlayMap, err = installutils.UpdatePartitionMapWithOverlays(partIDToDevPathMap, partIDToFsTypeMap, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, systemConfig)
@@ -555,12 +555,12 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 
 	var rootDevice string
 
-	// Add bootloader. Prefer a seperate boot partition if one exists.
+	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, ok := installMap[bootMountPoint]
 	bootPrefix := ""
 	if !ok {
 		bootDevice = installMap[rootMountPoint]
-		// If we do not have a seperate boot partition we will need to add a prefix to all paths used in the configs.
+		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
 	}
 

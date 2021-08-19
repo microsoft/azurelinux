@@ -161,7 +161,7 @@ func (i *InitramfsMount) Close() (err error) {
 	}
 	logger.Log.Infof("Bytes writen to file: %d", bytesIO)
 
-	// Explicit call to fsync, archive corruption was occuring occasionally otherwise.
+	// Explicit call to fsync, archive corruption was occurring occasionally otherwise.
 	err = i.initramfsOutputFile.Sync()
 	if err != nil {
 		logger.Log.Errorf("Failed to sync initramfs file: '%s'", err.Error())
