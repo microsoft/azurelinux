@@ -3,7 +3,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Patch3:         CVE-2021-28876.patch
 Patch4:         CVE-2021-28879.patch
 Patch5:         CVE-2021-28878.patch
 Patch6:         CVE-2020-36323.patch
+Patch7:         CVE-2021-29922.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -110,6 +111,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Thu Aug 19 2021 Muhammad Falak <mwani@microsoft.com> - 1.47.0-4
+- Patch CVE-2021-29922
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
 - Redo patch for CVE-2021-28879 with regards to patches listed above
