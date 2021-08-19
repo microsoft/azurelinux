@@ -196,7 +196,7 @@ Summary:        BIND utilities
 %{summary}.
 
 %prep
-%autosetup -p1
+%setup -q
 
 %patch9 -p1 -b .config-pkcs11
 cp -r bin/named{,-pkcs11}
