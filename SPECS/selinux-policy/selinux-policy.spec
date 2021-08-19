@@ -4,7 +4,7 @@
 %define distro redhat
 %define polyinstatiate n
 %define monolithic n
-%define POLICYVER 31
+%define POLICYVER 33
 %define POLICYCOREUTILSVER 3.2
 %define CHECKPOLICYVER 3.2
 Summary:        SELinux policy
