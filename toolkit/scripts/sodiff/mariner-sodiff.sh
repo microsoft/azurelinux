@@ -67,7 +67,8 @@ done
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-echo > "$sodiff_out_dir"/sodiff-summary.txt
+rm "$sodiff_out_dir"/sodiff-summary.txt
+touch "$sodiff_out_dir"/sodiff-summary.txt
 # Remove packages that have been dash-rolled already.
 
 echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
