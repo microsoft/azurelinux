@@ -1,0 +1,108 @@
+From 974192cd98b3efca8e5cd293f641f561e7487b30 Mon Sep 17 00:00:00 2001
+From: Cheng XU <git@xuc.me>
+Date: Tue, 30 Mar 2021 10:24:23 +0800
+Subject: [PATCH] Disallow octal format in Ipv4 string
+
+In its original specification, leading zero in Ipv4 string is interpreted
+as octal literals. So a IP address 0127.0.0.1 actually means 87.0.0.1.
+
+This confusion can lead to many security vulnerabilities. Therefore, in
+[IETF RFC 6943], it suggests to disallow octal/hexadecimal format in Ipv4
+string all together.
+
+Existing implementation already disallows hexadecimal numbers. This commit
+makes Parser reject octal numbers.
+
+Fixes #83648.
+
+[IETF RFC 6943]: https://tools.ietf.org/html/rfc6943#section-3.1.1
+---
+ library/std/src/net/ip.rs           |  2 ++
+ library/std/src/net/parser.rs       | 14 +++++++++++++-
+ library/std/src/net/parser/tests.rs |  8 ++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/library/std/src/net/ip.rs b/library/std/src/net/ip.rs
+index 2aa305d7f831e..7f8c33dac561f 100644
+--- a/library/std/src/net/ip.rs
++++ b/library/std/src/net/ip.rs
+@@ -67,7 +67,9 @@ pub enum IpAddr {
+ ///
+ /// `Ipv4Addr` provides a [`FromStr`] implementation. The four octets are in decimal
+ /// notation, divided by `.` (this is called "dot-decimal notation").
++/// Notably, octal numbers and hexadecimal numbers are not allowed per [IETF RFC 6943].
+ ///
++/// [IETF RFC 6943]: https://tools.ietf.org/html/rfc6943#section-3.1.1
+ /// [`FromStr`]: crate::str::FromStr
+ ///
+ /// # Examples
+diff --git a/library/std/src/net/parser.rs b/library/std/src/net/parser.rs
+index 7064ed3ed236d..88a8cb76befbf 100644
+--- a/library/std/src/net/parser.rs
++++ b/library/std/src/net/parser.rs
+@@ -67,6 +67,11 @@ impl<'a> Parser<'a> {
+         if self.state.is_empty() { result } else { None }.ok_or(AddrParseError(()))
+     }
+ 
++    /// Peek the next character from the input
++    fn peek_char(&self) -> Option<char> {
++        self.state.first().map(|&b| char::from(b))
++    }
++
+     /// Read the next character from the input
+     fn read_char(&mut self) -> Option<char> {
+         self.state.split_first().map(|(&b, tail)| {
+@@ -132,7 +137,14 @@ impl<'a> Parser<'a> {
+             let mut groups = [0; 4];
+ 
+             for (i, slot) in groups.iter_mut().enumerate() {
+-                *slot = p.read_separator('.', i, |p| p.read_number(10, None))?;
++                *slot = p.read_separator('.', i, |p| {
++                    // Disallow octal number in IP string.
++                    // https://tools.ietf.org/html/rfc6943#section-3.1.1
++                    match (p.peek_char(), p.read_number(10, None)) {
++                        (Some('0'), Some(number)) if number != 0 => None,
++                        (_, number) => number,
++                    }
++                })?;
+             }
+ 
+             Some(groups.into())
+diff --git a/library/std/src/net/parser/tests.rs b/library/std/src/net/parser/tests.rs
+index 8d8889cd19d36..6d2d48ecad02f 100644
+--- a/library/std/src/net/parser/tests.rs
++++ b/library/std/src/net/parser/tests.rs
+@@ -8,11 +8,15 @@ const SCOPE_ID: u32 = 1337;
+ const IPV4: Ipv4Addr = Ipv4Addr::new(192, 168, 0, 1);
+ const IPV4_STR: &str = "192.168.0.1";
+ const IPV4_STR_PORT: &str = "192.168.0.1:8080";
++const IPV4_STR_WITH_OCTAL: &str = "0127.0.0.1";
++const IPV4_STR_WITH_HEX: &str = "0x10.0.0.1";
+ 
+ const IPV6: Ipv6Addr = Ipv6Addr::new(0x2001, 0xdb8, 0, 0, 0, 0, 0xc0a8, 0x1);
+ const IPV6_STR_FULL: &str = "2001:db8:0:0:0:0:c0a8:1";
+ const IPV6_STR_COMPRESS: &str = "2001:db8::c0a8:1";
+ const IPV6_STR_V4: &str = "2001:db8::192.168.0.1";
++const IPV6_STR_V4_WITH_OCTAL: &str = "2001:db8::0127.0.0.1";
++const IPV6_STR_V4_WITH_HEX: &str = "2001:db8::0x10.0.0.1";
+ const IPV6_STR_PORT: &str = "[2001:db8::c0a8:1]:8080";
+ const IPV6_STR_PORT_SCOPE_ID: &str = "[2001:db8::c0a8:1%1337]:8080";
+ 
+@@ -22,6 +26,8 @@ fn parse_ipv4() {
+     assert_eq!(result, IPV4);
+ 
+     assert!(Ipv4Addr::from_str(IPV4_STR_PORT).is_err());
++    assert!(Ipv4Addr::from_str(IPV4_STR_WITH_OCTAL).is_err());
++    assert!(Ipv4Addr::from_str(IPV4_STR_WITH_HEX).is_err());
+     assert!(Ipv4Addr::from_str(IPV6_STR_FULL).is_err());
+     assert!(Ipv4Addr::from_str(IPV6_STR_COMPRESS).is_err());
+     assert!(Ipv4Addr::from_str(IPV6_STR_V4).is_err());
+@@ -39,6 +45,8 @@ fn parse_ipv6() {
+     let result: Ipv6Addr = IPV6_STR_V4.parse().unwrap();
+     assert_eq!(result, IPV6);
+ 
++    assert!(Ipv6Addr::from_str(IPV6_STR_V4_WITH_OCTAL).is_err());
++    assert!(Ipv6Addr::from_str(IPV6_STR_V4_WITH_HEX).is_err());
+     assert!(Ipv6Addr::from_str(IPV4_STR).is_err());
+     assert!(Ipv6Addr::from_str(IPV4_STR_PORT).is_err());
+     assert!(Ipv6Addr::from_str(IPV6_STR_PORT).is_err());
