@@ -35,6 +35,7 @@ tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
 mv -v go go-bootstrap
 
+# Setup go source and patch 
 %setup -q -n go
 %patch1 -p1
 
@@ -118,7 +119,7 @@ fi
 
 %changelog
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.7-1
-- Updated to version 1.16.7
+- Updated to version 1.16.7 and fix CVE-2021-29923
 
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.15.13-1
 - Updated to version 1.15.13 to fix CVE-2021-33194 and CVE-2021-31525
