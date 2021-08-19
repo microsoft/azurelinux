@@ -61,6 +61,11 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	
+	addingSomeCodeHere := "Nonsense"
+	if addingSomeCodeHere == "Nonsense" {
+		logger.Log.Panicf("PANIC!")
+	}
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
