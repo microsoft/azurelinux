@@ -182,6 +182,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 
 %files python3
 %license python/COPYING
+%{python3_sitelib}/__pycache__
 %{python3_sitelib}/seobject.py*
 %{python3_sitelib}/sepolgen
 %dir %{python3_sitelib}/sepolicy
@@ -234,6 +235,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %license restorecond/COPYING
 %{_sbindir}/restorecond
 %{_unitdir}/restorecond.service
+%{_libdir}/systemd/user/restorecond_user.service
 %config(noreplace) %{_sysconfdir}/selinux/restorecond.conf
 %config(noreplace) %{_sysconfdir}/selinux/restorecond_user.conf
 %{_sysconfdir}/xdg/autostart/restorecond.desktop
@@ -288,6 +290,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %{_bindir}/semodule_link
 %{_bindir}/semodule_package
 %{_bindir}/semodule_unpackage
+%{_bindir}/sestatus
 %{_libexecdir}/selinux/hll
 %{_libexecdir}/selinux/selinux-autorelabel
 %{_unitdir}/selinux-autorelabel-mark.service
