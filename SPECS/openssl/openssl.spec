@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -190,8 +190,6 @@ export HASHBANGPERL=%{_bindir}/perl
     no-sm4 \
     no-ssl \
     no-ssl3 \
-    no-tls1 \
-    no-tls1_1 \
     no-weak-ssl-ciphers \
     no-whirlpool \
     no-zlib \
@@ -323,6 +321,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jul 28 2021 Daniel Mihai <dmihai@microsoft.com> - 1.1.1k-6
+- Enable support for TLS 1 and TLS 1.1
+
 * Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
 - In FIPS mode, perform Linux RNG concatenation even if adin/pers functions
 - aren't defined in given DRBG
