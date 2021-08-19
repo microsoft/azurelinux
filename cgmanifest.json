@@ -104,6 +104,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "archivemount",
+          "version": "0.9.1",
+          "downloadUrl": "https://www.cybernoia.de/software/archivemount/archivemount-0.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "asciidoc",
           "version": "9.1.0",
           "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/9.1.0/asciidoc-9.1.0.tar.gz"
@@ -2199,8 +2209,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.28.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.28.1.tar.gz"
+          "version": "5.10.52.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
         }
       }
     },
@@ -3400,7 +3410,7 @@
         "other": {
           "name": "libselinux",
           "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libselinux-3.2.tar.gz"
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libselinux-3.2.tar.gz"
         }
       }
     },
@@ -4339,7 +4349,7 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.0.0-rc95+azure",
+          "version": "1.0.0~rc95+azure",
           "downloadUrl": "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc95/runc.tar.xz"
         }
       }
