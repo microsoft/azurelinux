@@ -8,12 +8,12 @@ This will allow us to control xmlto behavior from the spec file
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 1664009..6b9c6f6 100644
---- a/Makefile
+diff --git a/Makefile.original b/Makefile
+index d4a1c35..c4fd438 100644
+--- a/Makefile.original
 +++ b/Makefile
-@@ -48,10 +48,10 @@ $(SECIL2TREE): $(SECIL2TREE_OBJS)
- man: $(SECILC_MANPAGE) $(SECIL2CONF_MANPAGE) $(SECIL2TREE_MANPAGE)
+@@ -40,10 +40,10 @@ $(SECIL2CONF): $(SECIL2CONF_OBJS)
+ man: $(SECILC_MANPAGE) $(SECIL2CONF_MANPAGE)
  
  $(SECILC_MANPAGE): $(SECILC_MANPAGE).xml
 -	$(XMLTO) man $(SECILC_MANPAGE).xml
@@ -22,11 +22,7 @@ index 1664009..6b9c6f6 100644
  $(SECIL2CONF_MANPAGE): $(SECIL2CONF_MANPAGE).xml
 -	$(XMLTO) man $(SECIL2CONF_MANPAGE).xml
 +	$(XMLTO) $(XMLARGS) man $(SECIL2CONF_MANPAGE).xml
-
- $(SECIL2TREE_MANPAGE): $(SECIL2TREE_MANPAGE).xml
--	$(XMLTO) man $(SECIL2TREE_MANPAGE).xml
-+	$(XMLTO) $(XMLARGS) man $(SECIL2TREE_MANPAGE).xml
-
+ 
  install: all man
  	-mkdir -p $(DESTDIR)$(BINDIR)
 -- 
