@@ -106,6 +106,7 @@
                 "perl-local-lib",
                 "perl-Module-CPANfile",
                 "perl-Parse-PMFile",
+                "perl-Pod-Parser",
                 "perl-String-ShellQuote",                
                 "picosat",
                 "pkgconf",
