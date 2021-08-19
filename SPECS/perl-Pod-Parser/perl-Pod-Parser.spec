@@ -11,7 +11,6 @@ BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.5.0
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76

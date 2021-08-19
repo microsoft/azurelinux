@@ -5348,6 +5348,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Pod-Parser",
+          "version": "1.63",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.63.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-String-ShellQuote",
           "version": "1.04",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROSCH/String-ShellQuote-1.04.tar.gz"
