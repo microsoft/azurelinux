@@ -948,7 +948,6 @@ install -m 0644 -D udev/50-rbd.rules %{buildroot}%{_udevrulesdir}/50-rbd.rules
 
 # sudoers.d
 install -m 0600 -D sudoers.d/ceph-osd-smartctl %{buildroot}%{_sysconfdir}/sudoers.d/ceph-osd-smartctl
-install -m 0600 -D sudoers.d/cephadm %{buildroot}%{_sysconfdir}/sudoers.d/cephadm
 
 #set up placeholder directories
 mkdir -p %{buildroot}%{_sysconfdir}/ceph
@@ -1059,7 +1058,6 @@ exit 0
 %files -n cephadm
 %{_sbindir}/cephadm
 %{_mandir}/man8/cephadm.8*
-%{_sysconfdir}/sudoers.d/cephadm
 %attr(0700,cephadm,cephadm) %dir %{_sharedstatedir}/cephadm
 %attr(0700,cephadm,cephadm) %dir %{_sharedstatedir}/cephadm/.ssh
 %attr(0600,cephadm,cephadm) %{_sharedstatedir}/cephadm/.ssh/authorized_keys
@@ -1596,7 +1594,6 @@ fi
 
 %files -n librgw2
 %{_libdir}/librgw.so.*
-%{_libdir}/librgw_admin_user.so.*
 %if %{with lttng}
 %{_libdir}/librgw_op_tp.so.*
 %{_libdir}/librgw_rados_tp.so.*
@@ -1609,10 +1606,8 @@ fi
 %files -n librgw-devel
 %dir %{_includedir}/rados
 %{_includedir}/rados/librgw.h
-%{_includedir}/rados/librgw_admin_user.h
 %{_includedir}/rados/rgw_file.h
 %{_libdir}/librgw.so
-%{_libdir}/librgw_admin_user.so
 %if %{with lttng}
 %{_libdir}/librgw_op_tp.so
 %{_libdir}/librgw_rados_tp.so
