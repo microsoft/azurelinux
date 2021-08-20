@@ -10,30 +10,14 @@ Distribution:   Mariner
 %global debug_package %{nil}
 %endif
 
-%global provider github
-%global provider_tld com
-%global project containers
-%global repo conmon
-# https://github.com/containers/conmon
-%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
-%global commit0 c3f31c0671f6c84f5e02ec710385e1e8f2936066
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global git0 https://%{import_path}
-
-# Used for comparing with latest upstream tag
-# to decide whether to autobuild (non-rawhide only)
-%define built_tag v2.0.29
-%define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-%define download_url %{git0}/archive/%{built_tag}.tar.gz
-
 Name: %{repo}
 Version: 2.0.29
 Release: 3%{?dist}
 Summary: OCI container runtime monitor
 License: ASL 2.0
-URL: %{git0}
-#Source0: %{download_url}
-SOurce0: %{name}-%{version}.tar.gz
+URL: https://github.com/containers/conmon
+#Source0: https://github.com/containers/conmon/archive/v%{version}.tar.gz
+Source0: %{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: glib2-devel
@@ -48,7 +32,7 @@ Requires: systemd-libs
 %{summary}.
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -Sgit -n %{name}-%{version}
 
 %build
 %{__make} GOMD2MAN=go-md2man DEBUGFLAG="-g" bin/conmon
@@ -73,6 +57,7 @@ Requires: systemd-libs
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
 - Remove epoch
+- Remove unneeded macros/definitions
 
 * Thu Jul 08 2021 Lokesh Mandvekar <lsm5@fedoraproject.org> - 2:2.0.29-2
 - rebuild with podman gating test timeout increased to 25m
