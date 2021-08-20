@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.18.14
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,7 +31,7 @@ BuildRequires:  golang >= 1.13.15
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
-Requires:       cni-plugins
+Requires:       cni
 Requires:       cri-tools
 Requires:       ebtables
 Requires:       ethtool
@@ -270,9 +270,6 @@ fi
 %{_bindir}/pause
 
 %changelog
-* Wed Aug 18 2021 Henry Li <lihl@microsoft.com> - 1.18.14-6
-- Use cni-plugins as runtime requirement
-
 * Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.18.14-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
