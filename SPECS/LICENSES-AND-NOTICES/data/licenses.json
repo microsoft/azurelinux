@@ -24,6 +24,7 @@
                 "catch",
                 "chrony",
                 "conda",
+                "conmon",
                 "conntrack-tools",
                 "cpprest",
                 "cryptsetup",
@@ -257,9 +258,11 @@
                 "ant-contrib",
                 "bazel-workspaces",
                 "boringssl",
+                "cri-o",
                 "envoy",
                 "golang-packaging",
                 "jna",
+                "libcontainers-common",
                 "kured"
             ]
         },
