@@ -288,9 +288,7 @@
                 "ant-contrib",
                 "bazel-workspaces",
                 "boringssl",
-                "cni",
                 "envoy",
-                "fillup",
                 "golang-packaging",
                 "jna",
                 "kured"
@@ -341,7 +339,7 @@
                 "cloud-init",
                 "cloud-utils-growpart",
                 "cmake",
-                "cni-plugins",
+                "cni",
                 "core-packages",
                 "coreutils",
                 "cpio",
