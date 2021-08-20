@@ -195,7 +195,7 @@ cp -p %{SOURCE20} .
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
 asciidoc.py -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
-xsltproc --nonet -o %{name}/update-ca-trust.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
+xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 %install
 mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
@@ -257,8 +257,8 @@ touch %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 chmod 444 %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 
 # Directory links for compatibility with 3rd-party tools
-mkdir -p %{buildroot}/usr/lib/ssl
-for link in "%{buildroot}%{_sysconfdir}/ssl/certs" "%{buildroot}/usr/lib/ssl/certs"; do
+mkdir -p %{buildroot}%{_libdir}/ssl
+for link in "%{buildroot}%{_sysconfdir}/ssl/certs" "%{buildroot}%{_libdir}/ssl/certs"; do
   ln -s %{pkidir}/tls/certs "$link"
 done
 
@@ -353,7 +353,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 # symlink directory
 %{_sysconfdir}/ssl/certs
-/usr/lib/ssl/certs
+%{_libdir}/ssl/certs
 
 # README files
 %{_datadir}/pki/ca-trust-source/README
