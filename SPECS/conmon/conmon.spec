@@ -10,7 +10,7 @@ Distribution:   Mariner
 %global debug_package %{nil}
 %endif
 
-Name: %{repo}
+Name: conmon
 Version: 2.0.29
 Release: 3%{?dist}
 Summary: OCI container runtime monitor
