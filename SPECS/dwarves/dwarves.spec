@@ -1,9 +1,11 @@
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 %define libname libdwarves
 %define libver 1
 
 Name: dwarves
 Version: 1.21
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Summary: Debugging Information Manipulation Tools (pahole & friends)
 URL: http://acmel.wordpress.com
@@ -136,6 +138,9 @@ rm -Rf %{buildroot}
 %{_libdir}/%{libname}_reorganize.so
 
 %changelog
+* Fri Aug 20 2021 Chris Co <chrco@microsoft.com> - 1.21-4
+- Initial CBL-Mariner import from Fedora 35 (License: GPLv2)
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
