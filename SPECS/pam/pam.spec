@@ -1,24 +1,27 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
-Version:        1.3.1
-Release:        5%{?dist}
+Version:        1.5.1
+Release:        1%{?dist}
 License:        BSD and GPLv2+
-URL:            http://www.linux-pam.org/
+URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  cracklib-devel
+BuildRequires:  libselinux-devel
 Requires:       cracklib
+
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
 enable the local system administrator to choose how applications authenticate users.
 
-%package lang
-Summary: Additional language files for pam
-Group: System Environment/Base
+%package        lang
+Summary:        Additional language files for pam
+Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-%description lang
+
+%description    lang
 These are the additional language files of pam.
 
 %package        devel
@@ -31,54 +34,53 @@ This package contains libraries, header files and documentation
 for developing applications that use pam.
 
 %prep
-%setup -qn Linux-PAM-%{version}
-%build
+%autosetup -n Linux-PAM-%{version}
 
+%build
 ./configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
     --sysconfdir=/etc   \
     --enable-securedir=/usr/lib/security \
+    --enable-selinux \
     --docdir=%{_docdir}/%{name}-%{version}
+%make_build
 
-make %{?_smp_mflags}
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make install DESTDIR=%{buildroot}
+%make_install
+
 chmod -v 4755 %{buildroot}/sbin/unix_chkpwd
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
-ln -sf pam_unix.so %{buildroot}/usr/lib/security/pam_unix_auth.so
-ln -sf pam_unix.so %{buildroot}/usr/lib/security/pam_unix_acct.so
-ln -sf pam_unix.so %{buildroot}/usr/lib/security/pam_unix_passwd.so
-ln -sf pam_unix.so %{buildroot}/usr/lib/security/pam_unix_session.so
+ln -sf pam_unix.so %{buildroot}%{_libdir}/security/pam_unix_auth.so
+ln -sf pam_unix.so %{buildroot}%{_libdir}/security/pam_unix_acct.so
+ln -sf pam_unix.so %{buildroot}%{_libdir}/security/pam_unix_passwd.so
+ln -sf pam_unix.so %{buildroot}%{_libdir}/security/pam_unix_session.so
 echo 'PATH="/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"' >> %{buildroot}/etc/environment
-find %{buildroot}/%{_libdir} -name '*.la' -delete
-find %{buildroot}/usr/lib/ -name '*.la' -delete
+find %{buildroot} -name "*.la" -delete -print
 %{find_lang} Linux-PAM
 
 %{_fixperms} %{buildroot}/*
 
 %check
-install -v -m755 -d /etc/pam.d
-cat > /etc/pam.d/other << "EOF"
+install -v -m755 -d %{_sysconfdir}/pam.d
+cat > %{_sysconfdir}/pam.d/other << "EOF"
 auth     required       pam_deny.so
 account  required       pam_deny.so
 password required       pam_deny.so
 session  required       pam_deny.so
 EOF
-make %{?_smp_mflags} check
+%make_build check
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-%clean
-rm -rf %{buildroot}/*
+%ldconfig_scriptlets
+
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_sysconfdir}/*
 /sbin/*
 %{_libdir}/security/*
+%{_libdir}/systemd/system/pam_namespace.service
 %{_libdir}/*.so*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
@@ -93,6 +95,12 @@ rm -rf %{buildroot}/*
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-1
+- Upgrade to latest upstream version
+
+* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-6
+- Add SELinux support (JOSLOBO 7/26/21 bumped dash version to resolve merge conflict)
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.3.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

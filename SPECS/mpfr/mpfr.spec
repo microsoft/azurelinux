@@ -65,7 +65,7 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/COPYING
 
 %changelog
-* Sat May 09 00:20:52 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.0.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.0.1-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0.1-2

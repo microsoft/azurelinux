@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -304,6 +304,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 2.28-18
+- Dash Rolled for Merge from 1.0 branch
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
 - Merge the following releases from 1.0 to dev branch
 - lihl@microsoft.com, 2.28-13: Added patch to resolve CVE-2019-7309, Used autosteup

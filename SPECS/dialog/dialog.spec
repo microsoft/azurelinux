@@ -85,7 +85,7 @@ chmod +x %{buildroot}%{_libdir}/*
 %{_mandir}/man3/dialog.*
 
 %changelog
-* Sat May 09 00:20:59 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.3-3.20180621
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3-3.20180621
 - Added %%license line automatically
 
 *   Thu Apr 16 2020 Nick Samson <nisamson@microsoft.com> 1.3-2

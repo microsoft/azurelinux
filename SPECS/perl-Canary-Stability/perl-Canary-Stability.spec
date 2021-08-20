@@ -42,14 +42,18 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2012-5
--   Use new perl package names.
--   Provide perl(Canary::Stability).
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2012-4
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2012-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 2012-2
--   Consuming perl version upgrade of 5.28.0
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2012-5
+- Use new perl package names.
+- Provide perl(Canary::Stability).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2012-4
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2012-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 2012-2
+- Consuming perl version upgrade of 5.28.0
+
 * Wed Apr 05 2017 Robert Qi <qij@vmware.com> 2012-1
--   Initial version.
+- Initial version.

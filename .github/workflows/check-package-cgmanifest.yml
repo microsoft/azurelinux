@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Validate Manifests
+    name: Check Package CGManifests
     runs-on: ubuntu-18.04
     steps:
 

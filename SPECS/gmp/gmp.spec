@@ -63,7 +63,7 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
-* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
 - Added %%license line automatically
 
 *   Fri Feb 14 2020 Andrew Phelps <anphel@microsoft.com> 6.1.2-4

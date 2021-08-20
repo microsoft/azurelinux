@@ -87,7 +87,7 @@ popd
 
 
 %changelog
-* Sat May 09 00:20:46 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.4-9
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.4-9
 - Added %%license line automatically
 
 *   Tue Apr 14 2020 Nick Samson <nisamson@microsoft.com> 0.4-8

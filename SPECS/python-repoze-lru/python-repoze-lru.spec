@@ -7,10 +7,10 @@
 Summary:        A tiny LRU cache implementation and decorator
 Name:           python-%{pkgname}
 Version:        0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://pypi.io/packages/source/r/%{pypiname}/%{pypiname}-%{version}.tar.gz
 Source0:        %{pkgname}-%{version}.tar.gz
@@ -48,7 +48,7 @@ python3 setup.py install --root=%{buildroot}
 %if %{with check}
 %check
 pip3 install tox
-tox
+LANG=en_US.UTF-8 tox -e py37
 %endif
 
 %files -n python3-%{pkgname}
@@ -57,5 +57,9 @@ tox
 %{python3_sitelib}/*
 
 %changelog
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 2.4.1-1
-- Original CBL-Mariner version
+* Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> 0.7-2
+- Fix check tests
+
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 0.7-1
+- Original version for CBL-Mariner
+- License verified

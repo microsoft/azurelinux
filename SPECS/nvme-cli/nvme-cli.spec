@@ -30,7 +30,7 @@ make install PREFIX=%{_prefix} DESTDIR=%{buildroot}
 %{_mandir}/man1/*
 
 %changelog
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.1-3
 - Added %%license line automatically
 
 * Tue Mar 24 2020 Paul Monson <paulmon@microsoft.com> 1.8.1-2

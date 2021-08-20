@@ -16,7 +16,9 @@ Provides:       %{name}-ng = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  ncurses-term
 %endif
-
+BuildRequires:  libselinux-devel
+Requires: %{name}-libs = %{version}-%{release}
+Conflicts:      toybox
 %description
 Utilities for handling file systems, consoles, partitions,
 and messages.
@@ -66,7 +68,8 @@ autoreconf -fi
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
-    --without-python
+    --without-python \
+    --with-selinux
 make %{?_smp_mflags}
 
 %install
@@ -121,6 +124,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+
 * Mon Mar 15 2021 Henry Li <lihl@microsoft.com> - 2.36.1-3
 - Provide util-linux-ng
 - Add files to util-linux-devel
@@ -133,68 +137,71 @@ rm -rf %{buildroot}/lib/systemd/system
 - Upgrade to version 2.36.1.
 - Provide hardlink.
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.32.1-4
--   Provide libmount-devel, libblkid-devel, libuuid-devel in util-linux-devel
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.32.1-4
+- Provide libmount-devel, libblkid-devel, libuuid-devel in util-linux-devel
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.23.1-3
--   Added %%license line automatically
+* Fri Sep 04 2020 Daniel Burgener <daburgen@microsoft.com> 2.32.1-4
+- Enable SELinux support (Merged from Mariner 1.0 branch)
 
-*   Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 2.32.1-2
--   Rename ncurses-terminfo to ncurses-term.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.23.1-3
+- Added %%license line automatically
 
-*   Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 2.32.1-1
--   Update version to 2.32.1. License verified.
+* Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 2.32.1-2
+- Rename ncurses-terminfo to ncurses-term.
 
-*   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 2.32-4
--   Disable chfn, chsh, login, and su builds. These are provided by shadow.
+* Tue Mar 17 2020 Andrew Phelps <anphel@microsoft.com> 2.32.1-1
+- Update version to 2.32.1. License verified.
 
-*   Tue Dec 03 2019 Andrew Phelps <anphel@microsoft.com> 2.32-3
--   Run autoconf to remake build system files
+* Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 2.32-4
+- Disable chfn, chsh, login, and su builds. These are provided by shadow.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.32-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Dec 03 2019 Andrew Phelps <anphel@microsoft.com> 2.32-3
+- Run autoconf to remake build system files
 
-*   Mon Apr 09 2018 Xiaolin Li <xiaolinl@vmware.com> 2.32-1
--   Update to version 2.32, fix CVE-2018-7738
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.32-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 2.31.1-1
--   Upgrade to version 2.31.1.
+* Mon Apr 09 2018 Xiaolin Li <xiaolinl@vmware.com> 2.32-1
+- Update to version 2.32, fix CVE-2018-7738
 
-*   Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 2.29.2-5
--   Added conflicts toybox
+* Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 2.31.1-1
+- Upgrade to version 2.31.1.
 
-*   Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 2.29.2-4
--   Cleanup check
+* Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 2.29.2-5
+- Added conflicts toybox
 
-*   Mon Jul 31 2017 Xiaolin Li <xiaolinl@vmware.com> 2.29.2-3
--   Fixed rpm check errors.
+* Fri Sep 15 2017 Bo Gan <ganb@vmware.com> 2.29.2-4
+- Cleanup check
 
-*   Thu Apr 20 2017 Alexey Makhalov <amakhalov@vmware.com> 2.29.2-2
--   Added -libs subpackage to strip docker image.
+* Mon Jul 31 2017 Xiaolin Li <xiaolinl@vmware.com> 2.29.2-3
+- Fixed rpm check errors.
 
-*   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 2.29.2-1
--   Updated to version 2.29.2.
+* Thu Apr 20 2017 Alexey Makhalov <amakhalov@vmware.com> 2.29.2-2
+- Added -libs subpackage to strip docker image.
 
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.27.1-5
--   Moved man3 to devel subpackage.
+* Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 2.29.2-1
+- Updated to version 2.29.2.
 
-*   Thu Nov 17 2016 Alexey Makhalov <amakhalov@vmware.com> 2.27.1-4
--   Disable use tty droup
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.27.1-5
+- Moved man3 to devel subpackage.
 
-*   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 2.27.1-3
--   Modified %check
+* Thu Nov 17 2016 Alexey Makhalov <amakhalov@vmware.com> 2.27.1-4
+- Disable use tty droup
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.27.1-2
--   GA - Bump release of all rpms
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> 2.27.1-3
+- Modified %check
 
-*   Fri Dec 11 2015 Anish Swaminathan <anishs@vmware.com> 2.27.1-1
--   Upgrade version.
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.27.1-2
+- GA - Bump release of all rpms
 
-*   Tue Oct 6 2015 Xiaolin Li <xiaolinl@vmware.com> 2.24.1-3
--   Disable static, move header files, .so and config files to devel package.
+* Fri Dec 11 2015 Anish Swaminathan <anishs@vmware.com> 2.27.1-1
+- Upgrade version.
 
-*   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 2.24.1-2
--   Update according to UsrMove.
+* Tue Oct 6 2015 Xiaolin Li <xiaolinl@vmware.com> 2.24.1-3
+- Disable static, move header files, .so and config files to devel package.
 
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.24.1-1
--   Initial build. First version
+* Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 2.24.1-2
+- Update according to UsrMove.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.24.1-1
+- Initial build. First version

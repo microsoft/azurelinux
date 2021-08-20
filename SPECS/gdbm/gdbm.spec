@@ -76,22 +76,29 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.18-4
--   Symlink headers for compatibility.
-* Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.18-3
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.18-4
+- Symlink headers for compatibility.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.18-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.18-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 1.18-1
--   Update to version 1.18
-*   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.13-3
--   Add devel package.
-*   Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 1.13-2
--   Add lang package.
-*   Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> 1.13-1
--   Upgrade gdbm to 1.13
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.11-2
--   GA - Bump release of all rpms
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.11-1
--   Initial build.  First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.18-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 1.18-1
+- Update to version 1.18
+
+* Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.13-3
+- Add devel package.
+
+* Tue May 02 2017 Anish Swaminathan <anishs@vmware.com> 1.13-2
+- Add lang package.
+
+* Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> 1.13-1
+- Upgrade gdbm to 1.13
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.11-2
+- GA - Bump release of all rpms
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.11-1
+- Initial build.  First version

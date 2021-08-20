@@ -74,23 +74,34 @@ make %{?_smp_mflags} check
 %changelog
 * Fri Aug 28 2020 Thomas Crain <thcrain@microsoft.com> - 3.4.0-6
 - Add pkg-config provides to devel package
-* Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.4.0-5
+- License verified
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.4.0-5
 - Added %%license line automatically
+
 * Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 3.4.0-4
 - Rename from libnl to libnl3.
+
 * Tue Apr 14 2020 Nick Samson <nisamson@microsoft.com> - 3.4.0-3
 - Updated Source0, URL. License verified.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.4.0-2
-- Initial import from Photon (license: dual Apache2/GPL2).
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Wed Sep 19 2018 Bo Gan <ganb@vmware.com> - 3.4.0-1
 - Updated to version 3.4.0
+
 * Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 3.2.29-1
 - Updated to version 3.2.29.
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 3.2.27-2
 - GA - Bump release of all rpms
+
 * Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> - 3.2.27-1
 - Updated to version 3.2.27
+
 * Tue Sep 22 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 3.2.25-2
 - Updated build-requires after creating devel package for dbus.
+
 * Tue Jun 23 2015 Divya Thaluru <dthaluru@vmware.com> - 3.2.25-1
 - Initial build.

@@ -89,7 +89,7 @@ rm -rf %{buildroot}/*
 *   Tue May 12 2020 Paul Monson <paulmon@microsoft.com> 1.1.32-4
 -   Add patch for CVE-2019-5815
 
-*   Sat May 09 00:21:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.1.32-3
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.32-3
 -   Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.32-2

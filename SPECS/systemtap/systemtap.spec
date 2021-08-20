@@ -361,60 +361,61 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 4.1-6
--   Explicitly use python3 during build.
--   Use lib macros for paths.
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 4.1-6
+- Explicitly use python3 during build.
+- Use lib macros for paths.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-5
 - Added %%license line automatically
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-4
--   Renaming linux to kernel
-*   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-3
--   Rename shadow to shadow-utils.
-*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.1-2
--   Remove toybox and only use coreutils for requires.
-*   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 4.1-1
--   Update to 4.1. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> 4.0-2
--   Added BuildRequires python2-devel
-*   Tue Dec 04 2018 Keerthana K <keerthanak@vmware.com> 4.0-1
--   Updated to version 4.0
-*   Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 3.3-1
--   Updated to version 3.3
-*   Tue Jan 23 2018 Divya Thaluru <dthaluru@vmware.com>  3.2-1
--   Updated to version 3.2
-*   Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  3.1-5
--   Fixed the log file directory structure
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-4
--   Remove shadow from requires and use explicit tools for post actions
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-3
--   Requires coreutils or toybox
-*   Thu Aug 10 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-2
--   systemtap-sdt-devel requires systemtap
-*   Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.1-1
--   Update to version 3.1
-*   Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0-4
--   add shadow to requires
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 3.0-3
--   Use sqlite-{devel,libs}
-*   Tue Oct 04 2016 ChangLee <changlee@vmware.com> 3.0-2
--   Modified %check
-*   Fri Jul 22 2016 Divya Thaluru <dthaluru@vmware.com> 3.0-1
--   Updated version to 3.0
--   Removing patch to enable kernel (fix is present in upstream)
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-5
--   GA - Bump release of all rpms
-*   Mon May 23 2016 Harish Udaiya KUmar <hudaiyakumar@vmware.com> 2.9-4
--   Added the patch to enable kernel building with Kernel 4.4
-*   Fri May 20 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-3
--   Fixed the stap-prep script to be compatible with Photon
-*   Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-2
--   Fix for upgrade issues
-*   Wed Dec 16 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-1
--   Updated version to 2.9
-*   Fri Dec 11 2015 Xiaolin Li <xiaolinl@vmware.com> 2.7-2
--   Move dtrace to the main package.
-*   Wed Nov 18 2015 Anish Swaminathan <anishs@vmware.com> 2.7-1
--   Initial build. First version
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-4
+- Renaming linux to kernel
+* Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-3
+- Rename shadow to shadow-utils.
+* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.1-2
+- Remove toybox and only use coreutils for requires.
+* Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 4.1-1
+- Update to 4.1. License verified.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> 4.0-2
+- Added BuildRequires python2-devel
+* Tue Dec 04 2018 Keerthana K <keerthanak@vmware.com> 4.0-1
+- Updated to version 4.0
+* Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 3.3-1
+- Updated to version 3.3
+* Tue Jan 23 2018 Divya Thaluru <dthaluru@vmware.com>  3.2-1
+- Updated to version 3.2
+* Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  3.1-5
+- Fixed the log file directory structure
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-4
+- Remove shadow from requires and use explicit tools for post actions
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-3
+- Requires coreutils or toybox
+* Thu Aug 10 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-2
+- systemtap-sdt-devel requires systemtap
+* Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.1-1
+- Update to version 3.1
+* Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0-4
+- add shadow to requires
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 3.0-3
+- Use sqlite-{devel,libs}
+* Tue Oct 04 2016 ChangLee <changlee@vmware.com> 3.0-2
+- Modified %check
+* Fri Jul 22 2016 Divya Thaluru <dthaluru@vmware.com> 3.0-1
+- Updated version to 3.0
+- Removing patch to enable kernel (fix is present in upstream)
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-5
+- GA - Bump release of all rpms
+* Mon May 23 2016 Harish Udaiya KUmar <hudaiyakumar@vmware.com> 2.9-4
+- Added the patch to enable kernel building with Kernel 4.4
+* Fri May 20 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-3
+- Fixed the stap-prep script to be compatible with Photon
+* Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-2
+- Fix for upgrade issues
+* Wed Dec 16 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-1
+- Updated version to 2.9
+* Fri Dec 11 2015 Xiaolin Li <xiaolinl@vmware.com> 2.7-2
+- Move dtrace to the main package.
+* Wed Nov 18 2015 Anish Swaminathan <anishs@vmware.com> 2.7-1
+- Initial build. First version

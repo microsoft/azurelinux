@@ -45,7 +45,7 @@ rm -rf %{buildroot}
 %{_datadir}/*
 
 %changelog
-* Sat May 09 00:21:02 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.0.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0.1-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.0.1-3

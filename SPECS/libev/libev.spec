@@ -66,17 +66,17 @@ make %{?_smp_mflags} -k check
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.24-5
 - Split libev-libevent-devel subpackage to resolve event.h conflicts with libevent-devel.
 
-* Sat May 09 00:21:43 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.24-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.24-4
 - Added %%license line automatically
 
-*   Wed Apr 08 2020 Joe Schmitt <joschmit@microsoft.com> 4.24-3
--   Update Source0 with valid URL.
--   Remove sha1 macro.
--   License verified.
--   Fix changelog styling
+* Wed Apr 08 2020 Joe Schmitt <joschmit@microsoft.com> 4.24-3
+- Update Source0 with valid URL.
+- Remove sha1 macro.
+- License verified.
+- Fix changelog styling
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.24-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.24-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Apr 03 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 4.24-1
--   Initial Version.
+* Mon Apr 03 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 4.24-1
+- Initial Version.

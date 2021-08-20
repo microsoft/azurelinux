@@ -58,41 +58,43 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/texinfo/*
 
 %changelog
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 6.5-8
--   Provide info and texinfo-tex
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 6.5-7
--   Added %%license line automatically
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 6.5-6
--   Renaming perl-libintl to perl-libintl-perl
-*   Mon Apr 20 2020 Eric Li <eli@microsoft.com> 6.5-5
--   Fix URL and Source0:, delete sha1. License verified.
-*   Wed Jan 22 2020 Henry Beberman <hebeberm@microsoft.com> 6.5-4
--   Add missing Requires for perl-libintl to ensure the package exists for iso installs.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.5-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Nov 02 2018 Anish Swaminathan <anishs@vmware.com> 6.5-2
--   Fix texinfo issue with locales
--   http://lists.gnu.org/archive/html/bug-texinfo/2018-06/msg00029.html
-*   Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 6.5-1
--   Update version to 6.5.
-*   Fri May 05 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-3
--   Excluded pdftexi2dvi, texi2dvi, texi2pdf from package,
--   because these commands depend on installation of tex.
-*   Tue Apr 18 2017 Robert Qi <qij@vmware.com> 6.3-2
--   Updated to version 6.3-2 due to perl build requires.
-*   Tue Mar 28 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-1
--   Updated to version 6.3.
-*   Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.1-4
--   Modified %check
-*   Wed Jun 27 2016 Divya Thaluru <dthaluru@vmware.com> 6.1-3
--   Removed packaging of debug files
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.1-2
--   GA - Bump release of all rpms
-*   Mon Feb 22 2016 Xiaolin Li <xiaolinl@vmware.com> 6.1-1
--   Updated to version 6.1
-*   Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 5.2-3
--   Handled locale files with macro find_lang
-*   Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 5.2-2
--   Removing perl-libintl package from run-time required packages
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 5.2-1
--   Upgrade version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 6.5-8
+- Provide info and texinfo-tex
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.5-7
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 6.5-6
+- Renaming perl-libintl to perl-libintl-perl
+* Mon Apr 20 2020 Eric Li <eli@microsoft.com> 6.5-5
+- Fix URL and Source0:, delete sha1. License verified.
+* Wed Jan 22 2020 Henry Beberman <hebeberm@microsoft.com> 6.5-4
+- Add missing Requires for perl-libintl to ensure the package exists for iso installs.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.5-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Nov 02 2018 Anish Swaminathan <anishs@vmware.com> 6.5-2
+- Fix texinfo issue with locales
+- http://lists.gnu.org/archive/html/bug-texinfo/2018-06/msg00029.html
+* Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 6.5-1
+- Update version to 6.5.
+* Fri May 05 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-3
+- Excluded pdftexi2dvi, texi2dvi, texi2pdf from package,
+- because these commands depend on installation of tex.
+* Tue Apr 18 2017 Robert Qi <qij@vmware.com> 6.3-2
+- Updated to version 6.3-2 due to perl build requires.
+* Tue Mar 28 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-1
+- Updated to version 6.3.
+* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.1-4
+- Modified %check
+* Wed Jun 27 2016 Divya Thaluru <dthaluru@vmware.com> 6.1-3
+- Removed packaging of debug files
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.1-2
+- GA - Bump release of all rpms
+* Mon Feb 22 2016 Xiaolin Li <xiaolinl@vmware.com> 6.1-1
+- Updated to version 6.1
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 5.2-3
+- Handled locale files with macro find_lang
+* Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 5.2-2
+- Removing perl-libintl package from run-time required packages
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 5.2-1
+- Upgrade version

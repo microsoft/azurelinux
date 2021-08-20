@@ -66,7 +66,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/libexpat.so.*
 
 %changelog
-* Sat May 09 00:21:10 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
 - Added %%license line automatically
 
 *   Wed Apr 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.2.6-3

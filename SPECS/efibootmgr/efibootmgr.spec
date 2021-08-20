@@ -35,7 +35,7 @@ rm -rf %{buildroot}/*
 %{_sbindir}/*
 %{_mandir}/man8/*
 %changelog
-* Sat May 09 00:21:06 PST 2020 Nick Samson <nisamson@microsoft.com> - 16-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 16-2
 - Added %%license line automatically
 
 *   Wed Mar 18 2020 Nicolas Ontiveros <niontive@microsoft.com> 16-1

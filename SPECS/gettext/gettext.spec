@@ -56,25 +56,34 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.21-1
--   Update to version 0.21.
--   Update URL and Source0 to use https.
--   Provide gettext-devel
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 0.19.8.1-3
--   Disable -Wno-error=format-security to build with hardened cflags
-*   Sat May 09 00:21:19 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.19.8.1-2
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 19.8.1-1
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 0.19.8.1-1
--       Update to version 0.19.8.1
-*	Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> 0.19.8-1
--	Upgrade to 0.19.8
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.19.5.1-2
--	GA - Bump release of all rpms
-* 	Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 0.19.5.1-1
-- 	Updated to version 0.19.5.1
-*	Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 0.18.3.2-2
--	Handled locale files with macro find_lang
-*	Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 0.18.3.2-1
--	Initial build. First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.21-1
+- Update to version 0.21.
+- Update URL and Source0 to use https.
+- Provide gettext-devel
+
+* Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 0.19.8.1-3
+- Disable -Wno-error=format-security to build with hardened cflags
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.19.8.1-2
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 19.8.1-1
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 0.19.8.1-1
+- Update to version 0.19.8.1
+
+* Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> 0.19.8-1
+- Upgrade to 0.19.8
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.19.5.1-2
+- GA - Bump release of all rpms
+
+* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 0.19.5.1-1
+- Updated to version 0.19.5.1
+
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 0.18.3.2-2
+- Handled locale files with macro find_lang
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 0.18.3.2-1
+- Initial build. First version

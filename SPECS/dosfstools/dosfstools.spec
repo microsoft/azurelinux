@@ -28,7 +28,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/*
 %{_docdir}/dosfstools/*
 %changelog
-* Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 4.1-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.1-3

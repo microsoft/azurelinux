@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,7 +18,7 @@ BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd
 Requires:       systemd
-
+Requires:       iana-etc
 %description
 The next part of this chapter deals with firewalls. The principal
 firewall tool for Linux is Iptables. You will need to install
@@ -100,10 +100,13 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-6
+- Add dependency on iana-etc (JOSLOBO 7/26: bumped dash version for merge)
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-5
 - Merge the following releases from 1.0 to dev branch
 - rachelmenge@microsoft.com, 1.8.3-4: Add ssh brute force prevention to ip4save and ip6save
--   License verified
+- License verified
 
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.8.3-4
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
@@ -111,54 +114,54 @@ rm -rf %{buildroot}/*
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.3-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.3-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.3-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Jul 30 2019 Shreyas B. <shreyasb@vmware.com> 1.8.3-1
--   Updated to version 1.8.3
+* Tue Jul 30 2019 Shreyas B. <shreyasb@vmware.com> 1.8.3-1
+- Updated to version 1.8.3
 
-*   Tue Feb 26 2019 Alexey Makhalov <amakhalov@vmware.com> 1.8.0-2
--   Flush ip6tables on service stop
+* Tue Feb 26 2019 Alexey Makhalov <amakhalov@vmware.com> 1.8.0-2
+- Flush ip6tables on service stop
 
-*   Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 1.8.0-1
--   Updated to version 1.8.0
+* Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 1.8.0-1
+- Updated to version 1.8.0
 
-*   Thu Aug 10 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.1-4
--   fix ip4save script for upgrade issues.
+* Thu Aug 10 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.1-4
+- fix ip4save script for upgrade issues.
 
-*   Mon Jul 24 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.1-3
--   use iptables-restore to reload rules.
+* Mon Jul 24 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.1-3
+- use iptables-restore to reload rules.
 
-*   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.6.1-2
--   Add devel package.
+* Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 1.6.1-2
+- Add devel package.
 
-*   Tue Mar 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.6.1-1
--   Updated to version 1.6.1
+* Tue Mar 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.6.1-1
+- Updated to version 1.6.1
 
-*   Wed Jan 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.6.0-6
--   Flush iptables on service stop
+* Wed Jan 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.6.0-6
+- Flush iptables on service stop
 
-*   Tue Aug 30 2016 Anish Swaminathan <anishs@vmware.com> 1.6.0-5
--   Change config file properties for iptables script
+* Tue Aug 30 2016 Anish Swaminathan <anishs@vmware.com> 1.6.0-5
+- Change config file properties for iptables script
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.0-4
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.0-4
+- GA - Bump release of all rpms
 
-*   Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> 1.6.0-3
--   Adding package support in pre/post/un scripts section.
+* Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> 1.6.0-3
+- Adding package support in pre/post/un scripts section.
 
-*   Thu Apr 21 2016 Divya Thaluru <dthaluru@vmware.com> 1.6.0-2
--   Enabled iptable service. Added iptable rule to accept ssh connections by default.
+* Thu Apr 21 2016 Divya Thaluru <dthaluru@vmware.com> 1.6.0-2
+- Enabled iptable service. Added iptable rule to accept ssh connections by default.
 
-*   Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.6.0-1
--   Updated to version 1.6.0
+* Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.6.0-1
+- Updated to version 1.6.0
 
-*   Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  1.4.21-3
--   Add systemd to Requires and BuildRequires.
--   Use systemctl to enable/disable service.
+* Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  1.4.21-3
+- Add systemd to Requires and BuildRequires.
+- Use systemctl to enable/disable service.
 
-*   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 1.4.21-2
--   Updated group.
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 1.4.21-2
+- Updated group.
 
-*   Fri Oct 10 2014 Divya Thaluru <dthaluru@vmware.com> 1.4.21-1
--   Initial build.  First version
+* Fri Oct 10 2014 Divya Thaluru <dthaluru@vmware.com> 1.4.21-1
+- Initial build.  First version

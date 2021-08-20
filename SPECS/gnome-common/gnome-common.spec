@@ -39,7 +39,7 @@ make %{?_smp_mflags} check
 %{_datadir}/aclocal/*.m4
 
 %changelog
-* Sat May 09 00:21:20 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.18.0-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.18.0-6
 - Added %%license line automatically
 
 *   Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.18.0-5

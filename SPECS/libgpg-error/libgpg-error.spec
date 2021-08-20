@@ -72,25 +72,35 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5
--   Explicitly add Provides pkgconfig(gpg-error) to devel package.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.32-4
--   Added %%license line automatically
-*   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.32-3
--   Updated Source0, URL. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.32-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Mon Sep 10 2018 Bo Gan <ganb@vmware.com> 1.32-1
--       Update to 1.32
-*	Tue Apr 04 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.27-1
--	Upgraded to new version 1.27
-*   Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 1.21-3
--   Added -lang subpackage
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.21-2
--   GA - Bump release of all rpms
-*   Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.21-1
--   Updated to version 1.21
-*   Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 1.17-2
--   Handled locale files with macro find_lang
-*   Tue Dec 30 2014 Priyesh Padmavilasom <ppadmavilasom@vmware.com>
--   initial specfile.
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5
+- Explicitly add Provides pkgconfig(gpg-error) to devel package.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.32-4
+- Added %%license line automatically
+
+* Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.32-3
+- Updated Source0, URL. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.32-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Bo Gan <ganb@vmware.com> 1.32-1
+- Update to 1.32
+
+* Tue Apr 04 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.27-1
+- Upgraded to new version 1.27
+
+* Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 1.21-3
+- Added -lang subpackage
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.21-2
+- GA - Bump release of all rpms
+
+* Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.21-1
+- Updated to version 1.21
+
+* Tue Nov 10 2015 Xiaolin Li <xiaolinl@vmware.com> 1.17-2
+- Handled locale files with macro find_lang
+
+* Tue Dec 30 2014 Priyesh Padmavilasom <ppadmavilasom@vmware.com>
+- initial specfile.

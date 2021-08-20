@@ -71,7 +71,7 @@ rm -rf %{buildroot}
 %{_libdir}/systemd/system-preset/50-xinetd.preset
 
 %changelog
-* Sat May 09 00:21:40 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.3.15-12
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.15-12
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Joe Schmitt <joschmit@microsoft.com> 2.3.15-11

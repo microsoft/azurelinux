@@ -138,50 +138,53 @@ rm -rf %{buildroot}/*
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 1.17-4
 - Add missing requires on e2fsprogs-devel in devel subpackage.
 
+* Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.17-4 (from 1.0 branch)
+- Fix check tests by adding iana-etc which supplies required /etc/services file
+
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
 - Don't stomp on CPPFLAGS
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.17-2
 - Added %%license line automatically
 
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.17-1
--   Update to 1.17. Fix Source0 URL. License verified.
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.17-1
+- Update to 1.17. Fix Source0 URL. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.16.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.16.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Fri Sep 14 2018 Ankit Jain <ankitja@vmware.com> 1.16.1-1
--   Update to version 1.16.1
+* Fri Sep 14 2018 Ankit Jain <ankitja@vmware.com> 1.16.1-1
+- Update to version 1.16.1
 
-*   Wed Dec 13 2017 Xiaolin Li <xiaolinl@vmware.com> 1.16-1
--   Update to version 1.16 to address CVE-2017-15088
+* Wed Dec 13 2017 Xiaolin Li <xiaolinl@vmware.com> 1.16-1
+- Update to version 1.16 to address CVE-2017-15088
 
-*   Thu Sep 28 2017 Xiaolin Li <xiaolinl@vmware.com> 1.15.2-1
--   Update to version 1.15.2
+* Thu Sep 28 2017 Xiaolin Li <xiaolinl@vmware.com> 1.15.2-1
+- Update to version 1.15.2
 
-*   Mon Jul 10 2017 Alexey Makhalov <amakhalov@vmware.com> 1.15.1-2
--   Fix make check: add /etc/hosts entry, disable parallel check
+* Mon Jul 10 2017 Alexey Makhalov <amakhalov@vmware.com> 1.15.1-2
+- Fix make check: add /etc/hosts entry, disable parallel check
 
-*   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 1.15.1-1
--   Updated to version 1.51.1
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 1.15.1-1
+- Updated to version 1.51.1
 
-*   Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 1.14-6
--   Added -lang and -devel subpackages
+* Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 1.14-6
+- Added -lang and -devel subpackages
 
-*   Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.14-5
--   Use e2fsprogs-libs as runtime deps
+* Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 1.14-5
+- Use e2fsprogs-libs as runtime deps
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.14-4
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.14-4
+- GA - Bump release of all rpms
 
-*   Mon Mar 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com>  1.14-3
--   Add patch to never unload gssapi mechanisms
+* Mon Mar 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com>  1.14-3
+- Add patch to never unload gssapi mechanisms
 
-*   Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com>  1.14-2
--   Add patch for skipping unnecessary mech calls in gss_inquire_cred
+* Fri Mar 18 2016 Anish Swaminathan <anishs@vmware.com>  1.14-2
+- Add patch for skipping unnecessary mech calls in gss_inquire_cred
 
-*   Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.14-1
--   Upgrade version
+* Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.14-1
+- Upgrade version
 
-*   Tue Oct 07 2014 Divya Thaluru <dthaluru@vmware.com> 1.12.2-1
--   Initial build. First version
+* Tue Oct 07 2014 Divya Thaluru <dthaluru@vmware.com> 1.12.2-1
+- Initial build. First version

@@ -78,7 +78,7 @@ ln -sf %{_bindir}/modifyrepo_c %{buildroot}%{_bindir}/modifyrepo
 %{_lib64dir}/pkgconfig/%{name}.pc
 
 %changelog
-* Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.11.1-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.11.1-6
 - Added %%license line automatically
 
 *   Thu Apr 23 2020 Andrew Phelps <anphel@microsoft.com> 0.11.1-5

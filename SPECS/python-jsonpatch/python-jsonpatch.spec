@@ -70,7 +70,7 @@ popd
 %{_bindir}/jsonpatch3
 
 %changelog
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.23-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.23-4
 - Added %%license line automatically
 
 *   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 1.23-3

@@ -68,7 +68,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
-* Sat May 09 00:21:29 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.6-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6-5
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.6-4

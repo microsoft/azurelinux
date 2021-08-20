@@ -1,13 +1,13 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.10.28.1
-Release:        6%{?dist}
+Version:        5.10.52.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders
@@ -37,11 +37,53 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-6
-- Add glibc-kernheaders provides to base package
+* Tue Jul 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.52.1-1
+- Update source to 5.10.52.1
 
-* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.28.1-5
+* Mon Jul 19 2021 Chris Co <chrco@microsoft.com> - 5.10.47.1-2
 - Bump release number to match kernel release
+
+* Tue Jul 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.47.1-1
+- Update source to 5.10.47.1
+
+* Wed Jun 30 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-4
+- Bump release number to match kernel release
+
+* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.42.1-3
+- Bump release number to match kernel release
+
+* Wed Jun 16 2021 Chris Co <chrco@microsoft.com> - 5.10.42.1-2
+- Bump release number to match kernel release
+
+* Tue Jun 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.42.1-1
+- Update source to 5.10.42.1
+
+* Thu Jun 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-2
+- Bump release number to match kernel release
+
+* Fri May 28 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.37.1-1
+- Update source to 5.10.37.1
+
+* Thu May 27 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-7
+- Bump release number to match kernel release
+
+* Wed May 26 2021 Chris Co <chrco@microsoft.com> - 5.10.32.1-6
+- Bump release number to match kernel release
+
+* Tue May 25 2021 Daniel Mihai <dmihai@microsoft.com> - 5.10.32.1-5
+- Bump release number to match kernel release
+
+* Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
+- Bump release number to match kernel-signed update
+
+* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+- Bump release number to match kernel release
+
+* Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
+- Bump release number to match kernel release
+
+* Mon May 03 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-1
+- Update source to 5.10.32.1
 
 * Thu Apr 22 2021 Chris Co <chrco@microsoft.com> - 5.10.28.1-4
 - Bump release number to match kernel release

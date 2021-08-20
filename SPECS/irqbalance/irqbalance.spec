@@ -59,7 +59,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
-* Sat May 09 00:21:03 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.6.0-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.0-3
 - Added %%license line automatically
 
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.6.0-2
