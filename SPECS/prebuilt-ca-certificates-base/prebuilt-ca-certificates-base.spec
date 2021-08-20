@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 Version:        20200720
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,9 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_datadir}/pki/ca-trust-legacy/*
 
 %changelog
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-17
+- Making 'Release' match with 'ca-certificates'.
+
 * Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-16
 - Making 'Release' match with 'ca-certificates'.
 - No longer have to remove 'ca-bundle.legacy.crt' and 'ca-legacy.conf' - gone from 'ca-certificates'.

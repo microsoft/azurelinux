@@ -1,5 +1,5 @@
 %define pkidir %{_sysconfdir}/pki
-%define catrustdir %{_sysconfdir}/pki/ca-trust
+%define catrustdir %{pkidir}/ca-trust
 %define classic_tls_bundle ca-bundle.crt
 %define openssl_format_trust_bundle ca-bundle.trust.crt
 %define java_bundle java/cacerts
@@ -75,7 +75,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,7 +179,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 
 %description legacy
 Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
-pairs under %{_sysconfdir}/pki/tls/certs.
+pairs under %{pkidir}/tls/certs.
 
 %prep -q
 rm -rf %{name}
@@ -256,14 +256,18 @@ chmod 444 %{buildroot}%{catrustdir}/extracted/%{java_bundle}
 touch %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 chmod 444 %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 
-# /etc/ssl/certs symlink for 3rd-party tools
-ln -s ../pki/tls/certs \
-    %{buildroot}%{_sysconfdir}/ssl/certs
-# legacy filenames
+# Directory links for compatibility with 3rd-party tools
+mkdir -p %{buildroot}/usr/lib/ssl
+for link in "%{buildroot}%{_sysconfdir}/ssl/certs" "%{buildroot}/usr/lib/ssl/certs"; do
+  ln -s %{pkidir}/tls/certs "$link"
+done
+
+# Legacy file names and links for compatibility with 3rd-party tools
+for link in "%{buildroot}%{pkidir}/tls/certs/%{classic_tls_bundle}" "%{buildroot}%{_sysconfdir}/ssl/certs/ca-certificates.crt"; do
+  ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem "$link"
+done
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
     %{buildroot}%{pkidir}/tls/cert.pem
-ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    %{buildroot}%{pkidir}/tls/certs/%{classic_tls_bundle}
 ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
     %{buildroot}%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 ln -s %{catrustdir}/extracted/%{java_bundle} \
@@ -341,6 +345,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %license LICENSE
 
 # symlinks for old locations
+%{_sysconfdir}/ssl/certs/ca-certificates.crt
 %{pkidir}/tls/cert.pem
 %{pkidir}/tls/certs/%{classic_tls_bundle}
 %{pkidir}/tls/certs/%{openssl_format_trust_bundle}
@@ -348,6 +353,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 # symlink directory
 %{_sysconfdir}/ssl/certs
+/usr/lib/ssl/certs
 
 # README files
 %{_datadir}/pki/ca-trust-source/README
@@ -395,6 +401,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-17
+- Adding directory and files links for compatibility reasons.
+
 * Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-16
 - Removing the 'ca-legacy' script along with the empty files and broken links it generated.
 
