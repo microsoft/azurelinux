@@ -419,7 +419,7 @@
         "gnuplot",
         "gnutls",
         "gobject-introspection",
-        "golang-1.15",
+        "golang-1.16",
         "gperf",
         "gperftools",
         "gpgme",
