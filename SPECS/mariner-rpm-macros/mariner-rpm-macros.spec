@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 2.0-3
+- Add fillup-related macros
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-2
 - Adding the '_metainfodir' macro.
 
