@@ -13,6 +13,7 @@ Patch0:         CVE-2019-12749.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
+BuildRequires:  libselinux-devel
 Requires:       expat
 Requires:       systemd
 Requires:       xz
@@ -36,7 +37,7 @@ It contains the libraries and header files to create applications
 %configure \
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=no \
-    --enable-selinux=no \
+    --enable-selinux=yes \
     --with-console-auth-dir=/run/console
 
 make %{?_smp_mflags}
@@ -89,8 +90,11 @@ make %{?_smp_mflags} check
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.13.6-5
 - Systemd supports merged /usr. Update with corresponding file locations and macros.
 
-* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-4
+* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-4 (from dev branch)
 - Provide dbus-libs.
+
+* Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4 (from 1.0 branch)
+- Patch CVE-2019-12749
 
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3
 - Added %%license line automatically

@@ -5,7 +5,7 @@ Version:       1.4
 Release:       1%{?dist}
 License:       GPLv2+
 URL:           https://wiki.linuxfoundation.org/lsb/start
-Vendor:        Microsoft
+Vendor:        Microsoft Corporation
 Distribution:  Mariner
 BuildArch:     noarch
 Source0:       https://downloads.sourceforge.net/lsb/%{name}-%{version}.tar.gz
@@ -35,3 +35,4 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 %changelog
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> - 1.4-1
 -   Original version for Mariner.
+-   License verified.

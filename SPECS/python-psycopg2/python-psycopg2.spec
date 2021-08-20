@@ -119,15 +119,20 @@ rm -r /home/postgres/data &>/dev/null ||:
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7.5-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7.5-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 2.7.5-2
--   Consuming postgresql 10.5 version
-*   Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 2.7.5-1
--   Update to version 2.7.5
-*   Wed Aug 09 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.1-3
--   Fixed make check errors
-*   Thu Jul 6 2017 Divya Thaluru <dthaluru@vmware.com> 2.7.1-2
--   Added build requires on postgresql-devel
-*   Wed Apr 26 2017 Xialin Li <xiaolinl@vmware.com> 2.7.1-1
--   Initial packaging for Photon
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7.5-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 2.7.5-2
+- Consuming postgresql 10.5 version
+
+* Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 2.7.5-1
+- Update to version 2.7.5
+
+* Wed Aug 09 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.1-3
+- Fixed make check errors
+
+* Thu Jul 6 2017 Divya Thaluru <dthaluru@vmware.com> 2.7.1-2
+- Added build requires on postgresql-devel
+
+* Wed Apr 26 2017 Xialin Li <xiaolinl@vmware.com> 2.7.1-1
+- Initial packaging for Photon

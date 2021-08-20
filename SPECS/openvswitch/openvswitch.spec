@@ -298,7 +298,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 * Mon Feb 22 2021 Emre Girgin <mrgirgin@microsoft.com> - 2.12.0-3
 - Fix CVE-2020-35498.
 
-*   Sat May 09 00:21:27 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
 -   Added %%license line automatically
 
 *   Tue Mar 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2.12.0-1

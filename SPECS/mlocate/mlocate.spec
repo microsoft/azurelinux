@@ -48,7 +48,7 @@ mv %{buildroot}/%{_mandir}/man1/locate.1 %{buildroot}/%{_mandir}/man1/%{name}.1
 %{_localstatedir}/*
 
 %changelog
-* Sat May 09 00:20:54 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.26-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.26-4
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.26-3

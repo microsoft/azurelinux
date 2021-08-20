@@ -1,13 +1,14 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
 Version:        4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 3-Clause
 URL:            https://github.com/tpm2-software/tpm2-tools
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-3565.patch
 BuildRequires:  openssl-devel
 BuildRequires:  curl-devel
 BuildRequires:  tpm2-tss-devel >= 2.3.0
@@ -18,7 +19,7 @@ Requires:       /bin/awk
 The source repository for the TPM (Trusted Platform Module) 2 tools
 
 %prep
-%setup -q
+%autosetup -p1
 %build
 %configure \
     --disable-static
@@ -37,6 +38,9 @@ make DESTDIR=%{buildroot} install
 %{_datarootdir}/bash-completion/completions/tss2_*
 
 %changelog
+*   Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2-2
+-   CVE-2021-3565 fix
+
 *   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2-1
 -   Update to 4.2.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.4-2

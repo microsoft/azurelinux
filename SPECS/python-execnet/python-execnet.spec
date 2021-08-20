@@ -6,10 +6,10 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/e/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
@@ -56,7 +56,7 @@ python3 setup.py install --root=%{buildroot}
 %if %{with check}
 %check
 pip3 install tox
-tox
+LANG=en_US.UTF-8 tox -e py37
 %endif
 
 %files -n python3-%{pkgname}
@@ -65,5 +65,9 @@ tox
 %{python3_sitelib}/*
 
 %changelog
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 0.3.5-1
-- Original CBL-Mariner version
+* Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> 1.7.1-2
+- Fix check tests
+
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.1-1
+- Original version for CBL-Mariner
+- License verified

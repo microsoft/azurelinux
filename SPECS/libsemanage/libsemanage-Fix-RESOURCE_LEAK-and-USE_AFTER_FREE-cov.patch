@@ -1,0 +1,65 @@
+From dc105dcb5e34e256bcbcf547fea590cfcee06933 Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <plautrba@redhat.com>
+Date: Wed, 7 Nov 2018 18:17:34 +0100
+Subject: [PATCH] libsemanage: Fix RESOURCE_LEAK and USE_AFTER_FREE coverity
+ scan defects
+
+---
+ libsemanage/src/direct_api.c | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
+
+diff --git a/libsemanage/src/direct_api.c b/libsemanage/src/direct_api.c
+index 9a4e79385b69..393ec9faf92d 100644
+--- a/libsemanage/src/direct_api.c
++++ b/libsemanage/src/direct_api.c
+@@ -1028,7 +1028,7 @@ static int semanage_direct_write_langext(semanage_handle_t *sh,
+ 
+ 	fp = NULL;
+ 
+-	ret = 0;
++	return 0;
+ 
+ cleanup:
+ 	if (fp != NULL) fclose(fp);
+@@ -2185,7 +2185,6 @@ cleanup:
+ 	semanage_module_info_destroy(sh, modinfo);
+ 	free(modinfo);
+ 
+-	if (fp != NULL) fclose(fp);
+ 	return status;
+ }
+ 
+@@ -2350,16 +2349,6 @@ static int semanage_direct_get_module_info(semanage_handle_t *sh,
+ 	free(tmp);
+ 	tmp = NULL;
+ 
+-	if (fclose(fp) != 0) {
+-		ERR(sh,
+-		    "Unable to close %s module lang ext file.",
+-		    (*modinfo)->name);
+-		status = -1;
+-		goto cleanup;
+-	}
+-
+-	fp = NULL;
+-
+ 	/* lookup enabled/disabled status */
+ 	ret = semanage_module_get_path(sh,
+ 				       *modinfo,
+@@ -2403,7 +2392,13 @@ cleanup:
+ 		free(modinfos);
+ 	}
+ 
+-	if (fp != NULL) fclose(fp);
++	if (fp != NULL && fclose(fp) != 0) {
++		ERR(sh,
++		    "Unable to close %s module lang ext file.",
++		    (*modinfo)->name);
++		status = -1;
++	}
++
+ 	return status;
+ }
+ 
+-- 
+2.32.0

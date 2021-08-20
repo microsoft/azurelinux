@@ -1,18 +1,14 @@
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.9.10
-Release:        8%{?dist}
+Version:        2.9.12
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/General Libraries
 URL:            http://www.xmlsoft.org/
 Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
-Patch0:         CVE-2019-20388.patch
-Patch1:         CVE-2020-7595.patch
-Patch2:         CVE-2020-24977.patch
 BuildRequires:  python3-devel
-Provides:       pkgconfig(libxml-2.0) = %{version}-%{release}
 Provides:       %{name}-tools = %{version}-%{release}
 Provides:       libxml-tools = %{version}-%{release}
 
@@ -22,7 +18,7 @@ The libxml2 package contains libraries and utilities used for parsing XML files.
 %package -n     python3-libxml2
 Summary:        Python 3 bindings for libxml2.
 Group:          Development/Libraries
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 Requires:       python3-xml
 Provides:       %{name}-python3 = %{version}-%{release}
@@ -32,7 +28,7 @@ Python3 libxml2.
 
 %package devel
 Summary:        Libraries and header files for libxml
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description devel
@@ -44,30 +40,19 @@ Static libraries and header files for the support library for libxml
 %build
 %configure \
     --disable-static \
-    --with-history
-make %{?_smp_mflags}
+    --with-history \
+    --with-python=%{python3}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-make clean
-%configure \
-    --disable-static \
-    --with-python=%{_bindir}/python3
-make %{?_smp_mflags}
-make install DESTDIR=%{buildroot}
-
 %check
-make PYTHON_SUBDIR="" runtests
+%make_build PYTHON_SUBDIR="" runtests
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -92,6 +77,14 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Aug 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.12-2
+- Revert re-addition of python2 dependency from bad merge
+- Remove recompilation with python support during install step
+- Lint spec
+
+* Thu May 27 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.9.12-1
+- Update to version 2.9.12 to fix CVE-2021-3517, CVE-2021-3518 and CVE-2021-3537
+
 * Fri May 21 2021 Nick Samson <nisamson@microsoft.com> - 2.9.10-8
 - Added explicit requirement on python xml library
 - Remove requirement on python2
@@ -101,6 +94,9 @@ rm -rf %{buildroot}/*
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
 - anphel@microsoft.com, 2.9.10-4: Skip python tests which are known to be broken.
+
+* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.9.10-4
+- Skip python tests which are known to be broken.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-6
 - Provide libxml2-devel%%{?_isa}

@@ -37,7 +37,7 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/*.so.*
 
 %changelog
-* Sat May 09 00:21:33 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.23.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.23.0-4
 - Added %%license line automatically
 
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 2.23.0-3

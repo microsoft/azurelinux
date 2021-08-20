@@ -75,7 +75,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/libipset.pc
 
 %changelog
-* Sat May 09 00:20:42 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.1-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.1-2
 - Added %%license line automatically
 
 *   Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 7.1-1

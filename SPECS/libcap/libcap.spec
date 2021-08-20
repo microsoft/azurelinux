@@ -54,7 +54,7 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 09 00:21:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
 - Added %%license line automatically
 
 *   Mon Mar 16 2020 Andrew Phelps <anphel@microsoft.com> 2.26-1

@@ -59,7 +59,7 @@ chmod +x %{buildroot}/%{_libdir}/libtar.so.*
 %{_libdir}/libtar.la
 
 %changelog
-* Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.2.20-8
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.20-8
 - Added %%license line automatically
 
 *   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.2.20-7

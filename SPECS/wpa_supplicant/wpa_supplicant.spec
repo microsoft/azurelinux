@@ -112,7 +112,7 @@ EOF
 - Update version to 2.9.
 - Add patch for CVE-2019-16275.
 
-* Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.7-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7-4
 - Added %%license line automatically
 
 * Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.7-3

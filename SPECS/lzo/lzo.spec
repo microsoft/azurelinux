@@ -93,7 +93,7 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/lzo2.pc
 
 %changelog
-* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.10-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.10-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.10-2

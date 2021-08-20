@@ -64,7 +64,7 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 -   Update to version 1.9.0
 *   Tue May 12 2020 Paul Monson <paulmon@microsoft.com> 1.8.0-4
 -   Remove support for MD5, RIPEMD, BF, RC4, CAST, and DES
-*   Sat May 09 00:20:35 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.8.0-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.0-4
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.0-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).

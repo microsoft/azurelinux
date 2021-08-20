@@ -52,23 +52,23 @@ make %{?_smp_mflags} -k check
 * Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.15.0-3
 - Fix compilation by disabling -fstack-protector-strong
 
-*   Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.15.0-2
--   Added %%license line automaticall
+* Sat May 09 00:21:13 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.15.0-2
+- Added %%license line automaticall
 
-*   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 3.15.0-1
--   Update to 3.15.0. Fix Source0 URL. Removed patch fixed upstream. License verified.
+* Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 3.15.0-1
+- Update to 3.15.0. Fix Source0 URL. Removed patch fixed upstream. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.13.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.13.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> 3.13.0-1
--   Update to version 3.13.0
+* Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com> 3.13.0-1
+- Update to version 3.13.0
 
-*   Tue Sep 19 2017 Bo Gan <ganb@vmware.com> 3.12.0-2
--   Fix make check issue
+* Tue Sep 19 2017 Bo Gan <ganb@vmware.com> 3.12.0-2
+- Fix make check issue
 
-*   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 3.12.0-1
--   Updated to version 3.12.0.
+* Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 3.12.0-1
+- Updated to version 3.12.0.
 
-*   Fri Aug 05 2016 Kumar Kaushik <kaushikk@vmware.com> 3.11.0-1
--   Initial Build.
+* Fri Aug 05 2016 Kumar Kaushik <kaushikk@vmware.com> 3.11.0-1
+- Initial Build.

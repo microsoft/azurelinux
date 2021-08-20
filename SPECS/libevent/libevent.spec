@@ -59,7 +59,7 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/libevent_extra.pc
 
 %changelog
-* Sat May 09 00:21:17 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.1.8-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.1.8-3
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.8-2

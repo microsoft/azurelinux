@@ -5,7 +5,7 @@
 
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A Python interface to libcurl
 Group:          Development/Languages
 License:        LGPLv2+ or MIT
@@ -13,17 +13,20 @@ URL:            http://pycurl.sourceforge.net/
 Source0:        https://pypi.io/packages/source/p/pycurl/pycurl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Patch0:         skip-incompatible-libcurl-tests.patch
 BuildRequires:  openssl-devel
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  curl-devel
-
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 %if %{with_check}
-BuildRequires: python-setuptools, vsftpd, curl-libs
-BuildRequires: python3-setuptools, python3-xml
+BuildRequires:  python-setuptools
+BuildRequires:  vsftpd
+BuildRequires:  curl-libs
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
 %endif
 
 %description
@@ -60,6 +63,7 @@ Documentation and examples for pycurl
 
 %prep
 %setup -q -n pycurl-%{version}
+%patch0 -p1
 rm -f doc/*.xml_validity
 #chmod a-x examples/*
 
@@ -118,42 +122,63 @@ rm -rf %{buildroot}
 %doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+* Wed Jun 16 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-8
+- Add patch to fix libcurl package test issue 
+- (JOSLOBO: 7/26/21 Bumped dash verison due to merge conflict)
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-7
 - Update source URL
 
-*   Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
--   Disable unreliable multi_timer_test
-*   Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-5
--   Disable unreliable memory_mgmt_test
-*   Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-4
--   Fix check tests by setting PYCURL_SSL_LIBRARY and using specific bottle version.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 7.43.0.2-3
--   Added %%license line automatically
-*   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 7.43.0.2-2
--   Renaming pycurl to python-pycurl
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 7.43.0.2-1
--   Update to version 7.43.0.2. License verified. Remove fixed patch.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.43.0-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Nov 12 2018 Tapas Kundu <tkundu@vmware.com> 7.43.0-4
--   Fixed the make check.
-*   Mon Aug 14 2017 Chang Lee <changlee@vmware.com> 7.43.0-3
--   Added check requires and fixed check
-*   Wed May 31 2017 Dheeraj Shetty <dheerajs@vmware.com> 7.43.0-2
--   Using python2 explicitly while building
-*   Mon Apr 03 2017 Rongrong Qiu <rqiu@vmware.com> 7.43.0-1
--   Upgrade to 7.43.0  and add pycurl3
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 7.21.5-5
--   BuildRequires curl-devel.
-*   Mon Oct 10 2016 ChangLee <changlee@vmware.com> 7.21.5-4
--   Modified %check
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 7.21.5-3
--   GA - Bump release of all rpms
-*   Fri Apr 29 2016 Divya Thaluru <dthaluru@vmware.com> 7.21.5-2
--   Removing prebuilt binaries
-*   Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 7.21.5-1
--   Upgrade version
-*   Mon Jul 6 2015 Alexey Makhalov <amakhalov@vmware.com> 7.19.5.1-2
--   Added Doc subpackage. Removed chmod a-x for examples.
-*   Sat Jan 24 2015 Touseef Liaqat <tliaqat@vmware.com> 7.19.5.1
--   Initial build.  First version
+* Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6
+- Disable unreliable multi_timer_test
+
+* Wed Jan 20 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-5
+- Disable unreliable memory_mgmt_test
+
+* Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-4
+- Fix check tests by setting PYCURL_SSL_LIBRARY and using specific bottle version.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 7.43.0.2-3
+- Added %%license line automatically
+
+* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 7.43.0.2-2
+- Renaming pycurl to python-pycurl
+
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 7.43.0.2-1
+- Update to version 7.43.0.2. License verified. Remove fixed patch.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 7.43.0-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Nov 12 2018 Tapas Kundu <tkundu@vmware.com> 7.43.0-4
+- Fixed the make check.
+
+* Mon Aug 14 2017 Chang Lee <changlee@vmware.com> 7.43.0-3
+- Added check requires and fixed check
+
+* Wed May 31 2017 Dheeraj Shetty <dheerajs@vmware.com> 7.43.0-2
+- Using python2 explicitly while building
+
+* Mon Apr 03 2017 Rongrong Qiu <rqiu@vmware.com> 7.43.0-1
+- Upgrade to 7.43.0  and add pycurl3
+
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 7.21.5-5
+- BuildRequires curl-devel.
+
+* Mon Oct 10 2016 ChangLee <changlee@vmware.com> 7.21.5-4
+- Modified %check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 7.21.5-3
+- GA - Bump release of all rpms
+
+* Fri Apr 29 2016 Divya Thaluru <dthaluru@vmware.com> 7.21.5-2
+- Removing prebuilt binaries
+
+* Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 7.21.5-1
+- Upgrade version
+
+* Mon Jul 6 2015 Alexey Makhalov <amakhalov@vmware.com> 7.19.5.1-2
+- Added Doc subpackage. Removed chmod a-x for examples.
+
+* Sat Jan 24 2015 Touseef Liaqat <tliaqat@vmware.com> 7.19.5.1
+- Initial build.  First version

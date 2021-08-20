@@ -80,30 +80,31 @@ make %{?_smp_mflags} check
 %exclude /usr/share/info/
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.18.16-6
--   Add BuildRequires on perl.
-* Sat May 09 00:20:48 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.18.16-5
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.18.16-6
+- Add BuildRequires on perl.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.18.16-5
 - Added %%license line automatically
 
-*   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 5.18.16-4
--   Add compiler flags for GCC9 compatibility. License verified.
-*   Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 5.18.16-3
--   Exclude /usr/share/info from the RPM
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.18.16-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com>  5.18.16-1
--       Upgrade to 5.18.16
-*       Mon May 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 5.18.12-2
--       Adding Make Check
-*       Tue Apr 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 5.18.12-1
--       Updated version to 5.18.12
-*       Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.18.7-2
--       GA - Bump release of all rpms
-*       Wed Feb 24 2016 Kumar Kaushik <kaushikk@vmware.com> 5.18.7-1
--       Updated version tp 5.16.7.
-*       Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 5.18.6-1
--       Updated to version 5.18.6
-*       Tue Sep 29 2015 Xiaolin Li <xiaolinl@vmware.com> 5.18.5-2
--       Create a seperate libopts package.
-*       Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 5.18.5-1
--       Initial build. First version
+* Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 5.18.16-4
+- Add compiler flags for GCC9 compatibility. License verified.
+* Thu Feb 27 2020 Henry Beberman <hebeberm@microsoft.com> 5.18.16-3
+- Exclude /usr/share/info from the RPM
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.18.16-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Wed Sep 12 2018 Anish Swaminathan <anishs@vmware.com>  5.18.16-1
+- Upgrade to 5.18.16
+* Mon May 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 5.18.12-2
+- Adding Make Check
+* Tue Apr 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 5.18.12-1
+- Updated version to 5.18.12
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.18.7-2
+- GA - Bump release of all rpms
+* Wed Feb 24 2016 Kumar Kaushik <kaushikk@vmware.com> 5.18.7-1
+- Updated version tp 5.16.7.
+* Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 5.18.6-1
+- Updated to version 5.18.6
+* Tue Sep 29 2015 Xiaolin Li <xiaolinl@vmware.com> 5.18.5-2
+- Create a seperate libopts package.
+* Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 5.18.5-1
+- Initial build. First version

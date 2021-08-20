@@ -56,28 +56,39 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
--   Use new perl package names.
--   Provide perl(DBD::SQLite::*).
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.62-3
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.62-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 22 2019 Michelle Wang <michellew@vmware.com> 1.62-1
--   Update to version 1.62.
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.58-1
--   Update to version 1.58.
-*   Tue Feb 20 2018 Xiaolin Li <xiaolinl@vmware.com> 1.54-2
--   Build perl-DBD-SQLite with sqlite-autoconf-3.22.0.
-*   Mon Apr 3 2017 Robert Qi <qij@vmware.com> 1.54-1
--   Upgraded to 1.54.
-*   Wed Nov 16 2016 Alexey Makhalov <ppadmavilasom@vmware.com> 1.50-3
--   Use sqlite-devel as a BuildRequires.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.50-2
--   GA - Bump release of all rpms.
-*   Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.50-1
--   Upgraded to version 1.50.
-*   Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.48-1
--   Upgrade version.
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.46-1
--   Initial version.
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
+- Use new perl package names.
+- Provide perl(DBD::SQLite::*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.62-3
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.62-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 22 2019 Michelle Wang <michellew@vmware.com> 1.62-1
+- Update to version 1.62.
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.58-1
+- Update to version 1.58.
+
+* Tue Feb 20 2018 Xiaolin Li <xiaolinl@vmware.com> 1.54-2
+- Build perl-DBD-SQLite with sqlite-autoconf-3.22.0.
+
+* Mon Apr 3 2017 Robert Qi <qij@vmware.com> 1.54-1
+- Upgraded to 1.54.
+
+* Wed Nov 16 2016 Alexey Makhalov <ppadmavilasom@vmware.com> 1.50-3
+- Use sqlite-devel as a BuildRequires.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.50-2
+- GA - Bump release of all rpms.
+
+* Tue Feb 23 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.50-1
+- Upgraded to version 1.50.
+
+* Thu Jan 21 2016 Anish Swaminathan <anishs@vmware.com> 1.48-1
+- Upgrade version.
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.46-1
+- Initial version.

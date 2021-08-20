@@ -4,12 +4,11 @@ Version:        5.1
 Release:        3%{?dist}
 License:        Freely redistributable without restriction
 URL:            https://docbook.org/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       https://www.docbook.org/xml/%{version}/docbook-v%{version}-os.zip
 Source0:        %{name}-%{version}.zip
 Source1:        https://www.docbook.org/xml/5.0/docbook-5.0.zip
-Source2:        LICENSE
 
 Provides: docbook5-dtd = %{version}-%{release}
 Provides: docbook5-rng = %{version}-%{release}
@@ -36,7 +35,6 @@ developed by the OASIS consortium.
 %setup -c -T 
 mkdir 5.0
 mkdir 5.1
-mv %{SOURCE2} .
 
 #Unzip Docbook 5.0 specification
 cd 5.0
@@ -237,7 +235,7 @@ do
 done
 
 %install
-DOCBOOK5DIR=$RPM_BUILD_ROOT%{_datadir}/xml/docbook5
+DOCBOOK5DIR=%{buildroot}%{_datadir}/xml/docbook5
 for v in 5.0 5.1
 do
 mkdir -p ${DOCBOOK5DIR}/schema/rng/$v
@@ -249,13 +247,13 @@ mkdir -p ${DOCBOOK5DIR}/schema/dtd/5.0
 mkdir -p ${DOCBOOK5DIR}/schema/xsd/5.0
 install -m644 5.0/dtd/* ${DOCBOOK5DIR}/schema/dtd/5.0
 install -m644 5.0/xsd/* ${DOCBOOK5DIR}/schema/xsd/5.0
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -m755 %{version}/tools/db4-entities.pl $RPM_BUILD_ROOT%{_bindir}
+mkdir -p %{buildroot}%{_bindir}
+install -m755 %{version}/tools/db4-entities.pl %{buildroot}%{_bindir}
 mkdir -p ${DOCBOOK5DIR}/stylesheet/upgrade
 install -m644 %{version}/tools/db4-upgrade.xsl ${DOCBOOK5DIR}/stylesheet/upgrade
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/xml
-install -m644 docbook-5.xml $RPM_BUILD_ROOT%{_sysconfdir}/xml/docbook-5.xml
+mkdir -p %{buildroot}%{_sysconfdir}/xml
+install -m644 docbook-5.xml %{buildroot}%{_sysconfdir}/xml/docbook-5.xml
 
 %post
 ROOTCATALOG=%{_sysconfdir}/xml/catalog
@@ -315,7 +313,7 @@ if [ "$1" = 0 ]; then
 fi
 
 %files
-%license LICENSE
+%license 5.1/docbook-v5.1-os.html
 %doc docs/* README ChangeLog
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/xml/docbook-5.xml
 %dir %{_datadir}/xml/docbook5/
@@ -340,6 +338,7 @@ fi
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 5.1-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

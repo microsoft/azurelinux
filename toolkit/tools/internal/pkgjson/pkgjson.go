@@ -5,6 +5,7 @@ package pkgjson
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"microsoft.com/pkggen/internal/versioncompare"
@@ -13,14 +14,28 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 )
 
-var knownConditions = map[string]bool{
-	"":   true,
-	"=":  true,
-	"<":  true,
-	"<=": true,
-	">":  true,
-	">=": true,
-}
+const (
+	packageWithVersionNameIndex       = 1
+	packageWithVersionConditionIndex  = 2
+	packageWithVersionVersionIndex    = 3
+	packageWithVersionExpectedMatches = 4
+)
+
+var (
+	knownConditions = map[string]bool{
+		"":   true,
+		"=":  true,
+		"<":  true,
+		"<=": true,
+		">":  true,
+		">=": true,
+	}
+	// Regular expression to correctly split a string with the package name and an optional version constraint.
+	// Examples:
+	//	gcc ->       "gcc" "" ""
+	//	gcc=9.1.0 -> "gcc" "=" "1.9.0"
+	packageWithVersionRegex = regexp.MustCompile(`^\s*([^><=\s]+)\s*(?:((?:[<>]=)|(?:[<>=]))\s*([^<>=\s]+))?\s*$`)
+)
 
 // PackageRepo contains an array of SRPMs and relational dependencies
 type PackageRepo struct {
@@ -42,10 +57,6 @@ type PackageVerInterval struct {
 	UpperBound     *versioncompare.TolerantVersion // Upper bound on the range of valid versions
 	LowerInclusive bool                            // Does the lower bound actually include the indicated version (< vs <=)
 	UpperInclusive bool                            // Does the upper bound actually include the indicated version (< vs <=)
-}
-
-func (pkgVer *PackageVer) String() string {
-	return fmt.Sprintf("%s:C:'%s'V:'%s',C2:'%s'V2:'%s'", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
 }
 
 // Package is a representation of a package with name and version information
@@ -231,6 +242,30 @@ func (pkgVer *PackageVer) validatedIntervals() error {
 	}
 
 	return nil
+}
+
+// String prints the contents of the given PackageVer struct.
+func (pkgVer *PackageVer) String() string {
+	return fmt.Sprintf("%s:C:'%s'V:'%s',C2:'%s'V2:'%s'", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
+}
+
+// PackagesListEntryToPackageVer converts an entry from the packages list JSON into an instance of PackageVer.
+// The entries may contain only the name of the package or also include a single package version constraint.
+// Examples:
+//		- "gcc"
+//		- "gcc=9.1.0"
+func PackagesListEntryToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
+	matches := packageWithVersionRegex.FindStringSubmatch(packageString)
+	if len(matches) != packageWithVersionExpectedMatches {
+		err = fmt.Errorf("packages list entry \"%s\" does not match the '[name][optional_condition][optional_version]' format", packageString)
+		return
+	}
+
+	return &PackageVer{
+		Name:      matches[packageWithVersionNameIndex],
+		Condition: matches[packageWithVersionConditionIndex],
+		Version:   matches[packageWithVersionVersionIndex],
+	}, err
 }
 
 // String outputs an interval in interval notation

@@ -39,7 +39,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %exclude %{_libdir}/debug
 
 %changelog
-* Sat May 09 00:20:44 PST 2020 Nick Samson <nisamson@microsoft.com> - 22.0.7-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 22.0.7-2
 - Added %%license line automatically
 
 *   Thu Mar 19 2020 Henry Beberman <henry.beberman@microsoft.com> 22.0.7-1

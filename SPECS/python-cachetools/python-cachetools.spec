@@ -7,7 +7,7 @@ Version:        4.1.1
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/tkem/cachetools
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.python.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
@@ -44,4 +44,5 @@ python3 setup.py install --skip-build --root=%{buildroot}
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.20.1-1
-- Original CBL-Mariner version
+- Original version for CBL-Mariner
+- License verified

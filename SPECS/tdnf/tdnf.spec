@@ -226,7 +226,7 @@ find %{buildroot} -name '*.pyc' -delete
 - Upgrade to 2.1.0.
 - Add support for multiple gpgkeys in the .repo file.
 
-* Sat May 09 00:21:26 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 * Tue Apr 07 2020 Nicolas Ontiveros <niontive@microsoft.com> - 2.0.0-16

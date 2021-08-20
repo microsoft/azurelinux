@@ -1,13 +1,20 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-22898.patch
+Patch1:         CVE-2021-22901.patch
+Patch2:         CVE-2021-22897.patch
+Patch3:         CVE-2021-22922.nopatch
+Patch4:         CVE-2021-22923.nopatch
+Patch5:         CVE-2021-22924.patch
+Patch6:         CVE-2021-22925.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -15,11 +22,6 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
-%if %{with_check}
-BuildRequires:  python3
-BuildRequires:  shadow-utils
-BuildRequires:  sudo
-%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -49,6 +51,10 @@ This package contains minimal set of shared curl libraries.
 %autosetup -p1
 
 %build
+# CVE-2021-22922 and CVE-2021-22923 are vulnerabilities when curl's metalink
+# feature. We do not build with "--with-libmetalink" option and are therefore
+# not affected by these CVEs, but I am placing this comment here as a reminder
+# to leave metalink disabled.
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -67,12 +73,6 @@ make DESTDIR=%{buildroot} install
 install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
-
-%check
-chmod g+w . -R
-useradd test -G root -m
-
-sudo -u test make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -100,7 +100,19 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-2
+* Wed Jul 21 2021 Chris Co <chrco@microsoft.com> - 7.76.0-5
+- Address CVE-2021-22922, CVE-2021-22923, CVE-2021-22924, CVE-2021-22925
+
+* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.76.0-4
+- CVE-2021-22897 fix
+
+* Fri May 28 2021 Daniel Burgener <daburgen@microsoft.com> - 7.76.0-3
+- Disable check to remove circular dependency
+
+* Wed May 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 7.76.0-2 (from 1.0 branch)
+- Patch 7.76.0 to fix CVE-2021-22898 and CVE-2021-22901.
+
+* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-2 (from dev branch)
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 7.68.0-2: Add explicit provides for libcurl and libcurl-devel
 
@@ -133,7 +145,7 @@ rm -rf %{buildroot}/*
 *   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 7.66.0-1
 -   Upgrade to version 7.66.0, which fixes CVE-2018-16890 and CVE-2019-3822/3833.
 
-*   Sat May 09 00:21:39 PST 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.61.1-6
 -   Added %%license line automatically
 
 *   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.61.1-5

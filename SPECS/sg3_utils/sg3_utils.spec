@@ -61,20 +61,20 @@ install -m 755 scripts/rescan-scsi-bus.sh %{buildroot}/%{_bindir}
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.44-2
 - Added %%license line automatically
 
-*   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.44-1
--   Update to 1.44. Removed ctr patch (fixed upstream). Fix URL. Fix Source0 URL. License verified.
+* Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.44-1
+- Update to 1.44. Removed ctr patch (fixed upstream). Fix URL. Fix Source0 URL. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.43-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.43-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Sep 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.43-2
--   Fix compilation issue against glibc-2.28
+* Mon Sep 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.43-2
+- Fix compilation issue against glibc-2.28
 
-*   Tue Oct 03 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.43-1
--   Update to v1.43
+* Tue Oct 03 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.43-1
+- Update to v1.43
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.42-2
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.42-2
+- GA - Bump release of all rpms
 
 *   Thu Apr 14 2016 Kumar Kaushik <kaushikk@vmware.com> 1.42-1
 -   Initial build. First version

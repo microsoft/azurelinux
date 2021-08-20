@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 - Add openssl to BR
 - Disable OpenSSL NIST192 tests since OpenSSL no longer supports NIST192 EC.
 
-* Sat May 09 00:21:04 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.13.3-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.13.3-3
 - Added %%license line automatically
 
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 0.13.3-2

@@ -46,7 +46,7 @@ rm -rf %{buildroot}
 %changelog
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 5.8-5
 -   Add patch to fix format-security errors.
-*   Sat May 09 00:20:47 PST 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.8-4
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.8-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).

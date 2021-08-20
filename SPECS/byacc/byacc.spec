@@ -5,8 +5,8 @@ Name:         byacc
 Version:      1.9.%{byaccdate}
 Release:      3%{?dist}
 License:      Public Domain
-URL:          http://invisible-island.net/byacc/byacc.html
-Vendor:       Microsoft
+URL:          https://invisible-island.net/byacc/byacc.html
+Vendor:       Microsoft Corporation
 Distribution: Mariner
 #Source0:     https://invisible-mirror.net/archives/%{name}/%{name}-%{byaccdate}.tgz
 Source0:      %{name}-%{version}.tar.gz 
@@ -56,6 +56,7 @@ echo ====================TESTING END=====================
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.9.20200330-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.20200330-3
 - Second attempt - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

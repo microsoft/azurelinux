@@ -31,7 +31,7 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 %{_datadir}/dstat/
 
 %changelog
-* Sat May 09 00:21:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.7.4-2
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.4-2
 - Added %%license line automatically
 
 *   Mon Apr 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.7.4-1

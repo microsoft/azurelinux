@@ -5,7 +5,7 @@ Summary:        Docutils -- Python Documentation Utilities.
 Name:           python-docutils
 Version:        0.14
 Release:        4%{?dist}
-License:        Public Domain, Python, BSD, GPLv3
+License:        Public Domain, PSF-2.0, BSD, GPLv3
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,12 +137,13 @@ popd
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.14-4
 - Follow the Fedora convention of providing a suffix-less binary name
+- License verified
 
-* Sat May 09 00:21:15 PST 2020 Nick Samson <nisamson@microsoft.com> - 0.14-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.14-3
 - Added %%license line automatically
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.14-2
-- Initial import from Photon (license: dual Apache2/GPL2).
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
 * Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 0.14-1
 - Update to version 0.14
