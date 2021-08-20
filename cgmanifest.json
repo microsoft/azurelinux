@@ -804,6 +804,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "coredns",
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "coreutils",
           "version": "8.30",
           "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
