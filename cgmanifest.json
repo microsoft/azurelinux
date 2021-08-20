@@ -836,7 +836,7 @@
         "other": {
           "name": "conmon",
           "version": "2.0.29",
-          "downloadUrl": "hhttps://github.com/containers/conmon/archive/v2.0.29.tar.gz"
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
         }
       }
     },
