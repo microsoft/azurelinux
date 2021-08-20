@@ -17,21 +17,19 @@
 
 # commonver - version from containers/common
 %define commonver 0.14.6
-
 # podman - version from containers/podman
 %define podmanver 2.0.3
-
 # storagever - version from containers/storage
 %define storagever 1.20.2
-
 # imagever - version from containers/image
 %define imagever 5.5.1
-
+Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20200727
 Release:        2%{?dist}
-Summary:        Configuration files common to github.com/containers
-License:        Apache-2.0 and GPL-3.0+
+License:        Apache-2.0 AND GPL-3.0+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System/Management
 URL:            https://github.com/containers
 #Source0:       https://github.com/containers/image/archive/v5.5.1.tar.gz
@@ -50,12 +48,12 @@ Source8:        default.yaml
 Source9:        common-%{commonver}.tar.gz
 Source10:       containers.conf
 BuildRequires:  go-go-md2man
+Requires(post): grep
+Requires(post): util-linux
 Provides:       libcontainers-image
 Provides:       libcontainers-storage
 Obsoletes:      libcontainers-image
 Obsoletes:      libcontainers-storage
-Requires(post): util-linux
-Requires(post): grep
 BuildArch:      noarch
 
 %description
@@ -94,7 +92,7 @@ rename '.md' '.1' docs/*
 cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
-go-md2man -in docs/source/markdown/containers-mounts.conf.5.md -out docs/source/markdown/containers-mounts.conf.5 
+go-md2man -in docs/source/markdown/containers-mounts.conf.5.md -out docs/source/markdown/containers-mounts.conf.5
 go-md2man -in pkg/hooks/docs/oci-hooks.5.md -out pkg/hooks/docs/oci-hooks.5
 cd ..
 
@@ -134,7 +132,7 @@ install -D -m 0644 common-%{commonver}/docs/containers.conf.5 %{buildroot}/%{_ma
 # If installing, check if /var/lib/containers (or /var/lib in its defect) is btrfs and set driver
 # to "btrfs" if true
 if [ $1 -eq 1 ] ; then
-  fstype=$((findmnt -o FSTYPE -l --target /var/lib/containers || findmnt -o FSTYPE -l --target /var/lib) | grep -v FSTYPE)
+  fstype=$((findmnt -o FSTYPE -l --target %{_sharedstatedir}/containers || findmnt -o FSTYPE -l --target %{_var}/lib) | grep -v FSTYPE)
   if [ "$fstype" = "btrfs" ]; then
     sed -i 's/driver = ""/driver = "btrfs"/g' %{_sysconfdir}/containers/storage.conf
   fi
@@ -164,13 +162,14 @@ fi
 %license LICENSE
 
 %changelog
-* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> 20200727-2
+* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 20200727-2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
 - Remove {?ext_man}, which is not supported in CBL-Mariner
 
 * Mon Aug  3 2020 Callum Farmer <callumjfarmer13@gmail.com>
 - Fixes for %%_libexecdir changing to /usr/libexec (bsc#1174075)
+
 * Tue Jul 28 2020 Ralf Haferkamp <rhafer@suse.com>
 - Added containers/common tarball for containers.conf(5) man page
 - Install containers.conf default configuration in
@@ -186,12 +185,14 @@ fi
   - update document login see config.json as valid
 - Update storage to 1.20.2
   - Add back skip_mount_home
+
 * Fri Jun 19 2020 Ralf Haferkamp <rhafer@suse.com>
 - Remove remaining difference between SLE and openSUSE package and
   ship the some mounts.conf default configuration on both platforms.
   As the sources for the mount point do not exist on openSUSE by
   default this config will basically have no effect on openSUSE.
   (jsc#SLE-12122, bsc#1175821)
+
 * Wed Jun  3 2020 Ralf Haferkamp <rhafer@suse.com>
 - Update to image 5.4.4
   - Remove registries.conf VERSION 2 references from man page
@@ -211,8 +212,10 @@ fi
 - Remove the /var/lib/ca-certificates/pem/SUSE.pem workaround again.
   It never ended up in SLES and a different way to fix the underlying
   problem is being worked on.
+
 * Wed May 13 2020 Richard Brown <rbrown@suse.com>
 - Add registry.opensuse.org as default registry [bsc#1171578]
+
 * Fri Apr 24 2020 Ralf Haferkamp <rhafer@suse.com>
 - Add /var/lib/ca-certificates/pem/SUSE.pem to the SLES mounts.
   This for making container-suseconnect working in the public
@@ -220,6 +223,7 @@ fi
   verify the server certificates of the RMT servers hosted
   in the public cloud.
   (https://github.com/SUSE/container-suseconnect/issues/41)
+
 * Fri Mar  6 2020 Ralf Haferkamp <rhafer@suse.com>
 - New snaphot (bsc#1165917)
 - Update to image 5.2.1
@@ -231,6 +235,7 @@ fi
 - Update to storage 1.16.1
   * Add `rootless_storage_path` directive to storage.conf
   * Add better documentation for the mount_program in overlay driver
+
 * Wed Dec 11 2019 Richard Brown <rbrown@suse.com>
 - Update to image 5.0.0
   - Clean up various imports primarily so that imports of packages that aren't in the standard library are all in one section.
@@ -250,6 +255,7 @@ fi
   - overlay: allow storing images with more than 127 layers
   - Lazy initialize the layer store
   - tarlogger: drop state mutex
+
 * Wed Oct  2 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to image 4.0.0
   - Add http response to log
@@ -282,6 +288,7 @@ fi
 - Update to libpod 1.6.0
   - Nothing changed regarding the OCI hooks documentation provided by this
     package
+
 * Mon Sep 23 2019 Richard Brown <rbrown@suse.com>
 - Update to image 1.4.4
   - Hard-code the kernel keyring use to be disabled for now
@@ -290,13 +297,17 @@ fi
   - Minor bugfixes
 - Update to storage 1.12.16
   - Ignore ro mount options in btrfs and windows drivers
+
 * Mon Sep 23 2019 Richard Brown <rbrown@suse.com>
 - Check /var/lib/containers if possible before setting btrfs backend (bsc#1151028)
+
 * Wed Aug  7 2019 Sascha Grunert <sgrunert@suse.com>
 - Add missing licenses to spec file
+
 * Tue Aug  6 2019 Marco Vedovati <mvedovati@suse.com>
 - Add a default registries.d configuration file, used to specify images
   signatures storage location.
+
 * Fri Aug  2 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to image v3.0.0
   - Add "Env" to ImageInspectInfo
@@ -348,6 +359,7 @@ fi
   - overlay: fix small piece of repeated work
   - utils: fix check for missing conf file
   - zstd: use github.com/klauspost/compress directly
+
 * Mon Jul  8 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to libpod v1.4.4
   - Fixed a bug where rootless Podman would attempt to use the
@@ -441,6 +453,7 @@ fi
   - compression: add support for the zstd algorithm
   - overlay: cache the results of
     supported/using-metacopy/use-naive-diff feature tests
+
 * Tue Jun 11 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to libpod v1.4.0
   - The podman checkpoint and podman restore commands can now be
@@ -544,8 +557,10 @@ fi
   - add digest locks
   - drivers/copy: add a non-cgo fallback
 - Add default SLES mounts for container-suseconnect usage
+
 * Tue Jun  4 2019 Richard Brown <rbrown@suse.com>
 - Add util-linux and grep as Requires(post) to ensure btrfs config gets made correctly
+
 * Mon Apr  1 2019 Richard Brown <rbrown@suse.com>
 - Update to libpod v1.2.0
   * Rootless Podman can now be used with a single UID and GID, without requiring a full 65536 UIDs/GIDs to be allocated in /etc/subuid and /etc/subgid
@@ -556,10 +571,12 @@ fi
   * Move pkg/util default storage functions from libpod to containers/storage
   * containers/storage no longer depends on containers/image
 - Version 20190401
+
 * Wed Feb 27 2019 Richard Brown <rbrown@suse.com>
 - Update to libpod v1.1.0
   * Rootless Podman can now forward ports into containers (using the same -p and -P flags as root Podman)
   * Rootless Podman will now pull some configuration options (for example, OCI runtime path) from the default root libpod.conf if they are not explicitly set in the user's own libpod.conf
+
 * Tue Feb 19 2019 Richard Brown <rbrown@suse.com>
 - Upgrade to storage v1.10
   * enable parallel blob reads
@@ -568,8 +585,10 @@ fi
 - Upgrade to libpod v1.0.1
   * Do not unmarshal into c.config.Spec
   * spec: add nosuid,noexec,nodev to ro bind mount
+
 * Sat Feb  2 2019 Richard Brown <rbrown@suse.com>
 - Restore non-upstream storage.conf, needed by CRI-O
+
 * Fri Jan 25 2019 Richard Brown <rbrown@suse.com>
 - Upgrade to storage v1.8
   * Check for the OS when setting btrfs/libdm/ostree tags
@@ -581,35 +600,45 @@ fi
 - Remove non-upstream storage.conf
 - Set btrfs as default driver if /var/lib is on btrfs [boo#1123119]
 - Version 20190125
+
 * Thu Jan 17 2019 Richard Brown <rbrown@suse.com>
 - Upgrade to storage v1.6
   * Remove private mount from zfs driver
   * Update zfs driver to be closer to moby driver
   * Use mount options when mounting the chown layer.
+
 * Sun Jan 13 2019 Richard Brown <rbrown@suse.com>
 - Upgrade to libpod v1.0.0
   * Fixed a bug where storage.conf was sometimes ignored for rootless containers
+
 * Tue Jan  8 2019 Richard Brown <rbrown@suse.com>
 - Upgrade to libpod v0.12.1.2 and storage v1.4
   * No significant functional or packaging changes
+
 * Sun Jan  6 2019 Richard Brown <rbrown@suse.com>
 - storage.conf - restore btrfs as the default driver
+
 * Fri Dec  7 2018 Richard Brown <rbrown@suse.com>
 - Update to latest libpod and storage to support cri-o 1.13
+
 * Wed Dec  5 2018 Richard Brown <rbrown@suse.com>
 - Use seccomp.json from github.com/containers/libpod, instead of
   installing the tar.xz on users systems (boo#1118444)
+
 * Mon Nov 12 2018 Valentin Rothberg <vrothberg@suse.com>
 - Add oci-hooks(5) manpage from libpod.
+
 * Mon Nov 12 2018 Valentin Rothberg <vrothberg@suse.com>
 - Use seccomp.json from github.com/containers/libpod to align with the
   upstream defaults.
 - Update to the latest image and storage to pull in improvements to the
   manpages.
+
 * Mon Aug 27 2018 vrothberg@suse.com
 - storage.conf: comment out options that are not supported by btrfs.
   This simplifies switching the driver as it avoids the whack-a-mole
   of commenting out "unsupported" options.
+
 * Mon Aug 27 2018 vrothberg@suse.com
 - Consolidate libcontainers-{common,image,storage} into one package,
   libcontainers-common. That's the way upstream intended all libraries from
@@ -618,17 +647,21 @@ fi
   Note that the `storage` binary that previously has been provided by the
   libcontainers-storage package is not provided anymore as, despite the claims
   in the manpages, it is not intended for production use.
+
 * Mon Aug 13 2018 vrothberg@suse.com
 - Make libcontainers-common arch independent.
 - Add LICENSE.
+
 * Thu Apr 12 2018 fcastelli@suse.com
 - Added /usr/share/containers/oci/hooks.d and /etc/containers/oci/hooks.d
   to the package. These are used by tools like cri-o and podman to store
   custom hooks.
+
 * Mon Mar  5 2018 vrothberg@suse.com
 - Configuration files should generally be tagged as %%config(noreplace) in order
   to keep the modified config files and to avoid losing data when the package
   is being updated.
   feature#crio
+
 * Thu Feb  8 2018 vrothberg@suse.com
 - Add libcontainers-common package.

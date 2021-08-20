@@ -1,32 +1,30 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global with_debug 1
 %global with_check 0
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package %{nil}
 %endif
-
-Name: conmon
-Version: 2.0.29
-Release: 3%{?dist}
-Summary: OCI container runtime monitor
-License: ASL 2.0
-URL: https://github.com/containers/conmon
+Summary:        OCI container runtime monitor
+Name:           conmon
+Version:        2.0.29
+Release:        3%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/containers/conmon
 #Source0: https://github.com/containers/conmon/archive/v%{version}.tar.gz
-Source0: %{name}-%{version}.tar.gz
-BuildRequires: gcc
-BuildRequires: git
-BuildRequires: glib2-devel
-BuildRequires: go-md2man
-BuildRequires: systemd-devel
-BuildRequires: systemd-libs
-BuildRequires: make
-Requires: glib2
-Requires: systemd-libs
+Source0:        %{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  go-md2man
+BuildRequires:  make
+BuildRequires:  systemd-devel
+BuildRequires:  systemd-libs
+Requires:       glib2
+Requires:       systemd-libs
 
 %description
 %{summary}.
@@ -35,11 +33,11 @@ Requires: systemd-libs
 %autosetup -Sgit -n %{name}-%{version}
 
 %build
-%{__make} GOMD2MAN=go-md2man DEBUGFLAG="-g" bin/conmon
-%{__make} GOMD2MAN=go-md2man -C docs
+make GOMD2MAN=go-md2man DEBUGFLAG="-g" bin/conmon
+make GOMD2MAN=go-md2man -C docs
 
 %install
-%{__make} PREFIX=%{buildroot}%{_prefix} install install.crio
+make PREFIX=%{buildroot}%{_prefix} install install.crio
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
@@ -53,7 +51,7 @@ Requires: systemd-libs
 %dir %{_libexecdir}/crio
 
 %changelog
-* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> 2.0.29-3
+* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 2.0.29-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
 - Remove epoch

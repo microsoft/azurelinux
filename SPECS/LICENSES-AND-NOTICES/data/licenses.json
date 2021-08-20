@@ -293,8 +293,8 @@
                 "envoy",
                 "golang-packaging",
                 "jna",
-                "libcontainers-common",
-                "kured"
+                "kured",
+                "libcontainers-common"
             ]
         },
         {

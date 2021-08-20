@@ -16,22 +16,21 @@
 #
 
 
+%define debug_package %{nil}
+%define project github.com/cri-o/cri-o
 #Compat macro for new _fillupdir macro introduced in Nov 2017
 %if ! %{defined _fillupdir}
-  %define _fillupdir /var/adm/fillup-templates
+  %define _fillupdir %{_var}/adm/fillup-templates
 %endif
-
-%define debug_package %{nil}
-
-%define project github.com/cri-o/cri-o
+Summary:        OCI-based implementation of Kubernetes Container Runtime Interface
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.21.2
 Release:        2%{?dist}
-Summary:        OCI-based implementation of Kubernetes Container Runtime Interface
 License:        Apache-2.0
-Url:            https://github.com/cri-o/cri-o
-ExcludeArch:    i586
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/cri-o/cri-o
 #Source0:       https://github.com/%{name}/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -53,29 +52,30 @@ Source3:        sysconfig.crio
 Source4:        crio.conf
 Source5:        cri-o-rpmlintrc
 Source6:        kubelet.env
+BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
 BuildRequires:  glib2-devel
 BuildRequires:  glibc-devel
+BuildRequires:  golang
 BuildRequires:  golang-packaging
+BuildRequires:  gpgme-devel
 BuildRequires:  libapparmor-devel
 BuildRequires:  libassuan-devel
-BuildRequires:  btrfs-progs-devel
-BuildRequires:  gpgme-devel
 BuildRequires:  libseccomp-devel
-BuildRequires:  golang
 BuildRequires:  sed
-Requires:       conntrack-tools
 Requires:       cni
 Requires:       cni-plugins
+Requires:       conmon
+Requires:       conntrack-tools
 Requires:       iproute
 Requires:       iptables
 Requires:       libcontainers-common >= 0.0.1
 Requires:       moby-runc
-Requires:       conmon
 Suggests:       katacontainers
 # Provide generic cri-runtime dependency (needed by kubernetes)
 Provides:       cri-runtime
+ExcludeArch:    i586
 
 %description
 CRI-O provides an integration path between OCI conformant runtimes
@@ -88,8 +88,8 @@ Summary:        CRI-O container runtime configuration for kubeadm
 Requires:       kubernetes-kubeadm-provider
 Requires(post): %fillup_prereq
 Supplements:    cri-o
-Provides:       kubernetes-kubeadm-criconfig
 Conflicts:      docker-kubic-kubeadm-criconfig
+Provides:       kubernetes-kubeadm-criconfig
 
 %description kubeadm-criconfig
 This package provides the CRI-O container runtime configuration for kubeadm
@@ -203,10 +203,10 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
-* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> 1.21.2-2
+* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 1.21.2-2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
-- Use prebuilt go vendor source 
+- Use prebuilt go vendor source
 - Use mariner packages as build/runtime requirements
 - Remove macros that are not supported in CBL-Mariner
 - Remove patterns-base-apparmor from Requires
@@ -303,6 +303,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * runtimeVM: Use containerd/cgroups for metrics
   * runtimeVM: Move metricsToCtrStats() around
   * runtimeVM: Vendor typeurl instead of maintain our own copy
+
 * Thu Apr 15 2021 alexandre.vicenzi@suse.com
 - Update to version 1.21.0:
   * bump to v1.21.0
@@ -538,6 +539,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * test/devices.bats: skip earlier
   * Bandwidht CNI plugin reserved an upper limit on burst,in which banned include boundary. See: https://github.com/containernetworking/plugins/blob/v0.8.7/plugins/meta/bandwidth/main.go#L113
 - Drop config-fix-tz.patch as upstream dependency was patched
+
 * Fri Apr  9 2021 alexandre.vicenzi@suse.com
 - Update to version 1.20.2:
   * bump to latest c/storage 1.24 branch
@@ -551,6 +553,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * [PATCH 8/9] restore irqbalance config only on system restart
 - Add vendor.tar.gz to avoid dependency downloads
 - Add config-fix-tz.patch to fix crio validation error while building
+
 * Fri Jan  8 2021 rbrown@suse.com
 - Update to version 1.19.1:
   * bump to v1.19.1
@@ -573,6 +576,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * test/config: fix shellcheck warning
   * test/config: fix "config dir should fail with invalid option"
   * server: cleanup container in runtime after failed creation
+
 * Tue Sep 15 2020 Sascha Grunert <sgrunert@suse.com>
 - API Change
   - CRI-O now manages namespace lifecycles by default
@@ -688,11 +692,14 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
     reflect cri-tools v1.19.0 changes
 - Dependency-Change
   - Compile with go 1.15
+
 * Sun Aug  2 2020 Callum Farmer <callumjfarmer13@gmail.com>
 - Fixes for %%_libexecdir changing to /usr/libexec (bsc#1174075)
+
 * Tue Jul 28 2020 Fabian Vogt <fvogt@suse.com>
 - Suggest katacontainers instead of recommending it. It's not
   enabled by default, so it's just bloat
+
 * Mon Jul 20 2020 Sascha Grunert <sgrunert@suse.com>
 - Update to version 1.18.3:
   - Fix a bug where a sudden reboot causes incomplete image writes.
@@ -703,6 +710,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   - If conmon is v2.0.19 or greater, ExecSync requests will not
     double fork, causing systemd to have fewer conmons re-parented
     to it
+
 * Thu Jun 18 2020 dmueller@suse.com
 - Update to version 1.18.2:
   * Bump version to v1.18.2
@@ -712,6 +720,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Add info logs for image pull and status CRI calls
   * managed_ns: deflake tests
   * bump containers image to 5.4.4  (fixes gh#containers/image/issues/898)
+
 * Mon May 18 2020 sgrunert@suse.com
 - Update to version 1.18.1:
   - Feature
@@ -734,11 +743,14 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   - Removed crio-wipe.service and crio-shutdown.service systemd
     units from the static bundle since they are not required
   - Fix some crio version oddities
+
 * Wed Apr 29 2020 Sascha Grunert <sgrunert@suse.com>
 - Remove the `go >= 1.13` build requirement
+
 * Mon Apr 27 2020 Ralf Haferkamp <rhafer@suse.com>
 - Restore calls to %%service_* macros that were accidently removed
   with the last change
+
 * Thu Apr 23 2020 Sascha Grunert <sgrunert@suse.com>
 - Remove crio-wipe.service and crio-shutdown.service
 - Update to version 1.18.0:
@@ -823,10 +835,13 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   - Return grpc code NotFound when we can't find a container or
     pod
   - Systemd unit file: drop crio-wipe.service as a requirement
+
 * Thu Apr 16 2020 Richard Brown <rbrown@suse.com>
 - criconfig: Require kubernetes-kubeadm-provider to be compatable with multi-version kubernetes packaging
+
 * Thu Apr 16 2020 Michal Jura <mjura@suse.com>
 - Update apparmor_profile with current cri-o version, bsc#1161056
+
 * Fri Apr 10 2020 Michal Jura <mjura@suse.com>
 - Update to version 1.17.3:
   * Bump version to 1.17.3
@@ -839,8 +854,10 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Add the -d flag when installing runc for circle ci
   * Add the mounts that are required by systemd
   * bump to 1.17.2
+
 * Fri Mar 27 2020 Richard Brown <rbrown@suse.com>
 - Use new pause:3.2 image
+
 * Mon Mar 16 2020 Sascha Grunert <sgrunert@suse.com>
 - Update to v1.17.1:
   * Drop conmonmon
@@ -852,12 +869,15 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * exec: Close pipe fds to prevent hangs
   * Unwrap errors from label.Relabel() before checking for ENOTSUP
   * oci: Handle timeouts correctly for probes
+
 * Mon Feb 10 2020 Sascha Grunert <sgrunert@suse.com>
 - Put default configuration in /etc/crio/crio.conf.d/00-default.conf
   in replacement for /etc/crio/crio.conf
+
 * Mon Feb 10 2020 Sascha Grunert <sgrunert@suse.com>
 - Uncomment default apparmor profile to always fallback to the
   default one
+
 * Mon Feb 10 2020 Sascha Grunert <sgrunert@suse.com>
 - Remove prevent-local-loopback-teardown-rh1754154.patch which is
   now included in upstream
@@ -881,28 +901,36 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   - Add disk usage for ListContainerStats
   - Introduce new runtime field to restrict devices in privileged
     mode
+
 * Sat Jan 18 2020 Sascha Grunert <sgrunert@suse.com>
 - Fix invalid apparmor profile (bsc#1161179)
+
 * Thu Jan 16 2020 Sascha Grunert <sgrunert@suse.com>
 - Include system proxy settings in service if present (bsc#1155323)
+
 * Thu Jan 16 2020 Sascha Grunert <sgrunert@suse.com>
 - Removed the usage of `name_` variables to reduce the error
   proneness
 - Fixed systemd unit install locations for crio-wipe.service and
   crio-shutdown.service (bsc#1161056)
+
 * Fri Jan 10 2020 Richard Brown <rbrown@suse.com>
 - Add prevent-local-loopback-teardown-rh1754154.patch to stop local loopback interfaces being torndown before cluster is bootstrapped
+
 * Tue Dec 17 2019 jmassaguerpla@suse.com
 - Make cgroup-driver for kubelet be cgroupfs for SLE to be consistent
   with the cri-o configuration
+
 * Wed Nov 27 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to v1.16.1:
   * Add manifest list support
   * Default to system.slice for conmon cgroup
   * Don't set PodIPs on host network pods
+
 * Tue Nov 26 2019 Dirk Mueller <dmueller@suse.com>
 - switch to libcontainers-common requires, as the other two are
   provided by it already (avant-garde#1056)
+
 * Tue Nov 19 2019 David Cassany <dcassany@suse.com>
 - Revert cgroup_manager from systemd to cgroupsfs for SLE15
   k8s default is cgroupfs and in can be modified at runtime by the
@@ -910,9 +938,11 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   avoinding it is currently preferred over introducing it. In order
   to switch to systemd as the cgroups manager in SLE15 further analysis is
   required to find a suitable configuration strategy.
+
 * Fri Nov 15 2019 Sascha Grunert <sgrunert@suse.com>
 - Use single service macro invocation
 - Add shell completions directories to files
+
 * Thu Nov 14 2019 Sascha Grunert <sgrunert@suse.com>
 - Add crio and crio-status shell completions
 - Add crio-wipe and crio-shutdown services
@@ -952,26 +982,34 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Set some previously public packages as internal (client, lib,
     oci, pkg, tools, version)
   * infra container now spawned as not privileged
+
 * Mon Nov 11 2019 Richard Brown <rbrown@suse.com>
 - Switch to `systemd` cgroup driver in kubelet config also
+
 * Thu Oct 24 2019 Sascha Grunert <sgrunert@suse.com>
 - Switch to `systemd` cgroup manager in replacement for `cgroupfs`
+
 * Thu Oct 17 2019 Richard Brown <rbrown@suse.com>
 - Remove obsolete Groups tag (fate#326485)
+
 * Mon Oct  7 2019 Sascha Grunert <sgrunert@suse.com>
 - Fix default apparmor profile to match the latest version
+
 * Tue Sep 10 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to v1.15.2:
   * Use HTTP2MatchHeaderFieldSendSettings for incoming gRPC connections
   * Fix 32 bit builds
   * crio-wipe: Fix int compare in lib.bash
+
 * Thu Sep  5 2019 Marco Vedovati <mvedovati@suse.com>
 - Add katacontainers as a recommended package, and include it as an
   additional OCI runtime in the configuration.
 - Document the format of the [crio.runtime.runtimes] table entries,
   and remove clutter from the current runc entry.
+
 * Thu Sep  5 2019 David Cassany <dcassany@suse.com>
 - Updating to v1.15.1 included de fix for CVE-2019-10214 (bsc#1144065)
+
 * Thu Sep  5 2019 Sascha Grunert <sgrunert@suse.com>
 - Update to v1.15.1:
   * Bump container storage to v1.12.6
@@ -981,19 +1019,25 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Require crio-wipe for crio service file
   * Disable crio-wipe in systemd by default
   * Change default apparmor profile to actually contain the version
+
 * Thu Aug 29 2019 Sascha Grunert <sgrunert@suse.com>
 - Update crio.conf to:
   * set manage_network_ns_lifecycle per default to true
+
 * Tue Aug  6 2019 Sascha Grunert <sgrunert@suse.com>
 - Update crio.conf to:
   * use `127.0.0.1` as streaming address
   * use any ephemeral port for streaming server
+
 * Thu Jul 25 2019 Richard Brown <rbrown@suse.com>
 - Update crio.conf to use correct pause_command
+
 * Thu Jul 18 2019 Richard Brown <rbrown@suse.com>
 - Update crio.conf to use better versioned pause container
+
 * Wed Jul 17 2019 Richard Brown <rbrown@suse.com>
 - Update crio.conf to use official kubic pause container
+
 * Wed Jul  3 2019 Sascha Grunert <sgrunert@suse.com>
 - Update CRI-O to v1.15.0:
   * update readme for currently supported branches
@@ -1274,10 +1318,13 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   requires (local) networking
 - Remove seccomp.json since it is now included in the binary
 - Fix apparmor dependencies
+
 * Fri May 24 2019 Sascha Grunert <sgrunert@suse.com>
 - Add apparmor-parser as dependency (bsc#1136403)
+
 * Thu May 16 2019 Guillaume GARDET <guillaume.gardet@opensuse.org>
 - Add _constraints to avoid OOM
+
 * Thu May  9 2019 Sascha Grunert <sgrunert@suse.com>
 - Update cri-o to v1.14.1
   * Add min memory limit check to sandbox_run_linux.go
@@ -1288,27 +1335,33 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 - Add registry-mirror.patch
 - Update repository paths from `kubernetes-sigs` to `cri-o`
 - Remove unnecessary ostree dependency
+
 * Thu Apr 18 2019 Michal Rostecki <mrostecki@opensuse.org>
 - Use /opt/cni/bin as the additional directory where cri-o is going
   to look up for CNI plugins installed by DaemonSets running on
   Kubernetes (i.e. Cilium).
+
 * Fri Apr 12 2019 Sascha Grunert <sgrunert@suse.com>
 - Update the configuration to fallback to the storage driver
   specified in libcontainers-common (`/etc/containers/storage.conf`)
 - Update go version to >= 1.12 to be in sync with upstream
+
 * Mon Apr  1 2019 Flavio Castelli <fcastelli@suse.com>
 - Introduce new runtime dependency conntrack-tools: the conntrack
   package is required to avoid failures in network connection cleanup.
+
 * Fri Mar 29 2019 Flavio Castelli <fcastelli@suse.com>
 - Update cri-o to v1.14.0
   * Fix possible out of bounds access during log parsing
 - Update default configuration file: crio.network.plugin_dir is now
   a list instead of being a string
+
 * Thu Mar 28 2019 Daniel Orf <dorf@suse.com>
 - Update go requirements to >= go1.11.3 to fix
   * bsc#1118897 CVE-2018-16873
     go#29230 cmd/go: remote command execution during "go get -u"
   * bsc#1118898 CVE-2018-16874
+
 * Mon Mar 18 2019 Sascha Grunert <sgrunert@suse.com>
 - Update cri-o to v1.13.3
   * Always set gid if returned from container user files
@@ -1318,18 +1371,22 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Pause credentials 1.13
   * Allow device mounting to work in privileged mode
   * Fix detach non tty
+
 * Tue Feb 26 2019 Richard Brown <rbrown@suse.com>
 - Update cri-o to v1.13.1
   * container: fix potential segfault on setup failure
   * container_create: fix race with sandbox being stopped
   * oci: read conmon process status
   * oci: Extend container stop timeout
+
 * Fri Dec 14 2018 Sascha Grunert <sgrunert@suse.com>
 - Update cri-o deprecated configuration and documentation to match
   upstream
+
 * Fri Dec  7 2018 Richard Brown <rbrown@suse.com>
 - Update cri-o to v1.13.0:
   * Support kubernetes 1.13
+
 * Mon Nov 19 2018 Valentin Rothberg <vrothberg@suse.com>
 - Update cri-o to v1.12.1:
   * Remove nodev from mounts
@@ -1338,10 +1395,12 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Use CurrentContainerStatus in list CRI calls
   * oci: Add CurrentContainerStatus API
   * conmon: fsync the log file
+
 * Wed Nov  7 2018 Valentin Rothberg <vrothberg@suse.com>
 - Set NOFILE and NPROC limit to 1048576 to align with Docker/containerd
   and the upstream unit file.
   Fix bsc#1112980
+
 * Fri Oct 19 2018 Valentin Rothberg <vrothberg@suse.com>
 - Update cri-o to v1.12.0:
   * docs: tweak crio and crio.conf man pages
@@ -1360,6 +1419,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * conmon: close extra files before exit
   * Block use of /proc/acpi from inside containers
   * conmon: do not use an empty env when running the exit command
+
 * Mon Oct  8 2018 Jeff Kowalczyk <jkowalczyk@suse.com>
 - Add go-1.11-compat-backport.patch for go1.11 compatibility.
   * Tested with golang(API) == 1.10 and golang(API) == 1.11, OK
@@ -1385,11 +1445,14 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
     cri-o-1.11.6
     Filed upstream issue requesting patch contents in released version:
     https://github.com/kubernetes-sigs/cri-o/issues/1827
+
 * Tue Aug 21 2018 rbrown@suse.com
 - cri-o-kubeadm-criconfig: correct conflicts with docker-kubic
+
 * Tue Aug 21 2018 rbrown@suse.com
 - cri-o-kubeadm-criconfig: Remove /etc/kubernetes/runtime.conf,
   replace with /etc/sysconfig/kublet
+
 * Mon Aug 20 2018 vrothberg@suse.com
 - Update crio.conf to be as close to the default one as possible:
   * Extend crio.conf with all previously missing options; crio.conf(5) isn't
@@ -1403,18 +1466,23 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * container_create: Set a minimum memory limit
   * Add log-level option to conmon and crio.conf
   * server/container_create: error out if capability is unknown
+
 * Fri Aug 17 2018 vrothberg@suse.com
 - Add "docker.io" to the registries list in the crio.conf to enable
   pulling of unqualified images by default.
+
 * Thu Aug 16 2018 rbrown@suse.com
 - ExcludeArch i586 (does not build, nor makes sense for that arch)
+
 * Tue Aug 14 2018 rbrown@suse.com
 - Make crio default, docker as alternative runtime (boo#1104821)
 - Configure kubernetes CRI runtime with $runtime-kubeadm-criconfig
   packages
+
 * Tue Aug 14 2018 rbrown@suse.com
 - Use btrfs storage driver to be consistant with other supported
   runtimes
+
 * Thu Aug  2 2018 vrothberg@suse.com
 - Do not provide `/etc/crictl.yaml` anymore.  Although being shipped by
   upstream this package belongs into the `cri-tools` package.
@@ -1423,22 +1491,27 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 - Update cri-o to v1.11.1:
   * server: Don't make additional copy of config.json
   * cri-tools: Use release-1.11 branch
+
 * Tue Jul 10 2018 David Cassany <dcassany@suse.com>
 - Update to v1.10.6 included:
   * bsc#1100838 fix race between container create and cadvisor asking for info
+
 * Tue Jul 10 2018 vrothberg@suse.com
 - Update cri-o to v1.10.6:
   * mask /proc/{acpi,keys}
+
 * Mon Jul  2 2018 vrothberg@suse.com
 - Update cri-o to v1.10.5:
   * Reduce amount of logs being printed by default
   * Update to latest ocicni
+
 * Wed Jun 27 2018 vrothberg@suse.com
 - Update cri-o to v1.10.4:
   * network: Fix manage NetworkNS lifecycle
   * sandbox_run: fix selinux relabel sharing
   * container_create: more selinux relabel fixes
   * container_create: correctly relabel mounts when asked
+
 * Mon Jun 18 2018 vrothberg@suse.com
 - Update cri-o to v1.10.3:
   * container_portforward: add support for short pod IDs
@@ -1446,6 +1519,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * container_create: always mount sysfs as rw for privileged containers
   * container_create: set rw for privileged containers
   * conmon: on a flush error discard the iov buffer
+
 * Fri Jun 15 2018 vrothberg@suse.com
 - Update cri-o to v1.10.2:
   * various improvements to conmon
@@ -1468,24 +1542,31 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * container_create: only bind mount /etc/hosts if not provided by k8s
   * kubernetes: Simplify and freshen the required-files table
   * Report an warning when no stages are defined for a hook
+
 * Mon Jun 11 2018 vrothberg@suse.com
 - Use actual tag for v1.9.13.  Upstream missed to set a tag and the
   last revision mistakenly set it to v1.9.14-dev instead of v1.9.13.
+
 * Thu Jun  7 2018 vrothberg@suse.com
 - Update cri-o to v1.9.13:
   * runtime_status: report correct network status
   * container_status: expose LogPath as requested by the CRI
     bsc#1095154
+
 * Tue Jun  5 2018 dcassany@suse.com
 - Refactor %%license usage to a simpler form
+
 * Mon Jun  4 2018 dcassany@suse.com
 - Make use of %%license macro
+
 * Fri May  4 2018 ndas@suse.de
 - use correct path for runc
+
 * Thu Apr 12 2018 fcastelli@suse.com
 - Put cri-o deamon under the podruntime slice. This the recommended
   deployment to allow fine resource control on Kubernetes.
   bsc#1086185
+
 * Wed Apr 11 2018 vrothberg@suse.com
 - Update cri-o to v1.9.11:
   * oci: avoid race on container stop
@@ -1497,24 +1578,30 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Add methods for listing and fetching container stats
   * Implement the stats for the image_fs_info command
   * Return error for container exec
+
 * Thu Mar 15 2018 vrothberg@suse.com
 - Require cni and cni-plugins to enable container networking.
   feature#crio
+
 * Thu Mar 15 2018 vrothberg@suse.com
 - Update cri-o to v1.9.10:
   * conmon: Avoid strlen in logging path
   * conmon: Remove info logs
   * container_exec: Fix terminal setting for exec
+
 * Mon Mar 12 2018 vrothberg@suse.com
 - Update cri-o to v1.9.9:
   * sandbox_stop: Call CNI stop before stopping pod infra container
+
 * Thu Mar  8 2018 vrothberg@suse.com
 - Remove the crio-shutdown.service.  It does not have any effect when
   shutting down crio and also isn't shipped on Fedora.
   - crio-shutdown.service
+
 * Mon Mar  5 2018 vrothberg@suse.com
 - crio.conf: update default socket to /var/run/crio/crio.sock as suggested
   by upstream.
+
 * Mon Mar  5 2018 vrothberg@suse.com
 - Update cri-o to v1.9.8:
   * system_containers: Update mounts
@@ -1524,44 +1611,55 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Make the /opt/cni mount rw
   * sandbox_stop: close/remove the netns _after_ stopping the containers
   * sandbox net: set netns closed after actaully closing it
+
 * Mon Mar  5 2018 vrothberg@suse.com
 - Configuration files should generally be tagged as %%config(noreplace) in order
   to keep the modified config files and to avoid losing data when the package
   is being updated.
+
 * Sat Mar  3 2018 vrothberg@suse.com
 - Remove empty filter rule from cri-o-rpmlintrc, which was mistakenly
   masking a few warnings, some of which have been fixed, others need
   to be filtered.  conmon and pause are not compiled with -fpie anymore
   to align with what upstream does; linking fails when done properly.
+
 * Fri Mar  2 2018 fcastelli@suse.com
 - Update minimum version of the Go compiler required
+
 * Fri Mar  2 2018 fcastelli@suse.com
 - Add missing runtime dependencies: socat, iptables, iproute
+
 * Wed Feb 28 2018 vrothberg@suse.com
 - Change the installation path of conmon and pause from
   /usr/lib/crio to /usr/lib/crio/bin in order to align with upstream
   requirements.
 - Update crio.conf to the reflect the new path of conmon and set the correct
   path of CNI plugins (i.e., /usr/lib/cni).
+
 * Tue Feb 20 2018 vrothberg@suse.com
 - Update cri-o to v1.9.6:
   * vendor: update c/image to handle text/plain from registries
     Fixes cases where text/plain s1 schemes are mistakenly converted
     to MIME.
+
 * Sun Feb 18 2018 jengelh@inai.de
 - Let description say what the package really does.
+
 * Fri Feb 16 2018 vrothberg@suse.com
 - Update cri-o to v1.9.5:
   * system container: add /var/tmp as RW
   * container_create: correctly set user
   * imageService: cache information about images
   * image: Add lock around image cache access
+
 * Fri Feb 16 2018 vrothberg@suse.com
 - Cleanup version-update related changelogs to only keep log entries of
   changes that are visible and important to the user, and the project.
+
 * Mon Feb 12 2018 vrothberg@suse.com
 - Add requirements to libcontainers-{common,image,storage}.
 - Run spec-cleaner on cri-o.spec.
+
 * Mon Feb 12 2018 vrothberg@suse.com
 - Update cri-o to v1.9.3:
   * Be more diligent about cleaning up failed-to-create containers
@@ -1570,6 +1668,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * Switch to ImageServer.UntagImage in RemoveImage handler
   * Return image references from the storage package
   * storage: API fixups
+
 * Fri Feb  9 2018 vrothberg@suse.com
 - Use golang-packaging macro for binary stripping.
 - Use -buildmode=pie for compilation.
@@ -1594,13 +1693,17 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
   * replace crioctl in e2e with crictl
   * Move crio default sock to /var/run/crio/crio.sock
   * container_create: set the seccomp profile in the container object
+
 * Mon Feb  5 2018 vrothberg@suse.com
 - Fix libostree-devel %%if condition for TW, Leap 15+ and SLES 15+.
+
 * Thu Feb  1 2018 vrothberg@suse.com
 - Use `%%fdupes %%buildroot/%%_prefix` since `fdupes %%buildroot` is not allowedv
   because you cannot make hardlinks between certain partitions.
+
 * Wed Jan 31 2018 vrothberg@suse.com
 - Source the cri-o-rpmlintrc the spec file.
+
 * Tue Jan 30 2018 vrothberg@suse.com
 - Add cri-o package: CRI-O is meant to provide an integration path between OCI
   conformant runtimes and the kubelet. Specifically, it implements the Kubelet
