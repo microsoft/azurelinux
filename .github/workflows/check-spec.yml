@@ -1,0 +1,32 @@
+name: Check Spec for version and release
+
+on:
+  pull_request:
+    branches: [ main, dev, 1.0* ]
+
+jobs:
+
+  build:
+    name: Check Spec for version and release
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Get base commit for PRs
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+        echo "branch=${{ github.base_ref }}" >> $GITHUB_ENV
+
+    - name: Get the changed files
+      run: |
+        echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+        changed_specs=$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
+        echo "Spec Files to validate: '${changed_specs}'"
+        echo "updated_specs=$(echo ${changed_specs})" >> $GITHUB_ENV
+
+    - name: Check each spec
+      run: |
+        .github/workflows/validate-spec.sh ${{ env.branch }} ${{ env.updated_specs }}
