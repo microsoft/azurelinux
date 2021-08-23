@@ -258,13 +258,13 @@ chmod 444 %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 
 # Directory links for compatibility with 3rd-party tools
 mkdir -p %{buildroot}%{_libdir}/ssl
-for link in "%{buildroot}%{_sysconfdir}/ssl/certs" "%{buildroot}%{_libdir}/ssl/certs"; do
-  ln -s %{pkidir}/tls/certs "$link"
+for link in "%{_sysconfdir}/ssl/certs" "%{_libdir}/ssl/certs"; do
+  ln -s %{pkidir}/tls/certs "%{buildroot}$link"
 done
 
 # Legacy file names and links for compatibility with 3rd-party tools
-for link in "%{buildroot}%{pkidir}/tls/certs/%{classic_tls_bundle}" "%{buildroot}%{_sysconfdir}/ssl/certs/ca-certificates.crt"; do
-  ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem "$link"
+for link in "%{classic_tls_bundle}" ca-certificates.crt; do
+  ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem "%{buildroot}%{pkidir}/tls/certs/$link"
 done
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
     %{buildroot}%{pkidir}/tls/cert.pem
