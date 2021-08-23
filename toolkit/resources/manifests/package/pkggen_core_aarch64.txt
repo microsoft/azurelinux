@@ -68,9 +68,9 @@ xz-5.2.4-3.cm1.aarch64.rpm
 xz-devel-5.2.4-3.cm1.aarch64.rpm
 xz-lang-5.2.4-3.cm1.aarch64.rpm
 xz-libs-5.2.4-3.cm1.aarch64.rpm
-zstd-1.4.4-1.cm1.aarch64.rpm
-zstd-devel-1.4.4-1.cm1.aarch64.rpm
-zstd-libs-1.4.4-1.cm1.aarch64.rpm
+zstd-1.4.9-1.cm1.aarch64.rpm
+zstd-devel-1.4.9-1.cm1.aarch64.rpm
+zstd-libs-1.4.9-1.cm1.aarch64.rpm
 libtool-2.4.6-5.cm1.aarch64.rpm
 flex-2.6.4-6.cm1.aarch64.rpm
 flex-devel-2.6.4-6.cm1.aarch64.rpm

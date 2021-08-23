@@ -438,8 +438,8 @@ zip-debuginfo-3.0-5.cm1.aarch64.rpm
 zlib-1.2.11-3.cm1.aarch64.rpm
 zlib-debuginfo-1.2.11-3.cm1.aarch64.rpm
 zlib-devel-1.2.11-3.cm1.aarch64.rpm
-zstd-1.4.4-1.cm1.aarch64.rpm
-zstd-debuginfo-1.4.4-1.cm1.aarch64.rpm
-zstd-devel-1.4.4-1.cm1.aarch64.rpm
-zstd-doc-1.4.4-1.cm1.aarch64.rpm
-zstd-libs-1.4.4-1.cm1.aarch64.rpm
+zstd-1.4.9-1.cm1.aarch64.rpm
+zstd-debuginfo-1.4.9-1.cm1.aarch64.rpm
+zstd-devel-1.4.9-1.cm1.aarch64.rpm
+zstd-doc-1.4.9-1.cm1.aarch64.rpm
+zstd-libs-1.4.9-1.cm1.aarch64.rpm

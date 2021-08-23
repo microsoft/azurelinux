@@ -1,6 +1,6 @@
 Summary:        Tools for zstd compression and decompression
 Name:           zstd
-Version:        1.4.4
+Version:        1.4.9
 Release:        1%{?dist}
 URL:            https://facebook.github.io/zstd/
 License:        BSD and GPLv2
@@ -73,5 +73,8 @@ make check %{?_smp_mflags}
 %{_mandir}/man1/*
 
 %changelog
-*   Sat May 2 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-1
--   Original version for CBL-Mariner.
+* Fri Aug 20 2021 Muhammad Falak <mwani@microsoft.com> 1.4.9-1
+- Bump version 1.4.4 -> 1.4.9 (Fix CVE-2021-24031)
+
+* Sat May 2 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-1
+- Original version for CBL-Mariner.
