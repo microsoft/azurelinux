@@ -11,7 +11,7 @@ require (
 	github.com/gdamore/tcell v1.3.0
 	github.com/klauspost/compress v1.10.5 // indirect
 	github.com/klauspost/pgzip v1.2.3
-	github.com/muesli/crunchy v0.3.0
+	github.com/muesli/crunchy v0.4.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/rivo/tview v0.0.0-20200219135020-0ba8301b415c
 	github.com/sirupsen/logrus v1.6.0

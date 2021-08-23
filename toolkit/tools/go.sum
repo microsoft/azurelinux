@@ -34,8 +34,8 @@ github.com/lucasb-eyer/go-colorful v1.0.2 h1:mCMFu6PgSozg9tDNMMK3g18oJBX7oYGrC09
 github.com/lucasb-eyer/go-colorful v1.0.2/go.mod h1:0MS4r+7BZKSJ5mw4/S5MPN+qHFF1fYclkSPilDOKW0s=
 github.com/mattn/go-runewidth v0.0.4 h1:2BvfKmzob6Bmd4YsL0zygOqfdFnK7GR4QL06Do4/p7Y=
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
-github.com/muesli/crunchy v0.3.0 h1:wTkpy18QhHJIb/VzQTQKZgbo2oJjT5AhcnpgDGPz0/k=
-github.com/muesli/crunchy v0.3.0/go.mod h1:9k4x6xdSbb7WwtAVy0iDjaiDjIk6Wa5AgUIqp+HqOpU=
+github.com/muesli/crunchy v0.4.0 h1:qdiml8gywULHBsztiSAf6rrE6EyuNasNKZ104mAaahM=
+github.com/muesli/crunchy v0.4.0/go.mod h1:9k4x6xdSbb7WwtAVy0iDjaiDjIk6Wa5AgUIqp+HqOpU=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
