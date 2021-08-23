@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ and MIT and BSD and ISC
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
@@ -15,6 +15,9 @@ BuildRequires:  systemd
 Requires:       systemd
 Requires:       libselinux
 Requires:       pam
+
+Provides:       anacron = %{version}-%{release}
+
 %description
 Cronie contains the standard UNIX daemon crond that runs specified programs at
 scheduled times and related tools. It is based on the original cron and
@@ -121,6 +124,9 @@ make %{?_smp_mflags} check
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
 
 %changelog
+* Mon Aug 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-6
+- Adding "Provides: anacron" for compatibility reasons.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.2-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
