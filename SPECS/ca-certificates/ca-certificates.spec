@@ -345,10 +345,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %license LICENSE
 
 # symlinks for old locations
-%{_sysconfdir}/ssl/certs/ca-certificates.crt
 %{pkidir}/tls/cert.pem
 %{pkidir}/tls/certs/%{classic_tls_bundle}
 %{pkidir}/tls/certs/%{openssl_format_trust_bundle}
+%{pkidir}/tls/certs/ca-certificates.crt
 %{pkidir}/%{java_bundle}
 
 # symlink directory
