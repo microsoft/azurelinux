@@ -2376,3 +2376,16 @@ index e359626..0161cd1 100644
  
              /* Process the current test vector... */
              if (rv == ACVP_SUCCESS) {
+diff --git a/src/acvp_safe_primes.c b/src/acvp_safe_primes.c
+index 27e4d95..3d32f6c 100644
+--- a/src/acvp_safe_primes.c
++++ b/src/acvp_safe_primes.c
+@@ -259,7 +259,7 @@ ACVP_RESULT acvp_safe_primes_kat_handler(ACVP_CTX *ctx, JSON_Object *obj) {
+             rv = ACVP_MALFORMED_JSON;
+             goto err;
+         }
+-        json_object_set_number(r_gobj, "tg_id", tg_id);
++        json_object_set_number(r_gobj, "tgId", tg_id);
+         json_object_set_value(r_gobj, "tests", json_value_init_array());
+         r_tarr = json_object_get_array(r_gobj, "tests");
+ 

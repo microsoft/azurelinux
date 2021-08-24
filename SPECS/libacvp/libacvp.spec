@@ -1,7 +1,7 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
 Version:        1.3.0
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,12 +58,6 @@ rm -rf %{buildroot}/*
 %{_bindir}/acvp_app
 
 %changelog
-* Fri Aug 13 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-3
-- Bug fixes
-
-* Fri Aug 13 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-2
-- Add KAS, KDF, and RSA KeyGen support for OpenSSL
-
 * Fri Jul 30 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
 - Add patch to support OpenSSL ACVP testing.
