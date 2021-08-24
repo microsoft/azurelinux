@@ -58,7 +58,7 @@ This package provides the LDAP support for the apr-util.
 %package mysql
 Summary:        APR utility library MySQL DBD driver
 
-BuildRequires:  mariadb-connector-c-devel
+BuildRequires:  mariadb-devel
 
 Requires:       %{name} = %{version}-%{release}
 
