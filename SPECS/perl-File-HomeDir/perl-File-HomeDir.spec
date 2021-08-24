@@ -1,16 +1,15 @@
 Summary:        File-HomeDir
 Name:           perl-File-HomeDir
 Version:        1.004
-Release:        5%{?dist}
-License:        The Perl 5 License (Artistic 1 & GPL 1)
+Release:        6%{?dist}
+License:        GPL+ OR Artistic 
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-HomeDir/
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-%{version}.tar.gz
-%define sha1 File-HomeDir=7d2ceddfd2f331cc1ac0dc160b0d4a91302ee418
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
-BuildRequires:	perl >= 5.28.0
+BuildRequires:  perl >= 5.28.0
 %if %{with_check}
 BuildRequires:  perl-File-Which
 %endif
@@ -37,18 +36,18 @@ Provides:       perl(File::HomeDir::Windows) = %{version}-%{release}
 File::HomeDir is a module for locating the directories that are "owned" by a user (typicaly your user) and to solve the various issues that arise trying to find them consistently across a wide variety of platforms.
 
 %prep
-%setup -q -n File-HomeDir-%{version}
+%autosetup -n File-HomeDir-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 find %{buildroot} -name 'perllocal.pod' -delete
 
 %check
-make test
+%make_build test
 
 %files
 %license LICENSE
@@ -75,6 +74,11 @@ make test
 %{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
+* Mon Aug 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.004-6
+- Bump release to represent package's move to toolchain
+- Lint spec
+- License verified
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.004-5
 - Use new perl package names.
 - Provide perl(File::HomeDir*).
