@@ -392,8 +392,10 @@ perl-File-Copy-2.34-463.cm2.noarch.rpm
 perl-File-DosGlob-1.12-463.cm2.x86_64.rpm
 perl-File-Fetch-0.56-463.cm2.noarch.rpm
 perl-File-Find-1.37-463.cm2.noarch.rpm
+perl-File-HomeDir-1.004-6.cm2.noarch.rpm
 perl-File-Path-2.16-463.cm2.noarch.rpm
 perl-File-Temp-0.230.900-463.cm2.noarch.rpm
+perl-File-Which-1.22-6.cm2.noarch.rpm
 perl-File-stat-1.09-463.cm2.noarch.rpm
 perl-FileCache-1.10-463.cm2.noarch.rpm
 perl-FileHandle-2.03-463.cm2.noarch.rpm

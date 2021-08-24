@@ -116,6 +116,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-File-Dos/d' $TmpPkgGen
     sed -i '/perl-File-Fetch/d' $TmpPkgGen
     sed -i '/perl-File-Find/d' $TmpPkgGen
+    sed -i '/perl-File-HomeDir/d' $TmpPkgGen
+    sed -i '/perl-File-Which/d' $TmpPkgGen
     sed -i '/perl-FileCache/d' $TmpPkgGen
     sed -i '/perl-filetest/d' $TmpPkgGen
     sed -i '/perl-Filter/d' $TmpPkgGen
