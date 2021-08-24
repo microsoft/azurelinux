@@ -8,22 +8,20 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.36/%{name}-%{version}.tar.xz
+
+BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
+%if %{with_check}
+BuildRequires:  ncurses-term
+%endif
+
 Requires:       %{name}-libs = %{version}-%{release}
+
 Conflicts:      toybox
 
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1:1.3-9
 Provides:       uuidd = %{version}-%{release}
-
-%if %{with_check}
-BuildRequires:  ncurses-term
-%endif
-BuildRequires:  libselinux-devel
-
-Requires: %{name}-libs = %{version}-%{release}
-
-Conflicts:      toybox
 
 %description
 Utilities for handling file systems, consoles, partitions,
@@ -85,8 +83,8 @@ chmod 644 %{buildroot}%{_docdir}/util-linux/getopt/getopt*.tcsh
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # Install 'uuidd' directories, which are not created by 'make'.
-install -d %{buildroot}/usr/var/run/uuidd
-install -d %{buildroot}/var/lib/libuuid
+install -d %{buildroot}%{_prefix}%{_var}/run/uuidd
+install -d %{buildroot}%{_sharedstatedir}/libuuid
 
 %find_lang %{name}
 
@@ -102,8 +100,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sharedstatedir}/hwclock
-%dir /usr/var/run/uuidd
-%dir /var/lib/libuuid
+%dir %{_prefix}%{_var}/run/uuidd
+%dir %{_sharedstatedir}/libuuid
 /bin/*
 /lib/libfdisk.so.*
 /lib/libsmartcols.so.*
@@ -137,7 +135,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-4
 - Adding 'Provides' for 'uuidd' and fixing it.
 
