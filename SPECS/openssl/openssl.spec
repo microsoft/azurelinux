@@ -42,6 +42,7 @@ Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 Patch22:        CVE-2021-3711.patch
+Patch23:        CVE-2021-3712.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -130,6 +131,7 @@ cp %{SOURCE4} test/
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
