@@ -39,6 +39,7 @@ Source22:       forge.lua
 Source23:       macros.rust-srpm
 # macros.fonts is taken from the "fontpackages-devel" package.
 Source24:       macros.fonts
+Source25:       macros.suse
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -99,6 +100,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
+%{_rpmconfigdir}/macros.d/macros.suse
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
 %dir %{rcluadir}/rpm
