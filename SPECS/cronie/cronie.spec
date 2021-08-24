@@ -169,8 +169,6 @@ make %{?_smp_mflags} check
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-7
 - Splitting package into "cronie-anacron" and "cronie-noanacron".
 - Package changes are an import from Fedora 32 (license: MIT).
-- Adding "Provides: cronie-anacron" for compatibility reasons.
-- Moving "dailyjobs" to separate "*-noanachron" subpackage.
 
 * Mon Aug 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-6
 - Adding "Provides: anacron" for compatibility reasons.
