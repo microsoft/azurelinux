@@ -1,28 +1,35 @@
+%define     apuver    1
+
 Summary:    The Apache Portable Runtime Utility Library
 Name:       apr-util
 Version:    1.6.1
-Release:        4%{?dist}
-License:    Apache License 2.0
+Release:        5%{?dist}
+License:    ASL 2.0
 URL:        https://apr.apache.org/
 Group:      System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    http://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
-%define sha1 %{name}=5bae4ff8f1dad3d7091036d59c1c0b2e76903bf4
-%define     apuver    1
+Source0:    https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
 
 BuildRequires:   apr-devel
 BuildRequires:   sqlite-devel
 BuildRequires:   openssl-devel
-BuildRequires:   nss-devel
 BuildRequires:   expat-devel
+
 Requires:   apr
 Requires:   openssl
 Requires:   expat
-Requires:	nss
 
 %description
 The Apache Portable Runtime Utility Library.
+
+%package bdb
+Summary: APR utility library Berkeley DB driver
+Requires: %{name} = %{version}-%{release}
+
+%description bdb
+This package provides the Berkeley DB driver for the apr-util
+DBM (database abstraction) interface.
 
 %package devel
 Group: Development/Libraries
@@ -38,17 +45,43 @@ build applications using the APR utility library.
 Group: Development/Libraries
 Summary: APR utility library LDAP support
 BuildRequires: openldap
-Requires: apr-util
+Requires: %{name} = %{version}-%{release}
 Requires: openldap
 
 %description ldap
 This package provides the LDAP support for the apr-util.
 
+%package mysql
+Summary: APR utility library MySQL DBD driver
+BuildRequires: mariadb-connector-c-devel
+Requires: %{name} = %{version}-%{release}
+
+%description mysql
+This package provides the MySQL driver for the apr-util DBD
+(database abstraction) interface.
+
+%package odbc
+Summary: APR utility library ODBC DBD driver
+BuildRequires: unixODBC-devel
+Requires: %{name} = %{version}-%{release}
+
+%description odbc
+This package provides the ODBC driver for the apr-util DBD
+(database abstraction) interface.
+
+%package openssl
+Summary: APR utility library OpenSSL crypto support
+BuildRequires: openssl-devel
+Requires: %{name} = %{version}-%{release}
+
+%description openssl
+This package provides the OpenSSL crypto support for the apr-util.
+
 %package pgsql
 Group: Development/Libraries
 Summary: APR utility library PostgreSQL DBD driver
 BuildRequires: postgresql-devel >= 10.5
-Requires: apr-util
+Requires: %{name} = %{version}-%{release}
 Requires: postgresql >= 10.5
 
 %description pgsql
@@ -57,7 +90,7 @@ This package provides the PostgreSQL driver for the apr-util DBD (database abstr
 %package sqlite
 Group: Development/Libraries
 Summary: APR utility library SQLite DBD driver.
-Requires: apr-util
+Requires: %{name} = %{version}-%{release}
 
 %description sqlite
 This package provides the SQLite driver for the apr-util DBD
@@ -68,25 +101,27 @@ This package provides the SQLite driver for the apr-util DBD
 %build
 %configure --with-apr=%{_prefix} \
         --includedir=%{_includedir}/apr-%{apuver} \
-        --with-ldap --without-gdbm \
-        --with-sqlite3 --with-pgsql \
-        --without-sqlite2 \
+        --with-crypto \
+        --with-berkeley-db \
+        --with-ldap \
+        --with-mysql \
+        --with-odbc \
         --with-openssl=/usr \
-        --with-nss \
-        --with-crypto
+        --with-pgsql \
+        --with-sqlite3 \
+        --without-gdbm \
+        --without-nss \
+        --without-sqlite2
 
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 %check
 # Disable smp_flag because of race condition
-make check
-
-%clean
-rm -rf %{buildroot}
+%make_build -j1 check
 
 %post -p /sbin/ldconfig
 
@@ -97,9 +132,11 @@ rm -rf %{buildroot}
 %license LICENSE
 %{_libdir}/aprutil.exp
 %{_libdir}/libaprutil-%{apuver}.so.*
-%{_libdir}/apr-util-%{apuver}/apr_crypto_nss*
-%{_libdir}/apr-util-%{apuver}/apr_crypto_openssl*
 %exclude %{_libdir}/debug
+
+%files bdb
+%defattr(-,root,root)
+%{_libdir}/apr-util-%{apuver}/apr_dbm_db*
 
 %files devel
 %defattr(-,root,root)
@@ -113,6 +150,18 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_ldap*
 
+%files mysql
+%defattr(-,root,root,-)
+%{_libdir}/apr-util-%{apuver}/apr_dbd_mysql*
+
+%files odbc
+%defattr(-,root,root,-)
+%{_libdir}/apr-util-%{apuver}/apr_dbd_odbc*
+
+%files openssl
+%defattr(-,root,root,-)
+%{_libdir}/apr-util-%{apuver}/apr_crypto_openssl*
+
 %files pgsql
 %defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbd_pgsql*
@@ -122,6 +171,13 @@ rm -rf %{buildroot}
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
+* Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-5
+- Added support for more databases: BDB, ODBC, MySQL.
+- Split out the "*-openssl" subpackage.
+- Removed NSS components.
+- Removed the "sha1" macro.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
 - Added %%license line automatically
 
