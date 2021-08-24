@@ -2,21 +2,21 @@ Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
 Release:        7%{?dist}
-License:        GPLv2+ and MIT and BSD and ISC
+License:        GPLv2+ AND MIT AND BSD AND ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Base
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
 Source1:        run-parts.sh
-Group:          System Environment/Base
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 BuildRequires:  libselinux-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
 
-Requires:       systemd
 Requires:       libselinux
 Requires:       pam
+Requires:       systemd
 
 %description
 Cronie contains the standard UNIX daemon crond that runs specified programs at
@@ -25,14 +25,14 @@ has security and configuration enhancements like the ability to use pam and
 SELinux.
 
 %package anacron
-Summary:   Utility for running regular jobs
+Summary:        Utility for running regular jobs
 
-Provides:  dailyjobs = %{version}-%{release}
-Provides:  anacron = 2.4
-Obsoletes: anacron <= 2.3
-
+Requires:       %{name} = %{version}-%{release}
 Requires(post): coreutils
-Requires:  %{name} = %{version}-%{release}
+
+Provides:       dailyjobs = %{version}-%{release}
+Provides:       anacron = 2.4
+Obsoletes:      anacron <= 2.3
 
 %description anacron
 Anacron is part of cronie that is used for running jobs with regular
@@ -46,11 +46,11 @@ powered off and it also allows randomizing the time of the job execution
 for better utilization of resources shared among multiple systems.
 
 %package noanacron
-Summary:   Utility for running simple regular jobs in old cron style
+Summary:        Utility for running simple regular jobs in old cron style
 
-Provides:  dailyjobs = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
-Requires:  %{name} = %{version}-%{release}
+Provides:       dailyjobs = %{version}-%{release}
 
 %description noanacron
 Old style of running {hourly,daily,weekly,monthly}.jobs without anacron. No
@@ -61,10 +61,11 @@ extra features.
 sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/g;
      s/^\s*account\s*include\s*password-auth$/account    include    system-account/g;
      s/^\s*session\s*include\s*password-auth$/session    include    system-session/g;' pam/crond
+
 %build
 ./configure \
     --prefix=%{_prefix} \
-    --sysconfdir=/etc   \
+    --sysconfdir=%{_sysconfdir}   \
     --localstatedir=/var\
     --with-pam          \
     --with-selinux      \
@@ -72,6 +73,7 @@ sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/
     --enable-pie        \
     --enable-relro
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm700 %{buildroot}%{_localstatedir}/spool/cron
@@ -94,10 +96,10 @@ install -vm644 contrib/anacrontab %{buildroot}%{_sysconfdir}/anacrontab
 
 touch %{buildroot}%{_sysconfdir}/cron.deny
 
-install -vdm755 %{buildroot}/var/spool/anacron
-touch %{buildroot}/var/spool/anacron/cron.daily
-touch %{buildroot}/var/spool/anacron/cron.weekly
-touch %{buildroot}/var/spool/anacron/cron.monthly
+install -vdm755 %{buildroot}%{_var}/spool/anacron
+touch %{buildroot}%{_var}/spool/anacron/cron.daily
+touch %{buildroot}%{_var}/spool/anacron/cron.weekly
+touch %{buildroot}%{_var}/spool/anacron/cron.monthly
 
 install -m755  %{SOURCE1} %{buildroot}/%{_bindir}/run-parts
 
@@ -153,7 +155,7 @@ make %{?_smp_mflags} check
 %{_sbindir}/anacron
 %attr(0755,root,root) %{_sysconfdir}/cron.hourly/0anacron
 %config(noreplace) %{_sysconfdir}/anacrontab
-%dir /var/spool/anacron
+%dir %{_var}/spool/anacron
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.daily
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.monthly
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
@@ -184,37 +186,53 @@ make %{?_smp_mflags} check
 
 * Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.5.2-2
 - Renaming Linux-PAM to pam
+
 * Wed Mar 18 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.5.2-1
 - Update to 1.5.2. License verified.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.5.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Mon Apr 24 2017 Bo Gan <ganb@vmware.com> 1.5.1-1
 - Update to 1.5.1
+
 * Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-13
 - BuildRequires Linux-PAM-devel
+
 * Wed Oct 05 2016 ChangLee <changlee@vmware.com> 1.5.0-12
 - Modified %check
+
 * Mon Aug 29 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-11
 - Fixed pam configuration for crond
+
 * Thu Aug 4 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-10
 - Added logic to not replace conf files in upgrade scenario
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.0-9
 - GA - Bump release of all rpms
+
 * Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  1.5.0-8
 - Fixing spec file to handle rpm upgrade scenario correctly
+
 * Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-7
 - Add run-parts command.
+
 * Fri Mar 04 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-6
 - Add folders to sysconfdir.
+
 * Mon Feb 08 2016 Anish Swaminathan <anishs@vmware.com>  1.5.0-5
 - Change default sysconfdir.
+
 * Thu Dec 10 2015 Xiaolin Li <xiaolinl@vmware.com>  1.5.0-4
 - Add systemd to Requires and BuildRequires.
 - Use systemctl to enable/disable service.
+
 * Mon Nov 30 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-3
 - Symlink cron.service to crond.service.
 - And move the /usr/etc/pam.d/crond to /etc/pam.d/crond
+
 * Thu Nov 12 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.0-2
 - Add crond to systemd service.
+
 * Wed Jun 17 2015 Divya Thaluru <dthaluru@vmware.com> 1.5.0-1
 - Initial build. First version
