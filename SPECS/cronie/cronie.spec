@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+ and MIT and BSD and ISC
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz
@@ -9,20 +9,53 @@ Source1:        run-parts.sh
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+
 BuildRequires:  libselinux-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+
 Requires:       systemd
 Requires:       libselinux
 Requires:       pam
-
-Provides:       anacron = %{version}-%{release}
 
 %description
 Cronie contains the standard UNIX daemon crond that runs specified programs at
 scheduled times and related tools. It is based on the original cron and
 has security and configuration enhancements like the ability to use pam and
 SELinux.
+
+%package anacron
+Summary:   Utility for running regular jobs
+
+Provides:  dailyjobs = %{version}-%{release}
+Provides:  anacron = 2.4
+Obsoletes: anacron <= 2.3
+
+Requires(post): coreutils
+Requires:  %{name} = %{version}-%{release}
+
+%description anacron
+Anacron is part of cronie that is used for running jobs with regular
+periodicity which do not have exact time of day of execution.
+
+The default settings of anacron execute the daily, weekly, and monthly
+jobs, but anacron allows setting arbitrary periodicity of jobs.
+
+Using anacron allows running the periodic jobs even if the system is often
+powered off and it also allows randomizing the time of the job execution
+for better utilization of resources shared among multiple systems.
+
+%package noanacron
+Summary:   Utility for running simple regular jobs in old cron style
+
+Provides:  dailyjobs = %{version}-%{release}
+
+Requires:  %{name} = %{version}-%{release}
+
+%description noanacron
+Old style of running {hourly,daily,weekly,monthly}.jobs without anacron. No
+extra features.
+
 %prep
 %setup -q
 sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/g;
@@ -97,9 +130,7 @@ make %{?_smp_mflags} check
 %dir %{_localstatedir}/spool/cron
 %dir %{_sysconfdir}/cron.d
 %config(noreplace) %{_sysconfdir}/cron.d/0hourly
-%config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 %dir %{_sysconfdir}/cron.hourly
-%{_sysconfdir}/cron.hourly/0anacron
 %dir %{_sysconfdir}/cron.daily
 %dir %{_sysconfdir}/cron.weekly
 %dir %{_sysconfdir}/cron.monthly
@@ -108,22 +139,37 @@ make %{?_smp_mflags} check
 %attr(755,root,root) %{_bindir}/cronnext
 %{_bindir}/run-parts
 %{_sbindir}/crond
-%{_sbindir}/anacron
 
-%{_mandir}/man1/*
-%{_mandir}/man5/*
-%{_mandir}/man8/*
+%{_mandir}/man1/cronnext.*
+%{_mandir}/man1/crontab.*
+%{_mandir}/man5/crontab.*
+%{_mandir}/man8/cron.*
+%{_mandir}/man8/crond.*
 
 %config(noreplace) %{_sysconfdir}/cron.deny
 %config(noreplace) %{_sysconfdir}/sysconfig/crond
 
-%dir /var/spool/anacron
+%files anacron
+%{_sbindir}/anacron
+%attr(0755,root,root) %{_sysconfdir}/cron.hourly/0anacron
 %config(noreplace) %{_sysconfdir}/anacrontab
+%dir /var/spool/anacron
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.daily
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.monthly
 %ghost %attr(0600,root,root) %{_localstatedir}/spool/anacron/cron.weekly
+%{_mandir}/man5/anacrontab.*
+%{_mandir}/man8/anacron.*
+
+%files noanacron
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 
 %changelog
+* Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-7
+- Splitting package into "cronie-anacron" and "cronie-noanacron".
+- Package changes are an import from Fedora 32 (license: MIT).
+- Adding "Provides: cronie-anacron" for compatibility reasons.
+- Moving "dailyjobs" to separate "*-noanachron" subpackage.
+
 * Mon Aug 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-6
 - Adding "Provides: anacron" for compatibility reasons.
 
