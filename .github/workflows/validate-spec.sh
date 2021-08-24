@@ -18,13 +18,13 @@ do
   name=$(rpmspec --srpm  --define "with_check 0" --qf "%{NAME}" -q $spec 2>/dev/null )
   if [[ -z $name ]]
   then
-    echo "Not able to parse $spec, skipping" >> bad_specs.txt
+    echo "Not able to parse $spec, with_check 0, skipping" >> bad_specs.txt
     continue
   fi
   name=$(rpmspec --srpm  --define "with_check 1" --qf "%{NAME}" -q $spec 2>/dev/null )
   if [[ -z $name ]]
   then
-    echo "Not able to parse $spec, skipping" >> bad_specs.txt
+    echo "Not able to parse $spec, with_check 1, skipping" >> bad_specs.txt
     continue
   fi
 
