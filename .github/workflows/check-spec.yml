@@ -1,4 +1,4 @@
-name: Check Spec for version and/or release update
+name: Check Spec for version and/or release update and parsing
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 jobs:
 
   build:
-    name: Check Spec for version and/or release update
+    name: Check Spec for version and/or release update and parsing
     runs-on: ubuntu-18.04
     steps:
 
