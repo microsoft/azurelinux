@@ -1,96 +1,109 @@
 %define     apuver    1
 
-Summary:    The Apache Portable Runtime Utility Library
-Name:       apr-util
-Version:    1.6.1
+Summary:        The Apache Portable Runtime Utility Library
+Name:           apr-util
+Version:        1.6.1
 Release:        5%{?dist}
-License:    ASL 2.0
-URL:        https://apr.apache.org/
-Group:      System Environment/Libraries
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
+Group:          System Environment/Libraries
+URL:            https://apr.apache.org/
+Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
 
-BuildRequires:   apr-devel
-BuildRequires:   sqlite-devel
-BuildRequires:   openssl-devel
-BuildRequires:   expat-devel
+BuildRequires:  apr-devel
+BuildRequires:  expat-devel
+BuildRequires:  openssl-devel
+BuildRequires:  sqlite-devel
 
-Requires:   apr
-Requires:   openssl
-Requires:   expat
+Requires:       apr
+Requires:       expat
+Requires:       openssl
 
 %description
 The Apache Portable Runtime Utility Library.
 
 %package bdb
-Summary: APR utility library Berkeley DB driver
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library Berkeley DB driver
+Requires:       %{name} = %{version}-%{release}
 
 %description bdb
 This package provides the Berkeley DB driver for the apr-util
 DBM (database abstraction) interface.
 
 %package devel
-Group: Development/Libraries
-Summary: APR utility library development kit
-Requires: apr-devel
-Requires: expat-devel
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library development kit
+Group:          Development/Libraries
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       apr-devel
+Requires:       expat-devel
+
 %description devel
 This package provides the support files which can be used to
 build applications using the APR utility library.
 
 %package ldap
-Group: Development/Libraries
-Summary: APR utility library LDAP support
-BuildRequires: openldap
-Requires: %{name} = %{version}-%{release}
-Requires: openldap
+Summary:        APR utility library LDAP support
+Group:          Development/Libraries
+
+BuildRequires:  openldap
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       openldap
 
 %description ldap
 This package provides the LDAP support for the apr-util.
 
 %package mysql
-Summary: APR utility library MySQL DBD driver
-BuildRequires: mariadb-connector-c-devel
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library MySQL DBD driver
+
+BuildRequires:  mariadb-connector-c-devel
+
+Requires:       %{name} = %{version}-%{release}
 
 %description mysql
 This package provides the MySQL driver for the apr-util DBD
 (database abstraction) interface.
 
 %package odbc
-Summary: APR utility library ODBC DBD driver
-BuildRequires: unixODBC-devel
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library ODBC DBD driver
+
+BuildRequires:  unixODBC-devel
+
+Requires:       %{name} = %{version}-%{release}
 
 %description odbc
 This package provides the ODBC driver for the apr-util DBD
 (database abstraction) interface.
 
 %package openssl
-Summary: APR utility library OpenSSL crypto support
-BuildRequires: openssl-devel
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library OpenSSL crypto support
+
+BuildRequires:  openssl-devel
+
+Requires:       %{name} = %{version}-%{release}
 
 %description openssl
 This package provides the OpenSSL crypto support for the apr-util.
 
 %package pgsql
-Group: Development/Libraries
-Summary: APR utility library PostgreSQL DBD driver
-BuildRequires: postgresql-devel >= 10.5
-Requires: %{name} = %{version}-%{release}
-Requires: postgresql >= 10.5
+Summary:        APR utility library PostgreSQL DBD driver
+Group:          Development/Libraries
+
+BuildRequires:  postgresql-devel >= 10.5
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       postgresql >= 10.5
 
 %description pgsql
 This package provides the PostgreSQL driver for the apr-util DBD (database abstraction) interface.
 
 %package sqlite
-Group: Development/Libraries
-Summary: APR utility library SQLite DBD driver.
-Requires: %{name} = %{version}-%{release}
+Summary:        APR utility library SQLite DBD driver.
+Group:          Development/Libraries
+
+Requires:       %{name} = %{version}-%{release}
 
 %description sqlite
 This package provides the SQLite driver for the apr-util DBD
@@ -98,6 +111,7 @@ This package provides the SQLite driver for the apr-util DBD
 
 %prep
 %setup -q
+
 %build
 %configure --with-apr=%{_prefix} \
         --includedir=%{_includedir}/apr-%{apuver} \
@@ -106,13 +120,12 @@ This package provides the SQLite driver for the apr-util DBD
         --with-ldap \
         --with-mysql \
         --with-odbc \
-        --with-openssl=/usr \
+        --with-openssl=%{_prefix} \
         --with-pgsql \
         --with-sqlite3 \
         --without-gdbm \
         --without-nss \
         --without-sqlite2
-
 
 %make_build
 
@@ -181,35 +194,50 @@ This package provides the SQLite driver for the apr-util DBD
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.6.1-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.6.1-2
--   Consuming postgresql 10.5
-*   Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> 1.6.1-1
--   Updated to version 1.6.1
-*   Mon Sep 18 2017 Rui Gu <ruig@vmware.com> 1.5.4-12
--   Disable smp_flag on make check because of race condition
-*   Thu Jul 6 2017 Divya Thaluru <dthaluru@vmware.com> 1.5.4-11
--   Added build requires on postgresql-devel
-*   Wed May 10 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5.4-10
--   Add missing Requires.
-*   Tue Apr 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.5.4-9
--   Add expat-devel build deps otherwise it builds expat from its source tree
-*   Fri Nov 18 2016 Alexey Makhalov <amakhalov@vmware.com> 1.5.4-8
--   Add sqlite-devel build deps
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.4-7
--   GA - Bump release of all rpms
-*   Wed Apr 13 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.5.4-6
--   remove libexpat files
-*   Tue Sep 22 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5.4-5
--   Updated build-requires after creating devel package for apr.
-*   Wed Sep 16 2015 Xiaolin Li <xiaolinl@vmware.com> 1.5.4-4
--   Seperate Separate apr-util to apr-util, apr-util-devel, aprutil-ldap, apr-util-pgsql, and apr-utilsqlite.
-*   Wed Jul 15 2015 Sarah Choi <sarahc@vmware.com> 1.5.4-4
--   Use apuver(=1) instead of version for mesos
-*   Mon Jul 13 2015 Alexey Makhalov <amakhalov@vmware.com> 1.5.2-3
--   Exclude /usr/lib/debug
-*   Wed Jul 01 2015 Touseef Liaqat <tliaqat@vmware.com> 1.5.2-2
--   Fix tags and paths.
-*   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 1.5.4-1
--   Initial build. First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> - 1.6.1-2
+- Consuming postgresql 10.5
+
+* Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> - 1.6.1-1
+- Updated to version 1.6.1
+
+* Mon Sep 18 2017 Rui Gu <ruig@vmware.com> - 1.5.4-12
+- Disable smp_flag on make check because of race condition
+
+* Thu Jul 6 2017 Divya Thaluru <dthaluru@vmware.com> - 1.5.4-11
+- Added build requires on postgresql-devel
+
+* Wed May 10 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 1.5.4-10
+- Add missing Requires.
+
+* Tue Apr 18 2017 Alexey Makhalov <amakhalov@vmware.com> - 1.5.4-9
+- Add expat-devel build deps otherwise it builds expat from its source tree
+
+* Fri Nov 18 2016 Alexey Makhalov <amakhalov@vmware.com> - 1.5.4-8
+- Add sqlite-devel build deps
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.5.4-7
+- GA - Bump release of all rpms
+
+* Wed Apr 13 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.5.4-6
+- remove libexpat files
+
+* Tue Sep 22 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> - 1.5.4-5
+- Updated build-requires after creating devel package for apr.
+
+* Wed Sep 16 2015 Xiaolin Li <xiaolinl@vmware.com> - 1.5.4-4
+- Seperate Separate apr-util to apr-util, apr-util-devel, aprutil-ldap, apr-util-pgsql, and apr-utilsqlite.
+
+* Wed Jul 15 2015 Sarah Choi <sarahc@vmware.com> - 1.5.4-4
+- Use apuver(=1) instead of version for mesos
+
+* Mon Jul 13 2015 Alexey Makhalov <amakhalov@vmware.com> - 1.5.2-3
+- Exclude /usr/lib/debug
+
+* Wed Jul 01 2015 Touseef Liaqat <tliaqat@vmware.com> - 1.5.2-2
+- Fix tags and paths.
+
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> - 1.5.4-1
+- Initial build. First version
