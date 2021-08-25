@@ -2558,6 +2558,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "keda",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/kedacore/keda/archive/refs/tags/v2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "keepalived",
           "version": "2.0.10",
           "downloadUrl": "https://github.com/acassen/keepalived/archive/v2.0.10.zip"
