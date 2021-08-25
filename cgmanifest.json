@@ -1537,7 +1537,7 @@
         "other": {
           "name": "fillup",
           "version": "1.42",
-          "downloadUrl": "ttps://github.com/openSUSE/fillup/archive/refs/tags/1.42.tar.gz"
+          "downloadUrl": "https://github.com/openSUSE/fillup/archive/refs/tags/1.42.tar.gz"
         }
       }
     },
