@@ -123,8 +123,8 @@ rpm-build-libs-4.14.2-13.cm1.aarch64.rpm
 rpm-devel-4.14.2-13.cm1.aarch64.rpm
 rpm-lang-4.14.2-13.cm1.aarch64.rpm
 rpm-libs-4.14.2-13.cm1.aarch64.rpm
-cpio-2.13-3.cm1.aarch64.rpm
-cpio-lang-2.13-3.cm1.aarch64.rpm
+cpio-2.13-2.cm1.aarch64.rpm
+cpio-lang-2.13-2.cm1.aarch64.rpm
 e2fsprogs-libs-1.44.6-4.cm1.aarch64.rpm
 libsolv-0.7.7-4.cm1.aarch64.rpm
 libsolv-devel-0.7.7-4.cm1.aarch64.rpm
