@@ -20,40 +20,14 @@
 %define         cni_bin_dir  %{_libexecdir}/cni
 %define         cni_doc_dir  %{_docdir}/cni
 
-%define fillup_only(dans) \
-    %{-n:PNAME=%{1}}%{!-n:PNAME=%{name}} \
-    %{-s:SUBPNAME=-%{2}}%{!-s:SUBPNAME=%{-a:-%{name}}} \
-    SYSC_TEMPLATE=%{_fillupdir}/sysconfig.$PNAME$SUBPNAME \
-    # If template not in new %{_fillupdir}, fallback to old TEMPLATE_DIR \
-    if [ ! -f $SYSC_TEMPLATE ] ; then \
-        TEMPLATE_DIR=/var/adm/fillup-templates \
-        SYSC_TEMPLATE=$TEMPLATE_DIR/sysconfig.$PNAME$SUBPNAME \
-    fi \
-    SD_NAME="" \
-    %{-d:%{-s:SD_NAME=%{3}/}%{!-s:SD_NAME=%{2}/}} \
-    %{sysc_fillup} \
-    %nil
-
-%define sysc_fillup() \
-    if [ -x /usr/bin/fillup ] ; then \
-	    if [ -f $SYSC_TEMPLATE ] ; then \
-	      echo "Updating /etc/sysconfig/$SD_NAME$PNAME ..." \
-	      mkdir -p /etc/sysconfig/$SD_NAME \
-	      touch /etc/sysconfig/$SD_NAME$PNAME \
-	      /usr/bin/fillup -q /etc/sysconfig/$SD_NAME$PNAME $SYSC_TEMPLATE \
-	    fi \
-    else \
-	    echo "ERROR: fillup not found. This should not happen. Please compare" \
-	    echo "/etc/sysconfig/$PNAME and $TEMPLATE_DIR/sysconfig.$PNAME and" \
-	    echo "update by hand." \
-    fi
-
 Name:           cni
 Version:        0.8.1
 Release:        2%{?dist}
 Summary:        Container Network Interface - networking for Linux containers
 License:        Apache-2.0
 Group:          System/Management
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/containernetworking/cni
 #Source0:       https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -64,7 +38,7 @@ BuildRequires:  xz
 BuildRequires:  golang
 Recommends:     cni-plugins
 Requires:       systemd
-Requires(post): fillup
+Requires(post): %fillup_prereq
 # Remove stripping of Go binaries.
 %define __arch_install_post export NO_BRP_STRIP_DEBUG=true
 

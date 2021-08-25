@@ -15,19 +15,15 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
-#Compat macro for new _fillupdir macro introduced in Nov 2017
-%if ! %{defined _fillupdir}
-  %define _fillupdir /var/adm/fillup-templates
-%endif
-
 Name:           fillup
 Version:        1.42
 Release:        277%{?dist}
 Summary:        Tool for Merging Config Files
-License:        GPL-2.0-or-later
+License:        GPLv2+
 Group:          System/Base
-URL:            http://github.com/openSUSE/fillup
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/openSUSE/fillup
 #Source0:       https://github.com/openSUSE/%{name}/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         %{name}-optflags.patch
@@ -82,6 +78,7 @@ make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
 - Update Source0 URL path
 - Manually create BIN and OBJ folder to build the project
 - Remove symbolic link on fillup
+- Remove _fillupdir macro definition
 
 * Fri Oct 16 2020 Ludwig Nussel <lnussel@suse.de>
 - prepare usrmerge (boo#1029961)

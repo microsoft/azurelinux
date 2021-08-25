@@ -845,8 +845,8 @@
         "type": "other",
         "other": {
           "name": "cni-plugins",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.8.1.tar.gz"
+          "version": "0.9.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
         }
       }
     },
@@ -1466,7 +1466,7 @@
         "other": {
           "name": "fillup",
           "version": "1.42",
-          "downloadUrl": "ttps://github.com/openSUSE/%{name}/archive/refs/tags/1.42.tar.gz"
+          "downloadUrl": "ttps://github.com/openSUSE/fillup/archive/refs/tags/1.42.tar.gz"
         }
       }
     },
