@@ -36,12 +36,12 @@ It provides event driven scale for any container running in Kubernetes
 tar -xf %{SOURCE1} --no-same-owner
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
 
-go build -ldflags $LDFLAGS -mod=vendor -v -o bin/keda main.go
+go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda main.go
 
 gofmt -l -w -s .
 go vet ./...
 
-go build -ldflags $LDFLAGS -mod=vendor -v -o bin/keda-adapter adapter/main.go
+go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda-adapter adapter/main.go
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -52,7 +52,7 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/%{name}
-%{-bindir}/%{name}-adapter
+%{_bindir}/%{name}-adapter
 
 %changelog
 * Wed Aug 25 2021 Henry Li <lihl@microsoft.com> - 2.4.0-1
