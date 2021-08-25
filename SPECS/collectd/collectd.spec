@@ -1,8 +1,9 @@
 %global __provides_exclude_from ^%{_libdir}/collectd/.*\\.so$
+%bcond_with virt
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -314,7 +315,6 @@ Requires:       %{name} = %{version}-%{release}
 %description rrdtool
 This plugin for collectd provides rrdtool support.
 
-%ifnarch ppc sparc sparc64
 %package sensors
 Summary:        Libsensors module for collectd
 BuildRequires:  lm-sensors-devel
@@ -323,7 +323,6 @@ Requires:       %{name} = %{version}-%{release}
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
-%endif
 
 
 %package smart
@@ -359,7 +358,7 @@ Requires:       %{name} = %{version}-%{release}
 %description synproxy
 This plugin provides statistics for Linux SYNPROXY available since 3.12
 
-%ifnarch ppc sparc sparc64
+%if %{with virt}
 %package virt
 Summary:        Libvirt plugin for collectd
 BuildRequires:  libvirt-devel
@@ -471,18 +470,12 @@ touch src/pinba.proto
     --disable-nut \
     --disable-oracle \
     --disable-onewire \
-%ifarch s390 s390x
-    --disable-pcie_errors \
-%endif
     --disable-pf \
     --disable-ping \
     --disable-procevent \
     --disable-redis \
     --disable-redfish \
     --disable-routeros \
-%ifarch ppc sparc sparc64
-    --disable-sensors \
-%endif
     --disable-sigrok \
     --disable-slurm \
     --disable-sysevent \
@@ -491,6 +484,9 @@ touch src/pinba.proto
     --disable-turbostat \
     --disable-ubi \
     --disable-varnish \
+%if %{without virt}
+    --disable-virt \
+%endif
     --disable-write_influxdb_udp \
     --disable-write_mongodb \
     --disable-write_prometheus \
@@ -548,11 +544,7 @@ cp %{SOURCE97} %{buildroot}%{_sysconfdir}/collectd.d/rrdtool.conf
 cp %{SOURCE98} %{buildroot}%{_sysconfdir}/collectd.d/onewire.conf
 
 # configs for subpackaged plugins
-%ifnarch s390 s390x
 for p in dns ipmi libvirt nut perl ping postgresql
-%else
-for p in dns ipmi libvirt perl ping postgresql
-%endif
 do
 cat > %{buildroot}%{_sysconfdir}/collectd.d/$p.conf <<EOF
 LoadPlugin $p
@@ -563,11 +555,9 @@ done
 find %{buildroot} -type f -name "*.la" -delete -print
 
 
-%ifnarch s390 s390x
 # checks fails in test_plugin_smart on s390
 %check
 make check
-%endif
 
 
 %post
@@ -591,9 +581,7 @@ make check
 %exclude %{_sysconfdir}/collectd.d/libvirt.conf
 %exclude %{_sysconfdir}/collectd.d/mysql.conf
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
-%ifnarch s390 s390x
 %exclude %{_sysconfdir}/collectd.d/nut.conf
-%endif
 %exclude %{_sysconfdir}/collectd.d/onewire.conf
 %exclude %{_sysconfdir}/collectd.d/perl.conf
 %exclude %{_sysconfdir}/collectd.d/ping.conf
@@ -652,9 +640,7 @@ make check
 %{_libdir}/collectd/olsrd.so
 %{_libdir}/collectd/openvpn.so
 %{_libdir}/collectd/powerdns.so
-%ifnarch s390 s390x
 %{_libdir}/collectd/pcie_errors.so
-%endif
 %{_libdir}/collectd/processes.so
 %{_libdir}/collectd/protocols.so
 %{_libdir}/collectd/serial.so
@@ -832,11 +818,9 @@ make check
 %{_libdir}/collectd/rrdtool.so
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
-%ifnarch ppc sparc sparc64
 %files sensors
 %{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
-%endif
 
 
 %files smart
@@ -853,7 +837,7 @@ make check
 %files synproxy
 %{_libdir}/collectd/synproxy.so
 
-%ifnarch ppc sparc sparc64
+%if %{with virt}
 %files virt
 %{_libdir}/collectd/virt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
@@ -881,6 +865,10 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 5.12.0-7
+- Disable virt subpackage to mitigate build break regarding systemd %%post sections
+- Remove spec conditionals regarding unsupported architectures
+
 * Tue Jun 15 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.0-6
 - Update Requires to perl package
 
