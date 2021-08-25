@@ -19,28 +19,27 @@
 %define         cni_etc_dir  %{_sysconfdir}/cni
 %define         cni_bin_dir  %{_libexecdir}/cni
 %define         cni_doc_dir  %{_docdir}/cni
-
+# Remove stripping of Go binaries.
+%define __arch_install_post export NO_BRP_STRIP_DEBUG=true
+Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        0.8.1
 Release:        2%{?dist}
-Summary:        Container Network Interface - networking for Linux containers
 License:        Apache-2.0
-Group:          System/Management
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System/Management
 URL:            https://github.com/containernetworking/cni
 #Source0:       https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        99-loopback.conf
 Source2:        build.sh
+BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
-BuildRequires:  golang
-Recommends:     cni-plugins
 Requires:       systemd
 Requires(post): %fillup_prereq
-# Remove stripping of Go binaries.
-%define __arch_install_post export NO_BRP_STRIP_DEBUG=true
+Recommends:     cni-plugins
 
 %description
 The CNI (Container Network Interface) project consists of a
@@ -97,7 +96,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
-* Tue Aug 17 2021 Henry Li <lihl@microsoft.com> 0.8.1-2
+* Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 0.8.1-2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed
 - License Verified
 - Remove shadow from BR
@@ -109,14 +108,17 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 - Update to version 0.8.1:
   * This is a security release that fixes a single bug:
   - Tighten up plugin-finding logic (#811).
+
 * Sat Apr 24 2021 Dirk Müller <dmueller@suse.com>
 - use buildmode=pie (cnitool is installed into sbindir)
+
 * Tue Mar 16 2021 Jeff Kowalczyk <jkowalczyk@suse.com>
 - Set GO111MODULE=auto to build with go1.16+
   * Default changed to GO111MODULE=on in go1.16
   * Set temporarily until using upstream release with go.mod
   * Drop BuildRequires: golang-packaging not currently using macros
   * Add BuildRequires: golang(API) >= 1.13 recommended dependency expression
+
 * Thu Oct  1 2020 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.8.0:
   * Specification and Conventions changes
@@ -145,8 +147,10 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + intercept netplugin std error
     + invoke: capture and return stderr if plugin exits unexpectedly
     + Retry exec commands on text file busy
+
 * Mon Jan 13 2020 Sascha Grunert <sgrunert@suse.com>
 - Set correct CNI version for 99-loopback.conf
+
 * Tue Jul 16 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.1 (bsc#1160460):
   * Library changes:
@@ -158,6 +162,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Add cni-route-override to CNI plugin list
   * Build and test changes:
     + Release: bump go to v1.12
+
 * Fri May 17 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.0:
   * Spec changes:
@@ -190,22 +195,30 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Return a better error when the plugin returns none
 - Install sleep binary into CNI plugin directory
 - Restore build.sh script which was removed upstream
+
 * Tue Jun  5 2018 dcassany@suse.com
 - Refactor %%license usage to a simpler form
+
 * Mon Jun  4 2018 dcassany@suse.com
 - Make use of %%license macro
+
 * Wed Apr  4 2018 jmassaguerpla@suse.com
 - Remove creating subvolumes. This should be in another package (kubernetes-kubelet)
+
 * Mon Jan 29 2018 kmacinnes@suse.com
 - Use full/absolute path for mksubvolume
 - Change snapper Requires to a Requires(post)
+
 * Thu Jan 18 2018 kmacinnes@suse.com
 - Add snapper as a requirement, to provide mksubvolume
+
 * Mon Jan 15 2018 alvaro.saurin@suse.com
 - Make /var/lib/cni writable
+
 * Tue Dec 19 2017 alvaro.saurin@suse.com
 - Remove the dependency with the cni-plugins
 - Recommend the cni-plugins
+
 * Mon Aug 28 2017 opensuse-packaging@opensuse.org
 - Update to version 0.6.0:
   * Conventions: add convention around chaining interfaces
@@ -217,6 +230,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
   * scripts/release.sh: Add in s390x architecture
   * cnitool: add support for CNI_ARGS
   * README plugins list: add Linen CNI plugin
+
 * Mon Apr 10 2017 opensuse-packaging@opensuse.org
 - Update to version 0.5.2:
   * Rename build script to avoid conflict with bazel
@@ -228,6 +242,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
   * libcni: Improved error messages.
   * libcni: Fixed tests that were checking error strings.
   * Documentation: Added documentation for `cnitool`.
+
 * Thu Mar 23 2017 opensuse-packaging@opensuse.org
 - Update to version 0.5.1:
   * readme.md: Add link to community sync
@@ -237,6 +252,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
   * Added Romana to list of CNI providers...
   * plugins/meta/flannel: If net config is missing do not return err on DEL
   * plugins/*: Don't error if the device doesn't exist
+
 * Wed Mar 22 2017 alvaro.saurin@suse.com
 - Update to version 0.5.0:
   * Documentation: Add conventions doc
@@ -285,6 +301,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
   * do not error if last_reserved_ip is missing for host local ipam
   * add test for ensuring initial subnet creation does not contain an error
   * fix unrelated failing tests
+
 * Wed Mar  1 2017 opensuse-packaging@opensuse.org
 - Update to version 0.4.0:
   * plugins/noop: return a helpful message for test authors
@@ -294,5 +311,6 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
   * ipam/host-local: Move allocator and config to backend
   * ipam/host-local: add ResolvConf argument for DNS configuration
   * spec: notice of version
+
 * Thu Feb 23 2017 alvaro.saurin@suse.com
 - Initial version
