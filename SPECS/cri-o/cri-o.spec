@@ -27,7 +27,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 Name:           cri-o
 Version:        1.21.2
 Release:        2%{?dist}
-License:        Apache-2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cri-o/cri-o
@@ -74,7 +74,7 @@ Requires:       libcontainers-common >= 0.0.1
 Requires:       moby-runc
 Suggests:       katacontainers
 # Provide generic cri-runtime dependency (needed by kubernetes)
-Provides:       cri-runtime
+Provides:       cri-runtime = %{version}-%{release}
 ExcludeArch:    i586
 
 %description

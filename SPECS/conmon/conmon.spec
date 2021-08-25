@@ -1,5 +1,4 @@
 %global with_debug 1
-%global with_check 0
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
@@ -38,9 +37,6 @@ make GOMD2MAN=go-md2man -C docs
 
 %install
 make PREFIX=%{buildroot}%{_prefix} install install.crio
-
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
 
 %files
 %license LICENSE

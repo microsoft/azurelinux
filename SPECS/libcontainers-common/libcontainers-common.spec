@@ -27,33 +27,31 @@ Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20200727
 Release:        2%{?dist}
-License:        Apache-2.0 AND GPL-3.0+
+License:        ASL 2.0 AND GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Management
 URL:            https://github.com/containers
 #Source0:       https://github.com/containers/image/archive/v5.5.1.tar.gz
-Source0:        image-%{imagever}.tar.gz
+Source0:        %{name}-image-%{imagever}.tar.gz
 #Source1:       https://github.com/containers/storage/archive/v1.20.2.tar.gz
-Source1:        storage-%{storagever}.tar.gz
+Source1:        %{name}-storage-%{storagever}.tar.gz
 Source2:        LICENSE
 Source3:        policy.json
 Source4:        storage.conf
 Source5:        mounts.conf
 Source6:        registries.conf
 #Source7:       https://github.com/containers/podman/archive/v2.0.3.tar.gz
-Source7:        podman-%{podmanver}.tar.gz
+Source7:        %{name}-podman-%{podmanver}.tar.gz
 Source8:        default.yaml
 #Source9:       https://github.com/containers/common/archive/v0.14.6.tar.gz
-Source9:        common-%{commonver}.tar.gz
+Source9:        %{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
-Provides:       libcontainers-image
-Provides:       libcontainers-storage
-Obsoletes:      libcontainers-image
-Obsoletes:      libcontainers-storage
+Provides:       libcontainers-image = %{version}-%{release}
+Provides:       libcontainers-storage = %{version}-%{release}
 BuildArch:      noarch
 
 %description
