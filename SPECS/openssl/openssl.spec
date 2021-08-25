@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,8 @@ Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
+Patch22:        CVE-2021-3711.patch
+Patch23:        CVE-2021-3712.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -128,6 +130,8 @@ cp %{SOURCE4} test/
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
+%patch23 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -321,6 +325,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Aug 24 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-7
+- Patch CVE-2021-3711 and CVE-2021-3712.
+
 * Wed Jul 28 2021 Daniel Mihai <dmihai@microsoft.com> - 1.1.1k-6
 - Enable support for TLS 1 and TLS 1.1
 
