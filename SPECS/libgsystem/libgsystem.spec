@@ -87,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gir-*/*.gir
 
 %changelog
-* Sat May 09 00:20:37 PST 2020 Nick Samson <nisamson@microsoft.com> - 2015.2-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2015.2-5
 - Added %%license line automatically
 
 *   Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2015.2-4

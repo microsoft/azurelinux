@@ -3,13 +3,14 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        1.25.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/shazow/urllib3/archive/%{version}/urllib3-%{version}.tar.gz
+Patch0:         CVE-2021-33503.patch
 BuildRequires:  curl-devel
 #%if %{with_check}
 BuildRequires:  openssl-devel
@@ -43,6 +44,7 @@ Python 3 version.
 
 %prep
 %setup -q -n urllib3-%{version}
+%patch0 -p1
 # Dummyserver tests are failing when running in chroot. So disabling the tests.
 rm -rf test/with_dummyserver/
 
@@ -98,6 +100,9 @@ ulimit -n $nofiles
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jul 09 2021 Henry Li <lihl@microsoft.com> - 1.25.9-2
+- Resolve CVE-2021-33503
+
 * Wed Dec 23 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.25.9-1
 - Updated to version 1.25.9
 

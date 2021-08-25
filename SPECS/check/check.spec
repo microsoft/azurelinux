@@ -46,22 +46,30 @@ make %{?_smp_mflags} check
 /usr/share/aclocal/*
 
 %changelog
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.12.0-5
--   Provide check-devel
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.12.0-4
--   Added %%license line automatically
-*   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.12.0-3
--   License verified.
--   Updated 'Url' and 'Source0' tags.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.12.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Sep 19 2018 Ajay Kaher <akaher@vmware.com> 0.12.0-1
--   Upgraded to version 0.12.0
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.10.0-2
--   GA - Bump release of all rpms
-*   Tue Feb 23 2016 Xiaolin Li <xiaolinl@vmware.com> 0.10.0-1
--   Updated to version 0.10.0
-*   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 0.9.14-2
--   Updated group.
-*   Tue Nov 25 2014 Divya Thaluru <dthaluru@vmware.com> 0.9.14-1
--   Initial build. First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.12.0-5
+- Provide check-devel
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.12.0-4
+- Added %%license line automatically
+
+* Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.12.0-3
+- License verified.
+- Updated 'Url' and 'Source0' tags.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.12.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Sep 19 2018 Ajay Kaher <akaher@vmware.com> 0.12.0-1
+- Upgraded to version 0.12.0
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.10.0-2
+- GA - Bump release of all rpms
+
+* Tue Feb 23 2016 Xiaolin Li <xiaolinl@vmware.com> 0.10.0-1
+- Updated to version 0.10.0
+
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 0.9.14-2
+- Updated group.
+
+* Tue Nov 25 2014 Divya Thaluru <dthaluru@vmware.com> 0.9.14-1
+- Initial build. First version

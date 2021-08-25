@@ -1,8 +1,8 @@
 %define sha1    nginx-njs=fd8c3f2d219f175be958796e3beaa17f3b465126
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
-Version:        1.16.1
-Release:        4%{?dist}
+Version:        1.20.1
+Release:        1%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,8 +11,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-Patch0:         CVE-2019-20372.patch
-Patch1:         CVE-2009-4487.nopatch
+Patch0:         CVE-2009-4487.nopatch
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
@@ -89,8 +88,8 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 * Wed Feb 10 2021 Henry Li <lihl@microsoft.com> - 1.16.1-3
 - Add Provides for nginx-filesystem from nginx
 
-*   Sat May 09 00:21:09 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
+- Added %%license line automatically
 
 *   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.16.1-1
 -   Update to version 1.16.1. License verified.

@@ -67,7 +67,7 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 %{_datadir}/*
 
 %changelog
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com>
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-6

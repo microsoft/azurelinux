@@ -26,7 +26,7 @@ rm -rf %{buildroot}%{_infodir}
 %{_bindir}/*
 %{_mandir}/man1/*
 %changelog
-* Sat May 09 00:21:25 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.21-7
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.21-7
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.21-6

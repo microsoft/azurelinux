@@ -51,7 +51,7 @@ cd tests && make check-TESTS
 %{_libdir}/cmake/
 
 %changelog
-* Sat May 09 00:20:38 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.29-6
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-6
 - Added %%license line automatically
 
 * Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 1.29-5

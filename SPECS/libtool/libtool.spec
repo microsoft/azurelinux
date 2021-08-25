@@ -85,17 +85,23 @@ make %{?_smp_mflags} check
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.4.6-6
 - Provide libtool-ltdl-devel%%{?_isa}
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.6-6
--   Add explicit provides for libtool-ltdl, libtool-ltdl-devel
-*   Sat May 09 00:21:36 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
--   Added %%license line automatically
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.6-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.4.6-3
--   Move header file and source code to libltdl-devel package.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.6-2
--   GA - Bump release of all rpms
-*   Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> 2.4.6-1
--   Updated to version 2.4.6
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.4.2-1
--   Initial build.  First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.4.6-6
+- Add explicit provides for libtool-ltdl, libtool-ltdl-devel
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.4.6-5
+- Added %%license line automatically
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.6-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.4.6-3
+- Move header file and source code to libltdl-devel package.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.6-2
+- GA - Bump release of all rpms
+
+* Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> 2.4.6-1
+- Updated to version 2.4.6
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.4.2-1
+- Initial build.  First version

@@ -535,6 +535,7 @@ fi
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- License verified
 
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-5
 - Second attempt - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

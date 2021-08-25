@@ -51,7 +51,7 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-10
 -   Use new perl package names.
-*   Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> 2.69-9
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.69-9
 -   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.69-8
 -   Initial CBL-Mariner import from Photon (license: Apache2).

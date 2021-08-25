@@ -43,7 +43,7 @@ make PREFIX="%{_prefix}" DESTDIR="%{buildroot}" install
 %changelog
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.8.1-5
 -   Update make to explicitly consume cflags
-*   Sat May 09 00:21:11 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.8.1-4
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.8.1-4
 -   Added %%license line automatically
 *   Tue Apr 14 2020 Nick Samson <nisamson@microsoft.com> 2.8.1-3
 -   Updated Source0, License verified.

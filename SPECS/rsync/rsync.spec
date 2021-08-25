@@ -58,7 +58,7 @@ make %{?_smp_mflags} check
 %{_libdir}/systemd/system/rsyncd.service
 %{_sysconfdir}/rsyncd.conf
 %changelog
-* Sat May 09 00:20:50 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.1.3-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.1.3-5
 - Added %%license line automatically
 
 *   Wed Apr 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.1.3-4

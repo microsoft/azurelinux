@@ -41,7 +41,7 @@ python2 setup.py test
 %{python2_sitelib}/*
 
 %changelog
-* Sat May 09 00:21:32 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.0.22-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.22-5
 - Added %%license line automatically
 
 *   Fri Apr 24 2020 Andrew Phelps <anphel@microsoft.com> 1.0.22-4

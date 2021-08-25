@@ -64,29 +64,41 @@ find %{buildroot} -name '*.la' -delete
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 25-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
-*   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 25-5
--   Provide /sbin/modprobe and module-init-tools for base package
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 25-4
--   Added %%license line automatically
-*   Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> 25-3
--   Fix changelog date
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 25-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Sep 12 2018 Ankit Jain <ankitja@vmware.com> 25-1
--   Updated to version 25
-*   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 24-3
--   Add devel package.
-*   Tue Jun 06 2017 Chang Lee <changlee@vmware.com> 24-2
--   Remove %check
-*   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 24-1
--   Updated to version 24
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 21-4
--   GA - Bump release of all rpms
-*   Thu Apr 21 2016 Anish Swaminathan <anishs@vmware.com> 21-3
--   Add patch for return code fix in error path
-*   Fri Mar 25 2016 Alexey Makhalov <amakhalov@vmware.com> 21-2
--   /bin/lsmod -> /sbin/lsmod
-*   Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> 21-1
--   Updated to version 21
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 16-1
--   Initial build. First version
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 25-5
+- Provide /sbin/modprobe and module-init-tools for base package
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 25-4
+- Added %%license line automatically
+
+* Tue Jan 21 2020 Andrew Phelps <anphel@microsoft.com> 25-3
+- Fix changelog date
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 25-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Sep 12 2018 Ankit Jain <ankitja@vmware.com> 25-1
+- Updated to version 25
+
+* Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 24-3
+- Add devel package.
+
+* Tue Jun 06 2017 Chang Lee <changlee@vmware.com> 24-2
+- Remove %check
+
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 24-1
+- Updated to version 24
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 21-4
+- GA - Bump release of all rpms
+
+* Thu Apr 21 2016 Anish Swaminathan <anishs@vmware.com> 21-3
+- Add patch for return code fix in error path
+
+* Fri Mar 25 2016 Alexey Makhalov <amakhalov@vmware.com> 21-2
+- /bin/lsmod -> /sbin/lsmod
+
+* Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> 21-1
+- Updated to version 21
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 16-1
+- Initial build. First version

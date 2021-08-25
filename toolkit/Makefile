@@ -23,6 +23,7 @@ INCREMENTAL_TOOLCHAIN           ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
+ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
 USE_UPDATE_REPO                 ?= y
@@ -43,6 +44,7 @@ CONCURRENT_PACKAGE_BUILDS       ?= 0
 NUM_OF_ANALYTICS_RESULTS        ?= 10
 CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
+REBUILD_DEP_CHAINS              ?= y
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))

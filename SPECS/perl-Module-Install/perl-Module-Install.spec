@@ -90,23 +90,30 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.19-4
--   Use new perl package names.
--   Provide perl(Module::*).
-* Sat May 09 00:20:49 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.19-4
+- Use new perl package names.
+- Provide perl(Module::*).
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.19-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.19-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.19-1
--   Update to version 1.19
-*   Wed Apr 05 2017 Robert Qi <qij@vmware.com> 1.18-1
--   Update version to 1.18.
-*   Wed Oct 05 2016 ChangLee <changlee@vmware.com> 1.16-3
--   Modified %check
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.16-2
--   GA - Bump release of all rpms
-*   Thu Feb 25 2016 Anish Swaminathan <anishs@vmware.com> 1.16-1
--   Upgrade version to 1.16
-*   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.14-1
--   Initial version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.19-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.19-1
+- Update to version 1.19
+
+* Wed Apr 05 2017 Robert Qi <qij@vmware.com> 1.18-1
+- Update version to 1.18.
+
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> 1.16-3
+- Modified %check
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.16-2
+- GA - Bump release of all rpms
+
+* Thu Feb 25 2016 Anish Swaminathan <anishs@vmware.com> 1.16-1
+- Upgrade version to 1.16
+
+* Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.14-1
+- Initial version.

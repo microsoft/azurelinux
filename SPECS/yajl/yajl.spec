@@ -1,20 +1,28 @@
 Summary:        Yet Another JSON Library (YAJL)
 Name:           yajl
 Version:        2.1.0
-Release:        15%{?dist}
+Release:        17%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://lloyd.github.com/yajl/
-#Source0:       https://github.com/lloyd/%%{name}/archive/refs/tags/%%{version}.tar.gz
+#
+# NB, upstream does not provide pre-built tar.gz downloads. Instead
+# they make you use the 'on the fly' generated tar.gz from GITHub's
+# web interface
+#
+# The Source0 for any version is obtained by a URL
+#
+#   https://github.com/lloyd/yajl/releases/tag/2.1.0
+#
 Source0:        %{name}-%{version}.tar.gz
 Patch1:         %{name}-%{version}-pkgconfig-location.patch
 Patch2:         %{name}-%{version}-pkgconfig-includedir.patch
 Patch3:         %{name}-%{version}-test-location.patch
 Patch4:         %{name}-%{version}-dynlink-binaries.patch
-
 BuildRequires:  cmake
 BuildRequires:  gcc
+BuildRequires:  which
 
 %package devel
 Summary:        Libraries, includes, etc to develop with YAJL
@@ -78,10 +86,15 @@ cd test
 %{_libdir}/pkgconfig/yajl.pc
 
 %changelog
-* Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-15
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Using the '%%make_build' macro instead of 'make'.
-- License verified.
+* Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-17
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
+- License verified
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

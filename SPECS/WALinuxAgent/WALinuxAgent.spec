@@ -1,30 +1,29 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.2.52
-Release:        3%{?dist}
+Version:        2.2.54.2
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
-#Source0:        https://github.com/Azure/WALinuxAgent/archive/v%{version}.tar.gz
-Source0:        https://github.com/Azure/WALinuxAgent/archive/%{name}-%{version}.tar.gz
-Patch0:         add-distro.patch
-BuildRequires:  python-distro
-BuildRequires:  python-setuptools
-BuildRequires:  python-xml
-BuildRequires:  python2
-BuildRequires:  python2-libs
+#Source0:       https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+BuildRequires:  python3-distro
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
+BuildRequires:  python3
+BuildRequires:  python3-libs
 BuildRequires:  systemd
 Requires:       /bin/grep
 Requires:       /bin/sed
 Requires:       iptables
 Requires:       openssh
 Requires:       openssl
-Requires:       python-pyasn1
-Requires:       python-xml
-Requires:       python2
-Requires:       python2-libs
+Requires:       python3-pyasn1
+Requires:       python3-xml
+Requires:       python3
+Requires:       python3-libs
 Requires:       sudo
 Requires:       systemd
 Requires:       util-linux
@@ -36,23 +35,26 @@ VMs in the Windows Azure cloud. This package should be installed on Linux disk
 images that are built to run in the Windows Azure environment.
 
 %prep
-%setup -q
-%patch0 -p1
+%setup -q -n %{name}-%{version}
 
 %pre -p /bin/sh
 
 %build
-python2 setup.py build -b py2
+python3 setup.py build -b py3
 
 %install
-python2 -tt setup.py build -b py2 install --prefix=%{_prefix} --lnx-distro='mariner' --root=%{buildroot} --force
+python3 -tt setup.py build -b py3 install --prefix=%{_prefix} --lnx-distro='mariner' --root=%{buildroot} --force
 mkdir -p  %{buildroot}/%{_localstatedir}/log
 mkdir -p -m 0700 %{buildroot}/%{_sharedstatedir}/waagent
 mkdir -p %{buildroot}/%{_localstatedir}/log
 touch %{buildroot}/%{_localstatedir}/log/waagent.log
+# python refers to python2 version on CBL-Mariner hence update to use python3
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
+sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_libdir}/systemd/system/waagent.service
 
 %check
-python2 setup.py check && python2 setup.py test
+python3 setup.py check && python3 setup.py test
 
 %post
 %systemd_post waagent.service
@@ -67,17 +69,23 @@ python2 setup.py check && python2 setup.py test
 %{_libdir}/systemd/system/*
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
-%doc Changelog
-%attr(0755,root,root) %{_sbindir}/waagent
-%attr(0755,root,root) %{_sbindir}/waagent2.0
+%attr(0755,root,root) %{_bindir}/waagent
+%attr(0755,root,root) %{_bindir}/waagent2.0
 %config %{_sysconfdir}/waagent.conf
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
-%{_libdir}/python2.7/site-packages/*
+%{python3_sitelib}/*
 
 %changelog
+* Tue Aug 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.54.2-2
+- Fix incorrect %%{_lib} macro usage
+
+* Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.2.54.2-1
+- Upgrade to version 2.2.54.2 which has Mariner distro support.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.52-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
+- %{_lib}/python3.7/site-packages/*
 
 * Mon Jan 25 2021 Henry Beberman <henry.beberman@microsoft.com> 2.2.52-2
 - Remove log symlink and use /var/log/waagent.log directly

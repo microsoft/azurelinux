@@ -276,7 +276,7 @@ make %{?_smp_mflags} check-gcc
 * Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 9.1.0-5
 - Disable -Werror=format-security to build with hardened cflags
 
-* Sat May 09 00:21:12 PST 2020 Nick Samson <nisamson@microsoft.com> - 9.1.0-4
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.1.0-4
 - Added %%license line automatically
 
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 9.1.0-3

@@ -62,7 +62,7 @@ install -vDm 644 src/bin/*.{rom,mrom} %{buildroot}/usr/share/ipxe/
 /usr/share/ipxe/rtl8139.rom
 
 %changelog
-* Sat May 09 00:21:22 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.20.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.20.1-3
 - Added %%license line automatically
 
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.20.1-2

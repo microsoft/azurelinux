@@ -52,7 +52,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Sat May 09 00:21:24 PST 2020 Nick Samson <nisamson@microsoft.com> - 2.1.0-5
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.1.0-5
 - Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.0-4

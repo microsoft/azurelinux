@@ -86,26 +86,26 @@ rm -rf %{buildroot}/*
 * Tue Apr 27 2021 Henry Li <lihl@microsoft.com> - 8.0.1-4
 - Enable eh/rtti, which are required by lldb.
 
-*   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
--   Temporarily disable generation of debug symbols.
+* Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
+- Temporarily disable generation of debug symbols.
 
-*   Sat May 09 00:21:24 PST 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.0.1-2
+- Added %%license line automatically
 
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-1
--   Update to 8.0.1. Fix Source0 URL. License verified.
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-1
+- Update to 8.0.1. Fix Source0 URL. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.0.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.0.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Aug 09 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 6.0.1-1
--   Update to version 6.0.1 to get it to build with gcc 7.3
+* Thu Aug 09 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 6.0.1-1
+- Update to version 6.0.1 to get it to build with gcc 7.3
 
-*   Wed Jun 28 2017 Chang Lee <changlee@vmware.com> 4.0.0-2
--   Updated %check
+* Wed Jun 28 2017 Chang Lee <changlee@vmware.com> 4.0.0-2
+- Updated %check
 
-*   Fri Apr 7 2017 Alexey Makhalov <amakhalov@vmware.com> 4.0.0-1
--   Version update
+* Fri Apr 7 2017 Alexey Makhalov <amakhalov@vmware.com> 4.0.0-1
+- Version update
 
-*   Wed Jan 11 2017 Xiaolin Li <xiaolinl@vmware.com>  3.9.1-1
--   Initial build.
+* Wed Jan 11 2017 Xiaolin Li <xiaolinl@vmware.com>  3.9.1-1
+- Initial build.
