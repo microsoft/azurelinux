@@ -1376,6 +1376,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dwarves",
+          "version": "1.21",
+          "downloadUrl": "https://fedorapeople.org/~acme/dwarves/dwarves-1.21.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "e2fsprogs",
           "version": "1.45.6",
           "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz"
