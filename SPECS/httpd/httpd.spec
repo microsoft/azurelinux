@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -22,6 +22,7 @@ Patch100: CVE-1999-0236.nopatch
 Patch101: CVE-1999-1412.nopatch
 # CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
 Patch102: CVE-2007-0086.nopatch
+Patch103: CVE-2021-33193.patch
 
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
@@ -202,6 +203,8 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Wed Aug 25 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.4.46-6
+-   Added patch file(s) CVE-2021-33193.patch
 *   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5
 -   CVE-2021-26691 fix
 
