@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "cri-tools-1.11.1.tar.gz": "a357c67c891896032865f7a34f7ec330e5a00fe7f20b6d8be50399b91c99a4ac"
+  "cri-tools-1.21.0.tar.gz": "547e1a9af457d011d216cfb11bb5f0b3f4b3e55c25297ce809c6dc14e576157f",
+  "crictl.yaml": "a0377691e8fd88d234a9966b11fd5a0c7a8d75891eb12a939ed0424c7374956c"
  }
 }

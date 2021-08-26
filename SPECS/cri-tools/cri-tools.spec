@@ -2,12 +2,13 @@
 
 Summary:        CRI tools
 Name:           cri-tools
-Version:        1.11.1
-Release:        8%{?dist}
+Version:        1.21.0
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Source1:        crictl.yaml
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,17 +28,15 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_datadir}/%{name}
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/usr/lib/.build-id
 mkdir -p %{buildroot}/usr/share/doc/cri-tools
 mkdir -p %{buildroot}/usr/share/licenses/cri-tools
 mkdir -p %{buildroot}/man/man1
+mkdir -p %{buildroot}%{_sysconfdir}
 
-make install DESTDIR=%{buildroot}
-cp /usr/local/bin/crictl %{buildroot}/usr/bin
-cp /usr/local/bin/critest %{buildroot}/usr/bin
+make install DESTDIR=%{buildroot} BINDIR=/usr/bin
 cp CHANGELOG.md %{buildroot}/usr/share/doc/cri-tools
 cp LICENSE %{buildroot}/usr/share/licenses/cri-tools
 cp CHANGELOG.md %{buildroot}/usr/share/doc/cri-tools
@@ -47,11 +46,13 @@ cp README.md %{buildroot}/usr/share/doc/cri-tools
 cp code-of-conduct.md %{buildroot}/usr/share/doc/cri-tools
 cp docs/validation.md %{buildroot}/usr/share/doc/cri-tools
 cp docs/roadmap.md %{buildroot}/usr/share/doc/cri-tools
+cp %{S:1} %{buildroot}%{_sysconfdir}
 
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_datadir}/%{name}
+%{_sysconfdir}/crictl.yaml
 /usr/bin
 /usr/share/doc/*
 /usr/share/licenses/*
@@ -61,6 +62,8 @@ cp docs/roadmap.md %{buildroot}/usr/share/doc/cri-tools
 rm -rf %{buildroot}/*
 
 %changelog
+*   Thu Aug 26 2021 Vincent Nguyen <vinguyen@microsoft.com> 1.21.0-1
+-   update to latest crictl tool version 1.21.0.
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.11.1-8
 -   Increment release to force republishing using golang 1.15.13.
 *   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.11.1-7
