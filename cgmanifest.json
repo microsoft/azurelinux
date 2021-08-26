@@ -865,8 +865,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.11.1.tar.gz"
+          "version": "1.21.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.21.0.tar.gz"
         }
       }
     },
