@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ Source22:       forge.lua
 Source23:       macros.rust-srpm
 # macros.fonts is taken from the "fontpackages-devel" package.
 Source24:       macros.fonts
+Source25:       macros.suse
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -99,6 +100,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
+%{_rpmconfigdir}/macros.d/macros.suse
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
 %dir %{rcluadir}/rpm
@@ -112,6 +114,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 2.0-3
+- Add fillup-related macros
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-2
 - Adding the '_metainfodir' macro.
 

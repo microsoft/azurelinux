@@ -1,0 +1,23 @@
+Index: SRC/services.c
+===================================================================
+--- SRC/services.c.orig
++++ SRC/services.c
+@@ -263,11 +263,15 @@ displayVersion
+ )
+ {
+     static const char *versionString = 
+-                      "This is fillup, version %1.2f, compiled on %s\n\n";
++                      "This is fillup, version %1.2f\n\n";
+ 
+-    if( ( int )( strlen( versionString ) + strlen( __DATE__ ) - 3 ) != 
+-        fprintf( stderr, versionString, VERSION, __DATE__ ) )
++    if( ( int )( strlen( versionString ) - 1 ) !=
++        fprintf( stderr, versionString, VERSION ) )
+     {
++int res= fprintf( stderr, versionString, VERSION );
++	
++fprintf (stderr,"strlen: %d, res: %d\n", strlen( versionString ), res);
++	
+         fillup_exception( __FILE__, __LINE__, ServiceException, 
+                           "displayVersion" );
+         exitOnFailure( );

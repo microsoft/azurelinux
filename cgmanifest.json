@@ -785,8 +785,18 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "0.7.5",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v0.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cni-plugins",
+          "version": "0.9.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
         }
       }
     },
@@ -1538,6 +1548,16 @@
           "name": "file",
           "version": "5.38",
           "downloadUrl": "ftp://ftp.astron.com/pub/file/file-5.38.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fillup",
+          "version": "1.42",
+          "downloadUrl": "https://github.com/openSUSE/fillup/archive/refs/tags/1.42.tar.gz"
         }
       }
     },
@@ -2571,6 +2591,16 @@
           "name": "kde-settings",
           "version": "30.0",
           "downloadUrl": "https://github.com/FedoraKDE/kde-settings/archive/30.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "keda",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/kedacore/keda/archive/refs/tags/v2.4.0.tar.gz"
         }
       }
     },

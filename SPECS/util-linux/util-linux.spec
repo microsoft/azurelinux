@@ -1,24 +1,28 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.36.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.36/%{name}-%{version}.tar.xz
+
+BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
-Requires:       %{name}-libs = %{version}-%{release}
-Conflicts:      toybox
-Provides:       hardlink = 1:1.3-9
-Provides:       %{name}-ng = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  ncurses-term
 %endif
-BuildRequires:  libselinux-devel
-Requires: %{name}-libs = %{version}-%{release}
+
+Requires:       %{name}-libs = %{version}-%{release}
+
 Conflicts:      toybox
+
+Provides:       %{name}-ng = %{version}-%{release}
+Provides:       hardlink = 1:1.3-9
+Provides:       uuidd = %{version}-%{release}
+
 %description
 Utilities for handling file systems, consoles, partitions,
 and messages.
@@ -77,6 +81,11 @@ install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
 chmod 644 %{buildroot}%{_docdir}/util-linux/getopt/getopt*.tcsh
 find %{buildroot} -type f -name "*.la" -delete -print
+
+# Install 'uuidd' directories, which are not created by 'make'.
+install -d %{buildroot}%{_prefix}%{_var}/run/uuidd
+install -d %{buildroot}%{_sharedstatedir}/libuuid
+
 %find_lang %{name}
 
 %check
@@ -91,6 +100,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sharedstatedir}/hwclock
+%dir %{_prefix}%{_var}/run/uuidd
+%dir %{_sharedstatedir}/libuuid
 /bin/*
 /lib/libfdisk.so.*
 /lib/libsmartcols.so.*
@@ -124,6 +135,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-4
+- Adding 'Provides' for 'uuidd' and fixing it.
 
 * Mon Mar 15 2021 Henry Li <lihl@microsoft.com> - 2.36.1-3
 - Provide util-linux-ng
