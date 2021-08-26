@@ -1,21 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %define libname libdwarves
 %define libver 1
-
-Name: dwarves
-Version: 1.21
-Release: 4%{?dist}
-License: GPLv2
-Summary: Debugging Information Manipulation Tools (pahole & friends)
-URL: http://acmel.wordpress.com
-Source: http://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
-Patch1: 0001-btf-Remove-ftrace-filter.patch
-Requires: %{libname}%{libver} = %{version}-%{release}
-BuildRequires: gcc
-BuildRequires: cmake >= 2.8.12
-BuildRequires: zlib-devel
-BuildRequires: elfutils-devel >= 0.130
+Summary:        Debugging Information Manipulation Tools (pahole & friends)
+Name:           dwarves
+Version:        1.21
+Release:        4%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://acmel.wordpress.com
+Source:         http://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
+Patch1:         0001-btf-Remove-ftrace-filter.patch
+BuildRequires:  cmake >= 2.8.12
+BuildRequires:  elfutils-devel >= 0.130
+BuildRequires:  gcc
+BuildRequires:  zlib-devel
+Requires:       %{libname}%{libver} = %{version}-%{release}
 
 %description
 dwarves is a set of tools that use the debugging information inserted in
@@ -54,14 +53,14 @@ The btfdiff utility compares the output of pahole from BTF and DWARF to make
 sure they produce the same results.
 
 %package -n %{libname}%{libver}
-Summary: Debugging information  processing library
+Summary:        Debugging information  processing library
 
 %description -n %{libname}%{libver}
 Debugging information processing library.
 
 %package -n %{libname}%{libver}-devel
-Summary: Debugging information library development files
-Requires: %{libname}%{libver} = %{version}-%{release}
+Summary:        Debugging information library development files
+Requires:       %{libname}%{libver} = %{version}-%{release}
 
 %description -n %{libname}%{libver}-devel
 Debugging information processing library development files.
