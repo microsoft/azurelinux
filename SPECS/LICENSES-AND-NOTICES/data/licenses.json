@@ -40,6 +40,7 @@
                 "docbook5-schemas",
                 "dos2unix",
                 "dpdk",
+                "dwarves",
                 "dwz",
                 "ebtables",
                 "extra-cmake-modules",
