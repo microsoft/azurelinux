@@ -1,8 +1,9 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.36.1
-# We are shipping a static library `libiberty`, with every release,
-# update all specs/packages that depend on `libiberty`.
+# WARNING: we are shipping a bunch of static libraries `*.a`. With every release
+#          we MUST update all specs depending on `binutils-devel` in order to link
+#          with the updated libraries.
 Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
