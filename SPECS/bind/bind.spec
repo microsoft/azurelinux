@@ -9,7 +9,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,20 +37,23 @@ Patch0:         CVE-2019-6470.nopatch
 Patch1:         CVE-2020-8623.nopatch
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
+
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
-Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
-BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
 BuildRequires:  libuv-devel
 BuildRequires:  lmdb-devel
 BuildRequires:  make
+BuildRequires:  mariadb-devel
+BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
+BuildRequires:  postgresql-devel
 BuildRequires:  python3
 BuildRequires:  python3-ply
+BuildRequires:  sqlite-devel
+
 Requires:       libuv
 Requires:       openssl
 Requires(postun): %{_sbindir}/groupdel
@@ -68,6 +71,36 @@ Conflicts:      dhcp < 4.4.1
 BIND is open source software that implements the Domain Name System (DNS) protocols
 for the Internet. It is a reference implementation of those protocols, but it is
 also production-grade software, suitable for use in high-volume and high-reliability applications.
+
+%package dlz-filesystem
+Summary:        BIND server filesystem DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
+
+%description dlz-filesystem
+Dynamic Loadable Zones filesystem module for BIND server.
+
+%package dlz-ldap
+Summary:        BIND server ldap DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
+
+%description dlz-ldap
+Dynamic Loadable Zones LDAP module for BIND server.
+
+%package dlz-mysql
+Summary:        BIND server mysql and mysqldyn DLZ modules
+Requires:       bind%{?_isa} = %{version}-%{release}
+Provides:       %{name}-dlz-mysqldyn = %{version}-%{release}
+
+%description dlz-mysql
+Dynamic Loadable Zones MySQL module for BIND server.
+Contains also mysqldyn module with dynamic DNS updates (DDNS) support.
+
+%package dlz-sqlite3
+Summary:        BIND server sqlite3 DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
+
+%description dlz-sqlite3
+Dynamic Loadable Zones sqlite3 module for BIND server.
 
 %package pkcs11
 Summary:        Bind with native PKCS#11 functionality for crypto
@@ -208,6 +241,11 @@ cp -r lib/ns{,-pkcs11}
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
 %build
+
+# DLZ modules do not support oot builds. Copy files into build
+mkdir -p build/contrib/dlz
+cp -frp contrib/dlz/modules build/contrib/dlz/modules
+
 ./configure \
     --prefix=%{_prefix} \
     --with-python=python3 \
@@ -223,6 +261,17 @@ libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
     --enable-full-report \
 
 %make_build
+
+pushd build/contrib/dlz/modules
+for DIR in mysql mysqldyn; do
+  sed -e 's/@DLZ_DRIVER_MYSQL_INCLUDES@/$(shell mysql_config --cflags)/' \
+      -e 's/@DLZ_DRIVER_MYSQL_LIBS@/$(shell mysql_config --libs)/' \
+      $DIR/Makefile.in > $DIR/Makefile
+done
+for DIR in filesystem ldap mysql mysqldyn sqlite3; do
+  make -C $DIR CFLAGS="-fPIC -I../include $CFLAGS $LDFLAGS"
+done
+popd
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
@@ -322,6 +371,19 @@ done
 mkdir -p %{buildroot}%{_sysconfdir}/rwtab.d
 install -m 644 %{SOURCE13} %{buildroot}%{_sysconfdir}/rwtab.d/named
 
+pushd build/contrib/dlz/modules
+for DIR in filesystem ldap mysql mysqldyn sqlite3; do
+  %make_install -C $DIR libdir=%{_libdir}/named
+done
+pushd %{buildroot}%{_libdir}/bind
+  cp -s ../named/dlz_*.so .
+popd
+mkdir -p doc/{mysql,mysqldyn}
+cp -p mysqldyn/testing/README doc/mysqldyn/README.testing
+cp -p mysqldyn/testing/* doc/mysqldyn
+cp -p mysql/testing/* doc/mysql
+popd
+
 # Remove unwanted files
 rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
@@ -413,6 +475,23 @@ fi;
 # so rndc.conf is not necessary.
 %defattr(-,named,named,-)
 %dir /run/named
+
+%files dlz-filesystem
+%{_libdir}/{named,bind}/dlz_filesystem_dynamic.so
+
+%files dlz-mysql
+%{_libdir}/{named,bind}/dlz_mysql_dynamic.so
+%doc build/contrib/dlz/modules/doc/mysql
+%{_libdir}/{named,bind}/dlz_mysqldyn_mod.so
+%doc build/contrib/dlz/modules/doc/mysqldyn
+
+%files dlz-ldap
+%{_libdir}/{named,bind}/dlz_ldap_dynamic.so
+%doc contrib/dlz/modules/ldap/testing/*
+
+%files dlz-sqlite3
+%{_libdir}/{named,bind}/dlz_sqlite3_dynamic.so
+%doc contrib/dlz/modules/sqlite3/testing/*
 
 %files libs
 %{_libdir}/*-%{version}*.so
@@ -535,7 +614,10 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
-* Tue Jul 27 2021 Jon Slobodzian <joslobo@microsoft.com> - 9.16.15-1 
+* Fri Aug 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.15-2
+- Adding DBZ subpackages using Fedora 34 (license: MIT) specs as guidance.
+
+* Tue Jul 27 2021 Jon Slobodzian <joslobo@microsoft.com> - 9.16.15-1
 - Update version to 9.16.15 to fix CVE-2021-25215
 - Remove unprovided soname version of libraries
 - Include versioned library names in libs subpackage
@@ -544,7 +626,7 @@ fi;
 - Merge the following releases from 1.0 to dev branch
 - nicolasg@microsoft.com, 9.16.3-3: Fixes CVE-2020-8625
 
-* Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4 
+* Thu May 13 2021 Henry Li <lihl@microsoft.com> - 9.16.3-4
 - Fix file path error caused by linting
 - Remove duplicate %files section for bind-license
 - Remove named.conf from main package, which is already provided by bind-utils
