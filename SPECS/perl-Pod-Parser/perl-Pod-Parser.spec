@@ -1,7 +1,7 @@
 Summary:        Basic perl modules for handling Plain Old Documentation (POD)
 Name:           perl-Pod-Parser
 Version:        1.63
-Release:        448%{?dist}
+Release:        449%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,6 @@ BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(FileHandle)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More) >= 0.6
-BuildRequires:  perl(IO::String)
 BuildRequires:  perl(Pod::Checker) >= 1.40
 %endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -71,6 +70,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-449
+- Removing unnecessary BR on `Perl(IO::String)'.
+
 * Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 1.63-448
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 
