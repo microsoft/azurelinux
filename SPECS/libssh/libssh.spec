@@ -128,7 +128,7 @@ popd
 
 %changelog
 * Thu Aug 26 2021 Shane Guan <shaneguan@microsoft.com> - 0.9.6-1
-- Updated libssh version that addresses a CVE
+- Updated libssh version that addresses a CVE here: https://www.libssh.org/security/advisories/CVE-2021-3634.txt
 
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 0.9.5-2
 - Replace ldconfig_scriptlets with the expanded form
