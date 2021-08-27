@@ -1,6 +1,8 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.36.1
+# We are shipping a static library `libiberty`, with every release,
+# update all specs/packages that depend on `libiberty`.
 Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
