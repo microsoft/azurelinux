@@ -844,16 +844,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "conmon",
-          "version": "2.0.29",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
@@ -957,16 +947,6 @@
           "name": "createrepo_c",
           "version": "0.11.1",
           "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.11.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cri-o",
-          "version": "1.21.2",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.2.tar.gz"
         }
       }
     },
@@ -2921,16 +2901,6 @@
           "name": "libconfuse",
           "version": "3.3",
           "downloadUrl": "https://github.com/libconfuse/libconfuse/releases/download/v3.3/confuse-3.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libcontainers-common",
-          "version": "20200727",
-          "downloadUrl": "https://github.com/containers/image/archive/v5.5.1.tar.gz"
         }
       }
     },
