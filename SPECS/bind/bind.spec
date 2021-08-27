@@ -37,21 +37,23 @@ Patch0:         CVE-2019-6470.nopatch
 Patch1:         CVE-2020-8623.nopatch
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
+
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
-Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
-BuildRequires:  openldap-devel, libpq-devel, sqlite-devel, mariadb-devel
-BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
+BuildRequires:  libpq-devel
 BuildRequires:  libtool
 BuildRequires:  libuv-devel
 BuildRequires:  lmdb-devel
 BuildRequires:  make
+BuildRequires:  mariadb-devel
+BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 BuildRequires:  python3-ply
+BuildRequires:  sqlite-devel
+
 Requires:       libuv
 Requires:       openssl
 Requires(postun): %{_sbindir}/groupdel
@@ -71,31 +73,31 @@ for the Internet. It is a reference implementation of those protocols, but it is
 also production-grade software, suitable for use in high-volume and high-reliability applications.
 
 %package dlz-filesystem
-Summary: BIND server filesystem DLZ module
-Requires: bind%{?_isa} = %{version}-%{release}
+Summary:        BIND server filesystem DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
 
 %description dlz-filesystem
 Dynamic Loadable Zones filesystem module for BIND server.
 
 %package dlz-ldap
-Summary: BIND server ldap DLZ module
-Requires: bind%{?_isa} = %{version}-%{release}
+Summary:        BIND server ldap DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
 
 %description dlz-ldap
 Dynamic Loadable Zones LDAP module for BIND server.
 
 %package dlz-mysql
-Summary: BIND server mysql and mysqldyn DLZ modules
-Requires: bind%{?_isa} = %{version}-%{release}
-Provides: %{name}-dlz-mysqldyn = %{version}-%{release}
+Summary:        BIND server mysql and mysqldyn DLZ modules
+Requires:       bind%{?_isa} = %{version}-%{release}
+Provides:       %{name}-dlz-mysqldyn = %{version}-%{release}
 
 %description dlz-mysql
 Dynamic Loadable Zones MySQL module for BIND server.
 Contains also mysqldyn module with dynamic DNS updates (DDNS) support.
 
 %package dlz-sqlite3
-Summary: BIND server sqlite3 DLZ module
-Requires: bind%{?_isa} = %{version}-%{release}
+Summary:        BIND server sqlite3 DLZ module
+Requires:       bind%{?_isa} = %{version}-%{release}
 
 %description dlz-sqlite3
 Dynamic Loadable Zones sqlite3 module for BIND server.
