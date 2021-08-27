@@ -42,7 +42,6 @@ BuildRequires:  gcc
 BuildRequires:  json-c-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcap-devel
-BuildRequires:  libpq-devel
 BuildRequires:  libtool
 BuildRequires:  libuv-devel
 BuildRequires:  lmdb-devel
@@ -50,6 +49,7 @@ BuildRequires:  make
 BuildRequires:  mariadb-devel
 BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
+BuildRequires:  postgresql-devel
 BuildRequires:  python3
 BuildRequires:  python3-ply
 BuildRequires:  sqlite-devel
