@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.16.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         CVE-2021-29923.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
+Requires:       mariner-golang-macros
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
@@ -35,7 +36,7 @@ tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
 mv -v go go-bootstrap
 
-# Setup go source and patch 
+# Setup go source and patch
 %setup -q -n go
 %patch1 -p1
 
@@ -118,6 +119,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Aug 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.16.7-2
+- Require golang rpm macros to enable them on any system with golang.
+
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.7-1
 - Updated to version 1.16.7 and fix CVE-2021-29923
 

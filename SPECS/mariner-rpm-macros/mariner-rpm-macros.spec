@@ -12,9 +12,10 @@ Source2: default-hardened-cc1
 Source3: default-hardened-ld
 Source4: default-annobin-cc1
 Source5: macros.check
+Source6: macros.go-rpm
+Source7: macros.go-compilers-golang
 
 BuildArch: noarch
-
 
 %global rcdir /usr/lib/rpm/mariner
 
@@ -22,12 +23,16 @@ BuildArch: noarch
 Mariner specific rpm macro files.
 
 %package -n mariner-check-macros
-Summary:        Mariner specific rpm macros to override default %%check behavior
-License:        GPL+
-Group:          Development/System
+Summary: Mariner specific rpm macros to override default %%check behavior
+License: GPL+
+Group:   Development/System
 
 %description -n mariner-check-macros
 Mariner specific rpm macros to override default %%check behavior
+
+%package -n mariner-golang-macros
+Summary: Mariner-specific rpm macros enabling various go build options, e.g. %%gobuild
+License: GPLv3+
 
 %prep
 %setup -c -T
@@ -52,7 +57,13 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %files -n mariner-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
+%files -n mariner-golang-macros
+%{_rpmconfigdir}/macros.d/macros.go-rpm
+%{_rpmconfigdir}/macros.d/macros.go-compilers-golang
+
 %changelog
+* Mon Aug 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-5
+- Import golang macros from Fedora (License: GPL3)
 * Wed Jun 30 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-4
 - Modify macros to only strip debug symbols when debug_package is enabled
 * Tue Jun 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-3

@@ -1,0 +1,19 @@
+# Copyright (c) 2015 Jakub Cajka <jcajka@redhat.com>, Jan Chaloupka <jchaloup@redhat.com>
+# This file is distributed under the terms of GNU GPL license version 3, or
+# any later version.
+
+# This file contains macros for building projects in golang for packages
+# with golang compiler or gcc-go compiler based on an architecture.
+
+# Define commands for building
+# BUILD_ID can be generated for golang build no matter of debuginfo
+%gobuild(o:) %{expand:
+  # https://bugzilla.redhat.com/show_bug.cgi?id=995136#c12
+  %global _dwz_low_mem_die_limit 0
+  go build -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags %{?__golang_extldflags}'" -a -v -x %{?**};
+}
+
+# Define commands for testing
+%gotestflags      -buildmode pie -compiler gc
+%gotestextldflags %__global_ldflags %{?__golang_extldflags}
+%gotest() go test %{gotestflags} -ldflags "${LDFLAGS:-} -extldflags '%{gotestextldflags}'" %{?**};
