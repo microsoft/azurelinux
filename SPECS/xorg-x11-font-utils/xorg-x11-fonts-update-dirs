@@ -1,0 +1,61 @@
+#!/bin/sh
+# This script is used by the xorg-x11-fonts package in the %post stage for
+# some fonts to generate the right encodings.
+
+fontdir=""
+encodingsdir="@DATADIR@/X11/fonts/encodings"
+
+# some fonts need to skip mkfontscale, set to "yes" to skip
+skip_fontscale=""
+# some fonts need to run ttmkfdir, set to "yes" to run
+need_ttmkfdir=""
+
+if [ $# -lt 1 ]; then
+    echo "Need at least one parameter for font dir."
+    exit 1
+fi
+
+while [ $# != 0 ]; do
+    case $1 in
+        --skip-fontscale)
+        skip_fontscale="yes"
+        ;;
+        --need-ttmkfdir)
+        need_ttmkfdir="yes"
+        ;;
+        --encodingsdir)
+        shift
+        encodingsdir="$1"
+        ;;
+        *)
+        fontdir="$1"
+
+        if [ $# != 1 ]; then
+            echo "Too many parameters."
+            exit 1
+        fi
+        ;;
+    esac
+    shift
+done
+
+if [ "$skip_fontscale" != "yes" ]; then
+    mkfontscale $fontdir
+fi
+if [ "$need_ttmkfdir" = "yes" ]; then
+    ttmkfdir -d $fontdir -o "$fontdir/fonts.scale"
+fi
+
+mkfontdir $fontdir
+fc-cache $fontdir
+
+if ! [ -z "$encodingsdir" ]; then
+    [ -d "$encodingsdir" ] || mkdir -p "$encodingsdir"
+    [ -d "$encodingsdir/large" ] || mkdir -p "$encodingsdir/large"
+    oldpwd=$(pwd)
+    cd "$encodingsdir"
+    mkfontscale -n -e "$encodingsdir" -e "$encodingsdir/large"
+    cd ${oldpwd}
+fi
+
+

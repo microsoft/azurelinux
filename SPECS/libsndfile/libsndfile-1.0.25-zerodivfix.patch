@@ -1,0 +1,25 @@
+From 725c7dbb95bfaf8b4bb7b04820e3a00cceea9ce6 Mon Sep 17 00:00:00 2001
+From: Erik de Castro Lopo <erikd@mega-nerd.com>
+Date: Wed, 24 Dec 2014 21:02:35 +1100
+Subject: [PATCH] src/file_io.c : Prevent potential divide-by-zero.
+
+Closes: https://github.com/erikd/libsndfile/issues/92
+---
+ src/file_io.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/file_io.c b/src/file_io.c
+index 26d3d6d..6ccab78 100644
+--- a/src/file_io.c
++++ b/src/file_io.c
+@@ -1322,6 +1322,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
+ {	sf_count_t total = 0 ;
+ 	ssize_t	count ;
+ 
++	if (bytes == 0 || items == 0)
++		return 0 ;
++
+ 	if (psf->virtual_io)
+ 		return psf->vio.write (ptr, bytes*items, psf->vio_user_data) / bytes ;
+ 
+

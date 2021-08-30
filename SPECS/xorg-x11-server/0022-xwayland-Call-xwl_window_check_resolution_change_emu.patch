@@ -1,0 +1,48 @@
+From 677fd1ade4547008b0d67eec460770e002595c3c Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 4 Nov 2019 11:46:49 +0100
+Subject: [PATCH xserver 22/25] xwayland: Call
+ xwl_window_check_resolution_change_emulation() on newly created O-R windows
+
+Some clients, which use vidmode to change the resolution when going fullscreen,
+create an override-redirect window and never trigger the screen->ResizeWindow
+callback we rely on to do the xwl_window_check_resolution_change_emulation().
+
+This causes us to not apply a viewport to them, causing the fullscreen window
+to not fill the entire monitor.
+
+This commit adds a call to xwl_window_check_resolution_change_emulation()
+at the end of ensure_surface_for_window() to fix this. Note that
+ensure_surface_for_window() exits early without creating an xwl_window
+for new windows which will not be backed by a wayland surface and which
+thus will not have an xwl_window.
+
+This fixes ClanLib-0.6.x and alleggl-4.4.x using apps not properly
+fullscreening.
+
+Acked-by: Olivier Fourdan <ofourdan@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 4cfc2677f5c82ca5db0919de549b9b077f1ba113)
+---
+ hw/xwayland/xwayland.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index 4f19f3710..5bb7a68e9 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -808,6 +808,11 @@ ensure_surface_for_window(WindowPtr window)
+ 
+     xwl_window_init_allow_commits(xwl_window);
+ 
++    if (!window_is_wm_window(window)) {
++        /* CSD or O-R toplevel window, check viewport on creation */
++        xwl_window_check_resolution_change_emulation(xwl_window);
++    }
++
+     return TRUE;
+ 
+ err_surf:
+-- 
+2.28.0
+

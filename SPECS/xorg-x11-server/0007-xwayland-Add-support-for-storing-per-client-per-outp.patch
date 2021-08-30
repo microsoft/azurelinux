@@ -1,0 +1,149 @@
+From 4bc5480d2e63cceecdc18b4bfda4fb4624f8fb43 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 29 Aug 2019 23:04:36 +0200
+Subject: [PATCH xserver 07/25] xwayland: Add support for storing per client
+ per output emulated resolution
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add support for storing per output randr/vidmode emulated resolution
+into the per client data.
+
+Since we do not have a free/delete callback for the client this uses
+a simple static array. The entries are tied to a specific output by the
+server_output_id, with a server_output_id of 0 indicating a free slot
+(0 is the "None" Wayland object id).
+
+Note that even if we were to store this in a linked list, we would still
+need the server_output_id as this is *per client* *per output*.
+
+This is a preparation patch for adding randr/vidmode resolution
+change emulation.
+
+Reviewed-by: Olivier Fourdan <ofourdan@redhat.com>
+Acked-by: Michel Dänzer <mdaenzer@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit aca0a588eb40a5e6669094a2ab7f71ca0ba06b16)
+---
+ hw/xwayland/xwayland-output.c | 67 +++++++++++++++++++++++++++++++++++
+ hw/xwayland/xwayland.h        | 17 +++++++++
+ 2 files changed, 84 insertions(+)
+
+diff --git a/hw/xwayland/xwayland-output.c b/hw/xwayland/xwayland-output.c
+index 633ebb89e..64794dee7 100644
+--- a/hw/xwayland/xwayland-output.c
++++ b/hw/xwayland/xwayland-output.c
+@@ -208,6 +208,73 @@ update_screen_size(struct xwl_output *xwl_output, int width, int height)
+     update_desktop_dimensions();
+ }
+ 
++struct xwl_emulated_mode *
++xwl_output_get_emulated_mode_for_client(struct xwl_output *xwl_output,
++                                        ClientPtr client)
++{
++    struct xwl_client *xwl_client = xwl_client_get(client);
++    int i;
++
++    if (!xwl_output)
++        return NULL;
++
++    for (i = 0; i < XWL_CLIENT_MAX_EMULATED_MODES; i++) {
++        if (xwl_client->emulated_modes[i].server_output_id ==
++            xwl_output->server_output_id)
++            return &xwl_client->emulated_modes[i];
++    }
++
++    return NULL;
++}
++
++static void
++xwl_output_add_emulated_mode_for_client(struct xwl_output *xwl_output,
++                                        ClientPtr client,
++                                        RRModePtr mode,
++                                        Bool from_vidmode)
++{
++    struct xwl_client *xwl_client = xwl_client_get(client);
++    struct xwl_emulated_mode *emulated_mode;
++    int i;
++
++    emulated_mode = xwl_output_get_emulated_mode_for_client(xwl_output, client);
++    if (!emulated_mode) {
++        /* Find a free spot in the emulated modes array */
++        for (i = 0; i < XWL_CLIENT_MAX_EMULATED_MODES; i++) {
++            if (xwl_client->emulated_modes[i].server_output_id == 0) {
++                emulated_mode = &xwl_client->emulated_modes[i];
++                break;
++            }
++        }
++    }
++    if (!emulated_mode) {
++        static Bool warned;
++
++        if (!warned) {
++            ErrorF("Ran out of space for emulated-modes, not adding mode");
++            warned = TRUE;
++        }
++
++        return;
++    }
++
++    emulated_mode->server_output_id = xwl_output->server_output_id;
++    emulated_mode->width  = mode->mode.width;
++    emulated_mode->height = mode->mode.height;
++    emulated_mode->from_vidmode = from_vidmode;
++}
++
++static void
++xwl_output_remove_emulated_mode_for_client(struct xwl_output *xwl_output,
++                                           ClientPtr client)
++{
++    struct xwl_emulated_mode *emulated_mode;
++
++    emulated_mode = xwl_output_get_emulated_mode_for_client(xwl_output, client);
++    if (emulated_mode)
++        memset(emulated_mode, 0, sizeof(*emulated_mode));
++}
++
+ /* From hw/xfree86/common/xf86DefModeSet.c with some obscure modes dropped */
+ const int32_t xwl_output_fake_modes[][2] = {
+     /* 4:3 (1.33) */
+diff --git a/hw/xwayland/xwayland.h b/hw/xwayland/xwayland.h
+index 19626d394..c886d77e9 100644
+--- a/hw/xwayland/xwayland.h
++++ b/hw/xwayland/xwayland.h
+@@ -379,7 +379,21 @@ struct xwl_output {
+     Bool xdg_output_done;
+ };
+ 
++/* Per client per output emulated randr/vidmode resolution info. */
++struct xwl_emulated_mode {
++    uint32_t server_output_id;
++    int32_t width;
++    int32_t height;
++    Bool from_vidmode;
++};
++
++/* Apps which use randr/vidmode to change the mode when going fullscreen,
++ * usually change the mode of only a single monitor, so this should be plenty.
++ */
++#define XWL_CLIENT_MAX_EMULATED_MODES 16
++
+ struct xwl_client {
++    struct xwl_emulated_mode emulated_modes[XWL_CLIENT_MAX_EMULATED_MODES];
+ };
+ 
+ void xwl_window_create_frame_callback(struct xwl_window *xwl_window);
+@@ -427,6 +441,9 @@ void xwl_output_destroy(struct xwl_output *xwl_output);
+ 
+ void xwl_output_remove(struct xwl_output *xwl_output);
+ 
++struct xwl_emulated_mode *xwl_output_get_emulated_mode_for_client(
++                            struct xwl_output *xwl_output, ClientPtr client);
++
+ RRModePtr xwayland_cvt(int HDisplay, int VDisplay,
+                        float VRefresh, Bool Reduced, Bool Interlaced);
+ 
+-- 
+2.28.0
+

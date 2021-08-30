@@ -1,0 +1,54 @@
+diff -uNr libdrm-2.4.69.orig/xf86drm.c libdrm-2.4.69/xf86drm.c
+--- libdrm-2.4.69.orig/xf86drm.c	2016-07-20 20:42:39.000000000 +0200
++++ libdrm-2.4.69/xf86drm.c	2016-07-21 08:00:10.411599806 +0200
+@@ -484,11 +484,6 @@
+     int           fd;
+ 
+     if ((fd = drmOpenMinor(0, 1, DRM_NODE_PRIMARY)) < 0) {
+-#ifdef __linux__
+-        /* Try proc for backward Linux compatibility */
+-        if (!access("/proc/dri/0", R_OK))
+-            return 1;
+-#endif
+         return 0;
+     }
+ 
+@@ -661,38 +656,6 @@
+         }
+     }
+ 
+-#ifdef __linux__
+-    /* Backward-compatibility /proc support */
+-    for (i = 0; i < 8; i++) {
+-        char proc_name[64], buf[512];
+-        char *driver, *pt, *devstring;
+-        int  retcode;
+-
+-        sprintf(proc_name, "/proc/dri/%d/name", i);
+-        if ((fd = open(proc_name, 0, 0)) >= 0) {
+-            retcode = read(fd, buf, sizeof(buf)-1);
+-            close(fd);
+-            if (retcode) {
+-                buf[retcode-1] = '\0';
+-                for (driver = pt = buf; *pt && *pt != ' '; ++pt)
+-                    ;
+-                if (*pt) { /* Device is next */
+-                    *pt = '\0';
+-                    if (!strcmp(driver, name)) { /* Match */
+-                        for (devstring = ++pt; *pt && *pt != ' '; ++pt)
+-                            ;
+-                        if (*pt) { /* Found busid */
+-                            return drmOpenByBusid(++pt, type);
+-                        } else { /* No busid */
+-                            return drmOpenDevice(strtol(devstring, NULL, 0),i, type);
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-    }
+-#endif
+-
+     return -1;
+ }
+ 

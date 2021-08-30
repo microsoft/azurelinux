@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# The X server provides capabilities of the form:
+#
+# Provides: xserver-abi(ansic-0) = 4
+#
+# for an ABI version of 0.4.  The major number is encoded into the name so
+# that major number changes force upgrades.  If we didn't, then
+#
+# Requires: xserver-abi(ansic) >= 0.4
+#
+# would also match 1.0, which is wrong since major numbers mean an ABI break.
+
+echo "xserver-abi($1-@MAJOR@) >= @MINOR@"

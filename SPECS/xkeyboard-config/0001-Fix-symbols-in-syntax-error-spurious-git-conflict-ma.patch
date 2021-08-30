@@ -1,0 +1,27 @@
+From c8d68304c826567f27f5a913dd38f6e045b81483 Mon Sep 17 00:00:00 2001
+From: Pritam Baral <pritam@pritambaral.com>
+Date: Thu, 11 Jun 2020 04:02:27 +0000
+Subject: [PATCH xkeyboard-config] Fix symbols/in syntax error: spurious git
+ conflict marker
+
+Introduced in https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config/-/commit/93ea944c2599584a4dd1add1725fafd19fef2535#904fcb1a2ae93630fa2905a7fd0ced3f8e50a6e8_2329_2329
+---
+ symbols/in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/symbols/in b/symbols/in
+index 3ca78a2..b3a5ca9 100644
+--- a/symbols/in
++++ b/symbols/in
+@@ -2326,7 +2326,7 @@ xkb_symbols "marathi" {
+ 	key <AB09> { [ period, U0964, U0965, U093d ] };
+ 	key <AB10> { [ U092f, question, slash, question ] };
+ };
+-=======
++
+ // EXTRAS:
+ 
+ //           Modi is an ancient Indian script that is used to write texts in Marathi, Hindi and Sanskrit.
+-- 
+2.26.2
+

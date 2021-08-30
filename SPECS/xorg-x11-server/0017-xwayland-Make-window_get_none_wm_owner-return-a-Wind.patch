@@ -1,0 +1,82 @@
+From dd83985179b4a3c2613c96922eafeea40e21b7d2 Mon Sep 17 00:00:00 2001
+From: Roman Gilg <subdiff@gmail.com>
+Date: Wed, 15 Jan 2020 10:07:58 +0100
+Subject: [PATCH xserver 17/25] xwayland: Make window_get_none_wm_owner return
+ a Window instead of a Client
+
+Make window_get_none_wm_owner return the first non-wm-window instead of the
+owner (client) of the first non-wm-window and rename it to
+window_get_client_toplevel to match its new behavior.
+
+This is a preparation patch for switching to using the drawable coordinates
+in xwl_window_should_enable_viewport()
+
+Changes by Hans de Goede:
+- Split this change out into a separate patch for easier reviewing
+- Rename window_get_none_wm_owner to window_get_client_toplevel to match
+  its new behavior
+
+Signed-off-by: Roman Gilg <subdiff@gmail.com>
+Acked-by: Olivier Fourdan <ofourdan@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 060f10062eb1761515b762b46cba56c7a53db72c)
+---
+ hw/xwayland/xwayland.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index c38c4180b..b3b80beae 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -568,10 +568,10 @@ window_is_wm_window(WindowPtr window)
+     return CLIENT_ID(window->drawable.id) == xwl_screen->wm_client_id;
+ }
+ 
+-static ClientPtr
+-window_get_none_wm_owner(WindowPtr window)
++static WindowPtr
++window_get_client_toplevel(WindowPtr window)
+ {
+-    ClientPtr client = wClient(window);
++    assert(window);
+ 
+     /* If the toplevel window is owned by the window-manager, then the
+      * actual client toplevel window has been reparented to some window-manager
+@@ -580,12 +580,12 @@ window_get_none_wm_owner(WindowPtr window)
+      */
+     if (window_is_wm_window(window)) {
+         if (window->firstChild && window->firstChild == window->lastChild)
+-            return window_get_none_wm_owner(window->firstChild);
++            return window_get_client_toplevel(window->firstChild);
+         else
+             return NULL; /* Should never happen, skip resolution emulation */
+     }
+ 
+-    return client;
++    return window;
+ }
+ 
+ static Bool
+@@ -597,14 +597,17 @@ xwl_window_should_enable_viewport(struct xwl_window *xwl_window,
+     struct xwl_emulated_mode *emulated_mode;
+     struct xwl_output *xwl_output;
+     ClientPtr owner;
++    WindowPtr window;
+ 
+     if (!xwl_screen_has_resolution_change_emulation(xwl_screen))
+         return FALSE;
+ 
+-    owner = window_get_none_wm_owner(xwl_window->window);
+-    if (!owner)
++    window = window_get_client_toplevel(xwl_window->window);
++    if (!window)
+         return FALSE;
+ 
++    owner = wClient(window);
++
+     /* 1. Test if the window matches the emulated mode on one of the outputs
+      * This path gets hit by most games / libs (e.g. SDL, SFML, OGRE)
+      */
+-- 
+2.28.0
+
