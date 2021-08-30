@@ -1,10 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.36.1
-# WARNING: we are shipping a bunch of static libraries `*.a`. With every release
-#          we MUST update all specs depending on `binutils-devel` in order to link
-#          with the updated libraries.
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,15 +37,12 @@ for handling compiled objects.
     --disable-silent-rules
 
 %make_build tooldir=%{_prefix}
-%make_build CFLAGS="-g -fPIC" -C libiberty
 
 %install
 %make_install tooldir=%{_prefix}
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
-install -m 644 libiberty/libiberty.a %{buildroot}%{_libdir}
-install -m 644 include/libiberty.h %{buildroot}%{_prefix}/include
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
@@ -111,7 +105,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_includedir}/ctf-api.h
 %{_includedir}/ctf.h
 %{_includedir}/demangle.h
-%{_includedir}/libiberty.h
 %{_libdir}/libbfd.a
 %{_libdir}/libopcodes.a
 %{_libdir}/libbfd.so
@@ -125,12 +118,8 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libctf.so
 %{_libdir}/libctf.so.0
 %{_libdir}/libctf.so.0.*
-%{_libdir}/libiberty.a
 
 %changelog
-* Fri Aug 27 2021 Muhammad Falak <mwani@microsoft.com> - 2.36.1-3
-- Export libiberty.{a,h} for `devel` subpackage
-
 * Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.1-2
 - Add patch from Fedora 34 (license: MIT) to export demangle.h from libiberty sources
 - Lint spec
