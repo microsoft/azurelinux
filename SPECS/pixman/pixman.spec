@@ -9,7 +9,6 @@ URL:            https://gitlab.freedesktop.org/pixman/pixman
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
-BuildRequires:  marinerui-rpm-macros
 BuildRequires:  meson
 
 %description
@@ -62,6 +61,7 @@ sed -i 's/120/600/' test/meson.build
 %changelog
 * Mon Aug 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.40.0-4
 - Switching back to using ldconfig scriptlets, since they are now available.
+- Removing BR on 'marinerui-rpm-macros'. Using macros from the build env.
 
 * Fri Jan 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.40.0-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT). Switched from Photon's spec.
