@@ -220,8 +220,7 @@
                 "yajl",
                 "yaml-cpp",
                 "yasm",
-                "zipper",
-                "zipperarchivemount"
+                "zipper"
             ]
         },
         {

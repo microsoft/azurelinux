@@ -13,37 +13,40 @@
 
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
-  Cython \
   byacc \
+  Cython \
+  grub2-efi-binary-signed-aarch64 \
+  grub2-efi-binary-signed-x86_64 \
   initramfs \
+  installkernel \
+  kernel-signed-aarch64 \
+  kernel-signed-x86_64 \
   kf5 \
   mariner-repos \
   mariner-rpm-macros \
-  shim \
   moby-buildx \
   moby-containerd \
   openjdk8 \
   python-markupsafe \
   python-nocasedict \
+  python-nocasedict \
   python-pywbem \
+  python-pywbem \
+  python-repoze-lru \
   python-repoze-lru \
   python-requests \
   python-sphinxcontrib-websupport \
-  python-yamlloader \
-  python-zope-interface \
-  python-nocasedict \
-  python-pywbem \
-  python-repoze-lru \
   python-sphinxcontrib-websupport \
   python-yamlloader \
+  python-yamlloader \
+  python-zope-interface \
   qt5-rpm-macros \
   runc \
-  grub2-efi-binary-signed-aarch64 \
-  grub2-efi-binary-signed-x86_64 \
-  kernel-signed-aarch64 \
-  kernel-signed-x86_64 \
+  shim \
   verity-read-only-root \
-  installkernel"
+  xorg-x11-apps \
+  xorg-x11-font-utils \
+  xorg-x11-xkb-utils"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/

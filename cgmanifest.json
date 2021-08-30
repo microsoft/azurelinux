@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.11",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
+          "version": "1.10.9",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
         }
       }
     },
@@ -4457,6 +4457,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "mkfontdir",
           "version": "1.0.7",
@@ -4467,6 +4468,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "mkfontscale",
           "version": "1.1.3",
@@ -4967,6 +4969,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "oclock",
           "version": "1.0.4",
@@ -8317,6 +8320,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "setxkbmap",
           "version": "1.3.2",
@@ -9067,6 +9071,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "x11perf",
           "version": "1.6.0",
@@ -9087,6 +9092,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xclipboard",
           "version": "1.1.3",
@@ -9097,6 +9103,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xclock",
           "version": "1.0.9",
@@ -9117,6 +9124,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xconsole",
           "version": "1.0.6",
@@ -9137,6 +9145,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xcursorgen",
           "version": "1.0.6",
@@ -9167,6 +9176,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xeyes",
           "version": "1.1.2",
@@ -9217,6 +9227,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xfd",
           "version": "1.1.2",
@@ -9227,6 +9238,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xfontsel",
           "version": "1.0.6",
@@ -9267,6 +9279,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "xkbcomp",
           "version": "1.4.2",
@@ -9277,6 +9290,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "xkbevd",
           "version": "1.1.4",
@@ -9287,6 +9301,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "xkbprint",
           "version": "1.0.4",
@@ -9297,6 +9312,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "xkbutils",
           "version": "1.0.4",
@@ -9317,6 +9333,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xload",
           "version": "1.1.3",
@@ -9327,6 +9344,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xlogo",
           "version": "1.0.4",
@@ -9337,6 +9355,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xmag",
           "version": "1.0.6",
@@ -9347,6 +9366,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xmessage",
           "version": "1.0.5.",
@@ -9437,6 +9457,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xpr",
           "version": "1.0.5.",
@@ -9467,6 +9488,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xvidtune",
           "version": "1.0.3",
@@ -9477,6 +9499,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xwd",
           "version": "1.0.7",
@@ -9487,6 +9510,7 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xwud",
           "version": "1.0.5",
