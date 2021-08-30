@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -225,7 +225,6 @@ done
 make test
 
 %install
-[ %{buildroot} != "/" ] && rm -rf %{buildroot}/*
 install -d %{buildroot}{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl,%{_pkgdocdir}}
 make DESTDIR=%{buildroot} MANDIR=%{_mandir} MANSUFFIX=ssl install
 rename so.%{soversion} so.%{version} %{buildroot}%{_libdir}/*.so.%{soversion}
@@ -242,16 +241,7 @@ mv %{buildroot}%{_sysconfdir}/pki/tls/misc/tsget %{buildroot}%{_bindir}
 
 # Rename man pages so that they don't conflict with other system man pages.
 pushd %{buildroot}%{_mandir}
-ln -s -f config.5 man5/openssl.cnf.5
-for manpage in man*/* ; do
-	if [ -L ${manpage} ]; then
-		TARGET=`ls -l ${manpage} | awk '{ print $NF }'`
-		ln -snf ${TARGET}ssl ${manpage}ssl
-		rm -f ${manpage}
-	else
-		mv ${manpage} ${manpage}ssl
-	fi
-done
+ln -s -f config.5ssl man5/openssl.cnf.5ssl
 for conflict in passwd rand ; do
 	rename ${conflict} ssl${conflict} man*/${conflict}*
 # Fix dangling symlinks
@@ -320,11 +310,13 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
+* Mon Aug 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1k-8
+- Fix dangling symlinks in man page packaging
+- Fix duplicate ssl suffixes in man pages
+- Remove redundant %%clean section
+- Remove redundant buildroot cleaning in %%install section
+
 * Tue Aug 24 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-7
 - Patch CVE-2021-3711 and CVE-2021-3712.
 
