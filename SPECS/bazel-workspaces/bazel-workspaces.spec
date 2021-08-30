@@ -55,7 +55,7 @@ cp LICENSE README.md ..
 
 %changelog
 * Mon Jun 21 2021 Henry Li <lihl@microsoft.com> - 20200113-1.7
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Fix Source URL
 

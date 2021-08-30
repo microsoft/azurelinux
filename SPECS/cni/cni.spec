@@ -97,7 +97,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 
 %changelog
 * Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 0.8.1-2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Remove shadow from BR
 - Use systemd and fillup from runtime requirements

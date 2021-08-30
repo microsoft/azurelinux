@@ -267,7 +267,7 @@ fdupes %{buildroot}%{src_install_dir}
 
 %changelog
 * Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.14.4-3.4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Use gcc-c++ for BR
 - Use ninja-build for BR
