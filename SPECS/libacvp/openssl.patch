@@ -859,6 +859,21 @@ index aacaac1..2e879e6 100644
              printf("DH_generate_key failed for dgm = %d\n", tc->dgm);
              goto err;
          }
+diff --git a/app/app_kas_kdf.c b/app/app_kas_kdf.c
+index 53bad75..211d94d 100644
+--- a/app/app_kas_kdf.c
++++ b/app/app_kas_kdf.c
+@@ -423,6 +423,10 @@ int app_kas_kdf_onestep_handler(ACVP_TEST_CASE *test_case) {
+     }
+ 
+     switch (stc->aux_function) {
++    case ACVP_HASH_SHA1:
++        md = EVP_sha1();
++        h_output_len = 160;
++        break;
+     case ACVP_HASH_SHA224:
+     case ACVP_HMAC_SHA2_224:
+         md = EVP_sha224();
 diff --git a/app/app_kdf.c b/app/app_kdf.c
 index 1728527..e05fb3e 100644
 --- a/app/app_kdf.c
@@ -1339,7 +1354,7 @@ index 1728527..e05fb3e 100644
  
  #endif // OPENSSL_KDF_SUPPORT
 diff --git a/app/app_main.c b/app/app_main.c
-index 3d3943f..21ddfab 100755
+index 3d3943f..708b46b 100755
 --- a/app/app_main.c
 +++ b/app/app_main.c
 @@ -1477,7 +1477,6 @@ static int enable_kdf(ACVP_CTX *ctx) {
@@ -1375,7 +1390,16 @@ index 3d3943f..21ddfab 100755
      /* Support is for ECC-SSC for hashZ only */
      rv = acvp_cap_kas_ecc_enable(ctx, ACVP_KAS_ECC_SSC, &app_kas_ecc_handler);
      CHECK_ENABLE_CAP_RV(rv);
-@@ -1961,6 +1958,8 @@ static int enable_dsa(ACVP_CTX *ctx) {
+@@ -1889,6 +1886,8 @@ static int enable_kas_kdf(ACVP_CTX *ctx) {
+     CHECK_ENABLE_CAP_RV(rv);
+     rv = acvp_cap_kas_kdf_set_parm(ctx, ACVP_KAS_KDF_ONESTEP, ACVP_KAS_KDF_ENCODING_TYPE, ACVP_KAS_KDF_ENCODING_CONCAT, NULL);
+     CHECK_ENABLE_CAP_RV(rv);
++    rv = acvp_cap_kas_kdf_set_parm(ctx, ACVP_KAS_KDF_ONESTEP, ACVP_KAS_KDF_ONESTEP_AUX_FUNCTION, ACVP_HASH_SHA1, NULL);
++    CHECK_ENABLE_CAP_RV(rv);
+     rv = acvp_cap_kas_kdf_set_parm(ctx, ACVP_KAS_KDF_ONESTEP, ACVP_KAS_KDF_ONESTEP_AUX_FUNCTION, ACVP_HASH_SHA224, NULL);
+     CHECK_ENABLE_CAP_RV(rv);
+     rv = acvp_cap_kas_kdf_set_parm(ctx, ACVP_KAS_KDF_ONESTEP, ACVP_KAS_KDF_ONESTEP_AUX_FUNCTION, ACVP_HASH_SHA256, NULL);
+@@ -1961,6 +1960,8 @@ static int enable_dsa(ACVP_CTX *ctx) {
      CHECK_ENABLE_CAP_RV(rv);
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGGEN, ACVP_DSA_MODE_PQGGEN, ACVP_DSA_GENG, ACVP_DSA_CANONICAL);
      CHECK_ENABLE_CAP_RV(rv);
@@ -1384,7 +1408,7 @@ index 3d3943f..21ddfab 100755
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGGEN, ACVP_DSA_MODE_PQGGEN, ACVP_DSA_LN2048_224, ACVP_SHA224);
      CHECK_ENABLE_CAP_RV(rv);
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGGEN, ACVP_DSA_MODE_PQGGEN, ACVP_DSA_LN2048_224, ACVP_SHA256);
-@@ -2006,6 +2005,8 @@ static int enable_dsa(ACVP_CTX *ctx) {
+@@ -2006,6 +2007,8 @@ static int enable_dsa(ACVP_CTX *ctx) {
      CHECK_ENABLE_CAP_RV(rv);
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGVER, ACVP_DSA_MODE_PQGVER, ACVP_DSA_GENG, ACVP_DSA_CANONICAL);
      CHECK_ENABLE_CAP_RV(rv);
@@ -1393,7 +1417,7 @@ index 3d3943f..21ddfab 100755
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGVER, ACVP_DSA_MODE_PQGVER, ACVP_DSA_LN2048_224, ACVP_SHA224);
      CHECK_ENABLE_CAP_RV(rv);
      rv = acvp_cap_dsa_set_parm(ctx, ACVP_DSA_PQGVER, ACVP_DSA_MODE_PQGVER, ACVP_DSA_LN2048_224, ACVP_SHA256);
-@@ -2166,7 +2167,6 @@ static int enable_rsa(ACVP_CTX *ctx) {
+@@ -2166,7 +2169,6 @@ static int enable_rsa(ACVP_CTX *ctx) {
      /*
       * Enable RSA keygen...
       */
@@ -1401,7 +1425,7 @@ index 3d3943f..21ddfab 100755
      rv = acvp_cap_rsa_keygen_enable(ctx, ACVP_RSA_KEYGEN, &app_rsa_keygen_handler);
      CHECK_ENABLE_CAP_RV(rv);
      rv = acvp_cap_set_prereq(ctx, ACVP_RSA_KEYGEN, ACVP_PREREQ_SHA, value);
-@@ -2191,7 +2191,7 @@ static int enable_rsa(ACVP_CTX *ctx) {
+@@ -2191,7 +2193,7 @@ static int enable_rsa(ACVP_CTX *ctx) {
      rv = acvp_cap_rsa_keygen_set_primes(ctx, ACVP_RSA_KEYGEN_B34, 3072,
                                          ACVP_RSA_PRIME_HASH_ALG, ACVP_SHA256);
      CHECK_ENABLE_CAP_RV(rv);
@@ -2195,6 +2219,33 @@ index 601395e..9e8b1eb 100644
              ACVP_LOG_ERR("Server JSON invalid 'hashAlg'");
              rv = ACVP_INVALID_ARG;
              goto err;
+diff --git a/src/acvp_kas_kdf.c b/src/acvp_kas_kdf.c
+index 2db7cdb..c726f49 100644
+--- a/src/acvp_kas_kdf.c
++++ b/src/acvp_kas_kdf.c
+@@ -763,18 +763,22 @@ static ACVP_RESULT acvp_kas_kdf_process(ACVP_CTX *ctx,
+         }
+         salt_method_str = json_object_get_string(configobj, "saltMethod");
+         salt_method = read_salt_method(salt_method_str);
++        /*
+         if (!salt_method) {
+             ACVP_LOG_ERR("Invalid saltMethod provided by server");
+             rv = ACVP_MALFORMED_JSON;
+             goto err;
+         }
++        */
+         saltLen = json_object_get_number(configobj, "saltLen");
+         //saltLen seems tied to hashAlg bit length. Spec unclear as of writing.
++        /*
+         if (saltLen % 8 != 0 || saltLen < 0 || saltLen > 512) {
+             ACVP_LOG_ERR("Invalid saltLen provided by server");
+             rv = ACVP_MALFORMED_JSON;
+             goto err;
+         }
++        */
+         l = json_object_get_number(configobj, "l");
+         if (cipher == ACVP_KAS_HKDF) {
+             kdfcap = acvp_locate_cap_entry(ctx, ACVP_KAS_HKDF);
 diff --git a/src/acvp_kdf135_ssh.c b/src/acvp_kdf135_ssh.c
 index cb3c222..118c0b0 100644
 --- a/src/acvp_kdf135_ssh.c
@@ -2389,3 +2440,15 @@ index 27e4d95..3d32f6c 100644
          json_object_set_value(r_gobj, "tests", json_value_init_array());
          r_tarr = json_object_get_array(r_gobj, "tests");
  
+diff --git a/src/acvp_util.c b/src/acvp_util.c
+index b2b596c..df56cca 100644
+--- a/src/acvp_util.c
++++ b/src/acvp_util.c
+@@ -551,6 +551,7 @@ ACVP_EC_CURVE acvp_lookup_ec_curve(ACVP_CIPHER cipher, const char *name) {
+ }
+ 
+ static struct acvp_aux_function_info acvp_aux_function_tbl[] = {
++    { ACVP_HASH_SHA1, ACVP_ALG_SHA1 },
+     { ACVP_HASH_SHA224, ACVP_ALG_SHA224 },
+     { ACVP_HASH_SHA256, ACVP_ALG_SHA256 },
+     { ACVP_HASH_SHA384, ACVP_ALG_SHA384 },
