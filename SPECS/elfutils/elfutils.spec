@@ -13,7 +13,9 @@ Source0:	https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.b
 Provides: %{name}-libs = %{version}-%{release}
 
 Obsoletes:	libelf libelf-devel
-Requires:	elfutils-libelf = %{version}-%{release}
+
+Requires:	%{name}-libelf = %{version}-%{release}
+Requires: %{name}-default-yama-scope = %{version}-%{release}
 Requires:	glibc >= 2.7
 Requires:	bzip2-libs
 
@@ -38,6 +40,36 @@ symbols), readelf (to see the raw ELF file structures), and elflint
 (to check for well-formed ELF files).  Also included are numerous
 helper libraries which implement DWARF, ELF, and machine-specific ELF
 handling.
+
+%package default-yama-scope
+Summary: Default yama attach scope sysctl setting
+License: GPLv2+ OR LGPLv3+
+
+Provides: default-yama-scope = %{version}-%{release}
+
+BuildArch: noarch
+# For the sysctl_apply macro we need systemd as build requires.
+# We also need systemd-sysctl in post to apply the default kernel config.
+# But this creates a circular requirement (see below). And it would always
+# pull in systemd even in build containers that don't really need it.
+# Luckily systemd is normally always installed already. The only times it
+# might not is when we do an initial install (and the cyclic dependency
+# chain might be broken) or when installing into a container. In the first
+# case we'll reboot soon to apply the default kernel config. In the second
+# case we really require that the host has the correct kernel config so it
+# also is available inside the container. So if we have weak dependencies
+# use Recommends (sadly Recommends(post) doesn't exist). This works because
+# in all cases that really matter systemd will already be installed. #1599083
+Recommends: systemd
+
+%description default-yama-scope
+Yama sysctl setting to enable default attach scope settings
+enabling programs to use ptrace attach, access to
+/proc/PID/{mem,personality,stack,syscall}, and the syscalls
+process_vm_readv and process_vm_writev which are used for
+interprocess services, communication and introspection
+(like synchronisation, signaling, debugging, tracing and
+profiling) of processes.
 
 %package devel
 Summary: Development libraries to handle compiled objects.
@@ -120,8 +152,11 @@ mkdir -p ${RPM_BUILD_ROOT}%{_prefix}
 chmod +x ${RPM_BUILD_ROOT}/usr/lib/lib*.so*
 chmod +x ${RPM_BUILD_ROOT}/usr/lib/elfutils/lib*.so*
 
+install -Dm0644 config/10-default-yama-scope.conf ${RPM_BUILD_ROOT}%{_sysctldir}/10-default-yama-scope.conf
+
 # XXX Nuke unpackaged files
-{ pushd ${RPM_BUILD_ROOT}
+{
+  pushd ${RPM_BUILD_ROOT}
   rm -f .%{_bindir}/eu-ld
   rm -f .%{_includedir}/elfutils/libasm.h
   rm -f .%{_libdir}/libasm.so
@@ -148,6 +183,17 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %postun -p /sbin/ldconfig
 
+%post default-yama-scope
+# Due to circular dependencies might not be installed yet, so double check.
+# (systemd -> elfutils-libs -> default-yama-scope -> systemd)
+if [ -x /usr/lib/systemd/systemd-sysctl ] ; then
+%if 0%{?sysctl_apply}
+  %sysctl_apply 10-default-yama-scope.conf
+%else
+  /usr/lib/systemd/systemd-sysctl %{_sysctldir}/10-default-yama-scope.conf > /dev/null 2>&1 || :
+%endif
+fi
+
 %post libelf -p /sbin/ldconfig
 
 %postun libelf -p /sbin/ldconfig
@@ -164,6 +210,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libdw.so.*
 %dir %{_libdir}/elfutils
 %{_libdir}/elfutils/lib*.so
+
+%files default-yama-scope
+%{_sysctldir}/10-default-yama-scope.conf
 
 %files devel
 %defattr(-,root,root)
@@ -206,6 +255,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %changelog
 * Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 0.176-5
+- Adding "*-default-yama-scope" subpackage using Fedora 32 (license: MIT) specs as guidance.
 - Providing subpackage '*-libs' from the default package.
 * Tue Dec 22 2020 Andrew Phelps <anphel@microsoft.com> 0.176-4
 - Skip 2 tests that are expected to fail. License verified. Removed %%define sha1
