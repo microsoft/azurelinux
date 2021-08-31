@@ -61,8 +61,9 @@ cd build
 %{_libdir}/*.so
 
 %files libs
-%{_libdir}/*.so.*
+%{_libdir}/*.so.8*
 
 %changelog
-*   Thu Aug 12 2021 Andy Caldwell <andycaldwell@metaswitch.com>  8.0.1-1
--   Initial build.
+*   Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  8.0.1-1
+-   Original version for CBL-Mariner.
+-   License verified
