@@ -68,9 +68,8 @@ done
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
 rm "$sodiff_out_dir"/sodiff-summary.txt
-touch "$sodiff_out_dir"/sodiff-summary.txt
-# Remove packages that have been dash-rolled already.
 
+# Remove packages that have been dash-rolled already.
 echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
 for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # Remove version and release

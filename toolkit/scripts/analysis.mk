@@ -59,6 +59,7 @@ $(SODIFF_REPO_FILE):
 
 sodiff-check: $(BUILT_PACKAGES_FILE) | $(SODIFF_REPO_FILE)
 	<$(BUILT_PACKAGES_FILE) $(SODIFF_SCRIPT) $(RPMS_DIR)/ $(SODIFF_REPO_FILE) $(RELEASE_MAJOR_ID) $(SODIFF_OUTPUT_FOLDER)
-	( file -b $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt | grep -q empty ) || ( echo "SRPM files that need to be updated due to sodiff:"; cat $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt ; $(call print_error,$@ failed - see $(SODIFF_OUTPUT_FOLDER)/ for a list of failed files.) )
+	[ $(wc -w $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt | cut -f1 -d' ')  -eq 0 ] || ( echo "SRPM files that need to be updated due to sodiff:"; cat $(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt ; $(call print_error,$@ failed - see $(SODIFF_OUTPUT_FOLDER)/ for a list of failed files.) )
 	echo "SODIFF finished - no changes detected."
+
 package-toolkit: $(SODIFF_REPO_FILE)
