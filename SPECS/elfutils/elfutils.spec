@@ -2,7 +2,7 @@
 Summary:	A collection of utilities and DSOs to handle compiled objects
 Name:		elfutils
 Version:	0.176
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	GPLv3+ and (GPLv2+ or LGPLv3+)
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
@@ -10,10 +10,13 @@ Distribution:   Mariner
 URL:    	https://sourceware.org/elfutils
 Source0:	https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
 
+Provides: %{name}-libs = %{version}-%{release}
+
 Obsoletes:	libelf libelf-devel
 Requires:	elfutils-libelf = %{version}-%{release}
 Requires:	glibc >= 2.7
 Requires:	bzip2-libs
+
 # ExcludeArch: xxx
 
 BuildRequires:	gcc >= 4.1.2-33
@@ -202,6 +205,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root)
 
 %changelog
+* Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 0.176-5
+- Providing subpackage '*-libs' from the default package.
 * Tue Dec 22 2020 Andrew Phelps <anphel@microsoft.com> 0.176-4
 - Skip 2 tests that are expected to fail. License verified. Removed %%define sha1
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.176-3
