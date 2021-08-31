@@ -2,11 +2,11 @@ alsa-lib-1.2.2-1.cm1.aarch64.rpm
 alsa-lib-debuginfo-1.2.2-1.cm1.aarch64.rpm
 alsa-lib-devel-1.2.2-1.cm1.aarch64.rpm
 asciidoc-8.6.10-4.cm1.noarch.rpm
-audit-3.0-7.cm1.aarch64.rpm
-audit-debuginfo-3.0-7.cm1.aarch64.rpm
-audit-devel-3.0-7.cm1.aarch64.rpm
-audit-libs-3.0-7.cm1.aarch64.rpm
-audit-python-3.0-7.cm1.aarch64.rpm
+audit-3.0-8.cm1.aarch64.rpm
+audit-debuginfo-3.0-8.cm1.aarch64.rpm
+audit-devel-3.0-8.cm1.aarch64.rpm
+audit-libs-3.0-8.cm1.aarch64.rpm
+audit-python-3.0-8.cm1.aarch64.rpm
 autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
 bash-4.4.18-6.cm1.aarch64.rpm
@@ -22,12 +22,12 @@ bzip2-1.0.6-15.cm1.aarch64.rpm
 bzip2-debuginfo-1.0.6-15.cm1.aarch64.rpm
 bzip2-devel-1.0.6-15.cm1.aarch64.rpm
 bzip2-libs-1.0.6-15.cm1.aarch64.rpm
-ca-certificates-20200720-15.cm1.noarch.rpm
-ca-certificates-base-20200720-15.cm1.noarch.rpm
-ca-certificates-legacy-20200720-15.cm1.noarch.rpm
-ca-certificates-microsoft-20200720-15.cm1.noarch.rpm
-ca-certificates-shared-20200720-15.cm1.noarch.rpm
-ca-certificates-tools-20200720-15.cm1.noarch.rpm
+ca-certificates-20200720-17.cm1.noarch.rpm
+ca-certificates-base-20200720-17.cm1.noarch.rpm
+ca-certificates-legacy-20200720-17.cm1.noarch.rpm
+ca-certificates-microsoft-20200720-17.cm1.noarch.rpm
+ca-certificates-shared-20200720-17.cm1.noarch.rpm
+ca-certificates-tools-20200720-17.cm1.noarch.rpm
 check-0.12.0-4.cm1.aarch64.rpm
 check-debuginfo-0.12.0-4.cm1.aarch64.rpm
 cmake-3.17.3-2.cm1.aarch64.rpm
@@ -132,7 +132,7 @@ gmp-debuginfo-6.1.2-5.cm1.aarch64.rpm
 gmp-devel-6.1.2-5.cm1.aarch64.rpm
 gnupg2-2.2.20-3.cm1.aarch64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
-golang-1.15.13-1.cm1.aarch64.rpm
+golang-1.16.7-1.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
 gperf-debuginfo-3.1-3.cm1.aarch64.rpm
 gpgme-1.13.1-6.cm1.aarch64.rpm
@@ -158,7 +158,11 @@ json-c-debuginfo-0.14-3.cm1.aarch64.rpm
 json-c-devel-0.14-3.cm1.aarch64.rpm
 kbd-2.0.4-5.cm1.aarch64.rpm
 kbd-debuginfo-2.0.4-5.cm1.aarch64.rpm
+<<<<<<< HEAD
 kernel-headers-5.10.57.1-1.cm1.noarch.rpm
+=======
+kernel-headers-5.10.60.1-1.cm1.noarch.rpm
+>>>>>>> 1.0-dev
 kmod-25-4.cm1.aarch64.rpm
 kmod-debuginfo-25-4.cm1.aarch64.rpm
 kmod-devel-25-4.cm1.aarch64.rpm
@@ -266,7 +270,11 @@ m4-debuginfo-1.4.18-4.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
 make-debuginfo-4.2.1-5.cm1.aarch64.rpm
 mariner-check-macros-1.0-4.cm1.noarch.rpm
+<<<<<<< HEAD
 mariner-release-1.0-21.cm1.noarch.rpm
+=======
+mariner-release-1.0-22.cm1.noarch.rpm
+>>>>>>> 1.0-dev
 mariner-repos-1.0-14.cm1.noarch.rpm
 mariner-repos-extras-1.0-14.cm1.noarch.rpm
 mariner-repos-extras-preview-1.0-14.cm1.noarch.rpm
@@ -306,12 +314,12 @@ openjdk8-src-1.8.0.292-1.cm1.aarch64.rpm
 openjre8-1.8.0.292-1.cm1.aarch64.rpm
 openldap-2.4.57-2.cm1.aarch64.rpm
 openldap-debuginfo-2.4.57-2.cm1.aarch64.rpm
-openssl-1.1.1k-5.cm1.aarch64.rpm
-openssl-debuginfo-1.1.1k-5.cm1.aarch64.rpm
-openssl-devel-1.1.1k-5.cm1.aarch64.rpm
-openssl-libs-1.1.1k-5.cm1.aarch64.rpm
-openssl-perl-1.1.1k-5.cm1.aarch64.rpm
-openssl-static-1.1.1k-5.cm1.aarch64.rpm
+openssl-1.1.1k-8.cm1.aarch64.rpm
+openssl-debuginfo-1.1.1k-8.cm1.aarch64.rpm
+openssl-devel-1.1.1k-8.cm1.aarch64.rpm
+openssl-libs-1.1.1k-8.cm1.aarch64.rpm
+openssl-perl-1.1.1k-8.cm1.aarch64.rpm
+openssl-static-1.1.1k-8.cm1.aarch64.rpm
 p11-kit-0.23.22-1.cm1.aarch64.rpm
 p11-kit-debuginfo-0.23.22-1.cm1.aarch64.rpm
 p11-kit-devel-0.23.22-1.cm1.aarch64.rpm
@@ -360,7 +368,7 @@ python2-libcap-ng-0.7.9-3.cm1.aarch64.rpm
 python2-libs-2.7.18-7.cm1.aarch64.rpm
 python2-test-2.7.18-7.cm1.aarch64.rpm
 python2-tools-2.7.18-7.cm1.aarch64.rpm
-python3-audit-3.0-7.cm1.aarch64.rpm
+python3-audit-3.0-8.cm1.aarch64.rpm
 python3-cracklib-2.9.7-2.cm1.aarch64.rpm
 python3-gpg-1.13.1-6.cm1.aarch64.rpm
 python3-libcap-ng-0.7.9-3.cm1.aarch64.rpm
@@ -438,8 +446,8 @@ zip-debuginfo-3.0-5.cm1.aarch64.rpm
 zlib-1.2.11-3.cm1.aarch64.rpm
 zlib-debuginfo-1.2.11-3.cm1.aarch64.rpm
 zlib-devel-1.2.11-3.cm1.aarch64.rpm
-zstd-1.4.4-1.cm1.aarch64.rpm
-zstd-debuginfo-1.4.4-1.cm1.aarch64.rpm
-zstd-devel-1.4.4-1.cm1.aarch64.rpm
-zstd-doc-1.4.4-1.cm1.aarch64.rpm
-zstd-libs-1.4.4-1.cm1.aarch64.rpm
+zstd-1.4.9-1.cm1.aarch64.rpm
+zstd-debuginfo-1.4.9-1.cm1.aarch64.rpm
+zstd-devel-1.4.9-1.cm1.aarch64.rpm
+zstd-doc-1.4.9-1.cm1.aarch64.rpm
+zstd-libs-1.4.9-1.cm1.aarch64.rpm

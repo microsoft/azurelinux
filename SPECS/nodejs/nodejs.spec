@@ -1,6 +1,6 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        14.17.2
+Version:        14.17.5
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
@@ -10,7 +10,8 @@ URL:            https://github.com/nodejs/node
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         patch_tls_nodejs14.patch
 
-BuildRequires:  coreutils >= 8.22, openssl-devel >= 1.0.1
+BuildRequires:  coreutils >= 8.22
+BuildRequires:  openssl-devel >= 1.0.1
 BuildRequires:  python3
 BuildRequires:  which
 Requires:       coreutils >= 8.22
@@ -73,6 +74,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Mon Aug 30 2021 Andrew Phelps <anphel@microsoft.com> - 14.17.5-1
+-   Update to version 14.17.5 to fix CVE-2021-22931
 *   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
 -   Update to version 14.17.2 to fix CVE-2021-22918
 *   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1

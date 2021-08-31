@@ -3,7 +3,11 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
+<<<<<<< HEAD
 Version:        5.10.57.1
+=======
+Version:        5.10.60.1
+>>>>>>> 1.0-dev
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -15,8 +19,12 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
+<<<<<<< HEAD
 Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 Patch1:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+=======
+Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+>>>>>>> 1.0-dev
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -93,7 +101,10 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+<<<<<<< HEAD
 %patch1 -p1
+=======
+>>>>>>> 1.0-dev
 
 %build
 make mrproper
@@ -271,6 +282,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+<<<<<<< HEAD
+=======
+* Mon Aug 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.60.1-1
+- Update source to 5.10.60.1
+- Remove patch for CDROM eject errors
+
+>>>>>>> 1.0-dev
 * Thu Aug 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
 - Update source to 5.10.57.1
 

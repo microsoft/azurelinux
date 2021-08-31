@@ -113,14 +113,24 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
+<<<<<<< HEAD
 echo Linux-5.10.57.1 API Headers
 tar xf kernel-5.10.57.1.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.57.1
+=======
+echo Linux-5.10.60.1 API Headers
+tar xf kernel-5.10.60.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.60.1
+>>>>>>> 1.0-dev
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
+<<<<<<< HEAD
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.57.1
+=======
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.60.1
+>>>>>>> 1.0-dev
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 

@@ -3,7 +3,11 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
+<<<<<<< HEAD
 Version:        5.10.57.1
+=======
+Version:        5.10.60.1
+>>>>>>> 1.0-dev
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -16,8 +20,12 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
+<<<<<<< HEAD
 Patch0:         0001-Revert-scsi-sr-Return-appropriate-error-code-when-di.patch
 Patch1:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+=======
+Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+>>>>>>> 1.0-dev
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -206,6 +214,12 @@ Patch1168:      CVE-2021-3679.nopatch
 Patch1169:      CVE-2021-38198.nopatch
 Patch1170:      CVE-2021-38209.nopatch
 Patch1171:      CVE-2021-3655.nopatch
+<<<<<<< HEAD
+=======
+Patch1172:      CVE-2021-38166.nopatch
+Patch1173:      CVE-2021-38205.nopatch
+Patch1174:      CVE-2021-3573.nopatch
+>>>>>>> 1.0-dev
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -307,7 +321,10 @@ This package contains common device tree blobs (dtb)
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+<<<<<<< HEAD
 %patch1 -p1
+=======
+>>>>>>> 1.0-dev
 
 %build
 make mrproper
@@ -538,6 +555,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+<<<<<<< HEAD
+=======
+* Mon Aug 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.60.1-1
+- Update source to 5.10.60.1
+- Remove patch for CDROM eject errors
+- Address CVE-2021-38166, CVE-2021-38205, CVE-2021-3573
+
+>>>>>>> 1.0-dev
 * Thu Aug 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.57.1-1
 - Update source to 5.10.57.1
 - Address CVE-2021-37576, CVE-2021-34556, CVE-2021-35477, CVE-2021-28691,
