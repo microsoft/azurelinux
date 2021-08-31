@@ -3,20 +3,20 @@ Name:           lld
 Version:        8.0.1
 Release:        1%{?dist}
 License:        NCSA
-URL:            https://clang.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/lld-%{version}.src.tar.xz
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Requires:       ncurses
-Requires:       libxml2
-BuildRequires:  cmake
-BuildRequires:  make
+Group:          Development/Tools
+URL:            https://clang.llvm.org
+Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/lld-%{version}.src.tar.xz
 BuildRequires:  build-essential
-BuildRequires:  llvm-devel
-BuildRequires:  ncurses-devel
+BuildRequires:  cmake
 BuildRequires:  libxml2
+BuildRequires:  llvm-devel
+BuildRequires:  make
+BuildRequires:  ncurses-devel
 BuildRequires:  python3
+Requires:       libxml2
+Requires:       ncurses
 
 %package devel
 Summary:        Libraries and header files for LLD
