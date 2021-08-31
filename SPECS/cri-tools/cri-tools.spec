@@ -1,5 +1,4 @@
 %define debug_package %{nil}
-
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.21.0
@@ -12,7 +11,6 @@ URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        crictl.yaml
-
 BuildRequires:  golang
 
 %description
@@ -21,7 +19,7 @@ crictl: CLI for kubelet CRI.
 critest: validation test suites for kubelet CRI.
 
 %prep
-%setup -qn %{name}-%{version}
+%setup -q
 
 %build
 make %{?_smp_mflags}
@@ -61,8 +59,9 @@ cp %{SOURCE1} %{buildroot}%{_sysconfdir}
 %clean
 rm -rf %{buildroot}/*
 
+
 %changelog
-* Thu Aug 26 2021 Vincent Nguyen <vinguyen@microsoft.com> 1.21.0-1
+* Thu Aug 26 2021 Vincent Nguyen <vinguyen@microsoft.com> - 1.21.0-1
 - update to latest crictl tool version 1.21.0.
 
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.11.1-8
