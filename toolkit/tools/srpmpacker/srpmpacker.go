@@ -627,8 +627,8 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 		}
 
 		if isHydrated {
-			logger.Log.Warnf("Duplicate matching file found at (%s), skipping", path)
-			return nil
+			err = fmt.Errorf("Unable to process duplicate matching file (%s)", path)
+			return err
 		}
 
 		if !skipSignatureHandling {

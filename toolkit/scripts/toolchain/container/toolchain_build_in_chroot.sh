@@ -57,14 +57,24 @@ set -e
 #
 cd /sources
 
+<<<<<<< HEAD
 echo Linux-5.10.57.1 API Headers
 tar xf kernel-5.10.57.1.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.57.1
+=======
+echo Linux-5.10.60.1 API Headers
+tar xf kernel-5.10.60.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.60.1
+>>>>>>> 1.0-dev
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
+<<<<<<< HEAD
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.57.1
+=======
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.60.1
+>>>>>>> 1.0-dev
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02

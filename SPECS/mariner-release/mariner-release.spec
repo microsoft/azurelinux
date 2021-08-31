@@ -1,7 +1,11 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
+<<<<<<< HEAD
 Release:       21%{?dist}
+=======
+Release:       22%{?dist}
+>>>>>>> 1.0-dev
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -67,6 +71,11 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+<<<<<<< HEAD
+=======
+*   Mon Aug 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-22
+-   Updating version for August update.
+>>>>>>> 1.0-dev
 *   Thu Aug 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-21
 -   Off-cycle update for Kernel CVE's
 *   Fri Jul 23 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-20

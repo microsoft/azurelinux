@@ -2,7 +2,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,7 +179,6 @@ make  %{?_smp_mflags} test
 %dir %{_libdir}/python3.7/site-packages
 
 %{_libdir}/libpython3.so
-%{_libdir}/libpython3.7.so
 %{_libdir}/libpython3.7m.so.1.0
 
 %exclude %{_libdir}/python3.7/ctypes/test
@@ -221,6 +220,7 @@ make  %{?_smp_mflags} test
 %{_libdir}/pkgconfig/python-3.7.pc
 %{_libdir}/pkgconfig/python-3.7m.pc
 %{_libdir}/pkgconfig/python3.pc
+%{_libdir}/libpython3.7.so
 %{_libdir}/libpython3.7m.so
 %{_bindir}/python3-config
 %{_bindir}/python3.7-config
@@ -254,6 +254,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Aug 20 2021 Rachel Menge <rachelmenge@microsoft.com> 3.7.10-4
+- Move libpython3.7.so to devel files to resolve broken symlink 
+
 * Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> 3.7.10-3
 - Remove coreutils dependency to remove circular dependency with libselinux
 
