@@ -1,11 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.26
-<<<<<<< HEAD
-Release:        1%{?dist}
-=======
 Release:        2%{?dist}
->>>>>>> 1.0-dev
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,14 +54,10 @@ cmake . \
 %make_install
 
 %check
-<<<<<<< HEAD
-%make_build test
-=======
 # Test suite has multiple failures when run as root
 chmod g+w . -R
 useradd test -G root -m
 sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
->>>>>>> 1.0-dev
 
 %files
 %defattr(-,root,root)
@@ -93,14 +85,11 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-<<<<<<< HEAD
-=======
 * Mon Aug 30 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.26-2
 - Fix majority of package test failures by adding necessary requirements and running tests as non-root
 - Add missing tzdata runtime requirement
 - Add better log outputs for failed %%check tests
 
->>>>>>> 1.0-dev
 * Tue Jul 27 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.26-1
 - Upgrade to 8.0.26 to fix 31 CVEs
 
