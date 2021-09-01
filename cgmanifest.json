@@ -3804,6 +3804,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lld",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lld-8.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lldb",
           "version": "8.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
