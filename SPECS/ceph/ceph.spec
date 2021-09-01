@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -35,14 +35,14 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 %bcond_with cephfs_java
 %bcond_with cmake_verbose_logging
 %bcond_with kafka_endpoint
-%bcond_with libradosstriper
 %bcond_with lttng
 %bcond_with make_check
+%bcond_with mgr_diskprediction
 %bcond_with ocf
 %bcond_with seastar
 %bcond_with selinux
 %bcond_with tcmalloc
-%bcond_with mgr_diskprediction
+%bcond_without libradosstriper
 
 %define debug_package %{nil}
 
@@ -1804,6 +1804,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-4
+- Enabling the "libradosstriper" subpackages.
+
 * Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 16.2.0-3
 - Enable python byte compilation for directories outside of %%python3_site{lib,arch}
 
