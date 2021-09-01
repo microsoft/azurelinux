@@ -1,6 +1,6 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.23.4
+Version:        2.33.0
 Release:        1%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
@@ -89,6 +89,9 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 01 2021 Muhammad Falak <mwani@microsoft.com> - 2.33.0-1
+- Bump version 2.23.4 -> 2.33.0
+
 * Wed Apr 07 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.23.4-1
 - Update to version 2.23.4 for CVE-2021-21300 fix.
 
