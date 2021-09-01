@@ -85,7 +85,9 @@ the scope of the CRI.
 
 %package kubeadm-criconfig
 Summary:        CRI-O container runtime configuration for kubeadm
-Requires:       kubernetes-kubeadm-provider
+# Temporarily comment out this line as kubernetes is not supported
+# CBL-Mariner yet. Will fix this once kubernetes gets supported
+#Requires:       kubernetes-kubeadm-provider
 Requires(post): %fillup_prereq
 Supplements:    cri-o
 Conflicts:      docker-kubic-kubeadm-criconfig
