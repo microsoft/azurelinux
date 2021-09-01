@@ -13,7 +13,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/containers/conmon
-#Source0: https://github.com/containers/conmon/archive/v%{version}.tar.gz
+#Source0:       https://github.com/containers/conmon/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  git
