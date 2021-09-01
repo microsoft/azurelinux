@@ -1,0 +1,34 @@
+diff -up cairo-1.12.14/util/cairo-trace/cairo-trace.in.multilib cairo-1.12.14/util/cairo-trace/cairo-trace.in
+--- cairo-1.12.14/util/cairo-trace/cairo-trace.in.multilib	2013-07-18 16:03:38.044832193 -0400
++++ cairo-1.12.14/util/cairo-trace/cairo-trace.in	2013-07-18 16:03:43.981882777 -0400
+@@ -2,6 +2,12 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
++case `uname -m` in
++  x86_64|s390x|ppc64) libdir=@prefix@/lib64
++    ;;
++  *) libdir=@prefix@/lib
++    ;;
++esac
+ 
+ nofile=
+ flush=
+@@ -90,7 +96,7 @@ export CAIRO_TRACE_PROG_NAME
+ 
+ if test "x$CAIRO_TRACE_SO" = "x"; then
+     CAIRO_TRACE_SO=""
+-    for lib in @libdir@/cairo/libcairo-trace.@SHLIB_EXT@ @libdir@/cairo/libcairo-trace.@SHLIB_EXT@* @libdir@/cairo/libcairo-trace.*.@SHLIB_EXT@ ; do
++    for lib in $libdir/cairo/libcairo-trace.@SHLIB_EXT@ $libdir/cairo/libcairo-trace.@SHLIB_EXT@* $libdir/cairo/libcairo-trace.*.@SHLIB_EXT@ ; do
+ 	if test -h "$lib" -o -f "$lib"; then
+ 	    CAIRO_TRACE_SO="$lib"
+ 	    break
+@@ -98,7 +104,7 @@ if test "x$CAIRO_TRACE_SO" = "x"; then
+     done
+ fi
+ if test "x$CAIRO_TRACE_SO" = "x"; then
+-    echo "Could not find the cairo-trace shared library in @libdir@/cairo/." >&2
++    echo "Could not find the cairo-trace shared library in $libdir/cairo/." >&2
+     echo "Set the CAIRO_TRACE_SO environment variable to the full path of the library." >&2
+     exit 15
+ fi

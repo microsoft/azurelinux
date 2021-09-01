@@ -138,7 +138,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 
 %changelog
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com> - 20200921-1.2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Fix Source URL
 - Change build requirement from ninja to ninja-build

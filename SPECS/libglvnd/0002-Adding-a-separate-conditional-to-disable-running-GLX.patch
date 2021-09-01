@@ -1,0 +1,81 @@
+From 1ff94850e3fa88dac20cd9983ea2541168bc72d2 Mon Sep 17 00:00:00 2001
+From: Pawel <pawelwi@microsoft.com>
+Date: Mon, 25 Jan 2021 14:05:20 -0800
+Subject: [PATCH] Adding a separate conditional to disable running GLX tests.
+
+---
+ configure.ac            | 12 ++++++++++++
+ tests/Makefile.am       |  4 ++--
+ tests/dummy/Makefile.am |  4 ++--
+ 3 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1ec9cfc..43060e4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -80,6 +80,18 @@ if test "x$enable_x11" != "xyes" -a "x$enable_glx" = "xyes" ; then
+     AC_MSG_ERROR([Can't build GLX without X11.])
+ fi
+ 
++AC_ARG_ENABLE([glx-tests],
++    [AS_HELP_STRING([--disable-glx-tests],
++        [Disable running GLX tests @<:@default=enabled@:>@])],
++    [enable_glx_tests="$enableval"],
++    [enable_glx_tests="$enable_glx"]
++)
++AM_CONDITIONAL([ENABLE_GLX_TESTS], [test "x$enable_glx_tests" = "xyes"])
++
++if test "x$enable_glx" != "xyes" -a "x$enable_glx_tests" = "xyes" ; then
++    AC_MSG_ERROR([Can't run GLX tests without GLX.])
++fi
++
+ AC_ARG_ENABLE([gles1],
+     [AS_HELP_STRING([--disable-gles1],
+         [disable support for OpenGL ES 1.x API @<:@default=enabled@:>@])],
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 74bb8bc..f6d324e 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -98,7 +98,7 @@ TESTS_GLX += testglxgetprocaddress_genentry.sh
+ TESTS_GLX += testglxgetclientstr.sh
+ TESTS_GLX += testglxqueryversion.sh
+ 
+-if ENABLE_GLX
++if ENABLE_GLX_TESTS
+ 
+ TESTS += $(TESTS_GLX)
+ 
+@@ -168,7 +168,7 @@ testglxqueryversion_LDADD = $(X11_LIBS)
+ testglxqueryversion_LDADD += $(top_builddir)/src/GLX/libGLX.la
+ testglxqueryversion_LDADD += $(top_builddir)/src/OpenGL/libOpenGL.la
+ 
+-endif # ENABLE_GLX
++endif # ENABLE_GLX_TESTS
+ 
+ 
+ # Start of EGL-specific tests.
+diff --git a/tests/dummy/Makefile.am b/tests/dummy/Makefile.am
+index 24afd73..616f212 100644
+--- a/tests/dummy/Makefile.am
++++ b/tests/dummy/Makefile.am
+@@ -13,7 +13,7 @@ libpatchentrypoints_la_CFLAGS = \
+ libpatchentrypoints_la_SOURCES = \
+ 	patchentrypoints.c
+ 
+-if ENABLE_GLX
++if ENABLE_GLX_TESTS
+ check_LTLIBRARIES += libGLX_dummy.la
+ libGLX_dummy_la_CFLAGS = \
+ 	-I$(top_srcdir)/src/GLX        \
+@@ -32,7 +32,7 @@ libGLX_dummy_la_LDFLAGS = \
+ 	-shared \
+ 	-rpath /nowhere \
+ 	 $(LINKER_FLAG_NO_UNDEFINED)
+-endif # ENABLE_GLX
++endif # ENABLE_GLX_TESTS
+ 
+ if ENABLE_EGL
+ EGL_DUMMY_CFLAGS_COMMON = \
+-- 
+2.17.1
+

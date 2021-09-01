@@ -1,0 +1,54 @@
+diff --git a/src/gsm610.c b/src/gsm610.c
+index 06519bc..45d1bb3 100644
+--- a/src/gsm610.c
++++ b/src/gsm610.c
+@@ -27,7 +27,7 @@
+ #include "sfendian.h"
+ #include "common.h"
+ #include "wavlike.h"
+-#include "GSM610/gsm.h"
++#include <gsm.h>
+ 
+ #define	GSM610_BLOCKSIZE		33
+ #define	GSM610_SAMPLES			160
+@@ -391,7 +391,8 @@ gsm610_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
+ 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+ 		pgsm610->blockcount = 0 ;
+ 
+-		gsm_init (pgsm610->gsm_data) ;
++		gsm_destroy (pgsm610->gsm_data) ;
++		pgsm610->gsm_data = gsm_create () ;
+ 		if ((SF_CONTAINER (psf->sf.format)) == SF_FORMAT_WAV ||
+ 				(SF_CONTAINER (psf->sf.format)) == SF_FORMAT_W64)
+ 			gsm_option (pgsm610->gsm_data, GSM_OPT_WAV49, &true_flag) ;
+diff --git a/Makefile.am b/Makefile.am
+index 0b8bfa1..15feb97 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -71,7 +71,7 @@ src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.
+ 	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c \
+ 	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/ogg.h src/chanmap.h src/ogg_vcomment.h
+ nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
+-src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
++src_libsndfile_la_LIBADD = -lgsm src/G72x/libg72x.la src/ALAC/libalac.la \
+ 	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+ EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
+ 
+@@ -90,17 +90,6 @@ src_test_main_SOURCES = src/test_main.c src/test_main.h src/test_conversions.c s
+ 	src/test_binheader_writef.c src/test_nms_adpcm.c
+ src_test_main_LDADD = src/libcommon.la
+ 
+-##############
+-# src/GSM610 #
+-##############
+-
+-noinst_LTLIBRARIES += src/GSM610/libgsm.la
+-src_GSM610_libgsm_la_SOURCES = src/GSM610/config.h src/GSM610/gsm.h src/GSM610/gsm610_priv.h \
+-	src/GSM610/add.c src/GSM610/code.c src/GSM610/decode.c src/GSM610/gsm_create.c \
+-	src/GSM610/gsm_decode.c src/GSM610/gsm_destroy.c src/GSM610/gsm_encode.c \
+-	src/GSM610/gsm_option.c src/GSM610/long_term.c src/GSM610/lpc.c src/GSM610/preprocess.c \
+-	src/GSM610/rpe.c src/GSM610/short_term.c src/GSM610/table.c
+-
+ ############
+ # src/G72x #
+ ############

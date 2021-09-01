@@ -1,0 +1,12 @@
+diff -up libdrm-2.4.64/xf86drm.h.forceperms libdrm-2.4.64/xf86drm.h
+--- libdrm-2.4.64/xf86drm.h.forceperms	2015-08-25 07:25:09.946427122 +1000
++++ libdrm-2.4.64/xf86drm.h	2015-08-25 07:28:57.435553839 +1000
+@@ -74,7 +74,7 @@ extern "C" {
+ /* Default /dev/dri directory permissions 0755 */
+ #define DRM_DEV_DIRMODE	 	\
+ 	(S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH)
+-#define DRM_DEV_MODE	 (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)
++#define DRM_DEV_MODE	 (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+ 
+ #ifdef __OpenBSD__
+ #define DRM_DIR_NAME  "/dev"

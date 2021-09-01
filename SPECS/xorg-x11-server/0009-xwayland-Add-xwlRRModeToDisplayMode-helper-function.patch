@@ -1,0 +1,101 @@
+From aedd71a61ac2d78c347180e7d87e5918b795609e Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 8 Jul 2019 14:00:27 +0200
+Subject: [PATCH xserver 09/25] xwayland: Add xwlRRModeToDisplayMode() helper
+ function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is a preparation patch for adding emulated mode/resolution change
+support to Xwayland's XF86 vidmode extension emulation, using the
+Wayland viewport extension.
+
+Reviewed-by: Olivier Fourdan <ofourdan@redhat.com>
+Acked-by: Michel Dänzer <mdaenzer@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 43c80078126f6f33c6ab7d3cf4668733bde03366)
+---
+ hw/xwayland/xwayland-vidmode.c | 51 +++++++++++++++++++---------------
+ 1 file changed, 28 insertions(+), 23 deletions(-)
+
+diff --git a/hw/xwayland/xwayland-vidmode.c b/hw/xwayland/xwayland-vidmode.c
+index d25d1aca1..428af716d 100644
+--- a/hw/xwayland/xwayland-vidmode.c
++++ b/hw/xwayland/xwayland-vidmode.c
+@@ -78,13 +78,37 @@ mode_refresh(const xRRModeInfo *mode_info)
+     return rate;
+ }
+ 
++static void
++xwlRRModeToDisplayMode(RRModePtr rrmode, DisplayModePtr mode)
++{
++    const xRRModeInfo *mode_info = &rrmode->mode;
++
++    mode->next = mode;
++    mode->prev = mode;
++    mode->name = "";
++    mode->VScan = 1;
++    mode->Private = NULL;
++    mode->HDisplay = mode_info->width;
++    mode->HSyncStart = mode_info->hSyncStart;
++    mode->HSyncEnd = mode_info->hSyncEnd;
++    mode->HTotal = mode_info->hTotal;
++    mode->HSkew = mode_info->hSkew;
++    mode->VDisplay = mode_info->height;
++    mode->VSyncStart = mode_info->vSyncStart;
++    mode->VSyncEnd = mode_info->vSyncEnd;
++    mode->VTotal = mode_info->vTotal;
++    mode->Flags = mode_info->modeFlags;
++    mode->Clock = mode_info->dotClock / 1000.0;
++    mode->VRefresh = mode_refresh(mode_info); /* Or RRVerticalRefresh() */
++    mode->HSync = mode_hsync(mode_info);
++}
++
+ static Bool
+ xwlVidModeGetCurrentModeline(ScreenPtr pScreen, DisplayModePtr *mode, int *dotClock)
+ {
+     DisplayModePtr pMod;
+     RROutputPtr output;
+     RRCrtcPtr crtc;
+-    xRRModeInfo rrmode;
+ 
+     pMod = dixLookupPrivate(&pScreen->devPrivates, xwlVidModePrivateKey);
+     if (pMod == NULL)
+@@ -98,30 +122,11 @@ xwlVidModeGetCurrentModeline(ScreenPtr pScreen, DisplayModePtr *mode, int *dotCl
+     if (crtc == NULL)
+         return FALSE;
+ 
+-    rrmode = crtc->mode->mode;
+-
+-    pMod->next = pMod;
+-    pMod->prev = pMod;
+-    pMod->name = "";
+-    pMod->VScan = 1;
+-    pMod->Private = NULL;
+-    pMod->HDisplay = rrmode.width;
+-    pMod->HSyncStart = rrmode.hSyncStart;
+-    pMod->HSyncEnd = rrmode.hSyncEnd;
+-    pMod->HTotal = rrmode.hTotal;
+-    pMod->HSkew = rrmode.hSkew;
+-    pMod->VDisplay = rrmode.height;
+-    pMod->VSyncStart = rrmode.vSyncStart;
+-    pMod->VSyncEnd = rrmode.vSyncEnd;
+-    pMod->VTotal = rrmode.vTotal;
+-    pMod->Flags = rrmode.modeFlags;
+-    pMod->Clock = rrmode.dotClock / 1000.0;
+-    pMod->VRefresh = mode_refresh(&rrmode); /* Or RRVerticalRefresh() */
+-    pMod->HSync = mode_hsync(&rrmode);
+-    *mode = pMod;
++    xwlRRModeToDisplayMode(crtc->mode, pMod);
+ 
++    *mode = pMod;
+     if (dotClock != NULL)
+-        *dotClock = rrmode.dotClock / 1000.0;
++        *dotClock = pMod->Clock;
+ 
+     return TRUE;
+ }
+-- 
+2.28.0
+

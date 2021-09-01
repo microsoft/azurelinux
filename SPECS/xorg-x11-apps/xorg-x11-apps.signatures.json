@@ -1,0 +1,21 @@
+{
+ "Signatures": {
+  "oclock-1.0.4.tar.bz2": "cc20cfc1c0d5128d89e1eecd9ba52e58f111075be163e0aeda5690dbaafbaefe",
+  "x11perf-1.6.0.tar.bz2": "e87098dec1947572d70c62697a7b70bde1ab5668237d4660080eade6bc096751",
+  "xclipboard-1.1.3.tar.bz2": "9c0e0a1f4f1d49f73c6cf3ccd27b5ca0e18afc63679f1a1ee466b1d82446ebb5",
+  "xclock-1.0.9.tar.bz2": "cf461fb2c6f2ac42c54d8429ee2010fdb9a1442a370adfbfe8a7bfaf33c123bb",
+  "xconsole-1.0.6.tar.bz2": "e561959b6ee8b735a32c1050015cfd8c551ed162cabb6cb72e36ce72966855d1",
+  "xcursorgen-1.0.6.tar.bz2": "31c8910f54eb175a8a74a60e7662697467e21a8bf948220a6048a93924b3f66c",
+  "xeyes-1.1.2.tar.bz2": "57bcec0d2d167af9e5d44d0dbd74c6d7c0f0591cd0608952b23c749fdd910553",
+  "xfd-1.1.2.tar.bz2": "c1a32222fbb891e46f9a82ebab005bc5e54ce006a2586195ec9ea7ab308e2759",
+  "xfontsel-1.0.6.tar.bz2": "25aa0b7c4262f5e99c07c2b96e00e4eb25b7e53f94fa803942af9d0e8da3001c",
+  "xload-1.1.3.tar.bz2": "f34e4803871d771325cfe52bebd98cc5b6040d3f065184ec73de436f9a375907",
+  "xlogo-1.0.4.tar.bz2": "17af6f4fb73e7310e087fbfe5d773bab2b0d6f37a894ae5ee32de4693af6ba92",
+  "xmag-1.0.6.tar.bz2": "87a2bc23b251e2d8f8370d3283a4d6c8dac98a30cb5749a04336cdb55c14e161",
+  "xmessage-1.0.5.tar.bz2": "373dfb81e7a6f06d3d22485a12fcde6e255d58c6dee1bbaeb00c7d0caa9b2029",
+  "xpr-1.0.5.tar.bz2": "b936e0f1f8d63f5ad097a0bbdce2e67c34f5d49b7263f32a832ff62d394d1e1f",
+  "xvidtune-1.0.3.tar.bz2": "24e5e103933a04bfb2e1d18562619ed74031ab515e7343eb546bacdbcbeecf01",
+  "xwd-1.0.7.tar.bz2": "cd6815b8b9e0b98e284d3d732fb12162159cb9dcee4f45a7d4c0bd8b308a6794",
+  "xwud-1.0.5.tar.bz2": "99997051f8a892313f22edf41dab45864e86e7062ee9012d5dbb6a40fc6b10a9"
+ }
+}

@@ -1,0 +1,64 @@
+diff -up libglvnd-1.3.1/bin/symbols-check.py.orig libglvnd-1.3.1/bin/symbols-check.py
+--- libglvnd-1.3.1/bin/symbols-check.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/bin/symbols-check.py	2020-02-28 11:38:55.126765978 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # encoding=utf-8
+ # Copyright © 2018-2019 Intel Corporation
+ 
+diff -up libglvnd-1.3.1/src/generate/eglFunctionList.py.orig libglvnd-1.3.1/src/generate/eglFunctionList.py
+diff -up libglvnd-1.3.1/src/generate/genCommon.py.orig libglvnd-1.3.1/src/generate/genCommon.py
+--- libglvnd-1.3.1/src/generate/genCommon.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/generate/genCommon.py	2020-02-28 11:38:55.148766076 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # (C) Copyright 2015, NVIDIA CORPORATION.
+ # All Rights Reserved.
+diff -up libglvnd-1.3.1/src/generate/gen_egl_dispatch.py.orig libglvnd-1.3.1/src/generate/gen_egl_dispatch.py
+--- libglvnd-1.3.1/src/generate/gen_egl_dispatch.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/generate/gen_egl_dispatch.py	2020-02-28 11:38:55.155766107 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ """
+ Generates dispatch functions for EGL.
+diff -up libglvnd-1.3.1/src/generate/gen_gldispatch_mapi.py.orig libglvnd-1.3.1/src/generate/gen_gldispatch_mapi.py
+--- libglvnd-1.3.1/src/generate/gen_gldispatch_mapi.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/generate/gen_gldispatch_mapi.py	2020-02-28 11:38:55.150766085 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright (C) 2010 LunarG Inc.
+ # (C) Copyright 2015, NVIDIA CORPORATION.
+diff -up libglvnd-1.3.1/src/generate/gen_libgl_glxstubs.py.orig libglvnd-1.3.1/src/generate/gen_libgl_glxstubs.py
+--- libglvnd-1.3.1/src/generate/gen_libgl_glxstubs.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/generate/gen_libgl_glxstubs.py	2020-02-28 11:38:55.152766094 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # (C) Copyright 2015, NVIDIA CORPORATION.
+ # All Rights Reserved.
+diff -up libglvnd-1.3.1/src/generate/gen_libOpenGL_exports.py.orig libglvnd-1.3.1/src/generate/gen_libOpenGL_exports.py
+--- libglvnd-1.3.1/src/generate/gen_libOpenGL_exports.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/generate/gen_libOpenGL_exports.py	2020-02-28 11:38:55.160766129 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # (C) Copyright 2015, NVIDIA CORPORATION.
+ # All Rights Reserved.
+diff -up libglvnd-1.3.1/src/GLX/gen_glx_stubs.py.orig libglvnd-1.3.1/src/GLX/gen_glx_stubs.py
+--- libglvnd-1.3.1/src/GLX/gen_glx_stubs.py.orig	2020-02-21 22:28:47.000000000 +0100
++++ libglvnd-1.3.1/src/GLX/gen_glx_stubs.py	2020-02-28 11:38:55.168766164 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ import sys
+ 

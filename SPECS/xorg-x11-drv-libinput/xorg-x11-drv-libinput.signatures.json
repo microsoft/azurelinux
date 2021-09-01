@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "71-libinput-overrides-wacom.conf": "3bac43ac083a5033e9a240832be08bcbe740a6a35c1fb42140b6160379736fbf",
+  "xf86-input-libinput-0.30.0.tar.bz2": "f9c7f9fd41ae14061e0e9c3bd45fa170e5e21027a2bc5810034e1e748db996c0"
+ }
+}

@@ -1,0 +1,103 @@
+From df992bb3c92f862664cf6c0064226c74dd209691 Mon Sep 17 00:00:00 2001
+From: Pawel <pawelwi@microsoft.com>
+Date: Mon, 14 Dec 2020 17:38:48 -0800
+Subject: [PATCH] Fixing idle loop to make it thread-safe.
+
+---
+ src/event-loop.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
+
+diff --git a/src/event-loop.c b/src/event-loop.c
+index 339ff19..b0b5254 100644
+--- a/src/event-loop.c
++++ b/src/event-loop.c
+@@ -33,6 +33,7 @@
+ #include <stdbool.h>
+ #include <string.h>
+ #include <fcntl.h>
++#include <pthread.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <sys/epoll.h>
+@@ -73,6 +74,8 @@ struct wl_event_loop {
+ 	struct wl_list idle_list;
+ 	struct wl_list destroy_list;
+ 
++	pthread_mutex_t idle_list_mutex;
++
+ 	struct wl_signal destroy_signal;
+ 
+ 	struct wl_timer_heap timers;
+@@ -786,7 +789,9 @@ wl_event_loop_add_idle(struct wl_event_loop *loop,
+ 	source->func = func;
+ 	source->base.data = data;
+ 
++	pthread_mutex_lock(&loop->idle_list_mutex);
+ 	wl_list_insert(loop->idle_list.prev, &source->base.link);
++	pthread_mutex_unlock(&loop->idle_list_mutex);
+ 
+ 	return &source->base;
+ }
+@@ -898,6 +903,8 @@ wl_event_loop_create(void)
+ 	wl_list_init(&loop->idle_list);
+ 	wl_list_init(&loop->destroy_list);
+ 
++	pthread_mutex_init(&loop->idle_list_mutex, NULL);
++
+ 	wl_signal_init(&loop->destroy_signal);
+ 
+ 	wl_timer_heap_init(&loop->timers, loop);
+@@ -925,6 +932,7 @@ wl_event_loop_destroy(struct wl_event_loop *loop)
+ 
+ 	wl_event_loop_process_destroy_list(loop);
+ 	wl_timer_heap_release(&loop->timers);
++	pthread_mutex_destroy(&loop->idle_list_mutex);
+ 	close(loop->epoll_fd);
+ 	free(loop);
+ }
+@@ -951,6 +959,21 @@ post_dispatch_check(struct wl_event_loop *loop)
+ 	return needs_recheck;
+ }
+ 
++static struct wl_event_source_idle *
++get_next_idle_event_source(struct wl_event_loop *loop,
++			   struct wl_event_source_idle *prev_source)
++{
++	struct wl_event_source_idle *source = NULL;
++	pthread_mutex_lock(&loop->idle_list_mutex);
++	if (prev_source)
++		wl_event_source_remove(&prev_source->base);
++	if (!wl_list_empty(&loop->idle_list))
++		source = wl_container_of(loop->idle_list.next,
++					 source, base.link);
++	pthread_mutex_unlock(&loop->idle_list_mutex);
++	return source;
++}
++
+ /** Dispatch the idle sources
+  *
+  * \param loop The event loop whose idle sources are dispatched.
+@@ -961,14 +984,14 @@ post_dispatch_check(struct wl_event_loop *loop)
+ WL_EXPORT void
+ wl_event_loop_dispatch_idle(struct wl_event_loop *loop)
+ {
+-	struct wl_event_source_idle *source;
++	struct wl_event_source_idle *source = NULL;
+ 
+-	while (!wl_list_empty(&loop->idle_list)) {
+-		source = wl_container_of(loop->idle_list.next,
+-					 source, base.link);
++	/* It is multi-thread safe to checking list is empty */
++	if (wl_list_empty(&loop->idle_list))
++		return;
++
++	while (source = get_next_idle_event_source(loop, source))
+ 		source->func(source->base.data);
+-		wl_event_source_remove(&source->base);
+-	}
+ }
+ 
+ /** Wait for events and dispatch them
+-- 
+2.17.1
+

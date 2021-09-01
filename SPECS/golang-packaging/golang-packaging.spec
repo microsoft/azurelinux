@@ -60,7 +60,7 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 
 %changelog
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com>  15.0.15-1.4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Remove distro condition checks that do not apply for CBL-Mariner
 - Fix Source0 URL

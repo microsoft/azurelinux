@@ -1,0 +1,11 @@
+diff -up xtrans-1.2.7/Xtransutil.c.jx xtrans-1.2.7/Xtransutil.c
+--- xtrans-1.2.7/Xtransutil.c.jx	2012-03-22 23:04:35.000000000 -0400
++++ xtrans-1.2.7/Xtransutil.c	2012-04-09 16:39:29.000000000 -0400
+@@ -255,6 +255,7 @@ TRANS(GetMyNetworkId) (XtransConnInfo ci
+     case AF_UNIX:
+     {
+ 	struct sockaddr_un *saddr = (struct sockaddr_un *) addr;
++	strcpy(hostnamebuf, "unix");
+ 	networkId = malloc (3 + strlen (transName) +
+ 	    strlen (hostnamebuf) + strlen (saddr->sun_path));
+ 	sprintf (networkId, "%s/%s:%s", transName,

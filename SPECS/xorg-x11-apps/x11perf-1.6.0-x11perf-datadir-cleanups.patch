@@ -1,0 +1,12 @@
+diff -Naur x11perf-1.6.0.old/configure.ac x11perf-1.6.0/configure.ac
+--- x11perf-1.6.0.old/configure.ac	2015-04-30 15:03:46.668372759 +0200
++++ x11perf-1.6.0/configure.ac	2015-04-30 15:03:56.617354502 +0200
+@@ -39,7 +39,7 @@
+ XORG_DEFAULT_OPTIONS
+ 
+ # Define the installation directory for the x11 performance compare scripts
+-AC_SUBST([x11perfcompdir], [$libdir/X11/x11perfcomp])
++AC_SUBST([x11perfcompdir], [$datadir/X11/x11perfcomp])
+ 
+ # Checks for programs run by the scripts we install
+ AC_PATH_PROG(MKTEMP, mktemp)
