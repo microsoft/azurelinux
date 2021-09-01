@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,22 @@ Group:          System Environment/Daemons
 %description tools
 The httpd-tools of httpd.
 
+%package -n mod_ssl
+Summary: SSL/TLS module for the Apache HTTP Server
+
+BuildRequires: openssl-devel
+
+Requires(pre): %{name}-filesystem
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-mmn = %{mmnisa}
+Requires: sscg >= 2.2.0
+Requires: /usr/sbin/nologin
+
+%description -n mod_ssl
+The mod_ssl module provides strong cryptography for the Apache Web
+server via the Secure Sockets Layer (SSL) and Transport Layer
+Security (TLS) protocols.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -87,21 +103,24 @@ The httpd-tools of httpd.
 
 %build
 %configure \
-            --prefix=%{_sysconfdir}/httpd          \
-            --exec-prefix=%{_prefix}               \
-            --sysconfdir=%{_confdir}/httpd/conf    \
-            --libexecdir=%{_libdir}/httpd/modules  \
             --datadir=%{_sysconfdir}/httpd         \
             --enable-authnz-fcgi                   \
             --enable-mods-shared="all cgi"         \
             --enable-mpms-shared=all               \
+            --enable-ssl                           \
+            --exec-prefix=%{_prefix}               \
+            --libexecdir=%{_libdir}/httpd/modules  \
+            --prefix=%{_sysconfdir}/httpd          \
+            --sysconfdir=%{_confdir}/httpd/conf    \
+            --with-apr-util=%{_prefix}             \
             --with-apr=%{_prefix}                  \
-            --with-apr-util=%{_prefix}
+            --with-ssl
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
+
 install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_sysconfdir}/httpd/logs
 
@@ -188,6 +207,7 @@ fi
 %files
 %defattr(-,root,root)
 %{_libdir}/httpd/*
+%exclude %{_libdir}/httpd/modules/mod_ssl.so
 %{_bindir}/*
 %exclude %{_bindir}/apxs
 %exclude %{_bindir}/dbmmanage
@@ -218,11 +238,30 @@ fi
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
+%files -n mod_ssl
+%{_libdir}/httpd/modules/mod_ssl.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
+%attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
+%{_unitdir}/httpd.socket.d/10-listen443.conf
+%{_unitdir}/httpd-init.service
+%{_libexecdir}/httpd-ssl-gencerts
+%{_libexecdir}/httpd-ssl-pass-dialog
+%{_mandir}/man8/httpd-init.*
+
 %changelog
-* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5 (from 1.0 branch)
+* Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
+- Fixing invalid past release numbering.
+- Extending the package by following subpackages:
+    - mod_ldap,
+    - mod_proxy_html,
+    - mod_session,
+    - mod_ssl.
+
+* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-7
 - CVE-2021-26691 fix
 
-* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-4 (from 1.0 branch)
+* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-6
 - CVE-2020-13950 CVE-2021-26690 CVE-2021-30641 and CVE-2020-35452 fixes
 
 * Wed Apr 07 2021 Henry Li <lihl@microsoft.com> - 2.4.46-5
