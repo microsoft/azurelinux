@@ -1,0 +1,45 @@
+From 555e00dbf71d7c5b792bacd789cdde9c42203ff1 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 15 Jan 2020 14:36:45 +0100
+Subject: [PATCH xserver 19/25] xwayland: Also check
+ resolution-change-emulation when the xwl_window itself moves
+
+The recent change to use the top-level non-window-manager Window drawable
+coordinates from xwl_window_check_resolution_change_emulation() in
+combination with only calling it on a resize when the top-level window
+is moved breaks things with mutter/gnome-shell.
+
+When fullscreening a X11 window, mutter moves its window-decoration Window
+wrapping the top-level Window to the monitor's origin coordinates (e.g. 0x0)
+last. This updates the top-level's drawable coordinates, but as the
+actual MoveWindow is called on the wrapper Window and not on the toplevel
+we do not call xwl_window_check_resolution_change_emulation() and we never
+enable the viewport.
+
+This commit fixes this by also calling
+xwl_window_check_resolution_change_emulation() if the Window being moved
+is an xwl_window itself.
+
+Acked-by: Olivier Fourdan <ofourdan@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 4fc107460a349a1a46f0e5251e6fd2a31f4c0428)
+---
+ hw/xwayland/xwayland.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index b2e46336c..e07dabcfa 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -993,7 +993,7 @@ xwl_resize_window(WindowPtr window,
+     xwl_screen->ResizeWindow = screen->ResizeWindow;
+     screen->ResizeWindow = xwl_resize_window;
+ 
+-    if (xwl_window && xwl_window_is_toplevel(window))
++    if (xwl_window && (xwl_window_get(window) || xwl_window_is_toplevel(window)))
+         xwl_window_check_resolution_change_emulation(xwl_window);
+ }
+ 
+-- 
+2.28.0
+

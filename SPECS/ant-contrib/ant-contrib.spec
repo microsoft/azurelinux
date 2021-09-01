@@ -101,7 +101,7 @@ echo "call add_maven_depmap JPP.ant-%{name}.pom ant/%{name}.jar"
 
 %changelog
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0b3-19
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed.
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - Simplify buildrequires and runtime requires.
 - Remove junit integration.
 - Remove fdupes dependency.

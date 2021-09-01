@@ -1,0 +1,50 @@
+From 5448ffeb9b06d20e821174c04d2280933e3ca993 Mon Sep 17 00:00:00 2001
+From: Roman Gilg <subdiff@gmail.com>
+Date: Fri, 3 Jan 2020 17:12:14 +0100
+Subject: [PATCH xserver 15/25] xwayland: Reuse viewport instead of recreating
+
+When a viewport is already created we can reuse this object instead of
+destroying it and getting a new one for updating the source rectangle and
+destination size.
+
+Signed-off-by: Roman Gilg <subdiff@gmail.com>
+Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+Acked-by: Olivier Fourdan <ofourdan@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 948e02872feb641a176b3af82b6ef1201c97bb16)
+---
+ hw/xwayland/xwayland.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index f99cdf81f..8de3dd36b 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -539,17 +539,13 @@ xwl_window_enable_viewport(struct xwl_window *xwl_window,
+                            struct xwl_output *xwl_output,
+                            struct xwl_emulated_mode *emulated_mode)
+ {
+-    /* If necessary disable old viewport to apply new settings */
+-    if (xwl_window_has_viewport_enabled(xwl_window))
+-        xwl_window_disable_viewport(xwl_window);
+-
+-    DebugF("XWAYLAND: enabling viewport %dx%d -> %dx%d\n",
+-           emulated_mode->width, emulated_mode->height,
+-           xwl_output->width, xwl_output->height);
+-
+-    xwl_window->viewport =
+-        wp_viewporter_get_viewport(xwl_window->xwl_screen->viewporter,
+-                                   xwl_window->surface);
++    if (!xwl_window_has_viewport_enabled(xwl_window)) {
++        DebugF("XWAYLAND: enabling viewport %dx%d -> %dx%d\n",
++               emulated_mode->width, emulated_mode->height,
++               xwl_output->width, xwl_output->height);
++        xwl_window->viewport = wp_viewporter_get_viewport(xwl_window->xwl_screen->viewporter,
++                                                          xwl_window->surface);
++    }
+ 
+     wp_viewport_set_source(xwl_window->viewport,
+                            wl_fixed_from_int(0),
+-- 
+2.28.0
+

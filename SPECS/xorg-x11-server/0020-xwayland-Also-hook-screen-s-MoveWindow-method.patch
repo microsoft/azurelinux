@@ -1,0 +1,83 @@
+From 46ccf740dc5e81d84b2e8c19f6211eaf1d8d06de Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 9 Jan 2020 11:00:36 +0100
+Subject: [PATCH xserver 20/25] xwayland: Also hook screen's MoveWindow method
+
+Not only hook the ResizeWindow method of the screen (which really is
+MoveAndResize) but also hook the MoveWindow method for checking if we
+need to setup a viewport for resolution change emulation.
+
+Our resolution change emulation check if the windows origin matches
+the monitors origin and the windows origin can also be changed by just
+a move without being resized.
+
+Also checking on a move becomes esp. important when we move to checking
+on changes to the top-level non-window-manager client (X11)Window instead
+of on changes to the xwl_window later on in this patch series.
+
+Acked-by: Olivier Fourdan <ofourdan@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 10df0437a2b142e61c4d84ffffa9592ac6846ef1)
+---
+ hw/xwayland/xwayland.c | 25 +++++++++++++++++++++++++
+ hw/xwayland/xwayland.h |  1 +
+ 2 files changed, 26 insertions(+)
+
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index e07dabcfa..4f19f3710 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -997,6 +997,28 @@ xwl_resize_window(WindowPtr window,
+         xwl_window_check_resolution_change_emulation(xwl_window);
+ }
+ 
++static void
++xwl_move_window(WindowPtr window,
++                int x, int y,
++                WindowPtr next_sib,
++                VTKind kind)
++{
++    ScreenPtr screen = window->drawable.pScreen;
++    struct xwl_screen *xwl_screen;
++    struct xwl_window *xwl_window;
++
++    xwl_screen = xwl_screen_get(screen);
++    xwl_window = xwl_window_from_window(window);
++
++    screen->MoveWindow = xwl_screen->MoveWindow;
++    (*screen->MoveWindow) (window, x, y, next_sib, kind);
++    xwl_screen->MoveWindow = screen->MoveWindow;
++    screen->MoveWindow = xwl_move_window;
++
++    if (xwl_window && (xwl_window_get(window) || xwl_window_is_toplevel(window)))
++        xwl_window_check_resolution_change_emulation(xwl_window);
++}
++
+ static void
+ frame_callback(void *data,
+                struct wl_callback *callback,
+@@ -1580,6 +1602,9 @@ xwl_screen_init(ScreenPtr pScreen, int argc, char **argv)
+     xwl_screen->ResizeWindow = pScreen->ResizeWindow;
+     pScreen->ResizeWindow = xwl_resize_window;
+ 
++    xwl_screen->MoveWindow = pScreen->MoveWindow;
++    pScreen->MoveWindow = xwl_move_window;
++
+     if (xwl_screen->rootless) {
+         xwl_screen->SetWindowPixmap = pScreen->SetWindowPixmap;
+         pScreen->SetWindowPixmap = xwl_set_window_pixmap;
+diff --git a/hw/xwayland/xwayland.h b/hw/xwayland/xwayland.h
+index 0d0baac9b..451c08e23 100644
+--- a/hw/xwayland/xwayland.h
++++ b/hw/xwayland/xwayland.h
+@@ -138,6 +138,7 @@ struct xwl_screen {
+     SetWindowPixmapProcPtr SetWindowPixmap;
+     ChangeWindowAttributesProcPtr ChangeWindowAttributes;
+     ResizeWindowProcPtr ResizeWindow;
++    MoveWindowProcPtr MoveWindow;
+ 
+     struct xorg_list output_list;
+     struct xorg_list seat_list;
+-- 
+2.28.0
+

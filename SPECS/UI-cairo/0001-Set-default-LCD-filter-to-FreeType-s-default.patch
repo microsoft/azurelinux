@@ -1,0 +1,56 @@
+From 12a5b7384f35d9a3f4c6b151fac4857444db3d6a Mon Sep 17 00:00:00 2001
+From: Nikolaus Waxweiler <madigens@gmail.com>
+Date: Sat, 10 Nov 2018 16:44:23 +0000
+Subject: [PATCH] Set default LCD filter to FreeType's default
+
+---
+ src/cairo-ft-font.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/cairo-ft-font.c b/src/cairo-ft-font.c
+index 325dd61b4..3c47dc12e 100644
+--- a/src/cairo-ft-font.c
++++ b/src/cairo-ft-font.c
+@@ -1404,7 +1404,7 @@ _render_glyph_outline (FT_Face                    face,
+ 		       cairo_image_surface_t	**surface)
+ {
+     int rgba = FC_RGBA_UNKNOWN;
+-    int lcd_filter = FT_LCD_FILTER_LEGACY;
++    int lcd_filter = FT_LCD_FILTER_DEFAULT;
+     FT_GlyphSlot glyphslot = face->glyph;
+     FT_Outline *outline = &glyphslot->outline;
+     FT_Bitmap bitmap;
+@@ -1439,13 +1439,13 @@ _render_glyph_outline (FT_Face                    face,
+ 	case CAIRO_LCD_FILTER_NONE:
+ 	    lcd_filter = FT_LCD_FILTER_NONE;
+ 	    break;
+-	case CAIRO_LCD_FILTER_DEFAULT:
+ 	case CAIRO_LCD_FILTER_INTRA_PIXEL:
+ 	    lcd_filter = FT_LCD_FILTER_LEGACY;
+ 	    break;
+ 	case CAIRO_LCD_FILTER_FIR3:
+ 	    lcd_filter = FT_LCD_FILTER_LIGHT;
+ 	    break;
++	case CAIRO_LCD_FILTER_DEFAULT:
+ 	case CAIRO_LCD_FILTER_FIR5:
+ 	    lcd_filter = FT_LCD_FILTER_DEFAULT;
+ 	    break;
+@@ -3416,7 +3416,6 @@ _cairo_ft_font_options_substitute (const cairo_font_options_t *options,
+ 	    case CAIRO_LCD_FILTER_NONE:
+ 		lcd_filter = FT_LCD_FILTER_NONE;
+ 		break;
+-	    case CAIRO_LCD_FILTER_DEFAULT:
+ 	    case CAIRO_LCD_FILTER_INTRA_PIXEL:
+ 		lcd_filter = FT_LCD_FILTER_LEGACY;
+ 		break;
+@@ -3424,6 +3423,7 @@ _cairo_ft_font_options_substitute (const cairo_font_options_t *options,
+ 		lcd_filter = FT_LCD_FILTER_LIGHT;
+ 		break;
+ 	    default:
++	    case CAIRO_LCD_FILTER_DEFAULT:
+ 	    case CAIRO_LCD_FILTER_FIR5:
+ 		lcd_filter = FT_LCD_FILTER_DEFAULT;
+ 		break;
+-- 
+2.19.1
+

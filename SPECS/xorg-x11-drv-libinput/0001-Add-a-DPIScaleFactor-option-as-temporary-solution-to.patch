@@ -1,0 +1,98 @@
+From 41d20d35c1587f3de35acf47f926c97a30680978 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Thu, 18 May 2017 14:45:18 +1000
+Subject: [PATCH xf86-input-libinput] Add a DPIScaleFactor option as temporary
+ solution to the hidpi issue
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1413306
+---
+ man/libinput.man   | 21 +++++++++++++++++++++
+ src/xf86libinput.c | 26 ++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/man/libinput.man b/man/libinput.man
+index ec0f439..bdbdb37 100644
+--- a/man/libinput.man
++++ b/man/libinput.man
+@@ -386,6 +386,27 @@ This driver does not work with \fBOption \*qDevice\*q\fR set to an event
+ node in \fI/dev/input/by-id\fR and \fI/dev/input/by-path\fR. This can be
+ usually be worked by using \fBSection \*qInputClass\*q\fR with an
+ appropriate \fBMatch*\fR statement in the __xconfigfile__(__filemansuffix__).
++.PP
++This driver does not know about the display pixel density and submits motion
++events assuming an approximate display density of 96dpi. On high-dpi
++screens this results in a slower physical motion of the cursor (a one-pixel
++movement is a smaller physical movement on the screen). This can make
++interaction with the desktop difficult.
++.PP
++.TP 7
++.BI "Option \*qDPIScaleFactor\*q float
++This is a
++.B temporary
++solution. The factor should be set to the approximate ratio of the host display
++compared to the default 96dpi. For example, a display with 200dpi should set
++a factor of 2.0.
++.PP
++If set, x/y motion will be unconditionally multiplied by this factor,
++resulting in faster movement of the cursor. Note that this may make some
++pixels unadressable and should be used with caution.
++.PP
++.B This option is a temporary solution.
++It may be removed in any future update of this driver.
+ 
+ .SH AUTHORS
+ Peter Hutterer
+diff --git a/src/xf86libinput.c b/src/xf86libinput.c
+index 83ab75d..c1a1ce2 100644
+--- a/src/xf86libinput.c
++++ b/src/xf86libinput.c
+@@ -194,6 +194,8 @@ struct xf86libinput {
+ 	struct scale_factor {
+ 		double x, y;
+ 	} area_scale_factor;
++
++	double dpi_scale_factor; /* Fedora hack */
+ };
+ 
+ enum event_handling {
+@@ -1463,6 +1465,11 @@ xf86libinput_handle_motion(InputInfoPtr pInfo, struct libinput_event_pointer *ev
+ 	x = libinput_event_pointer_get_dx(event);
+ 	y = libinput_event_pointer_get_dy(event);
+ 
++	if (driver_data->dpi_scale_factor > 0.0) {
++		x *= driver_data->dpi_scale_factor;
++		y *= driver_data->dpi_scale_factor;
++	}
++
+ 	valuator_mask_zero(mask);
+ 
+ #if HAVE_VMASK_UNACCEL
+@@ -3421,6 +3428,25 @@ xf86libinput_pre_init(InputDriverPtr drv,
+ 
+ 	xf86libinput_parse_options(pInfo, driver_data, device);
+ 
++	/* XXX:
++	   Fedora hack for bug https://bugzilla.redhat.com/show_bug.cgi?id=1413306
++	   This is temporary only, but at least makes it work for now.
++	 */
++
++	if (xf86CheckRealOption(pInfo->options, "DPIScaleFactor", 0.0) != 0.0) {
++		xf86IDrvMsg(pInfo, X_WARNING,
++			    "\n"
++			    "******************** WARNING ********************\n"
++			    "* DPIScaleFactor option is a temporary solution *\n"
++			    "* and may cease to work without warning!        *\n"
++			    "******************** WARNING ********************\n");
++		driver_data->dpi_scale_factor = xf86SetRealOption(pInfo->options, "DPIScaleFactor", 0.0);
++		if (driver_data->dpi_scale_factor < 0.0) {
++			xf86IDrvMsg(pInfo, X_ERROR, "Invalid DPIScaleFactor, ignoring value\n");
++			driver_data->dpi_scale_factor = 0.0;
++		}
++	}
++
+ 	/* Device is both keyboard and pointer. Drop the keyboard cap from
+ 	 * this device, create a separate device instead */
+ 	if (!is_subdevice &&
+-- 
+2.14.3
+

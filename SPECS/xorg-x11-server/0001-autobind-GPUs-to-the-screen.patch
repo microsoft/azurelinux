@@ -1,0 +1,293 @@
+From 471289fa1dc359555ceed6302f7d9605ab6be3ea Mon Sep 17 00:00:00 2001
+From: Dave Airlie <airlied@redhat.com>
+Date: Mon, 2 Apr 2018 16:49:02 -0400
+Subject: [PATCH] autobind GPUs to the screen
+
+This is a modified version of a patch we've been carry-ing in Fedora and
+RHEL for years now. This patch automatically adds secondary GPUs to the
+master as output sink / offload source making e.g. the use of
+slave-outputs just work, with requiring the user to manually run
+"xrandr --setprovideroutputsource" before he can hookup an external
+monitor to his hybrid graphics laptop.
+
+There is one problem with this patch, which is why it was not upstreamed
+before. What to do when a secondary GPU gets detected really is a policy
+decission (e.g. one may want to autobind PCI GPUs but not USB ones) and
+as such should be under control of the Desktop Environment.
+
+Unconditionally adding autobinding support to the xserver will result
+in races between the DE dealing with the hotplug of a secondary GPU
+and the server itself dealing with it.
+
+However we've waited for years for any Desktop Environments to actually
+start doing some sort of autoconfiguration of secondary GPUs and there
+is still not a single DE dealing with this, so I believe that it is
+time to upstream this now.
+
+To avoid potential future problems if any DEs get support for doing
+secondary GPU configuration themselves, the new autobind functionality
+is made optional. Since no DEs currently support doing this themselves it
+is enabled by default. When DEs grow support for doing this themselves
+they can disable the servers autobinding through the servers cmdline or a
+xorg.conf snippet.
+
+Signed-off-by: Dave Airlie <airlied@gmail.com>
+[hdegoede@redhat.com: Make configurable, fix with nvidia, submit upstream]
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ hw/xfree86/common/xf86Config.c      | 19 +++++++++++++++++++
+ hw/xfree86/common/xf86Globals.c     |  2 ++
+ hw/xfree86/common/xf86Init.c        | 20 ++++++++++++++++++++
+ hw/xfree86/common/xf86Priv.h        |  1 +
+ hw/xfree86/common/xf86Privstr.h     |  1 +
+ hw/xfree86/common/xf86platformBus.c |  4 ++++
+ hw/xfree86/man/Xorg.man             |  7 +++++++
+ hw/xfree86/man/xorg.conf.man        |  6 ++++++
+ randr/randrstr.h                    |  3 +++
+ randr/rrprovider.c                  | 22 ++++++++++++++++++++++
+ 10 files changed, 85 insertions(+)
+
+diff --git a/hw/xfree86/common/xf86Config.c b/hw/xfree86/common/xf86Config.c
+index 2c1d335..d7d7c2e 100644
+--- a/hw/xfree86/common/xf86Config.c
++++ b/hw/xfree86/common/xf86Config.c
+@@ -643,6 +643,7 @@ typedef enum {
+     FLAG_DRI2,
+     FLAG_USE_SIGIO,
+     FLAG_AUTO_ADD_GPU,
++    FLAG_AUTO_BIND_GPU,
+     FLAG_MAX_CLIENTS,
+     FLAG_IGLX,
+     FLAG_DEBUG,
+@@ -699,6 +700,8 @@ static OptionInfoRec FlagOptions[] = {
+      {0}, FALSE},
+     {FLAG_AUTO_ADD_GPU, "AutoAddGPU", OPTV_BOOLEAN,
+      {0}, FALSE},
++    {FLAG_AUTO_BIND_GPU, "AutoBindGPU", OPTV_BOOLEAN,
++     {0}, FALSE},
+     {FLAG_MAX_CLIENTS, "MaxClients", OPTV_INTEGER,
+      {0}, FALSE },
+     {FLAG_IGLX, "IndirectGLX", OPTV_BOOLEAN,
+@@ -779,6 +782,22 @@ configServerFlags(XF86ConfFlagsPtr flagsconf, XF86OptionPtr layoutopts)
+     }
+     xf86Msg(from, "%sutomatically adding GPU devices\n",
+             xf86Info.autoAddGPU ? "A" : "Not a");
++
++    if (xf86AutoBindGPUDisabled) {
++        xf86Info.autoBindGPU = FALSE;
++        from = X_CMDLINE;
++    }
++    else if (xf86IsOptionSet(FlagOptions, FLAG_AUTO_BIND_GPU)) {
++        xf86GetOptValBool(FlagOptions, FLAG_AUTO_BIND_GPU,
++                          &xf86Info.autoBindGPU);
++        from = X_CONFIG;
++    }
++    else {
++        from = X_DEFAULT;
++    }
++    xf86Msg(from, "%sutomatically binding GPU devices\n",
++            xf86Info.autoBindGPU ? "A" : "Not a");
++
+     /*
+      * Set things up based on the config file information.  Some of these
+      * settings may be overridden later when the command line options are
+diff --git a/hw/xfree86/common/xf86Globals.c b/hw/xfree86/common/xf86Globals.c
+index e890f05..7b27b4c 100644
+--- a/hw/xfree86/common/xf86Globals.c
++++ b/hw/xfree86/common/xf86Globals.c
+@@ -131,6 +131,7 @@ xf86InfoRec xf86Info = {
+ #else
+     .autoAddGPU = FALSE,
+ #endif
++    .autoBindGPU = TRUE,
+ };
+ 
+ const char *xf86ConfigFile = NULL;
+@@ -191,6 +192,7 @@ Bool xf86FlipPixels = FALSE;
+ Gamma xf86Gamma = { 0.0, 0.0, 0.0 };
+ 
+ Bool xf86AllowMouseOpenFail = FALSE;
++Bool xf86AutoBindGPUDisabled = FALSE;
+ 
+ #ifdef XF86VIDMODE
+ Bool xf86VidModeDisabled = FALSE;
+diff --git a/hw/xfree86/common/xf86Init.c b/hw/xfree86/common/xf86Init.c
+index ea42ec9..ec255b6 100644
+--- a/hw/xfree86/common/xf86Init.c
++++ b/hw/xfree86/common/xf86Init.c
+@@ -76,6 +76,7 @@
+ #include "xf86DDC.h"
+ #include "xf86Xinput.h"
+ #include "xf86InPriv.h"
++#include "xf86Crtc.h"
+ #include "picturestr.h"
+ #include "randrstr.h"
+ #include "glxvndabi.h"
+@@ -237,6 +238,19 @@ xf86PrivsElevated(void)
+     return PrivsElevated();
+ }
+ 
++static void
++xf86AutoConfigOutputDevices(void)
++{
++    int i;
++
++    if (!xf86Info.autoBindGPU)
++        return;
++
++    for (i = 0; i < xf86NumGPUScreens; i++)
++        RRProviderAutoConfigGpuScreen(xf86ScrnToScreen(xf86GPUScreens[i]),
++                                      xf86ScrnToScreen(xf86Screens[0]));
++}
++
+ static void
+ TrapSignals(void)
+ {
+@@ -770,6 +784,8 @@ InitOutput(ScreenInfo * pScreenInfo, int argc, char **argv)
+     for (i = 0; i < xf86NumGPUScreens; i++)
+         AttachUnboundGPU(xf86Screens[0]->pScreen, xf86GPUScreens[i]->pScreen);
+ 
++    xf86AutoConfigOutputDevices();
++
+     xf86VGAarbiterWrapFunctions();
+     if (sigio_blocked)
+         input_unlock();
+@@ -1278,6 +1294,10 @@ ddxProcessArgument(int argc, char **argv, int i)
+         xf86Info.iglxFrom = X_CMDLINE;
+         return 0;
+     }
++    if (!strcmp(argv[i], "-noautoBindGPU")) {
++        xf86AutoBindGPUDisabled = TRUE;
++        return 1;
++    }
+ 
+     /* OS-specific processing */
+     return xf86ProcessArgument(argc, argv, i);
+diff --git a/hw/xfree86/common/xf86Priv.h b/hw/xfree86/common/xf86Priv.h
+index 4fe2b5f..6566622 100644
+--- a/hw/xfree86/common/xf86Priv.h
++++ b/hw/xfree86/common/xf86Priv.h
+@@ -46,6 +46,7 @@
+ extern _X_EXPORT const char *xf86ConfigFile;
+ extern _X_EXPORT const char *xf86ConfigDir;
+ extern _X_EXPORT Bool xf86AllowMouseOpenFail;
++extern _X_EXPORT Bool xf86AutoBindGPUDisabled;
+ 
+ #ifdef XF86VIDMODE
+ extern _X_EXPORT Bool xf86VidModeDisabled;
+diff --git a/hw/xfree86/common/xf86Privstr.h b/hw/xfree86/common/xf86Privstr.h
+index 21c2e1f..6c71863 100644
+--- a/hw/xfree86/common/xf86Privstr.h
++++ b/hw/xfree86/common/xf86Privstr.h
+@@ -98,6 +98,7 @@ typedef struct {
+ 
+     Bool autoAddGPU;
+     const char *debug;
++    Bool autoBindGPU;
+ } xf86InfoRec, *xf86InfoPtr;
+ 
+ /* ISC's cc can't handle ~ of UL constants, so explicitly type cast them. */
+diff --git a/hw/xfree86/common/xf86platformBus.c b/hw/xfree86/common/xf86platformBus.c
+index cef47da..913a324 100644
+--- a/hw/xfree86/common/xf86platformBus.c
++++ b/hw/xfree86/common/xf86platformBus.c
+@@ -49,6 +49,7 @@
+ #include "Pci.h"
+ #include "xf86platformBus.h"
+ #include "xf86Config.h"
++#include "xf86Crtc.h"
+ 
+ #include "randrstr.h"
+ int platformSlotClaimed;
+@@ -665,6 +666,9 @@ xf86platformAddDevice(int index)
+    }
+    /* attach unbound to 0 protocol screen */
+    AttachUnboundGPU(xf86Screens[0]->pScreen, xf86GPUScreens[i]->pScreen);
++   if (xf86Info.autoBindGPU)
++       RRProviderAutoConfigGpuScreen(xf86ScrnToScreen(xf86GPUScreens[i]),
++                                     xf86ScrnToScreen(xf86Screens[0]));
+ 
+    RRResourcesChanged(xf86Screens[0]->pScreen);
+    RRTellChanged(xf86Screens[0]->pScreen);
+diff --git a/hw/xfree86/man/Xorg.man b/hw/xfree86/man/Xorg.man
+index 13a9dc3..745f986 100644
+--- a/hw/xfree86/man/Xorg.man
++++ b/hw/xfree86/man/Xorg.man
+@@ -283,6 +283,13 @@ is a comma separated list of directories to search for
+ server modules.  This option is only available when the server is run
+ as root (i.e, with real-uid 0).
+ .TP 8
++.B \-noautoBindGPU
++Disable automatically setting secondary GPUs up as output sinks and offload
++sources. This is equivalent to setting the
++.B AutoBindGPU
++xorg.conf(__filemansuffix__) file option. To
++.B false.
++.TP 8
+ .B \-nosilk
+ Disable Silken Mouse support.
+ .TP 8
+diff --git a/hw/xfree86/man/xorg.conf.man b/hw/xfree86/man/xorg.conf.man
+index 9589262..8d51e06 100644
+--- a/hw/xfree86/man/xorg.conf.man
++++ b/hw/xfree86/man/xorg.conf.man
+@@ -672,6 +672,12 @@ Enabled by default.
+ If this option is disabled, then no GPU devices will be added from the udev
+ backend. Enabled by default. (May need to be disabled to setup Xinerama).
+ .TP 7
++.BI "Option \*qAutoBindGPU\*q  \*q" boolean \*q
++If enabled then secondary GPUs will be automatically set up as output-sinks and
++offload-sources. Making e.g. laptop outputs connected only to the secondary
++GPU directly available for use without needing to run
++"xrandr --setprovideroutputsource". Enabled by default.
++.TP 7
+ .BI "Option \*qLog\*q \*q" string \*q
+ This option controls whether the log is flushed and/or synced to disk after
+ each message.
+diff --git a/randr/randrstr.h b/randr/randrstr.h
+index f94174b..092d726 100644
+--- a/randr/randrstr.h
++++ b/randr/randrstr.h
+@@ -1039,6 +1039,9 @@ RRProviderLookup(XID id, RRProviderPtr *provider_p);
+ extern _X_EXPORT void
+ RRDeliverProviderEvent(ClientPtr client, WindowPtr pWin, RRProviderPtr provider);
+ 
++extern _X_EXPORT void
++RRProviderAutoConfigGpuScreen(ScreenPtr pScreen, ScreenPtr masterScreen);
++
+ /* rrproviderproperty.c */
+ 
+ extern _X_EXPORT void
+diff --git a/randr/rrprovider.c b/randr/rrprovider.c
+index e4bc2bf..e04c18f 100644
+--- a/randr/rrprovider.c
++++ b/randr/rrprovider.c
+@@ -485,3 +485,25 @@ RRDeliverProviderEvent(ClientPtr client, WindowPtr pWin, RRProviderPtr provider)
+ 
+     WriteEventsToClient(client, 1, (xEvent *) &pe);
+ }
++
++void
++RRProviderAutoConfigGpuScreen(ScreenPtr pScreen, ScreenPtr masterScreen)
++{
++    rrScrPrivPtr pScrPriv = rrGetScrPriv(pScreen);
++    rrScrPrivPtr masterPriv = rrGetScrPriv(masterScreen);
++    RRProviderPtr provider = pScrPriv->provider;
++    RRProviderPtr master_provider = masterPriv->provider;
++
++    if (!provider || !master_provider)
++        return;
++
++    if ((provider->capabilities & RR_Capability_SinkOutput) &&
++        (master_provider->capabilities & RR_Capability_SourceOutput)) {
++        pScrPriv->rrProviderSetOutputSource(pScreen, provider, master_provider);
++        RRInitPrimeSyncProps(pScreen);
++    }
++
++    if ((provider->capabilities & RR_Capability_SourceOffload) &&
++        (master_provider->capabilities & RR_Capability_SinkOffload))
++        pScrPriv->rrProviderSetOffloadSink(pScreen, provider, master_provider);
++}
+-- 
+2.16.2
+

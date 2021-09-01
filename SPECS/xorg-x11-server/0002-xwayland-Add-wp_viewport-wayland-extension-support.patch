@@ -1,0 +1,119 @@
+From 0a3046286e69b171c319ff419c94cf62929246bf Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@posteo.de>
+Date: Mon, 22 Jan 2018 22:02:32 +0100
+Subject: [PATCH xserver 02/25] xwayland: Add wp_viewport wayland extension
+ support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit adds support for the wayland wp_viewport extension, note
+nothing uses this yet.
+
+This is a preparation patch for adding support for fake mode-changes through
+xrandr for apps which want to change the resolution when going fullscreen.
+
+[hdegoede@redhat.com: Split the code for the extension out into its own patch]
+
+Reviewed-by: Olivier Fourdan <ofourdan@redhat.com>
+Acked-by: Michel Dänzer <mdaenzer@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 47bba4625339592d08b375bcd8e51029c0000850)
+---
+ hw/xwayland/Makefile.am | 9 ++++++++-
+ hw/xwayland/meson.build | 3 +++
+ hw/xwayland/xwayland.c  | 3 +++
+ hw/xwayland/xwayland.h  | 2 ++
+ 4 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xwayland/Makefile.am b/hw/xwayland/Makefile.am
+index bc1cb8506..49aae3d8b 100644
+--- a/hw/xwayland/Makefile.am
++++ b/hw/xwayland/Makefile.am
+@@ -71,7 +71,9 @@ Xwayland_built_sources +=					\
+ 	xdg-output-unstable-v1-protocol.c			\
+ 	xdg-output-unstable-v1-client-protocol.h		\
+ 	linux-dmabuf-unstable-v1-client-protocol.h		\
+-	linux-dmabuf-unstable-v1-protocol.c
++	linux-dmabuf-unstable-v1-protocol.c			\
++	viewporter-client-protocol.h				\
++	viewporter-protocol.c
+ 
+ if XWAYLAND_EGLSTREAM
+ Xwayland_built_sources +=					\
+@@ -120,6 +122,11 @@ linux-dmabuf-unstable-v1-protocol.c : $(WAYLAND_PROTOCOLS_DATADIR)/unstable/linu
+ linux-dmabuf-unstable-v1-client-protocol.h : $(WAYLAND_PROTOCOLS_DATADIR)/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml
+ 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header < $< > $@
+ 
++viewporter-protocol.c: $(WAYLAND_PROTOCOLS_DATADIR)/stable/viewporter/viewporter.xml
++	$(AM_V_GEN)$(WAYLAND_SCANNER) @SCANNER_ARG@ < $< > $@
++viewporter-client-protocol.h: $(WAYLAND_PROTOCOLS_DATADIR)/stable/viewporter/viewporter.xml
++	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header < $< > $@
++
+ wayland-eglstream-client-protocol.h : $(WAYLAND_EGLSTREAM_DATADIR)/wayland-eglstream.xml
+ 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header < $< > $@
+ wayland-eglstream-controller-client-protocol.h : $(WAYLAND_EGLSTREAM_DATADIR)/wayland-eglstream-controller.xml
+diff --git a/hw/xwayland/meson.build b/hw/xwayland/meson.build
+index 36bf2133a..4a8d171bb 100644
+--- a/hw/xwayland/meson.build
++++ b/hw/xwayland/meson.build
+@@ -21,6 +21,7 @@ tablet_xml = join_paths(protodir, 'unstable', 'tablet', 'tablet-unstable-v2.xml'
+ kbgrab_xml = join_paths(protodir, 'unstable', 'xwayland-keyboard-grab', 'xwayland-keyboard-grab-unstable-v1.xml')
+ xdg_output_xml = join_paths(protodir, 'unstable', 'xdg-output', 'xdg-output-unstable-v1.xml')
+ dmabuf_xml = join_paths(protodir, 'unstable', 'linux-dmabuf', 'linux-dmabuf-unstable-v1.xml')
++viewporter_xml = join_paths(protodir, 'stable', 'viewporter', 'viewporter.xml')
+ 
+ client_header = generator(scanner,
+     output : '@BASENAME@-client-protocol.h',
+@@ -43,12 +44,14 @@ srcs += client_header.process(tablet_xml)
+ srcs += client_header.process(kbgrab_xml)
+ srcs += client_header.process(xdg_output_xml)
+ srcs += client_header.process(dmabuf_xml)
++srcs += client_header.process(viewporter_xml)
+ srcs += code.process(relative_xml)
+ srcs += code.process(pointer_xml)
+ srcs += code.process(tablet_xml)
+ srcs += code.process(kbgrab_xml)
+ srcs += code.process(xdg_output_xml)
+ srcs += code.process(dmabuf_xml)
++srcs += code.process(viewporter_xml)
+ 
+ xwayland_glamor = []
+ eglstream_srcs = []
+diff --git a/hw/xwayland/xwayland.c b/hw/xwayland/xwayland.c
+index b353167c3..a70c1002f 100644
+--- a/hw/xwayland/xwayland.c
++++ b/hw/xwayland/xwayland.c
+@@ -912,6 +912,9 @@ registry_global(void *data, struct wl_registry *registry, uint32_t id,
+             wl_registry_bind(registry, id, &zxdg_output_manager_v1_interface, 1);
+         xwl_screen_init_xdg_output(xwl_screen);
+     }
++    else if (strcmp(interface, "wp_viewporter") == 0) {
++        xwl_screen->viewporter = wl_registry_bind(registry, id, &wp_viewporter_interface, 1);
++    }
+ #ifdef XWL_HAS_GLAMOR
+     else if (xwl_screen->glamor) {
+         xwl_glamor_init_wl_registry(xwl_screen, registry, id, interface,
+diff --git a/hw/xwayland/xwayland.h b/hw/xwayland/xwayland.h
+index b9495b313..91ae21eeb 100644
+--- a/hw/xwayland/xwayland.h
++++ b/hw/xwayland/xwayland.h
+@@ -48,6 +48,7 @@
+ #include "xwayland-keyboard-grab-unstable-v1-client-protocol.h"
+ #include "xdg-output-unstable-v1-client-protocol.h"
+ #include "linux-dmabuf-unstable-v1-client-protocol.h"
++#include "viewporter-client-protocol.h"
+ 
+ struct xwl_format {
+     uint32_t format;
+@@ -151,6 +152,7 @@ struct xwl_screen {
+     struct zwp_pointer_constraints_v1 *pointer_constraints;
+     struct zwp_xwayland_keyboard_grab_manager_v1 *wp_grab;
+     struct zxdg_output_manager_v1 *xdg_output_manager;
++    struct wp_viewporter *viewporter;
+     uint32_t serial;
+ 
+ #define XWL_FORMAT_ARGB8888 (1 << 0)
+-- 
+2.28.0
+

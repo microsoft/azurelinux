@@ -1,0 +1,139 @@
+From 09dcf01f5ea8d1f828a58e54edd608e6918d0b59 Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@posteo.de>
+Date: Mon, 22 Jan 2018 17:57:38 +0100
+Subject: [PATCH xserver 05/25] xwayland: Use RandR 1.2 interface (rev 2)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This adds the RandR 1.2 interface to xwayland and allows modes
+advertised by the compositor to be set in an undistructive manner.
+
+With this patch, applications that try to set the resolution will usually
+succeed and work while other apps using the same xwayland
+instance are not affected at all.
+
+The RandR 1.2 interface will be needed to implement fake-mode-setting and
+already makes applications work much cleaner and predictive when a mode
+was set.
+
+[hdegoede@redhat.com: Make crtc_set only succeed if the mode matches
+ the desktop resolution]
+
+Reviewed-by: Olivier Fourdan <ofourdan@redhat.com>
+Acked-by: Michel Dänzer <mdaenzer@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit e89872f51aa834fa9d94a4ca4822f03b0341ab4f)
+---
+ hw/xwayland/xwayland-output.c | 81 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
+
+diff --git a/hw/xwayland/xwayland-output.c b/hw/xwayland/xwayland-output.c
+index 4036ba681..633ebb89e 100644
+--- a/hw/xwayland/xwayland-output.c
++++ b/hw/xwayland/xwayland-output.c
+@@ -524,12 +524,80 @@ xwl_randr_get_info(ScreenPtr pScreen, Rotation * rotations)
+     return TRUE;
+ }
+ 
++#ifdef RANDR_10_INTERFACE
+ static Bool
+ xwl_randr_set_config(ScreenPtr pScreen,
+                      Rotation rotation, int rate, RRScreenSizePtr pSize)
+ {
+     return FALSE;
+ }
++#endif
++
++#if RANDR_12_INTERFACE
++static Bool
++xwl_randr_screen_set_size(ScreenPtr pScreen,
++                          CARD16 width,
++                          CARD16 height,
++                          CARD32 mmWidth, CARD32 mmHeight)
++{
++    return TRUE;
++}
++
++static Bool
++xwl_randr_crtc_set(ScreenPtr pScreen,
++                   RRCrtcPtr crtc,
++                   RRModePtr mode,
++                   int x,
++                   int y,
++                   Rotation rotation,
++                   int numOutputs, RROutputPtr * outputs)
++{
++    struct xwl_output *xwl_output = crtc->devPrivate;
++
++    if (!mode || (mode->mode.width  == xwl_output->width &&
++                  mode->mode.height == xwl_output->height)) {
++        RRCrtcChanged(crtc, TRUE);
++        return TRUE;
++    }
++
++    return FALSE;
++}
++
++static Bool
++xwl_randr_crtc_set_gamma(ScreenPtr pScreen, RRCrtcPtr crtc)
++{
++    return TRUE;
++}
++
++static Bool
++xwl_randr_crtc_get_gamma(ScreenPtr pScreen, RRCrtcPtr crtc)
++{
++    return TRUE;
++}
++
++static Bool
++xwl_randr_output_set_property(ScreenPtr pScreen,
++                              RROutputPtr output,
++                              Atom property,
++                              RRPropertyValuePtr value)
++{
++    return TRUE;
++}
++
++static Bool
++xwl_output_validate_mode(ScreenPtr pScreen,
++                         RROutputPtr output,
++                         RRModePtr mode)
++{
++    return TRUE;
++}
++
++static void
++xwl_randr_mode_destroy(ScreenPtr pScreen, RRModePtr mode)
++{
++    return;
++}
++#endif
+ 
+ Bool
+ xwl_screen_init_output(struct xwl_screen *xwl_screen)
+@@ -543,7 +611,20 @@ xwl_screen_init_output(struct xwl_screen *xwl_screen)
+ 
+     rp = rrGetScrPriv(xwl_screen->screen);
+     rp->rrGetInfo = xwl_randr_get_info;
++
++#if RANDR_10_INTERFACE
+     rp->rrSetConfig = xwl_randr_set_config;
++#endif
++
++#if RANDR_12_INTERFACE
++    rp->rrScreenSetSize = xwl_randr_screen_set_size;
++    rp->rrCrtcSet = xwl_randr_crtc_set;
++    rp->rrCrtcSetGamma = xwl_randr_crtc_set_gamma;
++    rp->rrCrtcGetGamma = xwl_randr_crtc_get_gamma;
++    rp->rrOutputSetProperty = xwl_randr_output_set_property;
++    rp->rrOutputValidateMode = xwl_output_validate_mode;
++    rp->rrModeDestroy = xwl_randr_mode_destroy;
++#endif
+ 
+     return TRUE;
+ }
+-- 
+2.28.0
+

@@ -1,0 +1,1 @@
+KERNEL=="controlD[0-9]*", SUBSYSTEM=="drm", MODE="0600"

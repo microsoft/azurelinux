@@ -1,0 +1,116 @@
+From a815e5f51f75684a53d8fa14b596e03b738cd281 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 29 Aug 2019 14:18:28 +0200
+Subject: [PATCH xserver 01/25] dix: Add GetCurrentClient helper
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Request-handlers as registered in the requestVector array, always get
+passed the clientPtr for the client which sent the request.
+But the implementation of many request-handlers typically consists of
+a generic handler calling implementation specific callbacks and / or
+various helpers often multiple levels deep and in many cases the clientPtr
+does not get passed to the callbacks / helpers.
+
+This means that in some places where we would like to have access to the
+current-client, we cannot easily access it and fixing this would require
+a lot of work and often would involve ABI breakage.
+
+This commit adds a GetCurrentClient helper which can be used as a
+shortcut to get access to the clienPtr for the currently being processed
+request without needing a lot of refactoring and ABI breakage.
+
+Note using this new GetCurrentClient helper is only safe for code
+which only runs from the main thread, this new variable MUST NOT be used
+by code which runs from signal handlers or from the input-thread.
+
+The specific use-case which resulted in the creation of this patch is adding
+support for emulation of randr / vidmode resolution changes to Xwayland.
+This emulation will not actually change the monitor resolution instead it
+will scale any window with a size which exactly matches the requested
+resolution to fill the entire monitor. The main use-case for this is
+games which are hard-coded to render at a specific resolution and have
+sofar relied on randr / vidmode to change the monitor resolution when going
+fullscreen.
+
+To make this emulation as robust as possible (e.g. avoid accidentally scaling
+windows from other apps) we want to make the emulated resolution a per client
+state. But e.g. the RRSetCrtc function does not take a client pointer; and is
+a (used) part of the Xorg server ABI (note the problem is not just limited
+to RRSetCrtc).
+
+Reviewed-by: Olivier Fourdan <ofourdan@redhat.com>
+Reviewed-by: Michel Dänzer <mdaenzer@redhat.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+(cherry picked from commit 834a467af978ac7a24ed17b8c8e58b6cddb4faf9)
+---
+ dix/dispatch.c | 23 ++++++++++++++++++++++-
+ include/dix.h  |  1 +
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/dix/dispatch.c b/dix/dispatch.c
+index a33bfaa9e..2b1cf1a74 100644
+--- a/dix/dispatch.c
++++ b/dix/dispatch.c
+@@ -148,6 +148,7 @@ xConnSetupPrefix connSetupPrefix;
+ PaddingInfo PixmapWidthPaddingInfo[33];
+ 
+ static ClientPtr grabClient;
++static ClientPtr currentClient; /* Client for the request currently being dispatched */
+ 
+ #define GrabNone 0
+ #define GrabActive 1
+@@ -176,6 +177,23 @@ volatile char isItTimeToYield;
+ #define SAME_SCREENS(a, b) (\
+     (a.pScreen == b.pScreen))
+ 
++ClientPtr
++GetCurrentClient(void)
++{
++    if (in_input_thread()) {
++        static Bool warned;
++
++        if (!warned) {
++            ErrorF("[dix] Error GetCurrentClient called from input-thread\n");
++            warned = TRUE;
++        }
++
++        return NULL;
++    }
++
++    return currentClient;
++}
++
+ void
+ SetInputCheck(HWEventQueuePtr c0, HWEventQueuePtr c1)
+ {
+@@ -474,9 +492,12 @@ Dispatch(void)
+                     result = BadLength;
+                 else {
+                     result = XaceHookDispatch(client, client->majorOp);
+-                    if (result == Success)
++                    if (result == Success) {
++                        currentClient = client;
+                         result =
+                             (*client->requestVector[client->majorOp]) (client);
++                        currentClient = NULL;
++                    }
+                 }
+                 if (!SmartScheduleSignalEnable)
+                     SmartScheduleTime = GetTimeInMillis();
+diff --git a/include/dix.h b/include/dix.h
+index b6e2bcfde..d65060cb6 100644
+--- a/include/dix.h
++++ b/include/dix.h
+@@ -148,6 +148,7 @@ typedef struct _TimeStamp {
+ } TimeStamp;
+ 
+ /* dispatch.c */
++extern _X_EXPORT ClientPtr GetCurrentClient(void);
+ 
+ extern _X_EXPORT void SetInputCheck(HWEventQueuePtr /*c0 */ ,
+                                     HWEventQueuePtr /*c1 */ );
+-- 
+2.28.0
+

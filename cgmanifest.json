@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.11",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
+          "version": "1.10.9",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
         }
       }
     },
@@ -214,16 +214,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "autoconf213",
-          "version": "2.13",
-          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "autoconf-archive",
           "version": "2018.03.13",
           "downloadUrl": "http://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2018.03.13.tar.xz"
@@ -234,9 +224,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "autoconf",
-          "version": "2.69",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
+          "name": "autoconf213",
+          "version": "2.13",
+          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
         }
       }
     },
@@ -377,6 +367,17 @@
           "name": "bcc",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.12.0/bcc-src-with-submodule.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
+        "other": {
+          "name": "bdftopcf",
+          "version": "1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/bdftopcf-1.1.tar.bz2"
         }
       }
     },
@@ -804,16 +805,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "conda",
-          "version": "4.10.1",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
-        }
-      }
-    },
-{
-      "component": {
-        "type": "other",
-        "other": {
           "name": "collectd",
           "version": "5.12.0",
           "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
@@ -837,6 +828,16 @@
           "name": "compositeproto",
           "version": "0.4.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/compositeproto-0.4.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "conda",
+          "version": "4.10.1",
+          "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
         }
       }
     },
@@ -1087,6 +1088,17 @@
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "DejaVu compiled fonts",
+        "other": {
+          "name": "dejavu-fonts",
+          "version": "2.37",
+          "downloadUrl": "https://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2"
         }
       }
     },
@@ -1400,7 +1412,7 @@
         }
       }
     },
-      {
+    {
       "component": {
         "type": "other",
         "other": {
@@ -1520,7 +1532,6 @@
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -1571,7 +1582,6 @@
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -1622,7 +1632,17 @@
         }
       }
     },
-
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
+        "other": {
+          "name": "font-util",
+          "version": "1.3.1",
+          "downloadUrl": "https://www.x.org/pub/individual/font/font-util-1.3.1.tar.bz2"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",
@@ -1640,6 +1660,17 @@
           "name": "fontsproto",
           "version": "2.1.3",
           "downloadUrl": "https://www.x.org/pub/individual/proto/fontsproto-2.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
+        "other": {
+          "name": "fonttosfnt",
+          "version": "1.2.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/fonttosfnt-1.2.1.tar.bz2"
         }
       }
     },
@@ -1797,9 +1828,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "glib-networking",
-          "version": "2.59.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/glib-networking-2.59.1.tar.xz"
+          "name": "glib",
+          "version": "2.60.1",
+          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.60/glib-2.60.1.tar.xz"
         }
       }
     },
@@ -1807,9 +1838,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "glib",
-          "version": "2.60.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.60/glib-2.60.1.tar.xz"
+          "name": "glib-networking",
+          "version": "2.59.1",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/glib-networking-2.59.1.tar.xz"
         }
       }
     },
@@ -2077,6 +2108,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gsm",
+          "version": "1.0.19",
+          "downloadUrl": "http://www.quut.com/gsm/gsm-1.0.19.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gtest",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
@@ -2207,9 +2248,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "http-parser",
-          "version": "2.8.1",
-          "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
+          "name": "hwdata",
+          "version": "0.341",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
         }
       }
     },
@@ -2223,17 +2264,6 @@
         }
       }
     },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "hwdata",
-          "version": "0.341",
-          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
-        }
-      }
-    },
-
     {
       "component": {
         "type": "other",
@@ -2948,9 +2978,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdrm",
+          "version": "2.4.102",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.102.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libedit",
           "version": "3.1.20180525",
           "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20180525-3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libepoxy",
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/anholt/libepoxy/releases/download/1.5.5/libepoxy-1.5.5.tar.xz"
         }
       }
     },
@@ -2971,6 +3021,16 @@
           "name": "libev",
           "version": "4.24",
           "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libevdev",
+          "version": "1.9.1",
+          "downloadUrl": "https://www.freedesktop.org/software/libevdev/libevdev-1.9.1.tar.xz"
         }
       }
     },
@@ -3010,7 +3070,7 @@
         "other": {
           "name": "libfontenc",
           "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
         }
       }
     },
@@ -3031,6 +3091,16 @@
           "name": "libgcrypt",
           "version": "1.8.7",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libglvnd",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/NVIDIA/libglvnd/archive/v1.3.2/libglvnd-1.3.2.tar.gz"
         }
       }
     },
@@ -3079,8 +3149,18 @@
         "type": "other",
         "other": {
           "name": "libICE",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.9.tar.bz2"
+          "version": "1.0.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libinput",
+          "version": "1.16.4",
+          "downloadUrl": "https://www.freedesktop.org/software/libinput/libinput-1.16.4.tar.xz"
         }
       }
     },
@@ -3499,8 +3579,18 @@
         "type": "other",
         "other": {
           "name": "libSM",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.2.tar.bz2"
+          "version": "1.2.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libsndfile",
+          "version": "1.0.31",
+          "downloadUrl": "https://github.com/libsndfile/libsndfile/archive/1.0.31.tar.gz"
         }
       }
     },
@@ -3658,6 +3748,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libwacom",
+          "version": "1.6",
+          "downloadUrl": "https://github.com/linuxwacom/libwacom/releases/download/libwacom-1.6/libwacom-1.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libwebp",
           "version": "1.0.3",
           "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.3.tar.gz"
@@ -3669,8 +3769,8 @@
         "type": "other",
         "other": {
           "name": "libX11",
-          "version": "1.6.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libX11-1.6.5.tar.bz2"
+          "version": "1.6.12",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.6.12.tar.bz2"
         }
       }
     },
@@ -3679,8 +3779,8 @@
         "type": "other",
         "other": {
           "name": "libXau",
-          "version": "1.0.8",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.8.tar.bz2"
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.9.tar.bz2"
         }
       }
     },
@@ -3699,8 +3799,8 @@
         "type": "other",
         "other": {
           "name": "libxcb",
-          "version": "1.12",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.12.tar.bz2"
+          "version": "1.13.1",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
         }
       }
     },
@@ -3719,8 +3819,8 @@
         "type": "other",
         "other": {
           "name": "libXcursor",
-          "version": "1.1.14",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcursor-1.1.14.tar.bz2"
+          "version": "1.2.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.0.tar.bz2"
         }
       }
     },
@@ -3729,8 +3829,18 @@
         "type": "other",
         "other": {
           "name": "libXdamage",
-          "version": "1.1.4",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXdmcp",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdmcp-1.1.3.tar.bz2"
         }
       }
     },
@@ -3739,8 +3849,8 @@
         "type": "other",
         "other": {
           "name": "libXext",
-          "version": "1.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXext-1.3.3.tar.bz2"
+          "version": "1.3.4",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
         }
       }
     },
@@ -3750,7 +3860,7 @@
         "other": {
           "name": "libXfixes",
           "version": "5.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfixes-5.0.3.tar.bz2"
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
         }
       }
     },
@@ -3759,8 +3869,8 @@
         "type": "other",
         "other": {
           "name": "libXfont2",
-          "version": "2.0.1",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.1.tar.bz2"
+          "version": "2.0.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.3.tar.bz2"
         }
       }
     },
@@ -3769,8 +3879,8 @@
         "type": "other",
         "other": {
           "name": "libXft",
-          "version": "2.3.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.2.tar.bz2"
+          "version": "2.3.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
         }
       }
     },
@@ -3779,8 +3889,8 @@
         "type": "other",
         "other": {
           "name": "libXi",
-          "version": "1.7.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.9.tar.bz2"
+          "version": "1.7.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.10.tar.bz2"
         }
       }
     },
@@ -3798,9 +3908,39 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxkbcommon",
+          "version": "1.0.1",
+          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.0.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxkbfile",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.0.9.tar.bz2"
+          "version": "1.1.0",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxml++",
+          "version": "3.2.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxml2",
+          "version": "2.9.12",
+          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz"
         }
       }
     },
@@ -3809,8 +3949,8 @@
         "type": "other",
         "other": {
           "name": "libXmu",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.2.tar.bz2"
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
         }
       }
     },
@@ -3819,8 +3959,8 @@
         "type": "other",
         "other": {
           "name": "libXpm",
-          "version": "3.5.12",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.12.tar.bz2"
+          "version": "3.5.13",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.13.tar.bz2"
         }
       }
     },
@@ -3829,8 +3969,8 @@
         "type": "other",
         "other": {
           "name": "libXrandr",
-          "version": "1.5.1",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXrandr-1.5.1.tar.bz2"
+          "version": "1.5.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.2.tar.bz2"
         }
       }
     },
@@ -3840,7 +3980,7 @@
         "other": {
           "name": "libXrender",
           "version": "0.9.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXrender-0.9.10.tar.bz2"
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.10.tar.bz2"
         }
       }
     },
@@ -3869,8 +4009,18 @@
         "type": "other",
         "other": {
           "name": "libxshmfence",
-          "version": "1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxshmfence-1.2.tar.bz2"
+          "version": "1.3",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxslt",
+          "version": "1.1.34",
+          "downloadUrl": "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
         }
       }
     },
@@ -3879,8 +4029,8 @@
         "type": "other",
         "other": {
           "name": "libXt",
-          "version": "1.1.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXt-1.1.5.tar.bz2"
+          "version": "1.2.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXt-1.2.0.tar.bz2"
         }
       }
     },
@@ -3890,7 +4040,7 @@
         "other": {
           "name": "libXtst",
           "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXtst-1.2.3.tar.bz2"
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
         }
       }
     },
@@ -3930,37 +4080,7 @@
         "other": {
           "name": "libXxf86vm",
           "version": "1.1.4",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXxf86vm-1.1.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxml++",
-          "version": "3.2.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxml2",
-          "version": "2.9.12",
-          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxslt",
-          "version": "1.1.34",
-          "downloadUrl": "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.4.tar.bz2"
         }
       }
     },
@@ -4318,9 +4438,41 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mesa",
+          "version": "21.0.0",
+          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-21.0.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "meson",
           "version": "0.57.1",
           "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/0.57.1/meson-0.57.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
+        "other": {
+          "name": "mkfontdir",
+          "version": "1.0.7",
+          "downloadUrl": "https://www.x.org/pub/individual/app/mkfontdir-1.0.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
+        "other": {
+          "name": "mkfontscale",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/mkfontscale-1.1.3.tar.bz2"
         }
       }
     },
@@ -4439,16 +4591,6 @@
         "type": "other",
         "other": {
           "name": "msgpack",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-2.0.0.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "msgpack",
           "version": "3.2.1",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.2.1.tar.gz"
         }
@@ -4461,6 +4603,16 @@
           "name": "msr-tools",
           "version": "1.3",
           "downloadUrl": "https://01.org/sites/default/files/downloads/msr-tools/msr-tools-1.3.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mtdev",
+          "version": "1.1.5",
+          "downloadUrl": "https://bitmath.org/code/mtdev/mtdev-1.1.5.tar.bz2"
         }
       }
     },
@@ -4764,7 +4916,7 @@
         }
       }
     },
-{
+    {
       "component": {
         "type": "other",
         "other": {
@@ -4817,6 +4969,17 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "oclock",
+          "version": "1.0.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/oclock-1.0.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "omi",
           "version": "1.6.6",
@@ -4858,9 +5021,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openjdk8_aarch64",
+          "name": "openjdk8",
           "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -4868,9 +5031,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openjdk8",
+          "name": "openjdk8_aarch64",
           "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u292-b10.tar.gz"
+          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
         }
       }
     },
@@ -4911,16 +5074,6 @@
           "name": "openssl",
           "version": "1.1.1k",
           "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1k.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "open-vm-tools",
-          "version": "11.1.0",
-          "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-11.1.0/open-vm-tools-11.1.0-16036546.tar.gz"
         }
       }
     },
@@ -5539,8 +5692,8 @@
         "type": "other",
         "other": {
           "name": "pixman",
-          "version": "0.36.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.36.0.tar.bz2"
+          "version": "0.40.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.40.0.tar.xz"
         }
       }
     },
@@ -5768,33 +5921,12 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python2",
-          "version": "2.7.18",
-          "downloadUrl": "http://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python3",
-          "version": "3.7.10",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-appdirs",
           "version": "1.4.3",
           "downloadUrl": "https://pypi.python.org/packages/48/69/d87c60746b393309ca30761f8e2b49473d43450b150cb08f3c6df5c11be5/appdirs-1.4.3.tar.gz"
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -6112,7 +6244,6 @@
           "name": "python-frozendict",
           "version": "1.2",
           "downloadUrl": "https://pypi.python.org/packages/source/f/frozendict/frozendict-1.2.tar.gz"
-
         }
       }
     },
@@ -8189,6 +8320,17 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
+        "other": {
+          "name": "setxkbmap",
+          "version": "1.3.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/setxkbmap-1.3.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "sg3_utils",
           "version": "1.44",
@@ -8660,6 +8802,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "UI-cairo",
+          "version": "1.16.0",
+          "downloadUrl": "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "unbound",
           "version": "1.10.0",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
@@ -8820,9 +8972,49 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vulkan-headers",
+          "version": "1.2.148.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-1.2.148.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "vulkan-loader",
+          "version": "1.2.148.1",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-1.2.148.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "WALinuxAgent",
           "version": "2.2.54.2",
           "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.2.54.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wayland",
+          "version": "1.18.0",
+          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-1.18.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wayland-protocols",
+          "version": "1.20",
+          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-protocols-1.20.tar.xz"
         }
       }
     },
@@ -8879,10 +9071,43 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "x11perf",
+          "version": "1.6.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/x11perf-1.6.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "xcb-proto",
-          "version": "1.12",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-proto-1.12.tar.bz2"
+          "version": "1.13",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-proto-1.13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xclipboard",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xclipboard-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xclock",
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xclock-1.0.9.tar.bz2"
         }
       }
     },
@@ -8893,6 +9118,38 @@
           "name": "xcmiscproto",
           "version": "1.2.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/xcmiscproto-1.2.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xconsole",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xconsole-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xcursor-themes",
+          "version": "1.0.6",
+          "downloadUrl": "https://xorg.freedesktop.org/releases/individual/data/xcursor-themes-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xcursorgen",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xcursorgen-1.0.6.tar.bz2"
         }
       }
     },
@@ -8913,6 +9170,17 @@
           "name": "xextproto",
           "version": "7.3.0",
           "downloadUrl": "https://www.x.org/pub/individual/proto/xextproto-7.3.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xeyes",
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xeyes-1.1.2.tar.bz2"
         }
       }
     },
@@ -8959,6 +9227,28 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xfd",
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xfd-1.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xfontsel",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xfontsel-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "xfsprogs",
           "version": "5.0.0",
@@ -8983,6 +9273,104 @@
           "name": "xinetd",
           "version": "2.3.15",
           "downloadUrl": "https://github.com/xinetd-org/xinetd/archive/xinetd-2-3-15.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
+        "other": {
+          "name": "xkbcomp",
+          "version": "1.4.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xkbcomp-1.4.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
+        "other": {
+          "name": "xkbevd",
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xkbevd-1.1.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
+        "other": {
+          "name": "xkbprint",
+          "version": "1.0.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xkbprint-1.0.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
+        "other": {
+          "name": "xkbutils",
+          "version": "1.0.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xkbutils-1.0.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xkeyboard-config",
+          "version": "2.30",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.30.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xload",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xload-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xlogo",
+          "version": "1.0.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xlogo-1.0.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xmag",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xmag-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xmessage",
+          "version": "1.0.5.",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xmessage-1.0.5.tar.bz2"
         }
       }
     },
@@ -9020,6 +9408,67 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-drv-libinput",
+          "version": "0.30.0",
+          "downloadUrl": "ftp://ftp.x.org/pub/individual/driver/xf86-input-libinput-0.30.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-proto-devel",
+          "version": "2019.1",
+          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2019.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-server",
+          "version": "1.20.10",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xorg-server-1.20.10.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-xauth",
+          "version": "1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xauth-1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-xtrans-devel",
+          "version": "1.4.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xpr",
+          "version": "1.0.5.",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xpr-1.0.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xproto",
           "version": "7.0.31",
           "downloadUrl": "https://www.x.org/pub/individual/proto/xproto-7.0.31.tar.bz2"
@@ -9033,6 +9482,39 @@
           "name": "xtrans",
           "version": "1.3.5",
           "downloadUrl": "https://www.x.org/pub/individual/lib/xtrans-1.3.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xvidtune",
+          "version": "1.0.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xvidtune-1.0.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xwd",
+          "version": "1.0.7",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xwd-1.0.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
+        "other": {
+          "name": "xwud",
+          "version": "1.0.5",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xwud-1.0.5.tar.bz2"
         }
       }
     },

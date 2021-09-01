@@ -125,7 +125,7 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 
 %changelog
 * Fri Jun 18 2021 Henry Li <lihl@microsoft.com> 1.6.1-1.6
-- Initial CBL-Mariner import from OpenSUSE TumbleWeed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Use golang as build dependency
 - Remove {?ext_man}, which is not supported in CBL-Mariner
