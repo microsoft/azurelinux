@@ -1,13 +1,15 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/cpio/
 Group:          System Environment/System utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
+
+Patch0:         CVE-2021-38185.patch
 
 Conflicts:      toybox
 
@@ -24,6 +26,7 @@ These are the additional language files of cpio
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 sed -i -e '/gets is a/d' gnu/stdio.in.h
@@ -59,6 +62,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 01 2021 Andrew Phelps <anphel@microsoft.com> 2.13-3
+- Add patch for CVE-2021-38185
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-2
 - Added %%license line automatically
 * Fri May 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.13-1
