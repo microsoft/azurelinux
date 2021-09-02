@@ -32,6 +32,7 @@
 # are consistently applied this override should be removed.
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
+/usr/lib/rpm/mariner/gen-ld-script.sh\
 %{set_build_flags}\
 %{nil}
 
@@ -59,7 +60,7 @@
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} -Wl,-T,/module_info.ld
 
 %set_build_flags \
   CFLAGS="${CFLAGS:-%{build_cflags}}" ; export CFLAGS ; \
