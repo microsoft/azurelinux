@@ -1,7 +1,7 @@
+Summary:        Simple SSL certificate generator
 Name:           sscg
 Version:        2.6.2
-Release:        1%{?dist}
-Summary:        Simple SSL certificate generator
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,14 +9,13 @@ URL:            https://github.com/sgallagher/sscg
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
-BuildRequires:  libtalloc-devel
-BuildRequires:  openssl-devel
-BuildRequires:  popt-devel
+BuildRequires:  help2man
 BuildRequires:  libpath_utils-devel
+BuildRequires:  libtalloc-devel
 BuildRequires:  meson
 BuildRequires:  ninja-build
-BuildRequires:  help2man
-
+BuildRequires:  openssl-devel
+BuildRequires:  popt-devel
 
 %description
 A utility to aid in the creation of more secure "self-signed"
@@ -98,7 +97,6 @@ false signatures from the service certificate.
 - Update to 2.4.0
 - Autodetect the minimum key strength from the system security level.
 - Disallow setting a key strength below the system minimum.
-
 - Drop upstreamed patches
 
 * Mon Sep 17 2018 Stephen Gallagher <sgallagh@redhat.com> - 2.3.3-4
