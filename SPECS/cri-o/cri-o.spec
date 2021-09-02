@@ -206,7 +206,7 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 
 %changelog
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 1.21.2-2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag)
 - License Verified
 - Use prebuilt go vendor source
 - Use mariner packages as build/runtime requirements
