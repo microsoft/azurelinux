@@ -1156,6 +1156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ding-libs",
+          "version": "0.6.1",
+          "downloadUrl": " https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dkms",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/dell/dkms/archive/v2.8.1.tar.gz"
@@ -2221,6 +2231,16 @@
           "name": "helm",
           "version": "3.4.1",
           "downloadUrl": "https://github.com/helm/helm/archive/v3.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "help2man",
+          "version": "1.47.14",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.47.14.tar.xz"
         }
       }
     },
