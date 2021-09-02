@@ -11,7 +11,7 @@ Summary:        "Ding is not GLib" assorted utility libraries
 Name:           ding-libs
 Version:        0.6.1
 Release:        45%{?dist}
-License:        LGPLv3+ AND GPLv3
+License:        LGPLv3+ AND GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/SSSD/ding-libs

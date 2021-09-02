@@ -2,7 +2,7 @@ Summary:        Simple SSL certificate generator
 Name:           sscg
 Version:        2.6.2
 Release:        2%{?dist}
-License:        GPLv3
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sgallagher/sscg
