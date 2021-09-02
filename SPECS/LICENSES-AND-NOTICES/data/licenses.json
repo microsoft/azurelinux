@@ -27,7 +27,8 @@
                 "chrony",
                 "collectd",
                 "colm",
-                "conda",
+                "conda",                
+                "conmon",
                 "conntrack-tools",
                 "cpprest",
                 "cryptsetup",
@@ -342,11 +343,13 @@
                 "bazel-workspaces",
                 "boringssl",
                 "cni",
+                "cri-o",
                 "envoy",
                 "fillup",
                 "golang-packaging",
                 "jna",
                 "kured",
+                "libcontainers-common",
                 "xcursor-themes"
             ]
         },
