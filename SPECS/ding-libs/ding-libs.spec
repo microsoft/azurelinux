@@ -1,13 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Name: ding-libs
-Version: 0.6.1
-Release: 45%{?dist}
-Summary: "Ding is not GLib" assorted utility libraries
-License: LGPLv3+ AND GPLv3
-URL: https://pagure.io/SSSD/ding-libs
-Source0: https://releases.pagure.org/SSSD/ding-libs/%{name}-%{version}.tar.gz
-
 # If a new upstream release changes some, but not all of these
 # version numbers, remember to keep the Release tag in order to
 # allow clean upgrades!
@@ -17,50 +7,57 @@ Source0: https://releases.pagure.org/SSSD/ding-libs/%{name}-%{version}.tar.gz
 %global ref_array_version 0.1.5
 %global basicobjects_version 0.1.1
 %global ini_config_version 1.3.1
-
+Summary:        "Ding is not GLib" assorted utility libraries
+Name:           ding-libs
+Version:        0.6.1
+Release:        45%{?dist}
+License:        LGPLv3+ AND GPLv3
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pagure.io/SSSD/ding-libs
+Source0:        https://releases.pagure.org/SSSD/ding-libs/%{name}-%{version}.tar.gz
 ### Patches ###
-Patch0: INI-Silence-ini_augment-match-failures.patch
-Patch1: INI-Remove-definiton-of-TRACE_LEVEL.patch
-Patch2: INI-Fix-detection-of-error-messages.patch
-Patch3: TEST-validators_ut_check-Fix-fail-with-new-glibc.patch
+Patch0:         INI-Silence-ini_augment-match-failures.patch
+Patch1:         INI-Remove-definiton-of-TRACE_LEVEL.patch
+Patch2:         INI-Fix-detection-of-error-messages.patch
+Patch3:         TEST-validators_ut_check-Fix-fail-with-new-glibc.patch
+
+### Build Dependencies ###
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  check-devel
+BuildRequires:  gcc
+BuildRequires:  git
+BuildRequires:  libtool
+BuildRequires:  m4
+BuildRequires:  pkg-config
 
 ### Dependencies ###
 # ding-libs is a meta-package that will pull in all of its own
 # sub-packages
-Requires: libpath_utils = %{path_utils_version}-%{release}
-Requires: libdhash = %{dhash_version}-%{release}
-Requires: libcollection = %{collection_version}-%{release}
-Requires: libref_array = %{ref_array_version}-%{release}
-Requires: libbasicobjects = %{basicobjects_version}-%{release}
-Requires: libini_config = %{ini_config_version}-%{release}
-
-### Build Dependencies ###
-
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: gcc
-BuildRequires: git
-BuildRequires: libtool
-BuildRequires: m4
-BuildRequires: pkgconfig
-BuildRequires: check-devel
+Requires:       libbasicobjects = %{basicobjects_version}-%{release}
+Requires:       libcollection = %{collection_version}-%{release}
+Requires:       libdhash = %{dhash_version}-%{release}
+Requires:       libini_config = %{ini_config_version}-%{release}
+Requires:       libpath_utils = %{path_utils_version}-%{release}
+Requires:       libref_array = %{ref_array_version}-%{release}
 
 %description
 A meta-package that pulls in libcollection, libdhash, libini_config,
 librefarray libbasicobjects, and libpath_utils.
 
 %package devel
-Summary: Development packages for ding-libs
-License: LGPLv3+
+Summary:        Development packages for ding-libs
+License:        LGPLv3+
 
 # ding-libs is a meta-package that will pull in all of its own
 # sub-packages
-Requires: libpath_utils-devel = %{path_utils_version}-%{release}
-Requires: libdhash-devel = %{dhash_version}-%{release}
-Requires: libcollection-devel = %{collection_version}-%{release}
-Requires: libref_array-devel = %{ref_array_version}-%{release}
-Requires: libbasicobjects-devel = %{basicobjects_version}-%{release}
-Requires: libini_config-devel = %{ini_config_version}-%{release}
+Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
+Requires:       libcollection-devel = %{collection_version}-%{release}
+Requires:       libdhash-devel = %{dhash_version}-%{release}
+Requires:       libini_config-devel = %{ini_config_version}-%{release}
+Requires:       libpath_utils-devel = %{path_utils_version}-%{release}
+Requires:       libref_array-devel = %{ref_array_version}-%{release}
 
 %description devel
 A meta-package that pulls in development libraries for libcollection,
@@ -71,18 +68,19 @@ libdhash, libini_config, librefarray and libpath_utils.
 ##############################################################################
 
 %package -n libpath_utils
-Summary: Filesystem Path Utilities
-License: LGPLv3+
-Version: %{path_utils_version}
+Summary:        Filesystem Path Utilities
+Version:        %{path_utils_version}
+License:        LGPLv3+
 
 %description -n libpath_utils
 Utility functions to manipulate filesystem pathnames
 
 %package -n libpath_utils-devel
-Summary: Development files for libpath_utils
-Requires: libpath_utils = %{path_utils_version}-%{release}
-License: LGPLv3+
-Version: %{path_utils_version}
+Summary:        Development files for libpath_utils
+Version:        %{path_utils_version}
+License:        LGPLv3+
+
+Requires:       libpath_utils = %{path_utils_version}-%{release}
 
 %description -n libpath_utils-devel
 Utility functions to manipulate filesystem pathnames
@@ -90,7 +88,7 @@ Utility functions to manipulate filesystem pathnames
 %ldconfig_scriptlets -n libpath_utils
 
 %files -n libpath_utils
-%doc COPYING COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libpath_utils.so.1
 %{_libdir}/libpath_utils.so.1.0.1
 
@@ -100,25 +98,25 @@ Utility functions to manipulate filesystem pathnames
 %{_libdir}/pkgconfig/path_utils.pc
 %doc path_utils/README.path_utils
 
-
 ##############################################################################
 # dhash
 ##############################################################################
 
 %package -n libdhash
-Summary: Dynamic hash table
-License: LGPLv3+
-Version: %{dhash_version}
+Summary:        Dynamic hash table
+Version:        %{dhash_version}
+License:        LGPLv3+
 
 %description -n libdhash
 A hash table which will dynamically resize to achieve optimal storage & access
 time properties
 
 %package -n libdhash-devel
-Summary: Development files for libdhash
-Requires: libdhash = %{dhash_version}-%{release}
-License: LGPLv3+
-Version: %{dhash_version}
+Summary:        Development files for libdhash
+Version:        %{dhash_version}
+License:        LGPLv3+
+
+Requires:       libdhash = %{dhash_version}-%{release}
 
 %description -n libdhash-devel
 A hash table which will dynamically resize to achieve optimal storage & access
@@ -127,7 +125,7 @@ time properties
 %ldconfig_scriptlets -n libdhash
 
 %files -n libdhash
-%doc COPYING COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libdhash.so.1
 %{_libdir}/libdhash.so.1.1.0
 
@@ -138,24 +136,24 @@ time properties
 %doc dhash/README.dhash
 %doc dhash/examples/*.c
 
-
 ##############################################################################
 # collection
 ##############################################################################
 %package -n libcollection
-Summary: Collection data-type for C
-License: LGPLv3+
-Version: %{collection_version}
+Summary:        Collection data-type for C
+Version:        %{collection_version}
+License:        LGPLv3+
 
 %description -n libcollection
 A data-type to collect data in a hierarchical structure for easy iteration
 and serialization
 
 %package -n libcollection-devel
-Summary: Development files for libcollection
-License: LGPLv3+
-Requires: libcollection = %{collection_version}-%{release}
-Version: %{collection_version}
+Summary:        Development files for libcollection
+Version:        %{collection_version}
+License:        LGPLv3+
+
+Requires:       libcollection = %{collection_version}-%{release}
 
 %description -n libcollection-devel
 A data-type to collect data in a hierarchical structure for easy iteration
@@ -163,10 +161,8 @@ and serialization
 
 %ldconfig_scriptlets -n libcollection
 
-
 %files -n libcollection
-%doc COPYING
-%doc COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libcollection.so.*
 
 %files -n libcollection-devel
@@ -177,24 +173,24 @@ and serialization
 %{_libdir}/libcollection.so
 %{_libdir}/pkgconfig/collection.pc
 
-
 ##############################################################################
 # ref_array
 ##############################################################################
 
 %package -n libref_array
-Summary: A refcounted array for C
-License: LGPLv3+
-Version: %{ref_array_version}
+Summary:        A refcounted array for C
+Version:        %{ref_array_version}
+License:        LGPLv3+
 
 %description -n libref_array
 A dynamically-growing, reference-counted array
 
 %package -n libref_array-devel
-Summary: Development files for libref_array
-Requires: libref_array = %{ref_array_version}-%{release}
-License: LGPLv3+
-Version: %{ref_array_version}
+Summary:        Development files for libref_array
+Version:        %{ref_array_version}
+License:        LGPLv3+
+
+Requires:       libref_array = %{ref_array_version}-%{release}
 
 %description -n libref_array-devel
 A dynamically-growing, reference-counted array
@@ -202,8 +198,7 @@ A dynamically-growing, reference-counted array
 %ldconfig_scriptlets -n libref_array
 
 %files -n libref_array
-%doc COPYING
-%doc COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libref_array.so.1
 %{_libdir}/libref_array.so.1.2.1
 
@@ -218,18 +213,19 @@ A dynamically-growing, reference-counted array
 ##############################################################################
 
 %package -n libbasicobjects
-Summary: Basic object types for C
-License: GPLv3+
-Version: %{basicobjects_version}
+Summary:        Basic object types for C
+Version:        %{basicobjects_version}
+License:        GPLv3+
 
 %description -n libbasicobjects
 Basic object types
 
 %package -n libbasicobjects-devel
-Summary: Development files for libbasicobjects
-License: GPLv3+
-Version: %{basicobjects_version}
-Requires: libbasicobjects = %{basicobjects_version}-%{release}
+Summary:        Development files for libbasicobjects
+Version:        %{basicobjects_version}
+License:        GPLv3+
+
+Requires:       libbasicobjects = %{basicobjects_version}-%{release}
 
 %description -n libbasicobjects-devel
 Basic object types
@@ -237,8 +233,7 @@ Basic object types
 %ldconfig_scriptlets -n libbasicobjects
 
 %files -n libbasicobjects
-%doc COPYING
-%doc COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libbasicobjects.so.0
 %{_libdir}/libbasicobjects.so.0.1.0
 
@@ -252,22 +247,23 @@ Basic object types
 ##############################################################################
 
 %package -n libini_config
-Summary: INI file parser for C
-License: LGPLv3+
-Version: %{ini_config_version}
+Summary:        INI file parser for C
+Version:        %{ini_config_version}
+License:        LGPLv3+
 
 %description -n libini_config
 Library to process config files in INI format into a libcollection data
 structure
 
 %package -n libini_config-devel
-Summary: Development files for libini_config
-License: LGPLv3+
-Requires: libini_config = %{ini_config_version}-%{release}
-Requires: libcollection-devel = %{collection_version}-%{release}
-Requires: libref_array-devel = %{ref_array_version}-%{release}
-Requires: libbasicobjects-devel = %{basicobjects_version}-%{release}
-Version: %{ini_config_version}
+Summary:        Development files for libini_config
+Version:        %{ini_config_version}
+License:        LGPLv3+
+
+Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
+Requires:       libcollection-devel = %{collection_version}-%{release}
+Requires:       libini_config = %{ini_config_version}-%{release}
+Requires:       libref_array-devel = %{ref_array_version}-%{release}
 
 %description -n libini_config-devel
 Library to process config files in INI format into a libcollection data
@@ -276,8 +272,7 @@ structure
 %ldconfig_scriptlets -n libini_config
 
 %files -n libini_config
-%doc COPYING
-%doc COPYING.LESSER
+%license COPYING COPYING.LESSER
 %{_libdir}/libini_config.so.5
 %{_libdir}/libini_config.so.5.2.1
 
@@ -289,7 +284,6 @@ structure
 %{_includedir}/ini_configmod.h
 %{_libdir}/libini_config.so
 %{_libdir}/pkgconfig/ini_config.pc
-
 
 ##############################################################################
 # Build steps
@@ -309,18 +303,18 @@ make %{?_smp_mflags} all
 make %{?_smp_mflags} check
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 # Remove .la files created by libtool
-rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # Remove the example files from the output directory
 # We will copy them directly from the source directory
 # for packaging
 rm -f \
-    $RPM_BUILD_ROOT/usr/share/doc/ding-libs/README.* \
-    $RPM_BUILD_ROOT/usr/share/doc/ding-libs/examples/dhash_example.c \
-    $RPM_BUILD_ROOT/usr/share/doc/ding-libs/examples/dhash_test.c
+    %{buildroot}%{_docdir}/ding-libs/README.* \
+    %{buildroot}%{_docdir}/ding-libs/examples/dhash_example.c \
+    %{buildroot}%{_docdir}/ding-libs/examples/dhash_test.c
 
 # Remove document install script. RPM is handling this
 rm -f */doc/html/installdox
