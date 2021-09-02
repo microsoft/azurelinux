@@ -11,6 +11,15 @@ Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        macros.httpd
+Source5: httpd-ssl-pass-dialog
+Source18:       00-ssl.conf
+Source19: 01-ldap.conf
+Source20: 00-proxyhtml.conf
+Source22: ssl.conf
+Source26: 01-session.conf
+Source27: 10-listen443.conf
+Source42: httpd-init.service
+Source43: httpd-ssl-gencerts
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 Patch2:         CVE-2020-13950.patch
@@ -44,7 +53,7 @@ Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       apache2
-Provides:       %{name}-mmn = %{version}-%{release}
+Provides:       %{name}-mmn = %{mmn}
 Provides:       %{name}-filesystem = %{version}-%{release}
 
 %description
@@ -75,6 +84,37 @@ Group:          System Environment/Daemons
 %description tools
 The httpd-tools of httpd.
 
+%package -n mod_ldap
+Summary: LDAP authentication modules for the Apache HTTP Server
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-mmn = %{mmn}
+Requires: apr-util-ldap
+
+%description -n mod_ldap
+The mod_ldap and mod_authnz_ldap modules add support for LDAP
+authentication to the Apache HTTP Server.
+
+%package -n mod_proxy_html
+Summary: HTML and XML content filters for the Apache HTTP Server
+
+BuildRequires: libxml2-devel
+
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-mmn = %{mmn}
+
+%description -n mod_proxy_html
+The mod_proxy_html and mod_xml2enc modules provide filters which can
+transform and modify HTML and XML content.
+
+%package -n mod_session
+Summary: Session interface for the Apache HTTP Server
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-mmn = %{mmn}
+
+%description -n mod_session
+The mod_session module and associated backends provide an abstract
+interface for storing and accessing per-user session data.
+
 %package -n mod_ssl
 Summary: SSL/TLS module for the Apache HTTP Server
 
@@ -82,7 +122,7 @@ BuildRequires: openssl-devel
 
 Requires(pre): %{name}-filesystem
 Requires: %{name} = %{version}-%{release}
-Requires: %{name}-mmn = %{mmnisa}
+Requires: %{name}-mmn = %{mmn}
 Requires: sscg >= 2.2.0
 Requires: /usr/sbin/nologin
 
@@ -120,6 +160,38 @@ Security (TLS) protocols.
 
 %install
 %make_install
+
+# Install systemd service files
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m 644 %{SOURCE42} %{buildroot}%{_unitdir}/httpd-init.service
+
+# install conf file/directory
+mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d \
+      %{buildroot}%{_sysconfdir}/httpd/conf.modules.d
+for conf in %{SOURCE18} %{SOURCE19} %{SOURCE20} %{SOURCE26}; do
+  install -m 644 -p $conf %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/$(basename $conf)
+done
+
+install -m 644 -p %{SOURCE22} %{buildroot}%{_sysconfdir}/httpd/conf.d/ssl.conf
+
+# install systemd override drop directory
+# Web application packages can drop snippets into this location if
+# they need ExecStart[pre|post].
+mkdir %{buildroot}%{_unitdir}/httpd.service.d
+mkdir %{buildroot}%{_unitdir}/httpd.socket.d
+
+install -m 644 -p %{SOURCE27} %{buildroot}%{_unitdir}/httpd.socket.d/10-listen443.conf
+
+# Create cache directory
+mkdir -p %{buildroot}%{_localstatedir}/cache/httpd \
+         %{buildroot}%{_localstatedir}/cache/httpd/proxy \
+         %{buildroot}%{_localstatedir}/cache/httpd/ssl
+
+# install 'http-ssl-gencerts' and 'http-ssl-pass-dialog'
+mkdir -p %{buildroot}%{_libexecdir}
+for exec in %{SOURCE5} %{SOURCE43}; do
+  install -m 644 -p $exec %{buildroot}%{_libexecdir}/$(basename $exec)
+done
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_sysconfdir}/httpd/logs
@@ -207,7 +279,12 @@ fi
 %files
 %defattr(-,root,root)
 %{_libdir}/httpd/*
+%exclude %{_libdir}/httpd/modules/mod_auth_form.so
+%exclude %{_libdir}/httpd/modules/mod_*ldap.so
+%exclude %{_libdir}/httpd/modules/mod_proxy_html.so
+%exclude %{_libdir}/httpd/modules/mod_session*.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
+%exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 %{_bindir}/*
 %exclude %{_bindir}/apxs
 %exclude %{_bindir}/dbmmanage
@@ -247,12 +324,25 @@ fi
 %{_unitdir}/httpd-init.service
 %{_libexecdir}/httpd-ssl-gencerts
 %{_libexecdir}/httpd-ssl-pass-dialog
-%{_mandir}/man8/httpd-init.*
+
+%files -n mod_proxy_html
+%{_libdir}/httpd/modules/mod_proxy_html.so
+%{_libdir}/httpd/modules/mod_xml2enc.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+
+%files -n mod_ldap
+%{_libdir}/httpd/modules/mod_*ldap.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+
+%files -n mod_session
+%{_libdir}/httpd/modules/mod_session*.so
+%{_libdir}/httpd/modules/mod_auth_form.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %changelog
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
 - Fixing invalid past release numbering.
-- Extending the package by following subpackages:
+- Extending the package by following subpackages using Fedora 32 (license: MIT) specs as guidance:
     - mod_ldap,
     - mod_proxy_html,
     - mod_session,
