@@ -322,6 +322,20 @@ fi
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
+%files -n mod_ldap
+%{_libdir}/httpd/modules/mod_*ldap.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+
+%files -n mod_proxy_html
+%{_libdir}/httpd/modules/mod_proxy_html.so
+%{_libdir}/httpd/modules/mod_xml2enc.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+
+%files -n mod_session
+%{_libdir}/httpd/modules/mod_session*.so
+%{_libdir}/httpd/modules/mod_auth_form.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+
 %files -n mod_ssl
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
@@ -331,20 +345,6 @@ fi
 %{_unitdir}/httpd-init.service
 %{_libexecdir}/httpd-ssl-gencerts
 %{_libexecdir}/httpd-ssl-pass-dialog
-
-%files -n mod_proxy_html
-%{_libdir}/httpd/modules/mod_proxy_html.so
-%{_libdir}/httpd/modules/mod_xml2enc.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
-
-%files -n mod_ldap
-%{_libdir}/httpd/modules/mod_*ldap.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
-
-%files -n mod_session
-%{_libdir}/httpd/modules/mod_session*.so
-%{_libdir}/httpd/modules/mod_auth_form.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %changelog
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
