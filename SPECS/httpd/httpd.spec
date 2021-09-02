@@ -11,15 +11,16 @@ Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        macros.httpd
-Source5: httpd-ssl-pass-dialog
+Source5:        httpd-ssl-pass-dialog
 Source18:       00-ssl.conf
-Source19: 01-ldap.conf
-Source20: 00-proxyhtml.conf
-Source22: ssl.conf
-Source26: 01-session.conf
-Source27: 10-listen443.conf
-Source42: httpd-init.service
-Source43: httpd-ssl-gencerts
+Source19:       01-ldap.conf
+Source20:       00-proxyhtml.conf
+Source22:       ssl.conf
+Source26:       01-session.conf
+Source27:       10-listen443.conf
+Source42:       httpd-init.service
+Source43:       httpd-ssl-gencerts
+
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 Patch2:         CVE-2020-13950.patch
@@ -27,13 +28,13 @@ Patch3:         CVE-2020-35452.patch
 Patch4:         CVE-2021-26690.patch
 Patch5:         CVE-2021-30641.patch
 Patch6:         CVE-2021-26691.patch
-
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100:       CVE-1999-0236.nopatch
 # CVE-1999-1412 applies only to MacOS X
 Patch101:       CVE-1999-1412.nopatch
 # CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
 Patch102:       CVE-2007-0086.nopatch
+
 BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
@@ -43,6 +44,7 @@ BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+
 Requires:       apr-util
 Requires:       lua
 Requires:       openldap
@@ -52,6 +54,7 @@ Requires(postun): %{_sbindir}/groupdel
 Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
+
 Provides:       apache2
 Provides:       %{name}-mmn = %{mmn}
 Provides:       %{name}-filesystem = %{version}-%{release}
@@ -62,6 +65,7 @@ The Apache HTTP Server.
 %package devel
 Summary:        Header files for httpd
 Group:          Applications/System
+
 Requires:       apr-devel
 Requires:       apr-util-devel
 Requires:       httpd
@@ -72,6 +76,7 @@ These are the header files of httpd.
 %package docs
 Summary:        Help files for httpd
 Group:          Applications/System
+
 Requires:       httpd
 
 %description docs
@@ -85,46 +90,48 @@ Group:          System Environment/Daemons
 The httpd-tools of httpd.
 
 %package -n mod_ldap
-Summary: LDAP authentication modules for the Apache HTTP Server
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-mmn = %{mmn}
-Requires: apr-util-ldap
+Summary:        LDAP authentication modules for the Apache HTTP Server
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+Requires:       apr-util-ldap
 
 %description -n mod_ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
 %package -n mod_proxy_html
-Summary: HTML and XML content filters for the Apache HTTP Server
+Summary:        HTML and XML content filters for the Apache HTTP Server
 
-BuildRequires: libxml2-devel
+BuildRequires:  libxml2-devel
 
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-mmn = %{mmn}
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
 
 %description -n mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
 %package -n mod_session
-Summary: Session interface for the Apache HTTP Server
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-mmn = %{mmn}
+Summary:        Session interface for the Apache HTTP Server
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
 
 %description -n mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
 %package -n mod_ssl
-Summary: SSL/TLS module for the Apache HTTP Server
+Summary:        SSL/TLS module for the Apache HTTP Server
 
-BuildRequires: openssl-devel
+BuildRequires:  openssl-devel
 
-Requires(pre): %{name}-filesystem
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-mmn = %{mmn}
-Requires: sscg >= 2.2.0
-Requires: /usr/sbin/nologin
+Requires:       %{_sbindir}/nologin
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+Requires:       sscg >= 2.2.0
+Requires(pre):  %{name}-filesystem
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -343,10 +350,10 @@ fi
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
 - Fixing invalid past release numbering.
 - Extending the package by following subpackages using Fedora 32 (license: MIT) specs as guidance:
-    - mod_ldap,
-    - mod_proxy_html,
-    - mod_session,
-    - mod_ssl.
+  - mod_ldap,
+  - mod_proxy_html,
+  - mod_session,
+  - mod_ssl.
 
 * Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-7
 - CVE-2021-26691 fix
