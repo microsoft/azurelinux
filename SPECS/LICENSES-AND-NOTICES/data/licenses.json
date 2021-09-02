@@ -195,6 +195,7 @@
                 "sgml-common",
                 "sos",
                 "squashfs-tools",
+                "sscg",
                 "uclibc-ng",
                 "UI-cairo",
                 "uuid",

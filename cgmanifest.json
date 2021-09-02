@@ -8452,6 +8452,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sscg",
+          "version": "2.6.2",
+          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sshpass",
           "version": "1.06",
           "downloadUrl": "http://downloads.sourceforge.net/project/sshpass/sshpass/1.06/sshpass-1.06.tar.gz"
