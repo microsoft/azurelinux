@@ -3,7 +3,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.23.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and GPLv2+ and LGPLv2+
 URL:            https://syslog-ng.org/
 Group:          System Environment/Daemons
@@ -13,6 +13,7 @@ Distribution:   Mariner
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
+Source3:        syslog-ng.conf
 
 Requires:       glib
 Requires:       json-glib
@@ -125,6 +126,11 @@ popd
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
 
+# Remove default and add syslog-ng.conf
+rm %{buildroot}%{_sysconfdir}/%{name}/syslog-ng.conf
+install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/conf.d
+install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/%{name}/syslog-ng.conf
+
 %check
 easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
 $easy_install_2 unittest2
@@ -159,6 +165,7 @@ rm -rf %{buildroot}/*
 %files
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
+%dir %{_sysconfdir}/syslog-ng/conf.d
 %config(noreplace) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %config(noreplace) %{_sysconfdir}/syslog-ng/scl.conf
 %{_sysconfdir}/systemd/journald.conf.d/*
@@ -194,6 +201,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/*
 
 %changelog
+*   Thu Sep 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.23.1-3
+-   Add customized syslog-ng.conf
 *   Tue Oct 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.23.1-2
 -   Added the %%license macro.
 -   License verified.
