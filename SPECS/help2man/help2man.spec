@@ -1,18 +1,17 @@
 # Supported build option:
 #
 # --with nls ... build this package with --enable-nls 
+%bcond_with nls
 
-Name:           help2man
 Summary:        Create simple man pages from --help output
+Name:           help2man
 Version:        1.47.14
 Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.gnu.org/software/help2man
+URL:            https://www.gnu.org/software/help2man
 Source:         ftp://ftp.gnu.org/gnu/help2man/help2man-%{version}.tar.xz
-
-%bcond_with nls
 
 %{!?with_nls:BuildArch: noarch}
 
@@ -23,7 +22,7 @@ BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Text::ParseWords)
 BuildRequires:  perl(Text::Tabs)
 BuildRequires:  perl(strict)
-%{?with_nls:BuildRequires: perl(Locale::gettext) /usr/bin/msgfmt}
+%{?with_nls:BuildRequires: perl(Locale::gettext) %{_bindir}/msgfmt}
 %{?with_nls:BuildRequires: perl(Encode)}
 %{?with_nls:BuildRequires: perl(I18N::Langinfo)}
 
@@ -43,11 +42,11 @@ still providing some useful information.
 make %{?_smp_mflags}
 
 %install
-make install_l10n DESTDIR=$RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-%find_lang %name --with-man
+make install_l10n DESTDIR=%{buildroot}
+make install DESTDIR=%{buildroot}
+%find_lang %{name} --with-man
 
-%files -f %name.lang
+%files -f %{name}.lang
 %doc README NEWS THANKS
 %license COPYING
 %{_bindir}/help2man
@@ -62,6 +61,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 * Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.47.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
+- Using HTTPS in the 'URL' tag.
 
 * Sat Apr 25 2020 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.47.14-1
 - Upstream update.
