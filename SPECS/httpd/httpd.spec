@@ -348,8 +348,8 @@ fi
 
 %changelog
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
-- Fixing invalid past release numbering.
-- Extending the package by following subpackages using Fedora 32 (license: MIT) specs as guidance:
+- Fixing invalid past release numbering in the changelog.
+- Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:
   - mod_ldap,
   - mod_proxy_html,
   - mod_session,
