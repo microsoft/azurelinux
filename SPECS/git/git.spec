@@ -41,6 +41,9 @@ These are the additional language files of git.
 
 
 %global with_daemon 1
+%global with_subtree 1
+%global with_svn 1
+%global with_email 0
 
 %if %{with_daemon}
 %package daemon
@@ -56,8 +59,6 @@ The git daemon for supporting git:// access to git repositories
 %endif
 
 
-%global with_email 0
-
 %if %{with_email}
 %package email
 Summary:        Git tools for sending patches via email
@@ -69,7 +70,6 @@ Requires:       perl(Net::SMTP::SSL)
 %{summary}.
 %endif
 
-%global with_subtree 1
 
 %if %{with_subtree}
 %package subtree
@@ -81,7 +81,6 @@ of the main project, optionally including the subproject's entire
 history.
 %endif
 
-%global with_svn 1
 
 %if %{with_svn}
 %package svn
