@@ -1,7 +1,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        8.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,14 @@ Requires:       %{name} = %{version}-%{release}
 %description devel
 The clang-devel package contains libraries, header files and documentation
 for developing applications that use clang.
+
+%package -n git-clang-format
+Summary:	Integration of clang-format for git
+Requires:	git
+Requires:	python3
+
+%description -n git-clang-format
+clang-format integration for git.
 
 %prep
 %setup -q -n cfe-%{version}.src
@@ -82,7 +90,13 @@ rm -rf %{buildroot}/*
 %{_libdir}/clang/*
 %{_includedir}/*
 
+%files -n git-clang-format
+%{_bindir}/git-clang-format
+
 %changelog
+* Sat Sep 04 2021 Muhammad Falak <mwani@microsoft.com> - 8.0.1-5
+- Add `git-clang-format` subpackage.
+
 * Tue Apr 27 2021 Henry Li <lihl@microsoft.com> - 8.0.1-4
 - Enable eh/rtti, which are required by lldb.
 
