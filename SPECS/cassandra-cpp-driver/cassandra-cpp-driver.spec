@@ -4,6 +4,7 @@ Version:        2.16.0
 Release:        1%{?dist}
 Epoch:          1
 License:        Apache 2.0
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/datastax/cpp-driver
@@ -22,12 +23,13 @@ Query Language along with extensions for DataStax Products.
 Summary:        Development libraries for ${name}
 Group:          Development/Tools
 Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       libuv-devel
 
 %description devel
 Development libraries for %{name}
 
 %prep
-%setup -n cpp-driver-%{version}
+%setup -q -n cpp-driver-%{version}
 
 %build
 mkdir -p build
@@ -56,6 +58,6 @@ cd build
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Wed Sep 1 2021 Andy Caldwell <andycaldwell@microsoft.com>  2.16.0-1
+* Wed Sep 1 2021 Andy Caldwell <andycaldwell@microsoft.com> - 2.16.0-1
 - Original version for CBL-Mariner
 - License verified
