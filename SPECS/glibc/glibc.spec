@@ -39,6 +39,12 @@ Patch14:        CVE-2019-25013.patch
 Patch15:        CVE-2021-3326.patch
 Patch16:        CVE-2020-27618.patch
 Patch17:        CVE-2021-35942.patch
+# CVE-2021-33574 is a backport CVE for GLIBC 2.28.  The original CVE fix applies to 2.32
+# See bug attachment: https://sourceware.org/bugzilla/attachment.cgi?id=13497&action=edit
+Patch18:        CVE-2021-33574.patch
+# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. The backport fix we took for 
+# CBL-Mariner does not carry the problem, so we are no-patching it here.
+Patch19:        CVE-2021-38604.nopatch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -310,6 +316,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon Sep 06 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.28-20
+- Patch CVE-2021-33574 and nopatch CVE-2021-38604.
+
 * Tue Aug 03 2021 Nicolas guibourge <nicolasg@microsoft.com> - 2.28-19
 - Patch CVE-2021-35942
 
