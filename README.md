@@ -21,7 +21,9 @@ When security vulnerabilities arise, CBL-Mariner supports both a package-based u
 Instructions for building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md).  
 
 ## ISO
-You can try CBL-Mariner with the following ISO Image: [x86_64 ISO](https://aka.ms/mariner-1.0-x86_64-iso).  Support for the ISO is community based as described [here](./SUPPORT.md).  After downloading the ISO, use [these instructions](./toolkit/docs/quick_start/quickstart.md#prepare-vm) to install and use in a Hyper-V VM.
+You can try CBL-Mariner with the following ISO Image: [x86_64 ISO](https://aka.ms/mariner-1.0-x86_64-iso). After downloading the ISO, use [these instructions](./toolkit/docs/quick_start/quickstart.md#prepare-vm) to install and use in a Hyper-V VM.
+
+**Note:** Support for the ISO is community based.  Please use [Github Issues](https://github.com/microsoft/CBL-Mariner/issues) to [report new issues or add feature requests](https://github.com/microsoft/CBL-Mariner/issues/new?labels=bug).  For additional information refer to the [support.md file](./SUPPORT.md).
 
 # Trademarks
 
