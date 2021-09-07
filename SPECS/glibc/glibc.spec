@@ -39,12 +39,11 @@ Patch14:        CVE-2019-25013.patch
 Patch15:        CVE-2021-3326.patch
 Patch16:        CVE-2020-27618.patch
 Patch17:        CVE-2021-35942.patch
-# CVE-2021-33574 is a backport CVE for GLIBC 2.28.  The original CVE fix applies to 2.32
-# See bug attachment: https://sourceware.org/bugzilla/attachment.cgi?id=13497&action=edit
-Patch18:        CVE-2021-33574.patch
-# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. The backport fix we took for 
-# CBL-Mariner does not carry the problem, so we are no-patching it here.
-Patch19:        CVE-2021-38604.nopatch
+# CVE-2021-33574 is composed of two changes.  The original CVE fix -0001 for GLIBC 2.32 and a backport fix for GLIBC 2.28 -0002
+Patch18:        CVE-2021-33574-0001.patch
+Patch19:        CVE-2021-33574-0002.patch
+# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. 
+Patch20:        CVE-2021-38604.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
