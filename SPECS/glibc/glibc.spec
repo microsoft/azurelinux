@@ -6,7 +6,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
