@@ -91,7 +91,7 @@ choose DVD Drive and press Add.
 
 
 ### ISO Image
-
+#### Build ISO
 The following builds a bootable ISO image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/1.0/prod/.
 
 ```bash
@@ -104,6 +104,8 @@ sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full
 **Copy ISO Image to Your VM Host Machine**
 
 Copy your binary image(s) to your VM Host Machine using your preferred technique.
+
+#### Prepare VM
 
 **Create VHD(X) Virtual Machine with Hyper-V**
 
@@ -124,7 +126,7 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select Firmware and adjust the boot order so DVD is first and Hard Drive is second.
 1. Select _Apply_ to apply all changes.
 
-**Boot ISO**
+#### Boot ISO
 1. Right click your VM and select _Connect..._.
 1. Select _Start_.
 1. Follow the Installer Prompts to Install your image
