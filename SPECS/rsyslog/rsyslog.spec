@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+ and ASL 2.0
 URL:            http://www.rsyslog.com/
 Source0:        http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
@@ -41,7 +41,8 @@ sed -i 's/libsystemd-journal/libsystemd/' configure
     --enable-imfile \
     --enable-imjournal \
     --enable-impstats \
-    --enable-imptcp
+    --enable-imptcp \
+    --enable-omuxsock
 
 make %{?_smp_mflags}
 
@@ -80,6 +81,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %changelog
+*   Thu Sep 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.37.0-5
+-   Enable omuxsock.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.37.0-4
 - Added %%license line automatically
 
