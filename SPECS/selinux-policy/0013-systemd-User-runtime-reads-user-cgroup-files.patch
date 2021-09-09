@@ -1,0 +1,28 @@
+From c0c69aee84d9bdf7de73f515d85c8b0f90bb7361 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 1 Sep 2021 19:57:45 +0000
+Subject: systemd: User runtime reads user cgroup files.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index d02855a08..97e6f5f8d 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1539,6 +1539,8 @@ fs_getattr_tmpfs(systemd_user_runtime_dir_t)
+ fs_list_tmpfs(systemd_user_runtime_dir_t)
+ fs_unmount_tmpfs(systemd_user_runtime_dir_t)
+ fs_relabelfrom_tmpfs_dirs(systemd_user_runtime_dir_t)
++fs_read_cgroup_files(systemd_user_runtime_dir_t)
++fs_getattr_cgroup(systemd_user_runtime_dir_t)
+
+ kernel_read_kernel_sysctls(systemd_user_runtime_dir_t)
+
+--
+2.17.1
+
