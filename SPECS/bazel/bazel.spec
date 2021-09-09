@@ -47,7 +47,7 @@ rm -rf %{buildroot}
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
-* Thu Sept 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-3
+* Thu Sep 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-3
 - Add which as BR
 
 * Tue Jul 13 2021 Henry Li <lihl@microsoft.com> - 2.2.0-2
