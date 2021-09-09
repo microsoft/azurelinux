@@ -4,7 +4,7 @@
   "default-hardened-cc1": "2102bdfbb06934d95ceb3c81f789c59c9f77f91b0f996fd39588e0aa052d6f77",
   "default-hardened-ld": "4dbb822a27eed292759bc4e9cabb4b84f34fc6701535fcac2fdddac33328678b",
   "gen-ld-script.sh": "8d36dadc1cf4d20450a8c5285f5958f7ddb361526fda7dfcf5bd479e403afc99",
-  "macros": "7cf718748906406c9839a87586e64d7157e91d9bfa7ac67ec6ce2cc6483e9479",
+  "macros": "c43e61ada03fb758df64ae64e35dfb4b6fa9938662cee0e4d764e572e1c9236e",
   "macros.check": "79367176c3c7d10c0158b6e5d881e0fc3c8fd50c5957dad2f097c2d4a37833e7",
   "rpmrc": "c197369d806430f581de9d5f0e89384d231745712f394ce39497ada47d1f4efe"
  }

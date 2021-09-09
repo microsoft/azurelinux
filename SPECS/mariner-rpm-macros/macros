@@ -60,7 +60,7 @@
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} -Wl,-T,/usr/src/mariner/BUILD/module_info.ld
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}
 
 %set_build_flags \
   CFLAGS="${CFLAGS:-%{build_cflags}}" ; export CFLAGS ; \
@@ -121,4 +121,4 @@
 %_ld_as_needed          1
 %_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
 
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -Wl,-T,/usr/src/mariner/BUILD/module_info.ld -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}
