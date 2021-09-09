@@ -304,6 +304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bazel",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bc",
           "version": "1.07.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz"
