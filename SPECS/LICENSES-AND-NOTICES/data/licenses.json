@@ -36,6 +36,7 @@
         "docbook5-schemas",
         "dos2unix",
         "dpdk",
+        "dwarves",
         "ebtables",
         "extra-cmake-modules",
         "fipscheck",
