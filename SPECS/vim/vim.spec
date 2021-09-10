@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.1.1667
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0: CVE-2021-3770.patch
 
 BuildRequires:  ncurses-devel
 
@@ -187,6 +188,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Fri Sep 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.1.1667-2
+-   Added patch file(s) CVE-2021-3770.patch
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.1667-1
 - Fix CVE-2019-20807 by updating to 8.1.1667.
 
