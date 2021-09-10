@@ -1,13 +1,14 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.23.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+Patch0: CVE-2021-40330.patch
 BuildRequires:  curl-devel
 BuildRequires:  python2
 Requires:       openssl
@@ -38,7 +39,7 @@ Requires: git >= 2.1.2
 These are the additional language files of git.
 
 %prep
-%setup -q
+%autosetup
 %build
 %configure \
     CFLAGS="%{optflags}" \
@@ -87,6 +88,8 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+*   Fri Sep 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.23.4-2
+-   Added patch file(s) CVE-2021-40330.patch
 *   Wed Apr 07 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.23.4-1
 -   Update to version 2.23.4 for CVE-2021-21300 fix.
 *   Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 2.23.3-2
