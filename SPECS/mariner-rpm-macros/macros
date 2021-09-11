@@ -27,12 +27,17 @@
 
 %__tar              /bin/tar --no-same-owner
 
+# Generate metadata linker script before prep section of each SPEC
+%__spec_prep_template   #!%{__spec_prep_shell}\
+%{__spec_prep_pre}\
+/usr/lib/rpm/mariner/gen-ld-script.sh\
+%{nil}
+
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
 # are consistently applied this override should be removed.
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
-/usr/lib/rpm/mariner/gen-ld-script.sh\
 %{set_build_flags}\
 %{nil}
 
