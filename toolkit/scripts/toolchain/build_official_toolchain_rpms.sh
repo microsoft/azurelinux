@@ -194,6 +194,7 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
 cp -v $SPECROOT/mariner-rpm-macros/macros $LFS/usr/etc/rpm/macros
+mkdir -pv $LFS/usr/lib/rpm/mariner
 cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
 cp -v $SPECROOT/rpm/brp* $LFS/usr/lib/rpm
 mkdir -pv $LFS/usr/lib/rpm/macros.d
