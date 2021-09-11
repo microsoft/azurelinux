@@ -65,7 +65,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.
 	@touch $@
 else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker)
-	GODEBUG=x509ignoreCN=0 $(go-srpmpacker) \
+	$(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \
@@ -78,11 +78,11 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
-		--log-level=$(LOG_LEVEL)
+		--log-level=$(LOG_LEVEL) && \
 	touch $@
 
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
-	GODEBUG=x509ignoreCN=0 $(go-srpmpacker) \
+	$(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \
@@ -95,6 +95,6 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--pack-list=$(toolchain_spec_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
-		--log-level=$(LOG_LEVEL)
+		--log-level=$(LOG_LEVEL) && \
 	touch $@
 endif
