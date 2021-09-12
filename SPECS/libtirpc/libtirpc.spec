@@ -1,7 +1,7 @@
 Summary:        Libraries for Transport Independent RPC
 Name:           libtirpc
 Version:        1.1.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Group:          System Environment/Libraries
 URL:            https://git.linux-nfs.org/?p=steved/libtirpc.git
@@ -45,6 +45,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post
 /sbin/ldconfig
@@ -65,9 +66,11 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/tirpc/*
 %{_mandir}/man3/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.4-5
+- Remove libtool archive files from final packaging
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.4-4
 - Added %%license line automatically
 

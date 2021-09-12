@@ -1,7 +1,7 @@
 Summary:        Glib interfaces to D-Bus API
 Name:           dbus-glib
 Version:        0.110
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        AFL OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Headers and static libraries for the D-Bus GLib bindings
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %make_build check
@@ -53,7 +54,6 @@ Headers and static libraries for the D-Bus GLib bindings
 %{_sysconfdir}/bash_completion.d/*
 %{_bindir}/*
 %{_libdir}/*.so.*
-%{_libdir}/*.la
 %{_libexecdir}/*
 %{_mandir}/man1/*
 %{_datadir}/gtk-doc/*
@@ -65,6 +65,9 @@ Headers and static libraries for the D-Bus GLib bindings
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.110-5
+- Remove libtool archive files from final packaging
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 0.110-4
 - Move pkgconfig(dbus-glib-1) provides to the devel package from the base package
 - License verified- corrected to "AFL OR GPLv2+" from "AFL AND GPLv2+"

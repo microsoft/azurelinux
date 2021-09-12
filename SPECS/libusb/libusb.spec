@@ -1,7 +1,7 @@
 Summary:        A library which allows userspace access to USB devices
 Name:           libusb
 Version:        1.0.24
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ develop applications that use libusb.
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 pushd tests
@@ -55,10 +56,12 @@ popd
 %files devel
 %{_includedir}/*
 %{_libdir}/libusb*.so
-%{_libdir}/libusb*.la
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.24-2
+- Remove libtool archive files from final packaging
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.24-1
 - Upgrade to latest upstream version
 - Provide libusbx, libusb1 names to match other distros

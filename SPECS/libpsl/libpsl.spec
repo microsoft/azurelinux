@@ -1,7 +1,7 @@
 Summary:        libpsl - C library to handle the Public Suffix List
 Name:           libpsl
 Version:        0.20.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,7 @@ make %{?_smp_mflags}
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 install -m0755 src/psl-make-dafsa %{buildroot}%{_bindir}/
 
 %check
@@ -90,10 +91,12 @@ make check
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.20.2-6
+- Remove libtool archive files from final packaging
+
 * Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.2-5
 - Bumping up release to re-compile against the new version of the 'icu' libraries.
 - License verified.

@@ -1,7 +1,7 @@
 Summary:        C++ xml parser.
 Name:           xerces-c
 Version:        3.2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            http://xerces.apache.org
 Group:          Applications/System
@@ -28,6 +28,7 @@ This package contains development headers and static library for xml parser.
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -45,9 +46,11 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.a
-%{_libdir}/*.la
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.2.3-2
+- Remove libtool archive files from final packaging
+
 *   Thu May 28 2020 Andrew Phelps <anphel@microsoft.com> 3.2.3-1
 -   Update to version 3.2.3 to fix CVE-2018-1311
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.2.2-2
