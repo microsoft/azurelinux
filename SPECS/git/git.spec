@@ -39,7 +39,8 @@ Requires: git >= 2.1.2
 These are the additional language files of git.
 
 %prep
-%autosetup
+%autosetup -p1
+
 %build
 %configure \
     CFLAGS="%{optflags}" \
