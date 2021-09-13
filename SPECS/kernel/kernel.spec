@@ -280,6 +280,7 @@ This package contains common device tree blobs (dtb)
 %package -n bpftool
 Summary: Inspection and simple manipulation of eBPF programs and maps
 License: GPLv2
+
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
