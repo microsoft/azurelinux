@@ -1,7 +1,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        5%{?dist}
+Release:        9%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,23 +43,23 @@ autoreconf -fi
 %configure \
     CFLAGS="%{optflags} -fPIC" \
     CXXFLAGS="%{optflags}" \
-    --with-plugindir=%{_libdir}/sasl2 \
-    --without-dblib \
-    --with-saslauthd=/run/saslauthd \
-    --without-authdaemond \
-    --disable-macos-framework \
-    --disable-sample \
-    --disable-digest \
-    --disable-otp \
-    --enable-plain \
-    --enable-login \
     --disable-anon \
-    --enable-srp \
-    --enable-gss_mutexes \
+    --disable-macos-framework \
+    --disable-otp \
+    --disable-sample \
     --disable-static \
-    --enable-shared \
+    --enable-digest \
     --enable-fast-install \
-    --enable-krb4
+    --enable-gss_mutexes \
+    --enable-krb4 \
+    --enable-login \
+    --enable-plain \
+    --enable-shared \
+    --enable-srp \
+    --with-dblib \
+    --with-plugindir=%{_libdir}/sasl2 \
+    --with-saslauthd=/run/saslauthd \
+    --without-authdaemond
 
 make
 
@@ -134,6 +134,16 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+* Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.27-9
+- Adding a few 'Provides' or subpackages:
+  - cyrus-sasl-gs2,
+  - cyrus-sasl-ldap,
+  - cyrus-sasl-lib,
+  - cyrus-sasl-md5,
+  - cyrus-sasl-ntlm,
+  - cyrus-sasl-scram,
+  - cyrus-sasl-sql.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-8
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 2.1.27-5: Add nopatch for CVE-2020-8032, Lint spec
