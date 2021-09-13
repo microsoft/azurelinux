@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -173,6 +173,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %files subid
+%license COPYING
 %{_libdir}/libsubid.so.3*
 
 %files subid-devel
@@ -180,6 +181,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
+- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
+- Add license to subid subpackage
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-1
 - Upgrade to latest upstream version and rebase chkname patch
 - Add upstream patch to deal with libsubid build failure when linking to pam
