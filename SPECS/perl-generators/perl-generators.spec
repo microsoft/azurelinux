@@ -6,15 +6,14 @@ License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://jplesnik.fedorapeople.org/generators
-Source0:        %{url}/generators-%{version}.tar.gz
+Source0:        %{url}/generators-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        LICENSE.PTR
+BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl >= 4:5.22.0-351
 BuildRequires:  sed
 Requires:       perl >= 4:5.22.0-351
-# The generators and attribute files were split from rpm-build
-Conflicts:      rpm-build < 4.11.2-15
-BuildArch:      noarch
 # Per Perl packaging guidelines, build-requiring perl-generators should
 # deliver Perl macros
 %if %{defined perl_bootstrap}
@@ -28,10 +27,13 @@ getting provides and requires from Perl binaries and modules.
 
 %prep
 %autosetup -n generators-%{version}
+cp %{SOURCE1} .
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor INSTALLVENDORSCRIPT=%{_rpmconfigdir} \
-     NO_PACKLIST=1
+perl Makefile.PL \
+    INSTALLDIRS=vendor \
+    INSTALLVENDORSCRIPT=%{_rpmconfigdir} \
+    NO_PACKLIST=1
 %make_build
 
 %install
@@ -45,13 +47,14 @@ install -p -m 644 fileattrs/* '%{buildroot}%{_rpmconfigdir}/fileattrs'
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes TODO
 %{_rpmconfigdir}/perl.*
 %{_rpmconfigdir}/fileattrs/perl*.attr
 
 %changelog
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.11-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-5
