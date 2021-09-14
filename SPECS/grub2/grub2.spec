@@ -3,10 +3,6 @@
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
-# Disable gen-ld-script.sh which results in error: "grub2-install: error: Decompressor is too big."
-%global __spec_prep_template #!%{__spec_prep_shell}\
-%{__spec_prep_pre}\
-%{nil}
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
