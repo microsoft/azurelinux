@@ -8,16 +8,18 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ppisar.fedorapeople.org/Fedora-VSP/
 Source0:        %{url}Fedora-VSP-%{version}.tar.gz
+
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl
-BuildArch:      noarch
 # Break build cycle: perl-Fedora-VSP → perl-generators → perl-Fedora-VSP
 %if %{defined perl_bootstrap}
 Provides:       perl(Fedora::VSP) = %{version}
 %else
 BuildRequires:  perl-generators
 %endif
+
+BuildArch:      noarch
 
 %description
 This module provides functions for normalizing Perl version strings for
