@@ -11,15 +11,15 @@ Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        macros.httpd
-Source5:        httpd-ssl-pass-dialog
-Source18:       00-ssl.conf
-Source19:       01-ldap.conf
-Source20:       00-proxyhtml.conf
-Source22:       ssl.conf
-Source26:       01-session.conf
-Source27:       10-listen443.conf
-Source42:       httpd-init.service
-Source43:       httpd-ssl-gencerts
+Source2:        httpd-ssl-pass-dialog
+Source3:       00-ssl.conf
+Source4:       01-ldap.conf
+Source5:       00-proxyhtml.conf
+Source6:       ssl.conf
+Source7:       01-session.conf
+Source8:       10-listen443.conf
+Source9:       httpd-init.service
+Source10:       httpd-ssl-gencerts
 
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
@@ -170,16 +170,16 @@ Security (TLS) protocols.
 
 # Install systemd service files
 mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE42} %{buildroot}%{_unitdir}/httpd-init.service
+install -p -m 644 %{SOURCE9} %{buildroot}%{_unitdir}/httpd-init.service
 
 # install conf file/directory
 mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d \
       %{buildroot}%{_sysconfdir}/httpd/conf.modules.d
-for conf in %{SOURCE18} %{SOURCE19} %{SOURCE20} %{SOURCE26}; do
+for conf in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE7}; do
   install -m 644 -p $conf %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/$(basename $conf)
 done
 
-install -m 644 -p %{SOURCE22} %{buildroot}%{_sysconfdir}/httpd/conf.d/ssl.conf
+install -m 644 -p %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/ssl.conf
 
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
@@ -187,7 +187,7 @@ install -m 644 -p %{SOURCE22} %{buildroot}%{_sysconfdir}/httpd/conf.d/ssl.conf
 mkdir %{buildroot}%{_unitdir}/httpd.service.d
 mkdir %{buildroot}%{_unitdir}/httpd.socket.d
 
-install -m 644 -p %{SOURCE27} %{buildroot}%{_unitdir}/httpd.socket.d/10-listen443.conf
+install -m 644 -p %{SOURCE8} %{buildroot}%{_unitdir}/httpd.socket.d/10-listen443.conf
 
 # Create cache directory
 mkdir -p %{buildroot}%{_localstatedir}/cache/httpd \
@@ -196,7 +196,7 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/httpd \
 
 # install 'http-ssl-gencerts' and 'http-ssl-pass-dialog'
 mkdir -p %{buildroot}%{_libexecdir}
-for exec in %{SOURCE5} %{SOURCE43}; do
+for exec in %{SOURCE2} %{SOURCE10}; do
   install -m 644 -p $exec %{buildroot}%{_libexecdir}/$(basename $exec)
 done
 
