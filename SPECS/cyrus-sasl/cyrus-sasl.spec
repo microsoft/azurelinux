@@ -1,3 +1,4 @@
+%define _soversion 3
 %global _plugindir2 %{_libdir}/sasl2
 
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
@@ -25,7 +26,7 @@ BuildRequires:  postgresql-devel
 BuildRequires:  postgresql-libs
 BuildRequires:  systemd
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
 Requires:       pam
@@ -43,8 +44,8 @@ protocol and the connection.
 %package devel
 Summary:        Files needed for developing applications with Cyrus SASL
 
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 Requires:       pkg-config
 
 %description devel
@@ -54,7 +55,7 @@ compiling applications which use the Cyrus SASL library.
 %package gs2
 Summary:        GS2 support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description gs2
 The %{name}-gs2 package contains the Cyrus SASL plugin which supports
@@ -63,7 +64,7 @@ the GS2 authentication scheme.
 %package gssapi
 Summary:        GSSAPI authentication support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description gssapi
 The %{name}-gssapi package contains the Cyrus SASL plugins which
@@ -73,7 +74,7 @@ authentication.
 %package ldap
 Summary:        LDAP auxprop support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description ldap
 The %{name}-ldap package contains the Cyrus SASL plugin which supports using
@@ -89,7 +90,7 @@ applications which use the Cyrus SASL library.
 %package md5
 Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description md5
 The %{name}-md5 package contains the Cyrus SASL plugins which support
@@ -98,7 +99,7 @@ CRAM-MD5 and DIGEST-MD5 authentication schemes.
 %package ntlm
 Summary:        NTLM authentication support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description ntlm
 The %{name}-ntlm package contains the Cyrus SASL plugin which supports
@@ -107,7 +108,7 @@ the NTLM authentication scheme.
 %package plain
 Summary:        PLAIN and LOGIN authentication support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description plain
 The %{name}-plain package contains the Cyrus SASL plugins which support
@@ -116,7 +117,7 @@ PLAIN and LOGIN authentication schemes.
 %package scram
 Summary:        SCRAM auxprop support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description scram
 The %{name}-scram package contains the Cyrus SASL plugin which supports
@@ -125,7 +126,7 @@ the SCRAM authentication scheme.
 %package sql
 Summary:        SQL auxprop support for Cyrus SASL
 
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
 
 %description sql
 The %{name}-sql package contains the Cyrus SASL plugin which supports
@@ -260,11 +261,11 @@ make %{?_smp_mflags} check
 
 %files gs2
 %{_plugindir2}/libgs2.so
-%{_plugindir2}/libgs2.so.3*
+%{_plugindir2}/libgs2.so.%{_soversion}*
 
 %files gssapi
 %{_plugindir2}/libgssapiv2.so
-%{_plugindir2}/libgssapiv2.so.3*
+%{_plugindir2}/libgssapiv2.so.%{_soversion}*
 
 %files ldap
 %{_plugindir2}/*ldapdb*.so*
@@ -272,38 +273,38 @@ make %{?_smp_mflags} check
 %files lib
 %license COPYING
 %doc AUTHORS doc/html/*.html
-%{_libdir}/libsasl2.so.3*
+%{_libdir}/libsasl2.so.%{_soversion}*
 %dir %{_plugindir2}/
 %{_plugindir2}/libanonymous.so
-%{_plugindir2}/libanonymous.so.3*
+%{_plugindir2}/libanonymous.so.%{_soversion}*
 %{_plugindir2}/libsasldb.so
-%{_plugindir2}/libsasldb.so.3*
+%{_plugindir2}/libsasldb.so.%{_soversion}*
 %{_sbindir}/saslpasswd2
 %{_sbindir}/sasldblistusers2
 
 %files md5
 %{_plugindir2}/libcrammd5.so
-%{_plugindir2}/libcrammd5.so.3*
+%{_plugindir2}/libcrammd5.so.%{_soversion}*
 %{_plugindir2}/libdigestmd5.so
-%{_plugindir2}/libdigestmd5.so.3*
+%{_plugindir2}/libdigestmd5.so.%{_soversion}*
 
 %files ntlm
 %{_plugindir2}/libntlm.so
-%{_plugindir2}/libntlm.so.3*
+%{_plugindir2}/libntlm.so.%{_soversion}*
 
 %files plain
 %{_plugindir2}/liblogin.so
-%{_plugindir2}/liblogin.so.3*
+%{_plugindir2}/liblogin.so.%{_soversion}*
 %{_plugindir2}/libplain.so
-%{_plugindir2}/libplain.so.3*
+%{_plugindir2}/libplain.so.%{_soversion}*
 
 %files scram
 %{_plugindir2}/libscram.so
-%{_plugindir2}/libscram.so.3*
+%{_plugindir2}/libscram.so.%{_soversion}*
 
 %files sql
 %{_plugindir2}/libsql.so
-%{_plugindir2}/libsql.so.3*
+%{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.27-9
