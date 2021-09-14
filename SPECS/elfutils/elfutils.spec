@@ -157,7 +157,7 @@ mkdir -p %{buildroot}%{_prefix}
 chmod +x %{buildroot}%{_libdir}/lib*.so*
 chmod +x %{buildroot}%{_libdir}/elfutils/lib*.so*
 
-install -Dm0644 config/10-default-yama-scope.conf %{buildroot}%{_sysctldir}/10-default-yama-scope.conf
+install -Dm0644 config/10-default-yama-scope.conf %{buildroot}%{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
 
 # XXX Nuke unpackaged files
 {
@@ -193,7 +193,7 @@ if [ -x %{_libdir}/systemd/systemd-sysctl ] ; then
 %if 0%{?sysctl_apply}
   %{sysctl_apply} 10-default-yama-scope.conf
 %else
-  %{_libdir}/systemd/systemd-sysctl %{_sysctldir}/10-default-yama-scope.conf > /dev/null 2>&1 || :
+  %{_libdir}/systemd/systemd-sysctl %{_sysconfdir}/sysctl.d/10-default-yama-scope.conf > /dev/null 2>&1 || :
 %endif
 fi
 
@@ -215,7 +215,7 @@ fi
 %{_libdir}/elfutils/lib*.so
 
 %files default-yama-scope
-%{_sysctldir}/10-default-yama-scope.conf
+%{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
 
 %files devel
 %defattr(-,root,root)

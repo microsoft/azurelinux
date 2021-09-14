@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
@@ -38,6 +38,60 @@ Group: System Environment/Programming
 Requires: git >= 2.1.2
 %description lang
 These are the additional language files of git.
+
+
+%global with_daemon 1
+%global with_subtree 1
+%global with_svn 1
+%global with_email 0
+
+%if %{with_daemon}
+%package daemon
+Summary:        Git protocol daemon
+Requires:       git-core = %{version}-%{release}
+Requires:       systemd
+Requires(post): systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+
+%description daemon
+The git daemon for supporting git:// access to git repositories
+%endif
+
+
+%if %{with_email}
+%package email
+Summary:        Git tools for sending patches via email
+BuildArch:      noarch
+Requires:       git = %{version}-%{release}
+Requires:       perl(Authen::SASL)
+Requires:       perl(Net::SMTP::SSL)
+%description email
+%{summary}.
+%endif
+
+
+%if %{with_subtree}
+%package subtree
+Summary:        Git tools to merge and split repositories
+Requires:       git-core = %{version}-%{release}
+%description subtree
+Git subtrees allow subprojects to be included within a subdirectory
+of the main project, optionally including the subproject's entire
+history.
+%endif
+
+
+%if %{with_svn}
+%package svn
+Summary:        Git tools for interacting with Subversion repositories
+BuildArch:      noarch
+Requires:       git = %{version}-%{release}
+Requires:       perl(Digest::MD5)
+Requires:       subversion
+%description svn
+%{summary}.
+%endif
 
 %prep
 %setup -q
@@ -79,16 +133,34 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/gitk/*
 %{_datarootdir}/gitweb/*
 %{_datarootdir}/bash-completion/
-#excluding git svn files
-%exclude %{_libexecdir}/git-core/*svn*
-%exclude %{perl_sitelib}/Git/SVN
-%exclude %{perl_sitelib}/Git/SVN.pm
-%exclude /usr/lib/perl5/*/*/perllocal.pod
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
+%if %{with_daemon}
+%files daemon
+%{_libexecdir}/git-core/git-daemon
+%endif
+
+%if %{with_email}
+%files email
+%{_libexecdir}/git-core/git-send-email
+%endif
+
+%if %{with_subtree}
+%files subtree
+%{_libexecdir}/git-core/git-merge-subtree
+%endif
+
+%if %{with_svn}
+%files svn
+%{_libexecdir}/git-core/git-svn
+%endif
+
 %changelog
+* Fri Sep 03 2021 Muhammad Falak <mwani@microsoft.com> - 2.33.0-2
+- Export `daemon`, `subtree` & `svn` subpackages.
+
 * Wed Sep 01 2021 Muhammad Falak <mwani@microsoft.com> - 2.33.0-1
 - Bump version 2.23.4 -> 2.33.0
 
