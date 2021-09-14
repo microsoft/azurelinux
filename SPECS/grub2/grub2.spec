@@ -3,10 +3,6 @@
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
-# Disable gen-ld-script.sh which results in error: "grub2-install: error: Decompressor is too big."
-%global __spec_prep_template #!%{__spec_prep_shell}\
-%{__spec_prep_pre}\
-%{nil}
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
@@ -108,12 +104,19 @@ Group:          System Environment/Base
 GRUB UEFI bootloader binaries
 
 %prep
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+export LDFLAGS
+
 %autosetup -p1 -n grub-2.06-rc1
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
 
 %build
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+export LDFLAGS
 ./bootstrap --no-git --gnulib-srcdir=./gnulib
 %ifarch x86_64
 mkdir build-for-pc
@@ -275,7 +278,7 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 
 %changelog
 * Mon Sep 13 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-5
-- Disable gen-ld-script.sh due to issue with ELF metadata note
+- Disable module_info.ld script due to issue with ELF metadata note
 
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4
 - Bump version to match grub-efi-binary-signed spec
