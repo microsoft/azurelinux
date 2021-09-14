@@ -1,3 +1,5 @@
+%global _plugindir2 %{_libdir}/sasl2
+
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
@@ -17,14 +19,16 @@ BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
 Requires:       pam
 Requires:       systemd
-Provides:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-gs2 = %{version}-%{release}
 Provides:       %{name}-gssapi = %{version}-%{release}
 Provides:       %{name}-gssapi%{?_isa} = %{version}-%{release}
 Provides:       %{name}-plain = %{version}-%{release}
+Provides:       %{name}-scram = %{version}-%{release}
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -34,6 +38,58 @@ for identifying and authenticating a user to a server and for
 optionally negotiating protection of subsequent protocol interactions.
 If its use is negotiated, a security layer is inserted between the
 protocol and the connection.
+
+%package devel
+Summary: Files needed for developing applications with Cyrus SASL
+
+Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: pkgconfig
+
+%description devel
+The %{name}-devel package contains files needed for developing and
+compiling applications which use the Cyrus SASL library.
+
+%package ldap
+Summary: LDAP auxprop support for Cyrus SASL
+
+Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+
+%description ldap
+The %{name}-ldap package contains the Cyrus SASL plugin which supports using
+a directory server, accessed using LDAP, for storing shared secrets.
+
+%package lib
+Summary: Shared libraries needed by applications which use Cyrus SASL
+
+%description lib
+The %{name}-lib package contains shared libraries which are needed by
+applications which use the Cyrus SASL library.
+
+%package md5
+Summary: CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
+
+Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+
+%description md5
+The %{name}-md5 package contains the Cyrus SASL plugins which support
+CRAM-MD5 and DIGEST-MD5 authentication schemes.
+
+%package ntlm
+Summary: NTLM authentication support for Cyrus SASL
+Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+
+%description ntlm
+The %{name}-ntlm package contains the Cyrus SASL plugin which supports
+the NTLM authentication scheme.
+
+%package sql
+Summary: SQL auxprop support for Cyrus SASL
+Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+
+%description sql
+The %{name}-sql package contains the Cyrus SASL plugin which supports
+using a RDBMS for storing shared secrets.
 
 %prep
 %autosetup -p1
@@ -52,14 +108,22 @@ autoreconf -fi
     --enable-fast-install \
     --enable-gss_mutexes \
     --enable-krb4 \
+    --enable-ldapdb \
     --enable-login \
+    --enable-ntlm \
     --enable-plain \
     --enable-shared \
+    --enable-sql \
     --enable-srp \
-    --with-dblib \
-    --with-plugindir=%{_libdir}/sasl2 \
+    --with-bdb=db \
+    --with-dblib=berkeley \
+    --with-ldap \
+    --with-mysql=yes \
+    --with-pgsql=yes \
+    --with-plugindir=%{_plugindir2} \
     --with-saslauthd=/run/saslauthd \
-    --without-authdaemond
+    --without-authdaemond \
+    --without-sqlite
 
 make
 
@@ -124,18 +188,57 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/sysconfig/saslauthd
 /lib/systemd/system/saslauthd.service
 %{_libdir}/systemd/system-preset/50-saslauthd.preset
-%{_includedir}/*
-%{_libdir}/*.so*
-%{_libdir}/pkgconfig/*
-%{_libdir}/sasl2/*
+%{_plugindir2}/libgs2.so
+%{_plugindir2}/libgs2.so.3*
+%{_plugindir2}/libgssapiv2.so
+%{_plugindir2}/libgssapiv2.so.3*
+%{_plugindir2}/libscram.so
+%{_plugindir2}/libscram.so.3*
+%{_plugindir2}/libsrp.so
+%{_plugindir2}/libsrp.so.3*
 %{_sbindir}/*
-%{_mandir}/man3/*
 %{_datadir}/licenses/%{name}/LICENSE
 %{_mandir}/man8/saslauthd.8.gz
 
+%files devel
+%{_includedir}/*
+%{_libdir}/libsasl2.so
+%{_libdir}/pkgconfig/*.pc
+%{_mandir}/man3/*
+
+%files ldap
+%{_plugindir2}/*ldapdb*.so*
+
+%files lib
+%license COPYING
+%doc AUTHORS doc/html/*.html
+%{_libdir}/libsasl2.so.3*
+%dir %{_sysconfdir}/sasl2
+%dir %{_plugindir2}/
+%{_plugindir2}/libanonymous.so
+%{_plugindir2}/libanonymous.so.3*
+%{_plugindir2}/libsasldb.so
+%{_plugindir2}/libsasldb.so.3*
+%{_sbindir}/saslpasswd2
+%{_sbindir}/sasldblistusers2
+
+%files md5
+%{_plugindir2}/libcrammd5.so
+%{_plugindir2}/libcrammd5.so.3*
+%{_plugindir2}/libdigestmd5.so
+%{_plugindir2}/libdigestmd5.so.3*
+
+%files ntlm
+%{_plugindir2}/libntlm.so
+%{_plugindir2}/libntlm.so.3*
+
+%files sql
+%{_plugindir2}/libsql.so
+%{_plugindir2}/libsql.so.3*
+
 %changelog
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.27-9
-- Adding a few 'Provides' or subpackages:
+- Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:
   - cyrus-sasl-gs2,
   - cyrus-sasl-ldap,
   - cyrus-sasl-lib,
@@ -143,6 +246,8 @@ make %{?_smp_mflags} check
   - cyrus-sasl-ntlm,
   - cyrus-sasl-scram,
   - cyrus-sasl-sql.
+- Moving common libs into the "*-devel" and "*-libs" subpackages.
+- Moving MD5 plug-in libs into the "*-md5" subpackage.
 
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-8
 - Merge the following releases from 1.0 to dev branch
