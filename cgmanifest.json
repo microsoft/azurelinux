@@ -5431,6 +5431,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Fedora-VSP",
+          "version": "0.001",
+          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-File-pushd",
           "version": "1.016",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-pushd-1.016.tar.gz"
@@ -5444,6 +5454,16 @@
           "name": "perl-File-Which",
           "version": "1.22",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.22.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-generators",
+          "version": "1.11",
+          "downloadUrl": "http://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
         }
       }
     },
