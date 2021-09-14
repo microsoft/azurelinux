@@ -151,7 +151,6 @@ autoreconf -fi
 %configure \
     CFLAGS="%{optflags} -fPIC" \
     CXXFLAGS="%{optflags}" \
-    --disable-anon \
     --disable-macos-framework \
     --disable-otp \
     --disable-sample \
