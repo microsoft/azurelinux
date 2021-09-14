@@ -8,11 +8,12 @@ Distribution:   Mariner
 URL:            https://jplesnik.fedorapeople.org/generators
 Source0:        %{url}/generators-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        LICENSE.PTR
-BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl >= 4:5.22.0-351
 BuildRequires:  sed
+
 Requires:       perl >= 4:5.22.0-351
 # Per Perl packaging guidelines, build-requiring perl-generators should
 # deliver Perl macros
@@ -20,6 +21,8 @@ Requires:       perl >= 4:5.22.0-351
 # Supply run-time dependencies manually when perl-generators is not available
 Requires:       perl(Fedora::VSP)
 %endif
+
+BuildArch:      noarch
 
 %description
 This package provides RPM Perl dependencies generators which are used for
