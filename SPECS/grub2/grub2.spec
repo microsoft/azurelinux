@@ -3,10 +3,14 @@
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
+# Disable gen-ld-script.sh which results in error: "grub2-install: error: Decompressor is too big."
+%global __spec_prep_template #!%{__spec_prep_shell}\
+%{__spec_prep_pre}\
+%{nil}
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -305,6 +309,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Mon Sep 13 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
+- Disable gen-ld-script.sh due to size issue
+
 * Tue Jul 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06~rc1-6
 - License verified.
 - Adding 'Provides' for:
