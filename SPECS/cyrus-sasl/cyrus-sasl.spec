@@ -14,6 +14,7 @@ Patch0:         CVE-2019-19906.patch
 # CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
 # https://bugzilla.suse.com/show_bug.cgi?id=1180669
 Patch1:         CVE-2020-8032.nopatch
+
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  mariadb-devel
@@ -23,6 +24,7 @@ BuildRequires:  pam-devel
 BuildRequires:  postgresql-devel
 BuildRequires:  postgresql-libs
 BuildRequires:  systemd
+
 Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
@@ -39,27 +41,29 @@ If its use is negotiated, a security layer is inserted between the
 protocol and the connection.
 
 %package devel
-Summary: Files needed for developing applications with Cyrus SASL
+Summary:        Files needed for developing applications with Cyrus SASL
 
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       pkg-config
 
 %description devel
 The %{name}-devel package contains files needed for developing and
 compiling applications which use the Cyrus SASL library.
 
 %package gs2
-Summary: GS2 support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        GS2 support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description gs2
 The %{name}-gs2 package contains the Cyrus SASL plugin which supports
 the GS2 authentication scheme.
 
 %package gssapi
-Summary: GSSAPI authentication support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        GSSAPI authentication support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description gssapi
 The %{name}-gssapi package contains the Cyrus SASL plugins which
@@ -67,57 +71,61 @@ support GSSAPI authentication. GSSAPI is commonly used for Kerberos
 authentication.
 
 %package ldap
-Summary: LDAP auxprop support for Cyrus SASL
+Summary:        LDAP auxprop support for Cyrus SASL
 
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description ldap
 The %{name}-ldap package contains the Cyrus SASL plugin which supports using
 a directory server, accessed using LDAP, for storing shared secrets.
 
 %package lib
-Summary: Shared libraries needed by applications which use Cyrus SASL
+Summary:        Shared libraries needed by applications which use Cyrus SASL
 
 %description lib
 The %{name}-lib package contains shared libraries which are needed by
 applications which use the Cyrus SASL library.
 
 %package md5
-Summary: CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
+Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
 
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description md5
 The %{name}-md5 package contains the Cyrus SASL plugins which support
 CRAM-MD5 and DIGEST-MD5 authentication schemes.
 
 %package ntlm
-Summary: NTLM authentication support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        NTLM authentication support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description ntlm
 The %{name}-ntlm package contains the Cyrus SASL plugin which supports
 the NTLM authentication scheme.
 
 %package plain
-Summary: PLAIN and LOGIN authentication support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        PLAIN and LOGIN authentication support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description plain
 The %{name}-plain package contains the Cyrus SASL plugins which support
 PLAIN and LOGIN authentication schemes.
 
 %package scram
-Summary: SCRAM auxprop support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        SCRAM auxprop support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description scram
 The %{name}-scram package contains the Cyrus SASL plugin which supports
 the SCRAM authentication scheme.
 
 %package sql
-Summary: SQL auxprop support for Cyrus SASL
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+Summary:        SQL auxprop support for Cyrus SASL
+
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
 
 %description sql
 The %{name}-sql package contains the Cyrus SASL plugin which supports
