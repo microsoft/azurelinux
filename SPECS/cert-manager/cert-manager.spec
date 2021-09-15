@@ -3,10 +3,29 @@ Version:        1.5.3
 Release:        1
 Summary:        Automatically provision and manage TLS certificates in Kubernetes 
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/jetstack/cert-manager
 #Source0:       https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated external dependencies from this tarball, since network is disabled during build time.
+#   1. wget https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. patch -p1 < Fix-dependency-checksum.patch
+#   5. mkdir -p BAZEL_CACHE
+#   6. bazel fetch --repository_cache=BAZEL_CACHE //...
+#   7. tar -czvf %{name}-%{version}-vendor.tar.gz BAZEL_CACHE
 Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
+#   1. wget https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod download
+#   5. cd $GOPATH
+#   5. tar -czvf %{name}-%{version}-gocache.tar.gz ../go
 Source2:        %{name}-%{version}-gocache.tar.gz
 Patch0:         Fix-dependency-checksum.patch
 Patch1:         Fix-os-WriteFile.patch
@@ -62,3 +81,4 @@ install -D -m0755 bazel-bin/cmd/acmesolver/acmesolver_/acmesolver %{buildroot}%{
 %changelog
 * Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 1.5.3-1
 - Original version for CBL-Mariner
+- License Verified
