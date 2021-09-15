@@ -12,13 +12,13 @@ URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        macros.httpd
 Source2:        httpd-ssl-pass-dialog
-Source3:       00-ssl.conf
-Source4:       01-ldap.conf
-Source5:       00-proxyhtml.conf
-Source6:       ssl.conf
-Source7:       01-session.conf
-Source8:       10-listen443.conf
-Source9:       httpd-init.service
+Source3:        00-ssl.conf
+Source4:        01-ldap.conf
+Source5:        00-proxyhtml.conf
+Source6:        ssl.conf
+Source7:        01-session.conf
+Source8:        10-listen443.conf
+Source9:        httpd-init.service
 Source10:       httpd-ssl-gencerts
 
 Patch0:         httpd-blfs_layout-1.patch
