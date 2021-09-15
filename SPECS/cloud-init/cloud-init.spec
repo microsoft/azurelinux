@@ -1,4 +1,5 @@
 %define python3_sitelib %{_libdir}/python3.7/site-packages
+%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.3
@@ -115,10 +116,6 @@ make check %{?_smp_mflags}
 %clean
 rm -rf %{buildroot}
 
-
-%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 %post
 %systemd_post %{cl_services}
