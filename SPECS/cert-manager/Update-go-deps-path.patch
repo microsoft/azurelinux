@@ -1,0 +1,201 @@
+diff --git a/hack/build/repos.bzl b/hack/build/repos.bzl
+index bc655540..91d34cff 100644
+--- a/hack/build/repos.bzl
++++ b/hack/build/repos.bzl
+@@ -3366,8 +3366,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "github.com/spf13/cobra",
+-        sum = "h1:+KmjbUw1hriSNMF55oPrkZcb27aECyrj8V2ytv7kWDw=",
+-        version = "v1.2.1",
++        sha256 = "382d414ff7b8f421ae07d32d5a17161718b45bdd00de86dc107a34e639857794",
++        strip_prefix = "cobra-1.2.1",
++        urls = [
++            "https://github.com/spf13/cobra/archive/refs/tags/v1.2.1.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -3384,8 +3387,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "github.com/spf13/pflag",
+-        sum = "h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=",
+-        version = "v1.0.5",
++        sha256 = "9a2cae1f8e8ab0d2cc8ebe468e871af28d9ac0962cf0520999e3ba85f0c7b808",
++        strip_prefix = "pflag-1.0.5",
++        urls = [
++            "https://github.com/spf13/pflag/archive/refs/tags/v1.0.5.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -3930,8 +3936,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/api",
+-        sum = "h1:cblWILbLO8ar+Fj6xdDGr603HRsf8Wu9E9rngJeprZQ=",
+-        version = "v0.21.3",
++        sha256 = "8beae58d35140567663752b5bb12bf4b7dad646a9fce16d459ceb35402e5ff3a",
++        strip_prefix = "api-0.21.3",
++        urls = [
++            "https://github.com/kubernetes/api/archive/refs/tags/v0.21.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -3948,8 +3957,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/apimachinery",
+-        sum = "h1:3Ju4nvjCngxxMYby0BimUk+pQHPOQp3eCGChk5kfVII=",
+-        version = "v0.21.3",
++        sha256 = "6fe97150ef16f769cf53b53924e63536b4cbeacd654b57e21a07e2e7a42813f8",
++        strip_prefix = "apimachinery-0.21.3",
++        urls = [
++            "https://github.com/kubernetes/apimachinery/archive/refs/tags/v0.21.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -3966,8 +3978,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/cli-runtime",
+-        sum = "h1:eXevRomULAAGjQ7m6qo+AWHvtVRqaLG8WQICEBwjtmo=",
+-        version = "v0.21.3",
++        sha256 = "25e1766a536f765eb306ec92de502f12669a1282e8b867541ea706b554ea51c7",
++        strip_prefix = "cli-runtime-0.21.3",
++        urls = [
++            "https://github.com/kubernetes/cli-runtime/archive/refs/tags/v0.21.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -3975,8 +3990,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/client-go",
+-        sum = "h1:J9nxZTOmvkInRDCzcSNQmPJbDYN/PjlxXT9Mos3HcLg=",
+-        version = "v0.21.3",
++        sha256 = "f1991d40532d20c217cd11e49a47d8d7a7ee98a741fce7b58b25ab25e13daca6",
++        strip_prefix = "client-go-0.21.3",
++        urls = [
++            "https://github.com/kubernetes/client-go/archive/refs/tags/v0.21.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4031,8 +4049,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/klog/v2",
+-        sum = "h1:Q3gmuM9hKEjefWFFYF0Mat+YyFJvsUyYuwyNNJ5C9Ts=",
+-        version = "v2.8.0",
++        sha256 = "1e3bd3899ed924690efbee7ff5030d1710ccecd975de9bed647d1d27e49b92eb",
++        strip_prefix = "klog-2.8.0",
++        urls = [
++            "https://github.com/kubernetes/klog/archive/refs/tags/v2.8.0.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4059,8 +4080,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/kubectl",
+-        sum = "h1:RmHvvz7tLnFmVqUzJuR44D8oE5zv1iyDojxSQllY+II=",
+-        version = "v0.21.3",
++        sha256 = "e87bd9cdfe7721c8d4fb0a16f8e16a8e56573e8f48119da4de8e20f7fe4505c3",
++        strip_prefix = "kubectl-0.21.3",
++        urls = [
++            "https://github.com/kubernetes/kubectl/archive/refs/tags/v0.21.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4086,8 +4110,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "sigs.k8s.io/controller-runtime",
+-        sum = "h1:MnCAsopQno6+hI9SgJHKddzXpmv2wtouZz6931Eax+Q=",
+-        version = "v0.9.2",
++        sha256 = "f47a88450461d994a23540700eae80932484aa4970e7137cebbfd14cf1864b29",
++        strip_prefix = "controller-runtime-0.9.2",
++        urls = [
++            "https://github.com/kubernetes-sigs/controller-runtime/archive/refs/tags/v0.9.2.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4104,8 +4131,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "sigs.k8s.io/gateway-api",
+-        sum = "h1:mKbQRlRIIY3dsCCbNF9Jv30V9vvOf6SRG82l0MfJQ9U=",
+-        version = "v0.3.0",
++        sha256 = "8eec75fd3d7a6a66e187a5915a4bb00cfbd48aa04a321d2cdb972daffba51018",
++        strip_prefix = "gateway-api-0.3.0",
++        urls = [
++            "https://github.com/kubernetes-sigs/gateway-api/archive/refs/tags/v0.3.0.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4167,8 +4197,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "sigs.k8s.io/yaml",
+-        sum = "h1:kr/MCeFWJWTwyaHoR9c8EjH9OumOmoF9YGiZd7lFm/Q=",
+-        version = "v1.2.0",
++        sha256 = "80612b8cc63863556906f04df7eca89179bf81e5b3d1133c082bd7e5e35d5514",
++        strip_prefix = "yaml-1.2.0",
++        urls = [
++            "https://github.com/kubernetes-sigs/yaml/archive/refs/tags/v1.2.0.tar.gz",
++        ],
+     )
+ 
+     go_repository(
+@@ -4176,8 +4209,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "k8s.io/utils",
+-        sum = "h1:Mx0aa+SUAcNRQbs5jUzV8lkDlGFU8laZsY9jrcVX5SY=",
+-        version = "v0.0.0-20210802155522-efc7438f0176",
++        sha256 = "61d2f097b64476ba64ab7fd9716d2f88613489bc204ca9c8d23ffb97fe918a09",
++        strip_prefix = "utils-efc7438f0176a4a29c62bac8989d8dd183054fa5",
++        urls = [
++            "https://github.com/kubernetes/utils/archive/efc7438f0176a4a29c62bac8989d8dd183054fa5.zip",
++        ],
+     )
+ 
+     go_repository(
+@@ -4303,9 +4339,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "golang.org/x/crypto",
+-        replace = "github.com/cert-manager/crypto",
+-        sum = "h1:HXp46OGPFPV7He+NPxUbCgEDCBL56R7BkQRGWEkznVQ=",
+-        version = "v0.0.0-20210409161129-d4c19753215a",
++        sha256 = "5dd42723ccf810117d0958e8194471a23e45f167090ed3369cd4f98699f4e9c3",
++        strip_prefix = "crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159",
++        urls = [
++            "https://github.com/golang/crypto/archive/c07d793c2f9aacf728fe68cbd7acd73adbd04159.zip",
++        ],
+     )
+ 
+     go_repository(
+@@ -4494,8 +4532,11 @@ def go_repositories():
+         build_file_generation = "on",
+         build_file_proto_mode = "disable",
+         importpath = "helm.sh/helm/v3",
+-        sum = "h1:0nKDyXJr23nI3JrcP7HH7NcR+CYRvro/52Dvr1KhGO0=",
+-        version = "v3.6.3",
++        sha256 = "1ef2253b97601f56da782ce380f0732246c82038c4241cbc37450e5a23f0c5a5",
++        strip_prefix = "helm-3.6.3",
++        urls = [
++            "https://github.com/helm/helm/archive/refs/tags/v3.6.3.tar.gz",
++        ],
+     )
+ 
+     go_repository(

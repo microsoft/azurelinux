@@ -655,6 +655,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cert-manager",
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "check",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/libcheck/check/archive/0.12.0.tar.gz"

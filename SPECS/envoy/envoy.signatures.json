@@ -1,7 +1,7 @@
 {
  "Signatures": {
+  "envoy-1.14.4-vendor.tar.gz": "ccf6d0d8ab0de10c713ab3234afe97a46a699f8af4cc935df172393479e6ff9a",
   "envoy-1.14.4.tar.gz": "d7f9ed0dc3aac91f1050502bb0d7ea1e457e31afc609438f967d68172727e1a9",
-  "envoy-rpmlintrc": "8b9331ceac885edc8b87416a9651496a88b03b6c6ff3bc836f8fcc3ad26eaa09",
-  "envoy-vendor-1.14.4.tar.gz": "7c421f726ca2b432e8e3248623a38359b8cf3ff6c1c8196702caf1ef3d40a3e0"
+  "envoy-rpmlintrc": "8b9331ceac885edc8b87416a9651496a88b03b6c6ff3bc836f8fcc3ad26eaa09"
  }
 }
