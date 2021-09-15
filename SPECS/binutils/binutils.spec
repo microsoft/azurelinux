@@ -46,11 +46,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
-# Rebuild libiberty.a with -fPIC.
-#%make_build -C libiberty clean
-#%make_build CFLAGS="$CFLAGS -g -fPIC" -C libiberty
-#install -m 644 libiberty/libiberty.a %{buildroot}%{_libdir}
-#install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+install -m 644 libiberty/libiberty.a %{buildroot}%{_libdir}
+install -m 644 include/libiberty.h %{buildroot}%{_includedir}
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
@@ -131,7 +128,7 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %changelog
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
-- Adding 'libiberty' libs using Fedora 32 (license: MIT) spec for guidance.
+- Adding 'libiberty' lib and header.
 
 * Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.1-2
 - Add patch from Fedora 34 (license: MIT) to export demangle.h from libiberty sources
