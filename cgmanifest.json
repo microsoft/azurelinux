@@ -815,6 +815,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "conda",
+          "version": "4.10.1",
+          "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "conmon",
+          "version": "2.0.29",
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "collectd",
           "version": "5.12.0",
           "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
@@ -958,6 +978,16 @@
           "name": "createrepo_c",
           "version": "0.11.1",
           "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.11.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cri-o",
+          "version": "1.21.2",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.2.tar.gz"
         }
       }
     },
@@ -1166,6 +1196,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ding-libs",
+          "version": "0.6.1",
+          "downloadUrl": " https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dkms",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/dell/dkms/archive/v2.8.1.tar.gz"
@@ -1349,6 +1389,16 @@
           "name": "dwz",
           "version": "0.13",
           "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dwarves",
+          "version": "1.21",
+          "downloadUrl": "https://fedorapeople.org/~acme/dwarves/dwarves-1.21.tar.xz"
         }
       }
     },
@@ -2238,6 +2288,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "help2man",
+          "version": "1.47.14",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.47.14.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "http-parser",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
@@ -2941,6 +3001,16 @@
           "name": "libconfuse",
           "version": "3.3",
           "downloadUrl": "https://github.com/libconfuse/libconfuse/releases/download/v3.3/confuse-3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcontainers-common",
+          "version": "20200727",
+          "downloadUrl": "https://github.com/containers/image/archive/v5.5.1.tar.gz"
         }
       }
     },
@@ -5381,6 +5451,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Fedora-VSP",
+          "version": "0.001",
+          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-File-pushd",
           "version": "1.016",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-pushd-1.016.tar.gz"
@@ -5394,6 +5474,16 @@
           "name": "perl-File-Which",
           "version": "1.22",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.22.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-generators",
+          "version": "1.11",
+          "downloadUrl": "http://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
         }
       }
     },
@@ -8455,6 +8545,16 @@
           "name": "squashfs-tools",
           "version": "4.3",
           "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sscg",
+          "version": "2.6.2",
+          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
         }
       }
     },

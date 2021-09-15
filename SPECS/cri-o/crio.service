@@ -1,0 +1,34 @@
+[Unit]
+Description=Container Runtime Interface for OCI (CRI-O)
+Documentation=https://github.com/cri-o/cri-o
+After=network.target
+After=lwm2-monitor.service
+After=SuSEfirewall2.service
+
+[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/proxy
+EnvironmentFile=-/etc/sysconfig/crio
+Environment=GOTRACEBACK=crash
+ExecStart=/usr/bin/crio $CRIO_OPTIONS
+ExecReload=/bin/kill -s HUP $MAINPID
+
+TasksMax=infinity
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=infinity
+
+# Set delegate yes so that systemd does not reset the cgroups of containers.
+# Only systemd 218 and above support this property.
+Delegate=yes
+
+OOMScoreAdjust=-999
+TimeoutStartSec=0
+Restart=on-abnormal
+
+# Place cri-o under the podruntime slice, this is part of the recommended
+# deployment to allow fine resource control on Kubernetes
+Slice=podruntime.slice
+
+[Install]
+WantedBy=multi-user.target
