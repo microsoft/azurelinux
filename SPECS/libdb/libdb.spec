@@ -1,10 +1,11 @@
 Summary:	The Berkley DB database library for C
 Name:		libdb
 Version:	5.3.28
-Release:    5%{?dist}
+Release:    6%{?dist}
 License:	BSD and LGPLv2 and Sleepycat
 URL:		https://oss.oracle.com/berkeley-db.html
 Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
+Patch0:		CVE-2019-2708.patch
 Group:		System/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +28,7 @@ Obsoletes:      db-docs
 The package contains the DB doc files
 
 %prep
-%setup -q -n db-%{version}
+%autosetup -p1 -n db-%{version}
 
 %build
 cd build_unix
@@ -67,6 +68,9 @@ rm -rf %{buildroot}
 %{_includedir}/*
 
 %changelog
+* Wed Sep 15 2021 Henry Li <lihl@microsoft.com> - 5.3.28-6
+- Patch CVE-2019-2708
+
 * Tue Aug 03 2021 Nicolas guibourge <nicolasg@microsoft.com> - 5.3.28-5
 - Nopatch CVE-2017-3604 to CVE-2017-3617 and CVE-2020-2981
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.3.28-4
