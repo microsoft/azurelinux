@@ -12,28 +12,35 @@ index 2f3390c3..3592ec53 100755
  BOUNCE_COMMAND_IFUP = [
      'sh', '-xc',
 diff --git a/cloudinit/sources/helpers/azure.py b/cloudinit/sources/helpers/azure.py
-index ad476076..951c631c 100755
+index ad476076..c49d5c1b 100755
 --- a/cloudinit/sources/helpers/azure.py
 +++ b/cloudinit/sources/helpers/azure.py
-@@ -1,5 +1,6 @@
- # This file is part of cloud-init. See LICENSE file for license information.
- import base64
+@@ -9,6 +9,7 @@ import struct
+ import time
+ import textwrap
+ import zlib
 +import configobj
- import json
- import logging
- import os
-@@ -27,8 +28,10 @@ from cloudinit import distros
+ from errno import ENOENT
+ 
+ from cloudinit.settings import CFG_BUILTIN
+@@ -27,6 +28,7 @@ from cloudinit import distros
  from cloudinit.reporting import events
  from cloudinit.net.dhcp import EphemeralDHCPv4
  from datetime import datetime
 +from io import StringIO
  
  LOG = logging.getLogger(__name__)
-+NETWORKD_LEASES_DIR = '/run/systemd/netif/leases'
  
- # This endpoint matches the format as found in dhcp lease files, since this
- # value is applied if the endpoint can't be found within a lease file
-@@ -783,6 +786,32 @@ class WALinuxAgentShim:
+@@ -38,6 +40,8 @@ BOOT_EVENT_TYPE = 'boot-telemetry'
+ SYSTEMINFO_EVENT_TYPE = 'system-info'
+ DIAGNOSTIC_EVENT_TYPE = 'diagnostic'
+ COMPRESSED_EVENT_TYPE = 'compressed'
++NETWORKD_LEASES_DIR = '/run/systemd/netif/leases'
++
+ # Maximum number of bytes of the cloud-init.log file that can be dumped to KVP
+ # at once. This number is based on the analysis done on a large sample of
+ # cloud-init.log files where the P95 of the file sizes was 537KB and the time
+@@ -783,6 +787,32 @@ class WALinuxAgentShim:
                  ) from e
          return dhcp_options
  
@@ -66,13 +73,10 @@ index ad476076..951c631c 100755
      @staticmethod
      @azure_ds_telemetry_reporter
      def _get_value_from_dhcpoptions(dhcp_options):
-@@ -832,8 +861,8 @@ class WALinuxAgentShim:
-                 'No Azure endpoint from networkd. '
-                 'Finding Azure endpoint from hook json...',
+@@ -834,6 +864,7 @@ class WALinuxAgentShim:
                  logger_func=LOG.debug)
--            dhcp_options = WALinuxAgentShim._load_dhclient_json()
--            value = WALinuxAgentShim._get_value_from_dhcpoptions(dhcp_options)
-+            value = WALinuxAgentShim._networkd_get_value_from_leases()
+             dhcp_options = WALinuxAgentShim._load_dhclient_json()
+             value = WALinuxAgentShim._get_value_from_dhcpoptions(dhcp_options)
 +            LOG.debug('networkd value from lease %s', value)
          if value is None:
              # Fallback and check the leases file if unsuccessful
