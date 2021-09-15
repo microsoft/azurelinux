@@ -1,7 +1,10 @@
+%define _soversion 3
+%global _plugindir2 %{_libdir}/sasl2
+
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        5%{?dist}
+Release:        9%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,19 +15,22 @@ Patch0:         CVE-2019-19906.patch
 # CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
 # https://bugzilla.suse.com/show_bug.cgi?id=1180669
 Patch1:         CVE-2020-8032.nopatch
+
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
+BuildRequires:  mariadb-devel
+BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
+BuildRequires:  postgresql-devel
+BuildRequires:  postgresql-libs
 BuildRequires:  systemd
+
+Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
 Requires:       pam
 Requires:       systemd
-Provides:       %{name}-devel = %{version}-%{release}
-Provides:       %{name}-gssapi = %{version}-%{release}
-Provides:       %{name}-gssapi%{?_isa} = %{version}-%{release}
-Provides:       %{name}-plain = %{version}-%{release}
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -35,31 +41,150 @@ optionally negotiating protection of subsequent protocol interactions.
 If its use is negotiated, a security layer is inserted between the
 protocol and the connection.
 
+%package devel
+Summary:        Files needed for developing applications with Cyrus SASL
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-lib = %{version}-%{release}
+Requires:       pkg-config
+
+%description devel
+The %{name}-devel package contains files needed for developing and
+compiling applications which use the Cyrus SASL library.
+
+%package gs2
+Summary:        GS2 support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description gs2
+The %{name}-gs2 package contains the Cyrus SASL plugin which supports
+the GS2 authentication scheme.
+
+%package gssapi
+Summary:        GSSAPI authentication support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description gssapi
+The %{name}-gssapi package contains the Cyrus SASL plugins which
+support GSSAPI authentication. GSSAPI is commonly used for Kerberos
+authentication.
+
+%package ldap
+Summary:        LDAP auxprop support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description ldap
+The %{name}-ldap package contains the Cyrus SASL plugin which supports using
+a directory server, accessed using LDAP, for storing shared secrets.
+
+%package lib
+Summary:        Shared libraries needed by applications which use Cyrus SASL
+
+%description lib
+The %{name}-lib package contains shared libraries which are needed by
+applications which use the Cyrus SASL library.
+
+%package md5
+Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description md5
+The %{name}-md5 package contains the Cyrus SASL plugins which support
+CRAM-MD5 and DIGEST-MD5 authentication schemes.
+
+%package ntlm
+Summary:        NTLM authentication support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description ntlm
+The %{name}-ntlm package contains the Cyrus SASL plugin which supports
+the NTLM authentication scheme.
+
+%package plain
+Summary:        PLAIN and LOGIN authentication support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description plain
+The %{name}-plain package contains the Cyrus SASL plugins which support
+PLAIN and LOGIN authentication schemes.
+
+%package scram
+Summary:        SCRAM auxprop support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description scram
+The %{name}-scram package contains the Cyrus SASL plugin which supports
+the SCRAM authentication scheme.
+
+%package sql
+Summary:        SQL auxprop support for Cyrus SASL
+
+Requires:       %{name}-lib = %{version}-%{release}
+
+%description sql
+The %{name}-sql package contains the Cyrus SASL plugin which supports
+using a RDBMS for storing shared secrets.
+
 %prep
 %autosetup -p1
 
 %build
+# Find the MySQL libraries used needed by the SQL auxprop plugin.
+INC_DIR="`mysql_config --include`"
+if test x"$INC_DIR" != "x-I%{_includedir}"; then
+        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
+fi
+LIB_DIR="`mysql_config --libs | sed -e 's,-[^L][^ ]*,,g' -e 's,^ *,,' -e 's, *$,,' -e 's,  *, ,g'`"
+if test x"$LIB_DIR" != "x-L%{_libdir}"; then
+        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
+fi
+
+# Find the PostgreSQL libraries used needed by the SQL auxprop plugin.
+INC_DIR="-I`pg_config --includedir`"
+if test x"$INC_DIR" != "x-I%{_includedir}"; then
+        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
+fi
+LIB_DIR="-L`pg_config --libdir`"
+if test x"$LIB_DIR" != "x-L%{_libdir}"; then
+        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
+fi
+
 autoreconf -fi
 %configure \
     CFLAGS="%{optflags} -fPIC" \
     CXXFLAGS="%{optflags}" \
-    --with-plugindir=%{_libdir}/sasl2 \
-    --without-dblib \
+    --disable-macos-framework \
+    --disable-otp \
+    --disable-sample \
+    --disable-srp \
+    --disable-static \
+    --enable-anon \
+    --enable-digest \
+    --enable-fast-install \
+    --enable-gss_mutexes \
+    --enable-krb4 \
+    --enable-ldapdb \
+    --enable-login \
+    --enable-ntlm \
+    --enable-plain \
+    --enable-shared \
+    --enable-sql \
+    --with-bdb=db \
+    --with-dblib=berkeley \
+    --with-ldap \
+    --with-mysql=yes \
+    --with-pgsql=yes \
+    --with-plugindir=%{_plugindir2} \
     --with-saslauthd=/run/saslauthd \
     --without-authdaemond \
-    --disable-macos-framework \
-    --disable-sample \
-    --disable-digest \
-    --disable-otp \
-    --enable-plain \
-    --enable-login \
-    --disable-anon \
-    --enable-srp \
-    --enable-gss_mutexes \
-    --disable-static \
-    --enable-shared \
-    --enable-fast-install \
-    --enable-krb4
+    --without-sqlite
 
 make
 
@@ -124,16 +249,78 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/sysconfig/saslauthd
 /lib/systemd/system/saslauthd.service
 %{_libdir}/systemd/system-preset/50-saslauthd.preset
-%{_includedir}/*
-%{_libdir}/*.so*
-%{_libdir}/pkgconfig/*
-%{_libdir}/sasl2/*
 %{_sbindir}/*
-%{_mandir}/man3/*
 %{_datadir}/licenses/%{name}/LICENSE
-%{_mandir}/man8/saslauthd.8.gz
+%{_mandir}/man8/*
+
+%files devel
+%{_includedir}/*
+%{_libdir}/libsasl2.so
+%{_libdir}/pkgconfig/*.pc
+%{_mandir}/man3/*
+
+%files gs2
+%{_plugindir2}/libgs2.so
+%{_plugindir2}/libgs2.so.%{_soversion}*
+
+%files gssapi
+%{_plugindir2}/libgssapiv2.so
+%{_plugindir2}/libgssapiv2.so.%{_soversion}*
+
+%files ldap
+%{_plugindir2}/*ldapdb*.so*
+
+%files lib
+%license COPYING
+%doc AUTHORS doc/html/*.html
+%{_libdir}/libsasl2.so.%{_soversion}*
+%dir %{_plugindir2}/
+%{_plugindir2}/libanonymous.so
+%{_plugindir2}/libanonymous.so.%{_soversion}*
+%{_plugindir2}/libsasldb.so
+%{_plugindir2}/libsasldb.so.%{_soversion}*
+%{_sbindir}/saslpasswd2
+%{_sbindir}/sasldblistusers2
+
+%files md5
+%{_plugindir2}/libcrammd5.so
+%{_plugindir2}/libcrammd5.so.%{_soversion}*
+%{_plugindir2}/libdigestmd5.so
+%{_plugindir2}/libdigestmd5.so.%{_soversion}*
+
+%files ntlm
+%{_plugindir2}/libntlm.so
+%{_plugindir2}/libntlm.so.%{_soversion}*
+
+%files plain
+%{_plugindir2}/liblogin.so
+%{_plugindir2}/liblogin.so.%{_soversion}*
+%{_plugindir2}/libplain.so
+%{_plugindir2}/libplain.so.%{_soversion}*
+
+%files scram
+%{_plugindir2}/libscram.so
+%{_plugindir2}/libscram.so.%{_soversion}*
+
+%files sql
+%{_plugindir2}/libsql.so
+%{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.27-9
+- Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:
+  - cyrus-sasl-gs2,
+  - cyrus-sasl-ldap,
+  - cyrus-sasl-lib,
+  - cyrus-sasl-md5,
+  - cyrus-sasl-ntlm,
+  - cyrus-sasl-plain,
+  - cyrus-sasl-scram,
+  - cyrus-sasl-sql.
+- Moving common libs into the "*-devel" and "*-libs" subpackages.
+- Moving MD5 plug-in libs into the "*-md5" subpackage.
+- Removed SRP libs as they were unused.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-8
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 2.1.27-5: Add nopatch for CVE-2020-8032, Lint spec
