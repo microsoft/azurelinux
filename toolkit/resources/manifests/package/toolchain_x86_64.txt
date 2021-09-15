@@ -54,8 +54,8 @@ curl-7.76.0-5.cm2.x86_64.rpm
 curl-debuginfo-7.76.0-5.cm2.x86_64.rpm
 curl-devel-7.76.0-5.cm2.x86_64.rpm
 curl-libs-7.76.0-5.cm2.x86_64.rpm
-cyrus-sasl-2.1.27-9.cm2.x86_64.rpm
-cyrus-sasl-debuginfo-2.1.27-9.cm2.x86_64.rpm
+cyrus-sasl-2.1.27-5.cm2.x86_64.rpm
+cyrus-sasl-debuginfo-2.1.27-5.cm2.x86_64.rpm
 device-mapper-2.03.05-7.cm2.x86_64.rpm
 device-mapper-devel-2.03.05-7.cm2.x86_64.rpm
 device-mapper-event-2.03.05-7.cm2.x86_64.rpm
@@ -312,8 +312,8 @@ openjdk8-doc-1.8.0.292-1.cm2.x86_64.rpm
 openjdk8-sample-1.8.0.292-1.cm2.x86_64.rpm
 openjdk8-src-1.8.0.292-1.cm2.x86_64.rpm
 openjre8-1.8.0.292-1.cm2.x86_64.rpm
-openldap-2.4.57-5.cm2.x86_64.rpm
-openldap-debuginfo-2.4.57-5.cm2.x86_64.rpm
+openldap-2.4.57-4.cm2.x86_64.rpm
+openldap-debuginfo-2.4.57-4.cm2.x86_64.rpm
 openssl-1.1.1k-5.cm2.x86_64.rpm
 openssl-debuginfo-1.1.1k-5.cm2.x86_64.rpm
 openssl-devel-1.1.1k-5.cm2.x86_64.rpm

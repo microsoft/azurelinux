@@ -5,7 +5,7 @@
 Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        1.4.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
 # files like src/rdfnv1a.c are under Public Domain
@@ -17,7 +17,7 @@ Group:          Development/Libraries/C and C++
 URL:            https://github.com/edenhill/librdkafka
 #Source0:        https://github.com/edenhill/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  cyrus-sasl-devel
+BuildRequires:  cyrus-sasl
 BuildRequires:  gcc >= 4.1
 BuildRequires:  libstdc++-devel
 BuildRequires:  openssl-devel
@@ -95,9 +95,6 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
-* Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-2
-- Updating BRs to pull in "cyrus-sasl-devel".
-
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.2.0-1
 - Initial CBL-Mariner import from Magnus Edenhill Open Source (license: BSD).
 - License verified.
