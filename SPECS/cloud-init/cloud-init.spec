@@ -115,7 +115,10 @@ make check %{?_smp_mflags}
 %clean
 rm -rf %{buildroot}
 
+
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 %post
 %systemd_post %{cl_services}
