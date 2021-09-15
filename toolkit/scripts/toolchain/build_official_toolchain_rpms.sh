@@ -480,7 +480,7 @@ build_rpm_in_chroot_no_install libsepol
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
-# util-linux, rpm, libsemanage and shadow-utils require libselinux
+# util-linux and rpm require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install rpm
@@ -554,27 +554,14 @@ chroot_and_install_rpms perl-File-HomeDir
 # openldap needs groff, cyrus-sasl
 chroot_and_install_rpms groff
 chroot_and_install_rpms cyrus-sasl
-build_rpm_in_chroot_no_install openldap
 
 build_rpm_in_chroot_no_install libcap-ng
 
 # audit needs systemd, golang, openldap, tcp_wrappers and libcap-ng
 chroot_and_install_rpms systemd
 chroot_and_install_rpms golang
-chroot_and_install_rpms openldap
 chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
-build_rpm_in_chroot_no_install audit
-
-# libsemanage requires libaudit
-chroot_and_install_rpms audit
-build_rpm_in_chroot_no_install libsemanage
-
-# shadow-utils requires libsemanage
-chroot_and_install_rpms libsemanage
-# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
-cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
-build_rpm_in_chroot_no_install shadow-utils
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1

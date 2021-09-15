@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ BuildRequires:  pam-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  libxslt
 Requires:       cracklib
 Requires:       pam
 Provides:       /sbin/nologin
@@ -181,6 +182,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-3
+- Adding missing BR for "libxslt".
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
 - Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
 - Add license to subid subpackage

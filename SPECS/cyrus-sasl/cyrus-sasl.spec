@@ -19,7 +19,6 @@ Patch1:         CVE-2020-8032.nopatch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  mariadb-devel
-BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  postgresql-devel

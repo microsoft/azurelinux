@@ -14,7 +14,6 @@ Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
 Patch3:         CVE-2021-27212.patch
-BuildRequires:  cyrus-sasl-devel >= 2.1
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  openssl-devel >= 1.0.1
@@ -72,7 +71,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.57-5
-- Updating BRs to pull in "cyrus-sasl-devel".
+- Updating BRs to remove dependency on "cyrus-sasl".
 
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.57-4
 - Add clients, compat subpackage provides from base package
