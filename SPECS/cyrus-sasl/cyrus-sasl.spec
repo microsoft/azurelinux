@@ -267,7 +267,8 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libgssapiv2.so.%{_soversion}*
 
 %files ldap
-%{_plugindir2}/*ldapdb*.so*
+%{_plugindir2}/libldapdb.so
+%{_plugindir2}/libldapdb.so.%{_soversion}*
 
 %files lib
 %license COPYING
