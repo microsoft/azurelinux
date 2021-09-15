@@ -542,8 +542,6 @@ chroot_and_install_rpms libnsl2
 chroot_and_install_rpms finger
 build_rpm_in_chroot_no_install tcp_wrappers
 
-build_rpm_in_chroot_no_install cyrus-sasl
-
 # groff needs perl-File-HomeDir installed to run
 # perl-File-HomeDir needs perl-File-Which installed to run
 build_rpm_in_chroot_no_install perl-File-Which
@@ -551,13 +549,12 @@ chroot_and_install_rpms perl-File-Which
 build_rpm_in_chroot_no_install perl-File-HomeDir
 chroot_and_install_rpms perl-File-HomeDir
 
-# openldap needs groff, cyrus-sasl
+# Removed 'openldap', might not need: groff
 chroot_and_install_rpms groff
-chroot_and_install_rpms cyrus-sasl
 
 build_rpm_in_chroot_no_install libcap-ng
 
-# audit needs systemd, golang, openldap, tcp_wrappers and libcap-ng
+# Removed 'audit', might not need: systemd, golang, tcp_wrappers and libcap-ng
 chroot_and_install_rpms systemd
 chroot_and_install_rpms golang
 chroot_and_install_rpms tcp_wrappers

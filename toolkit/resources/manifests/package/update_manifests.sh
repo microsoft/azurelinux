@@ -45,7 +45,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/ca-certificates-microsoft/d' $TmpPkgGen
-    sed -i '/cyrus-sasl/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
     sed -i '/lua-static/d' $TmpPkgGen
@@ -304,7 +303,6 @@ generate_pkggen_core () {
         grep "^python3-" $TmpPkgGen
         grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
-        grep "^cyrus-sasl-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
     } > "$1"
 }
