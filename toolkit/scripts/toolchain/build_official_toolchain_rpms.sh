@@ -522,7 +522,7 @@ chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
 
-build_rpm_in_chroot_no_install golang-1.15
+build_rpm_in_chroot_no_install golang-1.17
 build_rpm_in_chroot_no_install groff
 
 # libtiprc needs krb5
