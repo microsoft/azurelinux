@@ -194,6 +194,8 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
 cp -v $SPECROOT/mariner-rpm-macros/macros $LFS/usr/etc/rpm/macros
+mkdir -pv $LFS/usr/lib/rpm/mariner
+cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
 cp -v $SPECROOT/rpm/brp* $LFS/usr/lib/rpm
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
@@ -492,7 +494,7 @@ chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
 
-build_rpm_in_chroot_no_install golang-1.15
+build_rpm_in_chroot_no_install golang-1.16
 build_rpm_in_chroot_no_install groff
 
 # libtiprc needs krb5

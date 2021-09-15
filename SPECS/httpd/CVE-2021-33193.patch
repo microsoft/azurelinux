@@ -1,0 +1,974 @@
+From ecebcc035ccd8d0e2984fe41420d9e944f456b3c Mon Sep 17 00:00:00 2001
+From: Stefan Eissing <icing@apache.org>
+Date: Thu, 27 May 2021 13:08:21 +0000
+Subject: [PATCH] Merged
+ r1734009,r1734231,r1734281,r1838055,r1838079,r1840229,r1876664,r1876674,r1876784,r1879078,r1881620,r1887311,r1888871
+ from trunk:
+
+  *) core: Split ap_create_request() from ap_read_request(). [Graham Leggett]
+
+  *) core, h2: common ap_parse_request_line() and ap_check_request_header()
+     code. [Yann Ylavic]
+
+  *) core: Add StrictHostCheck to allow unconfigured hostnames to be
+     rejected. [Eric Covener]
+
+
+
+git-svn-id: https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x@1890245 13f79535-47bb-0310-9956-ffa450edef68
+---
+ CHANGES                    |   8 +
+ docs/manual/mod/core.xml   |  36 ++++
+ include/ap_mmn.h           |   5 +-
+ include/http_core.h        |   6 +
+ include/http_protocol.h    |  21 +++
+ include/http_vhost.h       |  13 ++
+ modules/http2/h2_request.c | 108 +-----------
+ server/core.c              |  14 +-
+ server/core_filters.c      |   5 -
+ server/protocol.c          | 328 +++++++++++++++++++++++--------------
+ server/vhost.c             |  38 ++++-
+ 11 files changed, 337 insertions(+), 245 deletions(-)
+
+diff --git a/CHANGES b/CHANGES
+index 7256c1db243..484877551ed 100644
+--- a/CHANGES
++++ b/CHANGES
+@@ -1,6 +1,14 @@
+                                                          -*- coding: utf-8 -*-
+ Changes with Apache 2.4.49
+ 
++  *) core: Split ap_create_request() from ap_read_request(). [Graham Leggett]
++
++  *) core, h2: common ap_parse_request_line() and ap_check_request_header()
++     code. [Yann Ylavic]
++
++  *) core: Add StrictHostCheck to allow unconfigured hostnames to be
++     rejected. [Eric Covener]
++
+ Changes with Apache 2.4.48
+ 
+   *) mod_proxy_wstunnel: Add ProxyWebsocketFallbackToProxyHttp to opt-out the
+diff --git a/docs/manual/mod/core.xml b/docs/manual/mod/core.xml
+index 6b9f1f03859..b576c532fce 100644
+--- a/docs/manual/mod/core.xml
++++ b/docs/manual/mod/core.xml
+@@ -5206,6 +5206,42 @@ recognized methods to modules.</p>
+ <seealso><directive module="mod_allowmethods">AllowMethods</directive></seealso>
+ </directivesynopsis>
+ 
++<directivesynopsis>
++<name>StrictHostCheck</name>
++<description>Controls whether the server requires the requested hostname be
++             listed enumerated in the virtual host handling the request
++             </description>
++<syntax>StrictHostCheck ON|OFF</syntax>
++<default>StrictHostCheck OFF</default>
++<contextlist><context>server config</context><context>virtual host</context>
++</contextlist>
++<compatibility>Added in 2.5.1</compatibility>
++
++<usage>
++    <p>By default, the server will respond to requests for any hostname,
++    including requests addressed to unexpected or unconfigured hostnames. 
++    While this is convenient, it is sometimes desirable to limit what hostnames
++    a backend application handles since it will often generate self-referential
++    responses.</p>
++
++    <p>By setting <directive>StrictHostCheck</directive> to <em>ON</em>,
++    the server will return an HTTP 400 error if the requested hostname
++    hasn't been explicitly listed by either <directive module="core"
++    >ServerName</directive> or <directive module="core"
++    >ServerAlias</directive> in the virtual host that best matches the
++    details of the incoming connection.</p>
++
++   <p>This directive also allows matching of the requested hostname to hostnames
++   specified within the opening <directive module="core">VirtualHost</directive>
++   tag, which is a relatively obscure configuration mechanism that acts like
++   additional <directive module="core">ServerAlias</directive> entries.</p>
++
++   <p>This directive has no affect in non-default virtual hosts. The value
++   inherited from the global server configuration, or the default virtualhost 
++   for the ip:port the underlying connection, determine the effective value.</p>
++</usage>
++</directivesynopsis>
++
+ <directivesynopsis>
+ <name>MergeSlashes</name>
+ <description>Controls whether the server merges consecutive slashes in URLs.
+diff --git a/include/ap_mmn.h b/include/ap_mmn.h
+index 7a6c7c68e06..dec371349f7 100644
+--- a/include/ap_mmn.h
++++ b/include/ap_mmn.h
+@@ -559,6 +559,9 @@
+  *                           and ap_ssl_answer_challenge and hooks.
+  * 20120211.104 (2.4.47-dev) Move ap_ssl_* into new http_ssl.h header file
+  * 20120211.105 (2.4.47-dev) Add ap_ssl_ocsp* hooks and functions to http_ssl.h.
++ * 20120211.106 (2.4.47-dev) Add ap_create_request().
++ * 20120211.107 (2.4.47-dev) Add ap_parse_request_line() and
++ *                           ap_check_request_header()
+  */
+ 
+ #define MODULE_MAGIC_COOKIE 0x41503234UL /* "AP24" */
+@@ -566,7 +569,7 @@
+ #ifndef MODULE_MAGIC_NUMBER_MAJOR
+ #define MODULE_MAGIC_NUMBER_MAJOR 20120211
+ #endif
+-#define MODULE_MAGIC_NUMBER_MINOR 105                 /* 0...n */
++#define MODULE_MAGIC_NUMBER_MINOR 107                 /* 0...n */
+ 
+ /**
+  * Determine if the server's current MODULE_MAGIC_NUMBER is at least a
+diff --git a/include/http_core.h b/include/http_core.h
+index 110c9ebe700..15c9bac5240 100644
+--- a/include/http_core.h
++++ b/include/http_core.h
+@@ -754,6 +754,7 @@ typedef struct {
+  
+     apr_size_t   flush_max_threshold;
+     apr_int32_t  flush_max_pipelined;
++    unsigned int strict_host_check;
+ } core_server_config;
+ 
+ /* for AddOutputFiltersByType in core.c */
+@@ -782,6 +783,11 @@ AP_DECLARE(void) ap_set_server_protocol(server_rec* s, const char* proto);
+ typedef struct core_output_filter_ctx core_output_filter_ctx_t;
+ typedef struct core_filter_ctx        core_ctx_t;
+ 
++struct core_filter_ctx {
++    apr_bucket_brigade *b;
++    apr_bucket_brigade *tmpbb;
++};
++
+ typedef struct core_net_rec {
+     /** Connection to the client */
+     apr_socket_t *client_socket;
+diff --git a/include/http_protocol.h b/include/http_protocol.h
+index c01c8a67e97..9ccac893fcb 100644
+--- a/include/http_protocol.h
++++ b/include/http_protocol.h
+@@ -53,6 +53,13 @@ AP_DECLARE_DATA extern ap_filter_rec_t *ap_old_write_func;
+  * or control the ones that eventually do.
+  */
+ 
++/**
++ * Read an empty request and set reasonable defaults.
++ * @param c The current connection
++ * @return The new request_rec
++ */
++AP_DECLARE(request_rec *) ap_create_request(conn_rec *c);
++
+ /**
+  * Read a request and fill in the fields.
+  * @param c The current connection
+@@ -60,6 +67,20 @@ AP_DECLARE_DATA extern ap_filter_rec_t *ap_old_write_func;
+  */
+ request_rec *ap_read_request(conn_rec *c);
+ 
++/**
++ * Parse and validate the request line.
++ * @param r The current request
++ * @return 1 on success, 0 on failure
++ */
++AP_DECLARE(int) ap_parse_request_line(request_rec *r);
++
++/**
++ * Validate the request header and select vhost.
++ * @param r The current request
++ * @return 1 on success, 0 on failure
++ */
++AP_DECLARE(int) ap_check_request_header(request_rec *r);
++
+ /**
+  * Read the mime-encoded headers.
+  * @param r The current request
+diff --git a/include/http_vhost.h b/include/http_vhost.h
+index 473c9c7d1e9..d2d9c97b212 100644
+--- a/include/http_vhost.h
++++ b/include/http_vhost.h
+@@ -99,6 +99,19 @@ AP_DECLARE(void) ap_update_vhost_given_ip(conn_rec *conn);
+  */
+ AP_DECLARE(void) ap_update_vhost_from_headers(request_rec *r);
+ 
++/**
++ * Updates r->server with the best name-based virtual host match, within
++ * the chain of matching virtual hosts selected by ap_update_vhost_given_ip.
++ * @param r The current request
++ * @param require_match 1 to return an HTTP error if the requested hostname is
++ * not explicitly matched to a VirtualHost. 
++ * @return return HTTP_OK unless require_match was specified and the requested
++ * hostname did not match any ServerName, ServerAlias, or VirtualHost 
++ * address-spec.
++ */
++AP_DECLARE(int) ap_update_vhost_from_headers_ex(request_rec *r, int require_match);
++
++
+ /**
+  * Match the host in the header with the hostname of the server for this
+  * request.
+diff --git a/modules/http2/h2_request.c b/modules/http2/h2_request.c
+index 45df9b153ec..5adf84151e9 100644
+--- a/modules/http2/h2_request.c
++++ b/modules/http2/h2_request.c
+@@ -210,75 +210,12 @@ h2_request *h2_request_clone(apr_pool_t *p, const h2_request *src)
+     return dst;
+ }
+ 
+-#if !AP_MODULE_MAGIC_AT_LEAST(20150222, 13)
+-static request_rec *my_ap_create_request(conn_rec *c)
+-{
+-    apr_pool_t *p;
+-    request_rec *r;
+-
+-    apr_pool_create(&p, c->pool);
+-    apr_pool_tag(p, "request");
+-    r = apr_pcalloc(p, sizeof(request_rec));
+-    AP_READ_REQUEST_ENTRY((intptr_t)r, (uintptr_t)c);
+-    r->pool            = p;
+-    r->connection      = c;
+-    r->server          = c->base_server;
+-    
+-    r->user            = NULL;
+-    r->ap_auth_type    = NULL;
+-    
+-    r->allowed_methods = ap_make_method_list(p, 2);
+-
+-    r->headers_in      = apr_table_make(r->pool, 5);
+-    r->trailers_in     = apr_table_make(r->pool, 5);
+-    r->subprocess_env  = apr_table_make(r->pool, 25);
+-    r->headers_out     = apr_table_make(r->pool, 12);
+-    r->err_headers_out = apr_table_make(r->pool, 5);
+-    r->trailers_out    = apr_table_make(r->pool, 5);
+-    r->notes           = apr_table_make(r->pool, 5);
+-    
+-    r->request_config  = ap_create_request_config(r->pool);
+-    /* Must be set before we run create request hook */
+-    
+-    r->proto_output_filters = c->output_filters;
+-    r->output_filters  = r->proto_output_filters;
+-    r->proto_input_filters = c->input_filters;
+-    r->input_filters   = r->proto_input_filters;
+-    ap_run_create_request(r);
+-    r->per_dir_config  = r->server->lookup_defaults;
+-    
+-    r->sent_bodyct     = 0;                      /* bytect isn't for body */
+-    
+-    r->read_length     = 0;
+-    r->read_body       = REQUEST_NO_BODY;
+-    
+-    r->status          = HTTP_OK;  /* Until further notice */
+-    r->header_only     = 0;
+-    r->the_request     = NULL;
+-    
+-    /* Begin by presuming any module can make its own path_info assumptions,
+-     * until some module interjects and changes the value.
+-     */
+-    r->used_path_info = AP_REQ_DEFAULT_PATH_INFO;
+-    
+-    r->useragent_addr = c->client_addr;
+-    r->useragent_ip = c->client_ip;
+-    
+-    return r;
+-}
+-#endif
+-
+ request_rec *h2_request_create_rec(const h2_request *req, conn_rec *c)
+ {
+-    int access_status;
++    int access_status = HTTP_OK;    
+ 
+-#if AP_MODULE_MAGIC_AT_LEAST(20150222, 13)
+     request_rec *r = ap_create_request(c);
+-#else
+-    request_rec *r = my_ap_create_request(c);
+-#endif
+ 
+-#if AP_MODULE_MAGIC_AT_LEAST(20200331, 3)
+     ap_run_pre_read_request(r, c);
+ 
+     /* Time to populate r with the data we have. */
+@@ -307,49 +244,6 @@ request_rec *h2_request_create_rec(const h2_request *req, conn_rec *c)
+         r->status = HTTP_OK;
+         goto die;
+     }
+-#else
+-    {
+-        const char *s;
+-
+-        r->headers_in = apr_table_clone(r->pool, req->headers);
+-        ap_run_pre_read_request(r, c);
+-
+-        /* Time to populate r with the data we have. */
+-        r->request_time = req->request_time;
+-        r->method = apr_pstrdup(r->pool, req->method);
+-        /* Provide quick information about the request method as soon as known */
+-        r->method_number = ap_method_number_of(r->method);
+-        if (r->method_number == M_GET && r->method[0] == 'H') {
+-            r->header_only = 1;
+-        }
+-        ap_parse_uri(r, req->path ? req->path : "");
+-        r->protocol = (char*)"HTTP/2.0";
+-        r->proto_num = HTTP_VERSION(2, 0);
+-        r->the_request = apr_psprintf(r->pool, "%s %s HTTP/2.0",
+-                                      r->method, req->path ? req->path : "");
+-
+-        /* Start with r->hostname = NULL, ap_check_request_header() will get it
+-         * form Host: header, otherwise we get complains about port numbers.
+-         */
+-        r->hostname = NULL;
+-        ap_update_vhost_from_headers(r);
+-
+-         /* we may have switched to another server */
+-         r->per_dir_config = r->server->lookup_defaults;
+-
+-         s = apr_table_get(r->headers_in, "Expect");
+-         if (s && s[0]) {
+-            if (ap_cstr_casecmp(s, "100-continue") == 0) {
+-                r->expecting_100 = 1;
+-            }
+-            else {
+-                r->status = HTTP_EXPECTATION_FAILED;
+-                access_status = r->status;
+-                goto die;
+-            }
+-         }
+-    }
+-#endif
+ 
+     /* we may have switched to another server */
+     r->per_dir_config = r->server->lookup_defaults;
+diff --git a/server/core.c b/server/core.c
+index d135764fef2..15645210762 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -511,6 +511,8 @@ static void *create_core_server_config(apr_pool_t *a, server_rec *s)
+     conf->protocols_honor_order = -1;
+     conf->merge_slashes = AP_CORE_CONFIG_UNSET; 
+     
++    conf->strict_host_check= AP_CORE_CONFIG_UNSET; 
++
+     return (void *)conf;
+ }
+ 
+@@ -585,6 +587,12 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+                                   ? virt->flush_max_pipelined
+                                   : base->flush_max_pipelined;
+ 
++    conf->strict_host_check = (virt->strict_host_check != AP_CORE_CONFIG_UNSET)
++                              ? virt->strict_host_check 
++                              : base->strict_host_check;
++
++    AP_CORE_MERGE_FLAG(strict_host_check, conf, base, virt);
++
+     return conf;
+ }
+ 
+@@ -4623,7 +4631,10 @@ AP_INIT_TAKE2("CGIVar", set_cgi_var, NULL, OR_FILEINFO,
+ AP_INIT_FLAG("QualifyRedirectURL", set_qualify_redirect_url, NULL, OR_FILEINFO,
+              "Controls whether the REDIRECT_URL environment variable is fully "
+              "qualified"),
+-
++AP_INIT_FLAG("StrictHostCheck", set_core_server_flag, 
++             (void *)APR_OFFSETOF(core_server_config, strict_host_check),  
++             RSRC_CONF,
++             "Controls whether a hostname match is required"),
+ AP_INIT_TAKE1("ForceType", ap_set_string_slot_lower,
+        (void *)APR_OFFSETOF(core_dir_config, mime_type), OR_FILEINFO,
+      "a mime type that overrides other configured type"),
+@@ -5623,4 +5634,3 @@ AP_DECLARE_MODULE(core) = {
+     core_cmds,                    /* command apr_table_t */
+     register_hooks                /* register hooks */
+ };
+-
+diff --git a/server/core_filters.c b/server/core_filters.c
+index d6a3169c3be..d81ffc97229 100644
+--- a/server/core_filters.c
++++ b/server/core_filters.c
+@@ -85,11 +85,6 @@ struct core_output_filter_ctx {
+     apr_size_t nvec;
+ };
+ 
+-struct core_filter_ctx {
+-    apr_bucket_brigade *b;
+-    apr_bucket_brigade *tmpbb;
+-};
+-
+ 
+ apr_status_t ap_core_input_filter(ap_filter_t *f, apr_bucket_brigade *b,
+                                   ap_input_mode_t mode, apr_read_type_e block,
+diff --git a/server/protocol.c b/server/protocol.c
+index 379db1b3879..97d3d4f98a8 100644
+--- a/server/protocol.c
++++ b/server/protocol.c
+@@ -609,8 +609,15 @@ AP_CORE_DECLARE(void) ap_parse_uri(request_rec *r, const char *uri)
+         }
+ 
+         r->args = r->parsed_uri.query;
+-        r->uri = r->parsed_uri.path ? r->parsed_uri.path
+-                 : apr_pstrdup(r->pool, "/");
++        if (r->parsed_uri.path) {
++            r->uri = r->parsed_uri.path;
++        }
++        else if (r->method_number == M_OPTIONS) {
++            r->uri = apr_pstrdup(r->pool, "*");
++        }
++        else {
++            r->uri = apr_pstrdup(r->pool, "/");
++        }
+ 
+ #if defined(OS2) || defined(WIN32)
+         /* Handle path translations for OS/2 and plug security hole.
+@@ -645,13 +652,6 @@ static int field_name_len(const char *field)
+ 
+ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+ {
+-    enum {
+-        rrl_none, rrl_badmethod, rrl_badwhitespace, rrl_excesswhitespace,
+-        rrl_missinguri, rrl_baduri, rrl_badprotocol, rrl_trailingtext,
+-        rrl_badmethod09, rrl_reject09
+-    } deferred_error = rrl_none;
+-    char *ll;
+-    char *uri;
+     apr_size_t len;
+     int num_blank_lines = DEFAULT_LIMIT_BLANK_LINES;
+     core_server_config *conf = ap_get_core_module_config(r->server->module_config);
+@@ -711,6 +711,20 @@ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+     }
+ 
+     r->request_time = apr_time_now();
++    return 1;
++}
++
++AP_DECLARE(int) ap_parse_request_line(request_rec *r)
++{
++    core_server_config *conf = ap_get_core_module_config(r->server->module_config);
++    int strict = (conf->http_conformance != AP_HTTP_CONFORMANCE_UNSAFE);
++    enum {
++        rrl_none, rrl_badmethod, rrl_badwhitespace, rrl_excesswhitespace,
++        rrl_missinguri, rrl_baduri, rrl_badprotocol, rrl_trailingtext,
++        rrl_badmethod09, rrl_reject09
++    } deferred_error = rrl_none;
++    apr_size_t len = 0;
++    char *uri, *ll;
+ 
+     r->method = r->the_request;
+ 
+@@ -742,7 +756,6 @@ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+         if (deferred_error == rrl_none)
+             deferred_error = rrl_missinguri;
+         r->protocol = uri = "";
+-        len = 0;
+         goto rrl_done;
+     }
+     else if (strict && ll[0] && apr_isspace(ll[1])
+@@ -773,7 +786,6 @@ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+     /* Verify URI terminated with a single SP, or mark as specific error */
+     if (!ll) {
+         r->protocol = "";
+-        len = 0;
+         goto rrl_done;
+     }
+     else if (strict && ll[0] && apr_isspace(ll[1])
+@@ -866,6 +878,14 @@ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+         r->header_only = 1;
+ 
+     ap_parse_uri(r, uri);
++    if (r->status == HTTP_OK
++            && (r->parsed_uri.path != NULL)
++            && (r->parsed_uri.path[0] != '/')
++            && (r->method_number != M_OPTIONS
++                || strcmp(r->parsed_uri.path, "*") != 0)) {
++        /* Invalid request-target per RFC 7230 section 5.3 */
++        r->status = HTTP_BAD_REQUEST;
++    }
+ 
+     /* With the request understood, we can consider HTTP/0.9 specific errors */
+     if (r->proto_num == HTTP_VERSION(0, 9) && deferred_error == rrl_none) {
+@@ -973,6 +993,79 @@ static int read_request_line(request_rec *r, apr_bucket_brigade *bb)
+     return 0;
+ }
+ 
++AP_DECLARE(int) ap_check_request_header(request_rec *r)
++{
++    core_server_config *conf;
++    int strict_host_check;
++    const char *expect;
++    int access_status;
++
++    conf = ap_get_core_module_config(r->server->module_config);
++
++    /* update what we think the virtual host is based on the headers we've
++     * now read. may update status.
++     */
++    strict_host_check = (conf->strict_host_check == AP_CORE_CONFIG_ON);
++    access_status = ap_update_vhost_from_headers_ex(r, strict_host_check);
++    if (strict_host_check && access_status != HTTP_OK) { 
++        if (r->server == ap_server_conf) { 
++            ap_log_rerror(APLOG_MARK, APLOG_WARNING, 0, r, APLOGNO(10156)
++                          "Requested hostname '%s' did not match any ServerName/ServerAlias "
++                          "in the global server configuration ", r->hostname);
++        }
++        else { 
++            ap_log_rerror(APLOG_MARK, APLOG_WARNING, 0, r, APLOGNO(10157)
++                          "Requested hostname '%s' did not match any ServerName/ServerAlias "
++                          "in the matching virtual host (default vhost for "
++                          "current connection is %s:%u)", 
++                          r->hostname, r->server->defn_name, r->server->defn_line_number);
++        }
++        r->status = access_status;
++    }
++    if (r->status != HTTP_OK) { 
++        return 0;
++    }
++
++    if ((!r->hostname && (r->proto_num >= HTTP_VERSION(1, 1)))
++        || ((r->proto_num == HTTP_VERSION(1, 1))
++            && !apr_table_get(r->headers_in, "Host"))) {
++        /*
++         * Client sent us an HTTP/1.1 or later request without telling us the
++         * hostname, either with a full URL or a Host: header. We therefore
++         * need to (as per the 1.1 spec) send an error.  As a special case,
++         * HTTP/1.1 mentions twice (S9, S14.23) that a request MUST contain
++         * a Host: header, and the server MUST respond with 400 if it doesn't.
++         */
++        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(00569)
++                      "client sent HTTP/1.1 request without hostname "
++                      "(see RFC2616 section 14.23): %s", r->uri);
++        r->status = HTTP_BAD_REQUEST;
++        return 0;
++    }
++
++    if (((expect = apr_table_get(r->headers_in, "Expect")) != NULL)
++        && (expect[0] != '\0')) {
++        /*
++         * The Expect header field was added to HTTP/1.1 after RFC 2068
++         * as a means to signal when a 100 response is desired and,
++         * unfortunately, to signal a poor man's mandatory extension that
++         * the server must understand or return 417 Expectation Failed.
++         */
++        if (ap_cstr_casecmp(expect, "100-continue") == 0) {
++            r->expecting_100 = 1;
++        }
++        else {
++            ap_log_rerror(APLOG_MARK, APLOG_INFO, 0, r, APLOGNO(00570)
++                          "client sent an unrecognized expectation value "
++                          "of Expect: %s", expect);
++            r->status = HTTP_EXPECTATION_FAILED;
++            return 0;
++        }
++    }
++
++    return 1;
++}
++
+ static int table_do_fn_check_lengths(void *r_, const char *key,
+                                      const char *value)
+ {
+@@ -1256,16 +1349,10 @@ AP_DECLARE(void) ap_get_mime_headers(request_rec *r)
+     apr_brigade_destroy(tmp_bb);
+ }
+ 
+-request_rec *ap_read_request(conn_rec *conn)
++AP_DECLARE(request_rec *) ap_create_request(conn_rec *conn)
+ {
+     request_rec *r;
+     apr_pool_t *p;
+-    const char *expect;
+-    int access_status;
+-    apr_bucket_brigade *tmp_bb;
+-    apr_socket_t *csd;
+-    apr_interval_time_t cur_timeout;
+-
+ 
+     apr_pool_create(&p, conn->pool);
+     apr_pool_tag(p, "request");
+@@ -1304,6 +1391,7 @@ request_rec *ap_read_request(conn_rec *conn)
+     r->read_body       = REQUEST_NO_BODY;
+ 
+     r->status          = HTTP_OK;  /* Until further notice */
++    r->header_only     = 0;
+     r->the_request     = NULL;
+ 
+     /* Begin by presuming any module can make its own path_info assumptions,
+@@ -1314,13 +1402,35 @@ request_rec *ap_read_request(conn_rec *conn)
+     r->useragent_addr = conn->client_addr;
+     r->useragent_ip = conn->client_ip;
+ 
++    return r;
++}
++
++/* Apply the server's timeout/config to the connection/request. */
++static void apply_server_config(request_rec *r)
++{
++    apr_socket_t *csd;
++
++    csd = ap_get_conn_socket(r->connection);
++    apr_socket_timeout_set(csd, r->server->timeout);
++
++    r->per_dir_config = r->server->lookup_defaults;
++}
++
++request_rec *ap_read_request(conn_rec *conn)
++{
++    int access_status;
++    apr_bucket_brigade *tmp_bb;
++
++    request_rec *r = ap_create_request(conn);
++
+     tmp_bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+     conn->keepalive = AP_CONN_UNKNOWN;
+ 
+     ap_run_pre_read_request(r, conn);
+ 
+     /* Get the request... */
+-    if (!read_request_line(r, tmp_bb)) {
++    if (!read_request_line(r, tmp_bb) || !ap_parse_request_line(r)) {
++        apr_brigade_cleanup(tmp_bb);
+         switch (r->status) {
+         case HTTP_REQUEST_URI_TOO_LARGE:
+         case HTTP_BAD_REQUEST:
+@@ -1336,49 +1446,38 @@ request_rec *ap_read_request(conn_rec *conn)
+                               "request failed: malformed request line");
+             }
+             access_status = r->status;
+-            r->status = HTTP_OK;
+-            ap_die(access_status, r);
+-            ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-            ap_run_log_transaction(r);
+-            r = NULL;
+-            apr_brigade_destroy(tmp_bb);
+-            goto traceout;
++            goto die_unusable_input;
++
+         case HTTP_REQUEST_TIME_OUT:
++            /* Just log, no further action on this connection. */
+             ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, NULL);
+             if (!r->connection->keepalives)
+                 ap_run_log_transaction(r);
+-            apr_brigade_destroy(tmp_bb);
+-            goto traceout;
+-        default:
+-            apr_brigade_destroy(tmp_bb);
+-            r = NULL;
+-            goto traceout;
++            break;
+         }
++        /* Not worth dying with. */
++        conn->keepalive = AP_CONN_CLOSE;
++        apr_pool_destroy(r->pool);
++        goto ignore;
+     }
++    apr_brigade_cleanup(tmp_bb);
+ 
+     /* We may have been in keep_alive_timeout mode, so toggle back
+      * to the normal timeout mode as we fetch the header lines,
+      * as necessary.
+      */
+-    csd = ap_get_conn_socket(conn);
+-    apr_socket_timeout_get(csd, &cur_timeout);
+-    if (cur_timeout != conn->base_server->timeout) {
+-        apr_socket_timeout_set(csd, conn->base_server->timeout);
+-        cur_timeout = conn->base_server->timeout;
+-    }
++    apply_server_config(r);
+ 
+     if (!r->assbackwards) {
+         const char *tenc, *clen;
+ 
+         ap_get_mime_headers_core(r, tmp_bb);
++        apr_brigade_cleanup(tmp_bb);
+         if (r->status != HTTP_OK) {
+             ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(00567)
+                           "request failed: error reading the headers");
+-            ap_send_error_response(r, 0);
+-            ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-            ap_run_log_transaction(r);
+-            apr_brigade_destroy(tmp_bb);
+-            goto traceout;
++            access_status = r->status;
++            goto die_unusable_input;
+         }
+ 
+         clen = apr_table_get(r->headers_in, "Content-Length");
+@@ -1389,13 +1488,8 @@ request_rec *ap_read_request(conn_rec *conn)
+                 ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(10242)
+                               "client sent invalid Content-Length "
+                               "(%s): %s", clen, r->uri);
+-                r->status = HTTP_BAD_REQUEST;
+-                conn->keepalive = AP_CONN_CLOSE;
+-                ap_send_error_response(r, 0);
+-                ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-                ap_run_log_transaction(r);
+-                apr_brigade_destroy(tmp_bb);
+-                goto traceout;
++                access_status = HTTP_BAD_REQUEST;
++                goto die_unusable_input;
+             }
+         }
+ 
+@@ -1411,13 +1505,8 @@ request_rec *ap_read_request(conn_rec *conn)
+                 ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(02539)
+                               "client sent unknown Transfer-Encoding "
+                               "(%s): %s", tenc, r->uri);
+-                r->status = HTTP_BAD_REQUEST;
+-                conn->keepalive = AP_CONN_CLOSE;
+-                ap_send_error_response(r, 0);
+-                ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-                ap_run_log_transaction(r);
+-                apr_brigade_destroy(tmp_bb);
+-                goto traceout;
++                access_status = HTTP_BAD_REQUEST;
++                goto die_unusable_input;
+             }
+ 
+             /* https://tools.ietf.org/html/rfc7230
+@@ -1437,88 +1526,79 @@ request_rec *ap_read_request(conn_rec *conn)
+         }
+     }
+ 
+-    apr_brigade_destroy(tmp_bb);
+-
+-    /* update what we think the virtual host is based on the headers we've
+-     * now read. may update status.
+-     */
+-    ap_update_vhost_from_headers(r);
+-    access_status = r->status;
+-
+-    /* Toggle to the Host:-based vhost's timeout mode to fetch the
+-     * request body and send the response body, if needed.
+-     */
+-    if (cur_timeout != r->server->timeout) {
+-        apr_socket_timeout_set(csd, r->server->timeout);
+-        cur_timeout = r->server->timeout;
+-    }
+-
+-    /* we may have switched to another server */
+-    r->per_dir_config = r->server->lookup_defaults;
+-
+-    if ((!r->hostname && (r->proto_num >= HTTP_VERSION(1, 1)))
+-        || ((r->proto_num == HTTP_VERSION(1, 1))
+-            && !apr_table_get(r->headers_in, "Host"))) {
+-        /*
+-         * Client sent us an HTTP/1.1 or later request without telling us the
+-         * hostname, either with a full URL or a Host: header. We therefore
+-         * need to (as per the 1.1 spec) send an error.  As a special case,
+-         * HTTP/1.1 mentions twice (S9, S14.23) that a request MUST contain
+-         * a Host: header, and the server MUST respond with 400 if it doesn't.
+-         */
+-        access_status = HTTP_BAD_REQUEST;
+-        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(00569)
+-                      "client sent HTTP/1.1 request without hostname "
+-                      "(see RFC2616 section 14.23): %s", r->uri);
+-    }
+-
+     /*
+      * Add the HTTP_IN filter here to ensure that ap_discard_request_body
+      * called by ap_die and by ap_send_error_response works correctly on
+      * status codes that do not cause the connection to be dropped and
+      * in situations where the connection should be kept alive.
+      */
+-
+     ap_add_input_filter_handle(ap_http_input_filter_handle,
+                                NULL, r, r->connection);
+ 
+-    if (access_status != HTTP_OK
+-        || (access_status = ap_run_post_read_request(r))) {
+-        ap_die(access_status, r);
+-        ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-        ap_run_log_transaction(r);
+-        r = NULL;
+-        goto traceout;
++    /* Validate Host/Expect headers and select vhost. */
++    if (!ap_check_request_header(r)) {
++        /* we may have switched to another server still */
++        apply_server_config(r);
++        access_status = r->status;
++        goto die_before_hooks;
+     }
+ 
+-    if (((expect = apr_table_get(r->headers_in, "Expect")) != NULL)
+-        && (expect[0] != '\0')) {
+-        /*
+-         * The Expect header field was added to HTTP/1.1 after RFC 2068
+-         * as a means to signal when a 100 response is desired and,
+-         * unfortunately, to signal a poor man's mandatory extension that
+-         * the server must understand or return 417 Expectation Failed.
+-         */
+-        if (ap_cstr_casecmp(expect, "100-continue") == 0) {
+-            r->expecting_100 = 1;
+-        }
+-        else {
+-            r->status = HTTP_EXPECTATION_FAILED;
+-            ap_log_rerror(APLOG_MARK, APLOG_INFO, 0, r, APLOGNO(00570)
+-                          "client sent an unrecognized expectation value of "
+-                          "Expect: %s", expect);
+-            ap_send_error_response(r, 0);
+-            ap_update_child_status(conn->sbh, SERVER_BUSY_LOG, r);
+-            ap_run_log_transaction(r);
+-            goto traceout;
+-        }
++    /* we may have switched to another server */
++    apply_server_config(r);
++
++    if ((access_status = ap_run_post_read_request(r))) {
++        goto die;
+     }
+ 
+-    AP_READ_REQUEST_SUCCESS((uintptr_t)r, (char *)r->method, (char *)r->uri, (char *)r->server->defn_name, r->status);
++    AP_READ_REQUEST_SUCCESS((uintptr_t)r, (char *)r->method,
++                            (char *)r->uri, (char *)r->server->defn_name,
++                            r->status);
+     return r;
+-    traceout:
++
++    /* Everything falls through on failure */
++
++die_unusable_input:
++    /* Input filters are in an undeterminate state, cleanup (including
++     * CORE_IN's socket) such that any further attempt to read is EOF.
++     */
++    {
++        ap_filter_t *f = conn->input_filters;
++        while (f) {
++            if (f->frec == ap_core_input_filter_handle) {
++                core_net_rec *net = f->ctx;
++                apr_brigade_cleanup(net->in_ctx->b);
++                break;
++            }
++            ap_remove_input_filter(f);
++            f = f->next;
++        }
++        conn->input_filters = r->input_filters = f;
++        conn->keepalive = AP_CONN_CLOSE;
++    }
++
++die_before_hooks:
++    /* First call to ap_die() (non recursive) */
++    r->status = HTTP_OK;
++
++die:
++    ap_die(access_status, r);
++
++    /* ap_die() sent the response through the output filters, we must now
++     * end the request with an EOR bucket for stream/pipeline accounting.
++     */
++    {
++        apr_bucket_brigade *eor_bb;
++        eor_bb = apr_brigade_create(conn->pool, conn->bucket_alloc);
++        APR_BRIGADE_INSERT_TAIL(eor_bb,
++                                ap_bucket_eor_create(conn->bucket_alloc, r));
++        ap_pass_brigade(conn->output_filters, eor_bb);
++        apr_brigade_cleanup(eor_bb);
++    }
++
++ignore:
++    r = NULL;
+     AP_READ_REQUEST_FAILURE((uintptr_t)r);
+-    return r;
++    return NULL;
+ }
+ 
+ /* if a request with a body creates a subrequest, remove original request's
+diff --git a/server/vhost.c b/server/vhost.c
+index 87bdcceeeb5..489c14130ba 100644
+--- a/server/vhost.c
++++ b/server/vhost.c
+@@ -34,6 +34,7 @@
+ #include "http_vhost.h"
+ #include "http_protocol.h"
+ #include "http_core.h"
++#include "http_main.h"
+ 
+ #if APR_HAVE_ARPA_INET_H
+ #include <arpa/inet.h>
+@@ -973,7 +974,13 @@ AP_DECLARE(int) ap_matches_request_vhost(request_rec *r, const char *host,
+ }
+ 
+ 
+-static void check_hostalias(request_rec *r)
++/*
++ * Updates r->server from ServerName/ServerAlias. Per the interaction
++ * of ip and name-based vhosts, it only looks in the best match from the
++ * connection-level ip-based matching.
++ * Returns HTTP_BAD_REQUEST if there was no match.
++ */
++static int update_server_from_aliases(request_rec *r)
+ {
+     /*
+      * Even if the request has a Host: header containing a port we ignore
+@@ -1051,11 +1058,18 @@ static void check_hostalias(request_rec *r)
+         goto found;
+     }
+ 
+-    return;
++    if (!r->connection->vhost_lookup_data) { 
++        if (matches_aliases(r->server, host)) {
++            s = r->server;
++            goto found;
++        }
++    }
++    return HTTP_BAD_REQUEST;
+ 
+ found:
+     /* s is the first matching server, we're done */
+     r->server = s;
++    return HTTP_OK;
+ }
+ 
+ 
+@@ -1072,7 +1086,7 @@ static void check_serverpath(request_rec *r)
+      * This is in conjunction with the ServerPath code in http_core, so we
+      * get the right host attached to a non- Host-sending request.
+      *
+-     * See the comment in check_hostalias about how each vhost can be
++     * See the comment in update_server_from_aliases about how each vhost can be
+      * listed multiple times.
+      */
+ 
+@@ -1135,11 +1149,17 @@ static APR_INLINE const char *construct_host_header(request_rec *r,
+ }
+ 
+ AP_DECLARE(void) ap_update_vhost_from_headers(request_rec *r)
++{
++    ap_update_vhost_from_headers_ex(r, 0);
++}
++
++AP_DECLARE(int) ap_update_vhost_from_headers_ex(request_rec *r, int require_match)
+ {
+     core_server_config *conf = ap_get_core_module_config(r->server->module_config);
+     const char *host_header = apr_table_get(r->headers_in, "Host");
+     int is_v6literal = 0;
+     int have_hostname_from_url = 0;
++    int rc = HTTP_OK;
+ 
+     if (r->hostname) {
+         /*
+@@ -1152,8 +1172,8 @@ AP_DECLARE(void) ap_update_vhost_from_headers(request_rec *r)
+     else if (host_header != NULL) {
+         is_v6literal = fix_hostname(r, host_header, conf->http_conformance);
+     }
+-    if (r->status != HTTP_OK)
+-        return;
++    if (!require_match && r->status != HTTP_OK)
++        return HTTP_OK;
+ 
+     if (conf->http_conformance != AP_HTTP_CONFORMANCE_UNSAFE) {
+         /*
+@@ -1174,10 +1194,16 @@ AP_DECLARE(void) ap_update_vhost_from_headers(request_rec *r)
+     /* check if we tucked away a name_chain */
+     if (r->connection->vhost_lookup_data) {
+         if (r->hostname)
+-            check_hostalias(r);
++            rc = update_server_from_aliases(r);
+         else
+             check_serverpath(r);
+     }
++    else if (require_match && r->hostname) { 
++        /* check the base server config */
++        rc = update_server_from_aliases(r);
++    }
++    
++    return rc;
+ }
+ 
+ /**

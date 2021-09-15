@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 Version:        20200720
-Release:        15%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,7 @@ BuildArch:      noarch
 %description
 Prebuilt version of the ca-certificates-base package with no runtime dependencies.
 
-BuildRequires:  ca-certificates-base
+BuildRequires:  ca-certificates-base = %{version}-%{release}
 
 Conflicts:      ca-certificates
 Conflicts:      ca-certificates-base
@@ -33,8 +33,6 @@ cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
 
 find %{buildroot} -name README -delete
 
-rm %{buildroot}%{_sysconfdir}/pki/ca-trust/ca-legacy.conf
-rm %{buildroot}%{_sysconfdir}/pki/ca-trust/source/ca-bundle.legacy.crt
 rm %{buildroot}%{_sysconfdir}/pki/tls/*.cnf
 rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 
@@ -47,6 +45,16 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_datadir}/pki/ca-trust-legacy/*
 
 %changelog
+* Mon Sep 13 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-18
+- Making 'Release' match with 'ca-certificates'.
+
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-17
+- Making 'Release' match with 'ca-certificates'.
+
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-16
+- Making 'Release' match with 'ca-certificates'.
+- No longer have to remove 'ca-bundle.legacy.crt' and 'ca-legacy.conf' - gone from 'ca-certificates'.
+
 * Wed Jul 07 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-15
 - Making 'Release' match with 'ca-certificates'.
 

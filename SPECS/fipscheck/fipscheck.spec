@@ -20,7 +20,6 @@ verification of the HMAC-SHA256 checksum files.
 
 %package lib
 Summary:        Library files for %{name}
-Requires:       %{_bindir}/fipscheck
 
 %description lib
 This package contains the FIPSCheck library.

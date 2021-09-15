@@ -304,6 +304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bazel",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bc",
           "version": "1.07.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz"
@@ -725,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "0.7.5",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.7.5.tar.gz"
+          "version": "0.9.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/refs/tags/v0.9.1.tar.gz"
         }
       }
     },
@@ -785,8 +795,8 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.6.7",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.7.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.7.0.tar.gz"
         }
       }
     },
@@ -795,8 +805,8 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.7.0.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.0.tar.gz"
         }
       }
     },
@@ -885,8 +895,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.11.1.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
         }
       }
     },
@@ -1345,16 +1355,6 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.4.3",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "etcd",
           "version": "3.4.13",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.13.tar.gz"
         }
@@ -1465,8 +1465,8 @@
         "type": "other",
         "other": {
           "name": "flannel",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },
@@ -1785,8 +1785,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.13",
-          "downloadUrl": "https://dl.google.com/go/go1.15.13.src.tar.gz"
+          "version": "1.16.7",
+          "downloadUrl": "https://golang.org/dl/go1.16.7.src.tar.gz"
         }
       }
     },
@@ -2025,8 +2025,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2355,8 +2355,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2365,8 +2365,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2375,8 +2375,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -3315,8 +3315,8 @@
         "type": "other",
         "other": {
           "name": "libssh",
-          "version": "0.9.5",
-          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.5.tar.xz"
+          "version": "0.9.6",
+          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.6.tar.xz"
         }
       }
     },
@@ -3794,6 +3794,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lld",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lld-8.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lldb",
           "version": "8.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
@@ -3805,8 +3815,8 @@
         "type": "other",
         "other": {
           "name": "lldpad",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/intel/openlldp/archive/v1.0.1.tar.gz"
+          "version": "1.1",
+          "downloadUrl": "https://github.com/intel/openlldp/archive/v1.1.tar.gz"
         }
       }
     },
@@ -4355,8 +4365,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.7.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.2.tar.gz"
+          "version": "3.7.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.3.tar.gz"
         }
       }
     },
@@ -4445,8 +4455,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.2",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.2/node-v14.17.2.tar.xz"
+          "version": "14.17.5",
+          "downloadUrl": "https://nodejs.org/download/release/v14.17.5/node-v14.17.5.tar.xz"
         }
       }
     },
@@ -8174,6 +8184,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tini",
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/krallin/tini/archive/v0.19.0/tini-0.19.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tinyxml2",
           "version": "7.1.0",
           "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
@@ -8225,8 +8245,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+          "version": "2.4.6",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
         }
       }
     },
@@ -8775,8 +8795,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.4.4/zstd-1.4.4.tar.gz"
+          "version": "1.4.9",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.4.9/zstd-1.4.9.tar.gz"
         }
       }
     }
