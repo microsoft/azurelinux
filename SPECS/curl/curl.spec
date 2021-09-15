@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,9 @@ Patch3:         CVE-2021-22922.nopatch
 Patch4:         CVE-2021-22923.nopatch
 Patch5:         CVE-2021-22924.patch
 Patch6:         CVE-2021-22925.patch
+Patch7:         CVE-2021-22945.patch
+Patch8:         CVE-2021-22946.patch
+Patch9:         CVE-2021-22947.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -98,6 +101,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Sep 15 2021 Henry Li <lihl@microsoft.com> - 7.76.0-6
+- Fix CVE-2021-22945, CVE-2021-22946, CVE-2021-22947
+
 * Wed Jul 21 2021 Chris Co <chrco@microsoft.com> - 7.76.0-5
 - Address CVE-2021-22922, CVE-2021-22923, CVE-2021-22924, CVE-2021-22925
 
