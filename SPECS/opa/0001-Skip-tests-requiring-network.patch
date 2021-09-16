@@ -1,0 +1,32 @@
+From 194b742484902569e1505ebd0b753a0d16c40553 Mon Sep 17 00:00:00 2001
+From: Olivier Lemasle <o.lemasle@gmail.com>
+Date: Tue, 27 Apr 2021 21:53:41 +0200
+Subject: [PATCH] Skip tests requiring network
+
+---
+ ast/schema_test.go | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ast/schema_test.go b/ast/schema_test.go
+index 1e017db4..729cc582 100644
+--- a/ast/schema_test.go
++++ b/ast/schema_test.go
+@@ -42,6 +42,7 @@ func TestParseSchemaObject(t *testing.T) {
+ }
+ 
+ func TestSetTypesWithSchemaRef(t *testing.T) {
++	t.Skip()
+ 	var sch interface{}
+ 	err := util.Unmarshal([]byte(refSchema), &sch)
+ 	if err != nil {
+@@ -60,6 +61,7 @@ func TestSetTypesWithSchemaRef(t *testing.T) {
+ }
+ 
+ func TestSetTypesWithPodSchema(t *testing.T) {
++	t.Skip()
+ 	var sch interface{}
+ 	err := util.Unmarshal([]byte(podSchema), &sch)
+ 	if err != nil {
+-- 
+2.31.1
+
