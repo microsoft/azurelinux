@@ -1,35 +1,22 @@
 #!/bin/bash
-echo "gen-ld-script.sh generating linker script"
 
-# 
-# Embed the following metadata:
-#
-# {
-#  "os": "mariner",
-#  "osVersion": "2.0",
-#  "type": "rpm"
-# }
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-LINKER_SCRIPT_START="SECTIONS { .note.package ALIGN(4): { "
-LINKER_SCRIPT_NAMESZ="BYTE(0x04) BYTE(0x00) BYTE(0x00) BYTE(0x00) "
-LINKER_SCRIPT_DESCSZ="BYTE(0x3c) BYTE(0x00) BYTE(0x00) BYTE(0x00) "
-LINKER_SCRIPT_TYPE="BYTE(0x7e) BYTE(0x1a) BYTE(0xfe) BYTE(0xca) "
-LINKER_SCRIPT_NAME="BYTE(0x46) BYTE(0x44) BYTE(0x4f) BYTE(0x00) "
-LINKER_SCRIPT_DESC="BYTE(0x7b) BYTE(0x0a) BYTE(0x20) BYTE(0x22)
-                    BYTE(0x6f) BYTE(0x73) BYTE(0x22) BYTE(0x3a)
-                    BYTE(0x20) BYTE(0x22) BYTE(0x6d) BYTE(0x61)
-                    BYTE(0x72) BYTE(0x69) BYTE(0x6e) BYTE(0x65)
-                    BYTE(0x72) BYTE(0x22) BYTE(0x2c) BYTE(0x0a)
-                    BYTE(0x20) BYTE(0x22) BYTE(0x6f) BYTE(0x73)
-                    BYTE(0x56) BYTE(0x65) BYTE(0x72) BYTE(0x73)
-                    BYTE(0x69) BYTE(0x6f) BYTE(0x6e) BYTE(0x22)
-                    BYTE(0x3a) BYTE(0x20) BYTE(0x22) BYTE(0x32)
-                    BYTE(0x2e) BYTE(0x30) BYTE(0x22) BYTE(0x2c)
-                    BYTE(0x0a) BYTE(0x20) BYTE(0x22) BYTE(0x74)
-                    BYTE(0x79) BYTE(0x70) BYTE(0x65) BYTE(0x22)
-                    BYTE(0x3a) BYTE(0x20) BYTE(0x22) BYTE(0x72)
-                    BYTE(0x70) BYTE(0x6d) BYTE(0x22) BYTE(0x0a)
-                    BYTE(0x7d) BYTE(0x00) BYTE(0x00) BYTE(0x00) "
-LINKER_SCRIPT_END="KEEP (*(.note.package)) } } INSERT AFTER .note.gnu.build-id;"
+# gen-ld-script.sh
+# Generate linker script to embed ELF binaries with build metadata
 
-echo $LINKER_SCRIPT_START $LINKER_SCRIPT_NAMESZ $LINKER_SCRIPT_DESCSZ $LINKER_SCRIPT_TYPE $LINKER_SCRIPT_NAME $LINKER_SCRIPT_DESC $LINKER_SCRIPT_END > /usr/src/mariner/BUILD/module_info.ld
+# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version}
+echo "gen-ld-script.sh name($1) version($2)"
+
+OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+OS_VERSION=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+
+/usr/lib/rpm/mariner/generate-package-note.py \
+   --os "$OS_ID" \
+   --osVersion "$OS_VERSION" \
+   --type "rpm" \
+   --name "$1" \
+   --version "$2" \
+   --moduleVersion "$2" \
+   --stamp "LinkerOnly"

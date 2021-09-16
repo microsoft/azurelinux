@@ -41,6 +41,7 @@ Source23:       macros.rust-srpm
 Source24:       macros.fonts
 Source25:       macros.suse
 Source26:       gen-ld-script.sh
+Source27:       generate-package-note.py
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -75,6 +76,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 install -p -m 755 -t %{buildroot}%{rcdir} compileall2.py
 install -p -m 755 -t %{buildroot}%{rcdir} brp-*
 install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
+install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
@@ -95,6 +97,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{rcdir}/brp-*
 %{rcdir}/compileall2.py
 %{rcdir}/gen-ld-script.sh
+%{rcdir}/generate-package-note.py
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
@@ -118,7 +121,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 
 %changelog
 * Mon Sep 13 2021 Andrew Phelps <anphel@microsoft.com> - 2.0-4
-- Add gen-ld-script.sh to generate ELF note metadata
+- Add gen-ld-script.sh and generate-package-note.py to generate ELF note metadata
 
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 2.0-3
 - Add fillup-related macros
