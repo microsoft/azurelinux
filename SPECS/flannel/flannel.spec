@@ -16,7 +16,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  golang >= 1.10.3
-BuildRequires: kernel-headers
+BuildRequires:  kernel-headers
 
 %description
 Flannel is a simple and easy way to configure a layer 3 network fabric designed for Kubernetes.
