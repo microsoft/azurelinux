@@ -5051,6 +5051,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "opa",
+          "version": "0.31.0",
+          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.31.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "open-vm-tools",
           "version": "11.1.0",
           "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-11.1.0/open-vm-tools-11.1.0-16036546.tar.gz"

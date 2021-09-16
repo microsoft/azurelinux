@@ -1,6 +1,6 @@
  
 # https://github.com/open-policy-agent/opa
-%global goipath         github.com/open-policy-agent/opa
+%global goipath     github.com/open-policy-agent/opa
 
 # short_commit is used to display in opa version
 %global short_commit    e88ad165
@@ -18,6 +18,7 @@ License:        ASL 2.0 and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/open-policy-agent/opa
+#Source0:       https://github.com/open-policy-agent/opa/archive/refs/tags/v0.31.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 # Make telemetry opt-out
@@ -36,57 +37,28 @@ that enables unified, context-aware policy enforcement across the entire
 stack.
  
 %prep
-%autosetup -p1 -n opa-%{version}
+%autosetup -p1
 mv internal/jwx/LICENSE LICENSE-jwx
-#
-#%autosetup -p1
-#%autosetup -c -n %{name}-%{version}
-#%patch0 -p1
 
- 
 # Remove code related to wasm, as we have to disable wasm,
 # wasmtime not being packaged in Fedora yet
 rm resolver/wasm/wasm.go version/wasm.go
 rm internal/rego/opa/opa.go internal/wasm/sdk/opa/capabilities/capabilities.go
 rm -rf internal/wasm/sdk/internal/wasm internal/wasm/sdk/opa/opa.go
 
-#OPA
-#go build -tags=opa_wasm -o opa_linux_amd64 -ldflags " -X github.com/open-policy-agent/opa/version.Version=0.33.0-dev -X github.com/open-policy-agent/opa/version.Vcs=f0a29bf3-dirty -X github.com/open-policy-agent/opa/version.Timestamp=2021-09-14T17:55:37Z -X github.com/open-policy-agent/opa/version.Hostname=maxbr-desk"
-
-#FLAGS DURING TEST MAKE OF OPA
-#export LDFLAGS = "-X github.com/open-policy-agent/opa/version.Version=0.33.0-dev 
-#-X github.com/open-policy-agent/opa/version.Vcs=f0a29bf3-dirty 
-#-X github.com/open-policy-agent/opa/version.Timestamp=2021-09-14T17:55:37Z 
-#-X github.com/open-policy-agent/opa/version.Hostname=maxbr-desk"
-
-#HELM
-#go build  -trimpath -tags '' -ldflags '-w -s -X helm.sh/helm/v3/internal/version.metadata=unreleased -X helm.sh/helm/v3/internal/version.gitCommit=db2485b20c8f53d802f4fc98c2f95e1fc0460d15 -X helm.sh/helm/v3/internal/version.gitTreeState=clean  -X helm.sh/helm/v3/pkg/lint/rules.k8sVersionMajor=1 -X helm.sh/helm/v3/pkg/lint/rules.k8sVersionMinor=22 -X helm.sh/helm/v3/pkg/chartutil.k8sVersionMajor=1 -X helm.sh/helm/v3/pkg/chartutil.k8sVersionMinor=22' -o '/home/maxbr/helm/bin'/helm ./cmd/helm
-
-
 %build
-
 # create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
+go build -o /bin/generate-man ./build/generate-man
+go build -ldflags "-X %{goipath}/version.Version=%{version} -X %{goipath}/version.Vcs=%{short_commit}" -mod=vendor -v -a -o opa
+mkdir _man
+/bin/generate-man _man
+rm /bin/generate-man
 
-export LDFLAGS = "-X %{goipath}/version.Version=%{version} \
--X %{goipath}/version.Vcs=%{short_commit} \
--X %{goipath}/version.Timestamp=$(./build/get-build-timestamp.sh) "
-
-go build -ldflags "$LDFLAGS" -mod=vendor -v -a -o ./opa
-
-#######
-#%gobuild -o %{gobuilddir}/bin/generate-man %{goipath}/build/generate-man
-#export LDFLAGS="-X %{goipath}/version.Version=%{version} -X %{goipath}/version.Vcs=%{short_commit} -X %{goipath}/version.Timestamp=$(./build/get-build-timestamp.sh) "
-#%gobuild -o %{gobuilddir}/bin/opa %{goipath}
-#mkdir _man
-#%{gobuilddir}/bin/generate-man _man
-#rm %{gobuilddir}/bin/generate-man
- 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp opa                 %{buildroot}%{_bindir}/
 install -d -p -m 0755                   %{buildroot}%{_mandir}/man1
-install -D -p -m 0644 _man/*            %{buildroot}%{_mandir}/man1/
+install -D -p -m 0644 _man/*         %{buildroot}%{_mandir}/man1/
  
 %files
 %license LICENSE LICENSE-jwx
@@ -96,6 +68,11 @@ install -D -p -m 0644 _man/*            %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Thu Sep 16 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.31.0-2
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
+- License Verified
+- Remove unused/un-supported macro usage
+
 * Sun Aug 15 2021 Olivier Lemasle <o.lemasle@gmail.com> - 0.31.0-1
 - Update to latest upstream 0.31.0 (fixes rhbz#1987088)
  
