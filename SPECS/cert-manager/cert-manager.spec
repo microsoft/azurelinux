@@ -75,7 +75,11 @@ done
 
 %install
 mkdir -p %{buildroot}%{_bindir}
+%ifarch aarch64
+install -D -m0755 bazel-out/aarch64-fastbuild-ST-4c64f0b3d5c7/bin/cmd/ctl/kubectl-cert_manager %{buildroot}%{_bindir}/
+%else
 install -D -m0755 bazel-out/k8-fastbuild-ST-4c64f0b3d5c7/bin/cmd/ctl/kubectl-cert_manager %{buildroot}%{_bindir}/
+%endif
 install -D -m0755 bazel-bin/cmd/webhook/webhook_/webhook %{buildroot}%{_bindir}/
 install -D -m0755 bazel-bin/cmd/controller/controller_/controller %{buildroot}%{_bindir}/
 install -D -m0755 bazel-bin/cmd/cainjector/cainjector_/cainjector %{buildroot}%{_bindir}/
