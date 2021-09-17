@@ -19,7 +19,7 @@ index 825deff4..8847bb7b 100644
  # not finding -any- datasources is resolved.
  datasource_list: ['NoCloud', 'ConfigDrive', 'Azure', 'OpenStack', 'Ec2']
 +{% elif variant in ["mariner"] %}
-+datasource_list: ['NoCloud', 'OVF', 'ConfigDrive', 'OpenStack', 'VMware', None]
++datasource_list: ['NoCloud', 'ConfigDrive', 'OVF', 'OpenStack', 'VMware', None]
  {% endif %}
  # Example datasource config
  # datasource:
