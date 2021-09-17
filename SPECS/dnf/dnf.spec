@@ -1,10 +1,9 @@
 %global confdir %{_sysconfdir}/%{name}
-%global python3_sitelib %(%{_bindir}/python3 -c "import site; print(site.getsitepackages()[-1])")
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
-Version:        4.2.18
-Release:        4%{?dist}
+Version:        4.8.0
+Release:        1%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -138,6 +137,10 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-1
+- Upgrade to latest upstream version
+- Lint spec
+
 * Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.18-4
 - Use modern bash-completion directory, now that dnf can auto-detect it based on bash-completion.pc
 

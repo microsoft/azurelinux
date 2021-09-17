@@ -471,8 +471,9 @@ build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf
 
-# Build createrepo_c-0.11.1
-# createrepo_c needs glib
+# Build createrepo_c
+# createrepo_c needs file, glib
+chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
