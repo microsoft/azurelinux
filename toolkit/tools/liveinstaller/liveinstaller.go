@@ -63,8 +63,21 @@ func main() {
 	const imagerLogFile = "/var/log/imager.log"
 
 	app.Version(exe.ToolkitVersion)
-	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	// GBG TEST ----------------------------------
+	kingpin.MustParse(app.Parse(os.Args[1:]))
+	_, err := app.Parse(os.Args[1:])
+	if err != nil {
+		logger.Log.Debugf("Check boot param")
+		stdout, stderr, err := shell.Execute("cat", "/proc/cmdline")
+		if err != nil {
+			logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
+			os.Exit(1)
+		}
+		logger.Log.Debugf("Partprobe -s returned: %s", stdout)
+	}
+	// GBG TEST ----------------------------------
 
 	// Prevent a SIGINT (Ctr-C) from stopping liveinstaller while an installation is in progress.
 	// It is the responsibility of the installer's user interface (terminal installer or Calamares) to handle quit requests from the user.
