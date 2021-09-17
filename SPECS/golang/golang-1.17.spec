@@ -24,6 +24,7 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
+Provides:       go = %{version}-%{release}
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
