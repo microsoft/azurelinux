@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "cert-manager-1.5.3-gocache.tar.gz": "ee30afa5c4ecd326b13c03f0ce71cb593cc2f882800a127ee1159391ee81fea9",
-  "cert-manager-1.5.3-vendor.tar.gz": "6470a5ec26c340724d8ab3ad1462be96272ca2c64210f26ecb891faf9974a1c5",
+  "cert-manager-1.5.3-gocache.tar.gz": "314222bf36a5a5b16f2f2b58099c0d19b1fa5da1c80f4057d2ad41f3043ebe0c",
+  "cert-manager-1.5.3-vendor.tar.gz": "b6c17ee4daee33ad980e5b41cb1d04cde33468f64400044d5d799c97edba8cf2",
   "cert-manager-1.5.3.tar.gz": "48c451bfc87a9fadd575a05e586d80858ddf87e933c695293aff3f4782f3cbda"
  }
 }

@@ -16,7 +16,11 @@ Source0:        %{name}-%{version}.tar.gz
 #   4. patch -p1 < Fix-dependency-checksum.patch
 #   5. mkdir -p BAZEL_CACHE
 #   6. bazel fetch --repository_cache=BAZEL_CACHE //...
-#   7. tar -czvf %{name}-%{version}-vendor.tar.gz BAZEL_CACHE
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz BAZEL_CACHE
 Source1:        %{name}-%{version}-vendor.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
@@ -24,8 +28,12 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod download
-#   5. cd $GOPATH
-#   5. tar -czvf %{name}-%{version}-gocache.tar.gz ../go
+#   5. cd $HOME
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-gocache.tar.gz go
 Source2:        %{name}-%{version}-gocache.tar.gz
 Patch0:         Fix-dependency-checksum.patch
 Patch1:         Fix-os-WriteFile.patch
