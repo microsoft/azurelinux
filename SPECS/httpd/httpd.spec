@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,16 @@ Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        macros.httpd
+Source2:        httpd-ssl-pass-dialog
+Source3:        00-ssl.conf
+Source4:        01-ldap.conf
+Source5:        00-proxyhtml.conf
+Source6:        ssl.conf
+Source7:        01-session.conf
+Source8:        10-listen443.conf
+Source9:        httpd-init.service
+Source10:       httpd-ssl-gencerts
+
 Patch0:         httpd-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
 Patch2:         CVE-2020-13950.patch
@@ -18,13 +28,13 @@ Patch3:         CVE-2020-35452.patch
 Patch4:         CVE-2021-26690.patch
 Patch5:         CVE-2021-30641.patch
 Patch6:         CVE-2021-26691.patch
-
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100:       CVE-1999-0236.nopatch
 # CVE-1999-1412 applies only to MacOS X
 Patch101:       CVE-1999-1412.nopatch
 # CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
 Patch102:       CVE-2007-0086.nopatch
+
 BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
@@ -34,6 +44,7 @@ BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+
 Requires:       apr-util
 Requires:       lua
 Requires:       openldap
@@ -43,8 +54,9 @@ Requires(postun): %{_sbindir}/groupdel
 Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
+
 Provides:       apache2
-Provides:       %{name}-mmn = %{version}-%{release}
+Provides:       %{name}-mmn = %{mmn}
 Provides:       %{name}-filesystem = %{version}-%{release}
 
 %description
@@ -53,6 +65,7 @@ The Apache HTTP Server.
 %package devel
 Summary:        Header files for httpd
 Group:          Applications/System
+
 Requires:       apr-devel
 Requires:       apr-util-devel
 Requires:       httpd
@@ -63,6 +76,7 @@ These are the header files of httpd.
 %package docs
 Summary:        Help files for httpd
 Group:          Applications/System
+
 Requires:       httpd
 
 %description docs
@@ -74,6 +88,55 @@ Group:          System Environment/Daemons
 
 %description tools
 The httpd-tools of httpd.
+
+%package -n mod_ldap
+Summary:        LDAP authentication modules for the Apache HTTP Server
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+Requires:       apr-util-ldap
+
+%description -n mod_ldap
+The mod_ldap and mod_authnz_ldap modules add support for LDAP
+authentication to the Apache HTTP Server.
+
+%package -n mod_proxy_html
+Summary:        HTML and XML content filters for the Apache HTTP Server
+
+BuildRequires:  libxml2-devel
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+
+%description -n mod_proxy_html
+The mod_proxy_html and mod_xml2enc modules provide filters which can
+transform and modify HTML and XML content.
+
+%package -n mod_session
+Summary:        Session interface for the Apache HTTP Server
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+
+%description -n mod_session
+The mod_session module and associated backends provide an abstract
+interface for storing and accessing per-user session data.
+
+%package -n mod_ssl
+Summary:        SSL/TLS module for the Apache HTTP Server
+
+BuildRequires:  openssl-devel
+
+Requires:       %{_sbindir}/nologin
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-mmn = %{mmn}
+Requires:       sscg >= 2.2.0
+Requires(pre):  %{name}-filesystem
+
+%description -n mod_ssl
+The mod_ssl module provides strong cryptography for the Apache Web
+server via the Secure Sockets Layer (SSL) and Transport Layer
+Security (TLS) protocols.
 
 %prep
 %setup -q
@@ -87,21 +150,56 @@ The httpd-tools of httpd.
 
 %build
 %configure \
-            --prefix=%{_sysconfdir}/httpd          \
-            --exec-prefix=%{_prefix}               \
-            --sysconfdir=%{_confdir}/httpd/conf    \
-            --libexecdir=%{_libdir}/httpd/modules  \
             --datadir=%{_sysconfdir}/httpd         \
             --enable-authnz-fcgi                   \
             --enable-mods-shared="all cgi"         \
             --enable-mpms-shared=all               \
+            --enable-ssl                           \
+            --exec-prefix=%{_prefix}               \
+            --libexecdir=%{_libdir}/httpd/modules  \
+            --prefix=%{_sysconfdir}/httpd          \
+            --sysconfdir=%{_confdir}/httpd/conf    \
+            --with-apr-util=%{_prefix}             \
             --with-apr=%{_prefix}                  \
-            --with-apr-util=%{_prefix}
+            --with-ssl
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
+
+# Install systemd service files
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m 644 %{SOURCE9} %{buildroot}%{_unitdir}/httpd-init.service
+
+# install conf file/directory
+mkdir %{buildroot}%{_sysconfdir}/httpd/conf.d \
+      %{buildroot}%{_sysconfdir}/httpd/conf.modules.d
+for conf in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE7}; do
+  install -m 644 -p $conf %{buildroot}%{_sysconfdir}/httpd/conf.modules.d/$(basename $conf)
+done
+
+install -m 644 -p %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/ssl.conf
+
+# install systemd override drop directory
+# Web application packages can drop snippets into this location if
+# they need ExecStart[pre|post].
+mkdir %{buildroot}%{_unitdir}/httpd.service.d
+mkdir %{buildroot}%{_unitdir}/httpd.socket.d
+
+install -m 644 -p %{SOURCE8} %{buildroot}%{_unitdir}/httpd.socket.d/10-listen443.conf
+
+# Create cache directory
+mkdir -p %{buildroot}%{_localstatedir}/cache/httpd \
+         %{buildroot}%{_localstatedir}/cache/httpd/proxy \
+         %{buildroot}%{_localstatedir}/cache/httpd/ssl
+
+# install 'http-ssl-gencerts' and 'http-ssl-pass-dialog'
+mkdir -p %{buildroot}%{_libexecdir}
+for exec in %{SOURCE2} %{SOURCE10}; do
+  install -m 644 -p $exec %{buildroot}%{_libexecdir}/$(basename $exec)
+done
+
 install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_sysconfdir}/httpd/logs
 
@@ -188,6 +286,12 @@ fi
 %files
 %defattr(-,root,root)
 %{_libdir}/httpd/*
+%exclude %{_libdir}/httpd/modules/mod_auth_form.so
+%exclude %{_libdir}/httpd/modules/mod_*ldap.so
+%exclude %{_libdir}/httpd/modules/mod_proxy_html.so
+%exclude %{_libdir}/httpd/modules/mod_session*.so
+%exclude %{_libdir}/httpd/modules/mod_ssl.so
+%exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 %{_bindir}/*
 %exclude %{_bindir}/apxs
 %exclude %{_bindir}/dbmmanage
@@ -218,11 +322,43 @@ fi
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
+%files -n mod_ldap
+%{_libdir}/httpd/modules/mod_*ldap.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+
+%files -n mod_proxy_html
+%{_libdir}/httpd/modules/mod_proxy_html.so
+%{_libdir}/httpd/modules/mod_xml2enc.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+
+%files -n mod_session
+%{_libdir}/httpd/modules/mod_session*.so
+%{_libdir}/httpd/modules/mod_auth_form.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+
+%files -n mod_ssl
+%{_libdir}/httpd/modules/mod_ssl.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
+%attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
+%{_unitdir}/httpd.socket.d/10-listen443.conf
+%{_unitdir}/httpd-init.service
+%{_libexecdir}/httpd-ssl-gencerts
+%{_libexecdir}/httpd-ssl-pass-dialog
+
 %changelog
-* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5 (from 1.0 branch)
+* Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
+- Fixing invalid past release numbering in the changelog.
+- Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:
+  - mod_ldap,
+  - mod_proxy_html,
+  - mod_session,
+  - mod_ssl.
+
+* Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-7
 - CVE-2021-26691 fix
 
-* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-4 (from 1.0 branch)
+* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-6
 - CVE-2020-13950 CVE-2021-26690 CVE-2021-30641 and CVE-2020-35452 fixes
 
 * Wed Apr 07 2021 Henry Li <lihl@microsoft.com> - 2.4.46-5

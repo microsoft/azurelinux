@@ -1,0 +1,12 @@
+The source for this package does not include a copy of the license text.
+However, from the contents of "Makefile.PL" we deduce the license is GPL:
+
+"
+(...)
+WriteMakefile(
+    'NAME' => 'generators',
+    'VERSION' => '1.11',
+    'AUTHOR' => 'Jitka Plesnikova <jplesnik@redhat.com>',
+    'LICENSE' => 'gpl',
+...
+"

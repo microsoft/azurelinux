@@ -1186,6 +1186,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ding-libs",
+          "version": "0.6.1",
+          "downloadUrl": " https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dkms",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/dell/dkms/archive/v2.8.1.tar.gz"
@@ -2261,6 +2271,16 @@
           "name": "helm",
           "version": "3.4.1",
           "downloadUrl": "https://github.com/helm/helm/archive/v3.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "help2man",
+          "version": "1.47.14",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.47.14.tar.xz"
         }
       }
     },
@@ -5431,6 +5451,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Fedora-VSP",
+          "version": "0.001",
+          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-File-pushd",
           "version": "1.016",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-pushd-1.016.tar.gz"
@@ -5444,6 +5474,16 @@
           "name": "perl-File-Which",
           "version": "1.22",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.22.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-generators",
+          "version": "1.11",
+          "downloadUrl": "http://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
         }
       }
     },
@@ -8505,6 +8545,16 @@
           "name": "squashfs-tools",
           "version": "4.3",
           "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sscg",
+          "version": "2.6.2",
+          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
         }
       }
     },
