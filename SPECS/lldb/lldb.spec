@@ -1,8 +1,8 @@
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        8.0.1
-Release:        4%{?dist}
+Version:        12.0.1
+Release:        1%{?dist}
 License:        NCSA
 URL:            https://lldb.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
@@ -101,6 +101,9 @@ rm -rf %{buildroot}/*
 %{python2_sitelib}/*
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
+- Update to 12.0.1
+
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 8.0.1-4
 -   Explicitly set python verison.
 *   Fri Jun 12 2020 Henry Beberman <henry.beberman@microsoft.com> 8.0.1-3
