@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -138,12 +138,20 @@ Provides:       %{name}-efi-x64 = %{version}-%{release}
 GRUB UEFI bootloader binaries
 
 %prep
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+export LDFLAGS
+
 %autosetup -p1 -n grub-2.06-rc1
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
 
 %build
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+export LDFLAGS
+
 export PYTHON=%{python3}
 ./bootstrap --no-git --gnulib-srcdir=./gnulib
 %ifarch x86_64
@@ -305,6 +313,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Tue Sep 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
+- Disable module_info.ld script due to issue with ELF metadata note
+
 * Tue Jul 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06~rc1-6
 - License verified.
 - Adding 'Provides' for:
