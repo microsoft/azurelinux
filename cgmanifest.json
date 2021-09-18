@@ -1684,6 +1684,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glide",
+          "version": "0.13.3",
+          "downloadUrl": "https://github.com/Masterminds/glide/archive/v0.13.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "glproto",
           "version": "1.4.17",
           "downloadUrl": "https://www.x.org/pub/individual/proto/glproto-1.4.17.tar.bz2"
@@ -2147,6 +2157,16 @@
           "name": "iproute",
           "version": "4.18.0",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-4.18.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ipsec-tools",
+          "version": "0.8.2",
+          "downloadUrl": "ftp://ftp.netbsd.org/pub/NetBSD/misc/ipsec-tools/0.8/ipsec-tools-0.8.2.tar.bz2"
         }
       }
     },
@@ -4364,6 +4384,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netplan",
+          "version": "0.95",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nettle",
           "version": "3.7.3",
           "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.3.tar.gz"
@@ -5567,6 +5597,16 @@
           "name": "pugixml",
           "version": "1.10",
           "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pwgen",
+          "version": "2.08",
+          "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
         }
       }
     },

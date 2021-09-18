@@ -1,0 +1,7 @@
+# file for pre-shared keys used for IKE authentication
+# format is:  'identifier' 'key'
+# For example:
+#
+#  10.1.1.1		flibbertigibbet
+#  www.example.com      12345
+#  foo@www.example.com  micropachycephalosaurus

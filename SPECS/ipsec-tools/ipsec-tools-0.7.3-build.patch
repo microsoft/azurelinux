@@ -1,0 +1,39 @@
+diff -up ipsec-tools-0.7.3/configure.ac.build ipsec-tools-0.7.3/configure.ac
+--- ipsec-tools-0.7.3/configure.ac.build	2010-12-07 18:36:22.000000000 +0100
++++ ipsec-tools-0.7.3/configure.ac	2011-02-10 10:26:24.000000000 +0100
+@@ -315,7 +315,7 @@ if test "$libiconv_dir" != "no"; then
+ 			AC_MSG_ERROR([ICONV libs or includes not found. Aborting.])
+ 	  	fi
+ 	fi
+-	LIBS="$LIBS -L$libiconv_dir/lib -R$libiconv_dir/lib -liconv"
++	LIBS="$LIBS -L$libiconv_dir/lib -liconv"
+ 	AC_CHECK_FUNCS(iconv_open)
+ fi
+ 
+@@ -379,7 +379,7 @@ if test "$libradius_dir" != "no"; then
+ 	  	fi
+ 	fi
+ 	AC_DEFINE([HAVE_LIBRADIUS], [], [Hybrid authentication uses RADIUS])
+-	LIBS="$LIBS -L$libradius_dir/lib -R$libradius_dir/lib -lradius"
++	LIBS="$LIBS -L$libradius_dir/lib -lradius"
+ 	AC_CHECK_FUNCS(rad_create_request)
+ fi
+ 
+@@ -405,7 +405,7 @@ if test "$libpam_dir" != "no"; then
+ 	  	fi
+ 	fi
+ 	AC_DEFINE([HAVE_LIBPAM], [], [Hybrid authentication uses PAM])
+-	LIBS="$LIBS -L$libpam_dir/lib -R$libpam_dir/lib -lpam"
++	LIBS="$LIBS -L$libpam_dir/lib -lpam"
+ 	AC_CHECK_FUNCS(pam_start)
+ fi
+ 
+@@ -431,7 +431,7 @@ if test "$libldap_dir" != "no"; then
+ 	  	fi
+ 	fi
+ 	AC_DEFINE([HAVE_LIBLDAP], [], [Hybrid authentication uses LDAP])
+-	LIBS="$LIBS -L$libldap_dir/lib -R$libldap_dir/lib -lldap"
++	LIBS="$LIBS -L$libldap_dir/lib -lldap"
+ 
+ 	saved_CFLAGS=$CFLAGS
+ 	CFLAGS="$CFLAGS -Wall -Werror"

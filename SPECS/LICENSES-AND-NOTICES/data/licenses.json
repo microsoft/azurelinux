@@ -71,6 +71,7 @@
         "libstoragemgmt",
         "libxcrypt",
         "libzip",
+        "ipsec-tools",
         "mailcap",
         "mcstrans",
         "mokutil",
@@ -93,6 +94,7 @@
         "perl-String-ShellQuote",
         "policycoreutils",
         "pugixml",
+        "pwgen",
         "pyelftools",
         "python-google-auth",
         "python-jwt",
@@ -412,6 +414,7 @@
         "glib-networking",
         "glibc",
         "glibmm24",
+        "glide",
         "gmp",
         "gnome-common",
         "gnupg2",
@@ -859,6 +862,13 @@
       "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
       "specs": [
         "ceph"
+      ]
+    },
+    {
+      "origin": "netplan",
+      "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
+      "specs": [
+        "netplan"
       ]
     },
     {

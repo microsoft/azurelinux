@@ -1,0 +1,303 @@
+#!/bin/sh
+#
+# ifup-ipsec
+#
+# Brings up ipsec interfaces
+
+handle_keys() {
+    [ -z "$KEY_AH_IN" -a -n "$KEY_AH" ] && KEY_AH_IN=$KEY_AH
+    [ -z "$KEY_AH_OUT" -a -n "$KEY_AH" ] && KEY_AH_OUT=$KEY_AH
+    [ -z "$KEY_ESP_IN" -a -n "$KEY_ESP" ] && KEY_ESP_IN=$KEY_ESP
+    [ -z "$KEY_ESP_OUT" -a -n "$KEY_ESP" ] && KEY_ESP_OUT=$KEY_ESP
+    [ -z "$KEY_AESP_IN" -a -n "$KEY_AESP" ] && KEY_AESP_IN=$KEY_AESP
+    [ -z "$KEY_AESP_OUT" -a -n "$KEY_AESP" ] && KEY_AESP_OUT=$KEY_AESP
+
+    [ -n "$KEY_AH_IN" -a "$KEY_AH_IN" = "${KEY_AH_IN##0x}" ] \
+	&& KEY_AH_IN=\"$KEY_AH_IN\"
+    [ -n "$KEY_AH_OUT" -a "$KEY_AH_OUT" = "${KEY_AH_OUT##0x}" ] \
+	&& KEY_AH_OUT=\"$KEY_AH_OUT\"
+    [ -n "$KEY_ESP_IN" -a "$KEY_ESP_IN" = "${KEY_ESP_IN##0x}" ] \
+	&& KEY_ESP_IN=\"$KEY_ESP_IN\"
+    [ -n "$KEY_ESP_OUT" -a "$KEY_ESP_OUT" = "${KEY_ESP_OUT##0x}" ] \
+	&& KEY_ESP_OUT=\"$KEY_ESP_OUT\"
+    [ -n "$KEY_AESP_IN" -a "$KEY_AESP_IN" = "${KEY_AESP_IN##0x}" ] \
+	&& KEY_AESP_IN=\"$KEY_AESP_IN\"
+    [ -n "$KEY_AESP_OUT" -a "$KEY_AESP_OUT" = "${KEY_AESP_OUT##0x}" ] \
+	&& KEY_AESP_OUT=\"$KEY_AESP_OUT\"
+}
+
+query_route() {
+    local attr=$1
+    shift
+    ip -o route "$@" | sed "s|.*$attr \([^ ]*\).*|\1|"
+}
+
+get_route() {
+    query_route src get to $1
+}
+
+. /etc/init.d/functions
+cd /etc/sysconfig/network-scripts
+. ./network-functions
+
+CONFIG=$1
+[ -f "${CONFIG}" ] || CONFIG=ifcfg-${1}
+source_config
+
+handle_keys
+
+if [ -n "$KEY_AH" -o -n "$KEY_ESP" ]; then
+  KEYING=manual
+fi
+
+
+if [ -n "$IKE_PSK" ]; then
+  KEYING=automatic
+  IKE_METHOD=PSK
+fi
+
+if [ -n "$IKE_CERTFILE" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+
+if [ -n "$IKE_PEER_CERTFILE" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+
+if [ -n "$IKE_DNSSEC" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+
+[ -n "$IKE_METHOD" ] && KEYING=automatic
+[ -z "$KEYING" ] && KEYING=manual
+
+if [ -z "$SRC" ]; then
+    SRC=$(get_route $DST)
+fi
+
+if [ -n "$SRCNET" -o -n "$DSTNET" ]; then
+  TUNNEL_MODE=yes
+  MODE=tunnel
+  [ -z "$SRCNET" ] && SRCNET="$SRC/32"
+  [ -z "$DSTNET" ] && DSTNET="$DST/32"
+  SPD_SRC=$SRCNET
+  SPD_DST=$DSTNET
+  # If SRCNET is a subnet of DSTNET, exclude SRCNET<->SRCNET communication
+  if [ "${SRCNET##*/}" -gt "${DSTNET##*/}" ] \
+      && [ "$(ipcalc -n "${SRCNET%%/*}/${DSTNET##*/}")" \
+           = "NETWORK=${DSTNET%%/*}" ]; then
+    EXCLUDE_SRCNET=yes
+  fi
+  [ -z "$SRCGW" ] && SRCGW=$(get_route $SRCNET)
+  ROUTE="to $DSTNET via $SRCGW src $SRCGW"
+  ip route add $ROUTE
+  for dev in all $(query_route dev list $ROUTE); do
+    sysctl -w net.ipv4.conf.$dev.send_redirects=0 > /dev/null
+  done
+else
+  unset TUNNEL_MODE
+  MODE=transport
+  SPD_SRC=$SRC
+  SPD_DST=$DST
+  unset EXCLUDE_SRCNET
+fi
+
+unset SPD_AH_IN SPD_AH_OUT SPD_ESP_IN SPD_ESP_OUT
+if [ "$KEYING" = "manual" ]; then
+    [ -z "$AH_PROTO" ] && AH_PROTO=hmac-sha1
+    [ -z "$ESP_PROTO" ] && ESP_PROTO=3des-cbc
+    [ -z "$AESP_PROTO" ] && AESP_PROTO=hmac-sha1
+
+    [ -n "$KEY_AH_IN" ] && SPD_AH_IN=yes
+    [ -n "$KEY_AH_OUT" ] && SPD_AH_OUT=yes
+    [ -n "$KEY_ESP_IN" ] && SPD_ESP_IN=yes
+    [ -n "$KEY_ESP_OUT" ] && SPD_ESP_OUT=yes
+else
+    [ -z "$IKE_DHGROUP" ] && IKE_DHGROUP=2
+    [ -z "$AH_PROTO" ] && AH_PROTO=sha1
+    [ -z "$ESP_PROTO" ] && ESP_PROTO=3des
+    [ -z "$IKE_AUTH" ] && IKE_AUTH=$AH_PROTO
+    [ -z "$IKE_ENC" ] && IKE_ENC=$ESP_PROTO
+    [ "$IKE_AUTH" = "none" ] && IKE_AUTH=sha1
+    [ "$IKE_ENC" = "none" ] && IKE_ENC=3des
+
+    SPD_AH_IN=yes
+    SPD_AH_OUT=yes
+    SPD_ESP_IN=yes
+    SPD_ESP_OUT=yes
+fi
+
+if [ "$AH_PROTO" = "none" ]; then
+    unset SPI_AH_IN SPI_AH_OUT KEY_AH_IN KEY_AH_OUT SPD_AH_IN SPD_AH_OUT
+fi
+if [ "$ESP_PROTO" = "none" ]; then
+    unset SPI_ESP_IN SPI_ESP_OUT KEY_ESP_IN KEY_ESP_OUT SPD_ESP_IN SPD_ESP_OUT
+fi
+
+/sbin/setkey -c >/dev/null 2>&1 << EOF
+${SPI_AH_OUT:+delete $SRC $DST ah $SPI_AH_OUT;}
+${SPI_AH_IN:+delete $DST $SRC ah $SPI_AH_IN;}
+${SPI_ESP_OUT:+delete $SRC $DST esp $SPI_ESP_OUT;}
+${SPI_ESP_IN:+delete $DST $SRC esp $SPI_ESP_IN;}
+spddelete $SPD_SRC $SPD_DST any -P out;
+spddelete $SPD_DST $SPD_SRC any -P in;
+${EXCLUDE_SRCNET:+spddelete $SPD_SRC $SPD_SRC any -P out;}
+${EXCLUDE_SRCNET:+spddelete $SPD_SRC $SPD_SRC any -P in;}
+EOF
+
+# ESP
+if [ "$ESP_PROTO" != "none" ]; then
+    /sbin/setkey -c >/dev/null 2>&1 << EOF
+    ${KEY_ESP_IN:+add $DST $SRC esp $SPI_ESP_IN ${TUNNEL_MODE:+-m tunnel} \
+    -E ${ESP_PROTO_IN:-$ESP_PROTO} $KEY_ESP_IN \
+    ${KEY_AESP_IN:+-A ${AESP_PROTO_IN:-$AESP_PROTO} $KEY_AESP_IN}
+    ;}
+    ${KEY_ESP_OUT:+add $SRC $DST esp $SPI_ESP_OUT ${TUNNEL_MODE:+-m tunnel} \
+    -E ${ESP_PROTO_OUT:-$ESP_PROTO} $KEY_ESP_OUT \
+    ${KEY_AESP_OUT:+-A ${AESP_PROTO_OUT:-$AESP_PROTO} $KEY_AESP_OUT}
+    ;}
+EOF
+fi
+
+# AH
+if [ "$AH_PROTO" != "none" ]; then
+    /sbin/setkey -c >/dev/null 2>&1 << EOF
+    ${KEY_AH_IN:+add $DST $SRC ah $SPI_AH_IN ${TUNNEL_MODE:+-m tunnel} -A ${AH_PROTO_IN:-$AH_PROTO} $KEY_AH_IN;}
+    ${KEY_AH_OUT:+add $SRC $DST ah $SPI_AH_OUT ${TUNNEL_MODE:+-m tunnel} -A ${AH_PROTO_OUT:-$AH_PROTO} $KEY_AH_OUT;}
+EOF
+fi
+
+/sbin/setkey -c >/dev/null 2>&1 << EOF
+${EXCLUDE_SRCNET:+spdadd $SPD_SRC $SPD_SRC any -P out none;}
+${EXCLUDE_SRCNET:+spdadd $SPD_SRC $SPD_SRC any -P in none;}
+EOF
+
+# This looks weird but if you use both ESP and AH you need to configure them together, not seperately.
+if [ "$ESP_PROTO" != "none" ] && [ "$AH_PROTO" != "none" ]; then
+/sbin/setkey -c >/dev/null 2>&1 << EOF
+spdadd $SPD_SRC $SPD_DST any -P out ipsec
+            ${SPD_ESP_OUT:+esp/$MODE/${TUNNEL_MODE:+$SRC-$DST}/require}
+            ${SPD_AH_OUT:+ah/$MODE/${TUNNEL_MODE:+$SRC-$DST}/require}
+	    ;
+
+spdadd $SPD_DST $SPD_SRC any -P in ipsec
+	    ${SPD_ESP_IN:+esp/$MODE/${TUNNEL_MODE:+$DST-$SRC}/require}
+	    ${SPD_AH_IN:+ah/$MODE/${TUNNEL_MODE:+$DST-$SRC}/require}
+	    ;
+EOF
+elif [ "$AH_PROTO" = "none" ]; then
+/sbin/setkey -c >/dev/null 2>&1 << EOF
+spdadd $SPD_SRC $SPD_DST any -P out ipsec
+            ${SPD_ESP_OUT:+esp/$MODE/${TUNNEL_MODE:+$SRC-$DST}/require}
+	    ;
+
+spdadd $SPD_DST $SPD_SRC any -P in ipsec
+	    ${SPD_ESP_IN:+esp/$MODE/${TUNNEL_MODE:+$DST-$SRC}/require}
+	    ;
+EOF
+elif [ "$ESP_PROTO" = "none" ]; then
+/sbin/setkey -c >/dev/null 2>&1 << EOF
+spdadd $SPD_SRC $SPD_DST any -P out ipsec
+            ${SPD_AH_OUT:+ah/$MODE/${TUNNEL_MODE:+$SRC-$DST}/require}
+	    ;
+
+spdadd $SPD_DST $SPD_SRC any -P in ipsec
+	    ${SPD_AH_IN:+ah/$MODE/${TUNNEL_MODE:+$DST-$SRC}/require}
+	    ;
+EOF
+fi
+
+if [ "$KEYING" = "automatic" -a -n "$IKE_METHOD" ]; then
+    if [ "$IKE_METHOD" = "PSK" ]; then
+       MYID=address
+       if [ -n "$MYID_TYPE" ]; then
+          case "$MYID_TYPE" in
+             *fqdn*)
+                 MYID="$MYID_TYPE \"$MYID_VALUE\""
+             ;;
+          esac
+       fi
+       tmpfile=$(mktemp /etc/racoon/psk.XXXXXX)
+       grep -v "^$DST " /etc/racoon/psk.txt > $tmpfile
+       echo "$DST  $IKE_PSK" >> $tmpfile
+       mv -f $tmpfile /etc/racoon/psk.txt
+    fi
+    if [ ! -f /etc/racoon/$DST.conf ] || [ /etc/racoon/$DST.conf -ot $1 ] ; then
+        cat > /etc/racoon/$DST.conf << EOF
+remote $DST
+{
+	${REMOTE_ID:+ph1id $REMOTE_ID;}
+	exchange_mode ${IKE_MODE:-main, aggressive};
+EOF
+	if [ -n "$DPD_DELAY" ]; then
+	    echo "        dpd_delay $DPD_DELAY;" >> /etc/racoon/$DST.conf
+	fi
+	if [ -n "$NAT_TRAVERSAL" ]; then
+	    echo "        nat_traversal $NAT_TRAVERSAL;" >> /etc/racoon/$DST.conf
+	fi
+        case "$IKE_METHOD" in
+           PSK)
+	      cat >> /etc/racoon/$DST.conf << EOF
+	my_identifier $MYID;
+	proposal {
+	        encryption_algorithm $IKE_ENC;
+		hash_algorithm $IKE_AUTH;
+		authentication_method pre_shared_key;
+		dh_group $IKE_DHGROUP;
+	}
+}
+EOF
+              ;;
+           X509)
+	      cat >> /etc/racoon/$DST.conf << EOF
+	my_identifier asn1dn;
+	peers_identifier asn1dn;
+	certificate_type x509 "$IKE_CERTFILE.public" "$IKE_CERTFILE.private";
+EOF
+	      if [ -n "$IKE_DNSSEC" ]; then
+	          echo "        peers_certfile dnssec;" >> /etc/racoon/$DST.conf
+	      fi
+	      if [ -n "$IKE_PEER_CERTFILE" ]; then
+	          echo "        peers_certfile x509 \"$IKE_PEER_CERTFILE.public\";" >> /etc/racoon/$DST.conf
+	      fi
+	      if [ -n "$IKE_CA_CERTFILE" ]; then
+	          echo "        ca_type x509 \"$IKE_CA_CERTFILE.public\";" >> /etc/racoon/$DST.conf
+	      fi
+	      cat >> /etc/racoon/$DST.conf << EOF
+        proposal {
+	        encryption_algorithm $IKE_ENC;
+		hash_algorithm $IKE_AUTH;
+		authentication_method rsasig;
+		dh_group $IKE_DHGROUP;
+	}
+}
+EOF
+              ;;
+	   GSSAPI)
+	      cat >> /etc/racoon/$DST.conf << EOF
+	my_identifier address;
+	proposal {
+	        encryption_algorithm $IKE_ENC;
+		hash_algorithm $IKE_AUTH;
+		authentication_method gssapi_krb;
+		dh_group $IKE_DHGROUP;
+	}
+}
+EOF
+         esac
+    fi
+    racoontmp=$(mktemp /etc/racoon/racoon.XXXXXX)
+    grep -v "^include \"/etc/racoon/$DST.conf\";" /etc/racoon/racoon.conf >> $racoontmp
+    echo "include \"/etc/racoon/$DST.conf\";" >> $racoontmp
+    mv -f $racoontmp /etc/racoon/racoon.conf
+fi
+if [ "$KEYING" = "automatic" ]; then
+    if ! pidof -x /usr/sbin/racoon > /dev/null 2>&1 ; then
+       /usr/sbin/racoon
+    elif [ -n "$IKE_METHOD" ]; then
+	killall -HUP racoon
+    fi
+fi

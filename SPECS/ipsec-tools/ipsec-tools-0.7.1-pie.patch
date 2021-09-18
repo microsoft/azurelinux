@@ -1,0 +1,32 @@
+diff -up ipsec-tools-0.7.1/src/racoon/Makefile.am.pie ipsec-tools-0.7.1/src/racoon/Makefile.am
+--- ipsec-tools-0.7.1/src/racoon/Makefile.am.pie	2008-10-17 14:13:24.000000000 +0200
++++ ipsec-tools-0.7.1/src/racoon/Makefile.am	2008-10-17 14:16:53.000000000 +0200
+@@ -12,7 +12,7 @@ adminsockdir=${localstatedir}/racoon
+ BUILT_SOURCES = cfparse.h prsa_par.h
+ INCLUDES = -I${srcdir}/../libipsec 
+ AM_CFLAGS = -D_GNU_SOURCE @GLIBC_BUGS@ -DSYSCONFDIR=\"${sysconfdir}\" \
+-	-DADMINPORTDIR=\"${adminsockdir}\"
++	-DADMINPORTDIR=\"${adminsockdir}\" -fPIE
+ AM_LDFLAGS = @EXTRA_CRYPTO@ -lcrypto
+ AM_YFLAGS = -d ${$*_YFLAGS}
+ AM_LFLAGS = ${$*_LFLAGS}
+@@ -38,6 +38,7 @@ racoon_SOURCES = \
+ 	cftoken.l cfparse.y prsa_tok.l prsa_par.y 
+ EXTRA_racoon_SOURCES = isakmp_xauth.c isakmp_cfg.c isakmp_unity.c throttle.c \
+ 	isakmp_frag.c nattraversal.c security.c $(MISSING_ALGOS)
++racoon_LDFLAGS = -pie -Wl,-z,relro
+ racoon_LDADD = $(CRYPTOBJS) $(HYBRID_OBJS) $(NATT_OBJS) $(FRAG_OBJS) $(LEXLIB) \
+ 	 $(SECCTX_OBJS) vmbuf.o sockmisc.o misc.o ../libipsec/libipsec.la @AUDIT_LIBS@
+ racoon_DEPENDENCIES = \
+diff -up ipsec-tools-0.7.1/src/libipsec/Makefile.am.pie ipsec-tools-0.7.1/src/libipsec/Makefile.am
+--- ipsec-tools-0.7.1/src/libipsec/Makefile.am.pie	2008-07-23 11:07:03.000000000 +0200
++++ ipsec-tools-0.7.1/src/libipsec/Makefile.am	2008-10-17 14:13:24.000000000 +0200
+@@ -7,7 +7,7 @@ libipsec_HEADERS = libpfkey.h
+ 
+ man3_MANS = ipsec_set_policy.3 ipsec_strerror.3
+ 
+-AM_CFLAGS = @GLIBC_BUGS@
++AM_CFLAGS = @GLIBC_BUGS@ -fPIE
+ AM_YFLAGS = -d -p __libipsec
+ AM_LFLAGS = -P__libipsec -olex.yy.c
+ 

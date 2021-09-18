@@ -1,0 +1,33 @@
+diff -up ipsec-tools-0.7.3/src/racoon/doc/README.gssapi ipsec-tools-0.7.3/src/racoon/doc/README
+diff -up ipsec-tools-0.7.3/src/racoon/gssapi.c.gssapi ipsec-tools-0.7.3/src/racoon/gssapi.c
+--- ipsec-tools-0.7.3/src/racoon/gssapi.c.gssapi	2006-09-09 18:22:09.000000000 +0200
++++ ipsec-tools-0.7.3/src/racoon/gssapi.c	2009-09-25 15:55:05.000000000 +0200
+@@ -215,7 +215,7 @@ gssapi_init(struct ph1handle *iph1)
+ 	} else
+ 		gssapi_get_default_name(iph1, 0, &princ);
+ 
+-	maj_stat = gss_canonicalize_name(&min_stat, princ, GSS_C_NO_OID,
++	maj_stat = gss_canonicalize_name(&min_stat, princ, (gss_OID_desc *)gss_mech_krb5,
+ 	    &canon_princ);
+ 	if (GSS_ERROR(maj_stat)) {
+ 		gssapi_error(min_stat, LOCATION, "canonicalize name\n");
+@@ -695,7 +695,7 @@ gssapi_get_id(struct ph1handle *iph1)
+ 	if (gssapi_get_default_name(iph1, 0, &defname) < 0)
+ 		return NULL;
+ 
+-	maj_stat = gss_canonicalize_name(&min_stat, defname, GSS_C_NO_OID,
++	maj_stat = gss_canonicalize_name(&min_stat, defname, (gss_OID_desc *)gss_mech_krb5,
+ 	    &canon_name);
+ 	if (GSS_ERROR(maj_stat)) {
+ 		gssapi_error(min_stat, LOCATION, "canonicalize name\n");
+diff -up ipsec-tools-0.7.3/src/racoon/gssapi.h.gssapi ipsec-tools-0.7.3/src/racoon/gssapi.h
+--- ipsec-tools-0.7.3/src/racoon/gssapi.h.gssapi	2006-09-09 18:22:09.000000000 +0200
++++ ipsec-tools-0.7.3/src/racoon/gssapi.h	2009-09-25 15:53:29.000000000 +0200
+@@ -38,6 +38,7 @@
+ #include "/usr/include/gssapi.h"
+ #else
+ #include <gssapi/gssapi.h>
++#include <gssapi/gssapi_krb5.h>
+ #endif
+ 
+ #define GSSAPI_DEF_NAME         "host"

@@ -1,0 +1,36 @@
+diff -up ipsec-tools-0.7.2/src/racoon/crypto_openssl.c.moreleaks ipsec-tools-0.7.2/src/racoon/crypto_openssl.c
+--- ipsec-tools-0.7.2/src/racoon/crypto_openssl.c.moreleaks	2009-04-20 15:33:30.000000000 +0200
++++ ipsec-tools-0.7.2/src/racoon/crypto_openssl.c	2009-05-13 20:07:27.000000000 +0200
+@@ -201,26 +201,24 @@ eay_str2asn1dn(str, len)
+ 	}
+ 
+ 	i = i2d_X509_NAME(name, NULL);
+-	if (!i)
++	if (i <= 0)
+ 		goto err;
+ 	ret = vmalloc(i);
+ 	if (!ret)
+ 		goto err;
+ 	p = ret->v;
+ 	i = i2d_X509_NAME(name, (void *)&p);
+-	if (!i)
+-		goto err;
+-
+-	return ret;
++	if (i <= 0) {
++		vfree(ret);
++		ret = NULL;
++	}
+ 
+     err:
+ 	if (buf)
+ 		racoon_free(buf);
+ 	if (name)
+ 		X509_NAME_free(name);
+-	if (ret)
+-		vfree(ret);
+-	return NULL;
++	return ret;
+ }
+ 
+ /*

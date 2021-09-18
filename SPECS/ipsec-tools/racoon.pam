@@ -1,0 +1,8 @@
+#%PAM-1.0
+# do not allow ipsec xauth for root
+auth       required     pam_succeed_if.so user != root
+auth       include      password-auth
+account    required     pam_nologin.so
+account    include      password-auth
+password   include      password-auth
+session    include      password-auth

@@ -1,0 +1,86 @@
+#!/bin/bash
+PATH=/sbin:/usr/sbin/:/bin:/usr/bin
+
+cd /etc/sysconfig/network-scripts
+. ./network-functions
+
+CONFIG=$1
+[ -f "${CONFIG}" ] || CONFIG=ifcfg-${1}
+source_config
+
+if [ -n "$KEY_AH" -o -n "$KEY_ESP" ]; then
+  KEYING=manual
+fi
+
+
+if [ -n "$IKE_PSK" ]; then
+  KEYING=automatic
+  IKE_METHOD=PSK
+fi
+
+if [ -n "$IKE_CERTFILE" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+
+if [ -n "$IKE_PEER_CERTFILE" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+
+if [ -n "$IKE_DNSSEC" ]; then
+  KEYING=automatic
+  IKE_METHOD=X509
+fi
+if [ -n "$RSA_KEY" ]; then
+  KEYING=automatic
+  IKE_METHOD=RSA
+fi
+
+[ -n "$IKE_METHOD" ] && KEYING=automatic
+[ -z "$KEYING" ] && KEYING=manual
+
+if [ -z "$SRC" ]; then
+    SRC=$(ip -o route get to $DST | sed "s|.*src \([^ ]*\).*|\1|")
+fi
+
+if [ -n "$SRCNET" -o -n "$DSTNET" ]; then
+  MODE=tunnel
+  [ -z "$SRCNET" ] && SRCNET="$SRC/32"
+  [ -z "$DSTNET" ] && DSTNET="$DST/32"
+  SPD_SRC=$SRCNET
+  SPD_DST=$DSTNET
+  # If SRCNET is a subnet of DSTNET, exclude SRCNET<->SRCNET communication
+  if [ "${SRCNET##*/}" -gt "${DSTNET##*/}" ] \
+      && [ "$(ipcalc -n "${SRCNET%%/*}/${DSTNET##*/}")" \
+           = "NETWORK=${DSTNET%%/*}" ]; then
+    EXCLUDE_SRCNET=yes
+  fi
+  [ -z "$SRCGW" ] && SRCGW=$(ip -o route get to $SRCNET | sed "s|.*src \([^ ]*\).*|\1|")
+  ip route del to $DSTNET via $SRCGW src $SRCGW
+else
+  MODE=transport
+  SPD_SRC=$SRC
+  SPD_DST=$DST
+  unset EXCLUDE_SRCNET
+fi
+
+setkey -c << EOF
+${SPI_AH_OUT:+delete $SRC $DST ah $SPI_AH_OUT;}
+${SPI_AH_IN:+delete $DST $SRC ah $SPI_AH_IN;}
+${SPI_ESP_OUT:+delete $SRC $DST esp $SPI_ESP_OUT;}
+${SPI_ESP_IN:+delete $DST $SRC esp $SPI_ESP_IN;}
+spddelete $SPD_SRC $SPD_DST any -P out;
+spddelete $SPD_DST $SPD_SRC any -P in;
+${EXCLUDE_SRCNET:+spddelete $SPD_SRC $SPD_SRC any -P out;}
+${EXCLUDE_SRCNET:+spddelete $SPD_SRC $SPD_SRC any -P in;}
+EOF
+
+if [ "$KEYING" = "automatic" -a -n "$IKE_METHOD" ]; then
+   racoontmp=$(mktemp /etc/racoon/racoon.XXXXXX)
+   grep -v "^include \"/etc/racoon/$DST.conf\";" /etc/racoon/racoon.conf >> $racoontmp
+   mv -f $racoontmp /etc/racoon/racoon.conf
+   /usr/bin/systemctl reload-or-restart racoon.service
+fi
+
+/etc/sysconfig/network-scripts/ifdown-post $CONFIG

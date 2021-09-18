@@ -1,0 +1,123 @@
+diff -up ipsec-tools-0.8.0/src/racoon/grabmyaddr.c.aliasing ipsec-tools-0.8.0/src/racoon/grabmyaddr.c
+--- ipsec-tools-0.8.0/src/racoon/grabmyaddr.c.aliasing	2011-03-14 18:18:12.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/grabmyaddr.c	2011-03-21 21:41:49.000000000 +0100
+@@ -399,10 +399,9 @@ netlink_add_del_address(int add, struct 
+ static int
+ netlink_process_addr(struct nlmsghdr *h)
+ {
+-	struct sockaddr_storage addr;
++	struct sockaddr_in6 sin6;
+ 	struct ifaddrmsg *ifa;
+ 	struct rtattr *rta[IFA_MAX+1];
+-	struct sockaddr_in6 *sin6;
+ 
+ 	ifa = NLMSG_DATA(h);
+ 	parse_rtattr(rta, IFA_MAX, IFA_RTA(ifa), IFA_PAYLOAD(h));
+@@ -416,17 +415,16 @@ netlink_process_addr(struct nlmsghdr *h)
+ 	if (rta[IFA_LOCAL] == NULL)
+ 		return 0;
+ 
+-	memset(&addr, 0, sizeof(addr));
+-	addr.ss_family = ifa->ifa_family;
+-	sin6 = (struct sockaddr_in6 *) &addr;
+-	memcpy(&sin6->sin6_addr, RTA_DATA(rta[IFA_LOCAL]),
+-		sizeof(sin6->sin6_addr));
+-	if (!IN6_IS_ADDR_LINKLOCAL(&sin6->sin6_addr))
++	memset(&sin6, 0, sizeof(sin6));
++	sin6.sin6_family = ifa->ifa_family;
++	memcpy(&sin6.sin6_addr, RTA_DATA(rta[IFA_LOCAL]),
++		sizeof(sin6.sin6_addr));
++	if (!IN6_IS_ADDR_LINKLOCAL(&sin6.sin6_addr))
+ 		return 0;
+-	sin6->sin6_scope_id = ifa->ifa_index;
++	sin6.sin6_scope_id = ifa->ifa_index;
+ 
+ 	netlink_add_del_address(h->nlmsg_type == RTM_NEWADDR,
+-				(struct sockaddr *) &addr);
++				(struct sockaddr *) &sin6);
+ 
+ 	return 0;
+ }
+@@ -471,13 +469,9 @@ netlink_route_is_local(int family, const
+ static int
+ netlink_process_route(struct nlmsghdr *h)
+ {
+-	struct sockaddr_storage addr;
++	union sockaddr_any addr;
+ 	struct rtmsg *rtm;
+ 	struct rtattr *rta[RTA_MAX+1];
+-	struct sockaddr_in *sin;
+-#ifdef INET6
+-	struct sockaddr_in6 *sin6;
+-#endif
+ 
+ 	rtm = NLMSG_DATA(h);
+ 
+@@ -492,21 +486,19 @@ netlink_process_route(struct nlmsghdr *h
+ 
+ 	/* setup the socket address */
+ 	memset(&addr, 0, sizeof(addr));
+-	addr.ss_family = rtm->rtm_family;
++	addr.sa.sa_family = rtm->rtm_family;
+ 	switch (rtm->rtm_family) {
+ 	case AF_INET:
+-		sin = (struct sockaddr_in *) &addr;
+-		memcpy(&sin->sin_addr, RTA_DATA(rta[RTA_DST]),
+-			sizeof(sin->sin_addr));
++		memcpy(&addr.sin.sin_addr, RTA_DATA(rta[RTA_DST]),
++			sizeof(addr.sin.sin_addr));
+ 		break;
+ #ifdef INET6
+ 	case AF_INET6:
+-		sin6 = (struct sockaddr_in6 *) &addr;
+-		memcpy(&sin6->sin6_addr, RTA_DATA(rta[RTA_DST]),
+-			sizeof(sin6->sin6_addr));
++		memcpy(&addr.sin6.sin6_addr, RTA_DATA(rta[RTA_DST]),
++			sizeof(addr.sin6.sin6_addr));
+ 		/* Link-local addresses are handled with RTM_NEWADDR
+ 		 * notifications */
+-		if (IN6_IS_ADDR_LINKLOCAL(&sin6->sin6_addr))
++		if (IN6_IS_ADDR_LINKLOCAL(&addr.sin6.sin6_addr))
+ 			return 0;
+ 		break;
+ #endif
+@@ -522,12 +514,12 @@ netlink_process_route(struct nlmsghdr *h
+ 				   RTA_PAYLOAD(rta[RTA_DST]))) {
+ 		plog(LLV_DEBUG, LOCATION, NULL,
+ 			"Netlink: not deleting %s yet, it exists still\n",
+-			saddrwop2str((struct sockaddr *) &addr));
++			saddrwop2str(&addr.sa));
+ 		return 0;
+ 	}
+ 
+ 	netlink_add_del_address(h->nlmsg_type == RTM_NEWROUTE,
+-				(struct sockaddr *) &addr);
++				&addr.sa);
+ 	return 0;
+ }
+ 
+diff -up ipsec-tools-0.8.0/src/racoon/isakmp_quick.c.aliasing ipsec-tools-0.8.0/src/racoon/isakmp_quick.c
+--- ipsec-tools-0.8.0/src/racoon/isakmp_quick.c.aliasing	2011-03-21 18:13:15.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/isakmp_quick.c	2011-03-21 21:30:05.000000000 +0100
+@@ -2173,15 +2173,15 @@ get_sainfo_r(iph2)
+ 	if (iph2->ph1->mode_cfg != NULL) {
+ 		if ((iph2->ph1->mode_cfg->flags & ISAKMP_CFG_ADDR4_EXTERN) ||
+ 		    (iph2->ph1->mode_cfg->flags & ISAKMP_CFG_ADDR4_LOCAL)){
+-			struct sockaddr saddr;
+-			saddr.sa_family = AF_INET;
++			struct sockaddr_in saddr;
++			saddr.sin_family = AF_INET;
+ #ifndef __linux__
+-			saddr.sa_len = sizeof(struct sockaddr_in);
++			saddr.sin_len = sizeof(struct sockaddr_in);
+ #endif
+-			((struct sockaddr_in *)&saddr)->sin_port = IPSEC_PORT_ANY;
+-			memcpy(&((struct sockaddr_in *)&saddr)->sin_addr, 
++			saddr.sin_port = IPSEC_PORT_ANY;
++			memcpy(&saddr.sin_addr, 
+ 				&iph2->ph1->mode_cfg->addr4, sizeof(struct in_addr));
+-			client = ipsecdoi_sockaddr2id(&saddr, 32, IPSEC_ULPROTO_ANY);
++			client = ipsecdoi_sockaddr2id((struct sockaddr *)&saddr, 32, IPSEC_ULPROTO_ANY);
+ 		}
+ 	}
+ 

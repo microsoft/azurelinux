@@ -1,0 +1,14 @@
+diff -Naur ipsec-tools-0.8.2-orig/src/racoon/isakmp_xauth.c ipsec-tools-0.8.2/src/racoon/isakmp_xauth.c
+--- ipsec-tools-0.8.2-orig/src/racoon/isakmp_xauth.c	2013-02-05 01:23:42.000000000 -0500
++++ ipsec-tools-0.8.2/src/racoon/isakmp_xauth.c	2015-05-26 12:35:45.852730976 -0400
+@@ -595,6 +595,10 @@
+ 		return -1;
+ 	}
+ 
++	if (rad_put_string(radius_auth_state, RAD_CALLING_STATION_ID,
++			   saddr2str(iph1->remote)) != 0)
++		return -1;
++
+ 	if (isakmp_cfg_radius_common(radius_auth_state, iph1->mode_cfg->port) != 0)
+ 		return -1;
+ 

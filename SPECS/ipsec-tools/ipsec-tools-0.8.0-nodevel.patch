@@ -1,0 +1,51 @@
+diff -up ipsec-tools-0.8.0/src/libipsec/Makefile.am.nodevel ipsec-tools-0.8.0/src/libipsec/Makefile.am
+--- ipsec-tools-0.8.0/src/libipsec/Makefile.am.nodevel	2011-03-21 17:26:37.000000000 +0100
++++ ipsec-tools-0.8.0/src/libipsec/Makefile.am	2011-03-21 17:26:37.000000000 +0100
+@@ -1,11 +1,10 @@
+ 
+ #bin_PROGRAMS = test-policy test-policy-priority
+-lib_LTLIBRARIES = libipsec.la
++noinst_LTLIBRARIES = libipsec.la
+ 
+ libipsecdir = $(includedir)/libipsec
+-libipsec_HEADERS = libpfkey.h
+ 
+-man3_MANS = ipsec_set_policy.3 ipsec_strerror.3
++#man3_MANS = ipsec_set_policy.3 ipsec_strerror.3
+ 
+ AM_CFLAGS = @GLIBC_BUGS@ -fPIE
+ AM_YFLAGS = -d -p __libipsec
+@@ -28,7 +27,7 @@ libipsec_la_SOURCES = \
+ libipsec_la_LDFLAGS = -version-info 0:1:0
+ libipsec_la_LIBADD = $(LEXLIB)
+ 
+-noinst_HEADERS = ipsec_strerror.h
++noinst_HEADERS = ipsec_strerror.h libpfkey.h
+ 
+ #test_policy_SOURCES = test-policy.c
+ #test_policy_LDFLAGS = libipsec.la
+diff -up ipsec-tools-0.8.0/src/racoon/Makefile.am.nodevel ipsec-tools-0.8.0/src/racoon/Makefile.am
+--- ipsec-tools-0.8.0/src/racoon/Makefile.am.nodevel	2011-03-21 17:26:37.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/Makefile.am	2011-03-21 17:27:57.000000000 +0100
+@@ -2,10 +2,10 @@
+ 
+ sbin_PROGRAMS = racoon racoonctl plainrsa-gen
+ noinst_PROGRAMS = eaytest
+-include_racoon_HEADERS = racoonctl.h var.h vmbuf.h misc.h gcmalloc.h admin.h \
++racoonhdr = racoonctl.h var.h vmbuf.h misc.h gcmalloc.h admin.h \
+ 	schedule.h sockmisc.h isakmp_var.h isakmp.h isakmp_xauth.h \
+ 	isakmp_cfg.h isakmp_unity.h ipsec_doi.h evt.h
+-lib_LTLIBRARIES = libracoon.la
++noinst_LTLIBRARIES = libracoon.la
+ 
+ adminsockdir=${localstatedir}/racoon
+ 
+@@ -64,7 +64,7 @@ eaytest_LDADD =	crypto_openssl_test.o vm
+ eaytest_DEPENDENCIES = crypto_openssl_test.o vmbuf.o str2val.o \
+ 	misc_noplog.o $(CRYPTOBJS)
+ 
+-noinst_HEADERS = \
++noinst_HEADERS = $(racoonhdr) \
+ 	admin.h           dnssec.h      isakmp_base.h   oakley.h      session.h \
+ 	admin_var.h       dump.h        isakmp_ident.h  pfkey.h       sockmisc.h \
+ 	algorithm.h       gcmalloc.h    isakmp_inf.h    plog.h        str2val.h \

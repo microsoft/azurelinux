@@ -1,0 +1,383 @@
+diff -up ipsec-tools-0.8.0/configure.ac.loopback ipsec-tools-0.8.0/configure.ac
+--- ipsec-tools-0.8.0/configure.ac.loopback	2011-03-18 14:25:12.000000000 +0100
++++ ipsec-tools-0.8.0/configure.ac	2011-03-21 16:54:55.000000000 +0100
+@@ -794,6 +794,27 @@ AC_TRY_COMPILE(
+ 	 AC_MSG_RESULT(yes)],
+ 	[AC_MSG_RESULT(no)])
+ 
++AC_MSG_CHECKING(whether to support Auditing)
++AC_ARG_ENABLE(audit,
++	[  --enable-audit    build audit daemon support for SELinux],
++		enable_audit=$enableval,enable_audit=auto)
++
++AC_MSG_RESULT($enable_audit)
++
++# libaudit detection
++if test x$enable_audit = xno ; then
++    have_libaudit=no;
++else
++    AC_CHECK_LIB(audit, audit_log_user_avc_message,
++                 have_libaudit=yes, have_libaudit=no)
++fi
++AM_CONDITIONAL(HAVE_LIBAUDIT, test x$have_libaudit = xyes)
++if test x$have_libaudit = xyes ; then
++    AUDIT_LIBS="-laudit"
++    AC_DEFINE(HAVE_LIBAUDIT,1,[audit daemon SELinux support])
++fi
++AC_SUBST(AUDIT_LIBS)
++
+ CFLAGS="$CFLAGS $CFLAGS_ADD"
+ CPPFLAGS="$CPPFLAGS $CPPFLAGS_ADD"
+ 
+diff -up ipsec-tools-0.8.0/src/racoon/handler.h.loopback ipsec-tools-0.8.0/src/racoon/handler.h
+--- ipsec-tools-0.8.0/src/racoon/handler.h.loopback	2011-03-21 16:54:55.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/handler.h	2011-03-21 16:54:55.000000000 +0100
+@@ -318,6 +318,7 @@ struct ph2handle {
+ 	u_int32_t msgid;		/* msgid for phase 2 */
+   
+ 	u_int32_t sa_count;             /* num of SAs sent in SADB_ADD */
++	u_int8_t loopback;
+ 
+ 	struct sainfo *sainfo;		/* place holder of sainfo */
+ 	struct saprop *proposal;	/* SA(s) proposal. */
+diff -up ipsec-tools-0.8.0/src/racoon/isakmp_quick.c.loopback ipsec-tools-0.8.0/src/racoon/isakmp_quick.c
+--- ipsec-tools-0.8.0/src/racoon/isakmp_quick.c.loopback	2011-03-14 18:18:13.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/isakmp_quick.c	2011-03-21 18:10:37.000000000 +0100
+@@ -99,11 +99,10 @@ static vchar_t *quick_ir1mx __P((struct 
+ static int get_sainfo_r __P((struct ph2handle *));
+ static int get_proposal_r __P((struct ph2handle *));
+ static int ph2_recv_n __P((struct ph2handle *, struct isakmp_gen *));
+-static void quick_timeover_stub __P((struct sched *));
+ static void quick_timeover __P((struct ph2handle *));
+ 
+ /* called from scheduler */
+-static void
++void
+ quick_timeover_stub(p)
+ 	struct sched *p;
+ {
+diff -up ipsec-tools-0.8.0/src/racoon/isakmp_quick.h.loopback ipsec-tools-0.8.0/src/racoon/isakmp_quick.h
+--- ipsec-tools-0.8.0/src/racoon/isakmp_quick.h.loopback	2006-09-09 18:22:09.000000000 +0200
++++ ipsec-tools-0.8.0/src/racoon/isakmp_quick.h	2011-03-21 18:10:57.000000000 +0100
+@@ -47,4 +47,5 @@ extern int quick_r3recv __P((struct ph2h
+ extern int quick_r3send __P((struct ph2handle *, vchar_t *));
+ extern int quick_r3prep __P((struct ph2handle *, vchar_t *));
+ 
++extern void quick_timeover_stub __P((struct sched *));
+ #endif /* _ISAKMP_QUICK_H */
+diff -up ipsec-tools-0.8.0/src/racoon/main.c.loopback ipsec-tools-0.8.0/src/racoon/main.c
+--- ipsec-tools-0.8.0/src/racoon/main.c.loopback	2009-01-26 19:13:06.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/main.c	2011-03-21 16:54:55.000000000 +0100
+@@ -297,6 +297,9 @@ main(ac, av)
+ #ifdef HAVE_SECCTX
+ 	init_avc();
+ #endif
++#ifdef HAVE_LIBAUDIT
++	audit_init();
++#endif
+ 	eay_init();
+ 	initrmconf();
+ 	oakley_dhinit();
+diff -up ipsec-tools-0.8.0/src/racoon/Makefile.am.loopback ipsec-tools-0.8.0/src/racoon/Makefile.am
+--- ipsec-tools-0.8.0/src/racoon/Makefile.am.loopback	2009-12-11 10:04:04.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/Makefile.am	2011-03-21 16:54:55.000000000 +0100
+@@ -39,7 +39,7 @@ racoon_SOURCES = \
+ EXTRA_racoon_SOURCES = isakmp_xauth.c isakmp_cfg.c isakmp_unity.c throttle.c \
+ 	isakmp_frag.c nattraversal.c security.c $(MISSING_ALGOS)
+ racoon_LDADD = $(CRYPTOBJS) $(HYBRID_OBJS) $(NATT_OBJS) $(FRAG_OBJS) $(LEXLIB) \
+-	 $(SECCTX_OBJS) vmbuf.o sockmisc.o misc.o ../libipsec/libipsec.la
++	 $(SECCTX_OBJS) vmbuf.o sockmisc.o misc.o ../libipsec/libipsec.la @AUDIT_LIBS@
+ racoon_DEPENDENCIES = \
+ 	$(CRYPTOBJS) $(HYBRID_OBJS) $(NATT_OBJS) $(FRAG_OBJS) $(SECCTX_OBJS) \
+ 	vmbuf.o sockmisc.o misc.o
+diff -up ipsec-tools-0.8.0/src/racoon/pfkey.c.loopback ipsec-tools-0.8.0/src/racoon/pfkey.c
+--- ipsec-tools-0.8.0/src/racoon/pfkey.c.loopback	2011-03-21 17:43:02.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/pfkey.c	2011-03-21 18:10:02.000000000 +0100
+@@ -87,6 +87,7 @@
+ #include "isakmp_var.h"
+ #include "isakmp.h"
+ #include "isakmp_inf.h"
++#include "isakmp_quick.h"
+ #include "ipsec_doi.h"
+ #include "oakley.h"
+ #include "pfkey.h"
+@@ -101,6 +102,7 @@
+ #include "nattraversal.h"
+ #include "crypto_openssl.h"
+ #include "grabmyaddr.h"
++#include "sockmisc.h"
+ 
+ #if defined(SADB_X_EALG_RIJNDAELCBC) && !defined(SADB_X_EALG_AESCBC)
+ #define SADB_X_EALG_AESCBC  SADB_X_EALG_RIJNDAELCBC
+@@ -1043,6 +1045,56 @@ pk_recvgetspi(mhp)
+ 		return -1;
+ 	}
+ 
++#ifdef HAVE_SECCTX
++	if (iph2->loopback == 1) {
++		u_int satype, reqid;
++		struct sockaddr *src;
++
++		src = PFKEY_ADDR_SADDR(mhp[SADB_EXT_ADDRESS_DST]);
++		if (cmpsaddr(src, dst) != CMPSADDR_MISMATCH) {
++			struct pfkey_send_sa_args sa_args;
++			/* yep, this is loopback. install SA */
++			satype = ipsecdoi2pfkey_proto(iph2->proposal->head->proto_id);
++			if (satype == ~0) {
++				plog(LLV_ERROR, LOCATION, NULL,
++				     "invalid proto_id %d\n",
++				     iph2->proposal->head->proto_id);
++				return -1;
++			}
++			      
++			reqid = iph2->proposal->head->reqid_in;
++			
++			iph2->status = PHASE2ST_ADDSA;
++
++			memset (&sa_args, 0, sizeof (sa_args));
++			sa_args.so = lcconf->sock_pfkey;
++			sa_args.satype = satype;
++			sa_args.mode = IPSEC_MODE_TRANSPORT;
++			sa_args.src = src;
++			sa_args.dst = dst;
++			sa_args.spi = sa->sadb_sa_spi;
++			sa_args.reqid = reqid;
++			sa_args.e_type = SADB_EALG_NULL;
++			sa_args.a_type = SADB_AALG_NONE;
++			sa_args.l_addtime = iph2->proposal->lifetime;
++			sa_args.seq = iph2->seq;
++			sa_args.ctxdoi = iph2->proposal->sctx.ctx_doi;
++			sa_args.ctxalg = iph2->proposal->sctx.ctx_alg;
++			sa_args.ctxstr = iph2->proposal->sctx.ctx_str;
++			sa_args.ctxstrlen = iph2->proposal->sctx.ctx_strlen;
++			if (pfkey_send_update2(&sa_args) < 0) {
++				plog(LLV_ERROR, LOCATION, NULL, 
++				     "failed to update loopback SA: %s\n", 
++				     ipsec_strerror());
++				remph2(iph2);
++				delph2(iph2);
++				return -1;
++			}
++		}
++		return 0;
++	}
++#endif /* HAVE SECCTX */
++			    	
+ 	/* set SPI, and check to get all spi whether or not */
+ 	allspiok = 1;
+ 	notfound = 1;
+@@ -1304,6 +1356,26 @@ pk_recvupdate(mhp)
+ 		return -1;
+ 	}
+ 
++#ifdef HAVE_SECCTX
++	/* get update for loopback here */
++	if (iph2->loopback == 1 && (cmpsaddr(src, dst) != CMPSADDR_MISMATCH)) {
++		plog(LLV_INFO, LOCATION, NULL,
++			"IPsec-SA established without ISAKMP: %s\n",
++			sadbsecas2str(iph2->dst, iph2->src,
++			msg->sadb_msg_satype, sa->sadb_sa_spi,
++			IPSEC_MODE_TRANSPORT));
++
++		/* turn off the timer for calling quick_timeover() */
++		sched_cancel(&iph2->sce);
++
++		sched_schedule(&iph2->sce, iph2->proposal->lifetime,
++			isakmp_ph2expire_stub);
++		
++		iph2->status = PHASE2ST_ESTABLISHED;
++		return 0;
++	}
++#endif
++		
+ 	/* check to complete all keys ? */
+ 	for (pr = iph2->approval->head; pr != NULL; pr = pr->next) {
+ 		proto_id = pfkey2ipsecdoi_proto(msg->sadb_msg_satype);
+@@ -1343,7 +1415,7 @@ pk_recvupdate(mhp)
+ 	if (incomplete)
+ 		return 0;
+ 
+-	/* turn off the timer for calling pfkey_timeover() */
++	/* turn off the timer for calling quick_timeover() */
+ 	sched_cancel(&iph2->sce);
+ 
+ 	/* update status */
+@@ -1768,6 +1840,12 @@ pk_recvacquire(mhp)
+ 	m_sec_ctx = (struct sadb_x_sec_ctx *)mhp[SADB_X_EXT_SEC_CTX];
+ 
+ 	if (m_sec_ctx != NULL) {
++		if (m_sec_ctx->sadb_x_ctx_len > MAX_CTXSTR_SIZE) {
++			plog(LLV_ERROR, LOCATION, NULL,
++			     "ignoring ACQUIRE: security context is greater than MAX, %d.\n",
++			     MAX_CTXSTR_SIZE);
++			return -1;
++		}
+ 		plog(LLV_INFO, LOCATION, NULL, "security context doi: %u\n",
+ 		     m_sec_ctx->sadb_x_ctx_doi);
+ 		plog(LLV_INFO, LOCATION, NULL,
+@@ -1974,6 +2052,73 @@ pk_recvacquire(mhp)
+ 		iph2->sa_dst = dupsaddr(sa_dst);
+ 	}
+ 
++#ifdef HAVE_SECCTX
++	/*
++	 * If the src address in the ACQUIRE is one we listen on and
++	 * the src and dst addresses are the same, then assume this
++	 * packet arrived over loopback and just get an SPI and
++	 * install the SA.
++	*/
++        if (m_sec_ctx && (cmpsaddr(src, dst) != CMPSADDR_MISMATCH)) {
++		struct saprop *newpp;
++		struct saproto *newpr;
++		iph2->loopback = 1;
++		newpp = newsaprop();
++		if (newpp == NULL) {
++			plog(LLV_ERROR, LOCATION, NULL, 
++			     "failed to allocate saprop.\n");
++			delph2(iph2);
++			return -1;
++		}
++		/* allocate to hold reqid */
++		newpr = newsaproto();
++		if (newpr == NULL) {
++			plog(LLV_ERROR, LOCATION, NULL, 
++			     "failed to allocate saproto.\n");
++			delph2(iph2);
++			return -1;
++		}
++
++		newpr->reqid_out = sp_out->req->saidx.reqid;
++		newpr->reqid_in = sp_in->req->saidx.reqid;
++		newpr->proto_id = ipproto2doi(sp_out->req->saidx.proto);
++		
++		inssaprotorev(newpp, newpr);
++		iph2->proposal = newpp;
++		printsaprop0(LLV_DEBUG, newpp);
++
++		set_secctx_in_proposal(iph2, spidx);
++		iph2->proposal->lifetime = IPSECDOI_ATTR_SA_LD_SEC_DEFAULT;
++
++		insph2(iph2);
++		
++		iph2->status = PHASE2ST_GETSPISENT;
++                plog(LLV_DEBUG, LOCATION, NULL, "call pfkey_send_getspi\n");
++                if (pfkey_send_getspi(
++                                lcconf->sock_pfkey,
++                                iph2->satype,
++                                IPSEC_MODE_TRANSPORT,
++                                dst,                    /* src of SA */
++                                src,                    /* dst of SA */
++                                0, 0,
++                                newpr->reqid_in, iph2->seq) < 0) {
++                        plog(LLV_ERROR, LOCATION, NULL,
++                                "ipseclib failed send getspi (%s)\n",
++                                ipsec_strerror());
++			delph2(iph2);
++                        return -1;
++                }
++		sched_schedule(&iph2->sce, lcconf->wait_ph2complete,
++                	quick_timeover_stub);
++
++                plog(LLV_DEBUG, LOCATION, NULL,
++                        "pfkey GETSPI sent: %s\n",
++                        sadbsecas2str(dst, src, iph2->satype, 0, 
++			IPSEC_MODE_TRANSPORT));
++		return 0;
++	}
++#endif /* HAVE_SECCTX */
++
+ 	if (isakmp_get_sainfo(iph2, sp_out, sp_in) < 0) {
+ 		delph2(iph2);
+ 		return -1;
+diff -up ipsec-tools-0.8.0/src/racoon/policy.h.loopback ipsec-tools-0.8.0/src/racoon/policy.h
+--- ipsec-tools-0.8.0/src/racoon/policy.h.loopback	2008-12-05 07:02:20.000000000 +0100
++++ ipsec-tools-0.8.0/src/racoon/policy.h	2011-03-21 16:54:55.000000000 +0100
+@@ -38,7 +38,12 @@
+ 
+ 
+ #ifdef HAVE_SECCTX
+-#define MAX_CTXSTR_SIZE 50
++
++/* Current LSPP policy is 1024 compartments, 5 chars each 'c1024'. SE Linux
++ * will attempt to combine so, worst case is all odd or even numbers. The
++ * context size of SE Linux types is max'ed around 256. We allow 16 for
++ * sensitivity */
++#define MAX_CTXSTR_SIZE 3344  /* (6 * 512) + 256 + 16 */
+ struct security_ctx {
+ 	u_int8_t ctx_doi;       /* Security Context DOI */
+ 	u_int8_t ctx_alg;       /* Security Context Algorithm */
+@@ -158,6 +163,9 @@ extern void initsp __P((void));
+ extern struct ipsecrequest *newipsecreq __P((void));
+ 
+ extern const char *spidx2str __P((const struct policyindex *));
++#ifdef HAVE_LIBAUDIT
++extern void audit_init __P((void));
++#endif
+ #ifdef HAVE_SECCTX
+ #include <selinux/selinux.h>
+ extern int get_security_context __P((vchar_t *, struct policyindex *));
+diff -up ipsec-tools-0.8.0/src/racoon/security.c.loopback ipsec-tools-0.8.0/src/racoon/security.c
+--- ipsec-tools-0.8.0/src/racoon/security.c.loopback	2007-05-31 21:54:55.000000000 +0200
++++ ipsec-tools-0.8.0/src/racoon/security.c	2011-03-21 16:54:55.000000000 +0100
+@@ -55,6 +55,61 @@
+ #include "proposal.h"
+ #include "strnames.h"
+ #include "handler.h"
++#ifdef HAVE_LIBAUDIT
++#include <unistd.h>
++#include <sys/param.h>
++#include "libaudit.h"
++#endif
++
++static void log_callback (const char *fmt, ...);
++
++static const struct avc_log_callback log_cb =
++{
++  .func_log = log_callback,
++  .func_audit = NULL
++};
++
++#ifdef HAVE_LIBAUDIT
++static int audit_fd = -1;
++void
++audit_init(void)
++{
++	audit_fd = audit_open();
++	if (audit_fd < 0) {
++	/* If kernel doesn't support audit, bail out */
++		if (errno == EINVAL || errno == EPROTONOSUPPORT ||
++				errno == EAFNOSUPPORT)
++			return;
++		/* If unprivileged, bail out */
++		if (errno == EPERM && getuid() != 0)
++			return;
++		plog (LLV_ERROR, LOCATION, NULL,
++			"Failed opening connection to the audit subsystem");
++	}
++}
++#endif /* HAVE_LIBAUDIT */
++
++static void
++log_callback (const char *fmt, ...)
++{
++	va_list ap;
++	va_start(ap, fmt);
++#ifdef HAVE_LIBAUDIT
++	if (audit_fd >= 0) {
++		char buf[PATH_MAX*2];
++
++		/* FIXME: need to change this to show real user */
++		vsnprintf(buf, sizeof(buf), fmt, ap);
++		audit_log_user_avc_message(audit_fd, AUDIT_USER_AVC,
++				buf, NULL, NULL, NULL, -1);
++		return;
++	} else
++#endif /* HAVE_LIBAUDIT */
++	{
++		vsyslog (LOG_INFO, fmt, ap);
++		va_end(ap);
++	}
++}
+ 
+ /* 
+  * Get the security context information from SA.
