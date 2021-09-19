@@ -41,7 +41,7 @@ Requires:	python3
 clang-format integration for git.
 
 %prep
-%setup -q -n cfe-%{version}.src
+%setup -q -n clang-%{version}.src
 
 %build
 # Disable symbol generation
