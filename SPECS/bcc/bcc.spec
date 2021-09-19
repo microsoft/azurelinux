@@ -5,7 +5,7 @@
 
 Name:            bcc
 Summary:         BPF Compiler Collection (BCC)
-Version:         0.12.0
+Version:         0.22.0
 Release:         1%{?dist}
 License:         ASL 2.0
 Vendor:          Microsoft Corporation
@@ -118,6 +118,9 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.22.0-1
+- Update to 0.22.0
+
 *   Fri Jun 05 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.12.0-1
 -   Update bcc version
 *   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 0.10.0-4
