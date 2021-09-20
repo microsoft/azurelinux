@@ -192,6 +192,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
     sed -i '/perl-Text-Template/d' $TmpPkgGen
+    sed -i '/python3-audit/d' $TmpPkgGen
     sed -i '/python3-curses/d' $TmpPkgGen
     sed -i '/python3-gpg/d' $TmpPkgGen
     sed -i '/python3-libxml2/d' $TmpPkgGen

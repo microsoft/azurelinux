@@ -2,7 +2,7 @@
 Summary:        Compiler for the Vala programming language
 Name:           vala
 Version:        0.34.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -80,7 +81,6 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/aclocal/vapigen.m4
 %{_datadir}/vala/Makefile.vapigen
 %{_includedir}/vala-*/*.h
-%{_libdir}/libvala-*.la
 %{_libdir}/libvala-*.so
 %{_libdir}/pkgconfig/libvala-*.pc
 %{_libdir}/pkgconfig/vapigen-%{majver}.pc
@@ -102,6 +102,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man1/vapigen*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.34.6-4
+- Remove libtool archive files from final packaging
+
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.34.6-3
 - Add necessary files to vala package
 

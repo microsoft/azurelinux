@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.103.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ line scanner and an advanced tool for automatic database updates.
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %make_build check
@@ -47,7 +48,6 @@ line scanner and an advanced tool for automatic database updates.
 %{_bindir}/*
 %{_sysconfdir}/*.sample
 %{_includedir}/*.h
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
@@ -58,6 +58,9 @@ line scanner and an advanced tool for automatic database updates.
 %{_mandir}/man8/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-3
+- Remove libtool archive files from final packaging
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-2
 - Add provides for devel, lib subpackages
 - Use make macros throughout

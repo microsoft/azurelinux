@@ -1,7 +1,7 @@
 Summary:        contains libraries for reading and writing PNG files.
 Name:           libpng
 Version:        1.6.37
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,8 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type l -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 chmod +x ./tests/pngtest-all
@@ -54,12 +56,14 @@ make %{?_smp_mflags} -k check
 %{_bindir}/*-config
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.37-5
+- Remove libtool archive files from final packaging
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.37-4
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.6.37-3: Moved "Provides" for "pkgconfig(*)" to the correct (-devel) subpackage.

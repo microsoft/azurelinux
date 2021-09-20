@@ -996,8 +996,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.11.1.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
         }
       }
     },
@@ -1657,8 +1657,8 @@
         "type": "other",
         "other": {
           "name": "flannel",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },
@@ -2039,8 +2039,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.13",
-          "downloadUrl": "https://dl.google.com/go/go1.15.13.src.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://golang.org/dl/go1.17.1.src.tar.gz"
         }
       }
     },
@@ -4169,8 +4169,8 @@
         "type": "other",
         "other": {
           "name": "libyaml",
-          "version": "0.2.1",
-          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.1.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
         }
       }
     },
@@ -5054,16 +5054,6 @@
           "name": "oclock",
           "version": "1.0.4",
           "downloadUrl": "https://www.x.org/pub/individual/app/oclock-1.0.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "omi",
-          "version": "1.6.6",
-          "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
         }
       }
     },

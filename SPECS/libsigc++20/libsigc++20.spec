@@ -1,7 +1,7 @@
 Summary:      Library that Implements a typesafe callback system for standard C++.
 Name:         libsigc++20
 Version:      2.10.0
-Release:      6%{?dist}
+Release:      7%{?dist}
 License:      LGPLv2+
 URL:          https://github.com/libsigcplusplus/libsigcplusplus
 Group:        Applications/System
@@ -25,6 +25,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -36,7 +37,6 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
@@ -45,6 +45,9 @@ make %{?_smp_mflags} check
 %{_datadir}/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.0-7
+- Remove libtool archive files from final packaging
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.10.0-6
 - Added %%license line automatically
 

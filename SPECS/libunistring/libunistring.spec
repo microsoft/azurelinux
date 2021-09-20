@@ -1,7 +1,7 @@
 Summary:        GNU Unicode string library
 Name:           libunistring
 Version:        0.9.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv3+
 Url:            http://www.gnu.org/software/libunistring/
 Source0:        http://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
@@ -33,6 +33,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 rm %{buildroot}%{_infodir}/*
 
 %check
@@ -46,7 +47,6 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so.*
 %{_docdir}/%{name}/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*.h
@@ -54,6 +54,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.10-5
+- Remove libtool archive files from final packaging
+
 * Thu Jan 07 2021 Andrew Phelps <anphel@microsoft.com> 0.9.10-4
 - Fix test-thread_create testcase by undefining _ld_as_needed. License verified.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.9.10-3

@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,7 @@ make %{?_smp_mflags}
 %install
 rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %find_lang %{name}
 
@@ -90,7 +91,6 @@ make  check
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %exclude %{_libdir}/*.a
 %{_libdir}/pkgconfig/*
 %{_datadir}/gir-1.0/*
@@ -103,6 +103,9 @@ make  check
 %defattr(-,root,root)
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
+- Remove libtool archive files from final packaging
+
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.64.0-6
 - Enable gobject-introspection support.
 
