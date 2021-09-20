@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.1.0/bazel-4.1.0-dist.zip"
         }
       }
     },
@@ -648,6 +648,16 @@
           "name": "ceph",
           "version": "16.2.0",
           "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cert-manager",
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.5.3.tar.gz"
         }
       }
     },

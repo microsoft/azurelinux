@@ -18,13 +18,11 @@
 
 %define _dwz_low_mem_die_limit  20000000
 %define _dwz_max_die_limit     100000000
-
-%define src_install_dir /usr/src/%{name}
-
+%define src_install_dir %{_prefix}/src/%{name}
+Summary:        L7 proxy and communication bus
 Name:           envoy
 Version:        1.14.4
-Release:        3.4%{?dist}
-Summary:        L7 proxy and communication bus
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,12 +91,13 @@ Source0:        %{name}-%{version}.tar.gz
 # - https://mirror.bazel.build/github.com/golang/protobuf/archive/v1.4.1.zip
 # - https://mirror.bazel.build/github.com/golang/tools/archive/2bc93b1c0c88b2406b967fcd19a623d1ff9ea0cd.zip
 # - https://mirror.bazel.build/github.com/protocolbuffers/protobuf-go/archive/v1.22.0.zip
-Source1:        %{name}-vendor-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 # END obs-service-bazel_repositories
 Source100:      %{name}-rpmlintrc
 Patch0:         0001-build-Use-Go-from-host.patch
 Patch1:         0002-build-update-several-go-dependencies-11581.patch
 Patch2:         0003-build-Add-explicit-requirement-on-rules_cc.patch
+Patch3:         0004-build-Use-new-bazel.patch
 BuildRequires:  bazel
 BuildRequires:  bazel-workspaces
 BuildRequires:  boringssl-source
@@ -127,7 +126,7 @@ Provides:       bundled(abseil-cpp) = 06f0e767d13d4d68071c4fc51e25724e0fc8bc74
 Provides:       bundled(apple_support) = 0.7.2
 Provides:       bundled(bazel-gazelle) = 0.19.1
 Provides:       bundled(bazel-skylib) = 0.9.0
-Provides:       bundled(bazel-toolchains) = 2.2.0
+Provides:       bundled(bazel-toolchains) = 4.1.0
 Provides:       bundled(c-ares) = d7e070e7283f822b1d2787903cce3615536c5610
 Provides:       bundled(cel-cpp) = 80e1cca533190d537a780ad007e8db64164c582e
 Provides:       bundled(client_model) = 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
@@ -160,8 +159,8 @@ Provides:       bundled(protoc-gen-validate) = ab56c3dd1cf9b516b62c5087e1ec1471b
 Provides:       bundled(rapidjson) = dfbe1db9da455552f7a9ad5d2aea17dd9d832ac1
 Provides:       bundled(re2)
 Provides:       bundled(rules_apple) = 0.19.0
-Provides:       bundled(rules_cc) = 818289e5613731ae410efb54218a4077fb9dbb03
-Provides:       bundled(rules_foreign_cc) = 7bc4be735b0560289f6b86ab6136ee25d20b65b7
+Provides:       bundled(rules_cc) = b1c40e1de81913a3c40e5948f78719c28152486d
+Provides:       bundled(rules_foreign_cc) = d54c78ab86b40770ee19f0949db9d74a831ab9f0
 Provides:       bundled(rules_go) = 0.23.3
 Provides:       bundled(rules_java) = 7cf3cefd652008d0a64a419c34c13bdca6c8f178
 Provides:       bundled(rules_proto) = 2c0468366367d7ed97a1f702f9cd7155ab3f73c5
@@ -266,8 +265,13 @@ fdupes %{buildroot}%{src_install_dir}
 %{src_install_dir}
 
 %changelog
+* Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 1.14.4-4
+- Add patch to use newer version of bazel
+- Update patch to use new version of external dependencies
+- Update vendor source and file name
+
 * Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.14.4-3.4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag)
 - License Verified
 - Use gcc-c++ for BR
 - Use ninja-build for BR
