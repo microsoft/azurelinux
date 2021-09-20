@@ -42,6 +42,12 @@ Requires: %{name} = %{version}-%{release}
 %{name}-devel contains shared libraries and header files for
 developing application.
 
+%package static
+Summary: Static Library for BPF Compiler Collection (BCC)
+Requires: %{name} = %{version}-%{release}
+%description static
+%{name}-static contains static libraries for developing application.
+
 %package -n python3-%{name}
 Summary: Python3 bindings for BPF Compiler Collection (BCC)
 Requires: %{name} = %{version}-%{release}
@@ -100,6 +106,11 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 %{_lib64dir}/pkgconfig/lib%{name}.pc
 %{_includedir}/%{name}/
 
+%files static
+%{_lib64dir}/libbcc-loader-static.a
+%{_lib64dir}/libbcc.a
+%{_lib64dir}/libbcc_bpf.a
+
 %files -n python3-bcc
 %{python3_sitelib}/%{name}*
 
@@ -120,6 +131,7 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 %changelog
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.22.0-1
 - Update to 0.22.0
+- Add static library subpackage
 
 *   Fri Jun 05 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.12.0-1
 -   Update bcc version
