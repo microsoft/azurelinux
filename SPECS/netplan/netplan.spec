@@ -19,7 +19,7 @@ Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv3
-URL:            http://netplan.io/
+URL:            https://netplan.io/
 # Source0:      https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
@@ -98,7 +98,7 @@ make check
 %{_unitdir}/%{name}*.service
 %{_systemdgeneratordir}/%{name}
 %{_mandir}/man5/%{name}.5*
-%dir %{_sysconfdir}/%{name}
+%dir %attr(0755, root, root) %{_sysconfdir}/%{name}
 %{_prefix}/lib/%{name}/
 %{_datadir}/bash-completion/completions/%{name}
 

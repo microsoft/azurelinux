@@ -1,4 +1,4 @@
-Summary:        Vendor Package Management for Goland
+Summary:        Vendor Package Management for Golang
 Name:           glide
 Version:        0.13.3
 Release:        6%{?dist}
@@ -49,6 +49,7 @@ popd
 
 %files
 %defattr(-,root,root)
+%license LICENSE
 %{_bindir}/glide
 
 %changelog

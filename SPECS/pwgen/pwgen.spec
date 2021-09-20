@@ -5,8 +5,8 @@ Summary:        Automatic password generation
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPL+
-URL:            http://sf.net/projects/pwgen
-Source0:        http://download.sf.net/pwgen/%{name}-%{version}.tar.gz
+URL:            https://sf.net/projects/pwgen
+Source0:        https://download.sf.net/pwgen/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  gcc
