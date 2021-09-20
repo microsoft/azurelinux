@@ -53,7 +53,7 @@ popd
 
 %changelog
 *   Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.3-6
--   Initial CBL-Mariner import from Photon
+-   Initial CBL-Mariner import from Photon: (license: Apache2)
 -   License verified
 
 *   Fri Jun 11 2021 Piyush Gupta<gpiyush@vmware.com> 0.13.3-5
