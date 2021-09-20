@@ -1,7 +1,7 @@
 Summary:    Provides API to packets queued by kernel packet filter
 Name:       libnetfilter_queue
 Version:    1.0.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:    GPLv2
 URL:        http://www.netfilter.org/projects/libnetfilter_queue/index.html
 Group:      System Environment/Libraries
@@ -38,6 +38,7 @@ make %{?_smp_mflags}
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -51,9 +52,11 @@ make %{?_smp_mflags}
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.3-5
+- Remove libtool archive files from final packaging
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.3-4
 - Added %%license line automatically
 

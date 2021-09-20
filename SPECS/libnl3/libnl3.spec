@@ -1,7 +1,7 @@
 Summary:        Netlink Protocol Library Suite
 Name:           libnl3
 Version:        3.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Group:          System Environment/Libraries
 URL:            https://www.infradead.org/~tgr/libnl/
@@ -41,6 +41,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -61,7 +62,6 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 %{_libdir}/libnl/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/*.a
 %{_libdir}/pkgconfig/libnl-3.0.pc
 %{_libdir}/pkgconfig/libnl-cli-3.0.pc
@@ -72,6 +72,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/libnl-xfrm-3.0.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.0-7
+- Remove libtool archive files from final packaging
+
 * Fri Aug 28 2020 Thomas Crain <thcrain@microsoft.com> - 3.4.0-6
 - Add pkg-config provides to devel package
 - License verified

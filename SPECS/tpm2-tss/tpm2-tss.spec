@@ -1,7 +1,7 @@
 Summary:          OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:             tpm2-tss
 Version:          2.4.0
-Release:          1%{?dist}
+Release:          2%{?dist}
 License:          BSD
 URL:              https://github.com/tpm2-software/tpm2-tss
 Group:            System Environment/Security
@@ -35,6 +35,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post
 /sbin/ldconfig
@@ -75,13 +76,15 @@ fi
 %defattr(-,root,root)
 %{_includedir}/tss2/*
 %{_libdir}/pkgconfig/*
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/*.so.0
 %{_mandir}/man3
 %{_mandir}/man7
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.0-2
+- Remove libtool archive files from final packaging
+
 *   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.0-1
 -   Update to 2.4.0.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-4

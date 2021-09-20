@@ -1,7 +1,7 @@
 Summary:        Implementation of a YAML 1.1 parser and emitter
 Name:           libyaml
 Version:        0.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ make %{?_smp_mflags} AM_CFLAGS=""
 
 %install
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -54,9 +55,11 @@ rm -rf %{buildroot}
 %{_includedir}/yaml.h
 %{_libdir}/libyaml.so
 %{_libdir}/pkgconfig/*.pc
-%exclude %{_libdir}/*.la
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.5-2
+- Remove libtool archive files from final packaging
+
 * Fri Jan 29 2021  Joe Schmitt <joschmit@microsoft.com> - 0.2.5-1
 - Upgrade to v0.2.5.
 - Update license and readme file names.
