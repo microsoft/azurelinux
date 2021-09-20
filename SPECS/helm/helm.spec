@@ -2,7 +2,7 @@
 Summary:        The Kubernetes Package Manager
 Name:           helm
 Version:        3.4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,13 +24,14 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2021-21303.patch
 BuildRequires:  golang >= 1.15.5
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 tar -xf %{SOURCE1} --no-same-owner
@@ -50,6 +51,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %{_bindir}/helm
 
 %changelog
+* Mon Sep 20 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-3
+- Patch CVE-2021-21303
+
 * Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 3.4.1-2
 - Update and rename vendor source tarball
 - Use go to build the project from vendor source
