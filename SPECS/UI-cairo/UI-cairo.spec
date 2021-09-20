@@ -11,7 +11,7 @@
 Summary:        A 2D graphics library (UI libs dependent)
 Name:           UI-cairo
 Version:        1.16.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 # The sources for 'cairo' itself are available under the (LGPLv2 OR MPLv1.1) license.
 # Test code and fonts are available under either the MIT or Public Domain license.
 # The 'cairo-trace' tools are released under the GPLv3 license - 'License' tag added separately for that subpackage.
@@ -149,6 +149,7 @@ This package contains tools for working with the cairo graphics library.
     --disable-gl \
     --disable-gtk-doc \
     --disable-static \
+    --disable-symbol-lookup \
     --enable-ft \
     --enable-gobject \
     --enable-pdf \
@@ -223,6 +224,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cairo/
 
 %changelog
+* Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.0-13
+- Disabling "symbol-lookup" feature due to compilation errors.
+
 * Thu Jun 10 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.0-12
 - Added missing 'Conflicts' for all 'cairo' subpackges.
 
