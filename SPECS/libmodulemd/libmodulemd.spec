@@ -5,7 +5,7 @@ Version:        2.13.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
-Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
+Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +80,7 @@ export LC_CTYPE=C.utf8
 %changelog
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.0-1
 - Upgrade to latest version
+- Use updated source URL
 
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.0-6
 - Merge the following releases from dev to 1.0 spec
