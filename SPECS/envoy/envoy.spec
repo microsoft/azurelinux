@@ -18,13 +18,11 @@
 
 %define _dwz_low_mem_die_limit  20000000
 %define _dwz_max_die_limit     100000000
-
-%define src_install_dir /usr/src/%{name}
-
+%define src_install_dir %{_prefix}/src/%{name}
+Summary:        L7 proxy and communication bus
 Name:           envoy
 Version:        1.14.4
 Release:        4%{?dist}
-Summary:        L7 proxy and communication bus
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

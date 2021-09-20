@@ -1,7 +1,7 @@
+Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.5.3
-Release:        1
-Summary:        Automatically provision and manage TLS certificates in Kubernetes 
+Release:        0
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,12 +38,12 @@ Source2:        %{name}-%{version}-gocache.tar.gz
 Patch0:         Fix-dependency-checksum.patch
 Patch1:         Fix-os-WriteFile.patch
 BuildRequires:  bazel
-BuildRequires:  patch
 BuildRequires:  git
 BuildRequires:  golang
+BuildRequires:  patch
 
 %description
-cert-manager is a Kubernetes add-on to automate the management and issuance 
+cert-manager is a Kubernetes add-on to automate the management and issuance
 of TLS certificates from various issuing sources.
 
 %prep
@@ -91,6 +91,6 @@ install -D -m0755 bazel-bin/cmd/acmesolver/acmesolver_/acmesolver %{buildroot}%{
 %{_bindir}/*
 
 %changelog
-* Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 1.5.3-1
+* Fri Sep 10 2021 Henry Li <lihl@microsoft.com> - 1.5.3-1
 - Original version for CBL-Mariner
 - License Verified

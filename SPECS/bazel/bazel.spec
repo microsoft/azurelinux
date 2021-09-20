@@ -38,7 +38,6 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %clean
 rm -rf %{buildroot}
 
-
 %files
 %defattr(-,root,root)
 %attr(0755,root,root) %{_bindir}/bazel
@@ -54,3 +53,4 @@ rm -rf %{buildroot}
 
 * Wed Jun 09 2021 Henry Li <lihl@microsoft.com> - 2.2.0-1
 - Original version for CBL-Mariner
+- License Verified
