@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.60.1
-Release:        2%{?dist}
+Version:        5.10.64.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -208,6 +208,7 @@ Patch1171:      CVE-2021-3655.nopatch
 Patch1172:      CVE-2021-38166.nopatch
 Patch1173:      CVE-2021-38205.nopatch
 Patch1174:      CVE-2021-3573.nopatch
+Patch1175:      CVE-2021-40490.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -539,6 +540,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Mon Sep 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.64.1-1
+- Update source to 5.10.64.1
+- Address CVE-2021-40490
+
 * Mon Sep 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.60.1-2
 - Remove cn from dracut drivers argument
 
