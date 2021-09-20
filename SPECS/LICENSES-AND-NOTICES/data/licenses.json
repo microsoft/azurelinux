@@ -71,7 +71,6 @@
         "libstoragemgmt",
         "libxcrypt",
         "libzip",
-        "ipsec-tools",
         "mailcap",
         "mcstrans",
         "mokutil",
