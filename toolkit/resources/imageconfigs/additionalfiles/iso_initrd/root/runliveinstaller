@@ -5,8 +5,30 @@
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
-# Mounting the ISO root for the installer.
 ISO_ROOT=/mnt/cdrom
+CONFIG_ROOT=$ISO_ROOT/config
+UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
+
+# parse script parameters:
+#
+# -u -> unattended config file (optional)
+
+while getopts ":u:" OPTIONS; do
+  case "${OPTIONS}" in
+    u ) UNATTENDED_CONFIG_FILE=$OPTARG ;;
+
+    \? )
+        echo "Error - Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+  esac
+done
+
+# Mounting the ISO root for the installer.
 mkdir -p $ISO_ROOT
 LABEL=CDROM
 
@@ -26,34 +48,6 @@ else
         ((RETRY++))
         sleep $SLEEPSECONDS
     done
-fi
-
-CONFIG_ROOT=$ISO_ROOT/config
-UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
-TEMPDIR=$(mktemp -d)
-
-# kickstart param is used to specify an unattended config file that is not part of an .iso image
-#
-# note:
-# - existing unattended config file is always preferred to kickstart param
-# - only 'ks=value' is recognized (=> 'ks=value' cannot contain space)
-#
-GRUB_PARAM=$(cat /proc/cmdline)
-if [[ ! -f "$UNATTENDED_CONFIG_FILE" && \
-      $GRUB_PARAM == *"ks="* ]]; then
-    # value of kickstart param is 1st item in the array
-    GRUB_PARAMS_FROM_KICKSTART=${GRUB_PARAM#*ks=}
-    read -a PARAM <<< "$GRUB_PARAMS_FROM_KICKSTART"
-    KICKSTART_PARAM=${PARAM[0]}
-
-    echo "unattended config file: $KICKSTART_PARAM"
-
-    # download unattended config file if necessary
-    if [[ $KICKSTART_PARAM == "http://"* || \
-        $KICKSTART_PARAM == "https://"* ]]; then
-        UNATTENDED_CONFIG_FILE=$TEMPDIR/unattended_config.json
-        curl $KICKSTART_PARAM -o $UNATTENDED_CONFIG_FILE
-    fi
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
@@ -84,8 +78,6 @@ stty -echo
 ./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --template-config $CONFIG_ROOT/attended_config.json \
                 --build-dir $PWD --log-file=/installer/log.txt
 installerExitCode=$?
-
-rm -rf $TEMPDIR
 
 # Consume any buffered stdin to prevent it from being passed to any future programs,
 # as it may contain sensitive data
