@@ -1,7 +1,7 @@
 Summary:        GNU Ubiquitous Intelligent Language for Extensions
 Name:           guile
 Version:        2.0.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 rm %{buildroot}%{_libdir}/*.scm
 rm %{buildroot}%{_infodir}/*
 
@@ -68,7 +69,6 @@ make  %{?_smp_mflags} check
 %{_mandir}/man1/*
 %{_datadir}/aclocal/*.m4
 %{_datadir}/guile/*
-%{_libdir}/*.la
 
 %files devel
 %defattr(-,root,root)
@@ -78,6 +78,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.14-4
+- Remove libtool archive files from final packaging
+
 * Tue Jan 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.0.14-3
 - Add compatibility symlinks for guile and guile-tools binaries.
 

@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.1.0/bazel-4.1.0-dist.zip"
         }
       }
     },
@@ -648,6 +648,16 @@
           "name": "ceph",
           "version": "16.2.0",
           "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cert-manager",
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.5.3.tar.gz"
         }
       }
     },
@@ -2329,8 +2339,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2689,8 +2699,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2699,8 +2709,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -2709,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.60.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
         }
       }
     },
@@ -4159,8 +4169,8 @@
         "type": "other",
         "other": {
           "name": "libyaml",
-          "version": "0.2.1",
-          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.1.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
         }
       }
     },
@@ -8382,8 +8392,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20200818",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20200818/refpolicy-2.20200818.tar.bz2"
+          "version": "2.20210203",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20210203/refpolicy-2.20210203.tar.bz2"
         }
       }
     },

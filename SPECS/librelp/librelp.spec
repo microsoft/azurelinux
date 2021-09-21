@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.2.17
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+
 URL:            https://github.com/rsyslog/librelp
 #Source0:       https://github.com/rsyslog/librelp/archive/v%{version}.tar.gz
@@ -40,6 +40,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # The tls-basic-brokencert test is marked unstable in upstream source, so disable it.
@@ -55,7 +56,6 @@ make check
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/*.so.*
-%{_libdir}/*.la
 %{_libdir}/*.a
 
 %files devel
@@ -65,6 +65,9 @@ make check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.17-9
+- Remove libtool archive files from final packaging
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.17-8
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.2.17-7: Fix check tests.

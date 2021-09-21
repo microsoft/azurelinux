@@ -1,7 +1,7 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
 Version:        0.7.1alpha
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 URL:            http://www.cabextract.org.uk/libmspack/libmspack-0.5alpha.tar.gz
 Group:          Applications/System
@@ -28,6 +28,7 @@ make
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 cd test
@@ -49,10 +50,12 @@ cd test
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 %{_libdir}/*.so
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
+- Remove libtool archive files from final packaging
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.1alpha-3
 - Added %%license line automatically
 

@@ -2,7 +2,7 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,7 @@ The net-snmp-devel package contains headers and libraries for building SNMP appl
 
 %install
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 mkdir -p %{buildroot}/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/lib/systemd/system/snmpd.service
 install -m 0644 %{SOURCE2} %{buildroot}/lib/systemd/system/snmptrapd.service
@@ -94,13 +95,15 @@ popd
 %defattr(-,root,root)
 %{_datadir}/*
 %{_includedir}/*
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 %{perl_vendorarch}/*
 %{_libdir}/*.so
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-6
+- Remove libtool archive files from final packaging
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-5
 - Add provides for libs, agent-libs subpackages from base package
 - Minor linting (https source, updated URL, make macros)

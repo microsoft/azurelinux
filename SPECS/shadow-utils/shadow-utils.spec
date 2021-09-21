@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,20 +23,21 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
+BuildRequires:  %{_bindir}/xsltproc
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
-BuildRequires:  pam-devel
-BuildRequires:  autoconf
-BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  pam-devel
 Requires:       cracklib
+Requires:       libselinux
+Requires:       libsemanage
 Requires:       pam
 Provides:       /sbin/nologin
 Provides:       passwd = %{version}-%{release}
-Requires:       libselinux
-Requires:       libsemanage
 
 %description
 The Shadow package contains programs for handling passwords
@@ -181,6 +182,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-3
+- Update pam.d configuration for SELinux logins.
+- Change loginuid to be set only on logins.
+- Add missing BuildRequires for xsltproc.
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
 - Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
 - Add license to subid subpackage

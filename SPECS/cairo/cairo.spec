@@ -1,7 +1,7 @@
 Summary:        A 2D graphics library.
 Name:           cairo
 Version:        1.17.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,7 +69,8 @@ It contains the libraries and header files to create applications
         --enable-xlib-xrender=no \
         --enable-gobject \
         CFLAGS="-O3 -fPIC" \
-        --disable-static
+        --disable-static \
+        --disable-symbol-lookup
 make %{?_smp_mflags}
 
 %install
@@ -103,6 +104,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-2
+- Disabling "symbol-lookup" feature due to compilation errors.
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.17.4-1
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 1.16.0-5: Fix CVE-2018-19876

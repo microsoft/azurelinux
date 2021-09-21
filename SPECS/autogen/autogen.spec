@@ -1,7 +1,7 @@
 Summary:	The Automated Text and Program Generation Tool
 Name:		autogen
 Version:    5.18.16
-Release:    6%{?dist}
+Release:    7%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/autogen/
 Source0:        ftp://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
@@ -45,6 +45,7 @@ This package contains development files for libopts.
 make %{?_smp_mflags} CFLAGS="%{build_cflags} -Wno-error=format-overflow="
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -76,10 +77,12 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/autoopts-config.1.gz
 %{_mandir}/man3/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 %exclude /usr/share/info/
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.18.16-7
+- Remove libtool archive files from final packaging
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.18.16-6
 - Add BuildRequires on perl.
 

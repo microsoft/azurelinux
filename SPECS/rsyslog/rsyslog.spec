@@ -1,8 +1,7 @@
-%define sha1    rsyslog=7541e3cf6facbab19792ff8d9d7f4cd3fbb1c634
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,6 +113,7 @@ sed -i 's/libsystemd-journal/libsystemd/' configure
 install -vd %{buildroot}%{_libdir}/systemd/system/
 install -vd %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -vd %{buildroot}%{_docdir}/%{name}/html
+install -vdm 755 %{buildroot}/%{_sysconfdir}/rsyslog.d
 rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
@@ -146,11 +146,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/systemd/system/rsyslog.service
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
+%dir %attr(0755, root, root) %{_sysconfdir}/rsyslog.d
 
 %files doc
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
+- Add /etc/rsyslog.d directory.
+
 * Mon Jul 19 2021 Thomas Crain <thcrain@microsoft.com> - 8.37.0-6
 - Add html documentation subpackage from upstream-provided tarball
 - Enable various features and add the corresponding provides for subpackages from other distros:

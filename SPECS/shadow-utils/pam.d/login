@@ -23,6 +23,12 @@ account   required    pam_access.so
 # include the default account settings
 account   include     system-account
 
+# pam_selinux.so close should be the first session rule
+session   required    pam_selinux.so close
+
+# set audit loginuid for the user
+session   required    pam_loginuid.so
+
 # Set default environment variables for the user
 session   required    pam_env.so
 
@@ -40,6 +46,10 @@ session   required    pam_limits.so
 
 # include the default session and password settings
 session   include     system-session
+
+# pam_selinux.so open should only be followed by sessions to be executed in the user context
+session   required    pam_selinux.so open
+
 password  include     system-password
 
 # End /etc/pam.d/login

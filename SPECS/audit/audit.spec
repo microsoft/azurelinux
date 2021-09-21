@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -90,6 +90,7 @@ mkdir -p %{buildroot}/%{_var}/log
 mkdir -p %{buildroot}/%{_var}/spool/audit
 ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-auditd.preset
@@ -143,7 +144,6 @@ make %{?_smp_mflags} check
 %files devel
 %defattr(-,root,root)
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/golang/*
 %{_includedir}/*.h
@@ -155,7 +155,10 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
-* Wed Aug 18 2021 Thomas Crian <thcrain@microsoft.com> - 3.0-6
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-7
+- Remove libtool archive files from final packaging
+
+* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-6
 - Remove python2 subpackage
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 3.0-5 (from dev branch)
