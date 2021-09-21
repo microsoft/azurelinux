@@ -45,6 +45,9 @@ Generated\ Files/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+# Visual Studio Code
+.vscode/
+
 # NUnit
 *.VisualState.xml
 TestResult.xml
