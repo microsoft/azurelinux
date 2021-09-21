@@ -15,7 +15,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  ncurses-term
 %endif
 
-Requires:       %{name}-libs = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
 
 Conflicts:      toybox
 
