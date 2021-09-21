@@ -67,7 +67,6 @@ if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
     # Ensure the userspace speakup connector is up
     systemctl enable espeakup
     systemctl start espeakup
-    fi
 fi
 
 cd /installer
