@@ -13,7 +13,7 @@ Distribution:    Mariner
 Group:           Development/Languages
 URL:             https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
-Source0:         https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz
+Source0:         https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-%{version}-src-with-submodule.tar.gz
 BuildRequires:   bison
 BuildRequires:   cmake >= 2.8.7
 BuildRequires:   flex
