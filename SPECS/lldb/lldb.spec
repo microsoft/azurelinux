@@ -95,7 +95,6 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 %{_libdir}/liblldb.so
 %{_libdir}/liblldbIntelFeatures.so
-%{_libdir}/*.a
 %{_includedir}/*
 
 %files -n python-lldb
@@ -106,6 +105,7 @@ rm -rf %{buildroot}/*
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 - Add upstream patch to deal with format string warning
+- Remove static lib packaging from -devel since they are not installed anymore
 
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 8.0.1-4
 -   Explicitly set python verison.
