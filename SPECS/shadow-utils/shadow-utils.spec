@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
+BuildRequires:  libxslt
 BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       libselinux
@@ -150,27 +151,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 %{_sbindir}/*
 /bin/passwd
-%{_mandir}/man1
-%{_mandir}/man5
-%{_mandir}/man8
-%exclude %{_mandir}/cs
-%exclude %{_mandir}/da
-%exclude %{_mandir}/de
-%exclude %{_mandir}/fi
-%exclude %{_mandir}/fr
-%exclude %{_mandir}/hu
-%exclude %{_mandir}/id
-%exclude %{_mandir}/it
-%exclude %{_mandir}/ja
-%exclude %{_mandir}/ko
-%exclude %{_mandir}/man3
-%exclude %{_mandir}/pl
-%exclude %{_mandir}/pt_BR
-%exclude %{_mandir}/ru
-%exclude %{_mandir}/sv
-%exclude %{_mandir}/tr
-%exclude %{_mandir}/zh_CN
-%exclude %{_mandir}/zh_TW
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %files subid
@@ -182,6 +162,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-4
+- Adding missing BR for "libxslt".
+- Removing not built man pages.
+
 * Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-3
 - Update pam.d configuration for SELinux logins.
 - Change loginuid to be set only on logins.
