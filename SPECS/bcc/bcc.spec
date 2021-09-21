@@ -1,32 +1,30 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 %global debug_package %{nil}
 %global __python3 \/usr\/bin\/python3
-
-Name:            bcc
-Summary:         BPF Compiler Collection (BCC)
-Version:         0.22.0
-Release:         1%{?dist}
-License:         ASL 2.0
-Vendor:          Microsoft Corporation
-Distribution:    Mariner
-Group:           Development/Languages
-URL:             https://github.com/iovisor/bcc
+Summary:        BPF Compiler Collection (BCC)
+Name:           bcc
+Version:        0.22.0
+Release:        1%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Development/Languages
+URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
-Source0:         https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-%{version}-src-with-submodule.tar.gz
-BuildRequires:   bison
-BuildRequires:   cmake >= 2.8.7
-BuildRequires:   flex
-BuildRequires:   make
-BuildRequires:   gcc
-BuildRequires:   libstdc++
-BuildRequires:   elfutils-libelf
-BuildRequires:   elfutils-libelf-devel-static
-BuildRequires:   python3-devel
-BuildRequires:   llvm-devel
-BuildRequires:   clang-devel
-BuildRequires:   pkg-config
-BuildRequires:   ncurses-devel
+Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-%{version}-src-with-submodule.tar.gz
+BuildRequires:  bison
+BuildRequires:  clang-devel
+BuildRequires:  cmake >= 2.8.7
+BuildRequires:  elfutils-libelf
+BuildRequires:  elfutils-libelf-devel-static
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  libstdc++
+BuildRequires:  llvm-devel
+BuildRequires:  make
+BuildRequires:  ncurses-devel
+BuildRequires:  pkg-config
+BuildRequires:  python3-devel
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation programs,
@@ -36,34 +34,39 @@ a new feature that was first added to Linux 3.15.
 Much of what BCC uses requires Linux 4.1 and above.
 
 %package devel
-Summary: Shared Library for BPF Compiler Collection (BCC)
-Requires: %{name} = %{version}-%{release}
+Summary:        Shared Library for BPF Compiler Collection (BCC)
+Requires:       %{name} = %{version}-%{release}
+
 %description devel
 %{name}-devel contains shared libraries and header files for
 developing application.
 
 %package static
-Summary: Static Library for BPF Compiler Collection (BCC)
-Requires: %{name} = %{version}-%{release}
+Summary:        Static Library for BPF Compiler Collection (BCC)
+Requires:       %{name} = %{version}-%{release}
+
 %description static
 %{name}-static contains static libraries for developing application.
 
 %package -n python3-%{name}
-Summary: Python3 bindings for BPF Compiler Collection (BCC)
-Requires: %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-bcc}
+Summary:        Python3 bindings for BPF Compiler Collection (BCC)
+Requires:       %{name} = %{version}-%{release}
+
 %description -n python3-%{name}
 Python bindings for BPF Compiler Collection (BCC)
 
 %package examples
-Summary: Examples for BPF Compiler Collection (BCC)
-Requires: python3-%{name} = %{version}-%{release}
+Summary:        Examples for BPF Compiler Collection (BCC)
+Requires:       python3-%{name} = %{version}-%{release}
+
 %description examples
 Examples for BPF Compiler Collection (BCC)
 
 %package tools
-Summary: Command line tools for BPF Compiler Collection (BCC)
-Requires: python3-%{name} = %{version}-%{release}
+Summary:        Command line tools for BPF Compiler Collection (BCC)
+Requires:       python3-%{name} = %{version}-%{release}
+
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
 
@@ -74,7 +77,7 @@ Command line tools for BPF Compiler Collection (BCC)
 mkdir build
 pushd build
 cmake .. -DREVISION_LAST=%{version} -DREVISION=%{version} \
-      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DPYTHON_CMD=python3 \
       %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
 make %{?_smp_mflags}
@@ -88,11 +91,8 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
     sed -i -e '1 s|^#!/usr/bin/python$|#!'%{__python3}'|' \
            -e '1 s|^#!/usr/bin/env python$|#!'%{__python3}'|' {} \;
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %doc README.md
@@ -133,13 +133,17 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 - Update to 0.22.0
 - Add static library subpackage
 
-*   Fri Jun 05 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.12.0-1
--   Update bcc version
-*   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 0.10.0-4
--   Fix #Source0
-*   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 0.10.0-3
--   Add #Source0. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.10.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Jun 26 2019  Keerthana K <keerthanak@vmware.com> 0.10.0-1
--   Initial bcc package for PhotonOS.
+* Fri Jun 05 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.12.0-1
+- Update bcc version
+
+* Tue Apr 21 2020 Eric Li <eli@microsoft.com> 0.10.0-4
+- Fix #Source0
+
+* Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 0.10.0-3
+- Add #Source0. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.10.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Jun 26 2019  Keerthana K <keerthanak@vmware.com> 0.10.0-1
+- Initial bcc package for PhotonOS.
