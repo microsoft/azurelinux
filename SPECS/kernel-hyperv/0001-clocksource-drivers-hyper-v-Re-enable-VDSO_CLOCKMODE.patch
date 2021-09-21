@@ -1,0 +1,63 @@
+From d1921ccf2f197a9e1699f2b35890f06dc4105500 Mon Sep 17 00:00:00 2001
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Thu, 13 May 2021 09:32:46 +0200
+Subject: [PATCH] clocksource/drivers/hyper-v: Re-enable VDSO_CLOCKMODE_HVCLOCK
+ on X86
+
+Mohammed reports (https://bugzilla.kernel.org/show_bug.cgi?id=213029)
+the commit e4ab4658f1cf ("clocksource/drivers/hyper-v: Handle vDSO
+differences inline") broke vDSO on x86. The problem appears to be that
+VDSO_CLOCKMODE_HVCLOCK is an enum value in 'enum vdso_clock_mode' and
+'#ifdef VDSO_CLOCKMODE_HVCLOCK' branch evaluates to false (it is not
+a define).
+
+Use a dedicated HAVE_VDSO_CLOCKMODE_HVCLOCK define instead.
+
+Fixes: e4ab4658f1cf ("clocksource/drivers/hyper-v: Handle vDSO differences inline")
+Reported-by: Mohammed Gamal <mgamal@redhat.com>
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+Link: https://lore.kernel.org/r/20210513073246.1715070-1-vkuznets@redhat.com
+---
+ arch/x86/include/asm/vdso/clocksource.h | 2 ++
+ drivers/clocksource/hyperv_timer.c      | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/vdso/clocksource.h b/arch/x86/include/asm/vdso/clocksource.h
+index 119ac8612d89..136e5e57cfe1 100644
+--- a/arch/x86/include/asm/vdso/clocksource.h
++++ b/arch/x86/include/asm/vdso/clocksource.h
+@@ -7,4 +7,6 @@
+ 	VDSO_CLOCKMODE_PVCLOCK,	\
+ 	VDSO_CLOCKMODE_HVCLOCK
+ 
++#define HAVE_VDSO_CLOCKMODE_HVCLOCK
++
+ #endif /* __ASM_VDSO_CLOCKSOURCE_H */
+diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
+index ba17faa92597..5d08f5f58a6b 100644
+--- a/drivers/clocksource/hyperv_timer.c
++++ b/drivers/clocksource/hyperv_timer.c
+@@ -419,7 +419,7 @@ static void resume_hv_clock_tsc(struct clocksource *arg)
+ 	hv_set_register(HV_REGISTER_REFERENCE_TSC, tsc_msr);
+ }
+ 
+-#ifdef VDSO_CLOCKMODE_HVCLOCK
++#ifdef HAVE_VDSO_CLOCKMODE_HVCLOCK
+ static int hv_cs_enable(struct clocksource *cs)
+ {
+ 	vclocks_set_used(VDSO_CLOCKMODE_HVCLOCK);
+@@ -435,7 +435,7 @@ static struct clocksource hyperv_cs_tsc = {
+ 	.flags	= CLOCK_SOURCE_IS_CONTINUOUS,
+ 	.suspend= suspend_hv_clock_tsc,
+ 	.resume	= resume_hv_clock_tsc,
+-#ifdef VDSO_CLOCKMODE_HVCLOCK
++#ifdef HAVE_VDSO_CLOCKMODE_HVCLOCK
+ 	.enable = hv_cs_enable,
+ 	.vdso_clock_mode = VDSO_CLOCKMODE_HVCLOCK,
+ #else
+-- 
+2.17.1
+
