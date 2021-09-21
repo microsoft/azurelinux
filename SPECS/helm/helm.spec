@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.4.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -26,6 +26,7 @@ Source0:       %{name}-%{version}.tar.gz
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2021-21303.patch
+Patch1:        CVE-2021-32690.patch
 BuildRequires: golang >= 1.15.5
 
 %description
@@ -53,6 +54,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Mon Sep 20 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-4
+- Patch CVE-2021-32690
+
 * Mon Sep 20 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-3
 - Patch CVE-2021-21303
 
