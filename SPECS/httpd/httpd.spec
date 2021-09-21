@@ -1,7 +1,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
@@ -23,6 +23,43 @@ Patch101: CVE-1999-1412.nopatch
 # CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
 Patch102: CVE-2007-0086.nopatch
 Patch103: CVE-2021-33193.patch
+Patch104: CVE-2019-17567_bc62c7.patch
+Patch105: CVE-2019-17567_856e69.patch
+Patch106: CVE-2019-17567_1376ba.patch
+Patch107: CVE-2019-17567_621b32.patch
+Patch108: CVE-2019-17567_ba5ac2.patch
+Patch109: CVE-2019-17567_92acc0.patch
+Patch110: CVE-2019-17567_e0d5c4.patch
+Patch111: CVE-2019-17567_330e0a.patch
+Patch112: CVE-2019-17567_e50584.patch
+Patch113: CVE-2019-17567_06e65a.patch
+Patch114: CVE-2019-17567_9279a2.patch
+Patch115: CVE-2019-17567_6da7cf.patch
+Patch116: CVE-2019-17567_3df065.patch
+Patch117: CVE-2019-17567_28ecf4.patch
+Patch118: CVE-2019-17567_b877df.patch
+Patch119: CVE-2019-17567_42cdf5.patch
+Patch120: CVE-2019-17567_fb1c59.patch
+Patch121: CVE-2019-17567_8a042c.patch
+Patch122: CVE-2019-17567_8580b4.patch
+Patch123: CVE-2019-17567_fe097d.patch
+Patch124: CVE-2019-17567_cf823e.patch
+Patch125: CVE-2019-17567_ac3b2d.patch
+Patch126: CVE-2019-17567_679d16.patch
+Patch127: CVE-2019-17567_bea547.patch
+Patch128: CVE-2019-17567_2d83bc.patch
+Patch129: CVE-2019-17567_fa60a3.patch
+Patch130: CVE-2019-17567_1f916c.patch
+Patch131: CVE-2019-17567_874482.patch
+Patch132: CVE-2019-17567_428474.patch
+Patch133: CVE-2019-17567_70eff2.patch
+Patch134: CVE-2019-17567_f7d35d.patch
+Patch135: CVE-2019-17567_975974.patch
+Patch136: CVE-2019-17567_41cdf5.patch
+Patch137: CVE-2019-17567_a83455.patch
+Patch138: CVE-2019-17567_18c4ac.patch
+Patch139: CVE-2019-17567_fa22b5.patch
+Patch140: CVE-2019-17567_cb517a.patch
 
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
@@ -203,6 +240,26 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Tue Sep 21 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.4.46-7
+-   Added patch file(s) CVE-2019-17567_bc62c7.patch,
+-   CVE-2019-17567_856e69.patch, CVE-2019-17567_1376ba.patch,
+-   CVE-2019-17567_621b32.patch, CVE-2019-17567_ba5ac2.patch,
+-   CVE-2019-17567_92acc0.patch, CVE-2019-17567_e0d5c4.patch,
+-   CVE-2019-17567_330e0a.patch, CVE-2019-17567_e50584.patch,
+-   CVE-2019-17567_06e65a.patch, CVE-2019-17567_9279a2.patch,
+-   CVE-2019-17567_6da7cf.patch, CVE-2019-17567_3df065.patch,
+-   CVE-2019-17567_28ecf4.patch, CVE-2019-17567_b877df.patch,
+-   CVE-2019-17567_42cdf5.patch, CVE-2019-17567_fb1c59.patch,
+-   CVE-2019-17567_8a042c.patch, CVE-2019-17567_8580b4.patch,
+-   CVE-2019-17567_fe097d.patch, CVE-2019-17567_cf823e.patch,
+-   CVE-2019-17567_ac3b2d.patch, CVE-2019-17567_679d16.patch,
+-   CVE-2019-17567_bea547.patch, CVE-2019-17567_2d83bc.patch,
+-   CVE-2019-17567_fa60a3.patch, CVE-2019-17567_1f916c.patch,
+-   CVE-2019-17567_874482.patch, CVE-2019-17567_428474.patch,
+-   CVE-2019-17567_70eff2.patch, CVE-2019-17567_f7d35d.patch,
+-   CVE-2019-17567_975974.patch, CVE-2019-17567_41cdf5.patch,
+-   CVE-2019-17567_a83455.patch, CVE-2019-17567_18c4ac.patch,
+-   CVE-2019-17567_fa22b5.patch, CVE-2019-17567_cb517a.patch
 *   Wed Aug 25 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.4.46-6
 -   Added patch file(s) CVE-2021-33193.patch
 *   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5
