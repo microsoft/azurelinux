@@ -64,9 +64,8 @@ gzip-1.9-6.cm2.aarch64.rpm
 make-4.2.1-5.cm2.aarch64.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
-util-linux-2.36.1-4.cm2.aarch64.rpm
-util-linux-devel-2.36.1-4.cm2.aarch64.rpm
-util-linux-libs-2.36.1-4.cm2.aarch64.rpm
+util-linux-2.36.1-5.cm2.aarch64.rpm
+util-linux-devel-2.36.1-5.cm2.aarch64.rpm
 tar-1.32-2.cm2.aarch64.rpm
 xz-5.2.4-4.cm2.aarch64.rpm
 xz-devel-5.2.4-4.cm2.aarch64.rpm
