@@ -1,6 +1,6 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.11.4
+Version:        0.13.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -17,7 +17,11 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
-BuildRequires:  llvm-devel >= 8.0.1-5
+BuildRequires:  gmock
+BuildRequires:  gmock-devel
+BuildRequires:  gtest
+BuildRequires:  gtest-devel
+BuildRequires:  llvm-devel >= 12.0.1-1
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  zlib-devel
@@ -27,7 +31,7 @@ Requires:       clang
 Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
-Requires:       llvm >= 8.0.1-5
+Requires:       llvm >= 12.0.1-1
 
 %description
 bpftrace is a high-level tracing language for Linux enhanced Berkeley Packet Filter (eBPF)
@@ -53,6 +57,9 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.13.0-1
+- Update to 0.13.0
+
 * Wed Feb 03 2021 Henry Beberman <henry.beberman@microsoft.com> - 0.11.4-1
 - Add bpftrace spec.
 - License verified
