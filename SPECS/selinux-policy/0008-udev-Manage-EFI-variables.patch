@@ -1,0 +1,27 @@
+From abc4772646fd187cb1fc1b5abe37c8dd89de7507 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 1 Sep 2021 19:41:55 +0000
+Subject: udev: Manage EFI variables.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/udev.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index 521d7e9c7..70ad2a3c2 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -130,6 +130,7 @@ fs_list_inotifyfs(udev_t)
+ fs_read_cgroup_files(udev_t)
+ fs_rw_anon_inodefs_files(udev_t)
+ fs_search_tracefs(udev_t)
++fs_manage_efivarfs_files(udev_t)
+
+ mcs_ptrace_all(udev_t)
+
+--
+2.17.1
+

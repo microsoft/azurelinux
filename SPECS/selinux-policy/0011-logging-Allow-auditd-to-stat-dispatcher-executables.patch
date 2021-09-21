@@ -1,0 +1,37 @@
+From 138e989c89842cde7e2a2dbfbcae438fc4676133 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 1 Sep 2021 19:49:05 +0000
+Subject: logging: Allow auditd to stat() dispatcher executables.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/logging.if | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
+index 10dee6563..f1183690a 100644
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -287,7 +287,7 @@ interface(`logging_signal_dispatcher',`
+ #
+ interface(`logging_dispatcher_domain',`
+ 	gen_require(`
+-		type audisp_t;
++		type audisp_t, auditd_t;
+ 		role system_r;
+ 	')
+
+@@ -296,6 +296,8 @@ interface(`logging_dispatcher_domain',`
+
+ 	role system_r types $1;
+
++	allow auditd_t $2:file getattr;
++
+ 	domtrans_pattern(audisp_t, $2, $1)
+ 	allow audisp_t $1:process { sigkill sigstop signull signal };
+
+--
+2.17.1
+
