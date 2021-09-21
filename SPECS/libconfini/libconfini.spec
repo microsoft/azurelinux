@@ -1,7 +1,7 @@
 Summary:        libconfini
 Name:           libconfini
 Version:        1.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %defattr(-,root,root,-)
@@ -46,10 +47,12 @@ make install DESTDIR=%{buildroot}
 %{_mandir}/*
 %{_includedir}/*.h
 %{_libdir}/*.a
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
+- Remove libtool archive files from final packaging
+
 *  Fri Dec 11 2020 Jonathan Chiu <jochi@microsoft.com> 1.16.0-1
 -  Original version for CBL-Mariner.

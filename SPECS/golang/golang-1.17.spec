@@ -12,14 +12,14 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.15.13
+Version:        1.17.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://golang.org
-Source0:        https://dl.google.com/go/go%{version}.src.tar.gz
+Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
@@ -63,7 +63,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{goroot}
 
-cp -R api bin doc favicon.ico lib pkg robots.txt src misc VERSION %{buildroot}%{goroot}
+cp -R api bin doc lib pkg src misc VERSION %{buildroot}%{goroot}
 
 # remove the unnecessary zoneinfo file (Go will always use the system one first)
 rm -rfv %{buildroot}%{goroot}/lib/time
@@ -116,6 +116,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Sep 15 2021 Andrew Phelps <anphel@microsoft.com> - 1.17.1-1
+- Updated to version 1.17.1
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.15.13-1
 - Updated to version 1.15.13 to fix CVE-2021-33194 and CVE-2021-31525
 

@@ -1,7 +1,7 @@
 Summary:        NUMA support for Linux
 Name:           numactl
 Version:        2.0.13
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -62,12 +63,14 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/numa.pc
 %{_mandir}/man2/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-5
+- Remove libtool archive files from final packaging
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.13-4
 - Provide numactl-libs and numactl-devel.
 

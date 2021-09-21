@@ -1,7 +1,7 @@
 Summary:        libgpg-error
 Name:           libgpg-error
 Version:        1.32
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
@@ -37,6 +37,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_infodir}
 %find_lang %{name}
 
@@ -63,7 +64,6 @@ make %{?_smp_mflags} check
 %{_bindir}/gpgrt-config
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_datadir}/libgpg-error
 %{_datadir}/aclocal/*
 %{_datadir}/common-lisp/source/gpg-error
@@ -72,6 +72,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.32-6
+- Remove libtool archive files from final packaging
+
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5
 - Explicitly add Provides pkgconfig(gpg-error) to devel package.
 

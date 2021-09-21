@@ -1,7 +1,7 @@
 Name:           ivykis
 Summary:        Library for asynchronous I/O readiness notification
 Version:        0.42.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license COPYING
@@ -35,11 +36,14 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man3/*.3.gz
 
 %files devel
-%{_libdir}/{*.a,*.la,*.so}
+%{_libdir}/{*.a,*.so}
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.42.4-3
+- Remove libtool archive files from final packaging
+
 *   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.42.4-2
 -   License verified.
 -   Added source URL.

@@ -1,7 +1,7 @@
 Summary:        GNU Parted manipulates partition tables
 Name:           parted
 Version:        3.2
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 rm -rf %{buildroot}%{_infodir}/dir
 
@@ -41,7 +42,6 @@ rm -rf %{buildroot}%{_infodir}/dir
 %license COPYING
 %{_sbindir}/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
@@ -50,6 +50,9 @@ rm -rf %{buildroot}%{_infodir}/dir
 %{_datadir}/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-12
+- Remove libtool archive files from final packaging
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 3.2-11
 - Provide parted-devel.
 

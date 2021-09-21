@@ -1,7 +1,7 @@
 Summary:        A library providing GObject bindings for libudev
 Name:           libgudev
 Version:        232
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPL2.1
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -41,6 +41,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -56,11 +57,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files devel
 %{_includedir}/*
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/gudev-1.0.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 232-6
+- Remove libtool archive files from final packaging
+
 * Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 232-5
 - Add provides for libgudev1, libgudev1-devel
 
