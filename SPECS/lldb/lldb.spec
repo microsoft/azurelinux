@@ -34,13 +34,13 @@ Requires:       %{name} = %{version}-%{release}
 The lldb-devel package contains libraries, header files and documentation
 for developing applications that use lldb.
 
-%package -n python-lldb
+%package -n python3-lldb
 Summary:        Python module for lldb
 Requires:       %{name} = %{version}-%{release}
-BuildRequires:  python2-devel
-Requires:       python-six
+BuildRequires:  python3-devel
+Requires:       python3-six
 
-%description -n python-lldb
+%description -n python3-lldb
 The package contains the LLDB Python module.
 
 %prep
@@ -97,15 +97,16 @@ rm -rf %{buildroot}/*
 %{_libdir}/liblldbIntelFeatures.so
 %{_includedir}/*
 
-%files -n python-lldb
+%files -n python3-lldb
 %defattr(-,root,root)
-%{python2_sitelib}/*
+%{python3_sitelib}/*
 
 %changelog
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 - Add upstream patch to deal with format string warning
 - Remove static lib packaging from -devel since they are not installed anymore
+- Remove python2 lldb subpackage and provide python3 lldb subpackage
 
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 8.0.1-4
 -   Explicitly set python verison.
