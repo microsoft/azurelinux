@@ -33,9 +33,9 @@ The clang-devel package contains libraries, header files and documentation
 for developing applications that use clang.
 
 %package -n git-clang-format
-Summary:	Integration of clang-format for git
-Requires:	git
-Requires:	python3
+Summary:        Integration of clang-format for git
+Requires:       git
+Requires:       python3
 
 %description -n git-clang-format
 clang-format integration for git.
@@ -72,7 +72,6 @@ make clang-check
 
 %clean
 rm -rf %{buildroot}/*
-
 
 %files
 %defattr(-,root,root)
