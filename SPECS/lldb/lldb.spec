@@ -6,6 +6,7 @@ Release:        1%{?dist}
 License:        NCSA
 URL:            https://lldb.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
+Patch1:         0001-Silence-GCC-warnings-about-format-not-being-a-string.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +45,7 @@ The package contains the LLDB Python module.
 
 %prep
 %setup -q -n %{name}-%{version}.src
+%patch1 -p1
 
 %build
 # Disable symbol generation
@@ -103,6 +105,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
+- Add upstream patch to deal with format string warning
 
 *   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 8.0.1-4
 -   Explicitly set python verison.
