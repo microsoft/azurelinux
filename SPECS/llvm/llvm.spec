@@ -71,7 +71,6 @@ ninja check-all
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
