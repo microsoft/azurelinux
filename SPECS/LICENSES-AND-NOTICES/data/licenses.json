@@ -887,7 +887,7 @@
     },
     {
       "origin": "OpenSuse",
-      "license": "[MIT] https://github.com/libgd/libgd/blob/master/COPYING",
+      "license": "[MIT](https://github.com/libgd/libgd/blob/master/COPYING)",
       "specs": [
         "gd"
       ]
