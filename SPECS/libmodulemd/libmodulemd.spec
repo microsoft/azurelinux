@@ -47,7 +47,11 @@ It contains the libraries and header files.
     -Dbuild_api_v2=true \
     -Dwith_py3_overrides=true \
     -Dwith_py2_overrides=false \
+%if %{with docs}
+    -Dwith_docs=true \
+%else
     -Dwith_docs=false \
+%endif
     -Dwith_manpages=disabled
 %meson_build
 
