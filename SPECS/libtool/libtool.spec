@@ -90,6 +90,7 @@ make %{?_smp_mflags} check
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 2.4.6-8
 - Replaced build commands with rpm macros
 - Corrected version in previous changelog
+- License verified
 - Removed sha1 macro
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.4.6-7
