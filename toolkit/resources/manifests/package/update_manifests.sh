@@ -45,7 +45,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/ca-certificates-microsoft/d' $TmpPkgGen
-    sed -i '/cyrus-sasl/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
     sed -i '/lua-static/d' $TmpPkgGen
@@ -79,7 +78,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/libsemanage-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsepol-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
@@ -202,7 +200,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-rpm/d' $TmpPkgGen
     sed -i '/python3-test/d' $TmpPkgGen
     sed -i '/python3-tools/d' $TmpPkgGen
-    sed -i '/shadow/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/tcp_wrappers-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
@@ -307,7 +304,6 @@ generate_pkggen_core () {
         grep "^python3-" $TmpPkgGen
         grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
-        grep "^cyrus-sasl-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
     } > "$1"
 }

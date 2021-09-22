@@ -245,6 +245,7 @@
                 "bmon",
                 "bond",
                 "ccache",
+                "cert-manager",
                 "clamav",
                 "cloud-hypervisor",
                 "cloud-init-vmware-guestinfo",
