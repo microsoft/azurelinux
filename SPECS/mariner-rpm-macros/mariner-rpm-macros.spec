@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -120,6 +120,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Sep 21 2021 Andrew Phelps <anphel@microsoft.com> - 2.0-5
+- Modify gen-ld-script.sh to ensure moduleVersion contains 4 part version
+
 * Mon Sep 13 2021 Andrew Phelps <anphel@microsoft.com> - 2.0-4
 - Add gen-ld-script.sh and generate-package-note.py to generate ELF note metadata
 
