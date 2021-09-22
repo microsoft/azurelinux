@@ -104,7 +104,7 @@ popd
 %files -f %{name}.lang
 %license COPYING
 %doc README.md AUTHORS
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.2*
 %dir %{_libdir}/libdnf/
 %dir %{_libdir}/libdnf/plugins/
 %{_libdir}/libdnf/plugins/README

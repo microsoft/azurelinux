@@ -73,7 +73,7 @@ popd
 %files
 %license COPYING
 %doc README.md
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.0*
 
 %files devel
 %{_libdir}/%{name}.so

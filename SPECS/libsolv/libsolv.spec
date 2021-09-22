@@ -60,8 +60,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %defattr(-,root,root)
 %license LICENSE.BSD
-%{_libdir}/libsolv.so.*
-%{_libdir}/libsolvext.so.*
+%{_libdir}/libsolv.so.1*
+%{_libdir}/libsolvext.so.1*
 
 %files devel
 %defattr(-,root,root)

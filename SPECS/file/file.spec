@@ -74,7 +74,7 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %files libs
 %defattr(-,root,root)
 %license COPYING
-%{_libdir}/*.so.*
+%{_libdir}/libmagic.so.1*
 %{_datarootdir}/misc/magic.mgc
 
 %files devel

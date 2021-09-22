@@ -72,7 +72,7 @@ popd
 %license COPYING
 %{_sysconfdir}/bash_completion.d/createrepo_c.bash
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/*.so.0*
 %{_mandir}/*
 %exclude %{_libdir}/python*
 
