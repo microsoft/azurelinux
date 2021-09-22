@@ -247,9 +247,6 @@ Various tcl packages (extensions) for the graphviz tools.
 
 %prep
 %autosetup -p1
-#%setup -q
-#%patch0 -p1 -b .dotty-menu-fix
-#%patch1 -p1 -b .coverity-scan-fixes
 
 # Attempt to fix rpmlint warnings about executable sources
 find -type f -regex '.*\.\(c\|h\)$' -exec chmod a-x {} ';'
