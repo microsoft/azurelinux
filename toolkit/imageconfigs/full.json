@@ -21,6 +21,16 @@
             "KernelOptions": {
                 "default": "kernel"
             }
+        },
+        {
+            "Name": "CBL-Mariner Azure VM",
+            "PackageLists": [
+                "packagelists/core-packages-image.json",
+                "packagelists/azurevm-packages.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            }
         }
     ]
 }
