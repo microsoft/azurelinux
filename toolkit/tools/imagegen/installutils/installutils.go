@@ -455,7 +455,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, encryptedRoot, hidepidEnabled)
+		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, encryptedRoot, hidepidEnabled)
 		if err != nil {
 			return
 		}
@@ -608,7 +608,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -616,7 +616,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, ins
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, hidepidEnabled)
+	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, hidepidEnabled)
 	if err != nil {
 		return
 	}
@@ -770,7 +770,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, hidepidEnabled bool) (err error) {
+func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, hidepidEnabled bool) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -778,7 +778,12 @@ func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPoi
 
 	for mountPoint, devicePath := range installMap {
 		if mountPoint != "" && devicePath != NullDevice {
-			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], !doPseudoFsMount)
+			partSetting := config.GetMountpointPartitionSetting(mountPoint)
+			if partSetting == nil {
+				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
+				return
+			}
+			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
 			if err != nil {
 				return
 			}
@@ -786,7 +791,7 @@ func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPoi
 	}
 
 	if hidepidEnabled {
-		err = addEntryToFstab(installRoot, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", doPseudoFsMount)
+		err = addEntryToFstab(installRoot, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", configuration.MountIdentifierNone, doPseudoFsMount)
 		if err != nil {
 			return
 		}
@@ -794,9 +799,8 @@ func updateFstab(installRoot string, installMap, mountPointToFsTypeMap, mountPoi
 	return
 }
 
-func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string, doPseudoFsMount bool) (err error) {
+func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string, identifierType configuration.MountIdentifier, doPseudoFsMount bool) (err error) {
 	const (
-		uuidPrefix       = "UUID="
 		fstabPath        = "/etc/fstab"
 		rootfsMountPoint = "/"
 		defaultOptions   = "defaults"
@@ -825,13 +829,11 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 	if diskutils.IsEncryptedDevice(devicePath) || diskutils.IsReadOnlyDevice(devicePath) || doPseudoFsMount {
 		device = devicePath
 	} else {
-		uuid, err := GetUUID(devicePath)
+		device, err = FormatMountIdentifier(identifierType, devicePath)
 		if err != nil {
-			logger.Log.Warnf("Failed to get UUID for block device %v", devicePath)
+			logger.Log.Warnf("Failed to get mount identifier for block device %v", devicePath)
 			return err
 		}
-
-		device = fmt.Sprintf("%v%v", uuidPrefix, uuid)
 	}
 
 	// Note: Rootfs should always have a pass number of 1. All other mountpoints are either 0 or 2
@@ -876,6 +878,7 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	)
 
 	fullCryptTabPath := filepath.Join(installRoot, cryptTabPath)
+	// Encrypted root will always use UUID rather than the PartitionSetting.MountIdentifier
 	uuid := encryptedRoot.LuksUUID
 	blockDevice := diskutils.GetLuksMappingName(uuid)
 	encryptedUUID := fmt.Sprintf("%v%v", uuidPrefix, uuid)
@@ -1555,6 +1558,49 @@ func GetPartUUID(device string) (stdout string, err error) {
 	}
 	logger.Log.Trace(stdout)
 	stdout = strings.TrimSpace(stdout)
+	return
+}
+
+// GetPartLabel queries the PARTLABEL of the given partition
+// - device is the device path of the desired partition
+func GetPartLabel(device string) (stdout string, err error) {
+	stdout, _, err = shell.Execute("blkid", device, "-s", "PARTLABEL", "-o", "value")
+	if err != nil {
+		return
+	}
+	logger.Log.Trace(stdout)
+	stdout = strings.TrimSpace(stdout)
+	return
+}
+
+// FormatMountIdentifier finds the requested identifier type for the given device, and formats it for use
+//  ie "UUID=12345678-abcd..."
+func FormatMountIdentifier(identifier configuration.MountIdentifier, device string) (identifierString string, err error) {
+	var id string
+	switch identifier {
+	case configuration.MountIdentifierUuid:
+		id, err = GetUUID(device)
+		if err != nil {
+			return
+		}
+		identifierString = fmt.Sprintf("UUID=%s", id)
+	case configuration.MountIdentifierPartUuid:
+		id, err = GetPartUUID(device)
+		if err != nil {
+			return
+		}
+		identifierString = fmt.Sprintf("PARTUUID=%s", id)
+	case configuration.MountIdentifierPartLabel:
+		id, err = GetPartLabel(device)
+		if err != nil {
+			return
+		}
+		identifierString = fmt.Sprintf("PARTLABEL=%s", id)
+	case configuration.MountIdentifierNone:
+		err = fmt.Errorf("must select a mount identifier for device (%s)", device)
+	default:
+		err = fmt.Errorf("unknown mount identifier: '%v'", identifier)
+	}
 	return
 }
 
