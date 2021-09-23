@@ -3668,6 +3668,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libslirp",
+          "version": "4.6.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libSM",
           "version": "1.2.3",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"

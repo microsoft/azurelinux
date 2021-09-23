@@ -96,6 +96,7 @@
                 "libpciaccess",
                 "libpwquality",
                 "libsemanage",
+                "libslirp",
                 "libSM",
                 "libsndfile",
                 "libstoragemgmt",
