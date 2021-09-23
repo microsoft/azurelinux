@@ -1,28 +1,27 @@
-Summary:       A toolkit for defining and handling authorizations.
-Name:          polkit
-Version:       0.116
-Release:       5%{?dist}
-Group:         Applications/System
-Vendor:        Microsoft Corporation
-License:       LGPLv2+
-URL:           https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
-Source0:       https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
-Patch0:        CVE-2021-3560.patch
-Distribution:  Mariner
-BuildRequires: autoconf
-BuildRequires: expat-devel
-BuildRequires: glib-devel
-BuildRequires: gobject-introspection
-BuildRequires: intltool >= 0.40.0
-BuildRequires: mozjs60-devel
-BuildRequires: pam-devel
-BuildRequires: systemd-devel
-Requires:      expat
-Requires:      glib
-Requires:      mozjs60
-Requires:      pam
-Requires:      systemd
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
+Summary:           A toolkit for defining and handling authorizations.
+Name:              polkit
+Version:           0.119
+Release:           1%{?dist}
+Group:             Applications/System
+Vendor:            Microsoft Corporation
+License:           LGPLv2+
+URL:               https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
+Source0:           https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
+Distribution:      Mariner
+BuildRequires:     autoconf
+BuildRequires:     expat-devel
+BuildRequires:     glib-devel
+BuildRequires:     gobject-introspection
+BuildRequires:     intltool >= 0.40.0
+BuildRequires:     mozjs-devel >= 78.3.1
+BuildRequires:     pam-devel
+BuildRequires:     systemd-devel
+Requires:          mozjs
+Requires:          expat
+Requires:          glib
+Requires:          pam
+Requires:          systemd
+Requires(pre):     /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):  /usr/sbin/userdel /usr/sbin/groupdel
 
 %description
@@ -30,19 +29,16 @@ polkit provides an authorization API intended to be used by privileged programs
 (“MECHANISMS”) offering service to unprivileged programs (“SUBJECTS”) often
 through some form of inter-process communication mechanism
 
-%package devel
-Summary: polkit development headers and libraries
-Group: Development/Libraries
-Requires: polkit = %{version}-%{release}
+%package           devel
+Summary:           polkit development headers and libraries
+Group:             Development/Libraries
+Requires:          polkit = %{version}-%{release}
 
-%description devel
+%description       devel
 header files and libraries for polkit
 
 %prep
-%autosetup -p1
-# Disable polkitbackend tests, which fail since dbus is not available in the worker chroot
-sed -i 's/polkitbackend//g' test/Makefile.am
-sed -i 's/polkitbackend//g' test/Makefile.in
+%setup -q
 
 %build
 %configure \
@@ -67,7 +63,7 @@ session  include        system-session
 EOF
 
 %check
-make check
+# Disable check. It requires dbus - not available in chroot/container.
 
 %pre
 getent group polkitd > /dev/null || groupadd -fg 27 polkitd &&
@@ -92,7 +88,6 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/pk*
 %{_libdir}/lib%{name}-*.so.*
 %{_libdir}/polkit-1/polkit-agent-helper-1
@@ -104,6 +99,7 @@ fi
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.PolicyKit1.conf
 %{_sysconfdir}/pam.d/polkit-1
 %{_sysconfdir}/polkit-1/rules.d/50-default.rules
+%{_datadir}/gettext/its
 
 %files devel
 %defattr(-,root,root)
@@ -111,29 +107,26 @@ fi
 %{_libdir}/lib%{name}-*.a
 %{_libdir}/lib%{name}-*.so
 %{_libdir}/pkgconfig/*.pc
-%{_datadir}/gettext/its/polkit.its
-%{_datadir}/gettext/its/polkit.loc
 
 %changelog
-*   Thu Jun 03 2021 Andrew Phelps <anphel@microsoft.com> - 0.116-5
--   Enable check tests (with exception of unsupported "polkitbackend" tests)
+*   Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> 0.119-1
+-   Initial CBL-Mariner import from Photon (license: Apache2)
+-   Bump to polkit 0.119
 
-*   Thu Jun 03 2021 Jon Slobodzian <josloboe@microsoft.com> - 0.116-4
--   Patch for CVE 2021-3560.  Fix changelog formatting.
+*   Wed Apr 28 2021 Gerrit Photon <photon-checkins@vmware.com> 0.118-2
+-   Bump up release version since mozjs is update to 78.10.0
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.116-3
--   Added %%license line automatically
+*   Wed Sep 09 2020 Gerrit Photon <photon-checkins@vmware.com> 0.118-1
+-   Automatic Version Bump
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 0.116-2
--   Renaming Linux-PAM to pam
+*   Tue Aug 25 2020 Ankit Jain <ankitja@vmware.com> 0.117-2
+-   This version of polkit build requires specific mozjs version
 
-*   Thu Apr 16 2020 Nicolas Ontiveros <niontive@microsoft.com> 0.116-1
--   Update to version 0.116.
--   License verified.
--   Use mozjs60 instead of js for requires and BR.
+*   Thu Aug 13 2020 Ankit Jain <ankitja@vmware.com> 0.117-1
+-   Upgraded to 0.117
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.113-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+*   Sat Oct 26 2019 Ankit Jain <ankitja@vmware.com> 0.116-1
+-   Upgraded to 0.116
 
 *   Thu Jan 10 2019 Dweep Advani <dadvani@vmware.com> 0.113-4
 -   Fix for CVE-2018-19788
