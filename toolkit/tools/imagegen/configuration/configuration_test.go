@@ -65,6 +65,12 @@ func TestShouldErrorForMissingFile(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestShouldSucceedReturnNilDiskForBadPartition(t *testing.T) {
+	badPartition := Partition{ID: "NOT_A_REAL_ID"}
+	diskPart := expectedConfiguration.GetDiskContainingPartition(&badPartition)
+	assert.Nil(t, diskPart)
+}
+
 func TestShouldFailForUntaggedEncryptionDeviceMapperRoot(t *testing.T) {
 	var checkedConfig Config
 	testConfig := expectedConfiguration
@@ -87,28 +93,24 @@ func TestShouldFailForUntaggedEncryptionDeviceMapperRoot(t *testing.T) {
 	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [Partition] 'MyRootfs' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] 'SmallerDisk's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
 }
 
-func TestShouldFailDeviceMapperWithNoRootDisks(t *testing.T) {
-	var checkedConfig Config
-	testConfig := expectedConfiguration
-
-	// Clear the disks, add one empty one
-	testConfig.Disks = []Disk{{}}
-
-	err := testConfig.IsValid()
-	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a [Disk] [Partition] to match with [PartitionSetting] 'MyRootfs'", err.Error())
-
-	err = remarshalJSON(testConfig, &checkedConfig)
-	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a [Disk] [Partition] to match with [PartitionSetting] 'MyRootfs'", err.Error())
-}
-
 func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
 	var checkedConfig Config
 	testConfig := expectedConfiguration
 
 	// Clear the partitions, then add a missmatching one
 	testConfig.SystemConfigs = append([]SystemConfig{}, testConfig.SystemConfigs...)
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.Disks[0].Partitions = []Partition{
+		{
+			ID: "NotRoot",
+			Flags: []PartitionFlag{
+				"dmroot",
+			},
+			Start:  uint64(0),
+			End:    uint64(1024),
+			FsType: "ext4",
+		},
+	}
 	testConfig.SystemConfigs[0].PartitionSettings = []PartitionSetting{{ID: "NotRoot", MountPoint: "/not/root"}}
 
 	err := testConfig.IsValid()
@@ -126,26 +128,41 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 	testConfig := expectedConfiguration
 
 	// Copy the root partition settings
-	ExtraDmRoot := Partition{
-		ID: "MySecondRootfs",
-		Flags: []PartitionFlag{
-			"dmroot",
+	ExtraDmRoots := []Partition{
+		{
+			ID: "MyRootfs",
+			Flags: []PartitionFlag{
+				"dmroot",
+			},
+			Start:  uint64(0),
+			End:    uint64(1024),
+			FsType: "ext4",
+		}, {
+			ID: "MySecondRootfs",
+			Flags: []PartitionFlag{
+				"dmroot",
+			},
+			Start:  uint64(1024),
+			End:    uint64(2048),
+			FsType: "ext4",
 		},
-		Start:  uint64(1024),
-		End:    uint64(2048),
-		FsType: "ext4",
 	}
-	ExtraPartitionSetting := PartitionSetting{
-		ID:         "MySecondRootfs",
-		MountPoint: "/OtherRoot",
+	ExtraPartitionSettings := []PartitionSetting{
+		{
+			ID:         "MyRootfs",
+			MountPoint: "/",
+		}, {
+			ID:         "MySecondRootfs",
+			MountPoint: "/OtherRoot",
+		},
 	}
 
 	// Copy the disks, then add the extra partition
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
-	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, ExtraDmRoot)
+	testConfig.Disks[0].Partitions = ExtraDmRoots
 	// Copy the partition settings, then add the extra partition setting
 	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs[0])
-	testConfig.SystemConfigs[0].PartitionSettings = append(testConfig.SystemConfigs[0].PartitionSettings, ExtraPartitionSetting)
+	testConfig.SystemConfigs[0].PartitionSettings = ExtraPartitionSettings
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
@@ -156,6 +173,59 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [SystemConfig] 'SmallerDisk' includes two (or more) device mapper root [PartitionSettings] 'MyRootfs' and 'MySecondRootfs', include only one", err.Error())
 
+}
+
+func TestShouldFailDuplicatedIDs(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	// Copy the disks, then add some duplicate IDs
+	// First on the same disk
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '0')", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '0')", err.Error())
+
+	// Reset the config, then try across disks
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
+	testConfig.Disks[1].Partitions = append([]Partition{}, expectedConfiguration.Disks[1].Partitions...)
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
+	testConfig.Disks[1].Partitions = append(testConfig.Disks[1].Partitions, Partition{ID: "duplicatedID"})
+
+	err = testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '1')", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '1')", err.Error())
+}
+
+func TestShouldFailMissingPartition(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs...)
+	testConfig.SystemConfigs[0].PartitionSettings = append([]PartitionSetting{}, expectedConfiguration.SystemConfigs[0].PartitionSettings...)
+	testConfig.SystemConfigs[0].PartitionSettings[0].ID = "NOT_AN_ID"
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'NOT_AN_ID' which has no corresponding partition on a [Disk]", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'NOT_AN_ID' which has no corresponding partition on a [Disk]", err.Error())
 }
 
 var expectedConfiguration Config = Config{

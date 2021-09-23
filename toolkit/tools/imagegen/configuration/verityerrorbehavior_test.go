@@ -23,7 +23,7 @@ var (
 	invalidVerityErrorBehaviorJSON = `1234`
 )
 
-func TestShouldSucceedValidImaPoliciesMatch_VerityErrorBehavior(t *testing.T) {
+func TestShouldSucceedValidVerityErrorBehaviorsMatch_VerityErrorBehavior(t *testing.T) {
 	var behavior VerityErrorBehavior
 	assert.Equal(t, len(validVerityErrorBehaviors), len(behavior.GetValidVerityErrorBehaviors()))
 
@@ -38,7 +38,7 @@ func TestShouldSucceedValidImaPoliciesMatch_VerityErrorBehavior(t *testing.T) {
 	}
 }
 
-func TestShouldSucceedParsingValidPolicies_VerityErrorBehavior(t *testing.T) {
+func TestShouldSucceedParsingValidErrorBehaviors_VerityErrorBehavior(t *testing.T) {
 	for _, validErrorBehavior := range validVerityErrorBehaviors {
 		var checkedBehavior VerityErrorBehavior
 
@@ -49,7 +49,7 @@ func TestShouldSucceedParsingValidPolicies_VerityErrorBehavior(t *testing.T) {
 	}
 }
 
-func TestShouldFailParsingInvalidErrorBehavoir_VerityErrorBehavior(t *testing.T) {
+func TestShouldFailParsingInvalidErrorBehavior_VerityErrorBehavior(t *testing.T) {
 	var checkedBehavior VerityErrorBehavior
 
 	err := invalidVerityErrorBehavior.IsValid()
