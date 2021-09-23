@@ -4,17 +4,9 @@
 %define openssl_format_trust_bundle ca-bundle.trust.crt
 %define java_bundle java/cacerts
 
-# Used only to simplify build scripts. Not present in any package.
-%define legacy_default_bundle ca-bundle.legacy.default.crt
-%define legacy_disable_bundle ca-bundle.legacy.disable.crt
-
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
-%define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
-%define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
 
 %define p11_format_microsoft_bundle ca-bundle.trust.microsoft.p11-kit
-%define legacy_default_microsoft_bundle ca-bundle.legacy.default.microsoft.crt
-%define legacy_disable_microsoft_bundle ca-bundle.legacy.disable.microsoft.crt
 
 # List of packages triggering legacy certs generation if 'ca-certificates-legacy'
 # is installed.
@@ -24,35 +16,28 @@
 %global refresh_bundles \
 %{_bindir}/update-ca-trust
 
-# Converts certdata.txt files to p11-kit format bundles and legacy crt files.
+# Converts certdata.txt files to p11-kit format bundles.
 # Arguments:
 # %1 - the source certdata.txt file;
 %define convert_certdata() \
 WORKDIR=$(basename %{1}.d) \
-mkdir -p $WORKDIR/certs/legacy-default \
-mkdir $WORKDIR/certs/legacy-disable \
+mkdir -p $WORKDIR/certs \
 mkdir $WORKDIR/java \
 pushd $WORKDIR/certs \
  pwd $WORKDIR \
  cp %{1} certdata.txt \
  python3 %{SOURCE4} >c2p.log 2>c2p.err \
 popd \
-%{SOURCE19} $WORKDIR %{SOURCE1} %{openssl_format_trust_bundle} %{legacy_default_bundle} %{legacy_disable_bundle} %{SOURCE3}
+%{SOURCE19} $WORKDIR %{openssl_format_trust_bundle} %{SOURCE3}
 
 # Installs bundle files to the right directories.
 # Arguments:
 # %1 - the source certdata.txt file;
 # %2 - output p11-kit format bundle name;
-# %3 - output legacy default bundle name;
-# %4 - output legacy disabled bundle name;
 %define install_bundles() \
 WORKDIR=$(basename %{1}.d) \
 install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
-install -p -m 644 $WORKDIR/%{legacy_default_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
-install -p -m 644 $WORKDIR/%{legacy_disable_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4}
+touch -r %{SOURCE23} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2}
 
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
@@ -65,8 +50,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://hg.mozilla.org
-# NOT DONE/TODO: See if we can remove Source1.
-Source1:        nssckbi.h
 Source2:        update-ca-trust
 Source3:        trust-fixes
 Source4:        certdata2pem.py
@@ -155,13 +138,11 @@ Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].
 pairs under %{pkidir}/tls/certs.
 
 %prep -q
-rm -rf %{name}
 mkdir %{name}
 
 %build
 cp -p %{SOURCE20} .
 
-%convert_certdata %{SOURCE0}
 %convert_certdata %{SOURCE21}
 %convert_certdata %{SOURCE23}
 
@@ -185,7 +166,6 @@ mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-legacy
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
@@ -200,10 +180,10 @@ install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
 install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
 # base certs
-%install_bundles %{SOURCE21} %{p11_format_base_bundle} %{legacy_default_base_bundle} %{legacy_disable_base_bundle}
+%install_bundles %{SOURCE21} %{p11_format_base_bundle}
 
 # Microsoft certs
-%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
+%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle}
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
@@ -244,13 +224,9 @@ ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
 
 %post
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 %{refresh_bundles}
 
 %post base
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
 %{refresh_bundles}
 
 %postun
@@ -275,28 +251,12 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %triggerpostun -n %{name}-legacy -- %{watched_pkgs}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
-%postun microsoft
-%{refresh_bundles}
-
-%clean
-
-
 %files
 # Microsoft certs bundle file with trust
 %{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 
 %files base
 %{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
 
 %files shared
 %license LICENSE
@@ -326,7 +286,6 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{_datadir}/pki/ca-trust-source
 %dir %{_datadir}/pki/ca-trust-source/anchors
 %dir %{_datadir}/pki/ca-trust-source/blacklist
-%dir %{_datadir}/pki/ca-trust-legacy
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
 %dir %{catrustdir}/extracted
@@ -359,8 +318,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 %changelog
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
-- NOT DONE! See if we can remove Source1 and update 'pem2bundle.sh' by removing unused code.
 - Removing Mozilla certs and making Microsoft's the default ones.
+- Removed support for legacy certdata.txt fields.
+- Removed the use of checked-in "nssckbi.h".
 
 * Mon Sep 13 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-18
 - Updating Microsoft trusted root CAs.
