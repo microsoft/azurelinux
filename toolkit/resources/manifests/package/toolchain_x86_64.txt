@@ -158,7 +158,7 @@ json-c-debuginfo-0.14-3.cm2.x86_64.rpm
 json-c-devel-0.14-3.cm2.x86_64.rpm
 kbd-2.0.4-5.cm2.x86_64.rpm
 kbd-debuginfo-2.0.4-5.cm2.x86_64.rpm
-kernel-headers-5.10.60.1-1.cm2.noarch.rpm
+kernel-headers-5.10.64.1-1.cm2.noarch.rpm
 kmod-25-6.cm2.x86_64.rpm
 kmod-debuginfo-25-6.cm2.x86_64.rpm
 kmod-devel-25-6.cm2.x86_64.rpm
@@ -604,11 +604,10 @@ texinfo-6.5-8.cm2.x86_64.rpm
 texinfo-debuginfo-6.5-8.cm2.x86_64.rpm
 unzip-6.0-19.cm2.x86_64.rpm
 unzip-debuginfo-6.0-19.cm2.x86_64.rpm
-util-linux-2.36.1-4.cm2.x86_64.rpm
-util-linux-debuginfo-2.36.1-4.cm2.x86_64.rpm
-util-linux-devel-2.36.1-4.cm2.x86_64.rpm
-util-linux-lang-2.36.1-4.cm2.x86_64.rpm
-util-linux-libs-2.36.1-4.cm2.x86_64.rpm
+util-linux-2.36.1-5.cm2.x86_64.rpm
+util-linux-debuginfo-2.36.1-5.cm2.x86_64.rpm
+util-linux-devel-2.36.1-5.cm2.x86_64.rpm
+util-linux-lang-2.36.1-5.cm2.x86_64.rpm
 veritysetup-2.3.3-2.cm2.x86_64.rpm
 wget-1.20.3-3.cm2.x86_64.rpm
 wget-debuginfo-1.20.3-3.cm2.x86_64.rpm
