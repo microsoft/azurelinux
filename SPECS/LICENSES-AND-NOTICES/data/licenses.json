@@ -132,6 +132,7 @@
                 "mtdev",
                 "nftables",
                 "oath-toolkit",
+                "opa",
                 "open-vm-tools",
                 "openssl",
                 "p11-kit",
