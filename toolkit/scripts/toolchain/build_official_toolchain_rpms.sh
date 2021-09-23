@@ -211,6 +211,8 @@ build_rpm_in_chroot_no_install mariner-rpm-macros
 copy_rpm_subpackage mariner-check-macros
 chroot_and_install_rpms mariner-rpm-macros
 chroot_and_install_rpms mariner-check-macros
+build_rpm_in_chroot_no_install mariner-release
+chroot_and_install_rpms mariner-release
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -263,7 +265,6 @@ build_rpm_in_chroot_no_install nss
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
-build_rpm_in_chroot_no_install mariner-release
 
 # Need to install perl-DBI in order for perl-DBD-SQLite to build
 build_rpm_in_chroot_no_install perl-DBI

@@ -7,7 +7,7 @@
   "default-hardened-cc1": "2102bdfbb06934d95ceb3c81f789c59c9f77f91b0f996fd39588e0aa052d6f77",
   "default-hardened-ld": "4dbb822a27eed292759bc4e9cabb4b84f34fc6701535fcac2fdddac33328678b",
   "forge.lua": "7390af6e81d8d61bc6957127fe9ebdbf5223e96d3810855641bdecc2a03800b4",
-  "gen-ld-script.sh": "a8b683402dc138105c29ae2052207b36c8134c6b6c81f6ff9b3ffc8e9e780b5f",
+  "gen-ld-script.sh": "299d6dd55f56bf58a175ce86f540299a02d9df2add199556f5825a39e34927f3",
   "generate-package-note.py": "d06816bbe7f2ae5a92d4320effd83ad6cd88bcc24db4d1649b2790d87e33599e",
   "gpgverify": "db0e050f56b694497d70603a6f5c17dd60ddbcf7cee670616851cd389f6767c4",
   "macros": "0db278ad00670f210c07ef23defe359b430767b9140d51c25115435ec3a16c3a",
