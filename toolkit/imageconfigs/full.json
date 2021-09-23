@@ -23,7 +23,7 @@
             }
         },
         {
-            "Name": "CBL-Mariner Azure VM",
+            "Name": "CBL-Mariner for VM",
             "PackageLists": [
                 "packagelists/core-packages-image.json",
                 "packagelists/azurevm-packages.json"
