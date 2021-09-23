@@ -1,10 +1,7 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%define _python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
 Summary:        Repodata downloading library
 Name:           librepo
-Version:        1.11.0
-Release:        4%{?dist}
+Version:        1.14.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,8 +9,6 @@ Group:          Applications/System
 URL:            https://github.com/rpm-software-management/librepo
 #Source0:       https://github.com/rpm-software-management/librepo/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-# CVE-2020-14352 patch taken from upstream commit 7daea2a2429a54dad68b1de9b37a5f65c5cf2600
-Patch0:         CVE-2020-14352.patch
 BuildRequires:  attr-devel
 BuildRequires:  check
 BuildRequires:  cmake
@@ -45,14 +40,6 @@ Requires:       curl-libs
 %description devel
 Development files for librepo.
 
-%package -n python2-%{name}
-%{?python_provide:%python_provide python2-%{name}}
-Summary:        Python bindings for the librepo library
-Requires:       %{name} = %{version}-%{release}
-
-%description -n python2-%{name}
-Python 2 bindings for the librepo library.
-
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-%{name}}
 Summary:        Python 3 bindings for the librepo library
@@ -63,58 +50,44 @@ Python 3 bindings for the librepo library.
 
 %prep
 %autosetup -p1
-mkdir build-py2
 mkdir build-py3
 
 %build
-pushd build-py2
-  %cmake -DPYTHON_DESIRED:FILEPATH=%{_bindir}/python -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
-  make %{?_smp_mflags}
-popd
-
 pushd build-py3
-  %cmake -DPYTHON_DESIRED:FILEPATH=%{_bindir}/python3 -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
-  make %{?_smp_mflags}
-popd
-
-%check
-pushd build-py2
-make test
-popd
-
-pushd build-py3
-make test
+%cmake -DPYTHON_DESIRED:FILEPATH=%{python3} -DENABLE_PYTHON_TESTS=%{!?with_pythontests:OFF} ..
+%make_build
 popd
 
 %install
-pushd build-py2
-  make DESTDIR=%{buildroot} install
-popd
-
 pushd build-py3
-  make DESTDIR=%{buildroot} install
+%make_install
 popd
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%check
+pushd build-py3
+%make_build test
+popd
+
+%ldconfig_scriptlets
 
 %files
 %license COPYING
 %doc README.md
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.0*
 
 %files devel
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
 
-%files -n python2-%{name}
-%{python_sitearch}/%{name}/
-
 %files -n python3-%{name}
-%{_python3_sitearch}/%{name}/
+%{python3_sitearch}/%{name}/
 
 %changelog
+* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-1
+- Update to latest upstream version
+- Lint spec
+
 * Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-4
 - Enable package tests for both major python versions
 

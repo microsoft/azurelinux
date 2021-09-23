@@ -976,8 +976,8 @@
         "type": "other",
         "other": {
           "name": "createrepo_c",
-          "version": "0.11.1",
-          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.11.1.tar.gz"
+          "version": "0.17.5",
+          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
         }
       }
     },
@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "dnf",
-          "version": "4.2.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.2.18.tar.gz"
+          "version": "4.8.0",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
         }
       }
     },
@@ -1597,8 +1597,8 @@
         "type": "other",
         "other": {
           "name": "file",
-          "version": "5.38",
-          "downloadUrl": "ftp://ftp.astron.com/pub/file/file-5.38.tar.gz"
+          "version": "5.40",
+          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
         }
       }
     },
@@ -3049,8 +3049,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.43.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
+          "version": "0.63.1",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.63.1.tar.gz"
         }
       }
     },
@@ -3359,8 +3359,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/libmodulemd-2.5.0/modulemd-2.5.0.tar.xz"
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
         }
       }
     },
@@ -3579,8 +3579,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.11.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
         }
       }
     },
@@ -3679,8 +3679,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.7",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.7/libsolv-0.7.7.tar.gz"
+          "version": "0.7.19",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.19/libsolv-0.7.19.tar.gz"
         }
       }
     },

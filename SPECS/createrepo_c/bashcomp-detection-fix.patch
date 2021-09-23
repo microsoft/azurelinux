@@ -1,0 +1,24 @@
+From bea39e1e86709d7413cfd2ef5858ae5335453360 Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Mon, 20 Sep 2021 08:31:39 -0500
+Subject: [PATCH] Fix logic typo in CMake bashcomp detection
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3d9b6ea..d4bb8c7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -125,7 +125,7 @@ IF (ENABLE_BASHCOMP)
+             execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink createrepo_c \$ENV{DESTDIR}${BASHCOMP_DIR}/modifyrepo_c)
+             execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink createrepo_c \$ENV{DESTDIR}${BASHCOMP_DIR}/sqliterepo_c)
+             ")
+-    ELSEIF (BASHCOMP_FOUND)
++    ELSE (BASHCOMP_FOUND)
+         INSTALL(FILES createrepo_c.bash DESTINATION "/etc/bash_completion.d")
+         message("Bash completion directory: /etc/bash_completion.d")
+     ENDIF (BASHCOMP_FOUND)
+-- 
+2.25.1
