@@ -2928,6 +2928,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libbpf",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
