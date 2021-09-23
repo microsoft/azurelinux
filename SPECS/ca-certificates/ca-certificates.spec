@@ -8,10 +8,6 @@
 %define legacy_default_bundle ca-bundle.legacy.default.crt
 %define legacy_disable_bundle ca-bundle.legacy.disable.crt
 
-%define p11_format_mozilla_bundle ca-bundle.trust.mozilla.p11-kit
-%define legacy_default_mozilla_bundle ca-bundle.legacy.default.mozilla.crt
-%define legacy_disable_mozilla_bundle ca-bundle.legacy.disable.mozilla.crt
-
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
 %define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
 %define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
@@ -60,29 +56,16 @@ touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4}
 
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
-# The files, certdata.txt and nssckbi.h, should be taken from a released version of NSS, as published
-# at https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/
-#
-# The versions that are used by the latest released version of
-# Mozilla Firefox should be available from:
-# https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/nssckbi.h
-# https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt
-#
-# The most recent development versions of the files can be found at
-# http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/nssckbi.h
-# http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/certdata.txt
-# (but these files might have not yet been released).
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://hg.mozilla.org
-# Please always update both certdata.txt and nssckbi.h
-Source0:        https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt
+# NOT DONE/TODO: See if we can remove Source1.
 Source1:        nssckbi.h
 Source2:        update-ca-trust
 Source3:        trust-fixes
@@ -100,6 +83,7 @@ Source19:       pem2bundle.sh
 Source20:       LICENSE
 Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
+# The certdata.microsoft.txt is provided by Microsoft's Trusted Root Program.
 Source23:       certdata.microsoft.txt
 
 BuildRequires:  /bin/ln
@@ -117,18 +101,19 @@ Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
 
+Provides:       ca-certificates-microsoft = %{version}-%{release}
 Provides:       ca-certificates-mozilla = %{version}-%{release}
 
 BuildArch:      noarch
 
 %description
-The Public Key Inrastructure is used for many security issues in a
-Linux system. In order for a certificate to be trusted, it must be
-signed by a trusted agent called a Certificate Authority (CA). The
-certificates loaded by this section are from the list on the Mozilla
-version control system and formats it into a form used by
-OpenSSL-1.0.1e. The certificates can also be used by other applications
-either directly of indirectly through openssl.
+The Public Key Inrastructure is used for many security issues in
+a Linux system. In order for a certificate to be trusted, it must be
+signed by a trusted agent called a Certificate Authority (CA).
+The certificates loaded by this section are from the list of CAs trusted
+through the Microsoft Trusted Root Program and formats it into a form
+used by OpenSSL-1.0.1e. The certificates can also be used by other
+applications either directly of indirectly through OpenSSL.
 
 %package shared
 Summary:        A set of directories and files required by all certificate packages.
@@ -147,18 +132,6 @@ Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
 
 %description base
-%{summary}
-
-%package microsoft
-Summary:        A list of CAs trusted through the Microsoft Trusted Root Program.
-Group:          System Environment/Security
-
-Requires:       %{name}-shared = %{version}-%{release}
-Requires(post): %{name}-tools = %{version}-%{release}
-Requires(post): coreutils
-Requires(postun): %{name}-tools = %{version}-%{release}
-
-%description microsoft
 %{summary}
 
 %package tools
@@ -226,9 +199,6 @@ install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
 install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
 install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
-# Mozilla certs
-%install_bundles %{SOURCE0} %{p11_format_mozilla_bundle} %{legacy_default_mozilla_bundle} %{legacy_disable_mozilla_bundle}
-
 # base certs
 %install_bundles %{SOURCE21} %{p11_format_base_bundle} %{legacy_default_base_bundle} %{legacy_disable_base_bundle}
 
@@ -274,18 +244,13 @@ ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
 
 %post
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_mozilla_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_mozilla_bundle}
+cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
+cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 %{refresh_bundles}
 
 %post base
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
 cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-%{refresh_bundles}
-
-%post microsoft
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 %{refresh_bundles}
 
 %postun
@@ -317,13 +282,13 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 
 %files
-# Mozilla certs bundle file with trust
-%{_datadir}/pki/ca-trust-source/%{p11_format_mozilla_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle}
+# Microsoft certs bundle file with trust
+%{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
+%{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle}
+%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle}
 
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_mozilla_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_mozilla_bundle}
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
+%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 
 %files base
 %{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
@@ -332,14 +297,6 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 %ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
 %ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-
-%files microsoft
-%{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 
 %files shared
 %license LICENSE
@@ -401,6 +358,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
+- NOT DONE! See if we can remove Source1 and update 'pem2bundle.sh' by removing unused code.
+- Removing Mozilla certs and making Microsoft's the default ones.
+
 * Mon Sep 13 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-18
 - Updating Microsoft trusted root CAs.
 
