@@ -34,7 +34,7 @@ export LFS LC_ALL LFS_TGT PATH
 EOF
 
 # Generate toolchain-local-wget-list
-cat ./container/toolchain-md5sums | awk -v env_src=${MARINER_SOURCE_URL} '{print env_src"/toolchain/"$2}' > ./container/toolchain-local-wget-list
+cat ./container/toolchain-sha256sums | awk -v env_src=${MARINER_SOURCE_URL} '{print env_src"/toolchain/"$2}' > ./container/toolchain-local-wget-list
 
 echo Building temp toolchain in container
 export tag=$(date +'%y%m%d.%H%M')
