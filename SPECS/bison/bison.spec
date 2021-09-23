@@ -1,18 +1,24 @@
 Summary:        Contains a parser generator
 Name:           bison
 Version:        3.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/bison
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnu.org/gnu/bison/%{name}-%{version}.tar.xz
-BuildRequires:  m4
-Requires:       m4
+
 BuildRequires:  flex
+BuildRequires:  m4
+
+Requires:       m4
+
+Provides:       %{name}-runtime = %{version}-%{release}
+
 %description
 This package contains a parser generator
+
 %prep
 %setup -q
 %build
@@ -48,6 +54,9 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1-5
+- Adding 'Provides' for 'bison-runtime'.
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4
 - Remove yacc command for compatibility with byacc package
 - Remove sha hash
