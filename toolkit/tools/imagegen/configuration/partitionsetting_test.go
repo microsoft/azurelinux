@@ -13,17 +13,26 @@ import (
 
 var (
 	validPartitionSetting PartitionSetting = PartitionSetting{
-		ID:         "testing",
-		MountPoint: "/",
+		ID:              "testing",
+		MountPoint:      "/",
+		MountIdentifier: GetDefaultMountIdentifier(),
 	}
 	invalidvalidPartitionSettingJSON = `{"RemoveDocs": 1234}`
 )
 
 func TestShouldSucceedParsingDefaultPartitionSetting_PartitionSetting(t *testing.T) {
-	var checkedPartitionSetting PartitionSetting
+	var (
+		checkedPartitionSetting PartitionSetting
+		defaultPartitionSetting PartitionSetting = PartitionSetting{
+			MountIdentifier: GetDefaultMountIdentifier(),
+		}
+	)
 	err := marshalJSONString("{}", &checkedPartitionSetting)
 	assert.NoError(t, err)
-	assert.Equal(t, PartitionSetting{}, checkedPartitionSetting)
+	assert.Equal(t, defaultPartitionSetting, checkedPartitionSetting)
+
+	// Check the non-standard default values are correct
+	assert.Equal(t, "partuuid", checkedPartitionSetting.MountIdentifier.String())
 }
 
 func TestShouldSucceedParsingValidPartitionSetting_PartitionSetting(t *testing.T) {

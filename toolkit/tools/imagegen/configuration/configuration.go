@@ -165,6 +165,29 @@ func checkDuplicatePartitionIDs(config *Config) (err error) {
 	return
 }
 
+// checkInvalidMountIdentifiers checks that we don't have an invalid combination of GPT/MBR, PARTLABEL, and Name for each partition.
+// PARTUUID and PARTLABEL are GPT concepts. MBR partly supports PARTUUID, but is completely incompatible with PARTLABEL.
+// If we want to use PARTLABEL, we need to define a [Name] for the partition as well.
+func checkInvalidMountIdentifiers(config *Config) (err error) {
+	for _, sysConfig := range config.SystemConfigs {
+		for _, partSetting := range sysConfig.PartitionSettings {
+			if partSetting.MountIdentifier == MountIdentifierPartLabel {
+				diskPart := config.GetDiskPartByID(partSetting.ID)
+				disk := config.GetDiskContainingPartition(diskPart)
+
+				if disk.PartitionTableType != PartitionTableTypeGpt {
+					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", sysConfig.Name, partSetting.ID)
+				}
+
+				if diskPart.Name == "" {
+					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but it has no [Name]", sysConfig.Name, partSetting.ID)
+				}
+			}
+		}
+	}
+	return
+}
+
 // IsValid returns an error if the Config is not valid
 func (c *Config) IsValid() (err error) {
 	for _, disk := range c.Disks {
@@ -188,6 +211,11 @@ func (c *Config) IsValid() (err error) {
 	err = checkDeviceMapperFlags(c)
 	if err != nil {
 		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: %w", err)
+	}
+
+	err = checkInvalidMountIdentifiers(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
 	}
 
 	if len(c.SystemConfigs) == 0 {
