@@ -8992,6 +8992,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "usbredir",
+          "version": "0.10.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.10.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "usbutils",
           "version": "010",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/usb/usbutils/usbutils-010.tar.xz"

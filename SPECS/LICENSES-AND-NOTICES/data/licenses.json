@@ -208,6 +208,7 @@
                 "sscg",
                 "uclibc-ng",
                 "UI-cairo",
+                "usbredir",
                 "uuid",
                 "vitess",
                 "vulkan-headers",
