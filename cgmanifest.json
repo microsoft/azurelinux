@@ -3798,6 +3798,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liburing",
+          "version": "2.0",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libusb",
           "version": "1.0.24",
           "downloadUrl": "https://github.com/libusb/libusb/releases/download/v1.0.24/libusb-1.0.24.tar.bz2"
