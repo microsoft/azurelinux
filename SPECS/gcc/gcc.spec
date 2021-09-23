@@ -2,15 +2,14 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        9.1.0
-Release:        11%{?dist}
+Version:        11.2.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         090_all_pr55930-dependency-tracking.patch
 # Only applies to the Power9 ISA
 Patch1:         CVE-2019-15847.nopatch
 Requires:       gcc-c++ = %{version}-%{release}
@@ -33,15 +32,6 @@ Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 %description
 The GCC package contains the GNU compiler collection,
 which includes the C and C++ compilers.
-
-%package -n     gfortran
-Summary:        GNU Fortran compiler.
-Group:          Development/Tools
-Requires:       gcc = %{version}-%{release}
-Provides:       gcc-gfortran = %{version}-%{release}
-
-%description -n gfortran
-The gfortran package contains GNU Fortran compiler.
 
 %package -n     libgcc
 Summary:        GNU C Library
@@ -117,9 +107,8 @@ This package contains development headers and static library for libgomp
 
 %prep
 %setup -q
-%patch0 -p1
 # disable no-pie for gcc binaries
-sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
+#sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
@@ -127,20 +116,14 @@ CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-erro
 export CFLAGS
 export CXXFLAGS
 
-export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
-SED=sed \
-%configure \
-    --enable-shared \
-    --enable-threads=posix \
-    --enable-__cxa_atexit \
-    --enable-clocale=gnu \
-    --enable-languages=c,c++,fortran \
-    --disable-multilib \
-    --disable-bootstrap \
-    --enable-linker-build-id \
-    --enable-plugin \
-    --enable-default-pie \
-    --with-system-zlib
+#export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
+#SED=sed \
+%configure --prefix=/usr              \
+             LD=ld                    \
+             --enable-languages=c,c++ \
+             --disable-multilib       \
+             --disable-bootstrap      \
+             --with-system-zlib
 make %{?_smp_mflags}
 
 %install
@@ -174,13 +157,11 @@ make %{?_smp_mflags} check-gcc
 %license COPYING
 %{_libdir}/cpp
 # Executables
-%exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
 %exclude %{_bindir}/*g++
 %{_bindir}/*
 # Libraries
 %{_lib64dir}/*
-%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 %{_libdir}/gcc/*
 # Library executables
@@ -200,12 +181,6 @@ make %{?_smp_mflags} check-gcc
 %exclude %{_lib64dir}/libsupc++*
 %exclude %{_lib64dir}/libgomp*
 
-%files -n gfortran
-%defattr(-,root,root)
-%{_bindir}/*gfortran
-%{_mandir}/man1/gfortran.1.gz
-%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
-
 %files -n libgcc
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so.*
@@ -217,7 +192,7 @@ make %{?_smp_mflags} check-gcc
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_libdir}/libcc1.*
+#%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
@@ -254,6 +229,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Wed Sep 22 2021 Andrew Phelps <anphel@microsoft.com> - 11.2.0-1
+- Update to version 11.2.0
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-11
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

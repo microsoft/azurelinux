@@ -35,9 +35,9 @@ rm -rf binutils-2.36.1
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
-echo GCC-9.1.0 - Pass 1
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo GCC-11.2.0 - Pass 1
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 tar xf ../mpfr-4.0.1.tar.xz
 mv -v mpfr-4.0.1 mpfr
 tar xf ../gmp-6.1.2.tar.xz
@@ -87,13 +87,12 @@ mkdir -v build
 cd       build
 ../configure                                       \
     --target=$LFS_TGT                              \
-    --prefix=/tools                                \
+    --prefix=$LFS/tools                            \
     --with-glibc-version=2.11                      \
     --with-sysroot=$LFS                            \
     --with-newlib                                  \
     --without-headers                              \
-    --with-local-prefix=/tools                     \
-    --with-native-system-header-dir=/tools/include \
+    --enable-initfini-array                        \
     --disable-nls                                  \
     --disable-shared                               \
     --disable-multilib                             \
@@ -108,8 +107,11 @@ cd       build
     --enable-languages=c,c++
 make -j$(nproc)
 make install
+cd ..
+cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
@@ -162,9 +164,9 @@ rm -rf glibc-2.28
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
-echo Libstdc++ from GCC-9.1.0
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo Libstdc++ from GCC-11.2.0
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -174,11 +176,11 @@ cd       build
     --disable-nls                   \
     --disable-libstdcxx-threads     \
     --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/9.1.0
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/11.2.0
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
@@ -206,11 +208,11 @@ rm -rf binutils-2.36.1
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-9.1.0 - Pass 2
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
-cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
-  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
+echo GCC-11.2.0 - Pass 2
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
+#cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+#  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 case $(uname -m) in
     x86_64)
       for file in gcc/config/{linux,i386/linux{,64}}.h
@@ -258,25 +260,31 @@ tar -xf ../mpc-1.1.0.tar.gz
 mv -v mpc-1.1.0 mpc
 mkdir -v build
 cd       build
-CC=$LFS_TGT-gcc                                    \
-CXX=$LFS_TGT-g++                                   \
-AR=$LFS_TGT-ar                                     \
-RANLIB=$LFS_TGT-ranlib                             \
+mkdir -pv $LFS_TGT/libgcc
+ln -s ../../../libgcc/gthr-posix.h $LFS_TGT/libgcc/gthr-default.h
 ../configure                                       \
-    --prefix=/tools                                \
-    --with-local-prefix=/tools                     \
-    --with-native-system-header-dir=/tools/include \
-    --enable-languages=c,c++                       \
-    --disable-libstdcxx-pch                        \
+    --build=$(../config.guess)                     \
+    --host=$LFS_TGT                                \
+    --prefix=/usr                                  \
+    CC_FOR_TARGET=$LFS_TGT-gcc                     \
+    --with-build-sysroot=$LFS                      \
+    --enable-initfini-array                        \
+    --disable-nls                                  \
     --disable-multilib                             \
-    --disable-bootstrap                            \
-    --disable-libgomp
+    --disable-decimal-float                        \
+    --disable-libatomic                            \
+    --disable-libgomp                              \
+    --disable-libquadmath                          \
+    --disable-libssp                               \
+    --disable-libvtv                               \
+    --disable-libstdcxx                            \
+    --enable-languages=c,c++
 make -j$(nproc)
-make install
-ln -sv gcc /tools/bin/cc
+make DESTDIR=$LFS install
+ln -sv gcc $LFS/usr/bin/cc
 # Sanity check
 set +e
-echo sanity check - temptoolchain - gcc 9.1.0 pass2
+echo sanity check - temptoolchain - gcc 11.2.0 pass2
 echo 'int main(){}' > dummy.c
 cc dummy.c
 readelf -l a.out | grep ': /tools'
@@ -290,9 +298,9 @@ case $(uname -m) in
 esac
 rm -v dummy.c a.out
 set -e
-echo End sanity check - temptoolchain - gcc 9.1.0 pass2
+echo End sanity check - temptoolchain - gcc 11.2.0 pass2
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 

@@ -32,7 +32,7 @@ http://www.lua.org/ftp/lua-5.3.5.tar.gz
 ftp://anduin.linuxfromscratch.org/BLFS/popt/popt-1.16.tar.gz
 http://ftp.rpm.org/releases/rpm-4.14.x/rpm-4.14.2.tar.bz2
 http://www.linuxfromscratch.org/patches/blfs/9.0/lua-5.3.5-shared_library-1.patch
-https://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.xz
+https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 http://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.xz
 http://www.linuxfromscratch.org/patches/lfs/8.3/glibc-2.28-fhs-1.patch
 http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
