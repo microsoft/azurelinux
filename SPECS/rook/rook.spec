@@ -57,7 +57,7 @@ BuildRequires:  ceph
 # From images/ceph/Dockerfile
 Requires:       tini
 # From Ceph base container: github.com/ceph/ceph-container/src/daemon-base/...
-Requires:       pattern() = ceph_base
+Requires:       patterns-ceph-containers-ceph_base
 
 %description
 Rook is a cloud-native storage orchestrator for Kubernetes, providing
@@ -223,9 +223,6 @@ install_location=%{buildroot}%{_bindir}
 
 install --mode=755 --directory "${install_location}"
 
-pwd 
-ls
-
 for binary in rook rookflex rook-integration; do
     install --preserve-timestamps --mode=755 \
         --target-directory="${install_location}" \
@@ -366,6 +363,10 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 # bother adding docs or changelog or anything
 
 %changelog
+* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com>
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
+- License Verified
+- Remove unused/un-supported macro usage
 * Fri May  7 2021 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.6.2
   * Set base Ceph operator image and example deployments to v16.2.2
