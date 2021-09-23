@@ -31,7 +31,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-
 # rhbz#1505230
 Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
 Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
+Patch2:         CVE-2020-18032.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -528,6 +529,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Thu Sep 23 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.42.4-5
+- Patch CVE-2020-18032
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 2.42.4-4
 - License verified
 - Replaced build commands with rpm macros
