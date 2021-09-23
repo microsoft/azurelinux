@@ -1,7 +1,7 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
 Version:        1.8.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_infodir}
 
 %check
@@ -54,11 +55,13 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 %{_includedir}/*.h
 %{_datadir}/aclocal/*
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-3
+- Remove libtool archive files from final packaging
+
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.7-2
 - libgcrypt CVE-2021-33560 fix
 

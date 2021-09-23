@@ -195,6 +195,9 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
 cp -v $SPECROOT/mariner-rpm-macros/macros $LFS/usr/etc/rpm/macros
+mkdir -pv $LFS/usr/lib/rpm/mariner
+cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
+cp -v $SPECROOT/mariner-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/mariner/generate-package-note.py
 cp -v $SPECROOT/rpm/brp* $LFS/usr/lib/rpm
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
@@ -468,8 +471,9 @@ build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf
 
-# Build createrepo_c-0.11.1
-# createrepo_c needs glib
+# Build createrepo_c
+# createrepo_c needs file, glib
+chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
@@ -480,7 +484,7 @@ build_rpm_in_chroot_no_install libsepol
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
-# util-linux, rpm, libsemanage and shadow-utils require libselinux
+# util-linux and rpm require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install rpm
@@ -522,7 +526,7 @@ chroot_and_install_rpms gperf
 chroot_and_install_rpms cryptsetup
 build_rpm_in_chroot_no_install systemd
 
-build_rpm_in_chroot_no_install golang-1.15
+build_rpm_in_chroot_no_install golang-1.17
 build_rpm_in_chroot_no_install groff
 
 # libtiprc needs krb5
@@ -542,8 +546,6 @@ chroot_and_install_rpms libnsl2
 chroot_and_install_rpms finger
 build_rpm_in_chroot_no_install tcp_wrappers
 
-build_rpm_in_chroot_no_install cyrus-sasl
-
 # groff needs perl-File-HomeDir installed to run
 # perl-File-HomeDir needs perl-File-Which installed to run
 build_rpm_in_chroot_no_install perl-File-Which
@@ -551,30 +553,16 @@ chroot_and_install_rpms perl-File-Which
 build_rpm_in_chroot_no_install perl-File-HomeDir
 chroot_and_install_rpms perl-File-HomeDir
 
-# openldap needs groff, cyrus-sasl
+# Removed 'openldap', might not need: groff
 chroot_and_install_rpms groff
-chroot_and_install_rpms cyrus-sasl
-build_rpm_in_chroot_no_install openldap
 
 build_rpm_in_chroot_no_install libcap-ng
 
-# audit needs systemd, golang, openldap, tcp_wrappers and libcap-ng
+# Removed 'audit', might not need: systemd, golang, tcp_wrappers and libcap-ng
 chroot_and_install_rpms systemd
 chroot_and_install_rpms golang
-chroot_and_install_rpms openldap
 chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
-build_rpm_in_chroot_no_install audit
-
-# libsemanage requires libaudit
-chroot_and_install_rpms audit
-build_rpm_in_chroot_no_install libsemanage
-
-# shadow-utils requires libsemanage
-chroot_and_install_rpms libsemanage
-# shadow-utils needs the pam.d sources in the root of SOURCES_DIR
-cp $SPECROOT/shadow-utils/pam.d/* $CHROOT_SOURCES_DIR
-build_rpm_in_chroot_no_install shadow-utils
 
 # p11-kit needs libtasn1
 chroot_and_install_rpms libtasn1

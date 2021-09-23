@@ -1,28 +1,29 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib    ;print(get_python_lib())")}
-
+%bcond_with docs
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
-Version:        2.5.0
-Release:        6%{?dist}
+Version:        2.13.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
-Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
+Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-Patch1:         test_v1_import_headers_timeout.patch
+Patch1:         test_import_headers_timeout.patch
 
-BuildRequires:  meson
 BuildRequires:  clang-devel
 BuildRequires:  gcc
 BuildRequires:  glib
-BuildRequires:  valgrind
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  libyaml-devel
+BuildRequires:  meson
 BuildRequires:  python3-gobject
 BuildRequires:  python3-pycodestyle
+BuildRequires:  valgrind
+%if %{with docs}
 BuildRequires:  gtk-doc
-BuildRequires:  libyaml-devel
+%endif
 Requires:       libyaml
 
 %description
@@ -32,47 +33,59 @@ C Library for manipulating module metadata files
 Summary:        Header and development files for libmodulemd
 Requires:       libyaml-devel
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files.
 
 %prep
-%setup -q -n modulemd-%{version}
-%patch1 -p1
+%autosetup -p1 -n modulemd-%{version}
 
 %build
-meson -Dprefix=%{_prefix} -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=false \
-       -Dwith_py3_overrides=true -Dwith_py2_overrides=false api1
-cd api1
-ninja
+%meson \
+    -Ddeveloper_build=false \
+    -Dbuild_api_v1=true \
+    -Dbuild_api_v2=true \
+    -Dwith_py3_overrides=true \
+    -Dwith_py2_overrides=false \
+%if %{with docs}
+    -Dwith_docs=true \
+%else
+    -Dwith_docs=false \
+%endif
+    -Dwith_manpages=disabled
+%meson_build
+
+%install
+%meson_install
 
 %check
 export LC_CTYPE=C.utf8
-cd api1
-ninja test
+%meson_test
 
-%install
-cd api1
-DESTDIR=%{buildroot}/ ninja install
-
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/modulemd-validator-v1
-%{_libdir}/girepository-1.0/Modulemd-1.0.typelib
-%{_libdir}/libmodulemd.so.*
-%{_datadir}/gir-1.0/Modulemd-1.0.gir
+%{_bindir}/modulemd-validator
+%{_libdir}/girepository-1.0/Modulemd-2.0.typelib
+%{_libdir}/libmodulemd.so.2*
+%{_datadir}/gir-1.0/Modulemd-2.0.gir
+%if %{with docs}
 %{_datadir}/gtk-doc/html/modulemd-1.0/*
+%endif
 %{python3_sitelib}/*
 
 %files  devel
 %{_libdir}/libmodulemd.so
-%{_libdir}/pkgconfig/modulemd.pc
-%{_includedir}/modulemd/*
+%{_libdir}/pkgconfig/modulemd-2.0.pc
+%{_includedir}/modulemd-2.0/*
 
 %changelog
+* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.0-1
+- Upgrade to latest version
+- Use updated source URL
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.0-6
 - Merge the following releases from dev to 1.0 spec
 - joschmit@microsoft.com, 2.5.0-4: Replace python3-pygobject requires with python3-gobject.

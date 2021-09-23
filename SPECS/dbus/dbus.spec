@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 install -vdm755 %{buildroot}%{_libdir}
 #ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libdbus-1.so) %{buildroot}%{_libdir}/libdbus-1.so
 #rm -f %{buildroot}%{_sharedstatedir}/dbus/machine-id
@@ -75,11 +76,13 @@ make %{?_smp_mflags} check
 %dir %{_libdir}/dbus-1.0
 %{_libdir}/dbus-1.0/include/
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/*.la
 %{_libdir}/*.a
 %{_libdir}/*.so
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-8
+- Remove libtool archive files from final packaging
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-7
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 1.13.6-4: Patch CVE-2019-12749
