@@ -44,7 +44,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/alsa-lib-/d' $TmpPkgGen
     sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
-    sed -i '/ca-certificates-microsoft/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
     sed -i '/lua-static/d' $TmpPkgGen

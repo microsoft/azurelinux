@@ -20,7 +20,6 @@ bzip2-libs-1.0.6-16.cm2.x86_64.rpm
 ca-certificates-20200720-19.cm2.noarch.rpm
 ca-certificates-base-20200720-19.cm2.noarch.rpm
 ca-certificates-legacy-20200720-19.cm2.noarch.rpm
-ca-certificates-microsoft-20200720-19.cm2.noarch.rpm
 ca-certificates-shared-20200720-19.cm2.noarch.rpm
 ca-certificates-tools-20200720-19.cm2.noarch.rpm
 check-0.12.0-5.cm2.x86_64.rpm
