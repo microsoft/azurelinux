@@ -11,10 +11,12 @@ UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
 
 # parse script parameters:
 #
+# -c -> config root folder (optional)
 # -u -> unattended config file (optional)
 
-while getopts ":u:" OPTIONS; do
+while getopts ":c:u:" OPTIONS; do
   case "${OPTIONS}" in
+    c ) CONFIG_ROOT=$OPTARG ;;
     u ) UNATTENDED_CONFIG_FILE=$OPTARG ;;
 
     \? )
