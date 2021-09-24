@@ -194,12 +194,14 @@
             "PartitionSettings": [
                 {
                     "ID": "MyBootA",
-                    "MountPoint": "/boot"
+                    "MountPoint": "/boot",
+                    "MountIdentifier": "uuid"
                 },
                 {
                     "ID": "MyRootfsA",
                     "MountPoint": "/",
-                    "RemoveDocs": true
+                    "RemoveDocs": true,
+                    "MountIdentifier": "uuid"
                 },
                 {
                     "ID": "SharedData",

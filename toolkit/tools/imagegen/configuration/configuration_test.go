@@ -97,7 +97,7 @@ func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
 	var checkedConfig Config
 	testConfig := expectedConfiguration
 
-	// Clear the partitions, then add a missmatching one
+	// Clear the partitions, then add a new non-root partition back
 	testConfig.SystemConfigs = append([]SystemConfig{}, testConfig.SystemConfigs...)
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
 	testConfig.Disks[0].Partitions = []Partition{
@@ -111,7 +111,7 @@ func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
 			FsType: "ext4",
 		},
 	}
-	testConfig.SystemConfigs[0].PartitionSettings = []PartitionSetting{{ID: "NotRoot", MountPoint: "/not/root"}}
+	testConfig.SystemConfigs[0].PartitionSettings = []PartitionSetting{{ID: "NotRoot", MountPoint: "/not/root", MountIdentifier: GetDefaultMountIdentifier()}}
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
@@ -149,11 +149,13 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 	}
 	ExtraPartitionSettings := []PartitionSetting{
 		{
-			ID:         "MyRootfs",
-			MountPoint: "/",
+			ID:              "MyRootfs",
+			MountPoint:      "/",
+			MountIdentifier: GetDefaultMountIdentifier(),
 		}, {
-			ID:         "MySecondRootfs",
-			MountPoint: "/OtherRoot",
+			ID:              "MySecondRootfs",
+			MountPoint:      "/OtherRoot",
+			MountIdentifier: GetDefaultMountIdentifier(),
 		},
 	}
 
@@ -226,6 +228,45 @@ func TestShouldFailMissingPartition(t *testing.T) {
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'NOT_AN_ID' which has no corresponding partition on a [Disk]", err.Error())
+}
+
+func TestShouldFailMissmatchedGPTMountsWithNonMBRDisk(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
+	testConfig.Disks[0].PartitionTableType = PartitionTableTypeMbr
+	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
+	testConfig.Disks[0].Partitions[0].Name = "LABEL_NAME"
+
+	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs...)
+	testConfig.SystemConfigs[0].PartitionSettings = append([]PartitionSetting{}, expectedConfiguration.SystemConfigs[0].PartitionSettings...)
+	testConfig.SystemConfigs[0].PartitionSettings[0].MountIdentifier = MountIdentifierPartLabel
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+}
+
+func TestShouldFailPartLabelWithNoName(t *testing.T) {
+	var checkedConfig Config
+	testConfig := expectedConfiguration
+
+	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs...)
+	testConfig.SystemConfigs[0].PartitionSettings = append([]PartitionSetting{}, expectedConfiguration.SystemConfigs[0].PartitionSettings...)
+	testConfig.SystemConfigs[0].PartitionSettings[0].MountIdentifier = MountIdentifierPartLabel
+
+	err := testConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but it has no [Name]", err.Error())
+
+	err = remarshalJSON(testConfig, &checkedConfig)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but it has no [Name]", err.Error())
 }
 
 var expectedConfiguration Config = Config{
@@ -338,15 +379,17 @@ var expectedConfiguration Config = Config{
 			Name:      "SmallerDisk",
 			IsDefault: true,
 			PartitionSettings: []PartitionSetting{
-				PartitionSetting{
-					ID:             "MyBoot",
-					MountPoint:     "/boot",
-					MountOptions:   "ro,exec",
-					RdiffBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
+				{
+					ID:              "MyBoot",
+					MountPoint:      "/boot",
+					MountIdentifier: "partuuid",
+					MountOptions:    "ro,exec",
+					RdiffBaseImage:  "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
-				PartitionSetting{
+				{
 					ID:               "MyRootfs",
 					MountPoint:       "/",
+					MountIdentifier:  "partuuid",
 					RemoveDocs:       true,
 					OverlayBaseImage: "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4",
 				},
@@ -430,18 +473,21 @@ var expectedConfiguration Config = Config{
 			Name: "BiggerDiskA",
 			PartitionSettings: []PartitionSetting{
 				{
-					ID:         "MyBootA",
-					MountPoint: "/boot",
+					ID:              "MyBootA",
+					MountPoint:      "/boot",
+					MountIdentifier: "uuid",
 				},
 				{
-					ID:         "MyRootfsA",
-					MountPoint: "/",
-					RemoveDocs: true,
+					ID:              "MyRootfsA",
+					MountPoint:      "/",
+					MountIdentifier: "uuid",
+					RemoveDocs:      true,
 				},
 				{
-					ID:           "SharedData",
-					MountPoint:   "/some/path/to/data",
-					MountOptions: "ro,noexec",
+					ID:              "SharedData",
+					MountPoint:      "/some/path/to/data",
+					MountIdentifier: "partuuid",
+					MountOptions:    "ro,noexec",
 				},
 			},
 			PackageLists: []string{
@@ -463,18 +509,21 @@ var expectedConfiguration Config = Config{
 			Name: "BiggerDiskB",
 			PartitionSettings: []PartitionSetting{
 				{
-					ID:         "MyBootB",
-					MountPoint: "/boot",
+					ID:              "MyBootB",
+					MountPoint:      "/boot",
+					MountIdentifier: "partuuid",
 				},
 				{
-					ID:         "MyRootfsB",
-					MountPoint: "/",
-					RemoveDocs: true,
+					ID:              "MyRootfsB",
+					MountPoint:      "/",
+					MountIdentifier: "partuuid",
+					RemoveDocs:      true,
 				},
 				{
-					ID:           "SharedData",
-					MountPoint:   "/some/path/to/data",
-					MountOptions: "ro,noexec",
+					ID:              "SharedData",
+					MountPoint:      "/some/path/to/data",
+					MountIdentifier: "partuuid",
+					MountOptions:    "ro,noexec",
 				},
 			},
 			PackageLists: []string{
