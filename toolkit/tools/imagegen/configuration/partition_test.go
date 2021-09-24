@@ -46,6 +46,65 @@ func TestShouldFailFindingBadFlag_Partition(t *testing.T) {
 	assert.False(t, validPartition.HasFlag("notaflag"))
 }
 
+func TestShouldPassEmptyName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	emptyNamePartition := validPartition
+
+	emptyNamePartition.Name = ""
+
+	err := remarshalJSON(emptyNamePartition, &checkedPartition)
+	assert.NoError(t, err)
+}
+
+func TestShouldPassMaxLengthName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	maxNamePartition := validPartition
+
+	maxNamePartition.Name = "abcdefghijklmnopqrstuvwxyz012345678"
+
+	err := remarshalJSON(maxNamePartition, &checkedPartition)
+	assert.NoError(t, err)
+}
+
+func TestShouldFailLongNormalName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	longNamePartition := validPartition
+
+	longNamePartition.Name = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+	err := longNamePartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+
+	err = remarshalJSON(longNamePartition, &checkedPartition)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Partition]: [Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+}
+
+func TestShouldPassShortSymbolName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	shortSymbolNamePartition := validPartition
+	shortSymbolNamePartition.Name = "1👌2🤣3🤢ab~52*^&%$6"
+
+	err := remarshalJSON(shortSymbolNamePartition, &checkedPartition)
+	assert.NoError(t, err)
+}
+
+func TestShouldFailLongSymbolName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	longSymbolNamePartition := validPartition
+
+	longSymbolNamePartition.Name = "1🤷‍♂️2@3( •_•)>⌐■~■ab~52(⌐■_■)67👩‍💻"
+
+	err := longSymbolNamePartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (1🤷\u200d♂️2@3( •_•)>⌐■~■ab~52(⌐■_■)67👩\u200d💻) needs 78 bytes", err.Error())
+
+	err = remarshalJSON(longSymbolNamePartition, &checkedPartition)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Partition]: [Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (1🤷\u200d♂️2@3( •_•)>⌐■~■ab~52(⌐■_■)67👩\u200d💻) needs 78 bytes", err.Error())
+}
+
 func TestShouldFailParsingInvalidFlag_Partition(t *testing.T) {
 	var checkedPartition Partition
 	invalidPartition := validPartition
