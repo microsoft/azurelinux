@@ -16,6 +16,17 @@ touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
+echo Setting up limited directory layout
+sudo chown -v lfs $LFS
+mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
+for i in bin lib sbin; do
+  ln -sv usr/$i $LFS/$i
+done
+case $(uname -m) in
+  x86_64) mkdir -pv $LFS/lib64 ;;
+esac
+chown -v lfs $LFS/lib64
+
 echo Binutils-2.36.1 - Pass 1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
@@ -87,12 +98,15 @@ mkdir -v build
 cd       build
 ../configure                                       \
     --target=$LFS_TGT                              \
-    --prefix=$LFS/tools                            \
+    --prefix=/tools                                \
     --with-glibc-version=2.11                      \
     --with-sysroot=$LFS                            \
     --with-newlib                                  \
     --without-headers                              \
     --enable-initfini-array                        \
+    --with-local-prefix=/tools                     \
+    --with-native-system-header-dir=/tools/include \
+    --disable-bootstrap                            \
     --disable-nls                                  \
     --disable-shared                               \
     --disable-multilib                             \
@@ -127,6 +141,13 @@ rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.64.1
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
 echo glibc-2.28
+case $(uname -m) in
+    i?86)   ln -sfv ld-linux.so.2 $LFS/lib/ld-lsb.so.3
+    ;;
+    x86_64) ln -sfv ../lib64/ld-linux-x86-64.so.2 $LFS/lib64
+            ln -sfv ../lib64/ld-linux-x86-64.so.2 $LFS/lib64/ld-lsb-x86-64.so.3
+    ;;
+esac
 tar xf glibc-2.28.tar.xz
 pushd glibc-2.28
 mkdir -v build
