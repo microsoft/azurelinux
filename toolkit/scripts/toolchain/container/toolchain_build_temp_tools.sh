@@ -134,6 +134,9 @@ tar xf kernel-5.10.64.1.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.64.1
 make mrproper
 make headers
+find usr/include -name '.*' -delete
+rm -v usr/include/Makefile
+cp -rv usr/include $LFS/usr
 cp -rv usr/include/* /tools/include
 popd
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.64.1
@@ -284,7 +287,6 @@ cd       build
 mkdir -pv $LFS_TGT/libgcc
 ln -s ../../../libgcc/gthr-posix.h $LFS_TGT/libgcc/gthr-default.h
 ../configure                                       \
-    --build=$(../config.guess)                     \
     --host=$LFS_TGT                                \
     --prefix=/usr                                  \
     CC_FOR_TARGET=$LFS_TGT-gcc                     \
