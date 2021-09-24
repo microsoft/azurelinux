@@ -12,8 +12,7 @@ BuildArch:      noarch
 
 BuildRequires:  ca-certificates = %{version}-%{release}
 
-Conflicts:      ca-certificates
-Conflicts:      ca-certificates-base
+Conflicts:      ca-certificates-shared
 Conflicts:      prebuilt-ca-certificates-base
 
 %description
