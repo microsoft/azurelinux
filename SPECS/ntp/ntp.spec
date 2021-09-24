@@ -1,28 +1,35 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
 Version:        4.2.8p13
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NTP
 URL:            http://www.ntp.org/
 Group:          System Environment/NetworkingPrograms
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/%{name}-%{version}.tar.gz
-%define sha1    ntp=cff200a987d64e891fb349a22313ecb0feaea090
-
 #https://github.com/darkhelmet/ntpstat
 Source1: ntpstat-master.zip
-%define sha1 ntpstat=729cf2c9f10da43554f26875e91e1973d4498761
 Source2: ntp.sysconfig
+Source3: ntp.step-tickers
+Source4: ntpdate.wrapper
+Source5: ntpdate.sysconfig
+Source6: ntpdate.service
+Source7: ntpd.service
+
 BuildRequires:  which
 BuildRequires:  libcap-devel
 BuildRequires:  unzip
 BuildRequires:  systemd
 BuildRequires:  openssl-devel
+
+Provides:       ntpdate = %{version}-%{release}
+
 Requires:       systemd
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires:       openssl
 Requires:       libcap >= 2.24
+
 %description
 The ntp package contains a client and server to keep the time
 synchronized between various computers over a network. This
@@ -50,6 +57,7 @@ state of the NTP daemon running on the local machine.
 %setup -q -a 1
 
 %build
+
 sh configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -58,57 +66,54 @@ sh configure \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
     --mandir=%{_mandir} \
-    --sysconfdir=/etc \
+    --sysconfdir=%{_sysconfdir} \
     --with-binsubdir=sbin \
     --enable-linuxcaps
 make %{?_smp_mflags}
 make -C ntpstat-master CFLAGS="$CFLAGS"
+
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
+
 make DESTDIR=%{buildroot} install
 install -v -m755    -d %{buildroot}%{_datadir}/doc/%{name}-%{version}
 cp -v -R html/*     %{buildroot}%{_datadir}/doc/%{name}-%{version}/
-install -vdm 755 %{buildroot}/etc
+install -vdm 755 %{buildroot}%{_sysconfdir}
 
 mkdir -p %{buildroot}/var/lib/ntp/drift
-mkdir -p %{buildroot}/etc/sysconfig
-cp %{SOURCE2} %{buildroot}/etc/sysconfig/ntp
+mkdir -p %{buildroot}%{_sysconfdir}/ntp
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
+cp %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/ntp
 pushd ntpstat-master
 install -m 755 ntpstat %{buildroot}/%{_bindir}
 install -m 644 ntpstat.1 %{buildroot}/%{_mandir}/man8/ntpstat.8
 popd
 
-cat > %{buildroot}/etc/ntp.conf <<- "EOF"
+cat > %{buildroot}%{_sysconfdir}/ntp.conf <<- "EOF"
 tinker panic 0
 restrict default kod nomodify notrap nopeer noquery
 restrict 127.0.0.1
 restrict -6 ::1
 driftfile /var/lib/ntp/drift/ntp.drift
 EOF
+
 install -D -m644 COPYRIGHT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
-rm -rf %{buildroot}/etc/rc.d/*
+rm -rf %{buildroot}%{_sysconfdir}/rc.d/*
 
 %{_fixperms} %{buildroot}/*
-mkdir -p %{buildroot}/lib/systemd/system
-cat << EOF >> %{buildroot}/lib/systemd/system/ntpd.service
-[Unit]
-Description=Network Time Service
-After=syslog.target network.target
-Documentation=man:ntpd
-Conflicts=systemd-timesyncd.service
-
-[Service]
-Type=forking
-EnvironmentFile=/etc/sysconfig/ntp
-ExecStart=/usr/bin/ntpd -g -u ntp:ntp
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m644 %{SOURCE7} %{buildroot}%{_unitdir}/ntpd.service
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable ntpd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ntpd.preset
+
+# No vendor pool created for CBL-Mariner yet.
+sed -e 's|VENDORZONE\.||' \
+	< %{SOURCE3} > %{buildroot}%{_sysconfdir}/ntp/step-tickers
+touch -r %{SOURCE3} %{buildroot}%{_sysconfdir}/ntp/step-tickers
+
+install -p -m755 %{SOURCE4} %{buildroot}%{_libexecdir}/ntpdate-wrapper
+install -p -m750 %{SOURCE5} %{buildroot}%{_sysconfdir}/sysconfig/ntpdate
+install -p -m644 %{SOURCE6} %{buildroot}%{_unitdir}/ntpdate.service
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -123,12 +128,15 @@ fi
 %post
 %{_sbindir}/ldconfig
 %systemd_post ntpd.service
+%systemd_post ntpdate.service
 
 %preun
 %systemd_preun ntpd.service
+%systemd_preun ntpdate.service
 
 %postun
 %systemd_postun_with_restart ntpd.service
+%systemd_postun ntpdate.service
 
 %clean
 rm -rf %{buildroot}/*
@@ -137,10 +145,14 @@ rm -rf %{buildroot}/*
 %license COPYRIGHT
 %dir /var/lib/ntp/drift
 %attr(0755, ntp, ntp) /var/lib/ntp/drift
-%attr(0750, root, root) %config(noreplace) /etc/ntp.conf
-%attr(0750, root, root) %config(noreplace) /etc/sysconfig/ntp
-/lib/systemd/system/ntpd.service
+%attr(0750, root, root) %config(noreplace) %{_sysconfdir}/ntp.conf
+%attr(0750, root, root) %config(noreplace) %{_sysconfdir}/sysconfig/ntp
+%attr(0750, root, root) %config(noreplace) %{_sysconfdir}/sysconfig/ntpdate
+%config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/ntp/step-tickers
+%{_unitdir}/ntpd.service
+%{_unitdir}/ntpdate.service
 %{_libdir}/systemd/system-preset/50-ntpd.preset
+%{_libexecdir}/ntpdate-wrapper
 %{_bindir}/ntpd
 %{_bindir}/ntpdate
 %{_bindir}/ntpdc
@@ -177,6 +189,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p13-4
+- Adding 'Provides' for 'ntpdate' using Fedora 32 spec (license: MIT) as guidance.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.8p13-3
 - Added %%license line automatically
 
