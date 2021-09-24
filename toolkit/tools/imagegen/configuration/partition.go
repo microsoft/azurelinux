@@ -42,13 +42,10 @@ func (p *Partition) HasFlag(flag PartitionFlag) bool {
 // for any non-ASCII characters
 // header (72 bytes of UTF-16)
 func nameCheck(name string) (err error) {
-	const (
-		maxLength = 36
-	)
+	const maxLength = 36
 
 	encodedString := utf16.Encode([]rune(name))
 	stringLengthWithNull := len(encodedString) + 1
-	//maxChar := utf16.Encode([]rune("\uFFFF"))
 
 	for pos, char := range name {
 		if char > unicode.MaxASCII {
