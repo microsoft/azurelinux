@@ -71,13 +71,15 @@ Debugging information processing library development files.
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release .
-%cmake_build
+%__cmake --build . %{?_smp_mflags} --verbose
 
 %install
 rm -Rf %{buildroot}
-%cmake_install
+DESTDIR="%{buildroot}" %__cmake --install .
 
-%ldconfig_scriptlets -n %{libname}%{libver}
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %doc README.ctracer
