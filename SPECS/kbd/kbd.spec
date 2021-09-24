@@ -1,17 +1,18 @@
 Summary:	Key table files, console fonts, and keyboard utilities
 Name:		kbd
 Version:	2.0.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPLv2
 URL:		http://ftp.altlinux.org/pub/people/legion/kbd
 Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
-%define sha1 kbd=cf5d45c62d6af70b8b1f210d89193b52f5efb05d
 Patch0:		kbd-2.0.4-backspace-1.patch
 BuildRequires:	check >= 0.9.4
 Conflicts:      toybox
+
+Provides:   %{name}-misc = %{version}-%{release}
 
 %description
 The Kbd package contains key-table files, console fonts, and keyboard utilities.
@@ -51,6 +52,10 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.4-6
+- Adding 'Provides' for 'kbm-misc'.
+- Removing 'sha1' macro.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.4-5
 - Added %%license line automatically
 
