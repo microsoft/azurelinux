@@ -6,7 +6,8 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/azurevm-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
@@ -17,16 +18,6 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
-            }
-        },
-        {
-            "Name": "CBL-Mariner for VM",
-            "PackageLists": [
-                "packagelists/core-packages-image.json",
-                "packagelists/azurevm-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
