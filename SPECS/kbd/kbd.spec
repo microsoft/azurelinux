@@ -1,18 +1,20 @@
-Summary:	Key table files, console fonts, and keyboard utilities
-Name:		kbd
-Version:	2.0.4
+Summary:        Key table files, console fonts, and keyboard utilities
+Name:           kbd
+Version:        2.0.4
 Release:        6%{?dist}
-License:	GPLv2
-URL:		http://ftp.altlinux.org/pub/people/legion/kbd
-Group:		Applications/System
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
-Patch0:		kbd-2.0.4-backspace-1.patch
-BuildRequires:	check >= 0.9.4
+Group:          Applications/System
+URL:            http://ftp.altlinux.org/pub/people/legion/kbd
+Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
+Patch0:         kbd-2.0.4-backspace-1.patch
+
+BuildRequires:  check >= 0.9.4
+
 Conflicts:      toybox
 
-Provides:   %{name}-misc = %{version}-%{release}
+Provides:       %{name}-misc = %{version}-%{release}
 
 %description
 The Kbd package contains key-table files, console fonts, and keyboard utilities.
@@ -40,6 +42,7 @@ make %{?_smp_mflags} check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
@@ -59,17 +62,23 @@ make %{?_smp_mflags} check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.4-5
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.4-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> 2.0.4-3
--   Add conflict toybox.
-*   Mon Sep 11 2017 Anish Swaminathan <anishs@vmware.com> 2.0.4-2
--   Remove FAQs from main package.
-*   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 2.0.4-1
--   Updated to version 2.0.4.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.0.3-2
--   GA - Bump release of all rpms.
-*   Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> 2.0.3-1
--   Updated to version 2.0.3.
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.0.1-1
--   Initial build First version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.4-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> - 2.0.4-3
+- Add conflict toybox.
+
+* Mon Sep 11 2017 Anish Swaminathan <anishs@vmware.com> - 2.0.4-2
+- Remove FAQs from main package.
+
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> - 2.0.4-1
+- Updated to version 2.0.4.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.0.3-2
+- GA - Bump release of all rpms.
+
+* Wed Jan 13 2016 Xiaolin Li <xiaolinl@vmware.com> - 2.0.3-1
+- Updated to version 2.0.3.
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.0.1-1
+- Initial build First version.
