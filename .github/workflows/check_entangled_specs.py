@@ -19,7 +19,8 @@ version_release_matching_groups = [
     ]),
     frozenset([
         "SPECS/ca-certificates/ca-certificates.spec",
-        "SPECS/prebuilt-ca-certificates-base/prebuilt-ca-certificates-base.spec"
+        "SPECS/prebuilt-ca-certificates-base/prebuilt-ca-certificates.spec,"
+        "SPECS/prebuilt-ca-certificates-base/prebuilt-ca-certificates-base.spec,"
     ])
 ]
 
