@@ -96,7 +96,7 @@ fi
 %{_datarootdir}/dbus-1/system-services/org.freedesktop.PolicyKit1.service
 %{_datarootdir}/locale/*
 %{_datarootdir}/polkit-1/actions/*.policy
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.PolicyKit1.conf
+%{_datadir}/dbus-1/system.d/org.freedesktop.PolicyKit1.conf
 %{_sysconfdir}/pam.d/polkit-1
 %{_sysconfdir}/polkit-1/rules.d/50-default.rules
 %{_datadir}/gettext/its
