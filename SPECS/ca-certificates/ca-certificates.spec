@@ -10,7 +10,7 @@
 
 # List of packages triggering legacy certs generation if 'ca-certificates-legacy'
 # is installed.
-%global watched_pkgs %{name}, %{name}-base, %{name}-microsoft
+%global watched_pkgs %{name}, %{name}-base
 
 # Rebuilding cert bundles with source certificates.
 %global refresh_bundles \
