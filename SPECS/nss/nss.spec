@@ -1,3 +1,4 @@
+%global nspr_version 4.21
 %global unsupported_tools_directory %{_libdir}/nss/unsupported-tools
 # Produce .chk files for the final stripped binaries
 %define __spec_install_post \
@@ -12,13 +13,15 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
+Source1:        nss-util.pc.in
+Source2:        nss-util-config.in
 Patch0:         nss-3.44-standalone-1.patch
 Patch1:         CVE-2020-12403.patch
 BuildRequires:  nspr-devel
@@ -44,6 +47,7 @@ Provides:       %{name}-static = %{version}-%{release}
 Provides:       %{name}-softokn-devel = %{version}-%{release}
 Provides:       %{name}-pkcs11-devel = %{version}-%{release}
 Provides:       %{name}-pkcs11-devel-static = %{version}-%{release}
+Provides:       %{name}-util-devel = %{version}-%{release}
 Requires:       nspr-devel
 Requires:       nss = %{version}-%{release}
 
@@ -68,7 +72,11 @@ This package contains minimal set of shared nss libraries.
 %build
 export NSS_FORCE_FIPS=1
 export NSS_DISABLE_GTESTS=1
-cd nss
+
+# Set up our package files
+mkdir -p dist/pkgconfig
+
+pushd nss
 # -j is not supported by nss
 make VERBOSE=1 BUILD_OPT=1 \
     NSPR_INCLUDE_DIR=%{_includedir}/nspr \
@@ -76,10 +84,31 @@ make VERBOSE=1 BUILD_OPT=1 \
     ZLIB_LIBS=-lz \
     USE_64=1 \
     $([ -f %{_includedir}/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
+popd
+
+cat %{SOURCE1} | sed -e "s,%%libdir%%,%{_libdir},g" \
+                     -e "s,%%prefix%%,%{_prefix},g" \
+                     -e "s,%%exec_prefix%%,%{_prefix},g" \
+                     -e "s,%%includedir%%,%{_includedir}/nssv,g" \
+                     -e "s,%%NSPR_VERSION%%,%{nspr_version},g" \
+                     -e "s,%%NSSUTIL_VERSION%%,%{version},g" \
+                          > dist/pkgconfig/nss-util.pc
+
+NSSUTIL_VMAJOR=$(grep "#define.*NSSUTIL_VMAJOR" nss/lib/util/nssutil.h | awk '{print $3}')
+NSSUTIL_VMINOR=$(grep "#define.*NSSUTIL_VMINOR" nss/lib/util/nssutil.h | awk '{print $3}')
+NSSUTIL_VPATCH=$(grep "#define.*NSSUTIL_VPATCH" nss/lib/util/nssutil.h | awk '{print $3}')
+
+cat %{SOURCE2} | sed -e "s,@libdir@,%{_libdir},g" \
+                     -e "s,@prefix@,%{_prefix},g" \
+                     -e "s,@exec_prefix@,%{_prefix},g" \
+                     -e "s,@includedir@,%{_includedir}/nss,g" \
+                     -e "s,@MOD_MAJOR_VERSION@,$NSSUTIL_VMAJOR,g" \
+                     -e "s,@MOD_MINOR_VERSION@,$NSSUTIL_VMINOR,g" \
+                     -e "s,@MOD_PATCH_VERSION@,$NSSUTIL_VPATCH,g" \
+                          > dist/pkgconfig/nss-util-config
 
 %install
-cd nss
-cd ../dist
+cd dist
 mkdir -p %{buildroot}%{unsupported_tools_directory}
 install -vdm 755 %{buildroot}%{_bindir}
 install -vdm 755 %{buildroot}%{_includedir}/nss
@@ -92,6 +121,8 @@ install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} %{buildroot}%{_bindir
 install -v -m755 Linux*/bin/shlibsign %{buildroot}%{unsupported_tools_directory}
 install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
 install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
+install -p -m 644 pkgconfig/nss-util.pc %{buildroot}%{_libdir}/pkgconfig/nss-util.pc
+install -p -m 755 pkgconfig/nss-util-config %{buildroot}%{_bindir}/nss-util-config
 
 %check
 pushd nss/tests
@@ -113,6 +144,7 @@ popd
 %exclude %{_libdir}/libsoftokn3.so
 
 %files devel
+%{_bindir}/nss-util-config
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
@@ -125,6 +157,10 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
+* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
+- Adding 'Provides' for 'nss-util-devel'.
+- Adding 'nss-util.pc' and 'nss-util-config' using Fedora 32 spec (license: MIT) as guidance.
+
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 3.44-7
 - Dash Rolled for Merge from 1.0 branch
 

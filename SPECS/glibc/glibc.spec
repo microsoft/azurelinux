@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,8 +41,9 @@ Patch15:        CVE-2021-3326.patch
 Patch16:        CVE-2020-27618.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
-Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
+Provides:       nss_db = %{version}-%{release}
+Provides:       rtld(GNU_HASH)
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -304,6 +305,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
+- Adding 'Provides' for 'nss_db'.
+
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 2.28-18
 - Dash Rolled for Merge from 1.0 branch
 
