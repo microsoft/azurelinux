@@ -6,7 +6,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,11 @@ Patch14:        CVE-2019-25013.patch
 Patch15:        CVE-2021-3326.patch
 Patch16:        CVE-2020-27618.patch
 Patch17:        CVE-2021-35942.patch
+# CVE-2021-33574 is composed of two changes.  The original CVE fix -0001 for GLIBC 2.32 and a backport fix for GLIBC 2.28 -0002
+Patch18:        CVE-2021-33574-0001.patch
+Patch19:        CVE-2021-33574-0002.patch
+# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. 
+Patch20:        CVE-2021-38604.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -310,6 +315,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon Sep 06 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.28-20
+- Patch CVE-2021-33574 and nopatch CVE-2021-38604.
+
 * Tue Aug 03 2021 Nicolas guibourge <nicolasg@microsoft.com> - 2.28-19
 - Patch CVE-2021-35942
 

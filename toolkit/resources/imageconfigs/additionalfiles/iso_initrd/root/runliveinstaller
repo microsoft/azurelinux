@@ -5,8 +5,32 @@
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
-# Mounting the ISO root for the installer.
 ISO_ROOT=/mnt/cdrom
+CONFIG_ROOT=$ISO_ROOT/config
+UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
+
+# parse script parameters:
+#
+# -c -> config root folder (optional)
+# -u -> unattended config file (optional)
+
+while getopts ":c:u:" OPTIONS; do
+  case "${OPTIONS}" in
+    c ) CONFIG_ROOT=$OPTARG ;;
+    u ) UNATTENDED_CONFIG_FILE=$OPTARG ;;
+
+    \? )
+        echo "Error - Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+  esac
+done
+
+# Mounting the ISO root for the installer.
 mkdir -p $ISO_ROOT
 LABEL=CDROM
 
@@ -28,10 +52,8 @@ else
     done
 fi
 
-CONFIG_ROOT=$ISO_ROOT/config
-
-# Restrict speakup use to attended installs
-if [[ ! -f "$CONFIG_ROOT/unattended_config.json" ]]; then
+if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
+    # Restrict speakup use to attended installs
     # FIXME(thcrain-msft)
     # This is a loop of silence to keep the default audio device alive
     # This is a temporary workaround that is needed for VirtualBox,
@@ -54,7 +76,7 @@ cd /installer
 # Turn off echoing while the installer runs to stop sensitive data from rendering in the TTY session.
 stty -echo
 
-./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $CONFIG_ROOT/unattended_config.json --template-config $CONFIG_ROOT/attended_config.json \
+./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --template-config $CONFIG_ROOT/attended_config.json \
                 --build-dir $PWD --log-file=/installer/log.txt
 installerExitCode=$?
 

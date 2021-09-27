@@ -304,6 +304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bazel",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bc",
           "version": "1.07.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz"
@@ -777,16 +787,6 @@
           "name": "conntrack-tools",
           "version": "1.4.5",
           "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "coredns",
-          "version": "1.6.7",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.6.7.tar.gz"
         }
       }
     },
@@ -1355,16 +1355,6 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.4.3",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "etcd",
           "version": "3.4.13",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.13.tar.gz"
         }
@@ -1604,6 +1594,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gd",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.0/libgd-2.3.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gdb",
           "version": "8.3",
           "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.xz"
@@ -1687,6 +1687,16 @@
           "name": "glibmm24",
           "version": "2.56.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.56/glibmm-2.56.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "glide",
+          "version": "0.13.3",
+          "downloadUrl": "https://github.com/Masterminds/glide/archive/v0.13.3.tar.gz"
         }
       }
     },
@@ -1864,6 +1874,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "graphviz",
+          "version": "2.42.4",
+          "downloadUrl": "https://gitlab.com/graphviz/graphviz/-/archive/2.42.4/graphviz-2.42.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grep",
           "version": "3.1",
           "downloadUrl": "http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz"
@@ -2014,6 +2034,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "helm",
+          "version": "3.4.1",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "http-parser",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
@@ -2035,8 +2065,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.60.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2365,8 +2395,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.60.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2375,8 +2405,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.60.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2385,8 +2415,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.60.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.60.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -3435,8 +3465,8 @@
         "type": "other",
         "other": {
           "name": "libusb",
-          "version": "1.0.22",
-          "downloadUrl": "http://downloads.sourceforge.net/libusb/libusb-1.0.22.tar.bz2"
+          "version": "1.0.24",
+          "downloadUrl": "http://downloads.sourceforge.net/libusb/libusb-1.0.24.tar.bz2"
         }
       }
     },
@@ -3804,6 +3834,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lld",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lld-8.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lldb",
           "version": "8.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
@@ -3815,8 +3855,8 @@
         "type": "other",
         "other": {
           "name": "lldpad",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/intel/openlldp/archive/v1.0.1.tar.gz"
+          "version": "1.1",
+          "downloadUrl": "https://github.com/intel/openlldp/archive/v1.1.tar.gz"
         }
       }
     },
@@ -4364,6 +4404,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netplan",
+          "version": "0.95",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nettle",
           "version": "3.7.3",
           "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.3.tar.gz"
@@ -4614,16 +4664,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "omi",
-          "version": "1.6.6",
-          "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "oniguruma",
           "version": "6.9.5",
           "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.5/onig-6.9.5.tar.gz"
@@ -4844,6 +4884,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "opensc",
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.22.0/opensc-0.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openscap",
           "version": "1.3.1",
           "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.1/openscap-1.3.1.tar.gz"
@@ -5014,6 +5064,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pcsc-lite",
+          "version": "1.9.0",
+          "downloadUrl": "https://pcsclite.apdu.fr/files/pcsc-lite-1.9.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pcsc-lite-ccid",
+          "version": "1.4.33",
+          "downloadUrl": "https://ccid.apdu.fr/files/ccid-1.4.33.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl",
           "version": "5.30.3",
           "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.30.3.tar.gz"
@@ -5134,6 +5204,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Fedora-VSP",
+          "version": "0.001",
+          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-File-HomeDir",
           "version": "1.004",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.004.tar.gz"
@@ -5157,6 +5237,16 @@
           "name": "perl-File-Which",
           "version": "1.22",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.22.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-generators",
+          "version": "1.11",
+          "downloadUrl": "http://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
         }
       }
     },
@@ -5577,6 +5667,16 @@
           "name": "pugixml",
           "version": "1.10",
           "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pwgen",
+          "version": "2.08",
+          "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
         }
       }
     },
@@ -7907,6 +8007,16 @@
           "name": "socket_wrapper",
           "version": "1.2.4",
           "downloadUrl": "https://ftp.samba.org/pub/cwrap/socket_wrapper-1.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "softhsm",
+          "version": "2.6.1",
+          "downloadUrl": "http://dist.opendnssec.org/source/softhsm-2.6.1.tar.gz"
         }
       }
     },

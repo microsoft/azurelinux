@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.10.60.1
-Release:        1%{?dist}
+Version:        5.10.64.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,15 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Sep 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.64.1-2
+- Bump release number to match kernel release
+
+* Mon Sep 20 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.64.1-1
+- Update source to 5.10.64.1
+
+* Mon Sep 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.60.1-2
+- Bump release number to match kernel release
+
 * Mon Aug 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.60.1-1
 - Update source to 5.10.60.1
 - Remove patch for CDROM eject errors
