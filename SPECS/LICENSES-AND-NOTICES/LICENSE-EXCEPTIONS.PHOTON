@@ -53,6 +53,7 @@ systemtap
 SPEC files that are derived from OpenSuse SPEC files, which are under the license of the package itself, or MIT license if it the package is not under an open source license (https://en.opensuse.org/openSUSE:Specfile_guidelines):
 python-jinja2
 acl
+gd
 
 SPEC files that are derived from Centos SPEC files:
 libaio

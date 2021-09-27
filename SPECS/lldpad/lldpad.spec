@@ -1,12 +1,11 @@
 Summary:    Intel LLDP Agent
 Name:       lldpad
-Version:    1.0.1
-Release:    17%{?dist}
+Version:    1.1
+Release:    1%{?dist}
 License:    GPLv2
 URL:        https://github.com/intel/openlldp
 #Source0:    https://github.com/intel/openlldp/archive/v%{version}.tar.gz
-Source0:    %{name}-%{version}.pkgupdate.tar.gz
-Patch0: remove-lldp-ethertype-use-linux-5.3-header-instead.patch
+Source0:    %{name}-%{version}.tar.gz
 Group:      System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,7 +24,6 @@ The lldpad package comes with utilities to manage an LLDP interface with support
 
 %prep
 %setup -q -n openlldp-%{version}
-%patch0 -p1
 sed -i "s/AM_CFLAGS = -Wall -Werror -Wextra -Wformat=2/AM_CFLAGS = -Wall -Werror -Wextra -Wformat=2 -std=gnu89 -Wno-implicit-fallthrough -Wno-error=stringop-overflow -Wno-format-truncation -Wno-error=address-of-packed-member -Wno-stringop-truncation/" Makefile.am
 sed -i "s/u8 arglen;/u8 arglen = 0;/g" lldp_util.c
 
@@ -44,6 +42,11 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.service \
 mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 	%{buildroot}/lib/systemd/system/lldpad.socket
 
+%check
+./bootstrap.sh
+./configure
+make check
+
 %preun
 %systemd_preun lldpad.socket
 %post
@@ -60,6 +63,7 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 %{_libdir}/liblldp_clif.so.*
 /etc/bash_completion.d/*
 %dir %{_sharedstatedir}/%{name}
+%{_mandir}/man3/*
 %{_mandir}/man8/*
 %{_includedir}/*
 %{_libdir}/pkgconfig/*.pc
@@ -69,7 +73,11 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 
 
 %changelog
-*   Thu Jun 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0.1-17
+*   Mon Aug 30 2021 Andrew Phelps <anphel@microsoft.com> - 1.1-1
+-   Update to version 1.1 to fix CVE
+-   Remove unneeded remove-lldp-ethertype-use-linux-5.3-header-instead.patch
+-   Enable check test
+*   Thu Jun 18 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-17
 -   Removing runtime dependency on a specific kernel package.
 *   Thu Jun 11 2020 Christopher Co <chrco@microsoft.com> - 1.0.1-16
 -   Remove KERNEL_VERSION macro from BuildRequires

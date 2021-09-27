@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -12,6 +12,7 @@ Source2: default-hardened-cc1
 Source3: default-hardened-ld
 Source4: default-annobin-cc1
 Source5: macros.check
+Source6: gen-ld-script.sh
 
 BuildArch: noarch
 
@@ -38,6 +39,7 @@ mkdir -p %{buildroot}%{rcdir}
 install -p -m 644 -t %{buildroot}%{rcdir} macros rpmrc
 install -p -m 444 -t %{buildroot}%{rcdir} default-hardened-*
 install -p -m 444 -t %{buildroot}%{rcdir} default-annobin-*
+install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
@@ -48,11 +50,14 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{rcdir}/rpmrc
 %{rcdir}/default-hardened-*
 %{rcdir}/default-annobin-*
+%{rcdir}/gen-ld-script.sh
 
 %files -n mariner-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Mon Aug 23 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-5
+- Add gen-ld-script.sh to generate ELF note metadata
 * Wed Jun 30 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-4
 - Modify macros to only strip debug symbols when debug_package is enabled
 * Tue Jun 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-3

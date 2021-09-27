@@ -41,6 +41,7 @@
         "fipscheck",
         "fuse-zip",
         "gnu-efi",
+        "graphviz",
         "hardening-check",
         "heimdal",
         "hyperv-daemons",
@@ -78,14 +79,19 @@
         "nss_wrapper",
         "oath-toolkit",
         "open-vm-tools",
+        "opensc",
         "openssl",
         "pam_wrapper",
         "p7zip",
         "p11-kit",
+        "pcsc-lite",
+        "pcsc-lite-ccid",
         "perl-App-cpanminus",
         "perl-CPAN-DistnameInfo",
         "perl-CPAN-Meta-Check",
+        "perl-Fedora-VSP",
         "perl-File-pushd",
+        "perl-generators",
         "perl-JSON",
         "perl-local-lib",
         "perl-Module-CPANfile",
@@ -93,6 +99,7 @@
         "perl-String-ShellQuote",
         "policycoreutils",
         "pugixml",
+        "pwgen",
         "pyelftools",
         "python-google-auth",
         "python-jwt",
@@ -113,6 +120,7 @@
         "setools",
         "sgml-common",
         "socket_wrapper",
+        "softhsm",
         "sos",
         "squashfs-tools",
         "tini",
@@ -136,17 +144,17 @@
         "azure-iot-sdk-c",
         "azure-iotedge",
         "azure-storage-cpp",
-        "bpftrace",
+        "bazel",
         "blobfuse",
         "bmon",
         "bond",
+        "bpftrace",
         "ccache",
         "check-restart",
         "clamav",
         "cloud-hypervisor",
         "cloud-init-vmware-guestinfo",
         "cockpit",
-        "coredns-1.6.7",
         "coredns-1.7.0",
         "coredns-1.8.0",
         "distroless-packages",
@@ -161,6 +169,7 @@
         "go-md2man",
         "grpc",
         "GSL",
+        "helm",
         "installkernel",
         "ivykis",
         "jsonbuilder",
@@ -177,6 +186,7 @@
         "libmaxminddb",
         "libuv",
         "libxml++",
+        "lld",
         "lsb-release",
         "lttng-consume",
         "mariner-release",
@@ -193,7 +203,6 @@
         "nmap",
         "node-problem-detector",
         "ntopng",
-        "omi",
         "pcaudiolib",
         "pcre2",
         "perl-Test-Warnings",
@@ -387,7 +396,6 @@
         "efivar",
         "elfutils",
         "erlang",
-        "etcd-3.4.3",
         "etcd-3.4.13",
         "ethtool",
         "expat",
@@ -413,6 +421,7 @@
         "glib-networking",
         "glibc",
         "glibmm24",
+        "glide",
         "gmp",
         "gnome-common",
         "gnupg2",
@@ -863,10 +872,24 @@
       ]
     },
     {
+      "origin": "netplan",
+      "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
+      "specs": [
+        "netplan"
+      ]
+    },
+    {
       "origin": "rpm-software-management",
       "license": "[GPLv2+](https://github.com/rpm-software-management/dnf-plugins-core/blob/master/COPYING)",
       "specs": [
         "dnf-plugins-core"
+      ]
+    },
+    {
+      "origin": "OpenSuse",
+      "license": "Following [openSUSE guidelines](https://en.opensuse.org/openSUSE:Specfile_guidelines#Specfile_Licensing)",
+      "specs": [
+        "gd"
       ]
     }
   ]
