@@ -1,0 +1,45 @@
+--- rpm-rpm-4.17.0-release/Makefile.am	2021-09-03 02:41:20.000000000 -0700
++++ rpm-rpm-4.17.0-release/Makefile2	2021-09-23 15:21:16.362202512 -0700
+@@ -27,7 +27,7 @@
+ 
+ SUBDIRS = po misc
+ SUBDIRS += luaext
+-SUBDIRS += rpmio lib sign build scripts fileattrs docs .
++SUBDIRS += rpmio lib sign build scripts fileattrs .
+ 
+ if ENABLE_PYTHON
+ SUBDIRS += python
+@@ -41,7 +41,7 @@
+ SUBDIRS += tests
+ endif
+ 
+-DIST_SUBDIRS = po misc luaext rpmio lib sign build python scripts fileattrs docs tests plugins
++DIST_SUBDIRS = po misc luaext rpmio lib sign build python scripts fileattrs tests plugins
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ 
+@@ -249,24 +249,6 @@
+ 
+ MAINTAINERCLEANFILES = ChangeLog
+ 
+-# Always build librpm docs
+-if DOXYGEN
+-docs/librpm.doxy: docs/librpm.doxy.in docs/librpm/Doxyheader.h Makefile.am configure.ac $(pkginclude_HEADERS)
+-	files=`echo " $(pkginclude_HEADERS)" | $(SED) -e "s, , \@top_srcdir\@/,g"`; \
+-	$(SED) -e "s,[@]pkginclude_HEADERS[@],$$files," \
+-	  -e "s,\@top_srcdir\@/,$(top_srcdir)/,g" \
+-	  -e "s,[@]HAVE_DOT[@],$(HAVE_DOT)," \
+-	  -e "s,[@]PACKAGE[@],$(PACKAGE)," \
+-	  -e "s,[@]VERSION[@],$(VERSION)," \
+-	< $(top_srcdir)/docs/librpm.doxy.in > docs/librpm.doxy
+-
+-docs/librpm/html: docs/librpm.doxy
+-	@DOXYGEN@ docs/librpm.doxy
+-noinst_DATA += docs/librpm/html
+-endif
+-EXTRA_DIST += docs/librpm.doxy.in docs/librpm/Doxyheader.h
+-EXTRA_DIST += docs/librpm/html
+-
+ .PHONY: ci
+ ci:
+ 	podman build -t rpm -f ci/Dockerfile .
