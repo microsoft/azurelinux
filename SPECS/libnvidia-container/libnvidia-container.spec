@@ -1,9 +1,9 @@
-%define modprobe_version 450.57
+%define modprobe_version 470.74
 %define _major 1
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.3.3
+Version:        1.5.1
 Release:        2%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
