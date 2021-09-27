@@ -93,6 +93,7 @@
                 "libisofs",
                 "libkcapi",
                 "liblognorm",
+                "libnfs",
                 "libpciaccess",
                 "libpwquality",
                 "libsemanage",

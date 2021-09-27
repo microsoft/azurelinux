@@ -3458,6 +3458,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnfs",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnftnl",
           "version": "1.1.9",
           "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
