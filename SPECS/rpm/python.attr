@@ -1,0 +1,4 @@
+%__python_provides	%{_rpmconfigdir}/pythondistdeps.py --provides --majorver-provides-versions @MAJORVER-PROVIDES-VERSIONS@
+%__python_requires	%{_rpmconfigdir}/pythondeps.sh --requires
+%__python_path	^((/usr/lib(64)?/python[[:digit:]]+\\.[[:digit:]]+/site-packages/[^/]+\\.(dist-info|egg-info|egg-link))|(/usr/lib(64)?/python[[:digit:]]+\\.[[:digit:]]+/.*\\.(py[oc]?|so))|(%{_bindir}/python[[:digit:]]+\\.[[:digit:]]+))$
+%__python_magic		[Pp]ython.*(executable|byte-compiled)
