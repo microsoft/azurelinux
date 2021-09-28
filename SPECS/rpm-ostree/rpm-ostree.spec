@@ -1,14 +1,12 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2019.3
-Release:        9%{?dist}
+Version:        2021.11
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/projectatomic/rpm-ostree
+URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Source1:        libglnx-470af87.tar.gz
-Source2:        libdnf-d8e481b.tar.gz
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
 
@@ -47,8 +45,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
-BuildRequires:  python2
-BuildRequires:  python2-libs
+BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
@@ -72,8 +69,6 @@ Requires:       ostree
 Requires:       ostree-grub2
 Requires:       ostree-libs
 Requires:       polkit
-ExclusiveArch:  x86_64
-
 ExclusiveArch:  x86_64
 
 %description
@@ -105,11 +100,7 @@ Requires:       %{name} = %{version}-%{release}
 Includes the scripts for rpm-ostree repo creation to act as server
 
 %prep
-%setup -q
-tar xf %{SOURCE1} --no-same-owner
-tar xf %{SOURCE2} --no-same-owner
-%patch0
-%patch1
+%autosetup
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -161,6 +152,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2021.11-1
+- Upgrade to latest upstream release (license verified)
+
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 2019.3-7: Systemd supports merged /usr. Update unit file directory macro.
