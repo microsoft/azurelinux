@@ -1788,6 +1788,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fuse3",
+          "version": "3.10.5",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse-zip",
           "version": "0.7.2",
           "downloadUrl": "https://bitbucket.org/agalanin/fuse-zip/downloads/fuse-zip-0.7.2.tar.gz"
@@ -2928,6 +2938,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libbpf",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
@@ -3448,6 +3468,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnfs",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnftnl",
           "version": "1.1.9",
           "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
@@ -3658,6 +3688,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libslirp",
+          "version": "4.6.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libSM",
           "version": "1.2.3",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
@@ -3791,6 +3831,16 @@
           "name": "libunwind",
           "version": "1.2",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liburing",
+          "version": "2.0",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
         }
       }
     },
@@ -8955,6 +9005,16 @@
           "name": "urfave-cli",
           "version": "2.3.0",
           "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "usbredir",
+          "version": "0.10.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.10.0.tar.xz"
         }
       }
     },
