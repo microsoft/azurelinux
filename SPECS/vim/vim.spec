@@ -189,7 +189,7 @@ fi
 
 %changelog
 * Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-1
-- Fix CVE-2021-3778 and update to version 8.2.3441.
+- Fix CVE-2021-3778 and CVE-2021-3796 CVEs by updating to 8.2.3441.
 
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.1667-1
 - Fix CVE-2019-20807 by updating to 8.1.1667.
