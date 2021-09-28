@@ -12,13 +12,13 @@ BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
 BuildRequires:  ncurses-devel
-BuildRequires:  python2-devel
+BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 Requires:       libstdc++-devel
 Requires:       libxml2
 Requires:       llvm
 Requires:       ncurses
-Requires:       python2
+Requires:       python3
 Requires:       zlib
 
 %description
@@ -41,7 +41,7 @@ Requires:       python3
 clang-format integration for git.
 
 %prep
-%setup -q -n clang-%{version}.src
+%setup -q -n %{name}-%{version}.src
 
 %build
 # Disable symbol generation
@@ -69,9 +69,6 @@ make DESTDIR=%{buildroot} install
 %check
 cd build
 make clang-check
-
-%clean
-rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)

@@ -1,4 +1,3 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
 Version:        12.0.1
@@ -61,9 +60,9 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLVM_DIR=%{_libdir}/cmake/llvm        \
       -DLLVM_BUILD_LLVM_DYLIB=ON ..         \
       -DLLDB_DISABLE_LIBEDIT:BOOL=ON        \
-      -DPYTHON_EXECUTABLE:STRING=%{__python2} \
-      -DPYTHON_VERSION_MAJOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.major)") \
-      -DPYTHON_VERSION_MINOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.minor)")
+      -DPYTHON_EXECUTABLE:STRING=%{__python3} \
+      -DPYTHON_VERSION_MAJOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.major)") \
+      -DPYTHON_VERSION_MINOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.minor)")
 
 make %{?_smp_mflags}
 
@@ -73,7 +72,7 @@ cd build
 make DESTDIR=%{buildroot} install
 
 #Remove bundled python-six files
-rm -f %{buildroot}%{python2_sitelib}/six.*
+rm -f %{buildroot}%{python3_sitelib}/six.*
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
