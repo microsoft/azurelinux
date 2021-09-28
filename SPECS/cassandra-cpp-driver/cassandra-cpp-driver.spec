@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/datastax/cpp-driver
-Source0:        https://github.com/datastax/cpp-driver/archive/refs/tags/%{version}.tar.gz
+Source0:        https://github.com/datastax/cpp-driver/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  libuv-devel
 BuildRequires:  openssl-devel
@@ -35,8 +35,7 @@ Development libraries for %{name}
 mkdir -p build
 cd build
 %cmake ..\
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DCASS_BUILD_STATIC=ON
+    -DCMAKE_BUILD_TYPE=RELEASE
 %make_build
 
 %install
@@ -53,7 +52,6 @@ cd build
 
 %files devel
 %{_includedir}/*.h
-%{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
