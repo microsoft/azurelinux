@@ -49,6 +49,7 @@
                 "firewalld",
                 "fmt",
                 "fribidi",
+                "fuse3",
                 "fuse-zip",
                 "gcovr",
                 "glusterfs",

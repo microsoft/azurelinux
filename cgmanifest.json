@@ -1788,6 +1788,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fuse3",
+          "version": "3.10.5",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse-zip",
           "version": "0.7.2",
           "downloadUrl": "https://bitbucket.org/agalanin/fuse-zip/downloads/fuse-zip-0.7.2.tar.gz"
