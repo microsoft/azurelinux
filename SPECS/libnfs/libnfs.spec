@@ -75,6 +75,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.0-6
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
+- License verified
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

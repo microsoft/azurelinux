@@ -28,14 +28,6 @@ Requires:       zlib
 The %{name}-devel package contains libraries header files for
 developing applications that use %{name}
 
-%package        static
-Summary:        Static library for libbpf development
-Requires:       %{name}-devel = %{version}-%{release}
-
-%description static
-The %{name}-static package contains static library for
-developing applications that use %{name}
-
 %define _lto_cflags %{nil}
 %global make_flags DESTDIR=%{buildroot} OBJDIR=%{_builddir} CFLAGS="%{build_cflags} -fPIC" LDFLAGS="%{build_ldflags} -Wl,--no-as-needed" LIBDIR=/%{_libdir} NO_PKG_CONFIG=1
 
@@ -47,23 +39,21 @@ developing applications that use %{name}
 
 %install
 %make_install -C ./src %{make_flags}
+find %{buildroot} -type f -name "*.a" -delete -print
 
 %files
-%{_libdir}/libbpf.so.%{version}
-%{_libdir}/libbpf.so.0
+%{_libdir}/libbpf.so.0*
 
 %files devel
 %{_libdir}/libbpf.so
 %{_includedir}/bpf/
 %{_libdir}/pkgconfig/libbpf.pc
 
-%files static
-%{_libdir}/libbpf.a
-
 %changelog
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec and remove epoch
+- Remove static subpackage
 - License verified
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2:0.4.0-2
