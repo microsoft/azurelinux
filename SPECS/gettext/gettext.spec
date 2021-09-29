@@ -9,29 +9,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
 Provides:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-common-devel = %{version}-%{release}
 
 %description
 These allow programs to be compiled with NLS
 (Native Language Support), enabling them to output
 messages in the user's native language.
-
-%package common-devel
-Summary: Common development files for %{name}
-# autopoint archive
-License: GPLv3+
-BuildArch: noarch
-
-%description common-devel
-This package contains common architecture independent gettext development files.
-
-%package libs
-Summary: Libraries for %{name}
-# libasprintf is LGPLv2+
-# libgettextpo is GPLv3+
-License: LGPLv2+ and GPLv3+
-
-%description libs
-This package contains libraries used internationalization support.
 
 %prep
 %setup -q
@@ -73,18 +57,9 @@ make %{?_smp_mflags} check
 %{_datarootdir}/%{name}/*
 %{_mandir}/*
 
-%files common-devel
-%{_datadir}/%{name}/archive.*.tar.xz
-
-%files libs
-%{_libdir}/libasprintf.so.0*
-%{_libdir}/libgettextpo.so.0*
-%{_libdir}/libgettextlib-0.*.so
-%{_libdir}/libgettextsrc-0.*.so
-
 %changelog
 * Mon Sep 20 2021 Muhammad Falak <mwani@microsoft.com> 0.21-2
-- Export subpackage `common-devel` & `libs`
+- Add explicit Provides for `gettext-common-devel` & `gettext-libs`
 
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.21-1
 - Update to version 0.21.
