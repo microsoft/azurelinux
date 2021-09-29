@@ -1,24 +1,24 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        8.0.1
-Release:        5%{?dist}
+Version:        12.0.1
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://clang.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/cfe-%{version}.src.tar.xz
+Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
 BuildRequires:  ncurses-devel
-BuildRequires:  python2-devel
+BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 Requires:       libstdc++-devel
 Requires:       libxml2
 Requires:       llvm
 Requires:       ncurses
-Requires:       python2
+Requires:       python3
 Requires:       zlib
 
 %description
@@ -33,15 +33,15 @@ The clang-devel package contains libraries, header files and documentation
 for developing applications that use clang.
 
 %package -n git-clang-format
-Summary:	Integration of clang-format for git
-Requires:	git
-Requires:	python3
+Summary:        Integration of clang-format for git
+Requires:       git
+Requires:       python3
 
 %description -n git-clang-format
 clang-format integration for git.
 
 %prep
-%setup -q -n cfe-%{version}.src
+%setup -q -n %{name}-%{version}.src
 
 %build
 # Disable symbol generation
@@ -70,10 +70,6 @@ make DESTDIR=%{buildroot} install
 cd build
 make clang-check
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
@@ -94,6 +90,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/git-clang-format
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
+- Update to 12.0.1
+
 * Sat Sep 04 2021 Muhammad Falak <mwani@microsoft.com> - 8.0.1-5
 - Add `git-clang-format` subpackage.
 
