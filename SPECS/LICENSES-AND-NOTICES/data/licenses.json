@@ -149,6 +149,7 @@
         "bmon",
         "bond",
         "bpftrace",
+        "cassandra-cpp-driver",
         "ccache",
         "check-restart",
         "clamav",

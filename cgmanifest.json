@@ -554,6 +554,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cassandra-cpp-driver",
+          "version": "2.16.0",
+          "downloadUrl": "https://github.com/datastax/cpp-driver/archive/refs/tags/2.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "catch",
           "version": "2.10.2",
           "downloadUrl": "https://github.com/philsquared/Catch/archive/v2.10.2/catch-2.10.2.tar.gz"
