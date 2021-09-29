@@ -7572,8 +7572,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2019.3",
-          "downloadUrl": "https://github.com/projectatomic/rpm-ostree/releases/download/v2019.3/rpm-ostree-2019.3.tar.xz"
+          "version": "2021.11",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2021.11/rpm-ostree-2021.11.tar.xz"
         }
       }
     },

@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "libdnf-d8e481b.tar.gz": "66851ef588e230be854e2fbb88c302a1553436d81bc4502fdb0dfb88f9e7ba25",
-  "libglnx-470af87.tar.gz": "80cc025002a7cd2a7aa78627ff4ceca97367fa858dd5cae82aa5d54ec9e18f0a",
-  "rpm-ostree-2019.3.tar.xz": "e36600452f2167e96f37f434dc1b9671858cf9777f28704f0c977f553e1fc5ad"
+  "rpm-ostree-2021.11.tar.xz": "07a2b9731270a795a79d935d692729dcea28e879c1133b1c747cf0737abe552a"
  }
 }
