@@ -87,15 +87,11 @@ Requires(postun): coreutils
 The kernel package contains the signed Linux kernel.
 
 %prep
-# Remove module_info.ld script due to error "unpackaged file" build error
-LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
-export LDFLAGS
 
 %build
 # This spec's whole purpose is to inject the signed kernel binary
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
-find / | grep module_info
 
 %install
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
@@ -145,6 +141,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
+%exclude /module_info.ld
 %ifarch x86_64
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 %endif
