@@ -69,11 +69,24 @@ type Config struct {
 }
 
 // GetDiskPartByID returns the disk partition object with the desired ID, nil if no partition found
-func (c *Config) GetDiskPartByID(ID string) (disk *Partition) {
+func (c *Config) GetDiskPartByID(ID string) (diskPart *Partition) {
 	for i, d := range c.Disks {
 		for j, p := range d.Partitions {
 			if p.ID == ID {
 				return &c.Disks[i].Partitions[j]
+			}
+		}
+	}
+	return nil
+}
+
+// GetDiskByPartition returns the disk containing the provided partition
+func (c *Config) GetDiskContainingPartition(partition *Partition) (disk *Disk) {
+	ID := partition.ID
+	for i, d := range c.Disks {
+		for _, p := range d.Partitions {
+			if p.ID == ID {
+				return &c.Disks[i]
 			}
 		}
 	}
@@ -122,6 +135,59 @@ func checkDeviceMapperFlags(config *Config) (err error) {
 	return
 }
 
+// checkForMissingDiskPartitions makes sure we don't try to mount a partition which doesn't actually exist as part of a disk.
+func checkForMissingDiskPartitions(config *Config) (err error) {
+	for _, sysConfig := range config.SystemConfigs {
+		for _, partSetting := range sysConfig.PartitionSettings {
+			if config.GetDiskPartByID(partSetting.ID) == nil {
+				return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' which has no corresponding partition on a [Disk]", sysConfig.Name, partSetting.ID)
+			}
+		}
+	}
+	return
+}
+
+// checkDuplicatePartitionIDs makes sure that we don't have two disk partitions which share an ID. It would not be clear
+// which should be mounted by a SystemConfig.
+func checkDuplicatePartitionIDs(config *Config) (err error) {
+	idUsed := make(map[string]int)
+	for i, disk := range config.Disks {
+		for _, part := range disk.Partitions {
+			id := part.ID
+			otherDisk, alreadyUsed := idUsed[id]
+			if alreadyUsed {
+				return fmt.Errorf("a [Partition] on a [Disk] '%d' shares an ID '%s' with another partition (on disk '%d')", otherDisk, id, i)
+			} else {
+				idUsed[id] = i
+			}
+		}
+	}
+	return
+}
+
+// checkInvalidMountIdentifiers checks that we don't have an invalid combination of GPT/MBR, PARTLABEL, and Name for each partition.
+// PARTUUID and PARTLABEL are GPT concepts. MBR partly supports PARTUUID, but is completely incompatible with PARTLABEL.
+// If we want to use PARTLABEL, we need to define a [Name] for the partition as well.
+func checkInvalidMountIdentifiers(config *Config) (err error) {
+	for _, sysConfig := range config.SystemConfigs {
+		for _, partSetting := range sysConfig.PartitionSettings {
+			if partSetting.MountIdentifier == MountIdentifierPartLabel {
+				diskPart := config.GetDiskPartByID(partSetting.ID)
+				disk := config.GetDiskContainingPartition(diskPart)
+
+				if disk.PartitionTableType != PartitionTableTypeGpt {
+					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", sysConfig.Name, partSetting.ID)
+				}
+
+				if diskPart.Name == "" {
+					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but it has no [Name]", sysConfig.Name, partSetting.ID)
+				}
+			}
+		}
+	}
+	return
+}
+
 // IsValid returns an error if the Config is not valid
 func (c *Config) IsValid() (err error) {
 	for _, disk := range c.Disks {
@@ -129,10 +195,27 @@ func (c *Config) IsValid() (err error) {
 			return fmt.Errorf("invalid [Disks]: %w", err)
 		}
 	}
+
+	// Check that we will be able to reliably find our disk partitions for each SystemConfig
+	err = checkForMissingDiskPartitions(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
+	}
+
+	err = checkDuplicatePartitionIDs(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
+	}
+
 	// Check the flags for the disks
 	err = checkDeviceMapperFlags(c)
 	if err != nil {
 		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: %w", err)
+	}
+
+	err = checkInvalidMountIdentifiers(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
 	}
 
 	if len(c.SystemConfigs) == 0 {

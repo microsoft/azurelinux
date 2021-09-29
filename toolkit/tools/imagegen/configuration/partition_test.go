@@ -46,6 +46,56 @@ func TestShouldFailFindingBadFlag_Partition(t *testing.T) {
 	assert.False(t, validPartition.HasFlag("notaflag"))
 }
 
+func TestShouldPassEmptyName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	emptyNamePartition := validPartition
+
+	emptyNamePartition.Name = ""
+
+	err := remarshalJSON(emptyNamePartition, &checkedPartition)
+	assert.NoError(t, err)
+}
+
+func TestShouldPassMaxLengthName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	maxNamePartition := validPartition
+
+	maxNamePartition.Name = "abcdefghijklmnopqrstuvwxyz012345678"
+
+	err := remarshalJSON(maxNamePartition, &checkedPartition)
+	assert.NoError(t, err)
+}
+
+func TestShouldFailLongNormalName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	longNamePartition := validPartition
+
+	longNamePartition.Name = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+	err := longNamePartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+
+	err = remarshalJSON(longNamePartition, &checkedPartition)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Partition]: [Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+}
+
+func TestShouldFailSymbolName_Partition(t *testing.T) {
+	var checkedPartition Partition
+	symbolNamePartition := validPartition
+	symbolNamePartition.Name = "( •_•)>⌐■~■"
+
+	err := symbolNamePartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "[Name] (( •_•)>⌐■~■) contains a non-ASCII character '•' at position (2)", err.Error())
+
+	err = remarshalJSON(symbolNamePartition, &checkedPartition)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Partition]: [Name] (( •_•)>⌐■~■) contains a non-ASCII character '•' at position (2)", err.Error())
+
+}
+
 func TestShouldFailParsingInvalidFlag_Partition(t *testing.T) {
 	var checkedPartition Partition
 	invalidPartition := validPartition

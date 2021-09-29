@@ -1,0 +1,29 @@
+#!/bin/bash
+
+ntpconf=/etc/ntp.conf
+ntpstep=/etc/ntp/step-tickers
+
+[ "$EUID" != "0" ] && exit 4
+[ -x /usr/sbin/ntpdate ] || exit 5
+[ -f /etc/sysconfig/ntpdate ] || exit 6
+. /etc/sysconfig/ntpdate
+
+[ -f $ntpstep ] && tickers=$(sed 's/#.*//' $ntpstep) || tickers=
+
+if ! echo "$tickers" | grep -qi '[a-z0-9]' && [ -f $ntpconf ]; then
+	# the step-tickers file doesn't specify a server,
+	# use servers from ntp.conf instead
+	tickers=$(awk '$1=="peer"||$1=="server"{print $2}' $ntpconf | \
+		grep -Ev '127\.127\.[0-9]+\.[0-9]+')
+fi
+
+if ! echo "$tickers" | grep -qi '[a-z0-9]'; then
+	echo "NTP server not specified in $ntpstep or $ntpconf"
+	exit 6
+fi
+
+/usr/sbin/ntpdate -s -b $OPTIONS $tickers &> /dev/null
+RETVAL=$?
+
+[ $RETVAL -eq 0 ] && [ "$SYNC_HWCLOCK" = "yes" ] && /sbin/hwclock --systohc
+exit $RETVAL

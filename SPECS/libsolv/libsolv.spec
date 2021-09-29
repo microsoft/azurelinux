@@ -1,19 +1,17 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.7
-Release:        4%{?dist}
+Version:        0.7.19
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/%{version}/%{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Requires:       expat-libs
-Requires:       libdb
-
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
+Requires:       expat-libs
+Requires:       libdb
 
 %description
 Libsolv is a free package management library, using SAT technology to solve requests.
@@ -23,8 +21,6 @@ It supports debian, rpm, archlinux and haiku style distributions.
 Summary:        Development headers for libsolv
 Requires:       %{name} = %{version}-%{release}
 Requires:       expat-devel
-Provides:       pkgconfig(libsolv)
-Provides:       pkgconfig(libsolvext)
 
 %description devel
 The libsolv-devel package contains libraries, header files and documentation
@@ -43,38 +39,36 @@ Requires:       xz
 %{summary}
 
 %prep
-%setup -q
+%autosetup
 
 %build
-cmake \
-    -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
+%cmake \
     -DENABLE_COMPLEX_DEPS=ON            \
     -DENABLE_RPMDB=ON                   \
     -DENABLE_RPMDB_BYRPMHEADER=ON       \
     -DENABLE_RPMDB_LIBRPM=ON            \
     -DENABLE_RPMMD=ON
-
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-make %{?_smp_mflags} test
+%make_build test
 
 %files
 %defattr(-,root,root)
 %license LICENSE.BSD
-%{_lib64dir}/libsolv.so.*
-%{_lib64dir}/libsolvext.so.*
+%{_libdir}/libsolv.so.1*
+%{_libdir}/libsolvext.so.1*
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_lib64dir}/libsolv.so
-%{_lib64dir}/libsolvext.so
-%{_lib64dir}/pkgconfig/*
+%{_libdir}/libsolv.so
+%{_libdir}/libsolvext.so
+%{_libdir}/pkgconfig/*
 %{_datadir}/cmake/*
 %{_mandir}/man3/*
 
@@ -83,6 +77,11 @@ make %{?_smp_mflags} test
 %{_mandir}/man1/*
 
 %changelog
+* Tue Aug 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.7-5
+- Upgrade to latest upstream
+- Install files to %%{_libdir} instead of %%{_lib64dir}
+- Lint spec
+
 *   Thu Jun 11 2020 Joe Schmitt <joschmit@microsoft.com> 0.7.7-4
 -   Add "pkgconfig(libsolvext)" to the "devel" subpackage.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.7.7-3

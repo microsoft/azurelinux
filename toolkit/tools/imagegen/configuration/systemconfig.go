@@ -38,7 +38,19 @@ type SystemConfig struct {
 func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
 	for i, p := range s.PartitionSettings {
 		if p.MountPoint == "/" {
-			// We want to refernce the actual object in the slice
+			// We want to reference the actual object in the slice
+			return &s.PartitionSettings[i]
+		}
+	}
+	return nil
+}
+
+// GetMountpointPartitionSetting will search the system configuration for the partition setting
+// corresponding to a mount point.
+func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
+	for i, p := range s.PartitionSettings {
+		if p.MountPoint == mountPoint {
+			// We want to reference the actual object in the slice
 			return &s.PartitionSettings[i]
 		}
 	}

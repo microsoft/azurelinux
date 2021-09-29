@@ -26,11 +26,11 @@
 %endif
 # Add option to build with examples, tools subpackages
 %bcond_with examples
-%bcond_with tools
+%bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Epoch:          2
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -297,6 +297,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Sat Sep 25 2021 Muhammad Falak <mwani@microsoft.com> - 2:18.11.2-6
+- Enable `tools` subpackage by default
+
 * Thu Aug 05 2021 Thomas Crain <thcrain@microsoft.com> - 2:18.11.2-5
 - Disable examples subpackage by default
 

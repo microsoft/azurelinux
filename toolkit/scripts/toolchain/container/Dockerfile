@@ -54,7 +54,7 @@ RUN apt-get update -y -qq && \
     ln    -sv $LFS/tools / && \
     $LFS/tools/version-check-container.sh
 
-COPY [ "./toolchain-md5sums", \
+COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
        "./texinfo-perl-fix.patch", \
@@ -63,7 +63,7 @@ COPY [ "./toolchain-md5sums", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
-# Append "; exit 0" after wget commands to ignore download errors that might be expected. The md5sum command will verify all downloads.
+# Append "; exit 0" after wget commands to ignore download errors that might be expected. The sha256sum command will verify all downloads.
 # Note: Fetch the kernel sources differently to ensure we rename the source tarball appropriately. The rename is needed to comply with
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
@@ -72,7 +72,7 @@ RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolch
 RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz -O kernel-5.10.64.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN /tools/toolchain-jdk8-wget.sh; exit 0
-RUN md5sum -c $LFS/tools/toolchain-md5sums && \
+RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
     echo "lfs:lfs" | chpasswd && \

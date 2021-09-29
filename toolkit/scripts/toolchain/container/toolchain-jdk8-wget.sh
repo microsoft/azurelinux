@@ -42,7 +42,7 @@ download_with_retry "$sourceTarball" "$targetTarball"
 # The sub-projects all have the same tag as the master repository.
 # This results in source tarballs all having the same name (but different URIs).
 # Rename the tarballs as they are downloaded so they don't overwrite each other.
-# This means the names in toolchain-md5sums do not match the source tarball names,
+# This means the names in toolchain-sha256sums do not match the source tarball names,
 # but they are all there.
 for subproject in corba hotspot jaxp jaxws langtools jdk nashorn; do
   sourceTarball=http://hg.openjdk.java.net/jdk8u/jdk8u/${subproject}/archive/jdk8u${version}.tar.bz2
@@ -61,7 +61,7 @@ download_with_retry "$sourceTarball" "$targetTarball"
 # The sub-projects all have the same tag as the master repository.
 # This results in source tarballs all having the same name (but different URIs).
 # Rename the tarballs as they are downloaded so they don't overwrite each other.
-# This means the names in toolchain-md5sums do not match the source tarball names,
+# This means the names in toolchain-sha256sums do not match the source tarball names,
 # but they are all there.
 for subproject in corba hotspot jaxp jaxws langtools jdk nashorn; do
   sourceTarball=http://hg.openjdk.java.net/aarch64-port/jdk8u/${subproject}/archive/aarch64-jdk8u${version}.tar.bz2

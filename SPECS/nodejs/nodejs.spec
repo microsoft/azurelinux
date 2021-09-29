@@ -1,7 +1,12 @@
+# Retrieved from 'deps/npm/package.json' inside the sources tarball.
+%define npm_version 6.14.13
+
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
+# WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
+#           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        14.17.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -16,6 +21,8 @@ BuildRequires:  which
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.0.1
 Requires:       python3
+
+Provides:       npm = %{npm_version}.%{version}-%{release}
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient. The Node.js package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
@@ -73,6 +80,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
+-   Adding 'Provides' for 'npm'.
 *   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
 -   Update to version 14.17.2 to fix CVE-2021-22918
 *   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
