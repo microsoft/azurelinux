@@ -81,6 +81,8 @@ find %{buildroot} -name '*.cmake' -delete
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
+%exclude %{_includedir}/re2/
+
 %{_libdir}/libgpr.so
 %{_libdir}/libgrpc++.so
 %{_libdir}/libgrpc++_alts.so
@@ -93,6 +95,10 @@ find %{buildroot} -name '*.cmake' -delete
 %{_libdir}/libgrpcpp_channelz.so
 %{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
+%exclude %{_libdir}/libabsl_*
+%exclude %{_libdir}/libaddress_sorting.so
+%exclude %{_libdir}/libre2.so
+%exclude %{_lib64dir}/libre2.so
 
 %files plugins
 %license LICENSE
