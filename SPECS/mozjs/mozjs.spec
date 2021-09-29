@@ -1,4 +1,3 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 %global	major 78
 Summary:       Mozilla's JavaScript engine.
@@ -7,10 +6,9 @@ Version:       78.10.0
 Release:       2%{?dist}
 Group:         Applications/System
 Vendor:        Microsoft Corporation
-License:       MPLv2.0 and MPLv1.1 and BSD and GPLv2+ and GPLv3+ and LGPLv2+ and AFL and ASL 2.0
+License:       MPLv2.0 and MPLv1.1 and BSD and GPLv2+ and GPLv3+ and LGPLv2+ and AFL and ASL 2.0 and CCO
 URL:           https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey
 Source0:       https://ftp.mozilla.org/pub/firefox/releases/%{version}esr/source/firefox-%{version}esr.source.tar.xz
-%define sha1   firefox-%{version}=547bac33732774993bd8223de9acfeedcc69a10d
 Patch0:        emitter.patch
 Patch1:        emitter_test.patch
 # Build fixes
@@ -34,6 +32,7 @@ Requires:      python3-libs
 Obsoletes:     mozjs60
 Obsoletes:     mozjs68
 Obsoletes:     js
+Provides:      mozjs%{major}
 
 %description
 Mozilla's JavaScript engine includes a just-in-time compiler (JIT) that compiles
@@ -48,11 +47,7 @@ Requires:      %{name} = %{version}-%{release}
 This contains development tools and libraries for SpiderMonkey.
 
 %prep
-%setup -q -n firefox-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1 -n firefox-%{version}
 rm -rf modules/zlib
 
 %build
@@ -63,23 +58,23 @@ cd js/src
     --disable-jemalloc \
     --disable-tests \
     --with-system-zlib
-make %{?_smp_mflags}
+%make_build
 
 %install
 cd js/src
-make DESTDIR=%{buildroot} install
+%make_install
 chmod -x %{buildroot}%{_libdir}/pkgconfig/*.pc
 # remove non required files
 rm %{buildroot}%{_libdir}/libjs_static.ajs
-rm -rf %{buildroot}%{_libdir}/debug
 rm -rf %{buildroot}/usr/src
 find %{buildroot} -name '*.la' -delete
 
 %post
-/sbin/ldconfig
+%ldconfig_scriptlets
 
 %postun
-/sbin/ldconfig
+%ldconfig_scriptlets
+
 
 %files
 %defattr(-,root,root)
@@ -89,24 +84,33 @@ find %{buildroot} -name '*.la' -delete
 
 %files devel
 %defattr(-,root,root)
+%license LICENSE
 %{_includedir}/mozjs-%{major}
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
-%changelog
-*   Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> 78.10.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2)
+%check
+# Run SpiderMonkey tests
+python3 tests/jstests.py -d -s -t 1800 --no-progress ../../js/src/js/src/shell/js
+# Run basic JIT tests
+python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/js basic
 
-*   Tue Apr 13 2021 Gerrit Photon <photon-checkins@vmware.com> 78.10.0-1
+%changelog
+*   Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
+-   Initial CBL-Mariner import from Photon (license: Apache2)
+-   Minor changelog formatting issues.
+-   License verifed.
+
+*   Tue Apr 13 2021 Gerrit Photon <photon-checkins@vmware.com> - 78.10.0-1
 -   Automatic Version Bump
 
-*   Fri Feb 19 2021 Alexey Makhalov <amakhalov@vmware.com> 78.3.1-2
+*   Fri Feb 19 2021 Alexey Makhalov <amakhalov@vmware.com> - 78.3.1-2
 -   Remove python2 requirements
 
-*   Mon Oct 05 2020 Ankit Jain <ankitja@vmware.com> 78.3.1-1
+*   Mon Oct 05 2020 Ankit Jain <ankitja@vmware.com> - 78.3.1-1
 -   Updated to 78.3.1
 
-*   Tue Aug 25 2020 Ankit Jain <ankitja@vmware.com> 68.11.0-2
+*   Tue Aug 25 2020 Ankit Jain <ankitja@vmware.com> - 68.11.0-2
 -   Removed autoconf213 dependency and obsoletes js
 
-*   Sat Oct 26 2019 Ankit Jain <ankitja@vmware.com> 68.11.0-1
+*   Sat Oct 26 2019 Ankit Jain <ankitja@vmware.com> - 68.11.0-1
 -   initial version
