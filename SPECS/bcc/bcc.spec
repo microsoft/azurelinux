@@ -10,11 +10,11 @@ Group:          Development/Languages
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-%{version}-src-with-submodule.tar.gz
+
 BuildRequires:  bison
 BuildRequires:  clang-devel
 BuildRequires:  cmake >= 2.8.7
-BuildRequires:  elfutils-libelf
-BuildRequires:  elfutils-libelf-devel-static
+BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libstdc++
@@ -23,6 +23,8 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
+
+Requires:  elfutils-libelf
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation programs,
@@ -38,13 +40,6 @@ Requires:       %{name} = %{version}-%{release}
 %description devel
 %{name}-devel contains shared libraries and header files for
 developing application.
-
-%package static
-Summary:        Static Library for BPF Compiler Collection (BCC)
-Requires:       %{name} = %{version}-%{release}
-
-%description static
-%{name}-static contains static libraries for developing application.
 
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-bcc}
@@ -74,10 +69,13 @@ Command line tools for BPF Compiler Collection (BCC)
 %build
 mkdir build
 pushd build
-cmake .. -DREVISION_LAST=%{version} -DREVISION=%{version} \
+cmake .. \
+      -DBUILD_SHARED_LIBS:BOOL=ON \
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+      -DENABLE_LLVM_SHARED=1 \
       -DPYTHON_CMD=python3 \
-      %{?with_llvm_shared:-DENABLE_LLVM_SHARED=1}
+      -DREVISION_LAST=%{version} \
+      -DREVISION=%{version}
 make %{?_smp_mflags}
 popd
 
@@ -88,6 +86,9 @@ make install/strip DESTDIR=%{buildroot}
 find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
     sed -i -e '1 s|^#!/usr/bin/python$|#!'%{__python3}'|' \
            -e '1 s|^#!/usr/bin/env python$|#!'%{__python3}'|' {} \;
+
+# Remove static libraries
+find %{buildroot}%{_lib64dir} -name '*.a' -delete
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -103,11 +104,6 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 %{_lib64dir}/libbcc_bpf.so
 %{_lib64dir}/pkgconfig/lib%{name}.pc
 %{_includedir}/%{name}/
-
-%files static
-%{_lib64dir}/libbcc-loader-static.a
-%{_lib64dir}/libbcc.a
-%{_lib64dir}/libbcc_bpf.a
 
 %files -n python3-bcc
 %{python3_sitelib}/%{name}*
@@ -129,7 +125,7 @@ find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
 %changelog
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.22.0-1
 - Update to 0.22.0
-- Add static library subpackage
+- Using shared `elfutils-libelf` libraries instead of static ones.
 
 * Fri Jun 05 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.12.0-1
 - Update bcc version
