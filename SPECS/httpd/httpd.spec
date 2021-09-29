@@ -1,20 +1,18 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.46
-Release:        6%{?dist}
+Version:        2.4.49
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
-Patch0:         httpd-blfs_layout-1.patch
+
+# Patch0 is taken from:
+# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.49-blfs_layout-1.patch
+Patch0:         httpd-2.4.49-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
-Patch2:         CVE-2020-13950.patch
-Patch3:         CVE-2020-35452.patch
-Patch4:         CVE-2021-26690.patch
-Patch5:         CVE-2021-30641.patch
-Patch6:         CVE-2021-26691.patch
 
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100: CVE-1999-0236.nopatch
@@ -22,7 +20,6 @@ Patch100: CVE-1999-0236.nopatch
 Patch101: CVE-1999-1412.nopatch
 # CVE-2007-0086 has been disputed to not be a vulnerability since 2007 due to default system configurations securing against it.
 Patch102: CVE-2007-0086.nopatch
-Patch103: CVE-2021-33193.patch
 
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
@@ -71,28 +68,28 @@ Summary: Tools for httpd
 The httpd-tools of httpd.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
+%autosetup -p1
 
 %build
-%configure \
-            --prefix=%{_sysconfdir}/httpd          \
-            --exec-prefix=%{_prefix}               \
-            --sysconfdir=%{_confdir}/httpd/conf    \
-            --libexecdir=%{_libdir}/httpd/modules  \
-            --datadir=%{_sysconfdir}/httpd         \
-            --enable-authnz-fcgi                   \
-            --enable-mods-shared="all cgi"         \
-            --enable-mpms-shared=all               \
-            --with-apr=%{_prefix}                  \
-            --with-apr-util=%{_prefix}
-
+sh ./configure \
+            --host=%{_host}                          \
+            --build=%{_host}                         \
+            --prefix="%{_sysconfdir}/httpd"          \
+            --exec-prefix="%{_prefix}"               \
+            --libdir=%{_libdir}                      \
+            --bindir="%{_bindir}"                    \
+            --sbindir="%{_sbindir}"                  \
+            --sysconfdir="%{_confdir}/httpd/conf"    \
+            --libexecdir="%{_libdir}/httpd/modules"  \
+            --datadir="%{_sysconfdir}/httpd"         \
+            --includedir="%{_includedir}"            \
+            --mandir="%{_mandir}"                    \
+            --enable-authnz-fcgi                     \
+            --enable-mods-shared="all cgi"           \
+            --enable-mpms-shared=all                 \
+            --with-apr=%{_prefix}                    \
+            --with-apr-util=%{_prefix}               \
+            --enable-layout=RPM
 make %{?_smp_mflags}
 
 %install
@@ -123,6 +120,11 @@ echo "disable httpd.service" > %{buildroot}/usr/lib/systemd/system-preset/50-htt
 ln -s /usr/sbin/httpd %{buildroot}/usr/sbin/apache2
 ln -s /etc/httpd/conf/httpd.conf %{buildroot}/etc/httpd/httpd.conf
 
+mkdir -p %{buildroot}%{_libdir}/tmpfiles.d
+cat >> %{buildroot}%{_libdir}/tmpfiles.d/httpd.conf << EOF
+d /var/run/httpd 0755 root root -
+EOF
+
 %post
 /sbin/ldconfig
 if [ $1 -eq 1 ]; then
@@ -142,6 +144,7 @@ fi
 
 ln -sf /etc/httpd/conf/mime.types /etc/mime.types
 mkdir -p /var/run/httpd
+systemd-tmpfiles --create httpd.conf
 %systemd_post httpd.service
 
 %preun
@@ -181,7 +184,7 @@ fi
 %exclude %{_bindir}/dbmmanage
 %{_sbindir}/*
 %{_datadir}/*
-%{_sysconfdir}/httpd/build/*
+%{_sysconfdir}/httpd/html/index.html
 %{_sysconfdir}/httpd/cgi-bin/*
 %{_sysconfdir}/httpd/conf/extra
 %{_sysconfdir}/httpd/conf/original
@@ -190,12 +193,13 @@ fi
 %config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
 %{_sysconfdir}/httpd/conf/mime.types
 %{_sysconfdir}/httpd/error/*
-%{_sysconfdir}/httpd/htdocs/*
 %{_sysconfdir}/httpd/icons/*
 %{_sysconfdir}/httpd/httpd.conf
 %dir %{_sysconfdir}/httpd/logs
 %{_libdir}/systemd/system/httpd.service
 %{_libdir}/systemd/system-preset/50-httpd.preset
+%{_libdir}/tmpfiles.d/httpd.conf
+%{_localstatedir}/log/httpd
 
 %files tools
 %defattr(-,root,root)
@@ -203,8 +207,12 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.49-1
+-   Fix CVE-2021-40438 CVE-2021-36160 and CVE-2021-34798 CVEs by updating to 2.4.49.
+
 *   Wed Aug 25 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.4.46-6
 -   Added patch file(s) CVE-2021-33193.patch
+
 *   Thu Jun 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.46-5
 -   CVE-2021-26691 fix
 
