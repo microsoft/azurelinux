@@ -1,0 +1,26 @@
+diff -ur nvidia-container-toolkit-1.5.1-orig/go.mod nvidia-container-toolkit-1.5.1/go.mod
+--- nvidia-container-toolkit-1.5.1-orig/go.mod	2021-09-29 08:36:04.432397867 -0700
++++ nvidia-container-toolkit-1.5.1/go.mod	2021-09-29 16:37:20.464834034 -0700
+@@ -4,6 +4,5 @@
+ 
+ require (
+ 	github.com/BurntSushi/toml v0.3.1
+-	github.com/stretchr/testify v1.7.0
+ 	golang.org/x/mod v0.3.0
+ )
+diff -ur nvidia-container-toolkit-1.5.1-orig/go.sum nvidia-container-toolkit-1.5.1/go.sum
+--- nvidia-container-toolkit-1.5.1-orig/go.sum	2021-09-29 08:40:17.231055971 -0700
++++ nvidia-container-toolkit-1.5.1/go.sum	2021-09-29 08:39:48.407209038 -0700
+@@ -1,11 +1,8 @@
+ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
+ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+-github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
+ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+-github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+-github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
+ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
+ golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
+Only in nvidia-container-toolkit-1.5.1-orig: vendor
