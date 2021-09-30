@@ -5222,8 +5222,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2019.2",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz"
+          "version": "2021.4",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2021.4/libostree-2021.4.tar.xz"
         }
       }
     },
@@ -7572,8 +7572,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2021.11",
-          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2021.11/rpm-ostree-2021.11.tar.xz"
+          "version": "2020.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
         }
       }
     },
