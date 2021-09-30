@@ -1,15 +1,15 @@
-diff --git a/src/libostree/ostree-sysroot-deploy.c b/src/libostree/ostree-sysroot-deploy.c
-index 0744d7e..634101e 100755
---- a/src/libostree/ostree-sysroot-deploy.c
+diff --git a/src/libostree/ostree-sysroot-deploy.c.old2 b/src/libostree/ostree-sysroot-deploy.c
+index 976c4b5..263e2f5 100644
+--- a/src/libostree/ostree-sysroot-deploy.c.old2
 +++ b/src/libostree/ostree-sysroot-deploy.c
-@@ -1040,15 +1040,15 @@ get_kernel_from_tree_usrlib_modules (int                  deployment_dfd,
+@@ -1191,15 +1191,15 @@ get_kernel_from_tree_usrlib_modules (OstreeSysroot       *sysroot,
+       ret_layout->kernel_hmac_namever = g_strdup_printf (".%s.hmac", ret_layout->kernel_namever);
+     }
  
-   g_clear_object (&in);
-   glnx_close_fd (&fd);
 -/* Setting the param for Copying Photon Specific config files to sutiable location */
 +/* Setting the param for Copying Mariner Specific config files to sutiable location */
    if (!glnx_opendirat (deployment_dfd, "usr/lib/ostree-boot", FALSE, &ret_layout->ostree_boot_dfd, error))
- 	return FALSE;
+        return FALSE;
 -  if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "photon.cfg", &fd, error))
 +  if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "mariner.cfg", &fd, error))
      return FALSE;
@@ -21,12 +21,12 @@ index 0744d7e..634101e 100755
      }
    glnx_close_fd (&fd);
    if (!ot_openat_ignore_enoent (ret_layout->ostree_boot_dfd, "systemd.cfg", &fd, error))
-@@ -1714,7 +1714,7 @@ install_deployment_kernel (OstreeSysroot   *sysroot,
-         }
+@@ -1926,7 +1926,7 @@ install_deployment_kernel (OstreeSysroot   *sysroot,
+       g_ptr_array_add (overlay_initrds, g_steal_pointer (&destpath));
      }
  
--/* Copying Photon Specific config files to sutiable location */
-+/* Copying Mariner Specific config files to sutiable location */
+-  /* Copying Photon Specific config files to sutiable location */
++  /* Copying Mariner Specific config files to sutiable location */
    if (kernel_layout->kernelcfg_srcpath)
      {
        if (!glnx_fstatat_allow_noent (bootcsum_dfd, kernel_layout->kernelcfg_namever, &stbuf, 0, error))

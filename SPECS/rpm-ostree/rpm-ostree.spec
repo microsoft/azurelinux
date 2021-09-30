@@ -1,6 +1,6 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2021.11
+Version:        2020.4
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
-
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -19,7 +18,7 @@ BuildRequires:  check
 BuildRequires:  cmake
 BuildRequires:  cppunit-devel
 BuildRequires:  createrepo_c
-BuildRequires:  dbus
+BuildRequires:  dbus-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
@@ -100,7 +99,7 @@ Requires:       %{name} = %{version}-%{release}
 Includes the scripts for rpm-ostree repo creation to act as server
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -131,7 +130,7 @@ make check
 %{_libdir}/%{name}/
 %{_libdir}/*.so.1*
 %{_libdir}/girepository-1.0/*.typelib
-%{_sysconfdir}/dbus-1/system.d/*
+%{_datadir}/dbus-1/system.d/*
 %{_unitdir}/*.service
 %{_libexecdir}/*
 %{_datadir}/dbus-1/system-services/*
@@ -152,8 +151,10 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2021.11-1
-- Upgrade to latest upstream release (license verified)
+* Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-1
+- Upgrade version and rebase patches
+- Move all dbus files to reside under %%{_datadir}
+- License verified
 
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
 - Merge the following releases from dev to 1.0 spec
