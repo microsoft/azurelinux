@@ -40,7 +40,7 @@ Provides a OCI hook to enable GPU support in containers.
 tar -xvf %{SOURCE1}
 
 %build
-go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./pkg
+go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./cmd/nvidia-container-toolkit
 
 %install
 mkdir -p %{buildroot}%{_bindir}

@@ -4565,8 +4565,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-runtime",
-          "version": "3.4.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.5.0.tar.gz"
         }
       }
     },
@@ -4575,8 +4575,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.4.2.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.5.1.tar.gz"
         }
       }
     },
