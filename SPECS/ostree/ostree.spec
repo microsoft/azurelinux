@@ -157,7 +157,7 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4
+* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-1
 - Upgrade to latest upstream and rebase patches
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2019.2-11
