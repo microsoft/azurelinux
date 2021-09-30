@@ -236,6 +236,5 @@ python3-libcap-ng-0.7.9-4.cm2.aarch64.rpm
 python3-libs-3.7.10-3.cm2.aarch64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-xml-3.7.10-3.cm2.aarch64.rpm
-systemd-rpm-macros-239-41.cm2.noarch.rpm
 which-2.21-7.cm2.aarch64.rpm
 libselinux-3.2-1.cm2.aarch64.rpm
