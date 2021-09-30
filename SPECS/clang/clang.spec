@@ -52,7 +52,7 @@ BuildRequires:  llvm-devel = %{version}
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
-Requires:	    %{name}-libs = %{version}-%{release}
+Requires:        %{name}-libs = %{version}-%{release}
 Requires:       libstdc++-devel
 Requires:       libxml2
 Requires:       llvm
@@ -118,18 +118,18 @@ A set of extra tools built using Clang's tooling API.
 %setup -T -q -b 1 -n %{clang_tools_srcdir}
 
 pathfix.py -i %{__python3} -pn \
-	clang-tidy/tool/*.py \
-	clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+    clang-tidy/tool/*.py \
+    clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
 %setup -q -n %{clang_srcdir}
 
 mv ../%{clang_tools_srcdir} tools/extra
 
 pathfix.py -i %{__python3} -pn \
-	tools/clang-format/*.py \
-	tools/clang-format/git-clang-format \
-	utils/hmaptool/hmaptool \
-	tools/scan-view/bin/scan-view
+    tools/clang-format/*.py \
+    tools/clang-format/git-clang-format \
+    utils/hmaptool/hmaptool \
+    tools/scan-view/bin/scan-view
 
 %build
 # Disable symbol generation
@@ -139,7 +139,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
-	-DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
+      -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
       -DCMAKE_BUILD_TYPE=Release    \
       -DLLVM_ENABLE_EH=ON \
       -DLLVM_ENABLE_RTTI=ON \
