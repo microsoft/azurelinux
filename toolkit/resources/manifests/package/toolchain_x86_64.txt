@@ -109,8 +109,8 @@ gdbm-1.18-4.cm2.x86_64.rpm
 gdbm-debuginfo-1.18-4.cm2.x86_64.rpm
 gdbm-devel-1.18-4.cm2.x86_64.rpm
 gdbm-lang-1.18-4.cm2.x86_64.rpm
-gettext-0.21-1.cm2.x86_64.rpm
-gettext-debuginfo-0.21-1.cm2.x86_64.rpm
+gettext-0.21-2.cm2.x86_64.rpm
+gettext-debuginfo-0.21-2.cm2.x86_64.rpm
 gfortran-9.1.0-11.cm2.x86_64.rpm
 glib-2.60.1-5.cm2.x86_64.rpm
 glib-debuginfo-2.60.1-5.cm2.x86_64.rpm

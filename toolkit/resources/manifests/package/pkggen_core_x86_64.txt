@@ -59,7 +59,7 @@ diffutils-3.6-4.cm2.x86_64.rpm
 gawk-4.2.1-4.cm2.x86_64.rpm
 findutils-4.6.0-7.cm2.x86_64.rpm
 findutils-lang-4.6.0-7.cm2.x86_64.rpm
-gettext-0.21-1.cm2.x86_64.rpm
+gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.9-6.cm2.x86_64.rpm
 make-4.2.1-5.cm2.x86_64.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
