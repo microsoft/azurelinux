@@ -1,7 +1,7 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        6.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,10 +13,25 @@ Patch1:         CVE-2020-14342-fix.patch
 Patch2:         CVE-2021-20208.patch
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
+BuildRequires:  keyutils-devel
+BuildRequires:  pam-devel
 Requires:       libcap-ng
 
 %description
 Cifs-utils, a package of utilities for doing and managing mounts of the Linux CIFS filesystem.
+
+%package -n pam_cifscreds
+Summary:        PAM module to manage NTLM credentials in kernel keyring
+
+%description -n pam_cifscreds
+The pam_cifscreds PAM module is a tool for automatically adding
+credentials (username and password) for the purpose of establishing
+sessions in multiuser mounts.
+
+When a cifs filesystem is mounted with the "multiuser" option, and does
+not use krb5 authentication, it needs to be able to get the credentials
+for each user from somewhere. The pam_cifscreds module can be used to
+provide these credentials to the kernel automatically at login.
 
 %package devel
 Summary:        The libraries and header files needed for Cifs-Utils development.
@@ -30,11 +45,12 @@ Provides header files needed for Cifs-Utils development.
 %autosetup
 
 %build
-autoreconf -fiv &&./configure --prefix=%{_prefix}
-make
+autoreconf -fiv
+%configure
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 %check
 make %{?_smp_mflags} check
@@ -42,13 +58,20 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
+%{_bindir}/cifscreds
 /sbin/mount.cifs
+
+%files -n pam_cifscreds
+%{_libdir}/security/pam_cifscreds.so
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.8-6
+- Adding the 'pam_cifscreds' subpackage using Fedora 32 spec (license: MIT) as guidance.
+
 * Mon May 03 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.8-5
 - Adding a patch fo CVE-2021-20208.
 - Updated "URL" tag to use HTTPS.

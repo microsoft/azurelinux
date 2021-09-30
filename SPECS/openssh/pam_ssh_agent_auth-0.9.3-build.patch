@@ -1,0 +1,198 @@
+diff -up openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-build openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c
+--- openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-build	2016-11-13 04:24:32.000000000 +0100
++++ openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c	2017-02-07 14:29:41.626116675 +0100
+@@ -43,12 +43,31 @@
+ #include <openssl/evp.h>
+ #include "ssh2.h"
+ #include "misc.h"
++#include "ssh.h"
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <fcntl.h>
+ 
+ #include "userauth_pubkey_from_id.h"
+ #include "identity.h"
+ #include "get_command_line.h"
+ extern char **environ;
+ 
++/* 
++ * Added by Jamie Beverly, ensure socket fd points to a socket owned by the user 
++ * A cursory check is done, but to avoid race conditions, it is necessary 
++ * to drop effective UID when connecting to the socket. 
++ *
++ * If the cause of error is EACCES, because we verified we would not have that 
++ * problem initially, we can safely assume that somebody is attempting to find a 
++ * race condition; so a more "direct" log message is generated.
++ */
++
+ static char *
+ log_action(char ** action, size_t count)
+ {
+@@ -85,7 +104,7 @@ void
+ pamsshagentauth_session_id2_gen(Buffer * session_id2, const char * user,
+                                 const char * ruser, const char * servicename)
+ {
+-    char *cookie = NULL;
++    u_char *cookie = NULL;
+     uint8_t i = 0;
+     uint32_t rnd = 0;
+     uint8_t cookie_len;
+@@ -112,7 +131,7 @@ pamsshagentauth_session_id2_gen(Buffer *
+         if (i % 4 == 0) {
+             rnd = pamsshagentauth_arc4random();
+         }
+-        cookie[i] = (char) rnd;
++        cookie[i] = (u_char) rnd;
+         rnd >>= 8;
+     }
+ 
+@@ -177,6 +196,86 @@ pamsshagentauth_session_id2_gen(Buffer *
+ }
+ 
+ int
++ssh_get_authentication_socket_for_uid(uid_t uid)
++{
++	const char *authsocket;
++	int sock;
++	struct sockaddr_un sunaddr;
++	struct stat sock_st;
++
++	authsocket = getenv(SSH_AUTHSOCKET_ENV_NAME);
++	if (!authsocket)
++		return -1;
++
++	/* Advisory only; seteuid ensures no race condition; but will only log if we see EACCES */
++	if( stat(authsocket,&sock_st) == 0) {
++		if(uid != 0 && sock_st.st_uid != uid) {
++			fatal("uid %lu attempted to open an agent socket owned by uid %lu", (unsigned long) uid, (unsigned long) sock_st.st_uid);
++			return -1;
++		}
++	}
++
++	/* 
++	 * Ensures that the EACCES tested for below can _only_ happen if somebody 
++	 * is attempting to race the stat above to bypass authentication.
++	 */
++	if( (sock_st.st_mode & S_IWUSR) != S_IWUSR || (sock_st.st_mode & S_IRUSR) != S_IRUSR) {
++		error("ssh-agent socket has incorrect permissions for owner");
++		return -1;
++	}
++
++	sunaddr.sun_family = AF_UNIX;
++	strlcpy(sunaddr.sun_path, authsocket, sizeof(sunaddr.sun_path));
++
++	sock = socket(AF_UNIX, SOCK_STREAM, 0);
++	if (sock < 0)
++		return -1;
++
++	/* close on exec */
++	if (fcntl(sock, F_SETFD, 1) == -1) {
++		close(sock);
++		return -1;
++	}
++
++	errno = 0; 
++	seteuid(uid); /* To ensure a race condition is not used to circumvent the stat
++	             above, we will temporarily drop UID to the caller */
++	if (connect(sock, (struct sockaddr *)&sunaddr, sizeof sunaddr) < 0) {
++		close(sock);
++        if(errno == EACCES)
++		fatal("MAJOR SECURITY WARNING: uid %lu made a deliberate and malicious attempt to open an agent socket owned by another user", (unsigned long) uid);
++		return -1;
++	}
++
++	seteuid(0); /* we now continue the regularly scheduled programming */
++
++	return sock;
++}
++
++AuthenticationConnection *
++ssh_get_authentication_connection_for_uid(uid_t uid)
++{
++	AuthenticationConnection *auth;
++	int sock;
++
++	sock = ssh_get_authentication_socket_for_uid(uid);
++
++	/*
++	 * Fail if we couldn't obtain a connection.  This happens if we
++	 * exited due to a timeout.
++	 */
++	if (sock < 0)
++		return NULL;
++
++	auth = xmalloc(sizeof(*auth));
++	auth->fd = sock;
++	buffer_init(&auth->identities);
++	auth->howmany = 0;
++
++	return auth;
++}
++
++int
+ pamsshagentauth_find_authorized_keys(const char * user, const char * ruser, const char * servicename)
+ {
+     Buffer session_id2 = { 0 };
+@@ -190,7 +289,7 @@ pamsshagentauth_find_authorized_keys(con
+     OpenSSL_add_all_digests();
+     pamsshagentauth_session_id2_gen(&session_id2, user, ruser, servicename);
+ 
+-    if ((ac = ssh_get_authentication_connection(uid))) {
++    if ((ac = ssh_get_authentication_connection_for_uid(uid))) {
+         pamsshagentauth_verbose("Contacted ssh-agent of user %s (%u)", ruser, uid);
+         for (key = ssh_get_first_identity(ac, &comment, 2); key != NULL; key = ssh_get_next_identity(ac, &comment, 2)) 
+         {
+diff -up openssh-7.4p1/pam_ssh_agent_auth-0.10.3/Makefile.in.psaa-build openssh-7.4p1/pam_ssh_agent_auth-0.10.3/Makefile.in
+--- openssh-7.4p1/pam_ssh_agent_auth-0.10.3/Makefile.in.psaa-build	2016-11-13 04:24:32.000000000 +0100
++++ openssh-7.4p1/pam_ssh_agent_auth-0.10.3/Makefile.in	2017-02-07 14:40:14.407566921 +0100
+@@ -52,7 +52,7 @@ PATHS=
+ CC=@CC@
+ LD=@LD@
+ CFLAGS=@CFLAGS@
+-CPPFLAGS=-I. -I$(srcdir) @CPPFLAGS@ $(PATHS) @DEFS@
++CPPFLAGS=-I.. -I$(srcdir) @CPPFLAGS@ $(PATHS) @DEFS@
+ LIBS=@LIBS@
+ AR=@AR@
+ AWK=@AWK@
+@@ -61,8 +61,8 @@ INSTALL=@INSTALL@
+ PERL=@PERL@
+ SED=@SED@
+ ENT=@ENT@
+-LDFLAGS=-L. -Lopenbsd-compat/ @LDFLAGS@
+-LDFLAGS_SHARED = @LDFLAGS_SHARED@
++LDFLAGS=-L.. -L../openbsd-compat/ @LDFLAGS@
++LDFLAGS_SHARED =-Wl,-z,defs @LDFLAGS_SHARED@
+ EXEEXT=@EXEEXT@
+ 
+ INSTALL_SSH_PRNG_CMDS=@INSTALL_SSH_PRNG_CMDS@
+@@ -74,7 +74,7 @@ SSHOBJS=xmalloc.o atomicio.o authfd.o bu
+ 
+ ED25519OBJS=ed25519-donna/ed25519.o
+ 
+-PAM_SSH_AGENT_AUTH_OBJS=pam_user_key_allowed2.o iterate_ssh_agent_keys.o userauth_pubkey_from_id.o pam_user_authorized_keys.o get_command_line.o
++PAM_SSH_AGENT_AUTH_OBJS=pam_user_key_allowed2.o iterate_ssh_agent_keys.o userauth_pubkey_from_id.o pam_user_authorized_keys.o get_command_line.o secure_filename.o
+ 
+ 
+ MANPAGES_IN	= pam_ssh_agent_auth.pod
+@@ -94,13 +94,13 @@ $(PAM_MODULES): Makefile.in config.h
+ .c.o:
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+ 
+-LIBCOMPAT=openbsd-compat/libopenbsd-compat.a
++LIBCOMPAT=../openbsd-compat/libopenbsd-compat.a
+ $(LIBCOMPAT): always
+ 	(cd openbsd-compat && $(MAKE))
+ always:
+ 
+-pam_ssh_agent_auth.so: $(LIBCOMPAT) $(SSHOBJS) $(ED25519OBJS) $(PAM_SSH_AGENT_AUTH_OBJS)  pam_ssh_agent_auth.o
+-	$(LD) $(LDFLAGS_SHARED) -o $@ $(SSHOBJS) $(ED25519OBJS) $(PAM_SSH_AGENT_AUTH_OBJS) $(LDFLAGS) -lopenbsd-compat pam_ssh_agent_auth.o $(LIBS) -lpam
++pam_ssh_agent_auth.so: $(PAM_SSH_AGENT_AUTH_OBJS)  pam_ssh_agent_auth.o ../uidswap.o ../ssh-sk-client.o
++	$(LD) $(LDFLAGS_SHARED) -o $@ $(PAM_SSH_AGENT_AUTH_OBJS) ../ssh-sk-client.o $(LDFLAGS) -lssh -lopenbsd-compat pam_ssh_agent_auth.o ../uidswap.o $(LIBS) -lpam
+ 
+ $(MANPAGES): $(MANPAGES_IN)
+ 	pod2man --section=8 --release=v0.10.3 --name=pam_ssh_agent_auth --official --center "PAM" pam_ssh_agent_auth.pod > pam_ssh_agent_auth.8
