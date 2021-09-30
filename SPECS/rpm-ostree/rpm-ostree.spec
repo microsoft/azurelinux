@@ -152,7 +152,8 @@ make check
 
 %changelog
 * Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-1
-- Upgrade to latest upstream release supported by 
+- Upgrade version and rebase patches
+- Move all dbus files to reside under %%{_datadir}
 - License verified
 
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
