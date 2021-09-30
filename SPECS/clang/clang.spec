@@ -52,24 +52,23 @@ BuildRequires:  llvm-devel = %{version}
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
-Requires:        %{name}-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libstdc++-devel
 Requires:       libxml2
 Requires:       llvm
 Requires:       ncurses
 Requires:       python3
 Requires:       zlib
-
-Provides:         %{name}-analyzer = %{version}-%{release}
+Provides:       %{name}-analyzer = %{version}-%{release}
 
 %description
 The goal of the Clang project is to create a new C based language front-end: C, C++, Objective C/C++, OpenCL C and others for the LLVM compiler. You can get and build the source today.
 
 %package analyzer
-Summary:    A source code analysis framework
-License:    NCSA and MIT
-BuildArch:    noarch
-Requires:    %{name} = %{version}-%{release}
+Summary:        A source code analysis framework
+License:        NCSA AND MIT
+Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description analyzer
 The Clang Static Analyzer consists of both a source code analysis
@@ -79,18 +78,20 @@ intended to run in tandem with a build of a project or code base.
 
 %package devel
 Summary:        Development headers for clang
+License:        NCSA
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 # The clang CMake files reference tools from clang-tools-extra.
 Requires:       %{name}-tools-extra = %{version}-%{release}
 
 %package libs
-Summary: Runtime library for clang
-Recommends: compiler-rt%{?_isa} = %{version}
+Summary:        Runtime library for clang
+License:        NCSA
+Recommends:     compiler-rt%{?_isa} = %{version}
+Recommends:     libomp%{_isa} = %{version}
 # libomp-devel is required, so clang can find the omp.h header when compiling
 # with -fopenmp.
-Recommends: libomp-devel%{_isa} = %{version}
-Recommends: libomp%{_isa} = %{version}
+Recommends:     libomp-devel%{_isa} = %{version}
 
 %description libs
 Runtime library for clang.
@@ -101,6 +102,7 @@ for developing applications that use clang.
 
 %package -n git-clang-format
 Summary:        Integration of clang-format for git
+License:        NCSA
 Requires:       git
 Requires:       python3
 
@@ -108,16 +110,17 @@ Requires:       python3
 clang-format integration for git.
 
 %package tools-extra
-Summary:    Extra tools for clang
-Requires:    %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Extra tools for clang
+License:        NCSA
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description tools-extra
 A set of extra tools built using Clang's tooling API.
 
 %prep
-%setup -T -q -b 1 -n %{clang_tools_srcdir}
+%setup -q -T -b 1 -n %{clang_tools_srcdir}
 
-pathfix.py -i %{__python3} -pn \
+pathfix.py -i python3 -pn \
     clang-tidy/tool/*.py \
     clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
@@ -125,7 +128,7 @@ pathfix.py -i %{__python3} -pn \
 
 mv ../%{clang_tools_srcdir} tools/extra
 
-pathfix.py -i %{__python3} -pn \
+pathfix.py -i python3 -pn \
     tools/clang-format/*.py \
     tools/clang-format/git-clang-format \
     utils/hmaptool/hmaptool \
