@@ -2,7 +2,7 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        2.13
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        GNU LGPL v2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,7 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  swig
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  which
 
 %description
@@ -345,6 +346,9 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-15
+- Added missing BR on "systemd-rpm-macros".
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.13-14
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 2.13-12: Add patch to severity.db to fix tests.
