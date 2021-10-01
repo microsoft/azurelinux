@@ -1,3 +1,5 @@
+%global systemd_version 239
+
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
