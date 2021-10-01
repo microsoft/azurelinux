@@ -76,7 +76,7 @@ mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-mov
 - Rename conflicting move_pages.2 man pages
 - Require libnuma from libnuma-devel
 - Fix license packaging
-- Lint specific
+- Lint spec
 - License verified
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-5
