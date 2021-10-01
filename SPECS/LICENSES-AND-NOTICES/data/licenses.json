@@ -191,6 +191,7 @@
                 "python-sphinx-theme-py3doc-enhanced",
                 "python-toolz",
                 "python-tqdm",
+                "python-pyudev",
                 "python3-pytest-asyncio",
                 "qt5-qtbase",
                 "qt5-qtdeclarative",
