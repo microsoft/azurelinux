@@ -1,16 +1,16 @@
 %global srcname pyudev
 
-Summary:          A libudev binding
-Name:             python-%{srcname}
-Version:          0.22.0
-Release:          2%{?dist}
-License:          LGPLv2+
+Summary:        A libudev binding
+Name:           python-%{srcname}
+Version:        0.22.0
+Release:        2%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:              https://pypi.python.org/pypi/pyudev
-Source0:          https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/%{srcname}-%{version}.tar.gz
+URL:            https://pypi.python.org/pypi/pyudev
+Source0:        https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/%{srcname}-%{version}.tar.gz
 
-BuildArch:        noarch
+BuildArch:      noarch
 
 %description
 pyudev is a LGPL licensed, pure Python binding for libudev, the device
@@ -25,17 +25,14 @@ versions of udev as found on dated Linux systems may work, but are not
 officially supported.
 
 %package -n python3-%{srcname}
-Summary:          A libudev binding
 %{?python_provide:%python_provide python3-%{srcname}}
-
-BuildRequires:    python3-devel
-BuildRequires:    python3-setuptools
-
-# Needed for libudev, loaded through ctypes
-Requires:         systemd-devel
-
+Summary:        A libudev binding
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 # Used for python2/3 compatibility
-Requires:         python3-six
+Requires:       python3-six
+# Needed for libudev, loaded through ctypes
+Requires:       systemd-devel
 
 %description -n python3-%{srcname}
 pyudev is a LGPL licensed, pure Python binding for libudev, the device
@@ -230,7 +227,9 @@ rm -rf pyudev.egg-info
 
 * Mon Jul 23 2012 Chris Lockfort <clockfort@redhat.com> 0.15-3
 - Reflect rawhide merging udev into systemd
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.15-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Mon Jun 18 2012 Chris Lockfort <clockfort@redhat.com> 0.15-1
 - initial package
