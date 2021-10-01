@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.5p1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,16 @@ Patch0:         blfs_systemd_fixes.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
+Patch101: CVE-2016-20012_6ad06d.patch
+Patch102: CVE-2016-20012_1300c3.patch
+Patch103: CVE-2016-20012_542de9.patch
+Patch104: CVE-2016-20012_051d8d.patch
+Patch105: CVE-2016-20012_990123.patch
+Patch106: CVE-2016-20012_833863.patch
+Patch107: CVE-2016-20012_1446f9.patch
+Patch108: CVE-2016-20012_e51839.patch
+Patch109: CVE-2016-20012_9367cc.patch
+Patch110: CVE-2016-20012_55f7b9.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -185,6 +195,13 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+*   Fri Oct 01 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.5p1-4
+-   Added patch file(s) CVE-2016-20012_6ad06d.patch,
+-   CVE-2016-20012_1300c3.patch, CVE-2016-20012_542de9.patch,
+-   CVE-2016-20012_051d8d.patch, CVE-2016-20012_990123.patch,
+-   CVE-2016-20012_833863.patch, CVE-2016-20012_1446f9.patch,
+-   CVE-2016-20012_e51839.patch, CVE-2016-20012_9367cc.patch,
+-   CVE-2016-20012_55f7b9.patch
 * Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-3
 - Add SELinux support
 
