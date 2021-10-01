@@ -77,9 +77,6 @@ filesystem-1.1-8.cm2.x86_64.rpm
 findutils-4.6.0-7.cm2.x86_64.rpm
 findutils-debuginfo-4.6.0-7.cm2.x86_64.rpm
 findutils-lang-4.6.0-7.cm2.x86_64.rpm
-finger-0.17-4.cm2.x86_64.rpm
-finger-debuginfo-0.17-4.cm2.x86_64.rpm
-finger-server-0.17-4.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-debuginfo-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
@@ -571,9 +568,6 @@ systemd-bootstrap-debuginfo-239-36.cm2.x86_64.rpm
 systemd-bootstrap-devel-239-36.cm2.x86_64.rpm
 tar-1.32-2.cm2.x86_64.rpm
 tar-debuginfo-1.32-2.cm2.x86_64.rpm
-tcp_wrappers-7.6-9.cm2.x86_64.rpm
-tcp_wrappers-debuginfo-7.6-9.cm2.x86_64.rpm
-tcp_wrappers-devel-7.6-9.cm2.x86_64.rpm
 tdnf-2.1.0-7.cm2.x86_64.rpm
 tdnf-cli-libs-2.1.0-7.cm2.x86_64.rpm
 tdnf-debuginfo-2.1.0-7.cm2.x86_64.rpm
