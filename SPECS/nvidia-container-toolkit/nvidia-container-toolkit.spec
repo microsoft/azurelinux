@@ -70,7 +70,7 @@ rm -f %{_bindir}/nvidia-container-runtime-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %changelog
-* Tue Sep 28 2021 Adithya Jayachandran <adjayach@microsoft.com> 1.5.1-1
+* Tue Sep 28 2021 Adithya Jayachandran <adjayach@microsoft.com> - 1.5.1-1
 - Update toolkit version to 1.5.1
 
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.4.2-4
