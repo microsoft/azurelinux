@@ -136,7 +136,6 @@ gtest-static-1.8.1-5.cm2.x86_64.rpm
 gtk-doc-1.29-6.cm2.noarch.rpm
 gzip-1.9-6.cm2.x86_64.rpm
 gzip-debuginfo-1.9-6.cm2.x86_64.rpm
-integritysetup-2.3.3-2.cm2.x86_64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 json-c-0.14-3.cm2.x86_64.rpm
