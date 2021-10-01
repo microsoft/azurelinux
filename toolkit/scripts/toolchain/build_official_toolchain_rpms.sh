@@ -532,12 +532,8 @@ chroot_and_install_rpms libtirpc
 chroot_and_install_rpms rpcsvc-proto
 build_rpm_in_chroot_no_install libnsl2
 
-build_rpm_in_chroot_no_install finger
-
-# tcp_wrappers needs libnsl2, finger
+# Removed 'tcp_wrappers', might not need: libnsl2
 chroot_and_install_rpms libnsl2
-chroot_and_install_rpms finger
-build_rpm_in_chroot_no_install tcp_wrappers
 
 # groff needs perl-File-HomeDir installed to run
 # perl-File-HomeDir needs perl-File-Which installed to run
@@ -551,9 +547,8 @@ chroot_and_install_rpms groff
 
 build_rpm_in_chroot_no_install libcap-ng
 
-# Removed 'audit', might not need: golang, tcp_wrappers and libcap-ng
+# Removed 'audit', might not need: golang, libcap-ng
 chroot_and_install_rpms golang
-chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
 
 # p11-kit needs libtasn1, systemd-bootstrap

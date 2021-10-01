@@ -1,3 +1,4 @@
+%global openssh_ver 8.5p1
 %global openssh_rel 4
 
 %global pam_ssh_agent_ver 0.10.3
@@ -7,14 +8,14 @@
 
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
-Version:        8.5p1
+Version:        %{openssh_ver}
 Release:        %{openssh_rel}%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssh.com/
-Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{version}.tar.gz
+Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{openssh_ver}.tar.gz
 Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/blfs-systemd-units-%{systemd_units_rel}.tar.xz
 Source2:        sshd.service
 Source3:        sshd-keygen.service
@@ -52,8 +53,8 @@ BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
 BuildRequires:  libselinux-devel
-Requires:       openssh-clients = %{version}-%{release}
-Requires:       openssh-server = %{version}-%{release}
+Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
+Requires:       openssh-server = %{openssh_ver}-%{openssh_rel}
 
 %description
 The OpenSSH package contains ssh clients and the sshd daemon. This is
@@ -85,7 +86,7 @@ The module is most useful for su and sudo service stacks.
 %package server
 Summary:        openssh server applications
 Requires:       ncurses-term
-Requires:       openssh-clients = %{version}-%{release}
+Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
 Requires:       pam
 Requires:       shadow-utils
 Requires(post): /bin/chown
