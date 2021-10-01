@@ -1,32 +1,100 @@
+%global maj_ver 12
+%global min_ver 0
+%global patch_ver 1
+
+%global clang_binaries \
+    %{_bindir}/clang \
+    %{_bindir}/clang++ \
+    %{_bindir}/clang-%{maj_ver} \
+    %{_bindir}/clang++-%{maj_ver} \
+    %{_bindir}/clang-cl \
+    %{_bindir}/clang-cpp \
+
+%global clang_tools_binaries \
+    %{_bindir}/clang-apply-replacements \
+    %{_bindir}/clang-change-namespace \
+    %{_bindir}/clang-check \
+    %{_bindir}/clang-doc \
+    %{_bindir}/clang-extdef-mapping \
+    %{_bindir}/clang-format \
+    %{_bindir}/clang-include-fixer \
+    %{_bindir}/clang-move \
+    %{_bindir}/clang-offload-bundler \
+    %{_bindir}/clang-offload-wrapper \
+    %{_bindir}/clang-query \
+    %{_bindir}/clang-refactor \
+    %{_bindir}/clang-rename \
+    %{_bindir}/clang-reorder-fields \
+    %{_bindir}/clang-scan-deps \
+    %{_bindir}/clang-tidy \
+    %{_bindir}/clangd \
+    %{_bindir}/diagtool \
+    %{_bindir}/hmaptool \
+    %{_bindir}/pp-trace
+
+%global clang_srcdir %{name}-%{version}.src
+%global clang_tools_srcdir %{name}-tools-extra-%{version}.src
+
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        12.0.1
-Release:        1%{?dist}
+Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
+Release:        2%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://clang.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
+Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_srcdir}.tar.xz
+Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_tools_srcdir}.tar.xz
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libstdc++-devel
 Requires:       libxml2
 Requires:       llvm
 Requires:       ncurses
 Requires:       python3
 Requires:       zlib
+Provides:       %{name}-analyzer = %{version}-%{release}
 
 %description
 The goal of the Clang project is to create a new C based language front-end: C, C++, Objective C/C++, OpenCL C and others for the LLVM compiler. You can get and build the source today.
 
+%package analyzer
+Summary:        A source code analysis framework
+License:        NCSA AND MIT
+Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
+
+%description analyzer
+The Clang Static Analyzer consists of both a source code analysis
+framework and a standalone tool that finds bugs in C and Objective-C
+programs. The standalone tool is invoked from the command-line, and is
+intended to run in tandem with a build of a project or code base.
+
 %package devel
 Summary:        Development headers for clang
+License:        NCSA
 Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
+# The clang CMake files reference tools from clang-tools-extra.
+Requires:       %{name}-tools-extra = %{version}-%{release}
+
+%package libs
+Summary:        Runtime library for clang
+License:        NCSA
+Recommends:     compiler-rt%{?_isa} = %{version}
+Recommends:     libomp%{_isa} = %{version}
+# libomp-devel is required, so clang can find the omp.h header when compiling
+# with -fopenmp.
+Recommends:     libomp-devel%{_isa} = %{version}
+
+%description libs
+Runtime library for clang.
 
 %description devel
 The clang-devel package contains libraries, header files and documentation
@@ -34,14 +102,37 @@ for developing applications that use clang.
 
 %package -n git-clang-format
 Summary:        Integration of clang-format for git
+License:        NCSA
 Requires:       git
 Requires:       python3
 
 %description -n git-clang-format
 clang-format integration for git.
 
+%package tools-extra
+Summary:        Extra tools for clang
+License:        NCSA
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description tools-extra
+A set of extra tools built using Clang's tooling API.
+
 %prep
-%setup -q -n %{name}-%{version}.src
+%setup -q -T -b 1 -n %{clang_tools_srcdir}
+
+pathfix.py -i python3 -pn \
+    clang-tidy/tool/*.py \
+    clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+
+%setup -q -n %{clang_srcdir}
+
+mv ../%{clang_tools_srcdir} tools/extra
+
+pathfix.py -i python3 -pn \
+    tools/clang-format/*.py \
+    tools/clang-format/git-clang-format \
+    utils/hmaptool/hmaptool \
+    tools/scan-view/bin/scan-view
 
 %build
 # Disable symbol generation
@@ -51,17 +142,35 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
+      -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
       -DCMAKE_BUILD_TYPE=Release    \
-	-DLLVM_ENABLE_EH=ON \
-	-DLLVM_ENABLE_RTTI=ON \
+      -DLLVM_ENABLE_EH=ON \
+      -DLLVM_ENABLE_RTTI=ON \
       -Wno-dev ..
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 cd build
-make DESTDIR=%{buildroot} install
+%make_install
+
+# Remove emacs integration files.
+rm %{buildroot}%{_datadir}/clang/*.el
+
+# Remove editor integrations (bbedit, sublime, emacs, vim).
+rm -vf %{buildroot}%{_datadir}/clang/clang-format-bbedit.applescript
+rm -vf %{buildroot}%{_datadir}/clang/clang-format-sublime.py*
+
+# Remove HTML docs
+rm -Rvf %{buildroot}%{_pkgdocdir}
+rm -Rvf %{buildroot}%{_datadir}/clang/clang-doc-default-stylesheet.css
+rm -Rvf %{buildroot}%{_datadir}/clang/index.js
+
+# Remove bash autocomplete files.
+rm -vf %{buildroot}%{_datadir}/clang/bash-autocomplete.sh
+
+# Add clang++-{version} symlink
+ln -s clang++ %{buildroot}%{_bindir}/clang++-%{maj_ver}
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -73,23 +182,54 @@ make clang-check
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-%{_bindir}/*
-%{_libexecdir}/*
+%{clang_binaries}
+
+%files analyzer
+%{_bindir}/scan-view
+%{_bindir}/scan-build
+%{_libexecdir}/ccc-analyzer
+%{_libexecdir}/c++-analyzer
+%{_datadir}/scan-view/
+%{_datadir}/scan-build/
+%{_mandir}/man1/scan-build.1.*
+
+%files libs
+%{_libdir}/clang/
 %{_libdir}/*.so.*
-%{_datadir}/*
 
 %files devel
 %defattr(-,root,root)
+%dir %{_datadir}/clang/
 %{_libdir}/*.so
 %{_libdir}/*.a
 %{_libdir}/cmake/*
-%{_libdir}/clang/*
-%{_includedir}/*
+%{_includedir}/clang/
+%{_includedir}/clang-c/
+%{_includedir}/clang-tidy/
 
 %files -n git-clang-format
 %{_bindir}/git-clang-format
 
+%files tools-extra
+%{clang_tools_binaries}
+%{_bindir}/c-index-test
+%{_bindir}/find-all-symbols
+%{_bindir}/modularize
+%{_datadir}/clang/clang-format.py*
+%{_datadir}/clang/clang-format-diff.py*
+%{_datadir}/clang/clang-include-fixer.py*
+%{_datadir}/clang/clang-tidy-diff.py*
+%{_datadir}/clang/run-clang-tidy.py*
+%{_datadir}/clang/run-find-all-symbols.py*
+%{_datadir}/clang/clang-rename.py*
+
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
+- Introduced following subpackages using Fedora 32 (license: MIT) spec as guidance:
+  - clang-analyzer,
+  - clang-libs,
+  - clang-tools-extra.
+
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 
