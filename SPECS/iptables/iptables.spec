@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,8 +17,10 @@ BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd
-Requires:       systemd
 Requires:       iana-etc
+Requires:       systemd
+Provides:       %{name}-services = %{version}-%{release}
+
 %description
 The next part of this chapter deals with firewalls. The principal
 firewall tool for Linux is Iptables. You will need to install
@@ -32,7 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure \
@@ -47,8 +49,7 @@ It contains the libraries and header files to create applications.
 make V=0
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 ln -sfv ../../sbin/xtables-multi %{buildroot}%{_libdir}/iptables-xml
 #   Install daemon scripts
 install -vdm755 %{buildroot}%{_unitdir}
@@ -74,9 +75,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 /sbin/ldconfig
 %systemd_postun_with_restart iptables.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -100,6 +98,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-7
+- Add provides from main package for services subpackage
+- Lint spec
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-6
 - Add dependency on iana-etc (JOSLOBO 7/26: bumped dash version for merge)
 
