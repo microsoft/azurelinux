@@ -39,7 +39,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%autosetup -p1 -n qtsvg-everywhere-src-%{version} -q
+%autosetup -p1 -n qtsvg-everywhere-src-%{version}
 
 
 
