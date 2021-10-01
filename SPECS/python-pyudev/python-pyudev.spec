@@ -8,7 +8,7 @@ License:          LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:              https://pypi.python.org/pypi/pyudev
-Source0:          https://pypi.io/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+Source0:          https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/%{srcname}-%{version}.tar.gz
 
 BuildArch:        noarch
 
