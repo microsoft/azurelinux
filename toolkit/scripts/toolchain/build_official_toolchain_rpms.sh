@@ -556,7 +556,7 @@ chroot_and_install_rpms golang
 chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
 
-# p11-kit needs libtasn1, systemd-bootstrap-devel
+# p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
 build_rpm_in_chroot_no_install p11-kit

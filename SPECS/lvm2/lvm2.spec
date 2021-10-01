@@ -339,7 +339,7 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 
 %changelog
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.03.05-8
-- Adding the 'lvm2-dbusd' package.
+- Adding the 'lvm2-dbusd' package using Fedora 32 (license: MIT) specs as guidance.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.03.05-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
