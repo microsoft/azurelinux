@@ -16,6 +16,7 @@ BuildRequires:  libsepol-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-dbus
 BuildRequires:  python3-devel
+BuildRequires:  python3-pyudev
 BuildRequires:  python3-setuptools
 BuildRequires:  readline-devel
 BuildRequires:  systemd-bootstrap-devel

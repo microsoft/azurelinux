@@ -3,7 +3,7 @@
 Summary:        A libudev binding
 Name:           python-%{srcname}
 Version:        0.22.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,10 @@ BuildRequires:  python3-setuptools
 # Used for python2/3 compatibility
 Requires:       python3-six
 # Needed for libudev, loaded through ctypes
-Requires:       systemd-devel
+# Using the weak dependency 'Recommends' to break a circular dependency during
+# from-scratch builds, where systemd's functionality is not required.
+# In real-life situations systemd will always be present and thus installed.
+Recommends:       systemd
 
 %description -n python3-%{srcname}
 pyudev is a LGPL licensed, pure Python binding for libudev, the device
@@ -73,6 +76,9 @@ rm -rf pyudev.egg-info
 %exclude %{python3_sitelib}/pyudev/__pycache__/wx.*
 
 %changelog
+* Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22.0-3
+- Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
+
 * Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 0.22.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove qt4 and qt5 dependencies.
