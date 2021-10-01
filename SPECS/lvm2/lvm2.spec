@@ -1,7 +1,9 @@
+%global systemd_version 239
+
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2, BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +16,10 @@ BuildRequires:  libaio-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsepol-devel
 BuildRequires:  ncurses-devel
+BuildRequires:  python3-dbus
+BuildRequires:  python3-devel
+BuildRequires:  python3-pyudev
+BuildRequires:  python3-setuptools
 BuildRequires:  readline-devel
 BuildRequires:  systemd-bootstrap-devel
 Requires:       device-mapper = %{version}-%{release}
@@ -28,6 +34,22 @@ multiple devices (MD), see mdadd(8) or even loop devices, see
 losetup(8)), creating volume groups (kind of virtual disks) from one
 or more physical volumes and creating one or more logical volumes
 (kind of logical partitions) in volume groups.
+
+%package dbusd
+Summary: LVM2 D-Bus daemon
+License: GPLv2
+BuildArch: noarch
+Requires: lvm2 >= %{version}-%{release}
+Requires: dbus
+Requires: python3-dbus
+Requires: python3-gobject-base
+Requires(post): systemd-units >= %{systemd_version}
+Requires(preun): systemd-units >= %{systemd_version}
+Requires(postun): systemd-units >= %{systemd_version}
+
+%description dbusd
+
+Daemon for access to LVM2 functionality through a D-Bus interface.
 
 %package    devel
 Summary:        Development libraries and headers
@@ -157,26 +179,27 @@ the device-mapper event library.
 
 %configure \
     --prefix=%{_prefix} \
-    --with-usrlibdir=%{_libdir} \
-    --with-default-dm-run-dir=%{_default_dm_run_dir} \
-    --with-default-run-dir=%{_default_run_dir} \
-    --with-default-pid-dir=%{_default_pid_dir} \
-    --with-default-locking-dir=%{_default_locking_dir} \
-    --enable-lvm1_fallback \
-    --enable-fsadm \
-    --with-pool=internal \
-    --enable-write_install \
-    --enable-pkgconfig \
     --enable-applib \
-    --enable-cmdlib \
-    --enable-dmeventd \
-    --enable-use_lvmetad \
     --enable-blkid_wiping \
+    --enable-cmdlib \
+    --enable-dbus-service --enable-notify-dbus \
+    --enable-dmeventd \
+    --enable-fsadm \
+    --enable-lvm1_fallback \
     --enable-lvmetad \
-    --with-udevdir=%{_udevdir} --enable-udev_sync \
-    --with-thin=internal \
+    --enable-pkgconfig \
+    --enable-use_lvmetad \
+    --enable-write_install \
     --with-cache=internal \
-    --with-cluster=internal --with-clvmd=none
+    --with-cluster=internal --with-clvmd=none \
+    --with-default-dm-run-dir=%{_default_dm_run_dir} \
+    --with-default-locking-dir=%{_default_locking_dir} \
+    --with-default-pid-dir=%{_default_pid_dir} \
+    --with-default-run-dir=%{_default_run_dir} \
+    --with-pool=internal \
+    --with-thin=internal \
+    --with-udevdir=%{_udevdir} --enable-udev_sync \
+    --with-usrlibdir=%{_libdir}
 
 
 make %{?_smp_mflags}
@@ -198,13 +221,32 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %preun
 %systemd_preun lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
 
+%preun dbusd
+%systemd_preun lvm2-lvmdbusd.service
+
 %post
 /sbin/ldconfig
 %systemd_post lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
 
+%post dbusd
+%systemd_post lvm2-lvmdbusd.service
+
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
+
+%postun dbusd
+%systemd_postun lvm2-lvmdbusd.service
+
+%files dbusd
+%defattr(555,root,root,-)
+%{_sbindir}/lvmdbusd
+%defattr(444,root,root,-)
+%{_sysconfdir}/dbus-1/system.d/com.redhat.lvmdbus1.conf
+%{_datadir}/dbus-1/system-services/com.redhat.lvmdbus1.service
+%{_mandir}/man8/lvmdbusd.8.gz
+%{_unitdir}/lvm2-lvmdbusd.service
+%{python3_sitelib}/lvmdbusd/*
 
 %files devel
 %defattr(-,root,root,-)
@@ -298,6 +340,9 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.03.05-8
+- Adding the 'lvm2-dbusd' package using Fedora 32 (license: MIT) specs as guidance.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.03.05-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

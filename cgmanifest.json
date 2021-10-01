@@ -6991,6 +6991,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyudev",
+          "version": "0.22.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/pyudev-0.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyvmomi",
           "version": "6.7.3",
           "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"

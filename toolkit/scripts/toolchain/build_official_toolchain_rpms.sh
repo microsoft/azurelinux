@@ -504,28 +504,20 @@ chroot_and_install_rpms meson
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
-# lvm2 requires libselinux, libsepol, ncurses, systemd-bootstrap, libaio,
+# Removed 'lvm2', might not need: libselinux, libsepol, ncurses, libaio,
 chroot_and_install_rpms libselinux
 chroot_and_install_rpms libsepol
 chroot_and_install_rpms ncurses
-chroot_and_install_rpms systemd-bootstrap
 chroot_and_install_rpms libaio
 
-# lvm2 provides device-mapper package
-build_rpm_in_chroot_no_install lvm2
-
-# cryptsetup requires popt, device-mapper, libpwquality, json-c
+# Removed 'cryptsetup', might not need: popt, libpwquality, json-c
 chroot_and_install_rpms popt
-chroot_and_install_rpms device-mapper
 chroot_and_install_rpms libpwquality
 chroot_and_install_rpms json-c
-build_rpm_in_chroot_no_install cryptsetup
 
-# systemd needs intltool, gperf, util-linux
+# Removed 'systemd', might not need: intltool, gperf
 chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
-chroot_and_install_rpms cryptsetup
-build_rpm_in_chroot_no_install systemd
 
 build_rpm_in_chroot_no_install golang-1.17
 build_rpm_in_chroot_no_install groff
@@ -559,14 +551,14 @@ chroot_and_install_rpms groff
 
 build_rpm_in_chroot_no_install libcap-ng
 
-# Removed 'audit', might not need: systemd, golang, tcp_wrappers and libcap-ng
-chroot_and_install_rpms systemd
+# Removed 'audit', might not need: golang, tcp_wrappers and libcap-ng
 chroot_and_install_rpms golang
 chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
 
-# p11-kit needs libtasn1
+# p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
+chroot_and_install_rpms systemd-bootstrap
 build_rpm_in_chroot_no_install p11-kit
 
 # asciidoc needs python3-xml

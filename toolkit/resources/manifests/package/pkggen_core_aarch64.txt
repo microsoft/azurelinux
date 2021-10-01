@@ -223,8 +223,8 @@ mariner-repos-preview-2.0-1.cm2.noarch.rpm
 libffi-3.2.1-12.cm2.aarch64.rpm
 libffi-devel-3.2.1-12.cm2.aarch64.rpm
 libtasn1-4.14-3.cm2.aarch64.rpm
-p11-kit-0.23.22-2.cm2.aarch64.rpm
-p11-kit-trust-0.23.22-2.cm2.aarch64.rpm
+p11-kit-0.23.22-3.cm2.aarch64.rpm
+p11-kit-trust-0.23.22-3.cm2.aarch64.rpm
 ca-certificates-shared-20200720-15.cm2.noarch.rpm
 ca-certificates-tools-20200720-15.cm2.noarch.rpm
 ca-certificates-base-20200720-15.cm2.noarch.rpm
@@ -236,6 +236,5 @@ python3-libcap-ng-0.7.9-4.cm2.aarch64.rpm
 python3-libs-3.7.10-3.cm2.aarch64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-xml-3.7.10-3.cm2.aarch64.rpm
-systemd-rpm-macros-239-41.cm2.noarch.rpm
 which-2.21-7.cm2.aarch64.rpm
 libselinux-3.2-1.cm2.aarch64.rpm

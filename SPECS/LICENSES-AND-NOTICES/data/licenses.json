@@ -184,6 +184,7 @@
                 "python-pytest-forked",
                 "python-pytest-mock",
                 "python-pytest-xdist",
+                "python-pyudev",
                 "python-pywbem",
                 "python-responses",
                 "python-ruamel-yaml",

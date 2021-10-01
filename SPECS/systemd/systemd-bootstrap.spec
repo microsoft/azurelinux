@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        239
-Release:        35%{?dist}
+Release:        36%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,7 +67,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-AutoReqProv:    no
+AutoReq:        no
 
 %description
 Systemd is an init replacement with better process control and security
@@ -76,7 +76,7 @@ Systemd is an init replacement with better process control and security
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
-AutoReqProv:    no
+AutoReq:        no
 
 %description devel
 Development headers for developing applications linking to libsystemd
@@ -242,6 +242,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-36
+- Enable auto provides to unblock bootstrap builds.
+
 * Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-35
 - CVE-2021-33910 fix
 

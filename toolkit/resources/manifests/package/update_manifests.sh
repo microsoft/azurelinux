@@ -302,7 +302,6 @@ generate_pkggen_core () {
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
-        grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
     } > "$1"

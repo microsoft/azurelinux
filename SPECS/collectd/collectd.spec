@@ -3,7 +3,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  perl
 BuildRequires:  perl(ExtUtils::Embed)
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  systemd-rpm-macros
 Requires(post): systemd
 Requires(postun): systemd
 Requires(preun): systemd
@@ -865,6 +866,9 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.0-8
+- Added missing BR on "systemd-rpm-macros".
+
 * Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 5.12.0-7
 - Disable virt subpackage to mitigate build break regarding systemd %%post sections
 - Remove spec conditionals regarding unsupported architectures
