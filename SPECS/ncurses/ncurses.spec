@@ -1,13 +1,14 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://invisible-island.net/ncurses/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        ftp://ftp.invisible-island.net/%{name}/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-39537.patch
 
 Requires:       ncurses-libs = %{version}-%{release}
 
@@ -46,7 +47,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains all terminfo files
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 common_options="\
@@ -208,6 +209,8 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+*   Sat Oct 02 2021 Mariner Autopatcher <cblmargh@microsoft.com> 6.2-5
+-   Added patch file(s) CVE-2021-39537.patch
 *   Thu Aug 06 2020 Mateusz Malisz <mamalisz@microsoft.com> 6.2-4
 -   Sync build process with Fedora 32.
 -   Add libtinfo
