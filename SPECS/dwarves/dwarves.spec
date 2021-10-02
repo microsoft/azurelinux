@@ -66,8 +66,7 @@ Requires:       %{libname}%{libver} = %{version}-%{release}
 Debugging information processing library development files.
 
 %prep
-%setup -q
-%patch1 -p1
+%autosetup -p1
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release .
@@ -86,6 +85,7 @@ DESTDIR="%{buildroot}" %__cmake --install .
 %doc README.btf
 %doc changes-v1.21
 %doc NEWS
+%license COPYING
 %{_bindir}/btfdiff
 %{_bindir}/codiff
 %{_bindir}/ctracer
@@ -141,6 +141,7 @@ DESTDIR="%{buildroot}" %__cmake --install .
 %changelog
 * Fri Aug 20 2021 Chris Co <chrco@microsoft.com> - 1.21-4
 - Initial CBL-Mariner import from Fedora 35 (License: MIT)
+- License verified
 
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
