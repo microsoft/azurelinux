@@ -11,7 +11,7 @@
 This package contains the basic SSL CA certificates available to use on all images. The certificates are split into two sub packages:
 
 - `ca-certificates-base` - package containing the minimal set of certificates required by the package management tools to authenticate the package repositories.
-- `ca-certificates` - package containig a collection of Mozilla certificates listed in [Mozzila's certdata.txt file](https://hg.mozilla.org/releases/mozilla-release/file/tip/security/nss/lib/ckfw/builtins/certdata.txt). For exact version information please consult the [`ca-certificates.spec`](../../../SPECS/ca-certificates/ca-certificates.spec). Installing this package will automatically pull in `ca-certificates-base`.
+- `ca-certificates` - package containing a collection of CAs trusted through the [Microsoft Trusted Root Program](https://docs.microsoft.com/en-us/security/trusted-root/release-notes). For exact version information please consult the [`ca-certificates.spec`](../../../SPECS/ca-certificates/ca-certificates.spec). Installing this package will automatically pull in `ca-certificates-base`.
 
 In addition to the certificates, the `ca-certificates-tools` package provides tooling for [installation of custom certificates](#custom-configuration-of-the-ca-certificates).
 
