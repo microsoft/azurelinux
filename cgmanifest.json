@@ -365,8 +365,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.12.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.22.0/bcc-src-with-submodule.tar.gz"
         }
       }
     },
@@ -496,8 +496,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.11.4",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/v0.11.4.tar.gz"
+          "version": "0.13.0",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.13.0.tar.gz"
         }
       }
     },
@@ -736,8 +736,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
         }
       }
     },
@@ -1781,6 +1781,16 @@
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fuse3",
+          "version": "3.10.5",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
         }
       }
     },
@@ -2928,6 +2938,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libbpf",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
@@ -3448,6 +3468,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnfs",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnftnl",
           "version": "1.1.9",
           "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
@@ -3658,6 +3688,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libslirp",
+          "version": "4.6.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libSM",
           "version": "1.2.3",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
@@ -3791,6 +3831,16 @@
           "name": "libunwind",
           "version": "1.2",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liburing",
+          "version": "2.0",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
         }
       }
     },
@@ -4199,8 +4249,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
         }
       }
     },
@@ -4219,8 +4269,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
         }
       }
     },
@@ -5172,8 +5222,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2019.2",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz"
+          "version": "2021.4",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2021.4/libostree-2021.4.tar.xz"
         }
       }
     },
@@ -6941,6 +6991,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyudev",
+          "version": "0.22.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/pyudev-0.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyvmomi",
           "version": "6.7.3",
           "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
@@ -7522,8 +7582,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2019.3",
-          "downloadUrl": "https://github.com/projectatomic/rpm-ostree/releases/download/v2019.3/rpm-ostree-2019.3.tar.xz"
+          "version": "2020.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
         }
       }
     },
@@ -8955,6 +9015,16 @@
           "name": "urfave-cli",
           "version": "2.3.0",
           "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "usbredir",
+          "version": "0.10.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.10.0.tar.xz"
         }
       }
     },

@@ -60,7 +60,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
-    sed -i '/finger-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
@@ -200,7 +199,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-test/d' $TmpPkgGen
     sed -i '/python3-tools/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
-    sed -i '/tcp_wrappers-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
@@ -301,7 +299,6 @@ generate_pkggen_core () {
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
-        grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
     } > "$1"

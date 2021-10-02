@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,7 @@ BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
 Requires:       lua
@@ -347,6 +348,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-9
+- Added missing BR on "systemd-rpm-macros".
+
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-8
 - Fixing invalid past release numbering in the changelog.
 - Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:

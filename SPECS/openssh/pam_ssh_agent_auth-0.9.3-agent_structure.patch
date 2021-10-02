@@ -1,0 +1,96 @@
+diff -up openssh/pam_ssh_agent_auth-0.10.3/identity.h.psaa-agent openssh/pam_ssh_agent_auth-0.10.3/identity.h
+--- openssh/pam_ssh_agent_auth-0.10.3/identity.h.psaa-agent	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/identity.h	2017-09-27 14:25:49.421739027 +0200
+@@ -38,6 +38,12 @@
+ typedef struct identity Identity;
+ typedef struct idlist Idlist;
+ 
++typedef struct {
++       int     fd;
++       struct sshbuf *identities;
++       int     howmany;
++}      AuthenticationConnection;
++
+ struct identity {
+     TAILQ_ENTRY(identity) next;
+     AuthenticationConnection *ac;   /* set if agent supports key */
+diff -up openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-agent openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c
+--- openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-agent	2017-09-27 14:25:49.420739021 +0200
++++ openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c	2017-09-27 14:25:49.421739027 +0200
+@@ -39,6 +39,7 @@
+ #include "sshbuf.h"
+ #include "sshkey.h"
+ #include "authfd.h"
++#include "ssherr.h"
+ #include <stdio.h>
+ #include <openssl/evp.h>
+ #include "ssh2.h"
+@@ -291,36 +292,43 @@ pamsshagentauth_find_authorized_keys(con
+ {
+     struct sshbuf *session_id2 = NULL;
+     Identity *id;
+-    struct sshkey *key;
+     AuthenticationConnection *ac;
+-    char *comment;
+     uint8_t retval = 0;
+     uid_t uid = getpwnam(ruser)->pw_uid;
++    struct ssh_identitylist *idlist;
++    int r;
++    unsigned int i;
+ 
+     OpenSSL_add_all_digests();
+     pamsshagentauth_session_id2_gen(&session_id2, user, ruser, servicename);
+ 
+     if ((ac = ssh_get_authentication_connection_for_uid(uid))) {
+         verbose("Contacted ssh-agent of user %s (%u)", ruser, uid);
+-        for (key = ssh_get_first_identity(ac, &comment, 2); key != NULL; key = ssh_get_next_identity(ac, &comment, 2)) 
+-        {
+-            if(key != NULL) {
++        if ((r = ssh_fetch_identitylist(ac->fd, &idlist)) != 0) {
++            if (r != SSH_ERR_AGENT_NO_IDENTITIES)
++               fprintf(stderr, "error fetching identities for "
++                               "protocol %d: %s\n", 2, ssh_err(r));
++        } else {
++            for (i = 0; i < idlist->nkeys; i++)
++            {
++              if (idlist->keys[i] != NULL) {
+                 id = xcalloc(1, sizeof(*id));
+-                id->key = key;
+-                id->filename = comment;
++                id->key = idlist->keys[i];
++                id->filename = idlist->comments[i];
+                 id->ac = ac;
+                 if(userauth_pubkey_from_id(ruser, id, session_id2)) {
+                     retval = 1;
+                 }
+-                free(id->filename);
+-                key_free(id->key);
+                 free(id);
+                 if(retval == 1)
+                     break;
+-            }
+-        }
++              }
++            }
+-        sshbuf_free(session_id2);
+-        ssh_close_authentication_connection(ac);
++            sshbuf_free(session_id2);
++            ssh_free_identitylist(idlist);
++        }
++        ssh_close_authentication_socket(ac->fd);
++        free(ac);
+     }
+     else {
+         verbose("No ssh-agent could be contacted");
+diff -up openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c.psaa-agent openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c
+--- openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c.psaa-agent	2017-09-27 14:25:49.420739021 +0200
++++ openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c	2017-09-27 14:25:49.422739032 +0200
+@@ -84,7 +85,7 @@ userauth_pubkey_from_id(const char *ruse
+         (r = sshbuf_put_string(b, pkblob, blen)) != 0)
+         fatal("%s: buffer error: %s", __func__, ssh_err(r));
+ 
+-    if (ssh_agent_sign(id->ac, id->key, &sig, &slen, sshbuf_ptr(b), sshbuf_len(b)) != 0)
++    if (ssh_agent_sign(id->ac->fd, id->key, &sig, &slen, sshbuf_ptr(b), sshbuf_len(b), NULL, 0) != 0)
+         goto user_auth_clean_exit;
+ 
+     /* test for correct signature */

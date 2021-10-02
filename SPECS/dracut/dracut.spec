@@ -5,7 +5,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        049
-Release:        6%{?dist}
+Release:        8%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -22,6 +22,7 @@ BuildRequires:  bash
 BuildRequires:  git
 BuildRequires:  kmod-devel
 BuildRequires:  pkg-config
+BuildRequires:  systemd-rpm-macros
 Requires:       /bin/grep
 Requires:       /bin/sed
 Requires:       bash >= 4
@@ -31,6 +32,8 @@ Requires:       findutils
 Requires:       kmod
 Requires:       systemd
 Requires:       util-linux
+
+Provides:       %{name}-caps = %{version}-%{release}
 
 %description
 dracut contains tools to create a bootable initramfs for 2.6 Linux kernels.
@@ -174,6 +177,12 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 049-8
+- Added missing BR on "systemd-rpm-macros".
+
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 049-7
+- Adding 'Provides' for 'dracut-caps'.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 049-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

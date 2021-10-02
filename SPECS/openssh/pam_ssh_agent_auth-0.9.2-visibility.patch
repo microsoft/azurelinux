@@ -1,0 +1,21 @@
+diff -up openssh-7.1p2/pam_ssh_agent_auth-0.10.2/pam_ssh_agent_auth.c.psaa-visibility openssh-7.1p2/pam_ssh_agent_auth-0.10.2/pam_ssh_agent_auth.c
+--- openssh-7.1p2/pam_ssh_agent_auth-0.10.2/pam_ssh_agent_auth.c.psaa-visibility	2014-03-31 19:35:17.000000000 +0200
++++ openssh-7.1p2/pam_ssh_agent_auth-0.10.2/pam_ssh_agent_auth.c	2016-01-22 15:22:40.984469774 +0100
+@@ -72,7 +72,7 @@ char           *__progname;
+ extern char    *__progname;
+ #endif
+ 
+-PAM_EXTERN int
++PAM_EXTERN int __attribute__ ((visibility ("default")))
+ pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc, const char **argv)
+ {
+     char          **argv_ptr;
+@@ -214,7 +214,7 @@ cleanexit:
+ }
+ 
+ 
+-PAM_EXTERN int
++PAM_EXTERN int __attribute__ ((visibility ("default")))
+ pam_sm_setcred(pam_handle_t * pamh, int flags, int argc, const char **argv)
+ {
+     UNUSED(pamh);

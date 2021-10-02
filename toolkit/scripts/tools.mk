@@ -103,7 +103,7 @@ go-fmt-all:
 # Formats the test coverage for the tools
 .PHONY: $(BUILD_DIR)/tools/all_tools.coverage
 $(BUILD_DIR)/tools/all_tools.coverage: $(shell find $(TOOLS_DIR)/ -type f -name '*.go')
-	cd $(TOOLS_DIR) && go test -covermode=atomic -coverprofile=$@ ./...
+	cd $(TOOLS_DIR) && go test -coverpkg=./... -covermode=atomic -coverprofile=$@ ./...
 $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@
 go-test-coverage: $(test_coverage_report)

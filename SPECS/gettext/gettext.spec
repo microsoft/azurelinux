@@ -1,7 +1,7 @@
 Summary:        Utilities for internationalization and localization
 Name:           gettext
 Version:        0.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
@@ -9,6 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
 Provides:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-common-devel = %{version}-%{release}
 
 %description
 These allow programs to be compiled with NLS
@@ -56,6 +58,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Mon Sep 20 2021 Muhammad Falak <mwani@microsoft.com> 0.21-2
+- Add explicit Provides for `gettext-common-devel` & `gettext-libs`
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.21-1
 - Update to version 0.21.
 - Update URL and Source0 to use https.

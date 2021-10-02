@@ -1,0 +1,5 @@
+# Options for ntpdate
+OPTIONS="-p 2"
+
+# Set to 'yes' to sync hw clock after successful ntpdate
+SYNC_HWCLOCK=no

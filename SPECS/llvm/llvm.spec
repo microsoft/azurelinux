@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        8.0.1
-Release:        5%{?dist}
+Version:        12.0.1
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,7 +71,6 @@ ninja check-all
 %clean
 rm -rf %{buildroot}/*
 
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
@@ -92,6 +91,8 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
+- Update to 12.0.1
 
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.1-5
 - Merge the following releases from 1.0 to dev branch

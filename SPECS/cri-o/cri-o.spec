@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.21.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,7 @@ BuildRequires:  libapparmor-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  sed
+BuildRequires:  systemd-rpm-macros
 Requires:       cni
 Requires:       cni-plugins
 Requires:       conmon
@@ -205,6 +206,9 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21.2-3
+- Added missing BR on "systemd-rpm-macros".
+
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 1.21.2-2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag)
 - License Verified
