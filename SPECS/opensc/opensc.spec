@@ -2,8 +2,8 @@
 %define nssdb %{_sysconfdir}/pki/nssdb
 Summary:        Smart card library and applications
 Name:           opensc
-Version:        0.20.0
-Release:        9%{?dist}
+Version:        0.22.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,9 +14,6 @@ Source1:        opensc.module
 # https://github.com/OpenSC/OpenSC/blob/master/tests/common.sh
 Source2:        common.sh
 Patch1:         opensc-0.19.0-pinpad.patch
-Patch2:         opensc-0.20.0-no-common.patch
-# https://github.com/OpenSC/OpenSC/pull/1987
-Patch3:         opensc-0.20.0-cardos.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash-completion
@@ -29,6 +26,7 @@ BuildRequires:  libxslt
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pcsc-lite-devel
+BuildRequires:  pcsc-lite-libs
 BuildRequires:  perl
 BuildRequires:  readline-devel
 BuildRequires:  softhsm
@@ -55,7 +53,7 @@ every software/card that does so, too.
 cp %{SOURCE2} tests/
 # The test-pkcs11-tool-allowed-mechanisms already works in Fedora
 sed -i -e '/XFAIL_TESTS/,$ {
-  s/XFAIL_TESTS.*/XFAIL_TESTS=test-pkcs11-tool-test.sh/
+  s/XFAIL_TESTS.*/XFAIL_TESTS=test-pkcs11-tool-test.sh test-pkcs11-tool-test-threads.sh/
   q
 }' tests/Makefile.am
 
@@ -85,7 +83,6 @@ sed -i -e 's|"/lib %{_prefix}/lib\b|"/%{_lib} %{_libdir}|' configure # lib64 rpa
 
 %check
 make check
-
 
 %install
 %make_install
@@ -183,6 +180,11 @@ rm -rf %{_mandir}/man1
 %{_datadir}/opensc/
 
 %changelog
+* Thu Sep 23 2021 Henry Beberman <henry.beberman@microsoft.com> - 0.22.0-1
+- Update to version 0.22.0
+- Remove patches already present in version 0.22.0
+- Add XFAIL for variant of an existing XFAIL test-pkcs11-tool-test-threads.sh
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 0.20.0-9
 - License verified
 - Update previous changelog entry with initial mariner import entry

@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.1.1667
+Version:        8.2.3441
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -16,7 +16,7 @@ BuildRequires:  ncurses-devel
 %description
 The Vim package contains a powerful text editor.
 
-%package    extra
+%package        extra
 Summary:        Extra files for Vim text editor
 Group:          Applications/Editors
 
@@ -85,99 +85,100 @@ fi
 
 %files extra
 %license README.txt
-%doc %{_datarootdir}/vim/vim81/doc/*
+%doc %{_datarootdir}/vim/vim*/doc/*
 %defattr(-,root,root)
 %{_bindir}/vimtutor
 %{_bindir}/xxd
 %{_mandir}/*/*
-%{_datarootdir}/vim/vim81/autoload/*
-%{_datarootdir}/vim/vim81/bugreport.vim
-%{_datarootdir}/vim/vim81/colors/*
+%{_datarootdir}/vim/vim*/autoload/*
+%{_datarootdir}/vim/vim*/bugreport.vim
+%{_datarootdir}/vim/vim*/colors/*
 %{_datarootdir}/applications/gvim.desktop
 %{_datarootdir}/applications/vim.desktop
 %{_datarootdir}/icons/hicolor/48x48/apps/gvim.png
 %{_datarootdir}/icons/locolor/16x16/apps/gvim.png
 %{_datarootdir}/icons/locolor/32x32/apps/gvim.png
-%{_datarootdir}/vim/vim81/defaults.vim
-%{_datarootdir}/vim/vim81/pack/dist/opt/*
-%exclude %{_datarootdir}/vim/vim81/colors/desert.vim
-%{_datarootdir}/vim/vim81/compiler/*
-%{_datarootdir}/vim/vim81/delmenu.vim
-%{_datarootdir}/vim/vim81/evim.vim
-%{_datarootdir}/vim/vim81/filetype.vim
-%{_datarootdir}/vim/vim81/ftoff.vim
-%{_datarootdir}/vim/vim81/ftplugin.vim
-%{_datarootdir}/vim/vim81/ftplugin/*
-%{_datarootdir}/vim/vim81/ftplugof.vim
-%{_datarootdir}/vim/vim81/gvimrc_example.vim
-%{_datarootdir}/vim/vim81/indent.vim
-%{_datarootdir}/vim/vim81/indent/*
-%{_datarootdir}/vim/vim81/indoff.vim
-%{_datarootdir}/vim/vim81/keymap/*
-%{_datarootdir}/vim/vim81/macros/*
-%{_datarootdir}/vim/vim81/menu.vim
-%{_datarootdir}/vim/vim81/mswin.vim
-%{_datarootdir}/vim/vim81/optwin.vim
-%{_datarootdir}/vim/vim81/plugin/*
-%{_datarootdir}/vim/vim81/synmenu.vim
-%{_datarootdir}/vim/vim81/vimrc_example.vim
-%{_datarootdir}/vim/vim81/print/*
-%{_datarootdir}/vim/vim81/scripts.vim
-%{_datarootdir}/vim/vim81/spell/*
-%{_datarootdir}/vim/vim81/syntax/*
-%exclude %{_datarootdir}/vim/vim81/syntax/syntax.vim
-%{_datarootdir}/vim/vim81/tools/*
-%{_datarootdir}/vim/vim81/tutor/*
-%{_datarootdir}/vim/vim81/lang/*.vim
-%doc %{_datarootdir}/vim/vim81/lang/*.txt
-%lang(af) %{_datarootdir}/vim/vim81/lang/af/LC_MESSAGES/vim.mo
-%lang(ca) %{_datarootdir}/vim/vim81/lang/ca/LC_MESSAGES/vim.mo
-%lang(cs) %{_datarootdir}/vim/vim81/lang/cs/LC_MESSAGES/vim.mo
-%lang(de) %{_datarootdir}/vim/vim81/lang/de/LC_MESSAGES/vim.mo
-%lang(eb_GB) %{_datarootdir}/vim/vim81/lang/en_GB/LC_MESSAGES/vim.mo
-%lang(eo) %{_datarootdir}/vim/vim81/lang/eo/LC_MESSAGES/vim.mo
-%lang(es) %{_datarootdir}/vim/vim81/lang/es/LC_MESSAGES/vim.mo
-%lang(fi) %{_datarootdir}/vim/vim81/lang/fi/LC_MESSAGES/vim.mo
-%lang(fr) %{_datarootdir}/vim/vim81/lang/fr/LC_MESSAGES/vim.mo
-%lang(ga) %{_datarootdir}/vim/vim81/lang/ga/LC_MESSAGES/vim.mo
-%lang(it) %{_datarootdir}/vim/vim81/lang/it/LC_MESSAGES/vim.mo
-%lang(ja) %{_datarootdir}/vim/vim81/lang/ja/LC_MESSAGES/vim.mo
-%lang(ko.UTF-8) %{_datarootdir}/vim/vim81/lang/ko.UTF-8/LC_MESSAGES/vim.mo
-%lang(ko) %{_datarootdir}/vim/vim81/lang/ko/LC_MESSAGES/vim.mo
-%lang(nb) %{_datarootdir}/vim/vim81/lang/nb/LC_MESSAGES/vim.mo
-%lang(no) %{_datarootdir}/vim/vim81/lang/no/LC_MESSAGES/vim.mo
-%lang(pl) %{_datarootdir}/vim/vim81/lang/pl/LC_MESSAGES/vim.mo
-%lang(pt_BR) %{_datarootdir}/vim/vim81/lang/pt_BR/LC_MESSAGES/vim.mo
-%lang(ru) %{_datarootdir}/vim/vim81/lang/ru/LC_MESSAGES/vim.mo
-%lang(sk) %{_datarootdir}/vim/vim81/lang/sk/LC_MESSAGES/vim.mo
-%lang(sv) %{_datarootdir}/vim/vim81/lang/sv/LC_MESSAGES/vim.mo
-%lang(uk) %{_datarootdir}/vim/vim81/lang/uk/LC_MESSAGES/vim.mo
-%lang(da) %{_datarootdir}/vim/vim81/lang/da/LC_MESSAGES/vim.mo
-%lang(lv) %{_datarootdir}/vim/vim81/lang/lv/LC_MESSAGES/vim.mo
-%lang(sr) %{_datarootdir}/vim/vim81/lang/sr/LC_MESSAGES/vim.mo
-%lang(vi) %{_datarootdir}/vim/vim81/lang/vi/LC_MESSAGES/vim.mo
-%lang(zh_CN.UTF-8) %{_datarootdir}/vim/vim81/lang/zh_CN.UTF-8/LC_MESSAGES/vim.mo
-%lang(zh_CN) %{_datarootdir}/vim/vim81/lang/zh_CN/LC_MESSAGES/vim.mo
-%lang(zh_TW.UTF-8) %{_datarootdir}/vim/vim81/lang/zh_TW.UTF-8/LC_MESSAGES/vim.mo
-%lang(zh_TW) %{_datarootdir}/vim/vim81/lang/zh_TW/LC_MESSAGES/vim.mo
-%lang(cs.cp1250) %{_datarootdir}/vim/vim81/lang/cs.cp1250/LC_MESSAGES/vim.mo
-%lang(ja.euc-jp) %{_datarootdir}/vim/vim81/lang/ja.euc-jp/LC_MESSAGES/vim.mo
-%lang(ja.sjis) %{_datarootdir}/vim/vim81/lang/ja.sjis/LC_MESSAGES/vim.mo
-%lang(nl) %{_datarootdir}/vim/vim81/lang/nl/LC_MESSAGES/vim.mo
-%lang(pl.UTF-8) %{_datarootdir}/vim/vim81/lang/pl.UTF-8/LC_MESSAGES/vim.mo
-%lang(pl.cp1250) %{_datarootdir}/vim/vim81/lang/pl.cp1250/LC_MESSAGES/vim.mo
-%lang(ru.cp1251) %{_datarootdir}/vim/vim81/lang/ru.cp1251/LC_MESSAGES/vim.mo
-%lang(sk.cp1250) %{_datarootdir}/vim/vim81/lang/sk.cp1250/LC_MESSAGES/vim.mo
-%lang(uk.cp1251) %{_datarootdir}/vim/vim81/lang/uk.cp1251/LC_MESSAGES/vim.mo
-%lang(zh_CN.cp936) %{_datarootdir}/vim/vim81/lang/zh_CN.cp936/LC_MESSAGES/vim.mo
+%{_datarootdir}/vim/vim*/defaults.vim
+%{_datarootdir}/vim/vim*/pack/dist/opt/*
+%exclude %{_datarootdir}/vim/vim*/colors/desert.vim
+%{_datarootdir}/vim/vim*/compiler/*
+%{_datarootdir}/vim/vim*/delmenu.vim
+%{_datarootdir}/vim/vim*/evim.vim
+%{_datarootdir}/vim/vim*/filetype.vim
+%{_datarootdir}/vim/vim*/ftoff.vim
+%{_datarootdir}/vim/vim*/ftplugin.vim
+%{_datarootdir}/vim/vim*/ftplugin/*
+%{_datarootdir}/vim/vim*/ftplugof.vim
+%{_datarootdir}/vim/vim*/gvimrc_example.vim
+%{_datarootdir}/vim/vim*/indent.vim
+%{_datarootdir}/vim/vim*/indent/*
+%{_datarootdir}/vim/vim*/indoff.vim
+%{_datarootdir}/vim/vim*/keymap/*
+%{_datarootdir}/vim/vim*/macros/*
+%{_datarootdir}/vim/vim*/menu.vim
+%{_datarootdir}/vim/vim*/mswin.vim
+%{_datarootdir}/vim/vim*/optwin.vim
+%{_datarootdir}/vim/vim*/plugin/*
+%{_datarootdir}/vim/vim*/synmenu.vim
+%{_datarootdir}/vim/vim*/vimrc_example.vim
+%{_datarootdir}/vim/vim*/print/*
+%{_datarootdir}/vim/vim*/scripts.vim
+%{_datarootdir}/vim/vim*/spell/*
+%{_datarootdir}/vim/vim*/syntax/*
+%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
+%{_datarootdir}/vim/vim*/tools/*
+%{_datarootdir}/vim/vim*/tutor/*
+%{_datarootdir}/vim/vim*/lang/*.vim
+%doc %{_datarootdir}/vim/vim*/lang/*.txt
+%lang(af) %{_datarootdir}/vim/vim*/lang/af/LC_MESSAGES/vim.mo
+%lang(ca) %{_datarootdir}/vim/vim*/lang/ca/LC_MESSAGES/vim.mo
+%lang(cs) %{_datarootdir}/vim/vim*/lang/cs/LC_MESSAGES/vim.mo
+%lang(de) %{_datarootdir}/vim/vim*/lang/de/LC_MESSAGES/vim.mo
+%lang(eb_GB) %{_datarootdir}/vim/vim*/lang/en_GB/LC_MESSAGES/vim.mo
+%lang(eo) %{_datarootdir}/vim/vim*/lang/eo/LC_MESSAGES/vim.mo
+%lang(es) %{_datarootdir}/vim/vim*/lang/es/LC_MESSAGES/vim.mo
+%lang(fi) %{_datarootdir}/vim/vim*/lang/fi/LC_MESSAGES/vim.mo
+%lang(fr) %{_datarootdir}/vim/vim*/lang/fr/LC_MESSAGES/vim.mo
+%lang(ga) %{_datarootdir}/vim/vim*/lang/ga/LC_MESSAGES/vim.mo
+%lang(it) %{_datarootdir}/vim/vim*/lang/it/LC_MESSAGES/vim.mo
+%lang(ja) %{_datarootdir}/vim/vim*/lang/ja/LC_MESSAGES/vim.mo
+%lang(ko.UTF-8) %{_datarootdir}/vim/vim*/lang/ko.UTF-8/LC_MESSAGES/vim.mo
+%lang(ko) %{_datarootdir}/vim/vim*/lang/ko/LC_MESSAGES/vim.mo
+%lang(nb) %{_datarootdir}/vim/vim*/lang/nb/LC_MESSAGES/vim.mo
+%lang(no) %{_datarootdir}/vim/vim*/lang/no/LC_MESSAGES/vim.mo
+%lang(pl) %{_datarootdir}/vim/vim*/lang/pl/LC_MESSAGES/vim.mo
+%lang(pt_BR) %{_datarootdir}/vim/vim*/lang/pt_BR/LC_MESSAGES/vim.mo
+%lang(ru) %{_datarootdir}/vim/vim*/lang/ru/LC_MESSAGES/vim.mo
+%lang(sk) %{_datarootdir}/vim/vim*/lang/sk/LC_MESSAGES/vim.mo
+%lang(sv) %{_datarootdir}/vim/vim*/lang/sv/LC_MESSAGES/vim.mo
+%lang(uk) %{_datarootdir}/vim/vim*/lang/uk/LC_MESSAGES/vim.mo
+%lang(da) %{_datarootdir}/vim/vim*/lang/da/LC_MESSAGES/vim.mo
+%lang(lv) %{_datarootdir}/vim/vim*/lang/lv/LC_MESSAGES/vim.mo
+%lang(sr) %{_datarootdir}/vim/vim*/lang/sr/LC_MESSAGES/vim.mo
+%lang(tr) %{_datarootdir}/vim/vim*/lang/tr/LC_MESSAGES/vim.mo
+%lang(vi) %{_datarootdir}/vim/vim*/lang/vi/LC_MESSAGES/vim.mo
+%lang(zh_CN.UTF-8) %{_datarootdir}/vim/vim*/lang/zh_CN.UTF-8/LC_MESSAGES/vim.mo
+%lang(zh_CN) %{_datarootdir}/vim/vim*/lang/zh_CN/LC_MESSAGES/vim.mo
+%lang(zh_TW.UTF-8) %{_datarootdir}/vim/vim*/lang/zh_TW.UTF-8/LC_MESSAGES/vim.mo
+%lang(zh_TW) %{_datarootdir}/vim/vim*/lang/zh_TW/LC_MESSAGES/vim.mo
+%lang(cs.cp1250) %{_datarootdir}/vim/vim*/lang/cs.cp1250/LC_MESSAGES/vim.mo
+%lang(ja.euc-jp) %{_datarootdir}/vim/vim*/lang/ja.euc-jp/LC_MESSAGES/vim.mo
+%lang(ja.sjis) %{_datarootdir}/vim/vim*/lang/ja.sjis/LC_MESSAGES/vim.mo
+%lang(nl) %{_datarootdir}/vim/vim*/lang/nl/LC_MESSAGES/vim.mo
+%lang(pl.UTF-8) %{_datarootdir}/vim/vim*/lang/pl.UTF-8/LC_MESSAGES/vim.mo
+%lang(pl.cp1250) %{_datarootdir}/vim/vim*/lang/pl.cp1250/LC_MESSAGES/vim.mo
+%lang(ru.cp1251) %{_datarootdir}/vim/vim*/lang/ru.cp1251/LC_MESSAGES/vim.mo
+%lang(sk.cp1250) %{_datarootdir}/vim/vim*/lang/sk.cp1250/LC_MESSAGES/vim.mo
+%lang(uk.cp1251) %{_datarootdir}/vim/vim*/lang/uk.cp1251/LC_MESSAGES/vim.mo
+%lang(zh_CN.cp936) %{_datarootdir}/vim/vim*/lang/zh_CN.cp936/LC_MESSAGES/vim.mo
 
 %files
 %defattr(-,root,root)
 %license README.txt
 %config(noreplace) %{_sysconfdir}/vimrc
-%{_datarootdir}/vim/vim81/syntax/syntax.vim
-%{_datarootdir}/vim/vim81/rgb.txt
-%{_datarootdir}/vim/vim81/colors/desert.vim
+%{_datarootdir}/vim/vim*/syntax/syntax.vim
+%{_datarootdir}/vim/vim*/rgb.txt
+%{_datarootdir}/vim/vim*/colors/desert.vim
 %{_bindir}/ex
 %{_bindir}/vi
 %{_bindir}/view
@@ -187,6 +188,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-1
+- Fix CVE-2021-3778 and CVE-2021-3796 CVEs by updating to 8.2.3441.
+
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.1667-1
 - Fix CVE-2019-20807 by updating to 8.1.1667.
 
