@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.5p1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ Patch0:         blfs_systemd_fixes.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
+Patch101: CVE-2021-41617_f3cbe4.patch
+Patch102: CVE-2021-41617_bf944e.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -185,6 +187,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+*   Sat Oct 02 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.5p1-4
+-   Added patch file(s) CVE-2021-41617_f3cbe4.patch,
+-   CVE-2021-41617_bf944e.patch
 * Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-3
 - Add SELinux support
 
