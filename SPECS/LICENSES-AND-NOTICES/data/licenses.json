@@ -720,7 +720,6 @@
                 "python-asn1crypto",
                 "python-atomicwrites",
                 "python-attrs",
-                "python-backports-ssl_match_hostname",
                 "python-bcrypt",
                 "python-boto3",
                 "python-botocore",
