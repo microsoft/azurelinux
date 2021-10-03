@@ -1,28 +1,17 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %define pypi_name zope.interface
 Summary:        Interfaces for Python
 Name:           python-zope-interface
 Version:        4.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/zopefoundation/zope.interface
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-BuildRequires:  python-setuptools
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-Requires:       python2
-Requires:       python2-libs
 
 %description
-This package is intended to be independently reusable in any Python project. It is maintained by the Zope Toolkit project.
-
-This package provides an implementation of “object interfaces” for Python. Interfaces are a mechanism for labeling objects as conforming to a given API or contract. So, this package can be considered as implementation of the Design By Contract methodology support in Python.
-
-For detailed documentation, please see http://docs.zope.org/zope.interface
+Interfaces for Python
 
 %package -n     python3-zope-interface
 Summary:        python3-zope-interface
@@ -32,46 +21,34 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-zope-interface
-
-Python 3 version.
+This package is intended to be independently reusable in any Python project. It is maintained by the Zope Toolkit project.
+This package provides an implementation of “object interfaces” for Python. Interfaces are a mechanism for labeling objects as conforming to a given API or contract. So, this package can be considered as implementation of the Design By Contract methodology support in Python.
+For detailed documentation, please see http://docs.zope.org/zope.interface
 
 %prep
-%setup -q -n %{pypi_name}-%{version}
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -n %{pypi_name}-%{version}
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-popd
-
+%py3_install
 
 %check
-python2 setup.py test
-pushd ../p3dir
-python3 setup.py test
-popd
-
-%files
-%defattr(-,root,root)
-%license LICENSE.txt
-%{python2_sitelib}/*
+%python3 setup.py test
 
 %files -n python3-zope-interface
 %defattr(-,root,root,-)
+%license LICENSE.txt
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 4.7.2-2
+- Add license to python3 package
+- Remove python2 package
+
 * Wed Nov 11 2020 Thomas Crain <thcrain@microsoft.com> - 4.7.2-1
 - Update to 4.7.2 to fix setuptools compatibility issues
 - Update Source0
