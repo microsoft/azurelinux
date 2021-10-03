@@ -6391,16 +6391,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-futures",
-          "version": "3.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/1f/9e/7b2ff7e965fc654592269f2906ade1c7d705f1bf25b7d469fa153f7d19eb/futures-3.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-gevent",
           "version": "1.3.6",
           "downloadUrl": "https://github.com/gevent/gevent/archive/1.3.6.tar.gz"

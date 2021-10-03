@@ -47,7 +47,6 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
-- Add license to python3 package
 - Remove python2 package
 - Lint spec
 

@@ -738,7 +738,6 @@
                 "python-docopt",
                 "python-docutils",
                 "python-ecdsa",
-                "python-futures",
                 "python-gevent",
                 "python-greenlet",
                 "python-hyperlink",
