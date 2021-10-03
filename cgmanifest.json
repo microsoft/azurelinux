@@ -6501,16 +6501,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-ipaddress",
-          "version": "1.0.22",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/ipaddress/ipaddress-1.0.22.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-jinja2",
           "version": "2.10.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/93/ea/d884a06f8c7f9b7afbc8138b762e80479fb17aedbbe2b06515a12de9378d/Jinja2-2.10.1.tar.gz"
