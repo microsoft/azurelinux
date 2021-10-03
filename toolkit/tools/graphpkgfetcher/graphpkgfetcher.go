@@ -17,6 +17,7 @@ import (
 	"microsoft.com/pkggen/internal/packagerepo/repoutils"
 	"microsoft.com/pkggen/internal/pkggraph"
 	"microsoft.com/pkggen/internal/pkgjson"
+	"microsoft.com/pkggen/internal/rpm"
 )
 
 var (
@@ -151,11 +152,15 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 // It will modify fetchedPackages on a successful package clone.
 func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, fetchedPackages map[string]bool, outDir string) (err error) {
 	const cloneDeps = true
+	var (
+		chosenRPMPath string
+		resolvedRPMs  []string
+	)
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
 	// Resolve nodes to exact package names so they can be referenced in the graph.
-	resolvedPackage, err := cloner.WhatProvides(node.VersionedPkg)
+	resolvedPackages, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
 		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
 		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
@@ -168,27 +173,63 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
-	if !fetchedPackages[resolvedPackage] {
-		desiredPackage := &pkgjson.PackageVer{
-			Name: resolvedPackage,
-		}
+	for _, resolvedPackage := range resolvedPackages {
+		if !fetchedPackages[resolvedPackage] {
+			desiredPackage := &pkgjson.PackageVer{
+				Name: resolvedPackage,
+			}
 
-		err = cloner.Clone(cloneDeps, desiredPackage)
-		if err != nil {
-			logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
-			return
-		}
-		fetchedPackages[resolvedPackage] = true
+			err = cloner.Clone(cloneDeps, desiredPackage)
+			if err != nil {
+				logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
+				return
+			}
+			fetchedPackages[resolvedPackage] = true
 
-		logger.Log.Infof("Fetched: %s", resolvedPackage)
+			logger.Log.Debugf("Fetched '%s' as potential candidate.", resolvedPackage)
+		}
 	}
 
-	// Construct the rpm path of the cloned package.
-	rpmName := fmt.Sprintf("%s.rpm", resolvedPackage)
-	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
-	rpmArch := resolvedPackage[strings.LastIndex(resolvedPackage, ".")+1:]
-	node.RpmPath = filepath.Join(outDir, rpmArch, rpmName)
+	rpmPaths := []string{}
+	for _, resolvedPackage := range resolvedPackages {
+		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
+	}
+
+	chosenRPMPath = rpmPaths[0]
+	if len(rpmPaths) > 1 {
+		logger.Log.Debugf("Found %d candidates. Resolving.", len(rpmPaths))
+
+		resolvedRPMs, err = rpm.ResolveCompetingPackages(rpmPaths...)
+		if err != nil {
+			logger.Log.Errorf("Failed while trying to pick an RPM providing '%s' from the following RPMs: %v", node.VersionedPkg.Name, rpmPaths)
+			return
+		}
+
+		resolvedRPMsCount := len(resolvedRPMs)
+		if resolvedRPMsCount == 0 {
+			logger.Log.Errorf("Failed while trying to pick an RPM providing '%s'. No RPM can be installed from the following: %v", node.VersionedPkg.Name, rpmPaths)
+			return
+		}
+
+		if resolvedRPMsCount > 1 {
+			logger.Log.Warnf("Found %d candidates to provide '%s'. Picking the first one.", resolvedRPMsCount, node.VersionedPkg.Name)
+		}
+
+		chosenRPMPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
+	}
+
+	node.RpmPath = chosenRPMPath
 	node.State = pkggraph.StateCached
 
+	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(chosenRPMPath), node.VersionedPkg.Name)
+
 	return
+}
+
+func rpmPackageToRPMPath(rpmPackage, outDir string) string {
+	// Construct the rpm path of the cloned package.
+	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
+	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
+	rpmArch := rpmPackage[strings.LastIndex(rpmPackage, ".")+1:]
+	return filepath.Join(outDir, rpmArch, rpmName)
 }

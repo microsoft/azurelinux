@@ -291,8 +291,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	return
 }
 
-// WhatProvides attempts to find a package which provides the requested PackageVer.
-func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName string, err error) {
+// WhatProvides attempts to find packages which provide the requested PackageVer.
+func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
 	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
 
 	args := []string{
@@ -329,8 +329,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName st
 				continue
 			}
 			// Local sources are listed last, keep searching for the last possible match
-			packageName = matches[1]
-			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
+			packageNames = append(packageNames, matches[1])
+			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageNames)
 		}
 		return
 	})
@@ -339,12 +339,12 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName st
 		return
 	}
 
-	if packageName == "" {
+	if len(packageNames) == 0 {
 		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
 		return
 	}
 
-	logger.Log.Debugf("Translated '%s' to package '%s'", pkgVer.Name, packageName)
+	logger.Log.Debugf("Translated '%s' to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
 	return
 }
 
