@@ -1,73 +1,45 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%define _python_bytecompile_errors_terminate_build 0
-
 Summary:        Python-PostgreSQL Database Adapter
 Name:           python-psycopg2
 Version:        2.7.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 Url:            https://pypi.python.org/pypi/psycopg2
 License:        LGPL with exceptions or ZPL
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-%{version}.tar.gz
-%define sha1    psycopg2=4f77e3efcf9a0970be5120352274315f7bd1c754
-
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  postgresql-devel >= 10.5
-Requires:       python2
-Requires:       python2-libs
-Requires:       postgresql >= 10.5
 
 %description
-Psycopg is the most popular PostgreSQL database adapter for the Python programming language. Its main features are the complete implementation of the Python DB API 2.0 specification and the thread safety (several threads can share the same connection). It was designed for heavily multi-threaded applications that create and destroy lots of cursors and make a large number of concurrent “INSERT”s or “UPDATE”s.
-
-Psycopg 2 is mostly implemented in C as a libpq wrapper, resulting in being both efficient and secure. It features client-side and server-side cursors, asynchronous communication and notifications, “COPY TO/COPY FROM” support. Many Python types are supported out-of-the-box and adapted to matching PostgreSQL data types; adaptation can be extended and customized thanks to a flexible objects adaptation system.
-
-Psycopg 2 is both Unicode and Python 3 friendly.
+Psycopg is the most popular PostgreSQL database adapter for the Python programming language.
 
 %package -n     python3-psycopg2
-Summary:        python-psycopg2
-BuildRequires:  python3
+Summary:        Python-PostgreSQL Database Adapter
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  postgresql-devel >= 10.5
 Requires:       python3
-Requires:       python3-libs
 Requires:       postgresql >= 10.5
 
 %description -n python3-psycopg2
-Python 3 version.
+Psycopg is the most popular PostgreSQL database adapter for the Python programming language.
+Its main features are the complete implementation of the Python DB API 2.0 specification and
+the thread safety (several threads can share the same connection). 
 
 %package doc
 Summary:  Documentation for psycopg python PostgreSQL database adapter
-Provides: python2-%{srcname}-doc = %{version}-%{release}
-Provides: python3-%{srcname}-doc = %{version}-%{release}
+Provides: python3-psycopg2-doc = %{version}-%{release}
 
 %description doc
 Documentation and example files for the psycopg python PostgreSQL
 database adapter.
 
 %prep
-%setup -q -n psycopg2-%{version}
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -n psycopg2-%{version}
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-popd
+%py3_install
 
 %check
 chmod 700 /etc/sudoers
@@ -87,21 +59,13 @@ chown -R postgres:postgres /run/postgresql
 su - postgres -c 'pg_ctl -D /home/postgres/data -l logfile start'
 sleep 3
 su - postgres -c 'createdb psycopg2_test'
-PYTHONPATH=%{buildroot}%{python2_sitelib} PATH=$PATH:%{buildroot}%{_bindir} sudo -u postgres python2 -c "from psycopg2 import tests; tests.unittest.main(defaultTest='tests.test_suite')" --verbose
-
-pushd ../p3dir
 PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} sudo -u postgres python3 -c "from psycopg2 import tests; tests.unittest.main(defaultTest='tests.test_suite')" --verbose
-popd
 su - postgres -c 'pg_ctl -D /home/postgres/data stop'
 rm -r /home/postgres/data &>/dev/null ||:
 
-%files
-%defattr(-,root,root)
-%license LICENSE
-%{python2_sitelib}/*
-
 %files -n python3-psycopg2
 %defattr(-,root,root,-)
+%license LICENSE
 %{python3_sitelib}/*
 
 %files doc
@@ -109,6 +73,11 @@ rm -r /home/postgres/data &>/dev/null ||:
 %doc doc
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-7
+- Add license to python3 package
+- Remove python2 package
+- Lint spec
+
 * Tue Jul 13 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.7.5-6
 - Extend using Fedora 32 spec (license: MIT)
 - Enable subpackage python-psycopg2-doc
