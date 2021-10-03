@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.22.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,34 +12,24 @@ Source0:        requests-%{version}.tar.gz
 Patch0:         test_requests_typeerror_testfix.patch
 Patch1:         test_requests_support_pytest_4.patch
 
-BuildRequires:  python-setuptools
-BuildRequires:  python2
-BuildRequires:  python2-libs
+%description
+Awesome Python HTTP Library That's Actually Usable
+
+%package -n     python3-requests
+Summary:        python-requests
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-Requires:       pyOpenSSL
-Requires:       python-certifi
-Requires:       python-chardet
-Requires:       python-idna
-Requires:       python-urllib3
-Requires:       python2
-Requires:       python2-libs
-BuildArch:      noarch
+Requires:       python3
+Requires:       python3-certifi
+Requires:       python3-chardet
+Requires:       python3-idna
+Requires:       python3-libs
+Requires:       python3-pyOpenSSL
+Requires:       python3-urllib3
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pytest
-BuildRequires:  python-atomicwrites
-BuildRequires:  python-attrs
-BuildRequires:  python-certifi
-BuildRequires:  python-chardet
-BuildRequires:  python-idna
-BuildRequires:  python-pip
-BuildRequires:  python-urllib3
-%endif
-%if %{with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-certifi
@@ -52,7 +40,7 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-urllib3
 %endif
 
-%description
+%description -n python3-requests
 Requests is an Apache2 Licensed HTTP library, written in Python, for human
 beings.
 
@@ -62,67 +50,18 @@ the HTTP capabilities you should need, but the api is thoroughly broken.
 It requires an enormous amount of work (even method overrides) to
 perform the simplest of tasks.
 
-Features:
-
-- Extremely simple GET, HEAD, POST, PUT, DELETE Requests
-    + Simple HTTP Header Request Attachment
-    + Simple Data/Params Request Attachment
-    + Simple Multipart File Uploads
-    + CookieJar Support
-    + Redirection History
-    + Redirection Recursion Urllib Fix
-    + Auto Decompression of GZipped Content
-    + Unicode URL Support
-- Simple Authentication
-    + Simple URL + HTTP Auth Registry
-
-%package -n     python3-requests
-Summary:        python-requests
-Requires:       python3
-Requires:       python3-certifi
-Requires:       python3-chardet
-Requires:       python3-idna
-Requires:       python3-libs
-Requires:       python3-pyOpenSSL
-Requires:       python3-urllib3
-
-%description -n python3-requests
-Python 3 version.
-
 %prep
-%setup -q -n requests-%{version}
-%patch0 -p1
-%patch1 -p1
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -p 1 -n requests-%{version}
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-popd
+%py3_install
 
 %check
-pip install tox
-LANG=en_US.UTF-8 tox -e py27
-
-pushd ../p3dir
 pip3 install tox
 LANG=en_US.UTF-8 tox -e py37
-popd
-
-%files
-%defattr(-,root,root)
-%license LICENSE
-%license LICENSE
-%doc README.md HISTORY.md
-%{python2_sitelib}/*
 
 %files -n python3-requests
 %defattr(-,root,root)
@@ -131,6 +70,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.22.0-3
+- Remove python2 package
+- Lint spec
+
 * Mon Mar 01 2021 Andrew Phelps <anphel@microsoft.com> - 2.22.0-2
 - Add patches for test issues and run tests with tox
 
