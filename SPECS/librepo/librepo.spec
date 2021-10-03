@@ -1,7 +1,7 @@
 Summary:        Repodata downloading library
 Name:           librepo
 Version:        1.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,8 +18,6 @@ BuildRequires:  glib-devel
 BuildRequires:  gpgme-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python-sphinx
-BuildRequires:  python2-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx
 BuildRequires:  zchunk-devel
@@ -84,6 +82,9 @@ popd
 %{python3_sitearch}/%{name}/
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-2
+- Remove unused python2 build requirements
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-1
 - Update to latest upstream version
 - Lint spec
