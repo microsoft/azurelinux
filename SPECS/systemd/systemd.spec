@@ -79,7 +79,7 @@ Requires:       lz4
 Requires:       pam
 Requires:       xz
 
-Obsoletes:      systemd-bootstrap <= %{version}-%{release}
+Obsoletes:      systemd-bootstrap
 Provides:       systemd-bootstrap = %{version}-%{release}
 
 Provides:       systemd-units = %{version}-%{release}
@@ -105,7 +105,7 @@ Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
 
-Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}
+Obsoletes:      systemd-bootstrap-devel
 Provides:       systemd-bootstrap-devel = %{version}-%{release}
 
 Provides:       systemd-libs = %{version}-%{release}
@@ -298,6 +298,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-42
 - Adding 'Obsoletes: systemd-bootstrap-devel' for the 'devel' subpackage.
+- Making 'systemd' obsolete 'systemd-bootstrap' regardless of version and release.
 
 * Wed Aug 18 2021 Jon Slobodzian <joslobo@microsoft.com> - 239-41
 - Merge from 1.0 to dev branch

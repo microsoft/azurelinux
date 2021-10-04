@@ -169,6 +169,10 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
+	if len(resolvedPackages) == 0 {
+		return fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
+	}
+
 	for _, resolvedPackage := range resolvedPackages {
 		if !fetchedPackages[resolvedPackage] {
 			desiredPackage := &pkgjson.PackageVer{

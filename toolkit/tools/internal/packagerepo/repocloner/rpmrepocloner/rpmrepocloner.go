@@ -330,7 +330,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			}
 			// Local sources are listed last, keep searching for the last possible match
 			packageNames = append(packageNames, matches[1])
-			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageNames)
+			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, matches[1])
 		}
 		return
 	})
