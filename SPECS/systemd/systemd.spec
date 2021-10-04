@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        41%{?dist}
+Release:        42%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,7 +78,10 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
+
 Obsoletes:      systemd-bootstrap
+Provides:       systemd-bootstrap = %{version}-%{release}
+
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
 Provides:       systemd-udev = %{version}-%{release}
@@ -101,6 +104,10 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
+
+Obsoletes:      systemd-bootstrap-devel
+Provides:       systemd-bootstrap-devel = %{version}-%{release}
+
 Provides:       systemd-libs = %{version}-%{release}
 Provides:       libudev-devel = %{version}-%{release}
 Provides:       libudev-devel%{?_isa} = %{version}-%{release}
@@ -289,6 +296,10 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-42
+- Adding 'Obsoletes: systemd-bootstrap-devel' for the 'devel' subpackage.
+- Making 'systemd' obsolete 'systemd-bootstrap' regardless of version and release.
+
 * Wed Aug 18 2021 Jon Slobodzian <joslobo@microsoft.com> - 239-41
 - Merge from 1.0 to dev branch
 - nehaagarwal@microsoft.com, 2.39-38: CVE-2021-33910 fix

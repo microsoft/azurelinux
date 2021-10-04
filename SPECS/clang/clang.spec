@@ -120,19 +120,9 @@ A set of extra tools built using Clang's tooling API.
 %prep
 %setup -q -T -b 1 -n %{clang_tools_srcdir}
 
-pathfix.py -i python3 -pn \
-    clang-tidy/tool/*.py \
-    clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
-
 %setup -q -n %{clang_srcdir}
 
 mv ../%{clang_tools_srcdir} tools/extra
-
-pathfix.py -i python3 -pn \
-    tools/clang-format/*.py \
-    tools/clang-format/git-clang-format \
-    utils/hmaptool/hmaptool \
-    tools/scan-view/bin/scan-view
 
 %build
 # Disable symbol generation
