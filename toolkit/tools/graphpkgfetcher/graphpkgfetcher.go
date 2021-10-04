@@ -152,10 +152,6 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 // It will modify fetchedPackages on a successful package clone.
 func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, fetchedPackages map[string]bool, outDir string) (err error) {
 	const cloneDeps = true
-	var (
-		chosenRPMPath string
-		resolvedRPMs  []string
-	)
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
@@ -190,13 +186,28 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		}
 	}
 
+	err = assignRPMPath(node, outDir, resolvedPackages)
+	if err != nil {
+		logger.Log.Errorf("Failed to find an RPM to provide '%s'. Error: %s", node.VersionedPkg.Name, err)
+		return
+	}
+
+	node.State = pkggraph.StateCached
+
+	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(node.RpmPath), node.VersionedPkg.Name)
+
+	return
+}
+
+func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []string) (err error) {
 	rpmPaths := []string{}
 	for _, resolvedPackage := range resolvedPackages {
 		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
 	}
 
-	chosenRPMPath = rpmPaths[0]
+	node.RpmPath = rpmPaths[0]
 	if len(rpmPaths) > 1 {
+		var resolvedRPMs []string
 		logger.Log.Debugf("Found %d candidates. Resolving.", len(rpmPaths))
 
 		resolvedRPMs, err = rpm.ResolveCompetingPackages(rpmPaths...)
@@ -215,13 +226,8 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 			logger.Log.Warnf("Found %d candidates to provide '%s'. Picking the first one.", resolvedRPMsCount, node.VersionedPkg.Name)
 		}
 
-		chosenRPMPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
+		node.RpmPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
 	}
-
-	node.RpmPath = chosenRPMPath
-	node.State = pkggraph.StateCached
-
-	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(chosenRPMPath), node.VersionedPkg.Name)
 
 	return
 }
