@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2021b
+Version:        2021c
 Release:        1%{?dist}
 URL:            https://www.iana.org/time-zones
 License:        Public Domain
@@ -43,6 +43,9 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Mon Oct 04 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2021c-1
+- Update to version  "2021c".
+
 * Mon Sep 27 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2021b-1
 - Update to version  "2021b".
 
