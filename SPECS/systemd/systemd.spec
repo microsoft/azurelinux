@@ -80,7 +80,6 @@ Requires:       pam
 Requires:       xz
 
 Obsoletes:      systemd-bootstrap
-Provides:       systemd-bootstrap = %{version}-%{release}
 
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
@@ -106,7 +105,6 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
 
 Obsoletes:      systemd-bootstrap-devel
-Provides:       systemd-bootstrap-devel = %{version}-%{release}
 
 Provides:       systemd-libs = %{version}-%{release}
 Provides:       libudev-devel = %{version}-%{release}
