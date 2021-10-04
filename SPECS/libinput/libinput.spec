@@ -3,7 +3,7 @@
 Summary:        Input device library
 Name:           libinput
 Version:        1.16.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,9 +17,9 @@ BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
 BuildRequires:  pkgconfig(libevdev)
-BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(libwacom)
 BuildRequires:  pkgconfig(mtdev)
+BuildRequires:  systemd-devel
 
 %description
 libinput is a library that handles input devices for display servers and other
@@ -99,6 +99,10 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 %{_mandir}/man1/libinput-test-suite.1*
 
 %changelog
+* Mon Oct 04 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.4-4
+- Replacing BR 'pkgconfig(libudev)' with 'systemd-devel' to avoid build confusion
+  between 'systemd-bootstrap-devel' and 'systemd-devel'.
+
 * Mon Aug 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.4-3
 - Removing BR on 'marinerui-rpm-macros'. Using macros from the build env.
 
