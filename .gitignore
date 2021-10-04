@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Exclude source archives from the spec directory
+SPECS/**/*.tar.*
+SPECS/**/*.tgz
+SPECS/**/*.zip
+
 # User-specific files
 *.rsuser
 *.suo
