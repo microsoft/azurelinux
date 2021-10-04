@@ -78,9 +78,7 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1 -c
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_topdir}/BUILD/%{name}-%{version}/libnetwork %{OUR_GOPATH}/src/github.com/docker/libnetwork
 mkdir -p '%{OUR_GOPATH}/src/github.com/docker'
@@ -155,6 +153,7 @@ fi
 %changelog
 * Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 19.03.15+azure-4
 - Patch CVE-2021-41091 and CVE-2021-41089
+- Switch to autosetup
 
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 19.03.15+azure-3
 - Increment release to force republishing using golang 1.16.7.
