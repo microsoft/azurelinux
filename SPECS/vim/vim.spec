@@ -19,7 +19,7 @@ The Vim package contains a powerful text editor.
 %package        extra
 Summary:        Extra files for Vim text editor
 Group:          Applications/Editors
-
+Requires:       %{name} = %{version}-%{release}
 Requires:       tcsh
 
 Conflicts:      toybox
@@ -197,6 +197,7 @@ fi
 %changelog
 * Tue Oct 05 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-2
 - Fix vim startup error.
+- vim-extra requires vim
 
 * Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-1
 - Fix CVE-2021-3778 and CVE-2021-3796 CVEs by updating to 8.2.3441.
