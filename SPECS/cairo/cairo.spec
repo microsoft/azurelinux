@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://cairographics.org
 Source0:        https://cairographics.org/snapshots/%{name}-%{version}.tar.xz
+
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  gcc
@@ -19,6 +20,7 @@ BuildRequires:  libXrender-devel
 BuildRequires:  pixman-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(xext)
+
 Requires:       expat
 Requires:       glib
 Requires:       libpng
@@ -30,19 +32,21 @@ Cairo is a 2D graphics library with support for multiple output devices.
 %package        devel
 Summary:        Header and development files
 License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
+
 Requires:       %{name} = %{version}-%{release}
-Requires:       freetype-devel
-Requires:       pixman-devel
-Requires:       libpng-devel
 Requires:       fontconfig-devel
+Requires:       freetype-devel
+Requires:       libpng-devel
+Requires:       pixman-devel
 
 %description    devel
 It contains the libraries and header files to create applications
 
 %package gobject
-Summary: GObject bindings for cairo
+Summary:        GObject bindings for cairo
 License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
-Requires: %{name}%{?_isa} = %{version}-%{release}
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description gobject
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -52,10 +56,11 @@ This package contains functionality to make cairo graphics library
 integrate well with the GObject object system used by GNOME.
 
 %package gobject-devel
-Summary: Development files for cairo-gobject
+Summary:        Development files for cairo-gobject
 License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
-Requires: %{name}-gobject%{?_isa} = %{version}-%{release}
+
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-gobject%{?_isa} = %{version}-%{release}
 
 %description gobject-devel
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -66,9 +71,8 @@ needed for developing software which uses the cairo Gobject library.
 
 %package tools
 Summary:        Development tools for cairo
-License:        GPLv3
 
-Conflicts:      cairo-tools
+License:        GPLv3
 
 %description tools
 Cairo is a 2D graphics library designed to provide high-quality display
