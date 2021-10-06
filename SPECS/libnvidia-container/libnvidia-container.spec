@@ -3,8 +3,8 @@
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.3.3
-Release:        2%{?dist}
+Version:        1.5.1
+Release:        1%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -131,6 +131,10 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Mon Sep 27 2021 Adithya Jayachandran <adjayach@microsoft.com> - 1.5.1-1
+- Updating to libnvidia-container to version 1.5.1
+- Maintaining nvidia-modprobe to version 450.57 as required by container v1.5.1
+
 * Fri Apr 23 2021 joseph knierman <joknierm@microsoft.com> - 1.3.3-2
 - License verified
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
