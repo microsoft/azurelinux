@@ -52,7 +52,7 @@ Requires: moby-runc >= 1.0.0~rc10~
 
 Conflicts: containerd
 Conflicts: containerd-io
-Conflicts: mooby-engine <= 3.0.10
+Conflicts: moby-engine <= 3.0.10
 
 Obsoletes: containerd
 Obsoletes: containerd-io
