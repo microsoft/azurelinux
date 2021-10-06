@@ -1,12 +1,12 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.4.2
-Release:        3%{?dist}
+Version:        1.5.1
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/NVIDIA/nvidia-container-runtime
+URL:            https://github.com/NVIDIA/nvidia-container-toolkit
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -28,7 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         nvidia-container-toolkit-1.4.2.patch
+Patch0:         nvidia-container-toolkit-1.5.1.patch
 BuildRequires:  golang
 Provides:       nvidia-container-runtime-hook
 
@@ -40,7 +40,7 @@ Provides a OCI hook to enable GPU support in containers.
 tar -xvf %{SOURCE1}
 
 %build
-go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./pkg
+go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./cmd/nvidia-container-toolkit
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -70,6 +70,12 @@ rm -f %{_bindir}/nvidia-container-runtime-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %changelog
+* Tue Sep 28 2021 Adithya Jayachandran <adjayach@microsoft.com> - 1.5.1-1
+- Update toolkit version to 1.5.1
+
+* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.4.2-4
+- Increment release to force republishing using golang 1.16.7.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.4.2-3
 - Increment release to force republishing using golang 1.15.13.
 
