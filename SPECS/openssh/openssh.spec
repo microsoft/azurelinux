@@ -1,8 +1,8 @@
 %define systemd_units_rel 20191026
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
-Version:        8.5p1
-Release:        3%{?dist}
+Version:        8.8p1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -185,6 +185,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Wed Oct 6 2021 Rachel Menge <rachelmenge@microsoft.com> 8.8p1-1
+- Update to 8.8p1 to patch CVE-2021-41617
+
 * Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-3
 - Add SELinux support
 
