@@ -9,7 +9,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,7 @@ BuildRequires:  postgresql-devel
 BuildRequires:  python3
 BuildRequires:  python3-ply
 BuildRequires:  sqlite-devel
+BuildRequires:  systemd-rpm-macros
 
 Requires:       libuv
 Requires:       openssl
@@ -614,6 +615,9 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
+* Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.15-3
+- Adding missing BR on 'systemd-rpm-macros'.
+
 * Fri Aug 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.15-2
 - Adding DBZ subpackages using Fedora 34 (license: MIT) specs as guidance.
 

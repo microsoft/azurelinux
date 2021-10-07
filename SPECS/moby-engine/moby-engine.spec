@@ -1,7 +1,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 19.03.15+azure
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 
@@ -27,6 +27,8 @@ Source2: docker.service
 Source3: docker.socket
 Source4: LICENSE
 Source5: NOTICE
+Patch0:  CVE-2021-41091.patch
+Patch1:  CVE-2021-41089.patch
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Mariner
@@ -76,7 +78,7 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
+%autosetup -p1 -c
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_topdir}/BUILD/%{name}-%{version}/libnetwork %{OUR_GOPATH}/src/github.com/docker/libnetwork
 mkdir -p '%{OUR_GOPATH}/src/github.com/docker'
@@ -149,6 +151,13 @@ fi
 /usr/share/doc/%{name}-%{version}/*
 
 %changelog
+* Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 19.03.15+azure-4
+- Patch CVE-2021-41091 and CVE-2021-41089
+- Switch to autosetup
+
+* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 19.03.15+azure-3
+- Increment release to force republishing using golang 1.16.7.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 19.03.15+azure-2
 - Increment release to force republishing using golang 1.15.13.
 

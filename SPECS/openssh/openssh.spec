@@ -1,15 +1,15 @@
 %global openssh_ver 8.5p1
-%global openssh_rel 4
+%global openssh_rel 4%{?dist}
 
 %global pam_ssh_agent_ver 0.10.3
-%global pam_ssh_agent_rel 10
+%global pam_ssh_agent_rel 10%{?dist}
 
 %define systemd_units_rel 20191026
 
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        %{openssh_rel}%{?dist}
+Release:        %{openssh_rel}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,7 +72,7 @@ This provides the ssh client utilities.
 %package -n pam_ssh_agent_auth
 Summary: PAM module for authentication with ssh-agent
 Version: %{pam_ssh_agent_ver}
-Release: %{pam_ssh_agent_rel}.%{openssh_rel}%{?dist}
+Release: %{pam_ssh_agent_rel}.%{openssh_rel}
 License: BSD
 
 %description -n pam_ssh_agent_auth

@@ -37,7 +37,7 @@ $(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
 		srpm_file=$(BUILD_SRPMS_DIR)/$${srpm} && \
 		spec_destination=$(BUILD_SPECS_DIR)/$$(rpm -qp $$srpm_file --define='with_check 1' --queryformat %{NAME}-%{VERSION}-%{RELEASE}/%{NAME}.spec) && \
 		spec_dir=$$(dirname $$spec_destination) && \
-		if [ ! -f $@ -o $$srpm -nt $@ ]; then \
+		if [ ! -f $@ -o $$srpm_file -nt $@ ]; then \
 			echo "Extracting \"$$srpm_file\" to \"$$spec_dir\"." | tee -a $(srpm_expand_log) && \
 			mkdir -p $$spec_dir && \
 			cd $$spec_dir && \

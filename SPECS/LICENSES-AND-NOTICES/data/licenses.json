@@ -210,7 +210,6 @@
                 "squashfs-tools",
                 "sscg",
                 "uclibc-ng",
-                "UI-cairo",
                 "usbredir",
                 "uuid",
                 "vitess",

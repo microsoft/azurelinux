@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.4.4+azure
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -18,6 +18,7 @@ Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
 Patch0:  CVE-2021-32760.patch
+Patch1:  CVE-2021-41103.patch
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
@@ -51,7 +52,7 @@ Requires: moby-runc >= 1.0.0~rc10~
 
 Conflicts: containerd
 Conflicts: containerd-io
-Conflicts: mooby-engine <= 3.0.10
+Conflicts: moby-engine <= 3.0.10
 
 Obsoletes: containerd
 Obsoletes: containerd-io
@@ -71,6 +72,7 @@ used directly by developers or end-users.
 %prep
 %setup -q -n %{name}-%{version} -c
 %patch0 -p1
+%patch1 -p1
 mkdir -p %{OUR_GOPATH}/src/github.com/containerd
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/containerd/containerd
 
@@ -90,18 +92,15 @@ make binaries
 mkdir -p %{buildroot}/%{_bindir}
 for i in bin/*; do
     cp -aT $i %{buildroot}/%{_bindir}/$(basename $i)
-    echo %{_bindir}/$(basename $i) >> files
 done
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
-echo %config %{_unitdir}/containerd.service >> ./files
-echo %config %{_sysconfdir}/containerd/config.toml >> ./files
 
-mkdir -p %{buildroot}/usr/share/doc/%{name}-%{version}
-cp %{SOURCE3} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
-cp %{SOURCE4} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
+mkdir -p %{buildroot}/%{_docdir}/%{name}-%{version}
+install -D -p -m 0644 %{SOURCE3} %{buildroot}/%{_docdir}/%{name}-%{version}/NOTICE
+install -D -p -m 0644 %{SOURCE4} %{buildroot}/%{_docdir}/%{name}-%{version}/LICENSE
 
 mkdir -p %{buildroot}/%{_mandir}
 for i in man/*; do
@@ -125,16 +124,22 @@ fi
 %postun
 %systemd_postun_with_restart containerd.service
 
-# list files owned by the package here
-%files -f ./files
-%license LICENSE
-
 %files
-/usr/share/doc/%{name}-%{version}/NOTICE
-/usr/share/doc/%{name}-%{version}/LICENSE
+%license LICENSE
+%{_bindir}/*
+%config(noreplace) %{_unitdir}/containerd.service
+%config(noreplace) %{_sysconfdir}/containerd/config.toml
+%{_docdir}/%{name}-%{version}/NOTICE
+%{_docdir}/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 1.4.4+azure-4
+- Patch CVE-2021-41103
+- Change config to noreplace
+- Refactor how files is specified
+* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.4.4+azure-3
+- Increment release to force republishing using golang 1.16.7.
 * Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> 1.4.4+azure-2
 - CVE-2021-32760 fix
 * Mon Jul 12 2021 Andrew Phelps <anphel@microsoft.com> 1.4.4+azure-1
