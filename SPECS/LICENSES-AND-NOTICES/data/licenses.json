@@ -316,6 +316,7 @@
                 "perl-Test-Warnings",
                 "perl-Text-Template",
                 "pigz",
+                "prebuilt-ca-certificates",
                 "prebuilt-ca-certificates-base",
                 "python-cachetools",
                 "python-cherrypy",

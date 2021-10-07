@@ -1,91 +1,58 @@
 %define pkidir %{_sysconfdir}/pki
-%define catrustdir %{_sysconfdir}/pki/ca-trust
+%define catrustdir %{pkidir}/ca-trust
 %define classic_tls_bundle ca-bundle.crt
 %define openssl_format_trust_bundle ca-bundle.trust.crt
-%define legacy_default_bundle ca-bundle.legacy.default.crt
-%define legacy_disable_bundle ca-bundle.legacy.disable.crt
 %define java_bundle java/cacerts
-%define p11_format_mozilla_bundle ca-bundle.trust.mozilla.p11-kit
-%define legacy_default_mozilla_bundle ca-bundle.legacy.default.mozilla.crt
-%define legacy_disable_mozilla_bundle ca-bundle.legacy.disable.mozilla.crt
+
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
-%define legacy_default_base_bundle ca-bundle.legacy.default.base.crt
-%define legacy_disable_base_bundle ca-bundle.legacy.disable.base.crt
+
 %define p11_format_microsoft_bundle ca-bundle.trust.microsoft.p11-kit
-%define legacy_default_microsoft_bundle ca-bundle.legacy.default.microsoft.crt
-%define legacy_disable_microsoft_bundle ca-bundle.legacy.disable.microsoft.crt
 
 # List of packages triggering legacy certs generation if 'ca-certificates-legacy'
 # is installed.
-%global watched_pkgs %{name}, %{name}-base, %{name}-microsoft
+%global watched_pkgs %{name}, %{name}-base
 
 # Rebuilding cert bundles with source certificates.
 %global refresh_bundles \
-%{_bindir}/ca-legacy install\
 %{_bindir}/update-ca-trust
 
-# Converts certdata.txt files to p11-kit format bundles and legacy crt files.
+# Converts certdata.txt files to p11-kit format bundles.
 # Arguments:
 # %1 - the source certdata.txt file;
 %define convert_certdata() \
 WORKDIR=$(basename %{1}.d) \
-mkdir -p $WORKDIR/certs/legacy-default \
-mkdir $WORKDIR/certs/legacy-disable \
+mkdir -p $WORKDIR/certs \
 mkdir $WORKDIR/java \
 pushd $WORKDIR/certs \
  pwd $WORKDIR \
  cp %{1} certdata.txt \
  python3 %{SOURCE4} >c2p.log 2>c2p.err \
 popd \
-%{SOURCE19} $WORKDIR %{SOURCE1} %{openssl_format_trust_bundle} %{legacy_default_bundle} %{legacy_disable_bundle} %{SOURCE3}
+%{SOURCE19} $WORKDIR %{openssl_format_trust_bundle} %{SOURCE3}
 
 # Installs bundle files to the right directories.
 # Arguments:
 # %1 - the source certdata.txt file;
 # %2 - output p11-kit format bundle name;
-# %3 - output legacy default bundle name;
-# %4 - output legacy disabled bundle name;
 %define install_bundles() \
 WORKDIR=$(basename %{1}.d) \
 install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
-install -p -m 644 $WORKDIR/%{legacy_default_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
-install -p -m 644 $WORKDIR/%{legacy_disable_bundle} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{3} \
-touch -r %{SOURCE0} %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{4}
+touch -r %{SOURCE23} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2}
 
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
-# The files, certdata.txt and nssckbi.h, should be taken from a released version of NSS, as published
-# at https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/
-#
-# The versions that are used by the latest released version of
-# Mozilla Firefox should be available from:
-# https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/nssckbi.h
-# https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt
-#
-# The most recent development versions of the files can be found at
-# http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/nssckbi.h
-# http://hg.mozilla.org/projects/nss/raw-file/default/lib/ckfw/builtins/certdata.txt
-# (but these files might have not yet been released).
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        15%{?dist}
+Release:        19%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://hg.mozilla.org
-# Please always update both certdata.txt and nssckbi.h
-Source0:        https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt
-Source1:        nssckbi.h
 Source2:        update-ca-trust
 Source3:        trust-fixes
 Source4:        certdata2pem.py
-Source5:        ca-legacy.conf
-Source6:        ca-legacy
-Source9:        ca-legacy.8.txt
 Source10:       update-ca-trust.8.txt
 Source11:       README.usr
 Source12:       README.etc
@@ -99,6 +66,7 @@ Source19:       pem2bundle.sh
 Source20:       LICENSE
 Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
+# The certdata.microsoft.txt is provided by Microsoft's Trusted Root Program.
 Source23:       certdata.microsoft.txt
 
 BuildRequires:  /bin/ln
@@ -116,18 +84,19 @@ Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
 
+Provides:       ca-certificates-microsoft = %{version}-%{release}
 Provides:       ca-certificates-mozilla = %{version}-%{release}
 
 BuildArch:      noarch
 
 %description
-The Public Key Inrastructure is used for many security issues in a
-Linux system. In order for a certificate to be trusted, it must be
-signed by a trusted agent called a Certificate Authority (CA). The
-certificates loaded by this section are from the list on the Mozilla
-version control system and formats it into a form used by
-OpenSSL-1.0.1e. The certificates can also be used by other applications
-either directly of indirectly through openssl.
+The Public Key Inrastructure is used for many security issues in
+a Linux system. In order for a certificate to be trusted, it must be
+signed by a trusted agent called a Certificate Authority (CA).
+The certificates loaded by this section are from the list of CAs trusted
+through the Microsoft Trusted Root Program and formats it into a form
+used by OpenSSL-1.0.1e. The certificates can also be used by other
+applications either directly of indirectly through OpenSSL.
 
 %package shared
 Summary:        A set of directories and files required by all certificate packages.
@@ -148,18 +117,6 @@ Requires(postun): %{name}-tools = %{version}-%{release}
 %description base
 %{summary}
 
-%package microsoft
-Summary:        A list of CAs trusted through the Microsoft Trusted Root Program.
-Group:          System Environment/Security
-
-Requires:       %{name}-shared = %{version}-%{release}
-Requires(post): %{name}-tools = %{version}-%{release}
-Requires(post): coreutils
-Requires(postun): %{name}-tools = %{version}-%{release}
-
-%description microsoft
-%{summary}
-
 %package tools
 Summary:        Cert generation tools.
 Group:          System Environment/Security
@@ -178,28 +135,21 @@ Requires:       %{name}-shared = %{version}-%{release}
 
 %description legacy
 Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
-pairs under %{_sysconfdir}/pki/tls/certs.
+pairs under %{pkidir}/tls/certs.
 
 %prep -q
-rm -rf %{name}
 mkdir %{name}
 
 %build
 cp -p %{SOURCE20} .
 
-%convert_certdata %{SOURCE0}
 %convert_certdata %{SOURCE21}
 %convert_certdata %{SOURCE23}
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
 asciidoc.py -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
-xsltproc --nonet -o %{name}/update-ca-trust.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
-
-cp %{SOURCE9} %{name}/ca-legacy.8.txt
-asciidoc.py -v -d manpage -b docbook %{name}/ca-legacy.8.txt
-xsltproc --nonet -o %{name}/ca-legacy.8 /etc/asciidoc/docbook-xsl/manpage.xsl %{name}/ca-legacy.8.xml
-
+xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 %install
 mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
@@ -216,12 +166,10 @@ mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-legacy
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
 install -p -m 644 %{name}/update-ca-trust.8 %{buildroot}%{_mandir}/man8
-install -p -m 644 %{name}/ca-legacy.8 %{buildroot}%{_mandir}/man8
 install -p -m 644 %{SOURCE11} %{buildroot}%{_datadir}/pki/ca-trust-source/README
 install -p -m 644 %{SOURCE12} %{buildroot}%{catrustdir}/README
 install -p -m 644 %{SOURCE13} %{buildroot}%{catrustdir}/extracted/README
@@ -231,22 +179,15 @@ install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
 install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
 install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
-install -p -m 644 %{SOURCE5} %{buildroot}%{catrustdir}/ca-legacy.conf
-
-# Mozilla certs
-%install_bundles %{SOURCE0} %{p11_format_mozilla_bundle} %{legacy_default_mozilla_bundle} %{legacy_disable_mozilla_bundle}
-
 # base certs
-%install_bundles %{SOURCE21} %{p11_format_base_bundle} %{legacy_default_base_bundle} %{legacy_disable_base_bundle}
+%install_bundles %{SOURCE21} %{p11_format_base_bundle}
 
 # Microsoft certs
-%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle} %{legacy_default_microsoft_bundle} %{legacy_disable_microsoft_bundle}
+%install_bundles %{SOURCE23} %{p11_format_microsoft_bundle}
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
 install -p -m 755 %{SOURCE2} %{buildroot}%{_bindir}/update-ca-trust
-
-install -p -m 755 %{SOURCE6} %{buildroot}%{_bindir}/ca-legacy
 
 install -p -m 755 %{SOURCE22} %{buildroot}%{_bindir}/bundle2pem.sh
 
@@ -264,37 +205,28 @@ touch %{buildroot}%{catrustdir}/extracted/%{java_bundle}
 chmod 444 %{buildroot}%{catrustdir}/extracted/%{java_bundle}
 touch %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
 chmod 444 %{buildroot}%{catrustdir}/extracted/edk2/cacerts.bin
-touch %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-chmod 444 %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-touch %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
-chmod 444 %{buildroot}%{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
 
-# /etc/ssl/certs symlink for 3rd-party tools
-ln -s ../pki/tls/certs \
-    %{buildroot}%{_sysconfdir}/ssl/certs
-# legacy filenames
+# Directory links for compatibility with 3rd-party tools
+mkdir -p %{buildroot}%{_libdir}/ssl
+for link in "%{_sysconfdir}/ssl/certs" "%{_libdir}/ssl/certs"; do
+  ln -s %{pkidir}/tls/certs "%{buildroot}$link"
+done
+
+# Legacy file names and links for compatibility with 3rd-party tools
+for link in "%{classic_tls_bundle}" ca-certificates.crt; do
+  ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem "%{buildroot}%{pkidir}/tls/certs/$link"
+done
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
     %{buildroot}%{pkidir}/tls/cert.pem
-ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    %{buildroot}%{pkidir}/tls/certs/%{classic_tls_bundle}
 ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
     %{buildroot}%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
 
 %post
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
 %{refresh_bundles}
 
 %post base
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-%{refresh_bundles}
-
-%post microsoft
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-cp -f %{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle} %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 %{refresh_bundles}
 
 %postun
@@ -319,53 +251,26 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %triggerpostun -n %{name}-legacy -- %{watched_pkgs}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
-%postun microsoft
-%{refresh_bundles}
-
-%clean
-
-
 %files
-# Mozilla certs bundle file with trust
-%{_datadir}/pki/ca-trust-source/%{p11_format_mozilla_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_mozilla_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_mozilla_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_bundle}
+# Microsoft certs bundle file with trust
+%{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
 
 %files base
 %{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_base_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_base_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_base_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_base_bundle}
-
-%files microsoft
-%{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_default_microsoft_bundle}
-%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_microsoft_bundle}
-
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_default_microsoft_bundle}
-%ghost %{_datadir}/pki/ca-trust-source/%{legacy_disable_microsoft_bundle}
 
 %files shared
 %license LICENSE
-
-%config(noreplace) %{catrustdir}/ca-legacy.conf
 
 # symlinks for old locations
 %{pkidir}/tls/cert.pem
 %{pkidir}/tls/certs/%{classic_tls_bundle}
 %{pkidir}/tls/certs/%{openssl_format_trust_bundle}
+%{pkidir}/tls/certs/ca-certificates.crt
 %{pkidir}/%{java_bundle}
 
 # symlink directory
 %{_sysconfdir}/ssl/certs
-
-# ghost files
-%ghost %{catrustdir}/source/ca-bundle.legacy.crt
+%{_libdir}/ssl/certs
 
 # README files
 %{_datadir}/pki/ca-trust-source/README
@@ -381,7 +286,6 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{_datadir}/pki/ca-trust-source
 %dir %{_datadir}/pki/ca-trust-source/anchors
 %dir %{_datadir}/pki/ca-trust-source/blacklist
-%dir %{_datadir}/pki/ca-trust-legacy
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
 %dir %{catrustdir}/extracted
@@ -406,15 +310,27 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %files tools
 # update/extract tool
 %{_bindir}/update-ca-trust
-%{_bindir}/ca-legacy
 
 %{_mandir}/man8/update-ca-trust.8.gz
-%{_mandir}/man8/ca-legacy.8.gz
 
 %files legacy
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
+- Removing Mozilla certs and making Microsoft's the default ones.
+- Removed support for legacy certdata.txt fields.
+- Removed the use of checked-in "nssckbi.h".
+
+* Mon Sep 13 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-18
+- Updating Microsoft trusted root CAs.
+
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-17
+- Adding directory and files links for compatibility reasons.
+
+* Fri Aug 20 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-16
+- Removing the 'ca-legacy' script along with the empty files and broken links it generated.
+
 * Wed Jul 07 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-15
 - Updating Microsoft trusted root CAs.
 
