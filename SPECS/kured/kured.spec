@@ -25,7 +25,7 @@
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
 Version:        1.6.1
-Release:        1.6%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -124,6 +124,9 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 %{_datarootdir}/k8s-yaml/kured/kured.yaml
 
 %changelog
+* Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-2
+- Switching to using a single digit for the 'Release' tag.
+
 * Fri Jun 18 2021 Henry Li <lihl@microsoft.com> 1.6.1-1.6
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
