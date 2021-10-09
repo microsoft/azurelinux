@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.6
-Release:        14%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,9 +26,9 @@ BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  pam-devel
 Requires:       cracklib
+Requires:       pam
 Requires:       libselinux
 Requires:       libsemanage
-Requires:       pam
 
 %description
 The Shadow package contains programs for handling passwords
@@ -40,7 +40,7 @@ in a secure way.
 sed -i 's/groups$(EXEEXT) //' src/Makefile.in
 find man -name Makefile.in -exec sed -i 's/groups\.1 / /' {} \;
 sed -i -e 's@#ENCRYPT_METHOD DES@ENCRYPT_METHOD SHA512@' \
-    -e 's@%{_var}/spool/mail@%{_var}/mail@' etc/login.defs
+    -e 's@/var/spool/mail@/var/mail@' etc/login.defs
 
 sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
@@ -144,10 +144,6 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
-- Update pam.d configuration for SELinux logins.
-- Change loginuid to be set only on logins.
-
 * Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
 - Fix issue with undocumented libselinux and libsemanage requirements
 
