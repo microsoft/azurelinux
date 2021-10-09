@@ -26,9 +26,9 @@ check-0.12.0-5.cm2.aarch64.rpm
 check-debuginfo-0.12.0-5.cm2.aarch64.rpm
 cmake-3.17.3-5.cm2.aarch64.rpm
 cmake-debuginfo-3.17.3-5.cm2.aarch64.rpm
-coreutils-8.30-10.cm2.aarch64.rpm
-coreutils-debuginfo-8.30-10.cm2.aarch64.rpm
-coreutils-lang-8.30-10.cm2.aarch64.rpm
+coreutils-8.32-1.cm2.aarch64.rpm
+coreutils-debuginfo-8.32-1.cm2.aarch64.rpm
+coreutils-lang-8.32-1.cm2.aarch64.rpm
 cpio-2.13-2.cm2.aarch64.rpm
 cpio-debuginfo-2.13-2.cm2.aarch64.rpm
 cpio-lang-2.13-2.cm2.aarch64.rpm
@@ -572,8 +572,8 @@ tdnf-debuginfo-2.1.0-7.cm2.aarch64.rpm
 tdnf-devel-2.1.0-7.cm2.aarch64.rpm
 tdnf-plugin-repogpgcheck-2.1.0-7.cm2.aarch64.rpm
 tdnf-python-2.1.0-7.cm2.aarch64.rpm
-texinfo-6.5-8.cm2.aarch64.rpm
-texinfo-debuginfo-6.5-8.cm2.aarch64.rpm
+texinfo-6.8-1.cm2.aarch64.rpm
+texinfo-debuginfo-6.8-1.cm2.aarch64.rpm
 unzip-6.0-19.cm2.aarch64.rpm
 unzip-debuginfo-6.0-19.cm2.aarch64.rpm
 util-linux-2.36.1-5.cm2.aarch64.rpm
