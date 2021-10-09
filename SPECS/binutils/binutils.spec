@@ -1,15 +1,13 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.36.1
-Release:        3%{?dist}
+Version:        2.37
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
-# Patch Source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
-Patch0:         export-demangle-header.patch
 
 Provides:       bundled(libiberty)
 
@@ -100,12 +98,12 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %files devel
 %{_includedir}/ansidecl.h
-%{_includedir}/bfd_stdint.h
+#%%{_includedir}/bfd_stdint.h
 %{_includedir}/bfd.h
 %{_includedir}/bfdlink.h
 %{_includedir}/ctf-api.h
 %{_includedir}/ctf.h
-%{_includedir}/demangle.h
+#%%{_includedir}/demangle.h
 %{_includedir}/diagnostics.h
 %{_includedir}/dis-asm.h
 %{_includedir}/libiberty.h
@@ -127,6 +125,9 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
+* Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-1
+- Update version to 2.37
+
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
 - Adding 'libiberty' lib and header.
 
