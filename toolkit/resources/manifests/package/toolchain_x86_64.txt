@@ -8,9 +8,9 @@ bash-4.4.18-7.cm2.x86_64.rpm
 bash-debuginfo-4.4.18-7.cm2.x86_64.rpm
 bash-devel-4.4.18-7.cm2.x86_64.rpm
 bash-lang-4.4.18-7.cm2.x86_64.rpm
-binutils-2.36.1-3.cm2.x86_64.rpm
-binutils-debuginfo-2.36.1-3.cm2.x86_64.rpm
-binutils-devel-2.36.1-3.cm2.x86_64.rpm
+binutils-2.37-1.cm2.x86_64.rpm
+binutils-debuginfo-2.37-1.cm2.x86_64.rpm
+binutils-devel-2.37-1.cm2.x86_64.rpm
 bison-3.1-5.cm2.x86_64.rpm
 bison-debuginfo-3.1-5.cm2.x86_64.rpm
 bzip2-1.0.6-16.cm2.x86_64.rpm
