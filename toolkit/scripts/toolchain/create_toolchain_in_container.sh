@@ -19,7 +19,6 @@ docker ps -a
 # docker rmi $(docker history marinertoolchain -q)
 
 # Texinfo patch file
-cp -v $MARINER_SPECS_DIR/texinfo/texinfo-perl-fix.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
 cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
@@ -62,7 +61,6 @@ ls -la ./populated_toolchain
 popd
 
 # Cleanup patch files used in container
-rm -vf ./container/texinfo-perl-fix.patch
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
 rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch

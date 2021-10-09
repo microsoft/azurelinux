@@ -411,14 +411,14 @@ rm -rf bzip2-1.0.6
 
 touch $LFS/logs/temptoolchain/status_bzip2_complete
 
-echo Coreutils-8.30
-tar xf coreutils-8.30.tar.xz
-pushd coreutils-8.30
+echo Coreutils-8.32
+tar xf coreutils-8.32.tar.xz
+pushd coreutils-8.32
 ./configure --prefix=/tools --enable-install-program=hostname
 make -j$(nproc)
 make install
 popd
-rm -rf coreutils-8.30
+rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
 
@@ -574,14 +574,14 @@ rm -rf tar-1.30
 
 touch $LFS/logs/temptoolchain/status_tar_complete
 
-echo Texinfo-6.5
-tar xf texinfo-6.5.tar.xz
-pushd texinfo-6.5
+echo Texinfo-6.8
+tar xf texinfo-6.8.tar.xz
+pushd texinfo-6.8
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf texinfo-6.5
+rm -rf texinfo-6.8
 
 touch $LFS/logs/temptoolchain/status_texinfo_complete
 
