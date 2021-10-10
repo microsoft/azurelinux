@@ -36,7 +36,7 @@ into other protocols.
 %py3_build
 
 %install
-%{py3_install --single-version-externally-managed}
+%{py3_install "--single-version-externally-managed"}
 
 %check
 python3 setup.py test

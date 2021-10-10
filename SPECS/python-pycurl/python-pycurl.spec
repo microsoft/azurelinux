@@ -49,10 +49,10 @@ rm -f doc/*.xml_validity
 rm -f tests/fake-curl/libcurl/*.so
 
 %build
-CFLAGS="%{optflags} -DHAVE_CURL_OPENSSL" %{py3_build --with-ssl}
+CFLAGS="%{optflags} -DHAVE_CURL_OPENSSL" %{py3_build "--with-ssl"}
 
 %install
-%{py3_install --with-ssl}
+%{py3_install "--with-ssl"}
 rm -rf %{buildroot}%{_docdir}/pycurl
 chmod 755 %{buildroot}%{python3_sitelib}/pycurl*.so
 

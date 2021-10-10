@@ -34,7 +34,7 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 %py3_build
 
 %install
-%{py3_install --single-version-externally-managed}
+%{py3_install "--single-version-externally-managed"}
 for item in %{buildroot}/%{_bindir}/*; do
     ln -s ${item} "${item}-%{python3_version}" ;
 done
