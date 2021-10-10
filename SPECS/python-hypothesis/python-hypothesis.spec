@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/HypothesisWorks/hypothesis-python
 Source0:        https://files.pythonhosted.org/packages/65/57/c4e2cc37a7b9de3d57a1cd6c200f931807cfdd9f7e05ef4c67fb9c507d65/hypothesis-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Hypothesis is an advanced testing library for Python. It lets you write tests which are parametrized by a source of examples,

@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/incremental
 Source0:        https://files.pythonhosted.org/packages/source/i/incremental/incremental-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Incremental is a small library that versions your Python projects.
