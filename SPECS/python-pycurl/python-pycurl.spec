@@ -1,127 +1,85 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python2_version: %define python2_version %(python2 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-
+Summary:        A Python interface to libcurl
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        8%{?dist}
-Summary:        A Python interface to libcurl
-Group:          Development/Languages
-License:        LGPLv2+ or MIT
-URL:            http://pycurl.sourceforge.net/
-Source0:        https://pypi.io/packages/source/p/pycurl/pycurl-%{version}.tar.gz
+Release:        9%{?dist}
+License:        LGPLv2+ OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Languages
+URL:            http://pycurl.sourceforge.net/
+Source0:        https://pypi.io/packages/source/p/pycurl/pycurl-%{version}.tar.gz
 Patch0:         skip-incompatible-libcurl-tests.patch
-BuildRequires:  openssl-devel
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
+
+%description
+A Python interface to libcurl
+
+%package -n     python3-pycurl
+Summary:        A Python interface to libcurl
 BuildRequires:  curl-devel
-BuildRequires:  python3
+BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
+Requires:       curl
+Requires:       python3
 %if %{with_check}
-BuildRequires:  python-setuptools
-BuildRequires:  vsftpd
 BuildRequires:  curl-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  vsftpd
 %endif
 
-%description
+%description -n python3-pycurl
 PycURL is a Python interface to libcurl. PycURL can be used to fetch
 objects identified by a URL from a Python program, similar to the
 urllib Python module. PycURL is mature, very fast, and supports a lot
 of features.
 
-%package -n     python2-pycurl
-Summary:        python2-pycurl
-Requires:       python2
-Requires:       python2-libs
-Requires:       curl
-Provides:       pycurl = %{version}-%{release}
-
-%description -n python2-pycurl
-Python 2 version.
-
-%package -n     python3-pycurl
-Summary:        python3 pycurl
-Requires:       python3
-Requires:       python3-libs
-Requires:       curl
-
-%description -n python3-pycurl
-Python 3 version.
-
 %package doc
-Summary:    Documentation and examples for pycurl
-Requires:   python2-pycurl = %{version}
+Summary:        Documentation and examples for pycurl
+Requires:       python3-pycurl = %{version}-%{release}
 
 %description doc
 Documentation and examples for pycurl
 
 %prep
-%setup -q -n pycurl-%{version}
-%patch0 -p1
+%autosetup -p 1 -n pycurl-%{version}
 rm -f doc/*.xml_validity
 #chmod a-x examples/*
 
 # removing prebuilt-binaries
 rm -f tests/fake-curl/libcurl/*.so
-rm -rf ../p3dir
-cp -a . ../p3dir
 
 %build
-CFLAGS="$RPM_OPT_FLAGS -DHAVE_CURL_OPENSSL" python2 setup.py build --with-ssl
-pushd ../p3dir
-CFLAGS="$RPM_OPT_FLAGS -DHAVE_CURL_OPENSSL" python3 setup.py build --with-ssl
-popd
+CFLAGS="%{optflags} -DHAVE_CURL_OPENSSL" %{py3_build --with-ssl}
 
 %install
-rm -rf %{buildroot}
-python2 setup.py install -O1 --skip-build --root %{buildroot} --with-ssl
-rm -rf %{buildroot}%{_datadir}/doc/pycurl
-chmod 755 %{buildroot}%{python2_sitelib}/pycurl*.so
-pushd ../p3dir
-python3 setup.py install -O1 --skip-build --root %{buildroot} --with-ssl
-rm -rf %{buildroot}%{_datadir}/doc/pycurl
+%{py3_install --with-ssl}
+rm -rf %{buildroot}%{_docdir}/pycurl
 chmod 755 %{buildroot}%{python3_sitelib}/pycurl*.so
-popd
-
 
 %check
 export PYCURL_SSL_LIBRARY=openssl
 export PYCURL_VSFTPD_PATH=vsftpd
 
-easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
-$easy_install_2 nose nose-show-skipped bottle flaky pyflakes
-rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py tests/multi_timer_test.py
-LANG=en_US.UTF-8  make test PYTHON=python%{python2_version} NOSETESTS="nosetests-%{python2_version} -v"
-
-cd ../p3dir
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
+easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
 $easy_install_3 nose nose-show-skipped bottle==0.12.16 flaky pyflakes
 rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py tests/multi_timer_test.py
 LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests-3.4 -v"
 
-%clean
-rm -rf %{buildroot}
-
-%files -n python2-pycurl
-%defattr(-,root,root,-)
-%license COPYING-MIT
-%{python2_sitelib}/*
-
 %files -n python3-pycurl
 %defattr(-,root,root,-)
+%license COPYING-MIT COPYING-LGPL
 %{python3_sitelib}/*
 
 %files doc
 %defattr(-,root,root)
-%doc COPYING-LGPL COPYING-MIT RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
+%doc RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-9
+- Add licenses to python3 package, remove from docs package
+- Remove python2 package
+- Lint spec
+
 * Wed Jun 16 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-8
 - Add patch to fix libcurl package test issue 
 - (JOSLOBO: 7/26/21 Bumped dash verison due to merge conflict)
