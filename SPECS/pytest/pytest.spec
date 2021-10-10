@@ -1,28 +1,20 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python2_version: %define python2_version %(python2 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        3.8.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://docs.pytest.org
-#Source0:        https://github.com/pytest-dev/pytest/archive/%{version}.tar.gz
+#Source0:       https://github.com/pytest-dev/pytest/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/5f/d2/7f77f406ac505abda02ab4afb50d06ebf304f6ea42fca34f8f37529106b2/pytest-%{version}.tar.gz
-BuildRequires:  python-hypothesis
-BuildRequires:  python-py
-BuildRequires:  python-setuptools
-BuildRequires:  python-setuptools_scm
-BuildRequires:  python-twisted
-BuildRequires:  python-xml
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python3
+
+%description
+pytest framework makes it easy to write small tests, yet scales to support complex functional testing for applications and libraries.
+
+%package -n     python3-pytest
+Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 BuildRequires:  python3-devel
 BuildRequires:  python3-hypothesis
 BuildRequires:  python3-py
@@ -30,72 +22,34 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-twisted
 BuildRequires:  python3-xml
-Requires:       python-py
-Requires:       python2
-Requires:       python2-libs
-AutoReqProv:    no
-Provides:       python2dist(pytest) = %{version}-%{release}
-Provides:       python2.7dist(pytest) = %{version}-%{release}
-BuildArch:      noarch
-
-%description
-pytest framework makes it easy to write small tests, yet scales to support complex functional testing for applications and libraries.
-
-%package -n     python3-pytest
-Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Requires:       python3
-Requires:       python3-libs
 Requires:       python3-py
 AutoReqProv:    no
 Provides:       python3dist(pytest) = %{version}-%{release}
 Provides:       python3.7dist(pytest) = %{version}-%{release}
 
 %description -n python3-pytest
-
-Python 3 version.
+pytest framework makes it easy to write small tests, yet scales to support complex functional testing for applications and libraries.
 
 %prep
-%setup -q
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-
-mv %{buildroot}%{_bindir}/pytest %{buildroot}%{_bindir}/pytest%{python2_version}
-ln -snf pytest%{python2_version} %{buildroot}%{_bindir}/pytest2
-mv %{buildroot}%{_bindir}/py.test %{buildroot}%{_bindir}/py.test%{python2_version}
-ln -snf py.test%{python2_version} %{buildroot}%{_bindir}/py.test2
-
-
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 mv %{buildroot}%{_bindir}/pytest %{buildroot}%{_bindir}/pytest%{python3_version}
 ln -snf pytest%{python3_version} %{buildroot}%{_bindir}/pytest3
 mv %{buildroot}%{_bindir}/py.test %{buildroot}%{_bindir}/py.test%{python3_version}
 ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
-popd
 
 %check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
-
-%files
-%defattr(-,root,root,-)
-%license LICENSE
-%{_bindir}/pytest2
-%{_bindir}/pytest%{python2_version}
-%{_bindir}/py.test2
-%{_bindir}/py.test%{python2_version}
-%{python2_sitelib}/*
+%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files -n python3-pytest
 %defattr(-,root,root,-)
+%license LICENSE
 %{_bindir}/pytest3
 %{_bindir}/pytest%{python3_version}
 %{_bindir}/py.test3
@@ -103,6 +57,11 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.8.2-8
+- Add license to python3 package
+- Remove python2 package
+- Lint spec
+
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.8.2-7
 - Disable auto dependency generator.
 

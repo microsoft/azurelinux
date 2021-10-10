@@ -1,86 +1,51 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 Summary:        Docutils -- Python Documentation Utilities.
 Name:           python-docutils
 Version:        0.14
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain, PSF-2.0, BSD, GPLv3
-Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Url:            https://pypi.python.org/pypi/docutils
+Group:          Development/Languages/Python
+URL:            https://pypi.python.org/pypi/docutils
 Source0:        https://files.pythonhosted.org/packages/source/d/docutils/docutils-%{version}.tar.gz
 
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  python-xml
-
-Requires:       python2
-Requires:       python2-libs
-
-BuildArch:      noarch
-
 %description
-Docutils is a modular system for processing documentation into useful formats, such as HTML, XML, and LaTeX. For input Docutils supports reStructuredText, an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax.
+Docutils -- Python Documentation Utilities.
 
 %package -n     python3-docutils
-Summary:        python-docutils
+Summary:        Docutils -- Python Documentation Utilities.
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  python3-xml
-
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-docutils
-Python 3 version.
+Docutils is a modular system for processing documentation into useful formats, such as HTML, XML, and LaTeX.
+For input Docutils supports reStructuredText, an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax.
 
 %prep
-%setup -q -n docutils-%{version}
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -n docutils-%{version}
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-for BINARY in rstpep2html rst2xml rst2xetex rst2s5 rst2pseudoxml rst2odt_prepstyles rst2odt rst2man rst2latex rst2html5 rst2html rst2html4
-do
-  mv %{buildroot}/%{_bindir}/$(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)3.py
-  ln -sfv $(echo $BINARY)3.py %{buildroot}/%{_bindir}/$(echo $BINARY)3
-done
-popd
-
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 for BINARY in rstpep2html rst2xml rst2xetex rst2s5 rst2pseudoxml rst2odt_prepstyles rst2odt rst2man rst2latex rst2html5 rst2html rst2html4
 do
   ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)
+  ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)3
+  ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)3.py
 done
-
 
 %check
 PATH=%{buildroot}%{_bindir}:${PATH} \
- PYTHONPATH=%{buildroot}%{python2_sitelib}
-python2 test/alltests.py
-pushd ../p3dir
-PATH=%{buildroot}%{_bindir}:${PATH} \
-  PYTHONPATH=%{buildroot}%{python3_sitelib}
-python3 test3/alltests.py
-popd
+  PYTHONPATH=%{buildroot}%{python3_sitelib} \
+ python3 test3/alltests.py
 
-%files
+%files -n python3-docutils
 %defattr(-,root,root)
 %license licenses
-%{python2_sitelib}/*
+%{python3_sitelib}/*
 %{_bindir}/rstpep2html
 %{_bindir}/rst2xml
 %{_bindir}/rst2xetex
@@ -105,10 +70,6 @@ popd
 %{_bindir}/rst2html5.py
 %{_bindir}/rst2html.py
 %{_bindir}/rst2html4.py
-
-%files -n python3-docutils
-%defattr(-,root,root)
-%{python3_sitelib}/*
 %{_bindir}/rstpep2html3
 %{_bindir}/rst2xml3
 %{_bindir}/rst2xetex3
@@ -135,6 +96,11 @@ popd
 %{_bindir}/rst2html43.py
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.14-5
+- Add license to python3 package
+- Remove python2 package, move old binary names to python3 package
+- Lint spec
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.14-4
 - Follow the Fedora convention of providing a suffix-less binary name
 - License verified

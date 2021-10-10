@@ -1,10 +1,7 @@
-%define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-%{!?__python3: %global __python3 /usr/bin/python3}
-
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
 Version:        31.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +27,7 @@ BuildRequires: pkg-config
 BuildRequires: pkgconfig(libnl-3.0)
 BuildRequires: pkgconfig(libnl-route-3.0)
 BuildRequires: python3-Cython
-BuildRequires: python-docutils
+BuildRequires: python3-docutils
 BuildRequires: python3-devel
 BuildRequires: python3-xml
 BuildRequires: systemd
@@ -616,6 +613,9 @@ fi
 %{_docdir}/%{name}/tests/*.py
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 31.0-3
+- Use python3-docutils dependency instead of python-docutils
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 31.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT). License verified.
 

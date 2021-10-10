@@ -1,64 +1,20 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%bcond_without python2
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        1.7.9
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://www.sphinx-doc.org
-#Source0:      https://github.com/sphinx-doc/sphinx/archive/v%{version}.tar.gz
+#Source0:       https://github.com/sphinx-doc/sphinx/archive/v%{version}.tar.gz
 Source0:        Sphinx-%{version}.tar.gz
-BuildArch:      noarch
-%if %{with python2}
-BuildRequires:  babel
-BuildRequires:  pytest
-BuildRequires:  python-docutils
-BuildRequires:  python-imagesize
-BuildRequires:  python-jinja2
-BuildRequires:  python-pip
-BuildRequires:  python-pygments
-BuildRequires:  python-requests
-BuildRequires:  python-setuptools
-BuildRequires:  python-six
-BuildRequires:  python-snowballstemmer
-BuildRequires:  python-sphinx-theme-alabaster
-BuildRequires:  python-typing
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-Requires:       babel
-Requires:       python-docutils
-Requires:       python-imagesize
-Requires:       python-jinja2
-Requires:       python-pygments
-Requires:       python-requests
-Requires:       python-setuptools
-Requires:       python-six
-Requires:       python-snowballstemmer
-Requires:       python-sphinx-theme-alabaster
-Requires:       python-typing
-Requires:       python2
-Requires:       python2-libs
-Requires:       python2-sphinxcontrib-websupport
-Provides:       %{name}-locale = %{version}-%{release}
-Provides:       %{name}-doc = %{version}-%{release}
-%endif
 
 %description
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
+Python documentation generator
 
 %package -n    python3-sphinx
 Summary:        Python documentation generator
-BuildRequires:  python3
 BuildRequires:  python3-babel
 BuildRequires:  python3-devel
 BuildRequires:  python3-docutils
@@ -85,34 +41,25 @@ Requires:       python3-six
 Requires:       python3-snowballstemmer
 Requires:       python3-sphinx-theme-alabaster
 Requires:       python3-sphinxcontrib-websupport
+Provides:       python3-sphinx-locale = %{version}-%{release}
+Provides:       python3-sphinx-doc = %{version}-%{release}
 
 %description -n python3-sphinx
-
-Python 3 version.
+Sphinx is a tool that makes it easy to create intelligent and
+beautiful documentation for Python projects (or other documents
+consisting of multiple reStructuredText sources), written by Georg
+Brandl. It was originally created to translate the new Python
+documentation, but has now been cleaned up in the hope that it will be
+useful to many other projects.
 
 %prep
-%setup -q -n Sphinx-%{version}
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -n Sphinx-%{version}
 
 %build
-%if %{with python2}
-python2 setup.py build
-%endif
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-%if %{with python2}
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-mv %{buildroot}/%{_bindir}/sphinx-quickstart %{buildroot}/%{_bindir}/sphinx-quickstart-2
-mv %{buildroot}/%{_bindir}/sphinx-build %{buildroot}/%{_bindir}/sphinx-build-2
-mv %{buildroot}/%{_bindir}/sphinx-autogen %{buildroot}/%{_bindir}/sphinx-autogen-2
-mv %{buildroot}/%{_bindir}/sphinx-apidoc %{buildroot}/%{_bindir}/sphinx-apidoc-2
-%endif
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart-3
 ln -sfv sphinx-quickstart %{buildroot}%{_bindir}/sphinx-quickstart3
 ln -sfv sphinx-build %{buildroot}%{_bindir}/sphinx-build-3
@@ -122,26 +69,13 @@ ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen-3
 ln -sfv sphinx-autogen %{buildroot}%{_bindir}/sphinx-autogen3
 ln -sfv sphinx-apidoc %{buildroot}%{_bindir}/sphinx-apidoc-3
 ln -sfv sphinx-apidoc %{buildroot}%{_bindir}/sphinx-apidoc3
-popd
-
 
 %check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
-
-%clean
-%if %{with python2}
-%files
-%defattr(-,root,root)
-%license LICENSE
-%{_bindir}/sphinx-quickstart-2
-%{_bindir}/sphinx-build-2
-%{_bindir}/sphinx-autogen-2
-%{_bindir}/sphinx-apidoc-2
-%{python2_sitelib}/*
-%endif
+%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files -n python3-sphinx
 %defattr(-,root,root)
+%license LICENSE
 %{_bindir}/sphinx-quickstart3
 %{_bindir}/sphinx-build3
 %{_bindir}/sphinx-autogen3
@@ -158,6 +92,11 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.9-16
+- Add license to python3 package
+- Remove python2 package
+- Lint spec
+
 * Tue Aug 10 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.7.9-15
 - Merged change from 1.0 branch and bumped dash number 
 -   Mon Jun 14 2021 Tom Fay <tomfay@microsoft.com> - 1.7.9-12

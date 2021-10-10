@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        1.25.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,73 +9,42 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/shazow/urllib3/archive/%{version}/urllib3-%{version}.tar.gz
 Patch0:         CVE-2021-33503.patch
-BuildRequires:  curl-devel
-#%if %{with_check}
-BuildRequires:  openssl-devel
-BuildRequires:  python-pip
-BuildRequires:  python-psutil
-BuildRequires:  python-setuptools
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-libs
-BuildRequires:  python3-pip
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-#%endif
-Requires:       python2
-Requires:       python2-libs
-BuildArch:      noarch
 
 %description
-urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Python ecosystem already uses urllib3 and you should too.
+A powerful, sanity-friendly HTTP client for Python.
 
 %package -n     python3-urllib3
 Summary:        python-urllib3
+BuildRequires:  curl-devel
+BuildRequires:  openssl-devel
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-urllib3
-Python 3 version.
+urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Python ecosystem already uses urllib3 and you should too.
 
 %prep
-%setup -q -n urllib3-%{version}
-%patch0 -p1
+%autosetup -p 1 -n urllib3-%{version}
 # Dummyserver tests are failing when running in chroot. So disabling the tests.
 rm -rf test/with_dummyserver/
 
 %build
-python2 setup.py build
-python3 setup.py build
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 
 %check
-
 nofiles=$(ulimit -n)
 ulimit -n 5000
-pip2 install -r dev-requirements.txt
 pip3 install -r dev-requirements.txt
 
 ignoretestslist='not test_select_interrupt_exception and not test_selector_error and not timeout and not test_request_host_header_ignores_fqdn_dot and not test_dotted_fqdn'
-case $(uname -m) in
-ppc*)
-ignoretestslist="$ignoretestslist and not test_select_timing and not test_select_multiple_interrupts_with_event and not test_interrupt_wait_for_read_with_event and not test_select_interrupt_with_event";;
-esac
-
-PYTHONPATH="%{buildroot}%{$python2_sitelib}" pytest \
-                --ignore=test/appengine \
-                --ignore=test/with_dummyserver/test_proxy_poolmanager.py \
-                --ignore=test/with_dummyserver/test_poolmanager.py \
-                --ignore=test/contrib/test_pyopenssl.py \
-                --ignore=test/contrib/test_securetransport.py \
-                -k "${ignoretestslist}" \
-                urllib3 test
-
 
 PYTHONPATH="%{buildroot}%{$python3_sitelib}" pytest \
                 --ignore=test/appengine \
@@ -89,18 +56,19 @@ PYTHONPATH="%{buildroot}%{$python3_sitelib}" pytest \
                 urllib3 test
 ulimit -n $nofiles
 
-
-%files
-%defattr(-,root,root)
-%license LICENSE.txt
-%{python2_sitelib}/*
-
 %files -n python3-urllib3
 %defattr(-,root,root,-)
+%license LICENSE.txt
 %{python3_sitelib}/*
 
 %changelog
-* Tue Jul 09 2021 Henry Li <lihl@microsoft.com> - 1.25.9-2
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.25.9-3
+- Add license to python3 package
+- Move python3-pip to check-time build requirements
+- Remove python2 package
+- Lint spec
+
+* Fri Jul 09 2021 Henry Li <lihl@microsoft.com> - 1.25.9-2
 - Resolve CVE-2021-33503
 
 * Wed Dec 23 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.25.9-1

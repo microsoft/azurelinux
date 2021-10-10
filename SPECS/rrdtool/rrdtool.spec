@@ -4,7 +4,7 @@
 Summary:        Round Robin Database Tool to store and display time-series data
 Name:           rrdtool
 Version:        1.7.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2 OR GPLv2 WITH FLOSS License Exception
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,6 @@ It contains the libraries and header files to create applications
 %{?python_provide:%python_provide python3-rrdtool}
 %{?__python3:Requires: python3}
 Summary:        Python RRDtool bindings
-BuildRequires:  python-setuptools
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       %{name} = %{version}-%{release}
@@ -162,6 +161,9 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-7
+- Remove unused python-setuptools dependency
+
 * Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.7.0-6
 - Build with lua, python3, and ruby support.
 
