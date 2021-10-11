@@ -183,8 +183,8 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
-// SpecArchitectureMatchesBuild verifies the "ExclusiveArch" tag against the machine architecture.
-func SpecArchitectureMatchesBuild(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool, err error) {
+// SpecArchitectureMatchesCurrent verifies the "ExclusiveArch" tag against the machine architecture.
+func SpecArchitectureMatchesCurrent(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool, err error) {
 	const (
 		queryExclusiveArchitectures = `%{ARCH}\n[%{EXCLUSIVEARCH} ]\n`
 		noExclusiveArchitecture     = ""

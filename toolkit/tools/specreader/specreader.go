@@ -154,7 +154,7 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 	}()
 
 	// Sanity check that rpmspec can read the spec file so we don't flood the log with warning if it cant.
-	matches, err := rpm.SpecArchitectureMatchesBuild(specfile, sourcedir, defines)
+	matches, err := rpm.SpecArchitectureMatchesCurrent(specfile, sourcedir, defines)
 	if err != nil {
 		logger.Log.Warnf("Failed to query exclusive architectures in spec (%s) with error: %s", specfile, err)
 		return

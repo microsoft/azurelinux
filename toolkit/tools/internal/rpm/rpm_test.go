@@ -4,24 +4,30 @@
 package rpm
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"microsoft.com/pkggen/internal/logger"
 )
 
 const sourceDir = "testdata"
 
 var defines = map[string]string{
-	"_sourcedir": "SPECS/dpdk",
 	"dist":       ".cmX",
 	"with_check": "1",
+}
+
+func TestMain(m *testing.M) {
+	logger.InitStderrLog()
+	os.Exit(m.Run())
 }
 
 func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(sourceDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesBuild(specFilePath, sourceDir, defines)
+	matches, err := SpecArchitectureMatchesCurrent(specFilePath, sourceDir, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -29,7 +35,7 @@ func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
 func TestShouldFailForUnsupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(sourceDir, "unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesBuild(specFilePath, sourceDir, defines)
+	matches, err := SpecArchitectureMatchesCurrent(specFilePath, sourceDir, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
