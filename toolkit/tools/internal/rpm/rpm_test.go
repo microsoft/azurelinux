@@ -12,7 +12,7 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 )
 
-const sourceDir = "testdata"
+const specsDir = "testdata"
 
 var defines = map[string]string{
 	"dist":       ".cmX",
@@ -25,17 +25,17 @@ func TestMain(m *testing.M) {
 }
 
 func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
-	specFilePath := filepath.Join(sourceDir, "supported_unsupported_architectures.spec")
+	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesCurrent(specFilePath, sourceDir, defines)
+	matches, err := SpecArchitectureMatchesCurrent(specFilePath, specsDir, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
 
 func TestShouldFailForUnsupportedArchitectures(t *testing.T) {
-	specFilePath := filepath.Join(sourceDir, "unsupported_architectures.spec")
+	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesCurrent(specFilePath, sourceDir, defines)
+	matches, err := SpecArchitectureMatchesCurrent(specFilePath, specsDir, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
