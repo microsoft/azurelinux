@@ -140,7 +140,7 @@ python3 setup.py build
 popd
 
 # Set provided python versions
-sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/2.7,3.6/' %{SOURCE3}
+sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 %check
 make check
