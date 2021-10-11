@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/Pygments
 Source0:        https://files.pythonhosted.org/packages/source/P/Pygments/Pygments-%{version}.tar.gz
 Patch0:         CVE-2021-27291.patch
 Patch1:         CVE-2021-20270.patch
+BuildArch:      noarch
 
 %description
 Pygments is a syntax highlighting package written in Python.

@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/certifi
 #Source0:       https://github.com/certifi/python-certifi/archive/%{version}.tar.gz
 Source0:        https://github.com/certifi/python-certifi/archive/certifi-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python package for providing Mozilla's CA Bundle

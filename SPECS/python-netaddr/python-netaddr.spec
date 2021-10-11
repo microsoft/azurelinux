@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/netaddr/netaddr
 Source0:        https://github.com/netaddr/netaddr/archive/netaddr-%{version}.tar.gz
 Patch0:         0001-fixed-broken-tests-in-issue-149-python-3-regression.patch
+BuildArch:      noarch
 
 %description
 A network address manipulation library for Python

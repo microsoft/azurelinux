@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/boto/botocore
 #Source0:       https://github.com/boto/botocore/archive/%{version}.tar.gz
 Source0:        botocore-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 A low-level interface to a growing number of Amazon Web Services. The botocore package is the foundation for the AWS CLI as well as boto3.

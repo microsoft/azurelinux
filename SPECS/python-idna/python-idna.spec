@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/kjd/idna
 #Source0:       https://github.com/kjd/idna/archive/v%{version}.tar.gz
 Source0:        idna-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Support for the Internationalised Domain Names in Applications (IDNA) protocol as specified in RFC 5891.

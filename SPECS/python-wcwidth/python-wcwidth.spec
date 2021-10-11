@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/wcwidth
 Source0:        https://files.pythonhosted.org/packages/source/w/wcwidth/wcwidth-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 This Library is mainly for those implementing a Terminal Emulator, or programs that carefully produce output to be interpreted by one.

@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-pam/
 Source0:        https://pypi.python.org/packages/source/p/python-pam/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python PAM module using ctypes
@@ -29,7 +30,7 @@ Python PAM module using ctypes
 %py3_build
 
 %install
-py3_install
+%py3_install
 
 %check
 %python3 setup.py test

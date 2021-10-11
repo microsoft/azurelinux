@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/packaging
 # This link seems very sensitive to the precise package version.
 # Source0:      https://files.pythonhosted.org/packages/77/32/439f47be99809c12ef2da8b60a2c47987786d2c6c9205549dd6ef95df8bd/packaging-%{version}.tar.gz
 Source0:        packaging-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Core utilities for Python packages

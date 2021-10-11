@@ -11,6 +11,7 @@ URL:            http://python-requests.org
 Source0:        requests-%{version}.tar.gz
 Patch0:         test_requests_typeerror_testfix.patch
 Patch1:         test_requests_support_pytest_4.patch
+BuildArch:      noarch
 
 %description
 Awesome Python HTTP Library That's Actually Usable

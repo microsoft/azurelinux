@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/Werkzeug
 Source0:        https://files.pythonhosted.org/packages/9f/08/a3bb1c045ec602dc680906fc0261c267bed6b3bb4609430aff92c3888ec8/Werkzeug-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 The Swiss Army knife of Python web development

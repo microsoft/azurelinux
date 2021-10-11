@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://docs.openstack.org/developer/pbr/
 Source0:        https://pypi.io/packages/source/p/pbr/pbr-%{version}.tar.gz
 Patch0:         disable-test-wsgi.patch
+BuildArch:      noarch
 
 %description
 A library for managing setuptools packaging needs in a consistent manner.

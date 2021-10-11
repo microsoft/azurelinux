@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/oauthlib/oauthlib
 Source0:        https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 OAuthLib is a generic utility which implements the logic of OAuth without assuming a specific HTTP request object or web framework
@@ -19,7 +20,6 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-oauthlib
 OAuthLib is a generic utility which implements the logic of OAuth without assuming a specific HTTP request object or web framework
@@ -31,7 +31,7 @@ OAuthLib is a generic utility which implements the logic of OAuth without assumi
 %py3_build
 
 %install
-%py3_build
+%py3_install
 
 %check
 easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)

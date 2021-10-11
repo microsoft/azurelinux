@@ -12,6 +12,7 @@ URL:            https://github.com/habnabit/vcversioner
 #Source0:       https://pypi.python.org/packages/source/v/vcversioner/vcversioner-2.16.0.0.tar.gz
 Source0:        vcversioner-%{version}.tar.gz
 Source1:        https://raw.githubusercontent.com/habnabit/vcversioner/%{version}/%{LICENSE_PATH}
+BuildArch:      noarch
 
 %description
 Elevator pitch: you can write a setup.py with no version information specified, and vcversioner will find a recent, properly-formatted VCS tag and extract a version from it.

@@ -36,7 +36,7 @@ find . -iname "*.py" | xargs -I file sed -i '1s/python/python3/g' file
 %py3_build
 
 %install
-%py_install
+%py3_install
 
 %check
 pushd tools

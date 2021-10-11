@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/defusedxml
 Source0:        https://files.pythonhosted.org/packages/a4/5f/f8aa58ca0cf01cbcee728abc9d88bfeb74e95e6cb4334cfd5bed5673ea77/defusedxml-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 XML bomb protection for Python stdlib modules

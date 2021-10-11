@@ -9,6 +9,7 @@ Group:          System Environment/Security
 URL:            https://pypi.python.org/pypi/ecdsa
 Source0:        https://pypi.python.org/packages/source/e/ecdsa/ecdsa-%{version}.tar.gz
 Patch0:         disable_nist192_test.patch
+BuildArch:      noarch
 
 %description
 ECDSA cryptographic signature library (pure python)

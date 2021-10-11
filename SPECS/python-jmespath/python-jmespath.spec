@@ -35,9 +35,7 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 
 %install
 %{py3_install "--single-version-externally-managed"}
-for item in %{buildroot}/%{_bindir}/*; do
-    ln -s ${item} "${item}-%{python3_version}" ;
-done
+ln -sfv jp.py %{buildroot}%{_bindir}/jp.py-%{python3_version}
 
 %check
 easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)

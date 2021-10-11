@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/jsonpointer/
 Source0:        https://pypi.python.org/packages/source/j/jsonpointer/jsonpointer-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Library to apply JSON Patches according to RFC 6902.

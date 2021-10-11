@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/pyparsing/pyparsing
 #Source0:       https://github.com/pyparsing/pyparsing/archive/pyparsing_%{version}.tar.gz
 Source0:        pyparsing-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 pyparsing is a module that can be used to easily and directly configure syntax

@@ -10,6 +10,7 @@ Group:          Development/Languages/Python
 URL:            https://code.google.com/archive/p/ntplib/
 Source0:        https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
+BuildArch:      noarch
 
 %description
 This module offers a simple interface to query NTP servers from Python.

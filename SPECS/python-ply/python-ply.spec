@@ -16,7 +16,7 @@ Source1:        LICENSE.PTR
 Python Lex & Yacc
 
 %package -n     python3-ply
-Summary:        python3 version
+Summary:        Python Lex & Yacc
 BuildRequires:  python3-devel
 Requires:       python3
 %if %{with_check}
@@ -38,10 +38,7 @@ It is compatible with both Python 2 and Python 3.
 %autosetup -n ply-%{version}
 
 %build
-CFLAGS="%{optflags}" python2 setup.py build
-pushd ../p3dir
-CFLAGS="%{optflags}" python3 setup.py build
-popd
+%py3_build
 cp %{SOURCE1} ./
 
 %install

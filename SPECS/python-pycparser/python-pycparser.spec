@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pycparser
 Source0:        https://pypi.python.org/packages/source/p/pycparser/pycparser-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python C parser

@@ -9,6 +9,7 @@ Distribution:   Mariner
 URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
 #Source0:       https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz
 Source0:        %{pkgname}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python API to integrate Sphinx into a web application

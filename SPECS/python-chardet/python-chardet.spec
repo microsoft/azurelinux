@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/chardet/chardet
 #Source0:       https://github.com/chardet/chardet/archive/%{version}.tar.gz
 Source0:        chardet-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 chardet is a universal character encoding detector in Python.

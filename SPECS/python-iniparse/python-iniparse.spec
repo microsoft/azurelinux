@@ -9,6 +9,7 @@ Group:          Development/Libraries
 URL:            https://github.com/candlepin/python-iniparse
 Source0:        https://files.pythonhosted.org/packages/0f/d1/3090ef9be165da5ddb1b0cf2b332d3282588bdd2dd0967e94b547f10055f/iniparse-%{version}.tar.gz
 Patch0:         0001-Add-python-3-compatibility.patch
+BuildArch:      noarch
 
 %description
 Python Module for Accessing and Modifying Configuration Data in INI files
@@ -30,7 +31,7 @@ lines are preserved when data is updated), and is more convenient to
 use.
 
 %prep
-%autosetup -n iniparse-%{version}
+%autosetup -p 1 -n iniparse-%{version}
 
 %build
 %py3_build

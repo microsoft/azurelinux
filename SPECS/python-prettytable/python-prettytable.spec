@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://code.google.com/p/prettytable/
 #Source0:       https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/prettytable/prettytable-%{version}.tar.gz
 Source0:        prettytable-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Library for displaying tabular data in a visually appealing ASCII format

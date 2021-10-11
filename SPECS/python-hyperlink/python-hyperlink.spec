@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/python-hyper/hyperlink
 #Source0:       https://github.com/python-hyper/hyperlink/archive/v%{version}.tar.gz
 Source0:        https://github.com/python-hyper/hyperlink/archive/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Hyperlink provides a pure-Python implementation of immutable URLs. Based on RFC 3986 and 3987, the Hyperlink URL makes working with both URIs and IRIs easy.

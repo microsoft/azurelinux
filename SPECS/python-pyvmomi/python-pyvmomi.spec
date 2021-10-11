@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/pyvmomi
 #Source0:       https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         python-pyvmomi-make-check-fix.patch
+BuildArch:      noarch
 
 %description
 pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage ESX, ESXi, and vCenter.

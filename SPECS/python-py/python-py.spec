@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/pytest-dev/py
 # Must use PyPI sources. Building from GitHub's release sources fails with a message to use PyPI.
 Source0:        https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python development support library

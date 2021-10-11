@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/untitaker/python-atomicwrites
 #Source0:       https://github.com/untitaker/python-atomicwrites/archive/%{version}.tar.gz
 Source0:        atomicwrites-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python Atomic file writes

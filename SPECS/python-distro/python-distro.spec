@@ -10,6 +10,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/distro
 #Source0:       https://github.com/nir0s/distro/archive/v%{version}.tar.gz
 Source0:        distro-%{version}-github.tar.gz
+BuildArch:      noarch
 
 %description
 Distro provides information about the OS distribution it runs on, such as a reliable machine-readable ID, or version information.
@@ -47,7 +48,7 @@ tox
 %doc CHANGELOG.md CONTRIBUTORS.md README.md
 %license LICENSE
 %{python3_sitelib}/*
-%{bindir}/*
+%{_bindir}/*
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-5

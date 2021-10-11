@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/boto/boto3
 #Source0:       https://github.com/boto/boto3/archive/%{version}.tar.gz
 Source0:        https://github.com/boto/boto3/archive/boto3-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 The AWS SDK for Python

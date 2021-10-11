@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pyopenssl
 Source0:        https://files.pythonhosted.org/packages/source/p/pyOpenSSL/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 High-level wrapper around a subset of the OpenSSL library.

@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-dateutil
 Source0:        https://files.pythonhosted.org/packages/a0/b0/a4e3241d2dee665fea11baec21389aec6886655cd4db7647ddf96c3fad15/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 The dateutil module provides powerful extensions to the datetime module available in the Python standard library.

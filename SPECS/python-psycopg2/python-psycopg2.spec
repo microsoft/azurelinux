@@ -1,3 +1,4 @@
+%define _python_bytecompile_errors_terminate_build 0
 Summary:        Python-PostgreSQL Database Adapter
 Name:           python-psycopg2
 Version:        2.7.5
@@ -22,7 +23,7 @@ Requires:       postgresql >= 10.5
 %description -n python3-psycopg2
 Psycopg is the most popular PostgreSQL database adapter for the Python programming language.
 Its main features are the complete implementation of the Python DB API 2.0 specification and
-the thread safety (several threads can share the same connection). 
+the thread safety (several threads can share the same connection).
 
 %package doc
 Summary:  Documentation for psycopg python PostgreSQL database adapter
