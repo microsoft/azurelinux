@@ -297,7 +297,7 @@ func specsToPackWorker(allSpecFiles chan string, specResults chan *specState, di
 		}
 
 		// Sanity check that SRPMS is meant to be built for the machine architecture
-		matches, err := rpm.SpecArchitectureMatchesCurrent(specFile, sourceDir, defines)
+		matches, err := rpm.SpecExclusiveArchIsCompatible(specFile, sourceDir, defines)
 		if err != nil {
 			logger.Log.Panicf("Failed to query SPEC (%s), skipping", specFile)
 			specResults <- result

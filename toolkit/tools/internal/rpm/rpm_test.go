@@ -27,7 +27,15 @@ func TestMain(m *testing.M) {
 func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesCurrent(specFilePath, specsDir, defines)
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.True(t, matches)
+}
+
+func TestShouldSucceedForNoExclusiveArch(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
+
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -35,7 +43,7 @@ func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
 func TestShouldFailForUnsupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
-	matches, err := SpecArchitectureMatchesCurrent(specFilePath, specsDir, defines)
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
