@@ -1,7 +1,7 @@
 Summary:        RPM Perl dependencies generators
 Name:           perl-generators
 Version:        1.11
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,9 +16,9 @@ Requires:       perl >= 4:5.22.0-351
 BuildArch:      noarch
 # Per Perl packaging guidelines, build-requiring perl-generators should
 # deliver Perl macros
-%if %{defined perl_bootstrap}
 # Supply run-time dependencies manually when perl-generators is not available
-Requires:       perl(Fedora::VSP)
+%if %{with_check}
+BuildRequires:  perl(Fedora::VSP)
 %endif
 
 %description
@@ -53,6 +53,9 @@ make test
 %{_rpmconfigdir}/fileattrs/perl*.attr
 
 %changelog
+* Mon Oct 11 2021 Bala <balakumaran.kannan@microsoft.com> - 1.11-7
+- Add perl(Fedora::VSP) as dependency for tests
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.11-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified
