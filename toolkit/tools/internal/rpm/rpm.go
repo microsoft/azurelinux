@@ -313,16 +313,12 @@ func ResolveCompetingPackages(rpmPaths ...string) (resolvedRPMs []string, err er
 
 // SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
 func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
-	const (
-		queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH}]\n"
-		// "(none)" means no ExclusiveArch tag has been set.
-		noExclusiveArch = "(none)"
-	)
+	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
 
 	const (
-		MachineArchField   = iota
-		ExclusiveArchField = iota
-		MinimumFieldsCount = iota
+		machineArchField   = iota
+		exclusiveArchField = iota
+		minimumFieldsCount = iota
 	)
 
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
@@ -333,12 +329,12 @@ func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[strin
 	}
 
 	// If the list does not return enough lines then there is no exclusive arch set
-	if len(exclusiveArchList) < MinimumFieldsCount {
+	if len(exclusiveArchList) < minimumFieldsCount {
 		isCompatible = true
 		return
 	}
 
-	if strings.Contains(exclusiveArchList[ExclusiveArchField], exclusiveArchList[MachineArchField]) {
+	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
 		isCompatible = true
 		return
 	}
