@@ -183,38 +183,33 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
-// SpecArchitectureMatchesCurrent verifies the "ExclusiveArch" tag against the machine architecture.
-func SpecArchitectureMatchesCurrent(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool, err error) {
-	const (
-		queryExclusiveArchitectures = `%{ARCH}\n[%{EXCLUSIVEARCH} ]\n`
-		noExclusiveArchitecture     = ""
-	)
+// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
+func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
 
 	const (
-		machineArchitectureField    = iota
-		exclusiveArchitecturesField = iota
-		expectedFieldsCount         = iota
+		machineArchField   = iota
+		exclusiveArchField = iota
+		minimumFieldsCount = iota
 	)
 
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArchitectures, defines, QueryHeaderArgument)
+	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, QueryHeaderArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
 		return
 	}
 
-	if len(exclusiveArchList) != expectedFieldsCount {
-		err = fmt.Errorf("the query for spec architecture returned %d lines! Expected %d", len(exclusiveArchList), expectedFieldsCount)
+	// If the list does not return enough lines then there is no exclusive arch set
+	if len(exclusiveArchList) < minimumFieldsCount {
+		isCompatible = true
 		return
 	}
 
-	machineArchitecture := exclusiveArchList[machineArchitectureField]
-	exclusiveArchitectures := exclusiveArchList[exclusiveArchitecturesField]
-	if exclusiveArchitectures == noExclusiveArchitecture ||
-		strings.Contains(exclusiveArchitectures, machineArchitecture) {
-		shouldBeBuilt = true
+	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
+		isCompatible = true
+		return
 	}
-
 	return
 }
 
