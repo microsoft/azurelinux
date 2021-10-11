@@ -144,7 +144,8 @@ make %{?_smp_mflags} check
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %changelog
-* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
+* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
+- License verified.
 - Update pam.d configuration for SELinux logins.
 - Change loginuid to be set only on logins.
 
