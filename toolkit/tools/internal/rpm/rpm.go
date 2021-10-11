@@ -183,6 +183,41 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
+// SpecArchitectureMatchesBuild verifies the "ExclusiveArch" tag against the machine architecture.
+func SpecArchitectureMatchesBuild(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool, err error) {
+	const (
+		queryExclusiveArchitectures = `%{ARCH}\n[%{EXCLUSIVEARCH} ]\n`
+		noExclusiveArchitecture     = ""
+	)
+
+	const (
+		machineArchitectureField    = iota
+		exclusiveArchitecturesField = iota
+		expectedFieldsCount         = iota
+	)
+
+	// Sanity check that this SPEC is meant to be built for the current machine architecture
+	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArchitectures, defines, QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
+
+	if len(exclusiveArchList) != expectedFieldsCount {
+		err = fmt.Errorf("the query for spec architecture returned %d lines! Expected %d", len(exclusiveArchList), expectedFieldsCount)
+		return
+	}
+
+	machineArchitecture := exclusiveArchList[machineArchitectureField]
+	exclusiveArchitectures := exclusiveArchList[exclusiveArchitecturesField]
+	if exclusiveArchitectures == noExclusiveArchitecture ||
+		strings.Contains(exclusiveArchitectures, machineArchitecture) {
+		shouldBeBuilt = true
+	}
+
+	return
+}
+
 // BuildRPMFromSRPM builds an RPM from the given SRPM file
 func BuildRPMFromSRPM(srpmFile string, defines map[string]string, extraArgs ...string) (err error) {
 	const (
