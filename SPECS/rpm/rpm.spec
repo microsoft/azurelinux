@@ -156,9 +156,10 @@ find %{buildroot} -name 'perl*' -delete
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
 install -vm755 %{SOURCE1} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
+install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
 install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
-install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
+
 
 pushd python
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}

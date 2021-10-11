@@ -1174,10 +1174,11 @@ rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
 RPM_WITH_VERSION=rpm-4.17.0
+RPM_FOLDER="$RPM_WITH_VERSION"-release
 echo $RPM_WITH_VERSION
 tar xf "$RPM_WITH_VERSION"-release.tar.gz
-mv rpm-"$RPM_WITH_VERSION"-release "$RPM_WITH_VERSION"-release
-pushd "$RPM_WITH_VERSION"-release
+mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
+pushd "$RPM_FOLDER"
 
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am
@@ -1195,7 +1196,7 @@ make install
 install -d /var/lib/rpm
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf "$RPM_WITH_VERSION"
+rm -rf "$RPM_FOLDER"
 touch /logs/status_rpm_complete
 
 # Cleanup

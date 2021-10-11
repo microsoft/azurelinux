@@ -9,6 +9,7 @@
 # /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version}
 echo "gen-ld-script.sh name($1) version($2)"
 
+sed -En '/^VERSION_ID=/ s/.+="?([^"]+)"?/\1/ p' /etc/os-release
 OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
 OS_VERSION=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
 
