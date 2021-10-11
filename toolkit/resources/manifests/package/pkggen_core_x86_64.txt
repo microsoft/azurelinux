@@ -176,6 +176,8 @@ libcap-ng-0.7.9-4.cm2.x86_64.rpm
 libdb-5.3.28-5.cm2.x86_64.rpm
 libdb-devel-5.3.28-5.cm2.x86_64.rpm
 libdb-docs-5.3.28-5.cm2.x86_64.rpm
+debugedit-5.0-1.cm2.x86_64.rpm
+debugedit-debuginfo-5.0-1.cm2.x86_64.rpm
 rpm-4.17.0-1.cm2.x86_64.rpm
 rpm-build-4.17.0-1.cm2.x86_64.rpm
 rpm-build-libs-4.17.0-1.cm2.x86_64.rpm

@@ -15,6 +15,7 @@ Source2:        brp-strip-unneeded
 Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
 BuildRequires:  openssl-devel
 BuildRequires:  file-devel
@@ -27,11 +28,13 @@ BuildRequires:  python3-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 Requires:       bash
+Requires:       debugedit
 Requires:       libarchive
 Requires:       libdb
 Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
+Requires:       rpm-build = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 
@@ -113,9 +116,9 @@ sed -i '/library_dirs/d' python/setup.py.in
 sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 
 ./autogen.sh --noconfigure
-#Enables new database format
+
 %configure \
-    CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
+    CPPFLAGS='-DLUA_COMPAT_APIINTCASTS' \
     --program-prefix= \
     --with-crypto=openssl \
     --enable-ndb \

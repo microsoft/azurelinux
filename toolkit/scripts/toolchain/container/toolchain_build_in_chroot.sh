@@ -1162,28 +1162,44 @@ popd
 rm -rf lua-5.3.5
 touch /logs/status_lua_complete
 
-echo rpm-4.14.2
-tar xjf rpm-4.14.2.tar.bz2
-pushd rpm-4.14.2
-patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+DEBUGEDIT_WITH_VERSION=debugedit-5.0
+echo $DEBUGEDIT_WITH_VERSION
+tar xf "$DEBUGEDIT_WITH_VERSION".tar.xz
+pushd "$DEBUGEDIT_WITH_VERSION"
+./configure --prefix=/usr
+make
+make install
+popd
+rm -rf "$DEBUGEDIT_WITH_VERSION"
+touch /logs/status_debugedit_complete
+
+RPM_WITH_VERSION=rpm-4.17.0
+echo $RPM_WITH_VERSION
+tar xf "$RPM_WITH_VERSION"-release.tar.gz
+mv rpm-"$RPM_WITH_VERSION"-release "$RPM_WITH_VERSION"-release
+pushd "$RPM_WITH_VERSION"-release
+
+# Do not build docs - pandoc dependency is not supplied in the toolchain.
+sed -iE '/SUBDIRS/ s/docs //' Makefile.am
+sed -iE '/Always build/,+16 d' Makefile.am
+
+./autogen.sh --noconfigure
 ./configure --prefix=/usr \
-    --enable-posixmutexes \
-    --without-selinux \
-    --with-vendor=mariner \
-    --without-python \
-    --with-lua \
-    --without-javaglue
+        --enable-ndb \
+        --without-selinux \
+        --with-crypto=openssl \
+        --with-vendor=mariner
+
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf rpm-4.14.2
+rm -rf "$RPM_WITH_VERSION"
 touch /logs/status_rpm_complete
 
 # Cleanup
 rm -rf /tmp/*
-unset BUILD_TARGET
 
 echo sanity check - raw toolchain - after build complete - gcc -v
 gcc -v

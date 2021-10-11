@@ -44,6 +44,8 @@ curl-7.76.0-5.cm2.x86_64.rpm
 curl-debuginfo-7.76.0-5.cm2.x86_64.rpm
 curl-devel-7.76.0-5.cm2.x86_64.rpm
 curl-libs-7.76.0-5.cm2.x86_64.rpm
+debugedit-5.0-1.cm2.x86_64.rpm
+debugedit-debuginfo-5.0-1.cm2.x86_64.rpm
 diffutils-3.6-4.cm2.x86_64.rpm
 diffutils-debuginfo-3.6-4.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm

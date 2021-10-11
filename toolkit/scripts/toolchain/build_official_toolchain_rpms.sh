@@ -488,6 +488,9 @@ build_rpm_in_chroot_no_install libselinux
 # util-linux and rpm require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
+# rpm requires debugedit
+build_rpm_in_chroot_no_install debugedit
+chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
 
 # rebuild pam with selinux support
