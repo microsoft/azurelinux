@@ -1,16 +1,4 @@
 # init
-*mangle
-:PREROUTING ACCEPT
-:INPUT ACCEPT
-:FORWARD ACCEPT
-:OUTPUT ACCEPT
-:POSTROUTING ACCEPT
-:SSHBRUTEFORCE - [0:0]
--A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
--A PREROUTING -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SSHBRUTEFORCE
--A SSHBRUTEFORCE -m limit --limit 1/sec -j LOG --log-prefix "Dropped SSH Packets: "
--A SSHBRUTEFORCE -j DROP
-COMMIT
 *filter
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]

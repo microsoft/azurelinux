@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            http://www.netfilter.org/projects/iptables
 Group:          System Environment/Security
@@ -96,6 +96,8 @@ rm -rf %{buildroot}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Oct 11 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.3-6
+-   Revert ssh brute force prevention added in commit #741
 *   Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-5
 -   Add dependency on iana-etc
 *   Thu Mar 11 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-4
