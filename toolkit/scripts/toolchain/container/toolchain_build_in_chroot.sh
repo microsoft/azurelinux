@@ -257,23 +257,23 @@ popd
 rm -rf binutils-2.37
 touch /logs/status_binutils_complete
 
-echo GMP-6.1.2
-tar xf gmp-6.1.2.tar.xz
-pushd gmp-6.1.2
+echo GMP-6.2.1
+tar xf gmp-6.2.1.tar.xz
+pushd gmp-6.2.1
 # Remove optimizations
 cp -v configfsf.guess config.guess
 cp -v configfsf.sub   config.sub
 ./configure --prefix=/usr    \
             --enable-cxx     \
             --disable-static \
-            --docdir=/usr/share/doc/gmp-6.1.2 \
+            --docdir=/usr/share/doc/gmp-6.2.1 \
             --disable-assembly
 make -j$(nproc)
 make html
 make install
 make install-html
 popd
-rm -rf gmp-6.1.2
+rm -rf gmp-6.2.1
 touch /logs/status_gmp_complete
 
 echo MPFR-4.1.0

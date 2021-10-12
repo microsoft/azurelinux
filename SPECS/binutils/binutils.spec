@@ -98,12 +98,10 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %files devel
 %{_includedir}/ansidecl.h
-#%%{_includedir}/bfd_stdint.h
 %{_includedir}/bfd.h
 %{_includedir}/bfdlink.h
 %{_includedir}/ctf-api.h
 %{_includedir}/ctf.h
-#%%{_includedir}/demangle.h
 %{_includedir}/diagnostics.h
 %{_includedir}/dis-asm.h
 %{_includedir}/libiberty.h
@@ -126,7 +124,7 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %changelog
 * Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-1
-- Update version to 2.37
+- Update to version 2.37
 
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
 - Adding 'libiberty' lib and header.
