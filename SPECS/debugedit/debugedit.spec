@@ -1,18 +1,18 @@
-Summary: Debugedit - obtain debug information from binaries.
-Name:    debugedit
-Version: 5.0
-Release: 1%{?dist}
-License: GPLv3+
-URL:     https://sourceware.org/debugedit/
-Vendor:  Microsoft Corporation
+Summary:      Debugedit - obtain debug information from binaries.
+Name:         debugedit
+Version:      5.0
+Release:      1%{?dist}
+License:      GPLv3+
+URL:          https://sourceware.org/debugedit/
+Vendor:       Microsoft Corporation
 Distribution: Mariner
-Source0: https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
+Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
 
 %description
 %{summary}
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure
@@ -32,4 +32,4 @@ make check
 
 %changelog
 * Fri Oct 08 2021 Mateusz Malisz <mamalisz@microsoft.com> 5.0-1
-- Initial CBL-Mariner creation.
+- Original version for CBL-Mariner
