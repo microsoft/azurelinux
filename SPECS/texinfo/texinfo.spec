@@ -20,8 +20,6 @@ and converting info pages.
 
 %prep
 %setup -q
-# Only needed for glibc 2.34 and later
-# sed -e 's/__attribute_nonnull__/__nonnull/' -i gnulib/lib/malloc/dynarray-skeleton.c
 
 %build
 %configure --disable-silent-rules

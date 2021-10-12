@@ -792,21 +792,15 @@ echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
 patch -Np1 -i ../coreutils-8.32-i18n-1.patch
-#sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
             --enable-no-install-program=kill,uptime
 make -j$(nproc)
 make install
-#mv -v /usr/bin/{cat,chgrp,chmod,chown,cp,date,dd,df,echo} /bin
-#mv -v /usr/bin/{false,ln,ls,mkdir,mknod,mv,pwd,rm} /bin
-# Might need to "sync" here to work around timing issue
-#mv -v /usr/bin/{rmdir,stty,sync,true,uname} /bin
 mv -v /usr/bin/chroot /usr/sbin
 mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
 sed -i s/\"1\"/\"8\"/1 /usr/share/man/man8/chroot.8
-#mv -v /usr/bin/{head,nice,sleep,touch} /bin
 popd
 rm -rf coreutils-8.32
 touch /logs/status_coreutils_complete
@@ -938,10 +932,6 @@ touch /logs/status_tar_complete
 echo Texinfo-6.8
 tar xf texinfo-6.8.tar.xz
 pushd texinfo-6.8
-# Fix for:
-# 2020-01-28T20:06:01.1088934Z Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.32), passed through in regex; marked by <-- HERE in m/^\s+@([[:alnum:]][[:alnum:]\-]*)({ <-- HERE })?\s*(\@(c|comment)((\@|\s+).*)?)?/ at /tools/share/texinfo/Texinfo/Parser.pm line 5485.
-#patch -p1 -i /tools/texinfo-perl-fix.patch
-#  --disable-perl-xs
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install

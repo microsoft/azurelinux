@@ -406,8 +406,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.37.2",
-          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.37.2.tar.xz"
+          "version": "2.37",
+          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz"
         }
       }
     },
