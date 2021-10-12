@@ -212,6 +212,7 @@ Patch1175:      CVE-2021-40490.nopatch
 # CVE-2021-38300 - MIPS not supported.
 Patch1176:      CVE-2021-38300.nopatch
 Patch1177:      CVE-2021-41073.nopatch
+Patch1178:      CVE-2021-3653.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -564,7 +565,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Oct 07 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.69.1-1
 - Update source to 5.10.69.1
-- Address CVE-2021-38300, CVE-2021-41073
+- Address CVE-2021-38300, CVE-2021-41073, CVE-2020-3653
 
 * Wed Sep 22 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.64.1-2
 - Enable CONFIG_NET_VRF
