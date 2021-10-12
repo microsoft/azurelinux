@@ -406,8 +406,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.36.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.36.1.tar.xz"
+          "version": "2.37.2",
+          "downloadUrl": "http://ftp.gnu.org/gnu/binutils/binutils-2.37.2.tar.xz"
         }
       }
     },
@@ -906,8 +906,8 @@
         "type": "other",
         "other": {
           "name": "coreutils",
-          "version": "8.30",
-          "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
+          "version": "8.32",
+          "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz"
         }
       }
     },
@@ -8843,8 +8843,8 @@
         "type": "other",
         "other": {
           "name": "texinfo",
-          "version": "6.5",
-          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.5.tar.xz"
+          "version": "6.8",
+          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz"
         }
       }
     },
