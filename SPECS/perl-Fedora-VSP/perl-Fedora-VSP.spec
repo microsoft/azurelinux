@@ -2,7 +2,7 @@
 Summary:        Perl version normalization for RPM
 Name:           perl-Fedora-VSP
 Version:        0.001
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,13 +11,8 @@ Source0:        %{url}Fedora-VSP-%{version}.tar.gz
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl
-BuildArch:      noarch
-# Break build cycle: perl-Fedora-VSP → perl-generators → perl-Fedora-VSP
-%if %{defined perl_bootstrap}
 Provides:       perl(Fedora::VSP) = %{version}
-%else
-BuildRequires:  perl-generators
-%endif
+BuildArch:      noarch
 
 %description
 This module provides functions for normalizing Perl version strings for
@@ -44,6 +39,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Oct 11 2021 Bala <balakumaran.kannan@microsoft.com> - 0.001-19
+- Remove dependency on perl-generators to avoid cyclic-dependency
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 0.001-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
