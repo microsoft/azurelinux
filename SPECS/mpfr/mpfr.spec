@@ -1,6 +1,6 @@
 Summary:	Functions for multiple precision math
 Name:		mpfr
-Version:	4.0.1
+Version:	4.1.0
 Release:        3%{?dist}
 License:	GPLv3+
 URL:		http://www.mpfr.org
@@ -8,7 +8,6 @@ Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.gz
-%define sha1 mpfr=655e3cf416a0cc9530d9cb3c38dc8839504f0e98
 Requires:	gmp
 %description
 The MPFR package contains functions for multiple precision math.
@@ -65,6 +64,8 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/COPYING
 
 %changelog
+* Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.0-1
+- Update to version 4.1.0
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.0.1-3
 - Added %%license line automatically
 

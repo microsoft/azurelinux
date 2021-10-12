@@ -1,14 +1,13 @@
 Summary:         Math libraries
 Name:            gmp
-Version:         6.1.2
-Release:         5%{?dist}
+Version:         6.2.1
+Release:         1%{?dist}
 License:         LGPLv3+
 URL:             http://www.gnu.org/software/gmp
 Group:           Applications/System
 Vendor:          Microsoft Corporation
 Distribution:    Mariner
 Source0:         http://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
-%define sha1     gmp=9dc6981197a7d92f339192eea974f5eca48fcffe
 
 %description
 The GMP package contains math libraries. These have useful functions
@@ -63,9 +62,10 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
-- Added %%license line automatically
-
+*   Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> 6.2.1-1
+-   Update to version 6.2.1
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
+-   Added %%license line automatically
 *   Fri Feb 14 2020 Andrew Phelps <anphel@microsoft.com> 6.1.2-4
 -   Use generic config to help prevent illegal instruction errors
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 6.1.2-3

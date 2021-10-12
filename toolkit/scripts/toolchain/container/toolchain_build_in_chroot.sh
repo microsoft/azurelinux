@@ -276,33 +276,33 @@ popd
 rm -rf gmp-6.1.2
 touch /logs/status_gmp_complete
 
-echo MPFR-4.0.1
-tar xf mpfr-4.0.1.tar.xz
-pushd mpfr-4.0.1
+echo MPFR-4.1.0
+tar xf mpfr-4.1.0.tar.xz
+pushd mpfr-4.1.0
 ./configure --prefix=/usr        \
             --disable-static     \
             --enable-thread-safe \
-            --docdir=/usr/share/doc/mpfr-4.0.1
+            --docdir=/usr/share/doc/mpfr-4.1.0
 make -j$(nproc)
 make html
 make install
 make install-html
 popd
-rm -rf mpfr-4.0.1
+rm -rf mpfr-4.1.0
 touch /logs/status_mpfr_complete
 
-echo MPC-1.1.0
-tar xf mpc-1.1.0.tar.gz
-pushd mpc-1.1.0
+echo MPC-1.2.1
+tar xf mpc-1.2.1.tar.gz
+pushd mpc-1.2.1
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/mpc-1.1.0
+            --docdir=/usr/share/doc/mpc-1.2.1
 make -j$(nproc)
 make html
 make install
 make install-html
 popd
-rm -rf mpc-1.1.0
+rm -rf mpc-1.2.1
 touch /logs/status_libmpc_complete
 
 echo GCC-9.1.0
@@ -967,12 +967,12 @@ popd
 rm -rf procps-ng-3.3.15
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.32.1
-tar xf util-linux-2.32.1.tar.xz
-pushd util-linux-2.32.1
+echo util-linux-2.37.2
+tar xf util-linux-2.37.2.tar.xz
+pushd util-linux-2.37.2
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-            --docdir=/usr/share/doc/util-linux-2.32.1 \
+            --docdir=/usr/share/doc/util-linux-2.37.2 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -987,7 +987,7 @@ mkdir -pv /var/lib/hwclock
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.32.1
+rm -rf util-linux-2.37.2
 touch /logs/status_util-linux_complete
 
 #
