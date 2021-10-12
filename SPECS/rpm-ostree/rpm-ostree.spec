@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2020.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,7 @@ BuildRequires:  dbus-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  gperf
 BuildRequires:  gpgme-devel
 BuildRequires:  gtk-doc
@@ -151,6 +151,10 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-2
+- Remove unused gobject-introspection-python requirement
+- Explicity specify python3-gobject-introspection requirement
+
 * Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-1
 - Upgrade version and rebase patches
 - Move all dbus files to reside under %%{_datadir}

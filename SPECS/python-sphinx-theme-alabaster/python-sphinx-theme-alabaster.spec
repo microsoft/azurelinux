@@ -32,7 +32,7 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 %py3_build
 
 %install
-%py3_build
+%py3_install
 
 %check
 %make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}

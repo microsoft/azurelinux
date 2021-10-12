@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://docs.pytest.org
 #Source0:       https://github.com/pytest-dev/pytest/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/5f/d2/7f77f406ac505abda02ab4afb50d06ebf304f6ea42fca34f8f37529106b2/pytest-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 pytest framework makes it easy to write small tests, yet scales to support complex functional testing for applications and libraries.

@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jmespath
 Source0:        https://pypi.python.org/packages/e5/21/795b7549397735e911b032f255cff5fb0de58f96da794274660bca4f58ef/jmespath-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 JMESPath (pronounced “james path”) allows you to declaratively specify how to extract elements from a JSON document.

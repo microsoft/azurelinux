@@ -1,7 +1,7 @@
 Summary:        Library providing serialization and deserialization support for the JSON format
 Name:           json-glib
 Version:        1.4.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/%{name}-%{version}.tar.xz
@@ -11,17 +11,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gobject-introspection-python
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  glib-devel
 BuildRequires:  libtool
 BuildRequires:  which
 BuildRequires:  meson
-BuildRequires:  python2
-BuildRequires:  python2-libs
+BuildRequires:  python3-devel
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  gtk-doc
 Requires:       glib
-Provides:       pkgconfig(json-glib-1.4)
 
 %description
 JSON-GLib is a library providing serialization and deserialization
@@ -91,6 +89,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/installed-tests/*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-7
+- Replace python2 with python3
+- Remove pkgconf provides
+
 *   Fri Dec 04 2020 Andrew Phelps <anphel@microsoft.com> 1.4.4-6
 -   Use meson test in check section.
 *   Mon Jun 01 2020 Henry Beberman <henry.beberman@microsoft.com> 1.4.4-5

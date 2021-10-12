@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonpatch
 #Source0:       https://github.com/stefankoegl/python-json-patch/archive/v%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/9a/7d/bcf203d81939420e1aaf7478a3efce1efb8ccb4d047a33cb85d7f96d775e/jsonpatch-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Library to apply JSON Patches according to RFC 6902.

@@ -46,6 +46,7 @@ LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
 %files -n python3-netaddr
 %defattr(-,root,root,-)
 %license LICENSE
+%{_bindir}/netaddr
 %{_bindir}/netaddr3
 %{python3_sitelib}/*
 

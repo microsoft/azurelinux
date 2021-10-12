@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/openstack/pylockfile
 Source0:        https://pypi.python.org/packages/source/l/lockfile/lockfile-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 File locking module

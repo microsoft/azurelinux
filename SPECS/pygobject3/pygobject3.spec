@@ -17,7 +17,7 @@ BuildRequires:  python3-cairo-devel
 BuildRequires:  glib-schemas
 BuildRequires:  python3-setuptools
 %if %{with_check}
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  python3-test
 BuildRequires:  dbus
 BuildRequires:  curl-devel

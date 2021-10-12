@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
 Source0:        https://files.pythonhosted.org/packages/eb/f3/67579bb486517c0d49547f9697e36582cd19dafb5df9e687ed8e22de57fa/Mako-1.0.7.tar.gz
+BuildArch:      noarch
 
 %description
 A super-fast templating language that borrows the best ideas from the existing templating languages. Mako is a template library written in Python. It provides a familiar, non-XML syntax which compiles into Python modules for maximum performance. Mako’s syntax and API borrows from the best ideas of many others, including Django templates, Cheetah, Myghty, and Genshi.
@@ -37,7 +38,7 @@ many others, including Django templates, Cheetah, Myghty, and Genshi.
 
 %install
 %py3_install
-ln -s %{buildroot}/%{_bindir}/mako-render %{buildroot}/%{_bindir}/mako-render3
+ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 %check
 %python3 setup.py test

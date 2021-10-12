@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pytz
 Source0:        https://files.pythonhosted.org/packages/source/p/pytz/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 pytz brings the Olson tz database into Python.

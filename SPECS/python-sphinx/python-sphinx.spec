@@ -9,6 +9,7 @@ Group:          Development/Tools
 URL:            https://www.sphinx-doc.org
 #Source0:       https://github.com/sphinx-doc/sphinx/archive/v%{version}.tar.gz
 Source0:        Sphinx-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Python documentation generator

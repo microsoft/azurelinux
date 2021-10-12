@@ -1,7 +1,7 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2021.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,9 +23,8 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  fuse-devel
 BuildRequires:  git
 BuildRequires:  glib-devel
-BuildRequires:  gobject-introspection
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  gpgme-devel
 BuildRequires:  gtk-doc
 BuildRequires:  icu-devel
@@ -157,6 +156,10 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-2
+- Remove unused gobject-introspection-python requirement
+- Explicity specify python3-gobject-introspection requirement
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-1
 - Upgrade to latest upstream and rebase patches
 

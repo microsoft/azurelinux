@@ -8,6 +8,7 @@ Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 This is a small but growing collection of ASN.1 data structures expressed in Python terms using pyasn1 data model.

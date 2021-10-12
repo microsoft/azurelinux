@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/docopt
 Source0:        https://files.pythonhosted.org/packages/source/d/docopt/docopt-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 docopt helps easily create most beautiful command-line interfaces.

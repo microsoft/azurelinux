@@ -11,6 +11,7 @@ URL:            https://www.dabeaz.com/ply/
 #Source0:       http://www.dabeaz.com/ply/ply-%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/e5/69/882ee5c9d017149285cab114ebeab373308ef0f874fcdac9beb90e0ac4da/ply-%{version}.tar.gz
 Source1:        LICENSE.PTR
+BuildArch:      noarch
 
 %description
 Python Lex & Yacc

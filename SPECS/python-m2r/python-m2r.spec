@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/m2r
 Source0:        https://github.com/miyakogi/m2r/archive/v%{version}/m2r-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 M2R converts a markdown file including reST markups to a valid reST format.

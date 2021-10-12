@@ -1,7 +1,7 @@
 Summary:        GIO-based library with Unix/Linux specific API
 Name:           libgsystem
 Version:        2015.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Group:          Development/Libraries
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/%{name}-%{version}.tar.xz
 License:        LGPLv2+
@@ -28,7 +28,7 @@ BuildRequires:  libffi-devel
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 Requires:   glib
 Requires:   libcap
 Requires:   libffi
@@ -87,6 +87,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gir-*/*.gir
 
 %changelog
+* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2015.2-6
+- Remove unused gobject-introspection-python requirement
+- Explicity specify python3-gobject-introspection requirement
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2015.2-5
 - Added %%license line automatically
 

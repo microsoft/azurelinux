@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 This library implements the well-behaved daemon specification of PEP 3143, “Standard daemon process library”.

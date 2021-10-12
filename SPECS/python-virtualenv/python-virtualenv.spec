@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/33/bc/fa0b5347139cd9564f0d44ebd2b147ac97c36b2403943dbee8a25fd74012/virtualenv-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 virtualenv is a tool to create isolated Python environment.
@@ -40,10 +41,11 @@ virtualenv is a tool to create isolated Python environment.
 %defattr(-,root,root,-)
 %license LICENSE.txt
 %{python3_sitelib}/*
+%{_bindir}/virtualenv
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
-- Add license to python3 package
+- Add license, virtualenv binary to python3 package
 - Remove python2 package
 - Lint spec
 

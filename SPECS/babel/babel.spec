@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://babel.pocoo.org
 Source0:        https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 Babel is an integrated collection of utilities that assist in internationalizing and localizing Python applications,
