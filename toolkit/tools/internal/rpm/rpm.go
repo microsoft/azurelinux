@@ -5,6 +5,7 @@ package rpm
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"microsoft.com/pkggen/internal/file"
@@ -48,6 +49,17 @@ const (
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
 	rpmBuildProgram = "rpmbuild"
+)
+
+var (
+	// Output from 'rpm' prints installed RPMs in a line with the following format:
+	//
+	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
+	//
+	// Example:
+	//
+	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
+	installedRPMLineRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
 )
 
 // SetMacroDir adds RPM_CONFIGDIR=$(newMacroDir) into the shell's environment for the duration of a program.
@@ -263,18 +275,50 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 	return
 }
 
-// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
-func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+// ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
+// end up being installed after resolving outdated, obsoleted, or conflicting packages.
+func ResolveCompetingPackages(rpmPaths ...string) (resolvedRPMs []string, err error) {
 	const (
-		queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH}]\n"
-		// "(none)" means no ExclusiveArch tag has been set.
-		noExclusiveArch = "(none)"
+		queryFormat       = ""
+		installedRPMIndex = 1
+		squashErrors      = true
 	)
 
+	args := []string{
+		"-Uvvh",
+		"--nodeps",
+		"--test",
+	}
+	args = append(args, rpmPaths...)
+
+	// Output of interest is printed to stderr.
+	_, stderr, err := shell.Execute(rpmProgram, args...)
+	if err != nil {
+		logger.Log.Warn(stderr)
+		return
+	}
+
+	splitStdout := strings.Split(stderr, "\n")
+	for _, line := range splitStdout {
+		matches := installedRPMLineRegex.FindStringSubmatch(line)
+		if len(matches) == 0 {
+			continue
+		}
+
+		resolvedRPMs = append(resolvedRPMs, matches[installedRPMIndex])
+	}
+
+	return
+}
+
+// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
+func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
+
 	const (
-		MachineArchField   = iota
-		ExclusiveArchField = iota
-		MinimumFieldsCount = iota
+		machineArchField   = iota
+		exclusiveArchField = iota
+		minimumFieldsCount = iota
 	)
 
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
@@ -285,12 +329,12 @@ func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[strin
 	}
 
 	// If the list does not return enough lines then there is no exclusive arch set
-	if len(exclusiveArchList) < MinimumFieldsCount {
+	if len(exclusiveArchList) < minimumFieldsCount {
 		isCompatible = true
 		return
 	}
 
-	if strings.Contains(exclusiveArchList[ExclusiveArchField], exclusiveArchList[MachineArchField]) {
+	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
 		isCompatible = true
 		return
 	}

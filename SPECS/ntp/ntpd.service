@@ -1,0 +1,14 @@
+[Unit]
+Description=Network Time Service
+After=syslog.target network.target
+Documentation=man:ntpd
+Conflicts=systemd-timesyncd.service
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/sysconfig/ntp
+ExecStart=/usr/bin/ntpd -g -u ntp:ntp
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

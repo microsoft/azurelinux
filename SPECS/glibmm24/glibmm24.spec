@@ -2,7 +2,7 @@ Summary:        C++ interface to the glib
 Name:           glibmm24
 %define BaseVersion 2.56
 Version:        %{BaseVersion}.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
@@ -43,6 +43,7 @@ These are the header files of glibmm.
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 #need read content from /etc/fstab, which couldn't be empty
@@ -60,14 +61,16 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 %files devel
 %defattr(-,root,root)
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/glibmm-2.4/include/*
 %{_libdir}/giomm-2.4/include/*
 %{_includedir}/*
 %{_datadir}/*
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.56.0-8
+- Remove libtool archive files from final packaging
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.56.0-7
 - Added %%license line automatically
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-6

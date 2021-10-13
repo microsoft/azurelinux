@@ -1,7 +1,7 @@
 Summary:        A garbage collector for C and C++
 Name:           gc
 Version:        8.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 # Source1 is licensed under GPLv2+. Other licenses refer to Source0.
 License:        GPLv2+ and GPLv3+ and MIT
 Url:            https://www.hboehm.info/gc/
@@ -37,6 +37,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -50,7 +51,6 @@ make %{?_smp_mflags} check
 %license README.QUICK libatomic_ops/COPYING
 %{_libdir}/*.so.*
 %{_docdir}/gc/*
-%{_libdir}/*.la
 %{_mandir}/man3/*
 
 %files devel
@@ -61,6 +61,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.0-4
+- Remove libtool archive files from final packaging
+
 *   Wed May 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.0.0-3
 -   Adding the "%%license" macro.
 -   Removing "sha1" macros.

@@ -1,7 +1,7 @@
 Summary:        NUMA support for Linux
 Name:           numactl
 Version:        2.0.13
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,7 @@ libnuma shared library ("NUMA API") to set NUMA policy in applications.
 %package -n libnuma-devel
 Summary:        Development libraries and header files for libnuma
 License:        GPLv2
-Requires:       %{name} = %{version}-%{release}
+Requires:       libnuma = %{version}-%{release}
 Provides:       %{name}-devel = %{version}-%{release}
 
 %description -n libnuma-devel
@@ -32,21 +32,24 @@ The package contains libraries and header files for
 developing applications that use libnuma.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 autoreconf -fiv
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
+
+# Rename conflicting docs (also packaged in man-pages)
+mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-move_pages.2
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post -n libnuma  -p /sbin/ldconfig
-%postun -n libnuma -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -56,18 +59,29 @@ make %{?_smp_mflags} check
 
 %files -n libnuma
 %defattr(-,root,root)
+%license LICENSE.LGPL2.1
 %{_libdir}/*.so.*
 
 %files -n libnuma-devel
 %defattr(-,root,root)
+%license LICENSE.GPL2
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/numa.pc
 %{_mandir}/man2/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-6
+- Rename conflicting move_pages.2 man pages
+- Require libnuma from libnuma-devel
+- Fix license packaging
+- Lint spec
+- License verified
+
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-5
+- Remove libtool archive files from final packaging
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.13-4
 - Provide numactl-libs and numactl-devel.
 

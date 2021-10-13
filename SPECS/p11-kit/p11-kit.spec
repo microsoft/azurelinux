@@ -2,7 +2,7 @@
 Summary:        Library for loading and sharing PKCS#11 modules
 Name:           p11-kit
 Version:        0.23.22
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,7 @@ BuildRequires:  gcc
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
 BuildRequires:  libtasn1-devel >= 2.3
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 
 %description
 p11-kit provides a way to load and enumerate PKCS#11 modules, as well
@@ -134,6 +134,10 @@ fi
 %{_userunitdir}/p11-kit-server.socket
 
 %changelog
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23.22-3
+- Replacing 'systemd-devel' BR with 'systemd-bootstrap-devel'
+  to remove cyclic dependencies in other packages.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.23.22-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

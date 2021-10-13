@@ -44,8 +44,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/alsa-lib-/d' $TmpPkgGen
     sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
-    sed -i '/ca-certificates-microsoft/d' $TmpPkgGen
-    sed -i '/cyrus-sasl/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
     sed -i '/lua-static/d' $TmpPkgGen
@@ -62,7 +60,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
-    sed -i '/finger-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
@@ -79,7 +76,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/libsemanage-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsepol-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
@@ -192,6 +188,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
     sed -i '/perl-Text-Template/d' $TmpPkgGen
+    sed -i '/python3-audit/d' $TmpPkgGen
     sed -i '/python3-curses/d' $TmpPkgGen
     sed -i '/python3-gpg/d' $TmpPkgGen
     sed -i '/python3-libxml2/d' $TmpPkgGen
@@ -201,9 +198,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-rpm/d' $TmpPkgGen
     sed -i '/python3-test/d' $TmpPkgGen
     sed -i '/python3-tools/d' $TmpPkgGen
-    sed -i '/shadow/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
-    sed -i '/tcp_wrappers-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
@@ -304,9 +299,7 @@ generate_pkggen_core () {
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
-        grep "^systemd-rpm-macros-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
-        grep "^cyrus-sasl-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
     } > "$1"
 }

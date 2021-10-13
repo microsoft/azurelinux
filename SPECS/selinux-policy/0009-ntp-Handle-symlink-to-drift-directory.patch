@@ -1,0 +1,27 @@
+From ee2c186fe4ffa047d2d4113406209dad58f323ed Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 1 Sep 2021 19:44:10 +0000
+Subject: ntp: Handle symlink to drift directory.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/services/ntp.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/services/ntp.te b/policy/modules/services/ntp.te
+index 4d7e00243..2f4ce73d9 100644
+--- a/policy/modules/services/ntp.te
++++ b/policy/modules/services/ntp.te
+@@ -63,6 +63,7 @@ allow ntpd_t self:unix_dgram_socket sendto;
+
+ allow ntpd_t ntp_conf_t:file read_file_perms;
+
++allow ntpd_t ntp_drift_t:lnk_file read_lnk_file_perms;
+ manage_dirs_pattern(ntpd_t, ntp_drift_t, ntp_drift_t)
+ manage_files_pattern(ntpd_t, ntp_drift_t, ntp_drift_t)
+ files_etc_filetrans(ntpd_t, ntp_drift_t, file)
+--
+2.17.1
+

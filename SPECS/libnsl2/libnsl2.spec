@@ -1,7 +1,7 @@
 Summary:        Libraries for the public client interface for NIS(YP) and NIS+.
 Name:           libnsl2
 Version:        1.2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Source0:        https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz
 License:        BSD and GPLv2+
 Group:          System Environment/Libraries
@@ -37,6 +37,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post
 /sbin/ldconfig
@@ -53,9 +54,11 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/rpcsvc/*
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.a
-%{_libdir}/*.la
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.0-5
+- Remove libtool archive files from final packaging
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.0-4
 - Added %%license line automatically
 

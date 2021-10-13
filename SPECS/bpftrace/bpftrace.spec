@@ -1,13 +1,14 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.11.4
+Version:        0.13.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/iovisor/bpftrace
-Source0:        https://github.com/iovisor/%{name}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
@@ -17,17 +18,25 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
-BuildRequires:  llvm-devel >= 8.0.1-5
+BuildRequires:  llvm-devel >= 12.0.1-1
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  zlib-devel
+
+%if %{with_check}
+BuildRequires:  gmock
+BuildRequires:  gmock-devel
+BuildRequires:  gtest
+BuildRequires:  gtest-devel
+%endif
+
 Requires:       bcc
 Requires:       binutils
 Requires:       clang
 Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
-Requires:       llvm >= 8.0.1-5
+Requires:       llvm >= 12.0.1-1
 
 %description
 bpftrace is a high-level tracing language for Linux enhanced Berkeley Packet Filter (eBPF)
@@ -36,8 +45,22 @@ bpftrace is a high-level tracing language for Linux enhanced Berkeley Packet Fil
 %autosetup -p1
 
 %build
-mkdir build; cd build; cmake -DCMAKE_BUILD_TYPE=Release -DOFFLINE_BUILDS=true ..
+
+mkdir build
+cd build
+
+%cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+%if !%{with_check}
+    -DBUILD_TESTING=0 \
+%endif
+    ..
+
 make bpftrace
+
+%check
+cd build
+make test
 
 %install
 mkdir -p %{buildroot}%{_bindir}/
@@ -53,6 +76,11 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.13.0-1
+- Update to 0.13.0.
+- Fixed source URL.
+- Enabled tests.
+
 * Wed Feb 03 2021 Henry Beberman <henry.beberman@microsoft.com> - 0.11.4-1
 - Add bpftrace spec.
 - License verified

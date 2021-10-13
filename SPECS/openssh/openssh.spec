@@ -1,21 +1,47 @@
+%global openssh_ver 8.8p1
+%global openssh_rel 1%{?dist}
+
+%global pam_ssh_agent_ver 0.10.3
+%global pam_ssh_agent_rel 10%{?dist}
+
 %define systemd_units_rel 20191026
+
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
-Version:        8.5p1
-Release:        3%{?dist}
+Version:        %{openssh_ver}
+Release:        %{openssh_rel}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssh.com/
-Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{version}.tar.gz
+Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{openssh_ver}.tar.gz
 Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/blfs-systemd-units-%{systemd_units_rel}.tar.xz
 Source2:        sshd.service
 Source3:        sshd-keygen.service
+Source4:        https://prdownloads.sourceforge.net/pamsshagentauth/pam_ssh_agent_auth/pam_ssh_agent_auth-%{pam_ssh_agent_ver}.tar.bz2
+Source5:        pam_ssh_agent-rmheaders
 Patch0:         blfs_systemd_fixes.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
+
+# --- pam_ssh-agent ---
+# make it build reusing the openssh sources
+Patch300: pam_ssh_agent_auth-0.9.3-build.patch
+# check return value of seteuid()
+# https://sourceforge.net/p/pamsshagentauth/bugs/23/
+Patch301: pam_ssh_agent_auth-0.10.3-seteuid.patch
+# explicitly make pam callbacks visible
+Patch302: pam_ssh_agent_auth-0.9.2-visibility.patch
+# update to current version of agent structure
+Patch305: pam_ssh_agent_auth-0.9.3-agent_structure.patch
+# remove prefixes to be able to build against current openssh library
+Patch306: pam_ssh_agent_auth-0.10.2-compat.patch
+# Fix NULL dereference from getpwuid() return value
+# https://sourceforge.net/p/pamsshagentauth/bugs/22/
+Patch307: pam_ssh_agent_auth-0.10.2-dereference.patch
+
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -27,8 +53,8 @@ BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
 BuildRequires:  libselinux-devel
-Requires:       openssh-clients = %{version}-%{release}
-Requires:       openssh-server = %{version}-%{release}
+Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
+Requires:       openssh-server = %{openssh_ver}-%{openssh_rel}
 
 %description
 The OpenSSH package contains ssh clients and the sshd daemon. This is
@@ -43,10 +69,24 @@ Requires:       openssl
 %description clients
 This provides the ssh client utilities.
 
+%package -n pam_ssh_agent_auth
+Summary: PAM module for authentication with ssh-agent
+Version: %{pam_ssh_agent_ver}
+Release: %{pam_ssh_agent_rel}.%{openssh_rel}
+License: BSD
+
+%description -n pam_ssh_agent_auth
+This package contains a PAM module which can be used to authenticate
+users using ssh keys stored in a ssh-agent. Through the use of the
+forwarding of ssh-agent connection it also allows to authenticate with
+remote ssh-agent instance.
+
+The module is most useful for su and sudo service stacks.
+
 %package server
 Summary:        openssh server applications
 Requires:       ncurses-term
-Requires:       openssh-clients = %{version}-%{release}
+Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
 Requires:       pam
 Requires:       shadow-utils
 Requires(post): /bin/chown
@@ -57,22 +97,49 @@ Requires(pre):  %{_sbindir}/useradd
 This provides the ssh server daemons, utilities, configuration and service files.
 
 %prep
-%setup -q
+%setup -q -a 4
 tar xf %{SOURCE1} --no-same-owner
 %patch0
 
+pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
+%patch300 -p2 -b .psaa-build
+%patch301 -p2 -b .psaa-seteuid
+%patch302 -p2 -b .psaa-visibility
+%patch306 -p2 -b .psaa-compat
+%patch305 -p2 -b .psaa-agent
+%patch307 -p2 -b .psaa-deref
+# Remove duplicate headers and library files
+rm -f $(cat %{SOURCE5})
+autoreconf
+popd
+
 %build
+# The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
+export CFLAGS="$CFLAGS -fvisibility=hidden -fpic"
+SAVE_LDFLAGS="$LDFLAGS"
+export LDFLAGS="$LDFLAGS -pie -z relro -z now"
 %configure \
     --sysconfdir=%{_sysconfdir}/ssh \
     --datadir=%{_datadir}/sshd \
     --with-md5-passwords \
     --with-privsep-path=%{_sharedstatedir}/sshd \
     --with-pam \
+    --with-pie=no \
     --with-selinux \
     --with-maintype=man \
+    --without-hardening `# The hardening flags are configured by system` \
     --enable-strip=no \
     --with-kerberos5=%{_prefix}
 %make_build
+
+pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
+export LDFLAGS="$SAVE_LDFLAGS"
+%configure  --with-selinux \
+            --libexecdir=/%{_libdir}/security \
+            --with-mantype=man \
+            --without-openssl-header-check # The check is broken
+%make_build
+popd
 
 %install
 %make_install
@@ -95,6 +162,10 @@ install -m755 contrib/ssh-copy-id %{buildroot}/%{_bindir}/
 install -m644 contrib/ssh-copy-id.1 %{buildroot}/%{_mandir}/man1/
 
 %{_fixperms} %{buildroot}/*
+
+pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
+%make_install
+popd
 
 %check
 if ! getent passwd sshd >/dev/null; then
@@ -141,6 +212,11 @@ rm -rf %{buildroot}/*
 %files
 %license LICENCE
 
+%files -n pam_ssh_agent_auth
+%license pam_ssh_agent_auth-%{pam_ssh_agent_ver}/OPENSSH_LICENSE
+%attr(0755,root,root) %{_libdir}/security/pam_ssh_agent_auth.so
+%attr(0644,root,root) %{_mandir}/man8/pam_ssh_agent_auth.8*
+
 %files server
 %defattr(-,root,root)
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config
@@ -185,6 +261,12 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Wed Oct 6 2021 Rachel Menge <rachelmenge@microsoft.com> 8.8p1-1
+- Update to 8.8p1 to patch CVE-2021-41617
+
+* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-4
+- Adding the 'pam_ssh_agent_auth' subpackage using Fedora 32 spec (license: MIT) as guidance.
+
 * Wed Mar 24 2021 Daniel Burgener <daburgen@microsoft.com> 8.5p1-3
 - Add SELinux support
 

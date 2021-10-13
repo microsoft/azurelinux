@@ -1,16 +1,13 @@
 Summary:        Git for operating system binaries
 Name:           ostree
-Version:        2019.2
-Release:        11%{?dist}
+Version:        2021.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://ostree.readthedocs.io/en/latest
-# Manually created Source tar which is equal to
-# Source0 + .git as it requires git hooks at build time
-#Source0:       https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz
-Source0:        %{name}-%{version}-withsubmodules.tar.gz
+Source0:        https://github.com/ostreedev/ostree/releases/download/v2021.4/lib%{name}-%{version}.tar.xz
 Source1:        91-ostree.preset
 Patch0:         dualboot-support.patch
 Patch1:         0001-ostree-Copying-photon-config-to-boot-directory.patch
@@ -86,11 +83,7 @@ Requires:       grub2-efi
 GRUB2 integration for OSTree
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p 1 -n lib%{name}-%{version}
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -164,6 +157,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-1
+- Upgrade to latest upstream and rebase patches
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2019.2-11
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

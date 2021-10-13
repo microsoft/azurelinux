@@ -136,7 +136,7 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 		for j, partition := range disk.Partitions {
 			for _, artifact := range partition.Artifacts {
 				// Currently only process 1 system config
-				inputName, isFile := partitionArtifactInput(i, j, retrievePartitionSettings(&config.SystemConfigs[defaultSystemConfig], partition.ID))
+				inputName, isFile := partitionArtifactInput(i, j, &artifact, retrievePartitionSettings(&config.SystemConfigs[defaultSystemConfig], partition.ID))
 				convertRequests <- &convertRequest{
 					inputPath:   filepath.Join(inDir, inputName),
 					isInputFile: isFile,
@@ -316,11 +316,11 @@ func diskArtifactInput(diskIndex int, disk configuration.Disk) (input string, is
 	return
 }
 
-func partitionArtifactInput(diskIndex, partitionIndex int, partitionSetting *configuration.PartitionSetting) (input string, isFile bool) {
+func partitionArtifactInput(diskIndex, partitionIndex int, diskPartArtifact *configuration.Artifact, partitionSetting *configuration.PartitionSetting) (input string, isFile bool) {
 	// Currently all file artifacts have a raw file for input
-	if partitionSetting.OverlayBaseImage != "" {
+	if diskPartArtifact.Type == "diff" && partitionSetting.OverlayBaseImage != "" {
 		input = fmt.Sprintf("disk%d.partition%d.diff", diskIndex, partitionIndex)
-	} else if partitionSetting.RdiffBaseImage != "" {
+	} else if diskPartArtifact.Type == "rdiff" && partitionSetting.RdiffBaseImage != "" {
 		input = fmt.Sprintf("disk%d.partition%d.rdiff", diskIndex, partitionIndex)
 	} else {
 		input = fmt.Sprintf("disk%d.partition%d.raw", diskIndex, partitionIndex)

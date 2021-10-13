@@ -3,10 +3,10 @@
         {
             "Name": "CBL-Mariner Full",
             "PackageLists": [
-                "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/azurevm-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

@@ -102,6 +102,38 @@ A sample PartitionSettings entry, designating an EFI and a root partitions:
 ],
 ```
 
+A PartitionSetting may set a `MountIdentifier` to control how a partition is identified in the `fstab` file. The supported options are `uuid`, `partuuid`, and `partlabel`. If the `MountIdentifier` is omitted `partuuid` will be selected by default.
+
+`partlabel` may not be used with `mbr` disks, and requires the `Name` key in the corresponding `Partition` be populated. An example with the rootfs mounted via `PARTLABEL=my_rootfs`, but the boot mount using the default `PARTUUID=<PARTUUID>`:
+``` json
+"Partitions": [
+    
+    ...
+    
+    {
+        "ID": "rootfs",
+        "Name": "my_rootfs",
+        "Start": 9,
+        "End": 0,
+        "FsType": "ext4"
+    }
+]
+```
+``` json
+"PartitionSettings": [
+    {
+        "ID": "boot",
+        "MountPoint": "/boot/efi",
+        "MountOptions" : "umask=0077"
+    },
+    {
+        "ID": "rootfs",
+        "MountPoint": "/",
+        "MountIdentifier": "partlabel"
+    }
+],
+```
+
 It is possible to use `PartitionSettings` to configure diff disk image creation. Two types of diffs are possible.
 `rdiff` and `overlay` diff.
 

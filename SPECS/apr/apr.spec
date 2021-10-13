@@ -1,7 +1,7 @@
 Summary:        The Apache Portable Runtime
 Name:           apr
 Version:        1.6.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache License 2.0
 URL:            https://apr.apache.org/
 Group:          System Environment/Libraries
@@ -37,6 +37,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check
@@ -48,7 +49,6 @@ make %{?_smp_mflags} check
 %license LICENSE
 %{_libdir}/*
 %exclude %{_libdir}/debug
-%exclude %{_libdir}/*.la
 %exclude %{_libdir}/*.a
 %exclude %{_libdir}/*.so
 %exclude %{_libdir}/pkgconfig
@@ -57,12 +57,13 @@ make %{?_smp_mflags} check
 %files  devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_libdir}/*.la
 %{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.5-5
+- Remove libtool archive files from final packaging
 *   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 1.6.5-4
 -   Fix check tests.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.6.5-3

@@ -19,7 +19,7 @@
 Summary:        Bazel workspaces for libraries packaged in CBL-Mariner
 Name:           bazel-workspaces
 Version:        20200113
-Release:        1.7%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,9 @@ cp LICENSE README.md ..
 %{_datadir}/%{name}
 
 %changelog
+* Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200113-2
+- Switching to using a single digit for the 'Release' tag.
+
 * Mon Jun 21 2021 Henry Li <lihl@microsoft.com> - 20200113-1.7
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified

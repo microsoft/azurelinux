@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,12 +11,15 @@ URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-12749.patch
 BuildRequires:  expat-devel
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
 BuildRequires:  libselinux-devel
 Requires:       expat
-Requires:       systemd
 Requires:       xz
+# Using the weak dependency 'Recommends' to break a circular dependency during
+# from-scratch builds, where systemd's functionality is not required for 'dbus'.
+# In real-life situations systemd will always be present and thus installed.
+Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
 
 %description
@@ -44,6 +47,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 install -vdm755 %{buildroot}%{_libdir}
 #ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libdbus-1.so) %{buildroot}%{_libdir}/libdbus-1.so
 #rm -f %{buildroot}%{_sharedstatedir}/dbus/machine-id
@@ -75,11 +79,16 @@ make %{?_smp_mflags} check
 %dir %{_libdir}/dbus-1.0
 %{_libdir}/dbus-1.0/include/
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/*.la
 %{_libdir}/*.a
 %{_libdir}/*.so
 
 %changelog
+* Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13.6-9
+- Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
+
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-8
+- Remove libtool archive files from final packaging
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-7
 - Merge the following releases from 1.0 to dev branch
 - thcrain@microsoft.com, 1.13.6-4: Patch CVE-2019-12749

@@ -164,8 +164,8 @@ func TestShouldFailToParsingMultipleSameMounts_SystemConfig(t *testing.T) {
 
 	badPartitionSettingsConfig := validSystemConfig
 	badPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
-		{MountPoint: "/"},
-		{MountPoint: "/"},
+		{MountPoint: "/", MountIdentifier: GetDefaultMountIdentifier()},
+		{MountPoint: "/", MountIdentifier: GetDefaultMountIdentifier()},
 	}
 
 	err := badPartitionSettingsConfig.IsValid()
@@ -182,8 +182,8 @@ func TestShouldSucceedParsingMultipleSameEmptyMounts_SystemConfig(t *testing.T) 
 
 	emptyPartitionSettingsConfig := validSystemConfig
 	emptyPartitionSettingsConfig.PartitionSettings = []PartitionSetting{
-		{MountPoint: ""},
-		{MountPoint: ""},
+		{MountPoint: "", MountIdentifier: GetDefaultMountIdentifier()},
+		{MountPoint: "", MountIdentifier: GetDefaultMountIdentifier()},
 	}
 
 	err := emptyPartitionSettingsConfig.IsValid()

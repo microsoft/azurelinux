@@ -1,13 +1,10 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 %global libdnf_major_version 0
-%global libdnf_minor_version 43
+%global libdnf_minor_version 63
 %global libdnf_micro_version 1
 
 Name:           libdnf
 Version:        %{libdnf_major_version}.%{libdnf_minor_version}.%{libdnf_micro_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -15,22 +12,21 @@ Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Patch0:         CVE-2021-3445.patch
 
-BuildRequires:  cmake
-BuildRequires:  gcc
-BuildRequires:  glib-devel
-BuildRequires:  libsolv-devel
-BuildRequires:  librepo-devel
 BuildRequires:  check
+BuildRequires:  cmake
+BuildRequires:  cppunit-devel
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  glib-devel
+BuildRequires:  gpgme-devel
+BuildRequires:  json-c-devel
+BuildRequires:  libmodulemd-devel
+BuildRequires:  librepo-devel
+BuildRequires:  libsolv-devel >= 0.7.19
+BuildRequires:  python3-sphinx
 BuildRequires:  rpm-devel
 BuildRequires:  sqlite-devel
-BuildRequires:  json-c-devel
-BuildRequires:  cppunit-devel
-BuildRequires:  libmodulemd-devel
-BuildRequires:  gettext
-BuildRequires:  gpgme-devel
-BuildRequires:  python-sphinx
 
 Requires:       libmodulemd
 Requires:       libsolv
@@ -47,16 +43,6 @@ Requires:       libsolv-devel%{?_isa}
 %description devel
 %{summary}
 
-%package -n python2-%{name}
-Summary:        Python 2 bindings for the libdnf library.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-BuildRequires:  python2-devel
-BuildRequires:  python-sphinx
-BuildRequires:  swig
-
-%description -n python2-%{name}
-Python 2 bindings for the libdnf library.
-
 %package -n python3-%{name}
 Summary:        Python 3 bindings for the libdnf library.
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -66,15 +52,6 @@ BuildRequires:  swig
 
 %description -n python3-%{name}
 %{summary}
-
-%package -n python2-hawkey
-Summary:        Python 2 bindings for the hawkey library
-BuildRequires:  python2-devel
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       python2-%{name} = %{version}-%{release}
-
-%description -n python2-hawkey
-Python 2 bindings for the hawkey library.
 
 %package -n python3-hawkey
 Summary:        Python 3 bindings for the hawkey library
@@ -87,74 +64,47 @@ Python 3 bindings for the hawkey library.
 
 %prep
 %autosetup -p1
+mkdir build-py3
 
 %build
 # Allows cmake to find libsolv.
 find %{_prefix} -name "FindLibSolv.cmake" -exec cp {} cmake/modules ';'
 
-mkdir build-py2
-pushd build-py2
-  %cmake \
-    -DPYTHON_DESIRED:FILEPATH="2" \
-    -DWITH_GIR=0 \
-    -DWITH_MAN=OFF \
-    -DWITH_HTML=OFF \
-    -DWITH_ZCHUNK=OFF \
-    -DWITH_GTKDOC=OFF \
-    -DDISABLE_VALGRIND=1 \
-    -DENABLE_RHSM_SUPPORT=OFF \
-    -DLIBDNF_MAJOR_VERSION=%{libdnf_major_version} \
-    -DLIBDNF_MINOR_VERSION=%{libdnf_minor_version} \
-    -DLIBDNF_MICRO_VERSION=%{libdnf_micro_version} \
-    ..
-  %make_build
-popd
-
-mkdir build-py3
 pushd build-py3
-  %cmake \
-    -DPYTHON_DESIRED:FILEPATH="3" \
-    -DWITH_GIR=0 \
-    -DWITH_MAN=OFF \
-    -DWITH_HTML=OFF \
-    -DWITH_ZCHUNK=OFF \
-    -DWITH_GTKDOC=OFF \
-    -DDISABLE_VALGRIND=1 \
-    -DENABLE_RHSM_SUPPORT=OFF \
-    -DLIBDNF_MAJOR_VERSION=%{libdnf_major_version} \
-    -DLIBDNF_MINOR_VERSION=%{libdnf_minor_version} \
-    -DLIBDNF_MICRO_VERSION=%{libdnf_micro_version} \
-    ..
-  %make_build
-popd
-
-%check
-pushd build-py2
-  make ARGS="-V" test
-popd
-
-pushd build-py3
-  make ARGS="-V" test
+%cmake \
+  -DPYTHON_DESIRED:FILEPATH="3" \
+  -DWITH_GIR=0 \
+  -DWITH_MAN=OFF \
+  -DWITH_HTML=OFF \
+  -DWITH_ZCHUNK=OFF \
+  -DWITH_GTKDOC=OFF \
+  -DDISABLE_VALGRIND=1 \
+  -DENABLE_RHSM_SUPPORT=OFF \
+  -DLIBDNF_MAJOR_VERSION=%{libdnf_major_version} \
+  -DLIBDNF_MINOR_VERSION=%{libdnf_minor_version} \
+  -DLIBDNF_MICRO_VERSION=%{libdnf_micro_version} \
+  ..
+%make_build
 popd
 
 %install
-pushd build-py2
-  %make_install
-popd
-
 pushd build-py3
   %make_install
 popd
 
 %find_lang %{name}
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%check
+pushd build-py3
+  make ARGS="-V" test
+popd
+
+%ldconfig_scriptlets
 
 %files -f %{name}.lang
 %license COPYING
 %doc README.md AUTHORS
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.2*
 %dir %{_libdir}/libdnf/
 %dir %{_libdir}/libdnf/plugins/
 %{_libdir}/libdnf/plugins/README
@@ -164,29 +114,27 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
 
-%files -n python2-%{name}
-%{python2_sitelib}/%{name}/
-
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}/
-
-%files -n python2-hawkey
-%{python2_sitelib}/hawkey/
 
 %files -n python3-hawkey
 %{python3_sitelib}/hawkey/
 
 %changelog
-* Tue Jul 06 2021 Henry Li <lihl@microsoft.com> 0.43.1-2
+* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.63.1-1
+- Upgrade to latest upstream version
+- Lint spec
+
+* Tue Jul 06 2021 Henry Li <lihl@microsoft.com> - 0.43.1-2
 - Patch CVE-2021-3445
 
-* Mon Aug 17 2020 Emre Girgin <mrgirgin@microsoft.com> 0.43.1-1
+* Mon Aug 17 2020 Emre Girgin <mrgirgin@microsoft.com> - 0.43.1-1
 - Updating to version 0.43.1.
 
-* Mon May 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.39.1-1
+* Mon May 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.39.1-1
 - Updating to version 0.39.1.
 
-* Fri Apr 17 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.35.3-7
+* Fri Apr 17 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.35.3-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Added 'Distribution' and 'Vendor' tags.
 - Fixed "Source0" tag.
@@ -516,7 +464,7 @@ popd
 * Fri Jan 06 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.7.1-1
 - 0.7.1
 
-* Wed Dec 21 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.7.0-0.7gitf9b798c
+* Wed Dec 21 2016 Peter Robinson <pbrobinson@fedoraproject.org> - 0.7.0-0.7gitf9b798c
 - Rebuild for Python 3.6
 
 * Mon Dec 19 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 0.7.0-0.6gitf9b798c

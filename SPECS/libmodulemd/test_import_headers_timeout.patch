@@ -1,0 +1,11 @@
+--- a/modulemd/meson.build
++++ b/modulemd/meson.build
+@@ -555,7 +555,7 @@ import_header_script = find_program('tests/test-import-headers.sh')
+ test('test_import_headers', import_header_script,
+       env : test_env,
+       args : modulemd_hdrs,
+-      timeout : 300,
++      timeout : 600,
+       suite : ['smoketest', 'ci'])
+ 
+ 

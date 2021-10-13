@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/2.2.0/bazel-2.2.0-dist.zip"
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.1.0/bazel-4.1.0-dist.zip"
         }
       }
     },
@@ -365,8 +365,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.12.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.22.0/bcc-src-with-submodule.tar.gz"
         }
       }
     },
@@ -496,8 +496,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.11.4",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/v0.11.4.tar.gz"
+          "version": "0.13.0",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.13.0.tar.gz"
         }
       }
     },
@@ -655,6 +655,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cert-manager",
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "check",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/libcheck/check/archive/0.12.0.tar.gz"
@@ -726,8 +736,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
         }
       }
     },
@@ -966,8 +976,8 @@
         "type": "other",
         "other": {
           "name": "createrepo_c",
-          "version": "0.11.1",
-          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.11.1.tar.gz"
+          "version": "0.17.5",
+          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
         }
       }
     },
@@ -986,8 +996,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.11.1.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
         }
       }
     },
@@ -1227,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "dnf",
-          "version": "4.2.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.2.18.tar.gz"
+          "version": "4.8.0",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
         }
       }
     },
@@ -1587,8 +1597,8 @@
         "type": "other",
         "other": {
           "name": "file",
-          "version": "5.38",
-          "downloadUrl": "ftp://ftp.astron.com/pub/file/file-5.38.tar.gz"
+          "version": "5.40",
+          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
         }
       }
     },
@@ -1647,8 +1657,8 @@
         "type": "other",
         "other": {
           "name": "flannel",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/coreos/flannel/archive/v0.12.0.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },
@@ -1771,6 +1781,16 @@
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fuse3",
+          "version": "3.10.5",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
         }
       }
     },
@@ -1960,7 +1980,7 @@
         "other": {
           "name": "gnu-efi",
           "version": "3.0.9",
-          "downloadUrl": "https://gigenet.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
+          "downloadUrl": "https://pilotfiber.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
         }
       }
     },
@@ -2029,8 +2049,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.15.13",
-          "downloadUrl": "https://dl.google.com/go/go1.15.13.src.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://golang.org/dl/go1.17.1.src.tar.gz"
         }
       }
     },
@@ -2329,8 +2349,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2689,8 +2709,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2699,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2709,8 +2729,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.52.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.52.1.tar.gz"
+          "version": "5.10.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
         }
       }
     },
@@ -2918,6 +2938,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libbpf",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
@@ -3039,8 +3069,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.43.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
+          "version": "0.63.1",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.63.1.tar.gz"
         }
       }
     },
@@ -3349,8 +3379,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/libmodulemd-2.5.0/modulemd-2.5.0.tar.xz"
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
         }
       }
     },
@@ -3431,6 +3461,16 @@
           "name": "libnfnetlink",
           "version": "1.0.1",
           "downloadUrl": "http://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-1.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libnfs",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
         }
       }
     },
@@ -3569,8 +3609,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.11.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
         }
       }
     },
@@ -3648,6 +3688,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libslirp",
+          "version": "4.6.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libSM",
           "version": "1.2.3",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
@@ -3669,8 +3719,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.7",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.7/libsolv-0.7.7.tar.gz"
+          "version": "0.7.19",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.19/libsolv-0.7.19.tar.gz"
         }
       }
     },
@@ -3781,6 +3831,16 @@
           "name": "libunwind",
           "version": "1.2",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liburing",
+          "version": "2.0",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
         }
       }
     },
@@ -4159,8 +4219,8 @@
         "type": "other",
         "other": {
           "name": "libyaml",
-          "version": "0.2.1",
-          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.1.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "http://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
         }
       }
     },
@@ -4189,8 +4249,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
         }
       }
     },
@@ -4209,8 +4269,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
         }
       }
     },
@@ -5051,9 +5111,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "omi",
-          "version": "1.6.6",
-          "downloadUrl": "https://github.com/microsoft/omi/archive/v1.6.6-0.tar.gz"
+          "name": "oniguruma",
+          "version": "6.9.5",
+          "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.5/onig-6.9.5.tar.gz"
         }
       }
     },
@@ -5061,9 +5121,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "oniguruma",
-          "version": "6.9.5",
-          "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.5/onig-6.9.5.tar.gz"
+          "name": "opa",
+          "version": "0.31.0",
+          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.31.0.tar.gz"
         }
       }
     },
@@ -5132,8 +5192,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.5p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.5p1.tar.gz"
+          "version": "8.8p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
         }
       }
     },
@@ -5162,8 +5222,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2019.2",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz"
+          "version": "2021.4",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2021.4/libostree-2021.4.tar.xz"
         }
       }
     },
@@ -6931,6 +6991,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyudev",
+          "version": "0.22.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/pyudev-0.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyvmomi",
           "version": "6.7.3",
           "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
@@ -7512,8 +7582,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2019.3",
-          "downloadUrl": "https://github.com/projectatomic/rpm-ostree/releases/download/v2019.3/rpm-ostree-2019.3.tar.xz"
+          "version": "2020.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
         }
       }
     },
@@ -8392,8 +8462,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20200818",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20200818/refpolicy-2.20200818.tar.bz2"
+          "version": "2.20210203",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20210203/refpolicy-2.20210203.tar.bz2"
         }
       }
     },
@@ -8902,16 +8972,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "UI-cairo",
-          "version": "1.16.0",
-          "downloadUrl": "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "unbound",
           "version": "1.10.0",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
@@ -8945,6 +9005,16 @@
           "name": "urfave-cli",
           "version": "2.3.0",
           "downloadUrl": "https://github.com/urfave/cli/archive/v2.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "usbredir",
+          "version": "0.10.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.10.0.tar.xz"
         }
       }
     },

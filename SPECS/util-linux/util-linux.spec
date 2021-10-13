@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.36.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  ncurses-term
 %endif
 
-Requires:       %{name}-libs = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
 
 Conflicts:      toybox
 
@@ -49,13 +49,6 @@ Provides:       libsmartcols-devel = %{version}-%{release}
 
 %description devel
 These are the header and library files of util-linux.
-
-%package libs
-Summary:        library files for util-linux
-Group:          Development/Libraries
-
-%description libs
-These are library files of util-linux.
 
 %prep
 %setup -q
@@ -103,8 +96,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %dir %{_prefix}%{_var}/run/uuidd
 %dir %{_sharedstatedir}/libuuid
 /bin/*
-/lib/libfdisk.so.*
-/lib/libsmartcols.so.*
 /sbin/*
 %{_bindir}/*
 %{_sbindir}/*
@@ -113,12 +104,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
 %{_docdir}/util-linux/getopt/*
-
-%files libs
-%defattr(-,root,root)
-/lib/libblkid.so.*
-/lib/libmount.so.*
-/lib/libuuid.so.*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -130,11 +115,19 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
 /lib/libblkid.so.*
+/lib/libmount.so.*
+/lib/libuuid.so.*
 /lib/libsmartcols.so.*
+/lib/libfdisk.so.*
 %{_includedir}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Sep 21 2021 Henry Li <lihl@microsoft.com> - 2.36.1-5
+- Add libmount, libuuid and libfdisk shared library files to util-linux-devel
+- Remove libblkid and libfdisk shared library files from util-linux
+- Remove util-linux-libs subpackage
+
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-4
 - Adding 'Provides' for 'uuidd' and fixing it.
 

@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.36.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,8 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch Source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
+
+Provides:       bundled(libiberty)
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -28,13 +30,13 @@ for handling compiled objects.
 
 %build
 %configure \
+    --disable-silent-rules \
+    --disable-werror    \
     --enable-gold       \
     --enable-ld=default \
     --enable-plugins    \
     --enable-shared     \
-    --disable-werror    \
-    --with-system-zlib  \
-    --disable-silent-rules
+    --with-system-zlib
 
 %make_build tooldir=%{_prefix}
 
@@ -43,6 +45,9 @@ for handling compiled objects.
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
+
+install -m 644 libiberty/libiberty.a %{buildroot}%{_libdir}
+install -m 644 include/libiberty.h %{buildroot}%{_includedir}
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
@@ -94,22 +99,21 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes-%{version}.so
 
 %files devel
-%{_includedir}/plugin-api.h
-%{_includedir}/symcat.h
-%{_includedir}/bfd.h
 %{_includedir}/ansidecl.h
-%{_includedir}/bfdlink.h
-%{_includedir}/dis-asm.h
 %{_includedir}/bfd_stdint.h
-%{_includedir}/diagnostics.h
+%{_includedir}/bfd.h
+%{_includedir}/bfdlink.h
 %{_includedir}/ctf-api.h
 %{_includedir}/ctf.h
 %{_includedir}/demangle.h
-%{_libdir}/libbfd.a
-%{_libdir}/libopcodes.a
-%{_libdir}/libbfd.so
-%{_libdir}/libopcodes.so
+%{_includedir}/diagnostics.h
+%{_includedir}/dis-asm.h
+%{_includedir}/libiberty.h
+%{_includedir}/plugin-api.h
+%{_includedir}/symcat.h
 %{_libdir}/bfd-plugins/libdep.so
+%{_libdir}/libbfd.a
+%{_libdir}/libbfd.so
 %{_libdir}/libctf-nobfd.a
 %{_libdir}/libctf-nobfd.so
 %{_libdir}/libctf-nobfd.so.0
@@ -118,8 +122,14 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libctf.so
 %{_libdir}/libctf.so.0
 %{_libdir}/libctf.so.0.*
+%{_libdir}/libiberty.a
+%{_libdir}/libopcodes.a
+%{_libdir}/libopcodes.so
 
 %changelog
+* Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
+- Adding 'libiberty' lib and header.
+
 * Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.1-2
 - Add patch from Fedora 34 (license: MIT) to export demangle.h from libiberty sources
 - Lint spec

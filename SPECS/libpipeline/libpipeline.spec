@@ -1,7 +1,7 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
 Version:        1.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 URL:            http://libpipeline.nongnu.org
 Group:          Applications/System
@@ -34,7 +34,7 @@ Development files for libpipeline
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
-#find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make -C tests check
@@ -50,11 +50,13 @@ make -C tests check
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-5
+- Remove libtool archive files from final packaging
+
 *   Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> 1.5.0-4
 -   Add "check" package to fix tests. Remove sha1
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.5.0-3

@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "cert-manager-1.5.3-gocache.tar.gz": "314222bf36a5a5b16f2f2b58099c0d19b1fa5da1c80f4057d2ad41f3043ebe0c",
+  "cert-manager-1.5.3-vendor.tar.gz": "b6c17ee4daee33ad980e5b41cb1d04cde33468f64400044d5d799c97edba8cf2",
+  "cert-manager-1.5.3.tar.gz": "48c451bfc87a9fadd575a05e586d80858ddf87e933c695293aff3f4782f3cbda"
+ }
+}

@@ -1,7 +1,7 @@
 Summary:        Library for Neighbor Discovery Protocol
 Name:           libndp
 Version:        1.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 URL:            http://www.libndp.org/
 Source:         http://www.libndp.org/files/%{name}-%{version}.tar.gz
@@ -32,6 +32,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 
 %post -p /sbin/ldconfig
@@ -46,10 +47,12 @@ make DESTDIR=%{buildroot} install
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.7-3
+- Remove libtool archive files from final packaging
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.7-2
 -   Added %%license line automatically
 -   Initial CBL-Mariner import from Photon (license: Apache2).
