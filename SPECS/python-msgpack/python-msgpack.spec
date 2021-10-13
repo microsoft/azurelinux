@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            http://msgpack.org/
-#Source0:       https://github.com/msgpack/msgpack-python/archive/%{version}.tar.gz
+#Source0:       https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 %description
