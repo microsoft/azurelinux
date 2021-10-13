@@ -60,6 +60,7 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/examples/sample.c
 %{_docdir}/mpfr-%{version}/examples/divworst.c
 %{_docdir}/mpfr-%{version}/examples/can_round.c
+%{_docdir}/mpfr-%{version}/examples/threads.c
 %{_docdir}/mpfr-%{version}/COPYING.LESSER
 %{_docdir}/mpfr-%{version}/TODO
 %{_docdir}/mpfr-%{version}/BUGS

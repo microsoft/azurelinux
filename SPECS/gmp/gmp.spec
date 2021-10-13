@@ -56,6 +56,7 @@ make %{?_smp_mflags} check
 %files devel
 %{_includedir}/gmp.h
 %{_libdir}/libgmp.so
+%{_libdir}/pkgconfig/gmp.pc
 %{_docdir}/%{name}-%{version}/tasks.html
 %{_docdir}/%{name}-%{version}/projects.html
 %{_docdir}/%{name}-%{version}/configuration
