@@ -9,8 +9,8 @@
 # /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version}
 echo "gen-ld-script.sh name($1) version($2)"
 
-OS_ID=$(sed -En '/^ID=/ s/.+="?([^"]+)"?/\1/ p' /etc/os-release)
-OS_VERSION=$(sed -En '/^VERSION_ID=/ s/.+="?([^"]+)"?/\1/ p' /etc/os-release)
+OS_ID=$(sed -En 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)
+OS_VERSION=$(sed -En 's/^VERSION_ID="?([^"]+)"?/\1/p' /etc/os-release)
 
 # Count number of dot separators in $2 (version)
 NUM_DOT_SEPARATORS="${2//[^.]}"
