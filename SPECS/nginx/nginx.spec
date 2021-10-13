@@ -1,4 +1,6 @@
-%define sha1    nginx-njs=fd8c3f2d219f175be958796e3beaa17f3b465126
+
+%global  nginx_user          nginx
+
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 Version:        1.20.1
@@ -17,12 +19,21 @@ BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
 
-Provides:       %{name}-filesystem = %{version}-%{release}
-
+Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
 %description
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
+
+%package filesystem
+Summary:           The basic directory layout for the Nginx server
+BuildArch:         noarch
+Requires(pre):     shadow-utils
+
+%description filesystem
+The nginx-filesystem package contains the basic directory layout
+for the Nginx server including the correct permissions for the
+directories.
 
 %prep
 %autosetup -p1
@@ -33,21 +44,23 @@ popd
 
 %build
 sh configure \
-    --prefix=%{_sysconfdir}//nginx              \
-    --sbin-path=%{_sbindir}/nginx                 \
-    --conf-path=%{_sysconfdir}/nginx/nginx.conf           \
-    --pid-path=%{_var}/run/nginx.pid               \
-    --lock-path=%{_var}/run/nginx.lock             \
-    --error-log-path=%{_var}/log/nginx/error.log   \
-    --http-log-path=%{_var}/log/nginx/access.log   \
     --add-module=../nginx-njs/njs-0.2.1/nginx   \
-    --with-http_ssl_module \
-    --with-pcre \
-    --with-ipv6 \
-    --with-stream \
+    --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
+    --error-log-path=%{_var}/log/nginx/error.log   \
+    --group=%{nginx_user} \
+    --http-log-path=%{_var}/log/nginx/access.log   \
+    --lock-path=%{_var}/run/nginx.lock             \
+    --pid-path=%{_var}/run/nginx.pid               \
+    --prefix=%{_sysconfdir}/nginx              \
+    --sbin-path=%{_sbindir}/nginx                 \
+    --user=%{nginx_user} \
     --with-http_auth_request_module \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
     --with-http_sub_module \
-    --with-http_stub_status_module
+    --with-ipv6 \
+    --with-pcre \
+    --with-stream
 
 make %{?_smp_mflags}
 
@@ -61,6 +74,13 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 
 # Using the ones provided through the "nginx-mimetype" package.
 rm -f %{buildroot}%{_sysconfdir}/%{name}/mime.types
+
+%pre filesystem
+getent group %{nginx_user} > /dev/null || groupadd -r %{nginx_user}
+getent passwd %{nginx_user} > /dev/null || \
+    useradd -r -d %{_localstatedir}/lib/nginx -g %{nginx_user} \
+    -s /sbin/nologin -c "Nginx web server" %{nginx_user}
+exit 0
 
 %files
 %defattr(-,root,root)
@@ -85,8 +105,12 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/mime.types
 %dir %{_var}/opt/nginx/log
 %{_var}/log/nginx
 
+%files filesystem
+%dir %{_sysconfdir}/%{name}
+
 %changelog
 * Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.1-2
+- Split out "nginx-filesystem" using Fedora 34 spec (license: MIT) as guidance.
 - Removing conflicts with "nginx-mimetypes" over "mime.types".
 - Fixed changelog history to include version update.
 
