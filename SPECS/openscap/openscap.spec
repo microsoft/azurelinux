@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -20,6 +20,7 @@ BuildRequires:  bzip2-devel
 BuildRequires:  curl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python2-devel
+BuildRequires:  dbus-devel
 Requires:       curl
 Requires:       popt
 %description
@@ -102,6 +103,9 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/python2.7/*
 
 %changelog
+* Thu Oct 07 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.1-4
+-   Add BuildRequires dbus-devel to support systemd unit module
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.1-3
 - Added %%license line automatically
 
