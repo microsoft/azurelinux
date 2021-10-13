@@ -72,7 +72,7 @@ make %{?_smp_mflags}
 %install
 install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
-chmod 644 %{buildroot}%{_docdir}/util-linux/getopt/getopt*.tcsh
+chmod 644 %{buildroot}%{_docdir}/util-linux/getopt*.tcsh
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # Install 'uuidd' directories, which are not created by 'make'.
@@ -103,7 +103,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
-%{_docdir}/util-linux/getopt/*
+%{_docdir}/util-linux/getopt*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)

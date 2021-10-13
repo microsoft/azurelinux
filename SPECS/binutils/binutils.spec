@@ -100,7 +100,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %files devel
 %{_includedir}/ansidecl.h
-%{_includedir}/bfd_stdint.h
 %{_includedir}/bfd.h
 %{_includedir}/bfdlink.h
 %{_includedir}/ctf-api.h
