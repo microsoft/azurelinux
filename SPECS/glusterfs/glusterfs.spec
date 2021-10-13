@@ -110,7 +110,7 @@
 Summary:        Distributed File System
 Name:           glusterfs
 Version:        7.9
-Release:        3%{?dev:%dev}%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -1226,6 +1226,9 @@ exit 0
 %endif
 
 %changelog
+* Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-4
+- Simplifying the 'Release' tag to a single digit and the %%dist macro.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-3
 - Making binaries paths compatible with CBL-Mariner's paths.
 - Removed conditions that don't apply in CBL0Mariner.
