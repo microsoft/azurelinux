@@ -1,7 +1,7 @@
 Summary:        Helper application and MIME type associations for file types
 Name:           mailcap
 Version:        2.1.49
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Public Domain and MIT
 URL:            https://pagure.io/mailcap
 Vendor:         Microsoft Corporation
@@ -29,7 +29,7 @@ by several applications e.g. to determine MIME types for filenames.
 %package     -n nginx-mimetypes
 Summary:        MIME type mappings for nginx
 License:        Public Domain
-Requires:       nginx
+Requires:       nginx-filesystem
 
 %description -n nginx-mimetypes
 MIME type mappings for nginx.
@@ -65,6 +65,9 @@ make check
 
 
 %changelog
+* Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.49-4
+- Changing BR to be more accurate: "nginx" -> "nginx-filesystem".
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.1.49-3
 - Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
 - License verified

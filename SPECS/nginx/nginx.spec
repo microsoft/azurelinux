@@ -2,7 +2,7 @@
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 Version:        1.20.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,10 +12,14 @@ Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
 Patch0:         CVE-2009-4487.nopatch
+
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
+
 Provides:       %{name}-filesystem = %{version}-%{release}
+
+Requires:       %{name}-mimetypes
 
 %description
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
@@ -55,6 +59,9 @@ install -vdm755 %{buildroot}%{_var}/opt/nginx/log
 ln -sfv %{_var}/opt/nginx/log %{buildroot}%{_var}/log/nginx
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.service
 
+# Using the ones provided through the "nginx-mimetype" package.
+rm -f %{buildroot}%{_sysconfdir}/%{name}/mime.types
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -64,7 +71,6 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 %config(noreplace) %{_sysconfdir}/%{name}/fastcgi_params.default
 %config(noreplace) %{_sysconfdir}/%{name}/koi-utf
 %config(noreplace) %{_sysconfdir}/%{name}/koi-win
-%config(noreplace) %{_sysconfdir}/%{name}/mime.types
 %config(noreplace) %{_sysconfdir}/%{name}/mime.types.default
 %config(noreplace) %{_sysconfdir}/%{name}/nginx.conf
 %config(noreplace) %{_sysconfdir}/%{name}/nginx.conf.default
@@ -80,6 +86,13 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 %{_var}/log/nginx
 
 %changelog
+* Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.1-2
+- Removing conflicts with "nginx-mimetypes" over "mime.types".
+- Fixed changelog history to include version update.
+
+* Fri Jun 11 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.20.1-1
+- Update to version 1.20.1 to resolve CVE-2021-23017
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.1-4
 - Merge the following releases from 1.0 to dev branch
 - lihl@microsoft.com, 1.16.1-3: Used autosetup, Added patch to resolve CVE-2019-20372
@@ -91,56 +104,56 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.servic
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-2
 - Added %%license line automatically
 
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.16.1-1
--   Update to version 1.16.1. License verified.
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> - 1.16.1-1
+- Update to version 1.16.1. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.15.3-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.15.3-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Fri Mar 15 2019 Keerthana K <keerthanak@vmware.com> 1.15.3-4
--   Enable http_stub_status_module.
+* Fri Mar 15 2019 Keerthana K <keerthanak@vmware.com> - 1.15.3-4
+- Enable http_stub_status_module.
 
-*   Wed Nov 07 2018 Ajay Kaher <akaher@vmware.com> 1.15.3-3
--   mark config files as non replaceable on upgrade.
+* Wed Nov 07 2018 Ajay Kaher <akaher@vmware.com> - 1.15.3-3
+- mark config files as non replaceable on upgrade.
 
-*   Mon Sep 17 2018 Keerthana K <keerthanak@vmware.com> 1.15.3-2
--   Adding http_auth_request_module and http_sub_module.
+* Mon Sep 17 2018 Keerthana K <keerthanak@vmware.com> - 1.15.3-2
+- Adding http_auth_request_module and http_sub_module.
 
-*   Fri Sep 7 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 1.15.3-1
--   Upgrade to version 1.15.3
+* Fri Sep 7 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 1.15.3-1
+- Upgrade to version 1.15.3
 
-*   Fri Jul 20 2018 Keerthana K <keerthanak@vmware.com> 1.13.8-3
--   Restarting nginx on failure.
+* Fri Jul 20 2018 Keerthana K <keerthanak@vmware.com> - 1.13.8-3
+- Restarting nginx on failure.
 
-*   Fri Jun 08 2018 Dheeraj Shetty <dheerajs@vmware.com> 1.13.8-2
--   adding module njs.
+* Fri Jun 08 2018 Dheeraj Shetty <dheerajs@vmware.com> - 1.13.8-2
+- adding module njs.
 
-*   Fri May 18 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 1.13.8-1
--   Update to version 1.13.8 to support nginx-ingress
+* Fri May 18 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 1.13.8-1
+- Update to version 1.13.8 to support nginx-ingress
 
-*   Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  1.13.5-2
--   Fixed the log file directory structure
+* Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com> - 1.13.5-2
+- Fixed the log file directory structure
 
-*   Wed Oct 04 2017 Xiaolin Li <xiaolinl@vmware.com> 1.13.5-1
--   Update to version 1.13.5
+* Wed Oct 04 2017 Xiaolin Li <xiaolinl@vmware.com> - 1.13.5-1
+- Update to version 1.13.5
 
-*   Mon May 01 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.11.13-2
--   adding module stream to nginx.
+* Mon May 01 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.11.13-2
+- adding module stream to nginx.
 
-*   Wed Apr 05 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.11.13-1
--   update to 1.11.13
+* Wed Apr 05 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.11.13-1
+- update to 1.11.13
 
-*   Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  1.10.0-5
--   Add patch for CVE-2016-4450
+* Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com> - 1.10.0-5
+- Add patch for CVE-2016-4450
 
-*   Wed Jul 27 2016 Divya Thaluru<dthaluru@vmware.com> 1.10.0-4
--   Removed packaging of debug files
+* Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> - 1.10.0-4
+- Removed packaging of debug files
 
-*   Fri Jul 8 2016 Divya Thaluru<dthaluru@vmware.com> 1.10.0-3
--   Modified default pid filepath and fixed nginx systemd service
+* Fri Jul 8 2016 Divya Thaluru <dthaluru@vmware.com> - 1.10.0-3
+- Modified default pid filepath and fixed nginx systemd service
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.10.0-2
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.10.0-2
+- GA - Bump release of all rpms
 
-*   Mon May 16 2016 Xiaolin Li <xiaolinl@vmware.com> 1.10.0-1
--   Initial build. First version
+* Mon May 16 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.10.0-1
+- Initial build. First version
