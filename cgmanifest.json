@@ -5311,16 +5311,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "patterns-ceph-containers",
-          "version": "1.0",
-          "downloadUrl": "https://en.opensuse.org/Patterns"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "pcaudiolib",
           "version": "1.1",
           "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
