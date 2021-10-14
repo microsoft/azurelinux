@@ -1,0 +1,40 @@
+From c6ad876774f3cc11e32681ea02a2eead00f2c521 Mon Sep 17 00:00:00 2001
+From: YiyuanGUO <yguoaz@gmail.com>
+Date: Wed, 29 Sep 2021 10:20:35 +0300
+Subject: [PATCH] Fix integer overflow in _sdsMakeRoomFor (CVE-2021-41099)
+
+---
+ src/sds.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/sds.c b/src/sds.c
+index 4dbb41d2b703..a43a1a5cbeed 100644
+--- a/src/sds.c
++++ b/src/sds.c
+@@ -205,7 +205,7 @@ void sdsclear(sds s) {
+ sds sdsMakeRoomFor(sds s, size_t addlen) {
+     void *sh, *newsh;
+     size_t avail = sdsavail(s);
+-    size_t len, newlen;
++    size_t len, newlen, reqlen;
+     char type, oldtype = s[-1] & SDS_TYPE_MASK;
+     int hdrlen;
+ 
+@@ -214,7 +214,7 @@ sds sdsMakeRoomFor(sds s, size_t addlen) {
+ 
+     len = sdslen(s);
+     sh = (char*)s-sdsHdrSize(oldtype);
+-    newlen = (len+addlen);
++    reqlen = newlen = (len+addlen);
+     assert(newlen > len);   /* Catch size_t overflow */
+     if (newlen < SDS_MAX_PREALLOC)
+         newlen *= 2;
+@@ -229,7 +229,7 @@ sds sdsMakeRoomFor(sds s, size_t addlen) {
+     if (type == SDS_TYPE_5) type = SDS_TYPE_8;
+ 
+     hdrlen = sdsHdrSize(type);
+-    assert(hdrlen + newlen + 1 > len);  /* Catch size_t overflow */
++    assert(hdrlen + newlen + 1 > reqlen);  /* Catch size_t overflow */
+     if (oldtype==type) {
+         newsh = s_realloc(sh, hdrlen+newlen+1);
+         if (newsh == NULL) return NULL;
