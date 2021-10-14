@@ -12,8 +12,8 @@ write_rpms_from_spec () {
     # $1 = spec file
     # $2 = file to save to
     spec_dir=$(dirname $1)
-    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="%{EXCLUSIVEARCH}" --srpm 2>/dev/null)
-    if [ "$exclusiveArch" != "(none)" -a "$exclusiveArch" != "$ARCH" ]; then
+    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="[%{EXCLUSIVEARCH} ]" --srpm 2>/dev/null)
+    if [[ -n "$exclusiveArch" && ! "$exclusiveArch" =~ "$ARCH" ]]; then
         return 0
     fi
 

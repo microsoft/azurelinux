@@ -1,5 +1,5 @@
 filesystem-1.1-8.cm2.x86_64.rpm
-kernel-headers-5.10.64.1-2.cm2.noarch.rpm
+kernel-headers-5.10.69.1-1.cm2.noarch.rpm
 glibc-2.28-19.cm2.x86_64.rpm
 glibc-devel-2.28-19.cm2.x86_64.rpm
 glibc-i18n-2.28-19.cm2.x86_64.rpm
@@ -71,9 +71,9 @@ xz-5.2.4-4.cm2.x86_64.rpm
 xz-devel-5.2.4-4.cm2.x86_64.rpm
 xz-lang-5.2.4-4.cm2.x86_64.rpm
 xz-libs-5.2.4-4.cm2.x86_64.rpm
-zstd-1.4.4-2.cm2.x86_64.rpm
-zstd-devel-1.4.4-2.cm2.x86_64.rpm
-zstd-libs-1.4.4-2.cm2.x86_64.rpm
+zstd-1.5.0-1.cm2.x86_64.rpm
+zstd-devel-1.5.0-1.cm2.x86_64.rpm
+zstd-libs-1.5.0-1.cm2.x86_64.rpm
 libtool-2.4.6-7.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
@@ -224,9 +224,9 @@ libffi-devel-3.2.1-12.cm2.x86_64.rpm
 libtasn1-4.14-3.cm2.x86_64.rpm
 p11-kit-0.23.22-3.cm2.x86_64.rpm
 p11-kit-trust-0.23.22-3.cm2.x86_64.rpm
-ca-certificates-shared-20200720-19.cm2.noarch.rpm
-ca-certificates-tools-20200720-19.cm2.noarch.rpm
-ca-certificates-base-20200720-19.cm2.noarch.rpm
+ca-certificates-shared-20200720-20.cm2.noarch.rpm
+ca-certificates-tools-20200720-20.cm2.noarch.rpm
+ca-certificates-base-20200720-20.cm2.noarch.rpm
 dwz-0.13-4.cm2.x86_64.rpm
 unzip-6.0-19.cm2.x86_64.rpm
 python3-3.7.10-3.cm2.x86_64.rpm

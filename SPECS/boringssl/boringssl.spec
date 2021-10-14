@@ -22,7 +22,7 @@
 Summary:        An SSL/TLS protocol implementation
 Name:           boringssl
 Version:        20200921
-Release:        1.3%{?dist}
+Release:        3%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,8 +137,12 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 %{src_install_dir}
 
 %changelog
-* Fri Oct 08 2021 Mateusz Malisz <mamalisz@microsoft.com> - 20200921-1.3
+
+* Tue Oct 12 2021 Mateusz Malisz <mamalisz@microsoft.com> - 20200921-3
 - Unify macro syntax used in the spec.
+
+* Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200921-2
+- Switching to using a single digit for the 'Release' tag.
 
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com> - 20200921-1.2
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
