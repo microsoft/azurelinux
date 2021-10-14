@@ -1,6 +1,6 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.49
+Version:        2.4.51
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
@@ -207,6 +207,8 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Wed Oct 13 2021 Nick Samson <nisamson@microsoft.com> 2.4.51-1
+-   Upgraded to 2.4.51 to fix CVE-2021-42013, CVE-2021-41773, CVE-2021-41524
 *   Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 2.4.49-1
 -   Fix CVE-2021-40438 CVE-2021-36160 and CVE-2021-34798 CVEs by updating to 2.4.49.
 
