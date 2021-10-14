@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "brp-strip-debug-symbols": "6cd7e01cd3ab55de6a04bd61a2a4f787bbddbfe575d85ec282f8d76563fa1cd4",
-  "brp-strip-unneeded": "b7d2323c52322b5f0144fd9de3ca86e4ea8ec24a262c0382490a9ea434dda3bf",
   "python.attr": "32eebee98c24edcc9524b4553cf05c0ec6707828fe14f76d250e294568e7091a",
   "pythondeps.sh": "1cc7665252eb845c7e4741ff3e832c78f54ffb05552f1cdb2d43d2c0cbf7c07d",
   "pythondistdeps.py": "f73f01bb78daa75d25d6581a6da40cf6f946654c5e9d166676036367307186d1",
