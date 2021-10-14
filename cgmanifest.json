@@ -9793,8 +9793,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.4.4/zstd-1.4.4.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
         }
       }
     }
