@@ -1,0 +1,117 @@
+From 5674b0057ff2903d43eaff802017eddf37c360f8 Mon Sep 17 00:00:00 2001
+From: Oran Agra <oran@redislabs.com>
+Date: Wed, 9 Jun 2021 17:31:39 +0300
+Subject: [PATCH] Prevent unauthenticated client from easily consuming lots of
+ memory (CVE-2021-32675)
+
+This change sets a low limit for multibulk and bulk length in the
+protocol for unauthenticated connections, so that they can't easily
+cause redis to allocate massive amounts of memory by sending just a few
+characters on the network.
+The new limits are 10 arguments of 16kb each (instead of 1m of 512mb)
+---
+ src/networking.c    | 17 +++++++++++++++++
+ src/server.c        |  9 ++-------
+ src/server.h        |  1 +
+ tests/unit/auth.tcl | 16 ++++++++++++++++
+ 4 files changed, 36 insertions(+), 7 deletions(-)
+
+diff --git a/src/networking.c b/src/networking.c
+index a61678dab2bb..b02397c96f49 100644
+--- a/src/networking.c
++++ b/src/networking.c
+@@ -97,6 +97,15 @@ void linkClient(client *c) {
+     raxInsert(server.clients_index,(unsigned char*)&id,sizeof(id),c,NULL);
+ }
+ 
++int authRequired(client *c) {
++    /* Check if the user is authenticated. This check is skipped in case
++     * the default user is flagged as "nopass" and is active. */
++    int auth_required = (!(DefaultUser->flags & USER_FLAG_NOPASS) ||
++                          (DefaultUser->flags & USER_FLAG_DISABLED)) &&
++                        !c->authenticated;
++    return auth_required;
++}
++
+ client *createClient(connection *conn) {
+     client *c = zmalloc(sizeof(client));
+ 
+@@ -1744,6 +1753,10 @@ int processMultibulkBuffer(client *c) {
+             addReplyError(c,"Protocol error: invalid multibulk length");
+             setProtocolError("invalid mbulk count",c);
+             return C_ERR;
++        } else if (ll > 10 && authRequired(c)) {
++            addReplyError(c, "Protocol error: unauthenticated multibulk length");
++            setProtocolError("unauth mbulk count", c);
++            return C_ERR;
+         }
+ 
+         c->qb_pos = (newline-c->querybuf)+2;
+@@ -1791,6 +1804,10 @@ int processMultibulkBuffer(client *c) {
+                 addReplyError(c,"Protocol error: invalid bulk length");
+                 setProtocolError("invalid bulk length",c);
+                 return C_ERR;
++            } else if (ll > 16384 && authRequired(c)) {
++                addReplyError(c, "Protocol error: unauthenticated bulk length");
++                setProtocolError("unauth bulk length", c);
++                return C_ERR;
+             }
+ 
+             c->qb_pos = newline-c->querybuf+2;
+diff --git a/src/server.c b/src/server.c
+index 93148f8e3ed3..c8768b1824bc 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -3590,13 +3590,8 @@ int processCommand(client *c) {
+     int is_denyloading_command = !(c->cmd->flags & CMD_LOADING) ||
+                                  (c->cmd->proc == execCommand && (c->mstate.cmd_inv_flags & CMD_LOADING));
+ 
+-    /* Check if the user is authenticated. This check is skipped in case
+-     * the default user is flagged as "nopass" and is active. */
+-    int auth_required = (!(DefaultUser->flags & USER_FLAG_NOPASS) ||
+-                          (DefaultUser->flags & USER_FLAG_DISABLED)) &&
+-                        !c->authenticated;
+-    if (auth_required) {
+-        /* AUTH and HELLO and no auth modules are valid even in
++    if (authRequired(c)) {
++        /* AUTH and HELLO and no auth commands are valid even in
+          * non-authenticated state. */
+         if (!(c->cmd->flags & CMD_NO_AUTH)) {
+             rejectCommand(c,shared.noautherr);
+diff --git a/src/server.h b/src/server.h
+index a16f28858296..530355421a8d 100644
+--- a/src/server.h
++++ b/src/server.h
+@@ -1743,6 +1743,7 @@ void protectClient(client *c);
+ void unprotectClient(client *c);
+ void initThreadedIO(void);
+ client *lookupClientByID(uint64_t id);
++int authRequired(client *c);
+ 
+ #ifdef __GNUC__
+ void addReplyErrorFormat(client *c, const char *fmt, ...)
+diff --git a/tests/unit/auth.tcl b/tests/unit/auth.tcl
+index 9080d4bf7e95..530ca7c8d912 100644
+--- a/tests/unit/auth.tcl
++++ b/tests/unit/auth.tcl
+@@ -24,4 +24,20 @@ start_server {tags {"auth"} overrides {requirepass foobar}} {
+         r set foo 100
+         r incr foo
+     } {101}
++
++    test {For unauthenticated clients multibulk and bulk length are limited} {
++        set rr [redis [srv "host"] [srv "port"] 0 $::tls]
++        $rr write "*100\r\n"
++        $rr flush
++        catch {[$rr read]} e
++        assert_match {*unauthenticated multibulk length*} $e
++        $rr close
++
++        set rr [redis [srv "host"] [srv "port"] 0 $::tls]
++        $rr write "*1\r\n\$100000000\r\n"
++        $rr flush
++        catch {[$rr read]} e
++        assert_match {*unauthenticated bulk length*} $e
++        $rr close
++    }
+ }
