@@ -44,10 +44,6 @@ make CC=gcc
 make install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %license LICENSE
 %{_datadir}/README.md
