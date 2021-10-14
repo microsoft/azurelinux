@@ -1066,32 +1066,6 @@ popd
 rm -rf db-5.3.28
 touch /logs/status_libdb_complete
 
-echo nss-3.44
-tar xf nss-3.44.tar.gz
-pushd nss-3.44
-patch -Np1 -i ../nss-3.44-standalone-1.patch
-cd nss
-export NSS_DISABLE_GTESTS=1
-# Build with single processor due to errors seen with parallel make
-make -j1 BUILD_OPT=1                    \
-    NSPR_INCLUDE_DIR=/usr/include/nspr  \
-    USE_SYSTEM_ZLIB=1                   \
-    ZLIB_LIBS=-lz                       \
-    NSS_ENABLE_WERROR=0                 \
-    USE_64=1                            \
-    $([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
-cd ../dist
-install -v -m755 Linux*/lib/*.so              /usr/lib
-install -v -m644 Linux*/lib/{*.chk,libcrmf.a} /usr/lib
-install -v -m755 -d                           /usr/include/nss
-cp -v -RL {public,private}/nss/*              /usr/include/nss
-chmod -v 644                                  /usr/include/nss/*
-install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} /usr/bin
-install -v -m644 Linux*/lib/pkgconfig/nss.pc  /usr/lib/pkgconfig
-popd
-rm -rf nss-3.44
-touch /logs/status_nss_complete
-
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
