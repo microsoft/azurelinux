@@ -1,0 +1,35 @@
+The Rook Operator has been installed. Check its status by running:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app=rook-ceph-operator"
+
+*************************************************************************************************
+                                **** CREATING A CEPH CLUSTER ****
+*************************************************************************************************
+After confirming the Rook Operator is running properly, the Ceph cluster can be deployed through
+YAML files which describe the desired state of the cluster. Sample YAML configuration files are
+included in the 'rook-k8s-yaml' package provided with SUSE Enterprise Storage 7. If installed
+(on an admin workstation or CaaSP master node) the sample YAML files can be found in
+the /usr/share/k8s-yaml/rook/ceph directory structure.
+
+Further documentation can be found in the 'Deploying and Administering Ceph on SUSE CaaS Platform'
+guide. This is under active development, but can be seen at the following URL:
+
+   https://susedoc.github.io/doc-ses/master/single-html/ses-rook/
+
+NOTE: The sample configuration files can serve as templates for production deployments. Whether
+creating entirely new configuration files or modifying the provided samples, ensure the following
+requirements are met:
+
+ - The CephCluster resource must be customized to meet deployment needs.
+ - The CephCluster must be deployed in its own namespace (samples default to 'rook-ceph').
+   - At this time, only one Ceph cluster per Kubernetes cluster is supported.
+ - Role Based Access Control (RBAC) roles and role bindings must be configured.
+   - This helm chart includes the required RBAC configuration to create a CephCluster CRD
+      in the same namespace.
+ - Any disk devices added to the cluster must be empty (no filesystem or partitions).
+   - Disk devices must be referenced using their devnode name (e.g. '/dev/sdb' or '/dev/xvde')
+
+Additional upstream documentation may be found at:
+
+- https://rook.github.io/docs/rook/master/ceph-quickstart.html
+- https://github.com/rook/rook/blob/master/cluster/examples/kubernetes/ceph/cluster.yaml
+

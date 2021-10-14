@@ -27,7 +27,7 @@ Group:          System/Filesystems
 URL:            https://rook.io/
 
 Source0:        %{name}-%{version}.tar.gz
-Source1:        vendor.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source97:       SUSE-helm-notes.txt
 Source98:       README
 Source99:       update-tarball.sh

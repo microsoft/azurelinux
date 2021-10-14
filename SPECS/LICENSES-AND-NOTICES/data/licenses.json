@@ -209,6 +209,7 @@
                 "sos",
                 "squashfs-tools",
                 "sscg",
+                "tini",
                 "uclibc-ng",
                 "usbredir",
                 "uuid",
@@ -364,6 +365,8 @@
                 "jna",
                 "kured",
                 "libcontainers-common",
+                "patterns-ceph-containers",
+                "rook",
                 "xcursor-themes"
             ]
         },

@@ -34,11 +34,13 @@ Requires: ceph-mgr
 Requires: ceph-mgr-rook
 Requires: ceph-mgr-cephadm
 Requires: ceph-mgr-dashboard
+#Temporarily commenting out dependency to allow package to build
 #Requires: ceph-mgr-diskprediction-local
 Requires: ceph-mon
 Requires: ceph-osd
 Requires: ceph-prometheus-alerts
 Requires: ceph-radosgw
+#Temporarily commenting out dependency to allow package to build
 #Requires: ceph-iscsi
 Requires: rbd-mirror
 Requires: rbd-nbd
