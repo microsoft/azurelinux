@@ -5313,7 +5313,7 @@
         "other": {
           "name": "patterns-ceph-containers",
           "version": "1.0",
-          "downloadUrl": ""
+          "downloadUrl": "https://en.opensuse.org/Patterns"
         }
       }
     },

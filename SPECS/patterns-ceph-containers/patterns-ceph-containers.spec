@@ -69,7 +69,7 @@ echo 'This file marks the pattern ceph-base to be installed.' >%buildroot/usr/sh
 %{_docdir}/packages/patterns-ceph-containers/ceph_base.txt
 
 %changelog
-* Mon Oct  4 2021 Max Brodeur-Urbas <maxbr@microsoft.com>
+* Mon Oct 4 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
 - Initial CBL-Mariner import from OpenSuse (license: MIT)
 - License Verified
 - Modified installation path 

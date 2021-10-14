@@ -363,7 +363,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 # bother adding docs or changelog or anything
 
 %changelog
-* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com>
+* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License Verified
 - Remove unused/un-supported macro usage
