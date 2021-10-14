@@ -1,0 +1,19 @@
+#!/bin/sh
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" -o "$RPM_BUILD_ROOT" = "/" ]; then
+	exit 0
+fi
+
+STRIP=${1:-strip}
+
+case `uname -a` in
+Darwin*) exit 0 ;;
+*) ;;
+esac
+
+# Strip ELF binaries
+for f in `find "$RPM_BUILD_ROOT" -type f -exec file {} \; | \
+        grep -v "^${RPM_BUILD_ROOT}/\?usr/lib/debug"  | \
+	sed -n -e 's/^\(.*\):[ 	]*ELF.*, not stripped/\1/p'`; do
+	$STRIP --strip-unneeded -g "$f" || :
+done

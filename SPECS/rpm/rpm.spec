@@ -8,11 +8,13 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
 Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
+Source1:        brp-strip-debug-symbols
+Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
 # The git repo is hosted by centos. The version below is centos 8 stable.
-Source1:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
-Source2:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
-Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
+Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
+Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
 BuildRequires:  openssl-devel
@@ -54,6 +56,7 @@ Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
 Requires:       mariner-rpm-macros
+Requires:       nss-libs
 Requires:       popt
 Requires:       xz-libs
 Requires:       zlib
@@ -137,7 +140,7 @@ pushd python
 popd
 
 # Set provided python versions
-sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE1}
+sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 %check
 %make_build_check
@@ -151,9 +154,9 @@ find %{buildroot} -name 'perl*' -delete
 %find_lang %{name}
 # System macros and prefix
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
-install -vm644 %{SOURCE1} %{buildroot}%{_fileattrsdir}/
-install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
-install -vm755 %{SOURCE3} %{buildroot}%{_libdir}/rpm/
+install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
+install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
+install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
 
 
 pushd python
