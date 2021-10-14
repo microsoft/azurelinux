@@ -16,48 +16,40 @@
 #
 
 
+Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
 Release:        1.2
-Summary:        Orchestrator for distributed storage systems in cloud-native environments
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Filesystems
 URL:            https://rook.io/
-
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Source97:       SUSE-helm-notes.txt
 Source98:       README
 Source99:       update-tarball.sh
-
-
 # When possible, a patch is preferred over link-time overrides because the patch will fail if the
 # upstream source is updated without the package maintainers knowing. Patches reduce user error when
 # creating a new SUSE release branch of Rook.
-
 # Change the default FlexVolume dir path to support Kubic.
 Patch0:         flexvolume-dir.patch
-
-# Go and spec requirements
-BuildRequires:  golang-packaging
-BuildRequires:  xz
-BuildRequires:  golang
-
+# Ceph version is needed to set correct container tag in manifests
+BuildRequires:  ceph
 # Rook requirements
 BuildRequires:  curl
 BuildRequires:  git
+BuildRequires:  golang
+# Go and spec requirements
+BuildRequires:  golang-packaging
 BuildRequires:  grep
-
-# Ceph version is needed to set correct container tag in manifests
-BuildRequires:  ceph
-
+BuildRequires:  xz
+# From Ceph base container: github.com/ceph/ceph-container/src/daemon-base/...
+Requires:       patterns-ceph-containers-ceph_base
 # Rook runtime requirements - referenced from packages installed in Rook images
 # From images/ceph/Dockerfile
 Requires:       tini
-# From Ceph base container: github.com/ceph/ceph-container/src/daemon-base/...
-Requires:       patterns-ceph-containers-ceph_base
 
 %description
 Rook is a cloud-native storage orchestrator for Kubernetes, providing
@@ -83,8 +75,8 @@ operations.
 %package k8s-yaml
 Summary:        Kubernetes YAML file manifests for deploying a Ceph cluster
 Group:          System/Management
-BuildArch:      noarch
 BuildRequires:  ceph
+BuildArch:      noarch
 
 %description k8s-yaml
 This package contains examples of yaml files required to deploy and run the
@@ -135,6 +127,8 @@ argument to [-test.run]. All Ceph test suites can be run with the argument
 # Build section
 ################################################################################
 %define _buildshell /bin/bash
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 %prep
 %autosetup -p1
@@ -288,7 +282,7 @@ sed -i -e "s|image: .*|image: %{rook_image}|g" %{buildroot}%{_datadir}/k8s-yaml/
 sed -i -e "s|image: .*|image: %{rook_image}|g" %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/osd-purge*
 sed -i -e "s|image: .*|image: %{rook_image}|g" %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/operator*
 sed -i -e "s|image: .*|image: %{rook_image}|g" %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/toolbox*
-sed -i -e "s|/usr/local/bin/toolbox.sh|%{_bindir}/toolbox.sh|g" %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/toolbox*
+sed -i -e "s|%{_prefix}/local/bin/toolbox.sh|%{_bindir}/toolbox.sh|g" %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/toolbox*
 
 # Install the helm charts
 %define chart_yaml "%{buildroot}%{_datadir}/%{name}-ceph-helm-charts/operator/Chart.yaml"
@@ -307,7 +301,7 @@ sed -i -e "/apiVersion/a appVersion: v%{helm_appVersion}" %{chart_yaml}
 sed -i -e "s|\(version: \).*|\1%{helm_version}|" %{chart_yaml}
 sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # Install SUSE specific helm chart NOTES.txt
-cp %SOURCE97 %{buildroot}%{_datadir}/%{name}-ceph-helm-charts/operator/templates/NOTES.txt
+cp %{SOURCE97} %{buildroot}%{_datadir}/%{name}-ceph-helm-charts/operator/templates/NOTES.txt
 
 # For the integration test tooling, store files with the current Rook and Ceph image names
 # These files can be cat'ed to get these without needing to do special processing
@@ -328,12 +322,12 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 # Due to upstream's use of /usr/local/bin in their example yamls, create
 # symlinks to avoid a difficult to find configuration problem
 %post
-[[ -e /usr/local/bin/toolbox.sh ]] || ln -s %{_bindir}/toolbox.sh /usr/local/bin/toolbox.sh
-[[ -e /usr/local/bin/rook ]] || ln -s %{_bindir}/rook /usr/local/bin/rook
+[[ -e %{_prefix}/local/bin/toolbox.sh ]] || ln -s %{_bindir}/toolbox.sh %{_prefix}/local/bin/toolbox.sh
+[[ -e %{_prefix}/local/bin/rook ]] || ln -s %{_bindir}/rook %{_prefix}/local/bin/rook
 
 %postun
-[[ -e /usr/local/bin/toolbox.sh ]] && rm /usr/local/bin/toolbox.sh
-[[ -e /usr/local/bin/rook ]] && rm /usr/local/bin/rook
+[[ -e %{_prefix}/local/bin/toolbox.sh ]] && rm %{_prefix}/local/bin/toolbox.sh
+[[ -e %{_prefix}/local/bin/rook ]] && rm %{_prefix}/local/bin/rook
 
 %files rookflex
 %{_bindir}/rookflex
@@ -367,6 +361,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License Verified
 - Remove unused/un-supported macro usage
+
 * Fri May  7 2021 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.6.2
   * Set base Ceph operator image and example deployments to v16.2.2
@@ -430,6 +425,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Monitor failover can be disabled, for scenarios where
     maintenance is planned and automatic mon failover is not desired
   * CephClient CRD has been converted to use the controller-runtime library
+
 * Wed Apr 21 2021 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.5.10
   * Ceph
@@ -445,6 +441,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Fix init container "expand-encrypted-bluefs" for encrypted OSDs (#7466)
   * Fail pool creation if the sub failure domain is the same as the failure domain (#7284)
   * Set default backend for vault and remove temp key for encrypted OSDs (#7454)
+
 * Wed Mar  3 2021 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.5.7
   * Ceph
@@ -466,9 +463,11 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Timeout for rgw configuration to prevent stuck object store when no healthy OSDs (#7075)
   * Update lib bucket provisioner for OBCs (#7086)
 - Drop csi-images-SUSE.patch
+
 * Wed Nov 18 2020 Mike Latimer <mlatimer@suse.com>
 - Derive CSI and sidecar image versions from code defaults rather
   than images found in the build service
+
 * Fri Nov  6 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.7
   * Ceph
@@ -487,12 +486,15 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Update the mon PDBs if the maxUnavailable changed (#6469)
   * NFS
   * Update documentation and examples (#6455)
+
 * Wed Oct 28 2020 Mike Latimer <mlatimer@suse.com>
 - Drop OFFSET from cephcsi image tag
+
 * Mon Oct 26 2020 Mike Latimer <mlatimer@suse.com>
 - Update helm chart to use appropriate version prefix for the final registry
   destination (e.g. registry.suse.com or registry.opensuse.org)
 - Improve consistency with image tags
+
 * Tue Oct 20 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.6
   * Support IPv6 single-stack (#6283)
@@ -507,15 +509,19 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Check underlying block status for encrypted OSDs (#6367)
 - Add 'latest' and appVersion tags to helm chart
 - Include sample manifests in helm chart
+
 * Fri Oct  9 2020 Mike Latimer <mlatimer@suse.com>
 - Set the helm chart version to the rook version
+
 * Tue Oct  6 2020 Mike Latimer <mlatimer@suse.com>
 - Minor fix to helm chart to ensure SemVer formatting
 - Fix typo in sample cluster.yaml
+
 * Tue Oct  6 2020 Joshua Hesketh <jhesketh@suse.com>
 - Update the operator.yaml ConfigMap to reflect the default SUSE images
   that are used rather than upstreams.
 - Fix indentation of patch tabs to match original
+
 * Fri Oct  2 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.5
   * Update the CSI driver to v3.1.1 (#6340)
@@ -534,9 +540,11 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Merge config from rook-config-override configmap to the default global
     config file (#6252)
 - Package all sample yaml files in rook-k8s-yaml
+
 * Tue Sep 29 2020 Mike Latimer <mlatimer@suse.com>
 - Update helm chart version to match rook product version plus
   the current release number
+
 * Tue Sep 29 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.4
   * Upgrade to v1.4.3 for cluster-on-pvc hung due to changing label
@@ -545,13 +553,16 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Allow running rgw daemons from an external cluster (#6226)
 - Create symlinks in /usr/local/bin for toolbox.sh and rook to
   ensure compatibility with upstream sample yamls
+
 * Mon Sep 21 2020 Stefan Haas <stefan.haas@suse.com>
 - fixed spec-file:
   * operator.yaml does not get changed to use the SUSE-images
+
 * Thu Sep 17 2020 Mike Latimer <mlatimer@suse.com>
 - helm chart, manifests:
   * fixed tolerations
   * Update SUSE documentation URL in NOTES.txt
+
 * Thu Sep 17 2020 Mike Latimer <mlatimer@suse.com>
 - ceph: fix drive group deployment failure (bsc#1176170)
 - helm chart, manifests:
@@ -563,8 +574,10 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Remove FlexVolume agent
   * Require currentNamespaceOnly=true
   * Replace NOTES.txt with SUSE specific version
+
 * Tue Sep 15 2020 Mike Latimer <mlatimer@suse.com>
 - Include operator and common yamls in manifest package
+
 * Sat Sep 12 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.3
   * The Ceph-CSI driver was being unexpectedly removed by the garbage
@@ -582,6 +595,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Do not use label selector on external mgr service (#6142)
   * Allow uninstall even if volumes still exist with a new CephCluster
     setting (#6145)
+
 * Thu Sep 10 2020 Mike Latimer <mlatimer@suse.com>
 - Update to v1.4.2
   - Patch release focusing on small feature additions and bug fixes.
@@ -626,6 +640,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   - Leave ceph-csi templates in /etc, and include them in main rook package.
   - csi-template-paths.patch
   - Include only designated yaml examples in rook-k8s-yaml package
+
 * Mon Aug 10 2020 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.4.0:
   * Ceph-CSI 3.0 is deployed by default
@@ -661,6 +676,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * The operator will check for the presence of the lvm2 package on the host where OSDs will run. If not available, the prepare job will fail. This will prevent issues of OSDs not restarting on node reboot.
   * Added a new label ceph_daemon_type to Ceph daemon pods.
   * Added a toolbox job example for running a script with Ceph commands, similar to running commands in the Rook toolbox.
+
 * Wed May 27 2020 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.3.4:
   * Finalizer for OBC cleanup (#5436)
@@ -677,17 +693,20 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * CSI priority class example update (#5443)
   * Set test default pool size to one (#5428)
   * Remove invalid verbose params from lv activate (#5438)
+
 * Wed Apr 22 2020 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.3.1:
   * Stop the pool controller from staying in a reconcile loop (#5173)
   * Update the rgw service port during upgrade (#5228)
 - Removed orchestrator-cli-rename.patch as it got merged
+
 * Mon Apr 20 2020 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.3.0:
   * Ceph: revert mgr to minimal privilege (#5183)
   * Enable the Ceph CSI v2.0.1 driver by default in Rook (#5162)
   * ceph: add liveness probe to mon, mds and osd daemons (#5128)
   * Ceph: prevent pre-existing lvms from wipe (#4966)
+
 * Tue Mar 31 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.7 (bsc#1168160):
   * Apply the expected lower PG count for rgw metadata pools (#5091)
@@ -698,6 +717,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Resizer container fix due to misinterpretation of the cephcsi version (#5073-1)
   * Set ResourceVersion for Prometheus rules (#4528)
   * Upgrade doc clarification for RBAC related to the helm chart (#5054)
+
 * Wed Mar 18 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.6:
   * Update default Ceph version to v14.2.8 (#4960)
@@ -705,11 +725,14 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Mount /udev so the osds can discover device info (#5001)
   * Query for the topology.kubernetes.io labels in K8s 1.17 or newer for the CRUSH hierarchy (#4989)
   * Log a warning when useAllNodes is true, but nodes are defined in the cluster CR ([commit](https://github.com/rook/rook/pull/4974/commits/69c9ed4206f47644687733396d87022e93d312a3))
+
 * Tue Mar 10 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - ceph: orchestrator cli name change
   * Add orchestrator-cli-rename.patch
+
 * Thu Feb 20 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - ceph: populate CSI configmap for external cluster
+
 * Tue Feb 18 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.4:
   * Stop garbage collector from deleting the CSI driver unexpectedly (#4820)
@@ -719,8 +742,10 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Sort flexvolume docs and update for kubespray (#4747)
   * Add OpenShift common issues documentation (#4764)
   * Improved integration test when cleaning devices (#4796)
+
 * Fri Jan 31 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Package helm charts for the rook operator for ceph (SES-799)
+
 * Mon Jan 27 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.2:
   * Allow multiple clusters to set useAllDevices (#4692)
@@ -739,6 +764,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Add option to the cluster CR to continue upgrade even with unclean PGs (#4617)
   * Add K8s 1.11 back to the integration tests as the minimum version (#4673)
   * Fixed replication factor flag and the master addresses (#4625)
+
 * Wed Jan  8 2020 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.1:
   * Add missing env var  `ROOK_CEPH_MON_HOST` for OSDs (#4589)
@@ -746,6 +772,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Add missing vol mount for encrypted osds (#4583)
   * Bumping ceph-operator memory limit to 256Mi (#4561)
   * Fix object bucket provisioner when rgw not on port 80 (#4508)
+
 * Fri Dec 20 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Update to v1.2.0:
   * Security audit completed by Trail of Bits found no major concerns
@@ -781,6 +808,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 - Update csi-dummy-images.patch
 - Update flexvolume-dir.patch
 - Drop outdated patch 0001-bsc-1152690-ceph-csi-Driver-will-fail-with-error.patch
+
 * Tue Dec  3 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Update rook to v1.1.7:
   * Skip osd prepare job creation if osd daemon exists for the pvc (#4277)
@@ -796,6 +824,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Silence disruption errors if necessary and add missing errors (#4288)
   * Create csi keys and secrets for external cluster (#4276)
   * Add retry to ObjectUser creation (#4149)
+
 * Wed Nov  6 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Update rook to v1.1.6:
   * Flex driver should not allow attach before detach on a different node (#3582)
@@ -812,6 +841,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   * Use the rook image for drain canary pods (#4213)
   * Allow setting of osd prepare resource limits (#4182)
   * Documentation for object bucket provisioning (#3882)
+
 * Tue Nov  5 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Update rook to v1.1.4:
   * OSD config overrides were ignored for some upgraded OSDs (#4161)
@@ -839,17 +869,22 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 - Update csi-dummy-images.patch
 - Update csi-template-paths.patch
 - Update 0001-bsc-1152690-ceph-csi-Driver-will-fail-with-error.patch
+
 * Wed Oct  2 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Force use of ceph kernel client driver (bsc#1152690)
 - Add 0001-bsc-1152690-ceph-csi-Driver-will-fail-with-error.patch
+
 * Tue Oct  1 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Define build shell as /bin/bash for usage of `=~` conditional (bsc#1152559)
+
 * Mon Sep 30 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Fix csi-dummy-images.patch to work with Go linker's -X flag (bsc#1152559)
   + update linker flags themselves to remove comments from flags
   + add test to spec file to verify linker flags are working in future
+
 * Thu Sep 26 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Fix 2 improper RPM spec variable references in specfile (bsc#1151909)
+
 * Wed Sep 25 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Use lightweight git tags when determining Rook version from source in tarball script (bsc#1151909)
   + Build should now be tagged appropriately as version 1.1.1.0 instead of 1.1.0.x
@@ -864,8 +899,10 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 - Add patch: csi-dummy-images.patch
 - Add patch: csi-template-paths.patch
 - Add patch: flexvolume-dir.patch
+
 * Wed Sep 25 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - rook-k8s-yaml: Fix YAML indentation of cephcsi image value (bsc#1152008)
+
 * Wed Sep 25 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Update Rook to match upstream version v1.1.1 (bsc#1151909)
   + Disable the flex driver by default in new clusters
@@ -896,8 +933,10 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + uncomment ROOK_CSI_CEPH_IMAGE var
   + set FlexVolume dir path for Kubic
   + add ROOK_CSI_*_TEMPLATE_PATH configs
+
 * Mon Sep 16 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - rook-k8s-yaml: Revert to buildrequire for ceph (bsc#1151479)
+
 * Fri Sep 13 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Update tar creation script
   + build rook tag 'v1.1.0' from 'suse-release-1.1' branch
@@ -910,9 +949,11 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + set command property for the OSD prepare init container blkdevmapper
   + change OSD DOWN message to debug level
   + discovery daemon: ignore updates on nbd devices
+
 * Mon Sep  9 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Support upstream beta tags by replacing hyphens in release tag with tildes
   + RPMs sorts tildes before anything else to support vX.Y.0~beta.B coming before vX.Y.0
+
 * Mon Sep  9 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Update tar creation script
   + fail on more types of script errors
@@ -948,14 +989,18 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + add ability to enable mgr modules via CRD (notably the pg_autoscaler module)
   + fix topologyAware on PVC-based OSDs
   + add support for OpenShift machine disruption budgets
+
 * Fri Aug 23 2019 Kristoffer Gronlund <kgronlund@suse.com>
 - Make rook-k8s-yaml require the matching ceph version
 - Update rook to commit 692553221d8b18fec8aa3ccdc5872e51f05ca372:
   +  uncomment ROOK_CSI_CEPH_IMAGE var
+
 * Fri Aug 16 2019 Jan Engelhardt <jengelh@inai.de>
 - Trim redundant wording from description.
+
 * Tue Aug 13 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Tech preview release for containers (bsc#1145433)
+
 * Mon Aug 12 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update Rook to commit e9abbf4831673a9a5545971532ae326e95f3ea60
   + enable the ceph-csi driver by default
@@ -967,26 +1012,32 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + ceph: chown with init container
   + ceph: when mons use pvc mount volume at subpath
 - csi was merged to operator.yaml, sed to correct file
+
 * Fri Aug  2 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Fix build broken with creation of new rook-integration helper files
 - Put helper files into /usr/share/rook-integration dir
 - Change name of 'integration' binary to 'rook-integration'
+
 * Thu Aug  1 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Generate files which contain the names of all images used in the manifests produced by this build
   which are installed with the rook-integration package to assist the integration tooling.
+
 * Thu Aug  1 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Update spec file to build rook-integration binary
   - Building test binaries is different from building main binaries, so manual steps needed
 - Apply linker flags to rookflex binary also (just in case)
 - Slightly rework rook-k8s-yaml summary description
+
 * Fri Jul 26 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Correct toolbox location in manifest files
+
 * Tue Jul 23 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update Rook to commit 7a48482f5cd92397eef068d097ad233739ceae06
   + ceph: run ceph processes with the 'ceph' user
   + Correct typo about skipVolumeForDirectory's code comment
   + Fix: topologyAware does not pick up failure domains.
   + Correct typo about skipVolumeForDirectory's code comment
+
 * Mon Jul 22 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update Rook to commit 0141cfea50a7f80ff1ee67aa8cc7ad28edc79a64
   + OSD startup on SDN for error "Cannot assign requested address"
@@ -1005,19 +1056,25 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + Stop creating initial crushmap to avoid incorrect crush map warning
   + Use correct rounding of PV size for binding of PVCs (for example G or Gi)
 - Add psp to common.yaml
+
 * Wed Jul 17 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Use ceph-base pattern instead of packages
+
 * Fri Jul 12 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Fix sed expression to replace correct link
+
 * Fri Jul 12 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Add ceph-csi as a dependency and update manifest link with it
+
 * Thu Jul 11 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - correct version for Rook build that doesn's support "+"
+
 * Tue Jul  9 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - noarch for the rook-k8s-yaml package
 - update rook to a265cdf commit
   + added ROOK_CSI_* template pathes
 - modify update script for none Go enviroment
+
 * Mon Jul  8 2019 Blaine Gardner <blaine.gardner@suse.com>
 - Fix subtly broken dependency (vendor dir) generation
 - Generate two tarballs for builds to follow latest upstream best practices for Golang RPM builds
@@ -1037,30 +1094,38 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + set fully qualified apiVersion on OwnerReferences
   + OSDs marked out by Ceph will have their Kubernetes resources automatically cleaned up (will not be removed from CRUSH map)
   + add NodeAffinity to system daemons
+
 * Wed Jul  3 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - restore package name and correct unique containers tags
+
 * Tue Jun 18 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - changing package name as it couldn't comply to the container tag name
   + https://github.com/containers/image/issues/649
+
 * Tue Jun 18 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Ceph added as a requirement to get it version for the container image
 - Added service to strip Ceph version from ceph package
 - Fixed sed for the container images names
+
 * Tue Jun 18 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update Rook to commit ad89e4f47e744c484b8e264e351f6276a42eedfc
   + change csi template path to match rook-k8s-yaml package files
 - Fix update-tarball.sh to delete right files
 - Add all manifests to the rook-k8s-yaml packages
 - Fix rook binary location from /usr/local/bin/ to /usr/bin/
+
 * Tue Jun 18 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Fix update-tarball.sh to ignore errors where is needed
 - Update spec to include additional ceph-csi config files
+
 * Mon Jun 17 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Adding additional files as Source to spec
+
 * Mon Jun 17 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update tarball generation script to get correct version
 - Correct tarball name, spec version and package name
 - Add new k8s-yaml package to distribute manifests files
+
 * Tue May 21 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Update rook to commit 700cdd36fe9107733a717fac934c2bedd91fd290
 - build from https://github.com/SUSE/rook/tree/suse-master
@@ -1071,6 +1136,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + A CephNFS CRD will start NFS daemon(s) for exporting CephFS volumes or RGW buckets
   + The number of mons can be increased automatically when new nodes come online
   + OSDs provisioned by ceph-volume now supports metadataDevice and databaseSizeMB options
+
 * Mon Apr 29 2019 Jan Fajerski <jan.fajerski@suse.com>
 - Update rook to commit c43b57844e37a7909beb362d08ef85fffdd5fed4
 - build from https://github.com/SUSE/rook/tree/suse-master
@@ -1081,6 +1147,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + clean shutdown of CephFS
   + improve logging
   + improved upgrade ochestration
+
 * Mon Apr  8 2019 Jan Fajerski <jan.fajerski@suse.com>
 - Update rook to commit 69936c170cb3913a539eacf963993e9bb3545e8a
 - Cassandra: Fix the mount point for th
@@ -1088,6 +1155,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
   + Improve mon failover cleanup and operator restart during failover
   + Enable host ipc for osd encryption
   + Add missing "host path requires privileged" setting to the helm chart
+
 * Tue Jan 29 2019 Jan Fajerski <jan.fajerski@suse.com>
 - Update rook to commit 8e263cd9c31b0a310b0d1180e58ac843b432b14b
 - Correctly capture and log the stderr output from child processes
@@ -1098,20 +1166,25 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 - Correctly configure the ssl certificate for the RGW service
 - Allow configuration of the dashboard port
 - Allow disabling of ssl on the dashboard
+
 * Thu Jan 17 2019 Jan Fajerski <jan.fajerski@suse.com>
 - Update rook to commit d0cd8cec72176bf28a3ac0ba1457297151004f79
 - Ceph CRDs have been declared stable V1.
 - Ceph versioning is decoupled from the Rook version. Luminous and Mimic can be run in production, or Nautilus in experimental mode.
 - Ceph upgrades are greatly simplified
 - The minimum version of Kubernetes supported by Rook changed from 1.7 to 1.8
+
 * Mon Jan 14 2019 Jan Fajerski <jan.fajerski@suse.com>
 - install to /usr/local/bin as rook hardcodes this path for rookflex
+
 * Tue Oct 30 2018 Jan Fajerski <jan.fajerski@suse.com>
 - Update rook to commit bf2759e317c44c0ad0aaf635e04cbd72a002a5a0
 - Refactor ceph containers to disconnect rook and ceph versions
+
 * Thu Apr 26 2018 blaine.gardner@suse.com
 - Update Rook build to use '-buildmode=pie' flag
 - Version at commit e11b3d863728667ea018aa329f3ad907360473cf
+
 * Tue Apr 24 2018 blaine.gardner@suse.com
 - Initial submission
 - Version at commit 71514921ad8e41ede6f2814e7004f0465e3dd0f7
