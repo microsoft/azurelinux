@@ -25,6 +25,7 @@ var (
 
 	pkgsToSearch  = app.Flag("packages", "Space seperated list of packages to search from.").String()
 	specsToSearch = app.Flag("specs", "Space seperated list of specfiles to search from.").String()
+	goalsToSearch = app.Flag("goals", "Space seperated list of goal names to search (Try 'ALL' or 'PackagesToBuild').").String()
 
 	reverseSearch = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
 
@@ -49,14 +50,17 @@ func main() {
 
 	pkgSearchList := exe.ParseListArgument(*pkgsToSearch)
 	specSearchList := exe.ParseListArgument(*specsToSearch)
+	goalSearchList := exe.ParseListArgument(*goalsToSearch)
 
 	nodeListPkg := searchForPkg(graph, pkgSearchList)
 	nodeListSpec := searchForSpec(graph, specSearchList)
+	nodeListGoal := searchForGoal(graph, goalSearchList)
 
-	nodeSet := removeDuplicates(append(nodeListPkg, nodeListSpec...))
+	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
+	nodeSet := removeDuplicates(nodeLists)
 
 	if len(nodeSet) == 0 {
-		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s]", *pkgsToSearch, *specsToSearch)
+		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
 	} else {
 		logger.Log.Infof("Found %d nodes to consider", len(nodeSet))
 	}
@@ -72,6 +76,16 @@ func main() {
 	printSpecs(outputGraph)
 
 	pkggraph.WriteDOTGraphFile(outputGraph, *outputGraphFile)
+}
+
+func searchForGoal(graph *pkggraph.PkgGraph, goals []string) (list []*pkggraph.PkgNode) {
+	for _, goal := range goals {
+		n := graph.FindGoalNode(goal)
+		if n != nil {
+			list = append(list, n)
+		}
+	}
+	return
 }
 
 func searchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph.PkgNode) {
