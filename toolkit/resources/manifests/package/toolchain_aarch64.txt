@@ -142,7 +142,7 @@ json-c-debuginfo-0.14-3.cm2.aarch64.rpm
 json-c-devel-0.14-3.cm2.aarch64.rpm
 kbd-2.0.4-6.cm2.aarch64.rpm
 kbd-debuginfo-2.0.4-6.cm2.aarch64.rpm
-kernel-headers-5.10.64.1-2.cm2.noarch.rpm
+kernel-headers-5.10.69.1-1.cm2.noarch.rpm
 kmod-25-6.cm2.aarch64.rpm
 kmod-debuginfo-25-6.cm2.aarch64.rpm
 kmod-devel-25-6.cm2.aarch64.rpm
