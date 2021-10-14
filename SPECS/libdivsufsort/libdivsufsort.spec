@@ -22,19 +22,17 @@ A software library that implements a lightweight suffix array construction algor
 %build
 mkdir build
 cd build
-%cmake -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="/usr" ..
-make %{?_smp_mflags}
+%cmake -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="%{_prefix}" ..
+%make_build
 
 %install
 cd build
 %make_install
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %{_includedir}/divsufsort.h
-%{_libdir}/libdivsufsort.so*
+%{_libdir}/libdivsufsort.so
+%{_libdir}/libdivsufsort.so.3*
 %{_libdir}/pkgconfig/libdivsufsort.pc
 
 %changelog
