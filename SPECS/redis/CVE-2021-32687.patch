@@ -1,0 +1,67 @@
+From a30d367a71b7017581cf1ca104242a3c644dec0f Mon Sep 17 00:00:00 2001
+From: Oran Agra <oran@redislabs.com>
+Date: Sun, 26 Sep 2021 15:42:17 +0300
+Subject: [PATCH] Fix Integer overflow issue with intsets (CVE-2021-32687)
+
+The vulnerability involves changing the default set-max-intset-entries
+configuration parameter to a very large value and constructing specially
+crafted commands to manipulate sets
+---
+ src/intset.c | 4 +++-
+ src/rdb.c    | 4 +++-
+ src/t_set.c  | 5 ++++-
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/intset.c b/src/intset.c
+index 19f6562ed69c..3f8b754e3a3e 100644
+--- a/src/intset.c
++++ b/src/intset.c
+@@ -34,6 +34,7 @@
+ #include "intset.h"
+ #include "zmalloc.h"
+ #include "endianconv.h"
++#include "redisassert.h"
+ 
+ /* Note that these encodings are ordered, so:
+  * INTSET_ENC_INT16 < INTSET_ENC_INT32 < INTSET_ENC_INT64. */
+@@ -103,7 +104,8 @@ intset *intsetNew(void) {
+ 
+ /* Resize the intset */
+ static intset *intsetResize(intset *is, uint32_t len) {
+-    uint32_t size = len*intrev32ifbe(is->encoding);
++    uint64_t size = (uint64_t)len*intrev32ifbe(is->encoding);
++    assert(size <= SIZE_MAX - sizeof(intset));
+     is = zrealloc(is,sizeof(intset)+size);
+     return is;
+ }
+diff --git a/src/rdb.c b/src/rdb.c
+index 82b4cf5065d1..ecd2c0e9870a 100644
+--- a/src/rdb.c
++++ b/src/rdb.c
+@@ -1518,7 +1518,9 @@ robj *rdbLoadObject(int rdbtype, rio *rdb, sds key) {
+         if ((len = rdbLoadLen(rdb,NULL)) == RDB_LENERR) return NULL;
+ 
+         /* Use a regular set when there are too many entries. */
+-        if (len > server.set_max_intset_entries) {
++        size_t max_entries = server.set_max_intset_entries;
++        if (max_entries >= 1<<30) max_entries = 1<<30;
++        if (len > max_entries) {
+             o = createSetObject();
+             /* It's faster to expand the dict to the right size asap in order
+              * to avoid rehashing */
+diff --git a/src/t_set.c b/src/t_set.c
+index f32565e41102..eea45c8df2d8 100644
+--- a/src/t_set.c
++++ b/src/t_set.c
+@@ -66,7 +66,10 @@ int setTypeAdd(robj *subject, sds value) {
+             if (success) {
+                 /* Convert to regular set when the intset contains
+                  * too many entries. */
+-                if (intsetLen(subject->ptr) > server.set_max_intset_entries)
++                size_t max_entries = server.set_max_intset_entries;
++                /* limit to 1G entries due to intset internals. */
++                if (max_entries >= 1<<30) max_entries = 1<<30;
++                if (intsetLen(subject->ptr) > max_entries)
+                     setTypeConvert(subject,OBJ_ENCODING_HT);
+                 return 1;
+             }
