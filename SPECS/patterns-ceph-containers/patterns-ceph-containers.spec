@@ -1,7 +1,7 @@
 Summary:        Patterns for the Ceph containers
 Name:           patterns-ceph-containers
 Version:        1.0
-Release:        bp153.1.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

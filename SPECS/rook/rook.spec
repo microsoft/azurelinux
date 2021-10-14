@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        1.2
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -357,7 +357,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 # bother adding docs or changelog or anything
 
 %changelog
-* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-1
+* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License Verified
 - Remove unused/un-supported macro usage
