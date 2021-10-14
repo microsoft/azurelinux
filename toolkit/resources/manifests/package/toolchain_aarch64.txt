@@ -166,11 +166,6 @@ libcap-devel-2.26-2.cm2.aarch64.rpm
 libcap-ng-0.7.9-4.cm2.aarch64.rpm
 libcap-ng-debuginfo-0.7.9-4.cm2.aarch64.rpm
 libcap-ng-devel-0.7.9-4.cm2.aarch64.rpm
-libdb-5.3.28-5.cm2.aarch64.rpm
-libdb-debuginfo-5.3.28-5.cm2.aarch64.rpm
-libdb-devel-5.3.28-5.cm2.aarch64.rpm
-libdb-docs-5.3.28-5.cm2.aarch64.rpm
-libdb-utils-5.3.28-5.cm2.aarch64.rpm
 libffi-3.2.1-12.cm2.aarch64.rpm
 libffi-debuginfo-3.2.1-12.cm2.aarch64.rpm
 libffi-devel-3.2.1-12.cm2.aarch64.rpm
@@ -275,10 +270,6 @@ npth-devel-1.6-3.cm2.aarch64.rpm
 nspr-4.21-2.cm2.aarch64.rpm
 nspr-debuginfo-4.21-2.cm2.aarch64.rpm
 nspr-devel-4.21-2.cm2.aarch64.rpm
-nss-3.44-8.cm2.aarch64.rpm
-nss-debuginfo-3.44-8.cm2.aarch64.rpm
-nss-devel-3.44-8.cm2.aarch64.rpm
-nss-libs-3.44-8.cm2.aarch64.rpm
 openjdk8-1.8.0.292-1.cm2.aarch64.rpm
 openjdk8-debuginfo-1.8.0.292-1.cm2.aarch64.rpm
 openjdk8-doc-1.8.0.292-1.cm2.aarch64.rpm
