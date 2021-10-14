@@ -2055,8 +2055,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.49",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.49.tar.bz2"
+          "version": "2.4.51",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.51.tar.bz2"
         }
       }
     },
