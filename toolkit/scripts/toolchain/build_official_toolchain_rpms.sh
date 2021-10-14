@@ -261,7 +261,6 @@ chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
 chroot_and_install_rpms perl
 
-build_rpm_in_chroot_no_install nss
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
@@ -488,6 +487,9 @@ build_rpm_in_chroot_no_install libselinux
 # util-linux and rpm require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
+# rpm requires debugedit
+build_rpm_in_chroot_no_install debugedit
+chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
 
 # rebuild pam with selinux support

@@ -1066,32 +1066,6 @@ popd
 rm -rf db-5.3.28
 touch /logs/status_libdb_complete
 
-echo nss-3.44
-tar xf nss-3.44.tar.gz
-pushd nss-3.44
-patch -Np1 -i ../nss-3.44-standalone-1.patch
-cd nss
-export NSS_DISABLE_GTESTS=1
-# Build with single processor due to errors seen with parallel make
-make -j1 BUILD_OPT=1                    \
-    NSPR_INCLUDE_DIR=/usr/include/nspr  \
-    USE_SYSTEM_ZLIB=1                   \
-    ZLIB_LIBS=-lz                       \
-    NSS_ENABLE_WERROR=0                 \
-    USE_64=1                            \
-    $([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
-cd ../dist
-install -v -m755 Linux*/lib/*.so              /usr/lib
-install -v -m644 Linux*/lib/{*.chk,libcrmf.a} /usr/lib
-install -v -m755 -d                           /usr/include/nss
-cp -v -RL {public,private}/nss/*              /usr/include/nss
-chmod -v 644                                  /usr/include/nss/*
-install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} /usr/bin
-install -v -m644 Linux*/lib/pkgconfig/nss.pc  /usr/lib/pkgconfig
-popd
-rm -rf nss-3.44
-touch /logs/status_nss_complete
-
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
@@ -1162,28 +1136,45 @@ popd
 rm -rf lua-5.3.5
 touch /logs/status_lua_complete
 
-echo rpm-4.14.2
-tar xjf rpm-4.14.2.tar.bz2
-pushd rpm-4.14.2
-patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+DEBUGEDIT_WITH_VERSION=debugedit-5.0
+echo $DEBUGEDIT_WITH_VERSION
+tar xf "$DEBUGEDIT_WITH_VERSION".tar.xz
+pushd "$DEBUGEDIT_WITH_VERSION"
+./configure --prefix=/usr
+make
+make install
+popd
+rm -rf "$DEBUGEDIT_WITH_VERSION"
+touch /logs/status_debugedit_complete
+
+RPM_WITH_VERSION=rpm-4.17.0
+RPM_FOLDER="$RPM_WITH_VERSION"-release
+echo $RPM_WITH_VERSION
+tar xf "$RPM_WITH_VERSION"-release.tar.gz
+mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
+pushd "$RPM_FOLDER"
+
+# Do not build docs - pandoc dependency is not supplied in the toolchain.
+sed -iE '/SUBDIRS/ s/docs //' Makefile.am
+sed -iE '/Always build/,+16 d' Makefile.am
+
+./autogen.sh --noconfigure
 ./configure --prefix=/usr \
-    --enable-posixmutexes \
-    --without-selinux \
-    --with-vendor=mariner \
-    --without-python \
-    --with-lua \
-    --without-javaglue
+        --enable-ndb \
+        --without-selinux \
+        --with-crypto=openssl \
+        --with-vendor=mariner
+
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf rpm-4.14.2
+rm -rf "$RPM_FOLDER"
 touch /logs/status_rpm_complete
 
 # Cleanup
 rm -rf /tmp/*
-unset BUILD_TARGET
 
 echo sanity check - raw toolchain - after build complete - gcc -v
 gcc -v

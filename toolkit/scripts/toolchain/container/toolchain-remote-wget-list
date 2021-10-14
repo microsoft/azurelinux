@@ -1,6 +1,7 @@
 http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz
 http://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.xz
 https://ftp.gnu.org/gnu/binutils/binutils-2.36.1.tar.xz
+https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz
 http://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.2.tar.gz
 https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz
 https://sourceware.org/ftp/elfutils/0.176/elfutils-0.176.tar.bz2
@@ -30,7 +31,7 @@ http://anduin.linuxfromscratch.org/BLFS/bdb/db-5.3.28.tar.gz
 https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz
 http://www.lua.org/ftp/lua-5.3.5.tar.gz
 ftp://anduin.linuxfromscratch.org/BLFS/popt/popt-1.16.tar.gz
-http://ftp.rpm.org/releases/rpm-4.14.x/rpm-4.14.2.tar.bz2
+https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 http://www.linuxfromscratch.org/patches/blfs/9.0/lua-5.3.5-shared_library-1.patch
 https://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.xz
 http://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.xz
@@ -57,8 +58,6 @@ https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.t
 http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 http://download.savannah.gnu.org/releases/man-db/man-db-2.8.4.tar.xz
 https://archive.mozilla.org/pub/nspr/releases/v4.21/src/nspr-4.21.tar.gz
-http://www.linuxfromscratch.org/patches/downloads/nss/nss-3.44-standalone-1.patch
-https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.gz
 https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.028.tar.gz
 https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.51.tar.gz
 https://www.openssl.org/source/openssl-1.1.1g.tar.gz
