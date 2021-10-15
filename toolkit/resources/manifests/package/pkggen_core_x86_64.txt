@@ -44,9 +44,9 @@ coreutils-lang-8.30-10.cm2.x86_64.rpm
 bash-4.4.18-7.cm2.x86_64.rpm
 bash-devel-4.4.18-7.cm2.x86_64.rpm
 bash-lang-4.4.18-7.cm2.x86_64.rpm
-bzip2-1.0.6-16.cm2.x86_64.rpm
-bzip2-devel-1.0.6-16.cm2.x86_64.rpm
-bzip2-libs-1.0.6-16.cm2.x86_64.rpm
+bzip2-1.0.8-1.cm2.x86_64.rpm
+bzip2-devel-1.0.8-1.cm2.x86_64.rpm
+bzip2-libs-1.0.8-1.cm2.x86_64.rpm
 sed-4.5-3.cm2.x86_64.rpm
 sed-lang-4.5-3.cm2.x86_64.rpm
 procps-ng-3.3.15-5.cm2.x86_64.rpm
