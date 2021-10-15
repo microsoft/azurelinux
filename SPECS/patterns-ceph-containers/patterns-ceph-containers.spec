@@ -19,7 +19,6 @@ not make sense.
 Summary:        Ceph base
 Group:          Metapackages
 Provides:       pattern() = ceph_base
-#Provides:      pattern-icon() = yast-iscsi-client
 Provides:       pattern-category() = Containers
 Provides:       pattern-order() = 3000
 Provides:       pattern-visible()
@@ -70,7 +69,7 @@ echo 'This file marks the pattern ceph-base to be installed.' >%{buildroot}%{_do
 
 %changelog
 * Mon Oct 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
-- Initial CBL-Mariner import from OpenSuse (license: MIT)
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Modified installation path 
 

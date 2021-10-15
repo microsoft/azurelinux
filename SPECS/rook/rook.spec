@@ -25,6 +25,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Filesystems
 URL:            https://rook.io/
+#Source0:       https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Source97:       SUSE-helm-notes.txt
@@ -127,23 +128,10 @@ argument to [-test.run]. All Ceph test suites can be run with the argument
 # Build section
 ################################################################################
 %define _buildshell /bin/bash
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 %prep
 %autosetup -p1
 tar -xf %{SOURCE1} --no-same-owner
-
-# Determine registry to use in manifests depending on the base os type
-%if 0%{?is_opensuse}
-%define registry registry.opensuse.org/opensuse
-%else # is SES
-%if 0%{?sle_version} >= 150200
-%define registry registry.suse.com/ses/7
-%else
-%define registry registry.suse.com/ses/6
-%endif
-%endif
 
 # Replace default registry and paths in all required files
 %define spec_go pkg/operator/ceph/csi/spec.go
@@ -207,6 +195,8 @@ done
 #         -v (orint package names), -x (print commands)]
 #    and flags to get rid of RPMLINT report warnings/errors:
 #         -buildmode=pie (position-independent executable)
+
+%check
 GOPATH=%{_builddir}/go GOBIN="${GOPATH}"/bin \
     go test -v -x -buildmode=pie -c -mod=vendor\
         -o rook-integration ./tests/integration
@@ -358,7 +348,7 @@ echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 
 %changelog
 * Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-2
-- Initial CBL-Mariner import from Fedora 35 (license: MIT)
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Remove unused/un-supported macro usage
 
