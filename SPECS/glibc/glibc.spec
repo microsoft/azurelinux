@@ -6,8 +6,8 @@
 
 Summary:        Main C library
 Name:           glibc
-Version:        2.28
-Release:        19%{?dist}
+Version:        2.34
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
-Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.25-fhs-1.patch
+Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
 Patch1:         glibc-2.24-bindrsvport-blacklist.patch
 Patch2:         0002-malloc-arena-fix.patch
 Patch3:         glibc-2.28-CVE-2018-19591.patch
@@ -305,6 +305,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.34-1
+- Upgrade to version 2.34
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
 - Adding 'Provides' for 'nss_db'.
 
