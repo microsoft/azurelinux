@@ -1,0 +1,40 @@
+From 37ebe5c83d6fbeec96bad96950f4528a95380aff Mon Sep 17 00:00:00 2001
+From: Shreenidhi Shedi <sshedi@vmware.com>
+Date: Wed, 25 Aug 2021 19:14:01 +0530
+Subject: [PATCH] Add default DS list & few other changes to cloud.cfg
+
+Comments in the file describe why they are needed
+
+Signed-off-by: Shreenidhi Shedi <sshedi@vmware.com>
+---
+ config/cloud.cfg.tmpl | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index 825deff4..8847bb7b 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -51,6 +51,8 @@ preserve_hostname: false
+ # This should not be required, but leave it in place until the real cause of
+ # not finding -any- datasources is resolved.
+ datasource_list: ['NoCloud', 'ConfigDrive', 'Azure', 'OpenStack', 'Ec2']
++{% elif variant in ["mariner"] %}
++datasource_list: ['NoCloud', 'ConfigDrive', 'OVF', 'OpenStack', 'VMware', None]
+ {% endif %}
+ # Example datasource config
+ # datasource:
+@@ -59,6 +61,11 @@ datasource_list: ['NoCloud', 'ConfigDrive', 'Azure', 'OpenStack', 'Ec2']
+ #      timeout: 5 # (defaults to 50 seconds)
+ #      max_wait: 10 # (defaults to 120 seconds)
+ 
++# Set allow_raw_data to true if you want OVF to support raw data feature
++# this will wait 15 sec for cust.cfg
++datasource:
++  OVF:
++    allow_raw_data: false
+ 
+ {% if variant == "amazon" %}
+ # Amazon Linux relies on ec2-net-utils for network configuration
+-- 
+2.32.0
+
