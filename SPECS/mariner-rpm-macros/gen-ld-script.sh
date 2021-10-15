@@ -37,4 +37,5 @@ esac
    --name "$1" \
    --version "$2" \
    --moduleVersion "$MODULEVERSION" \
-   --stamp "LinkerOnly"
+   --stamp "LinkerOnly" \
+   --outdir "/usr/src/mariner/BUILD/"

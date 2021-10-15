@@ -340,6 +340,7 @@ if __name__ == '__main__':
     outdir = args.outdir
 
     if outdir:
+        os.path.join(outdir, '')
         print("outdir is: {}".format(outdir))
 
     endian = Endian.map[args.endian]
