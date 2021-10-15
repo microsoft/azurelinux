@@ -62,7 +62,6 @@ popd
 # Cleanup patch files used in container
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
-rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 
