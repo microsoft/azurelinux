@@ -1,5 +1,5 @@
-%global openssh_ver 8.5p1
-%global openssh_rel 4%{?dist}
+%global openssh_ver 8.8p1
+%global openssh_rel 1%{?dist}
 
 %global pam_ssh_agent_ver 0.10.3
 %global pam_ssh_agent_rel 10%{?dist}
@@ -261,6 +261,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Wed Oct 6 2021 Rachel Menge <rachelmenge@microsoft.com> 8.8p1-1
+- Update to 8.8p1 to patch CVE-2021-41617
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5p1-4
 - Adding the 'pam_ssh_agent_auth' subpackage using Fedora 32 spec (license: MIT) as guidance.
 

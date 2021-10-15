@@ -1125,6 +1125,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "debugedit",
+          "version": "5.0",
+          "downloadUrl": "https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
@@ -1980,7 +1990,7 @@
         "other": {
           "name": "gnu-efi",
           "version": "3.0.9",
-          "downloadUrl": "https://gigenet.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
+          "downloadUrl": "https://pilotfiber.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
         }
       }
     },
@@ -2349,8 +2359,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.69.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
         }
       }
     },
@@ -2709,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.69.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
         }
       }
     },
@@ -2719,8 +2729,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.69.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
         }
       }
     },
@@ -2729,8 +2739,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.69.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
         }
       }
     },
@@ -5192,8 +5202,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.5p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.5p1.tar.gz"
+          "version": "8.8p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
         }
       }
     },
@@ -7572,8 +7582,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.14.2.1",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.14.2.1-release.tar.gz"
+          "version": "4.17.0",
+          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz"
         }
       }
     },
@@ -9793,8 +9803,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.4.4/zstd-1.4.4.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
         }
       }
     }

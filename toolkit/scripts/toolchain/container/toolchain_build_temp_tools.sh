@@ -113,14 +113,14 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.64.1 API Headers
-tar xf kernel-5.10.64.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.64.1
+echo Linux-5.10.69.1 API Headers
+tar xf kernel-5.10.69.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.69.1
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.64.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.69.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -596,13 +596,13 @@ rm -rf xz-5.2.4
 
 touch $LFS/logs/temptoolchain/status_xz_complete
 
-echo zstd-1.4.4
-tar xf zstd-1.4.4.tar.gz
-pushd zstd-1.4.4
+echo zstd-1.5.0
+tar xf zstd-1.5.0.tar.gz
+pushd zstd-1.5.0
 make -j$(nproc)
 make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
 popd
-rm -rf zstd-1.4.4
+rm -rf zstd-1.5.0
 
 touch $LFS/logs/temptoolchain/status_zstd_complete
 

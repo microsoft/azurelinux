@@ -21,7 +21,6 @@ docker ps -a
 # Texinfo patch file
 cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
-cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022

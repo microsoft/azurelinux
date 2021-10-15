@@ -258,6 +258,7 @@
                 "cloud-init-vmware-guestinfo",
                 "coredns-1.6.7",
                 "coredns-1.7.0",
+                "debugedit",
                 "dejavu-fonts",
                 "distroless-packages",
                 "dtc",

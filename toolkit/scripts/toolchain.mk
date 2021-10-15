@@ -54,7 +54,6 @@ clean-toolchain:
 	rm -f $(SCRIPTS_DIR)/toolchain/container/texinfo-perl-fix.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/Awt_build_headless_only.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/check-system-ca-certs.patch
-	rm -f $(SCRIPTS_DIR)/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/.bashrc
 
 clean-toolchain-rpms:
