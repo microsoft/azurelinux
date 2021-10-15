@@ -120,6 +120,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri Oct 15 2021 Ismail Kose <iskose@microsoft.com> - 2.0.7
+- Update generate-package-note.py tool to 2.1.0
+
 * Mon Oct 11 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.0-6
 - Remove too verbose logs from the linker script
 - Update default mariner macros with invalid_encoding_terminates_build
