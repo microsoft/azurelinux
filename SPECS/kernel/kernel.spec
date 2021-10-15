@@ -564,6 +564,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
+* Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.69.1-2
+- Update CONFIG_LD_VERSION for binutils 2.37
+
 * Thu Oct 07 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.69.1-1
 - Update source to 5.10.69.1
 - Address CVE-2021-38300, CVE-2021-41073, CVE-2021-3653, CVE-2021-42008
