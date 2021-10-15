@@ -1,0 +1,95 @@
+From 57415dda6cf04e73ffc3723be518eddfae599bfd Mon Sep 17 00:00:00 2001
+From: Greg Hudson <ghudson@mit.edu>
+Date: Sat, 31 Oct 2020 17:07:05 -0400
+Subject: [PATCH] Add recursion limit for ASN.1 indefinite lengths
+
+The libkrb5 ASN.1 decoder supports BER indefinite lengths.  It
+computes the tag length using recursion; the lack of a recursion limit
+allows an attacker to overrun the stack and cause the process to
+crash.  Reported by Demi Obenour.
+
+CVE-2020-28196:
+
+In MIT krb5 releases 1.11 and later, an unauthenticated attacker can
+cause a denial of service for any client or server to which it can
+send an ASN.1-encoded Kerberos message of sufficient length.
+
+ticket: 8959 (new)
+tags: pullup
+target_version: 1.18-next
+target_version: 1.17-next
+---
+ src/lib/krb5/asn.1/asn1_encode.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/src/lib/krb5/asn.1/asn1_encode.c b/src/lib/krb5/asn.1/asn1_encode.c
+index a160cf4fe86..cd6b879f776 100644
+--- a/src/lib/krb5/asn.1/asn1_encode.c
++++ b/src/lib/krb5/asn.1/asn1_encode.c
+@@ -356,7 +356,7 @@ make_tag(asn1buf *buf, const taginfo *t, size_t len)
+ static krb5_error_code
+ get_tag(const uint8_t *asn1, size_t len, taginfo *tag_out,
+         const uint8_t **contents_out, size_t *clen_out,
+-        const uint8_t **remainder_out, size_t *rlen_out)
++        const uint8_t **remainder_out, size_t *rlen_out, int recursion)
+ {
+     krb5_error_code ret;
+     uint8_t o;
+@@ -394,9 +394,11 @@ get_tag(const uint8_t *asn1, size_t len, taginfo *tag_out,
+         /* Indefinite form (should not be present in DER, but we accept it). */
+         if (tag_out->construction != CONSTRUCTED)
+             return ASN1_MISMATCH_INDEF;
++        if (recursion >= 32)
++            return ASN1_OVERFLOW;
+         p = asn1;
+         while (!(len >= 2 && p[0] == 0 && p[1] == 0)) {
+-            ret = get_tag(p, len, &t, &c, &clen, &p, &len);
++            ret = get_tag(p, len, &t, &c, &clen, &p, &len, recursion + 1);
+             if (ret)
+                 return ret;
+         }
+@@ -613,7 +615,7 @@ split_der(asn1buf *buf, uint8_t *const *der, size_t len, taginfo *tag_out)
+     const uint8_t *contents, *remainder;
+     size_t clen, rlen;
+ 
+-    ret = get_tag(*der, len, tag_out, &contents, &clen, &remainder, &rlen);
++    ret = get_tag(*der, len, tag_out, &contents, &clen, &remainder, &rlen, 0);
+     if (ret)
+         return ret;
+     if (rlen != 0)
+@@ -1199,7 +1201,7 @@ decode_atype(const taginfo *t, const uint8_t *asn1, size_t len,
+         const uint8_t *rem;
+         size_t rlen;
+         if (!tag->implicit) {
+-            ret = get_tag(asn1, len, &inner_tag, &asn1, &len, &rem, &rlen);
++            ret = get_tag(asn1, len, &inner_tag, &asn1, &len, &rem, &rlen, 0);
+             if (ret)
+                 return ret;
+             /* Note: we don't check rlen (it should be 0). */
+@@ -1420,7 +1422,7 @@ decode_sequence(const uint8_t *asn1, size_t len, const struct seq_info *seq,
+     for (i = 0; i < seq->n_fields; i++) {
+         if (len == 0)
+             break;
+-        ret = get_tag(asn1, len, &t, &contents, &clen, &asn1, &len);
++        ret = get_tag(asn1, len, &t, &contents, &clen, &asn1, &len, 0);
+         if (ret)
+             goto error;
+         /*
+@@ -1478,7 +1480,7 @@ decode_sequence_of(const uint8_t *asn1, size_t len,
+     *seq_out = NULL;
+     *count_out = 0;
+     while (len > 0) {
+-        ret = get_tag(asn1, len, &t, &contents, &clen, &asn1, &len);
++        ret = get_tag(asn1, len, &t, &contents, &clen, &asn1, &len, 0);
+         if (ret)
+             goto error;
+         if (!check_atype_tag(elemtype, &t)) {
+@@ -1584,7 +1586,7 @@ k5_asn1_full_decode(const krb5_data *code, const struct atype_info *a,
+ 
+     *retrep = NULL;
+     ret = get_tag((uint8_t *)code->data, code->length, &t, &contents,
+-                  &clen, &remainder, &rlen);
++                  &clen, &remainder, &rlen, 0);
+     if (ret)
+         return ret;
+     /* rlen should be 0, but we don't check it (and due to padding in
