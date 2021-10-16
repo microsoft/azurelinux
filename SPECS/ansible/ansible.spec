@@ -1,7 +1,8 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.9.18
+Version:        2.9.23
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -9,13 +10,17 @@ Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://releases.ansible.com/ansible/%{name}-%{version}.tar.gz
-BuildRequires:  python-setuptools
-BuildRequires:  python2
-BuildRequires:  python2-libs
-Requires:       python2
-# Required for %check
-Requires:       python2-devel
-Requires:       python2-libs
+BuildRequires:  python3-setuptools
+BuildRequires:  python3
+BuildRequires:  python3-libs
+%if %{with_check}
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+%endif
+
+Requires:       python3
+Requires:       python3-libs
+
 BuildArch:      noarch
 
 %description
@@ -25,22 +30,26 @@ Ansible is a radically simple IT automation system. It handles configuration-man
 %setup -q
 
 %build
-python2 setup.py build
+python3 setup.py build
 
 %install
-python2 setup.py install -O1 --skip-build \
-    --root %{buildroot}
+python3 setup.py install -O1 --root %{buildroot}
 
 %check
-python2 setup.py test
+pip3 install tox
+cd build/lib/ansible_test/_data && tox
 
 %files
 %defattr(-, root, root)
 %license licenses
 %{_bindir}/*
-%{python2_sitelib}/*
+%{python3_sitelib}/*
 
 %changelog
+* Fri Oct 15 2021 Bala <balakumaran.kannan@microsoft.com> - 2.9.23-1
+- Upgrade to version 2.9.23, which resolves CVE-2021-3583, CVE-2020-14330 and CVE-2021-20228
+- Switching to building with Python 3 to fix tests.
+
 * Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.9.18-1
 - Upgrade to version 2.9.18, which resolves CVE-2021-20191 and CVE-2021-20178
 
