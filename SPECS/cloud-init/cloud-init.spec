@@ -70,10 +70,10 @@ need special scripts to run during initialization to retrieve and install
 ssh keys and to let the user run various scripts.
 
 %package azure-kvp
-Summary:        Cloud-init configuration for Hyper-v telemetry
+Summary:        Cloud-init configuration for Hyper-V telemetry
 Requires:       %{name} = %{version}-%{release}
 %description    azure-kvp
-Cloud-init configuration for Hyper-v telemetry
+Cloud-init configuration for Hyper-V telemetry
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
