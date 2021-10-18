@@ -23,6 +23,7 @@
         "calamares",
         "catch",
         "checkpolicy",
+        "checksec",
         "chrony",
         "cmocka",
         "collectd",
