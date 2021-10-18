@@ -25,9 +25,26 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Filesystems
 URL:            https://rook.io/
-#Source0:       https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz
+#Source0:       https://github.com/rook/rook/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/rook/rook/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+#   NOTES:
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source97:       SUSE-helm-notes.txt
 Source98:       README
 Source99:       update-tarball.sh
