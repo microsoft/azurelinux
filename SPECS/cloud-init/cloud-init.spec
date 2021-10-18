@@ -3,7 +3,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        dscheck_VMwareGuestInfo
+Source2:        10-azure-kvp.cfg
 Patch0:         cloud-init-azureds.patch
 Patch1:         ds-identify.patch
 Patch2:         ds-vmware-mariner.patch
@@ -68,6 +69,12 @@ Cloud-init is a set of init scripts for cloud instances.  Cloud instances
 need special scripts to run during initialization to retrieve and install
 ssh keys and to let the user run various scripts.
 
+%package azure-kvp
+Summary:        Cloud-init configuration for Hyper-v telemetry
+Requires:       %{name} = %{version}-%{release}
+%description    azure-kvp
+Cloud-init configuration for Hyper-v telemetry
+
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
@@ -91,6 +98,7 @@ mkdir -p %{buildroot}%{_sharedstatedir}/cloud
 mkdir -p %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d
 
 install -m 755 %{SOURCE1} %{buildroot}/%{_bindir}
+install -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d/
 
 %check
 touch vd ud
@@ -146,7 +154,13 @@ rm -rf %{buildroot}
 %{_udevrulesdir}/10-cloud-init-hook-hotplug.rules
 %{_datadir}/bash-completion/completions/cloud-init
 
+%files azure-kvp
+%config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
+
 %changelog
+* Mon Oct 18 2021 Henry Beberman <henry.beberman@microsoft.com> - 21.3-3
+- Add azure-kvp subpackage.
+
 * Wed Sep 15 2021 Jiri Appl <jiria@microsoft.com> - 21.3-2
 - Port from Photon to Mariner
 - Fix dependencies
