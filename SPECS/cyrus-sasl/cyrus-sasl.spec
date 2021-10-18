@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,12 +25,14 @@ BuildRequires:  pam-devel
 BuildRequires:  postgresql-devel
 BuildRequires:  postgresql-libs
 BuildRequires:  systemd
+BuildRequires:  libdb-devel
 
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
 Requires:       pam
 Requires:       systemd
+Requires:       libdb
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security

@@ -12,7 +12,9 @@ BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  nss-devel
 Requires:       libltdl
+Requires:       nss
 Requires:       libxml2
 Provides:       %{name}-gcrypt = %{release}-%{version}
 Provides:       %{name}-gnutls = %{release}-%{version}
@@ -32,6 +34,7 @@ Requires:       gnutls-devel
 Requires:       libgcrypt-devel
 Requires:       libltdl-devel
 Requires:       libxml2-devel
+Requires:       nss-devel
 Provides:       %{name}-gcrypt-devel = %{release}-%{version}
 Provides:       %{name}-gnutls-devel = %{release}-%{version}
 Provides:       %{name}-openssl-devel = %{release}-%{version}

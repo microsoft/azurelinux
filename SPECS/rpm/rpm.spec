@@ -30,7 +30,6 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       debugedit
 Requires:       libarchive
-Requires:       libdb
 Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
@@ -56,7 +55,6 @@ Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
 Requires:       mariner-rpm-macros
-Requires:       nss-libs
 Requires:       popt
 Requires:       xz-libs
 Requires:       zlib
@@ -264,7 +262,7 @@ popd
 %changelog
 
 * Wed Sep 15 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.17.0-1
-- Upgrade to version 4.17.0
+- Upgrade to version 4.17.0.  Remove libdb dependency.
 
 * Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-4
 - Add patch to define "$RPM_LD_FLAGS" during spec %%build phases
