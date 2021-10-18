@@ -1125,16 +1125,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "debugedit",
-          "version": "5.0",
-          "downloadUrl": "https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dejagnu",
           "version": "1.6.2",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.2.tar.gz"
@@ -7582,8 +7572,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.17.0",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz"
+          "version": "4.14.2.1",
+          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.14.2.1-release.tar.gz"
         }
       }
     },
