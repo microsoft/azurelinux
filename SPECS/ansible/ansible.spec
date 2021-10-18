@@ -3,13 +3,15 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.9.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://releases.ansible.com/ansible/%{name}-%{version}.tar.gz
+Patch0: CVE-2020-14330_2c0ac0.patch
+Patch1: CVE-2020-14330_e0f25a.patch
 BuildRequires:  python3-setuptools
 BuildRequires:  python3
 BuildRequires:  python3-libs
@@ -27,7 +29,7 @@ BuildArch:      noarch
 Ansible is a radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 python3 setup.py build
@@ -46,6 +48,9 @@ cd build/lib/ansible_test/_data && tox
 %{python3_sitelib}/*
 
 %changelog
+*   Mon Oct 18 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.9.23-2
+-   Added patch file(s) CVE-2020-14330_2c0ac0.patch,
+-   CVE-2020-14330_e0f25a.patch
 * Fri Oct 15 2021 Bala <balakumaran.kannan@microsoft.com> - 2.9.23-1
 - Upgrade to version 2.9.23, which resolves CVE-2021-3583, CVE-2020-14330 and CVE-2021-20228
 - Switching to building with Python 3 to fix tests.
