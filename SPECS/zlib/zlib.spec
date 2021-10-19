@@ -1,4 +1,4 @@
-%global release_number 6
+%global release_number 06
 
 Summary:        Compression and decompression routines
 Name:           zlib
