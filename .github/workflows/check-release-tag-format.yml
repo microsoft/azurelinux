@@ -51,10 +51,19 @@ jobs:
         run: |
           for spec in ${{ env.updated-specs }}
           do
-            if ! grep -P "^Release:\s+(\d+|%\{release_number\})%\{\?dist\}$" "$spec"
+            if ! grep -P "^Release:\s+([1-9]\d*|%\{release_number\})%\{\?dist\}$" "$spec"
             then
               echo "Invalid 'Release' tag format in spec '$spec'!"
               found_errors="true"
+            fi
+
+            if grep -P "^Release:\s+%\{release_number\}%\{\?dist\}$" "$spec"
+            then
+              if ! grep -P "^\s*%(global|define)\s+release_number\s+[1-9]\d*$" "$spec"
+              then
+                echo "Invalid 'Release' tag format in spec '$spec'! The 'release_number' macro must be a single number."
+                found_errors="true"
+              fi
             fi
           done
 
@@ -66,8 +75,8 @@ jobs:
             echo "Found .spec files with an invalid format of the 'Release' tag."
             echo
             echo "Accepted formats are:"
-            echo "  - '[number]%{?dist}', example: 10%{?dist}"
-            echo "  - '%{release_number}%{?dist}'"
+            echo "  - '[number]%{?dist}' (example: 10%{?dist}),"
+            echo "  - '%{release_number}%{?dist}', where the value of `release_number` must be a single number."
             echo
             echo "The 'Release' tag must also be placed at the beginning of the line."
             echo
