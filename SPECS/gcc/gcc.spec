@@ -2,8 +2,8 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        9.1.0
-Release:        11%{?dist}
+Version:        11.2.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,14 +34,14 @@ Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 The GCC package contains the GNU compiler collection,
 which includes the C and C++ compilers.
 
-%package -n     gfortran
-Summary:        GNU Fortran compiler.
-Group:          Development/Tools
-Requires:       gcc = %{version}-%{release}
-Provides:       gcc-gfortran = %{version}-%{release}
+#%package -n     gfortran
+#Summary:        GNU Fortran compiler.
+#Group:          Development/Tools
+#Requires:       gcc = %{version}-%{release}
+#Provides:       gcc-gfortran = %{version}-%{release}
 
-%description -n gfortran
-The gfortran package contains GNU Fortran compiler.
+#%description -n gfortran
+#The gfortran package contains GNU Fortran compiler.
 
 %package -n     libgcc
 Summary:        GNU C Library
@@ -117,7 +117,7 @@ This package contains development headers and static library for libgomp
 
 %prep
 %setup -q
-%patch0 -p1
+#%%patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
@@ -134,7 +134,7 @@ SED=sed \
     --enable-threads=posix \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
-    --enable-languages=c,c++,fortran \
+    --enable-languages=c,c++ \
     --disable-multilib \
     --disable-bootstrap \
     --enable-linker-build-id \
@@ -192,6 +192,7 @@ make %{?_smp_mflags} check-gcc
 %{_mandir}/man1/gcc.1.gz
 %{_mandir}/man1/g++.1.gz
 %{_mandir}/man1/cpp.1.gz
+%{_mandir}/man1/lto-dump.1.gz
 %{_mandir}/man7/*.gz
 %{_datadir}/gdb/*
 
@@ -200,11 +201,11 @@ make %{?_smp_mflags} check-gcc
 %exclude %{_lib64dir}/libsupc++*
 %exclude %{_lib64dir}/libgomp*
 
-%files -n gfortran
-%defattr(-,root,root)
-%{_bindir}/*gfortran
-%{_mandir}/man1/gfortran.1.gz
-%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+#%files -n gfortran
+#%defattr(-,root,root)
+#%{_bindir}/*gfortran
+#%{_mandir}/man1/gfortran.1.gz
+#%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 
 %files -n libgcc
 %defattr(-,root,root)
@@ -254,6 +255,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Mon Oct 18 2021 Andrew Phelps <anphel@microsoft.com> - 11.2.0-1
+- Update to version 11.2.0
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-11
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
