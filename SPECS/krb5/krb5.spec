@@ -1,13 +1,14 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.17
-Release:        4%{?dist}
+Version:        1.18.4
+Release:        1%{?dist}
 License:        MIT
 URL:            https://web.mit.edu/kerberos/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://web.mit.edu/kerberos/dist/%{name}/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://web.mit.edu/kerberos/dist/%{name}/1.18/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-37750.patch
 Requires:       openssl
 Requires:       e2fsprogs-libs
 BuildRequires:  openssl-devel
@@ -38,7 +39,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of krb5.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 cd src &&
@@ -122,6 +123,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Tue Oct 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.18.4-1
+- Update version to fix CVE-2019-14844, CVE-2020-28196, CVE-2021-36222
+- Add patch to fix CVE-2021-37750
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.17-4
 - Fix check tests by adding iana-etc which supplies required /etc/services file
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 1.17-3
