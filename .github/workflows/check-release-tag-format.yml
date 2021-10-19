@@ -11,7 +11,7 @@ on:
     branches: [main, dev, 1.0*]
 
 jobs:
-  release-tag-format:
+  release_tag_format:
     name: 'Release' tag format check
     runs-on: ubuntu-latest
 
