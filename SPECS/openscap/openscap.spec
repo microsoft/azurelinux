@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
-Version:        1.3.1
-Release:        4%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -110,6 +110,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/python2.7/*
 
 %changelog
+* Mon Oct 18 2021 Chris Co <chrco@microsoft.com> - 1.3.2-1
+- Update to 1.3.2 to fix --stig-viewer output
+
 * Thu Oct 07 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.1-4
 - Add BuildRequires dbus-devel to support systemd unit module
 
