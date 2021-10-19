@@ -1,4 +1,4 @@
-name: Spec Linting
+name: 'Release' tag format check
 
 on:
   push:
