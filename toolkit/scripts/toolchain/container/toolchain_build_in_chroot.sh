@@ -37,6 +37,8 @@ ls -la /bin/bash
 ls -la /bin/sh
 ls -la /bin
 ls -la /tools/bin
+ls -la /lib64
+ls -la /tools/lib
 ls /tools/bin
 ls /tools/sbin
 ls /bin
@@ -48,6 +50,9 @@ ls -la /usr/bin
 ls -la /bin/bash
 ls -la /bin/sh
 echo sanity check - raw toolchain - before building - gcc -v
+# Fix interpreter link
+ln -sv /tools/lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+file /tools/bin/gcc
 gcc -v
 echo Finished printing debug info
 
@@ -83,10 +88,10 @@ ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
     x86_64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/9.1.0/include
+        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/11.2.0/include
     ;;
     aarch64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/9.1.0/include
+        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/11.2.0/include
         ln -sv ld-2.27.so /lib64/ld-linux.so.3
     ;;
 esac
@@ -305,9 +310,9 @@ popd
 rm -rf mpc-1.2.1
 touch /logs/status_libmpc_complete
 
-echo GCC-9.1.0
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo GCC-11.2.0
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 case $(uname -m) in
   x86_64)
     sed -e '/m64=/s/lib64/lib/' \
@@ -350,11 +355,11 @@ ln -sv ../usr/bin/cpp /lib
 ln -sv gcc /usr/bin/cc
 
 install -v -dm755 /usr/lib/bfd-plugins
-ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/9.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
+ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/11.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
 
 # Sanity check
 set +e
-echo sanity check - raw toolchain - gcc 9.1.0
+echo sanity check - raw toolchain - gcc 11.2.0
 ldconfig -v
 ldconfig -p
 ldconfig
@@ -370,15 +375,15 @@ echo Expected output: '[Requesting program interpreter: /lib64/ld-linux-x86-64.s
 # [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
 grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
 # Expected output:
-# /usr/lib/gcc/x86_64-pc-linux-gnu/9.1.0/../../../../lib/crt1.o succeeded
-# /usr/lib/gcc/x86_64-pc-linux-gnu/9.1.0/../../../../lib/crti.o succeeded
-# /usr/lib/gcc/x86_64-pc-linux-gnu/9.1.0/../../../../lib/crtn.o succeeded
+# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crt1.o succeeded
+# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crti.o succeeded
+# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crtn.o succeeded
 grep -B4 '^ /usr/include' dummy.log
 # Expected output:
 # #include <...> search starts here:
-#  /usr/lib/gcc/x86_64-pc-linux-gnu/9.1.0/include
+#  /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include
 #  /usr/local/include
-#  /usr/lib/gcc/x86_64-pc-linux-gnu/9.1.0/include-fixed
+#  /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed
 #  /usr/include
 grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
 # Expected output:
@@ -399,13 +404,13 @@ echo Expected output: 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
 # Expected output:
 # found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2
 rm -v dummy.c a.out dummy.log
-echo End sanity check - raw toolchain - gcc 9.1.0
+echo End sanity check - raw toolchain - gcc 11.2.0
 set -e
 
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
 mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch /logs/status_gcc_complete
 

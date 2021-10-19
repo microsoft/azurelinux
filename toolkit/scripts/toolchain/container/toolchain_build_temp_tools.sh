@@ -35,9 +35,9 @@ rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
-echo GCC-9.1.0 - Pass 1
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo GCC-11.2.0 - Pass 1
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 tar xf ../mpfr-4.1.0.tar.xz
 mv -v mpfr-4.1.0 mpfr
 tar xf ../gmp-6.2.1.tar.xz
@@ -109,7 +109,7 @@ cd       build
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
@@ -162,9 +162,9 @@ rm -rf glibc-2.28
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
-echo Libstdc++ from GCC-9.1.0
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo Libstdc++ from GCC-11.2.0
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -174,11 +174,11 @@ cd       build
     --disable-nls                   \
     --disable-libstdcxx-threads     \
     --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/9.1.0
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/11.2.0
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
@@ -206,9 +206,9 @@ rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-9.1.0 - Pass 2
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo GCC-11.2.0 - Pass 2
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 case $(uname -m) in
@@ -258,10 +258,6 @@ tar -xf ../mpc-1.2.1.tar.gz
 mv -v mpc-1.2.1 mpc
 mkdir -v build
 cd       build
-CC=$LFS_TGT-gcc                                    \
-CXX=$LFS_TGT-g++                                   \
-AR=$LFS_TGT-ar                                     \
-RANLIB=$LFS_TGT-ranlib                             \
 ../configure                                       \
     --prefix=/tools                                \
     --with-local-prefix=/tools                     \
@@ -276,7 +272,7 @@ make install
 ln -sv gcc /tools/bin/cc
 # Sanity check
 set +e
-echo sanity check - temptoolchain - gcc 9.1.0 pass2
+echo sanity check - temptoolchain - gcc 11.2.0 pass2
 echo 'int main(){}' > dummy.c
 cc dummy.c
 readelf -l a.out | grep ': /tools'
@@ -290,9 +286,9 @@ case $(uname -m) in
 esac
 rm -v dummy.c a.out
 set -e
-echo End sanity check - temptoolchain - gcc 9.1.0 pass2
+echo End sanity check - temptoolchain - gcc 11.2.0 pass2
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
