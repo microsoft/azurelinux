@@ -17,7 +17,7 @@
             ],
             "PostInstallScripts": [
                 {
-                    "Path": "postinstallscripts/core-container/cleanup-and-set-term.sh"
+                    "Path": "postinstallscripts/core-container/cleanup.sh"
                 }
             ]
         }
