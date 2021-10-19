@@ -60,6 +60,7 @@ Python bindings.
 
 %prep
 %setup -q
+mkdir build
 
 %build
 cd build
