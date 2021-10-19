@@ -1,9 +1,7 @@
-%global release_number 06
-
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.11
-Release:        %{release_number}%{?dist}
+Release:        5%{?dist}
 URL:            http://www.zlib.net/
 License:        zlib
 Group:          Applications/System
@@ -49,9 +47,6 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.11-6
-- GitHub check test, DO NOT MERGE!
-
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.11-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

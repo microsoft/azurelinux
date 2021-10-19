@@ -76,7 +76,7 @@ jobs:
             echo
             echo "Accepted formats are:"
             echo "  - '[number]%{?dist}' (example: 10%{?dist}),"
-            echo "  - '%{release_number}%{?dist}', where the value of `release_number` must be a single number."
+            echo "  - '%{release_number}%{?dist}', where the value of 'release_number' must be a single number."
             echo
             echo "The 'Release' tag must also be placed at the beginning of the line."
             echo
