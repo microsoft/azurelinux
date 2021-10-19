@@ -1,4 +1,4 @@
-name: 'Release' tag format check
+name: Release tag format check
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   release_tag_format:
-    name: 'Release' tag format check
+    name: Release tag format check
     runs-on: ubuntu-latest
 
     steps:
