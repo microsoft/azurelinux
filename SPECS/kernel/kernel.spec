@@ -565,7 +565,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.69.1-2
-- Update CONFIG_LD_VERSION for binutils 2.37
+- Update configs for gcc 11.2.0 and binutils 2.37 updates
 
 * Thu Oct 07 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.69.1-1
 - Update source to 5.10.69.1
