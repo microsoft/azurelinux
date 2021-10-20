@@ -45,11 +45,10 @@ jobs:
 
       - name: Get the changed files
         run: |
-          changed_files="$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})"
-          echo "Files changed: '$changed_files'"
-          changed_specs=$(echo $changed_files | { grep "\.spec$" || test $? = 1; })
+          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+          changed_specs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
           echo "Files to validate: '${changed_specs}'"
-          echo "updated-specs=$changed_specs" >> $GITHUB_ENV
+          echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
       - name: Main branch checkout 
         uses: actions/checkout@v2
