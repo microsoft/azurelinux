@@ -63,7 +63,7 @@ ERROR: license not verified.
     Make sure the package's license matches the information provided inside the 'License' tag.
     Once that's done, indicate that through a changelog entry "License verified" or "Verified license".
 
-    NOTE: please use the names from the "Short Name" column inside Fedora's licensing guidelines:
+    NOTE: for the 'License' tag please use the names from the "Short Name" column inside Fedora's licensing guidelines:
           https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#Good_Licenses
 """)
         return False
