@@ -49,13 +49,16 @@ EPILOG = """
         --version "1.2.3.4" --moduleVersion "1.2.3.4-beta" \\
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
-        --copyright "Microsoft" --repo "CBL-Mariner" \\
+        --copyright "Microsoft" \\
+        --outdir "/source/Mariner/pkgname/build/" \\
+        --repo "CBL-Mariner" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "Mix"
 
     - Generated example C code:
 
-    const char __attribute__((aligned(4), section(".note.package")))
+    const unsigned char __attribute__((aligned(4), section(".note.package")))
+         __attribute__((used)) module_info_note_package[] = {
         module_info_note_package[] = {
             0x04,  0x00,  0x00,  0x00,
             0xac,  0x01,  0x00,  0x00,
@@ -83,7 +86,9 @@ EPILOG = """
         --version "1.2.3.4" --moduleVersion "1.2.3.4-beta" \\
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
-        --copyright "Microsoft" --repo "CBL-Mariner" \\
+        --copyright "Microsoft" \\
+        --outdir "/source/Mariner/pkgname/build/" \\
+        --repo "CBL-Mariner" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "LinkerOnly"
 
@@ -279,7 +284,8 @@ def parse_args():
 
     parser.add_argument('--outdir', type=dir_path,
                         help='Folder to write .note.package.bin'
-                        ' and module_info.ld files.\n\n')
+                        ', module_info.ld and header files.'
+                        ' Both Windows or Linux paths are supported.\n\n')
 
     parser.add_argument('--version', required=True,
                         help='Package version.\n\n')
