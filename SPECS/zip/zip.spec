@@ -1,7 +1,7 @@
 Summary:        zip-3.0
 Name:           zip
 Version:        3.0
-Release:        5%{?dist}
+Release:        5.3%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/infozip/zip30.tar.gz
