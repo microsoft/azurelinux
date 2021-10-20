@@ -1,0 +1,37 @@
+diff -urN a/gcc/Makefile.in b/gcc/Makefile.in
+--- a/gcc/Makefile.in	2021-10-20 00:09:28.088460084 +0000
++++ b/gcc/Makefile.in	2021-10-20 00:10:40.276254566 +0000
+@@ -2592,31 +2592,9 @@
+ # \r is not portable to Solaris tr, therefore we have a special
+ # case for ASCII.  We use \r for other encodings like EBCDIC.
+ s-tm-texi: build/genhooks$(build_exeext) $(srcdir)/doc/tm.texi.in
+-	$(RUN_GEN) build/genhooks$(build_exeext) -d \
+-			$(srcdir)/doc/tm.texi.in > tmp-tm.texi
+-	case `echo X|tr X '\101'` in \
+-	  A) tr -d '\015' < tmp-tm.texi > tmp2-tm.texi ;; \
+-	  *) tr -d '\r' < tmp-tm.texi > tmp2-tm.texi ;; \
+-	esac
+-	mv tmp2-tm.texi tmp-tm.texi
++	cat $(srcdir)/doc/tm.texi.in > tmp-tm.texi
+ 	$(SHELL) $(srcdir)/../move-if-change tmp-tm.texi tm.texi
+-	@if cmp -s $(srcdir)/doc/tm.texi tm.texi; then \
+-	  $(STAMP) $@; \
+-	elif test $(srcdir)/doc/tm.texi -nt $(srcdir)/doc/tm.texi.in \
+-	  && ( test $(srcdir)/doc/tm.texi -nt $(srcdir)/target.def \
+-	    || test $(srcdir)/doc/tm.texi -nt $(srcdir)/c-family/c-target.def \
+-	    || test $(srcdir)/doc/tm.texi -nt $(srcdir)/common/common-target.def \
+-	    || test $(srcdir)/doc/tm.texi -nt $(srcdir)/d/d-target.def \
+-	  ); then \
+-	  echo >&2 ; \
+-	  echo You should edit $(srcdir)/doc/tm.texi.in rather than $(srcdir)/doc/tm.texi . >&2 ; \
+-	  false; \
+-	else \
+-	  echo >&2 ; \
+-	  echo Verify that you have permission to grant a GFDL license for all >&2 ; \
+-	  echo new text in $(objdir)/tm.texi, then copy it to $(srcdir)/doc/tm.texi. >&2 ; \
+-	  false; \
+-	fi
++	$(STAMP) $@
+ 
+ gimple-match.c: s-match gimple-match-head.c ; @true
+ generic-match.c: s-match generic-match-head.c ; @true

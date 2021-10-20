@@ -21,6 +21,8 @@ docker ps -a
 # Texinfo patch file
 cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
+# GCC patch
+cp -v $MARINER_SPECS_DIR/gcc/gcc_tm_texi.patch ./container
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022
@@ -62,6 +64,7 @@ popd
 # Cleanup patch files used in container
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
+rm -vf ./container/gcc_tm_texi.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 

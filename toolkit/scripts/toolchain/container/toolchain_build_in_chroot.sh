@@ -36,9 +36,10 @@ echo Path: $PATH
 ls -la /bin/bash
 ls -la /bin/sh
 ls -la /bin
+ls -la /tools
 ls -la /tools/bin
-ls -la /lib64
 ls -la /tools/lib
+ls -la /lib64
 ls /tools/bin
 ls /tools/sbin
 ls /bin
@@ -331,16 +332,17 @@ sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 ls -la /usr/lib/gcc
 ls /usr/lib/gcc
 rm -f /usr/lib/gcc
+patch -Np1 -i /tools/gcc_tm_texi.patch
 mkdir -v build
 cd       build
-export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
-SED=sed \
+#export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
+#SED=sed \
 ../configure    --prefix=/usr \
                 --enable-shared \
                 --enable-threads=posix \
                 --enable-__cxa_atexit \
                 --enable-clocale=gnu \
-                --enable-languages=c,c++,fortran\
+                --enable-languages=c,c++\
                 --disable-multilib \
                 --disable-bootstrap \
                 --enable-linker-build-id \

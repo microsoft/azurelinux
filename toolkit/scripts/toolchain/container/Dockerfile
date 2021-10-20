@@ -99,6 +99,7 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./Awt_build_headless_only.patch", \
        "./check-system-ca-certs.patch", \
        "./go14_bootstrap_aarch64.patch", \
+       "./gcc_tm_texi.patch", \
        "$LFS/tools/" ]
 
 USER root
