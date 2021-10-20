@@ -12,12 +12,6 @@ Patch0:         PyYAML-CVE-2017-18342.patch
 Patch1:         ConstructorError_fix.patch
 Patch2:         change_default_loader.patch
 Patch3:         PyYAML-lib3-CVE-2017-18342.patch
-
-%description
-YAML parser and emitter for Python
-
-%package -n     python3-PyYAML
-Summary:        YAML parser and emitter for Python
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
 BuildRequires:  python3-devel
@@ -25,9 +19,10 @@ BuildRequires:  python3-libs
 Requires:       libyaml
 Requires:       python3
 Requires:       python3-libs
+Provides:       python3-%{name} = %{version}-%{release}
 Provides:       python3-yaml = %{version}-%{release}
 
-%description -n python3-PyYAML
+%description
 YAML is a data serialization format designed for human readability and
 interaction with scripting languages.  PyYAML is a YAML parser and
 emitter for Python.
@@ -48,13 +43,13 @@ configuration files to object serialization and persistence.
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 chmod a-x examples/yaml-highlight/yaml_hl.py
 
 %check
 %python3 setup.py test
 
-%files -n python3-PyYAML
+%files
 %defattr(-,root,root,-)
 %license LICENSE
 %doc PKG-INFO README examples
@@ -62,8 +57,8 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-7
+- Remove python2 package, have main package contain python3 version
 - Add license to python3 package
-- Remove python2 package
 - Lint spec
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.13-6

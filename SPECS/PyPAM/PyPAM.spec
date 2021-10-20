@@ -16,17 +16,12 @@ Patch2:         PyPAM-0.5.0-nofree.patch
 Patch3:         PyPAM-0.5.0-memory-errors.patch
 Patch4:         PyPAM-0.5.0-return-value.patch
 Patch5:         PyPAM-python3-support.patch
-
-%description
-Python bindings for PAM (Pluggable Authentication Modules).
-
-%package -n     python3-PyPAM
-Summary:        Python bindings for PAM (Pluggable Authentication Modules).
 BuildRequires:  pam-devel
 BuildRequires:  python3-devel
 Requires:       python3
+Provides:       python3-%{name} = %{version}-%{release}
 
-%description -n python3-PyPAM
+%description
 Python bindings for PAM (Pluggable Authentication Modules).
 
 %prep
@@ -43,16 +38,16 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
   PYTHONPATH=%{buildroot}%{python3_sitelib} \
   python3 tests/PamTest.py
 
-%files -n python3-PyPAM
+%files
 %defattr(-,root,root,-)
 %license COPYING
 %{python3_sitelib}/*
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-9
+- Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Align python3 support patch file prefix level with other patches
-- Remove python2 package
 - Lint spec
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.5.0-8

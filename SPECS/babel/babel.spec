@@ -8,14 +8,6 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://babel.pocoo.org
 Source0:        https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-%{version}.tar.gz
-BuildArch:      noarch
-
-%description
-Babel is an integrated collection of utilities that assist in internationalizing and localizing Python applications,
-with an emphasis on web-based applications.
-
-%package -n     python3-babel
-Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytz
@@ -29,8 +21,10 @@ BuildRequires:  python3-six
 %endif
 Requires:       python3
 Requires:       python3-pytz
+Provides:       python3-%{name} = %{version}-%{release}
+BuildArch:      noarch
 
-%description -n python3-babel
+%description
 Babel is an integrated collection of utilities that assist in internationalizing and localizing Python applications,
 with an emphasis on web-based applications.
 
@@ -53,7 +47,7 @@ easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
 $easy_install_3 pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3} setup.py test
 
-%files -n python3-babel
+%files
 %defattr(-,root,root,-)
 %license LICENSE
 %{_bindir}/pybabel
@@ -62,8 +56,8 @@ $easy_install_3 pytest freezegun funcsigs pathlib2 pluggy utils
 
 %changelog
 * Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-9
+- Remove python2 package, have main package contain python3 version
 - Add license to python3 package
-- Remove python2 package
 - Lint spec
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.6.0-8
