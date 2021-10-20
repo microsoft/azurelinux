@@ -1,4 +1,4 @@
-name: Release tag format check
+name: Spec files check
 
 on:
   push:
@@ -11,8 +11,8 @@ on:
     branches: [main, dev, 1.0*]
 
 jobs:
-  release_tag_format:
-    name: Release tag format check
+  spec-check:
+    name: Spec files check
     runs-on: ubuntu-latest
 
     steps:
@@ -56,5 +56,5 @@ jobs:
           ref: 'main'
           path: 'main-checkout'
       
-      - name: Verify 'Release' tag
+      - name: Verify .spec files
         run: python3 .github/workflows/check_spec_guidelines.py ${{ env.updated-specs }}
