@@ -81,7 +81,7 @@ popd
 
 
 %changelog
-* Mon Oct 20 2021 Cameron Baird <cameronbaird@microsoft.com> - 2.5.0-1
+* Wed Oct 20 2021 Cameron Baird <cameronbaird@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Update to 2.5.0 upstream release
 - License verified
