@@ -20,6 +20,15 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v2
 
+      # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Get Python dependencies
+        run: python3 -m pip install python-rpm-spec
+
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
         run: |
@@ -48,41 +57,4 @@ jobs:
           path: 'main-checkout'
       
       - name: Verify 'Release' tag
-        run: |
-          for spec in ${{ env.updated-specs }}
-          do
-            if ! grep -qP "^Release:\s+([1-9]\d*|%\{release_number\})%\{\?dist\}$" "$spec"
-            then
-              echo "Invalid 'Release' tag format in spec '$spec'!"
-              found_errors="true"
-            fi
-
-            if grep -qP "^Release:\s+%\{release_number\}%\{\?dist\}$" "$spec"
-            then
-              if ! grep -qP "^\s*%(global|define)\s+release_number\s+[1-9]\d*$" "$spec"
-              then
-                echo "Invalid 'Release' tag format in spec '$spec'! The 'release_number' macro must be a single number."
-                found_errors="true"
-              fi
-            fi
-          done
-
-          if [[ -n "$found_errors" ]]
-          then
-            echo
-            echo "====================== 'Release' tags verification FAILED ======================"
-            echo
-            echo "Found .spec files with an invalid format of the 'Release' tag."
-            echo
-            echo "Accepted formats are:"
-            echo "  - '[number]%{?dist}' (example: 10%{?dist}),"
-            echo "  - '%{release_number}%{?dist}', where the value of 'release_number' must be a single number."
-            echo
-            echo "The 'Release' tag must also be placed at the beginning of the line."
-            echo
-            echo "Please update the spec files listed above."
-
-            exit 1
-          fi
-
-          exit 0
+        run: python3 .github/workflows/check_spec_guidelines.py ${{ env.updated-specs }}
