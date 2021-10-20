@@ -82,7 +82,7 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 
 %changelog
 * Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 4.3-26
-- Initial CBL-Mariner import from Fedora32(license:MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
 * Sat Feb 08 2020 Bruno Wolff III <bruno@wolff.to> - 4.3-25
 - Fix duplicate definition flagged by gcc10

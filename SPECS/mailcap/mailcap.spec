@@ -69,7 +69,7 @@ make check
 - Changing BR to be more accurate: "nginx" -> "nginx-filesystem".
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.1.49-3
-- Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.49-2

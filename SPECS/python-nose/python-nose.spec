@@ -82,7 +82,7 @@ python3 selftest.py
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.3.7-31
-- Initial CBL-Mariner version imported from Fedora 32 (license: MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
 
 * Fri Jan 31 2020 Miro Hrončok <mhroncok@redhat.com> - 1.3.7-30

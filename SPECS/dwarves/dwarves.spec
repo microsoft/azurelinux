@@ -138,7 +138,7 @@ rm -Rf %{buildroot}
 
 %changelog
 * Fri Aug 20 2021 Chris Co <chrco@microsoft.com> - 1.21-4
-- Initial CBL-Mariner import from Fedora 35 (License: MIT)
+- Initial CBL-Mariner import from Fedora 35 (license: MIT).
 
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

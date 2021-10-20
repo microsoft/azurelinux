@@ -261,7 +261,7 @@ popd
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Thu Nov 19 2020 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Remove non-applicable patches.
 - Remove suse_version checks.
 - Rename apache-ant-1.8.ant.conf to ant.conf.
