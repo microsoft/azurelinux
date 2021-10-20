@@ -50,7 +50,7 @@ messenger for Zope.
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
 - Add license to python3 package
 - Remove python3-typing requirement
 - Remove python2 package

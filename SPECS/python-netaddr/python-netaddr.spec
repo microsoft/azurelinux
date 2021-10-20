@@ -51,7 +51,7 @@ LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-9
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-9
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

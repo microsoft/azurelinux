@@ -46,7 +46,7 @@ SSL certificates while verifying the identity of TLS hosts
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2018.10.15-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2018.10.15-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

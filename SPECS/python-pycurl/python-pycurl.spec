@@ -75,7 +75,7 @@ LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests
 %doc RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-9
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-9
 - Add licenses to python3 package, remove from docs package
 - Remove python2 package
 - Lint spec

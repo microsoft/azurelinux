@@ -98,7 +98,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-11
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-11
 - Remove python2 package
 - Lint spec
 

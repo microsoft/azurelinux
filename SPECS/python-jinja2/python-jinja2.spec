@@ -48,7 +48,7 @@ sed -i 's/\r$//' LICENSE # Fix wrong EOL encoding
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.1-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.1-3
 - Remove python2 package and re-enable fatal python byte compilation errors
 - Fix build instruction ordering
 - Lint spec

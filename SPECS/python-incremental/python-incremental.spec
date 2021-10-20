@@ -43,7 +43,7 @@ Incremental is a small library that versions your Python projects.
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 17.5.0-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 17.5.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

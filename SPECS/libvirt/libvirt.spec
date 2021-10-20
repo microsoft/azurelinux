@@ -1053,7 +1053,7 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-4
 - Use python3-docutils dependency instead of python-docutils
 
 *   Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-3

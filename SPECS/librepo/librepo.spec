@@ -82,7 +82,7 @@ popd
 %{python3_sitearch}/%{name}/
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-2
 - Remove unused python2 build requirements
 
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-1

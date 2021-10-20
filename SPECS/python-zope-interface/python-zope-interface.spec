@@ -45,7 +45,7 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 4.7.2-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.7.2-2
 - Add license to python3 package
 - Remove python2 package
 

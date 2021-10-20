@@ -56,7 +56,7 @@ $easy_install_3 mock
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

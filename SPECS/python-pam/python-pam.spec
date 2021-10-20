@@ -41,7 +41,7 @@ Python PAM module using ctypes
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

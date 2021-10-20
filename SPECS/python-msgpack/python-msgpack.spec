@@ -42,7 +42,7 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

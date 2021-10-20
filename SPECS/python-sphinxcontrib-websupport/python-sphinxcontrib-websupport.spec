@@ -49,7 +49,7 @@ tox
 %{python3_sitelib}/*.pth
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-2
 - Remove python2 package
 - Lint spec
 

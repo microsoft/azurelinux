@@ -89,7 +89,7 @@ LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
 %{_bindir}/cftp3
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-7
 - Remove python2 package, move default bindaries to python3 package
 - Lint spec
 

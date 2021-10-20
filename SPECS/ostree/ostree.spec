@@ -156,7 +156,7 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-2
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 

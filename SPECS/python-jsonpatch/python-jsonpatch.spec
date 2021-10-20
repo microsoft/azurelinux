@@ -47,7 +47,7 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 %{_bindir}/jsonpatch3
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.23-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.23-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -59,7 +59,7 @@ it is usable as a command-line tool and as a library.
 %{_bindir}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.2-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.2-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

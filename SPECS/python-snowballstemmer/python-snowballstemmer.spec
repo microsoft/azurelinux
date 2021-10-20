@@ -58,7 +58,7 @@ It includes following language algorithms:
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -42,7 +42,7 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.3-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.3-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

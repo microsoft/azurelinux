@@ -53,7 +53,7 @@ LANG=en_US.UTF-8 tox -e py36
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 4.5.1-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.5.1-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

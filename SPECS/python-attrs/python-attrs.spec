@@ -49,7 +49,7 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 18.2.0-8
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 18.2.0-8
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

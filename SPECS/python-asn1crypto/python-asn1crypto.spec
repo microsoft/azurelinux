@@ -42,7 +42,7 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.24.0-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.24.0-4
 - Remove python2 package
 - Add license to python3 package
 - Lint spec

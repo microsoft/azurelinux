@@ -87,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gir-*/*.gir
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2015.2-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2015.2-6
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 

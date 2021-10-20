@@ -43,7 +43,7 @@ docopt helps easily create most beautiful command-line interfaces.
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -161,7 +161,7 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-7
 - Remove unused python-setuptools dependency
 
 * Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.7.0-6

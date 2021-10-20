@@ -46,7 +46,7 @@ and then generates simple and comprehensible examples that make your tests fail.
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.71.0-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.71.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

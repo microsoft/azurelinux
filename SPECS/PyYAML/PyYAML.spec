@@ -56,7 +56,7 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-7
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Lint spec

@@ -97,7 +97,7 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{_bindir}/rst2html43.py
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.14-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.14-5
 - Add license to python3 package
 - Remove python2 package, move old binary names to python3 package
 - Lint spec

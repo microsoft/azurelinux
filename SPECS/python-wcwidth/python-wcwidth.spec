@@ -42,7 +42,7 @@ This Library is mainly for those implementing a Terminal Emulator, or programs t
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.7-5
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.7-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

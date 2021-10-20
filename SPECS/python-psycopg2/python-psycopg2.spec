@@ -74,7 +74,7 @@ rm -r /home/postgres/data &>/dev/null ||:
 %doc doc
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

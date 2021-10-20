@@ -71,7 +71,7 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.22.0-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.22.0-3
 - Remove python2 package
 - Lint spec
 

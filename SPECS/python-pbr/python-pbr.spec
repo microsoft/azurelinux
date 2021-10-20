@@ -61,7 +61,7 @@ $easy_install_3 wheel
 %{python3_sitelib}/pbr
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-3
 - Remove python2 package
 - Lint spec
 

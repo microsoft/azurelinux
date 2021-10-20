@@ -46,7 +46,7 @@ WebSocket client for python3
 %{_bindir}/wsdump.py
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.56.0-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.56.0-3
 - Add license, wsdump.py binary to python3 package
 - Remove python2 package
 - Lint spec

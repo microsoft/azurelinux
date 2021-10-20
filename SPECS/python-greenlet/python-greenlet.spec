@@ -41,7 +41,7 @@ A “greenlet”, on the other hand, is a still more primitive notion of micro-t
 %{_includedir}/python3.7m/greenlet/greenlet.h
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.15-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.15-6
 - Add license to python3 package
 - Remove python2 package
 - Fix Source0

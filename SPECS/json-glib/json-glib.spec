@@ -89,7 +89,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/installed-tests/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-7
 - Replace python2 with python3
 - Remove pkgconf provides
 

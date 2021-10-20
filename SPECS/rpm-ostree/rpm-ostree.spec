@@ -151,7 +151,7 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-2
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 

@@ -55,7 +55,7 @@ $easy_install_3 pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-9
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-9
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Lint spec

@@ -53,7 +53,7 @@ cp tests/test_atomicwrites.py .
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-6
 - Remove python2 package
 - Lint spec
 

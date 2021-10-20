@@ -47,7 +47,7 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 %{_bindir}/jsonschema3
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec
 

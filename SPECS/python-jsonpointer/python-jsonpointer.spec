@@ -44,7 +44,7 @@ ln -s jsonpointer %{buildroot}%{_bindir}/jsonpointer3
 %{_bindir}/jsonpointer3
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

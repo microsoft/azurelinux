@@ -59,7 +59,7 @@ mv mariner.pem %{_sysconfdir}/ssl/certs
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.3.2-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.3.2-2
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

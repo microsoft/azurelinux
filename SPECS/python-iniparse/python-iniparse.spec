@@ -52,7 +52,7 @@ mv %{buildroot}%{_docdir}/iniparse-%{version} %{buildroot}%{_docdir}/%{name}-%{v
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-10
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-10
 - Add license, docs to python3 package
 - Remove python2 package
 - Lint spec

@@ -39,7 +39,7 @@ It is pure Python code with no dependencies, but includes an optional C extensio
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.0-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.0-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

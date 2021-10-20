@@ -93,7 +93,7 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-4
 - Remove unused python-setuptools dependency
 
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-3

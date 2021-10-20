@@ -44,7 +44,7 @@ virtualenv is a tool to create isolated Python environment.
 %{_bindir}/virtualenv
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
 - Add license, virtualenv binary to python3 package
 - Remove python2 package
 - Lint spec

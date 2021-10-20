@@ -58,7 +58,7 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.8.2-8
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.8.2-8
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

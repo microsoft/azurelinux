@@ -613,7 +613,7 @@ fi
 %{_docdir}/%{name}/tests/*.py
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 31.0-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 31.0-3
 - Use python3-docutils dependency instead of python-docutils
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 31.0-2

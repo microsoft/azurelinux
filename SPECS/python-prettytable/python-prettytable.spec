@@ -47,7 +47,7 @@ LANG=en_US.UTF-8 %{python3} prettytable_test.py
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.2-9
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.2-9
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

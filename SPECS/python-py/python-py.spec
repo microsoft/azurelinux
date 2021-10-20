@@ -54,7 +54,7 @@ py.code: dynamic code generation and introspection
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-2
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-2
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

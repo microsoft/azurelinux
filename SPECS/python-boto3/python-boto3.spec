@@ -47,7 +47,7 @@ Amazon S3 and Amazon EC2
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.21-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.21-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

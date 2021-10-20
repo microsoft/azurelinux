@@ -93,7 +93,7 @@ ln -sfv sphinx-apidoc %{buildroot}%{_bindir}/sphinx-apidoc3
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.9-16
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.9-16
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

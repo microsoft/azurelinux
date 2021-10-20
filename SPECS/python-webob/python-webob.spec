@@ -46,7 +46,7 @@ rm -f tests/performance_test.py
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.5-4
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.5-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

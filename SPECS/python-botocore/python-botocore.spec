@@ -50,7 +50,7 @@ nosetests tests/unit
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.21-3
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.21-3
 - Add license to python3 package, fix license tag
 - Remove python2 package
 - Lint spec
