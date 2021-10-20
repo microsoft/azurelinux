@@ -8,7 +8,7 @@
   "default-hardened-ld": "4dbb822a27eed292759bc4e9cabb4b84f34fc6701535fcac2fdddac33328678b",
   "forge.lua": "7390af6e81d8d61bc6957127fe9ebdbf5223e96d3810855641bdecc2a03800b4",
   "gen-ld-script.sh": "09adeb1316cbf22670ad749a3af1bffc81bd3145192c56c63171a204317f47da",
-  "generate-package-note.py": "74250b64b8ff46b8b57d19cab4fcde3ab4ecf12e7d33daf6889b7f1769c5e887",
+  "generate-package-note.py": "b8247e255ca6232f31cc01e7986b7af2e9f6cc497461b8241a5092d5425411c3",
   "gpgverify": "db0e050f56b694497d70603a6f5c17dd60ddbcf7cee670616851cd389f6767c4",
   "macros": "6dceae8e111c7f56b56c91c4cc10f488ed8fb98166db5e4e26f94d651455bf5e",
   "macros.check": "79367176c3c7d10c0158b6e5d881e0fc3c8fd50c5957dad2f097c2d4a37833e7",
