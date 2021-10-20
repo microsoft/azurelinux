@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        3.5.1
-Release:        5%{?dist}
+Release:        5%{?dist}s
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -221,8 +221,7 @@ systemctl start chronyd.service
 - Start chronyd after installation
 
 * Wed Aug 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
+- Initial CBL-Mariner import from Fedora 32s (license: MIT).
 - Removed workaround for 'chrony' < 3.3-2.
 - Removed build-time dependency on 'pps-tools-devel'.
 - Using Windows NTP server instead of pool in the default config.
