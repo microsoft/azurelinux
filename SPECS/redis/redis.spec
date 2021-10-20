@@ -10,8 +10,6 @@ Distribution:   Mariner
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch2:         disable_active_defrag_big_keys.patch
-# CVE-2021-21309 affects 32-bit executables only. Mariner always builds with -m64 and does not support 32-bit architectures.
-Patch3:         CVE-2021-21309.nopatch
 
 BuildRequires:  gcc
 BuildRequires:  systemd
