@@ -221,7 +221,7 @@ systemctl start chronyd.service
 - Start chronyd after installation
 
 * Wed Aug 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5-9
-- Initial CBL-Mariner import from Fedora 3d2 (license: MIT).
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
 - Removed workaround for 'chrony' < 3.3-2.
 - Removed build-time dependency on 'pps-tools-devel'.
