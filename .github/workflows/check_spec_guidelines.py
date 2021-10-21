@@ -13,6 +13,7 @@ valid_release_tag_regex = re.compile(
 valid_source_attributions = [
     r'Original version for CBL-Mariner',
     r'Initial CBL-Mariner import from Azure',
+    r'Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)',
     r'Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)',
     r'Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)',
     r'Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)',
