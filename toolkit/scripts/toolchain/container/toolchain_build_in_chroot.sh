@@ -314,6 +314,9 @@ touch /logs/status_libmpc_complete
 echo GCC-11.2.0
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
+sed -e '/static.*SIGSTKSZ/d' \
+    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
 case $(uname -m) in
   x86_64)
     sed -e '/m64=/s/lib64/lib/' \

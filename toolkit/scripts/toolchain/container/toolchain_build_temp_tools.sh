@@ -209,6 +209,9 @@ touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 echo GCC-11.2.0 - Pass 2
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
+sed -e '/static.*SIGSTKSZ/d' \
+    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
 cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 case $(uname -m) in
