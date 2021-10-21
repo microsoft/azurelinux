@@ -8435,8 +8435,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2021c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2021c.tar.gz"
+          "version": "2021d",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2021d.tar.gz"
         }
       }
     },
