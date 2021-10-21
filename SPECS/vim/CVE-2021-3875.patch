@@ -1,0 +1,67 @@
+From 35a319b77f897744eec1155b736e9372c9c5575f Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Sat, 9 Oct 2021 13:58:55 +0100
+Subject: [PATCH] patch 8.2.3489: ml_get error after search with range
+
+Problem:    ml_get error after search with range.
+Solution:   Limit the line number to the buffer line count.
+---
+ src/ex_docmd.c              |  6 ++++--
+ src/testdir/test_search.vim | 14 ++++++++++++++
+ src/version.c               |  2 ++
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/src/ex_docmd.c b/src/ex_docmd.c
+index 2c55e67bc37..08a48305ed0 100644
+--- a/src/ex_docmd.c
++++ b/src/ex_docmd.c
+@@ -4229,8 +4229,10 @@ get_address(
+ 
+ 		    // When '/' or '?' follows another address, start from
+ 		    // there.
+-		    if (lnum != MAXLNUM)
+-			curwin->w_cursor.lnum = lnum;
++		    if (lnum > 0 && lnum != MAXLNUM)
++			curwin->w_cursor.lnum =
++				lnum > curbuf->b_ml.ml_line_count
++					   ? curbuf->b_ml.ml_line_count : lnum;
+ 
+ 		    // Start a forward search at the end of the line (unless
+ 		    // before the first line).
+diff --git a/src/testdir/test_search.vim b/src/testdir/test_search.vim
+index bb4e45defa6..eaf9c232691 100644
+--- a/src/testdir/test_search.vim
++++ b/src/testdir/test_search.vim
+@@ -1989,5 +1989,19 @@ func Test_no_last_search_pattern()
+   call feedkeys("??\<C-T>", 'xt')
+ endfunc
+ 
++func Test_search_with_invalid_range()
++  new
++  let lines =<< trim END
++    /\%.v
++    5/
++    c
++  END
++  call writefile(lines, 'Xrangesearch')
++  source Xrangesearch
++
++  bwipe!
++  call delete('Xrangesearch')
++endfunc
++
+ 
+ " vim: shiftwidth=2 sts=2 expandtab
+diff --git a/src/version.c b/src/version.c
+index f3fbd45bc28..43f87aabec7 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -757,6 +757,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    3489,
+ /**/
+     3488,
+ /**/
