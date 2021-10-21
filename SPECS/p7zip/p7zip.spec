@@ -136,7 +136,6 @@ make test
 
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 16.02-21
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
-- License verified
 
 * Thu Apr 22 2021 Sérgio Basto <sergio@serjux.com> - 16.02-20
 - Fix two Null Pointer Dereferences, thanks to NSFOCUS Security Team

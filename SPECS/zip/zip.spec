@@ -38,7 +38,7 @@ make prefix=%{buildroot}/%{_prefix} MANDIR=%{buildroot}/usr/share/man/man1 -f un
 -   Update Source0 and URL.
 -   License verified.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.0-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+-   Initial CBL-Marsiner import from Photon (license: Apache2).
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0-2
 -   GA - Bump release of all rpms
 *   Fri May 29 2015 Alexey Makhalov <amakhalov@vmware.com> 3.0-1

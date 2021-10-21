@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        3.5.1
-Release:        5%{?dist}
+Release:        5%{?dist}2
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
