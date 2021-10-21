@@ -8635,8 +8635,8 @@
         "type": "other",
         "other": {
           "name": "wget",
-          "version": "1.20.3",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz"
+          "version": "1.21.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/wget/wget-1.21.2.tar.gz"
         }
       }
     },
