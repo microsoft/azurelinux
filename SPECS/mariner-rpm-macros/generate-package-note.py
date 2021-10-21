@@ -9,7 +9,7 @@ import argparse
 import json
 import struct
 
-VERSION = "2.1.1"
+VERSION = "2.1.2"
 MEMORY_ALIGN = 4
 N_TYPE = 0xcafe1a7e
 OWNER = 'FDO'
@@ -59,7 +59,6 @@ EPILOG = """
 
     const unsigned char __attribute__((aligned(4), section(".note.package")))
          __attribute__((used)) module_info_note_package[] = {
-        module_info_note_package[] = {
             0x04,  0x00,  0x00,  0x00,
             0xac,  0x01,  0x00,  0x00,
             0x7e,  0x1a,  0xfe,  0xca,
