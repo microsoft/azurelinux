@@ -50,8 +50,8 @@ EPILOG = """
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
         --copyright "Microsoft" \\
-        --outdir "/source/Mariner/pkgname/build/" \\
-        --repo "CBL-Mariner" \\
+        --outdir "/source/pkgname/build/" \\
+        --repo "pkgname-git-repo-name" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "Mix"
 
@@ -87,8 +87,8 @@ EPILOG = """
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
         --copyright "Microsoft" \\
-        --outdir "/source/Mariner/pkgname/build/" \\
-        --repo "CBL-Mariner" \\
+        --outdir "/source/pkgname/build/" \\
+        --repo "pkgname-git-repo-name" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "LinkerOnly"
 
