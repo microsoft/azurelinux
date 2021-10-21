@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
