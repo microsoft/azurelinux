@@ -332,7 +332,7 @@ sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 ls -la /usr/lib/gcc
 ls /usr/lib/gcc
 rm -f /usr/lib/gcc
-patch -Np1 -i /tools/gcc_tm_texi.patch
+#patch -Np1 -i /tools/gcc_tm_texi.patch
 mkdir -v build
 cd       build
 #export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
