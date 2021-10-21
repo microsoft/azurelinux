@@ -23,6 +23,9 @@ cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
 # GCC patch
 cp -v $MARINER_SPECS_DIR/gcc/gcc_tm_texi.patch ./container
+# M4 patch
+cp -v $MARINER_SPECS_DIR/m4/04-fix-sigstksz.patch ./container
+cp -v $MARINER_SPECS_DIR/m4/m4-1.4.18-glibc-change-work-around.patch ./container
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022
@@ -65,6 +68,8 @@ popd
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
 rm -vf ./container/gcc_tm_texi.patch
+rm -vf ./container/04-fix-sigstksz.patch
+rm -vf ./container/m4-1.4.18-glibc-change-work-around.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 

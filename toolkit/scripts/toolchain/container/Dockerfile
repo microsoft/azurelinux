@@ -87,6 +87,8 @@ COPY [ "./.bashrc", \
 
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
+       "./04-fix-sigstksz.patch", \
+       "./m4-1.4.18-glibc-change-work-around.patch", \
        "$LFS/tools/" ]
 RUN /tools/toolchain_build_temp_tools.sh
 

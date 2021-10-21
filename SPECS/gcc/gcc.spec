@@ -119,7 +119,7 @@ This package contains development headers and static library for libgomp
 %prep
 %setup -q
 #%%patch0 -p1
-%patch2 -p1
+#%%patch2 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 

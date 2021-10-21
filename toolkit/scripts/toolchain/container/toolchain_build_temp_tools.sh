@@ -347,8 +347,10 @@ touch $LFS/logs/temptoolchain/status_dejagnu_complete
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
+patch -Np1 -i /tools/04-fix-sigstksz.patch
+patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
+#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
