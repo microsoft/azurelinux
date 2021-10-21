@@ -29,9 +29,7 @@ It contains the libraries and header files to create applications
 for handling compiled objects.
 
 %prep
-%setup -q 
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 %configure \
