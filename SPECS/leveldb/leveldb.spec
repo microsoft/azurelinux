@@ -90,7 +90,7 @@ ctest -V %{?_smp_mflags}
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.22-3
-- Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.22-2

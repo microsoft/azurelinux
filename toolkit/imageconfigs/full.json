@@ -6,7 +6,8 @@
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/azurevm-packages.json"
+                "packagelists/hyperv-packages.json",
+                "packagelists/ssh-server.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

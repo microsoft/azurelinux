@@ -74,4 +74,4 @@ install -p -m 0755  %{SOURCE5} %{buildroot}/mnt/create_linear_mount.sh
 
 %changelog
 * Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.0-1
-- Initial Mariner version.
+- Original version for CBL-Mariner.

@@ -271,7 +271,7 @@ fdupes %{buildroot}%{src_install_dir}
 - Update vendor source and file name
 
 * Tue Jun 15 2021 Henry Li <lihl@microsoft.com> - 1.14.4-3.4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag)
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License Verified
 - Use gcc-c++ for BR
 - Use ninja-build for BR

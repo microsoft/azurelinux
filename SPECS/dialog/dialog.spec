@@ -1,14 +1,15 @@
+%global dialogsubversion 20180621
+
 Summary:       A utility for creating TTY dialog boxes
 Name:          dialog
 Version:       1.3
-%global dialogsubversion 20180621
-Release:       3.%{dialogsubversion}%{?dist}
+Release:       4%{?dist}
 License:       LGPLv2+
 URL:           https://invisible-island.net/dialog/dialog.html
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-Source0:       ftp://ftp.invisible-island.net/dialog/%{name}-%{version}-20180621.tgz
+Source0:       ftp://ftp.invisible-island.net/dialog/%{name}-%{version}-%{dialogsubversion}.tgz
 BuildRequires: ncurses-devel
 BuildRequires: gettext
 BuildRequires: findutils
@@ -85,18 +86,26 @@ chmod +x %{buildroot}%{_libdir}/*
 %{_mandir}/man3/dialog.*
 
 %changelog
+* Tue Oct 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-4
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3-3.20180621
 - Added %%license line automatically
 
-*   Thu Apr 16 2020 Nick Samson <nisamson@microsoft.com> 1.3-2
--   Updated Source0, URL, removed sha1. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3-1
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*	Mon Jan 28 2019 Bo Gan <ganb@vmware.com> 1.3-4.20180621
--	Fix library permission.
-*	Wed Sep 19 2018 Bo Gan <ganb@vmware.com> 1.3-3.20180621
--	Update to 20180621
-*	Wed Apr 19 2017 Bo Gan <ganb@vmware.com> 1.3-2.20170131
--	update to 20170131
-*	Fri May 30 2016 Nick Shi <nshi@vmware.com> 1.3-1.20160209
--	Initial version
+* Thu Apr 16 2020 Nick Samson <nisamson@microsoft.com> - 1.3-2.20180621
+- Updated Source0, URL, removed sha1. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.3-1.20180621
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Jan 28 2019 Bo Gan <ganb@vmware.com> - 1.3-4.20180621
+- Fix library permission.
+
+* Wed Sep 19 2018 Bo Gan <ganb@vmware.com> - 1.3-3.20180621
+- Update to 20180621
+
+* Wed Apr 19 2017 Bo Gan <ganb@vmware.com> - 1.3-2.20170131
+- update to 20170131
+
+* Fri May 30 2016 Nick Shi <nshi@vmware.com> - 1.3-1.20160209
+- Initial version

@@ -34,5 +34,5 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 
 %changelog
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> - 1.4-1
--   Original version for Mariner.
+-   Original version for CBL-Mariner.
 -   License verified.

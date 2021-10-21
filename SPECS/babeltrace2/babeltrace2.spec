@@ -89,7 +89,7 @@ rm -fv %{buildroot}%{_docdir}/babeltrace2/*
 - License verified
 
 * Tue Feb 11 2020 Nick Bopp <nichbop@microsoft.com> - 2.0.1-2
-- Initial import from Fedora 32 (license: MIT and GPLv2)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Added runtime dependency on glib2
 - Remove python requirements
 - Removed ldconfig_scriptlets

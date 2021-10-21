@@ -73,7 +73,7 @@ make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
 
 %changelog
 * Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 1.42-277
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Update Source0 URL path
 - Manually create BIN and OBJ folder to build the project
