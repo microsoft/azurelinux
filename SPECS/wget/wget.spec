@@ -61,9 +61,6 @@ make  %{?_smp_mflags} check
 %{_mandir}/man1/*
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
-%clean
-rm -rf %{buildroot}/*
-
 %changelog
 * Wed Oct 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.21.2-1
 - Update version to fix CVE-2021-31879
