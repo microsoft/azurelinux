@@ -423,14 +423,14 @@ rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
 
-echo Diffutils-3.6
-tar xf diffutils-3.6.tar.xz
-pushd diffutils-3.6
+echo Diffutils-3.8
+tar xf diffutils-3.8.tar.xz
+pushd diffutils-3.8
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf diffutils-3.6
+rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
@@ -505,15 +505,15 @@ rm -rf gzip-1.9
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
-echo Make-4.2.1
-tar xf make-4.2.1.tar.gz
-pushd make-4.2.1
-sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+echo Make-4.3
+tar xf make-4.3.tar.gz
+pushd make-4.3
+#sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 ./configure --prefix=/tools --without-guile
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.2.1
+rm -rf make-4.3
 
 touch $LFS/logs/temptoolchain/status_make_complete
 

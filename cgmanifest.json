@@ -1197,8 +1197,8 @@
         "type": "other",
         "other": {
           "name": "diffutils",
-          "version": "3.6",
-          "downloadUrl": "http://ftp.gnu.org/gnu/diffutils/diffutils-3.6.tar.xz"
+          "version": "3.8",
+          "downloadUrl": "http://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz"
         }
       }
     },
@@ -4499,8 +4499,8 @@
         "type": "other",
         "other": {
           "name": "make",
-          "version": "4.2.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/make/make-4.2.1.tar.bz2"
+          "version": "4.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.3.tar.gz"
         }
       }
     },
