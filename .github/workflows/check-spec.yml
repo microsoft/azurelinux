@@ -1,0 +1,60 @@
+name: Spec files check
+
+on:
+  push:
+    paths:
+      - '**.spec'
+    branches: [main, dev, 1.0*]
+  pull_request:
+    paths:
+      - '**.spec'
+    branches: [main, dev, 1.0*]
+
+jobs:
+  spec-check:
+    name: Spec files check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Get Python dependencies
+        run: python3 -m pip install python-rpm-spec
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+      - name: Get the changed files
+        run: |
+          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+          changed_specs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
+          echo "Files to validate: '${changed_specs}'"
+          echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
+
+      - name: Main branch checkout 
+        uses: actions/checkout@v2
+        with:
+          ref: 'main'
+          path: 'main-checkout'
+      
+      - name: Verify .spec files
+        run: python3 .github/workflows/check_spec_guidelines.py ${{ env.updated-specs }}
