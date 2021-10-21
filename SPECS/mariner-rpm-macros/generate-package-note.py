@@ -9,7 +9,7 @@ import argparse
 import json
 import struct
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 MEMORY_ALIGN = 4
 N_TYPE = 0xcafe1a7e
 OWNER = 'FDO'
