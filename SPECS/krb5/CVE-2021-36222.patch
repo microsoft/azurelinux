@@ -1,0 +1,111 @@
+From fc98f520caefff2e5ee9a0026fdf5109944b3562 Mon Sep 17 00:00:00 2001
+From: Joseph Sutton <josephsutton@catalyst.net.nz>
+Date: Wed, 7 Jul 2021 11:47:44 +1200
+Subject: [PATCH] Fix KDC null deref on bad encrypted challenge
+
+The function ec_verify() in src/kdc/kdc_preauth_ec.c contains a check
+to avoid further processing if the armor key is NULL.  However, this
+check is bypassed by a call to k5memdup0() which overwrites retval
+with 0 if the allocation succeeds.  If the armor key is NULL, a call
+to krb5_c_fx_cf2_simple() will then dereference it, resulting in a
+crash.  Add a check before the k5memdup0() call to avoid overwriting
+retval.
+
+CVE-2021-36222:
+
+In MIT krb5 releases 1.16 and later, an unauthenticated attacker can
+cause a null dereference in the KDC by sending a request containing a
+PA-ENCRYPTED-CHALLENGE padata element without using FAST.
+
+[ghudson@mit.edu: trimmed patch; added test case; edited commit
+message]
+
+ticket: 9007 (new)
+tags: pullup
+target_version: 1.19-next
+target_version: 1.18-next
+---
+ src/kdc/kdc_preauth_ec.c      |  3 ++-
+ src/tests/Makefile.in         |  1 +
+ src/tests/t_cve-2021-36222.py | 46 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+), 1 deletion(-)
+ create mode 100644 src/tests/t_cve-2021-36222.py
+
+diff --git a/src/kdc/kdc_preauth_ec.c b/src/kdc/kdc_preauth_ec.c
+index 7e636b3f9fe..43a9902cc99 100644
+--- a/src/kdc/kdc_preauth_ec.c
++++ b/src/kdc/kdc_preauth_ec.c
+@@ -87,7 +87,8 @@ ec_verify(krb5_context context, krb5_data *req_pkt, krb5_kdc_req *request,
+     }
+ 
+     /* Check for a configured FAST ec auth indicator. */
+-    realmstr = k5memdup0(realm.data, realm.length, &retval);
++    if (retval == 0)
++        realmstr = k5memdup0(realm.data, realm.length, &retval);
+     if (realmstr != NULL)
+         retval = profile_get_string(context->profile, KRB5_CONF_REALMS,
+                                     realmstr,
+diff --git a/src/tests/Makefile.in b/src/tests/Makefile.in
+index fc6fcc0c3b8..1a193830681 100644
+--- a/src/tests/Makefile.in
++++ b/src/tests/Makefile.in
+@@ -166,6 +166,7 @@ check-pytests: unlockiter s4u2self
+ 	$(RUNPYTEST) $(srcdir)/t_cve-2012-1015.py $(PYTESTFLAGS)
+ 	$(RUNPYTEST) $(srcdir)/t_cve-2013-1416.py $(PYTESTFLAGS)
+ 	$(RUNPYTEST) $(srcdir)/t_cve-2013-1417.py $(PYTESTFLAGS)
++	$(RUNPYTEST) $(srcdir)/t_cve-2021-36222.py $(PYTESTFLAGS)
+ 	$(RM) au.log
+ 	$(RUNPYTEST) $(srcdir)/t_audit.py $(PYTESTFLAGS)
+ 	$(RUNPYTEST) $(srcdir)/jsonwalker.py -d $(srcdir)/au_dict.json \
+diff --git a/src/tests/t_cve-2021-36222.py b/src/tests/t_cve-2021-36222.py
+new file mode 100644
+index 00000000000..57e04993bc0
+--- /dev/null
++++ b/src/tests/t_cve-2021-36222.py
+@@ -0,0 +1,46 @@
++import socket
++from k5test import *
++
++realm = K5Realm()
++
++# CVE-2021-36222 KDC null dereference on encrypted challenge preauth
++# without FAST
++
++s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++a = (hostname, realm.portbase)
++
++m = ('6A81A0' '30819D'          # [APPLICATION 10] SEQUENCE
++     'A103' '0201' '05'         #  [1] pvno = 5
++     'A203' '0201' '0A'         #  [2] msg-type = 10
++     'A30E' '300C'              #  [3] padata = SEQUENCE OF
++     '300A'                     #   SEQUENCE
++     'A104' '0202' '008A'       #    [1] padata-type = PA-ENCRYPTED-CHALLENGE
++     'A202' '0400'              #    [2] padata-value = ""
++     'A48180' '307E'            #  [4] req-body = SEQUENCE
++     'A007' '0305' '0000000000' #   [0] kdc-options = 0
++     'A120' '301E'              #   [1] cname = SEQUENCE
++     'A003' '0201' '01'         #    [0] name-type = NT-PRINCIPAL
++     'A117' '3015'              #    [1] name-string = SEQUENCE-OF
++     '1B06' '6B7262746774'      #     krbtgt
++     '1B0B' '4B5242544553542E434F4D'
++                                #     KRBTEST.COM
++     'A20D' '1B0B' '4B5242544553542E434F4D'
++                                #   [2] realm = KRBTEST.COM
++     'A320' '301E'              #   [3] sname = SEQUENCE
++     'A003' '0201' '01'         #    [0] name-type = NT-PRINCIPAL
++     'A117' '3015'              #    [1] name-string = SEQUENCE-OF
++     '1B06' '6B7262746774'      #     krbtgt
++     '1B0B' '4B5242544553542E434F4D'
++                                #     KRBTEST.COM
++     'A511' '180F' '31393934303631303036303331375A'
++                                #   [5] till = 19940610060317Z
++     'A703' '0201' '00'         #   [7] nonce = 0
++     'A808' '3006'              #   [8] etype = SEQUENCE OF
++     '020112' '020111')         #    aes256-cts aes128-cts
++
++s.sendto(bytes.fromhex(m), a)
++
++# Make sure kinit still works.
++realm.kinit(realm.user_princ, password('user'))
++
++success('CVE-2021-36222 regression test')
