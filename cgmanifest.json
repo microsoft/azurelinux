@@ -567,7 +567,7 @@
         "other": {
           "name": "bzip2",
           "version": "1.0.8",
-          "downloadUrl": "https://downloads.sourceforge.net/project/bzip2/bzip2-1.0.8.tar.gz"
+          "downloadUrl": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
         }
       }
     },
