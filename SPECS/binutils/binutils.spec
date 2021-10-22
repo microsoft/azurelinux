@@ -10,10 +10,8 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch Source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
-
 # Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
 Patch1:         linker-script-readonly-keyword-support.patch
-
 Provides:       bundled(libiberty)
 
 %description
