@@ -600,15 +600,15 @@ rm -rf xz-5.2.4
 
 touch $LFS/logs/temptoolchain/status_xz_complete
 
-echo zstd-1.5.0
-tar xf zstd-1.5.0.tar.gz
-pushd zstd-1.5.0
-make -j$(nproc)
-make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
-popd
-rm -rf zstd-1.5.0
+# echo zstd-1.5.0
+# tar xf zstd-1.5.0.tar.gz
+# pushd zstd-1.5.0
+# make -j$(nproc)
+# make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
+# popd
+# rm -rf zstd-1.5.0
 
-touch $LFS/logs/temptoolchain/status_zstd_complete
+# touch $LFS/logs/temptoolchain/status_zstd_complete
 
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
 

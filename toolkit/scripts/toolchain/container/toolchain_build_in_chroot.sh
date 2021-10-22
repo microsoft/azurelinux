@@ -57,6 +57,8 @@ file /tools/bin/gcc
 gcc -v
 echo Finished printing debug info
 
+rm -vf /tools/include/zstd.h
+
 set -e
 #
 # Start building packages
@@ -667,6 +669,7 @@ tar xf zstd-1.5.0.tar.gz
 pushd zstd-1.5.0
 make -j$(nproc)
 make install prefix=/usr pkgconfigdir=/usr/lib/pkgconfig
+rm -v /usr/lib/libzstd.a
 popd
 rm -rf zstd-1.5.0
 touch /logs/status_zstd_complete
