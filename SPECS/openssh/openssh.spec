@@ -1,15 +1,13 @@
 %global openssh_ver 8.8p1
-%global openssh_rel 1%{?dist}
 
 %global pam_ssh_agent_ver 0.10.3
-%global pam_ssh_agent_rel 10%{?dist}
 
 %define systemd_units_rel 20191026
 
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        %{openssh_rel}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,8 +51,8 @@ BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
 BuildRequires:  libselinux-devel
-Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
-Requires:       openssh-server = %{openssh_ver}-%{openssh_rel}
+Requires:       openssh-clients = %{openssh_ver}-%{release}
+Requires:       openssh-server = %{openssh_ver}-%{release}
 
 %description
 The OpenSSH package contains ssh clients and the sshd daemon. This is
@@ -69,10 +67,23 @@ Requires:       openssl
 %description clients
 This provides the ssh client utilities.
 
+%package server
+Summary:        openssh server applications
+Requires:       ncurses-term
+Requires:       openssh-clients = %{openssh_ver}-%{release}
+Requires:       pam
+Requires:       shadow-utils
+Requires(post): /bin/chown
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
+
+%description server
+This provides the ssh server daemons, utilities, configuration and service files.
+
 %package -n pam_ssh_agent_auth
 Summary: PAM module for authentication with ssh-agent
 Version: %{pam_ssh_agent_ver}
-Release: %{pam_ssh_agent_rel}.%{openssh_rel}
+Release: 11%{?dist}
 License: BSD
 
 %description -n pam_ssh_agent_auth
@@ -82,19 +93,6 @@ forwarding of ssh-agent connection it also allows to authenticate with
 remote ssh-agent instance.
 
 The module is most useful for su and sudo service stacks.
-
-%package server
-Summary:        openssh server applications
-Requires:       ncurses-term
-Requires:       openssh-clients = %{openssh_ver}-%{openssh_rel}
-Requires:       pam
-Requires:       shadow-utils
-Requires(post): /bin/chown
-Requires(pre):  %{_sbindir}/groupadd
-Requires(pre):  %{_sbindir}/useradd
-
-%description server
-This provides the ssh server daemons, utilities, configuration and service files.
 
 %prep
 %setup -q -a 4
@@ -261,6 +259,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Oct 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.8p1-2
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
 * Wed Oct 6 2021 Rachel Menge <rachelmenge@microsoft.com> 8.8p1-1
 - Update to 8.8p1 to patch CVE-2021-41617
 

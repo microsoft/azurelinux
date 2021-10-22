@@ -63,5 +63,5 @@ python3 setup.py test
 - Add explicit dist provides.
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.0-1
-- Original CBL-Mariner version.
+- Original version for CBL-Mariner.
 - License verified.

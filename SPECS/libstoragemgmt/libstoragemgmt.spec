@@ -534,7 +534,7 @@ fi
 - Remove manual placement of bash-completion file, now that this package has bash-completion.pc available to it
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
-- Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-5

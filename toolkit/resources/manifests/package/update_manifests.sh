@@ -264,7 +264,6 @@ generate_pkggen_core () {
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
         grep "^libdb-" $TmpPkgGen
-        grep "^debugedit-" $TmpPkgGen
         grep "^rpm-" $TmpPkgGen
         grep "^cpio-" $TmpPkgGen
         grep "^e2fsprogs-" $TmpPkgGen

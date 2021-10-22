@@ -161,7 +161,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 - Set SUDO_USER and USER to allow rust to hydrate as root
 
 * Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> - 1.34.2-2
-- Initial CBL-Mariner import from Photon (license: Apache2)
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
 * Wed May 15 2019 Ankit Jain <ankitja@vmware.com> - 1.34.2-1
 - Initial build. First version

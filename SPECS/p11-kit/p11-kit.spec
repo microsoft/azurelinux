@@ -146,7 +146,7 @@ fi
 - Update source URL
 
 * Wed May 27 2020 Paul Monson <paulmon@microsoft.com> - 0.23.16.1-2
-- Initial CBL-Mariner import from Fedora 29 (license:MIT).
+- Initial CBL-Mariner import from Fedora 29 (license: MIT).
 - License verified.
 
 * Thu May 23 2019 Daiki Ueno <dueno@redhat.com> - 0.23.16.1-1

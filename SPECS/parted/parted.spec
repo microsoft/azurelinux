@@ -63,7 +63,7 @@ rm -rf %{buildroot}%{_infodir}/dir
 -  Added %%license line automatically
 
 *  Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.2-8
--  Initial CBL-Mariner import from Photon (license: dual Apache2/GPL2).
+-  Initial CBL-Mariner import from Photon (license: Apache2).
 
 *  Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> 3.2-7
 -  Add conflict toybox.
