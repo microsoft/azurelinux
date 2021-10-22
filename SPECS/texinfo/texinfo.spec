@@ -22,6 +22,8 @@ and converting info pages.
 %setup -q
 
 %build
+sed -e 's/__attribute_nonnull__/__nonnull/' \
+    -i gnulib/lib/malloc/dynarray-skeleton.c
 %configure --disable-silent-rules
 make %{?_smp_mflags}
 

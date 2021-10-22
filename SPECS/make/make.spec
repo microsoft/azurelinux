@@ -16,7 +16,8 @@ The Make package contains a program for compiling packages.
 %setup -q
 %build
 #work around an error caused by glibc-2.27
-#sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+sed -i '215 d; 223 d;' glob/glob.c
 
 ./configure \
     --prefix=%{_prefix} \

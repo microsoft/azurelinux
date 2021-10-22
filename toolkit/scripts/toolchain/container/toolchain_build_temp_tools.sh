@@ -508,9 +508,9 @@ touch $LFS/logs/temptoolchain/status_gzip_complete
 echo Make-4.2.1
 tar xf make-4.2.1.tar.gz
 pushd make-4.2.1
-#sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
-#./configure --prefix=/tools --without-guile
-./configure --prefix=/tools
+sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+sed -i '215 d; 223 d;' glob/glob.c
+./configure --prefix=/tools --without-guile
 make -j$(nproc)
 make install
 popd
@@ -579,6 +579,8 @@ touch $LFS/logs/temptoolchain/status_tar_complete
 echo Texinfo-6.8
 tar xf texinfo-6.8.tar.xz
 pushd texinfo-6.8
+sed -e 's/__attribute_nonnull__/__nonnull/' \
+    -i gnulib/lib/malloc/dynarray-skeleton.c
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
