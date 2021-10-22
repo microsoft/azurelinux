@@ -1,0 +1,82 @@
+From 826bfe4bbd7594188e3d74d2539d9707b1c6a14b Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Fri, 8 Oct 2021 18:39:28 +0100
+Subject: [PATCH] patch 8.2.3487: illegal memory access if buffer name is very
+ long
+
+Problem:    Illegal memory access if buffer name is very long.
+Solution:   Make sure not to go over the end of the buffer.
+---
+ src/drawscreen.c                | 10 +++++-----
+ src/testdir/test_statusline.vim | 10 ++++++++++
+ src/version.c                   |  2 ++
+ 3 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/src/drawscreen.c b/src/drawscreen.c
+index 82e53753bf9..e38ca95863b 100644
+--- a/src/drawscreen.c
++++ b/src/drawscreen.c
+@@ -464,13 +464,13 @@ win_redr_status(win_T *wp, int ignore_pum UNUSED)
+ 	    *(p + len++) = ' ';
+ 	if (bt_help(wp->w_buffer))
+ 	{
+-	    STRCPY(p + len, _("[Help]"));
++	    vim_snprintf((char *)p + len, MAXPATHL - len, "%s", _("[Help]"));
+ 	    len += (int)STRLEN(p + len);
+ 	}
+ #ifdef FEAT_QUICKFIX
+ 	if (wp->w_p_pvw)
+ 	{
+-	    STRCPY(p + len, _("[Preview]"));
++	    vim_snprintf((char *)p + len, MAXPATHL - len, "%s", _("[Preview]"));
+ 	    len += (int)STRLEN(p + len);
+ 	}
+ #endif
+@@ -480,12 +480,12 @@ win_redr_status(win_T *wp, int ignore_pum UNUSED)
+ #endif
+ 		)
+ 	{
+-	    STRCPY(p + len, "[+]");
+-	    len += 3;
++	    vim_snprintf((char *)p + len, MAXPATHL - len, "%s", "[+]");
++	    len += (int)STRLEN(p + len);
+ 	}
+ 	if (wp->w_buffer->b_p_ro)
+ 	{
+-	    STRCPY(p + len, _("[RO]"));
++	    vim_snprintf((char *)p + len, MAXPATHL - len, "%s", _("[RO]"));
+ 	    len += (int)STRLEN(p + len);
+ 	}
+ 
+diff --git a/src/testdir/test_statusline.vim b/src/testdir/test_statusline.vim
+index f3eea2e71eb..a952de69b90 100644
+--- a/src/testdir/test_statusline.vim
++++ b/src/testdir/test_statusline.vim
+@@ -522,4 +522,14 @@ func Test_statusline_mbyte_fillchar()
+   %bw!
+ endfunc
+ 
++" Used to write beyond allocated memory.  This assumes MAXPATHL is 4096 bytes.
++func Test_statusline_verylong_filename()
++  let fname = repeat('x', 4090)
++  exe "new " .. fname
++  set buftype=help
++  set previewwindow
++  redraw
++  bwipe!
++endfunc
++
+ " vim: shiftwidth=2 sts=2 expandtab
+diff --git a/src/version.c b/src/version.c
+index 4c66b2425ed..06421bb0f2e 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -757,6 +757,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    3487,
+ /**/
+     3486,
+ /**/
