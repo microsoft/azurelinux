@@ -685,6 +685,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "checksec",
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/slimm609/checksec.sh/archive/2.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chkconfig",
           "version": "1.11",
           "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
