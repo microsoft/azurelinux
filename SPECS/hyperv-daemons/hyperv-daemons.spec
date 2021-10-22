@@ -8,7 +8,7 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.69.1
+Version:        5.10.74.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -221,6 +221,10 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Tue Oct 19 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-1
+- Update source to 5.10.74.1
+- License verified
+
 * Thu Oct 07 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.69.1-1
 - Update source to 5.10.69.1
 

@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.69.1
+Version:        5.10.74.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -214,6 +214,8 @@ Patch1176:      CVE-2021-38300.nopatch
 Patch1177:      CVE-2021-41073.nopatch
 Patch1178:      CVE-2021-3653.nopatch
 Patch1179:      CVE-2021-42008.nopatch
+Patch1180:      CVE-2021-41864.nopatch
+Patch1181:      CVE-2021-42252.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -564,6 +566,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
+* Tue Oct 19 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-1
+- Update source to 5.10.74.1
+- Address CVE-2021-41864, CVE-2021-42252
+- License verified
+
 * Thu Oct 07 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.69.1-1
 - Update source to 5.10.69.1
 - Address CVE-2021-38300, CVE-2021-41073, CVE-2021-3653, CVE-2021-42008
