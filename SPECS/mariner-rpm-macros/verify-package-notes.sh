@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Usage:
 # ./verify-package-notes.sh <input_binary> <input_note_section_binary> <note_section_name>
 # This script verifies .note.package is successfully stamped to ELF executable or shared library

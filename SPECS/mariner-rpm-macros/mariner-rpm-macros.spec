@@ -42,6 +42,7 @@ Source24:       macros.fonts
 Source25:       macros.suse
 Source26:       gen-ld-script.sh
 Source27:       generate-package-note.py
+Source28:       verify-package-notes.sh
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -77,6 +78,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} compileall2.py
 install -p -m 755 -t %{buildroot}%{rcdir} brp-*
 install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
+install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
@@ -98,6 +100,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{rcdir}/compileall2.py
 %{rcdir}/gen-ld-script.sh
 %{rcdir}/generate-package-note.py
+%{rcdir}/verify-package-notes.sh
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
