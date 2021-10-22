@@ -888,15 +888,15 @@ popd
 rm -rf libpipeline-1.5.0
 touch /logs/status_libpipeline_complete
 
-echo Make-4.3
-tar xf make-4.3.tar.gz
-pushd make-4.3
+echo Make-4.2.1
+tar xf make-4.2.1.tar.gz
+pushd make-4.2.1
 #sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.3
+rm -rf make-4.2.1
 touch /logs/status_make_complete
 
 echo Patch-2.7.6

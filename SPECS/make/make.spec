@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
-Version:        4.3
-Release:        1%{?dist}
+Version:        4.2.1
+Release:        6%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/make
 Group:          Development/Tools
@@ -41,8 +41,8 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
-* Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 4.3-1
-- Update to version 4.3
+* Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-6
+- Remove glibc workaround
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 4.2.1-5
 - Fix check test
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-4
