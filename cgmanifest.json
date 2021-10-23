@@ -1869,8 +1869,8 @@
         "type": "other",
         "other": {
           "name": "gdbm",
-          "version": "1.18",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gdbm/gdbm-1.18.tar.gz"
+          "version": "1.21",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gdbm/gdbm-1.21.tar.gz"
         }
       }
     },

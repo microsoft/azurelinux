@@ -586,16 +586,16 @@ popd
 rm -rf libtool-2.4.6
 touch /logs/status_libtool_complete
 
-echo GDBM-1.18.1
-tar xf gdbm-1.18.1.tar.gz
-pushd gdbm-1.18.1
+echo GDBM-1.21
+tar xf gdbm-1.21.tar.gz
+pushd gdbm-1.21
 ./configure --prefix=/usr    \
             --disable-static \
             --enable-libgdbm-compat
 make -j$(nproc)
 make install
 popd
-rm -rf gdbm-1.18.1
+rm -rf gdbm-1.21
 touch /logs/status_gdbm_complete
 
 echo gperf-3.1
