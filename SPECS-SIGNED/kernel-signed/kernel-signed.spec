@@ -146,7 +146,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-2
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-2
 - Bump release number to match kernel release
 
 * Tue Oct 19 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-1
