@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            http://ftp.altlinux.org/pub/people/legion/kbd
 Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
+Source1:        vlock.pam
 Patch0:         kbd-2.0.4-backspace-1.patch
 BuildRequires:  check >= 0.9.4
 BuildRequires:  pam-devel
@@ -34,6 +35,9 @@ cp -R -v docs/doc/* %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 rm -f %{buildroot}%{_defaultdocdir}/%{name}-%{version}/kbd.FAQ*
 %find_lang %{name}
 
+mkdir -p %{buildroot}%{_sysconfdir}/pam.d
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/vlock
+
 %check
 make %{?_smp_mflags} check
 
@@ -44,6 +48,7 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 %license COPYING
 %{_bindir}/*
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/vlock
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_datarootdir}/consolefonts/*
 %{_datarootdir}/consoletrans/*
