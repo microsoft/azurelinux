@@ -261,6 +261,10 @@ tar -xf ../mpc-1.2.1.tar.gz
 mv -v mpc-1.2.1 mpc
 mkdir -v build
 cd       build
+CC=$LFS_TGT-gcc                                    \
+CXX=$LFS_TGT-g++                                   \
+AR=$LFS_TGT-ar                                     \
+RANLIB=$LFS_TGT-ranlib                             \
 ../configure                                       \
     --prefix=/tools                                \
     --with-local-prefix=/tools                     \
@@ -448,9 +452,9 @@ touch $LFS/logs/temptoolchain/status_file_complete
 echo Findutils-4.6.0
 tar xf findutils-4.6.0.tar.gz
 pushd findutils-4.6.0
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
+#sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
+#echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
@@ -496,8 +500,8 @@ echo Gzip-1.9
 tar xf gzip-1.9.tar.xz
 pushd gzip-1.9
 ./configure --prefix=/tools
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
+#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 popd

@@ -51,13 +51,25 @@ ls -la /usr/bin
 ls -la /bin/bash
 ls -la /bin/sh
 echo sanity check - raw toolchain - before building - gcc -v
+find / -name ld-linux-x86-64.so.2
+# find / -name ld-linux-x86-64.so.2
+# /tools/lib/ld-linux-x86-64.so.2
+ls -la /lib64/ld-linux-x86-64.so.2
+ls -la /tools/lib/ld-linux-x86-64.so.2
+
+#+ ln -sfv ../lib/ld-linux-x86-64.so.2 /lib64
+#'/lib64/ld-linux-x86-64.so.2' -> '../lib/ld-linux-x86-64.so.2'
+#+ ln -sfv ../lib/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3
+#'/lib64/ld-lsb-x86-64.so.3' -> '../lib/ld-linux-x86-64.so.2'
+
+ls -la /lib64
+ls -la /lib64/ld-lsb-x86-64.so.3
+ls -la /lib64/ld-linux-x86-64.so.2
 # Fix interpreter link
-ln -sv /tools/lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+#ln -sv /tools/lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
 file /tools/bin/gcc
 gcc -v
 echo Finished printing debug info
-
-rm -vf /tools/include/zstd.h
 
 set -e
 #
@@ -134,6 +146,7 @@ rm -rf glibc-2.34
 touch /logs/status_glibc_complete
 
 echo 6.10. Adjusting the Toolchain
+find / -name ld-linux-x86-64.so.2
 # The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
 mv -v /tools/bin/{ld,ld-old}
 mv -v /tools/$BUILD_TARGET/bin/{ld,ld-old}
@@ -845,9 +858,9 @@ echo Findutils-4.6.0
 tar xf findutils-4.6.0.tar.gz
 pushd findutils-4.6.0
 sed -i 's/test-lock..EXEEXT.//' tests/Makefile.in
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
+#sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
+#echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
 ./configure --prefix=/usr --localstatedir=/var/lib/locate
 make -j$(nproc)
 make install
@@ -872,8 +885,8 @@ echo Gzip-1.9
 tar xf gzip-1.9.tar.xz
 pushd gzip-1.9
 ./configure --prefix=/usr
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
+#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 #mv -v /usr/bin/gzip /bin
