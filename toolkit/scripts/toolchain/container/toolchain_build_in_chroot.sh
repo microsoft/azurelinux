@@ -52,21 +52,11 @@ ls -la /bin/bash
 ls -la /bin/sh
 echo sanity check - raw toolchain - before building - gcc -v
 find / -name ld-linux-x86-64.so.2
-# find / -name ld-linux-x86-64.so.2
-# /tools/lib/ld-linux-x86-64.so.2
 ls -la /lib64/ld-linux-x86-64.so.2
 ls -la /tools/lib/ld-linux-x86-64.so.2
-
-#+ ln -sfv ../lib/ld-linux-x86-64.so.2 /lib64
-#'/lib64/ld-linux-x86-64.so.2' -> '../lib/ld-linux-x86-64.so.2'
-#+ ln -sfv ../lib/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3
-#'/lib64/ld-lsb-x86-64.so.3' -> '../lib/ld-linux-x86-64.so.2'
-
 ls -la /lib64
 ls -la /lib64/ld-lsb-x86-64.so.3
 ls -la /lib64/ld-linux-x86-64.so.2
-# Fix interpreter link
-#ln -sv /tools/lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
 file /tools/bin/gcc
 gcc -v
 echo Finished printing debug info
@@ -1119,6 +1109,7 @@ touch /logs/status_nss_complete
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
+patch -Np1 -i /tools/cpio_extern_nocommon.patch
 ./configure --prefix=/usr \
         --bindir=/bin \
         --enable-mt   \

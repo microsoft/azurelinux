@@ -8,6 +8,7 @@ Group:          System Environment/System utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         cpio_extern_nocommon.patch
 
 Conflicts:      toybox
 
@@ -23,7 +24,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of cpio
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 sed -i -e '/gets is a/d' gnu/stdio.in.h
