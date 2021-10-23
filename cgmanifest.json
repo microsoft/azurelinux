@@ -1627,8 +1627,8 @@
         "type": "other",
         "other": {
           "name": "findutils",
-          "version": "4.6.0",
-          "downloadUrl": "http://ftp.gnu.org/gnu/findutils/findutils-4.6.0.tar.gz"
+          "version": "4.8.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz"
         }
       }
     },
@@ -2229,8 +2229,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.9",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.9.tar.xz"
+          "version": "1.11",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz"
         }
       }
     },
