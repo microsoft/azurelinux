@@ -63,7 +63,7 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.29.13-6
-- Initial CBL-Mariner import from Fedora 31 (License: MIT)
+- Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.29.13-5
 - Rebuilt for Python 3.8.0rc1 (#1748018)

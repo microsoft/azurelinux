@@ -566,8 +566,8 @@
         "type": "other",
         "other": {
           "name": "bzip2",
-          "version": "1.0.6",
-          "downloadUrl": "https://downloads.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz"
+          "version": "1.0.8",
+          "downloadUrl": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
         }
       }
     },
@@ -1118,16 +1118,6 @@
           "name": "dbus-python",
           "version": "1.2.16",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "debugedit",
-          "version": "5.0",
-          "downloadUrl": "https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz"
         }
       }
     },
@@ -2359,8 +2349,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.69.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2719,8 +2709,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.69.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2729,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.69.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2739,8 +2729,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.69.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -7582,8 +7572,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.17.0",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz"
+          "version": "4.14.2.1",
+          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.14.2.1-release.tar.gz"
         }
       }
     },

@@ -26,6 +26,7 @@ cp -v $MARINER_SPECS_DIR/gcc/gcc_tm_texi.patch ./container
 # M4 patch
 cp -v $MARINER_SPECS_DIR/m4/04-fix-sigstksz.patch ./container
 cp -v $MARINER_SPECS_DIR/m4/m4-1.4.18-glibc-change-work-around.patch ./container
+cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022
