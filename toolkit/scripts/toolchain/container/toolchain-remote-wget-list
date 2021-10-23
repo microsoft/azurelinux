@@ -6,7 +6,7 @@ http://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.2.tar.gz
 https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz
 https://sourceware.org/ftp/elfutils/0.176/elfutils-0.176.tar.bz2
 https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz
-http://ftp.gnu.org/gnu/findutils/findutils-4.6.0.tar.gz
+https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz
 https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
 http://ftp.gnu.org/gnu/gdbm/gdbm-1.18.1.tar.gz
 http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
@@ -53,7 +53,7 @@ http://ftp.gnu.org/gnu/gawk/gawk-4.2.1.tar.xz
 http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz
 http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz
 http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz
-http://ftp.gnu.org/gnu/gzip/gzip-1.9.tar.xz
+https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.tar.xz
 http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 http://download.savannah.gnu.org/releases/man-db/man-db-2.8.4.tar.xz

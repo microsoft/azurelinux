@@ -854,9 +854,9 @@ popd
 rm -rf gawk-4.2.1
 touch /logs/status_gawk_complete
 
-echo Findutils-4.6.0
-tar xf findutils-4.6.0.tar.gz
-pushd findutils-4.6.0
+echo Findutils-4.8.0
+tar xf findutils-4.8.0.tar.xz
+pushd findutils-4.8.0
 sed -i 's/test-lock..EXEEXT.//' tests/Makefile.in
 #sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
 #sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
@@ -867,7 +867,7 @@ make install
 #mv -v /usr/bin/find /bin
 sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
 popd
-rm -rf findutils-4.6.0
+rm -rf findutils-4.8.0
 touch /logs/status_findutils_complete
 
 echo Groff-1.22.3
@@ -881,9 +881,9 @@ popd
 rm -rf groff-1.22.3
 touch /logs/status_groff_complete
 
-echo Gzip-1.9
-tar xf gzip-1.9.tar.xz
-pushd gzip-1.9
+echo Gzip-1.11
+tar xf gzip-1.11.tar.xz
+pushd gzip-1.11
 ./configure --prefix=/usr
 #sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
 #echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
@@ -891,7 +891,7 @@ make -j$(nproc)
 make install
 #mv -v /usr/bin/gzip /bin
 popd
-rm -rf gzip-1.9
+rm -rf gzip-1.11
 touch /logs/status_gzip_complete
 
 echo Libpipeline-1.5.0

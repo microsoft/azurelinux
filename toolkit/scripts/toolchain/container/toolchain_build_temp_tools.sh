@@ -449,9 +449,9 @@ rm -rf file-5.34
 
 touch $LFS/logs/temptoolchain/status_file_complete
 
-echo Findutils-4.6.0
-tar xf findutils-4.6.0.tar.gz
-pushd findutils-4.6.0
+echo Findutils-4.8.0
+tar xf findutils-4.8.0.tar.xz
+pushd findutils-4.8.0
 #sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
 #sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
 #echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
@@ -459,7 +459,7 @@ pushd findutils-4.6.0
 make -j$(nproc)
 make install
 popd
-rm -rf findutils-4.6.0
+rm -rf findutils-4.8.0
 
 touch $LFS/logs/temptoolchain/status_findutils_complete
 
@@ -496,16 +496,16 @@ rm -rf grep-3.1
 
 touch $LFS/logs/temptoolchain/status_grep_complete
 
-echo Gzip-1.9
-tar xf gzip-1.9.tar.xz
-pushd gzip-1.9
+echo Gzip-1.11
+tar xf gzip-1.11.tar.xz
+pushd gzip-1.11
 ./configure --prefix=/tools
 #sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
 #echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 popd
-rm -rf gzip-1.9
+rm -rf gzip-1.11
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
