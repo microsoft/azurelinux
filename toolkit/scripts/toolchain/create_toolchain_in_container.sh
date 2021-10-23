@@ -18,7 +18,7 @@ docker ps -a
 # docker rmi $(docker images -a -q)
 # docker rmi $(docker history marinertoolchain -q)
 
-# Texinfo patch file
+# OpenJDK8 patch files
 cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
 # GCC patch

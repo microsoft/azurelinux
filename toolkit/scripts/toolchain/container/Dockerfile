@@ -57,7 +57,6 @@ RUN apt-get update -y -qq && \
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
-       "./texinfo-perl-fix.patch", \
        "./toolchain-jdk8-wget.sh", \
        "$LFS/tools/" ]
 
