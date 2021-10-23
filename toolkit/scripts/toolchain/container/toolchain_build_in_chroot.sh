@@ -700,10 +700,13 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.176
-tar xjf elfutils-0.176.tar.bz2
-pushd elfutils-0.176
-./configure --prefix=/usr
+echo Elfutils-0.185
+tar xjf elfutils-0.185.tar.bz2
+pushd elfutils-0.185
+./configure \
+    --prefix=/usr \
+    --disable-debuginfod \
+    --enable-libdebuginfod=dummy
 make -j$(nproc)
 make -C libelf install
 install -vm644 config/libelf.pc /usr/lib/pkgconfig
@@ -712,7 +715,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.176
+rm -rf elfutils-0.185
 touch /logs/status_libelf_complete
 
 echo Libffi-3.2.1

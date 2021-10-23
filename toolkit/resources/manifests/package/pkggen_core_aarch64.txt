@@ -57,10 +57,10 @@ grep-3.1-5.cm2.aarch64.rpm
 grep-lang-3.1-5.cm2.aarch64.rpm
 diffutils-3.8-1.cm2.aarch64.rpm
 gawk-4.2.1-4.cm2.aarch64.rpm
-findutils-4.6.0-7.cm2.aarch64.rpm
-findutils-lang-4.6.0-7.cm2.aarch64.rpm
+findutils-4.8.0-1.cm2.aarch64.rpm
+findutils-lang-4.8.0-1.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
-gzip-1.9-6.cm2.aarch64.rpm
+gzip-1.11-1.cm2.aarch64.rpm
 make-4.2.1-6.cm2.aarch64.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
@@ -99,9 +99,9 @@ expat-devel-2.2.6-4.cm2.aarch64.rpm
 expat-libs-2.2.6-4.cm2.aarch64.rpm
 libpipeline-1.5.0-5.cm2.aarch64.rpm
 libpipeline-devel-1.5.0-5.cm2.aarch64.rpm
-gdbm-1.18-4.cm2.aarch64.rpm
-gdbm-devel-1.18-4.cm2.aarch64.rpm
-gdbm-lang-1.18-4.cm2.aarch64.rpm
+gdbm-1.21-1.cm2.aarch64.rpm
+gdbm-devel-1.21-1.cm2.aarch64.rpm
+gdbm-lang-1.21-1.cm2.aarch64.rpm
 perl-B-1.80-463.cm2.aarch64.rpm
 perl-Carp-1.50-463.cm2.noarch.rpm
 perl-Class-Struct-0.66-463.cm2.noarch.rpm

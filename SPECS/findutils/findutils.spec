@@ -59,7 +59,7 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-* Sat Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 4.8.0-1
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 4.8.0-1
 - Update to version 4.8.0
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.6.0-7
 - Added %%license line automatically
