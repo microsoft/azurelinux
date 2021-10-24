@@ -55,7 +55,7 @@ func PlaceHolderize(thing []string) string {
 	return fmt.Sprintf("(%s)", strings.Join(thing, "|"))
 }
 
-// ParseListArgument takes a user provided string list that is space seperated
+// ParseListArgument takes a user provided string list that is space separated
 // and returns a slice of the split and trimmed elements.
 func ParseListArgument(input string) (results []string) {
 	const delimiter = " "
