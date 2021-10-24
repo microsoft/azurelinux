@@ -139,8 +139,8 @@ itstool-2.0.6-4.cm2.noarch.rpm
 json-c-0.14-3.cm2.aarch64.rpm
 json-c-debuginfo-0.14-3.cm2.aarch64.rpm
 json-c-devel-0.14-3.cm2.aarch64.rpm
-kbd-2.0.4-7.cm2.aarch64.rpm
-kbd-debuginfo-2.0.4-7.cm2.aarch64.rpm
+kbd-2.2.0-1.cm2.aarch64.rpm
+kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
 kernel-headers-5.10.74.1-2.cm2.noarch.rpm
 kmod-25-6.cm2.aarch64.rpm
 kmod-debuginfo-25-6.cm2.aarch64.rpm
@@ -220,9 +220,9 @@ libstdc++-devel-11.2.0-1.cm2.aarch64.rpm
 libtasn1-4.14-3.cm2.aarch64.rpm
 libtasn1-debuginfo-4.14-3.cm2.aarch64.rpm
 libtasn1-devel-4.14-3.cm2.aarch64.rpm
-libtirpc-1.1.4-5.cm2.aarch64.rpm
-libtirpc-debuginfo-1.1.4-5.cm2.aarch64.rpm
-libtirpc-devel-1.1.4-5.cm2.aarch64.rpm
+libtirpc-1.1.4-6.cm2.aarch64.rpm
+libtirpc-debuginfo-1.1.4-6.cm2.aarch64.rpm
+libtirpc-devel-1.1.4-6.cm2.aarch64.rpm
 libtool-2.4.6-7.cm2.aarch64.rpm
 libtool-debuginfo-2.4.6-7.cm2.aarch64.rpm
 libxml2-2.9.12-2.cm2.aarch64.rpm
@@ -243,7 +243,7 @@ m4-1.4.18-5.cm2.aarch64.rpm
 m4-debuginfo-1.4.18-5.cm2.aarch64.rpm
 make-4.2.1-6.cm2.aarch64.rpm
 make-debuginfo-4.2.1-6.cm2.aarch64.rpm
-mariner-check-macros-2.0-6.cm2.noarch.rpm
+mariner-check-macros-2.0-5.cm2.noarch.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
 mariner-repos-2.0-1.cm2.noarch.rpm
 mariner-repos-extras-2.0-1.cm2.noarch.rpm

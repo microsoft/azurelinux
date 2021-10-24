@@ -1,7 +1,7 @@
 Summary:        Key table files, console fonts, and keyboard utilities
 Name:           kbd
-Version:        2.0.4
-Release:        7%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,8 +58,8 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
-* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.0.4-7
-- Fix for gcc 11.2.0 compilation issue
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.0-1
+- Update to version 2.2.0
 
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.4-6
 - Adding 'Provides' for 'kbm-misc'.
