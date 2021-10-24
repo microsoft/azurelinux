@@ -162,7 +162,7 @@ func GetInstalledPackages() (result []string, err error) {
 
 // QuerySPEC queries a SPEC file with queryFormat. Returns the output split by line and trimmed.
 func QuerySPEC(specFile, sourceDir, queryFormat string, defines map[string]string, extraArgs ...string) (result []string, err error) {
-	const queryArg = "-q"
+	const queryArg = "-q -v"
 
 	var allDefines map[string]string
 
@@ -194,7 +194,7 @@ func QuerySPECForBuiltRPMs(specFile, sourceDir, queryFormat string, defines map[
 
 // QueryPackage queries an RPM or SRPM file with queryFormat. Returns the output split by line and trimmed.
 func QueryPackage(packageFile, queryFormat string, defines map[string]string, extraArgs ...string) (result []string, err error) {
-	const queryArg = "-q"
+	const queryArg = "-q -v"
 
 	extraArgs = append(extraArgs, queryArg)
 	args := formatCommandArgs(extraArgs, packageFile, queryFormat, defines)
