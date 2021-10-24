@@ -256,7 +256,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_lib64dir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
-%{_sbindir}/zdump
+#%%{_sbindir}/zdump
 %{_sbindir}/zic
 %{_sbindir}/iconvconfig
 %{_bindir}/*

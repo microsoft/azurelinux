@@ -3,8 +3,8 @@
 
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
-Version:        0.176
-Release:        5%{?dist}
+Version:        0.185
+Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -257,6 +257,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 0.185-1
+- Update to version 0.185
+
 * Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.176-5
 - Adding "*-default-yama-scope" subpackage using Fedora 32 (license: MIT) specs as guidance.
 - Providing subpackage '*-libs' from the default package.
