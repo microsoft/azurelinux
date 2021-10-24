@@ -13,7 +13,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -83,6 +83,7 @@ make VERBOSE=1 BUILD_OPT=1 \
     USE_SYSTEM_ZLIB=1 \
     ZLIB_LIBS=-lz \
     USE_64=1 \
+    NSS_ENABLE_WERROR=0 \
     $([ -f %{_includedir}/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
 popd
 
@@ -157,7 +158,10 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
-* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 3.44-9
+- Fix for gcc 11.2.0
+
+* Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 3.44-8
 - Adding 'Provides' for 'nss-util-devel'.
 - Adding 'nss-util.pc' and 'nss-util-config' using Fedora 32 spec (license: MIT) as guidance.
 
