@@ -5,7 +5,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.292
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib
 URL:            https://openjdk.java.net
 Group:          Development/Tools
@@ -89,8 +89,8 @@ sed -i '0,/BUILD_LIBMLIB_SRC/s/BUILD_LIBMLIB_SRC/BUILD_HEADLESS_ONLY := 1\nOPENJ
 
 %build
 chmod a+x ./configur*
-export CFLAGS="%{build_cflags} -Wno-error=format-overflow= -Wno-error=stringop-overflow="
-export CXXFLAGS="%{build_cxxflags}-Wno-error=format-overflow= -Wno-error=stringop-overflow="
+export CFLAGS="%{build_cflags} -Wno-error=register -Wno-error=format-overflow= -Wno-error=stringop-overflow="
+export CXXFLAGS="%{build_cxxflags} -Wno-error=register -Wno-error=format-overflow= -Wno-error=stringop-overflow="
 export CFLAGS=$(echo $CFLAGS | sed "s/-Wall//" | sed "s/-Wformat//" | sed "s/-Werror=format-security//")
 export CXXFLAGS=$(echo $CXXFLAGS | sed "s/-Wall//" | sed "s/-Wformat// | sed "s/-Werror=format-security//"")
 unset JAVA_HOME &&
@@ -100,7 +100,7 @@ unset JAVA_HOME &&
 	--disable-headful \
 	--with-cacerts-file=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap/jre/lib/security/cacerts \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
-	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
+	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse -fcommon" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
 	--with-stdc++lib=dynamic \
@@ -266,9 +266,12 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
--   Update to 8u292 to address CVEs
--   Switch to AdoptOpenJDK-generated source tarball
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.8.0.292-2
+- Modify to build with gcc 11.2.0
+
+* Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
+- Update to 8u292 to address CVEs
+- Switch to AdoptOpenJDK-generated source tarball
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.212-15
 - Replace incorrect %%{_lib} usage with %%{_libdir}
