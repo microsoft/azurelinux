@@ -1,32 +1,28 @@
-Summary:	A macro processor
-Name:		m4
-Version:	1.4.18
+Summary:        A macro processor
+Name:           m4
+Version:        1.4.18
 Release:        5%{?dist}
-License:	GPLv3+
-URL:		http://www.gnu.org/software/m4
-Group:		Development/Tools
+License:        GPLv3+
+URL:            http://www.gnu.org/software/m4
+Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
-Patch0:     04-fix-sigstksz.patch
-Patch1:     m4-1.4.18-glibc-change-work-around.patch
+Source0:        http://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
+Patch0:         04-fix-sigstksz.patch
+Patch1:         m4-1.4.18-glibc-change-work-around.patch
 
 %description
 The M4 package contains a macro processor
 
 %prep
+%setup -q
 %patch0 -p1
 %patch1 -p1
-%setup -q
 
 %build
-#make some fixes required by glibc-2.28:
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
-
 ./configure \
-	--prefix=%{_prefix} \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --disable-silent-rules
 make %{?_smp_mflags}
 
 %install
@@ -45,7 +41,7 @@ make  %{?_smp_mflags}  check
 
 %changelog
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 1.4.18-5
-- Add patch for glibc 2.34
+- Add patches for glibc 2.34
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.4.18-4
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.18-3
