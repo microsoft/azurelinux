@@ -269,7 +269,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-* Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-2
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-2
 - Bump release number to match kernel release
 
 * Tue Oct 19 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-1
@@ -332,7 +332,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Bump release number to match kernel-signed update
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Mon May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Remove build-id match check
 
