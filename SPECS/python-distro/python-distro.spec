@@ -3,21 +3,21 @@
 
 Summary:        Distro - an OS platform information API
 Name:           python-distro
-Version:        1.4.0
-Release:        5%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        ASL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/distro
-#Source0:       https://github.com/nir0s/distro/archive/v%{version}.tar.gz
-Source0:        distro-%{version}-github.tar.gz
+Source0:        https://github.com/nir0s/distro/archive/v%{version}.tar.gz#/distro-%{version}-github.tar.gz
 
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
+BuildRequires:  git
 BuildRequires:  python3-pip
 %endif
 
@@ -60,7 +60,8 @@ tox
 %license LICENSE
 
 %changelog
-* Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.4.0-5
+* Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.0-1
+- Updated to version 1.6.0 to make tests work with Python 3.7.
 - Removing Python 2 version.
 
 * Fri Feb 26 2021 Andrew Phelps <anphel@microsoft.com> - 1.4.0-4
