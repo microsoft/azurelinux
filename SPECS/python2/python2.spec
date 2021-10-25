@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -44,9 +44,8 @@ BuildRequires:  ncurses-devel
 BuildRequires:  readline-devel
 Requires:       openssl
 Requires:       python2-libs = %{version}-%{release}
-Provides:       python-sqlite
-Provides:       python(abi)
-Provides:       /bin/python
+Provides:       python-sqlite = %{version}-%{release}
+Provides:       python(abi) = %{version}-%{release}
 Provides:       /bin/python2
 
 %description
@@ -247,6 +246,10 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.7.18-8
+- Specify version and release number for "Provides: python(abi)" to avoid mixing with Python 3.
+- Removing "Provides: /bin/python" as this is satisfied by Python 3.
+
 * Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 2.7.18-7
 - Remove coreutils dependency to remove circular dependency with libselinux
 
