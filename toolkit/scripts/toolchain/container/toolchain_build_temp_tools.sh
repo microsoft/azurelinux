@@ -419,6 +419,11 @@ touch $LFS/logs/temptoolchain/status_bzip2_complete
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
+case $(uname -m) in
+    aarch64)
+        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
+    ;;
+esac
 ./configure --prefix=/tools --enable-install-program=hostname
 make -j$(nproc)
 make install

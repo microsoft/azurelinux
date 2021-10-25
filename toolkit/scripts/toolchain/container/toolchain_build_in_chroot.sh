@@ -813,6 +813,11 @@ echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
 patch -Np1 -i ../coreutils-8.32-i18n-1.patch
+case $(uname -m) in
+    aarch64)
+        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
+    ;;
+esac
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
@@ -1177,9 +1182,9 @@ popd
 rm -rf lua-5.3.5
 touch /logs/status_lua_complete
 
-echo rpm-4.14.2
-tar xjf rpm-4.14.2.tar.bz2
-pushd rpm-4.14.2
+echo rpm-4.14.2.1
+tar xjf rpm-4.14.2.1.tar.bz2
+pushd rpm-4.14.2.1
 patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
 ./configure --prefix=/usr \
     --enable-posixmutexes \
@@ -1193,7 +1198,7 @@ make install
 install -d /var/lib/rpm
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf rpm-4.14.2
+rm -rf rpm-4.14.2.1
 touch /logs/status_rpm_complete
 
 # Cleanup

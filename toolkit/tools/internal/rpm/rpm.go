@@ -162,7 +162,7 @@ func GetInstalledPackages() (result []string, err error) {
 
 // QuerySPEC queries a SPEC file with queryFormat. Returns the output split by line and trimmed.
 func QuerySPEC(specFile, sourceDir, queryFormat string, defines map[string]string, extraArgs ...string) (result []string, err error) {
-	const queryArg = "-q -v"
+	const queryArg = "-q"
 
 	var allDefines map[string]string
 
