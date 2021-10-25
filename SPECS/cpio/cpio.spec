@@ -1,7 +1,7 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/cpio/
 Group:          System Environment/System utilities
@@ -60,6 +60,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 2.13-3
+- Add patch for gcc 11 compatability
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-2
 - Added %%license line automatically
 * Fri May 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.13-1
