@@ -130,6 +130,7 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %changelog
 * Fri Oct 15 2021 Ismail Kose <iskose@microsoft.com> - 2.36.1-4
 - Adding READONLY keyword support in linker script
+- Verified license
 
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
 - Adding 'libiberty' lib and header.
