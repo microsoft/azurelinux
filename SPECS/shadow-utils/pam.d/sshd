@@ -8,7 +8,7 @@ password        include         system-password
 session         required        pam_selinux.so close
 
 # set audit loginuid for the user
-session         required        pam_loginuid.so
+session         optional        pam_loginuid.so
 
 session         include         system-session
 
