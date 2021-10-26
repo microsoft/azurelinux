@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        7%{?dist}
+Release:        6%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -123,15 +123,10 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Thu Oct 21 2021 Ismail Kose <iskose@microsoft.com> - 2.0-7
+* Thu Oct 21 2021 Ismail Kose <iskose@microsoft.com> - 2.0-6
 - Update generate-package-note.py tool to 2.1.2
 - Add verify-package-notes.sh tool
 - Verified license
-
-* Mon Oct 11 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.0-6
-- Remove too verbose logs from the linker script
-- Update default mariner macros with invalid_encoding_terminates_build
-- Update linker script to use sed instead of "grep -P" and "tr"
 
 * Tue Sep 21 2021 Andrew Phelps <anphel@microsoft.com> - 2.0-5
 - Modify gen-ld-script.sh to ensure moduleVersion contains 4 part version
