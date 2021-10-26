@@ -3,7 +3,9 @@ Summary:        International Components for Unicode.
 Name:           icu
 Version:        68.2.0.9
 Release:        2%{?dist}
-License:        BSD AND MIT AND Public Domain AND naist-2003
+License:        BSD and MIT and Public Domain and naist-2003
+URL:            https://github.com/microsoft/icu
+Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
