@@ -4,7 +4,7 @@
 Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,9 +17,7 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
-BuildRequires:  git
 BuildRequires:  python3-pip
-BuildRequires:  python3-xml
 %endif
 
 BuildArch:      noarch
@@ -50,6 +48,12 @@ python3 setup.py build
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 %check
+# Disabled tests:
+# - 'py27' - depends on Python 2, CBL-Mariner doesn't support that anymore.
+# - 'lint' - new test added in version 1.6.0, depends on 'pre-commit', which is not provided by CBL-Mariner.
+sed -i -E "s/(lint|py27), //g" tox.ini
+sed -i -E "/.*testenv:lint/Q" tox.ini
+
 pip3 install tox
 tox
 
@@ -61,6 +65,9 @@ tox
 %license LICENSE
 
 %changelog
+* Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.0-2
+- Disabling tests we cannot run from the '%%check' section.
+
 * Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.0-1
 - Updated to version 1.6.0 to make tests work with Python 3.7.
 - Removing Python 2 version.
