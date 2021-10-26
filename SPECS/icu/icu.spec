@@ -1,7 +1,8 @@
+%define __requires_exclude ^/(bin|usr/bin).*/(ba)?sh$
 Summary:        International Components for Unicode.
 Name:           icu
 Version:        68.2.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 URL:            https://github.com/microsoft/icu
 Group:          System Environment/Libraries
@@ -61,6 +62,9 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Tue Oct 26 2021 Mateusz Malisz <mamalisz@microsoft.com> - 68.2.0.9-2
+-   Remove bash/sh dependency.
+
 *   Tue Sep 28 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 68.2.0.9-1
 -   Update to version  "68.2.0.9".
 

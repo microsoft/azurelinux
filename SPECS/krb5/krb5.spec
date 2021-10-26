@@ -1,7 +1,9 @@
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*/(ba)?sh$
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.18.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -123,6 +125,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Tue Oct 26 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.18.4-2
+- Remove dependency on sh/bash.
+
 * Tue Oct 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.18.4-1
 - Update version to fix CVE-2019-14844, CVE-2020-28196, CVE-2021-36222
 - Add patch to fix CVE-2021-37750
