@@ -19,6 +19,7 @@ BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  git
 BuildRequires:  python3-pip
+BuildRequires:  python3-xml
 %endif
 
 BuildArch:      noarch
