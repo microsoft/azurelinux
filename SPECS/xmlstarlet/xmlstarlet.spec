@@ -61,7 +61,7 @@ make check
 
 %changelog
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.6.1-16
-* Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-15
