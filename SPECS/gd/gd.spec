@@ -122,7 +122,17 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license COPYING
-%{_bindir}/*
+%{_bindir}/bdftogd
+%{_bindir}/gd2copypal
+%{_bindir}/gd2togif
+%{_bindir}/gd2topng
+%{_bindir}/gdcmpgif
+%{_bindir}/gdparttopng
+%{_bindir}/gdtopng
+%{_bindir}/giftogd2
+%{_bindir}/pngtogd
+%{_bindir}/pngtogd2
+%{_bindir}/webpng
 
 %files -n %{lname}
 %license COPYING
