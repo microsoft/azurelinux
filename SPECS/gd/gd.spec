@@ -147,6 +147,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Thu Oct 21 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.4
 - Build without fontconfig and freetype as fontconfig support is failing
+- Remove `annotate` binary
 
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.3
 - License verified
