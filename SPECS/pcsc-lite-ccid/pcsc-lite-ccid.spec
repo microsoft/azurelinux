@@ -3,7 +3,7 @@
 Summary:        Generic USB CCID smart card reader driver
 Name:           pcsc-lite-ccid
 Version:        1.4.33
-Release:        2%{dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,9 +13,7 @@ Patch0:         ccid-1.4.26-omnikey-3121.patch
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libusb1-devel
-BuildRequires:  pcsc-lite >= %{pcsc_lite_ver}
 BuildRequires:  pcsc-lite-devel >= %{pcsc_lite_ver}
-BuildRequires:  pcsc-lite-libs >= %{pcsc_lite_ver}
 BuildRequires:  perl
 Requires:       pcsc-lite%{?_isa} >= %{pcsc_lite_ver}
 Requires(post): systemd
@@ -60,6 +58,9 @@ cp -p src/openct/LICENSE LICENSE.openct
 %config(noreplace) %{_sysconfdir}/reader.conf.d/libccidtwin
 
 %changelog
+* Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.4.33-3%{dist}
+- Removing invalid "BuildRequires".
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.4.33-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
