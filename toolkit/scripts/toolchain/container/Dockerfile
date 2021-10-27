@@ -59,6 +59,7 @@ COPY [ "./toolchain-sha256sums", \
        "./toolchain-local-wget-list", \
        "./texinfo-perl-fix.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
+       "./linker-script-readonly-keyword-support.patch", \
        "./toolchain-jdk8-wget.sh", \
        "$LFS/tools/" ]
 

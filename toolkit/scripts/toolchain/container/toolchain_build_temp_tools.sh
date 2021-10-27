@@ -19,6 +19,7 @@ LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo Binutils-2.36.1 - Pass 1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
