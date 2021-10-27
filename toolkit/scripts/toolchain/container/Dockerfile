@@ -103,7 +103,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./check-system-ca-certs.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./go14_bootstrap_aarch64.patch", \
-       "./gcc_tm_texi.patch", \
        "./cpio_extern_nocommon.patch", \
        "$LFS/tools/" ]
 

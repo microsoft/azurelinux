@@ -138,8 +138,7 @@ cd       build
       --with-headers=/tools/include      \
       libc_cv_forced_unwind=yes          \
       libc_cv_c_cleanup=yes
-# Build with single processor due to LFS warning about glibc errors seen with parallel make
-make -j1
+make -j$(nproc)
 make install
 echo sanity check - temptoolchain - glibc
 set +e
@@ -209,6 +208,7 @@ touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 echo GCC-11.2.0 - Pass 2
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
+# fix issue compiling with glibc 2.34
 sed -e '/static.*SIGSTKSZ/d' \
     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
@@ -351,10 +351,9 @@ touch $LFS/logs/temptoolchain/status_dejagnu_complete
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
+# Fix issues building with glibc 2.34
 patch -Np1 -i /tools/04-fix-sigstksz.patch
 patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
@@ -457,9 +456,6 @@ touch $LFS/logs/temptoolchain/status_file_complete
 echo Findutils-4.8.0
 tar xf findutils-4.8.0.tar.xz
 pushd findutils-4.8.0
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-#sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-#echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
@@ -505,8 +501,6 @@ echo Gzip-1.11
 tar xf gzip-1.11.tar.xz
 pushd gzip-1.11
 ./configure --prefix=/tools
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 popd
@@ -588,6 +582,7 @@ touch $LFS/logs/temptoolchain/status_tar_complete
 echo Texinfo-6.8
 tar xf texinfo-6.8.tar.xz
 pushd texinfo-6.8
+# fix issue building with glibc 2.34:
 sed -e 's/__attribute_nonnull__/__nonnull/' \
     -i gnulib/lib/malloc/dynarray-skeleton.c
 ./configure --prefix=/tools
@@ -608,16 +603,6 @@ popd
 rm -rf xz-5.2.4
 
 touch $LFS/logs/temptoolchain/status_xz_complete
-
-# echo zstd-1.5.0
-# tar xf zstd-1.5.0.tar.gz
-# pushd zstd-1.5.0
-# make -j$(nproc)
-# make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
-# popd
-# rm -rf zstd-1.5.0
-
-# touch $LFS/logs/temptoolchain/status_zstd_complete
 
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
 

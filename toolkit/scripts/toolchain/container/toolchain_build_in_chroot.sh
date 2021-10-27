@@ -115,8 +115,7 @@ CC="gcc -isystem $GCC_INCDIR -isystem /usr/include" \
 # checking whether to use .ctors/.dtors header and trailer... configure: error: missing __attribute__ ((constructor)) support??
 # adding 'libc_cv_ctors_header=yes'
 unset GCC_INCDIR
-# Build with single processor due to LFS warning about glibc errors seen with parallel make
-make -j1
+make -j$(nproc)
 touch /etc/ld.so.conf
 sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
 make install
@@ -237,10 +236,9 @@ touch /logs/status_readline_complete
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
+# patch issues building with glibc 2.34
 patch -Np1 -i /tools/04-fix-sigstksz.patch
 patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
@@ -321,6 +319,7 @@ touch /logs/status_libmpc_complete
 echo GCC-11.2.0
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
+# fix issue compiling with glibc 2.34
 sed -e '/static.*SIGSTKSZ/d' \
     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
@@ -342,11 +341,9 @@ sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 ls -la /usr/lib/gcc
 ls /usr/lib/gcc
 rm -f /usr/lib/gcc
-#patch -Np1 -i /tools/gcc_tm_texi.patch
 mkdir -v build
 cd       build
-#export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
-#SED=sed \
+SED=sed \
 ../configure    --prefix=/usr \
                 --enable-shared \
                 --enable-threads=posix \
@@ -855,10 +852,6 @@ touch /logs/status_gawk_complete
 echo Findutils-4.8.0
 tar xf findutils-4.8.0.tar.xz
 pushd findutils-4.8.0
-#sed -i 's/test-lock..EXEEXT.//' tests/Makefile.in
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-#sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-#echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
 ./configure --prefix=/usr --localstatedir=/var/lib/locate
 make -j$(nproc)
 make install
@@ -883,8 +876,6 @@ echo Gzip-1.11
 tar xf gzip-1.11.tar.xz
 pushd gzip-1.11
 ./configure --prefix=/usr
-#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 #mv -v /usr/bin/gzip /bin
@@ -905,6 +896,9 @@ touch /logs/status_libpipeline_complete
 echo Make-4.2.1
 tar xf make-4.2.1.tar.gz
 pushd make-4.2.1
+# fix errors caused by glibc 2.34
+# Note: upgrading to make 4.3 fixes the glob errors, but also caused the following errors: (possibly faccessat2 docker issue)
+# make[1]: /bin/sh: Operation not permitted
 sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 sed -i '215 d; 223 d;' glob/glob.c
 ./configure --prefix=/usr
@@ -960,6 +954,7 @@ echo Texinfo-6.8
 tar xf texinfo-6.8.tar.xz
 pushd texinfo-6.8
 ./configure --prefix=/usr --disable-static
+# fix issue building with glibc 2.34:
 sed -e 's/__attribute_nonnull__/__nonnull/' \
     -i gnulib/lib/malloc/dynarray-skeleton.c
 make -j$(nproc)

@@ -10,10 +10,8 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         090_all_pr55930-dependency-tracking.patch
 # Only applies to the Power9 ISA
 Patch1:         CVE-2019-15847.nopatch
-Patch2:         gcc_tm_texi.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -118,8 +116,6 @@ This package contains development headers and static library for libgomp
 
 %prep
 %setup -q
-#%%patch0 -p1
-#%%patch2 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
@@ -129,7 +125,6 @@ CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-erro
 export CFLAGS
 export CXXFLAGS
 
-export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
 SED=sed \
 %configure \
     --enable-shared \
@@ -176,13 +171,13 @@ make %{?_smp_mflags} check-gcc
 %license COPYING
 %{_libdir}/cpp
 # Executables
-%exclude %{_bindir}/*gfortran
+#%%exclude %%{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
 %exclude %{_bindir}/*g++
 %{_bindir}/*
 # Libraries
 %{_lib64dir}/*
-%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+#%%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 %{_libdir}/gcc/*
 # Library executables

@@ -154,10 +154,7 @@ cd %{_builddir}/%{name}-build
 %endif
         --disable-silent-rules
 
-# Sometimes we have false "out of memory" make error
-# just rerun/continue make to workaroung it.
-#make %{?_smp_mflags} || make %{?_smp_mflags} || make %{?_smp_mflags}
-make
+make %{?_smp_mflags}
 
 %install
 #       Do not remove static libs

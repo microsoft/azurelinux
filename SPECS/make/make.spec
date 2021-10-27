@@ -15,7 +15,7 @@ The Make package contains a program for compiling packages.
 %prep
 %setup -q
 %build
-#work around an error caused by glibc-2.27
+# work around an errors caused by glibc-2.34
 sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 sed -i '215 d; 223 d;' glob/glob.c
 
@@ -43,7 +43,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-6
-- Remove glibc workaround
+- Add additional glibc 2.34 workarounds to glob.c
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 4.2.1-5
 - Fix check test
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-4
