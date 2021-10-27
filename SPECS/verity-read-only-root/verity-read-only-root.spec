@@ -75,6 +75,7 @@ install -p -m 0755  %{SOURCE5} %{buildroot}/mnt/create_linear_mount.sh
 %changelog
 * Wed Oct 13 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.0-2
 - Add required whitespace before and after module list in verity.conf
+- License verified.
 
 * Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.0-1
 - Original version for CBL-Mariner.
