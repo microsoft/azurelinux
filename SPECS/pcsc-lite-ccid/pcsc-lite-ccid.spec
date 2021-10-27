@@ -58,7 +58,7 @@ cp -p src/openct/LICENSE LICENSE.openct
 %config(noreplace) %{_sysconfdir}/reader.conf.d/libccidtwin
 
 %changelog
-* Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.4.33-3%{dist}
+* Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.4.33-3
 - Removing invalid "BuildRequires".
 
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.4.33-2
