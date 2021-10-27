@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,7 +114,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  wayland-devel
 BuildRequires:  wayland-protocols-devel
-BuildRequires:  xorg-x11-font-utils >= 1:7.2-11
+BuildRequires:  xorg-x11-font-utils >= 7.2-11
 BuildRequires:  xorg-x11-proto-devel >= 7.7-10
 BuildRequires:  xorg-x11-util-macros >= 1.17
 BuildRequires:  xorg-x11-xtrans-devel >= 1.3.2
@@ -384,6 +384,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Fri Nov 05 2021 Muhammad Falak <mwani@microsft.com> - 0.13.0.7-4
+- Remove epoch from xorg-x11-font-utils
+
 * Tue Jan 05 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.10-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.

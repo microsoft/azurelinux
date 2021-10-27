@@ -8,8 +8,7 @@
 Summary:        X.Org X11 font utilities
 Name:           xorg-x11-font-utils
 Version:        7.5
-Release:        48%{?dist}
-Epoch:          1
+Release:        49%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,8 +38,8 @@ Provides:       fonttosfnt = %{fonttosfnt}
 Provides:       mkfontdir = %{mkfontdir}
 Provides:       mkfontscale = %{mkfontscale}
 Provides:       font-util = %{font_util}
-Provides:       font-utils = %{epoch}:%{version}-%{release}
-Provides:       pkgconfig(fontutil) = %{epoch}:%{version}-%{release}
+Provides:       font-utils = %{version}-%{release}
+Provides:       pkgconfig(fontutil) = %{version}-%{release}
 Provides:       ucs2any = %{font_util}
 
 %description
@@ -116,6 +115,9 @@ find %{buildroot} -name bdftruncate\* -print0 | xargs -0 rm -f
 %{_x11fontdir}/util/map-*
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.5-49
+- Remove epoch
+
 * Thu Jan 07 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:7.5-48
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.
