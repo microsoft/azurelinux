@@ -2,11 +2,11 @@
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
 # Don't depend on bash by default
-%define __requires_exclude ^/(bin|usr/bin).*$
+%define __requires_exclude ^/(bin|usr/bin).*/(ba)?sh$
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -322,6 +322,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 09 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.28-22
+- Filter out /bin/sh alongside bash from the dependencies.
+
 * Thu Nov 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.28-21
 - Patch for glibc pthread_cond_signal failed to wake up pthread_cond_wait issue.
 
