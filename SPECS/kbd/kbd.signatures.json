@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "kbd-2.0.4.tar.xz": "f3ba359a56627dd0346dfc0f4711da3f45da60ba03e90fca2592992e439c5c29"
+  "kbd-2.0.4.tar.xz": "f3ba359a56627dd0346dfc0f4711da3f45da60ba03e90fca2592992e439c5c29",
+  "vlock.pam": "035b84b8ab28ef1a25fcfd9ea81c2cc58a523aef3454683da88e44cf2ae8cf3d"
  }
 }

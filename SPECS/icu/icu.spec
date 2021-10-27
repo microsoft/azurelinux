@@ -1,6 +1,6 @@
 Summary:        International Components for Unicode.
 Name:           icu
-Version:        68.2.0.6
+Version:        68.2.0.9
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 URL:            https://github.com/microsoft/icu
@@ -61,6 +61,9 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Tue Sep 28 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 68.2.0.9-1
+-   Update to version  "68.2.0.9".
+
 *   Fri Apr 16 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 68.2.0.6-1
 -   Update to version  "68.2.0.6".
 -   Explicitly listing provided shared libraries' versions.
