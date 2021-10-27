@@ -19,6 +19,7 @@ LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo Binutils-2.36.1 - Pass 1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -605,6 +606,19 @@ popd
 rm -rf zstd-1.5.0
 
 touch $LFS/logs/temptoolchain/status_zstd_complete
+
+echo Flex-2.6.4
+tar xf flex-2.6.4.tar.gz
+pushd flex-2.6.4
+sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+HELP2MAN=/tools/bin/true \
+./configure --prefix=/tools
+make -j$(nproc)
+make install
+popd
+rm -rf flex-2.6.4
+
+touch $LFS/logs/temptoolchain/status_flex_complete
 
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
 

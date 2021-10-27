@@ -238,6 +238,7 @@ touch /logs/status_m4_complete
 echo Binutils-2.36.1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
