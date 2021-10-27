@@ -154,7 +154,6 @@ fi
 %changelog
 * Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.9.0-3
 - Removing invalid "Provides" and unused macros.
-- Fixing the "Release" tag.
 
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
