@@ -607,6 +607,19 @@ rm -rf zstd-1.5.0
 
 touch $LFS/logs/temptoolchain/status_zstd_complete
 
+echo Flex-2.6.4
+tar xf flex-2.6.4.tar.gz
+pushd flex-2.6.4
+sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+HELP2MAN=/tools/bin/true \
+./configure --prefix=/tools
+make -j$(nproc)
+make install
+popd
+rm -rf flex-2.6.4
+
+touch $LFS/logs/temptoolchain/status_flex_complete
+
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
 
 echo Done with script

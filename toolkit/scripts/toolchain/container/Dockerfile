@@ -44,7 +44,8 @@ RUN apt-get update -y -qq && \
     zip \
     ccache \
     libgif-dev \
-    libfontconfig1-dev && \
+    libfontconfig1-dev \
+    flex && \
     apt-get clean && \
     ln    -sf bash /bin/sh && \
     mkdir -pv $LFS/sources && \
