@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,19 +75,39 @@ find %{buildroot} -name '*.cmake' -delete
 %files
 %license LICENSE
 %{_libdir}/*.so.*
+%exclude %{_libdir}/libaddress_sorting.so.*
 %{_datadir}/grpc/roots.pem
 
 %files devel
-%{_includedir}/*
-%{_libdir}/*.so
-%{_lib64dir}/*.so
+%{_includedir}/grpc
+%{_includedir}/grpc++
+%{_includedir}/grpcpp
+%exclude %{_includedir}/re2/
+%{_libdir}/libgpr.so
+%{_libdir}/libgrpc++.so
+%{_libdir}/libgrpc++_alts.so
+%{_libdir}/libgrpc++_error_details.so
+%{_libdir}/libgrpc++_reflection.so
+%{_libdir}/libgrpc++_unsecure.so
+%{_libdir}/libgrpc.so
+%{_libdir}/libgrpc_plugin_support.so
+%{_libdir}/libgrpc_unsecure.so
+%{_libdir}/libgrpcpp_channelz.so
+%{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
+%exclude %{_libdir}/libabsl_*
+%exclude %{_libdir}/libaddress_sorting.so
+%exclude %{_libdir}/libre2.so
+%exclude %{_lib64dir}/libre2.so
 
 %files plugins
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Tue Sep 28 2021 Andrew Phelps <anphel@microsoft.com> - 1.35.0-5
+- Explicitly provide grpc-devel files to avoid packaging conflicts with re2-devel.
+
 * Mon Jun 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-4
 - Switch to system package for protobuf dependency.
 

@@ -20,7 +20,7 @@
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 Name:           gd
 Version:        2.3.0
-Release:        2.3%{?dist}
+Release:        2.4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,8 +33,6 @@ Patch1:         gd-fontpath.patch
 Patch2:         gd-format.patch
 # could be upstreamed
 Patch3:         gd-aliasing.patch
-BuildRequires:  fontconfig-devel
-BuildRequires:  freetype > 2
 Provides:       gdlib = %{version}
 Obsoletes:      gdlib < %{version}
 %if %{with_check}
@@ -95,8 +93,6 @@ export CFLAGS="$CFLAGS -ffp-contract=off"
 	--disable-werror \
 	--without-liq \
 	--without-x \
-	--with-fontconfig \
-	--with-freetype \
 	--with-jpeg \
 	--with-png \
 	--with-webp \
@@ -126,7 +122,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license COPYING
-%{_bindir}/annotate
 %{_bindir}/bdftogd
 %{_bindir}/gd2copypal
 %{_bindir}/gd2togif
@@ -150,6 +145,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Thu Oct 21 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.4
+- Build without fontconfig and freetype as fontconfig support is failing
+- Remove `annotate` binary
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.3
 - License verified
 

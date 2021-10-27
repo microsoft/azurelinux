@@ -153,15 +153,15 @@ func readspec(specfile, distTag, srpmDir string, wg *sync.WaitGroup, ch chan []*
 		wg.Done()
 	}()
 
-	// Sanity check that rpmspec can read the spec file so we dont flood the log with warning if it cant.
-	_, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, defines)
+	// Sanity check that rpmspec can read the spec file so we don't flood the log with warning if it cant.
+	matches, err := rpm.SpecExclusiveArchIsCompatible(specfile, sourcedir, defines)
 	if err != nil {
-		logger.Log.Warnf(`rpmspec could not parse %s`, specfile)
+		logger.Log.Warnf("Failed to query exclusive architectures in spec (%s) with error: %s", specfile, err)
 		return
 	}
 
-	if !specArchMatchesBuild(specfile, sourcedir, defines) {
-		logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
+	if !matches {
+		logger.Log.Debugf("Skipping (%s) since it cannot be built on current architecture.", specfile)
 		return
 	}
 
@@ -366,39 +366,6 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 			continue
 		}
 		filteredPkgVers = append(filteredPkgVers, req)
-	}
-
-	return
-}
-
-// specArchMatchesBuild verifies ExclusiveArch tag against the machine architecture.
-func specArchMatchesBuild(specfile, sourcedir string, defines map[string]string) (shouldBeBuilt bool) {
-	const (
-		queryExclusiveArch = "%{ARCH}\n%{EXCLUSIVEARCH}\n"
-		noExclusiveArch    = "(none)"
-	)
-
-	const (
-		MachineArchField   = iota
-		ExclusiveArchField = iota
-		MinimumFieldsCount = iota
-	)
-
-	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	exclusiveArchList, err := rpm.QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, rpm.QueryHeaderArgument)
-	if err != nil {
-		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
-		return
-	}
-
-	if len(exclusiveArchList) < MinimumFieldsCount {
-		logger.Log.Warnf("The query for spec architecture did not return enough lines!")
-		return
-	}
-
-	if exclusiveArchList[ExclusiveArchField] == noExclusiveArch ||
-		exclusiveArchList[ExclusiveArchField] == exclusiveArchList[MachineArchField] {
-		shouldBeBuilt = true
 	}
 
 	return

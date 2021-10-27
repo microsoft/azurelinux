@@ -183,6 +183,36 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
+// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
+func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
+
+	const (
+		machineArchField   = iota
+		exclusiveArchField = iota
+		minimumFieldsCount = iota
+	)
+
+	// Sanity check that this SPEC is meant to be built for the current machine architecture
+	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
+
+	// If the list does not return enough lines then there is no exclusive arch set
+	if len(exclusiveArchList) < minimumFieldsCount {
+		isCompatible = true
+		return
+	}
+
+	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
+		isCompatible = true
+		return
+	}
+	return
+}
+
 // BuildRPMFromSRPM builds an RPM from the given SRPM file
 func BuildRPMFromSRPM(srpmFile string, defines map[string]string, extraArgs ...string) (err error) {
 	const (

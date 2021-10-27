@@ -1,7 +1,7 @@
 Summary:        A library which allows userspace access to USB devices
 Name:           libusb
 Version:        1.0.24
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,7 +45,8 @@ pushd tests
 ./stress
 popd
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %license COPYING
@@ -59,6 +60,9 @@ popd
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Mon Oct 11 2021 Bala <balakumaran.kannan@microsoft.com> - 1.0.24-2
+- Replace ldconfig_scriptlets
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.24-1
 - Upgrade to latest upstream version
 - Provide libusbx, libusb1 names to match other distros

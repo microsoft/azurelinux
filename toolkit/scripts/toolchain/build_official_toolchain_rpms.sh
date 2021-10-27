@@ -342,7 +342,6 @@ build_rpm_in_chroot_no_install e2fsprogs
 # libgcrypt needs libgpg-error
 chroot_and_install_rpms libgpg-error
 build_rpm_in_chroot_no_install libgcrypt
-build_rpm_in_chroot_no_install kbd
 
 # krb5 needs e2fsprogs
 chroot_and_install_rpms e2fsprogs
@@ -376,6 +375,9 @@ build_rpm_in_chroot_no_install libxslt
 # docbook-style-xsl needs pam
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
+
+# kbd needs pam
+build_rpm_in_chroot_no_install kbd
 
 # gtest needs cmake
 chroot_and_install_rpms cmake
