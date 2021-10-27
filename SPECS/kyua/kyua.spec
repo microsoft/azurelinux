@@ -3,7 +3,7 @@
 
 Name:           kyua
 Version:        0.13
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Testing framework for infrastructure software
 
 License:        BSD
@@ -20,7 +20,7 @@ BuildRequires:  pkgconfig(lutok) >= 0.4
 BuildRequires:  pkgconfig(sqlite3) >= 3.6.22
 
 Obsoletes:      kyua-cli < 0.10
-Provides:       kyua-cli = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       kyua-cli = %{version}-%{release}
 Obsoletes:      kyua-testers < 0.10
 Obsoletes:      kyua-testers-devel < 0.10
 
@@ -44,7 +44,7 @@ TAP-compliant test programs can also be executed through Kyua.
 
 %package tests
 Summary:        Runtime tests of the Kyua toolchain
-Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Obsoletes:      kyua-cli-tests < 0.10
 Obsoletes:      kyua-testers-tests < 0.10
 
@@ -82,6 +82,9 @@ HOME=$(pwd)/check %make_build check %{_make_args} || :
 %{_libexecdir}/%{name}/
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 0.13-7
+- Remove epoch
+
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 0.13-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add with_check conditional.
