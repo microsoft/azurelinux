@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3441
-Release:        2%{?dist}
+Version:        8.2.3489
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -195,6 +195,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Oct 26 2021 Chris Co <chrco@microsoft.com> - 8.2.3489-1
+- Fix CVE-2021-3875 and CVE-2021-3872 by updated to 8.2.3489
+
 * Tue Oct 05 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-2
 - Fix vim startup error.
 - vim-extra requires vim and fix for make check failure.
