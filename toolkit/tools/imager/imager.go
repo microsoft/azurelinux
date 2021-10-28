@@ -555,12 +555,12 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 
 	var rootDevice string
 
-	// Add bootloader. Prefer a seperate boot partition if one exists.
+	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, ok := installMap[bootMountPoint]
 	bootPrefix := ""
 	if !ok {
 		bootDevice = installMap[rootMountPoint]
-		// If we do not have a seperate boot partition we will need to add a prefix to all paths used in the configs.
+		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
 	}
 
@@ -568,6 +568,8 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		// In case of overlay device being mounted at root, no need to change the bootloader.
 		return
 	}
+
+	// Grub only accepts UUID, not PARTUUID or PARTLABEL
 	bootUUID, err := installutils.GetUUID(bootDevice)
 	if err != nil {
 		err = fmt.Errorf("failed to get UUID: %s", err)
@@ -582,27 +584,35 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	// Add grub config to image
+	rootPartitionSetting := systemConfig.GetRootPartitionSetting()
+	if rootPartitionSetting == nil {
+		err = fmt.Errorf("failed to find partition setting for root mountpoint")
+		return
+	}
+	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 	if systemConfig.Encryption.Enable {
+		// Encrypted devices don't currently support identifiers
 		rootDevice = installMap[rootMountPoint]
 	} else if systemConfig.ReadOnlyVerityRoot.Enable {
-		var partUUID string
-		partUUID, err = installutils.GetPartUUID(readOnlyRoot.BackingDevice)
+		var partIdentifier string
+		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
 		if err != nil {
-			err = fmt.Errorf("failed to get PARTUUID: %s", err)
+			err = fmt.Errorf("failed to get partIdentifier: %s", err)
 			return
 		}
-		rootDevice = fmt.Sprintf("verityroot:PARTUUID=%v", partUUID)
+		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
 	} else {
-		var partUUID string
-		partUUID, err = installutils.GetPartUUID(installMap[rootMountPoint])
+		var partIdentifier string
+		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
 		if err != nil {
-			err = fmt.Errorf("failed to get PARTUUID: %s", err)
+			err = fmt.Errorf("failed to get partIdentifier: %s", err)
 			return
 		}
 
-		rootDevice = fmt.Sprintf("PARTUUID=%v", partUUID)
+		rootDevice = partIdentifier
 	}
 
+	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
 	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
