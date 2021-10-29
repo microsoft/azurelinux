@@ -2,7 +2,7 @@ Summary:        The Apache Portable Runtime
 Name:           apr
 Version:        1.6.5
 Release:        6%{?dist}
-License:        Apache License 2.0
+License:        ASL 2.0
 URL:            https://apr.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -65,6 +65,7 @@ make -j1 check
 * Thu Oct 28 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.5-6
 - Fixing tests further by making them run on a single thread.
 - Removed `%%sha1` macro.
+- License verified.
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.5-5
 - Remove libtool archive files from final packaging
 * Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> - 1.6.5-4
