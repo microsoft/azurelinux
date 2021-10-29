@@ -2,7 +2,7 @@ Summary:        The Apache Portable Runtime
 Name:           apr
 Version:        1.6.5
 Release:        5%{?dist}
-License:        Apache License 2.0
+License:        ASL 2.0
 URL:            https://apr.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
