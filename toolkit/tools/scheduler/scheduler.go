@@ -331,7 +331,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 
 		if res.Node.Type == pkggraph.TypeBuild {
-			logger.Log.Infof("%d currently active builds: %v.", activeSRPMsCount, activeSRPMs)
+			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
 	}
 
