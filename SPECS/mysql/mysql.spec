@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.26
-Release:        2%{?dist}
+Version:        8.0.27
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Fri Oct 29 2021 Chris Co <chrco@microsoft.com> - 8.0.27-1
+- Upgrade to 8.0.27 to fix 3 CVEs
+
 * Mon Aug 30 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.26-2
 - Fix majority of package test failures by adding necessary requirements and running tests as non-root
 - Add missing tzdata runtime requirement
