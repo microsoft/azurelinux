@@ -11,8 +11,8 @@ Url:            https://babel.pocoo.org
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-%{version}.tar.gz
-Patch0: CVE-2021-42771_3a700b.patch
-Patch1: CVE-2021-42771_5caf71.patch
+Patch0:         CVE-2021-42771_3a700b.patch
+Patch1:         CVE-2021-42771_5caf71.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-devel
@@ -58,7 +58,7 @@ Requires:       python3-pytz
 Python 3 version.
 
 %prep
-%autosetup -n Babel-%{version}
+%autosetup -p1 -n Babel-%{version}
 rm -rf ../p3dir
 cp -a . ../p3dir
 
