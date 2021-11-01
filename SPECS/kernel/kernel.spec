@@ -224,6 +224,7 @@ Patch1185:      CVE-2021-43389.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  dwarves
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
