@@ -3,7 +3,7 @@
 
 Name:           babel
 Version:        2.6.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        an integrated collection of utilities that assist in internationalizing and localizing Python applications
 License:        BSD
 Group:          Development/Languages/Python
@@ -11,6 +11,8 @@ Url:            https://babel.pocoo.org
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-%{version}.tar.gz
+Patch0:         CVE-2021-42771_3a700b.patch
+Patch1:         CVE-2021-42771_5caf71.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-devel
@@ -56,7 +58,7 @@ Requires:       python3-pytz
 Python 3 version.
 
 %prep
-%setup -n Babel-%{version}
+%autosetup -p1 -n Babel-%{version}
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -95,6 +97,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+*   Tue Oct 26 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.6.0-9
+-   Added patch file(s) CVE-2021-42771_3a700b.patch,
+-   CVE-2021-42771_5caf71.patch
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
