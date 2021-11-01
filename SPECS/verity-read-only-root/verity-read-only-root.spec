@@ -1,7 +1,7 @@
 Summary:        Dracut module to enable dm-verity read-only roots
 Name:           verity-read-only-root
 Version:        1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,5 +73,9 @@ install -p -m 0755  %{SOURCE5} %{buildroot}/mnt/create_linear_mount.sh
 /mnt/create_linear_mount.sh
 
 %changelog
+* Wed Oct 13 2021 Daniel McIlvaney <damcilva@microsoft.com> - 1.0-2
+- Add required whitespace before and after module list in verity.conf
+- License verified.
+
 * Fri Dec 11 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.0-1
 - Original version for CBL-Mariner.
