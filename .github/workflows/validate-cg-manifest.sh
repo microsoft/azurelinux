@@ -64,6 +64,7 @@ do
   fi
 
   version=$(rpmspec --srpm  --define "with_check 0" --qf "%{VERSION}" -q $spec 2>/dev/null )
+  version_no_tilde=$(echo $version | sed "s/~/-/g")
 
   # Get the source0 for the package, it apears to always occur last in the list of sources
   source0=$(rpmspec --srpm  --define "with_check 0" --qf "[%{SOURCE}\n]" -q $spec  2>/dev/null | tail -1)
@@ -82,7 +83,7 @@ do
 
   # Pull the current registration from the cgmanifest file. Every registration should have a url, so if we don't find one
   # that implies the registration is missing.
-  manifesturl=$(jq --raw-output ".Registrations[].component.other | select(.name==\"$name\" and .version==\"$version\") | .downloadUrl" cgmanifest.json)
+  manifesturl=$(jq --raw-output ".Registrations[].component.other | select(.name==\"$name\" and (.version==\"$version\" or .version==\"$version_no_tilde\")) | .downloadUrl" cgmanifest.json)
   if [[ -z $manifesturl ]]
   then
     echo "Registration for \"$name\":\"$version\" is missing" >> bad_registrations.txt
