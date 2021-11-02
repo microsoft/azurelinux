@@ -226,10 +226,10 @@ libsemanage-python3-2.9-4.cm1.x86_64.rpm
 libsepol-2.9-5.cm1.x86_64.rpm
 libsepol-debuginfo-2.9-5.cm1.x86_64.rpm
 libsepol-devel-2.9-5.cm1.x86_64.rpm
-libsolv-0.7.7-4.cm1.x86_64.rpm
-libsolv-debuginfo-0.7.7-4.cm1.x86_64.rpm
-libsolv-devel-0.7.7-4.cm1.x86_64.rpm
-libsolv-tools-0.7.7-4.cm1.x86_64.rpm
+libsolv-0.7.19-1.cm1.x86_64.rpm
+libsolv-debuginfo-0.7.19-1.cm1.x86_64.rpm
+libsolv-devel-0.7.19-1.cm1.x86_64.rpm
+libsolv-tools-0.7.19-1.cm1.x86_64.rpm
 libssh2-1.9.0-1.cm1.x86_64.rpm
 libssh2-debuginfo-1.9.0-1.cm1.x86_64.rpm
 libssh2-devel-1.9.0-1.cm1.x86_64.rpm
