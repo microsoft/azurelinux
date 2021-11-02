@@ -2,7 +2,7 @@
 Summary:        The Kubernetes Package Manager
 Name:           helm
 Version:        3.4.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %{_bindir}/helm
 
 %changelog
+* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.1-5
+- Increment release for force republishing using golang 1.16.9
+
 * Mon Sep 20 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-4
 - Patch CVE-2021-32690
 
