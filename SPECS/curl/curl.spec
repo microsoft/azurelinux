@@ -1,13 +1,13 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
-URL:            https://curl.haxx.se
-Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+URL:            https://curl.se
+Source0:        https://curl.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-22898.patch
 Patch1:         CVE-2021-22901.patch
 Patch2:         CVE-2021-22897.patch
@@ -15,13 +15,15 @@ Patch3:         CVE-2021-22922.nopatch
 Patch4:         CVE-2021-22923.nopatch
 Patch5:         CVE-2021-22924.patch
 Patch6:         CVE-2021-22925.patch
-Patch7:         CVE-2021-22945.patch
-Patch8:         CVE-2021-22946.patch
-Patch9:         CVE-2021-22947.patch
+# CVE-2021-22926 is only applicable for macOS builds
+Patch7:         CVE-2021-22926.nopatch
+Patch8:         CVE-2021-22945.patch
+Patch9:         CVE-2021-22946.patch
+Patch10:        CVE-2021-22947.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
-Requires:       curl-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
@@ -34,18 +36,18 @@ DICT, LDAP, LDAPS and FILE. Its ability to both download and
 upload files can be incorporated into other programs to support
 functions like streaming media.
 
-%package devel
+%package        devel
 Summary:        Libraries and header files for curl
 Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Static libraries and header files for the support library for curl
 
-%package libs
+%package        libs
 Summary:        Libraries for curl
 Group:          System Environment/Libraries
 
-%description libs
+%description    libs
 This package contains minimal set of shared curl libraries.
 
 %prep
@@ -66,11 +68,10 @@ This package contains minimal set of shared curl libraries.
     --with-libssh2 \
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
-make %{?_smp_mflags}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
@@ -78,13 +79,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/*
 %{_mandir}/man1/*
 
@@ -98,9 +94,16 @@ rm -rf %{buildroot}/*
 %{_docdir}/%{name}-%{version}
 
 %files libs
-%{_libdir}/libcurl.so.*
+%license COPYING
+%{_libdir}/libcurl.so.4*
 
 %changelog
+* Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-7
+- Add nopatch for CVE-2021-22926
+- Switch to new upstream URL
+- Move license to libs subpackage
+- Lint spec
+
 * Wed Sep 15 2021 Henry Li <lihl@microsoft.com> - 7.76.0-6
 - Fix CVE-2021-22945, CVE-2021-22946, CVE-2021-22947
 
