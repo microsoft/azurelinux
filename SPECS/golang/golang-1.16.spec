@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.16.7
+Version:        1.16.9
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -35,7 +35,7 @@ tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
 mv -v go go-bootstrap
 
-# Setup go source and patch 
+# Setup go source and patch
 %setup -q -n go
 %patch1 -p1
 
@@ -118,6 +118,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.9-1
+- Updated to version 1.16.9 to fix CVE-2021-38297, CVE-2021-39293
+
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.7-1
 - Updated to version 1.16.7 and fix CVE-2021-29923
 
