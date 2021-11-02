@@ -1,15 +1,15 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
 Version:        1.8.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gnupg.org/related_software/libgcrypt/
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
-#libgcrypt CVE-2021-33560 fix
-Patch0:         libgcrypt-CVE-2021-33560-fix.patch
+Patch0:         CVE-2021-33560.patch
+Patch1:         CVE-2021-40528.patch
 BuildRequires:  libgpg-error-devel
 Requires:       libgpg-error
 
@@ -31,14 +31,14 @@ developing applications that use libgcrypt.
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 rm -rf %{buildroot}%{_infodir}
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %post -p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
@@ -59,6 +59,11 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-3
+- Add patch for CVE-2021-33560
+- Rename old CVE-2021-33560 patch to reflect that it actually fixed CVE-2021-40528
+  (CVE seems to have been renumbered at some point)
+
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.7-2
 - libgcrypt CVE-2021-33560 fix
 
