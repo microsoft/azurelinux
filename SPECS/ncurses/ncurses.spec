@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://invisible-island.net/ncurses/
 Source0:        https://invisible-mirror.net/archives/%{name}/%{name}-%{version}.tar.gz
-Patch0:		CVE-2021-39537.patch
+Patch0:         CVE-2021-39537.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
