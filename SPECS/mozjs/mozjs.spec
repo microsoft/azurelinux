@@ -14,6 +14,7 @@ Patch1:        emitter_test.patch
 # Build fixes
 Patch2:        init_patch.patch
 Patch3:        spidermonkey_checks_disable.patch
+Patch4:        fix-soname.patch
 Distribution:  Mariner
 BuildRequires: which
 BuildRequires: python3-xml
@@ -47,27 +48,41 @@ Requires:      %{name} = %{version}-%{release}
 This contains development tools and libraries for SpiderMonkey.
 
 %prep
-%autosetup -p1 -n firefox-%{version}
+%autosetup -p1 -n firefox-%{version}/js/src
 rm -rf modules/zlib
 
 %build
-cd js/src
 %configure \
     --with-system-icu \
     --enable-readline \
     --disable-jemalloc \
+%if %{with_check}
+    --enable-tests \
+%else
     --disable-tests \
+%endif
     --with-system-zlib
 %make_build
 
 %install
-cd js/src
 %make_install
 chmod -x %{buildroot}%{_libdir}/pkgconfig/*.pc
 # remove non required files
 rm %{buildroot}%{_libdir}/libjs_static.ajs
 rm -rf %{buildroot}/usr/src
 find %{buildroot} -name '*.la' -delete
+
+# Re-naming library and adding symbolic links to follow typical conventions for libraries.
+mv %{buildroot}%{_libdir}/libmozjs-%{major}.so \
+   %{buildroot}%{_libdir}/libmozjs-%{major}.so.0.0.0
+ln -s libmozjs-%{major}.so.0.0.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so.0
+ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
+
+%check
+%make_build test
+
+PYTHONPATH=tests/lib %{__python3} tests/jstests.py -d -s -t 1800 --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major}
+PYTHONPATH=tests/lib %{__python3} jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic
 
 %post
 %ldconfig_scriptlets
@@ -80,12 +95,13 @@ find %{buildroot} -name '*.la' -delete
 %defattr(-,root,root)
 %{_bindir}/js%{major}
 %{_bindir}/js%{major}-config
-%{_libdir}/libmozjs-%{major}.so
+%{_libdir}/libmozjs-%{major}.so.0*
 
 %files devel
 %defattr(-,root,root)
 %license LICENSE
 %{_includedir}/mozjs-%{major}
+%{_libdir}/libmozjs-%{major}.so
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %check
@@ -95,22 +111,23 @@ python3 tests/jstests.py -d -s -t 1800 --no-progress ../../js/src/js/src/shell/j
 python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/js basic
 
 %changelog
-*   Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2)
--   Minor changelog formatting issues.
--   License verifed.
+* Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2)
+- Minor changelog formatting issues.
+- Adding the 'fix-soname.patch' fix using Fedora 34 (license: MIT) as guidance.
+- License verifed.
 
-*   Tue Apr 13 2021 Gerrit Photon <photon-checkins@vmware.com> - 78.10.0-1
--   Automatic Version Bump
+* Tue Apr 13 2021 Gerrit Photon <photon-checkins@vmware.com> - 78.10.0-1
+- Automatic Version Bump
 
-*   Fri Feb 19 2021 Alexey Makhalov <amakhalov@vmware.com> - 78.3.1-2
--   Remove python2 requirements
+* Fri Feb 19 2021 Alexey Makhalov <amakhalov@vmware.com> - 78.3.1-2
+- Remove python2 requirements
 
-*   Mon Oct 05 2020 Ankit Jain <ankitja@vmware.com> - 78.3.1-1
--   Updated to 78.3.1
+* Mon Oct 05 2020 Ankit Jain <ankitja@vmware.com> - 78.3.1-1
+- Updated to 78.3.1
 
-*   Tue Aug 25 2020 Ankit Jain <ankitja@vmware.com> - 68.11.0-2
--   Removed autoconf213 dependency and obsoletes js
+* Tue Aug 25 2020 Ankit Jain <ankitja@vmware.com> - 68.11.0-2
+- Removed autoconf213 dependency and obsoletes js
 
-*   Sat Oct 26 2019 Ankit Jain <ankitja@vmware.com> - 68.11.0-1
--   initial version
+* Sat Oct 26 2019 Ankit Jain <ankitja@vmware.com> - 68.11.0-1
+- initial version
