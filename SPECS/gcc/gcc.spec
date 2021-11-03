@@ -33,14 +33,14 @@ Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 The GCC package contains the GNU compiler collection,
 which includes the C and C++ compilers.
 
-#%package -n     gfortran
-#Summary:        GNU Fortran compiler.
-#Group:          Development/Tools
-#Requires:       gcc = %{version}-%{release}
-#Provides:       gcc-gfortran = %{version}-%{release}
+%package -n     gfortran
+Summary:        GNU Fortran compiler.
+Group:          Development/Tools
+Requires:       gcc = %{version}-%{release}
+Provides:       gcc-gfortran = %{version}-%{release}
 
-#%description -n gfortran
-#The gfortran package contains GNU Fortran compiler.
+%description -n gfortran
+The gfortran package contains GNU Fortran compiler.
 
 %package -n     libgcc
 Summary:        GNU C Library
@@ -122,8 +122,10 @@ sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
+FCFLAGS="`echo " %{build_fflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 export CFLAGS
 export CXXFLAGS
+export FCFLAGS
 
 SED=sed \
 %configure \
@@ -131,7 +133,7 @@ SED=sed \
     --enable-threads=posix \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
-    --enable-languages=c,c++ \
+    --enable-languages=c,c++,fortran \
     --disable-multilib \
     --disable-bootstrap \
     --enable-linker-build-id \
@@ -171,13 +173,13 @@ make %{?_smp_mflags} check-gcc
 %license COPYING
 %{_libdir}/cpp
 # Executables
-#%%exclude %%{_bindir}/*gfortran
+%exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
 %exclude %{_bindir}/*g++
 %{_bindir}/*
 # Libraries
 %{_lib64dir}/*
-#%%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+%exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 %exclude %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 %{_libdir}/gcc/*
 # Library executables
@@ -198,11 +200,11 @@ make %{?_smp_mflags} check-gcc
 %exclude %{_lib64dir}/libsupc++*
 %exclude %{_lib64dir}/libgomp*
 
-#%files -n gfortran
-#%defattr(-,root,root)
-#%{_bindir}/*gfortran
-#%{_mandir}/man1/gfortran.1.gz
-#%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+%files -n gfortran
+%defattr(-,root,root)
+%{_bindir}/*gfortran
+%{_mandir}/man1/gfortran.1.gz
+%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 
 %files -n libgcc
 %defattr(-,root,root)
