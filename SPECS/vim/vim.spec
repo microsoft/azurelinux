@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.3489
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0: CVE-2021-3903.patch
 
 BuildRequires:  ncurses-devel
 
@@ -195,6 +196,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Wed Nov 03 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.3489-2
+-   Added patch file(s) CVE-2021-3903.patch
 * Tue Oct 26 2021 Chris Co <chrco@microsoft.com> - 8.2.3489-1
 - Fix CVE-2021-3875 and CVE-2021-3872 by updated to 8.2.3489
 
