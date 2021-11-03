@@ -1,8 +1,7 @@
-%global __python3	%{_bindir}/python3
 Summary:        PC/SC Lite smart card framework and applications
 Name:           pcsc-lite
 Version:        1.9.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +20,6 @@ BuildRequires:  libtool
 BuildRequires:  polkit-devel
 BuildRequires:  python3-devel
 BuildRequires:  systemd-devel
-Requires:       %{name}-devel = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       polkit
 Requires:       python3
@@ -31,8 +29,6 @@ Requires(preun): systemd
 Recommends:     pcsc-lite-ccid
 # This is bundled in upstream withou simple way to remove
 Provides:       bundled(simclist) = 1.6
-Provides:       %{name}-libs = %{version}-%{release}
-Provides:       %{name}-devel = %{version}-%{release}
 
 %description
 The purpose of PC/SC Lite is to provide a Windows(R) SCard interface
@@ -156,6 +152,9 @@ fi
 %{_docdir}/pcsc-lite/README.polkit
 
 %changelog
+* Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.9.0-3
+- Removing invalid "Provides" and unused macros.
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

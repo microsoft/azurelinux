@@ -1,7 +1,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
 Version:        1.0.0~rc95+azure
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://runc.io/
 
@@ -114,6 +114,9 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0~rc95+azure-4
+- Increment release for force republishing using golang 1.16.9
+
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0~rc95+azure-3
 - Increment release to force republishing using golang 1.16.7.
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.0.0~rc95+azure-2

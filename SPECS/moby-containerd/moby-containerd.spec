@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.4.4+azure
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -134,6 +134,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4+azure-5
+- Increment release for force republishing using golang 1.16.9
+
 * Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 1.4.4+azure-4
 - Patch CVE-2021-41103
 - Change config to noreplace
