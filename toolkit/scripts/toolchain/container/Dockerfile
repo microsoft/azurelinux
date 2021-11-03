@@ -44,7 +44,8 @@ RUN apt-get update -y -qq && \
     zip \
     ccache \
     libgif-dev \
-    libfontconfig1-dev && \
+    libfontconfig1-dev \
+    flex && \
     apt-get clean && \
     ln    -sf bash /bin/sh && \
     mkdir -pv $LFS/sources && \
@@ -59,6 +60,7 @@ COPY [ "./toolchain-sha256sums", \
        "./toolchain-local-wget-list", \
        "./texinfo-perl-fix.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
+       "./linker-script-readonly-keyword-support.patch", \
        "./toolchain-jdk8-wget.sh", \
        "$LFS/tools/" ]
 
@@ -69,7 +71,7 @@ COPY [ "./toolchain-sha256sums", \
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.69.1.tar.gz -O kernel-5.10.69.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz -O kernel-5.10.74.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN /tools/toolchain-jdk8-wget.sh; exit 0
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \

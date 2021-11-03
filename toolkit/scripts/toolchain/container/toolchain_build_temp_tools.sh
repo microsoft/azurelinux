@@ -19,6 +19,7 @@ LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo Binutils-2.36.1 - Pass 1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -113,14 +114,14 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.69.1 API Headers
-tar xf kernel-5.10.69.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.69.1
+echo Linux-5.10.74.1 API Headers
+tar xf kernel-5.10.74.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.69.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -605,6 +606,19 @@ popd
 rm -rf zstd-1.5.0
 
 touch $LFS/logs/temptoolchain/status_zstd_complete
+
+echo Flex-2.6.4
+tar xf flex-2.6.4.tar.gz
+pushd flex-2.6.4
+sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+HELP2MAN=/tools/bin/true \
+./configure --prefix=/tools
+make -j$(nproc)
+make install
+popd
+rm -rf flex-2.6.4
+
+touch $LFS/logs/temptoolchain/status_flex_complete
 
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
 

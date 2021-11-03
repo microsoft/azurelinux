@@ -49,7 +49,7 @@ mv -v %{buildroot}%{python3_sitelib}/%{srcname}/%{srcname}.1 %{buildroot}%{_mand
 
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.50.2-2
-- Initial CBL-Mariner version imported from Fedora 33 (license: MIT)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
 * Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 4.50.2-1

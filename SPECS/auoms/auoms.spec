@@ -202,4 +202,4 @@ done
 - Fix setup macro
 
 * Thu Oct 22 2020 Andrew Phelps <anphel@microsoft.com> 2.2.5-1
-- Initial CBL-Mariner version.
+- Original version for CBL-Mariner.

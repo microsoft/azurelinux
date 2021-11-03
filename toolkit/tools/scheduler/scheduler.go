@@ -322,12 +322,16 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 			stopBuilding = true
 		}
 
+		activeSRPMs := buildState.ActiveSRPMs()
+		activeSRPMsCount := len(activeSRPMs)
 		if stopBuilding {
-			outstandingBuilds := len(buildState.ActiveBuilds())
-			if outstandingBuilds == 0 {
+			if activeSRPMsCount == 0 {
 				break
 			}
-			logger.Log.Infof("Waiting for %d outstanding builds to complete", outstandingBuilds)
+		}
+
+		if res.Node.Type == pkggraph.TypeBuild {
+			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
 	}
 

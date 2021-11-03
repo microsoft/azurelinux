@@ -23,6 +23,7 @@ cp -v $MARINER_SPECS_DIR/texinfo/texinfo-perl-fix.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/Awt_build_headless_only.patch ./container
 cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
 cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
+cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022
@@ -66,6 +67,7 @@ rm -vf ./container/texinfo-perl-fix.patch
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
 rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch
+rm -vf ./container/linker-script-readonly-keyword-support.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 

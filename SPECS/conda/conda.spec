@@ -236,7 +236,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.10.1-2
-- Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
 
 * Thu Apr 15 2021 Orion Poplawski <orion@nwra.com> - 4.10.1-1

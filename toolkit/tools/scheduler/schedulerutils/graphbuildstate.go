@@ -4,6 +4,8 @@
 package schedulerutils
 
 import (
+	"path/filepath"
+
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkggraph"
 )
@@ -55,6 +57,17 @@ func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 // ActiveBuilds returns a map of Node IDs to BuildRequests that represents all outstanding builds.
 func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 	return g.activeBuilds
+}
+
+// ActiveSRPMs returns a list of all SRPMs, which are currently being built.
+func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
+	for _, buildRequest := range g.activeBuilds {
+		if buildRequest.Node.Type == pkggraph.TypeBuild {
+			builtSRPMs = append(builtSRPMs, filepath.Base(buildRequest.Node.SrpmPath))
+		}
+	}
+
+	return
 }
 
 // BuildFailures returns a slice of all failed builds.

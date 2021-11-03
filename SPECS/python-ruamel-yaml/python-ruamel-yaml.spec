@@ -57,7 +57,7 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 
 %changelog
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.16.6-6
-- Initial CBL-Mariner version imported from Fedora 34 (license: MIT)
+- Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.6-5

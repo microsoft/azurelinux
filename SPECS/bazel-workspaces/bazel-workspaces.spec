@@ -58,7 +58,7 @@ cp LICENSE README.md ..
 - Switching to using a single digit for the 'Release' tag.
 
 * Mon Jun 21 2021 Henry Li <lihl@microsoft.com> - 20200113-1.7
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Fix Source URL
 
