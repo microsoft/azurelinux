@@ -8,8 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
-#Source0:       https://github.com/%%{name}/%%{name}/archive/v%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 
 %description
