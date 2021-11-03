@@ -208,8 +208,8 @@ pcre-libs-8.44-3.cm2.x86_64.rpm
 krb5-1.18-1.cm2.x86_64.rpm
 lua-5.3.5-11.cm2.x86_64.rpm
 lua-libs-5.3.5-11.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-6.cm2.noarch.rpm
-mariner-check-macros-2.0-6.cm2.noarch.rpm
+mariner-rpm-macros-2.0-7.cm2.noarch.rpm
+mariner-check-macros-2.0-7.cm2.noarch.rpm
 libassuan-2.5.1-5.cm2.x86_64.rpm
 libgpg-error-1.32-6.cm2.x86_64.rpm
 libgcrypt-1.8.7-3.cm2.x86_64.rpm
