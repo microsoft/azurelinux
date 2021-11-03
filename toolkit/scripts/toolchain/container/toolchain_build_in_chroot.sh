@@ -97,7 +97,6 @@ case $(uname -m) in
     ;;
     aarch64)
         GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/11.2.0/include
-        ln -sv ld-2.27.so /lib64/ld-linux.so.3
     ;;
 esac
 rm -f /usr/include/limits.h
