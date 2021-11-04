@@ -18,7 +18,7 @@
 
 Name:           golang-packaging
 Version:        15.0.15
-Release:        1.4%{?dist}
+Release:        2%{?dist}
 Summary:        A toolchain to help packaging golang
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -59,8 +59,11 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 %config %{_sysconfdir}/rpm/macros.go
 
 %changelog
+* Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.0.15-2
+- Switching to using a single digit for the 'Release' tag.
+
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com>  15.0.15-1.4
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Remove distro condition checks that do not apply for CBL-Mariner
 - Fix Source0 URL

@@ -1,20 +1,26 @@
 Summary:        A 2D graphics library.
 Name:           cairo
 Version:        1.17.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://cairographics.org
 Source0:        https://cairographics.org/snapshots/%{name}-%{version}.tar.xz
+
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
+BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  libpng-devel
+BuildRequires:  libX11-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  libXrender-devel
 BuildRequires:  pixman-devel
 BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(xext)
+
 Requires:       expat
 Requires:       glib
 Requires:       libpng
@@ -23,9 +29,24 @@ Requires:       pixman
 %description
 Cairo is a 2D graphics library with support for multiple output devices.
 
+%package        devel
+Summary:        Header and development files
+License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       fontconfig-devel
+Requires:       freetype-devel
+Requires:       libpng-devel
+Requires:       pixman-devel
+
+%description    devel
+It contains the libraries and header files to create applications
+
 %package gobject
-Summary: GObject bindings for cairo
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        GObject bindings for cairo
+License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description gobject
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -35,9 +56,11 @@ This package contains functionality to make cairo graphics library
 integrate well with the GObject object system used by GNOME.
 
 %package gobject-devel
-Summary: Development files for cairo-gobject
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
-Requires: %{name}-gobject%{?_isa} = %{version}-%{release}
+Summary:        Development files for cairo-gobject
+License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
+
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-gobject%{?_isa} = %{version}-%{release}
 
 %description gobject-devel
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -46,55 +69,53 @@ and print output.
 This package contains libraries, header files and developer documentation
 needed for developing software which uses the cairo Gobject library.
 
-%package        devel
-Summary:        Header and development files
-Requires:       %{name} = %{version}-%{release}
-Requires:       freetype-devel
-Requires:       pixman-devel
-Requires:       libpng-devel
-Requires:       fontconfig-devel
+%package tools
+Summary:        Development tools for cairo
 
-%description    devel
-It contains the libraries and header files to create applications
+License:        GPLv3
+
+%description tools
+Cairo is a 2D graphics library designed to provide high-quality display
+and print output.
+
+This package contains tools for working with the cairo graphics library.
+ * cairo-trace: Record cairo library calls for later playback
 
 %prep
 %autosetup -p1
 
 %build
-./configure \
-        --prefix=%{_prefix} \
-        --enable-win32=no \
-        --enable-tee      \
-        --enable-xlib=no     \
-        --enable-xlib-xrender=no \
-        --enable-gobject \
-        CFLAGS="-O3 -fPIC" \
+%configure \
+        --disable-gl \
+        --disable-gtk-doc \
         --disable-static \
-        --disable-symbol-lookup
-make %{?_smp_mflags}
+        --disable-symbol-lookup \
+        --enable-ft \
+        --enable-gobject \
+        --enable-pdf \
+        --enable-ps \
+        --enable-svg \
+        --enable-tee \
+        --enable-win32=no \
+        --enable-xlib
+
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+rm -rf %{buildroot}%{_datadir}/gtk-doc
+
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license COPYING
-%{_bindir}/*
-%{_libdir}/*.so.*
-%{_libdir}/cairo/*.so*
-%{_datadir}/*
-
-%files gobject
-%{_libdir}/libcairo-gobject.so.*
-
-%files gobject-devel
-%{_includedir}/cairo/cairo-gobject.h
-%{_libdir}/libcairo-gobject.so
-%{_libdir}/pkgconfig/cairo-gobject.pc
+%license COPYING COPYING-LGPL-2.1 COPYING-MPL-1.1
+%{_libdir}/libcairo.so.*
+%{_libdir}/libcairo-script-interpreter.so.*
 
 %files devel
 %defattr(-,root,root)
@@ -103,7 +124,24 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
+%files gobject
+%{_libdir}/libcairo-gobject.so.*
+
+%files gobject-devel
+%{_includedir}/%{name}/cairo-gobject.h
+%{_libdir}/libcairo-gobject.so
+%{_libdir}/pkgconfig/cairo-gobject.pc
+
+%files tools
+%license util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
+%{_bindir}/cairo-trace
+%{_libdir}/%{name}/
+
 %changelog
+* Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-3
+- Adding X components from "UI-cairo".
+- Adding the "tools" subpackage.
+
 * Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-2
 - Disabling "symbol-lookup" feature due to compilation errors.
 

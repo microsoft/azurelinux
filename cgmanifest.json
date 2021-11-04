@@ -365,8 +365,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.12.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.22.0/bcc-src-with-submodule.tar.gz"
         }
       }
     },
@@ -496,8 +496,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.11.4",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/v0.11.4.tar.gz"
+          "version": "0.13.0",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.13.0.tar.gz"
         }
       }
     },
@@ -566,8 +566,8 @@
         "type": "other",
         "other": {
           "name": "bzip2",
-          "version": "1.0.6",
-          "downloadUrl": "https://downloads.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz"
+          "version": "1.0.8",
+          "downloadUrl": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
         }
       }
     },
@@ -685,6 +685,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "checksec",
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/slimm609/checksec.sh/archive/2.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "chkconfig",
           "version": "1.11",
           "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
@@ -736,8 +746,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
         }
       }
     },
@@ -1980,7 +1990,7 @@
         "other": {
           "name": "gnu-efi",
           "version": "3.0.9",
-          "downloadUrl": "https://gigenet.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
+          "downloadUrl": "https://pilotfiber.dl.sourceforge.net/project/gnu-efi/gnu-efi-3.0.9.tar.bz2"
         }
       }
     },
@@ -2349,8 +2359,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2709,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2719,8 +2729,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -2729,8 +2739,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.64.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.64.1.tar.gz"
+          "version": "5.10.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
         }
       }
     },
@@ -4249,8 +4259,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/lldb-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
         }
       }
     },
@@ -4269,8 +4279,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz"
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
         }
       }
     },
@@ -5192,8 +5202,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.5p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.5p1.tar.gz"
+          "version": "8.8p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
         }
       }
     },
@@ -5222,8 +5232,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2019.2",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2019.2/libostree-2019.2.tar.xz"
+          "version": "2021.4",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2021.4/libostree-2021.4.tar.xz"
         }
       }
     },
@@ -6991,6 +7001,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyudev",
+          "version": "0.22.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/pyudev-0.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyvmomi",
           "version": "6.7.3",
           "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
@@ -7572,8 +7592,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2019.3",
-          "downloadUrl": "https://github.com/projectatomic/rpm-ostree/releases/download/v2019.3/rpm-ostree-2019.3.tar.xz"
+          "version": "2020.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
         }
       }
     },
@@ -8962,16 +8982,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "UI-cairo",
-          "version": "1.16.0",
-          "downloadUrl": "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "unbound",
           "version": "1.10.0",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
@@ -9793,8 +9803,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.4.4/zstd-1.4.4.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
         }
       }
     }

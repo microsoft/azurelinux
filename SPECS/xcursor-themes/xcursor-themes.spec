@@ -18,7 +18,7 @@
 Summary:        Default set of cursor themes for X
 Name:           xcursor-themes
 Version:        1.0.6
-Release:        1.3
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,10 @@ of the X.Org software distribution.
 %{_datadir}/icons/whiteglass/
 
 %changelog
+* Fri Oct 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.6-2
+- Switching to using a single digit for the 'Release' tag.
+- Adding distribution information to the 'Release' tag.
+
 * Tue Jan 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.6-1.3
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified.

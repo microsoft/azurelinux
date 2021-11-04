@@ -9,11 +9,11 @@ to add kernel and systemd commandline parameter
 Signed-off-by: Ajay Kaher <akaher@vmware.com>
 Signed-off-by: Ankit Jain <ankitja@vmware.com>
 ---
- src/libostree/ostree-bootloader-grub2.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ src/libostree/ostree-bootloader-grub2.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/src/libostree/ostree-bootloader-grub2.c b/src/libostree/ostree-bootloader-grub2.c
-index ee3ae6f..ad74509 100644
+index 22037f1..53fbfa6 100644
 --- a/src/libostree/ostree-bootloader-grub2.c
 +++ b/src/libostree/ostree-bootloader-grub2.c
 @@ -193,6 +193,8 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
@@ -25,14 +25,11 @@ index ee3ae6f..ad74509 100644
        char *quoted_title = NULL;
        char *uuid = NULL;
        char *quoted_uuid = NULL;
-@@ -217,6 +219,25 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
+@@ -217,6 +219,22 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
        g_string_append (output, grub2_prepare_root_cache);
        g_string_append_c (output, '\n');
  
-+
-+
 +      kernelcfg = ostree_bootconfig_parser_get (config, "kernelcfg");
-+
 +      if(kernelcfg)
 +        {
 +          g_string_append (output, "load_env -f ");

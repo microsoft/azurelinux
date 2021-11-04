@@ -9,12 +9,12 @@ import argparse
 import json
 import struct
 
-VERSION = "2.0.0"
+VERSION = "2.1.2"
 MEMORY_ALIGN = 4
 N_TYPE = 0xcafe1a7e
 OWNER = 'FDO'
 NOTE_SECTION_NAME = ".note.package"
-OUTPUT_LINKER_SCRIPT_NAME = "/usr/src/mariner/BUILD/module_info.ld"
+OUTPUT_LINKER_SCRIPT_NAME = "module_info.ld"
 
 DESCRIPTION = 'Generate package note section'
 
@@ -49,20 +49,22 @@ EPILOG = """
         --version "1.2.3.4" --moduleVersion "1.2.3.4-beta" \\
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
-        --copyright "Microsoft" --repo "CBL-Mariner" \\
+        --copyright "Microsoft" \\
+        --outdir "/source/pkgname/build/" \\
+        --repo "pkgname-git-repo-name" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "Mix"
 
     - Generated example C code:
 
-     const char __attribute__((aligned(4), section(".note.package")))
-            module_info_note_package[] = {
-                 0x04,  0x00,  0x00,  0x00,
-                 0xac,  0x01,  0x00,  0x00,
-                 0x7e,  0x1a,  0xfe,  0xca,
-                 0x46,  0x44,  0x4f,  0x00,
-                  ....
-           };
+    const unsigned char __attribute__((aligned(4), section(".note.package")))
+         __attribute__((used)) module_info_note_package[] = {
+            0x04,  0x00,  0x00,  0x00,
+            0xac,  0x01,  0x00,  0x00,
+            0x7e,  0x1a,  0xfe,  0xca,
+            0x46,  0x44,  0x4f,  0x00,
+            ....
+        };
 
     - Generated example Linker script:
         SECTIONS
@@ -83,13 +85,15 @@ EPILOG = """
         --version "1.2.3.4" --moduleVersion "1.2.3.4-beta" \\
         --os "mariner" --osVersion "1.0" \\
         --maintainer "DEADBEEF-BBC3-4FED-9192-110C11DED04D" \\
-        --copyright "Microsoft" --repo "CBL-Mariner" \\
+        --copyright "Microsoft" \\
+        --outdir "/source/pkgname/build/" \\
+        --repo "pkgname-git-repo-name" \\
         --hash "527233b5780c25911998c4a1b3d35d38fafa39cd" \\
         --branch "1.0" --stamp "LinkerOnly"
 
         SECTIONS
         {
-            .note.package : ALIGN(4)
+            .note.package (READONLY) : ALIGN(4)
             {
                 BYTE(0x04) BYTE(0x00) BYTE(0x00) BYTE(0x00)
                 BYTE(0x04) BYTE(0x01) BYTE(0x00) BYTE(0x00)
@@ -172,8 +176,10 @@ class Note_Section():
             f.write(self.note_section)
 
     def save_c_code(self, file_name, alignment):
-        c_code_text = "const char __attribute__((aligned(" + str(alignment)
+        c_code_text = "const unsigned char __attribute__((aligned("
+        c_code_text += str(alignment)
         c_code_text += "), section(\".note.package\")))"
+        c_code_text += " __attribute__((used))"
         c_code_text += " module_info_note_package[] = {"
         c_code_text += "\n\t\t"
         c_code_text += bin_to_hex(self.note_section, '0x', ', ', self.align)
@@ -198,9 +204,11 @@ class LinkerScript():
         self.comment = ""
         self.script_text = ""
 
-    def generate(self):
+    def generate(self, readonly_flag=True):
         self.text += "SECTIONS\n{\n"
         self.text += "\t" + self.section_name
+        if readonly_flag:
+            self.text += " (READONLY)"
         self.text += " : ALIGN({})".format(self.align)
         self.text += "\n\t{\n\t\t"
         self.text += bin_to_hex(self.note_bin, 'BYTE(0x', ')', self.align)
@@ -228,8 +236,10 @@ class LinkerScript():
         print("Linker script, {}, was written successfully.".format(file_name))
 
 
-def generate_cpp_header(module_info):
+def generate_cpp_header(module_info, outdir):
     file_name = 'auto_module_info.h'
+    if outdir:
+        file_name = outdir + 'auto_module_info.h'
     cpp_header_content = """\
 #ifndef _AUTO_MODULE_INFO_H_
 #define _AUTO_MODULE_INFO_H_
@@ -254,6 +264,14 @@ def generate_cpp_header(module_info):
     print("Generated {} file...\n".format(file_name))
 
 
+def dir_path(path):
+    if os.path.isdir(path):
+        return path
+    else:
+        raise argparse.ArgumentTypeError(
+            "readable_dir:{} does not exist".format(path))
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
                 description=DESCRIPTION,
@@ -263,11 +281,16 @@ def parse_args():
     parser.add_argument('--name', required=True,
                         help='Package name.\n\n')
 
+    parser.add_argument('--outdir', type=dir_path,
+                        help='Folder to write .note.package.bin'
+                        ', module_info.ld and header files.'
+                        ' Both Windows or Linux paths are supported.\n\n')
+
     parser.add_argument('--version', required=True,
                         help='Package version.\n\n')
 
     parser.add_argument('--type',
-                        choices=['bb', 'deb', 'rpm', 'agent'],
+                        choices=['bb', 'deb', 'rpm', 'agent', 'lib'],
                         help='Package/binary type. e.g. bb for bitbake,'
                         ' deb for debian packages. If a binary is from rpm'
                         ' and, it is an agent, please use \'agent\'.\n\n')
@@ -284,7 +307,7 @@ def parse_args():
 
     parser.add_argument('--maintainer',
                         help='Maintainer information. '
-                        'Internal service GUID.\n\n')
+                        'Internal service GUID or Maintainer e-mail.\n\n')
 
     parser.add_argument('--pkgid', help='package-system dependent identifier, '
                         'e.g. binutils-2.30-21ubuntu~18.04.4.\n\n')
@@ -319,12 +342,20 @@ if __name__ == '__main__':
     print("==== ELF note generator v{} ====\n\n".format(VERSION))
     args = parse_args()
     print("Note section memory alignment: {}\n\n".format(args.endian))
+    outdir = args.outdir
+
+    if outdir:
+        os.path.join(outdir, '')
+        print("outdir is: {}".format(outdir))
+
     endian = Endian.map[args.endian]
     stamp_method = args.stamp
     print("Stamp method: {}\n".format(stamp_method))
 
+    delattr(args, 'outdir')
     delattr(args, 'endian')
     delattr(args, 'stamp')
+
     module_info = {
                     arg: getattr(args, arg) for arg in dir(args)
                     if getattr(args, arg) is not None and arg[0] != '_'
@@ -332,29 +363,40 @@ if __name__ == '__main__':
 
     desc_json = json.dumps(module_info, indent=1)
     note = Note_Section(N_TYPE, OWNER, desc_json, MEMORY_ALIGN, endian)
-    note.save(NOTE_SECTION_NAME + ".bin")
 
-    generated_files = ""
+    if outdir:
+        note.save(outdir + NOTE_SECTION_NAME + ".bin")
+    else:
+        note.save(NOTE_SECTION_NAME + ".bin")
+
+    generated_files = ''
     if stamp_method == 'LinkerOnly':
         script = LinkerScript(NOTE_SECTION_NAME, note.get())
         script.add_comment(DO_NOT_EDIT_COMMENT)
         script.add_comment("".join(arg + ' ' for arg in sys.argv))
         script.add_comment(desc_json)
         script.generate()
-        script.save(OUTPUT_LINKER_SCRIPT_NAME)
+        if outdir:
+            script.save(outdir + OUTPUT_LINKER_SCRIPT_NAME)
+        else:
+            script.save(OUTPUT_LINKER_SCRIPT_NAME)
         generated_files += OUTPUT_LINKER_SCRIPT_NAME
     else:
         script = LinkerScript(NOTE_SECTION_NAME)
         script.add_comment(DO_NOT_EDIT_COMMENT)
         script.add_comment("".join(arg + ' ' for arg in sys.argv))
         script.add_comment(desc_json)
-        script.generate()
-        script.save(OUTPUT_LINKER_SCRIPT_NAME)
-        note.save_c_code(C_MODULE_NAME, MEMORY_ALIGN)
+        script.generate(readonly_flag=False)
+        if outdir:
+            script.save(outdir + OUTPUT_LINKER_SCRIPT_NAME)
+            note.save_c_code(outdir + C_MODULE_NAME, MEMORY_ALIGN)
+        else:
+            script.save(OUTPUT_LINKER_SCRIPT_NAME)
+            note.save_c_code(C_MODULE_NAME, MEMORY_ALIGN)
         generated_files += OUTPUT_LINKER_SCRIPT_NAME + ", "
         generated_files += C_MODULE_NAME
 
-    #generate_cpp_header(module_info)
+    generate_cpp_header(module_info, outdir)
     print('Successfully generated {}'
           ' and {} files...'.format(
               generated_files,

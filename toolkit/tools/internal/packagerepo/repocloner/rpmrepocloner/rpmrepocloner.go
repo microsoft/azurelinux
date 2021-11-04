@@ -21,6 +21,8 @@ import (
 )
 
 const (
+	allRepoIDs             = "*"
+	builtRepoID            = "local-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
@@ -256,9 +258,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		strictComparisonOperator          = "="
 		lessThanOrEqualComparisonOperator = "<="
 		versionSuffixFormat               = "-%s"
-
-		builtRepoID = "local-repo"
-		allRepoIDs  = "*"
 	)
 
 	for _, pkg := range packagesToClone {
@@ -291,60 +290,76 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	return
 }
 
-// WhatProvides attempts to find a package which provides the requested PackageVer.
-func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageName string, err error) {
+// WhatProvides attempts to find packages which provide the requested PackageVer.
+func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
 	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
 
-	args := []string{
+	baseArgs := []string{
 		"provides",
 		provideQuery,
+		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 	}
 
-	if !r.useUpdateRepo {
-		args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
-	}
+	foundPackages := make(map[string]bool)
+	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	for _, repoID := range repoOrderList {
+		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
-	if !r.usePreviewRepo {
-		args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-	}
+		err = r.chroot.Run(func() (err error) {
+			completeArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
 
-	err = r.chroot.Run(func() (err error) {
+			if !r.usePreviewRepo {
+				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+			}
 
-		if !r.usePreviewRepo {
-			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-		}
+			if !r.useUpdateRepo {
+				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", updateRepoID))
+			}
 
-		stdout, stderr, err := shell.Execute("tdnf", args...)
-		logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
+			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
 
+			if err != nil {
+				logger.Log.Errorf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
+				return
+			}
+
+			splitStdout := strings.Split(stdout, "\n")
+			for _, line := range splitStdout {
+				matches := packageLookupNameMatchRegex.FindStringSubmatch(line)
+				if len(matches) == 0 {
+					continue
+				}
+
+				packageName := matches[1]
+				if !foundPackages[packageName] {
+					foundPackages[packageName] = true
+					logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
+				}
+			}
+			return
+		})
 		if err != nil {
-			logger.Log.Errorf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
 			return
 		}
 
-		splitStdout := strings.Split(stdout, "\n")
-		for _, line := range splitStdout {
-			matches := packageLookupNameMatchRegex.FindStringSubmatch(line)
-			if len(matches) == 0 {
-				continue
-			}
-			// Local sources are listed last, keep searching for the last possible match
-			packageName = matches[1]
-			logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
+		if len(foundPackages) > 0 {
+			logger.Log.Debug("Found required package(s), skipping further search in other repos.")
+			break
 		}
-		return
-	})
-
-	if err != nil {
-		return
 	}
 
-	if packageName == "" {
+	if len(foundPackages) == 0 {
 		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
 		return
 	}
 
-	logger.Log.Debugf("Translated '%s' to package '%s'", pkgVer.Name, packageName)
+	for packageName := range foundPackages {
+		packageNames = append(packageNames, packageName)
+	}
+
+	logger.Log.Debugf("Translated '%s' to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
 	return
 }
 

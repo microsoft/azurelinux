@@ -1,5 +1,5 @@
 diff --git a/src/libostree/ostree-bootloader-grub2.c b/src/libostree/ostree-bootloader-grub2.c
-index ceea682..ee3ae6f 100644
+index 0ef751d..22037f1 100644
 --- a/src/libostree/ostree-bootloader-grub2.c
 +++ b/src/libostree/ostree-bootloader-grub2.c
 @@ -174,6 +174,7 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
@@ -10,7 +10,7 @@ index ceea682..ee3ae6f 100644
  
    g_autoptr(GOutputStream) out_stream = g_unix_output_stream_new (target_fd, FALSE);
  
-@@ -219,10 +220,12 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
+@@ -220,10 +220,12 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
        if (!kernel)
          return glnx_throw (error, "No \"linux\" key in bootloader config");
        g_string_append (output, "linux");
@@ -25,7 +25,7 @@ index ceea682..ee3ae6f 100644
        g_string_append_c (output, ' ');
        g_string_append (output, kernel);
  
-@@ -238,10 +241,12 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
+@@ -239,10 +241,12 @@ _ostree_bootloader_grub2_generate_config (OstreeSysroot                 *sysroot
        if (initrd)
          {
            g_string_append (output, "initrd");
@@ -40,3 +40,4 @@ index ceea682..ee3ae6f 100644
            g_string_append_c (output, ' ');
            g_string_append (output, initrd);
            g_string_append_c (output, '\n');
+

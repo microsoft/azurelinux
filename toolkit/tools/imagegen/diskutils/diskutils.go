@@ -435,9 +435,11 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	// There are two primary partition naming conventions:
 	// /dev/sdN<y> style or /dev/loopNp<x> style
 	// Detect the exact one we are using.
+	// Make sure we check for /dev/loopNp<x> FIRST, since /dev/loop1 would generate /dev/loop11 as a partition
+	// device which may be a valid device. We want to select /dev/loop1p1 first.
 	testPartDevPaths := []string{
-		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
+		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
 	}
 
 	err = retry.Run(func() error {

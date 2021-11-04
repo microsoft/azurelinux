@@ -1,0 +1,930 @@
+diff -up openssh/pam_ssh_agent_auth-0.10.3/get_command_line.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/get_command_line.c
+--- openssh/pam_ssh_agent_auth-0.10.3/get_command_line.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/get_command_line.c	2020-02-07 10:43:05.011757956 +0100
+@@ -27,6 +27,7 @@
+  * or implied, of Jamie Beverly.
+  */
+ 
++#include <stdlib.h>
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
+@@ -65,8 +66,8 @@ proc_pid_cmdline(char *** inargv)
+                 case EOF:
+                 case '\0':
+                     if (len > 0) { 
+-                        argv = pamsshagentauth_xrealloc(argv, count + 1, sizeof(*argv));
+-                        argv[count] = pamsshagentauth_xcalloc(len + 1, sizeof(*argv[count]));
++                        argv = xreallocarray(argv, count + 1, sizeof(*argv));
++                        argv[count] = xcalloc(len + 1, sizeof(*argv[count]));
+                         strncpy(argv[count++], argbuf, len);
+                         memset(argbuf, '\0', MAX_LEN_PER_CMDLINE_ARG + 1);
+                         len = 0;
+@@ -105,9 +106,9 @@ pamsshagentauth_free_command_line(char *
+ {
+     size_t i;
+     for (i = 0; i < n_args; i++)
+-        pamsshagentauth_xfree(argv[i]);
++        free(argv[i]);
+ 
+-    pamsshagentauth_xfree(argv);
++    free(argv);
+     return;
+ }
+ 
+diff -up openssh/pam_ssh_agent_auth-0.10.3/identity.h.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/identity.h
+--- openssh/pam_ssh_agent_auth-0.10.3/identity.h.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/identity.h	2020-02-07 10:43:05.011757956 +0100
+@@ -30,8 +30,8 @@
+ #include "openbsd-compat/sys-queue.h"
+ #include "xmalloc.h"
+ #include "log.h"
+-#include "buffer.h"
+-#include "key.h"
++#include "sshbuf.h"
++#include "sshkey.h"
+ #include "authfd.h"
+ #include <stdio.h>
+ 
+@@ -41,7 +41,7 @@ typedef struct idlist Idlist;
+ struct identity {
+     TAILQ_ENTRY(identity) next;
+     AuthenticationConnection *ac;   /* set if agent supports key */
+-    Key *key;           /* public/private key */
++    struct sshkey *key;           /* public/private key */
+     char    *filename;      /* comment for agent-only keys */
+     int tried;
+     int isprivate;      /* key points to the private key */
+diff -up openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c
+--- openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-compat	2020-02-07 10:43:05.009757925 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c	2020-02-07 10:43:05.012757972 +0100
+@@ -36,8 +36,8 @@
+ #include "openbsd-compat/sys-queue.h"
+ #include "xmalloc.h"
+ #include "log.h"
+-#include "buffer.h"
+-#include "key.h"
++#include "sshbuf.h"
++#include "sshkey.h"
+ #include "authfd.h"
+ #include <stdio.h>
+ #include <openssl/evp.h>
+@@ -58,6 +58,8 @@
+ #include "get_command_line.h"
+ extern char **environ;
+ 
++#define PAM_SSH_AGENT_AUTH_REQUESTv1 101
++
+ /* 
+  * Added by Jamie Beverly, ensure socket fd points to a socket owned by the user 
+  * A cursory check is done, but to avoid race conditions, it is necessary 
+@@ -77,7 +79,7 @@ log_action(char ** action, size_t count)
+     if (count == 0)
+         return NULL;
+    
+-    buf = pamsshagentauth_xcalloc((count * MAX_LEN_PER_CMDLINE_ARG) + (count * 3), sizeof(*buf));
++    buf = xcalloc((count * MAX_LEN_PER_CMDLINE_ARG) + (count * 3), sizeof(*buf));
+     for (i = 0; i < count; i++) {
+         strcat(buf, (i > 0) ? " '" : "'");
+         strncat(buf, action[i], MAX_LEN_PER_CMDLINE_ARG);
+@@ -87,21 +89,25 @@ log_action(char ** action, size_t count)
+ }
+ 
+ void
+-agent_action(Buffer *buf, char ** action, size_t count)
++agent_action(struct sshbuf **buf, char ** action, size_t count)
+ {
+     size_t i;
+-    pamsshagentauth_buffer_init(buf);
++    int r;
+ 
+-    pamsshagentauth_buffer_put_int(buf, count);
++    if ((*buf = sshbuf_new()) == NULL)
++        fatal("%s: sshbuf_new failed", __func__);
++    if ((r = sshbuf_put_u32(*buf, count)) != 0)
++        fatal("%s: buffer error: %s", __func__, ssh_err(r));
+ 
+     for (i = 0; i < count; i++) {
+-        pamsshagentauth_buffer_put_cstring(buf, action[i]);
++        if ((r = sshbuf_put_cstring(*buf, action[i])) != 0)
++            fatal("%s: buffer error: %s", __func__, ssh_err(r));
+     }
+ }
+ 
+ 
+-void
+-pamsshagentauth_session_id2_gen(Buffer * session_id2, const char * user,
++static void
++pamsshagentauth_session_id2_gen(struct sshbuf ** session_id2, const char * user,
+                                 const char * ruser, const char * servicename)
+ {
+     u_char *cookie = NULL;
+@@ -114,22 +120,23 @@ pamsshagentauth_session_id2_gen(Buffer *
+     char ** reported_argv = NULL;
+     size_t count = 0;
+     char * action_logbuf = NULL;
+-    Buffer action_agentbuf;
++    struct sshbuf *action_agentbuf = NULL;
+     uint8_t free_logbuf = 0;
+     char * retc;
+     int32_t reti;
++    int r;
+ 
+-    rnd = pamsshagentauth_arc4random();
++    rnd = arc4random();
+     cookie_len = ((uint8_t) rnd);
+     while (cookie_len < 16) { 
+         cookie_len += 16;                                          /* Add 16 bytes to the size to ensure that while the length is random, the length is always reasonable; ticket #18 */
+     }
+ 
+-    cookie = pamsshagentauth_xcalloc(1,cookie_len);
++    cookie = xcalloc(1, cookie_len);
+ 
+     for (i = 0; i < cookie_len; i++) {
+         if (i % 4 == 0) {
+-            rnd = pamsshagentauth_arc4random();
++            rnd = arc4random();
+         }
+         cookie[i] = (u_char) rnd;
+         rnd >>= 8;
+@@ -144,7 +151,8 @@ pamsshagentauth_session_id2_gen(Buffer *
+     }
+     else {
+         action_logbuf = "unknown on this platform";
+-        pamsshagentauth_buffer_init(&action_agentbuf); /* stays empty, means unavailable */
++        if ((action_agentbuf = sshbuf_new()) == NULL) /* stays empty, means unavailable */
++            fatal("%s: sshbuf_new failed", __func__);
+     }
+     
+     /*
+@@ -161,35 +169,39 @@ pamsshagentauth_session_id2_gen(Buffer *
+     retc = getcwd(pwd, sizeof(pwd) - 1);
+     time(&ts);
+ 
+-    pamsshagentauth_buffer_init(session_id2);
++    if ((*session_id2 = sshbuf_new()) == NULL)
++        fatal("%s: sshbuf_new failed", __func__);
+ 
+-    pamsshagentauth_buffer_put_int(session_id2, PAM_SSH_AGENT_AUTH_REQUESTv1);
+-    /* pamsshagentauth_debug3("cookie: %s", pamsshagentauth_tohex(cookie, cookie_len)); */
+-    pamsshagentauth_buffer_put_string(session_id2, cookie, cookie_len);
+-    /* pamsshagentauth_debug3("user: %s", user); */
+-    pamsshagentauth_buffer_put_cstring(session_id2, user);
+-    /* pamsshagentauth_debug3("ruser: %s", ruser); */
+-    pamsshagentauth_buffer_put_cstring(session_id2, ruser);
+-    /* pamsshagentauth_debug3("servicename: %s", servicename); */
+-    pamsshagentauth_buffer_put_cstring(session_id2, servicename);
+-    /* pamsshagentauth_debug3("pwd: %s", pwd); */
+-    if(retc)
+-        pamsshagentauth_buffer_put_cstring(session_id2, pwd);
+-    else
+-        pamsshagentauth_buffer_put_cstring(session_id2, "");
+-    /* pamsshagentauth_debug3("action: %s", action_logbuf); */
+-    pamsshagentauth_buffer_put_string(session_id2, action_agentbuf.buf + action_agentbuf.offset, action_agentbuf.end - action_agentbuf.offset);
++    if ((r = sshbuf_put_u32(*session_id2, PAM_SSH_AGENT_AUTH_REQUESTv1)) != 0 ||
++        (r = sshbuf_put_string(*session_id2, cookie, cookie_len)) != 0 ||
++        (r = sshbuf_put_cstring(*session_id2, user)) != 0 ||
++        (r = sshbuf_put_cstring(*session_id2, ruser)) != 0 ||
++        (r = sshbuf_put_cstring(*session_id2, servicename)) != 0)
++        fatal("%s: buffer error: %s", __func__, ssh_err(r));
++    if (retc) {
++        if ((r = sshbuf_put_cstring(*session_id2, pwd)) != 0)
++            fatal("%s: buffer error: %s", __func__, ssh_err(r));
++    } else {
++        if ((r = sshbuf_put_cstring(*session_id2, "")) != 0)
++            fatal("%s: buffer error: %s", __func__, ssh_err(r));
++    }
++    if ((r = sshbuf_put_stringb(*session_id2, action_agentbuf)) != 0)
++        fatal("%s: buffer error: %s", __func__, ssh_err(r));
+     if (free_logbuf) { 
+-        pamsshagentauth_xfree(action_logbuf);
+-        pamsshagentauth_buffer_free(&action_agentbuf);
++        free(action_logbuf);
++        sshbuf_free(action_agentbuf);
++    }
++    /* debug3("hostname: %s", hostname); */
++    if (reti >= 0) {
++        if ((r = sshbuf_put_cstring(*session_id2, hostname)) != 0)
++            fatal("%s: buffer error: %s", __func__, ssh_err(r));
++    } else {
++        if ((r = sshbuf_put_cstring(*session_id2, "")) != 0)
++            fatal("%s: buffer error: %s", __func__, ssh_err(r));
+     }
+-    /* pamsshagentauth_debug3("hostname: %s", hostname); */
+-    if(reti >= 0)
+-        pamsshagentauth_buffer_put_cstring(session_id2, hostname);
+-    else
+-        pamsshagentauth_buffer_put_cstring(session_id2, "");
+-    /* pamsshagentauth_debug3("ts: %ld", ts); */
+-    pamsshagentauth_buffer_put_int64(session_id2, (uint64_t) ts);
++    /* debug3("ts: %ld", ts); */
++    if ((r = sshbuf_put_u64(*session_id2, (uint64_t) ts)) != 0)
++        fatal("%s: buffer error: %s", __func__, ssh_err(r));
+ 
+     free(cookie);
+     return;
+@@ -278,7 +290,8 @@ ssh_get_authentication_connection_for_ui
+ 
+ 	auth = xmalloc(sizeof(*auth));
+ 	auth->fd = sock;
+-	buffer_init(&auth->identities);
++	if ((auth->identities = sshbuf_new()) == NULL)
++           fatal("%s: sshbuf_new failed", __func__);
+ 	auth->howmany = 0;
+ 
+ 	return auth;
+@@ -287,9 +300,9 @@ ssh_get_authentication_connection_for_ui
+ int
+ pamsshagentauth_find_authorized_keys(const char * user, const char * ruser, const char * servicename)
+ {
+-    Buffer session_id2 = { 0 };
++    struct sshbuf *session_id2 = NULL;
+     Identity *id;
+-    Key *key;
++    struct sshkey *key;
+     AuthenticationConnection *ac;
+     char *comment;
+     uint8_t retval = 0;
+@@ -299,31 +312,30 @@ pamsshagentauth_find_authorized_keys(con
+     pamsshagentauth_session_id2_gen(&session_id2, user, ruser, servicename);
+ 
+     if ((ac = ssh_get_authentication_connection_for_uid(uid))) {
+-        pamsshagentauth_verbose("Contacted ssh-agent of user %s (%u)", ruser, uid);
++        verbose("Contacted ssh-agent of user %s (%u)", ruser, uid);
+         for (key = ssh_get_first_identity(ac, &comment, 2); key != NULL; key = ssh_get_next_identity(ac, &comment, 2)) 
+         {
+             if(key != NULL) {
+-                id = pamsshagentauth_xcalloc(1, sizeof(*id));
++                id = xcalloc(1, sizeof(*id));
+                 id->key = key;
+                 id->filename = comment;
+                 id->ac = ac;
+-                if(userauth_pubkey_from_id(ruser, id, &session_id2)) {
++                if(userauth_pubkey_from_id(ruser, id, session_id2)) {
+                     retval = 1;
+                 }
+-                pamsshagentauth_xfree(id->filename);
+-                pamsshagentauth_key_free(id->key);
+-                pamsshagentauth_xfree(id);
++                free(id->filename);
++                key_free(id->key);
++                free(id);
+                 if(retval == 1)
+                     break;
+             }
+         }
+-        pamsshagentauth_buffer_free(&session_id2);
++        sshbuf_free(session_id2);
+         ssh_close_authentication_connection(ac);
+     }
+     else {
+-        pamsshagentauth_verbose("No ssh-agent could be contacted");
++        verbose("No ssh-agent could be contacted");
+     }
+-    /* pamsshagentauth_xfree(session_id2); */
+     EVP_cleanup();
+     return retval;
+ }
+diff -up openssh/pam_ssh_agent_auth-0.10.3/pam_ssh_agent_auth.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/pam_ssh_agent_auth.c
+--- openssh/pam_ssh_agent_auth-0.10.3/pam_ssh_agent_auth.c.psaa-compat	2020-02-07 10:43:05.010757940 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/pam_ssh_agent_auth.c	2020-02-07 10:43:05.012757972 +0100
+@@ -104,7 +104,7 @@ pam_sm_authenticate(pam_handle_t * pamh,
+  * a patch 8-)
+  */
+ #if ! HAVE___PROGNAME || HAVE_BUNDLE
+-    __progname = pamsshagentauth_xstrdup(servicename);
++    __progname = xstrdup(servicename);
+ #endif
+ 
+     for(i = argc, argv_ptr = (char **) argv; i > 0; ++argv_ptr, i--) {
+@@ -130,11 +130,11 @@ pam_sm_authenticate(pam_handle_t * pamh,
+ #endif
+     }
+ 
+-    pamsshagentauth_log_init(__progname, log_lvl, facility, getenv("PAM_SSH_AGENT_AUTH_DEBUG") ? 1 : 0);
++    log_init(__progname, log_lvl, facility, getenv("PAM_SSH_AGENT_AUTH_DEBUG") ? 1 : 0);
+     pam_get_item(pamh, PAM_USER, (void *) &user);
+     pam_get_item(pamh, PAM_RUSER, (void *) &ruser_ptr);
+ 
+-    pamsshagentauth_verbose("Beginning pam_ssh_agent_auth for user %s", user);
++    verbose("Beginning pam_ssh_agent_auth for user %s", user);
+ 
+     if(ruser_ptr) {
+         strncpy(ruser, ruser_ptr, sizeof(ruser) - 1);
+@@ -149,12 +149,12 @@ pam_sm_authenticate(pam_handle_t * pamh,
+ #ifdef ENABLE_SUDO_HACK
+         if( (strlen(sudo_service_name) > 0) && strncasecmp(servicename, sudo_service_name, sizeof(sudo_service_name) - 1) == 0 && getenv("SUDO_USER") ) {
+             strncpy(ruser, getenv("SUDO_USER"), sizeof(ruser) - 1 );
+-            pamsshagentauth_verbose( "Using environment variable SUDO_USER (%s)", ruser );
++            verbose( "Using environment variable SUDO_USER (%s)", ruser );
+         } else
+ #endif
+         {
+             if( ! getpwuid(getuid()) ) {
+-                pamsshagentauth_verbose("Unable to getpwuid(getuid())");
++                verbose("Unable to getpwuid(getuid())");
+                 goto cleanexit;
+             }
+             strncpy(ruser, getpwuid(getuid())->pw_name, sizeof(ruser) - 1);
+@@ -163,11 +163,11 @@ pam_sm_authenticate(pam_handle_t * pamh,
+ 
+     /* Might as well explicitely confirm the user exists here */
+     if(! getpwnam(ruser) ) {
+-        pamsshagentauth_verbose("getpwnam(%s) failed, bailing out", ruser);
++        verbose("getpwnam(%s) failed, bailing out", ruser);
+         goto cleanexit;
+     }
+     if( ! getpwnam(user) ) {
+-        pamsshagentauth_verbose("getpwnam(%s) failed, bailing out", user);
++        verbose("getpwnam(%s) failed, bailing out", user);
+         goto cleanexit;
+     }
+ 
+@@ -177,8 +177,8 @@ pam_sm_authenticate(pam_handle_t * pamh,
+          */
+         parse_authorized_key_file(user, authorized_keys_file_input);
+     } else {
+-        pamsshagentauth_verbose("Using default file=/etc/security/authorized_keys");
+-        authorized_keys_file = pamsshagentauth_xstrdup("/etc/security/authorized_keys");
++        verbose("Using default file=/etc/security/authorized_keys");
++        authorized_keys_file = xstrdup("/etc/security/authorized_keys");
+     }
+ 
+     /*
+@@ -187,19 +187,19 @@ pam_sm_authenticate(pam_handle_t * pamh,
+      */
+ 
+     if(user && strlen(ruser) > 0) {
+-        pamsshagentauth_verbose("Attempting authentication: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
++        verbose("Attempting authentication: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
+ 
+         /*
+          * this pw_uid is used to validate the SSH_AUTH_SOCK, and so must be the uid of the ruser invoking the program, not the target-user
+          */
+         if(pamsshagentauth_find_authorized_keys(user, ruser, servicename)) { /* getpwnam(ruser)->pw_uid)) { */
+-            pamsshagentauth_logit("Authenticated: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
++            logit("Authenticated: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
+             retval = PAM_SUCCESS;
+         } else {
+-            pamsshagentauth_logit("Failed Authentication: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
++            logit("Failed Authentication: `%s' as `%s' using %s", ruser, user, authorized_keys_file);
+         }
+     } else {
+-        pamsshagentauth_logit("No %s specified, cannot continue with this form of authentication", (user) ? "ruser" : "user" );
++        logit("No %s specified, cannot continue with this form of authentication", (user) ? "ruser" : "user" );
+     }
+ 
+ cleanexit:
+diff -up openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.c
+--- openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.c	2020-02-07 10:43:05.012757972 +0100
+@@ -66,8 +66,8 @@
+ #include "xmalloc.h"
+ #include "match.h"
+ #include "log.h"
+-#include "buffer.h"
+-#include "key.h"
++#include "sshbuf.h"
++#include "sshkey.h"
+ #include "misc.h"
+ 
+ #include "xmalloc.h"
+@@ -77,7 +77,6 @@
+ #include "pathnames.h"
+ #include "secure_filename.h"
+ 
+-#include "identity.h"
+ #include "pam_user_key_allowed2.h"
+ 
+ extern char *authorized_keys_file;
+@@ -117,12 +116,12 @@ parse_authorized_key_file(const char *us
+         } else {
+             slash_ptr = strchr(auth_keys_file_buf, '/');
+             if(!slash_ptr)
+-                pamsshagentauth_fatal
++                fatal
+                     ("cannot expand tilde in path without a `/'");
+ 
+             owner_uname_len = slash_ptr - auth_keys_file_buf - 1;
+             if(owner_uname_len > (sizeof(owner_uname) - 1))
+-                pamsshagentauth_fatal("Username too long");
++                fatal("Username too long");
+ 
+             strncat(owner_uname, auth_keys_file_buf + 1, owner_uname_len);
+             if(!authorized_keys_file_allowed_owner_uid)
+@@ -130,11 +129,11 @@ parse_authorized_key_file(const char *us
+                     getpwnam(owner_uname)->pw_uid;
+         }
+         authorized_keys_file =
+-            pamsshagentauth_tilde_expand_filename(auth_keys_file_buf,
++            tilde_expand_filename(auth_keys_file_buf,
+                                                   authorized_keys_file_allowed_owner_uid);
+         strncpy(auth_keys_file_buf, authorized_keys_file,
+                 sizeof(auth_keys_file_buf) - 1);
+-        pamsshagentauth_xfree(authorized_keys_file)        /* when we
++        free(authorized_keys_file)        /* when we
+                                                               percent_expand
+                                                               later, we'd step
+                                                               on this, so free
+@@ -150,13 +149,13 @@ parse_authorized_key_file(const char *us
+     strncat(hostname, fqdn, strcspn(fqdn, "."));
+ #endif
+     authorized_keys_file =
+-        pamsshagentauth_percent_expand(auth_keys_file_buf, "h",
++        percent_expand(auth_keys_file_buf, "h",
+                                        getpwnam(user)->pw_dir, "H", hostname,
+                                        "f", fqdn, "u", user, NULL);
+ }
+ 
+ int
+-pam_user_key_allowed(const char *ruser, Key * key)
++pam_user_key_allowed(const char *ruser, struct sshkey * key)
+ {
+     return
+         pamsshagentauth_user_key_allowed2(getpwuid(authorized_keys_file_allowed_owner_uid),
+diff -up openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.h.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.h
+--- openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.h.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/pam_user_authorized_keys.h	2020-02-07 10:43:05.012757972 +0100
+@@ -32,7 +32,7 @@
+ #define _PAM_USER_KEY_ALLOWED_H
+ 
+ #include "identity.h"
+-int pam_user_key_allowed(const char *, Key *);
++int pam_user_key_allowed(const char *, struct sshkey *);
+ void parse_authorized_key_file(const char *, const char *);
+ 
+ #endif
+diff -up openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.c
+--- openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.c	2020-02-07 10:43:05.012757972 +0100
+@@ -45,44 +45,46 @@
+ #include "xmalloc.h"
+ #include "ssh.h"
+ #include "ssh2.h"
+-#include "buffer.h"
++#include "sshbuf.h"
+ #include "log.h"
+ #include "compat.h"
+-#include "key.h"
++#include "digest.h"
++#include "sshkey.h"
+ #include "pathnames.h"
+ #include "misc.h"
+ #include "secure_filename.h"
+ #include "uidswap.h"
+-
+-#include "identity.h"
++#include <unistd.h>
+ 
+ /* return 1 if user allows given key */
+ /* Modified slightly from original found in auth2-pubkey.c */
+ static int
+-pamsshagentauth_check_authkeys_file(FILE * f, char *file, Key * key)
++pamsshagentauth_check_authkeys_file(FILE * f, char *file, struct sshkey * key)
+ {
+-    char line[SSH_MAX_PUBKEY_BYTES];
++    char *line = NULL;
+     int found_key = 0;
+     u_long linenum = 0;
+-    Key *found;
++    struct sshkey *found;
+     char *fp;
++    size_t linesize = 0;
+ 
+     found_key = 0;
+-    found = pamsshagentauth_key_new(key->type);
++    found = sshkey_new(key->type);
+ 
+-    while(read_keyfile_line(f, file, line, sizeof(line), &linenum) != -1) {
++    while ((getline(&line, &linesize, f)) != -1) {
+         char *cp = NULL; /* *key_options = NULL; */
+ 
++        linenum++;
+         /* Skip leading whitespace, empty and comment lines. */
+         for(cp = line; *cp == ' ' || *cp == '\t'; cp++);
+         if(!*cp || *cp == '\n' || *cp == '#')
+             continue;
+ 
+-        if(pamsshagentauth_key_read(found, &cp) != 1) {
++        if (sshkey_read(found, &cp) != 0) {
+             /* no key? check if there are options for this key */
+             int quoted = 0;
+ 
+-            pamsshagentauth_verbose("user_key_allowed: check options: '%s'", cp);
++            verbose("user_key_allowed: check options: '%s'", cp);
+             /* key_options = cp; */
+             for(; *cp && (quoted || (*cp != ' ' && *cp != '\t')); cp++) {
+                 if(*cp == '\\' && cp[1] == '"')
+@@ -92,26 +94,27 @@ pamsshagentauth_check_authkeys_file(FILE
+             }
+             /* Skip remaining whitespace. */
+             for(; *cp == ' ' || *cp == '\t'; cp++);
+-            if(pamsshagentauth_key_read(found, &cp) != 1) {
+-                pamsshagentauth_verbose("user_key_allowed: advance: '%s'", cp);
++            if(sshkey_read(found, &cp) != 0) {
++                verbose("user_key_allowed: advance: '%s'", cp);
+                 /* still no key? advance to next line */
+                 continue;
+             }
+         }
+-        if(pamsshagentauth_key_equal(found, key)) {
++        if(sshkey_equal(found, key)) {
+             found_key = 1;
+-            pamsshagentauth_logit("matching key found: file/command %s, line %lu", file,
++            logit("matching key found: file/command %s, line %lu", file,
+                                   linenum);
+-            fp = pamsshagentauth_key_fingerprint(found, SSH_FP_MD5, SSH_FP_HEX);
+-            pamsshagentauth_logit("Found matching %s key: %s",
+-                                  pamsshagentauth_key_type(found), fp);
+-            pamsshagentauth_xfree(fp);
++            fp = sshkey_fingerprint(found, SSH_DIGEST_SHA256, SSH_FP_BASE64);
++            logit("Found matching %s key: %s",
++                                  sshkey_type(found), fp);
++            free(fp);
+             break;
+         }
+     }
+-    pamsshagentauth_key_free(found);
++    free(line);
++    sshkey_free(found);
+     if(!found_key)
+-        pamsshagentauth_verbose("key not found");
++        verbose("key not found");
+     return found_key;
+ }
+ 
+@@ -120,19 +123,19 @@ pamsshagentauth_check_authkeys_file(FILE
+  * returns 1 if the key is allowed or 0 otherwise.
+  */
+ int
+-pamsshagentauth_user_key_allowed2(struct passwd *pw, Key * key, char *file)
++pamsshagentauth_user_key_allowed2(struct passwd *pw, struct sshkey * key, char *file)
+ {
+     FILE *f;
+     int found_key = 0;
+     struct stat st;
+-    char buf[SSH_MAX_PUBKEY_BYTES];
++    char buf[256];
+ 
+     /* Temporarily use the user's uid. */
+-    pamsshagentauth_verbose("trying public key file %s", file);
++    verbose("trying public key file %s", file);
+ 
+     /* Fail not so quietly if file does not exist */
+     if(stat(file, &st) < 0) {
+-        pamsshagentauth_verbose("File not found: %s", file);
++        verbose("File not found: %s", file);
+         return 0;
+     }
+ 
+@@ -144,7 +147,7 @@ pamsshagentauth_user_key_allowed2(struct
+ 
+     if(pamsshagentauth_secure_filename(f, file, pw, buf, sizeof(buf)) != 0) {
+         fclose(f);
+-        pamsshagentauth_logit("Authentication refused: %s", buf);
++        logit("Authentication refused: %s", buf);
+         return 0;
+     }
+ 
+@@ -160,7 +163,7 @@ pamsshagentauth_user_key_allowed2(struct
+ int
+ pamsshagentauth_user_key_command_allowed2(char *authorized_keys_command,
+                           char *authorized_keys_command_user,
+-                          struct passwd *user_pw, Key * key)
++                          struct passwd *user_pw, struct sshkey * key)
+ {
+     FILE *f;
+     int ok, found_key = 0;
+@@ -187,44 +190,44 @@ pamsshagentauth_user_key_command_allowed
+     else {
+         pw = getpwnam(authorized_keys_command_user);
+         if(pw == NULL) {
+-            pamsshagentauth_logerror("authorized_keys_command_user \"%s\" not found: %s",
++            error("authorized_keys_command_user \"%s\" not found: %s",
+                  authorized_keys_command_user, strerror(errno));
+             return 0;
+         }
+     }
+ 
+-    pamsshagentauth_temporarily_use_uid(pw);
++    temporarily_use_uid(pw);
+ 
+     if(stat(authorized_keys_command, &st) < 0) {
+-        pamsshagentauth_logerror
++        error
+             ("Could not stat AuthorizedKeysCommand \"%s\": %s",
+              authorized_keys_command, strerror(errno));
+         goto out;
+     }
+     if(pamsshagentauth_auth_secure_path
+        (authorized_keys_command, &st, NULL, 0, errmsg, sizeof(errmsg)) != 0) {
+-        pamsshagentauth_logerror("Unsafe AuthorizedKeysCommand: %s", errmsg);
++        error("Unsafe AuthorizedKeysCommand: %s", errmsg);
+         goto out;
+     }
+ 
+     /* open the pipe and read the keys */
+     if(pipe(p) != 0) {
+-        pamsshagentauth_logerror("%s: pipe: %s", __func__, strerror(errno));
++        error("%s: pipe: %s", __func__, strerror(errno));
+         goto out;
+     }
+ 
+-    pamsshagentauth_debug("Running AuthorizedKeysCommand: \"%s\" as \"%s\" with argument: \"%s\"",
++    debug("Running AuthorizedKeysCommand: \"%s\" as \"%s\" with argument: \"%s\"",
+                           authorized_keys_command, pw->pw_name, username);
+ 
+     /* 
+      * Don't want to call this in the child, where it can fatal() and
+      * run cleanup_exit() code.
+      */
+-    pamsshagentauth_restore_uid();
++    restore_uid();
+ 
+     switch ((pid = fork())) {
+     case -1:                                              /* error */
+-        pamsshagentauth_logerror("%s: fork: %s", __func__, strerror(errno));
++        error("%s: fork: %s", __func__, strerror(errno));
+         close(p[0]);
+         close(p[1]);
+         return 0;
+@@ -234,13 +237,13 @@ pamsshagentauth_user_key_command_allowed
+ 
+         /* do this before the setresuid so thta they can be logged */
+         if((devnull = open(_PATH_DEVNULL, O_RDWR)) == -1) {
+-            pamsshagentauth_logerror("%s: open %s: %s", __func__, _PATH_DEVNULL,
++            error("%s: open %s: %s", __func__, _PATH_DEVNULL,
+                                      strerror(errno));
+             _exit(1);
+         }
+         if(dup2(devnull, STDIN_FILENO) == -1 || dup2(p[1], STDOUT_FILENO) == -1
+            || dup2(devnull, STDERR_FILENO) == -1) {
+-            pamsshagentauth_logerror("%s: dup2: %s", __func__, strerror(errno));
++            error("%s: dup2: %s", __func__, strerror(errno));
+             _exit(1);
+         }
+ #if defined(HAVE_SETRESGID) && !defined(BROKEN_SETRESGID)
+@@ -248,7 +251,7 @@ pamsshagentauth_user_key_command_allowed
+ #else
+         if (setgid(pw->pw_gid) != 0 || setegid(pw->pw_gid) != 0) {
+ #endif
+-            pamsshagentauth_logerror("setresgid %u: %s", (u_int) pw->pw_gid,
++            error("setresgid %u: %s", (u_int) pw->pw_gid,
+                                      strerror(errno));
+             _exit(1);
+         }
+@@ -258,7 +261,7 @@ pamsshagentauth_user_key_command_allowed
+ #else
+         if (setuid(pw->pw_uid) != 0 || seteuid(pw->pw_uid) != 0) {
+ #endif
+-            pamsshagentauth_logerror("setresuid %u: %s", (u_int) pw->pw_uid,
++            error("setresuid %u: %s", (u_int) pw->pw_uid,
+                                      strerror(errno));
+             _exit(1);
+         }
+@@ -270,18 +273,18 @@ pamsshagentauth_user_key_command_allowed
+ 
+         /* pretty sure this will barf because we are now suid, but since we
+            should't reach this anyway, I'll leave it here */
+-        pamsshagentauth_logerror("AuthorizedKeysCommand %s exec failed: %s",
++        error("AuthorizedKeysCommand %s exec failed: %s",
+                                  authorized_keys_command, strerror(errno));
+         _exit(127);
+     default:                                              /* parent */
+         break;
+     }
+ 
+-    pamsshagentauth_temporarily_use_uid(pw);
++    temporarily_use_uid(pw);
+ 
+     close(p[1]);
+     if((f = fdopen(p[0], "r")) == NULL) {
+-        pamsshagentauth_logerror("%s: fdopen: %s", __func__, strerror(errno));
++        error("%s: fdopen: %s", __func__, strerror(errno));
+         close(p[0]);
+         /* Don't leave zombie child */
+         while(waitpid(pid, NULL, 0) == -1 && errno == EINTR);
+@@ -292,22 +295,22 @@ pamsshagentauth_user_key_command_allowed
+ 
+     while(waitpid(pid, &status, 0) == -1) {
+         if(errno != EINTR) {
+-            pamsshagentauth_logerror("%s: waitpid: %s", __func__,
++            error("%s: waitpid: %s", __func__,
+                                      strerror(errno));
+             goto out;
+         }
+     }
+     if(WIFSIGNALED(status)) {
+-        pamsshagentauth_logerror("AuthorizedKeysCommand %s exited on signal %d",
++        error("AuthorizedKeysCommand %s exited on signal %d",
+                                  authorized_keys_command, WTERMSIG(status));
+         goto out;
+     } else if(WEXITSTATUS(status) != 0) {
+-        pamsshagentauth_logerror("AuthorizedKeysCommand %s returned status %d",
++        error("AuthorizedKeysCommand %s returned status %d",
+                                  authorized_keys_command, WEXITSTATUS(status));
+         goto out;
+     }
+     found_key = ok;
+   out:
+-    pamsshagentauth_restore_uid();
++    restore_uid();
+     return found_key;
+ }
+diff -up openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.h.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.h
+--- openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.h.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/pam_user_key_allowed2.h	2020-02-07 10:43:05.012757972 +0100
+@@ -32,7 +32,7 @@
+ #define _PAM_USER_KEY_ALLOWED_H
+ 
+ #include "identity.h"
+-int pamsshagentauth_user_key_allowed2(struct passwd *, Key *, char *);
+-int pamsshagentauth_user_key_command_allowed2(char *, char *, struct passwd *, Key *);
++int pamsshagentauth_user_key_allowed2(struct passwd *, struct sshkey *, char *);
++int pamsshagentauth_user_key_command_allowed2(char *, char *, struct passwd *, struct sshkey *);
+ 
+ #endif
+diff -up openssh/pam_ssh_agent_auth-0.10.3/secure_filename.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/secure_filename.c
+--- openssh/pam_ssh_agent_auth-0.10.3/secure_filename.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/secure_filename.c	2020-02-07 10:43:05.012757972 +0100
+@@ -53,8 +53,8 @@
+ #include "xmalloc.h"
+ #include "match.h"
+ #include "log.h"
+-#include "buffer.h"
+-#include "key.h"
++#include "sshbuf.h"
++#include "sshkey.h"
+ #include "misc.h"
+ 
+ 
+@@ -80,7 +80,7 @@ pamsshagentauth_auth_secure_path(const c
+ 	int comparehome = 0;
+ 	struct stat st;
+ 
+-    pamsshagentauth_verbose("auth_secure_filename: checking for uid: %u", uid);
++    verbose("auth_secure_filename: checking for uid: %u", uid);
+ 
+ 	if (realpath(name, buf) == NULL) {
+ 		snprintf(err, errlen, "realpath %s failed: %s", name,
+@@ -115,9 +115,9 @@ pamsshagentauth_auth_secure_path(const c
+ 			snprintf(err, errlen, "dirname() failed");
+ 			return -1;
+ 		}
+-		pamsshagentauth_strlcpy(buf, cp, sizeof(buf));
++		strlcpy(buf, cp, sizeof(buf));
+ 
+-		pamsshagentauth_verbose("secure_filename: checking '%s'", buf);
++		verbose("secure_filename: checking '%s'", buf);
+ 		if (stat(buf, &st) < 0 ||
+ 		    (st.st_uid != 0 && st.st_uid != uid) ||
+ 		    (st.st_mode & 022) != 0) {
+@@ -128,7 +128,7 @@ pamsshagentauth_auth_secure_path(const c
+ 
+ 		/* If are passed the homedir then we can stop */
+ 		if (comparehome && strcmp(homedir, buf) == 0) {
+-			pamsshagentauth_verbose("secure_filename: terminating check at '%s'",
++			verbose("secure_filename: terminating check at '%s'",
+ 			    buf);
+ 			break;
+ 		}
+diff -up openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c
+--- openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.c	2020-02-07 10:43:23.520048960 +0100
+@@ -37,10 +37,11 @@
+ #include "xmalloc.h"
+ #include "ssh.h"
+ #include "ssh2.h"
+-#include "buffer.h"
++#include "sshbuf.h"
+ #include "log.h"
+ #include "compat.h"
+-#include "key.h"
++#include "sshkey.h"
++#include "ssherr.h"
+ #include "pathnames.h"
+ #include "misc.h"
+ #include "secure_filename.h"
+@@ -48,54 +49,59 @@
+ #include "identity.h"
+ #include "pam_user_authorized_keys.h"
+ 
++#define SSH2_MSG_USERAUTH_TRUST_REQUEST          54
++
+ /* extern u_char  *session_id2;
+ extern uint8_t  session_id_len;
+  */
+ 
+ int
+-userauth_pubkey_from_id(const char *ruser, Identity * id, Buffer * session_id2)
++userauth_pubkey_from_id(const char *ruser, Identity * id, struct sshbuf * session_id2)
+ {
+-    Buffer          b = { 0 };
++    struct sshbuf  *b = NULL;
+     char           *pkalg = NULL;
+     u_char         *pkblob = NULL, *sig = NULL;
+-    u_int           blen = 0, slen = 0;
+-    int             authenticated = 0;
++    size_t          blen = 0, slen = 0;
++    int             r, authenticated = 0;
+ 
+-    pkalg = (char *) key_ssh_name(id->key);
++    pkalg = (char *) sshkey_ssh_name(id->key);
+ 
+     /* first test if this key is even allowed */
+     if(! pam_user_key_allowed(ruser, id->key))
+-        goto user_auth_clean_exit;
++        goto user_auth_clean_exit_without_buffer;
+ 
+-    if(pamsshagentauth_key_to_blob(id->key, &pkblob, &blen) == 0)
+-        goto user_auth_clean_exit;
++    if(sshkey_to_blob(id->key, &pkblob, &blen) != 0)
++        goto user_auth_clean_exit_without_buffer;
+ 
+     /* construct packet to sign and test */
+-    pamsshagentauth_buffer_init(&b);
++    if ((b = sshbuf_new()) == NULL)
++        fatal("%s: sshbuf_new failed", __func__);
+ 
+-    pamsshagentauth_buffer_put_string(&b, session_id2->buf + session_id2->offset, session_id2->end - session_id2->offset);
+-    pamsshagentauth_buffer_put_char(&b, SSH2_MSG_USERAUTH_TRUST_REQUEST); 
+-    pamsshagentauth_buffer_put_cstring(&b, ruser);
+-    pamsshagentauth_buffer_put_cstring(&b, "pam_ssh_agent_auth");
+-    pamsshagentauth_buffer_put_cstring(&b, "publickey");
+-    pamsshagentauth_buffer_put_char(&b, 1);
+-    pamsshagentauth_buffer_put_cstring(&b, pkalg);
+-    pamsshagentauth_buffer_put_string(&b, pkblob, blen);
++    if ((r = sshbuf_put_string(b, sshbuf_ptr(session_id2), sshbuf_len(session_id2))) != 0 ||
++        (r = sshbuf_put_u8(b, SSH2_MSG_USERAUTH_TRUST_REQUEST)) != 0 ||
++        (r = sshbuf_put_cstring(b, ruser)) != 0 ||
++        (r = sshbuf_put_cstring(b, "pam_ssh_agent_auth")) != 0 ||
++        (r = sshbuf_put_cstring(b, "publickey")) != 0 ||
++        (r = sshbuf_put_u8(b, 1)) != 0 ||
++        (r = sshbuf_put_cstring(b, pkalg)) != 0 ||
++        (r = sshbuf_put_string(b, pkblob, blen)) != 0)
++        fatal("%s: buffer error: %s", __func__, ssh_err(r));
+ 
+-    if(ssh_agent_sign(id->ac, id->key, &sig, &slen, pamsshagentauth_buffer_ptr(&b), pamsshagentauth_buffer_len(&b)) != 0)
++    if (ssh_agent_sign(id->ac, id->key, &sig, &slen, sshbuf_ptr(b), sshbuf_len(b)) != 0)
+         goto user_auth_clean_exit;
+ 
+     /* test for correct signature */
+-    if(pamsshagentauth_key_verify(id->key, sig, slen, pamsshagentauth_buffer_ptr(&b), pamsshagentauth_buffer_len(&b)) == 1)
++    if (sshkey_verify(id->key, sig, slen, sshbuf_ptr(b), sshbuf_len(b), NULL, 0, NULL) == 0)
+         authenticated = 1;
+ 
+   user_auth_clean_exit:
+     /* if(&b != NULL) */
+-    pamsshagentauth_buffer_free(&b);
++    sshbuf_free(b);
++  user_auth_clean_exit_without_buffer:
+     if(sig != NULL)
+-        pamsshagentauth_xfree(sig);
++        free(sig);
+     if(pkblob != NULL)
+-        pamsshagentauth_xfree(pkblob);
++        free(pkblob);
+     CRYPTO_cleanup_all_ex_data();
+     return authenticated;
+ }
+diff -up openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.h.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.h
+--- openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.h.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/userauth_pubkey_from_id.h	2020-02-07 10:43:05.013757988 +0100
+@@ -31,7 +31,7 @@
+ #ifndef _USERAUTH_PUBKEY_FROM_ID_H
+ #define _USERAUTH_PUBKEY_FROM_ID_H
+ 
+-#include <identity.h>
+-int userauth_pubkey_from_id(const char *, Identity *, Buffer *);
++#include "identity.h"
++int userauth_pubkey_from_id(const char *, Identity *, struct sshbuf *);
+ 
+ #endif
+diff -up openssh/pam_ssh_agent_auth-0.10.3/uuencode.c.psaa-compat openssh/pam_ssh_agent_auth-0.10.3/uuencode.c
+--- openssh/pam_ssh_agent_auth-0.10.3/uuencode.c.psaa-compat	2016-11-13 04:24:32.000000000 +0100
++++ openssh/pam_ssh_agent_auth-0.10.3/uuencode.c	2020-02-07 10:43:05.013757988 +0100
+@@ -56,7 +56,7 @@ pamsshagentauth_uudecode(const char *src
+ 	/* and remove trailing whitespace because __b64_pton needs this */
+ 	*p = '\0';
+ 	len = pamsshagentauth___b64_pton(encoded, target, targsize);
+-	pamsshagentauth_xfree(encoded);
++	xfree(encoded);
+ 	return len;
+ }
+ 
+@@ -70,7 +70,7 @@ pamsshagentauth_dump_base64(FILE *fp, co
+ 		fprintf(fp, "dump_base64: len > 65536\n");
+ 		return;
+ 	}
+-	buf = pamsshagentauth_xmalloc(2*len);
++	buf = malloc(2*len);
+ 	n = pamsshagentauth_uuencode(data, len, buf, 2*len);
+ 	for (i = 0; i < n; i++) {
+ 		fprintf(fp, "%c", buf[i]);
+@@ -79,5 +79,5 @@ pamsshagentauth_dump_base64(FILE *fp, co
+ 	}
+ 	if (i % 70 != 69)
+ 		fprintf(fp, "\n");
+-	pamsshagentauth_xfree(buf);
++	free(buf);
+ }

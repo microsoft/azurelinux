@@ -161,7 +161,7 @@ fi
 
 %changelog
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 20200727-2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag)
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License Verified
 - Remove {?ext_man}, which is not supported in CBL-Mariner
 

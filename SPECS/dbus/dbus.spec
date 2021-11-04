@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,12 +11,15 @@ URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-12749.patch
 BuildRequires:  expat-devel
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
 BuildRequires:  libselinux-devel
 Requires:       expat
-Requires:       systemd
 Requires:       xz
+# Using the weak dependency 'Recommends' to break a circular dependency during
+# from-scratch builds, where systemd's functionality is not required for 'dbus'.
+# In real-life situations systemd will always be present and thus installed.
+Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
 
 %description
@@ -80,6 +83,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13.6-9
+- Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-8
 - Remove libtool archive files from final packaging
 

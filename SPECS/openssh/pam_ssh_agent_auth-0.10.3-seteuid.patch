@@ -1,0 +1,37 @@
+diff -up openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-seteuid openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c
+--- openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c.psaa-seteuid	2017-02-07 15:41:53.172334151 +0100
++++ openssh-7.4p1/pam_ssh_agent_auth-0.10.3/iterate_ssh_agent_keys.c	2017-02-07 15:41:53.174334149 +0100
+@@ -238,17 +238,26 @@ ssh_get_authentication_socket_for_uid(ui
+ 	}
+ 
+ 	errno = 0; 
+-	seteuid(uid); /* To ensure a race condition is not used to circumvent the stat
+-	             above, we will temporarily drop UID to the caller */
+-	if (connect(sock, (struct sockaddr *)&sunaddr, sizeof sunaddr) < 0) {
++	/* To ensure a race condition is not used to circumvent the stat
++	   above, we will temporarily drop UID to the caller */
++	if (seteuid(uid) == -1) {
+ 		close(sock);
+-        if(errno == EACCES)
+-		fatal("MAJOR SECURITY WARNING: uid %lu made a deliberate and malicious attempt to open an agent socket owned by another user", (unsigned long) uid);
++		error("seteuid(%lu) failed with error: %s",
++		    (unsigned long) uid, strerror(errno));
+ 		return -1;
+ 	}
++	if (connect(sock, (struct sockaddr *)&sunaddr, sizeof sunaddr) < 0) {
++		close(sock);
++		sock = -1;
++		if(errno == EACCES)
++			fatal("MAJOR SECURITY WARNING: uid %lu made a deliberate and malicious attempt to open an agent socket owned by another user", (unsigned long) uid);
++	}
+ 
+-	seteuid(0); /* we now continue the regularly scheduled programming */
+-
++	/* we now continue the regularly scheduled programming */
++	if (0 != seteuid(0)) {
++		fatal("setuid(0) failed with error: %s", strerror(errno));
++		return -1;
++	}
+ 	return sock;
+ }
+ 

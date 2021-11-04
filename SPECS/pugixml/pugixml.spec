@@ -66,7 +66,7 @@ make check -C build
 - Update Source0
 
 * Wed Feb 12 2020 Nick Bopp <nichbop@microsoft.com> - 1.10-1
-- Initial import from Fedora 32 (license: MIT)
+- Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - Update to 1.10
 
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.9-4
