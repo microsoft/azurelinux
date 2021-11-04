@@ -101,7 +101,7 @@ PYTHONPATH=tests/lib python3 tests/jstests.py -d -s -t 1800 --no-progress --wpt=
 # Run basic JIT tests
 PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic || TEST_RESULT=$?
 
-exit $TEST_RESULT
+[[ $TEST_RESULT -eq 0 ]]
 
 %post
 %ldconfig_scriptlets
