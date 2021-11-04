@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "libsepol-3.2.tar.gz": "dfc7f662af8000116e56a01de6a0394ed79be1b34b999e551346233c5dd19508"
+ "signatures": {
+  "selinux-3.2.tar.gz": "cda0b315ea88f93b1e7b6aa9f48d3b568a5506af1f8f401f5d05fa2ce8c7008f"
  }
 }

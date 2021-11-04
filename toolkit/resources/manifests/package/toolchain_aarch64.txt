@@ -206,9 +206,9 @@ libselinux-debuginfo-3.2-1.cm2.aarch64.rpm
 libselinux-devel-3.2-1.cm2.aarch64.rpm
 libselinux-python3-3.2-1.cm2.aarch64.rpm
 libselinux-utils-3.2-1.cm2.aarch64.rpm
-libsepol-3.2-1.cm2.aarch64.rpm
-libsepol-debuginfo-3.2-1.cm2.aarch64.rpm
-libsepol-devel-3.2-1.cm2.aarch64.rpm
+libsepol-3.2-2.cm2.aarch64.rpm
+libsepol-debuginfo-3.2-2.cm2.aarch64.rpm
+libsepol-devel-3.2-2.cm2.aarch64.rpm
 libsolv-0.7.19-1.cm2.aarch64.rpm
 libsolv-debuginfo-0.7.19-1.cm2.aarch64.rpm
 libsolv-devel-0.7.19-1.cm2.aarch64.rpm

@@ -3670,7 +3670,7 @@
         "other": {
           "name": "libsepol",
           "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libsepol-3.2.tar.gz"
+          "downloadUrl": "https://codeload.github.com/SELinuxProject/selinux/tar.gz/refs/tags/3.2"
         }
       }
     },
