@@ -4,7 +4,7 @@ Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
 Release:        2%{?dist}
-License:        MPLv2.0 AND MPLv1.1 AND BSD AND GPLv2+ AND GPLv3+ AND LGPLv2+ AND AFL AND ASL 2.0 AND CCO
+License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -101,6 +101,10 @@ PYTHONPATH=tests/lib python3 tests/jstests.py -d -s -t 1800 --no-progress --wpt=
 # Run basic JIT tests
 PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic || TEST_RESULT=$?
 
+if [[ $TEST_RESULT -ne 0 ]]
+then
+    echo "At least one of the tests failed. Look for all tests, which assign a value to the 'TEST_RESULT' variable."
+fi
 [[ $TEST_RESULT -eq 0 ]]
 
 %post
@@ -111,13 +115,13 @@ PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../..
 
 %files
 %defattr(-,root,root)
+%license LICENSE
 %{_bindir}/js%{major}
 %{_bindir}/js%{major}-config
 %{_libdir}/libmozjs-%{major}.so.0*
 
 %files devel
 %defattr(-,root,root)
-%license LICENSE
 %{_includedir}/mozjs-%{major}
 %{_libdir}/libmozjs-%{major}.so
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
@@ -125,9 +129,9 @@ PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../..
 %changelog
 * Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2)
-- Minor changelog formatting issues.
+- Fixing minor changelog formatting issues.
 - Adding the 'fix-soname.patch' fix using Fedora 34 (license: MIT) as guidance.
-- License verifed.
+- License verified.
 
 * Tue Apr 13 2021 Gerrit Photon <photon-checkins@vmware.com> - 78.10.0-1
 - Automatic Version Bump

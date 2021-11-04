@@ -4710,7 +4710,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mozjs78",
+          "name": "mozjs",
           "version": "78.10.0",
           "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/78.10.0esr/source/firefox-78.10.0esr.source.tar.xz"
         }
