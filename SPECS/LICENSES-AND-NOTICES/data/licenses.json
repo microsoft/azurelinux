@@ -626,7 +626,7 @@
                 "meson",
                 "mlocate",
                 "ModemManager",
-                "mozjs78",
+                "mozjs",
                 "mpfr",
                 "msr-tools",
                 "mysql",
