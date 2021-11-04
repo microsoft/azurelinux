@@ -4710,9 +4710,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mozjs60",
-          "version": "60.9.0",
-          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/60.9.0esr/source/firefox-60.9.0esr.source.tar.xz"
+          "name": "mozjs",
+          "version": "78.10.0",
+          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/78.10.0esr/source/firefox-78.10.0esr.source.tar.xz"
         }
       }
     },
@@ -5882,8 +5882,8 @@
         "type": "other",
         "other": {
           "name": "polkit",
-          "version": "0.116",
-          "downloadUrl": "https://www.freedesktop.org/software/polkit/releases/polkit-0.116.tar.gz"
+          "version": "0.119",
+          "downloadUrl": "https://www.freedesktop.org/software/polkit/releases/polkit-0.119.tar.gz"
         }
       }
     },

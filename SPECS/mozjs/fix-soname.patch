@@ -1,0 +1,26 @@
+From d21c7cb9343d8c495d987e71be0f35887574c820 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Wed, 15 Jul 2020 08:21:47 +0200
+Subject: [PATCH] Add soname switch to linker, regardless of Operating System
+
+Fix backported from Debian: http://bugs.debian.org/746705
+---
+ config/rules.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/config/rules.mk b/config/rules.mk
+index 3965c88..3f92f83 100644
+--- a/config/rules.mk
++++ b/config/rules.mk
+@@ -320,6 +320,8 @@ ifeq ($(OS_ARCH),GNU)
+ OS_CPPFLAGS += -DPATH_MAX=1024 -DMAXPATHLEN=1024
+ endif
+ 
++EXTRA_DSO_LDOPTS += -Wl,-soname,lib$(JS_LIBRARY_NAME).so.0
++
+ #
+ # MINGW32
+ #
+-- 
+2.26.2
+
