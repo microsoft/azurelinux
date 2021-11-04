@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	5%{?dist}
+Release:	6%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -56,6 +56,8 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Nov 02 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-6
+- Generate module_info.ld directory as needed.
 * Mon Aug 23 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-5
 - Add gen-ld-script.sh to generate ELF note metadata
 * Wed Jun 30 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-4

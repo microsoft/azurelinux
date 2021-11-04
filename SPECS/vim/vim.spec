@@ -1,16 +1,14 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3441
-Release:        2%{?dist}
+Version:        8.2.3564
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
-#Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-
+Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 
 %description
@@ -29,17 +27,14 @@ The vim extra package contains a extra files for powerful text editor.
 
 %prep
 %autosetup
-
 echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 
 %build
-
 %configure --enable-multibyte
-make VERBOSE=1 %{?_smp_mflags}
+%make_build
 
 %install
-#cd %{_builddir}/%{name}74
-make DESTDIR=%{buildroot} install
+%make_install
 ln -sv vim %{buildroot}%{_bindir}/vi
 install -vdm 755 %{buildroot}%{_sysconfdir}
 cat > %{buildroot}%{_sysconfdir}/vimrc << "EOF"
@@ -77,7 +72,7 @@ sed -i '916d' src/testdir/test_search.vim
 sed -i '454,594d' src/testdir/test_autocmd.vim
 sed -i '1,9d' src/testdir/test_modeline.vim
 sed -i '133d' ./src/testdir/Make_all.mak
-make test %{?_smp_mflags}
+%make_build test
 
 %post
 if ! sed -n -e '0,/[[:space:]]*call[[:space:]]\+system\>/p' %{_sysconfdir}/vimrc | \
@@ -176,10 +171,9 @@ fi
 
 %files
 %defattr(-,root,root)
-%license README.txt
+%license README.txt runtime/doc/uganda.txt
 %config(noreplace) %{_sysconfdir}/vimrc
 %{_datarootdir}/vim/vim*/syntax/syntax.vim
-%{_datarootdir}/vim/vim*/rgb.txt
 %{_datarootdir}/vim/vim*/colors/desert.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
@@ -195,6 +189,16 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-1
+- Upgrade to 8.2.3564 to fix CVE-2021-3903
+- Package actual license text
+- License verified
+- Remove rgb.txt from packaging- removed in patch level 3562
+- Use make macros
+
+* Tue Oct 26 2021 Chris Co <chrco@microsoft.com> - 8.2.3489-1
+- Fix CVE-2021-3875 and CVE-2021-3872 by updated to 8.2.3489
+
 * Tue Oct 05 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-2
 - Fix vim startup error.
 - vim-extra requires vim and fix for make check failure.

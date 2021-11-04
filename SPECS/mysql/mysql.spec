@@ -1,12 +1,13 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.26
-Release:        2%{?dist}
+Version:        8.0.27
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.mysql.com
+# Note that the community download page is here: https://dev.mysql.com/downloads/mysql/
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
 BuildRequires:  cmake
@@ -85,6 +86,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Sat Oct 30 2021 Jon Slobodzian <joslobo@microsoft.com> - 8.0.27-1
+- Upgrade to 8.0.27 to fix 36 CVEs
+
 * Mon Aug 30 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.26-2
 - Fix majority of package test failures by adding necessary requirements and running tests as non-root
 - Add missing tzdata runtime requirement
