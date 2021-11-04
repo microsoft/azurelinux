@@ -189,8 +189,6 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-<<<<<<< HEAD
-=======
 * Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-1
 - Upgrade to 8.2.3564 to fix CVE-2021-3903
 - Package actual license text
@@ -201,7 +199,6 @@ fi
 * Tue Oct 26 2021 Chris Co <chrco@microsoft.com> - 8.2.3489-1
 - Fix CVE-2021-3875 and CVE-2021-3872 by updated to 8.2.3489
 
->>>>>>> 8a11f88e... Upgrade vim to 8.2.3564 to fix CVE-2021-3903 (#1614)
 * Tue Oct 05 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-2
 - Fix vim startup error.
 - vim-extra requires vim and fix for make check failure.
