@@ -199,7 +199,7 @@ tdnf-plugin-repogpgcheck-2.1.0-7.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 libxml2-2.9.12-2.cm2.x86_64.rpm
 libxml2-devel-2.9.12-2.cm2.x86_64.rpm
-libsepol-3.2-1.cm2.x86_64.rpm
+libsepol-3.2-2.cm2.x86_64.rpm
 glib-2.60.1-5.cm2.x86_64.rpm
 libltdl-2.4.6-7.cm2.x86_64.rpm
 libltdl-devel-2.4.6-7.cm2.x86_64.rpm
