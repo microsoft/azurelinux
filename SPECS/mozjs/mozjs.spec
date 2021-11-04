@@ -94,13 +94,14 @@ ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 %check
 cd js/src
 
-%make_build test
-
+TEST_RESULT=0
 # Run SpiderMonkey tests
-PYTHONPATH=tests/lib python3 tests/jstests.py -d -s -t 1800 --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major}
+PYTHONPATH=tests/lib python3 tests/jstests.py -d -s -t 1800 --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major} || TEST_RESULT=$?
 
 # Run basic JIT tests
-PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic
+PYTHONPATH=tests/lib python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic || TEST_RESULT=$?
+
+exit $TEST_RESULT
 
 %post
 %ldconfig_scriptlets
