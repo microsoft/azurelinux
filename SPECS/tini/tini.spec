@@ -1,7 +1,7 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,13 +19,6 @@ All Tini does is spawn a single child (Tini is meant to be run in a container),
 and wait for it to exit all the while reaping zombies and performing signal
 forwarding.
 
-%package        static
-Summary:        Standalone static build of %{name}
-
-%description    static
-This package contains a standalone static build of %{name}, meant to be used
-inside a container.
-
 %prep
 %autosetup
 # Do not strip binaries
@@ -38,18 +31,17 @@ mkdir build && cd build
 
 %install
 %make_install -C build
+rm -f %{buildroot}/%{_bindir}/tini-static
 
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/tini
 
-%files static
-%license LICENSE
-%doc README.md
-%{_bindir}/tini-static
-
 %changelog
+* Thu Nov 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.19.0-5
+- Removed static tini package
+
 * Wed Aug 18 2021 Tom Fay <tomfay@microsoft.com> - 0.19.0-4
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - License verified

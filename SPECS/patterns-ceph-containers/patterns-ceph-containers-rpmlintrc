@@ -1,8 +1,0 @@
-addFilter("W: no-binary");
-addFilter("W: unexpanded-macro.*pattern-category");
-addFilter("W: explicit-lib-dependency");
-addFilter("W: devel-package-with-non-devel-group");
-addFilter("W: conflicts-with-provides");
-addFilter("W: description-shorter-than-summary");
-addFilter("W: suse-branding-specific-branding-req");
-addFilter("W: useless-provides");

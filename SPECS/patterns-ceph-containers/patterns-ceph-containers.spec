@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Metapackages
 URL:            http://en.opensuse.org/Patterns
-Source0:        %{name}-rpmlintrc
 ExclusiveArch:  x86_64 aarch64 ppc64le s390x
 
 %description
@@ -33,7 +32,7 @@ Requires:       ceph-mgr
 Requires:       ceph-mgr-cephadm
 Requires:       ceph-mgr-dashboard
 Requires:       ceph-mgr-rook
-#Temporarily commenting out dependency to allow package to build
+#Package currently not supported in mariner, keeping dependency for future reference.
 #Requires:      ceph-mgr-diskprediction-local
 Requires:       ceph-mon
 Requires:       ceph-osd
@@ -44,7 +43,7 @@ Requires:       e2fsprogs
 Requires:       gptfdisk
 Requires:       kmod
 Requires:       lvm2
-#Temporarily commenting out dependency to allow package to build
+#Package currently not supported in mariner, keeping dependency for future reference.
 #Requires: ceph-iscsi
 Requires:       rbd-mirror
 Requires:       rbd-nbd
@@ -58,20 +57,14 @@ This provides the base for the Ceph, Rook, Ceph CSI driver packages and containe
 %build
 # empty on purpose
 
-%install
-mkdir -p %{buildroot}%{_docdir}/packages/patterns-ceph-containers/
-echo 'This file marks the pattern ceph-base to be installed.' >%{buildroot}%{_docdir}/packages/patterns-ceph-containers/ceph_base.txt
-
 %files ceph_base
-%defattr(-,root,root)
-%dir %{_docdir}/packages/patterns-ceph-containers
-%{_docdir}/packages/patterns-ceph-containers/ceph_base.txt
 
 %changelog
 * Mon Oct 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Modified installation path 
+- Removed unused source file
 
 * Mon Feb  1 2021 Nathan Cutler <ncutler@suse.com>
 - Drop all nfs-ganesha packages from ceph-base:

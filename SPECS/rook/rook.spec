@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,6 @@ Group:          System/Filesystems
 URL:            https://rook.io/
 #Source0:       https://github.com/rook/rook/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -45,6 +44,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source98:       README
 Source99:       update-tarball.sh
 # When possible, a patch is preferred over link-time overrides because the patch will fail if the
@@ -117,30 +117,6 @@ solutions to integrate with cloud-native environments.
 This package contains Helm Charts for Rook.
 
 ################################################################################
-# Rook integration test binary metadata
-################################################################################
-%package integration
-Summary:        Application which runs Rook integration tests
-Group:          System/Benchmark
-
-%description integration
-This package is intended to be used only for testing. Please don't install it
-in production environments.
-
-Rook's integration tests conveniently get built into a standalone binary. The
-tests require a running Kubernetes cluster, and the image being tested must be
-pushed to all Kubernetes cluster nodes as 'rook/ceph:master'. They also require
-that 'kubectl' works without additional connection arguments from the system
-which will run the binary. The integration tests can be flaky and are best run
-on a Kubernetes cluster which has not previously run the integration tests.
-
-The list of possible integration test suites can be gotten from the integration
-binary with the argument [-test.list '.*']. A subset of test suites can be run
-by specifying a regular expression (or a specific test suite name) as an
-argument to [-test.run]. All Ceph test suites can be run with the argument
-[-test.run 'TestCeph'].
-
-################################################################################
 # Build section
 ################################################################################
 %define _buildshell /bin/bash
@@ -149,32 +125,7 @@ argument to [-test.run]. All Ceph test suites can be run with the argument
 %autosetup -p1
 tar -xf %{SOURCE1} --no-same-owner
 
-# Replace default registry and paths in all required files
-#%%define spec_go pkg/operator/ceph/csi/spec.go
-#%%define values_yaml cluster/charts/rook-ceph/values.yaml
-#%%define operator_yaml cluster/examples/kubernetes/ceph/operator.yaml
-#for file in %{spec_go} %%{values_yaml} %%{operator_yaml}; do
-#sed -i -e "s|\(.*\)quay.io.*\/\(.*\)|\1%%{registry}/cephcsi/\2|" $file
-#sed -i -e "s|\(.*\)k8s.gcr.io.*\/\(.*\)|\1%%{registry}/cephcsi/\2|" $file
-#done
-#sed -i -e "s|\(.*\)repository: rook\(.*\)|\1repository: %%{registry}/rook\2|" %%{values_yaml}
-
 %build
-# Setup images and versions for use in linker flags
-#%%define spec_go pkg/operator/ceph/csi/spec.go
-#ceph_csi_image=$(sed -ne "s|.*DefaultCSIPluginImage.*= \"\(.*cephcsi:.*\)\"|\1|p" %%{spec_go})
-#csi_reg_image=$(sed -ne "s|.*DefaultRegistrarImage.*= \"\(.*registrar:.*\)\"|\1|p" %%{spec_go})
-#csi_prov_image=$(sed -ne "s|.*DefaultProvisionerImage.*= \"\(.*provisioner:.*\)\"|\1|p" %%{spec_go})
-#csi_attach_image=$(sed -ne "s|.*DefaultAttacherImage.* \"\(.*attacher:.*\)\"|\1|p" %%{spec_go})
-#csi_snap_image=$(sed -ne "s|.*DefaultSnapshotterImage.* \"\(.*snapshotter:.*\)\"|\1|p" %%{spec_go})
-#csi_resize_image=$(sed -ne "s|.*DefaultResizerImage.* \"\(.*resizer:.*\)\"|\1|p" %%{spec_go})
-#  16.2.4.26 is replaced at build time by _service
-#  rook_container_version is updated by update-tarball.sh:
-#%%global rook_container_version 1.6.2
-#%%global rook_image       %%{registry}/rook/ceph:%%{rook_container_version}
-#%%global ceph_image       %%{registry}/ceph/ceph:16.2.4.26
-#%%global ceph_csi_image   $ceph_csi_image
-
 # remove symbols unsupported by k8s (+) from version
 version_full=%{version}
 version_noplus="${version_full//[+]/_}"
@@ -190,33 +141,13 @@ for cmd in cmd/* ; do
   go build "${build_flags[@]}" -o $(basename $cmd) ./$cmd
 done
 
-%check
-# BUILDING TEST BINARIES, NOTES:
-# Building test binaries works differently than main binaries; test binaries are built by 'go test',
-#     not 'go build' or 'go install'.
-# Spec build tooling provides 'gotest', but it expects to run the tests, which we cannot do with
-#     the integration tests at build time, so we run this manually. This may be fragile.
-# To compile but not run test binaries, we don't need the build flags needed by main binaries, but
-#     we do need: -c (compile test binary) and -o=<output-location> (output file)
-# 'goprep' does not set GOTPATH or GOBIN despite what the documentation might say; that is set in
-#     'gobuild', so we need to set it for our manual run of 'go test'.
-# Because this is a test binary which we SHOULD NOT ship to customers, we shouldn't need to follow
-#     every single go build best practice, and we don't need to worry about this becoming too out of
-#     date. We can specify some important flags for debugging bad builds:
-#         -v (orint package names), -x (print commands)]
-#    and flags to get rid of RPMLINT report warnings/errors:
-#         -buildmode=pie (position-independent executable)
-GOPATH=%{_builddir}/go GOBIN="${GOPATH}"/bin \
-    go test -v -x -buildmode=pie -c -mod=vendor\
-        -o rook-integration ./tests/integration
-
 %install
 rook_bin_location=$PWD/
 install_location=%{buildroot}%{_bindir}
 
 install --mode=755 --directory "${install_location}"
 
-for binary in rook rookflex rook-integration; do
+for binary in rook rookflex ; do
     install --preserve-timestamps --mode=755 \
         --target-directory="${install_location}" \
         "${rook_bin_location}"/"${binary}"
@@ -259,12 +190,6 @@ if [[ ! "$bin_version" =~ "$version" ]]; then
     exit 1
 fi
 
-# Check Ceph CSI default image is set
-if grep -q --binary --text quay.io "$rook_bin"; then
-    echo "Default CSI image was not set!"
-    exit 1
-fi
-
 ################################################################################
 # Update manifests with images coming from Build Service
 ################################################################################
@@ -283,14 +208,6 @@ cp -pr %{buildroot}%{_datadir}/k8s-yaml/rook/ceph/*  %{buildroot}%{_datadir}/%{n
 sed -i -e "/apiVersion/a appVersion: v%{helm_appVersion}" %{chart_yaml}
 sed -i -e "s|\(version: \).*|\1%{helm_version}|" %{chart_yaml}
 sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
-
-# For the integration test tooling, store files with the current Rook and Ceph image names
-# These files can be cat'ed to get these without needing to do special processing
-#%define rook_integration_dir %{buildroot}%{_datadir}/rook-integration
-#mkdir -p %{rook_integration_dir}
-#echo -n %{rook_image}     > %{rook_integration_dir}/rook-image-name
-#echo -n %{ceph_image}     > %{rook_integration_dir}/ceph-image-name
-#echo -n %{ceph_csi_image} > %{rook_integration_dir}/ceph-csi-image-name
 
 ################################################################################
 # Specify which files we built belong to each package
@@ -323,13 +240,6 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 %doc %{_datadir}/%{name}-ceph-helm-charts/operator/README.md
 %{_datadir}/%{name}-ceph-helm-charts
 
-%files integration
-# integration test binary
-%{_bindir}/rook-integration
-# integration test helper files
-%dir %{_datarootdir}/rook-integration
-%{_datadir}/rook-integration
-
 ################################################################################
 # Finalize
 ################################################################################
@@ -338,10 +248,12 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
-* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-2
+* Wed Sep 22 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.6.2-1
 - Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Remove unused/un-supported macro usage
+- Remove opensuse specific csi build flags
+- Remove integration test binaries and package
 
 * Fri May  7 2021 Stefan Haas <stefan.haas@suse.com>
 - Update to v1.6.2
