@@ -27,6 +27,9 @@ BuildRequires: llvm-devel
 BuildRequires: icu-devel
 BuildRequires: rust
 BuildRequires: autoconf213
+%if %{with_check}
+BuildRequires: python3-six
+%endif
 Requires:      icu
 Requires:      python3
 Requires:      python3-libs
@@ -48,10 +51,12 @@ Requires:      %{name} = %{version}-%{release}
 This contains development tools and libraries for SpiderMonkey.
 
 %prep
-%autosetup -p1 -n firefox-%{version}/js/src
+%autosetup -p1 -n firefox-%{version}
 rm -rf modules/zlib
 
 %build
+cd js/src
+
 %configure \
     --with-system-icu \
     --enable-readline \
@@ -65,6 +70,8 @@ rm -rf modules/zlib
 %make_build
 
 %install
+cd js/src
+
 %make_install
 chmod -x %{buildroot}%{_libdir}/pkgconfig/*.pc
 # remove non required files
@@ -79,9 +86,14 @@ ln -s libmozjs-%{major}.so.0.0.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so.0
 ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 
 %check
+cd js/src
+
 %make_build test
 
+# Run SpiderMonkey tests
 PYTHONPATH=tests/lib %{__python3} tests/jstests.py -d -s -t 1800 --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major}
+
+# Run basic JIT tests
 PYTHONPATH=tests/lib %{__python3} jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/dist/bin/js%{major} basic
 
 %post
@@ -103,12 +115,6 @@ PYTHONPATH=tests/lib %{__python3} jit-test/jit_test.py -s -t 1800 --no-progress 
 %{_includedir}/mozjs-%{major}
 %{_libdir}/libmozjs-%{major}.so
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
-
-%check
-# Run SpiderMonkey tests
-python3 tests/jstests.py -d -s -t 1800 --no-progress ../../js/src/js/src/shell/js
-# Run basic JIT tests
-python3 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/js basic
 
 %changelog
 * Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
