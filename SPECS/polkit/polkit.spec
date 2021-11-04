@@ -113,7 +113,6 @@ fi
 -   Bump to polkit 0.119.
 -   Switching a BR to CBL-Mariner's "mozjs" from "mozjs[version]".
 -   Disabling tests due to their dependency on "dbus".
--   License verified.
 
 *   Thu Jun 03 2021 Andrew Phelps <anphel@microsoft.com> - 0.116-5
 -   Enable check tests (with exception of unsupported "polkitbackend" tests)
