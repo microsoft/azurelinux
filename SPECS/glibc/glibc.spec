@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,11 +39,16 @@ Patch13:        CVE-2019-19126.patch
 Patch14:        CVE-2019-25013.patch
 Patch15:        CVE-2021-3326.patch
 Patch16:        CVE-2020-27618.patch
+
+BuildRequires:  perl(File::Find)
+
 Requires:       filesystem
+
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
 Provides:       nss_db = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
+
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -305,6 +310,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.28-20
+- Adding missing BR on "perl(File::Find)".
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
 - Adding 'Provides' for 'nss_db'.
 
