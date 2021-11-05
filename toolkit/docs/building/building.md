@@ -494,11 +494,11 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 ##### `REFRESH_WORKER_CHROOT=`**`n`**
 
-> If exists, don't attempt to rebuild the worker chroot, even if the its build script, its manifest, or the packages it consists of have been modified in the local repository.
+> If exists, don't attempt to rebuild the worker chroot, even if its build script, its manifest, or the packages it consists of have been modified in the local repository.
 
 ##### `REFRESH_WORKER_CHROOT=`**`y`** *(default)*
 
-> Rebuild the worker chroot every time at least one of the following has changes:
+> Rebuild the worker chroot every time at least one of the following has changed:
 >
 > - worker chroot's manifest file,
 > - at least one of the RPM packages mentioned in the manifest file, or
