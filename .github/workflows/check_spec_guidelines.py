@@ -1,4 +1,4 @@
-from pyrpm.spec import Spec, replace_macros
+from pyrpm.spec import Spec
 
 import argparse
 import re
@@ -11,16 +11,16 @@ valid_release_tag_regex = re.compile(
     r'^([1-9]\d*|%\{release_number\})%\{\?dist\}$')
 
 valid_source_attributions = [
-    r'Original version for CBL-Mariner',
-    r'Initial CBL-Mariner import from Azure',
-    r'Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)',
-    r'Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)',
-    r'Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)',
-    r'Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)',
-    r'Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)',
-    r'Initial CBL-Mariner import from OpenMamba',
-    r'Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)',
-    r'Initial CBL-Mariner import from Photon \(license: Apache2\)'
+    r'\n-\s+Original version for CBL-Mariner( \(license: MIT\))?(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from Azure( \(license: MIT\))?(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
+    r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
 ]
 
 valid_source_attributions_regex = [ re.compile(x) for x in valid_source_attributions ]
@@ -82,7 +82,7 @@ def check_source_attribution(spec_path: str):
             return True
 
     print(f"""
-ERROR: no source attribution.
+ERROR: no valid source attribution.
 
     Make sure to indicate the origin of the spec file in the changelog.
     Currently supported source attributions (in form of regular expressions):

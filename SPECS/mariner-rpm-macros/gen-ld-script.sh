@@ -37,4 +37,10 @@ esac
    --name "$1" \
    --version "$2" \
    --moduleVersion "$MODULEVERSION" \
-   --stamp "LinkerOnly"
+   --stamp "LinkerOnly" \
+   --outdir "/usr/src/mariner/BUILD/"
+
+
+# Verify if .note.package is properly included in a binary
+# /usr/lib/rpm/mariner/verify-package-notes.sh <input_binary> <input_note_section_binary> .note.package
+

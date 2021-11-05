@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -162,6 +162,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-5
+- Make pam_loginuid use optional for systems that don't have audit.
+- License verified.
+
 * Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-4
 - Adding missing BR for "libxslt".
 - Removing not built man pages.

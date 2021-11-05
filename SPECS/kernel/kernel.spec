@@ -219,6 +219,7 @@ Patch1181:      CVE-2021-42252.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  dwarves
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
@@ -566,8 +567,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
-* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-2
+* Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-3
 - Update configs for gcc 11.2.0 and binutils 2.37 updates
+
+* Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
+- Update configs for eBPF support
+- Add dwarves Build-requires
 
 * Tue Oct 19 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-1
 - Update source to 5.10.74.1

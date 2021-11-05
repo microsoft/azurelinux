@@ -30,6 +30,8 @@ cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RP
 cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
 # Coreutils aarch64 patch
 cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
+# Binutils readonly patch
+cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022
@@ -76,6 +78,7 @@ rm -vf ./container/04-fix-sigstksz.patch
 rm -vf ./container/m4-1.4.18-glibc-change-work-around.patch
 rm -vf ./container/coreutils-fix-get-sys_getdents-aarch64.patch
 rm -vf ./container/cpio_extern_nocommon.patch
+rm -vf ./container/linker-script-readonly-keyword-support.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 
