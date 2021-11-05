@@ -1,28 +1,27 @@
-Summary:       A toolkit for defining and handling authorizations.
-Name:          polkit
-Version:       0.116
-Release:       5%{?dist}
-Group:         Applications/System
-Vendor:        Microsoft Corporation
-License:       LGPLv2+
-URL:           https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
-Source0:       https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
-Patch0:        CVE-2021-3560.patch
-Distribution:  Mariner
-BuildRequires: autoconf
-BuildRequires: expat-devel
-BuildRequires: glib-devel
-BuildRequires: gobject-introspection
-BuildRequires: intltool >= 0.40.0
-BuildRequires: mozjs60-devel
-BuildRequires: pam-devel
-BuildRequires: systemd-devel
-Requires:      expat
-Requires:      glib
-Requires:      mozjs60
-Requires:      pam
-Requires:      systemd
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
+Summary:           A toolkit for defining and handling authorizations.
+Name:              polkit
+Version:           0.119
+Release:           1%{?dist}
+Group:             Applications/System
+Vendor:            Microsoft Corporation
+License:           GPLv2+
+URL:               https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
+Source0:           https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
+Distribution:      Mariner
+BuildRequires:     autoconf
+BuildRequires:     expat-devel
+BuildRequires:     glib-devel
+BuildRequires:     gobject-introspection
+BuildRequires:     intltool >= 0.40.0
+BuildRequires:     mozjs-devel >= 78.3.1
+BuildRequires:     pam-devel
+BuildRequires:     systemd-devel
+Requires:          mozjs
+Requires:          expat
+Requires:          glib
+Requires:          pam
+Requires:          systemd
+Requires(pre):     /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):  /usr/sbin/userdel /usr/sbin/groupdel
 
 %description
@@ -30,19 +29,16 @@ polkit provides an authorization API intended to be used by privileged programs
 (“MECHANISMS”) offering service to unprivileged programs (“SUBJECTS”) often
 through some form of inter-process communication mechanism
 
-%package devel
-Summary: polkit development headers and libraries
-Group: Development/Libraries
-Requires: polkit = %{version}-%{release}
+%package           devel
+Summary:           polkit development headers and libraries
+Group:             Development/Libraries
+Requires:          polkit = %{version}-%{release}
 
-%description devel
+%description       devel
 header files and libraries for polkit
 
 %prep
-%autosetup -p1
-# Disable polkitbackend tests, which fail since dbus is not available in the worker chroot
-sed -i 's/polkitbackend//g' test/Makefile.am
-sed -i 's/polkitbackend//g' test/Makefile.in
+%setup -q
 
 %build
 %configure \
@@ -67,7 +63,7 @@ session  include        system-session
 EOF
 
 %check
-make check
+# Disable check. It requires dbus - not available in chroot/container.
 
 %pre
 getent group polkitd > /dev/null || groupadd -fg 27 polkitd &&
@@ -92,7 +88,6 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/pk*
 %{_libdir}/lib%{name}-*.so.*
 %{_libdir}/polkit-1/polkit-agent-helper-1
@@ -101,9 +96,10 @@ fi
 %{_datarootdir}/dbus-1/system-services/org.freedesktop.PolicyKit1.service
 %{_datarootdir}/locale/*
 %{_datarootdir}/polkit-1/actions/*.policy
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.PolicyKit1.conf
+%{_datadir}/dbus-1/system.d/org.freedesktop.PolicyKit1.conf
 %{_sysconfdir}/pam.d/polkit-1
 %{_sysconfdir}/polkit-1/rules.d/50-default.rules
+%{_datadir}/gettext/its
 
 %files devel
 %defattr(-,root,root)
@@ -111,10 +107,13 @@ fi
 %{_libdir}/lib%{name}-*.a
 %{_libdir}/lib%{name}-*.so
 %{_libdir}/pkgconfig/*.pc
-%{_datadir}/gettext/its/polkit.its
-%{_datadir}/gettext/its/polkit.loc
 
 %changelog
+*   Wed Nov 03 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.119-1
+-   Bump to polkit 0.119.
+-   Switching a BR to CBL-Mariner's "mozjs" from "mozjs[version]".
+-   Disabling tests due to their dependency on "dbus".
+
 *   Thu Jun 03 2021 Andrew Phelps <anphel@microsoft.com> - 0.116-5
 -   Enable check tests (with exception of unsupported "polkitbackend" tests)
 

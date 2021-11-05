@@ -1,15 +1,20 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsepol
 Version:        3.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
-Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/SELinuxProject/selinux/archive/refs/tags/%{version}.tar.gz#/selinux-%{version}.tar.gz
+
 %if %{with_check}
-BuildRequires:  cunit-devel
+BuildRequires:  bison
+BuildRequires:  CUnit-devel
+BuildRequires:  flex
+BuildRequires:  flex-devel
+BuildRequires:  gcc
 %endif
 
 %description
@@ -39,7 +44,7 @@ The libsepol-devel package contains the libraries and header files
 needed for developing applications that manipulate binary policies.
 
 %prep
-%autosetup
+%autosetup -n selinux-%{version}/%{name}
 sed  -i 's/int rc;/int rc = SEPOL_OK;/' ./cil/src/cil_binary.c
 
 %build
@@ -47,10 +52,9 @@ sed  -i 's/int rc;/int rc = SEPOL_OK;/' ./cil/src/cil_binary.c
 %make_build CFLAGS="%{build_cflags} -fno-semantic-interposition"
 
 %install
-mkdir -p %{buildroot}/%{_lib}
-mkdir -p %{buildroot}/%{_libdir}
-mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_includedir}
+mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_mandir}/man3
 mkdir -p %{buildroot}%{_mandir}/man8
 
@@ -63,6 +67,12 @@ rm -rf %{buildroot}%{_mandir}/man8
 rm -rf %{buildroot}%{_mandir}/ru/man8
 
 %check
+# Tests require the "checkpolicy" project to be built as well. That in turn requires "libsepol-devel".
+%make_install DESTDIR=/ LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}"
+pushd ../checkpolicy
+%make_build CFLAGS="%{build_cflags} -fno-semantic-interposition"
+popd
+
 %make_build test
 
 %post
@@ -90,6 +100,10 @@ exit 0
 %{_mandir}/man3/*.3.gz
 
 %changelog
+* Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 3.2-2
+- Fixing BR on "CUnit-devel".
+- Switching to source tarball for full SELinux project to include test dependencies.
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream and update source URL format
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
