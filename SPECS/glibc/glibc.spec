@@ -42,7 +42,7 @@ Patch17:        CVE-2021-35942.patch
 # CVE-2021-33574 is composed of two changes.  The original CVE fix -0001 for GLIBC 2.32 and a backport fix for GLIBC 2.28 -0002
 Patch18:        CVE-2021-33574-0001.patch
 Patch19:        CVE-2021-33574-0002.patch
-# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. 
+# CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE.
 Patch20:        CVE-2021-38604.patch
 # pthread_cond_signal failed to wake up pthread_cond_wait
 # Bug reference: https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/1899800
