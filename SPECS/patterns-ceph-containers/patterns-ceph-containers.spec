@@ -61,9 +61,9 @@ This provides the base for the Ceph, Rook, Ceph CSI driver packages and containe
 
 %changelog
 * Mon Oct 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
-- Modified installation path 
+- Modified installation path
 - Removed unused source file
 
 * Mon Feb  1 2021 Nathan Cutler <ncutler@suse.com>
