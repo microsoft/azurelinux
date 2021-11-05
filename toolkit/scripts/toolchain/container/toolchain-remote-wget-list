@@ -36,11 +36,11 @@ https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
 http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
-http://ftp.gnu.org/gnu/tar/tar-1.30.tar.xz
+https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
 http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
 https://www.cpan.org/src/5.0/perl-5.30.3.tar.gz
 http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz
-https://ftp.gnu.org/gnu/bison/bison-3.1.tar.xz
+https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz
 https://sourceware.org/pub/bzip2/bzip2-1.0.6.tar.gz
 http://www.linuxfromscratch.org/patches/downloads/bzip2/bzip2-1.0.6-install_docs-1.patch
 https://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz
@@ -50,7 +50,7 @@ https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.b
 ftp://ftp.astron.com/pub/file/file-5.34.tar.gz
 http://ftp.gnu.org/gnu/gawk/gawk-4.2.1.tar.xz
 http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz
-http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz
+https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz
 http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz
 https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.tar.xz
@@ -62,7 +62,7 @@ https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.
 https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.028.tar.gz
 https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.51.tar.gz
 https://www.openssl.org/source/openssl-1.1.1g.tar.gz
-http://ftp.gnu.org/gnu/sed/sed-4.5.tar.xz
+https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz
 https://www.sqlite.org/2020/sqlite-autoconf-3320100.tar.gz
 https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.2.tar.xz
 https://www.x.org/pub/individual/lib/xtrans-1.3.5.tar.bz2

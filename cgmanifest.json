@@ -416,8 +416,8 @@
         "type": "other",
         "other": {
           "name": "bison",
-          "version": "3.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/bison/bison-3.1.tar.xz"
+          "version": "3.7.6",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz"
         }
       }
     },
@@ -2139,8 +2139,8 @@
         "type": "other",
         "other": {
           "name": "grep",
-          "version": "3.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/grep/grep-3.1.tar.xz"
+          "version": "3.7",
+          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
         }
       }
     },
@@ -8462,8 +8462,8 @@
         "type": "other",
         "other": {
           "name": "sed",
-          "version": "4.5",
-          "downloadUrl": "http://ftp.gnu.org/gnu/sed/sed-4.5.tar.xz"
+          "version": "4.8",
+          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz"
         }
       }
     },
@@ -8763,8 +8763,8 @@
         "type": "other",
         "other": {
           "name": "tar",
-          "version": "1.32",
-          "downloadUrl": "https://ftp.gnu.org/gnu/tar/tar-1.32.tar.xz"
+          "version": "1.34",
+          "downloadUrl": "https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz"
         }
       }
     },

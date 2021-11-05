@@ -499,32 +499,27 @@ popd
 rm -rf libcap-2.26
 touch /logs/status_libcap_complete
 
-echo Sed-4.5
-tar xf sed-4.5.tar.xz
-pushd sed-4.5
-sed -i 's/usr/tools/'                 build-aux/help2man
-sed -i 's/testsuite.panic-tests.sh//' Makefile.in
+echo Sed-4.8
+tar xf sed-4.8.tar.xz
+pushd sed-4.8
 ./configure --prefix=/usr --bindir=/bin
 make -j$(nproc)
-make html
 make install
-install -d -m755           /usr/share/doc/sed-4.5
-install -m644 doc/sed.html /usr/share/doc/sed-4.5
 popd
-rm -rf sed-4.5
+rm -rf sed-4.8
 touch /logs/status_sed_complete
 
-echo Bison-3.1
-tar xf bison-3.1.tar.xz
-pushd bison-3.1
-sed -i '6855 s/mv/cp/' Makefile.in
-./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.1
+echo Bison-3.7.6
+tar xf bison-3.7.6.tar.xz
+pushd bison-3.7.6
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.7.6
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-make -j1
+# try parallel make with new version
+make -j$(nproc)
 make install
 popd
-rm -rf bison-3.1
+rm -rf bison-3.7.6
 touch /logs/status_bison_complete
 
 echo Flex-2.6.4
@@ -540,14 +535,14 @@ popd
 rm -rf flex-2.6.4
 touch /logs/status_flex_complete
 
-echo Grep-3.1
-tar xf grep-3.1.tar.xz
-pushd grep-3.1
+echo Grep-3.7
+tar xf grep-3.7.tar.xz
+pushd grep-3.7
 ./configure --prefix=/usr --bindir=/bin
 make -j$(nproc)
 make install
 popd
-rm -rf grep-3.1
+rm -rf grep-3.7
 touch /logs/status_grep_complete
 
 echo Bash-4.4.18
@@ -937,17 +932,16 @@ popd
 rm -rf man-db-2.8.4
 touch /logs/status_man_db_complete
 
-echo Tar-1.30
-tar xf tar-1.30.tar.xz
-pushd tar-1.30
+echo Tar-1.34
+tar xf tar-1.34.tar.xz
+pushd tar-1.34
 FORCE_UNSAFE_CONFIGURE=1  \
 ./configure --prefix=/usr \
             --bindir=/bin
 make -j$(nproc)
 make install
-make -C doc install-html docdir=/usr/share/doc/tar-1.30
 popd
-rm -rf tar-1.30
+rm -rf tar-1.34
 touch /logs/status_tar_complete
 
 echo Texinfo-6.8

@@ -393,16 +393,17 @@ rm -rf bash-4.4.18
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
-echo Bison-3.1
-tar xf bison-3.1.tar.xz
-pushd bison-3.1
+echo Bison-3.7.6
+tar xf bison-3.7.6.tar.xz
+pushd bison-3.7.6
 ./configure --prefix=/tools
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-make -j1
+# try parallel make with new version
+make -j$(nproc)
 make install
 popd
-rm -rf bison-3.1
+rm -rf bison-3.7.6
 
 touch $LFS/logs/temptoolchain/status_bison_complete
 
@@ -487,14 +488,14 @@ rm -rf gettext-0.19.8.1
 
 touch $LFS/logs/temptoolchain/status_gettext_complete
 
-echo Grep-3.1
-tar xf grep-3.1.tar.xz
-pushd grep-3.1
+echo Grep-3.7
+tar xf grep-3.7.tar.xz
+pushd grep-3.7
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf grep-3.1
+rm -rf grep-3.7
 
 touch $LFS/logs/temptoolchain/status_grep_complete
 
@@ -558,25 +559,25 @@ rm -rf Python-3.7.4
 
 touch $LFS/logs/temptoolchain/status_python_complete
 
-echo Sed-4.5
-tar xf sed-4.5.tar.xz
-pushd sed-4.5
+echo Sed-4.8
+tar xf sed-4.8.tar.xz
+pushd sed-4.8
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf sed-4.5
+rm -rf sed-4.8
 
 touch $LFS/logs/temptoolchain/status_sed_complete
 
-echo Tar-1.30
-tar xf tar-1.30.tar.xz
-pushd tar-1.30
+echo Tar-1.34
+tar xf tar-1.34.tar.xz
+pushd tar-1.34
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf tar-1.30
+rm -rf tar-1.34
 
 touch $LFS/logs/temptoolchain/status_tar_complete
 
