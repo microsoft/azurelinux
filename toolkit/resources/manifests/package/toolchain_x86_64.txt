@@ -206,9 +206,9 @@ libselinux-debuginfo-3.2-1.cm2.x86_64.rpm
 libselinux-devel-3.2-1.cm2.x86_64.rpm
 libselinux-python3-3.2-1.cm2.x86_64.rpm
 libselinux-utils-3.2-1.cm2.x86_64.rpm
-libsepol-3.2-1.cm2.x86_64.rpm
-libsepol-debuginfo-3.2-1.cm2.x86_64.rpm
-libsepol-devel-3.2-1.cm2.x86_64.rpm
+libsepol-3.2-2.cm2.x86_64.rpm
+libsepol-debuginfo-3.2-2.cm2.x86_64.rpm
+libsepol-devel-3.2-2.cm2.x86_64.rpm
 libsolv-0.7.19-1.cm2.x86_64.rpm
 libsolv-debuginfo-0.7.19-1.cm2.x86_64.rpm
 libsolv-devel-0.7.19-1.cm2.x86_64.rpm
@@ -244,7 +244,7 @@ m4-1.4.18-5.cm2.x86_64.rpm
 m4-debuginfo-1.4.18-5.cm2.x86_64.rpm
 make-4.2.1-6.cm2.x86_64.rpm
 make-debuginfo-4.2.1-6.cm2.x86_64.rpm
-mariner-check-macros-2.0-6.cm2.noarch.rpm
+mariner-check-macros-2.0-7.cm2.noarch.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
 mariner-repos-2.0-1.cm2.noarch.rpm
 mariner-repos-extras-2.0-1.cm2.noarch.rpm
@@ -254,7 +254,7 @@ mariner-repos-microsoft-preview-2.0-1.cm2.noarch.rpm
 mariner-repos-preview-2.0-1.cm2.noarch.rpm
 mariner-repos-ui-2.0-1.cm2.noarch.rpm
 mariner-repos-ui-preview-2.0-1.cm2.noarch.rpm
-mariner-rpm-macros-2.0-6.cm2.noarch.rpm
+mariner-rpm-macros-2.0-7.cm2.noarch.rpm
 meson-0.57.1-2.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.x86_64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.x86_64.rpm

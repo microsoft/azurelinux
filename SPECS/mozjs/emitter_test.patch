@@ -1,0 +1,31 @@
+diff --git a/python/mozbuild/mozbuild/test/frontend/test_emitter.py b/python/mozbuild/mozbuild/test/frontend/test_emitter.py
+index e8cbd81d41..d45ccee50a 100644
+--- a/python/mozbuild/mozbuild/test/frontend/test_emitter.py
++++ b/python/mozbuild/mozbuild/test/frontend/test_emitter.py
+@@ -1040,26 +1040,6 @@ class TestEmitterBasic(unittest.TestCase):
+ 
+         self.assertEqual(local_includes, expected)
+ 
+-    def test_local_includes_invalid(self):
+-        """Test that invalid LOCAL_INCLUDES are properly detected."""
+-        reader = self.reader('local_includes-invalid/srcdir')
+-
+-        with six.assertRaisesRegex(
+-                self,
+-                SandboxValidationError,
+-                'Path specified in LOCAL_INCLUDES.*resolves to the '
+-                'topsrcdir or topobjdir'):
+-            self.read_topsrcdir(reader)
+-
+-        reader = self.reader('local_includes-invalid/objdir')
+-
+-        with six.assertRaisesRegex(
+-                self,
+-                SandboxValidationError,
+-                'Path specified in LOCAL_INCLUDES.*resolves to the '
+-                'topsrcdir or topobjdir'):
+-            self.read_topsrcdir(reader)
+-
+     def test_local_includes_file(self):
+         """Test that a filename can't be used in LOCAL_INCLUDES."""
+         reader = self.reader('local_includes-filename')
