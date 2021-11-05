@@ -6,7 +6,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,13 @@ Patch18:        CVE-2021-33574-0001.patch
 Patch19:        CVE-2021-33574-0002.patch
 # CVE-2021-38604 is as issues introduced with the original CVE-2021-33574 CVE. 
 Patch20:        CVE-2021-38604.patch
+# pthread_cond_signal failed to wake up pthread_cond_wait
+# Bug reference: https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/1899800
+# https://bugzilla.redhat.com/show_bug.cgi?id=1889892
+# https://github.com/dotnet/runtime/issues/47700
+# Patch path for reference:
+# https://sourceware.org/bugzilla/attachment.cgi?id=12484&action=diff&collapsed=&headers=1&format=raw
+Patch21:        glibc-2.28_pthread_cond_wait.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -315,6 +322,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Nov 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.28-21
+- Patch for glibc pthread_cond_signal failed to wake up pthread_cond_wait issue.
+
 * Mon Sep 06 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.28-20
 - Patch CVE-2021-33574 and nopatch CVE-2021-38604.
 
