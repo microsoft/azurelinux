@@ -127,7 +127,7 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
-* Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-1
+* Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-1
 - Update version to 2.37
 - Update export-demangle-header.patch
 
