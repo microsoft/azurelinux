@@ -39,6 +39,7 @@ Patch11:        CVE-2018-20796.nopatch
 #Patch14:        CVE-2019-25013.patch
 #Patch15:        CVE-2021-3326.patch
 #Patch16:        CVE-2020-27618.patch
+Patch17:        glibc-2.34_pthread_cond_wait.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
