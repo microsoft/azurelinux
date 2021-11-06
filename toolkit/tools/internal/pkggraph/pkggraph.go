@@ -1158,9 +1158,21 @@ func (g *PkgGraph) MakeDAG() (err error) {
 	}
 }
 
-// fixCycle attempts to fix a cycle. Cycles may be acceptable if all nodes are from the same spec file.
-// If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
+// fixCycle attempts to fix a cycle. Cycles may be acceptable if:
+// - all nodes are from the same spec file or
+// - at least one of the nodes of the cycle represents a pre-built SRPM.
 func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
+	err = g.fixIntraSpecCycle(cycle)
+	if err == nil {
+		return
+	}
+
+	return g.fixPrebuiltSRPMsCycle(cycle)
+}
+
+// fixIntraSpecCycle attempts to fix a cycle if all nodes are from the same spec file.
+// If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
+func (g *PkgGraph) fixIntraSpecCycle(cycle []*PkgNode) (err error) {
 	srpmPath := cycle[0].SrpmPath
 	// Omit the first element of the cycle, since it is repeated as the last element
 	trimmedCycle := cycle[1:]
@@ -1199,6 +1211,12 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
 	metaNode.SrpmPath = srpmPath
 
 	return
+}
+
+// fixPrebuiltSRPMsCycle attempts to fix a cycle if at least one node is a pre-built SRPM.
+// If a cycle can be fixed, edges representing the build dependencies of the pre-built SRPM will be removed.
+func (g *PkgGraph) fixPrebuiltSRPMsCycle(cycle []*PkgNode) (err error) {
+	return fmt.Errorf("not implemented, FIX ME")
 }
 
 // removePkgNodeFromLookup removes a node from the lookup tables.
