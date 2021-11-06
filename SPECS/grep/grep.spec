@@ -8,9 +8,6 @@ Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.gnu.org/software/grep
 Source0:        https://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
-Patch0:         grep-3.31-man-fix-gs.patch
-Patch1:         grep-3.31-help-align.patch
-#Patch2:         grep-3.1-glibc-2.28-fix.patch
 BuildRequires:  pcre-devel
 Requires:       pcre
 Conflicts:      toybox
@@ -28,9 +25,6 @@ These are the additional language files of grep
 
 %prep
 %setup -q
-%patch0 -p1 -b .man-fix-gs
-%patch1 -p1 -b .help-align
-#%patch2 -p1 -b .glibc-2.28-fix
 # Skip pcre-jitstack test, which is known to fail when libpcre is built without jit
 sed -i 's/require_pcre_/require_pcre_\nskip_ "test known to fail when libpcre is built without jit"/g' tests/pcre-jitstack
 

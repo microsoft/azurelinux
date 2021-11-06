@@ -444,14 +444,14 @@ rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.40
 
 touch $LFS/logs/temptoolchain/status_file_complete
 
@@ -595,14 +595,14 @@ rm -rf texinfo-6.8
 
 touch $LFS/logs/temptoolchain/status_texinfo_complete
 
-echo Xz-5.2.4
-tar xf xz-5.2.4.tar.xz
-pushd xz-5.2.4
+echo Xz-5.2.5
+tar xf xz-5.2.5.tar.xz
+pushd xz-5.2.5
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf xz-5.2.4
+rm -rf xz-5.2.5
 
 touch $LFS/logs/temptoolchain/status_xz_complete
 

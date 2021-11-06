@@ -16,7 +16,7 @@ The Sed package contains a stream editor.
 %package lang
 Summary: Additional language files for sed
 Group: System Environment/Programming
-Requires: sed >= 4.8
+Requires: sed >= %{version}
 %description lang
 These are the additional language files of sed.
 

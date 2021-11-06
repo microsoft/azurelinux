@@ -85,8 +85,8 @@ fontconfig-devel-2.13.91-1.cm2.aarch64.rpm
 freetype-2.9.1-5.cm2.aarch64.rpm
 freetype-debuginfo-2.9.1-5.cm2.aarch64.rpm
 freetype-devel-2.9.1-5.cm2.aarch64.rpm
-gawk-4.2.1-4.cm2.aarch64.rpm
-gawk-debuginfo-4.2.1-4.cm2.aarch64.rpm
+gawk-5.1.0-1.cm2.aarch64.rpm
+gawk-debuginfo-5.1.0-1.cm2.aarch64.rpm
 gcc-11.2.0-1.cm2.aarch64.rpm
 gcc-c++-11.2.0-1.cm2.aarch64.rpm
 gcc-debuginfo-11.2.0-1.cm2.aarch64.rpm
@@ -584,11 +584,11 @@ wget-1.20.3-3.cm2.aarch64.rpm
 wget-debuginfo-1.20.3-3.cm2.aarch64.rpm
 which-2.21-7.cm2.aarch64.rpm
 which-debuginfo-2.21-7.cm2.aarch64.rpm
-xz-5.2.4-4.cm2.aarch64.rpm
-xz-debuginfo-5.2.4-4.cm2.aarch64.rpm
-xz-devel-5.2.4-4.cm2.aarch64.rpm
-xz-lang-5.2.4-4.cm2.aarch64.rpm
-xz-libs-5.2.4-4.cm2.aarch64.rpm
+xz-5.2.5-1.cm2.aarch64.rpm
+xz-debuginfo-5.2.5-1.cm2.aarch64.rpm
+xz-devel-5.2.5-1.cm2.aarch64.rpm
+xz-lang-5.2.5-1.cm2.aarch64.rpm
+xz-libs-5.2.5-1.cm2.aarch64.rpm
 zip-3.0-5.cm2.aarch64.rpm
 zip-debuginfo-3.0-5.cm2.aarch64.rpm
 zlib-1.2.11-5.cm2.aarch64.rpm

@@ -207,15 +207,15 @@ popd
 rm -rf zlib-1.2.11
 touch /logs/status_zlib_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
 ./configure --prefix=/usr
 # Note: libmagic issue. --libdir=/usr/lib/x86_64-linux-gnu ?
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.40
 touch /logs/status_file_complete
 
 echo Readline-7.0
@@ -644,19 +644,16 @@ popd
 rm -rf automake-1.16.1
 touch /logs/status_automake_complete
 
-echo Xz-5.2.4
-tar xf xz-5.2.4.tar.xz
-pushd xz-5.2.4
+echo Xz-5.2.5
+tar xf xz-5.2.5.tar.xz
+pushd xz-5.2.5
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/xz-5.2.4
+            --docdir=/usr/share/doc/xz-5.2.5
 make -j$(nproc)
 make install
-#mv -v   /usr/bin/{lzma,unlzma,lzcat,xz,unxz,xzcat} /bin
-#mv -v /usr/lib/liblzma.so.* /lib
-#ln -svf ../../lib/$(readlink /usr/lib/liblzma.so) /usr/lib/liblzma.so
 popd
-rm -rf xz-5.2.4
+rm -rf xz-5.2.5
 touch /logs/status_xz_complete
 
 echo zstd-1.5.0
@@ -833,15 +830,15 @@ popd
 rm -rf diffutils-3.8
 touch /logs/status_diffutils_complete
 
-echo Gawk-4.2.1
-tar xf gawk-4.2.1.tar.xz
-pushd gawk-4.2.1
+echo Gawk-5.1.0
+tar xf gawk-5.1.0.tar.xz
+pushd gawk-5.1.0
 sed -i 's/extras//' Makefile.in
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-4.2.1
+rm -rf gawk-5.1.0
 touch /logs/status_gawk_complete
 
 echo Findutils-4.8.0

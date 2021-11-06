@@ -56,7 +56,7 @@ m4-1.4.18-5.cm2.aarch64.rpm
 grep-3.7-1.cm2.aarch64.rpm
 grep-lang-3.7-1.cm2.aarch64.rpm
 diffutils-3.8-1.cm2.aarch64.rpm
-gawk-4.2.1-4.cm2.aarch64.rpm
+gawk-5.1.0-1.cm2.aarch64.rpm
 findutils-4.8.0-1.cm2.aarch64.rpm
 findutils-lang-4.8.0-1.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
@@ -67,10 +67,10 @@ patch-2.7.6-7.cm2.aarch64.rpm
 util-linux-2.37.2-1.cm2.aarch64.rpm
 util-linux-devel-2.37.2-1.cm2.aarch64.rpm
 tar-1.34-1.cm2.aarch64.rpm
-xz-5.2.4-4.cm2.aarch64.rpm
-xz-devel-5.2.4-4.cm2.aarch64.rpm
-xz-lang-5.2.4-4.cm2.aarch64.rpm
-xz-libs-5.2.4-4.cm2.aarch64.rpm
+xz-5.2.5-1.cm2.aarch64.rpm
+xz-devel-5.2.5-1.cm2.aarch64.rpm
+xz-lang-5.2.5-1.cm2.aarch64.rpm
+xz-libs-5.2.5-1.cm2.aarch64.rpm
 zstd-1.5.0-1.cm2.aarch64.rpm
 zstd-devel-1.5.0-1.cm2.aarch64.rpm
 zstd-libs-1.5.0-1.cm2.aarch64.rpm
