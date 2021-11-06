@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.3564
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -90,13 +90,14 @@ fi
 %{_datarootdir}/vim/vim*/autoload/*
 %{_datarootdir}/vim/vim*/bugreport.vim
 %{_datarootdir}/vim/vim*/colors/*
+%exclude %{_datarootdir}/vim/vim*/colors/desert.vim
+%exclude %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/applications/gvim.desktop
 %{_datarootdir}/applications/vim.desktop
 %{_datarootdir}/icons/hicolor/48x48/apps/gvim.png
 %{_datarootdir}/icons/locolor/16x16/apps/gvim.png
 %{_datarootdir}/icons/locolor/32x32/apps/gvim.png
 %{_datarootdir}/vim/vim*/pack/dist/opt/*
-%exclude %{_datarootdir}/vim/vim*/colors/desert.vim
 %{_datarootdir}/vim/vim*/compiler/*
 %{_datarootdir}/vim/vim*/delmenu.vim
 %{_datarootdir}/vim/vim*/evim.vim
@@ -175,6 +176,7 @@ fi
 %config(noreplace) %{_sysconfdir}/vimrc
 %{_datarootdir}/vim/vim*/syntax/syntax.vim
 %{_datarootdir}/vim/vim*/colors/desert.vim
+%{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
 %{_datarootdir}/vim/vim82/syntax/nosyntax.vim
@@ -189,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Fri Nov 05 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-2
+- Package default color list in main package for use by default theme
+
 * Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-1
 - Upgrade to 8.2.3564 to fix CVE-2021-3903
 - Package actual license text
