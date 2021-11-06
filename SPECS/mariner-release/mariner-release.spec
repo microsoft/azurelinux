@@ -69,7 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 *   Fri Nov 05 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-26
 -   Updating version for off-cycle post-October update to fix vim CVE and update glibc to patch 
--   dotnet/glibc garbage collector issue (pthread_cond_signal failed to wake up pthread_cond_wait ())
+-   dotnet/glibc garbage collector issue (pthread_cond_signal failed to wake up pthread_cond_wait)
 *   Wed Nov 03 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-25
 -   Updating version for off-cycle post-October update to service toolchain CVE's and miscellaneous bug fixes.
 *   Tue Oct 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-24
