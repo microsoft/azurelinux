@@ -192,7 +192,7 @@ fi
 
 %changelog
 * Fri Nov 05 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-2
-- Pacakge default color list in main package for use by default theme
+- Package default color list in main package for use by default theme
 
 * Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-1
 - Upgrade to 8.2.3564 to fix CVE-2021-3903
