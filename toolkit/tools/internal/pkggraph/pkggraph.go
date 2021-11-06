@@ -1143,30 +1143,19 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
 func (g *PkgGraph) MakeDAG() (err error) {
-	cycle, err := g.FindAnyDirectedCycle()
-	if err != nil {
-		return
-	}
+	var cycle []*PkgNode
 
-	for len(cycle) > 0 {
-		err = g.fixCycle(cycle)
-		if err != nil {
-			var cycleStringBuilder strings.Builder
-			fmt.Fprintf(&cycleStringBuilder, "{%s}", cycle[0].FriendlyName())
-			for _, node := range cycle[1:] {
-				fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
-			}
-			logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
-			err = fmt.Errorf("cycles detected in dependency graph")
-			return err
-		}
-
+	for {
 		cycle, err = g.FindAnyDirectedCycle()
-		if err != nil {
+		if err != nil || len(cycle) == 0 {
 			return
 		}
+
+		err = g.fixCycle(cycle)
+		if err != nil {
+			return formatCycleErrorMessage(cycle, err)
+		}
 	}
-	return
 }
 
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if all nodes are from the same spec file.
@@ -1223,4 +1212,16 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 			break
 		}
 	}
+}
+
+func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
+	var cycleStringBuilder strings.Builder
+
+	fmt.Fprintf(&cycleStringBuilder, "{%s}", cycle[0].FriendlyName())
+	for _, node := range cycle[1:] {
+		fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+	}
+	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
+
+	return fmt.Errorf("cycles detected in dependency graph")
 }
