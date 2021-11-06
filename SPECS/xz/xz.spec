@@ -84,6 +84,7 @@ make  %{?_smp_mflags}  check
 %{_bindir}/xzgrep
 %{_bindir}/xzdec
 %{_mandir}/man1/*
+%{_mandir}/de/man1/*
 
 %files devel
 %{_includedir}/lzma.h
