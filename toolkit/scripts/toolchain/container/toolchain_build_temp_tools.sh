@@ -466,14 +466,14 @@ rm -rf findutils-4.8.0
 
 touch $LFS/logs/temptoolchain/status_findutils_complete
 
-echo Gawk-4.2.1
-tar xf gawk-4.2.1.tar.xz
-pushd gawk-4.2.1
+echo Gawk-5.1.0
+tar xf gawk-5.1.0.tar.xz
+pushd gawk-5.1.0
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-4.2.1
+rm -rf gawk-5.1.0
 
 touch $LFS/logs/temptoolchain/status_gawk_complete
 
