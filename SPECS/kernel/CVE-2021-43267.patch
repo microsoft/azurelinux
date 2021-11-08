@@ -1,0 +1,90 @@
+From fa40d9734a57bcbfa79a280189799f76c88f7bb0 Mon Sep 17 00:00:00 2001
+From: Max VA <maxv@sentinelone.com>
+Date: Mon, 25 Oct 2021 17:31:53 +0200
+Subject: [PATCH] tipc: fix size validations for the MSG_CRYPTO type
+
+The function tipc_crypto_key_rcv is used to parse MSG_CRYPTO messages
+to receive keys from other nodes in the cluster in order to decrypt any
+further messages from them.
+This patch verifies that any supplied sizes in the message body are
+valid for the received message.
+
+Fixes: 1ef6f7c9390f ("tipc: add automatic session key exchange")
+Signed-off-by: Max VA <maxv@sentinelone.com>
+Acked-by: Ying Xue <ying.xue@windriver.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Jon Maloy <jmaloy@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ net/tipc/crypto.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
+
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index c9391d38de85cc..dc60c32bb70df9 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -2285,43 +2285,53 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
+ 	u16 key_gen = msg_key_gen(hdr);
+ 	u16 size = msg_data_sz(hdr);
+ 	u8 *data = msg_data(hdr);
++	unsigned int keylen;
++
++	/* Verify whether the size can exist in the packet */
++	if (unlikely(size < sizeof(struct tipc_aead_key) + TIPC_AEAD_KEYLEN_MIN)) {
++		pr_debug("%s: message data size is too small\n", rx->name);
++		goto exit;
++	}
++
++	keylen = ntohl(*((__be32 *)(data + TIPC_AEAD_ALG_NAME)));
++
++	/* Verify the supplied size values */
++	if (unlikely(size != keylen + sizeof(struct tipc_aead_key) ||
++		     keylen > TIPC_AEAD_KEY_SIZE_MAX)) {
++		pr_debug("%s: invalid MSG_CRYPTO key size\n", rx->name);
++		goto exit;
++	}
+ 
+ 	spin_lock(&rx->lock);
+ 	if (unlikely(rx->skey || (key_gen == rx->key_gen && rx->key.keys))) {
+ 		pr_err("%s: key existed <%p>, gen %d vs %d\n", rx->name,
+ 		       rx->skey, key_gen, rx->key_gen);
+-		goto exit;
++		goto exit_unlock;
+ 	}
+ 
+ 	/* Allocate memory for the key */
+ 	skey = kmalloc(size, GFP_ATOMIC);
+ 	if (unlikely(!skey)) {
+ 		pr_err("%s: unable to allocate memory for skey\n", rx->name);
+-		goto exit;
++		goto exit_unlock;
+ 	}
+ 
+ 	/* Copy key from msg data */
+-	skey->keylen = ntohl(*((__be32 *)(data + TIPC_AEAD_ALG_NAME)));
++	skey->keylen = keylen;
+ 	memcpy(skey->alg_name, data, TIPC_AEAD_ALG_NAME);
+ 	memcpy(skey->key, data + TIPC_AEAD_ALG_NAME + sizeof(__be32),
+ 	       skey->keylen);
+ 
+-	/* Sanity check */
+-	if (unlikely(size != tipc_aead_key_size(skey))) {
+-		kfree(skey);
+-		skey = NULL;
+-		goto exit;
+-	}
+-
+ 	rx->key_gen = key_gen;
+ 	rx->skey_mode = msg_key_mode(hdr);
+ 	rx->skey = skey;
+ 	rx->nokey = 0;
+ 	mb(); /* for nokey flag */
+ 
+-exit:
++exit_unlock:
+ 	spin_unlock(&rx->lock);
+ 
++exit:
+ 	/* Schedule the key attaching on this crypto */
+ 	if (likely(skey && queue_delayed_work(tx->wq, &rx->work, 0)))
+ 		return true;

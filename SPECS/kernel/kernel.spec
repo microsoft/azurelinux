@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.74.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -216,6 +216,7 @@ Patch1178:      CVE-2021-3653.nopatch
 Patch1179:      CVE-2021-42008.nopatch
 Patch1180:      CVE-2021-41864.nopatch
 Patch1181:      CVE-2021-42252.nopatch
+Patch1182: CVE-2021-43267.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -567,6 +568,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
+*   Mon Nov 08 2021 Mariner Autopatcher <cblmargh@microsoft.com> 5.10.74.1-3
+-   Added patch file(s) CVE-2021-43267.patch
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
 - Update configs for eBPF support
 - Add dwarves Build-requires
