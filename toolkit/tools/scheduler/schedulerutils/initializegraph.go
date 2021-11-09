@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	allGoalNodeName   = "ALL"
 	buildGoalNodeName = "PackagesToBuild"
 )
 
@@ -43,9 +42,9 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer) (i
 		pkgGraph = optimizedGraph
 	} else {
 		logger.Log.Warn("Could not create solvable subgraph, forcing full package build")
-		goalNode = pkgGraph.FindGoalNode(allGoalNodeName)
+		goalNode = pkgGraph.FindGoalNode(pkggraph.AllGoalNodeName)
 		if goalNode == nil {
-			err = fmt.Errorf("could not find goal node %s", allGoalNodeName)
+			err = fmt.Errorf("could not find goal node %s", pkggraph.AllGoalNodeName)
 			return
 		}
 	}
@@ -70,9 +69,9 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 		}
 
 		// Create a solvable ALL goal node
-		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, true)
+		goalNode, err = optimizedGraph.AddGoalNode(pkggraph.AllGoalNodeName, nil, true)
 		if err != nil {
-			logger.Log.Warnf("Failed to add goal node (%s), error: %s", allGoalNodeName, err)
+			logger.Log.Warnf("Failed to add goal node (%s), error: %s", pkggraph.AllGoalNodeName, err)
 			return
 		}
 	} else {

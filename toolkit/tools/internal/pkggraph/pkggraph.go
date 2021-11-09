@@ -21,6 +21,7 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 	"gonum.org/v1/gonum/graph/traverse"
 
+	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkgjson"
 	"microsoft.com/pkggen/internal/versioncompare"
@@ -28,6 +29,9 @@ import (
 
 // NodeState indicates if a node is a package node (build, upToDate,unresolved,cached) or a meta node (meta)
 type NodeState int
+
+// AllGoalNodeName is an artificial node with a dependency on all top-level nodes in the package graph.
+const AllGoalNodeName = "ALL"
 
 // Valid values for NodeState type
 const (
@@ -348,6 +352,19 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 			return intervalI.Compare(&intervalJ) < 0
 		})
 	}
+	return
+}
+
+// AddEdge creates a new edge between the provided nodes.
+func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
+	newEdge := g.NewEdge(from, to)
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("failed to add edge: '%s' -> '%s'", from.SrpmPath, to.SrpmPath)
+		}
+	}()
+	g.SetEdge(newEdge)
+
 	return
 }
 
@@ -1078,6 +1095,14 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 	return
 }
 
+// IsSRPMPrebuilt checks if an SRPM is prebuilt, returning true if so along with a slice of corresponding prebuilt RPMs.
+// The function will lock 'graphMutex' before performing the check if the mutex is not nil.
+func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, rpmFiles []string) {
+	rpmFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	isPrebuilt = findAllRPMS(rpmFiles)
+	return
+}
+
 // WriteDOTGraphFile writes the graph to a DOT graph format file
 func WriteDOTGraphFile(g graph.Directed, filename string) (err error) {
 	logger.Log.Infof("Writing DOT graph to %s", filename)
@@ -1162,21 +1187,23 @@ func (g *PkgGraph) MakeDAG() (err error) {
 // - all nodes are from the same spec file or
 // - at least one of the nodes of the cycle represents a pre-built SRPM.
 func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
-	err = g.fixIntraSpecCycle(cycle)
+	logger.Log.Debugf("Found cycle: %v", cycle)
+
+	// Omit the first element of the cycle, since it is repeated as the last element
+	trimmedCycle := cycle[1:]
+
+	err = g.fixIntraSpecCycle(trimmedCycle)
 	if err == nil {
 		return
 	}
 
-	return g.fixPrebuiltSRPMsCycle(cycle)
+	return g.fixPrebuiltSRPMsCycle(trimmedCycle)
 }
 
 // fixIntraSpecCycle attempts to fix a cycle if all nodes are from the same spec file.
 // If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
-func (g *PkgGraph) fixIntraSpecCycle(cycle []*PkgNode) (err error) {
-	srpmPath := cycle[0].SrpmPath
-	// Omit the first element of the cycle, since it is repeated as the last element
-	trimmedCycle := cycle[1:]
-	logger.Log.Debugf("Found cycle: %v", cycle)
+func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
+	logger.Log.Debug("Checking if cycle consists only of subpackages of one .spec file.")
 
 	// For each node, remove any edges which point to other nodes in the cycle, and move any remaining dependencies to a new
 	// meta node, then have everything in the cycle depend on the new meta node.
@@ -1184,6 +1211,7 @@ func (g *PkgGraph) fixIntraSpecCycle(cycle []*PkgNode) (err error) {
 	for _, currentNode := range trimmedCycle {
 		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
 		if currentNode.Type == TypeBuild {
+			logger.Log.Debug("Cycle contains build dependencies, cannot be solved this way.")
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
 		// Remove all links to other members of the cycle
@@ -1208,15 +1236,45 @@ func (g *PkgGraph) fixIntraSpecCycle(cycle []*PkgNode) (err error) {
 	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
 
 	// Enable cycle detection between meta nodes within the same srpm file
-	metaNode.SrpmPath = srpmPath
+	metaNode.SrpmPath = trimmedCycle[0].SrpmPath
 
 	return
 }
 
 // fixPrebuiltSRPMsCycle attempts to fix a cycle if at least one node is a pre-built SRPM.
 // If a cycle can be fixed, edges representing the build dependencies of the pre-built SRPM will be removed.
-func (g *PkgGraph) fixPrebuiltSRPMsCycle(cycle []*PkgNode) (err error) {
-	return fmt.Errorf("not implemented, FIX ME")
+func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
+	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
+
+	goalNode := g.FindGoalNode(AllGoalNodeName)
+	if goalNode == nil {
+		return fmt.Errorf("couldn't find goal node '%s' - required to resolve cycles", AllGoalNodeName)
+	}
+
+	for _, currentNode := range trimmedCycle {
+		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); isPrebuilt {
+			logger.Log.Debugf("Found pre-built SRPM (%s). Will remove edges leading to it from the graph.", currentNode.SrpmPath)
+
+			// Record any other dependencies the nodes have (ie, where can we get to from here), then remove them
+			toNodes := graph.NodesOf(g.To(currentNode.ID()))
+			for _, to := range toNodes {
+				logger.Log.Tracef("Removing edge from '%s'", to.(*PkgNode).SrpmPath)
+				g.RemoveEdge(to.ID(), currentNode.ID())
+			}
+
+			if !g.HasEdgeFromTo(goalNode.ID(), currentNode.ID()) {
+				logger.Log.Debug("Adding edge from the goal node to the pre-built SRPM node.")
+				err = g.AddEdge(goalNode, currentNode)
+				if err != nil {
+					return
+				}
+			}
+
+			return
+		}
+	}
+
+	return fmt.Errorf("cycle contains no pre-build SRPMs, unresolvable")
 }
 
 // removePkgNodeFromLookup removes a node from the lookup tables.
@@ -1242,4 +1300,47 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
 	return fmt.Errorf("cycles detected in dependency graph")
+}
+
+// rpmsProvidedBySRPM returns all RPMs produced from a SRPM file.
+func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (rpmFiles []string) {
+	if graphMutex != nil {
+		graphMutex.RLock()
+		defer graphMutex.RUnlock()
+	}
+
+	rpmsMap := make(map[string]bool)
+	runNodes := pkgGraph.AllRunNodes()
+	for _, node := range runNodes {
+		if node.SrpmPath != srpmPath {
+			continue
+		}
+
+		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
+			continue
+		}
+
+		rpmsMap[node.RpmPath] = true
+	}
+
+	rpmFiles = make([]string, 0, len(rpmsMap))
+	for rpm := range rpmsMap {
+		rpmFiles = append(rpmFiles, rpm)
+	}
+
+	return
+}
+
+// findAllRPMS returns true if all RPMs requested are found on disk.
+func findAllRPMS(rpmsToFind []string) bool {
+	for _, rpm := range rpmsToFind {
+		isFile, _ := file.IsFile(rpm)
+
+		if !isFile {
+			logger.Log.Debugf("Did not find (%s)", rpm)
+			return false
+		}
+	}
+
+	return true
 }
