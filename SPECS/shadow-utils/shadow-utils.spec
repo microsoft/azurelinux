@@ -38,6 +38,11 @@ Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
 Provides:       /sbin/nologin
+Provides:       /usr/sbin/groupadd
+Provides:       /usr/sbin/groupdel
+Provides:       /usr/sbin/nologin
+Provides:       /usr/sbin/useradd
+Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
 
 %description

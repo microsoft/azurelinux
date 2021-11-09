@@ -539,7 +539,7 @@ rm -rf patch-2.7.6
 touch $LFS/logs/temptoolchain/status_patch_complete
 
 echo Perl-5.32.0
-tar xf perl-5.32.0.tar.gz
+tar xf perl-5.32.0.tar.xz
 pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
 make -j$(nproc)

@@ -45,6 +45,7 @@ Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
 Provides:       nss_db = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
+Provides:	    glibc
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -60,6 +61,7 @@ Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-headers = %{version}-%{release}
 Provides:       %{name}-static = %{version}-%{release}
 Provides:       %{name}-static%{?_isa} = %{version}-%{release}
+Provides:	    glibc-devel
 
 %description devel
 These are the header files of glibc.
@@ -249,7 +251,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 /lib64/*
 %ifarch aarch64
 /lib/ld-linux-aarch64.so.1
-%exclude /lib
 %endif
 %exclude /lib64/libpcprofile.so
 %{_lib64dir}/*.so

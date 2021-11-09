@@ -602,7 +602,7 @@ rm -rf expat-2.2.6
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0
-tar xf perl-5.32.0.tar.gz
+tar xf perl-5.32.0.tar.xz
 pushd perl-5.32.0
 echo "127.0.0.1 localhost $(hostname)" > /etc/hosts
 export BUILD_ZLIB=False
