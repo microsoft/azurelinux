@@ -98,7 +98,7 @@ sh configure \
 	--disable-headful \
 	--with-cacerts-file=%{bootstrapjdk}/jre/lib/security/cacerts \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
-	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse -fcommon" \
+	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
 	--with-native-debug-symbols=none \

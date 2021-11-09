@@ -207,15 +207,14 @@ popd
 rm -rf zlib-1.2.11
 touch /logs/status_zlib_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
 ./configure --prefix=/usr
-# Note: libmagic issue. --libdir=/usr/lib/x86_64-linux-gnu ?
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.40
 touch /logs/status_file_complete
 
 echo Readline-7.0
@@ -423,10 +422,9 @@ rm -rf gcc-11.2.0
 
 touch /logs/status_gcc_complete
 
-echo Bzip2-1.0.6
-tar xf bzip2-1.0.6.tar.gz
-pushd bzip2-1.0.6
-patch -Np1 -i ../bzip2-1.0.6-install_docs-1.patch
+echo Bzip2-1.0.8
+tar xf bzip2-1.0.8.tar.gz
+pushd bzip2-1.0.8
 sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
 sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
 make -f Makefile-libbz2_so
@@ -440,7 +438,7 @@ rm -v /usr/bin/{bunzip2,bzcat,bzip2}
 ln -sv bzip2 /bin/bunzip2
 ln -sv bzip2 /bin/bzcat
 popd
-rm -rf bzip2-1.0.6
+rm -rf bzip2-1.0.8
 touch /logs/status_bzip2_complete
 
 echo Pkg-config-0.29.2

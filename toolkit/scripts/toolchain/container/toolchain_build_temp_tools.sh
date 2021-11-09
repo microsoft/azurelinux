@@ -407,16 +407,6 @@ rm -rf bison-3.7.6
 
 touch $LFS/logs/temptoolchain/status_bison_complete
 
-echo Bzip2-1.0.6
-tar xf bzip2-1.0.6.tar.gz
-pushd bzip2-1.0.6
-make -j$(nproc)
-make PREFIX=/tools install
-popd
-rm -rf bzip2-1.0.6
-
-touch $LFS/logs/temptoolchain/status_bzip2_complete
-
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
@@ -444,16 +434,30 @@ rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.40
 
 touch $LFS/logs/temptoolchain/status_file_complete
+
+# "bzip2" should build after "file" to prevent error:
+#/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
+#collect2: error: ld returned 1 exit status
+#Makefile:499: recipe for target 'libmagic.la' failed
+echo Bzip2-1.0.8
+tar xf bzip2-1.0.8.tar.gz
+pushd bzip2-1.0.8
+make -j$(nproc)
+make PREFIX=/tools install
+popd
+rm -rf bzip2-1.0.8
+
+touch $LFS/logs/temptoolchain/status_bzip2_complete
 
 echo Findutils-4.8.0
 tar xf findutils-4.8.0.tar.xz

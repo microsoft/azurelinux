@@ -100,7 +100,7 @@ unset JAVA_HOME &&
 	--disable-headful \
 	--with-cacerts-file=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap/jre/lib/security/cacerts \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
-	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse -fcommon" \
+	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
 	--with-stdc++lib=dynamic \
