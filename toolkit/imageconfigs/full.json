@@ -17,7 +17,8 @@
             "Name": "CBL-Mariner Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/drtm.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

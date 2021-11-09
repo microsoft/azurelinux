@@ -1,0 +1,8 @@
+{
+    "packages": [
+        "tboot",
+        "libtspi",
+        "tpm2-tools",
+        "tpm2-tss"
+    ]
+}
