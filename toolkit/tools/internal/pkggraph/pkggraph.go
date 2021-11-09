@@ -30,9 +30,6 @@ import (
 // NodeState indicates if a node is a package node (build, upToDate,unresolved,cached) or a meta node (meta)
 type NodeState int
 
-// AllGoalNodeName is an artificial node with a dependency on all top-level nodes in the package graph.
-const AllGoalNodeName = "ALL"
-
 // Valid values for NodeState type
 const (
 	StateUnknown    NodeState = iota            // Unknown state
@@ -1170,6 +1167,10 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 func (g *PkgGraph) MakeDAG() (err error) {
 	var cycle []*PkgNode
 
+	if len(g.findNodesByType(TypeGoal)) == 0 {
+		return fmt.Errorf("must set a goal nodes before removing cycles from the dependency graph")
+	}
+
 	for {
 		cycle, err = g.FindAnyDirectedCycle()
 		if err != nil || len(cycle) == 0 {
@@ -1246,32 +1247,27 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
-	goalNode := g.FindGoalNode(AllGoalNodeName)
-	if goalNode == nil {
-		return fmt.Errorf("couldn't find goal node '%s' - required to resolve cycles", AllGoalNodeName)
-	}
-
+	previousNode := trimmedCycle[len(trimmedCycle)-1]
 	for _, currentNode := range trimmedCycle {
 		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); isPrebuilt {
-			logger.Log.Debugf("Found pre-built SRPM (%s). Will remove edges leading to it from the graph.", currentNode.SrpmPath)
+			logger.Log.Debugf("Found pre-built SRPM '%s' in cycle. Removing edge from '%s'.", previousNode.FriendlyName(), currentNode.FriendlyName())
+			g.RemoveEdge(previousNode.ID(), currentNode.ID())
 
-			// Record any other dependencies the nodes have (ie, where can we get to from here), then remove them
-			toNodes := graph.NodesOf(g.To(currentNode.ID()))
-			for _, to := range toNodes {
-				logger.Log.Tracef("Removing edge from '%s'", to.(*PkgNode).SrpmPath)
-				g.RemoveEdge(to.ID(), currentNode.ID())
-			}
-
-			if !g.HasEdgeFromTo(goalNode.ID(), currentNode.ID()) {
-				logger.Log.Debug("Adding edge from the goal node to the pre-built SRPM node.")
-				err = g.AddEdge(goalNode, currentNode)
-				if err != nil {
+			goalNodes := g.findNodesByType(TypeGoal)
+			for _, goalNode := range goalNodes {
+				if g.HasEdgeFromTo(goalNode.ID(), currentNode.ID()) {
+					logger.Log.Debugf("Found edge from the '%s' goal node to the pre-built SRPM - no need for a new one.", goalNode.FriendlyName())
 					return
 				}
 			}
 
+			logger.Log.Debugf("No goal node depends on the pre-built SRPM. Adding edge from the '%s' goal node to ensure potential forced rebuild.", goalNodes[0].FriendlyName())
+			err = g.AddEdge(goalNodes[0], currentNode)
+
 			return
 		}
+
+		previousNode = currentNode
 	}
 
 	return fmt.Errorf("cycle contains no pre-build SRPMs, unresolvable")
@@ -1288,6 +1284,17 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 			break
 		}
 	}
+}
+
+// findNodesByType returns a list of all nodes matching the input type.
+func (g *PkgGraph) findNodesByType(searchedType NodeType) (foundNodes []*PkgNode) {
+	for _, node := range graph.NodesOf(g.Nodes()) {
+		if node.(*PkgNode).Type == searchedType {
+			foundNodes = append(foundNodes, node.(*PkgNode))
+		}
+	}
+
+	return
 }
 
 func formatCycleErrorMessage(cycle []*PkgNode, err error) error {

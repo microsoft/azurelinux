@@ -28,6 +28,8 @@ var (
 )
 
 func main() {
+	const goalNodeName = "ALL"
+
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
@@ -45,14 +47,14 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
-	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
-	err = depGraph.MakeDAG()
+	// Add a default "ALL" goal to build everything local
+	_, err = depGraph.AddGoalNode(goalNodeName, nil, *strictGoals)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
 
-	// Add a default "ALL" goal to build everything local
-	_, err = depGraph.AddGoalNode(pkggraph.AllGoalNodeName, nil, *strictGoals)
+	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
+	err = depGraph.MakeDAG()
 	if err != nil {
 		logger.Log.Panic(err)
 	}
