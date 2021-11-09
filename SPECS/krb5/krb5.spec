@@ -1,7 +1,9 @@
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*/(ba)?sh$
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.18.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,17 +11,16 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://web.mit.edu/kerberos/dist/%{name}/1.18/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-37750.patch
-Requires:       openssl
-Requires:       e2fsprogs-libs
-BuildRequires:  openssl-devel
 BuildRequires:  e2fsprogs-devel
-
+BuildRequires:  openssl-devel
+Requires:       e2fsprogs-libs
+Requires:       openssl
+Provides:       pkgconfig(mit-krb5)
+Provides:       pkgconfig(mit-krb5-gssapi)
 %if %{with_check}
 BuildRequires:  iana-etc
 %endif
 
-Provides:       pkgconfig(mit-krb5)
-Provides:       pkgconfig(mit-krb5-gssapi)
 %description
 Kerberos V5 is a trusted-third-party network authentication system,
 which can improve your network's security by eliminating the insecure
@@ -27,14 +28,16 @@ practice of clear text passwords.
 
 %package devel
 Summary:        Libraries and header files for krb5
-Requires:   %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+
 %description devel
 Static libraries and header files for the support library for krb5
 
 %package lang
-Summary:    Additional language files for krb5
-Group:      System Environment/Security
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional language files for krb5
+Group:          System Environment/Security
+Requires:       %{name} = %{version}-%{release}
+
 %description lang
 These are the additional language files of krb5.
 
@@ -51,8 +54,8 @@ autoconf &&
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
-    --sysconfdir=/etc \
-        --localstatedir=/var/lib \
+    --sysconfdir=%{_sysconfdir} \
+        --localstatedir=%{_sharedstatedir} \
         --with-system-et         \
         --with-system-ss         \
         --with-system-verto=no   \
@@ -66,15 +69,15 @@ make %{?_smp_mflags}
 cd src
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 for LIBRARY in gssapi_krb5 gssrpc k5crypto kadm5clnt kadm5srv \
                kdb5 krad krb5 krb5support verto ; do
     chmod -v 755 %{buildroot}/%{_libdir}/lib$LIBRARY.so
 done
 
-ln -v -sf %{buildroot}/%{_libdir}/libkrb5.so.3.3        /usr/lib/libkrb5.so
-ln -v -sf %{buildroot}/%{_libdir}/libk5crypto.so.3.1    /usr/lib/libk5crypto.so
-ln -v -sf %{buildroot}/%{_libdir}/libkrb5support.so.0.1 /usr/lib/libkrb5support.so
+ln -v -sf %{buildroot}/%{_libdir}/libkrb5.so.3.3        %{_lib}/libkrb5.so
+ln -v -sf %{buildroot}/%{_libdir}/libk5crypto.so.3.1    %{_lib}/libk5crypto.so
+ln -v -sf %{buildroot}/%{_libdir}/libkrb5support.so.0.1 %{_lib}/libkrb5support.so
 
 mv -v %{buildroot}/%{_bindir}/ksu /bin
 chmod -v 755 /bin/ksu
@@ -86,7 +89,7 @@ unset LIBRARY
 
 %check
 # krb5 tests require hostname resolve
-echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
+echo "127.0.0.1 $HOSTNAME" >> %{_sysconfdir}/hosts
 cd src
 make check
 
@@ -123,6 +126,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Tue Oct 26 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.18.4-2
+- Remove dependency on sh/bash.
+
 * Tue Oct 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.18.4-1
 - Update version to fix CVE-2019-14844, CVE-2020-28196, CVE-2021-36222
 - Add patch to fix CVE-2021-37750
