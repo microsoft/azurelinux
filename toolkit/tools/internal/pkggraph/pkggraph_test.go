@@ -1005,3 +1005,23 @@ func TestEncodingSubGraph(t *testing.T) {
 	assert.Equal(t, len(component), len(subGraph.AllNodes()))
 	assert.Equal(t, len(component), len(gCopy.AllNodes()))
 }
+
+func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	goalNode, err := gOut.AddGoalNode("test", nil, true)
+	assert.NotNil(t, goalNode)
+	assert.NoError(t, err)
+
+	assert.NoError(t, gOut.MakeDAG())
+}
+
+func TestShouldFailMakeDAGWithoutGoalNode(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	assert.Error(t, gOut.MakeDAG())
+}
