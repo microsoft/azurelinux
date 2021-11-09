@@ -61,6 +61,7 @@ COPY [ "./toolchain-sha256sums", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./linker-script-readonly-keyword-support.patch", \
        "./toolchain-jdk8-wget.sh", \
+       "./0002-add-linux-syscall-license-info.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.

@@ -12,6 +12,7 @@ Source0:        kernel-%{version}.tar.gz
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
+Patch1:         0002-add-linux-syscall-license-info.patch
 BuildArch:      noarch
 
 %description
@@ -20,6 +21,7 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -41,6 +43,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %changelog
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
+- Add patch to fix SPDX-License-Identifier in headers
 
 * Mon Nov 15 2021 Thomas Crian <thcrain@microsoft.com> - 5.10.74.1-4
 - Bump release number to match kernel release
