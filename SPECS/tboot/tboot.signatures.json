@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "create-drtm-policy.sh": "ad534c7b87c430601d8a7170f474de3bb86a42cf68b7bd875431fd1aeb916858",
   "tboot-1.9.12.tar.gz": "007212deacab8eb159d71449766f9b2e0523439f1c4fd64d1932eb38cb60e053"
  }
 }
