@@ -248,7 +248,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %config %{_sysconfdir}/locale-gen.conf
 /lib64/*
 %ifarch aarch64
-%{_libdir}/ld-linux-aarch64.so.1
+/lib/ld-linux-aarch64.so.1
 %exclude /lib
 %endif
 %exclude /lib64/libpcprofile.so
