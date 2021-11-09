@@ -59,6 +59,7 @@ COPY [ "./toolchain-sha256sums", \
        "./toolchain-local-wget-list", \
        "./texinfo-perl-fix.patch", \
        "./toolchain-jdk8-wget.sh", \
+       "./0002-add-linux-syscall-license-info.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.

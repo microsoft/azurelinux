@@ -17,6 +17,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         0002-add-linux-syscall-license-info.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -329,6 +330,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -573,6 +575,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Mon Nov 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327
+- Add patch to fix SPDX-License-Identifier in headers
 
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
 - Update configs for eBPF support
