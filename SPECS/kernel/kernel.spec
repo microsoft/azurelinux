@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.74.1
-Release:        4%{?dist}
+Version:        5.10.78.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -217,6 +217,9 @@ Patch1178:      CVE-2021-3653.nopatch
 Patch1179:      CVE-2021-42008.nopatch
 Patch1180:      CVE-2021-41864.nopatch
 Patch1181:      CVE-2021-42252.nopatch
+Patch1182:      CVE-2021-43267.nopatch
+Patch1183:      CVE-2021-42739.nopatch
+Patch1184:      CVE-2021-42327.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -583,6 +586,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
+- Update source to 5.10.78.1
+- Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327
+
 * Mon Nov 15 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.74.1-4
 - Add python3-perf subpackage and add python3-devel to build-time requirements
 - Exclude accessibility modules from main package to avoid subpackage conflict
