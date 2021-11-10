@@ -7561,6 +7561,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rook",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rpcbind",
           "version": "1.2.5",
           "downloadUrl": "http://downloads.sourceforge.net/rpcbind/rpcbind-1.2.5.tar.bz2"
@@ -8855,6 +8865,16 @@
           "name": "texinfo",
           "version": "6.5",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tini",
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/krallin/tini/archive/v0.19.0/tini-0.19.0.tar.gz"
         }
       }
     },
