@@ -1387,8 +1387,8 @@
         "type": "other",
         "other": {
           "name": "dtc",
-          "version": "1.5.1",
-          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.5.1.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.6.1.tar.gz"
         }
       }
     },
