@@ -48,11 +48,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\d\?|#! %{_bindir}/python3|' {} +
 %make_build -k check
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
