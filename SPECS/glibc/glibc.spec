@@ -8,7 +8,7 @@ Summary:        Main C library
 Name:           glibc
 Version:        2.28
 Release:        20%{?dist}
-License:        LGPLv2+
+License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -244,7 +244,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files
 %defattr(-,root,root)
-%license LICENSES
+%license COPYING COPYING.LIB LICENSES
 %{_libdir}/locale/*
 %dir %{_sysconfdir}/ld.so.conf.d
 %config(noreplace) %{_sysconfdir}/nsswitch.conf
@@ -312,6 +312,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %changelog
 * Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.28-20
 - Adding missing BR on "perl(File::Find)".
+- License verified.
 
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
 - Adding 'Provides' for 'nss_db'.
