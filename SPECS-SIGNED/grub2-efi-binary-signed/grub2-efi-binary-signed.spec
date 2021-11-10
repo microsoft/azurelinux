@@ -63,6 +63,7 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 %changelog
 * Mon Nov 08 2021 Henry Li <lihl@microsoft.com> - 2.06~rc1-8
 - Update release to be aligned with unsigned version.
+- License verified.
 
 * Tue Sep 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
 - Update release to be aligned with unsigned version.
