@@ -8,17 +8,17 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
 Source0:        https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
+BuildRequires:  glib-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(fontconfig)
 BuildRequires:  pkgconfig(freetype2)
-BuildRequires:  glib-devel
 BuildRequires:  pkgconfig(icu-uc)
+Requires:       glib
 %if %{with_check}
+BuildRequires:  binutils
 BuildRequires:  python3-devel
 BuildRequires:  which
-BuildRequires:  binutils
 %endif
-Requires:       glib
 
 %description
 HarfBuzz is an implementation of the OpenType Layout engine.
@@ -48,6 +48,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\d\?|#! %{_bindir}/python3|' {} +
 %make_build -k check
 
+%post
+/sbin/ldconfig
+
+%postun
 /sbin/ldconfig
 
 %files
