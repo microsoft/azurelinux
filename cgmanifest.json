@@ -2879,8 +2879,8 @@
         "type": "other",
         "other": {
           "name": "libacvp",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/cisco/libacvp/archive/v1.2.0.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/cisco/libacvp/archive/v1.4.1.tar.gz"
         }
       }
     },
