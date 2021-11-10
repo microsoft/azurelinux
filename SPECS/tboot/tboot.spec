@@ -9,8 +9,6 @@ Group:          System Environment/Security
 URL:            https://sourceforge.net/projects/tboot/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        create-drtm-policy.sh
-BuildRequires:  make
-BuildRequires:  gcc
 BuildRequires:  trousers-devel
 Requires:       libtspi
 ExclusiveArch:  x86_64

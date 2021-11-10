@@ -10,7 +10,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06~rc1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Mon Nov 08 2021 Henry Li <lihl@microsoft.com> - 2.06~rc1-8
+- Update release to be aligned with unsigned version.
+
 * Tue Sep 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
 - Update release to be aligned with unsigned version.
 
