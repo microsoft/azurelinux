@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.3564
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-3927.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -191,6 +192,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Wed Nov 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.3564-3
+-   Added patch file(s) CVE-2021-3927.patch
 * Fri Nov 05 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-2
 - Package default color list in main package for use by default theme
 
