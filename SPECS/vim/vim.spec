@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3564
-Release:        2%{?dist}
+Version:        8.2.3582
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -192,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Nov 10 2021 Nick Samson <nisamson@microsoft.com> - 8.2.3582-1
+- Upgrade to 8.2.3582 to fix CVE-2021-3927 and CVE-2021-3928
+
 * Fri Nov 05 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-2
 - Package default color list in main package for use by default theme
 
