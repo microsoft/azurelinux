@@ -339,13 +339,13 @@ popd
 rm -rf expect5.45.4
 touch $LFS/logs/temptoolchain/status_expect_complete
 
-echo DejaGNU-1.6.2
-tar xf dejagnu-1.6.2.tar.gz
-pushd dejagnu-1.6.2
+echo DejaGNU-1.6.3
+tar xf dejagnu-1.6.3.tar.gz
+pushd dejagnu-1.6.3
 ./configure --prefix=/tools
 make install
 popd
-rm -rf dejagnu-1.6.2
+rm -rf dejagnu-1.6.3
 
 touch $LFS/logs/temptoolchain/status_dejagnu_complete
 
