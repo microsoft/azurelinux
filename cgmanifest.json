@@ -2519,8 +2519,8 @@
         "type": "other",
         "other": {
           "name": "ipxe",
-          "version": "1.20.1",
-          "downloadUrl": "https://github.com/ipxe/ipxe/archive/v1.20.1.tar.gz"
+          "version": "1.21.1",
+          "downloadUrl": "https://github.com/ipxe/ipxe/archive/v1.21.1.tar.gz"
         }
       }
     },
