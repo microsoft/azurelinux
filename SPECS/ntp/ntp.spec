@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
-Version:        4.2.8p13
-Release:        4%{?dist}
+Version:        4.2.8p15
+Release:        1%{?dist}
 License:        NTP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,10 @@ Source4:        ntpdate.wrapper
 Source5:        ntpdate.sysconfig
 Source6:        ntpdate.service
 Source7:        ntpd.service
+Patch0:         ntp-gcc11.patch
 
+BuildRequires:  gcc >= 11.2.0
+BuildRequires:  glibc >= 2.34
 BuildRequires:  libcap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  systemd
@@ -59,6 +62,7 @@ state of the NTP daemon running on the local machine.
 
 %prep
 %setup -q -a 1
+%patch0 -p1
 
 %build
 
@@ -195,6 +199,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 4.2.8p15-1
+- Upgrade to version 4.2.8p15.
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p13-4
 - Adding 'Provides' for 'ntpdate' using Fedora 32 spec (license: MIT) as guidance.
 
