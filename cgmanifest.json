@@ -7542,8 +7542,8 @@
         "type": "other",
         "other": {
           "name": "rocksdb",
-          "version": "6.7.3",
-          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v6.7.3.tar.gz"
+          "version": "6.26.0",
+          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v6.26.0.tar.gz"
         }
       }
     },

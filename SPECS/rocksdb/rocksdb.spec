@@ -2,17 +2,16 @@
 
 Name:           rocksdb
 Summary:        A library that provides an embeddable, persistent key-value store for fast storage.
-Version:        6.7.3
-Release:        2%{?dist}
+Version:        6.26.0
+Release:        1%{?dist}
 License:        GPLv2+ and ASL 2.0 and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://rocksdb.org
-#Source0:       https://github.com/facebook/%{name}/archive/v%{version}.tar.gz
+#Source0:       https://github.com/facebook/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
-BuildRequires:  build-essential
 BuildRequires:  gflags-devel
 
 %description
@@ -57,9 +56,10 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/rocksdb
 %{_libdir}/{*.so,*.a}
 %{_libdir}/cmake/rocksdb
-/usr/src/debug/*
 
 %changelog
+*   Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 6.26.0-1
+-   Update to version 6.26.0
 *   Thu Oct 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 6.7.3-2
 -   Fixed 'Source0' URL.
 -   License verified.
