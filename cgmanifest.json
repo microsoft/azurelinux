@@ -235,8 +235,8 @@
         "type": "other",
         "other": {
           "name": "autofs",
-          "version": "5.1.4",
-          "downloadUrl": "http://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.4.tar.xz"
+          "version": "5.1.8",
+          "downloadUrl": "http://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.8.tar.xz"
         }
       }
     },
@@ -2989,8 +2989,8 @@
         "type": "other",
         "other": {
           "name": "libcomps",
-          "version": "0.1.11",
-          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/libcomps-0.1.11.tar.gz"
+          "version": "0.1.18",
+          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/libcomps-0.1.18.tar.gz"
         }
       }
     },
