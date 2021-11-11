@@ -52,6 +52,9 @@
       - [`REBUILD_TOOLS=...`](#rebuild_tools)
         - [`REBUILD_TOOLS=`**`n`** *(default)*](#rebuild_toolsn-default)
         - [`REBUILD_TOOLS=`**`y`**](#rebuild_toolsy)
+      - [`REFRESH_WORKER_CHROOT=...`](#refresh_worker_chroot)
+        - [`REFRESH_WORKER_CHROOT=`**`n`**](#refresh_worker_chrootn)
+        - [`REFRESH_WORKER_CHROOT=`**`y`** *(default)*](#refresh_worker_chrooty-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -486,6 +489,20 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 ##### `REBUILD_TOOLS=`**`y`**
 
 > Build the go tools from source as needed.
+
+#### `REFRESH_WORKER_CHROOT=...`
+
+##### `REFRESH_WORKER_CHROOT=`**`n`**
+
+> If exists, don't attempt to rebuild the worker chroot, even if its build script, its manifest, or the packages it consists of have been modified in the local repository.
+
+##### `REFRESH_WORKER_CHROOT=`**`y`** *(default)*
+
+> Rebuild the worker chroot every time at least one of the following has changed:
+>
+> - worker chroot's manifest file,
+> - at least one of the RPM packages mentioned in the manifest file, or
+> - the script responsible for building the chroot.
 
 ## All Build Targets
 

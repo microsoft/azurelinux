@@ -30,8 +30,7 @@
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
-Release:        6%{?dist}
-Epoch:          2
+Release:        7%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,7 +60,7 @@ fast packet processing in the user space.
 
 %package devel
 Summary:        Data Plane Development Kit development files
-Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       python3
 
 %description devel
@@ -78,7 +77,7 @@ API programming documentation for the Data Plane Development Kit.
 %if %{with tools}
 %package tools
 Summary:        Tools for setting up Data Plane Development Kit environment
-Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       findutils
 Requires:       iproute
 Requires:       kmod
@@ -297,6 +296,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 18.11.2-7
+- Remove epoch
+
 * Sat Sep 25 2021 Muhammad Falak <mwani@microsoft.com> - 2:18.11.2-6
 - Enable `tools` subpackage by default
 

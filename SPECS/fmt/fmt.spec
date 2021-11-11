@@ -2,7 +2,7 @@
 Summary:        Small, safe and fast formatting library for C++
 Name:           fmt
 Version:        7.0.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,8 +21,8 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
 # This package replaces the old name of cppformat
-Provides:       cppformat = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      cppformat < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       cppformat = %{version}-%{release}
+Obsoletes:      cppformat < %{version}-%{release}
 %undefine __cmake_in_source_build
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  cmake3
@@ -40,8 +40,8 @@ BuildRequires:  python3-breathe
 BuildRequires:  python3-sphinx
 %endif
 %else
-Provides:       %{name}-doc = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      %{name}-doc < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-doc = %{version}-%{release}
+Obsoletes:      %{name}-doc < %{version}-%{release}
 %endif
 
 %description
@@ -51,10 +51,10 @@ safe alternative to printf or as a fast alternative to IOStreams.
 %package        devel
 Summary:        Development files for %{name}
 License:        BSD
-Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 # This package replaces the old name of cppformat
-Provides:       cppformat-devel = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      cppformat-devel < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       cppformat-devel = %{version}-%{release}
+Obsoletes:      cppformat-devel < %{version}-%{release}
 
 %description    devel
 This package contains the header file for using %{name}.
@@ -64,8 +64,8 @@ This package contains the header file for using %{name}.
 Summary:        Documentation files for %{name}
 License:        Python
 # This package replaces the old name of cppformat
-Provides:       cppformat-doc = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      cppformat-doc < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       cppformat-doc = %{version}-%{release}
+Obsoletes:      cppformat-doc < %{version}-%{release}
 BuildArch:      noarch
 
 %description    doc
@@ -129,6 +129,9 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 %endif
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.3-4
+- Remove epoch
+
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 7.0.3-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License Verified

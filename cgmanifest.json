@@ -235,8 +235,8 @@
         "type": "other",
         "other": {
           "name": "autofs",
-          "version": "5.1.4",
-          "downloadUrl": "http://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.4.tar.xz"
+          "version": "5.1.8",
+          "downloadUrl": "http://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.8.tar.xz"
         }
       }
     },
@@ -2519,8 +2519,8 @@
         "type": "other",
         "other": {
           "name": "ipxe",
-          "version": "1.20.1",
-          "downloadUrl": "https://github.com/ipxe/ipxe/archive/v1.20.1.tar.gz"
+          "version": "1.21.1",
+          "downloadUrl": "https://github.com/ipxe/ipxe/archive/v1.21.1.tar.gz"
         }
       }
     },
@@ -2989,8 +2989,8 @@
         "type": "other",
         "other": {
           "name": "libcomps",
-          "version": "0.1.11",
-          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/libcomps-0.1.11.tar.gz"
+          "version": "0.1.18",
+          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/libcomps-0.1.18.tar.gz"
         }
       }
     },
@@ -7551,6 +7551,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rook",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rpcbind",
           "version": "1.2.5",
           "downloadUrl": "http://downloads.sourceforge.net/rpcbind/rpcbind-1.2.5.tar.bz2"
@@ -8845,6 +8855,16 @@
           "name": "texinfo",
           "version": "6.8",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tini",
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/krallin/tini/archive/v0.19.0/tini-0.19.0.tar.gz"
         }
       }
     },
