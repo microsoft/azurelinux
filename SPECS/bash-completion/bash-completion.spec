@@ -1,6 +1,6 @@
 Name:          bash-completion
 Version:       2.7
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
@@ -11,7 +11,7 @@ Patch0:        bash-completion-2.1-bash-4.3.patch
 License:       GPLv2+
 
 Requires:      bash
-Requires:      %{name}-devel = %{?epoch:%epoch:}%{version}-%{release}
+Requires:      %{name}-devel = %{version}-%{release}
 %global debug_package %{nil}
 
 %description
@@ -20,7 +20,7 @@ bash-completion is a collection of shell functions that take advantage of the pr
 %package devel
 Group:         Development/Libraries
 Summary:       Development files for %{name}
-Requires:      %{name} = %{?epoch:%epoch:}%{version}-%{release}
+Requires:      %{name} = %{version}-%{release}
 
 %description devel
 This package contains files need for development.
@@ -74,6 +74,9 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 2.7-4
+- Remove epoch
+
 * Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-3
 - Require devel subpackage from base package for compatibility with other distros
 
