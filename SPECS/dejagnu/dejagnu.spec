@@ -1,7 +1,7 @@
 Summary:        DejaGnu test framework
 Name:           dejagnu
-Version:        1.6.2
-Release:        2%{?dist}
+Version:        1.6.3
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://www.gnu.org/software/dejagnu
 Source0:        https://ftp.gnu.org/pub/gnu/dejagnu/%{name}-%{version}.tar.gz
@@ -62,14 +62,20 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
+* Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 1.6.3-1
+- Update to 1.6.3
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.2-2
 - Added %%license line automatically
 
-*   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 1.6.2-1
--   Update to 1.6.2.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.6-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 10 2018 Ajay Kaher <akaher@vmware.com> 1.6-1
--   Upgraded to version 1.6
-*   Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com> 1.5.3-1
--   Initial build. First version
+* Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.6.2-1
+- Update to 1.6.2.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.6-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Ajay Kaher <akaher@vmware.com> - 1.6-1
+- Upgraded to version 1.6
+
+* Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 1.5.3-1
+- Initial build. First version
