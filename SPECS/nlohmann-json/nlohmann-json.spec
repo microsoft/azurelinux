@@ -45,6 +45,7 @@ make test -C build
 %doc README.md
 %{_includedir}/nlohmann
 %{_libdir}/cmake/nlohmann_json
+%{_libdir}/pkgconfig/nlohmann_json.pc
 
 %changelog
 * Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 3.10.4-1

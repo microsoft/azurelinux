@@ -44,10 +44,10 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 %setup -qn %{name}-%{version}
 
 %build
-CFLAGS="$CFLAGS '                                                   \
-        -D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"'         \
-        -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"'               \
-        -D_PATH_DHCLIENT_CONF='\"/etc/dhcp/dhclient.conf\"'"        \
+CFLAGS="$CFLAGS \
+        -D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"' \
+        -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"' \
+        -D_PATH_DHCLIENT_CONF='\"/etc/dhcp/dhclient.conf\"'" \
 ./configure \
     --prefix=%{_prefix} \
     --sysconfdir=/etc/dhcp                                  \
