@@ -3,8 +3,7 @@
 Summary:        X.Org X11 X authority utilities
 Name:           xorg-x11-%{pkgname}
 Version:        1.1
-Release:        6%{?dist}
-Epoch:          1
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +43,9 @@ rm -r %{buildroot}%{_mandir}/man1/xauth.1*
 %{_bindir}/xauth
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 1.1-7
+- Remove epoch
+
 * Mon Jan 25 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.1-6
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.
