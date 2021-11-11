@@ -220,6 +220,7 @@ Patch1181:      CVE-2021-42252.nopatch
 Patch1182:      CVE-2021-43267.nopatch
 Patch1183:      CVE-2021-42739.nopatch
 Patch1184:      CVE-2021-42327.nopatch
+Patch1185:      CVE-2021-43389.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -574,7 +575,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon Nov 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
-- Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327
+- Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389
 - Add patch to fix SPDX-License-Identifier in headers
 
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
