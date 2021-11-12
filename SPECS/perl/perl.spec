@@ -1,8 +1,5 @@
 %define _unpackaged_files_terminate_build 0
 
-# RPM pipeline is rebuilding perl which gets stuck extracting debug info
-%global debug_package %{nil}
-
 %global perl_version    5.32.0
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
