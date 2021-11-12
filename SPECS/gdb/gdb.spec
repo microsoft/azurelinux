@@ -1,45 +1,48 @@
 Summary:        C debugger
 Name:           gdb
-Version:        8.3
-Release:        5%{?dist}
+Version:        11.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
-Patch0:         gdb-7.12-pstack.patch
-# 8.3 contains a partial fix in the form of a warning when this bug is triggered
-# The complete fix is not easily backported from 9.1
-Patch1:         CVE-2019-1010180.nopatch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+BuildRequires:  readline-devel
 BuildRequires:  xz-devel
-Requires:       expat
-Requires:       ncurses
-Requires:       python3
-Requires:       xz-libs
-Provides:       %{name}-headless = %{version}-%{release}
-Provides:       %{name}-gdbserver = %{version}-%{release}
+BuildRequires:  zlib-devel
 %if %{with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
 %endif
+Requires:       expat
+Requires:       ncurses
+Requires:       python3
+Requires:       readline
+Requires:       xz-libs
+Requires:       zlib
+Provides:       %{name}-headless = %{version}-%{release}
+Provides:       %{name}-gdbserver = %{version}-%{release}
 
 %description
 GDB, the GNU Project debugger, allows you to see what is going on
-`inside' another program while it executes -- or what
+'inside' another program while it executes -- or what
 another program was doing at the moment it crashed.
 
 %prep
 %autosetup -p1
 
 %build
-%configure --with-python=%{python3}
+%configure \
+    --with-system-readline \
+    --with-system-zlib \
+    --with-python=%{python3}
 %make_build
 
 %install
@@ -47,20 +50,20 @@ another program was doing at the moment it crashed.
 find %{buildroot} -type f -name "*.la" -delete -print
 rm %{buildroot}%{_infodir}/dir
 
-# following files conflicts with binutils-2.24-1.x86_64
+# following files conflict with binutils-2.37
 rm %{buildroot}%{_includedir}/ansidecl.h
 rm %{buildroot}%{_includedir}/bfd.h
 rm %{buildroot}%{_includedir}/bfdlink.h
 rm %{buildroot}%{_includedir}/dis-asm.h
 rm %{buildroot}%{_libdir}/libbfd.a
 rm %{buildroot}%{_libdir}/libopcodes.a
-# following files conflicts with binutils-2.25-1.x86_64
 rm %{buildroot}%{_datadir}/locale/de/LC_MESSAGES/opcodes.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/bfd.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/opcodes.mo
 %ifarch aarch64
 rm %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %endif
+
 %find_lang %{name} --all-name
 
 %check
@@ -83,6 +86,10 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 11.1
+- Upgrade to latest upstream version and remove upstreamed patches
+- Use system zlib during build
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-5
 - Add compatibility provides for gdbserver subpackage
 - Use make macros throughout
