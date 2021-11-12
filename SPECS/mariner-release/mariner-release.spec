@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       26%{?dist}
+Release:       27%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -67,6 +67,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Thu Nov 11 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-27
+-   Updating version for off-cycle post-October update to fix kernel CVE
 *   Fri Nov 05 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-26
 -   Updating version for off-cycle post-October update to fix vim CVE and update glibc to patch 
 -   dotnet/glibc garbage collector issue (pthread_cond_signal failed to wake up pthread_cond_wait)
