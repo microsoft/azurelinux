@@ -1,16 +1,18 @@
 %global debug_package %{nil}
 
 Name:           catch
-Version:        2.10.2
+Version:        2.13.7
 Release:        1%{?dist}
 Summary:        Modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 License:        Boost
-URL:            https://github.com/philsquared/Catch
-Source0:        https://github.com/philsquared/Catch/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  cmake make python3
+URL:            https://github.com/catchorg/Catch2
+Source0:        https://github.com/catchorg/Catch2/archive/v%{version}/%{name}-%{version}.tar.gz#/Catch2-%{version}.tar.gz
+BuildRequires:  cmake
+BuildRequires:  make
+BuildRequires:  python3
 
 %description
 Catch stands for C++ Automated Test Cases in Headers and is a
@@ -29,42 +31,37 @@ multi-paradigm automated test framework for C++ and Objective-C (and,
 maybe, C). It is implemented entirely in a set of header files, but
 is packaged up as a single header for extra convenience.
 
-
 %prep
-%setup -n Catch2-%{version}
-# No python, just python3
-sed -i -e "s|COMMAND python |COMMAND python3 |" projects/CMakeLists.txt
-
+%autosetup -n Catch2-%{version}
 
 %build
 %cmake . -Bbuild -DCATCH_ENABLE_WERROR=OFF
 %make_build -Cbuild
 
-
 %install
 %make_install -Cbuild
 rm -rf %{buildroot}/%{_docdir}
-
 
 %check
 cd build
 ctest -V %{?_smp_mflags}
 
-
 %files devel
-%doc README.md CODE_OF_CONDUCT.md docs
 %license LICENSE.txt
+%doc README.md CODE_OF_CONDUCT.md docs
 %{_includedir}/catch2/
 %{_datadir}/Catch2/
 %{_datadir}/pkgconfig/catch2.pc
 %{_libdir}/cmake/Catch2/
 
-
 %changelog
-* Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 2.10.2-1
+* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.7-1
+- Upgrade to latest upstream version for glibc > 2.33 compatibility
+
+* Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.10.2-1
 - Update to 2.10.2 upstream release. License verified.
 
-* Thu Dec 5 2019 Emre Girgin <mrgirgin@microsoft.com> 2.9.2-2
+* Thu Dec 5 2019 Emre Girgin <mrgirgin@microsoft.com> - 2.9.2-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
 * Fri Aug 16 2019 Tom Hughes <tom@compton.nu> - 2.9.2-1
