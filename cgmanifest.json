@@ -4861,8 +4861,8 @@
         "type": "other",
         "other": {
           "name": "nfs-utils",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/nfs-utils/2.3.3/nfs-utils-2.3.3.tar.xz"
+          "version": "2.5.4",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/nfs-utils/2.5.4/nfs-utils-2.5.4.tar.xz"
         }
       }
     },
