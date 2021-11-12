@@ -3,16 +3,16 @@ Name:           dejagnu
 Version:        1.6.3
 Release:        1%{?dist}
 License:        GPLv2+
-URL:            https://www.gnu.org/software/dejagnu
-Source0:        https://ftp.gnu.org/pub/gnu/dejagnu/%{name}-%{version}.tar.gz
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildArch:      noarch
-Requires:       expect
+Group:          Development/Tools
+URL:            https://www.gnu.org/software/dejagnu
+Source0:        https://ftp.gnu.org/pub/gnu/dejagnu/%{name}-%{version}.tar.gz
 BuildRequires:  expect-devel
+Requires:       expect
 Requires(post): texinfo
 Requires(postun): texinfo
+BuildArch:      noarch
 
 %description
 DejaGnu is a framework for testing other programs. Its purpose is to provide
@@ -23,10 +23,10 @@ Each program can have multiple testsuites, all supported by a single test
 harness. DejaGnu is written in Expect, which in turn uses Tcl.
 
 %package devel
-Summary: Headers and development libraries for dejagnu
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: expect-devel
+Summary:        Headers and development libraries for dejagnu
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+Requires:       expect-devel
 
 %description devel
 Headers and development libraries for dejagnu
