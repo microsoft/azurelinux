@@ -840,7 +840,6 @@
                 "systemd-bootstrap",
                 "systemtap",
                 "tar",
-                "tboot",
                 "tcl",
                 "tcpdump",
                 "tcp_wrappers",

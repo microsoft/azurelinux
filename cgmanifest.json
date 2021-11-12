@@ -8772,16 +8772,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tboot",
-          "version": "1.9.12",
-          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.9.12.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tcl",
           "version": "8.6.8",
           "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.8-src.tar.gz"
