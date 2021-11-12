@@ -8792,16 +8792,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tcp_wrappers",
-          "version": "7.6",
-          "downloadUrl": "ftp://ftp.porcupine.org/pub/security/tcp_wrappers_7.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tcpdump",
           "version": "4.9.3",
           "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.9.3.tar.gz"
