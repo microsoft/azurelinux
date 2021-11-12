@@ -3,7 +3,7 @@
 
 Summary:        Azure IoT standard mode HSM lib
 Name:           libiothsm-std
-Version:        1.2.5
+Version:        1.1.8
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -40,10 +40,9 @@ Azure IoT standard mode Hardware Security Module library.
 This library is used to interface with the TPM from Azure IoT Edge.
 
 %prep
-%setup -q -n %{_topdir}/BUILD/azure-iotedge-%{version}/edgelet/hsm-sys/azure-iot-hsm-c
+%setup -q -n azure-iotedge-%{version}/edgelet/hsm-sys/azure-iot-hsm-c
 
 %build
-cd %{_topdir}/BUILD/azure-iotedge-%{version}/edgelet/hsm-sys/azure-iot-hsm-c
 cmake -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED="ON" -Duse_emulator="OFF" -Duse_default_uuid=On -Duse_http=Off -DCMAKE_INSTALL_LIBDIR="%{buildroot}%{_libdir}" .
 %make_build
 
@@ -59,8 +58,8 @@ rm -rf %{buildroot}
 %{_libdir}/libiothsm.so*
 
 %changelog
-* Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-1
-- Update to version 1.2.5 to be compatible with GCC 11.
+* Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-1
+- Update to version 1.1.8 to be compatible with GCC 11.
 - Removing invalid 'Source0' comment.
 
 * Fri May 14 2021 Andrew Phelps <anphel@microsoft.com> - 1.1.2-1
