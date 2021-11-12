@@ -1,29 +1,24 @@
 %global debug_package %{nil}
 Summary:        A language for data analysis and graphics
 Name:           R
-Version:        4.1.0
-Release:        2%{?dist}
+Version:        4.1.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.r-project.org
 Source0:        https://cran.r-project.org/src/base/R-4/R-%{version}.tar.gz
-BuildRequires:  build-essential
 BuildRequires:  bzip2-devel
 BuildRequires:  curl-devel
 BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
-BuildRequires:  make
 BuildRequires:  openjdk8
 BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
-BuildRequires:  xz
-BuildRequires:  xz-devel
-BuildRequires:  zlib-devel
 
 %description
 R is a language and environment for statistical computing and graphics.
@@ -117,6 +112,8 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.2-1
+- Update to version 4.1.2
 * Wed Jun 16 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.1.0-1
 - Add R spec.
 - License verified

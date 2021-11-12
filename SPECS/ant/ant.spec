@@ -17,14 +17,14 @@
 %global ant_home %{_datadir}/ant
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.9
-Release:        5%{?dist}
+Version:        1.10.12
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
-Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
+Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
@@ -257,6 +257,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.12-1
+- Update to version 1.10.12
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

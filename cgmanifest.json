@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "version": "1.10.12",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.12-src.tar.gz"
         }
       }
     },
@@ -7424,6 +7424,16 @@
           "name": "qt5-qttools",
           "version": "5.12.5",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "R",
+          "version": "4.1.2",
+          "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.1.2.tar.gz"
         }
       }
     },
