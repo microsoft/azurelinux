@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://github.com/intel/openlldp
-Source0:       https://github.com/intel/openlldp/archive/v%{majmin}.tar.gz#/openlldp-%{majmin}.tar.gz
+Source0:        https://github.com/intel/openlldp/archive/v%{majmin}.tar.gz#/openlldp-%{majmin}.tar.gz
 BuildRequires:  flex-devel
 BuildRequires:  kernel-headers
 BuildRequires:  libconfig-devel
@@ -59,6 +59,7 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 %{_libdir}/liblldp_clif.so.*
 %{_sysconfdir}/bash_completion.d/*
 %dir %{_sharedstatedir}/%{name}
+%{_mandir}/man3/*
 %{_mandir}/man8/*
 %{_includedir}/*
 %{_libdir}/pkgconfig/*.pc
