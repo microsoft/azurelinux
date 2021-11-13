@@ -42,6 +42,8 @@ It contains the libraries and header files to create fuse applications.
 %patch6 -p1
 
 %build
+# fuse-gcc11.patch modifies configure.ac, so regenerate it.
+aclocal -I . && autoheader && autoconf && automake --add-missing -c
 %configure --disable-static INIT_D_PATH=/tmp/init.d &&
 %make_build
 
