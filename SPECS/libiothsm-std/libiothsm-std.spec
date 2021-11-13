@@ -45,14 +45,11 @@ This library is used to interface with the TPM from Azure IoT Edge.
 %patch1 -p1 -d deps/c-shared
 
 %build
-cmake -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED="ON" -Duse_emulator="OFF" -Duse_default_uuid=On -Duse_http=Off -DCMAKE_INSTALL_LIBDIR="%{buildroot}%{_libdir}" .
+cmake -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED="ON" -Duse_emulator="OFF" -Duse_default_uuid=On -Duse_http=Off -DCMAKE_INSTALL_LIBDIR="%{_libdir}" .
 %make_build
 
 %install
 %make_install
-
-%clean
-rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
