@@ -1,7 +1,7 @@
 Summary:        File System in Userspace (FUSE) utilities
 Name:           fuse
 Version:        2.9.7
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch2:         fuse-escaped-commas-CVE-2018-10906.patch
 Patch3:         fuse-bailout-transient-config-read-failure.patch
 Patch4:         fuse-refuse-unknown-options-CVE-2018-10906.patch
 Patch5:         fuse-whitelist-known-good-filesystems.patch
+Patch6:         fuse-gcc11.patch
 Provides:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -38,8 +39,11 @@ It contains the libraries and header files to create fuse applications.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
+# fuse-gcc11.patch modifies configure.ac, so regenerate it.
+aclocal -I . && autoheader && autoconf && automake --add-missing -c
 %configure --disable-static INIT_D_PATH=/tmp/init.d &&
 %make_build
 
@@ -72,6 +76,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/fuse.pc
 
 %changelog
+* Fri Nov 12 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9.7-10
+- Fix gcc 11 build issue
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.7-8
 - Add provides for libs subpackages from base package
 - Minor linting (make macros, replace source URL)

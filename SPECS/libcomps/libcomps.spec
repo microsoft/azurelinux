@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/libcomps
-#Source0:       %{url}/archive/%{name}-%{version}.tar.gz
+#Source0:       %{url}/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
