@@ -30,6 +30,7 @@ URL:            https://github.com/azure/iotedge
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source0:        azure-iotedge-%{version}.tar.gz
+Patch1:         hmac.c-fix-mismatching-function-prototype.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  readline-devel
@@ -41,6 +42,7 @@ This library is used to interface with the TPM from Azure IoT Edge.
 
 %prep
 %setup -q -n azure-iotedge-%{version}/edgelet/hsm-sys/azure-iot-hsm-c
+%patch1 -p1 -d deps/c-shared
 
 %build
 cmake -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED="ON" -Duse_emulator="OFF" -Duse_default_uuid=On -Duse_http=Off -DCMAKE_INSTALL_LIBDIR="%{buildroot}%{_libdir}" .
@@ -60,6 +62,7 @@ rm -rf %{buildroot}
 %changelog
 * Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-1
 - Update to version 1.1.8 to be compatible with GCC 11.
+- Applying a GCC 11 patch.
 - Removing invalid 'Source0' comment.
 
 * Fri May 14 2021 Andrew Phelps <anphel@microsoft.com> - 1.1.2-1

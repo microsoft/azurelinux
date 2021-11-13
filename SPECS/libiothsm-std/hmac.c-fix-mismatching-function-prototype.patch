@@ -1,0 +1,35 @@
+From 0b5c1ae33c3ec802c404b0e50430c67a2f7811e2 Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Fri, 12 Nov 2021 16:17:56 -0800
+Subject: [PATCH] hmac.c: fix mismatching function prototype
+
+The reported function raises a warning when compilers assert the flag
+`-Warray-parameter=`, signaling that an array-type argument was promoted
+to a pointer-type argument.
+
+While in practice in most C implementations this is correct, fixing the
+warning (and, in this case, indicating the maximum size for the array)
+would represent a best-practice for finding out-of-bound accesses or
+identifying wrongly-sized arrays passed in the function.
+
+Signed-off-by: Francesco Giancane <francesco.giancane@accenture.com>
+---
+ src/hmac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hmac.c b/src/hmac.c
+index 53f2411f..160af9d2 100644
+--- a/src/hmac.c
++++ b/src/hmac.c
+@@ -208,7 +208,7 @@ int hmacFinalBits(HMACContext *ctx,
+ *   sha Error Code.
+ *
+ */
+-int hmacResult(HMACContext *ctx, uint8_t *digest)
++int hmacResult(HMACContext *ctx, uint8_t digest[USHAMaxHashSize])
+ {
+     if (!ctx) return shaNull;
+ 
+-- 
+2.17.1
+
