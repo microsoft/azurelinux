@@ -42,6 +42,7 @@ another program was doing at the moment it crashed.
 %configure \
     --with-system-readline \
     --with-system-zlib \
+    --disable-sim \
     --with-python=%{python3}
 %make_build
 
@@ -57,6 +58,7 @@ rm %{buildroot}%{_includedir}/bfdlink.h
 rm %{buildroot}%{_includedir}/dis-asm.h
 rm %{buildroot}%{_libdir}/libbfd.a
 rm %{buildroot}%{_libdir}/libopcodes.a
+rm %{buildroot}%{_libdir}/libctf*.a
 rm %{buildroot}%{_datadir}/locale/de/LC_MESSAGES/opcodes.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/bfd.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/opcodes.mo
