@@ -1,7 +1,7 @@
 Summary:        Modern C++ library for realtime consumption of LTTNG events
 Name:           lttng-consume
-Version:        0.2
-Release:        3%{?dist}
+Version:        0.2.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ mkdir build && cd build
 %{_includedir}/lttng-consume
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 0.2.1-1
+- Update to version 0.2.1 to fix gcc11 compilation error
+
 * Wed Oct 07 2020 Thomas Crain <thcrain@microsoft.com> - 0.2-3
 - Add #Source0 URL
 - Verified License field and %%license macro
