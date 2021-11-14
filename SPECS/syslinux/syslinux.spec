@@ -36,9 +36,14 @@ Headers and libraries for syslinux development.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+
 %build
-# gcc 11.2.0 and above (set cf-protection to none)
-OPTFLAGS="`echo " %{optflags} " | sed 's/ -fcf-protection/ -fcf-protection=none/'`"
+# gcc 11.2.0 and above produce error: "cc1: error: '-fcf-protection' is not compatible with this target"
+OPTFLAGS="`echo " %{optflags} " |  sed 's/-fcf-protection//g'`"
+CFLAGS="`echo " %{build_cflags} " | sed 's/-fcf-protection//g'`"
+CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-fcf-protection//g'`"
+export CFLAGS
+export CXXFLAGS
 
 # Remove build-wide ldflags
 export LDFLAGS=""
@@ -52,7 +57,7 @@ make bios install-all \
 	LIBDIR=%{_prefix}/lib DATADIR=%{_datadir} \
 	MANDIR=%{_mandir} INCDIR=%{_includedir} \
 	LDLINUX=ldlinux.c32 \
-	CFLAGS="%{build_cflags}" \
+	CFLAGS="$CFLAGS" \
 	OPTFLAGS="$OPTFLAGS"
 rm -rf %{buildroot}/boot
 rm -rf %{buildroot}/tftpboot
