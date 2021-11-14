@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.35.0
-Release:        5%{?dist}
+Version:        1.41.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,8 @@ The grpc-plugins package contains the grpc plugins.
 
 %prep
 %autosetup
+# fix issue compiling absl with gcc11
+sed -i 's/std::max(SIGSTKSZ/std::max<size_t>(SIGSTKSZ/g' third_party/abseil-cpp/absl/debugging/failure_signal_handler.cc
 
 %build
 mkdir -p cmake/build
@@ -82,7 +84,9 @@ find %{buildroot} -name '*.cmake' -delete
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
+%exclude %{_includedir}/absl/
 %exclude %{_includedir}/re2/
+%{_libdir}/libaddress_sorting.so
 %{_libdir}/libgpr.so
 %{_libdir}/libgrpc++.so
 %{_libdir}/libgrpc++_alts.so
@@ -96,15 +100,18 @@ find %{buildroot} -name '*.cmake' -delete
 %{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
 %exclude %{_libdir}/libabsl_*
-%exclude %{_libdir}/libaddress_sorting.so
 %exclude %{_libdir}/libre2.so
 %exclude %{_lib64dir}/libre2.so
+%exclude %{_lib64dir}/libabsl_*
 
 %files plugins
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 1.41.1-1
+- Update to version 1.41.1
+
 * Tue Sep 28 2021 Andrew Phelps <anphel@microsoft.com> - 1.35.0-5
 - Explicitly provide grpc-devel files to avoid packaging conflicts with re2-devel.
 
