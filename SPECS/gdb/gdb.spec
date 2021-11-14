@@ -63,7 +63,7 @@ rm %{buildroot}%{_datadir}/locale/de/LC_MESSAGES/opcodes.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/bfd.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/opcodes.mo
 %ifarch aarch64
-rm %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
+rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %endif
 
 %find_lang %{name} --all-name
