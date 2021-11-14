@@ -108,7 +108,9 @@ mv LICENSE.utf8 LICENSE
 %build
 export OPT_JAR_LIST=:
 
-export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
+export ANT_OPTS=-Xmx256m
+#export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
+export GC_MAXIMUM_HEAP_SIZE="268435456" #256M
 export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
 sh -x ./build.sh --noconfig jars
 
