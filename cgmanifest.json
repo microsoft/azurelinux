@@ -275,8 +275,8 @@
         "type": "other",
         "other": {
           "name": "azure-iotedge",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
+          "version": "1.1.8",
+          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.8.tar.gz"
         }
       }
     },
