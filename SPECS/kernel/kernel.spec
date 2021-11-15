@@ -326,6 +326,8 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+# upstream fix: https://github.com/torvalds/linux/commit/d08c84e01afa7a7eee6badab25d5420fa847f783
+sed -i 's/ PTHREAD_STACK_MIN/ (int)PTHREAD_STACK_MIN/g' tools/perf/builtin-sched.c
 
 %build
 make mrproper
