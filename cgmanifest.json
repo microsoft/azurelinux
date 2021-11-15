@@ -44,26 +44,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ant",
-          "version": "1.10.12",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.12-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ant-contrib",
-          "version": "1.0b3",
-          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "apparmor",
           "version": "2.13",
           "downloadUrl": "https://launchpad.net/apparmor/2.13/2.13.0/+download/apparmor-2.13.tar.gz"
@@ -2601,16 +2581,6 @@
           "name": "jemalloc",
           "version": "5.2.1",
           "downloadUrl": "https://github.com/jemalloc/jemalloc/releases/download/5.2.1/jemalloc-5.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "jna",
-          "version": "5.5.0",
-          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
         }
       }
     },
@@ -7424,16 +7394,6 @@
           "name": "qt5-qttools",
           "version": "5.12.5",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "R",
-          "version": "4.1.2",
-          "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.1.2.tar.gz"
         }
       }
     },
