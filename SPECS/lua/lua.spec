@@ -69,7 +69,7 @@ cat > %{buildroot}%{_libdir}/pkgconfig/lua.pc <<- "EOF"
     Libs: -L${libdir} -llua -lm
     Cflags: -I${includedir}
 EOF
-rmdir %{buildroot}%{_libdir}/lua/5.3
+rmdir %{buildroot}%{_libdir}/lua/%{majmin}
 rmdir %{buildroot}%{_libdir}/lua
 
 %check
