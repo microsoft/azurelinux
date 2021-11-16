@@ -75,13 +75,13 @@ find %{buildroot} -name '*.cmake' -delete
 %files
 %license LICENSE
 %{_libdir}/*.so.*
+%{_libdir}/libabsl_*
 %{_datadir}/grpc/roots.pem
 
 %files devel
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
-%{_libdir}/libabsl_*
 %{_libdir}/libaddress_sorting.so
 %{_libdir}/libgpr.so
 %{_libdir}/libgrpc++.so
