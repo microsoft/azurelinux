@@ -77,11 +77,13 @@ ctest --output-on-failure
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so
+%{_libdir}/libabsl_*.so.2111.*
 
 %files devel
 %{_includedir}/absl
 %{_libdir}/cmake/absl
+%{_libdir}/libabsl_*.so
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20211102.0-1
