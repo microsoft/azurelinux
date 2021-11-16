@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         abseil-cpp-20211102.0-typematch.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -78,6 +77,7 @@ ctest --output-on-failure
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - License verified.
 - Updating to version 20211102.0.
+- Removing redundant type fix patch.
 
 * Mon Mar 08 2021 Rich Mattes <richmattes@gmail.com> - 20200923.3-1
 - Update to release 20200923.3
