@@ -7,12 +7,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         gtest_build_fix.patch
 
-BuildRequires:  cmake
+BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
 BuildRequires:  make
 
 %if %{with_check}
+BuildRequires:  gmock
+BuildRequires:  gmock-devel
+BuildRequires:  gtest
 BuildRequires:  gtest-devel
 %endif
 
@@ -45,8 +49,10 @@ Development headers for %{name}
 mkdir build
 pushd build
 %cmake \
+  -DABSL_PROPAGATE_CXX_STD=ON \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 %if %{with_check}
+  -DABSL_FIND_GOOGLETEST=ON \
   -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
   -DBUILD_TESTING=ON \
 %else
