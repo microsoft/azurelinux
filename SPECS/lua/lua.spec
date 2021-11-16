@@ -57,7 +57,7 @@ cat > %{buildroot}%{_libdir}/pkgconfig/lua.pc <<- "EOF"
     INSTALL_BIN=${prefix}/bin
     INSTALL_INC=${prefix}/include
     INSTALL_LIB=${prefix}/lib
-    INSTALL_MAN=${prefix}/man/man1
+    INSTALL_MAN=${prefix}/share/man/man1
     exec_prefix=${prefix}
     libdir=${exec_prefix}/lib
     includedir=${prefix}/include
@@ -66,7 +66,7 @@ cat > %{buildroot}%{_libdir}/pkgconfig/lua.pc <<- "EOF"
     Description: An Extensible Extension Language
     Version: ${R}
     Requires:
-    Libs: -L${libdir} -llua -lm
+    Libs: -L${libdir} -llua -lm -ldl
     Cflags: -I${includedir}
 EOF
 rmdir %{buildroot}%{_libdir}/lua/%{majmin}
