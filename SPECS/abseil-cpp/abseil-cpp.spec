@@ -8,10 +8,10 @@ Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 # Workaround until GTest publishes a release including the "GTEST_FLAG_GET" macro.
-# Currently only available in "main" branch: https://github.com/google/googletest/commit/977cffc4423a2d6c0df3fc9a7b5253b8f79c3f18
+# Currently only available in the "main" branch: https://github.com/google/googletest/commit/977cffc4423a2d6c0df3fc9a7b5253b8f79c3f18
 Patch0:         gtest_build_fix.patch
 # Workaround until GTest publishes a release including the "::testing::Conditional" matcher.
-# Currently only available in "main" branch: https://github.com/google/googletest/commit/8306020a3e9eceafec65508868d7ab5c63bb41f7
+# Currently only available in the "main" branch: https://github.com/google/googletest/commit/8306020a3e9eceafec65508868d7ab5c63bb41f7
 Patch1:         disabling_invalid_tests.patch
 
 BuildRequires:  cmake >= 3.20.0
