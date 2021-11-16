@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.74.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -220,8 +220,8 @@ Patch1181:      CVE-2021-42252.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
-BuildRequires:  dwarves
 BuildRequires:  diffutils
+BuildRequires:  dwarves
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
@@ -231,7 +231,7 @@ BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
-BuildRequires:  python3
+BuildRequires:  python3-devel
 BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
@@ -309,6 +309,13 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
+%package -n     python3-perf
+Summary:        Python 3 extension for perf tools
+Requires:       python3
+
+%description -n python3-perf
+This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
+
 %package dtb
 Summary:        This package contains common device tree blobs (dtb)
 Group:          System Environment/Kernel
@@ -316,9 +323,8 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n bpftool
-Summary: Inspection and simple manipulation of eBPF programs and maps
-License: GPLv2
+%package -n     bpftool
+Summary:        Inspection and simple manipulation of eBPF programs and maps
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -367,7 +373,9 @@ fi
 cp %{SOURCE4} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
-make -C tools perf
+
+# Compile perf, python3-perf
+make -C tools/perf PYTHON=%{python3} all
 
 #Compile bpftool
 make -C tools/bpf/bpftool
@@ -459,6 +467,9 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 # Linux version that was affected is 4.4.26
 make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 
+# Install python3-perf
+make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
+
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
@@ -511,6 +522,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
+%exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
 %ifarch x86_64
@@ -558,6 +570,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
 
+%files -n python3-perf
+%{python3_sitearch}/*
+
 %ifarch aarch64
 %files dtb
 /boot/dtb/fsl-imx8mq-evk.dtb
@@ -567,8 +582,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
-
 %changelog
+* Mon Nov 15 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.74.1-4
+- Add python3-perf subpackage and add python3-devel to build-time requirements
+- Exclude accessibility modules from main package to avoid subpackage conflict
+- Remove redundant License tag from bpftool subpackage
+
 * Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-3
 - Update configs for gcc 11.2.0 and binutils 2.37 updates
 
