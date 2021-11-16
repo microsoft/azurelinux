@@ -16,6 +16,7 @@ Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{versi
 #  popd
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
+BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -60,6 +61,7 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
+   -DgRPC_ABSL_PROVIDER:STRING='package'    \
    -DgRPC_CARES_PROVIDER:STRING='package'    \
    -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
    -DgRPC_RE2_PROVIDER:STRING='package'      \
@@ -75,7 +77,6 @@ find %{buildroot} -name '*.cmake' -delete
 %files
 %license LICENSE
 %{_libdir}/*.so.*
-%{_libdir}/libabsl_*
 %{_datadir}/grpc/roots.pem
 
 %files devel
@@ -102,9 +103,7 @@ find %{buildroot} -name '*.cmake' -delete
 
 %changelog
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-7
-- Use pre-installed "re2" instead of building it.
-- Re-enable bundled 'abseil-cpp' libraries to fix run-time requirements
-  until 'abseil-cpp' is available as a separate package.
+- Use pre-installed "re2" and "abseil-cpp" instead of building them.
 
 * Wed Nov 03 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.35.0-6
 - Bringing back the "libaddress_sorting" library.

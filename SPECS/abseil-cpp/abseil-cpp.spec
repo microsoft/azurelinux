@@ -1,20 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        C++ Common Libraries
 Name:           abseil-cpp
 Version:        20200923.3
 Release:        2%{?dist}
-Summary:        C++ Common Libraries
-
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-
 Patch0:         abseil-cpp-20200923.3-typematch.patch
 
 BuildRequires:  cmake
-BuildRequires:  gcc-c++
+BuildRequires:  gcc
 BuildRequires:  make
+
 %if %{with_check}
 BuildRequires:  gtest-devel
 %endif
@@ -35,8 +33,8 @@ found that many of these utilities serve a purpose within our code base,
 and we now want to provide those resources to the C++ community as a whole.
 
 %package devel
-Summary: Development files for %{name}
-Requires: %{name} = %{version}-%{release}
+Summary:        Development files for %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development headers for %{name}
