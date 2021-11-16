@@ -102,6 +102,7 @@ make  %{?_smp_mflags}  check
 %changelog
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.2.5-1
 -   Update to version 5.2.5
+-   License verified
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.2.4-4
 -   Provide xz-lzma-compat and lzma
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com>  5.2.4-3

@@ -44,6 +44,7 @@ make %{?_smp_mflags} check
 %changelog
 * Wed Oct 20 2021 Andrew Phelps <anphel@microsoft.com> 3.8-1
 - Update to version 3.8
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.6-4
 - Added %%license line automatically

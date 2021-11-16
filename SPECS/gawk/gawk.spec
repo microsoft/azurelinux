@@ -61,6 +61,7 @@ make %{?_smp_mflags} check
 %changelog
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.1.0-1
 -   Update to version 5.1.0
+-   License verified
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-4
 -   Skip timeout test
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-3

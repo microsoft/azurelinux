@@ -45,6 +45,7 @@ make  %{?_smp_mflags} check
 %changelog
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.34-1
 -   Update to version 1.34
+-   License verified
 *   Wed Jul 29 2020 Andrew Phelps <anphel@microsoft.com> 1.32-2
 -   Add symlink for gtar.
 *   Wed Jun 03 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-1

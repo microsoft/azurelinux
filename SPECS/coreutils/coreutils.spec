@@ -101,6 +101,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 * Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> 8.32-1
 - Update to version 8.32
 - Add patch to fix aarch64 build issue
+- License verified
 
 * Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> 8.30-10
 - Fix issue with undocumented libselinux requirement
