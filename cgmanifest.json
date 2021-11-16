@@ -4,6 +4,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "abseil-cpp",
+          "version": "20211102.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "acl",
           "version": "2.2.53",
           "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/acl/acl-2.2.53.tar.gz"

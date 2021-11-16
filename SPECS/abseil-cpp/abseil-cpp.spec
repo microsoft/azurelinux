@@ -1,13 +1,13 @@
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20200923.3
-Release:        2%{?dist}
+Version:        20211102.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         abseil-cpp-20200923.3-typematch.patch
+Patch0:         abseil-cpp-20211102.0-typematch.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -74,9 +74,10 @@ ctest --output-on-failure
 %{_libdir}/cmake/absl
 
 %changelog
-* Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200923.3-2
+* Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20211102.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - License verified.
+- Updating to version 20211102.0.
 
 * Mon Mar 08 2021 Rich Mattes <richmattes@gmail.com> - 20200923.3-1
 - Update to release 20200923.3
