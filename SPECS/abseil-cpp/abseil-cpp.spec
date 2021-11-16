@@ -76,7 +76,7 @@ ctest --output-on-failure
 
 %files
 %license LICENSE
-%doc FAQ.md LTS.md README.md UPGRADES.md
+%doc FAQ.md README.md UPGRADES.md
 %{_libdir}/libabsl_*.so
 
 %files devel
@@ -89,6 +89,7 @@ ctest --output-on-failure
 - License verified.
 - Updating to version 20211102.0.
 - Removing redundant type fix patch.
+- Adding patches removing use of unpublished GTest macros and matchers from the test code.
 
 * Mon Mar 08 2021 Rich Mattes <richmattes@gmail.com> - 20200923.3-1
 - Update to release 20200923.3
