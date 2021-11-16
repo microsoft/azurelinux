@@ -105,7 +105,6 @@ find %{buildroot} -name '*.cmake' -delete
 %changelog
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-7
 - Use pre-installed "re2" and "abseil-cpp" instead of building them.
-- Breaking implicit dependency of 'grpc' on 'grpc-devel'.
 
 * Wed Nov 03 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.35.0-6
 - Bringing back the "libaddress_sorting" library.

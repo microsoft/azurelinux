@@ -47,8 +47,8 @@ pushd build
 %cmake \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 %if %{with_check}
+  -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
   -DBUILD_TESTING=ON \
-  -DABSL_USE_GOOGLETEST_HEAD=OFF \
 %else
   -DBUILD_TESTING=OFF \
 %endif
