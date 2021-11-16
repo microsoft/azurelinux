@@ -1975,8 +1975,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
         }
       }
     },
