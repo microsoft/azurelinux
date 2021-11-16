@@ -36,6 +36,9 @@ BuildRequires:  openjdk8
 BuildRequires:  openjre8
 Requires:       openjre8
 
+# Temp: Do not build with x86_64 due to Onebranch build issue
+ExclusiveArch:  aarch64
+
 %description
 JNA provides Java programs easy access to native shared libraries
 (DLLs on Windows) without writing anything but Java code. JNA's

@@ -35,6 +35,9 @@ Requires:       ant
 Requires:       java-headless
 BuildArch:      noarch
 
+# Temp: Do not build with x86_64 due to Onebranch build issue
+ExclusiveArch:  aarch64
+
 %description
 The Ant-Contrib project is a collection of tasks (and at one point
 maybe types and other tools) for Apache Ant.
