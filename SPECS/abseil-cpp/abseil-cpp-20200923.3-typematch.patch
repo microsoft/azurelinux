@@ -1,0 +1,12 @@
+diff -up ./absl/debugging/failure_signal_handler.cc.typematch ./absl/debugging/failure_signal_handler.cc
+--- ./absl/debugging/failure_signal_handler.cc.typematch	2021-03-08 20:43:57.158396960 -0500
++++ ./absl/debugging/failure_signal_handler.cc	2021-03-08 20:44:07.971430229 -0500
+@@ -135,7 +135,7 @@ static bool SetupAlternateStackOnce() {
+ #else
+   const size_t page_mask = sysconf(_SC_PAGESIZE) - 1;
+ #endif
+-  size_t stack_size = (std::max(SIGSTKSZ, 65536) + page_mask) & ~page_mask;
++  size_t stack_size = (std::max(SIGSTKSZ, static_cast<decltype(SIGSTKSZ)>(65536)) + page_mask) & ~page_mask;
+ #if defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
+     defined(ABSL_HAVE_MEMORY_SANITIZER) || defined(ABSL_HAVE_THREAD_SANITIZER)
+   // Account for sanitizer instrumentation requiring additional stack space.
