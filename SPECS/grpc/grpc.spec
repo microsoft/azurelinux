@@ -26,6 +26,7 @@ BuildRequires:  protobuf-devel
 BuildRequires:  re2-devel
 BuildRequires:  zlib-devel
 
+Requires:       abseil
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
