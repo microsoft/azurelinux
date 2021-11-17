@@ -308,6 +308,7 @@ func TestNodeTypeString(t *testing.T) {
 	assert.Equal(t, "Goal", TypeGoal.String())
 	assert.Equal(t, "Remote", TypeRemote.String())
 	assert.Equal(t, "PureMeta", TypePureMeta.String())
+	assert.Equal(t, "PreBuilt", TypePreBuilt.String())
 	var tp NodeType
 	tp = -1
 	assert.Panics(t, func() { _ = tp.String() })
@@ -1018,10 +1019,10 @@ func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	assert.NoError(t, gOut.MakeDAG())
 }
 
-func TestShouldFailMakeDAGWithoutGoalNode(t *testing.T) {
+func TestShouldSucceedMakeDAGWithoutGoalNode(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
 	assert.NotNil(t, gOut)
 
-	assert.Error(t, gOut.MakeDAG())
+	assert.NoError(t, gOut.MakeDAG())
 }

@@ -53,6 +53,7 @@ const (
 	TypeGoal     NodeType = iota         // Meta node which depends on a user selected subset of packages to be built.
 	TypeRemote   NodeType = iota         // A non-local node which may have a cache entry
 	TypePureMeta NodeType = iota         // An arbitrary meta node with no other meaning
+	TypePreBuilt NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
 	TypeMAX      NodeType = TypePureMeta // Max allowable type
 )
 
@@ -134,6 +135,8 @@ func (n NodeType) String() string {
 		return "Remote"
 	case TypePureMeta:
 		return "PureMeta"
+	case TypePreBuilt:
+		return "PreBuilt"
 	default:
 		logger.Log.Panic("Invalid NodeType encountered when serializing to string!")
 		return "error"
@@ -153,6 +156,9 @@ func (n *PkgNode) DOTColor() string {
 	case StateBuildError:
 		return "darkorange"
 	case StateUpToDate:
+		if n.Type == TypePreBuilt {
+			return "greenyellow"
+		}
 		return "forestgreen"
 	case StateUnresolved:
 		return "crimson"
@@ -658,9 +664,11 @@ func (n *PkgNode) FriendlyName() string {
 		}
 		return fmt.Sprintf("%s-%s-REMOTE<%s>", n.VersionedPkg.Name, ver2, n.State.String())
 	case TypeGoal:
-		return fmt.Sprintf("%s", n.GoalName)
+		return n.GoalName
 	case TypePureMeta:
 		return fmt.Sprintf("Meta(%d)", n.ID())
+	case TypePreBuilt:
+		return fmt.Sprintf("%s-%s-PREBUILT<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
 	default:
 		return "UNKNOWN NODE TYPE"
 	}
@@ -1167,10 +1175,6 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 func (g *PkgGraph) MakeDAG() (err error) {
 	var cycle []*PkgNode
 
-	if len(g.findNodesByType(TypeGoal)) == 0 {
-		return fmt.Errorf("must set a goal nodes before removing cycles from the dependency graph")
-	}
-
 	for {
 		cycle, err = g.FindAnyDirectedCycle()
 		if err != nil || len(cycle) == 0 {
@@ -1182,6 +1186,27 @@ func (g *PkgGraph) MakeDAG() (err error) {
 			return formatCycleErrorMessage(cycle, err)
 		}
 	}
+}
+
+// cloneNode creates a clone of the input node with a new, unique ID.
+// The clone doesn't have any edges attached to it.
+func (g *PkgGraph) cloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
+	newNode = &PkgNode{
+		nodeID:       g.NewNode().ID(),
+		VersionedPkg: pkgNode.VersionedPkg,
+		State:        pkgNode.State,
+		Type:         pkgNode.Type,
+		SrpmPath:     pkgNode.SrpmPath,
+		RpmPath:      pkgNode.RpmPath,
+		SpecPath:     pkgNode.SpecPath,
+		SourceDir:    pkgNode.SourceDir,
+		Architecture: pkgNode.Architecture,
+		SourceRepo:   pkgNode.SourceRepo,
+		Implicit:     pkgNode.Implicit,
+	}
+	newNode.This = newNode
+
+	return
 }
 
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if:
@@ -1247,27 +1272,32 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
-	previousNode := trimmedCycle[len(trimmedCycle)-1]
-	for _, currentNode := range trimmedCycle {
-		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); isPrebuilt {
-			logger.Log.Debugf("Found pre-built SRPM '%s' in cycle. Removing edge from '%s'.", previousNode.FriendlyName(), currentNode.FriendlyName())
+	currentNode := trimmedCycle[len(trimmedCycle)-1]
+	for _, previousNode := range trimmedCycle {
+		// Why we're targetting only "build node -> run node" edges:
+		// 1. Explicit package rebuilds create an edge between the goal node and an SRPM's run nodes.
+		//    Considering that, we avoid accidentally skipping a rebuild by only removing edges between a build and a run node.
+		// 2. Every build cycle must contain at least one edge between a build node and a run node from different SRPMs.
+		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
+		buildToRunEdge := previousNode.Type == TypeBuild && currentNode.Type == TypeRun
+		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
+			logger.Log.Debugf("Found pre-built SRPM '%s' in cycle. Replacing edge leading to it from build node '%s' with an edge to a new 'PreBuilt' node.", currentNode.FriendlyName(), previousNode.FriendlyName())
 			g.RemoveEdge(previousNode.ID(), currentNode.ID())
 
-			goalNodes := g.findNodesByType(TypeGoal)
-			for _, goalNode := range goalNodes {
-				if g.HasEdgeFromTo(goalNode.ID(), currentNode.ID()) {
-					logger.Log.Debugf("Found edge from the '%s' goal node to the pre-built SRPM - no need for a new one.", goalNode.FriendlyName())
-					return
-				}
-			}
+			preBuiltNode := g.cloneNode(currentNode)
+			preBuiltNode.State = StateUpToDate
+			preBuiltNode.Type = TypePreBuilt
 
-			logger.Log.Debugf("No goal node depends on the pre-built SRPM. Adding edge from the '%s' goal node to ensure potential forced rebuild.", goalNodes[0].FriendlyName())
-			err = g.AddEdge(goalNodes[0], currentNode)
+			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
+			err = g.AddEdge(previousNode, preBuiltNode)
+			if err != nil {
+				logger.Log.Errorf("Adding edge failed for %v -> %v", previousNode, preBuiltNode)
+			}
 
 			return
 		}
 
-		previousNode = currentNode
+		currentNode = previousNode
 	}
 
 	return fmt.Errorf("cycle contains no pre-build SRPMs, unresolvable")
@@ -1284,17 +1314,6 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 			break
 		}
 	}
-}
-
-// findNodesByType returns a list of all nodes matching the input type.
-func (g *PkgGraph) findNodesByType(searchedType NodeType) (foundNodes []*PkgNode) {
-	for _, node := range graph.NodesOf(g.Nodes()) {
-		if node.(*PkgNode).Type == searchedType {
-			foundNodes = append(foundNodes, node.(*PkgNode))
-		}
-	}
-
-	return
 }
 
 func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
