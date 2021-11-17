@@ -360,6 +360,8 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 
 // AddEdge creates a new edge between the provided nodes.
 func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
+	logger.Log.Tracef("Adding node: %s -> %s", from.FriendlyName(), to.FriendlyName())
+
 	newEdge := g.NewEdge(from, to)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1281,17 +1283,26 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
 		buildToRunEdge := previousNode.Type == TypeBuild && currentNode.Type == TypeRun
 		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
-			logger.Log.Debugf("Found pre-built SRPM '%s' in cycle. Replacing edge leading to it from build node '%s' with an edge to a new 'PreBuilt' node.", currentNode.FriendlyName(), previousNode.FriendlyName())
-			g.RemoveEdge(previousNode.ID(), currentNode.ID())
+			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
+				currentNode.SrpmPath, previousNode.SrpmPath)
 
 			preBuiltNode := g.cloneNode(currentNode)
 			preBuiltNode.State = StateUpToDate
 			preBuiltNode.Type = TypePreBuilt
 
 			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
-			err = g.AddEdge(previousNode, preBuiltNode)
-			if err != nil {
-				logger.Log.Errorf("Adding edge failed for %v -> %v", previousNode, preBuiltNode)
+
+			parentNodes := g.To(currentNode.ID())
+			for parentNodes.Next() {
+				parentNode := parentNodes.Node().(*PkgNode)
+				if parentNode.Type == TypeBuild && parentNode.SrpmPath == previousNode.SrpmPath {
+					g.RemoveEdge(parentNode.ID(), currentNode.ID())
+
+					err = g.AddEdge(parentNode, preBuiltNode)
+					if err != nil {
+						logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+					}
+				}
 			}
 
 			return
