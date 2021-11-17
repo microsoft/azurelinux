@@ -36,7 +36,7 @@ BuildRequires:  openjdk8
 BuildRequires:  openjre8
 Requires:       openjre8
 
-# Temp: Do not build with x86_64 due to Onebranch build issue
+# Temp: Do not build with x86_64 due to docker build issue
 ExclusiveArch:  aarch64
 
 %description

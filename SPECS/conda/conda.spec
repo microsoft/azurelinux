@@ -29,7 +29,7 @@ Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
 
 BuildArch:      noarch
 
-# Temp: Do not build with x86_64 due to Onebranch build issue
+# Temp: Do not build with x86_64 due to docker build issue
 ExclusiveArch:  aarch64
 
 BuildRequires:  bash-completion-devel

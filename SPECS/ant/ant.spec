@@ -38,8 +38,8 @@ Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
 BuildArch:      noarch
 
-# Temp: Do not build with x86_64 due to Onebranch build issue
-ExclusiveArch:  aarch64
+# Temp: Do not build with x86_64 due to docker build issue
+#ExclusiveArch:  aarch64
 
 %description
 Apache Ant is a Java library and command-line tool whose mission is to
