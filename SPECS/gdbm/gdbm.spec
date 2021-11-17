@@ -77,6 +77,7 @@ make %{?_smp_mflags} check
 %changelog
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 1.21-1
 - Update to version 1.21
+- License verified
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.18-4
 - Symlink headers for compatibility.

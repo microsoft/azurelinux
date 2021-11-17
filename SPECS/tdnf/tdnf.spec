@@ -136,9 +136,7 @@ popd
 find %{buildroot} -name '*.pyc' -delete
 
 # Pre-install
-#%%pre
-# Remove. Might be related to aarch64 "Add RPM to worker chroot" issue?
-# error: %%prein(tdnf-2.1.0-7.cm2.aarch64) scriptlet failed, exit status 127
+%pre
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
@@ -151,7 +149,7 @@ find %{buildroot} -name '*.pyc' -delete
     /sbin/ldconfig
 
 # Pre-uninstall
-#%%preun
+%preun
 
     # First argument is 0 => Uninstall
     # First argument is 1 => Upgrade

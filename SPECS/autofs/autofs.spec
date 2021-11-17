@@ -72,6 +72,7 @@ rm -rf %{buildroot}/*
 %changelog
 *   Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.1.8-1
 -   Upgrade to version 5.1.8
+-   License verified
 *   Wed May 13 2020 Nick Samson <nisamson@microsoft.com> - 5.1.4-6
 -   Added %%license line automatically
 *   Tue May 12 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.1.4-5

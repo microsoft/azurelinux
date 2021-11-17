@@ -56,6 +56,7 @@ make %{?_smp_mflags} check
 %changelog
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 3.7-1
 - Update to version 3.7
+- License verified
 * Tue Jun 15 2021 Andrew Phelps <anphel@microsoft.com> 3.1-5
 - Support perl regular expressions ("grep -P")
 - Fix test issues

@@ -60,6 +60,7 @@ make %{?_smp_mflags} check
 %changelog
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.0-1
 - Update to version 2.2.0
+- License verified
 
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.4-6
 - Adding 'Provides' for 'kbm-misc'.

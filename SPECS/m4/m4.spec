@@ -42,6 +42,7 @@ make  %{?_smp_mflags}  check
 %changelog
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 1.4.18-5
 - Add patches for glibc 2.34
+- License verified
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.4.18-4
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.18-3

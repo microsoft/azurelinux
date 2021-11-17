@@ -154,6 +154,7 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %changelog
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
 - Remove tcp_wrappers dependency due to package removal
+- License verified
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-7
 - Remove libtool archive files from final packaging

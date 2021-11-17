@@ -193,6 +193,7 @@ done
 %changelog
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.5-6
 - Fix gcc11 compilation issues
+- License verified
 
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.5-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}

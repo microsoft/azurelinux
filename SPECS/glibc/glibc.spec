@@ -308,6 +308,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %changelog
 * Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.34-1
 - Upgrade to version 2.34
+- License verified
 
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
 - Adding 'Provides' for 'nss_db'.

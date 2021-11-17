@@ -65,6 +65,7 @@ make %{?_smp_mflags} check
 %changelog
 *   Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> 6.2.1-1
 -   Update to version 6.2.1
+-   License verified
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
 -   Added %%license line automatically
 *   Fri Feb 14 2020 Andrew Phelps <anphel@microsoft.com> 6.1.2-4

@@ -70,6 +70,7 @@ make %{?_smp_mflags} check
 %changelog
 * Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.0-1
 - Update to version 4.1.0
+- License verified.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.0.1-3
 - Added %%license line automatically
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0.1-2

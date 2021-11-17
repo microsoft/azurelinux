@@ -44,6 +44,7 @@ make %{?_smp_mflags} check
 %changelog
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-6
 - Add additional glibc 2.34 workarounds to glob.c
+- License verified
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 4.2.1-5
 - Fix check test
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-4
