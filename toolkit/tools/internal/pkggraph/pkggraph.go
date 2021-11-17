@@ -360,7 +360,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 
 // AddEdge creates a new edge between the provided nodes.
 func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
-	logger.Log.Tracef("Adding node: %s -> %s", from.FriendlyName(), to.FriendlyName())
+	logger.Log.Tracef("Adding edge: %s -> %s", from.FriendlyName(), to.FriendlyName())
 
 	newEdge := g.NewEdge(from, to)
 	defer func() {
