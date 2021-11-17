@@ -36,10 +36,10 @@ Requires:       java-devel >= 1.8
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
-BuildArch:      noarch
-
 # Temp: Do not build with x86_64 due to docker build issue
-#ExclusiveArch:  aarch64
+ExclusiveArch:  aarch64
+#BuildArch:      noarch
+
 
 %description
 Apache Ant is a Java library and command-line tool whose mission is to
