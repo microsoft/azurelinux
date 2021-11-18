@@ -17,6 +17,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         pthread_stack_min_int_cast.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -326,8 +327,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-# upstream fix: https://github.com/torvalds/linux/commit/d08c84e01afa7a7eee6badab25d5420fa847f783
-sed -i 's/ PTHREAD_STACK_MIN/ (int)PTHREAD_STACK_MIN/g' tools/perf/builtin-sched.c
+%patch1 -p1
 
 %build
 make mrproper

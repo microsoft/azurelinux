@@ -16,6 +16,7 @@ Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         pthread_stack_min_int_cast.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -92,8 +93,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-# upstream fix: https://github.com/torvalds/linux/commit/d08c84e01afa7a7eee6badab25d5420fa847f783
-sed -i 's/ PTHREAD_STACK_MIN/ (int)PTHREAD_STACK_MIN/g' tools/perf/builtin-sched.c
+%patch1 -p1
 
 %build
 make mrproper
