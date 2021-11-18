@@ -2,7 +2,7 @@
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
 Version:        3.0.12
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,7 +45,7 @@ the same lock object twice, it will not block.
 %build
 %py3_build
 
-%make_build -C docs html man SPHINXBUILD=sphinx-build3
+make -C docs html man SPHINXBUILD=sphinx-build3
 rm docs/build/html/.buildinfo
 
 %install
@@ -69,6 +69,9 @@ python%{python3_version} test.py
 %{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
+* Wed Nov 17 2021 Andrew Phelps <anphel@microsoft.com> - 3.0.12-11
+- Use make with single processor to mitigate intermittent build failures
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.0.12-10
 - Remove python2 support
 - License verified
