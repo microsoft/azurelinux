@@ -137,6 +137,7 @@ find %{buildroot} -name '*.pyc' -delete
 
 # Pre-install
 %pre
+
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
