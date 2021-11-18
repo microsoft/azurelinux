@@ -18,6 +18,7 @@ URL:            https://github.com/nodejs/node
 Source0:        node-v%{version}-clean.tar.xz
 Source1:        clean-source-tarball.sh
 Patch0:         patch_tls_nodejs14.patch
+Patch1:         remove_unsupported_tlsv13_ciphers.patch
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
@@ -89,10 +90,11 @@ done
 * Tue Nov 09 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
 - Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
   CVE-2021-37712, CVE-2021-37713, CVE-2021-39134, CVE-2021-39135
+- Add patch to remove problematic cipher from default list
 - Add config flag to use OpenSSL cert store instead of built-in Mozilla certs
 - Add script to remove vendored OpenSSL tree from source tarball
 - Add runtime requirement on ca-certificates for base package
-- Update require OpenSSL version to 1.1.1
+- Update required OpenSSL version to 1.1.1
 - Use python configure script directly
 - Enable a larger set of tests
 - Lint spec
