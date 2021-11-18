@@ -9,8 +9,8 @@
 
 print_usage() {
     echo "Usage:"
-    echo "make-hobbled-nodejs-source.sh {version}"
-    echo "Example: make-hobbled-nodejs-source.sh 14.18.1"
+    echo "clean-source-tarball.sh {version}"
+    echo "Example: clean-source-tarball.sh 14.18.1"
     echo
     exit
 }

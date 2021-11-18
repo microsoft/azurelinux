@@ -1,8 +1,3 @@
-
-# WARNING: MUST check and update the 'npm_version' macro for every version update of this package.
-#           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-%define npm_version 6.14.15
-
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 Version:        14.18.1
@@ -70,7 +65,8 @@ done
 # Run all tests, minus linter/doc tests
 %make_build test-only
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -87,7 +83,7 @@ done
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Tue Nov 09 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
+* Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
 - Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
   CVE-2021-37712, CVE-2021-37713, CVE-2021-39134, CVE-2021-39135
 - Add patch to remove problematic cipher from default list
