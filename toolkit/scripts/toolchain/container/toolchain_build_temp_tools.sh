@@ -16,9 +16,9 @@ touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
-echo Binutils-2.36.1 - Pass 1
-tar xf binutils-2.36.1.tar.xz
-pushd binutils-2.36.1
+echo Binutils-2.37 - Pass 1
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
 patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 mkdir -v build
 cd build
@@ -32,19 +32,19 @@ make -j$(nproc)
 mkdir -v /tools/lib && ln -sv lib /tools/lib64
 make install
 popd
-rm -rf binutils-2.36.1
+rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
-echo GCC-9.1.0 - Pass 1
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
-tar xf ../mpfr-4.0.1.tar.xz
-mv -v mpfr-4.0.1 mpfr
-tar xf ../gmp-6.1.2.tar.xz
-mv -v gmp-6.1.2 gmp
-tar xf ../mpc-1.1.0.tar.gz
-mv -v mpc-1.1.0 mpc
+echo GCC-11.2.0 - Pass 1
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
+tar xf ../mpfr-4.1.0.tar.xz
+mv -v mpfr-4.1.0 mpfr
+tar xf ../gmp-6.2.1.tar.xz
+mv -v gmp-6.2.1 gmp
+tar xf ../mpc-1.2.1.tar.gz
+mv -v mpc-1.2.1 mpc
 case $(uname -m) in
     x86_64)
       for file in gcc/config/{linux,i386/linux{,64}}.h
@@ -110,7 +110,7 @@ cd       build
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
@@ -125,9 +125,9 @@ rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
-echo glibc-2.28
-tar xf glibc-2.28.tar.xz
-pushd glibc-2.28
+echo glibc-2.34
+tar xf glibc-2.34.tar.xz
+pushd glibc-2.34
 mkdir -v build
 cd       build
 ../configure                             \
@@ -139,8 +139,7 @@ cd       build
       --with-headers=/tools/include      \
       libc_cv_forced_unwind=yes          \
       libc_cv_c_cleanup=yes
-# Build with single processor due to LFS warning about glibc errors seen with parallel make
-make -j1
+make -j$(nproc)
 make install
 echo sanity check - temptoolchain - glibc
 set +e
@@ -159,13 +158,13 @@ rm -v dummy.c a.out
 set -e
 echo End sanity check - temptoolchain - glibc
 popd
-rm -rf glibc-2.28
+rm -rf glibc-2.34
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
-echo Libstdc++ from GCC-9.1.0
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo Libstdc++ from GCC-11.2.0
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -175,17 +174,17 @@ cd       build
     --disable-nls                   \
     --disable-libstdcxx-threads     \
     --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/9.1.0
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/11.2.0
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
-echo Binutils-2.36.1 - Pass 2
-tar xf binutils-2.36.1.tar.xz
-pushd binutils-2.36.1
+echo Binutils-2.37 - Pass 2
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
 mkdir -v build
 cd build
 CC=$LFS_TGT-gcc                  \
@@ -203,13 +202,17 @@ make -C ld clean
 make -C ld LIB_PATH=/usr/lib:/lib
 cp -v ld/ld-new /tools/bin
 popd
-rm -rf binutils-2.36.1
+rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-9.1.0 - Pass 2
-tar xf gcc-9.1.0.tar.xz
-pushd gcc-9.1.0
+echo GCC-11.2.0 - Pass 2
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
+# fix issue compiling with glibc 2.34
+sed -e '/static.*SIGSTKSZ/d' \
+    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
 cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 case $(uname -m) in
@@ -251,12 +254,12 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-tar -xf ../mpfr-4.0.1.tar.xz
-mv -v mpfr-4.0.1 mpfr
-tar -xf ../gmp-6.1.2.tar.xz
-mv -v gmp-6.1.2 gmp
-tar -xf ../mpc-1.1.0.tar.gz
-mv -v mpc-1.1.0 mpc
+tar -xf ../mpfr-4.1.0.tar.xz
+mv -v mpfr-4.1.0 mpfr
+tar -xf ../gmp-6.2.1.tar.xz
+mv -v gmp-6.2.1 gmp
+tar -xf ../mpc-1.2.1.tar.gz
+mv -v mpc-1.2.1 mpc
 mkdir -v build
 cd       build
 CC=$LFS_TGT-gcc                                    \
@@ -277,7 +280,7 @@ make install
 ln -sv gcc /tools/bin/cc
 # Sanity check
 set +e
-echo sanity check - temptoolchain - gcc 9.1.0 pass2
+echo sanity check - temptoolchain - gcc 11.2.0 pass2
 echo 'int main(){}' > dummy.c
 cc dummy.c
 readelf -l a.out | grep ': /tools'
@@ -291,9 +294,9 @@ case $(uname -m) in
 esac
 rm -v dummy.c a.out
 set -e
-echo End sanity check - temptoolchain - gcc 9.1.0 pass2
+echo End sanity check - temptoolchain - gcc 11.2.0 pass2
 popd
-rm -rf gcc-9.1.0
+rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
@@ -349,8 +352,9 @@ touch $LFS/logs/temptoolchain/status_dejagnu_complete
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
+# Fix issues building with glibc 2.34
+patch -Np1 -i /tools/04-fix-sigstksz.patch
+patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
@@ -389,84 +393,91 @@ rm -rf bash-4.4.18
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
-echo Bison-3.1
-tar xf bison-3.1.tar.xz
-pushd bison-3.1
+echo Bison-3.7.6
+tar xf bison-3.7.6.tar.xz
+pushd bison-3.7.6
 ./configure --prefix=/tools
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-make -j1
+# try parallel make with new version
+make -j$(nproc)
 make install
 popd
-rm -rf bison-3.1
+rm -rf bison-3.7.6
 
 touch $LFS/logs/temptoolchain/status_bison_complete
 
-echo Bzip2-1.0.6
-tar xf bzip2-1.0.6.tar.gz
-pushd bzip2-1.0.6
-make -j$(nproc)
-make PREFIX=/tools install
-popd
-rm -rf bzip2-1.0.6
-
-touch $LFS/logs/temptoolchain/status_bzip2_complete
-
-echo Coreutils-8.30
-tar xf coreutils-8.30.tar.xz
-pushd coreutils-8.30
+echo Coreutils-8.32
+tar xf coreutils-8.32.tar.xz
+pushd coreutils-8.32
+case $(uname -m) in
+    aarch64)
+        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
+    ;;
+esac
 ./configure --prefix=/tools --enable-install-program=hostname
 make -j$(nproc)
 make install
 popd
-rm -rf coreutils-8.30
+rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
 
-echo Diffutils-3.6
-tar xf diffutils-3.6.tar.xz
-pushd diffutils-3.6
+echo Diffutils-3.8
+tar xf diffutils-3.8.tar.xz
+pushd diffutils-3.8
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf diffutils-3.6
+rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.34
-tar xf file-5.34.tar.gz
-pushd file-5.34
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.34
+rm -rf file-5.40
 
 touch $LFS/logs/temptoolchain/status_file_complete
 
-echo Findutils-4.6.0
-tar xf findutils-4.6.0.tar.gz
-pushd findutils-4.6.0
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
+# "bzip2" should build after "file" to prevent error:
+#/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
+#collect2: error: ld returned 1 exit status
+#Makefile:499: recipe for target 'libmagic.la' failed
+echo Bzip2-1.0.8
+tar xf bzip2-1.0.8.tar.gz
+pushd bzip2-1.0.8
+make -j$(nproc)
+make PREFIX=/tools install
+popd
+rm -rf bzip2-1.0.8
+
+touch $LFS/logs/temptoolchain/status_bzip2_complete
+
+echo Findutils-4.8.0
+tar xf findutils-4.8.0.tar.xz
+pushd findutils-4.8.0
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf findutils-4.6.0
+rm -rf findutils-4.8.0
 
 touch $LFS/logs/temptoolchain/status_findutils_complete
 
-echo Gawk-4.2.1
-tar xf gawk-4.2.1.tar.xz
-pushd gawk-4.2.1
+echo Gawk-5.1.0
+tar xf gawk-5.1.0.tar.xz
+pushd gawk-5.1.0
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-4.2.1
+rm -rf gawk-5.1.0
 
 touch $LFS/logs/temptoolchain/status_gawk_complete
 
@@ -481,27 +492,25 @@ rm -rf gettext-0.19.8.1
 
 touch $LFS/logs/temptoolchain/status_gettext_complete
 
-echo Grep-3.1
-tar xf grep-3.1.tar.xz
-pushd grep-3.1
+echo Grep-3.7
+tar xf grep-3.7.tar.xz
+pushd grep-3.7
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf grep-3.1
+rm -rf grep-3.7
 
 touch $LFS/logs/temptoolchain/status_grep_complete
 
-echo Gzip-1.9
-tar xf gzip-1.9.tar.xz
-pushd gzip-1.9
+echo Gzip-1.11
+tar xf gzip-1.11.tar.xz
+pushd gzip-1.11
 ./configure --prefix=/tools
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 make -j$(nproc)
 make install
 popd
-rm -rf gzip-1.9
+rm -rf gzip-1.11
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
@@ -509,6 +518,7 @@ echo Make-4.2.1
 tar xf make-4.2.1.tar.gz
 pushd make-4.2.1
 sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+sed -i '215 d; 223 d;' glob/glob.c
 ./configure --prefix=/tools --without-guile
 make -j$(nproc)
 make install
@@ -528,16 +538,16 @@ rm -rf patch-2.7.6
 
 touch $LFS/logs/temptoolchain/status_patch_complete
 
-echo Perl-5.30.3
-tar xf perl-5.30.3.tar.gz
-pushd perl-5.30.3
+echo Perl-5.32.0
+tar xf perl-5.32.0.tar.xz
+pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
 make -j$(nproc)
 cp -v perl cpan/podlators/scripts/pod2man /tools/bin
-mkdir -pv /tools/lib/perl5/5.30.3
-cp -Rv lib/* /tools/lib/perl5/5.30.3
+mkdir -pv /tools/lib/perl5/5.32.0
+cp -Rv lib/* /tools/lib/perl5/5.32.0
 popd
-rm -rf perl-5.30.3
+rm -rf perl-5.32.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
@@ -553,59 +563,52 @@ rm -rf Python-3.7.4
 
 touch $LFS/logs/temptoolchain/status_python_complete
 
-echo Sed-4.5
-tar xf sed-4.5.tar.xz
-pushd sed-4.5
+echo Sed-4.8
+tar xf sed-4.8.tar.xz
+pushd sed-4.8
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf sed-4.5
+rm -rf sed-4.8
 
 touch $LFS/logs/temptoolchain/status_sed_complete
 
-echo Tar-1.30
-tar xf tar-1.30.tar.xz
-pushd tar-1.30
+echo Tar-1.34
+tar xf tar-1.34.tar.xz
+pushd tar-1.34
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf tar-1.30
+rm -rf tar-1.34
 
 touch $LFS/logs/temptoolchain/status_tar_complete
 
-echo Texinfo-6.5
-tar xf texinfo-6.5.tar.xz
-pushd texinfo-6.5
+echo Texinfo-6.8
+tar xf texinfo-6.8.tar.xz
+pushd texinfo-6.8
+# fix issue building with glibc 2.34:
+sed -e 's/__attribute_nonnull__/__nonnull/' \
+    -i gnulib/lib/malloc/dynarray-skeleton.c
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf texinfo-6.5
+rm -rf texinfo-6.8
 
 touch $LFS/logs/temptoolchain/status_texinfo_complete
 
-echo Xz-5.2.4
-tar xf xz-5.2.4.tar.xz
-pushd xz-5.2.4
+echo Xz-5.2.5
+tar xf xz-5.2.5.tar.xz
+pushd xz-5.2.5
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf xz-5.2.4
+rm -rf xz-5.2.5
 
 touch $LFS/logs/temptoolchain/status_xz_complete
-
-echo zstd-1.5.0
-tar xf zstd-1.5.0.tar.gz
-pushd zstd-1.5.0
-make -j$(nproc)
-make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
-popd
-rm -rf zstd-1.5.0
-
-touch $LFS/logs/temptoolchain/status_zstd_complete
 
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz

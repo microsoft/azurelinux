@@ -1,11 +1,11 @@
 Summary:        libgpg-error
 Name:           libgpg-error
-Version:        1.32
-Release:        6%{?dist}
+Version:        1.43
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
-Source0:        ftp://ftp.gnupg.org/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -67,12 +67,16 @@ make %{?_smp_mflags} check
 %{_datadir}/libgpg-error
 %{_datadir}/aclocal/*
 %{_datadir}/common-lisp/source/gpg-error
+%{_libdir}/pkgconfig/*.pc
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
 %changelog
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.32-6
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.43-1
+- Update to version 1.43
+
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> 1.32-6
 - Remove libtool archive files from final packaging
 
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5

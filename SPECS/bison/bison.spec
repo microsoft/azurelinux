@@ -1,13 +1,13 @@
 Summary:        Contains a parser generator
 Name:           bison
-Version:        3.1
-Release:        5%{?dist}
+Version:        3.7.6
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bison
-Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:  flex
 BuildRequires:  m4
@@ -24,8 +24,8 @@ This package contains a parser generator
 
 %build
 #make some fixes required by glibc-2.28:
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
+#sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
+#echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
 
 ./configure \
     --prefix=%{_prefix} \
@@ -55,7 +55,10 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
-* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1-5
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 3.7.6-1
+- Update to version 3.7.6
+
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 3.1-5
 - Adding 'Provides' for 'bison-runtime'.
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4

@@ -3,8 +3,8 @@
 
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
-Version:        0.176
-Release:        5%{?dist}
+Version:        0.185
+Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -146,7 +146,10 @@ These are the additional language files of elfutils.
 %setup -q
 
 %build
-%configure --program-prefix=%{_programprefix}
+%configure \
+    --program-prefix=%{_programprefix} \
+    --disable-debuginfod \
+    --enable-libdebuginfod=dummy
 make %{?_smp_mflags}
 
 %install
@@ -155,7 +158,7 @@ mkdir -p %{buildroot}%{_prefix}
 %makeinstall
 
 chmod +x %{buildroot}%{_libdir}/lib*.so*
-chmod +x %{buildroot}%{_libdir}/elfutils/lib*.so*
+#chmod +x %{buildroot}%{_libdir}/elfutils/lib*.so*
 
 install -Dm0644 config/10-default-yama-scope.conf %{buildroot}%{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
 
@@ -206,13 +209,15 @@ fi
 %license COPYING COPYING-GPLV2 COPYING-LGPLV3
 %doc README TODO CONTRIBUTING
 %{_bindir}/eu-*
+%{_bindir}/debuginfod-find
 %exclude %{_bindir}/eu-ld
 %{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
 %{_libdir}/libasm.so.*
 %{_libdir}/libdw.so.*
-%dir %{_libdir}/elfutils
-%{_libdir}/elfutils/lib*.so
+#%%dir %%{_libdir}/elfutils
+#%%{_libdir}/elfutils/lib*.so
+%{_mandir}/man1/*
 
 %files default-yama-scope
 %{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
@@ -220,18 +225,23 @@ fi
 %files devel
 %defattr(-,root,root)
 %{_includedir}/dwarf.h
+/etc/profile.d/debuginfod.csh
+/etc/profile.d/debuginfod.sh
 %dir %{_includedir}/elfutils
 %{_includedir}/elfutils/elf-knowledge.h
 #%{_includedir}/elfutils/libasm.h
-%{_includedir}/elfutils/libebl.h
+#%%{_includedir}/elfutils/libebl.h
 %{_includedir}/elfutils/libdw.h
 %{_includedir}/elfutils/libdwfl.h
 %{_includedir}/elfutils/known-dwarf.h
 %{_includedir}/elfutils/libdwelf.h
-%{_libdir}/libebl.a
+%{_includedir}/elfutils/debuginfod.h
+#%%{_libdir}/libebl.a
 #%{_libdir}/libasm.so
 %{_libdir}/libdw.so
+%{_libdir}/libdebuginfod*
 %{_libdir}/pkgconfig/*.pc
+%{_mandir}/man3/*
 
 %files devel-static
 %{_libdir}/libdw.a
@@ -257,6 +267,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 0.185-1
+- Update to version 0.185
+
 * Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.176-5
 - Adding "*-default-yama-scope" subpackage using Fedora 32 (license: MIT) specs as guidance.
 - Providing subpackage '*-libs' from the default package.

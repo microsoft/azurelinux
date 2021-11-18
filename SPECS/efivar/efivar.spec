@@ -1,8 +1,8 @@
 Summary:        Tools and libraries to manipulate EFI variables
 Name:           efivar
 Version:        37
-Release:        4%{?dist}
-License:        GPLv2
+Release:        5%{?dist}
+License:        LGPL-2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/System Utilities
@@ -29,7 +29,7 @@ It contains the libraries and header files to create applications
     PREFIX=%{_prefix} \
     libdir=%{_libdir} \
     bindir=%{_bindir} \
-    CFLAGS="%{build_cflags} -Wno-error=address-of-packed-member"
+    CFLAGS="%{build_cflags} -Wno-error=address-of-packed-member -Wno-error=stringop-truncation"
 
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
@@ -52,6 +52,10 @@ It contains the libraries and header files to create applications
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 09 2021 Andrew Phelps <anphel@microsoft.com> - 37-5
+- Modify CFLAGS to build with gcc11
+- License verified
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 37-4
 - Lint spec, using make macros throughout
 - Package libraries in %%{_libdir}, not %%{_lib64dir}

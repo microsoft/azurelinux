@@ -19,8 +19,8 @@
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
-Release:        1%{?dist}
-License:        LGPLv2.1+ OR ASL 2.0
+Release:        2%{?dist}
+License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -35,6 +35,9 @@ BuildRequires:  libffi-devel
 BuildRequires:  openjdk8
 BuildRequires:  openjre8
 Requires:       openjre8
+
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
 
 %description
 JNA provides Java programs easy access to native shared libraries
@@ -135,6 +138,9 @@ ant
 %license LICENSE
 
 %changelog
+* Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-2
+- License verified.
+
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.5.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Disable JAWT to avoid X11 header dependencies.

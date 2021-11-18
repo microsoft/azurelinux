@@ -1,20 +1,21 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Summary:        Intel LLDP Agent
 Name:           lldpad
-Version:        1.0.1
-Release:        18%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://github.com/intel/openlldp
-#Source0:       https://github.com/intel/openlldp/archive/v%%{version}.tar.gz
-Source0:        %{name}-%{version}.pkgupdate.tar.gz
-Patch0:         remove-lldp-ethertype-use-linux-5.3-header-instead.patch
+Source0:        https://github.com/intel/openlldp/archive/v%{majmin}.tar.gz#/openlldp-%{majmin}.tar.gz
+BuildRequires:  flex-devel
 BuildRequires:  kernel-headers
 BuildRequires:  libconfig-devel
 BuildRequires:  libnl3-devel
 BuildRequires:  readline-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-devel
 Requires:       libconfig
 Requires:       libnl3
 Requires:       systemd
@@ -23,10 +24,7 @@ Requires:       systemd
 The lldpad package comes with utilities to manage an LLDP interface with support for reading and configuring TLVs. TLVs and interfaces are individual controlled allowing flexible configuration for TX only, RX only, or TX/RX modes per TLV.
 
 %prep
-%setup -q -n openlldp-%{version}
-%patch0 -p1
-sed -i "s/AM_CFLAGS = -Wall -Werror -Wextra -Wformat=2/AM_CFLAGS = -Wall -Werror -Wextra -Wformat=2 -std=gnu89 -Wno-implicit-fallthrough -Wno-error=stringop-overflow -Wno-format-truncation -Wno-error=address-of-packed-member -Wno-stringop-truncation/" Makefile.am
-sed -i "s/u8 arglen;/u8 arglen = 0;/g" lldp_util.c
+%autosetup -n openlldp-%{majmin}
 
 %build
 ./bootstrap.sh
@@ -61,6 +59,7 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 %{_libdir}/liblldp_clif.so.*
 %{_sysconfdir}/bash_completion.d/*
 %dir %{_sharedstatedir}/%{name}
+%{_mandir}/man3/*
 %{_mandir}/man8/*
 %{_includedir}/*
 %{_libdir}/pkgconfig/*.pc
@@ -69,6 +68,9 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 /lib/systemd/system/lldpad.socket
 
 %changelog
+* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-1
+- Upgrade to latest upstream version
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.1-18
 - Use libconfig-devel at build-time, rather than libconfig
 - Lint spec, modernize with macros

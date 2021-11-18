@@ -1,8 +1,8 @@
 %global security_hardening none
 Summary:        Memory Management Debugger.
 Name:           valgrind
-Version:        3.15.0
-Release:        4%{?dist}
+Version:        3.18.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
+* Fri Nov 13 2021 Andrew Phelps <anphel@microsoft.com> - 3.18.1-1
+- Update to version 3.18.1
+
 * Thu Jan 07 2021 Joe Schmitt <joschmit@microsoft.com> - 3.15.0-4
 - Provide valgrind-devel.
 

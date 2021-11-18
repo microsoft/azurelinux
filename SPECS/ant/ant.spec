@@ -18,13 +18,13 @@
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        5%{?dist}
-License:        ASL 2.0 AND BSD AND W3C
+Release:        6%{?dist}
+License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
-Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
+Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
 Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
@@ -36,7 +36,10 @@ Requires:       java-devel >= 1.8
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
-BuildArch:      noarch
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
+#BuildArch:      noarch
+
 
 %description
 Apache Ant is a Java library and command-line tool whose mission is to
@@ -257,6 +260,10 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.9-6
+- License verified.
+- Fixed 'Source0' URL.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.10.9-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

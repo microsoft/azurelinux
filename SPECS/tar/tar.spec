@@ -1,7 +1,7 @@
 Summary:        Archiving program
 Name:           tar
-Version:        1.32
-Release:        2%{?dist}
+Version:        1.34
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
@@ -16,9 +16,9 @@ Contains GNU archiving program
 %setup -q
 %build
 FORCE_UNSAFE_CONFIGURE=1  ./configure \
-	--prefix=%{_prefix} \
-	--bindir=/bin \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --bindir=/bin \
+    --disable-silent-rules
 make %{?_smp_mflags}
 
 %install
@@ -43,6 +43,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+*   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.34-1
+-   Update to version 1.34
+-   License verified
 *   Wed Jul 29 2020 Andrew Phelps <anphel@microsoft.com> 1.32-2
 -   Add symlink for gtar.
 *   Wed Jun 03 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-1

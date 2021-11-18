@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.74.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         pthread_stack_min_int_cast.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -92,6 +93,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -269,6 +271,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-3
+- Bump release number to match kernel release
+
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
 - Bump release number to match kernel release
 
@@ -332,7 +337,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Bump release number to match kernel-signed update
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Mon May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Remove build-id match check
 

@@ -1,13 +1,13 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.36.1
-Release:        5%{?dist}
+Version:        2.37.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
-Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.36/%{name}-%{version}.tar.xz
+Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
 
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
@@ -72,7 +72,7 @@ make %{?_smp_mflags}
 %install
 install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
-chmod 644 %{buildroot}%{_docdir}/util-linux/getopt/getopt*.tcsh
+chmod 644 %{buildroot}%{_docdir}/util-linux/getopt*.tcsh
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # Install 'uuidd' directories, which are not created by 'make'.
@@ -103,7 +103,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
-%{_docdir}/util-linux/getopt/*
+%{_docdir}/util-linux/getopt*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -123,6 +123,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Tue Oct 12 2021 Andrew Phelps <anphel@microsoft.com> - 2.37.2-1
+- Update to version 2.37.2
+
 * Tue Sep 21 2021 Henry Li <lihl@microsoft.com> - 2.36.1-5
 - Add libmount, libuuid and libfdisk shared library files to util-linux-devel
 - Remove libblkid and libfdisk shared library files from util-linux

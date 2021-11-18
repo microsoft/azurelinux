@@ -23,6 +23,9 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       bzip2
 Requires:       gzip
 
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
+
 %description
 PicoSAT solves the SAT problem, which is the classical NP complete
 problem of searching for a satisfying assignment of a propositional

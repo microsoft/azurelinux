@@ -178,6 +178,9 @@ Provides:       bundled(zipkin-api) = 0.2.2
 # END obs-service-bazel_repositories
 ExcludeArch:    %{ix86}
 
+# Temp: Do not build with 2.0 toolchain
+ExclusiveArch:  mips
+
 %description
 Envoy is an L7 proxy and communication bus designed for large modern service
 oriented architectures.

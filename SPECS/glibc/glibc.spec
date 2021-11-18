@@ -6,8 +6,8 @@
 
 Summary:        Main C library
 Name:           glibc
-Version:        2.28
-Release:        19%{?dist}
+Version:        2.34
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,14 +16,14 @@ URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
-Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.25-fhs-1.patch
-Patch1:         glibc-2.24-bindrsvport-blacklist.patch
-Patch2:         0002-malloc-arena-fix.patch
-Patch3:         glibc-2.28-CVE-2018-19591.patch
-Patch4:         CVE-2019-9169.patch
-Patch5:         CVE-2016-10739.patch
-Patch6:         CVE-2020-1752.patch
-Patch7:         CVE-2020-10029.patch
+Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
+#Patch1:         glibc-2.24-bindrsvport-blacklist.patch
+#Patch2:         0002-malloc-arena-fix.patch
+#Patch3:         glibc-2.28-CVE-2018-19591.patch
+#Patch4:         CVE-2019-9169.patch
+#Patch5:         CVE-2016-10739.patch
+#Patch6:         CVE-2020-1752.patch
+#Patch7:         CVE-2020-10029.patch
 # Only applicable on ARMv7 targets.
 Patch8:         CVE-2020-6096.nopatch
 # Only applicable on x32 targets.
@@ -33,17 +33,19 @@ Patch10:        CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch11:        CVE-2018-20796.nopatch
-Patch12:        CVE-2019-7309.patch
+#Patch12:        CVE-2019-7309.patch
 # CVE-2019-19126 patch taken from upstream commit 7966ce07e89fa4ccc8fdba00d4439fc652862462
-Patch13:        CVE-2019-19126.patch
-Patch14:        CVE-2019-25013.patch
-Patch15:        CVE-2021-3326.patch
-Patch16:        CVE-2020-27618.patch
+#Patch13:        CVE-2019-19126.patch
+#Patch14:        CVE-2019-25013.patch
+#Patch15:        CVE-2021-3326.patch
+#Patch16:        CVE-2020-27618.patch
+Patch17:        glibc-2.34_pthread_cond_wait.patch
 Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
 Provides:       nss_db = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
+Provides:	    glibc
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -59,6 +61,7 @@ Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-headers = %{version}-%{release}
 Provides:       %{name}-static = %{version}-%{release}
 Provides:       %{name}-static%{?_isa} = %{version}-%{release}
+Provides:	    glibc-devel
 
 %description devel
 These are the header files of glibc.
@@ -154,9 +157,7 @@ cd %{_builddir}/%{name}-build
 %endif
         --disable-silent-rules
 
-# Sometimes we have false "out of memory" make error
-# just rerun/continue make to workaroung it.
-make %{?_smp_mflags} || make %{?_smp_mflags} || make %{?_smp_mflags}
+make %{?_smp_mflags}
 
 %install
 #       Do not remove static libs
@@ -249,13 +250,13 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %config %{_sysconfdir}/locale-gen.conf
 /lib64/*
 %ifarch aarch64
-%exclude /lib
+/lib/ld-linux-aarch64.so.1
 %endif
 %exclude /lib64/libpcprofile.so
 %{_lib64dir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
-%{_sbindir}/zdump
+#%%{_sbindir}/zdump
 %{_sbindir}/zic
 %{_sbindir}/iconvconfig
 %{_bindir}/*
@@ -305,6 +306,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.34-1
+- Upgrade to version 2.34
+- License verified
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-19
 - Adding 'Provides' for 'nss_db'.
 

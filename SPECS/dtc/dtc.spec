@@ -1,14 +1,13 @@
 Summary:        Device Tree Compiler
 Name:           dtc
-Version:        1.5.1
-Release:        4%{?dist}
+Version:        1.6.1
+Release:        1%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://devicetree.org/
 Source0:        https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
-Patch0:         dtc-disable-warning.patch
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
@@ -40,7 +39,7 @@ sed -i 's/python2/python3/' pylibfdt/setup.py
 sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
 
 %build
-%make_build CC="gcc %{optflags} $LDFLAGS"
+make %{?_smp_mflags} V=1 CC="gcc %{optflags} $LDFLAGS -Wno-error=missing-prototypes -Wno-error=cast-qual" NO_PYTHON=1
 
 %install
 %make_install \
@@ -63,6 +62,10 @@ sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
 %{_includedir}/*
 
 %changelog
+* Tue Nov 09 2021 Andrew Phelps <anphel@microsoft.com> - 1.6.1-1
+- Update to version 1.6.1
+- Remove dtc-disable-warning.patch
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-4
 - Add compatibility provides for libfdt, libfdt-static, libfdt-devel, python3-libfdt packages
 - Use make macros throughout, lint spec

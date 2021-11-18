@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "ntp-4.2.8p13.tar.gz": "288772cecfcd9a53694ffab108d1825a31ba77f3a8466b0401baeca3bc232a38",
+  "LICENSE.PTR": "22591c393c8f9d309234493b98ccddcf246cf5f843358b2bdb62d84e59780e02",
+  "ntp-4.2.8p15.tar.gz": "f65840deab68614d5d7ceb2d0bb9304ff70dcdedd09abb79754a87536b849c19",
   "ntp.step-tickers": "8b4bc72cc4a0af1e855f8836de5ceaa15b29620b7d3147e8f05c73bac773bee8",
   "ntp.sysconfig": "f2a0ab20767f2c1975cd56cc2b013070fc5b0fbc6a619a3fad05c16d5d0bd6ba",
   "ntpd.service": "10636ab4e5d799c3071a08a961b2ed668309f70ebae9f46bf23f4079be60d431",

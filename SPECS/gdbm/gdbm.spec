@@ -1,14 +1,13 @@
 Summary:        The GNU Database Manager
 Name:           gdbm
-Version:        1.18
-Release:        4%{?dist}
+Version:        1.21
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/gdbm
 Group:          Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/gdbm/%{name}-%{version}.tar.gz
-%define sha1    gdbm=0f1056ab3beb1bf09dad06f8083f2c79716a5b1b
+Source0:        https://ftp.gnu.org/gnu/gdbm/%{name}-%{version}.tar.gz
 
 %description
 This is a disk file format database which stores key/data-pairs in
@@ -76,6 +75,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 1.21-1
+- Update to version 1.21
+- License verified
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.18-4
 - Symlink headers for compatibility.
 

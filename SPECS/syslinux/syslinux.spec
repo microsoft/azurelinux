@@ -2,20 +2,22 @@
 Summary:        Simple kernel loader which boots from a FAT filesystem
 Name:           syslinux
 Version:        6.04
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
-URL:            http://www.syslinux.org
+URL:            https://www.syslinux.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.kernel.org/pub/linux/utils/boot/%{name}/Testing/%{version}/%{name}-%{version}-pre1.tar.xz
-Patch0:	        0001-Add-install-all-target-to-top-side-of-HAVE_FIRMWARE.patch
+Patch0:         0001-Add-install-all-target-to-top-side-of-HAVE_FIRMWARE.patch
+Patch1:         0006-Replace-builtin-strlen-that-appears-to-get-optimized.patch
+Patch2:         syslinux-6.04_pre1-fcommon.patch
 ExclusiveArch:  x86_64
+BuildRequires:  gcc >= 11.2.0
 BuildRequires:  nasm
-BuildRequires: util-linux-devel
-Requires:      util-linux
+BuildRequires:  util-linux-devel
+Requires:       util-linux
 
-%define sha1 syslinux=599b7a85d522b1b6658a1fe290e4d23dc64b1470
 %description
 SYSLINUX is a suite of bootloaders, currently supporting DOS FAT
 filesystems, Linux ext2/ext3 filesystems (EXTLINUX), PXE network boots
@@ -32,7 +34,17 @@ Headers and libraries for syslinux development.
 %prep
 %setup -q -n %{name}-%{version}-pre1
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+
 %build
+# gcc 11.2.0 and above produce error: "cc1: error: '-fcf-protection' is not compatible with this target"
+OPTFLAGS="`echo " %{optflags} " |  sed 's/-fcf-protection//g'`"
+CFLAGS="`echo " %{build_cflags} " | sed 's/-fcf-protection//g'`"
+CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-fcf-protection//g'`"
+export CFLAGS
+export CXXFLAGS
+
 # Remove build-wide ldflags
 export LDFLAGS=""
 
@@ -45,7 +57,8 @@ make bios install-all \
 	LIBDIR=%{_prefix}/lib DATADIR=%{_datadir} \
 	MANDIR=%{_mandir} INCDIR=%{_includedir} \
 	LDLINUX=ldlinux.c32 \
-	CFLAGS="%{build_cflags}"
+	CFLAGS="$CFLAGS" \
+	OPTFLAGS="$OPTFLAGS"
 rm -rf %{buildroot}/boot
 rm -rf %{buildroot}/tftpboot
 # remove it unless provide perl(Crypt::PasswdMD5)
@@ -66,6 +79,8 @@ rm %{buildroot}/%{_bindir}/sha1pass
 %{_datadir}/syslinux/com32/*
 
 %changelog
+* Thu Nov 11 2021 Nicolas Guibourge <nicolasg@microsoft.com> 6.04-10
+- Fix build issue triggered by gcc 11.2.0 usage.
 * Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 6.04-9
 - Disable hardened ldflags to fix build.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.04-8

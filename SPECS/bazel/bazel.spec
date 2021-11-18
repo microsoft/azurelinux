@@ -19,6 +19,9 @@ BuildRequires:  unzip
 BuildRequires:  zip
 Requires:       openjdk8
 
+# Temp: Do not build with 2.0 toolchain
+ExclusiveArch:  mips
+
 %description
 A fast, scalable, multi-language and extensible build system.
 

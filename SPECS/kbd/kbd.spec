@@ -1,7 +1,7 @@
 Summary:        Key table files, console fonts, and keyboard utilities
 Name:           kbd
-Version:        2.0.4
-Release:        6%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,9 @@ The Kbd package contains key-table files, console fonts, and keyboard utilities.
 %patch0 -p1
 sed -i 's/\(RESIZECONS_PROGS=\)yes/\1no/g' configure
 sed -i 's/resizecons.8 //'  docs/man/man8/Makefile.in
+# /bin/ld: libfont.a(kdmapop.o):/usr/src/mariner/BUILD/kbd-2.0.4/src/version.h:8: multiple definition of `progname';
+# mapscrn-mapscrn.o:/usr/src/mariner/BUILD/kbd-2.0.4/src/version.h:8: first defined here
+
 
 %build
 PKG_CONFIG_PATH=/tools/lib/pkgconfig \
@@ -55,6 +58,10 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.0-1
+- Update to version 2.2.0
+- License verified
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.4-6
 - Adding 'Provides' for 'kbm-misc'.
 - Removing 'sha1' macro.

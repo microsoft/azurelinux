@@ -1,14 +1,13 @@
-Summary:	Stream editor
-Name:		sed
-Version:	4.5
-Release:        3%{?dist}
-License:	GPLv3
-URL:		http://www.gnu.org/software/sed
-Group:		Applications/Editors
+Summary:        Stream editor
+Name:           sed
+Version:        4.8
+Release:        1%{?dist}
+License:        GPLv3
+URL:            https://www.gnu.org/software/sed
+Group:          Applications/Editors
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
-%define sha1 sed=6635c344956ef928cc33aca798ad20c6c1ea25f7
+Source0:        https://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
 Conflicts:      toybox
 
 %description
@@ -17,7 +16,7 @@ The Sed package contains a stream editor.
 %package lang
 Summary: Additional language files for sed
 Group: System Environment/Programming
-Requires: sed >= 4.5
+Requires: sed >= %{version}
 %description lang
 These are the additional language files of sed.
 
@@ -26,10 +25,10 @@ These are the additional language files of sed.
 
 %build
 ./configure \
-	--prefix=%{_prefix} \
-	--bindir=/bin \
-	--htmldir=%{_defaultdocdir}/%{name}-%{version} \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --bindir=/bin \
+    --htmldir=%{_defaultdocdir}/%{name}-%{version} \
+    --disable-silent-rules
 make %{?_smp_mflags}
 
 %install
@@ -52,11 +51,13 @@ make check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.5-3
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 4.8-1
+- Update to version 4.8
+- License verified
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.5-3
 - Added %%license line automatically
-
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.5-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.5-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 * Tue Sep 18 2018 Srinidhi Rao <srinidhir@vmware.com> 4.5-1
 - Updating to version 4.5
 * Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 4.4-3

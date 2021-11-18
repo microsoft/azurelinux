@@ -1,7 +1,7 @@
 Summary:        Libraries for Transport Independent RPC
 Name:           libtirpc
-Version:        1.1.4
-Release:        5%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        BSD
 Group:          System Environment/Libraries
 URL:            https://git.linux-nfs.org/?p=steved/libtirpc.git
@@ -68,6 +68,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.3.2-1
+- Update to version 1.3.2
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.4-5
 - Remove libtool archive files from final packaging
 

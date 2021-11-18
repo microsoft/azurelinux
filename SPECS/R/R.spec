@@ -25,6 +25,9 @@ BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
+
 %description
 R is a language and environment for statistical computing and graphics.
 It is a GNU project which is similar to the S language and environment

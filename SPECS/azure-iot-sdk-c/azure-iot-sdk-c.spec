@@ -7,7 +7,7 @@ Name:           azure-iot-sdk-c
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
 Version:        2020.02.04.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 # Source0: https://github.com/Azure/%{name}/archive/LTS_02_2020_Ref01.tar.gz
 # The below tarball includes all submodules.
 
@@ -58,7 +58,9 @@ export CFLAGS=" %{build_cflags}        \
     -Wno-error=unknown-pragmas         \
     -Wno-error=enum-compare            \
     -Wno-error=unused-function         \
-    -Wno-error=maybe-uninitialized"
+    -Wno-error=maybe-uninitialized     \
+    -Wno-error=array-parameter         \
+    -Wno-error=stringop-truncation"
 
 cmake \
     -Duse_prov_client:BOOL=ON \
@@ -93,6 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/cmake/*
 
 %changelog
+*   Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 2020.02.04.1-7
+-   Fix build with gcc11
 *   Mon Jun 22 2020 Saravanan Somasundaram <sarsoma@microsoft.com> 2020.02.04.1-6
 -   Removing the Conflict reference to azure-iot-sdk-c-public-preview.
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2020.02.04.1-5

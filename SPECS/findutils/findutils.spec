@@ -1,15 +1,15 @@
-Summary:	This package contains programs to find files
-Name:		findutils
-Version:	4.6.0
-Release:        7%{?dist}
-License:	GPLv3+
-URL:		http://www.gnu.org/software/findutils
-Group:		Applications/File
+Summary:        This package contains programs to find files
+Name:           findutils
+Version:        4.8.0
+Release:        1%{?dist}
+License:        GPLv3+
+URL:            http://www.gnu.org/software/findutils
+Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.gz
-%define sha1 findutils=f18e8aaee3f3d4173a1f598001003be8706d28b0
+Source0:        https://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.xz
 Conflicts:      toybox
+
 %description
 These programs are provided to recursively search through a
 directory tree and to create, maintain, and search a database
@@ -25,17 +25,14 @@ These are the additional language files of findutils
 
 %prep
 %setup -q
-%build
-#make some fixes required by glibc-2.28:
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' gl/lib/*.c
-sed -i '/unistd/a #include <sys/sysmacros.h>' gl/lib/mountlist.c
-echo "#define _IO_IN_BACKUP 0x100" >> gl/lib/stdio-impl.h
 
+%build
 ./configure \
-	--prefix=%{_prefix} \
-	--localstatedir=%{_sharedstatedir}/locate \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --localstatedir=%{_sharedstatedir}/locate \
+    --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
@@ -47,8 +44,8 @@ rm -rf %{buildroot}%{_infodir}
 %check
 make %{?_smp_mflags} check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%post   -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -62,11 +59,13 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6.0-7
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 4.8.0-1
+- Update to version 4.8.0
+- License verified
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.6.0-7
 - Added %%license line automatically
-
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.6.0-6
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.6.0-6
+- Initial CBL-Mariner import from Photon (license: Apache2).
 * Sun Sep 09 2018 Alexey Makhalov <amakhalov@vmware.com> 4.6.0-5
 - Fix compilation issue against glibc-2.28
 * Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 4.6.0-4

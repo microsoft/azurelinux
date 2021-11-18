@@ -1,16 +1,17 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
-Version:        5.2.4
-Release:        4%{?dist}
-URL:            http://tukaani.org/xz
+Version:        5.2.5
+Release:        1%{?dist}
+URL:            https://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://tukaani.org/xz/%{name}-%{version}.tar.xz
+Source0:        https://tukaani.org/xz/%{name}-%{version}.tar.xz
 Provides:       xz-lzma-compat = %{version}-%{release}
 Provides:       lzma = %{version}-%{release}
 Requires:       xz-libs = %{version}-%{release}
+
 %description
 The Xz package contains programs for compressing and
 decompressing files
@@ -83,6 +84,7 @@ make  %{?_smp_mflags}  check
 %{_bindir}/xzgrep
 %{_bindir}/xzdec
 %{_mandir}/man1/*
+%{_mandir}/de/man1/*
 
 %files devel
 %{_includedir}/lzma.h
@@ -98,6 +100,9 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
+*   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.2.5-1
+-   Update to version 5.2.5
+-   License verified
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 5.2.4-4
 -   Provide xz-lzma-compat and lzma
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com>  5.2.4-3

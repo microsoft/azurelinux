@@ -153,7 +153,8 @@
 %_ld_as_needed          1
 %_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
 
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}
+%_legacy_common_support 1
+%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

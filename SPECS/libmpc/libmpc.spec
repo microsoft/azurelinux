@@ -1,7 +1,7 @@
 Summary:        Library for the arithmetic of complex numbers
 Name:           libmpc
-Version:        1.1.0
-Release:        6%{?dist}
+Version:        1.2.1
+Release:        1%{?dist}
 License:        LGPLv3+
 URL:            http://www.multiprecision.org
 Group:          Applications/System
@@ -45,6 +45,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so.*
 
 %changelog
+* Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> 1.2.1-1
+- Update to version 1.2.1
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1.0-6
 - Provide libmpc-devel
 

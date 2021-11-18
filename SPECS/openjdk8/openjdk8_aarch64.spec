@@ -8,7 +8,7 @@
 Summary:        OpenJDK
 Name:           openjdk8
 Version:        1.8.0.292
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,8 +86,8 @@ sed -i "s#\"ft2build.h\"#<ft2build.h>#g" jdk/src/share/native/sun/font/freetypeS
 sed -i '0,/BUILD_LIBMLIB_SRC/s/BUILD_LIBMLIB_SRC/BUILD_HEADLESS_ONLY := 1\nOPENJDK_TARGET_OS := linux\n&/' jdk/make/lib/Awt2dLibraries.gmk
 
 %build
-export CFLAGS="%{build_cflags} -Wno-error=format-overflow= -Wno-error=stringop-overflow="
-export CXXFLAGS="%{build_cxxflags} -Wno-error=format-overflow= -Wno-error=stringop-overflow="
+export CFLAGS="%{build_cflags} -Wno-error=register -Wno-error=format-overflow= -Wno-error=stringop-overflow="
+export CXXFLAGS="%{build_cxxflags} -Wno-error=register -Wno-error=format-overflow= -Wno-error=stringop-overflow="
 export CFLAGS=$(echo $CFLAGS | sed "s/-Wall//" | sed "s/-Wformat//" | sed "s/-Werror=format-security//")
 export CXXFLAGS=$(echo $CXXFLAGS | sed "s/-Wall//" | sed "s/-Wformat// | sed "s/-Werror=format-security//"")
 unset JAVA_HOME &&
@@ -263,6 +263,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.8.0.292-2
+- Modify to fix issues with gcc 11.2.0
+
 * Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
 - Update to 8u292 to address CVEs.
 - Switch to Shenandoah version of the aarch64 port

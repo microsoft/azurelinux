@@ -16,7 +16,7 @@
 Summary:        Collection of tasks for Ant
 Name:           ant-contrib
 Version:        1.0b3
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0 AND ASL 1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ BuildRequires:  javapackages-local-bootstrap
 Requires:       ant
 Requires:       java-headless
 BuildArch:      noarch
+
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
 
 %description
 The Ant-Contrib project is a collection of tasks (and at one point
@@ -100,6 +103,9 @@ echo "call add_maven_depmap JPP.ant-%{name}.pom ant/%{name}.jar"
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0b3-20
+- License verified.
+
 * Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 1.0b3-19
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Simplify buildrequires and runtime requires.
