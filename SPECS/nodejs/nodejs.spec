@@ -3,9 +3,9 @@ Name:           nodejs
 Version:        14.18.1
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
 URL:            https://github.com/nodejs/node
 # Source0 has a vendored OpenSSL source tree with patented algorithms.
 # Use Source1 to create a clean and reproducible source tarball.
@@ -143,4 +143,3 @@ done
 
 * Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> - 7.7.4-1
 - Initial packaging for Photon
-
