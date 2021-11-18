@@ -84,7 +84,7 @@ rm -rf %{buildroot}
 %license %{LICENSE_PATH}
 %defattr(-,root,root)
 %{_bindir}/*
-%{_libdir}/liblua.so.*
+%{_libdir}/liblua.so.%{majmin}.*
 %{_mandir}/*/*
 
 %files devel

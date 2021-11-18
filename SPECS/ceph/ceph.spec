@@ -14,7 +14,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -240,6 +240,7 @@ Requires:      e2fsprogs
 Requires:      findutils
 Requires:      grep
 Requires:      logrotate
+Requires:      lua
 Requires:      parted
 Requires:      psmisc
 Requires:      python%{python3_pkgversion}-setuptools
@@ -267,6 +268,7 @@ Summary:    Ceph Common
 Requires:   librbd1 = %{version}-%{release}
 Requires:   librados2 = %{version}-%{release}
 Requires:   libcephfs2 = %{version}-%{release}
+Requires:   lua
 Requires:   python%{python3_pkgversion}-rados = %{version}-%{release}
 Requires:   python%{python3_pkgversion}-rbd = %{version}-%{release}
 Requires:   python%{python3_pkgversion}-cephfs = %{version}-%{release}
@@ -285,6 +287,7 @@ Comprised of files that are common to Ceph clients and servers.
 %package mds
 Summary:    Ceph Metadata Server Daemon
 Requires:   ceph-base = %{version}-%{release}
+Requires:   lua
 %description mds
 ceph-mds is the metadata server daemon for the Ceph distributed file system.
 One or more instances of ceph-mds collectively manage the file system
@@ -442,6 +445,7 @@ Requires:   ceph-selinux = %{version}-%{release}
 %endif
 Requires:   librados2 = %{version}-%{release}
 Requires:   librgw2 = %{version}-%{release}
+Requires:   lua
 Requires:   mailcap
 
 %description radosgw
@@ -526,6 +530,7 @@ This package provides a library implementation of the RADOS gateway
 Summary:    RADOS gateway client library
 Requires:   librados-devel = %{version}-%{release}
 Requires:   librgw2 = %{version}-%{release}
+Requires:   lua
 Provides:   librgw2-devel = %{version}-%{release}
 Obsoletes:  librgw2-devel < %{version}-%{release}
 
@@ -1803,6 +1808,10 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+*   Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-4
+-   Added missing dependencies on 'lua'.
+-   Updating release to recompile with 'lua' 5.4.3.
+
 *   Thu Jul 22 2021 Andrew Phelps <anphel@microsoft.com> 16.2.0-3
 -   Set __os_install_post to reduce package size
 -   Remove duplicate line to disable debug_package

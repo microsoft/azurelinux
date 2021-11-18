@@ -2,7 +2,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -192,6 +192,7 @@ This plugin formats messages as JSON events for Logstash
 Summary:        Lua plugin for collectd
 BuildRequires:  lua-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       lua
 
 %description lua
 The Lua plugin embeds a Lua interpreter into collectd and exposes the
@@ -881,6 +882,10 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.0-7
+- Added missing dependencies on 'lua'.
+- Updating release to recompile with 'lua' 5.4.3.
+
 * Tue Jun 15 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.0-6
 - Update Requires to perl package
 

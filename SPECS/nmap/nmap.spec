@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.90
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,11 +20,14 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
+Requires:       lua
+
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
 
 %package ncat
 Summary:        Nmap replacement for ncat
+Requires:       lua
 Provides:       nc
 
 %description ncat
@@ -59,6 +62,10 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.90-3
+- Added missing dependencies on 'lua'.
+- Updating release to recompile with 'lua' 5.4.3.
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 7.90-2
 - nmap-unix_crash.patch fix for crash with unix sockets.
 

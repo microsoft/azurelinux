@@ -31,7 +31,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -529,6 +529,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.42.4-6
+- Updating release to recompile with 'lua' 5.4.3.
+
 * Thu Sep 23 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.42.4-5
 - Patch CVE-2020-18032
 
