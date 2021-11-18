@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      7%{?dist}
+Release:      8%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -411,19 +411,6 @@ EOF
 #		chapter 9.1. The End
 #
 
-# Since these following symlinks are ghosted entries, create them manually upon
-# package installation.
-
-# Use Lua to achieve this since when filesystem installs, there may not be any
-# other packages installed if this is a new environment.
-%post -p <lua>
-posix.symlink("lib", "/usr/lib/debug/lib64")
-posix.symlink("../bin", "/usr/lib/debug/usr/bin")
-posix.symlink("../sbin", "/usr/lib/debug/usr/sbin")
-posix.symlink("../lib", "/usr/lib/debug/usr/lib")
-posix.symlink("../lib", "/usr/lib/debug/usr/lib64")
-return 0
-
 %files
 %defattr(-,root,root)
 #	Root filesystem
@@ -558,6 +545,8 @@ return 0
 /usr/local/lib64
 
 %changelog
+*   Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-8
+-   Removing dependency on 'lua'.
 *   Mon Jun 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.1-7
 -   Use ghost directive for /usr/lib/debug/* symlinks to avoid conflicting with debuginfo packages.
 *   Wed May 20 2020 Emre Girgin <mrgirgin@microsoft.com> 1.1-6

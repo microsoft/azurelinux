@@ -23,7 +23,6 @@ BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdb-devel
 BuildRequires:  libselinux-devel
-BuildRequires:  lua-devel
 BuildRequires:  nss-devel
 BuildRequires:  popt-devel
 BuildRequires:  python2-devel
@@ -34,7 +33,6 @@ Requires:       bash
 Requires:       libarchive
 Requires:       libdb
 Requires:       libselinux
-Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
 
 %description
@@ -43,7 +41,6 @@ RPM package manager
 %package devel
 Summary:        Libraries and header files for rpm
 Requires:       %{name} = %{version}-%{release}
-Requires:       lua
 Provides:       pkgconfig(rpm)
 
 %description devel
@@ -55,7 +52,6 @@ Requires:       bzip2-libs
 Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
-Requires:       lua
 Requires:       mariner-rpm-macros
 Requires:       nss-libs
 Requires:       popt
@@ -68,8 +64,6 @@ Shared libraries librpm and librpmio
 
 %package build-libs
 Summary:        Librpmbuild.so.* libraries needed to build rpms.
-
-Requires:       lua
 
 %description build-libs
 %{summary}
@@ -101,7 +95,6 @@ These are the additional language files of rpm.
 %package -n     python-rpm
 Summary:        Python 2 bindings for rpm.
 Group:          Development/Libraries
-Requires:       lua
 Requires:       python2
 
 %description -n python-rpm
@@ -127,14 +120,14 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 
 ./autogen.sh --noconfigure
 %configure \
-    CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
+    CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss' \
         --program-prefix= \
         --disable-dependency-tracking \
         --disable-static \
         --with-vendor=mariner \
         --enable-python \
         --with-cap \
-        --with-lua \
+        --with-lua=no \
         --disable-silent-rules \
         --with-external-db \
         --with-selinux
@@ -285,9 +278,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
-* Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.2-14
-- Added missing dependencies on 'lua'.
-- Updating release to recompile with 'lua' 5.4.3.
+*   Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.2-14
+-   Removing dependency on 'lua'.
 
 *   Thu Jun 24 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.14.2-13
 -   Patch CVE-2021-20266

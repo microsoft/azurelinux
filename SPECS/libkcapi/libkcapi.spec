@@ -7,11 +7,7 @@
 # Do we need to tweak sysctl.d? In newer versions of the Linux
 # Kernel the default ancillary buffer size is set high enough.
 # TODO: Adapt this when the patch for net/core/sock.c is merged.
-%if %{lua:print(rpm.vercmp('99.0.0', posix.uname('%r')));} >= 0
 %global with_sysctl_tweak 1
-%else
-%global with_sysctl_tweak 0
-%endif
 # Lowest limit to run the testsuite.  If we cannot obtain this
 # value, we asume the testsuite cannot be run.
 %global test_optmem_max   %(cat /proc/sys/net/core/optmem_max || echo 0)
@@ -53,12 +49,12 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 # Value used for the sysctl.d preset.
 %global sysctl_optmem_max 81920
 # Extension for the README.distro file.
-%global distroname_ext    %{?fedora:fedora}%{?rhel:redhat}
+%global distroname_ext    mariner
 %endif
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -256,6 +252,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-6
+- Removing dependency on 'lua'.
+
 * Fri Feb 05 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-5
 - Use OpenSSL to perform hmac calculations
 
