@@ -224,7 +224,6 @@ Patch1185:      CVE-2021-43389.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
-BuildRequires:  dwarves
 BuildRequires:  diffutils
 BuildRequires:  glib-devel
 BuildRequires:  kbd
@@ -577,6 +576,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Update source to 5.10.78.1
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389
 - Add patch to fix SPDX-License-Identifier in headers
+- Revert ebpf configs due to increased boot times
 
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
 - Update configs for eBPF support
