@@ -82,7 +82,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxml2-python/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
-    sed -i '/lua-devel/d' $TmpPkgGen
     sed -ri '/mariner-repos-(extras|ui|microsoft)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
@@ -173,7 +172,6 @@ generate_pkggen_core () {
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
         grep "^krb5-" $TmpPkgGen
-        grep "^lua-" $TmpPkgGen
         grep "^mariner-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen
         grep "^libassuan-" $TmpPkgGen

@@ -1,7 +1,7 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL
 URL:            http://www.haproxy.org
 Group:          Applications/System
@@ -10,7 +10,6 @@ Distribution:   Mariner
 Source0:        http://www.haproxy.org/download/2.1/src/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
-BuildRequires:  lua-devel
 BuildRequires:  pkg-config
 BuildRequires:  zlib-devel
 BuildRequires:  systemd-devel
@@ -58,6 +57,8 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+*   Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.5-2
+-   Removing invalid BR on 'lua-devel'.
 *   Thu Jun 04 2020 Ruying Chen <v-ruyche@microsoft.com> 2.1.5-1
 -   Update to 2.1.5
 *   Tue May 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-5

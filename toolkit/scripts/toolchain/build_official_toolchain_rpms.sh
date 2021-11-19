@@ -318,10 +318,6 @@ build_rpm_in_chroot_no_install python2
 rm -vf $FINISHED_RPM_DIR/python2*debuginfo*.rpm
 chroot_and_install_rpms python2
 
-# Lua needs to be installed for RPM to build
-build_rpm_in_chroot_no_install lua
-chroot_and_install_rpms lua
-
 build_rpm_in_chroot_no_install cpio
 
 # Build tdnf-2.1.0

@@ -13,7 +13,7 @@ Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
 Patch0:         lua-5.4.3-shared_library-1.patch
-# From mailing LUA's list ('patch' link found on NIST): http://lua-users.org/lists/lua-l/2021-11/msg00015.html.
+# From LUA's mailing list ('patch' link found on NIST): http://lua-users.org/lists/lua-l/2021-11/msg00015.html.
 Patch1:         CVE-2021-43519.patch
 
 BuildRequires:  readline-devel
