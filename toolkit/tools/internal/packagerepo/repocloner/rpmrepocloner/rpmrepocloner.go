@@ -321,7 +321,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
 
 			if err != nil {
-				logger.Log.Errorf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
+				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
 				return
 			}
 

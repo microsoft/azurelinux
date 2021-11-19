@@ -38,7 +38,7 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer) (i
 
 	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit)
 	if optimizeErr == nil {
-		logger.Log.Infof("Successfully create solvable subgraph")
+		logger.Log.Infof("Successfully created solvable subgraph")
 		isOptimized = true
 		pkgGraph = optimizedGraph
 	} else {
