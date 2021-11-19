@@ -2,7 +2,7 @@ Summary:        DejaGnu test framework
 Name:           dejagnu
 Version:        1.6.3
 Release:        1%{?dist}
-License:        GPLv2+
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
@@ -64,6 +64,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 1.6.3-1
 - Update to 1.6.3
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.2-2
 - Added %%license line automatically
