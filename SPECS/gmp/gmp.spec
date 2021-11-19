@@ -51,7 +51,7 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING COPYING.LESSERv3 COPYINGv2 COPYINGv3
-%{_libdir}/libgmp.so.*
+%{_libdir}/libgmp.so.10*
 
 %files devel
 %{_includedir}/gmp.h
