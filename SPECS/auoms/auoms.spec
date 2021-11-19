@@ -2,7 +2,7 @@
 Summary:        Auditd plugin that forwards audit events to OMS Agent for Linux
 Name:           auoms
 Version:        2.2.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,10 @@ cp %{SOURCE2} ./
 cp %{SOURCE3} ./
 %setup -q -n OMS-Auditd-Plugin-2.2.5-0
 %patch0 -p1
+# Fix gcc11 compilation errors
+sed -i 's#throw#throw;//throw#g' TranslateSyscall.cpp
+sed -i 's/#include <cstring>/#include <string>\n#include <cstring>/g' AuditRules.h
+sed -i 's#throw#throw;//throw#g' AuditRules.h
 
 %build
 grep AUOMS_BUILDVERSION auoms.version | head -n 4 | cut -d'=' -f2 | tr '\n' '.' | sed 's/.$//' | sed 's/^/#define AUOMS_VERSION "/' > auoms_version.h
@@ -187,6 +191,10 @@ done
 %{_var}/opt/microsoft/auoms/data/outputs
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.5-6
+- Fix gcc11 compilation issues
+- License verified
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.5-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

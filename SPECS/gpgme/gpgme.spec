@@ -3,7 +3,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.13.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+ or LGPLv2+
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Group:          System Environment/Security
@@ -41,6 +41,7 @@ Requires:       %{name} = %{version}-%{release}
 
 %prep
 %setup -q
+sed -i 's/defined(__FreeBSD__)/defined(__FreeBSD__) || defined(__GLIBC__)/g' src/posix-io.c
 
 %build
 %configure \
@@ -85,6 +86,8 @@ make check-TESTS
 %{python3_sitearch}/gpg/
 
 %changelog
+*   Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 1.13.1-8
+-   Fix issue with glibc 2.34
 *   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> 1.13.1-7
 -   Removed python2 support
 *   Tue Nov 10 2020 Andrew Phelps <anphel@microsoft.com> 1.13.1-6

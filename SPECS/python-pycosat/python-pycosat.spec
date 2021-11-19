@@ -17,6 +17,9 @@ Source0:        https://github.com/ContinuumIO/%{srcname}/archive/%{version}/%{s
 BuildRequires:  gcc
 BuildRequires:  picosat-devel
 
+# Temp: Do not build with x86_64 due to docker build issue
+ExclusiveArch:  aarch64
+
 %description
 %{pkgdesc}
 

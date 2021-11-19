@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
-Version:        2.3.3
-Release:        8%{?dist}
+Version:        2.5.4
+Release:        1%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -37,8 +37,6 @@ Requires:       python3-libs
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 
-Patch0:         nfs-utils-fix-format-security.patch
-
 %description
 The nfs-utils package contains simple nfs client service
 
@@ -72,7 +70,6 @@ Requires:    libnfsidmap = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1
 #not prevent statd to start
 sed -i "/daemon_init/s:\!::" utils/statd/statd.c
 sed '/unistd.h/a#include <stdint.h>' -i support/nsm/rpc.c
@@ -87,7 +84,7 @@ sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
             --without-tcp-wrappers      \
             --enable-gss                \
             --enable-nfsv4              \
-	    --with-rpcgen=internal	\
+            --with-rpcgen=internal      \
             --disable-static
 
 # fix building against new gcc
@@ -150,6 +147,7 @@ fi
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/*
+%exclude /usr/bin/rpcgen
 /sbin/*
 %{_sbindir}/*
 %{_sharedstatedir}/*
@@ -170,7 +168,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
-*   Mon Jun 03 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.3.3-8
+*   Wed Nov 10 2021 Andrew Phelps <anphel@microsoft.com> 2.5.4-1
+-   Update to version 2.5.4
+*   Wed Jun 03 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.3.3-8
 -   Fix format-security errors and re-disable -Werror=strict-prototypes
 *   Tue Jun 02 2020 Andrew Phelps <anphel@microsoft.com> 2.3.3-7
 -   Add sqlite build requirement.

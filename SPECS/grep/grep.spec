@@ -1,16 +1,13 @@
 Summary:        Programs for searching through files
 Name:           grep
-Version:        3.1
-Release:        5%{?dist}
+Version:        3.7
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.gnu.org/software/grep
-Source0:        http://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
-Patch0:         grep-3.31-man-fix-gs.patch
-Patch1:         grep-3.31-help-align.patch
-Patch2:         grep-3.1-glibc-2.28-fix.patch
+Source0:        https://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
 BuildRequires:  pcre-devel
 Requires:       pcre
 Conflicts:      toybox
@@ -28,9 +25,6 @@ These are the additional language files of grep
 
 %prep
 %setup -q
-%patch0 -p1 -b .man-fix-gs
-%patch1 -p1 -b .help-align
-%patch2 -p1 -b .glibc-2.28-fix
 # Skip pcre-jitstack test, which is known to fail when libpcre is built without jit
 sed -i 's/require_pcre_/require_pcre_\nskip_ "test known to fail when libpcre is built without jit"/g' tests/pcre-jitstack
 
@@ -60,6 +54,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 3.7-1
+- Update to version 3.7
+- License verified
 * Tue Jun 15 2021 Andrew Phelps <anphel@microsoft.com> 3.1-5
 - Support perl regular expressions ("grep -P")
 - Fix test issues

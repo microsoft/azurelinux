@@ -42,7 +42,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.5
-Release:      5%{?dist}
+Release:      6%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -280,6 +280,8 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  bin/syncqt.pl \
  mkspecs/features/data/unix/findclasslist.pl
 
+# gcc 11 requires <limits> to be explicitly included for std::numeric_limits
+sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/corelib/global/qglobal.h
 
 %build
 ## FIXME/TODO:
@@ -762,6 +764,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.5-6
+- Fix gcc11 build issue
+
 * Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-5
 - Added explicit 'Requires' on 'icu'.
 - Bumping up release to re-compile against the new version of the 'icu' libraries.

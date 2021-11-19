@@ -1,14 +1,13 @@
 Summary:        Reading, writing, and converting info pages
 Name:           texinfo
-Version:        6.5
-Release:        8%{?dist}
+Version:        6.8
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/texinfo/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
-Patch0:         texinfo-perl-fix.patch
 Provides:       info = %{version}-%{release}
 Provides:       %{name}-tex = %{version}-%{release}
 BuildRequires:  perl
@@ -18,10 +17,14 @@ Requires:       perl-libintl-perl
 %description
 The Texinfo package contains programs for reading, writing,
 and converting info pages.
+
 %prep
 %setup -q
-%patch0 -p1
+
 %build
+# fix issue building with glibc 2.34:
+sed -e 's/__attribute_nonnull__/__nonnull/' \
+    -i gnulib/lib/malloc/dynarray-skeleton.c
 %configure --disable-silent-rules
 make %{?_smp_mflags}
 
@@ -58,6 +61,11 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/texinfo/*
 
 %changelog
+* Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> 6.8-1
+- Update to version 6.8
+- Fix issue building with glibc 2.34
+- Remove texinfo-perl-fix.patch
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 6.5-8
 - Provide info and texinfo-tex
 

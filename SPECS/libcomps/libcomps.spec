@@ -1,20 +1,18 @@
 %global python3_sitelib %(/usr/bin/python3 -c "import site; print(site.getsitepackages()[-1])")
 
 Name:           libcomps
-Version:        0.1.11
-Release:        4%{?dist}
+Version:        0.1.18
+Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/libcomps
-#Source0:       %{url}/archive/%{name}-%{version}.tar.gz
-Source0:        %{name}-%{name}-%{version}.tar.gz
-Patch1:         50.patch
+#Source0:       %{url}/archive/refs/tags/%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
-BuildRequires:  gcc
 BuildRequires:  libxml2-devel
 BuildRequires:  check
 BuildRequires:  expat-devel
@@ -40,8 +38,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Python3 bindings for libcomps library.
 
 %prep
-%setup -n %{name}-%{name}-%{version}
-%patch1 -p1
+%setup -n %{name}-%{version}
 
 mkdir build
 
@@ -72,12 +69,17 @@ popd
 
 %files devel
 %{_libdir}/%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
 
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}/
+%{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.1.18-1
+- Upgrade to version 0.1.18.
+
 * Sun Apr 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.1.11-4
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Added 'Distribution' and 'Vendor' tags.
@@ -272,4 +274,3 @@ popd
 
 * Tue Jun 25 2013 Jindrich Luza <jluza@redhat.com> 0.1.1-1
 - Automatic commit of package [libcomps] release [0.1.1-1].
-

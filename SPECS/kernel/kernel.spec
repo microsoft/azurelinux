@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.74.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         pthread_stack_min_int_cast.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -326,6 +327,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -567,6 +569,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
+* Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-3
+- Update configs for gcc 11.2.0 and binutils 2.37 updates
+
 * Tue Oct 26 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.74.1-2
 - Update configs for eBPF support
 - Add dwarves Build-requires
@@ -647,7 +652,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Bump release number to match kernel-signed update
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Mon May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Remove build-id match check
 

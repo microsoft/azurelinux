@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.8.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -49,7 +49,7 @@ It contains the libraries and header files to create applications
 %setup -qn multipath-tools-%{version}
 
 %build
-make %{?_smp_mflags}
+make %{?_smp_mflags} CC="gcc %{optflags} $LDFLAGS -Wno-error=sign-compare"
 
 %install
 make install DESTDIR=%{buildroot} \
@@ -100,6 +100,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> 0.8.6-2
+- Fix gcc11 build error
+
 * Thu Apr 29 2021 Andrew Phelps <anphel@microsoft.com> 0.8.6-1
 - Update to version 0.8.6 for parallel build fix.
 - Update Source0 URL.

@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,14 +16,12 @@ BuildRequires:  libcap-ng-devel
 BuildRequires:  openldap
 BuildRequires:  swig
 BuildRequires:  systemd
-BuildRequires:  tcp_wrappers-devel
-Requires:       audit-libs
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
 Requires:       krb5
 Requires:       libcap-ng
 Requires:       openldap
 Requires:       systemd
-Requires:       tcp_wrappers
 
 %description
 The audit package contains the user space utilities for
@@ -72,7 +70,6 @@ and libauparse.
     --libdir=%{_libdir} \
     --sysconfdir=%{_sysconfdir} \
     --with-python3=yes \
-    --with-libwrap \
     --enable-gssapi-krb5=yes \
     --with-libcap-ng=yes \
     --with-aarch64 \
@@ -81,7 +78,7 @@ and libauparse.
     --enable-systemd \
     --disable-static
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 mkdir -p %{buildroot}/{etc/audit/plugins.d,etc/audit/rules.d}
@@ -89,14 +86,14 @@ mkdir -p %{buildroot}/%{_var}/opt/audit/log
 mkdir -p %{buildroot}/%{_var}/log
 mkdir -p %{buildroot}/%{_var}/spool/audit
 ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
-make install DESTDIR=%{buildroot}
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-auditd.preset
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %post
 /sbin/ldconfig
@@ -111,7 +108,6 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/*
 %{_sbindir}/*
 %{_libdir}/systemd/system/auditd.service
@@ -139,6 +135,7 @@ make %{?_smp_mflags} check
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
 
 %files libs
+%license COPYING
 %{_libdir}/*.so.*
 
 %files devel
@@ -155,6 +152,10 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
+- Remove tcp_wrappers dependency due to package removal
+- License verified
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-7
 - Remove libtool archive files from final packaging
 

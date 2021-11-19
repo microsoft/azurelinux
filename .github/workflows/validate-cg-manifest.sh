@@ -27,6 +27,7 @@ ignore_list=" \
   moby-buildx \
   moby-containerd \
   openjdk8 \
+  patterns-ceph-containers \
   python-markupsafe \
   python-nocasedict \
   python-nocasedict \

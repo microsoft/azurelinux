@@ -1,6 +1,6 @@
 Name:           colm
 Version:        0.13.0.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 # aapl/ and some headers from src/ are the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -28,7 +28,7 @@ in the family of program transformation languages.
 
 %package devel
 Summary:        Development libraries and header files for %{name}
-Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 %{summary}.
@@ -66,6 +66,9 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %{_includedir}/%{name}/
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 0.13.0.7-4
+- Remove epoch
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.0.7-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

@@ -1,14 +1,14 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.36.1
-Release:        4%{?dist}
+Version:        2.37
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
-# Patch Source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
+# Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
 # Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
 Patch1:         linker-script-readonly-keyword-support.patch
@@ -101,7 +101,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %files devel
 %{_includedir}/ansidecl.h
-%{_includedir}/bfd_stdint.h
 %{_includedir}/bfd.h
 %{_includedir}/bfdlink.h
 %{_includedir}/ctf-api.h
@@ -128,6 +127,10 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
+* Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-1
+- Update version to 2.37
+- Update export-demangle-header.patch
+
 * Fri Oct 15 2021 Ismail Kose <iskose@microsoft.com> - 2.36.1-4
 - Adding READONLY keyword support in linker script
 - Verified license

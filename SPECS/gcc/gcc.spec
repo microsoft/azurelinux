@@ -2,15 +2,14 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        9.1.0
-Release:        11%{?dist}
+Version:        11.2.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         090_all_pr55930-dependency-tracking.patch
 # Only applies to the Power9 ISA
 Patch1:         CVE-2019-15847.nopatch
 Requires:       gcc-c++ = %{version}-%{release}
@@ -117,17 +116,17 @@ This package contains development headers and static library for libgomp
 
 %prep
 %setup -q
-%patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
+FCFLAGS="`echo " %{build_fflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 export CFLAGS
 export CXXFLAGS
+export FCFLAGS
 
-export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
 SED=sed \
 %configure \
     --enable-shared \
@@ -192,6 +191,7 @@ make %{?_smp_mflags} check-gcc
 %{_mandir}/man1/gcc.1.gz
 %{_mandir}/man1/g++.1.gz
 %{_mandir}/man1/cpp.1.gz
+%{_mandir}/man1/lto-dump.1.gz
 %{_mandir}/man7/*.gz
 %{_datadir}/gdb/*
 
@@ -254,6 +254,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Mon Oct 18 2021 Andrew Phelps <anphel@microsoft.com> - 11.2.0-1
+- Update to version 11.2.0
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 9.1.0-11
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

@@ -1,7 +1,7 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
-Version:        1.9
-Release:        6%{?dist}
+Version:        1.11
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,10 +20,6 @@ decompressing files.
 %setup -q
 
 %build
-#make some fixes required by glibc-2.28:
-sed -i 's/IO_ftrylockfile/IO_EOF_SEEN/' lib/*.c
-echo "#define _IO_IN_BACKUP 0x100" >> lib/stdio-impl.h
-
 %configure --disable-silent-rules
 make %{?_smp_mflags}
 
@@ -46,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.11-1
+- Update to version 1.11
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.9-6
 - Stop packaging 'uncompress' binary alias
 - Lint spec

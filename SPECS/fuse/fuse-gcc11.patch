@@ -1,0 +1,41 @@
+diff -ru libfuse-fuse-2.9.7-orig/configure.ac libfuse-fuse-2.9.7/configure.ac
+--- libfuse-fuse-2.9.7-orig/configure.ac	2016-06-20 12:55:12.000000000 -0700
++++ libfuse-fuse-2.9.7/configure.ac	2021-11-12 14:12:55.724416171 -0800
+@@ -55,6 +55,7 @@
+
+ AC_CHECK_FUNCS([fork setxattr fdatasync splice vmsplice utimensat])
+ AC_CHECK_FUNCS([posix_fallocate])
++AC_CHECK_FUNCS([closefrom])
+ AC_CHECK_MEMBERS([struct stat.st_atim])
+ AC_CHECK_MEMBERS([struct stat.st_atimespec])
+
+diff -ru libfuse-fuse-2.9.7-orig/util/ulockmgr_server.c libfuse-fuse-2.9.7/util/ulockmgr_server.c
+--- libfuse-fuse-2.9.7-orig/util/ulockmgr_server.c	2016-06-20 12:55:12.000000000 -0700
++++ libfuse-fuse-2.9.7/util/ulockmgr_server.c	2021-11-12 14:14:37.528205804 -0800
+@@ -22,6 +22,10 @@
+ #include <sys/socket.h>
+ #include <sys/wait.h>
+
++#ifdef HAVE_CONFIG_H
++	#include "config.h"
++#endif
++
+ struct message {
+ 	unsigned intr : 1;
+ 	unsigned nofd : 1;
+@@ -124,6 +128,7 @@
+ 	return res;
+ }
+
++#if !defined(HAVE_CLOSEFROM)
+ static int closefrom(int minfd)
+ {
+ 	DIR *dir = opendir("/proc/self/fd");
+@@ -141,6 +146,7 @@
+ 	}
+ 	return 0;
+ }
++#endif
+
+ static void send_reply(int cfd, struct message *msg)
+ {

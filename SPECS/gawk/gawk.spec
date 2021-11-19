@@ -1,30 +1,33 @@
-Summary:	Contains programs for manipulating text files
-Name:		gawk
-Version:	4.2.1
-Release:        4%{?dist}
-License:	GPLv3
-URL:		http://www.gnu.org/software/gawk
-Group:		Applications/File
+Summary:        Contains programs for manipulating text files
+Name:           gawk
+Version:        5.1.0
+Release:        1%{?dist}
+License:        GPLv3
+URL:            https://www.gnu.org/software/gawk
+Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:		http://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
-%define sha1 gawk=71fc3595865ea6ea859587cbbb35cbf9aeb39d2d
-Provides:	/bin/awk
-Provides:	/bin/gawk
-Provides:	awk
-Requires:	mpfr
-Requires:	gmp
-Requires:	readline >= 7.0
+Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
+Provides:       /bin/awk
+Provides:       /bin/gawk
+Provides:       awk
+Requires:       mpfr
+Requires:       gmp
+Requires:       readline >= 7.0
+
 %description
 The Gawk package contains programs for manipulating text files.
+
 %prep
 %setup -q
+
 %build
 %configure \
-	--prefix=%{_prefix} \
-	--sysconfdir=%{_sysconfdir } \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --sysconfdir=%{_sysconfdir } \
+    --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}%{_defaultdocdir}/%{name}-%{version}
@@ -39,8 +42,9 @@ sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
 make %{?_smp_mflags} check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%post   -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
@@ -55,6 +59,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+*   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.1.0-1
+-   Update to version 5.1.0
+-   License verified
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-4
 -   Skip timeout test
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-3

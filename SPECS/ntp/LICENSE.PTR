@@ -1,0 +1,7 @@
+In addition to the contents of the 'COPYRIGHT' file, parts of the software distributed
+with this package are licensed under terms listed inside the package's 'License' field.
+
+The license conditions were found by searching the source directory the following way:
+
+find . -iname "LICENSE*" -o -iname "COPYING*" -o -iname "COPYRIGHT*" -o -iname "NOTICE*" -o -iname "README*"
+grep -m1 -R "license" .

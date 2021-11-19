@@ -1,6 +1,6 @@
 Name:           ragel
 Version:        7.0.0.12
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Finite state machine compiler
 # aapl/ is the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -27,7 +27,7 @@ is done using inline operators that do not disrupt the regular language syntax.
 
 %package devel
 Summary:        Development libraries header files for %{name}
-Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 %{summary}.
@@ -70,6 +70,9 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %{_includedir}/%{name}/
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.0.12-6
+- Remove epoch
+
 * Sat Jul 10 2021 Henry Li <lihl@microsoft.com> - 7.0.0.12-5
 - Remove Provides bundled(aapl)
 

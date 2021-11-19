@@ -1,15 +1,14 @@
 %global debug_package %{nil}
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
-Version:        5.1.4
-Release:        6%{?dist}
+Version:        5.1.8
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            http://www.kernel.org/pub/linux/daemons/autofs
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.kernel.org/pub/linux/daemons/%{name}/v5/%{name}-%{version}.tar.xz
-%define sha1    autofs=c26f2e5e24814adb0572f2c01066215d11ee0782
 
 BuildRequires:  systemd
 BuildRequires:  rpcsvc-proto-devel
@@ -32,6 +31,7 @@ make %{?_smp_mflags}
 mkdir -p -m755 %{buildroot}/lib/systemd/system
 mkdir -p -m755 %{buildroot}/etc/auto.master.d
 make install mandir=%{_mandir} INSTALLROOT=%{buildroot}
+make install_samples INSTALLROOT=%{buildroot}
 make -C redhat
 install -m 644 redhat/autofs.service  %{buildroot}/lib/systemd/system/autofs.service
 rm -rf %{buildroot}/etc/rc.d
@@ -63,12 +63,16 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/autofs_ldap_auth.conf
 %{_sbindir}/automount
 %{_libdir}/autofs/*
+%{_libdir}/libautofs.so
 %dir %{_sysconfdir}/auto.master.d
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 /lib/systemd/system/autofs.service
 
 %changelog
+*   Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.1.8-1
+-   Upgrade to version 5.1.8
+-   License verified
 *   Wed May 13 2020 Nick Samson <nisamson@microsoft.com> - 5.1.4-6
 -   Added %%license line automatically
 *   Tue May 12 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.1.4-5

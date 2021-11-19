@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Wed Nov 10 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-8
+- Revert ssh brute force prevention
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-7
 - Add provides from main package for services subpackage
 - Lint spec

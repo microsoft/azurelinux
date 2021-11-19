@@ -1,13 +1,13 @@
 Summary:        Program for compiling packages
 Name:           make
 Version:        4.2.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/make
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.bz2
+Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
 
 %description
 The Make package contains a program for compiling packages.
@@ -15,8 +15,9 @@ The Make package contains a program for compiling packages.
 %prep
 %setup -q
 %build
-#work around an error caused by glibc-2.27
+# work around an errors caused by glibc-2.34
 sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
+sed -i '215 d; 223 d;' glob/glob.c
 
 ./configure \
     --prefix=%{_prefix} \
@@ -41,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-6
+- Add additional glibc 2.34 workarounds to glob.c
+- License verified
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> 4.2.1-5
 - Fix check test
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-4

@@ -1,0 +1,106 @@
+diff -urN a/hw/core/machine.c b/hw/core/machine.c
+--- a/hw/core/machine.c	2021-11-12 11:09:11.174672980 +0000
++++ b/hw/core/machine.c	2021-11-12 11:09:54.550535243 +0000
+@@ -1143,6 +1143,30 @@
+     machine_class->init(machine);
+ }
+ 
++static NotifierList machine_init_done_notifiers =
++    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
++
++bool machine_init_done;
++
++void qemu_add_machine_init_done_notifier(Notifier *notify)
++{
++    notifier_list_add(&machine_init_done_notifiers, notify);
++    if (machine_init_done) {
++        notify->notify(notify, NULL);
++    }
++}
++
++void qemu_remove_machine_init_done_notifier(Notifier *notify)
++{
++    notifier_remove(notify);
++}
++
++void qemu_run_machine_init_done_notifiers(void)
++{
++    machine_init_done = true;
++    notifier_list_notify(&machine_init_done_notifiers, NULL);
++}
++
+ static const TypeInfo machine_info = {
+     .name = TYPE_MACHINE,
+     .parent = TYPE_OBJECT,
+diff -urN a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+--- a/include/sysemu/sysemu.h	2021-11-12 11:08:00.794894614 +0000
++++ b/include/sysemu/sysemu.h	2021-11-12 11:08:20.510832772 +0000
+@@ -20,6 +20,7 @@
+ 
+ extern bool machine_init_done;
+ 
++void qemu_run_machine_init_done_notifiers(void);
+ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+diff -urN a/machine-init-done.c b/machine-init-done.c
+--- a/machine-init-done.c	1970-01-01 00:00:00.000000000 +0000
++++ b/machine-init-done.c	2021-11-12 19:04:11.492047475 +0000
+@@ -0,0 +1,5 @@
++#include "qemu/osdep.h"
++#include "sysemu/sysemu.h"
++
++bool machine_init_done = true;
++
+diff -urN a/stubs/machine-init-done.c b/stubs/machine-init-done.c
+--- a/stubs/machine-init-done.c	2021-11-12 19:29:59.182565795 +0000
++++ b/stubs/machine-init-done.c	2021-11-12 19:30:12.358518748 +0000
+@@ -2,7 +2,3 @@
+ #include "sysemu/sysemu.h"
+ 
+ bool machine_init_done = true;
+-
+-void qemu_add_machine_init_done_notifier(Notifier *notify)
+-{
+-}
+diff -urN a/vl.c b/vl.c
+--- a/vl.c	2021-11-12 11:06:24.743192851 +0000
++++ b/vl.c	2021-11-12 11:07:22.459014275 +0000
+@@ -198,9 +198,6 @@
+ static NotifierList exit_notifiers =
+     NOTIFIER_LIST_INITIALIZER(exit_notifiers);
+ 
+-static NotifierList machine_init_done_notifiers =
+-    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
+-
+ bool xen_allowed;
+ uint32_t xen_domid;
+ enum xen_mode xen_mode = XEN_EMULATE;
+@@ -2525,27 +2522,6 @@
+     }
+ }
+ 
+-bool machine_init_done;
+-
+-void qemu_add_machine_init_done_notifier(Notifier *notify)
+-{
+-    notifier_list_add(&machine_init_done_notifiers, notify);
+-    if (machine_init_done) {
+-        notify->notify(notify, NULL);
+-    }
+-}
+-
+-void qemu_remove_machine_init_done_notifier(Notifier *notify)
+-{
+-    notifier_remove(notify);
+-}
+-
+-static void qemu_run_machine_init_done_notifiers(void)
+-{
+-    machine_init_done = true;
+-    notifier_list_notify(&machine_init_done_notifiers, NULL);
+-}
+-
+ static const QEMUOption *lookup_opt(int argc, char **argv,
+                                     const char **poptarg, int *poptind)
+ {

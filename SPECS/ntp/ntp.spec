@@ -1,8 +1,8 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
-Version:        4.2.8p13
-Release:        4%{?dist}
-License:        NTP
+Version:        4.2.8p15
+Release:        2%{?dist}
+License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingPrograms
@@ -16,7 +16,11 @@ Source4:        ntpdate.wrapper
 Source5:        ntpdate.sysconfig
 Source6:        ntpdate.service
 Source7:        ntpd.service
+Source8:        LICENSE.PTR
+Patch0:         ntp-gcc11.patch
 
+BuildRequires:  gcc >= 11.2.0
+BuildRequires:  glibc >= 2.34
 BuildRequires:  libcap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  systemd
@@ -59,6 +63,7 @@ state of the NTP daemon running on the local machine.
 
 %prep
 %setup -q -a 1
+%patch0 -p1
 
 %build
 
@@ -77,6 +82,8 @@ make %{?_smp_mflags}
 make -C ntpstat-master CFLAGS="$CFLAGS"
 
 %install
+
+cp %{SOURCE8} .
 
 make DESTDIR=%{buildroot} install
 install -v -m755    -d %{buildroot}%{_docdir}/%{name}-%{version}
@@ -148,7 +155,7 @@ rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT
+%license COPYRIGHT LICENSE.PTR
 %dir %{_sharedstatedir}/ntp/drift
 %attr(0755, ntp, ntp) %{_sharedstatedir}/ntp/drift
 %attr(0750, root, root) %config(noreplace) %{_sysconfdir}/ntp.conf
@@ -195,6 +202,13 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p15-2
+- License verified.
+- Added "LICENSE.PTR" to clarify licensing.
+
+* Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 4.2.8p15-1
+- Upgrade to version 4.2.8p15.
+
 * Fri Sep 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p13-4
 - Adding 'Provides' for 'ntpdate' using Fedora 32 spec (license: MIT) as guidance.
 

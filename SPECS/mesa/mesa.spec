@@ -52,7 +52,7 @@
 Summary:        Mesa graphics libraries
 Name:           mesa
 Version:        21.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -138,24 +138,24 @@ BuildRequires:  pkgconfig(valgrind)
 
 %package filesystem
 Summary:        Mesa driver filesystem
-Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       mesa-dri-filesystem = %{version}-%{release}
+Obsoletes:      mesa-dri-filesystem < %{version}-%{release}
 
 %description filesystem
 %{summary}.
 
 %package libGL
 Summary:        Mesa libGL runtime libraries
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-glx%{?_isa} >= 1:1.3.2
+Requires:       %{name}-libglapi%{?_isa} = %{version}-%{release}
+Requires:       libglvnd-glx%{?_isa} >= 1.3.2
 
 %description libGL
 %{summary}.
 
 %package libGL-devel
 Summary:        Mesa libGL development package
-Requires:       %{name}-libGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
+Requires:       %{name}-libGL%{?_isa} = %{version}-%{release}
+Requires:       libglvnd-devel%{?_isa} >= 1.3.2
 Provides:       libGL-devel
 Provides:       libGL-devel%{?_isa}
 Recommends:     gl-manpages
@@ -165,15 +165,15 @@ Recommends:     gl-manpages
 
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
-Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
+Requires:       libglvnd-egl%{?_isa} >= 1.3.2
 
 %description libEGL
 %{summary}.
 
 %package libEGL-devel
 Summary:        Mesa libEGL development package
-Requires:       %{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
+Requires:       %{name}-libEGL%{?_isa} = %{version}-%{release}
+Requires:       libglvnd-devel%{?_isa} >= 1.3.2
 Requires:       %{name}-khr-devel%{?_isa}
 Provides:       libEGL-devel
 Provides:       libEGL-devel%{?_isa}
@@ -183,7 +183,7 @@ Provides:       libEGL-devel%{?_isa}
 
 %package dri-drivers
 Summary:        Mesa-based DRI drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
 %description dri-drivers
 %{summary}.
@@ -191,7 +191,7 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %if 0%{?with_omx}
 %package omx-drivers
 Summary:        Mesa-based OMX drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
 %description omx-drivers
 %{summary}.
@@ -200,7 +200,7 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %if 0%{?with_vdpau}
 %package        vdpau-drivers
 Summary:        Mesa-based VDPAU drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
 %description vdpau-drivers
 %{summary}.
@@ -208,7 +208,7 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 
 %package libOSMesa
 Summary:        Mesa offscreen rendering libraries
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libglapi%{?_isa} = %{version}-%{release}
 Provides:       libOSMesa
 Provides:       libOSMesa%{?_isa}
 
@@ -217,7 +217,7 @@ Provides:       libOSMesa%{?_isa}
 
 %package libOSMesa-devel
 Summary:        Mesa offscreen rendering development package
-Requires:       %{name}-libOSMesa%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libOSMesa%{?_isa} = %{version}-%{release}
 
 %description libOSMesa-devel
 %{summary}.
@@ -232,7 +232,7 @@ Provides:       libgbm%{?_isa}
 
 %package libgbm-devel
 Summary:        Mesa libgbm development package
-Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libgbm%{?_isa} = %{version}-%{release}
 Provides:       libgbm-devel
 Provides:       libgbm-devel%{?_isa}
 
@@ -250,7 +250,7 @@ Provides:       libxatracker%{?_isa}
 
 %package libxatracker-devel
 Summary:        Mesa XA state tracker development package
-Requires:       %{name}-libxatracker%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libxatracker%{?_isa} = %{version}-%{release}
 Provides:       libxatracker-devel
 Provides:       libxatracker-devel%{?_isa}
 
@@ -271,7 +271,7 @@ Provides:       libglapi%{?_isa}
 Summary:        Mesa OpenCL runtime library
 Requires:       ocl-icd%{?_isa}
 Requires:       libclc%{?_isa}
-Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libgbm%{?_isa} = %{version}-%{release}
 Requires:       opencl-filesystem
 
 %description libOpenCL
@@ -279,7 +279,7 @@ Requires:       opencl-filesystem
 
 %package libOpenCL-devel
 Summary:        Mesa OpenCL development package
-Requires:       %{name}-libOpenCL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libOpenCL%{?_isa} = %{version}-%{release}
 
 %description libOpenCL-devel
 %{summary}.
@@ -294,7 +294,7 @@ Summary:        Mesa Direct3D9 state tracker
 
 %package libd3d-devel
 Summary:        Mesa Direct3D9 state tracker development package
-Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libd3d%{?_isa} = %{version}-%{release}
 
 %description libd3d-devel
 %{summary}.
@@ -309,7 +309,7 @@ The drivers with support for the Vulkan API.
 
 %package vulkan-devel
 Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-vulkan-drivers%{?_isa} = %{version}-%{release}
 Requires:       vulkan-devel
 
 %description vulkan-devel
@@ -588,6 +588,9 @@ popd
 %endif
 
 %changelog
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 21.0.0-3
+- Remove epoch
+
 * Mon Aug 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 21.0.0-2
 - Removing BR on 'marinerui-rpm-macros'. Using macros from the build env.
 

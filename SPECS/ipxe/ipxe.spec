@@ -3,8 +3,8 @@
 
 Summary:        iPXE open source boot firmware
 Name:           ipxe
-Version:        1.20.1
-Release:        3%{?dist}
+Version:        1.21.1
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://ipxe.org
 Source0:        https://github.com/ipxe/ipxe/archive/%{name}-%{version}.tar.gz
@@ -13,18 +13,8 @@ Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 ExclusiveArch:  x86_64
-BuildRequires:  binutils
-BuildRequires:  binutils-devel
 BuildRequires:  cdrkit
-BuildRequires:  gcc
-BuildRequires:  libgcc
-BuildRequires:  libgcc-devel
-BuildRequires:  make
 BuildRequires:  perl
-BuildRequires:  xz
-BuildRequires:  xz-devel
-BuildRequires:  zlib
-BuildRequires:  zlib-devel
 
 %description
 iPXE is the leading open source network boot firmware. It provides a full
@@ -35,7 +25,7 @@ PXE implementation enhanced with additional features.
 
 %build
 cd src
-make %{_smp_mflags}
+make %{_smp_mflags} NO_WERROR=1 V=1
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
@@ -62,9 +52,10 @@ install -vDm 644 src/bin/*.{rom,mrom} %{buildroot}/usr/share/ipxe/
 /usr/share/ipxe/rtl8139.rom
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.20.1-3
-- Added %%license line automatically
-
+*   Wed Nov 10 2021 Andrew Phelps <anphel@microsoft.com> 1.21.1-1
+-   Update version. Remove unnecessary BR. Modify to build with gcc11.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.20.1-3
+-   Added %%license line automatically
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.20.1-2
 -   Replace BuildArch with ExclusiveArch
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.20.1-1

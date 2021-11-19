@@ -1,32 +1,33 @@
-Summary:	Functions for multiple precision math
-Name:		mpfr
-Version:	4.0.1
-Release:        3%{?dist}
-License:	GPLv3+
-URL:		http://www.mpfr.org
-Group:		Applications/System
+Summary:        Functions for multiple precision math
+Name:           mpfr
+Version:        4.1.0
+Release:        1%{?dist}
+License:        GPLv3+
+URL:            http://www.mpfr.org
+Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.gz
-%define sha1 mpfr=655e3cf416a0cc9530d9cb3c38dc8839504f0e98
-Requires:	gmp
+Source0:        http://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.xz
+Requires:       gmp
+
 %description
 The MPFR package contains functions for multiple precision math.
-%package	devel
-Summary:	Header and development files for mpfr
-Requires:	%{name} = %{version}
 
-%description	devel
+%package    devel
+Summary:    Header and development files for mpfr
+Requires:   %{name} = %{version}
+
+%description    devel
 It contains the libraries and header files to create applications
 
 %prep
 %setup -q
 %build
 ./configure \
-	--prefix=%{_prefix} \
-	--enable-thread-safe \
-	--docdir=%{_defaultdocdir}/%{name}-%{version} \
-	--disable-silent-rules
+    --prefix=%{_prefix} \
+    --enable-thread-safe \
+    --docdir=%{_defaultdocdir}/%{name}-%{version} \
+    --disable-silent-rules
 make %{?_smp_mflags}
 
 %install
@@ -37,8 +38,9 @@ rm -rf %{buildroot}%{_infodir}
 %check
 make %{?_smp_mflags} check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%post   -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -58,6 +60,7 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/examples/sample.c
 %{_docdir}/mpfr-%{version}/examples/divworst.c
 %{_docdir}/mpfr-%{version}/examples/can_round.c
+%{_docdir}/mpfr-%{version}/examples/threads.c
 %{_docdir}/mpfr-%{version}/COPYING.LESSER
 %{_docdir}/mpfr-%{version}/TODO
 %{_docdir}/mpfr-%{version}/BUGS
@@ -65,20 +68,22 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/COPYING
 
 %changelog
+* Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.0-1
+- Update to version 4.1.0
+- License verified.
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.0.1-3
 - Added %%license line automatically
-
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 4.0.1-1
--       Update package version
-*       Fri Mar 31 2017 Michelle Wang <michellew@vmware.com> 3.1.5-1
--       Update package version
-*       Mon Oct 03 2016 ChangLee <changlee@vmware.com> 3.1.3-3
--       Modified %check
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.1.3-2
--	GA - Bump release of all rpms
-*       Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  3.1.3-1
--       Update version.
-*	Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com>> 3.1.2-1
--	Initial build.	First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+* Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 4.0.1-1
+- Update package version
+* Fri Mar 31 2017 Michelle Wang <michellew@vmware.com> 3.1.5-1
+- Update package version
+* Mon Oct 03 2016 ChangLee <changlee@vmware.com> 3.1.3-3
+- Modified %check
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.1.3-2
+- GA - Bump release of all rpms
+* Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  3.1.3-1
+- Update version.
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com>> 3.1.2-1
+- Initial build. First version

@@ -1,7 +1,7 @@
 Summary:	    Dynamic host configuration protocol
 Name:		    dhcp
 Version:	    4.4.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -44,9 +44,10 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 %setup -qn %{name}-%{version}
 
 %build
-CFLAGS="-D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"'         \
-        -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"'               \
-        -D_PATH_DHCLIENT_CONF='\"/etc/dhcp/dhclient.conf\"'"        \
+CFLAGS="$CFLAGS \
+        -D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"' \
+        -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"' \
+        -D_PATH_DHCLIENT_CONF='\"/etc/dhcp/dhclient.conf\"'" \
 ./configure \
     --prefix=%{_prefix} \
     --sysconfdir=/etc/dhcp                                  \
@@ -171,6 +172,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 4.4.2-4
+- Modified "CFLAGS" to include CBL-Mariner defaults.
+
 * Tue Jun 08 2021 Muhammad Falak Wani <mwani@microsoft.com> 4.4.2-3
 - Add an explicit provides for dhclient.
 

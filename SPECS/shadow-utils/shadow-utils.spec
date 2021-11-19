@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,11 @@ Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
 Provides:       /sbin/nologin
+Provides:       /usr/sbin/groupadd
+Provides:       /usr/sbin/groupdel
+Provides:       /usr/sbin/nologin
+Provides:       /usr/sbin/useradd
+Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
 
 %description
@@ -162,6 +167,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
+- Add provides to resolve dynamic dependencies
+
 * Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-5
 - Make pam_loginuid use optional for systems that don't have audit.
 - License verified.
