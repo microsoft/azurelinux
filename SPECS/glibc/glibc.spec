@@ -8,7 +8,7 @@ Summary:        Main C library
 Name:           glibc
 Version:        2.34
 Release:        2%{?dist}
-License:        LGPLv2+
+License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -310,6 +310,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %changelog
 * Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.34-2
 - Adding missing BR on "perl(File::Find)".
+- Fixing licensing information.
 - Removing redundant 'Provides'.
 
 * Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.34-1
