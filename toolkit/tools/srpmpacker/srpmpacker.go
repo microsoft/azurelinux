@@ -71,10 +71,11 @@ const (
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.
 type sourceRetrievalConfiguration struct {
-	localSourceDir string
-	sourceURL      string
-	caCerts        *x509.CertPool
-	tlsCerts       []tls.Certificate
+	localSourceCacheDir string
+	localSourceDir      string
+	sourceURL           string
+	caCerts             *x509.CertPool
+	tlsCerts            []tls.Certificate
 
 	signatureHandling signatureHandlingType
 	signatureLookup   map[string]string
@@ -113,10 +114,11 @@ var (
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
 
 	// Use String() and not ExistingFile() as the Makefile may pass an empty string if the user did not specify any of these options
-	sourceURL     = app.Flag("source-url", "URL to a source server to download SPEC sources from.").String()
-	caCertFile    = app.Flag("ca-cert", "Root certificate authority to use when downloading files.").String()
-	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
-	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
+	sourceURL      = app.Flag("source-url", "URL to a source server to download SPEC sources from.").String()
+	sourceCacheDir = app.Flag("source-cache-dir", "Path to a directory where remote sources can be cached.").String()
+	caCertFile     = app.Flag("ca-cert", "Root certificate authority to use when downloading files.").String()
+	tlsClientCert  = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
+	tlsClientKey   = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 
 	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz. If this argument is empty, SRPMs will be packed in the host environment.").ExistingFile()
 
@@ -147,6 +149,18 @@ func main() {
 		templateSrcConfig.signatureHandling = signatureUpdate
 	default:
 		logger.Log.Fatalf("Invalid signature handling encountered: %s. Allowed: %s", *signatureHandling, validSignatureLevels)
+	}
+
+	// Setup remote source caching
+	if *sourceCacheDir != "" {
+		fileInfo, err := os.Stat(*sourceCacheDir)
+		if err != nil {
+			logger.Log.Fatalf("Received error getting information for source cache directory. Error: %v", err)
+		}
+		if !fileInfo.IsDir() {
+			logger.Log.Fatalf("Source cache directory (%s) is not a directory", *sourceCacheDir)
+		}
+		templateSrcConfig.localSourceCacheDir = *sourceCacheDir
 	}
 
 	// Setup remote source configuration
@@ -804,9 +818,11 @@ func readSPECTagArray(specFile, sourceDir, tag string, defines map[string]string
 func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string) (err error) {
 	const (
 		downloadMissingPatchFiles = false
+		cacheMissingPatchFiles    = false
 		skipPatchSignatures       = true
 
 		downloadMissingSourceFiles = true
+		cacheMissingSourceFiles    = true
 		skipSourceSignatures       = false
 
 		patchTag  = "PATCH"
@@ -816,6 +832,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	var (
 		specTag               string
 		hydrateRemotely       bool
+		cacheMissingFiles     bool
 		skipSignatureHandling bool
 	)
 
@@ -823,10 +840,12 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	case fileTypePatch:
 		specTag = patchTag
 		hydrateRemotely = downloadMissingPatchFiles
+		cacheMissingFiles = cacheMissingPatchFiles
 		skipSignatureHandling = skipPatchSignatures
 	case fileTypeSource:
 		specTag = sourceTag
 		hydrateRemotely = downloadMissingSourceFiles
+		cacheMissingFiles = cacheMissingSourceFiles
 		skipSignatureHandling = skipSourceSignatures
 	default:
 		return fmt.Errorf("invalid filetype (%d)", fileTypeToHydrate)
@@ -845,8 +864,8 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 		fileHydrationState[fileNeeded] = false
 	}
 
-	// If the user provided an existing source dir, prefer it over remote sources.
-	if srcConfig.localSourceDir != "" {
+	// If the user provided an existing source dir or a cache directory, prefer those over remote sources.
+	if srcConfig.localSourceDir != "" || srcConfig.localSourceCacheDir != "" {
 		err = hydrateFromLocalSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
 		// On error warn and default to hydrating from an external server.
 		if err != nil {
@@ -855,7 +874,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	}
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
-		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
+		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, cacheMissingFiles, currentSignatures)
 	}
 
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
@@ -871,7 +890,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 // hydrateFromLocalSource will update fileHydrationState.
 // Will alter currentSignatures.
 func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) (err error) {
-	err = filepath.Walk(srcConfig.localSourceDir, func(path string, info os.FileInfo, err error) error {
+	walkFunc := func(path string, info os.FileInfo, err error) error {
 		isFile, _ := file.IsFile(path)
 		if !isFile {
 			return nil
@@ -907,14 +926,28 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 
 		fileHydrationState[fileName] = true
 		return nil
-	})
+	}
+
+	// Hydrate using the local source directory and the local source cache directory, in that order
+	if srcConfig.localSourceDir != "" {
+		err = filepath.Walk(srcConfig.localSourceDir, walkFunc)
+		if err != nil {
+			return
+		}
+	}
+	if srcConfig.localSourceCacheDir != "" {
+		err = filepath.Walk(srcConfig.localSourceCacheDir, walkFunc)
+		if err != nil {
+			return
+		}
+	}
 
 	return
 }
 
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
-func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
+func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling, cacheMissingFiles bool, currentSignatures map[string]string) {
 	const (
 		downloadRetryAttempts = 3
 		downloadRetryDuration = time.Second
@@ -960,6 +993,16 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		fileHydrationState[fileName] = true
 		logger.Log.Debugf("Hydrated (%s) from (%s)", fileName, url)
+
+		if cacheMissingFiles && srcConfig.localSourceCacheDir != "" {
+			cacheDestinationFile := filepath.Join(srcConfig.localSourceCacheDir, fileName)
+			err = file.Copy(destinationFile, cacheDestinationFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to copy remote source (%s) to cache directory (%s). Error: %v", fileName, srcConfig.localSourceCacheDir, err)
+			} else {
+				logger.Log.Debugf("Cached (%s) to (%s)", fileName, srcConfig.localSourceCacheDir)
+			}
+		}
 	}
 }
 

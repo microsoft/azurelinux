@@ -326,6 +326,7 @@ USE_UPDATE_REPO        ?= y
 DISABLE_UPSTREAM_REPOS ?= n
 TOOLCHAIN_ARCHIVE      ?=
 PACKAGE_ARCHIVE        ?=
+SOURCE_CACHE_DIR       ?=
 ```
 
 See [Local Build Variables](#local-build-variables) for details on what each variable does.
@@ -371,6 +372,10 @@ If that is not desired all remote sources can be disabled by clearing the follow
 #### `SOURCE_URL=...`
 
 > URL to download unavailable source files from when creating `*.src.rpm` files prior to build. Only one URL can be set at a time; there is no support for a list of multiple source URLs.
+
+#### `SOURCE_CACHE_DIR=...`
+
+> Path to a local folder for cached remote sources. The `srpmpacker` tool will search this directory before attempting to download sources remotely. The `srpmpacker` tool will copy remotely downloaded sources into this folder.
 
 #### `PACKAGE_URL_LIST=...`
 
@@ -513,6 +518,7 @@ These are the useful build targets:
 | chroot-tools                     | Create the chroot working from the toolchain RPMs.
 | clean                            | Clean all built files.
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
+| clean-source-cache               | Deletes the source cache folder. Not invoked by the regular `clean` target.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 | compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 | copy-toolchain-rpms              | Copy all toolchain RPMS from `../build/rpm_cache/cache` to  `../out/RPMS`.
@@ -645,6 +651,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | STOP_ON_WARNING               | n                                                                                                      | Stop on non-fatal makefile failures (see `$(call print_warning, message)`)
 | STOP_ON_PKG_FAIL              | n                                                                                                      | Stop all package builds on any failure rather than try and continue.
 | SRPM_FILE_SIGNATURE_HANDLING  | enforce                                                                                                | Behavior when checking source file hashes from SPEC files. `update` will create a new entry in the signature file (`enforce, skip, update`)
+| SOURCE_CACHE_DIR              | (empty)                                                                                                | Path to a local directory where remote sources will be cached for future use.
 | ARCHIVE_TOOL                  | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
 | INCREMENTAL_TOOLCHAIN         | n                                                                                                      | Only build toolchain RPM packages if they are not already present
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages

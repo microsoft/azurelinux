@@ -33,6 +33,7 @@ TOOLCHAIN_CONTAINER_ARCHIVE     ?=
 TOOLCHAIN_ARCHIVE               ?=
 TOOLCHAIN_SOURCES_ARCHIVE       ?=
 CACHE_DIR                       ?=
+SOURCE_CACHE_DIR                ?= 
 PACKAGE_CACHE_SUMMARY           ?=
 IMAGE_CACHE_SUMMARY             ?=
 INITRD_CACHE_SUMMARY            ?=
@@ -162,7 +163,7 @@ include $(SCRIPTS_DIR)/toolchain.mk
 include $(SCRIPTS_DIR)/tools.mk
 
 # Create SRPMS from local SPECS with:
-#	input-srpms, clean-input-srpms
+#	input-srpms, clean-input-srpms, clean-source-cache
 include $(SCRIPTS_DIR)/srpm_pack.mk
 
 # Expand local SRPMS into sources and SPECS with:

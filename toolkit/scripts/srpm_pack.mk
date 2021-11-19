@@ -22,17 +22,22 @@ toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(BUILD_DIR)/SRPM_packaging)
+$(call create_folder,$(SOURCE_CACHE_DIR))
 
 # General targets
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
 input-srpms: $(BUILD_SRPMS_DIR)
 toolchain-input-srpms: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 
+# Main `clean` target deliberately does not include `clean-source-cache` as a dependency
+# The cache should persist through a `make clean` invocation
 clean: clean-input-srpms
 clean-input-srpms:
 	rm -rf $(BUILD_SRPMS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_srpms.flag
 	rm -rf $(BUILD_DIR)/SRPM_packaging
+clean-source-cache:
+	rm -rf $(SOURCE_CACHE_DIR)
 
 # The directory freshness is tracked with a status flag. The status flag is only updated when all SRPMs have been
 # updated.
@@ -76,6 +81,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
+		--source-cache-dir=$(SOURCE_CACHE_DIR) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
@@ -93,6 +99,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--build-dir=$(BUILD_DIR)/SRPM_packaging \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list=$(toolchain_spec_list) \
+		--source-cache-dir=$(SOURCE_CACHE_DIR) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
