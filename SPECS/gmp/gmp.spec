@@ -1,14 +1,14 @@
 Summary:         Math libraries
 Name:            gmp
 Version:         6.1.2
-Release:         5%{?dist}
-License:         LGPLv3+
-URL:             http://www.gnu.org/software/gmp
+Release:         6%{?dist}
+License:         GPLv2+ AND GPLv3+ AND LGPLv3+
+URL:             https://www.gnu.org/software/gmp
 Group:           Applications/System
 Vendor:          Microsoft Corporation
 Distribution:    Mariner
-Source0:         http://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
-%define sha1     gmp=9dc6981197a7d92f339192eea974f5eca48fcffe
+Source0:         https://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
+Patch0:          CVE-2021-43618.patch
 
 %description
 The GMP package contains math libraries. These have useful functions
@@ -23,7 +23,7 @@ It contains the libraries and header files to create applications
 for handling compiled objects.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 cp -v configfsf.guess config.guess
@@ -51,7 +51,7 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license COPYING COPYING.LESSERv3 COPYINGv2 COPYINGv3
 %{_libdir}/libgmp.so.*
 
 %files devel
@@ -63,6 +63,11 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
+* Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.2-6
+- Adding a patch to fix CVE-2021-43618.
+- License verified.
+- Using HTTPS in the 'URL' and 'Source0' tags.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.1.2-5
 - Added %%license line automatically
 
