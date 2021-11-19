@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,7 @@ Patch35:        CVE-2021-3527.patch
 Patch36:        CVE-2021-3546.patch
 Patch37:        CVE-2021-3682.patch
 Patch38:        CVE-2021-3713.patch
+Patch39:        CVE-2021-3545.patch
 
 # Range 1001+ reserved for nopatch files
 Patch1001: CVE-2020-7039.nopatch
@@ -61,6 +62,7 @@ Patch1001: CVE-2020-7039.nopatch
 # This is resolved in qemu >= 5.0
 Patch1002: CVE-2020-12829.nopatch
 Patch1003: CVE-2020-27661.nopatch
+Patch1004: CVE-2020-35506.nopatch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
@@ -187,6 +189,10 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
+- Patched CVE-2021-3545
+- Marked CVE-2020-35506 as nopatch
+
 * Thu Sep 09 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.2.0-36
 - Patched CVE-2021-3713
 - Move nopatch files to 1001+ range.
