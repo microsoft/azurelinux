@@ -1,15 +1,14 @@
+%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
 Version:        8.6.12
-%define majorver 8.6
 Release:        1%{?dist}
-URL:            http://tcl.sourceforge.net/
-License:        LGPLv2+
-Group:          System Environment/Libraries
+License:        TCL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
-
 BuildRequires:  cmake
 
 %description
@@ -21,9 +20,9 @@ Tcl can also be used for a variety of web-related tasks and for creating
 powerful command languages for applications.
 
 %package devel
-Summary: Headers and development libraries for tcl
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Summary:        Headers and development libraries for tcl
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Headers and development libraries for tcl
@@ -96,11 +95,11 @@ make test
 %{_mandir}/mann/*
 %{_mandir}/man3/*
 
-
 %changelog
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 8.6.12-1
 - Update to 8.6.12
 - Fix lint
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.8-3
 - Added %%license line automatically
