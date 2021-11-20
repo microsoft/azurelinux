@@ -62,6 +62,8 @@ Patch1001: CVE-2020-7039.nopatch
 # This is resolved in qemu >= 5.0
 Patch1002: CVE-2020-12829.nopatch
 Patch1003: CVE-2020-27661.nopatch
+# CVE 2020-35506 affects the SCSI ESP driver (esp.c), which is only compiled when CONFIG_ESP is set.
+# Our configuration does not enable CONFIG_ESP/compile esp.c, so Mariner is not vulnerable.
 Patch1004: CVE-2020-35506.nopatch
 
 BuildRequires:  alsa-lib-devel
