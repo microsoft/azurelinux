@@ -1,24 +1,28 @@
-Summary:	Displays information about running processes
-Name:		psmisc
-Version:	23.4
+Summary:        Displays information about running processes
+Name:           psmisc
+Version:        23.4
 Release:        1%{?dist}
-License:	GPLv2+
-URL:		http://psmisc.sourceforge.net/
-Group:		Applications/System
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://prdownloads.sourceforge.net/psmisc/%{name}-%{version}.tar.xz
-BuildRequires:	ncurses-devel
-Requires:	ncurses
+Group:          Applications/System
+URL:            http://psmisc.sourceforge.net/
+Source0:        http://prdownloads.sourceforge.net/psmisc/%{name}-%{version}.tar.xz
+BuildRequires:  ncurses-devel
+Requires:       ncurses
+
 %description
 The Psmisc package contains programs for displaying information
 about running processes.
+
 %prep
 %setup -q
+
 %build
 ./configure \
 	--prefix=%{_prefix}
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
@@ -40,6 +44,7 @@ make %{?_smp_mflags} check
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 23.4-1
 - Update to 23.4
 - Fix lint
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 23.2-4
 - Added %%license line automatically
