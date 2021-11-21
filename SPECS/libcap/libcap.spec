@@ -1,7 +1,7 @@
 Summary:		Libcap
 Name:			libcap
-Version:		2.26
-Release:        2%{?dist}
+Version:		2.60
+Release:        1%{?dist}
 License:		GPLv2+
 URL:			https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
 Source0:		https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/%{name}-%{version}.tar.xz
@@ -41,6 +41,7 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %defattr(-,root,root)
 %license License
 %{_lib64dir}/libcap.so.*
+%{_lib64dir}/libpsx.so.*
 %{_mandir}/man1/*
 %{_mandir}/man8/*
 %{_sbindir}/*
@@ -49,11 +50,16 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %defattr(-,root,root)
 %{_includedir}/*
 %exclude %{_lib64dir}/libcap.a
+%exclude %{_lib64dir}/libpsx.a
 %{_lib64dir}/pkgconfig/*
 %{_lib64dir}/libcap.so
+%{_lib64dir}/libpsx.so
 %{_mandir}/man3/*
 
 %changelog
+* Sat Nov 20 2021 Chris Co <chrco@microsoft.com> - 2.60-1
+- Update version to 2.60
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
 - Added %%license line automatically
 
