@@ -148,9 +148,9 @@ libarchive-devel-3.6.0-1.cm2.aarch64.rpm
 libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
-libcap-2.26-2.cm2.aarch64.rpm
-libcap-debuginfo-2.26-2.cm2.aarch64.rpm
-libcap-devel-2.26-2.cm2.aarch64.rpm
+libcap-2.60-1.cm2.aarch64.rpm
+libcap-debuginfo-2.60-1.cm2.aarch64.rpm
+libcap-devel-2.60-1.cm2.aarch64.rpm
 libffi-3.4.2-2.cm2.aarch64.rpm
 libffi-debuginfo-3.4.2-2.cm2.aarch64.rpm
 libffi-devel-3.4.2-2.cm2.aarch64.rpm
