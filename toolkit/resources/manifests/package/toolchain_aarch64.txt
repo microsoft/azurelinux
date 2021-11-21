@@ -125,9 +125,9 @@ glib-devel-2.58.0-9.cm1.aarch64.rpm
 glib-schemas-2.58.0-9.cm1.aarch64.rpm
 gmock-1.11.0-1.cm1.aarch64.rpm
 gmock-devel-1.11.0-1.cm1.aarch64.rpm
-gmp-6.1.2-5.cm1.aarch64.rpm
-gmp-debuginfo-6.1.2-5.cm1.aarch64.rpm
-gmp-devel-6.1.2-5.cm1.aarch64.rpm
+gmp-6.1.2-6.cm1.aarch64.rpm
+gmp-debuginfo-6.1.2-6.cm1.aarch64.rpm
+gmp-devel-6.1.2-6.cm1.aarch64.rpm
 gnupg2-2.2.20-3.cm1.aarch64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
 golang-1.16.10-1.cm1.aarch64.rpm
