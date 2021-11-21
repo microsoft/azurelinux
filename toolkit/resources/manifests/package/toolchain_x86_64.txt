@@ -29,8 +29,8 @@ ca-certificates-shared-20200720-21.cm1.noarch.rpm
 ca-certificates-tools-20200720-21.cm1.noarch.rpm
 check-0.12.0-4.cm1.x86_64.rpm
 check-debuginfo-0.12.0-4.cm1.x86_64.rpm
-cmake-3.17.3-2.cm1.x86_64.rpm
-cmake-debuginfo-3.17.3-2.cm1.x86_64.rpm
+cmake-3.21.4-1.cm1.x86_64.rpm
+cmake-debuginfo-3.21.4-1.cm1.x86_64.rpm
 coreutils-8.30-10.cm1.x86_64.rpm
 coreutils-debuginfo-8.30-10.cm1.x86_64.rpm
 coreutils-lang-8.30-10.cm1.x86_64.rpm
@@ -123,9 +123,8 @@ glibc-tools-2.28-22.cm1.x86_64.rpm
 glib-debuginfo-2.58.0-9.cm1.x86_64.rpm
 glib-devel-2.58.0-9.cm1.x86_64.rpm
 glib-schemas-2.58.0-9.cm1.x86_64.rpm
-gmock-1.8.1-5.cm1.x86_64.rpm
-gmock-devel-1.8.1-5.cm1.x86_64.rpm
-gmock-static-1.8.1-5.cm1.x86_64.rpm
+gmock-1.11.0-1.cm1.x86_64.rpm
+gmock-devel-1.11.0-1.cm1.x86_64.rpm
 gmp-6.1.2-6.cm1.x86_64.rpm
 gmp-debuginfo-6.1.2-6.cm1.x86_64.rpm
 gmp-devel-6.1.2-6.cm1.x86_64.rpm
@@ -142,10 +141,9 @@ grep-debuginfo-3.1-5.cm1.x86_64.rpm
 grep-lang-3.1-5.cm1.x86_64.rpm
 groff-1.22.3-6.cm1.x86_64.rpm
 groff-debuginfo-1.22.3-6.cm1.x86_64.rpm
-gtest-1.8.1-5.cm1.x86_64.rpm
-gtest-debuginfo-1.8.1-5.cm1.x86_64.rpm
-gtest-devel-1.8.1-5.cm1.x86_64.rpm
-gtest-static-1.8.1-5.cm1.x86_64.rpm
+gtest-1.11.0-1.cm1.x86_64.rpm
+gtest-debuginfo-1.11.0-1.cm1.x86_64.rpm
+gtest-devel-1.11.0-1.cm1.x86_64.rpm
 gtk-doc-1.29-6.cm1.noarch.rpm
 gzip-1.9-5.cm1.x86_64.rpm
 gzip-debuginfo-1.9-5.cm1.x86_64.rpm
