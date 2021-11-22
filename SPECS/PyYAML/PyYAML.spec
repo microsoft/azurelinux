@@ -60,6 +60,7 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Lint spec
+- License verified
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.13-6
 - Provide python3-yaml

@@ -65,6 +65,7 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com>  - 18.0.0-6
 - Added %%license line automatically

@@ -60,6 +60,7 @@ $easy_install_3 mock
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.2.0-5
 - Added %%license line automatically

@@ -46,6 +46,7 @@ This Library is mainly for those implementing a Terminal Emulator, or programs t
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.1.7-4
 - Added %%license line automatically

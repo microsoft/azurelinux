@@ -4,7 +4,7 @@ Name:           python-psycopg2
 Version:        2.7.5
 Release:        7%{?dist}
 Url:            https://pypi.python.org/pypi/psycopg2
-License:        LGPL with exceptions or ZPL
+License:        LGPLv3+ with exceptions
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,7 @@ rm -r /home/postgres/data &>/dev/null ||:
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Tue Jul 13 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.7.5-6
 - Extend using Fedora 32 spec (license: MIT)

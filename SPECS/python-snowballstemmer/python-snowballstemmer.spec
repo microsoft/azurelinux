@@ -62,6 +62,7 @@ It includes following language algorithms:
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.1-4
 - Added %%license line automatically

@@ -50,6 +50,7 @@ as a demonstration of the possibilities it provides than as production-quality c
 - Add license to python3 package, fix summary
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.12.2-5
 - Added %%license line automatically

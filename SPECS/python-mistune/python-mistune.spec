@@ -46,6 +46,7 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.8.3-3
 - Added %%license line automatically

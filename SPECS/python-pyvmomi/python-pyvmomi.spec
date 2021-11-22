@@ -51,6 +51,7 @@ pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage E
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 6.7.3-2
 - Added %%license line automatically

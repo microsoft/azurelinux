@@ -2,7 +2,7 @@ Summary:        WebSocket client for python
 Name:           python-websocket-client
 Version:        0.56.0
 Release:        3%{?dist}
-License:        BSD
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
@@ -50,6 +50,7 @@ WebSocket client for python3
 - Add license, wsdump.py binary to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.56.0-2
 - Added %%license line automatically

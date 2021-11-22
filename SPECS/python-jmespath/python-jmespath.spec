@@ -55,6 +55,7 @@ $easy_install_3 nose
 - Add license to python3 package
 - Remove python2 package,
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.9.3-4
 - Added %%license line automatically

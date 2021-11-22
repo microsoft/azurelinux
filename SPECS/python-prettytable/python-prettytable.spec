@@ -51,6 +51,7 @@ LANG=en_US.UTF-8 %{python3} prettytable_test.py
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.2-8
 - Added %%license line automatically

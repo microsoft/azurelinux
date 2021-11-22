@@ -43,6 +43,7 @@ It is pure Python code with no dependencies, but includes an optional C extensio
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.17.0-2
 - Added %%license line automatically

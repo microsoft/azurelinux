@@ -46,6 +46,7 @@ easy_install py
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Wed Nov 11 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.1-1
 - Upgrade to 1.1.1 to fix setuptools compatibility issues

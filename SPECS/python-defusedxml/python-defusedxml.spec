@@ -46,6 +46,7 @@ XML bomb protection for Python stdlib modules
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.6.0-2
 - Added %%license line automatically

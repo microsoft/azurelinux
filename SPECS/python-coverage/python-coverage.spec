@@ -2,7 +2,7 @@ Summary:        Code coverage measurement for Python.
 Name:           python-coverage
 Version:        4.5.1
 Release:        5%{?dist}
-License:        Apache 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
@@ -57,6 +57,7 @@ LANG=en_US.UTF-8 tox -e py36
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.5.1-4
 - Added %%license line automatically

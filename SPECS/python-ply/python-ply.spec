@@ -62,6 +62,7 @@ popd
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.11-6
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Fri May 29 2020 Mateusz Malisz <mamalisz@microsoft.com> - 3.11-7
 - Added %%license macro.

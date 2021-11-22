@@ -54,6 +54,7 @@ $easy_install_3 pytest
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified
 
 * Thu Feb 11 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.14.5-1
 - Update to 1.14.5

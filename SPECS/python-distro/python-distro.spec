@@ -3,7 +3,7 @@ Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.4.0
 Release:        5%{?dist}
-License:        ASL
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
@@ -55,6 +55,7 @@ tox
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
+- License verified (clarified ASL version in tag)
 
 * Fri Feb 26 2021 Andrew Phelps <anphel@microsoft.com> - 1.4.0-4
 - Use github source to fix check tests.

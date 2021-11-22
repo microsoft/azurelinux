@@ -41,6 +41,12 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.18-4
+- Add license to python3 package
+- Remove python2 package
+- Lint spec
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.18-3
 - Added %%license line automatically
 
