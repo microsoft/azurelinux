@@ -4555,8 +4555,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.5",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.5/node-v14.17.5.tar.xz"
+          "version": "14.18.1",
+          "downloadUrl": "https://nodejs.org/download/release/v14.18.1/node-v14.18.1.tar.xz"
         }
       }
     },

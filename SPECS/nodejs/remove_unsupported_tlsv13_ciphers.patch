@@ -1,0 +1,30 @@
+From bc1684951d93403cb8a4453ef0e4ce9b37c8c798 Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Thu, 18 Nov 2021 07:22:22 -0800
+Subject: [PATCH] Remove TLS_CHACHA20_POLY1305_SHA256 from default cipher list
+
+Mariner's OpenSSL configuration does not allow for this TLSv1.3
+cipher. OpenSSL does not like being asked to use TLSv1.3 ciphers
+it doesn't support (despite being fine processing similar cipher
+requests for TLS < 1.3). This cipher's presence in the default
+cipher list causes failures when initializing secure contexts
+in the context of Node's TLS library.
+---
+ src/node_constants.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/node_constants.h b/src/node_constants.h
+index d7de705f..750c00a1 100644
+--- a/src/node_constants.h
++++ b/src/node_constants.h
+@@ -48,7 +48,6 @@
+ //   https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_set_ciphersuites.html
+ #define DEFAULT_CIPHER_LIST_CORE \
+                                  "TLS_AES_256_GCM_SHA384:"          \
+-                                 "TLS_CHACHA20_POLY1305_SHA256:"    \
+                                  "TLS_AES_128_GCM_SHA256:"          \
+                                  "ECDHE-RSA-AES128-GCM-SHA256:"     \
+                                  "ECDHE-ECDSA-AES128-GCM-SHA256:"   \
+-- 
+2.25.1
+
