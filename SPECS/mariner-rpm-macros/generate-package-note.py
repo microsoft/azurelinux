@@ -233,7 +233,6 @@ class LinkerScript():
         with open(file_name, "wb") as f:
             f.write(bytearray(self.comment.encode('ascii')))
             f.write(bytearray(self.text.encode('ascii')))
-        print("Linker script, {}, was written successfully.".format(file_name))
 
 
 def generate_cpp_header(module_info, outdir):
@@ -339,18 +338,10 @@ def parse_args():
         sys.exit(0)
 
 if __name__ == '__main__':
-    print("==== ELF note generator v{} ====\n\n".format(VERSION))
+    print("==== ELF note generator v{} ====".format(VERSION))
     args = parse_args()
-    print("Note section memory alignment: {}\n\n".format(args.endian))
-    outdir = args.outdir
-
-    if outdir:
-        os.path.join(outdir, '')
-        print("outdir is: {}".format(outdir))
-
     endian = Endian.map[args.endian]
     stamp_method = args.stamp
-    print("Stamp method: {}\n".format(stamp_method))
 
     delattr(args, 'outdir')
     delattr(args, 'endian')
