@@ -14,11 +14,12 @@
 # published by the Open Source Initiative.
 #
 
+%global debug_package %{nil}
 %global ant_home %{_datadir}/ant
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.9
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -260,6 +261,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Fri Nov 19 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.9-7
+- Disable debuginfo package
+
 * Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.9-6
 - License verified.
 - Fixed 'Source0' URL.
