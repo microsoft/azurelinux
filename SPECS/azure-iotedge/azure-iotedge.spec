@@ -1,7 +1,7 @@
 Summary:        Azure IoT Edge Security Daemon
 Name:           azure-iotedge
 Version:        1.1.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 # A buildable azure-iotedge environments needs functioning submodules that do not work from the archive download
 # Tracking github issue is: https://github.com/Azure/iotedge/issues/1685
@@ -62,6 +62,7 @@ Requires:       moby-engine
 Requires:       moby-cli
 
 Patch0:         0001-set-mgmt-socket-to-var-lib.patch
+Patch1:         cmake_3.21.4_fix.patch
 
 %description
 Azure IoT Edge Security Daemon
@@ -89,6 +90,8 @@ tar xf %{SOURCE1} --no-same-owner
 popd
 %setup -q -n %{_topdir}/BUILD/azure-iotedge-%{version}/edgelet
 %patch0 -p1
+%patch1 -p1 -d hsm-sys/azure-iot-hsm-c/deps/c-shared
+%patch1 -p1 -d hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility
 
 %build
 cd %{_topdir}/BUILD/azure-iotedge-%{version}/edgelet
@@ -195,6 +198,9 @@ echo "==========================================================================
 %doc %{_docdir}/iotedge-%{version}/trademark
 
 %changelog
+* Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-2
+- Adding a fix to work with newer version of cmake.
+
 * Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-1
 - Update to version 1.1.8 to be compatible with GCC 11.
 - Applying a GCC 11 patch.

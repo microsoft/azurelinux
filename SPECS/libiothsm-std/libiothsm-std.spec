@@ -4,7 +4,7 @@
 Summary:        Azure IoT standard mode HSM lib
 Name:           libiothsm-std
 Version:        1.1.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ URL:            https://github.com/azure/iotedge
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source0:        azure-iotedge-%{version}.tar.gz
+Patch0:         cmake_3.21.4_fix.patch
 Patch1:         hmac.c-fix-mismatching-function-prototype.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -42,6 +43,7 @@ This library is used to interface with the TPM from Azure IoT Edge.
 
 %prep
 %setup -q -n azure-iotedge-%{version}/edgelet/hsm-sys/azure-iot-hsm-c
+%patch0 -p1 -d deps/c-shared
 %patch1 -p1 -d deps/c-shared
 
 %build
@@ -57,6 +59,9 @@ cmake -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED="ON" -Duse_emulator="OFF" -Dus
 %{_libdir}/libiothsm.so*
 
 %changelog
+* Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-2
+- Adding a fix to work with newer version of cmake.
+
 * Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-1
 - Update to version 1.1.8 to be compatible with GCC 11.
 - Applying a GCC 11 patch.
