@@ -114,8 +114,8 @@ var (
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
 
 	// Use String() and not ExistingFile() as the Makefile may pass an empty string if the user did not specify any of these options
-	sourceURL      = app.Flag("source-url", "URL to a source server to download SPEC sources from.").String()
 	sourceCacheDir = app.Flag("source-cache-dir", "Path to a directory where remote sources can be cached.").String()
+	sourceURL      = app.Flag("source-url", "URL to a source server to download SPEC sources from.").String()
 	caCertFile     = app.Flag("ca-cert", "Root certificate authority to use when downloading files.").String()
 	tlsClientCert  = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey   = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -248,9 +248,11 @@ func parsePackListFile(packListFile string) (packList []string, err error) {
 func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
+	originalCacheDir := templateSrcConfig.localSourceCacheDir
+
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir)
+		chroot, buildDir, outDir, specsDir, templateSrcConfig.localSourceCacheDir, err = createChroot(workerTar, buildDir, outDir, specsDir, originalCacheDir)
 		if err != nil {
 			return
 		}
@@ -274,10 +276,16 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	}
 
 	// If this is container build then the bind mounts will not have been created.
-	// Copy the chroot output to host output folder.
+	// Copy the chroot output and cached sources to host output folder.
 	if !buildpipeline.IsRegularBuild() {
 		srpmsInChroot := filepath.Join(chroot.RootDir(), outDir)
 		err = directory.CopyContents(srpmsInChroot, originalOutDir)
+		if err != nil {
+			return
+		}
+
+		cacheInChroot := filepath.Join(chroot.RootDir(), templateSrcConfig.localSourceCacheDir)
+		err = directory.CopyContents(cacheInChroot, originalCacheDir)
 	}
 
 	return
@@ -331,7 +339,7 @@ func findSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
+func createChroot(workerTar, buildDir, outDir, specsDir, cacheDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir, newCacheDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false
@@ -339,12 +347,18 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 
 		outMountPoint    = "/output"
 		specsMountPoint  = "/specs"
+		cacheMountPoint  = "/cache"
 		buildDirInChroot = "/build"
 	)
 
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(outDir, outMountPoint, "", safechroot.BindMountPointFlags, ""),
 		safechroot.NewMountPoint(specsDir, specsMountPoint, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	if cacheDir != "" {
+		cacheMount := safechroot.NewMountPoint(cacheDir, cacheMountPoint, "", safechroot.BindMountPointFlags, "")
+		extraMountPoints = append(extraMountPoints, cacheMount)
 	}
 
 	extraDirectories := []string{
@@ -354,6 +368,12 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	newBuildDir = buildDirInChroot
 	newOutDir = outMountPoint
 	newSpecsDir = specsMountPoint
+
+	if cacheDir != "" {
+		newCacheDir = cacheMountPoint
+	} else {
+		newCacheDir = ""
+	}
 
 	chrootDir := filepath.Join(buildDir, chrootName)
 	chroot = safechroot.NewChroot(chrootDir, existingDir)
@@ -386,6 +406,15 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 		err = directory.CopyContents(outDir, srpmsInChroot)
 		if err != nil {
 			return
+		}
+
+		// Copy any cached sources
+		if cacheDir != "" {
+			cacheInChroot := filepath.Join(chroot.RootDir(), newCacheDir)
+			err = directory.CopyContents(cacheDir, cacheInChroot)
+			if err != nil {
+				return
+			}
 		}
 	}
 
