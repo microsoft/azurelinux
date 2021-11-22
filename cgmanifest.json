@@ -41,25 +41,25 @@
       }
     },
     {
-        "component": {
-          "type": "other",
-          "other": {
-            "name": "ant",
-            "version": "1.10.9",
-            "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
-          }
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ant",
+          "version": "1.10.9",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
         }
-      },
-      {
-        "component": {
-          "type": "other",
-          "other": {
-            "name": "ant-contrib",
-            "version": "1.0b3",
-            "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.bz2"
-          }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ant-contrib",
+          "version": "1.0b3",
+          "downloadUrl": "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/1.0b3/ant-contrib-1.0b3-src.tar.bz2"
         }
-      },
+      }
+    },
     {
       "component": {
         "type": "other",
@@ -2369,8 +2369,8 @@
         "type": "other",
         "other": {
           "name": "iana-etc",
-          "version": "2.30",
-          "downloadUrl": "http://anduin.linuxfromscratch.org/sources/LFS/lfs-packages/conglomeration//iana-etc/iana-etc-2.30.tar.bz2"
+          "version": "20211115",
+          "downloadUrl": "https://github.com/Mic92/iana-etc/releases/download/20211115/iana-etc-20211115.tar.gz"
         }
       }
     },
@@ -2605,15 +2605,15 @@
       }
     },
     {
-        "component": {
-          "type": "other",
-          "other": {
-            "name": "jna",
-            "version": "5.5.0",
-            "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
-          }
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jna",
+          "version": "5.5.0",
+          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
         }
-      },
+      }
+    },
     {
       "component": {
         "type": "other",
@@ -7428,15 +7428,15 @@
       }
     },
     {
-        "component": {
-          "type": "other",
-          "other": {
-            "name": "R",
-            "version": "4.1.0",
-            "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.1.0.tar.gz"
-          }
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "R",
+          "version": "4.1.0",
+          "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.1.0.tar.gz"
         }
-      },
+      }
+    },
     {
       "component": {
         "type": "other",
