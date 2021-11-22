@@ -18,8 +18,6 @@ BuildRequires:  coreutils >= 8.22
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
-# ca-certificates is needed to communicate with default npm registry
-Requires:       ca-certificates
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 Requires:       python3
@@ -88,7 +86,6 @@ make cctest
 - Add patch to remove problematic cipher from default list
 - Add config flag to use OpenSSL cert store instead of built-in Mozilla certs
 - Add script to remove vendored OpenSSL tree from source tarball
-- Add runtime requirement on ca-certificates for base package
 - Update required OpenSSL version to 1.1.1
 - Use python configure script directly
 - Lint spec

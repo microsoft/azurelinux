@@ -45,6 +45,8 @@ rm -rf ./$namever/deps/openssl
 
 # Create a reproducible tarball
 # Credit to https://reproducible-builds.org/docs/archives/ for instructions
+# Do not update mtime value for new versions- keep the same value for ease of
+# reproducing old tarball versions in the future if necessary
 echo "Repacking source tarball..."
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
