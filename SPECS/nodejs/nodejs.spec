@@ -42,7 +42,7 @@ for developing applications that use nodejs.
 %autosetup -p1 -n node-v%{version}
 
 %build
-%{python3} configure.py \
+python3 configure.py \
   --prefix=%{_prefix} \
   --shared-openssl \
   --shared-zlib \
@@ -62,8 +62,7 @@ for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
 done
 
 %check
-# Run all tests, minus linter/doc tests
-%make_build test-only
+make cctest
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -92,7 +91,6 @@ done
 - Add runtime requirement on ca-certificates for base package
 - Update required OpenSSL version to 1.1.1
 - Use python configure script directly
-- Enable a larger set of tests
 - Lint spec
 
 * Mon Aug 30 2021 Andrew Phelps <anphel@microsoft.com> - 14.17.5-1
