@@ -543,17 +543,17 @@ popd
 rm -rf grep-3.7
 touch /logs/status_grep_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
-./configure --prefix=/usr                    \
-            --docdir=/usr/share/doc/bash-4.4.18 \
-            --without-bash-malloc            \
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
+./configure --prefix=/usr                      \
+            --docdir=/usr/share/doc/bash-5.1.8 \
+            --without-bash-malloc              \
             --with-installed-readline
 make -j$(nproc)
 make install
 cd /sources
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 touch /logs/status_bash_complete
 
 echo Libtool-2.4.6

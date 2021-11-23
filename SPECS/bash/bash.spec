@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
-Version:        4.4.18
-Release:        7%{?dist}
+Version:        5.1.8
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,7 @@ Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bash/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
-Patch0:         bash-4.4.patch
+Patch0:         bash-5.1.patch
 # CVE-2019-18276 has a negligible security impact, 
 # since we don't ship bash with suid.
 # Backporting the patch is non-trivial, as well.
@@ -332,6 +332,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 5.1.8-1
+- Update to version 5.1.8
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.18-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
