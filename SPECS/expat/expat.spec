@@ -67,6 +67,7 @@ rm -rf %{buildroot}/*
 * Fri Nov 19 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.4.1-1
 - Update to 2.4.1
 - License verified
+- Removed manfile generation to avoid circular dependency.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
 - Added %%license line automatically
