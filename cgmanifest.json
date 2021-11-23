@@ -2459,8 +2459,8 @@
         "type": "other",
         "other": {
           "name": "iproute",
-          "version": "4.18.0",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-4.18.0.tar.xz"
+          "version": "5.15.0",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-5.15.0.tar.xz"
         }
       }
     },
