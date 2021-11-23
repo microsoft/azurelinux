@@ -1,3 +1,4 @@
+%global 		underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
 Version:        2.4.1
@@ -7,16 +8,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
-
-%define underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
-
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
 The Expat package contains a stream oriented C library for parsing XML.
 
-%package    devel
+%package devel
 Summary:        Header and development files for expat
 Requires:       %{name} = %{version}-%{release}
 
@@ -63,14 +61,14 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/cmake/expat-%{version}
 
 %files libs
-%{_libdir}/libexpat.so.1*
 %license COPYING
+%{_libdir}/libexpat.so.1*
 
 %changelog
 * Fri Nov 19 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.4.1-1
 - Update to 2.4.1
 - License verified
-- Removed manfile generation to avoid circular dependency.
+- Removed reference to manfiles, generation causes circular dependency.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
 - Added %%license line automatically
