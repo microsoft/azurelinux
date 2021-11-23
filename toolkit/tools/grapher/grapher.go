@@ -28,6 +28,8 @@ var (
 )
 
 func main() {
+	const goalNodeName = "ALL"
+
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
@@ -45,14 +47,14 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
-	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
-	err = depGraph.MakeDAG()
+	// Add a default "ALL" goal to build everything local
+	_, err = depGraph.AddGoalNode(goalNodeName, nil, *strictGoals)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
 
-	// Add a default "ALL" goal to build everything local
-	_, err = depGraph.AddGoalNode("ALL", nil, *strictGoals)
+	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
+	err = depGraph.MakeDAG()
 	if err != nil {
 		logger.Log.Panic(err)
 	}
@@ -133,14 +135,10 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 	}
 
 	// A "run" node has an implicit dependency on its coresponding "build" node, encode that here.
-	// SetEdge panics on error, and does not support looping edges.
-	newEdge := g.NewEdge(newRunNode, newBuildNode)
-	defer func() {
-		if r := recover(); r != nil {
-			logger.Log.Panicf("Adding edge failed for %+v", pkgVer)
-		}
-	}()
-	g.SetEdge(newEdge)
+	err = g.AddEdge(newRunNode, newBuildNode)
+	if err != nil {
+		logger.Log.Errorf("Adding edge failed for %+v", pkgVer)
+	}
 
 	return
 }
@@ -148,7 +146,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 // addSingleDependency will add an edge between packageNode and the "Run" node for the
 // dependency described in the PackageVer structure. Returns an error if the
 // addition failed.
-func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, dependency *pkgjson.PackageVer) error {
+func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, dependency *pkgjson.PackageVer) (err error) {
 	var dependentNode *pkggraph.PkgNode
 	logger.Log.Tracef("Adding a dependency from %+v to %+v", packageNode.VersionedPkg, dependency)
 	nodes, err := g.FindBestPkgNode(dependency)
@@ -168,14 +166,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		dependentNode = nodes.RunNode
 	}
 
-	// SetEdge panics on error, and does not support looping edges.
-	newEdge := g.NewEdge(packageNode, dependentNode)
-	defer func() {
-		if r := recover(); r != nil {
-			logger.Log.Errorf("Failed to add edge failed between %+v and %+v", packageNode, dependency)
-		}
-	}()
-	if newEdge.To() == newEdge.From() {
+	if packageNode == dependentNode {
 		logger.Log.Debugf("Package %+v requires itself!", packageNode)
 		return nil
 	}
@@ -192,7 +183,10 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		return nil
 	}
 
-	g.SetEdge(newEdge)
+	err = g.AddEdge(packageNode, dependentNode)
+	if err != nil {
+		logger.Log.Errorf("Failed to add edge failed between %+v and %+v.", packageNode, dependency)
+	}
 
 	return err
 }
@@ -250,7 +244,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 
 // populateGraph adds all the data contained in the PackageRepo structure into
 // the graph.
-func populateGraph(g *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) {
+func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) {
 	packages := repo.Repo
 
 	// Scan and add each package we know about
@@ -258,7 +252,7 @@ func populateGraph(g *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) 
 	// NOTE: range iterates by value, not reference. Manually access slice
 	for idx := range packages {
 		pkg := packages[idx]
-		err = addLocalPackage(g, pkg)
+		err = addLocalPackage(graph, pkg)
 		if err != nil {
 			logger.Log.Errorf("Failed to add local package %+v", pkg)
 			return err
@@ -271,7 +265,7 @@ func populateGraph(g *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) 
 	dependenciesAdded := 0
 	for idx := range packages {
 		pkg := packages[idx]
-		num, err := addPkgDependencies(g, pkg)
+		num, err := addPkgDependencies(graph, pkg)
 		if err != nil {
 			logger.Log.Errorf("Failed to add dependency %+v", pkg)
 			return err
