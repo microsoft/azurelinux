@@ -112,9 +112,9 @@ glibc-tools-2.34-2.cm2.x86_64.rpm
 gmock-1.8.1-5.cm2.x86_64.rpm
 gmock-devel-1.8.1-5.cm2.x86_64.rpm
 gmock-static-1.8.1-5.cm2.x86_64.rpm
-gmp-6.2.1-1.cm2.x86_64.rpm
-gmp-debuginfo-6.2.1-1.cm2.x86_64.rpm
-gmp-devel-6.2.1-1.cm2.x86_64.rpm
+gmp-6.2.1-2.cm2.x86_64.rpm
+gmp-debuginfo-6.2.1-2.cm2.x86_64.rpm
+gmp-devel-6.2.1-2.cm2.x86_64.rpm
 gnupg2-2.2.20-4.cm2.x86_64.rpm
 gnupg2-debuginfo-2.2.20-4.cm2.x86_64.rpm
 golang-1.17.1-1.cm2.x86_64.rpm
