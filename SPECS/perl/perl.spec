@@ -22,7 +22,7 @@
 Name:           perl
 License:        GPL+ or Artistic 
 Epoch:          %{perl_epoch}
-Version:        %{perl_version} 
+Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
 Release:        464%{?dist}
 Summary:        Practical Extraction and Report Language
@@ -4222,15 +4222,15 @@ make install DESTDIR=$RPM_BUILD_ROOT
 # Make proper DSO names, move libperl to standard path.
 mv "%{build_archlib}/CORE/libperl.so" \
     "$RPM_BUILD_ROOT%{_libdir}/libperl.so.%{perl_version}"
-#ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/%{soname}"
-#ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/libperl.so"
+ln -svf "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/%{soname}"
+ln -svf "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/libperl.so"
 # XXX: Keep symlink from original location because various code glues
 # $archlib/CORE/$libperl to get the DSO.
-ln -s "../../libperl.so.%{perl_version}" "%{build_archlib}/CORE/libperl.so"
+ln -svf "../../libperl.so.%{perl_version}" "%{build_archlib}/CORE/libperl.so"
 # XXX: Remove the soname named file from CORE directory that was created as
 # a symlink in build section and installed as a regular file by perl build
 # system.
-rm -f "%{build_archlib}/CORE/%{soname}"
+rm -vf "%{build_archlib}/CORE/%{soname}"
 
 install -p -m 755 utils/pl2pm %{build_bindir}/pl2pm
 
@@ -5256,8 +5256,8 @@ done
 %{privlib}/ExtUtils/Liblist.pm
 %{privlib}/ExtUtils/MakeMaker
 %{privlib}/ExtUtils/MakeMaker.pm
-#%{privlib}/ExtUtils/MM.pm
-#%{privlib}/ExtUtils/MM_*.pm
+#%%{privlib}/ExtUtils/MM.pm
+#%%{privlib}/ExtUtils/MM_*.pm
 %{privlib}/ExtUtils/MY.pm
 %{privlib}/ExtUtils/Mkbootstrap.pm
 %{privlib}/ExtUtils/Mksymlists.pm
@@ -5305,9 +5305,9 @@ done
 %if %{dual_life} || %{rebuild_from_scratch}
 %files ExtUtils-MM-Utils
 %dir %{privlib}/ExtUtils
-#%dir %{privlib}/ExtUtils/MM
-#%{privlib}/ExtUtils/MM/Utils.pm
-#%{_mandir}/man3/ExtUtils::MM::Utils.*
+#%%dir %%{privlib}/ExtUtils/MM
+#%%{privlib}/ExtUtils/MM/Utils.pm
+#%%{_mandir}/man3/ExtUtils::MM::Utils.*
 %else
 %exclude %dir %{privlib}/ExtUtils/MM
 %exclude %{privlib}/ExtUtils/MM/Utils.pm

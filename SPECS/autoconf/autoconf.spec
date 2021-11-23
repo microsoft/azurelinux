@@ -7,8 +7,7 @@ URL:		    http://www.gnu.org/software/autoconf
 Group:		    System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
-Patch0:         autoconf-make-check.patch
+Source0:        https://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
 
 BuildRequires:  perl
 BuildRequires:  m4
@@ -22,7 +21,6 @@ automatically configure source code.
 
 %prep
 %setup -q
-#%%patch0 -p1
 
 %build
 %configure \
@@ -47,6 +45,7 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 %changelog
 *   Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 2.71-1
 -   Update to version 2.71
+-   Remove unneeded autoconf-make-check.patch
 *   Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 2.69-11
 -   Merge the following releases from 1.0 to dev branch
 -   anphel@microsoft.com, 2.69-10: Fix check tests

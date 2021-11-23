@@ -57,7 +57,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-#ln -s bash %{buildroot}/bin/sh
+ln -s bash %{buildroot}/bin/sh
 install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 755 %{buildroot}%{_sysconfdir}/profile.d
 install -vdm 755 %{buildroot}%{_sysconfdir}/skel
@@ -319,9 +319,9 @@ fi
 /bin/*
 %{_libdir}/%{name}/*
 %{_sysconfdir}/
-#%{_defaultdocdir}/%{name}-%{version}/*
+%{_defaultdocdir}/%{name}-%{version}/*
 %{_defaultdocdir}/%{name}/*
-#%{_mandir}/*/*
+%{_mandir}/*/*
 %{_datadir}/bash-completion/
 
 %files devel
