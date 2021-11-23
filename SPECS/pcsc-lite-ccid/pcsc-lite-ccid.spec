@@ -25,7 +25,7 @@ Provides:       pcsc-ifd-handler
 Obsoletes:      ccid < 1.4.0-3
 Provides:       ccid = %{version}-%{release}
 
-# Workaround for package build issues in CBL-Mariner where this build ordering issues with "pcsc-lite".
+# Workaround for package build issues in CBL-Mariner where this creates ordering issues with "pcsc-lite".
 # We want to keep the 'Provides' around for the sake of easier security vulnerability detection.
 # See Fedora's bundling guidelines for more insight: https://docs.fedoraproject.org/en-US/packaging-guidelines/#bundling
 %if ! 0%{?bundled_conflicts}
