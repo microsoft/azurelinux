@@ -44,6 +44,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Nov 23 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.5-1
 - Upgrade to version 1.16.5
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-3
 - Added %%license line automatically
