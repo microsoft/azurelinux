@@ -152,15 +152,9 @@ func main() {
 	}
 
 	// Setup remote source caching
-	if *sourceCacheDir != "" {
-		fileInfo, err := os.Stat(*sourceCacheDir)
-		if err != nil {
-			logger.Log.Fatalf("Received error getting information for source cache directory. Error: %v", err)
-		}
-		if !fileInfo.IsDir() {
-			logger.Log.Fatalf("Source cache directory (%s) is not a directory", *sourceCacheDir)
-		}
-		templateSrcConfig.localSourceCacheDir = *sourceCacheDir
+	templateSrcConfig.localSourceCacheDir = *sourceCacheDir
+	if *sourceCacheDir != "" && !file.IsDir(*sourceCacheDir) {
+		logger.Log.Fatalf("Source cache directory (%s) is not a directory", *sourceCacheDir)
 	}
 
 	// Setup remote source configuration
