@@ -340,8 +340,15 @@ def parse_args():
 if __name__ == '__main__':
     print("==== ELF note generator v{} ====".format(VERSION))
     args = parse_args()
+    outdir = args.outdir
+
+    if outdir:
+        os.path.join(outdir, '')
+        print("outdir is: {}".format(outdir))
+
     endian = Endian.map[args.endian]
     stamp_method = args.stamp
+    print("Stamp method: {}\n".format(stamp_method))
 
     delattr(args, 'outdir')
     delattr(args, 'endian')

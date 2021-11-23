@@ -1172,6 +1172,10 @@ sed -iE '/Always build/,+16 d' Makefile.am
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
+install -p pythondistdeps.py /usr/lib/pythondistddeps.py
+install -p pythondeps.sh /usr/lib/pythondeps.sh
+install -p python.attr /usr/lib/rpm/fileattrs/python.attr
+
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
 

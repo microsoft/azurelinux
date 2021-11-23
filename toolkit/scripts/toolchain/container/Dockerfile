@@ -103,7 +103,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain-jdk8-build.sh", \
        "./Awt_build_headless_only.patch", \
        "./check-system-ca-certs.patch", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
        "./go14_bootstrap_aarch64.patch", \
        "./cpio_extern_nocommon.patch", \
        "$LFS/tools/" ]
