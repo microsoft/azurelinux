@@ -10,10 +10,6 @@ URL:            https://www.gnu.org/software/bash/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
 Patch0:         bash-5.1.patch
-# CVE-2019-18276 has a negligible security impact,
-# since we don't ship bash with suid.
-# Backporting the patch is non-trivial, as well.
-Patch1:         CVE-2019-18276.nopatch
 BuildRequires:  readline
 Requires:       readline
 Requires(post): /bin/cp
