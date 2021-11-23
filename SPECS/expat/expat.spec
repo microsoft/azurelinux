@@ -7,8 +7,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
-Source0:        https://github.com/libexpat/libexpat/releases/download/R_2_4_1/%{name}-%{version}.tar.bz2
-Requires:       expat-libs = %{version}-%{release}
+
+%define underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+
+Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description
 The Expat package contains a stream oriented C library for parsing XML.
@@ -34,30 +37,22 @@ This package contains minimal set of shared expat libraries.
 %configure \
 	CFLAGS="%{optflags}" \
 	CXXFLAGS="%{optflags}" \
-	--bindir=%{_bindir} \
-	--libdir=%{_libdir} \
 	--disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_fixperms} %{buildroot}/*
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %doc AUTHORS Changes
 %{_bindir}/*
 
@@ -68,7 +63,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/expat-%{version}
 
 %files libs
-%{_libdir}/libexpat.so.*
+%{_libdir}/libexpat.so.1*
+%license COPYING
 
 %changelog
 * Fri Nov 19 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.4.1-1
