@@ -4,8 +4,7 @@ Version:        0.15.2
 Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://libcheck.github.io/check/
-#Source0:       https://github.com/libcheck/check/archive/refs/tags/%{version}.tar.gz
-Source0:        https://github.com/libcheck/check/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libcheck/check/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Provides:       %{name}-devel = %{version}-%{release}
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
