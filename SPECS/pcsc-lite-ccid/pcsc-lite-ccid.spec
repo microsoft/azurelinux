@@ -1,9 +1,11 @@
+%define bundled_conflicts 1
 %global dropdir %(pkg-config libpcsclite --variable usbdropdir 2>/dev/null)
 %global pcsc_lite_ver 1.8.9
+
 Summary:        Generic USB CCID smart card reader driver
 Name:           pcsc-lite-ccid
 Version:        1.4.33
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,8 +24,14 @@ Provides:       pcsc-ifd-handler
 # Provide upgrade path from 'ccid' package
 Obsoletes:      ccid < 1.4.0-3
 Provides:       ccid = %{version}-%{release}
+
+# Workaround for package build issues in CBL-Mariner where this build ordering issues with "pcsc-lite".
+# We want to keep the 'Provides' around for the sake of easier security vulnerability detection.
+# See Fedora's bundling guidelines for more insight: https://docs.fedoraproject.org/en-US/packaging-guidelines/#bundling
+%if ! 0%{?bundled_conflicts}
 # This is bundled from pcsc-lite upstream
 Provides:       bundled(simclist) = 1.6
+%endif
 
 %description
 Generic USB CCID (Chip/Smart Card Interface Devices) driver for use with the
@@ -58,6 +66,9 @@ cp -p src/openct/LICENSE LICENSE.openct
 %config(noreplace) %{_sysconfdir}/reader.conf.d/libccidtwin
 
 %changelog
+* Tue Nov 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.33-4
+- Disabling 'Provides = bundled(simclist) = 1.6' as a workaround for package build issues.
+
 * Wed Oct 27 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.4.33-3
 - Removing invalid "BuildRequires".
 - Fixing the "Release" tag.
