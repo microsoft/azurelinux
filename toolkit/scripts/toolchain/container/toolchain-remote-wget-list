@@ -1,10 +1,8 @@
 http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz
 http://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.xz
 https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz
-http://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.3.tar.gz
 https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz
 https://sourceware.org/ftp/elfutils/0.185/elfutils-0.185.tar.bz2
-https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz
 https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz
 https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
 https://ftp.gnu.org/gnu/gdbm/gdbm-1.21.tar.gz
@@ -22,7 +20,6 @@ http://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz
 https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.15.tar.xz
 https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tar.xz
-https://downloads.sourceforge.net/tcl/tcl8.6.9-src.tar.gz
 https://tukaani.org/xz/xz-5.2.5.tar.xz
 https://zlib.net/zlib-1.2.11.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
