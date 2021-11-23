@@ -1,6 +1,6 @@
 %define _unpackaged_files_terminate_build 0
 
-%global perl_version    5.32.0
+%global perl_version    5.34.0
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
@@ -24,7 +24,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        463%{?dist}
+Release:        464%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -4055,35 +4055,35 @@ you're not running VMS, this module does nothing.
 
 %prep
 %setup -q -n perl-%{perl_version}
-%patch5 -p1
+#%%patch5 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
+#%%patch10 -p1
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
+#%%patch14 -p1
+#%%patch15 -p1
+#%%patch16 -p1
+#%%patch17 -p1
+#%%patch18 -p1
+#%%patch19 -p1
+#%%patch20 -p1
+#%%patch21 -p1
+#%%patch22 -p1
+#%%patch23 -p1
+#%%patch24 -p1
+#%%patch25 -p1
+#%%patch26 -p1
+#%%patch27 -p1
+#%%patch28 -p1
+#%%patch29 -p1
+#%%patch30 -p1
+#%%patch31 -p1
+#%%patch32 -p1
+#%%patch33 -p1
+#%%patch34 -p1
+#%%patch35 -p1
 %patch200 -p1
 %patch201 -p1
 
@@ -4222,8 +4222,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 # Make proper DSO names, move libperl to standard path.
 mv "%{build_archlib}/CORE/libperl.so" \
     "$RPM_BUILD_ROOT%{_libdir}/libperl.so.%{perl_version}"
-ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/%{soname}"
-ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/libperl.so"
+#ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/%{soname}"
+#ln -s "libperl.so.%{perl_version}" "$RPM_BUILD_ROOT%{_libdir}/libperl.so"
 # XXX: Keep symlink from original location because various code glues
 # $archlib/CORE/$libperl to get the DSO.
 ln -s "../../libperl.so.%{perl_version}" "%{build_archlib}/CORE/libperl.so"
@@ -4945,7 +4945,7 @@ done
 %{privlib}/pod/perlsource.pod
 %{privlib}/pod/perlstyle.pod
 %{privlib}/pod/perlsub.pod
-%{privlib}/pod/perlsymbian.pod
+#%%{privlib}/pod/perlsymbian.pod
 %{privlib}/pod/perlsyn.pod
 %{privlib}/pod/perlsynology.pod
 %{privlib}/pod/perlthrtut.pod
@@ -5066,7 +5066,7 @@ done
 %{_mandir}/man1/perlsource.*
 %{_mandir}/man1/perlstyle.*
 %{_mandir}/man1/perlsub.*
-%{_mandir}/man1/perlsymbian.*
+#%%{_mandir}/man1/perlsymbian.*
 %{_mandir}/man1/perlsyn.*
 %{_mandir}/man1/perlsynology.*
 %{_mandir}/man1/perlthrtut.*
@@ -5256,8 +5256,8 @@ done
 %{privlib}/ExtUtils/Liblist.pm
 %{privlib}/ExtUtils/MakeMaker
 %{privlib}/ExtUtils/MakeMaker.pm
-%{privlib}/ExtUtils/MM.pm
-%{privlib}/ExtUtils/MM_*.pm
+#%{privlib}/ExtUtils/MM.pm
+#%{privlib}/ExtUtils/MM_*.pm
 %{privlib}/ExtUtils/MY.pm
 %{privlib}/ExtUtils/Mkbootstrap.pm
 %{privlib}/ExtUtils/Mksymlists.pm
@@ -5305,9 +5305,9 @@ done
 %if %{dual_life} || %{rebuild_from_scratch}
 %files ExtUtils-MM-Utils
 %dir %{privlib}/ExtUtils
-%dir %{privlib}/ExtUtils/MM
-%{privlib}/ExtUtils/MM/Utils.pm
-%{_mandir}/man3/ExtUtils::MM::Utils.*
+#%dir %{privlib}/ExtUtils/MM
+#%{privlib}/ExtUtils/MM/Utils.pm
+#%{_mandir}/man3/ExtUtils::MM::Utils.*
 %else
 %exclude %dir %{privlib}/ExtUtils/MM
 %exclude %{privlib}/ExtUtils/MM/Utils.pm
@@ -6702,6 +6702,8 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 4:5.34.0-464
+- Update to version 5.34
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 4:5.32.0-463
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)

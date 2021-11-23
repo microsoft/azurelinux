@@ -1,4 +1,4 @@
-http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz
+http://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz
 http://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.xz
 https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz
 http://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.3.tar.gz
@@ -38,8 +38,8 @@ https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
 http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
 https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
 http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
-https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz
-http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz
+https://www.cpan.org/src/5.0/perl-5.34.0.tar.xz
+https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz
 https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz
 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
 https://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz

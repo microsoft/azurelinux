@@ -205,8 +205,8 @@
         "type": "other",
         "other": {
           "name": "autoconf",
-          "version": "2.69",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
+          "version": "2.71",
+          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
         }
       }
     },
@@ -315,8 +315,8 @@
         "type": "other",
         "other": {
           "name": "bash",
-          "version": "4.4.18",
-          "downloadUrl": "http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz"
+          "version": "5.1.8",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz"
         }
       }
     },
@@ -5352,8 +5352,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.32.0",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz"
+          "version": "5.34.0",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.34.0.tar.xz"
         }
       }
     },

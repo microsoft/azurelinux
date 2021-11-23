@@ -543,17 +543,17 @@ popd
 rm -rf grep-3.7
 touch /logs/status_grep_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
-./configure --prefix=/usr                    \
-            --docdir=/usr/share/doc/bash-4.4.18 \
-            --without-bash-malloc            \
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
+./configure --prefix=/usr                      \
+            --docdir=/usr/share/doc/bash-5.1.8 \
+            --without-bash-malloc              \
             --with-installed-readline
 make -j$(nproc)
 make install
 cd /sources
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 touch /logs/status_bash_complete
 
 echo Libtool-2.4.6
@@ -601,9 +601,9 @@ popd
 rm -rf expat-2.2.6
 touch /logs/status_expat_complete
 
-echo Perl-5.32.0
-tar xf perl-5.32.0.tar.xz
-pushd perl-5.32.0
+echo Perl-5.34.0
+tar xf perl-5.34.0.tar.xz
+pushd perl-5.34.0
 echo "127.0.0.1 localhost $(hostname)" > /etc/hosts
 export BUILD_ZLIB=False
 export BUILD_BZIP2=0
@@ -618,18 +618,17 @@ make -j$(nproc)
 make install
 unset BUILD_ZLIB BUILD_BZIP2
 popd
-rm -rf perl-5.32.0
+rm -rf perl-5.34.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.1

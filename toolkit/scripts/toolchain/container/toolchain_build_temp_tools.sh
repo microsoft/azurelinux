@@ -381,15 +381,15 @@ rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
 ./configure --prefix=/tools --without-bash-malloc
 make -j$(nproc)
 make install
 ln -sv bash /tools/bin/sh
 popd
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
@@ -538,16 +538,16 @@ rm -rf patch-2.7.6
 
 touch $LFS/logs/temptoolchain/status_patch_complete
 
-echo Perl-5.32.0
-tar xf perl-5.32.0.tar.xz
-pushd perl-5.32.0
+echo Perl-5.34.0
+tar xf perl-5.34.0.tar.xz
+pushd perl-5.34.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
 make -j$(nproc)
 cp -v perl cpan/podlators/scripts/pod2man /tools/bin
-mkdir -pv /tools/lib/perl5/5.32.0
-cp -Rv lib/* /tools/lib/perl5/5.32.0
+mkdir -pv /tools/lib/perl5/5.34.0
+cp -Rv lib/* /tools/lib/perl5/5.34.0
 popd
-rm -rf perl-5.32.0
+rm -rf perl-5.34.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
