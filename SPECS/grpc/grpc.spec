@@ -9,13 +9,23 @@ Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
 # A buildable grpc environment needs functioning submodules that do not work from the archive download
-# To recreate the tar.gz run the following
+# To recreate the tar.gz run the following:
 #  git clone -b RELEASE_TAG_HERE --depth 1 https://github.com/grpc/grpc
 #  pushd grpc
 #  git submodule update --depth 1 --init
 #  popd
-#  sudo mv grpc grpc-%{version}
-#  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
+#  mv grpc grpc-%%{version}
+#  tar  --sort=name \
+#       --mtime="2021-04-26 00:00Z" \
+#       --owner=0 --group=0 --numeric-owner \
+#       --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#       -cf grpc-%%{version}.tar.gz grpc-%%{version}/
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
