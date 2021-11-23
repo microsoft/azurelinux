@@ -1,31 +1,35 @@
-Summary:	An XML parser library
-Name:		expat
-Version:	2.4.1
-Release:    1%{?dist}
-License:	MIT
-URL:		https://libexpat.github.io/
-Group:		System Environment/GeneralLibraries
+Summary:        An XML parser library
+Name:           expat
+Version:        2.4.1
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/GeneralLibraries
+URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_2_4_1/%{name}-%{version}.tar.bz2
 Requires:       expat-libs = %{version}-%{release}
+
 %description
 The Expat package contains a stream oriented C library for parsing XML.
 
 %package    devel
-Summary:    Header and development files for expat
-Requires:   %{name} = %{version}-%{release}
+Summary:        Header and development files for expat
+Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %package libs
-Summary: Libraries for expat
-Group:      System Environment/Libraries
+Summary:        Libraries for expat
+Group:          System Environment/Libraries
+
 %description libs
 This package contains minimal set of shared expat libraries.
 
 %prep
 %setup -q
+
 %build
 %configure \
 	CFLAGS="%{optflags}" \
@@ -34,10 +38,11 @@ This package contains minimal set of shared expat libraries.
 	--libdir=%{_libdir} \
 	--disable-static
 make %{?_smp_mflags}
+
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_fixperms} %{buildroot}/*
 
@@ -46,8 +51,10 @@ make %{?_smp_mflags} check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
 %clean
 rm -rf %{buildroot}/*
+
 %files
 %defattr(-,root,root)
 %license COPYING
