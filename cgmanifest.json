@@ -256,7 +256,7 @@
         "other": {
           "name": "automake",
           "version": "1.16.5",
-          "downloadUrl": "http://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.xz"
+          "downloadUrl": "http://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz"
         }
       }
     },
