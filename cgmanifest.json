@@ -667,7 +667,7 @@
         "other": {
           "name": "check",
           "version": "0.15.2",
-          "downloadUrl": "https://github.com/libcheck/check/archive/refs/tags/0.12.0.tar.gz"
+          "downloadUrl": "https://github.com/libcheck/check/archive/refs/tags/0.15.2.tar.gz"
         }
       }
     },
