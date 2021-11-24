@@ -332,15 +332,15 @@ rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
 ./configure --prefix=/tools --without-bash-malloc
 make -j$(nproc)
 make install
 ln -sv bash /tools/bin/sh
 popd
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 

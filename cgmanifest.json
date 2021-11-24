@@ -315,8 +315,8 @@
         "type": "other",
         "other": {
           "name": "bash",
-          "version": "4.4.18",
-          "downloadUrl": "http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz"
+          "version": "5.1.8",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz"
         }
       }
     },
