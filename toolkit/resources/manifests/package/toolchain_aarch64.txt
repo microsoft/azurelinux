@@ -125,8 +125,6 @@ gpgme-devel-1.16.0-1.cm2.aarch64.rpm
 grep-3.7-1.cm2.aarch64.rpm
 grep-debuginfo-3.7-1.cm2.aarch64.rpm
 grep-lang-3.7-1.cm2.aarch64.rpm
-groff-1.22.3-7.cm2.aarch64.rpm
-groff-debuginfo-1.22.3-7.cm2.aarch64.rpm
 gtest-1.8.1-5.cm2.aarch64.rpm
 gtest-debuginfo-1.8.1-5.cm2.aarch64.rpm
 gtest-devel-1.8.1-5.cm2.aarch64.rpm

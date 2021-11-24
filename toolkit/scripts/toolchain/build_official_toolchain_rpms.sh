@@ -520,8 +520,6 @@ chroot_and_install_rpms json-c
 chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
 
-build_rpm_in_chroot_no_install groff
-
 # libtiprc needs krb5
 chroot_and_install_rpms krb5
 build_rpm_in_chroot_no_install libtirpc
@@ -535,15 +533,13 @@ build_rpm_in_chroot_no_install libnsl2
 # Removed 'tcp_wrappers', might not need: libnsl2
 chroot_and_install_rpms libnsl2
 
+# Removed 'groff', might not need: perl-File-HomeDir, perl-File-Which
 # groff needs perl-File-HomeDir installed to run
 # perl-File-HomeDir needs perl-File-Which installed to run
 build_rpm_in_chroot_no_install perl-File-Which
 chroot_and_install_rpms perl-File-Which
 build_rpm_in_chroot_no_install perl-File-HomeDir
 chroot_and_install_rpms perl-File-HomeDir
-
-# Removed 'openldap', might not need: groff
-chroot_and_install_rpms groff
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
