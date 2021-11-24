@@ -2,7 +2,7 @@ Summary:        Utilities for managing filesystem extended attributes
 Name:           attr
 Version:        2.5.1
 Release:        1%{?dist}
-License:        GPLv2+
+License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security

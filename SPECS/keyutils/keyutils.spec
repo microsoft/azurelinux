@@ -63,6 +63,7 @@ find %{buildroot} -name '*.a'  -delete
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1.
+- License verified.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.10-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
