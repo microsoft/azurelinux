@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.3582
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-3968.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -191,6 +192,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Wed Nov 24 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.3582-2
+-   Added patch file(s) CVE-2021-3968.patch
 * Wed Nov 10 2021 Nick Samson <nisamson@microsoft.com> - 8.2.3582-1
 - Upgrade to 8.2.3582 to fix CVE-2021-3927 and CVE-2021-3928
 
