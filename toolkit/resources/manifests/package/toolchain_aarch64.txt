@@ -134,9 +134,6 @@ gzip-1.11-1.cm2.aarch64.rpm
 gzip-debuginfo-1.11-1.cm2.aarch64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
-json-c-0.14-3.cm2.aarch64.rpm
-json-c-debuginfo-0.14-3.cm2.aarch64.rpm
-json-c-devel-0.14-3.cm2.aarch64.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
 kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
 kernel-headers-5.10.74.1-4.cm2.noarch.rpm

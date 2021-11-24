@@ -480,7 +480,6 @@ chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
-build_rpm_in_chroot_no_install json-c
 build_rpm_in_chroot_no_install libsepol
 
 # libselinux requires libsepol
@@ -513,9 +512,8 @@ chroot_and_install_rpms libsepol
 chroot_and_install_rpms ncurses
 chroot_and_install_rpms libaio
 
-# Removed 'cryptsetup', might not need: popt, json-c
+# Removed 'cryptsetup', might not need: popt
 chroot_and_install_rpms popt
-chroot_and_install_rpms json-c
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
