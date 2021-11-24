@@ -5256,8 +5256,8 @@ done
 %{privlib}/ExtUtils/Liblist.pm
 %{privlib}/ExtUtils/MakeMaker
 %{privlib}/ExtUtils/MakeMaker.pm
-#%%{privlib}/ExtUtils/MM.pm
-#%%{privlib}/ExtUtils/MM_*.pm
+%{privlib}/ExtUtils/MM.pm
+%{privlib}/ExtUtils/MM_*.pm
 %{privlib}/ExtUtils/MY.pm
 %{privlib}/ExtUtils/Mkbootstrap.pm
 %{privlib}/ExtUtils/Mksymlists.pm
@@ -5305,9 +5305,9 @@ done
 %if %{dual_life} || %{rebuild_from_scratch}
 %files ExtUtils-MM-Utils
 %dir %{privlib}/ExtUtils
-#%%dir %%{privlib}/ExtUtils/MM
-#%%{privlib}/ExtUtils/MM/Utils.pm
-#%%{_mandir}/man3/ExtUtils::MM::Utils.*
+%dir %%{privlib}/ExtUtils/MM
+%{privlib}/ExtUtils/MM/Utils.pm
+%{_mandir}/man3/ExtUtils::MM::Utils.*
 %else
 %exclude %dir %{privlib}/ExtUtils/MM
 %exclude %{privlib}/ExtUtils/MM/Utils.pm
