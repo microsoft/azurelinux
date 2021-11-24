@@ -1,31 +1,14 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.41.1
-Release:        2%{?dist}
+Version:        1.42.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
-# A buildable grpc environment needs functioning submodules that do not work from the archive download
-# To recreate the tar.gz run the following:
-#  git clone -b RELEASE_TAG_HERE --depth 1 https://github.com/grpc/grpc
-#  pushd grpc
-#  git submodule update --depth 1 --init
-#  popd
-#  mv grpc grpc-%%{version}
-#  tar  --sort=name \
-#       --mtime="2021-04-26 00:00Z" \
-#       --owner=0 --group=0 --numeric-owner \
-#       --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#       -cf grpc-%%{version}.tar.gz grpc-%%{version}/
-#
-#   NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -64,17 +47,21 @@ The grpc-plugins package contains the grpc plugins.
 
 %prep
 %autosetup
-# fix issue compiling absl with gcc11
-sed -i 's/std::max(SIGSTKSZ/std::max<size_t>(SIGSTKSZ/g' third_party/abseil-cpp/absl/debugging/failure_signal_handler.cc
 
 %build
+# Updating used C++ version to be compatible with the build dependencies.
+# Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
+# which generate a different set of APIs than the ones provided by the BR 'abseil-cpp'.
+CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
+
 mkdir -p cmake/build
 cd cmake/build
-cmake ../.. -DgRPC_INSTALL=ON                \
+cmake ../.. -DgRPC_INSTALL=ON               \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
+   -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
-   -DgRPC_ABSL_PROVIDER:STRING='package'    \
+   -DgRPC_ABSL_PROVIDER:STRING='package'     \
    -DgRPC_CARES_PROVIDER:STRING='package'    \
    -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
    -DgRPC_RE2_PROVIDER:STRING='package'      \
@@ -115,8 +102,10 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
-* Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.1-2
-- Use pre-installed "re2" and "abseil-cpp" instead of building them.
+* Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-1
+- Updated to version 1.42.0.
+- Overwritten hard-coded compilation with C++11 to use CBL-Mariner defaults.
+- Using pre-installed "re2" and "abseil-cpp" instead of building them.
 
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 1.41.1-1
 - Update to version 1.41.1
