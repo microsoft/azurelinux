@@ -3,10 +3,10 @@ Name:           make
 Version:        4.3
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            https://www.gnu.org/software/make
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
+URL:            https://www.gnu.org/software/make
 Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
 
 %description
@@ -40,26 +40,37 @@ PERL_USE_UNSAFE_INC=1 %make_build check
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.3-1
 - Updated to version 4.3.
+
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-6
 - Add additional glibc 2.34 workarounds to glob.c
 - License verified
+
 * Mon Oct 19 2020 Andrew Phelps <anphel@microsoft.com> - 4.2.1-5
 - Fix check test
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.1-4
 - Added %%license line automatically
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.2.1-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Sun Sep 09 2018 Alexey Makhalov <amakhalov@vmware.com> - 4.2.1-2
 - Fix compilation issue against glibc-2.27
+
 * Fri Mar 31 2017 Michelle Wang <michellew@vmware.com> - 4.2.1-1
 - Update package version
+
 * Mon Oct 03 2016 ChangLee <changLee@vmware.com> - 4.1-4
 - Modified check
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.1-3
 - GA - Bump release of all rpms
+
 * Tue May 10 2016 Kumar Kaushik <kaushikk@vmware.com> - 4.1-2
 - Fix for segfaults in chroot env.
+
 * Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com> - 4.1-1
 - Update version.
+
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 4.0-1
 - Initial build. First version
