@@ -9,6 +9,10 @@ Group:          Development/Tools
 URL:            https://www.gnu.org/software/make
 Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
 
+%if %{with_check}
+BuildRequires: perl(FindBin)
+%endif
+
 %description
 The Make package contains a program for compiling packages.
 
@@ -28,7 +32,7 @@ rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
 %check
-PERL_USE_UNSAFE_INC=1 %make_build check
+%make_build check
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -40,6 +44,7 @@ PERL_USE_UNSAFE_INC=1 %make_build check
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.3-1
 - Updated to version 4.3.
+- Adding a test BR on "perl(FindBin)".
 
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-6
 - Add additional glibc 2.34 workarounds to glob.c
