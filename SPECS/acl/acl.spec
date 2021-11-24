@@ -1,15 +1,17 @@
 Summary:        Access control list utilities
 Name:           acl
-Version:        2.2.53
-Release:        5%{?dist}
-Source0:        https://download-mirror.savannah.gnu.org/releases/acl/%{name}-%{version}.tar.gz
+Version:        2.3.1
+Release:        1%{?dist}
+Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 License:        GPLv2+
 Group:          System Environment/Base
 URL:            https://savannah.nongnu.org/projects/acl/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Requires:       libacl = %{version}-%{release}
+
 BuildRequires:  attr-devel
+
+Requires:       libacl = %{version}-%{release}
 
 %description
 This package contains the getfacl and setfacl utilities needed for
@@ -39,15 +41,15 @@ programs which make use of the access control list programming interface
 defined in POSIX 1003.1e draft standard 17.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure
 
-make %{?_smp_mflags} LIBTOOL="libtool --tag=CC"
+%make_build LIBTOOL="libtool --tag=CC"
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
@@ -62,17 +64,9 @@ sed -e 's|test/cp.test||' -i test/Makemodule.am Makefile.in Makefile
 sed -e 's|test/root/permissions.test||' -i test/Makemodule.am Makefile.in Makefile
 sed -e 's|test/root/setfacl.test||' -i test/Makemodule.am Makefile.in Makefile
 sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
-if ./setfacl -m u:`id -u`:rwx .; then
-    make %{?_smp_mflags} check
-else
-    echo '*** The chroot file system does not support all ACL options ***'
-fi
+%make_build check
 
-%post -n libacl
-/sbin/ldconfig
-
-%postun -n libacl
-/sbin/ldconfig
+%ldconfig_scriptlets -n libacl
 
 %files -f %{name}.lang
 %license doc/COPYING*
@@ -97,6 +91,8 @@ fi
 %{_libdir}/libacl.so.*
 
 %changelog
+* Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-1
+- Updating to version 2.3.1.
 * Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 2.2.53-5
 - Fix check tests.
 * Tue Apr 14 2020 Henry Beberman <henry.beberman@microsoft.com> 2.2.53-4
