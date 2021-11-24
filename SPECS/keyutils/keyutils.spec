@@ -47,7 +47,7 @@ find %{buildroot} -name '*.a'  -delete
 %check
 # Installing keyutils binaries to be available for the tests to use.
 %make_install DESTDIR=/
-%make_build test |& tee %{_specdir}/%{name}-test-log
+%make_build -k test
 
 %ldconfig_scriptlets
 
@@ -78,7 +78,7 @@ find %{buildroot} -name '*.a'  -delete
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1.
-- Enabled more tests.
+- Enabled tests.
 - License verified.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.10-5
