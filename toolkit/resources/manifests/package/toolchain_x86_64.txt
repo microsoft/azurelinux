@@ -529,9 +529,6 @@ python3-xml-3.7.10-3.cm2.x86_64.rpm
 readline-7.0-5.cm2.x86_64.rpm
 readline-debuginfo-7.0-5.cm2.x86_64.rpm
 readline-devel-7.0-5.cm2.x86_64.rpm
-rpcsvc-proto-1.4-4.cm2.x86_64.rpm
-rpcsvc-proto-debuginfo-1.4-4.cm2.x86_64.rpm
-rpcsvc-proto-devel-1.4-4.cm2.x86_64.rpm
 rpm-4.14.2.1-4.cm2.x86_64.rpm
 rpm-build-4.14.2.1-4.cm2.x86_64.rpm
 rpm-build-libs-4.14.2.1-4.cm2.x86_64.rpm

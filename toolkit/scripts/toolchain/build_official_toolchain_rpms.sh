@@ -520,12 +520,8 @@ chroot_and_install_rpms json-c
 chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
 
-# libtiprc needs krb5
+# Removed 'libtiprc', might not need: krb5
 chroot_and_install_rpms krb5
-build_rpm_in_chroot_no_install rpcsvc-proto
-
-# Removed libnsl2, might not need: rpcsvc-proto
-chroot_and_install_rpms rpcsvc-proto
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
