@@ -545,11 +545,6 @@ chroot_and_install_rpms perl-File-HomeDir
 # Removed 'openldap', might not need: groff
 chroot_and_install_rpms groff
 
-build_rpm_in_chroot_no_install libcap-ng
-
-# Removed 'audit', might not need: libcap-ng
-chroot_and_install_rpms libcap-ng
-
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
