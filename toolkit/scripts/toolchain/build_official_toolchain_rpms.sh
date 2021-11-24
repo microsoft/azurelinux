@@ -496,6 +496,7 @@ build_rpm_in_chroot_no_install rpm
 build_rpm_in_chroot_no_install pam
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
+# gperf is also needed, but is installed earlier
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
@@ -517,9 +518,8 @@ chroot_and_install_rpms popt
 chroot_and_install_rpms libpwquality
 chroot_and_install_rpms json-c
 
-# Removed 'systemd', might not need: intltool, gperf
+# Removed 'systemd', might not need: intltool
 chroot_and_install_rpms intltool
-chroot_and_install_rpms gperf
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
