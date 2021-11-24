@@ -588,17 +588,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.2.6
-tar xf expat-2.2.6.tar.bz2
-pushd expat-2.2.6
+echo Expat-2.4.1
+tar xf expat-2.4.1.tar.bz2
+pushd expat-2.4.1
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.2.6
+            --docdir=/usr/share/doc/expat-2.4.1
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.2.6
+rm -rf expat-2.4.1
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0

@@ -1547,8 +1547,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2"
+          "version": "2.4.1",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2"
         }
       }
     },
