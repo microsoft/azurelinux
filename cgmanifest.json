@@ -165,8 +165,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.4.48",
-          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/attr/attr-2.4.48.tar.gz"
+          "version": "2.5.1",
+          "downloadUrl": "http://download.savannah.nongnu.org/releases/attr/attr-2.5.1.tar.gz"
         }
       }
     },

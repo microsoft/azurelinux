@@ -3,22 +3,16 @@ Name:          attr
 Vendor:        Microsoft Corporation
 Group:         System Environment/Security
 Distribution:  Mariner
-Version:       2.4.48
-Release:       6%{?dist}
-Source:        https://download-mirror.savannah.gnu.org/releases/attr/attr-%{version}.tar.gz
-%define sha1 %{name}=d7c88cb5db51c5e255a511b0a15e832fcdda5b4f
-
-# fix test-suite failure with perl-5.26.0 (#1473853)
-Patch1:  0001-attr-2.4.48-test-suite-perl.patch
-
-# fix conflict with fakechroot (https://github.com/dex4er/fakechroot/issues/57)
-Patch2:  0002-attr-2.4.48-switch-back-to-syscall.patch
-
+Version:       2.5.1
+Release:       1%{?dist}
+Source:        http://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 License: GPLv2+
 URL: https://savannah.nongnu.org/projects/attr
+
 BuildRequires: gettext
 BuildRequires: libtool
 BuildRequires: flex-devel
+
 Requires: libattr = %{version}-%{release}
 
 %description
@@ -31,8 +25,6 @@ with the SGI IRIX tool of the same name.
 %package -n libattr
 Summary: Dynamic library for extended attribute support
 License: LGPLv2+
-# Hopefully does not conflict with Mariner version
-#Conflicts: filesystem < 3
 
 %description -n libattr
 This package contains the libattr.so dynamic library which contains
@@ -84,15 +76,10 @@ sed -e 's|test/root/getfattr.test||' \
 %build
 %configure
 
-make %{?_smp_mflags}
+%make_build
 
 %check
-if ./setfattr -n user.name -v value .; then
-    make check || exit $?
-else
-    echo '*** xattrs are probably not supported by the file system,' \
-         'the test-suite will NOT run ***'
-fi
+%make_build check || exit $?
 
 %install
 %make_install
@@ -108,12 +95,10 @@ ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
 
 %find_lang %{name}
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files -f %{name}.lang
 %doc doc/CHANGES
-%{!?_licensedir:%global license %%doc}
 %license doc/COPYING*
 %{_bindir}/attr
 %{_bindir}/getfattr
@@ -135,6 +120,11 @@ ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
 %files devel
 
 %changelog
+* Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.1-1
+- Updating to version 2.5.1.
+- License verified.
+- Removed outdated patches.
+
 * Thu Nov 14 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.48-6
 - Initial CBL-Mariner import from Fedora 30 (license: MIT).
 - Add attr-devel as alias for libattr-devel
