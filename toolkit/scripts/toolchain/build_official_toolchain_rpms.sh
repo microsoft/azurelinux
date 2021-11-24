@@ -504,13 +504,11 @@ chroot_and_install_rpms util-linux
 chroot_and_install_rpms meson
 chroot_and_install_rpms intltool
 build_rpm_in_chroot_no_install systemd-bootstrap
-build_rpm_in_chroot_no_install libaio
 
-# Removed 'lvm2', might not need: libselinux, libsepol, ncurses, libaio,
+# Removed 'lvm2', might not need: libselinux, libsepol, ncurses
 chroot_and_install_rpms libselinux
 chroot_and_install_rpms libsepol
 chroot_and_install_rpms ncurses
-chroot_and_install_rpms libaio
 
 # Removed 'cryptsetup', might not need: popt
 chroot_and_install_rpms popt

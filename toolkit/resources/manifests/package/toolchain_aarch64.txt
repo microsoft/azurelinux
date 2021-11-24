@@ -144,9 +144,6 @@ krb5-1.18-1.cm2.aarch64.rpm
 krb5-debuginfo-1.18-1.cm2.aarch64.rpm
 krb5-devel-1.18-1.cm2.aarch64.rpm
 krb5-lang-1.18-1.cm2.aarch64.rpm
-libaio-0.3.112-3.cm2.aarch64.rpm
-libaio-debuginfo-0.3.112-3.cm2.aarch64.rpm
-libaio-devel-0.3.112-3.cm2.aarch64.rpm
 libarchive-3.4.2-3.cm2.aarch64.rpm
 libarchive-debuginfo-3.4.2-3.cm2.aarch64.rpm
 libarchive-devel-3.4.2-3.cm2.aarch64.rpm
