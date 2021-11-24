@@ -533,10 +533,6 @@ build_rpm_in_chroot_no_install libnsl2
 # Removed 'tcp_wrappers', might not need: libnsl2
 chroot_and_install_rpms libnsl2
 
-# Removed 'perl-File-HomeDir', might not need: perl-File-Which
-build_rpm_in_chroot_no_install perl-File-Which
-chroot_and_install_rpms perl-File-Which
-
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
