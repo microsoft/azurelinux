@@ -1,14 +1,13 @@
 Summary:	Programs for generating Makefiles
 Name:		automake
-Version:	1.16.1
-Release:        3%{?dist}
+Version:	1.16.5
+Release:	1%{?dist}
 License:	GPLv2+
-URL:		http://www.gnu.org/software/automake/
+URL:		https://www.gnu.org/software/automake/
 Group:		System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	http://ftp.gnu.org/gnu/automake/%{name}-%{version}.tar.xz
-%define sha1 automake=1012bc79956013d53da0890f8493388a6cb20831
+Source0:	https://ftp.gnu.org/gnu/automake/%{name}-%{version}.tar.gz
 BuildRequires:	autoconf
 BuildArch:      noarch
 
@@ -43,6 +42,10 @@ make %{?_smp_mflags} check
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 %changelog
+* Tue Nov 23 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.5-1
+- Upgrade to version 1.16.5
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16.1-3
 - Added %%license line automatically
 

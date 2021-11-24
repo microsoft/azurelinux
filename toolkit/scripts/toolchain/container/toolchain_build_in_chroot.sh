@@ -632,14 +632,14 @@ popd
 rm -rf autoconf-2.69
 touch /logs/status_autoconf_complete
 
-echo Automake-1.16.1
-tar xf automake-1.16.1.tar.xz
-pushd automake-1.16.1
-./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.1
+echo Automake-1.16.5
+tar xf automake-1.16.5.tar.gz
+pushd automake-1.16.5
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
 make -j$(nproc)
 make install
 popd
-rm -rf automake-1.16.1
+rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
 echo Xz-5.2.5

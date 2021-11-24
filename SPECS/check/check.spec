@@ -1,11 +1,10 @@
-Summary:        Check-0.12.0
+Summary:        Check is a unit testing framework for C
 Name:           check
-Version:        0.12.0
-Release:        5%{?dist}
+Version:        0.15.2
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://libcheck.github.io/check/
-#Source0:       https://github.com/libcheck/check/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/libcheck/check/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Provides:       %{name}-devel = %{version}-%{release}
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -46,6 +45,9 @@ make %{?_smp_mflags} check
 /usr/share/aclocal/*
 
 %changelog
+* Tue Nov 23 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.15.2-1
+- Upgrade to version 0.15.2
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 0.12.0-5
 - Provide check-devel
 
