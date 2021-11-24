@@ -4489,8 +4489,8 @@
         "type": "other",
         "other": {
           "name": "make",
-          "version": "4.2.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.2.1.tar.gz"
+          "version": "4.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.3.tar.gz"
         }
       }
     },
