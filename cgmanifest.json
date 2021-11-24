@@ -255,8 +255,8 @@
         "type": "other",
         "other": {
           "name": "automake",
-          "version": "1.16.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.xz"
+          "version": "1.16.5",
+          "downloadUrl": "http://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz"
         }
       }
     },
@@ -666,8 +666,8 @@
         "type": "other",
         "other": {
           "name": "check",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/libcheck/check/archive/0.12.0.tar.gz"
+          "version": "0.15.2",
+          "downloadUrl": "https://github.com/libcheck/check/archive/refs/tags/0.15.2.tar.gz"
         }
       }
     },
