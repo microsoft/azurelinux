@@ -300,55 +300,6 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
-echo Tcl-8.6.9
-tar xf tcl8.6.9-src.tar.gz
-pushd tcl8.6.9
-cd unix
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-chmod -v u+w /tools/lib/libtcl8.6.so
-make install-private-headers
-ln -sv tclsh8.6 /tools/bin/tclsh
-popd
-rm -rf tcl8.6.9
-
-touch $LFS/logs/temptoolchain/status_tcl_complete
-
-echo Expect-5.45.4
-tar -zxf expect5.45.4.tar.gz
-pushd expect5.45.4
-cp -v configure{,.orig}
-sed 's:/usr/local/bin:/bin:' configure.orig > configure
-case $(uname -m) in
-    x86_64)
-      ./configure --prefix=/tools \
-        --with-tcl=/tools/lib \
-        --with-tclinclude=/tools/include
-    ;;
-    aarch64)
-      ./configure --prefix=/tools \
-        --with-tcl=/tools/lib \
-        --with-tclinclude=/tools/include \
-        --build=aarch64-unknown-linux-gnu
-    ;;
-esac
-make -j$(nproc)
-make SCRIPTS="" install
-popd
-rm -rf expect5.45.4
-touch $LFS/logs/temptoolchain/status_expect_complete
-
-echo DejaGNU-1.6.3
-tar xf dejagnu-1.6.3.tar.gz
-pushd dejagnu-1.6.3
-./configure --prefix=/tools
-make install
-popd
-rm -rf dejagnu-1.6.3
-
-touch $LFS/logs/temptoolchain/status_dejagnu_complete
-
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
