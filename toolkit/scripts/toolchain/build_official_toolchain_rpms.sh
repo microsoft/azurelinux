@@ -267,16 +267,9 @@ build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
 
-# Need to install perl-DBI in order for perl-DBD-SQLite to build
-build_rpm_in_chroot_no_install perl-DBI
-chroot_and_install_rpms perl-DBI
-
-build_rpm_in_chroot_no_install perl-Object-Accessor
 build_rpm_in_chroot_no_install bison
 build_rpm_in_chroot_no_install autoconf
 build_rpm_in_chroot_no_install texinfo
-build_rpm_in_chroot_no_install perl-DBD-SQLite
-build_rpm_in_chroot_no_install perl-DBIx-Simple
 build_rpm_in_chroot_no_install elfutils
 build_rpm_in_chroot_no_install automake
 

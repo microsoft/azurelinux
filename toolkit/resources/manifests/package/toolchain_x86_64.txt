@@ -302,11 +302,6 @@ perl-Compress-Raw-Bzip2-2.093-463.cm2.x86_64.rpm
 perl-Compress-Raw-Zlib-2.093-463.cm2.x86_64.rpm
 perl-Config-Extensions-0.03-463.cm2.noarch.rpm
 perl-Config-Perl-V-0.32-463.cm2.noarch.rpm
-perl-DBD-SQLite-1.62-4.cm2.x86_64.rpm
-perl-DBD-SQLite-debuginfo-1.62-4.cm2.x86_64.rpm
-perl-DBI-1.641-4.cm2.x86_64.rpm
-perl-DBI-debuginfo-1.641-4.cm2.x86_64.rpm
-perl-DBIx-Simple-1.37-3.cm2.noarch.rpm
 perl-DBM_Filter-0.06-463.cm2.noarch.rpm
 perl-DB_File-1.853-463.cm2.x86_64.rpm
 perl-Data-Dumper-2.174-463.cm2.x86_64.rpm
@@ -386,7 +381,6 @@ perl-NEXT-0.67-463.cm2.noarch.rpm
 perl-Net-1.02-463.cm2.noarch.rpm
 perl-Net-Ping-2.72-463.cm2.noarch.rpm
 perl-ODBM_File-1.16-463.cm2.x86_64.rpm
-perl-Object-Accessor-0.48-7.cm2.noarch.rpm
 perl-Opcode-1.47-463.cm2.x86_64.rpm
 perl-POSIX-1.94-463.cm2.x86_64.rpm
 perl-Params-Check-0.38-463.cm2.noarch.rpm
