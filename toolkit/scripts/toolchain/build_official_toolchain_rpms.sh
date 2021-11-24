@@ -374,8 +374,9 @@ build_rpm_in_chroot_no_install kbd
 chroot_and_install_rpms e2fsprogs
 build_rpm_in_chroot_no_install krb5
 
-# curl needs libssh2
+# curl needs libssh2, krb5
 chroot_and_install_rpms libssh2
+chroot_and_install_rpms krb5
 build_rpm_in_chroot_no_install curl
 
 # python3-setuptools needs python3-xml
@@ -519,9 +520,6 @@ chroot_and_install_rpms json-c
 # Removed 'systemd', might not need: intltool, gperf
 chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
-
-# Removed 'libtiprc', might not need: krb5
-chroot_and_install_rpms krb5
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1

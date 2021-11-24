@@ -266,6 +266,7 @@ generate_pkggen_core () {
         grep "^e2fsprogs-" $TmpPkgGen
         grep "^libsolv-" $TmpPkgGen
         grep "^libssh2-" $TmpPkgGen
+        grep "^krb5-" $TmpPkgGen
         grep "^curl-" $TmpPkgGen
         grep "^tdnf-" $TmpPkgGen
         grep "^createrepo_c-" $TmpPkgGen
@@ -274,7 +275,6 @@ generate_pkggen_core () {
         grep "^glib-" $TmpPkgGen
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
-        grep "^krb5-" $TmpPkgGen
         grep "^lua-" $TmpPkgGen
         grep "^mariner-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen
