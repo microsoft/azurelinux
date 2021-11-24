@@ -191,9 +191,6 @@ libpipeline-debuginfo-1.5.0-5.cm2.x86_64.rpm
 libpipeline-devel-1.5.0-5.cm2.x86_64.rpm
 libpkgconf-1.7.0-3.cm2.x86_64.rpm
 libpkgconf-devel-1.7.0-3.cm2.x86_64.rpm
-libpwquality-1.4.2-6.cm2.x86_64.rpm
-libpwquality-debuginfo-1.4.2-6.cm2.x86_64.rpm
-libpwquality-devel-1.4.2-6.cm2.x86_64.rpm
 libselinux-3.2-1.cm2.x86_64.rpm
 libselinux-debuginfo-3.2-1.cm2.x86_64.rpm
 libselinux-devel-3.2-1.cm2.x86_64.rpm
@@ -520,7 +517,6 @@ python3-libs-3.7.10-3.cm2.x86_64.rpm
 python3-libxml2-2.9.12-2.cm2.x86_64.rpm
 python3-magic-5.40-1.cm2.noarch.rpm
 python3-pip-3.7.10-3.cm2.noarch.rpm
-python3-pwquality-1.4.2-6.cm2.x86_64.rpm
 python3-rpm-4.14.2.1-4.cm2.x86_64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-test-3.7.10-3.cm2.x86_64.rpm
