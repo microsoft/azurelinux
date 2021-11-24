@@ -113,7 +113,7 @@ ln -fs ../sys/xattr.h %{buildroot}%{_includedir}/attr/xattr.h
 - Updating to version 2.5.1.
 - License verified.
 - Removed outdated patches.
-- Replaced empty "attr-devel" subpackage with a "Provides: libattr-devel".
+- Replaced empty "attr-devel" subpackage with a "Provides: attr-devel" in "libattr-devel".
 
 * Thu Nov 14 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.48-6
 - Initial CBL-Mariner import from Fedora 30 (license: MIT).
