@@ -520,7 +520,6 @@ chroot_and_install_rpms json-c
 chroot_and_install_rpms intltool
 chroot_and_install_rpms gperf
 
-build_rpm_in_chroot_no_install golang-1.17
 build_rpm_in_chroot_no_install groff
 
 # libtiprc needs krb5
@@ -548,8 +547,7 @@ chroot_and_install_rpms groff
 
 build_rpm_in_chroot_no_install libcap-ng
 
-# Removed 'audit', might not need: golang, libcap-ng
-chroot_and_install_rpms golang
+# Removed 'audit', might not need: libcap-ng
 chroot_and_install_rpms libcap-ng
 
 # p11-kit needs libtasn1, systemd-bootstrap

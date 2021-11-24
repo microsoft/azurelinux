@@ -117,7 +117,6 @@ gmp-debuginfo-6.2.1-2.cm2.aarch64.rpm
 gmp-devel-6.2.1-2.cm2.aarch64.rpm
 gnupg2-2.3.3-1.cm2.aarch64.rpm
 gnupg2-debuginfo-2.3.3-1.cm2.aarch64.rpm
-golang-1.17.1-1.cm2.aarch64.rpm
 gperf-3.1-3.cm2.aarch64.rpm
 gperf-debuginfo-3.1-3.cm2.aarch64.rpm
 gpgme-1.16.0-1.cm2.aarch64.rpm
