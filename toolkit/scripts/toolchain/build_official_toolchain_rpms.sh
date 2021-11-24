@@ -495,7 +495,7 @@ build_rpm_in_chroot_no_install rpm
 # rebuild pam with selinux support
 build_rpm_in_chroot_no_install pam
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool
 # gperf is also needed, but is installed earlier
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
@@ -504,6 +504,7 @@ chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
 chroot_and_install_rpms meson
+chroot_and_install_rpms intltool
 build_rpm_in_chroot_no_install systemd-bootstrap
 build_rpm_in_chroot_no_install libaio
 
@@ -517,9 +518,6 @@ chroot_and_install_rpms libaio
 chroot_and_install_rpms popt
 chroot_and_install_rpms libpwquality
 chroot_and_install_rpms json-c
-
-# Removed 'systemd', might not need: intltool
-chroot_and_install_rpms intltool
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
