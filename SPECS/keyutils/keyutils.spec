@@ -8,6 +8,13 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://people.redhat.com/~dhowells/keyutils/
 Source0:        https://people.redhat.com/~dhowells/keyutils/%{name}-%{version}.tar.bz2
+%if %{with_check}
+Patch0:         tests_endianness_check_fix.patch
+%endif
+
+%if %{with_check}
+BuildRequires: lsb-release
+%endif
 
 %description
 Utilities to control the kernel key management facility and to provide
@@ -24,17 +31,23 @@ Provides:       %{name}-libs-devel = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %make_build
 
 %install
-%make_install
+%make_install           \
+    BINDIR=%{_bindir}   \
+    LIBDIR=%{_libdir}   \
+    SBINDIR=%{_sbindir} \
+    USRLIBDIR=%{_libdir}
 find %{buildroot} -name '*.a'  -delete
 
 %check
-%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+# Installing keyutils binaries to be available for the tests to use.
+%make_install DESTDIR=/
+%make_build test |& tee %{_specdir}/%{name}-test-log
 
 %ldconfig_scriptlets
 
@@ -42,27 +55,30 @@ find %{buildroot} -name '*.a'  -delete
 %defattr(-,root,root)
 %license LICENCE.GPL LICENCE.LGPL
 %doc README
-/sbin/*
-/bin/*
-%{_libdir}/*.so.*
+%{_bindir}/*
 %{_datadir}/keyutils
+%{_libdir}/*.so.1
+%{_libdir}/*.so.1.*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
+%{_sbindir}/*
 %config(noreplace) %{_sysconfdir}/request-key.conf
 %dir %{_sysconfdir}/request-key.d/
 
 %files devel
 %defattr(-,root,root)
 %license LICENCE.GPL LICENCE.LGPL
-%{_libdir}/*.so
 %{_includedir}/*
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/*
 
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1.
+- Enabled more tests.
 - License verified.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.5.10-5
