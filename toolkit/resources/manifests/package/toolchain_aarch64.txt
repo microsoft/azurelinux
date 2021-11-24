@@ -186,9 +186,6 @@ libltdl-2.4.6-7.cm2.aarch64.rpm
 libltdl-devel-2.4.6-7.cm2.aarch64.rpm
 libmpc-1.2.1-1.cm2.aarch64.rpm
 libmpc-debuginfo-1.2.1-1.cm2.aarch64.rpm
-libnsl2-1.2.0-5.cm2.aarch64.rpm
-libnsl2-debuginfo-1.2.0-5.cm2.aarch64.rpm
-libnsl2-devel-1.2.0-5.cm2.aarch64.rpm
 libpipeline-1.5.0-5.cm2.aarch64.rpm
 libpipeline-debuginfo-1.5.0-5.cm2.aarch64.rpm
 libpipeline-devel-1.5.0-5.cm2.aarch64.rpm

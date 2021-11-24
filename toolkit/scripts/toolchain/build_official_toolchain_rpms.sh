@@ -525,13 +525,9 @@ chroot_and_install_rpms krb5
 build_rpm_in_chroot_no_install libtirpc
 build_rpm_in_chroot_no_install rpcsvc-proto
 
-# libnsl2 needs libtirpc and rpcsvc-proto
+# Removed libnsl2, might not need: libtirpc, rpcsvc-proto
 chroot_and_install_rpms libtirpc
 chroot_and_install_rpms rpcsvc-proto
-build_rpm_in_chroot_no_install libnsl2
-
-# Removed 'tcp_wrappers', might not need: libnsl2
-chroot_and_install_rpms libnsl2
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
