@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "bash-4.4.18.tar.gz": "604d9eec5e4ed5fd2180ee44dd756ddca92e0b6aa4217bbab2b6227380317f23",
+  "bash-5.1.8.tar.gz": "0cfb5c9bb1a29f800a97bd242d19511c997a1013815b805e0fdd32214113d6be",
   "bash_completion": "2243e372a314c975595bf22f0ea330533ff0242c7e5d17525d7c061e25ea5ae4"
  }
 }
