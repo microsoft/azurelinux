@@ -3,11 +3,11 @@ Name:           libksba
 Version:        1.6.0
 Release:        1%{?dist}
 # See AUTHORS file for licensing details
-License:	    (LGPLv3+ or GPLv2+) and GPLv3+ 
+License:        (LGPLv3+ or GPLv2+) and GPLv3+ 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:		    Security/Libraries.
-URL:		    https://www.gnupg.org/(fr)/download/index.html#libksba
+Group:          Security/Libraries.
+URL:            https://www.gnupg.org/(fr)/download/index.html#libksba
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires:  libgpg-error-devel >= 1.8
 Requires:       libgpg-error >= 1.8
@@ -60,6 +60,7 @@ rm -rf %{buildroot}%{_infodir}
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
 - Upgrade to latest upstream version
 - Split out development files into a devel subpackage
+- Lint spec
 - License verified
 
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.3.5-4
@@ -71,7 +72,7 @@ rm -rf %{buildroot}%{_infodir}
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.5-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Tue	Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
+* Tue    Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
 - Udpated to version 1.3.5
 
 * Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2
