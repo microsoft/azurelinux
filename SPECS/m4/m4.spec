@@ -8,16 +8,12 @@ Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
-Patch0:         04-fix-sigstksz.patch
-Patch1:         m4-1.4.18-glibc-change-work-around.patch
 
 %description
 The M4 package contains a macro processor
 
 %prep
 %setup -q
-#%patch0 -p1
-#%patch1 -p1
 
 %build
 ./configure \
@@ -43,6 +39,7 @@ make  %{?_smp_mflags}  check
 %changelog
 * Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> 1.4.19-1
 - Update to version 1.4.19
+- Remove patches
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 1.4.18-5
 - Add patches for glibc 2.34
 - License verified

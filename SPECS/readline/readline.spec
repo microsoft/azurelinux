@@ -3,7 +3,7 @@ Name:           readline
 Version:        8.1
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+URL:            https://tiswww.case.edu/php/chet/readline/rltop.html
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -109,6 +109,7 @@ make %{?_smp_mflags} check
 %changelog
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 8.1-1
 - Update to version 8.1
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 7.0-4
 - Added %%license line automatically

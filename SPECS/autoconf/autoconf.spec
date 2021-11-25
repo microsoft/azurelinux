@@ -3,7 +3,7 @@ Name:		    autoconf
 Version:	    2.71
 Release:        1%{?dist}
 License:	    GPLv2
-URL:		    http://www.gnu.org/software/autoconf
+URL:		    https://www.gnu.org/software/autoconf/
 Group:		    System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 %changelog
 *   Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 2.71-1
 -   Update to version 2.71
+-   License verified
 -   Remove unneeded autoconf-make-check.patch
 *   Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 2.69-11
 -   Merge the following releases from 1.0 to dev branch

@@ -170,7 +170,7 @@ Requires:  zlib-devel
 
 
 # compat macro needed for rebuild
-%global perl_compat perl(:MODULE_COMPAT_5.32.0)
+%global perl_compat perl(:MODULE_COMPAT_5.34.0)
 
 Requires:       %perl_compat
 Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
@@ -4055,35 +4055,11 @@ you're not running VMS, this module does nothing.
 
 %prep
 %setup -q -n perl-%{perl_version}
-#%%patch5 -p1
 %patch8 -p1
 %patch9 -p1
-#%%patch10 -p1
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-#%%patch14 -p1
-#%%patch15 -p1
-#%%patch16 -p1
-#%%patch17 -p1
-#%%patch18 -p1
-#%%patch19 -p1
-#%%patch20 -p1
-#%%patch21 -p1
-#%%patch22 -p1
-#%%patch23 -p1
-#%%patch24 -p1
-#%%patch25 -p1
-#%%patch26 -p1
-#%%patch27 -p1
-#%%patch28 -p1
-#%%patch29 -p1
-#%%patch30 -p1
-#%%patch31 -p1
-#%%patch32 -p1
-#%%patch33 -p1
-#%%patch34 -p1
-#%%patch35 -p1
 %patch200 -p1
 %patch201 -p1
 
@@ -5305,7 +5281,7 @@ done
 %if %{dual_life} || %{rebuild_from_scratch}
 %files ExtUtils-MM-Utils
 %dir %{privlib}/ExtUtils
-%dir %%{privlib}/ExtUtils/MM
+%dir %{privlib}/ExtUtils/MM
 %{privlib}/ExtUtils/MM/Utils.pm
 %{_mandir}/man3/ExtUtils::MM::Utils.*
 %else
