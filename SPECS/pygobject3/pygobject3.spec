@@ -1,6 +1,6 @@
 Name:           pygobject3
 Version:        3.36.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Python bindings for GObject Introspection
 
 License:        LGPLv2+
@@ -15,10 +15,9 @@ BuildRequires:  meson
 BuildRequires:  python3-devel
 BuildRequires:  python3-cairo-devel
 BuildRequires:  glib-schemas
-BuildRequires:  python-setuptools
 BuildRequires:  python3-setuptools
 %if %{with_check}
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  python3-test
 BuildRequires:  dbus
 BuildRequires:  curl-devel
@@ -94,6 +93,9 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-4
+- Remove unused python-setuptools dependency
+
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-3
 - Move python setuptools and glib schemas to non-check BuildRequires
 

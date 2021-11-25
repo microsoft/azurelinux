@@ -3,7 +3,7 @@ alsa-lib-debuginfo-1.2.2-2.cm2.x86_64.rpm
 alsa-lib-devel-1.2.2-2.cm2.x86_64.rpm
 asciidoc-9.1.0-1.cm2.noarch.rpm
 autoconf-2.71-1.cm2.noarch.rpm
-automake-1.16.1-3.cm2.noarch.rpm
+automake-1.16.5-1.cm2.noarch.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
 bash-debuginfo-5.1.8-1.cm2.x86_64.rpm
 bash-devel-5.1.8-1.cm2.x86_64.rpm
@@ -22,8 +22,8 @@ ca-certificates-base-20200720-20.cm2.noarch.rpm
 ca-certificates-legacy-20200720-20.cm2.noarch.rpm
 ca-certificates-shared-20200720-20.cm2.noarch.rpm
 ca-certificates-tools-20200720-20.cm2.noarch.rpm
-check-0.12.0-5.cm2.x86_64.rpm
-check-debuginfo-0.12.0-5.cm2.x86_64.rpm
+check-0.15.2-1.cm2.x86_64.rpm
+check-debuginfo-0.15.2-1.cm2.x86_64.rpm
 cmake-3.17.3-5.cm2.x86_64.rpm
 cmake-debuginfo-3.17.3-5.cm2.x86_64.rpm
 coreutils-8.32-1.cm2.x86_64.rpm
@@ -64,10 +64,10 @@ elfutils-libelf-0.185-1.cm2.x86_64.rpm
 elfutils-libelf-devel-0.185-1.cm2.x86_64.rpm
 elfutils-libelf-devel-static-0.185-1.cm2.x86_64.rpm
 elfutils-libelf-lang-0.185-1.cm2.x86_64.rpm
-expat-2.2.6-4.cm2.x86_64.rpm
-expat-debuginfo-2.2.6-4.cm2.x86_64.rpm
-expat-devel-2.2.6-4.cm2.x86_64.rpm
-expat-libs-2.2.6-4.cm2.x86_64.rpm
+expat-2.4.1-1.cm2.x86_64.rpm
+expat-debuginfo-2.4.1-1.cm2.x86_64.rpm
+expat-devel-2.4.1-1.cm2.x86_64.rpm
+expat-libs-2.4.1-1.cm2.x86_64.rpm
 file-5.40-1.cm2.x86_64.rpm
 file-debuginfo-5.40-1.cm2.x86_64.rpm
 file-devel-5.40-1.cm2.x86_64.rpm
@@ -112,9 +112,9 @@ glibc-tools-2.34-2.cm2.x86_64.rpm
 gmock-1.8.1-5.cm2.x86_64.rpm
 gmock-devel-1.8.1-5.cm2.x86_64.rpm
 gmock-static-1.8.1-5.cm2.x86_64.rpm
-gmp-6.2.1-1.cm2.x86_64.rpm
-gmp-debuginfo-6.2.1-1.cm2.x86_64.rpm
-gmp-devel-6.2.1-1.cm2.x86_64.rpm
+gmp-6.2.1-2.cm2.x86_64.rpm
+gmp-debuginfo-6.2.1-2.cm2.x86_64.rpm
+gmp-devel-6.2.1-2.cm2.x86_64.rpm
 gnupg2-2.2.20-4.cm2.x86_64.rpm
 gnupg2-debuginfo-2.2.20-4.cm2.x86_64.rpm
 golang-1.17.1-1.cm2.x86_64.rpm

@@ -589,17 +589,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.2.6
-tar xf expat-2.2.6.tar.bz2
-pushd expat-2.2.6
+echo Expat-2.4.1
+tar xf expat-2.4.1.tar.bz2
+pushd expat-2.4.1
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.2.6
+            --docdir=/usr/share/doc/expat-2.4.1
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.2.6
+rm -rf expat-2.4.1
 touch /logs/status_expat_complete
 
 echo Perl-5.34.0
@@ -632,14 +632,14 @@ popd
 rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
-echo Automake-1.16.1
-tar xf automake-1.16.1.tar.xz
-pushd automake-1.16.1
-./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.1
+echo Automake-1.16.5
+tar xf automake-1.16.5.tar.gz
+pushd automake-1.16.5
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
 make -j$(nproc)
 make install
 popd
-rm -rf automake-1.16.1
+rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
 echo Xz-5.2.5
