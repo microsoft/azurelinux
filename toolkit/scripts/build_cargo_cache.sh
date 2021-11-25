@@ -50,7 +50,6 @@ pushd "$temp_dir" &> /dev/null
 popd &> /dev/null
 
 mv "$temp_dir/$directory_name/$cache_tarball_name" .
-rm -rf "$temp_dir"
 
 echo "Done:"
 sha256sum "$cache_tarball_name"
