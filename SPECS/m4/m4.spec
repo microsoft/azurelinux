@@ -1,13 +1,13 @@
 Summary:        A macro processor
 Name:           m4
-Version:        1.4.18
-Release:        5%{?dist}
+Version:        1.4.19
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/m4
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
+Source0:        https://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
 Patch0:         04-fix-sigstksz.patch
 Patch1:         m4-1.4.18-glibc-change-work-around.patch
 
@@ -16,8 +16,8 @@ The M4 package contains a macro processor
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+#%patch0 -p1
+#%patch1 -p1
 
 %build
 ./configure \
@@ -38,8 +38,11 @@ make  %{?_smp_mflags}  check
 %license COPYING
 %{_bindir}/*
 %{_mandir}/*/*
+%{_datadir}/locale/*/*
 
 %changelog
+* Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> 1.4.19-1
+- Update to version 1.4.19
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 1.4.18-5
 - Add patches for glibc 2.34
 - License verified
