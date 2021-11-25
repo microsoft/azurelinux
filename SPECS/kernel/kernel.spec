@@ -6,8 +6,8 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.78.1
-Release:        3%{?dist}
+Version:        5.15.2.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,9 +19,8 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
-Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         pthread_stack_min_int_cast.patch
-Patch2:         0002-add-linux-syscall-license-info.patch
+#Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
+Patch1:         0002-add-linux-syscall-license-info.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -229,7 +228,7 @@ BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
-BuildRequires:  dwarves
+BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
@@ -298,16 +297,6 @@ Requires:       python3
 %description docs
 This package contains the Linux kernel doc files
 
-%ifarch x86_64
-%package oprofile
-Summary:        Kernel driver for oprofile, a statistical profiler for Linux systems
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-
-%description oprofile
-Kernel driver for oprofile, a statistical profiler for Linux systems
-%endif
-
 %package tools
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
@@ -340,9 +329,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -453,6 +440,12 @@ EOF
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
 rm -rf %{buildroot}/lib/modules/%{uname_r}/build
 
+
+# disable (JOBS=1) parallel build to fix this issue:
+# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
+# Linux version that was affected is 4.4.26
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
+
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/${archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find $(find arch/${archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -465,16 +458,13 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
-find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
+ls %{buildroot}/lib/modules
+find %{buildroot}/lib/modules -name '*.ko.xz' -print0 | xargs -0 chmod u+x
 
 %ifarch aarch64
 cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
-# disable (JOBS=1) parallel build to fix this issue:
-# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
-# Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 
 # Install python3-perf
 make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
@@ -513,11 +503,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
-%ifarch x86_64
-%post oprofile
-/sbin/depmod -a %{uname_r}
-%endif
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -534,13 +519,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch x86_64
-%exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-%endif
 %ifarch aarch64
 %exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 %exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
 %endif
+%exclude /usr/include/perf/perf_dlfilter.h
 
 %files docs
 %defattr(-,root,root)
@@ -558,12 +541,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
-
-%ifarch x86_64
-%files oprofile
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-%endif
 
 %files tools
 %defattr(-,root,root)
@@ -595,6 +572,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
+- Update source to 5.15.2.1
+
 * Tue Jan 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-3
 - Add provides exclude for debug build-id for aarch64 to generate debuginfo rpm
 - Fix missing brackets for __os_install_post.

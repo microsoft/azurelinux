@@ -8,7 +8,7 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.78.1
+Version:        5.15.2.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -27,7 +27,6 @@ Source102:      hypervvss.rules
 # HYPERV FCOPY DAEMON
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
-Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
@@ -106,7 +105,6 @@ Contains tools and scripts useful for Hyper-V guests.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch0 -p1
 %patch1 -p1
 
 %build
@@ -223,6 +221,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
+- Update source to 5.15.2.1
+
 * Mon Nov 08 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Add patch to fix SPDX-License-Identifier in headers
