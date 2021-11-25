@@ -1,7 +1,9 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
-# Release date of a given version can be found under https://github.com/rust-lang/rust/releases.
-%define release_date 2021-11-01
+# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
+# Look for "date:" and "rustc:".
+%define release_date 2021-09-09
+%define stage0_version 1.55.0
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.56.1
@@ -12,19 +14,23 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.gz
-#Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{version}-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{version}-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{version}-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{version}-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{version}-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{version}-aarch64-unknown-linux-gnu.tar.gz
+# Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
+Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
+BuildRequires:  ninja-build
 BuildRequires:  python2
 %if %{with_check}
 BuildRequires:  python-xml
@@ -39,7 +45,7 @@ Rust Programming Language
 # Setup .cargo directory
 mkdir -p $HOME
 pushd $HOME
-# tar xf %{SOURCE1} --no-same-owner
+tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
@@ -49,17 +55,17 @@ popd
 sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
 
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/%{release_date}/
-mkdir -pv %{BUILD_CACHE_DIR}
+BUILD_CACHE_DIR="build/cache/%{release_date}"
+mkdir -pv "$BUILD_CACHE_DIR"
 %ifarch x86_64
-mv %{SOURCE2} %{BUILD_CACHE_DIR}
-mv %{SOURCE3} %{BUILD_CACHE_DIR}
-mv %{SOURCE4} %{BUILD_CACHE_DIR}
+mv %{SOURCE2} "$BUILD_CACHE_DIR"
+mv %{SOURCE3} "$BUILD_CACHE_DIR"
+mv %{SOURCE4} "$BUILD_CACHE_DIR"
 %endif
 %ifarch aarch64
-mv %{SOURCE5} %{BUILD_CACHE_DIR}
-mv %{SOURCE6} %{BUILD_CACHE_DIR}
-mv %{SOURCE7} %{BUILD_CACHE_DIR}
+mv %{SOURCE5} "$BUILD_CACHE_DIR"
+mv %{SOURCE6} "$BUILD_CACHE_DIR"
+mv %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
 %build
@@ -91,6 +97,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
+%{_libexecdir}/cargo-credential-1password
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
 %doc %{_docdir}/%{name}/html/*
