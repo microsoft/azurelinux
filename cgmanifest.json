@@ -1999,8 +1999,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.2.20",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.2.20.tar.bz2"
+          "version": "2.3.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.3.tar.bz2"
         }
       }
     },
@@ -2109,8 +2109,8 @@
         "type": "other",
         "other": {
           "name": "gpgme",
-          "version": "1.13.1",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.13.1.tar.bz2"
+          "version": "1.16.0",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.16.0.tar.bz2"
         }
       }
     },
@@ -2909,8 +2909,8 @@
         "type": "other",
         "other": {
           "name": "libassuan",
-          "version": "2.5.1",
-          "downloadUrl": "ftp://ftp.gnupg.org/gcrypt/libassuan/libassuan-2.5.1.tar.bz2"
+          "version": "2.5.5",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.5.tar.bz2"
         }
       }
     },
@@ -3189,8 +3189,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.8.7",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
+          "version": "1.9.4",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
         }
       }
     },
@@ -3319,8 +3319,8 @@
         "type": "other",
         "other": {
           "name": "libksba",
-          "version": "1.3.5",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.3.5.tar.bz2"
+          "version": "1.6.0",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.6.0.tar.bz2"
         }
       }
     },
@@ -4952,7 +4952,7 @@
         "other": {
           "name": "npth",
           "version": "1.6",
-          "downloadUrl": "https://github.com/gpg/npth/archive/npth-1.6.tar.gz"
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
         }
       }
     },
@@ -5832,8 +5832,8 @@
         "type": "other",
         "other": {
           "name": "pinentry",
-          "version": "1.1.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.1.0.tar.bz2"
+          "version": "1.2.0",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
         }
       }
     },
