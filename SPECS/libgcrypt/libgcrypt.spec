@@ -1,15 +1,13 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
-Version:        1.8.7
-Release:        3%{?dist}
-License:        GPLv2+ AND LGPLv2+
+Version:        1.9.4
+Release:        1%{?dist}
+License:        GPLv2+ and LGPLv2+ and BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gnupg.org/related_software/libgcrypt/
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
-#libgcrypt CVE-2021-33560 fix
-Patch0:         libgcrypt-CVE-2021-33560-fix.patch
 BuildRequires:  libgpg-error-devel
 Requires:       libgpg-error
 
@@ -27,38 +25,44 @@ The package contains libraries and header files for
 developing applications that use libgcrypt.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_infodir}
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post -p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license LICENSES
-%{_bindir}/*
-%{_libdir}/*.so.*
-%{_mandir}/man1/*
+%license COPYING COPYING.LIB LICENSES
+%{_bindir}/dumpsexp
+%{_bindir}/hmac256
+%{_bindir}/libgcrypt-config
+%{_bindir}/mpicalc
+%{_libdir}/%{name}.so.20*
+%{_mandir}/man1/hmac256*
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/*.h
-%{_datadir}/aclocal/*
-%{_libdir}/*.so
+%{_includedir}/gcrypt.h
+%{_datadir}/aclocal/%{name}.m4
+%{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.9.4-1
+- Upgrade to latest upstream version
+- License verified
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-3
 - Remove libtool archive files from final packaging
 

@@ -1,17 +1,15 @@
-Summary:	   Provides IPC between GnuPG Components
-Name:		   libassuan
-Version:	   2.5.1
-Release:       5%{?dist}
-License:	   GPLv3+
-URL:		   https://www.gnupg.org/(fr)/related_software/libassuan/index.html
-Group:		   Development/Libraries
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Source0:	   ftp://ftp.gnupg.org/gcrypt/%{name}/%{name}-%{version}.tar.bz2
-Provides:      %{name}-devel = %{version}-%{release}
-Provides:      pkgconfig(libassuan) = %{version}-%{release}
-Requires:	   libgpg-error >= 1.21
-BuildRequires: libgpg-error-devel >= 1.21
+Summary:        Provides IPC between GnuPG Components
+Name:           libassuan
+Version:        2.5.5
+Release:        1%{?dist}
+License:        LGPLv2+
+URL:            https://gnupg.org/software/libassuan/index.html
+Group:          Development/Libraries
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+BuildRequires:  libgpg-error-devel >= 1.21
+Requires:       libgpg-error >= 1.21
 
 %description
 The libassuan package contains an inter process communication library
@@ -21,61 +19,80 @@ libassuan is not, however, limited to use with GnuPG servers and clients.
 It was designed to be flexible enough to meet the demands
 of many transaction based environments with non-persistent servers.
 
+%package        devel
+Summary:        Development files for libassuan
+Requires:       %{name} = %{version}-%{release}
+Requires:       libgpg-error-devel >= 1.21
+Provides:       pkgconfig(libassuan) = %{version}-%{release}
+
+%description    devel
+This package contains development files for libassuan
+
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-rm %{buildroot}/%{_libdir}/*.la
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_infodir}
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%ldconfig_scriptlets
+
 %files
 %defattr(-,root,root)
-%license COPYING
-%{_bindir}/*
-%{_includedir}/*.h
-%{_libdir}/*.so*
+%license AUTHORS COPYING
+%{_bindir}/%{name}-config
+%{_libdir}/%{name}.so.0*
+
+%files devel
+%{_libdir}/%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
+%{_includedir}/assuan.h
 %{_datadir}/aclocal/*
 
 %changelog
-* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 2.5.1-5
+* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.5-1
+- Upgrade to latest upstream version
+- Split out development files into devel subpackage
+- Lint spec
+- License verified
+
+* Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 2.5.1-5
 - Provide pkgconfig(libassuan).
 
-* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 2.5.1-4
+* Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.5.1-4
 - Provide libassuan-devel
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.5.1-3
 - Added %%license line automatically
 
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.5.1-2
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.5.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Fri Sep 21 2018 Keerthana K <keerthanak@vmware.com> 2.5.1-1
+* Fri Sep 21 2018 Keerthana K <keerthanak@vmware.com> - 2.5.1-1
 - Update to version 2.5.1
 
-* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> 2.4.3-1
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com> - 2.4.3-1
 - Upgrade version to 2.4.3
 
-* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.4.2-3
+* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> - 2.4.2-3
 - BuildRequired libgpg-error-devel.
 
-* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.2-2
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.4.2-2
 - GA - Bump release of all rpms
 
-* Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 2.4.2-1
+* Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> - 2.4.2-1
 - Updated to version 2.4.2
 
-* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 2.2.0-2
+* Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> - 2.2.0-2
 - Updated group.
 
-* Tue Dec 30 2014 Divya Thaluru <dthaluru@vmware.com> 2.2.0-1
+* Tue Dec 30 2014 Divya Thaluru <dthaluru@vmware.com> - 2.2.0-1
 - Initial version
