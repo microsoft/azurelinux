@@ -5281,9 +5281,9 @@ done
 %if %{dual_life} || %{rebuild_from_scratch}
 %files ExtUtils-MM-Utils
 %dir %{privlib}/ExtUtils
-%dir %{privlib}/ExtUtils/MM
-%{privlib}/ExtUtils/MM/Utils.pm
-%{_mandir}/man3/ExtUtils::MM::Utils.*
+#%%dir %{privlib}/ExtUtils/MM
+#%%{privlib}/ExtUtils/MM/Utils.pm
+#%%{_mandir}/man3/ExtUtils::MM::Utils.*
 %else
 %exclude %dir %{privlib}/ExtUtils/MM
 %exclude %{privlib}/ExtUtils/MM/Utils.pm
