@@ -1,14 +1,13 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
-#Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
 # A buildable grpc environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
 #  git clone -b RELEASE_TAG_HERE --depth 1 https://github.com/grpc/grpc
@@ -17,14 +16,17 @@ Source0:        %{name}-%{version}.tar.gz
 #  popd
 #  sudo mv grpc grpc-%{version}
 #  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
+BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  openssl-devel
 BuildRequires:  protobuf-devel
+BuildRequires:  re2-devel
 BuildRequires:  zlib-devel
 
+Requires:       abseil-cpp
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
@@ -60,8 +62,10 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
+   -DgRPC_ABSL_PROVIDER:STRING='package'    \
    -DgRPC_CARES_PROVIDER:STRING='package'    \
    -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
+   -DgRPC_RE2_PROVIDER:STRING='package'      \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
@@ -69,7 +73,6 @@ cmake ../.. -DgRPC_INSTALL=ON                \
 %install
 cd cmake/build
 %make_install
-find %{buildroot} -name '*.a' -delete
 find %{buildroot} -name '*.cmake' -delete
 
 %files
@@ -81,7 +84,6 @@ find %{buildroot} -name '*.cmake' -delete
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
-%exclude %{_includedir}/re2/
 %{_libdir}/libaddress_sorting.so
 %{_libdir}/libgpr.so
 %{_libdir}/libgrpc++.so
@@ -95,15 +97,15 @@ find %{buildroot} -name '*.cmake' -delete
 %{_libdir}/libgrpcpp_channelz.so
 %{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
-%exclude %{_libdir}/libabsl_*
-%exclude %{_libdir}/libre2.so
-%exclude %{_lib64dir}/libre2.so
 
 %files plugins
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-7
+- Use pre-installed "re2" and "abseil-cpp" instead of building them.
+
 * Wed Nov 03 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.35.0-6
 - Bringing back the "libaddress_sorting" library.
 

@@ -4,6 +4,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "abseil-cpp",
+          "version": "20211102.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "acl",
           "version": "2.2.53",
           "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/acl/acl-2.2.53.tar.gz"
@@ -345,8 +355,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.15",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
+          "version": "9.16.22",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.22/bind-9.16.22.tar.xz"
         }
       }
     },
@@ -735,8 +745,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz"
+          "version": "3.21.4",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
         }
       }
     },
@@ -865,8 +875,8 @@
         "type": "other",
         "other": {
           "name": "cppunit",
-          "version": "1.12.1",
-          "downloadUrl": "https://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz"
+          "version": "1.15.1",
+          "downloadUrl": "http://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
         }
       }
     },
@@ -1835,8 +1845,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.9",
-          "downloadUrl": "https://golang.org/dl/go1.16.9.src.tar.gz"
+          "version": "1.16.10",
+          "downloadUrl": "https://golang.org/dl/go1.16.10.src.tar.gz"
         }
       }
     },
@@ -1965,8 +1975,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
         }
       }
     },
@@ -2025,8 +2035,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "1.9.0",
-          "downloadUrl": "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.9.0.tar.bz2"
+          "version": "2.6.4",
+          "downloadUrl": "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-2.6.4.tar.xz"
         }
       }
     },
@@ -4545,8 +4555,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.5",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.5/node-v14.17.5.tar.xz"
+          "version": "14.18.1",
+          "downloadUrl": "https://nodejs.org/download/release/v14.18.1/node-v14.18.1.tar.xz"
         }
       }
     },
