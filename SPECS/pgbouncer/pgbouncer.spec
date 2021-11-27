@@ -1,10 +1,11 @@
 Summary:	Connection pooler for PostgreSQL.
 Name:		pgbouncer
 Version:	1.11.0
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	ISC License
 URL:		https://www.pgbouncer.org/
 Source0:	https://%{name}.github.io/downloads/files/%{version}/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-3935.patch
 Source1:        pgbouncer.service
 Group:		Application/Databases.
 Vendor:         Microsoft Corporation
@@ -21,7 +22,7 @@ Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 Pgbouncer is a light-weight, robust connection pooler for PostgreSQL.
 
 %prep
-%setup
+%autosetup
 
 %build
 %configure --datadir=%{_datadir}
@@ -80,6 +81,8 @@ fi
 /usr/share/doc/pgbouncer/*
 
 %changelog
+*   Sat Nov 27 2021 Mariner Autopatcher <cblmargh@microsoft.com> 1.11.0-3
+-   Added patch file(s) CVE-2021-3935.patch
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
 - Added %%license line automatically
 
