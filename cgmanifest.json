@@ -3599,8 +3599,8 @@
         "type": "other",
         "other": {
           "name": "librelp",
-          "version": "1.2.17",
-          "downloadUrl": "https://github.com/rsyslog/librelp/archive/v1.2.17.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://download.rsyslog.com/librelp/librelp-1.10.0.tar.gz"
         }
       }
     },
