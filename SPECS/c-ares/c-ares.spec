@@ -1,6 +1,6 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.17.1
+Version:        1.18.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -62,6 +62,7 @@ rm -rf %{buildroot}
 %{_includedir}/ares.h
 %{_includedir}/ares_build.h
 %{_includedir}/ares_dns.h
+%{_includedir}/ares_nameser.h
 %{_includedir}/ares_rules.h
 %{_includedir}/ares_version.h
 %{_libdir}/*.so
@@ -69,27 +70,30 @@ rm -rf %{buildroot}
 %{_mandir}/man3/ares_*
 
 %changelog
+* Sun Nov 28 2021 Muhammad Falak <mwani@microsoft.com> - 1.18.1-1
+- Bump version to fix CVE-2021-3672
+
 * Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.17.1-1
 - Removed %%sha line. Upgraded to 1.17.1 to address CVE-2020-8277.
 - License confirmed as MIT. Changed URLs to use HTTPS.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
+- Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Fri Sep 21 2018 Sujay G <gsujay@vmware.com> 1.14.0-1
--   Bump c-ares version to 1.14.0
+* Fri Sep 21 2018 Sujay G <gsujay@vmware.com> 1.14.0-1
+- Bump c-ares version to 1.14.0
 
-*   Fri Sep 29 2017 Dheeraj Shetty <dheerajs@vmware.com>  1.12.0-2
--   Fix for CVE-2017-1000381
+* Fri Sep 29 2017 Dheeraj Shetty <dheerajs@vmware.com>  1.12.0-2
+- Fix for CVE-2017-1000381
 
-*   Fri Apr 07 2017 Anish Swaminathan <anishs@vmware.com>  1.12.0-1
--   Upgrade to 1.12.0
+* Fri Apr 07 2017 Anish Swaminathan <anishs@vmware.com>  1.12.0-1
+- Upgrade to 1.12.0
 
-*   Wed Oct 05 2016 Xiaolin Li <xiaolinl@vmware.com> 1.10.0-3
--   Apply patch for CVE-2016-5180.
+* Wed Oct 05 2016 Xiaolin Li <xiaolinl@vmware.com> 1.10.0-3
+- Apply patch for CVE-2016-5180.
 
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.10.0-2
 -   GA - Bump release of all rpms
