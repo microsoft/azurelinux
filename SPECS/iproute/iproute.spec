@@ -72,6 +72,7 @@ sed -i 's/\"libnetlink.h\"/"..\/include\/libnetlink.h\"/g' ../lib/libnetlink.c
 * Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 5.15.0-1
 - Upgrade to latest upstream version
 - Add relevant build/runtime requirements
+- Fix check section instructions for new version
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.18.0-5
 - Added %%license line automatically
