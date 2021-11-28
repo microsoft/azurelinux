@@ -1178,7 +1178,7 @@ popd
 
 rm -rf "$RPM_FOLDER"
 
-install -p pythondistdeps.py /usr/lib/rpm/pythondistddeps.py
+install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
 install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
 install -p python.attr /usr/lib/rpm/fileattrs/python.attr
 
