@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/rsyslog/librelp
-Source0:        http://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  autogen
 BuildRequires:  automake
