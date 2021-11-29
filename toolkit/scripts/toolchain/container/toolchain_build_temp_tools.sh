@@ -486,16 +486,16 @@ rm -rf patch-2.7.6
 
 touch $LFS/logs/temptoolchain/status_patch_complete
 
-echo Perl-5.34.0
-tar xf perl-5.34.0.tar.xz
-pushd perl-5.34.0
+echo Perl-5.32.0
+tar xf perl-5.32.0.tar.xz
+pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
 make -j$(nproc)
 cp -v perl cpan/podlators/scripts/pod2man /tools/bin
-mkdir -pv /tools/lib/perl5/5.34.0
-cp -Rv lib/* /tools/lib/perl5/5.34.0
+mkdir -pv /tools/lib/perl5/5.32.0
+cp -Rv lib/* /tools/lib/perl5/5.32.0
 popd
-rm -rf perl-5.34.0
+rm -rf perl-5.32.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 

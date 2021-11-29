@@ -599,9 +599,9 @@ popd
 rm -rf expat-2.4.1
 touch /logs/status_expat_complete
 
-echo Perl-5.34.0
-tar xf perl-5.34.0.tar.xz
-pushd perl-5.34.0
+echo Perl-5.32.0
+tar xf perl-5.32.0.tar.xz
+pushd perl-5.32.0
 echo "127.0.0.1 localhost $(hostname)" > /etc/hosts
 export BUILD_ZLIB=False
 export BUILD_BZIP2=0
@@ -616,7 +616,7 @@ make -j$(nproc)
 make install
 unset BUILD_ZLIB BUILD_BZIP2
 popd
-rm -rf perl-5.34.0
+rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
 echo Autoconf-2.71
