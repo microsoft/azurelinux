@@ -1,7 +1,7 @@
 Summary:        Markdown to reStructuredText converter.
 Name:           python-m2r
 Version:        0.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,8 +44,7 @@ M2R converts a markdown file including reST markups to a valid reST format.
 ln -s m2r %{buildroot}/%{_bindir}/m2r3
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 mock
+pip3 install mock
 %python3 setup.py test -s tests
 
 %files -n python3-m2r
@@ -56,6 +55,9 @@ $easy_install_3 mock
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com>
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-6
 - Add license to python3 package
 - Remove python2 package

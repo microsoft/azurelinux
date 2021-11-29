@@ -1,7 +1,7 @@
 Summary:        Python Atomic file writes
 Name:           python-atomicwrites
 Version:        1.2.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Requires:       python3
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 %endif
@@ -41,8 +42,7 @@ Python Atomic file writes
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 funcsigs pathlib2 pluggy more-itertools
+pip3 install funcsigs pathlib2 pluggy more-itertools
 cp tests/test_atomicwrites.py .
 %python3 test_atomicwrites.py
 
@@ -53,6 +53,9 @@ cp tests/test_atomicwrites.py .
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-7
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-6
 - Remove python2 package
 - Lint spec

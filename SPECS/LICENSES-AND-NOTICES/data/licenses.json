@@ -184,7 +184,6 @@
                 "python-jwt",
                 "python-kubernetes",
                 "python-mock",
-                "python-nose",
                 "python-pexpect",
                 "python-process-tests",
                 "python-ptyprocess",

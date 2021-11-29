@@ -1,7 +1,7 @@
 Summary:        A Python interface to libcurl
 Name:           python-pycurl
 Version:        7.43.0.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+ OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Requires:       curl
 Requires:       python3
 %if %{with_check}
 BuildRequires:  curl-libs
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  vsftpd
@@ -60,8 +61,7 @@ chmod 755 %{buildroot}%{python3_sitelib}/pycurl*.so
 export PYCURL_SSL_LIBRARY=openssl
 export PYCURL_VSFTPD_PATH=vsftpd
 
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 nose nose-show-skipped bottle==0.12.16 flaky pyflakes
+pip3 install nose nose-show-skipped bottle==0.12.16 flaky pyflakes
 rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_constants_test.py tests/seek_cb_test.py tests/memory_mgmt_test.py tests/multi_timer_test.py
 LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests-3.4 -v"
 
@@ -75,6 +75,9 @@ LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests
 %doc RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-10
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-9
 - Add licenses to python3 package, remove from docs package
 - Remove python2 package

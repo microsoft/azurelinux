@@ -781,22 +781,23 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.9.9
+tar xf Python-3.9.9.tar.xz
+pushd Python-3.9.9
 ./configure --prefix=/usr       \
+            --with-platlibdir=lib \
             --enable-shared     \
             --with-system-expat \
             --with-system-ffi   \
             --with-ensurepip=yes
 make -j$(nproc)
 make install
-chmod -v 755 /usr/lib/libpython3.7m.so
+chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
-ln -sfv pip3.7 /usr/bin/pip3
+ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.7.4
-touch /logs/status_python374_complete
+rm -rf Python-3.9.9
+touch /logs/status_python399_complete
 
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz

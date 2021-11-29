@@ -2,7 +2,7 @@
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
 Version:        %{BaseVersion}.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,10 @@ Libraries and headers for gobject-introspection.
 
 %prep
 %autosetup -p 1
+# Python 3.9 compatibility fix
+# Fixed upstream in v1.63.2
+# https://gitlab.gnome.org/GNOME/gobject-introspection/issues/325
+sed -i 's/.getchildren()//' giscanner/girparser.py
 autoreconf -fiv
 
 %build
@@ -98,6 +102,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-12
+- Fix Python 3.9 compatibility issue
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-11
 - Remove python2 package
 - Lint spec
