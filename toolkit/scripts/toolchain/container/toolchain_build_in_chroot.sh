@@ -887,7 +887,8 @@ echo Make-4.3
 tar xf make-4.3.tar.gz
 pushd make-4.3
 ./configure --prefix=/usr
-make -j$(nproc)
+# Running in a single thread due to make 4.3 build breaking with "read jobs pipe: Resource temporarily unavailable".
+make -j1
 make install
 popd
 rm -rf make-4.3

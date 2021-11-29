@@ -491,7 +491,8 @@ echo Perl-5.32.0
 tar xf perl-5.32.0.tar.xz
 pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
-make -j$(nproc)
+# Running in a single thread due to make 4.3 build breaking with "read jobs pipe: Resource temporarily unavailable".
+make -j1
 cp -v perl cpan/podlators/scripts/pod2man /tools/bin
 mkdir -pv /tools/lib/perl5/5.32.0
 cp -Rv lib/* /tools/lib/perl5/5.32.0
