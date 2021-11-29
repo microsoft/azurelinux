@@ -1,13 +1,13 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.17.1
+Version:        1.18.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            https://c-ares.haxx.se/
-Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
+URL:            https://c-ares.org/
+Source0:        https://c-ares.org/download/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -69,11 +69,15 @@ rm -rf %{buildroot}
 %{_mandir}/man3/ares_*
 
 %changelog
-* Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.17.1-1
-- Removed %%sha line. Upgraded to 1.17.1 to address CVE-2020-8277.
-- License confirmed as MIT. Changed URLs to use HTTPS.
+*   Mon Nov 29 2021 Andrew Phelps <anphel@microsoft.com> 1.18.1-1
+-   Update to version 1.18.1 to address CVE-2021-3672
+-   Update URL domain
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.14.0-3
+*   Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> 1.17.1-1
+-   Removed %%sha line. Upgraded to 1.17.1 to address CVE-2020-8277.
+-   License confirmed as MIT. Changed URLs to use HTTPS.
+
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.14.0-3
 -   Added %%license line automatically
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.14.0-2
@@ -94,5 +98,5 @@ rm -rf %{buildroot}
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.10.0-2
 -   GA - Bump release of all rpms
 
-*   Wed Feb 03 2016 Anish Swaminathan <anishs@vmware.com> - 1.10.0-1
+*   Wed Feb 03 2016 Anish Swaminathan <anishs@vmware.com> 1.10.0-1
 -   Initial version
