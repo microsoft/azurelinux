@@ -1,51 +1,68 @@
-Summary:	Library for accessing X.509 and CMS data structure.
-Name:		libksba
-Version:	1.3.5
-Release:        4%{?dist}
-License:	GPLv3+
-URL:		https://www.gnupg.org/(fr)/download/index.html#libksba
-Group:		Security/Libraries.
-Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+Summary:        Library for accessing X.509 and CMS data structure.
+Name:           libksba
+Version:        1.6.0
+Release:        1%{?dist}
+# See AUTHORS file for licensing details
+License:        (LGPLv3+ or GPLv2+) and GPLv3+ 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Provides:       %{name}-devel = %{version}-%{release}
-BuildRequires:  libgpg-error-devel >= 1.2
+Group:          Security/Libraries.
+URL:            https://www.gnupg.org/(fr)/download/index.html#libksba
+Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+BuildRequires:  libgpg-error-devel >= 1.8
+Requires:       libgpg-error >= 1.8
 
 %description
 Libksba is a library to make the tasks of working with X.509 certificates,
 CMS data and related objects more easy. It provides a highlevel interface
 to the implemented protocols and presents the data in a consistent way.
 
+%package        devel
+Summary:        Development libraries and header files for libksba
+Requires:       %{name} = %{version}-%{release}
+Requires:       libgpg-error-devel >= 1.8
+
+%description    devel
+The package contains libraries and header files for
+developing applications that use libksba.
+
 %prep
-%setup -q
+%autosetup
 
 %build
-%configure --disable-static \
-           --prefix=%{_prefix}
-make
+%configure \
+    --disable-static
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot}%{_libdir} -name '*.la' -delete
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}%{_infodir}
 
 %check
-make %{?_smp_mflags} -k check
+%make_build -k check
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license AUTHORS COPYING COPYING.GPLv2 COPYING.GPLv3 COPYING.LGPLv3
 %{_bindir}/ksba-config
-%{_libdir}/*.so*
-%{_includedir}/*
+%{_libdir}/%{name}.so.8*
+
+%files devel
+%{_libdir}/%{name}.so
 %{_datadir}/aclocal/ksba.m4
-%{_datadir}/info/ksba.info.gz
-%exclude %{_datadir}/info/dir
+%{_includedir}/ksba.h
+%{_libdir}/pkgconfig/ksba.pc
 
 %changelog
+* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
+- Upgrade to latest upstream version
+- Split out development files into a devel subpackage
+- Lint spec
+- License verified
+
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.3.5-4
 - Provide libksba-devel for base package
 
@@ -55,7 +72,7 @@ make %{?_smp_mflags} -k check
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.5-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Tue	Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
+* Tue    Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.3.5-1
 - Udpated to version 1.3.5
 
 * Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2

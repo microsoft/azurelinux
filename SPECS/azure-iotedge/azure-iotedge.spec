@@ -24,25 +24,9 @@ Release:        1%{?dist}
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source0:       https://github.com/Azure/iotedge/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-# Note: the azure-iotedge-%%{version}-cargo.tar.gz file is created by capturing the contents downloaded into /root/.cargo
-# To update the tar.gz run the following:
-#   Locally modify SPEC by removing SOURCE1 and adding a long sleep at the end of the %%build section such as:
-#     sleep 30m
-#   Build the package locally, and set RUN_CHECK=y to enable network access in the chroot.
-#   Check the log file to see when the cargo contents are downloaded and the build enters the sleep
-#   From another terminal create the archive:
-#     sudo tar --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -C [CBL-Mariner_repo_dir]/build/worker/chroot/azure-iotedge-%%{version}-%%{release}/root \
-#           -czpf azure-iotedge-%%{version}-cargo.tar.gz .cargo
-#
-# NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+# Note: the azure-iotedge-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh azure-iotedge-%%{version}.tar.gz azure-iotedge-%%{version}/edgelet
 Source1:        %{name}-%{version}-cargo.tar.gz
 License:        MIT
 Group:          Applications/File

@@ -1,7 +1,7 @@
 Summary:	Connection pooler for PostgreSQL.
 Name:		pgbouncer
-Version:	1.11.0
-Release:	2%{?dist}
+Version:	1.16.1
+Release:	1%{?dist}
 License:	ISC License
 URL:		https://www.pgbouncer.org/
 Source0:	https://%{name}.github.io/downloads/files/%{version}/%{name}-%{version}.tar.gz
@@ -80,26 +80,38 @@ fi
 /usr/share/doc/pgbouncer/*
 
 %changelog
+* Sun Nov 28 2021 Muhammad Falak <mwani@microsoft.com> - 1.16.1-1
+- Bump version to fix CVE-2021-3935
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.11.0-2
 - Added %%license line automatically
 
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-1
--   Update to version 1.11.0. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.9.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.9.0-1
--   Updated to version 1.9.0
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.7.2-7
--   Remove shadow from requires and use explicit tools for post actions
-*   Mon Jul 24 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.7.2-6
--   Seperate the service file from the spec file
-*   Wed May 31 2017 Rongrong Qiu <rqiu@vmware.com> 1.7.2-5
--   Add RuntimeDirectory and Type=forking
-*   Thu Apr 13 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.7.2-4
--   Fixed the requires.
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.7.2-3
--   GA - Bump release of all rpms
-*   Wed May 04 2016 Anish Swaminathan <anishs@vmware.com> 1.7.2-2
--   Edit scriptlets.
-*   Thu Apr 28 2016 Kumar Kaushik <kaushikk@vmware.com> 1.7.2-1
--   Initial Version.
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-1
+- Update to version 1.11.0. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.9.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 1.9.0-1
+- Updated to version 1.9.0
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.7.2-7
+- Remove shadow from requires and use explicit tools for post actions
+
+* Mon Jul 24 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.7.2-6
+- Seperate the service file from the spec file
+
+* Wed May 31 2017 Rongrong Qiu <rqiu@vmware.com> 1.7.2-5
+- Add RuntimeDirectory and Type=forking
+
+* Thu Apr 13 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.7.2-4
+- Fixed the requires.
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.7.2-3
+- GA - Bump release of all rpms
+
+* Wed May 04 2016 Anish Swaminathan <anishs@vmware.com> 1.7.2-2
+- Edit scriptlets.
+
+* Thu Apr 28 2016 Kumar Kaushik <kaushikk@vmware.com> 1.7.2-1
+- Initial Version.

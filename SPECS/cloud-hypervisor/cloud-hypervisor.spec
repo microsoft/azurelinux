@@ -9,6 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Note: the cloud-hypervisor-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh cloud-hypervisor-%%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 ExclusiveArch:  x86_64
 

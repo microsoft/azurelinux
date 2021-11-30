@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.74.1
-Release:        3%{?dist}
+Version:        5.10.78.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         pthread_stack_min_int_cast.patch
+Patch2:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -94,6 +95,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 make mrproper
@@ -271,6 +273,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
+- Update source to 5.10.78.1
+- Add patch to fix SPDX-License-Identifier in headers
+
 * Thu Nov 04 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.74.1-3
 - Bump release number to match kernel release
 
