@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.8.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -198,6 +198,7 @@ plugin selection for locally managed storage.
 %autosetup -p1
 
 %build
+export CFLAGS="-Wno-format-extra-args -Wno-format"
 ./autogen.sh
 %configure --with-python3 --disable-static
 %make_build
@@ -526,6 +527,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-9
+- Fix build issue due to gcc 11.2 and CFLAGS
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-8
 - Use libconfig-devel at build-time instead of libconfig
 - Remove %%bcond_with test line
