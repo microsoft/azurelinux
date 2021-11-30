@@ -106,6 +106,8 @@ libpipeline-devel-1.5.0-5.cm2.x86_64.rpm
 gdbm-1.21-1.cm2.x86_64.rpm
 gdbm-devel-1.21-1.cm2.x86_64.rpm
 gdbm-lang-1.21-1.cm2.x86_64.rpm
+libnsl2-1.2.0-5.cm2.x86_64.rpm
+libtirpc-1.3.2-1.cm2.x86_64.rpm
 perl-B-1.80-464.cm2.x86_64.rpm
 perl-Carp-1.50-464.cm2.noarch.rpm
 perl-Class-Struct-0.66-464.cm2.noarch.rpm
