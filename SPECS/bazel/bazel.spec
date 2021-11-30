@@ -26,6 +26,8 @@ A fast, scalable, multi-language and extensible build system.
 
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
+sed -i 's/#include <string.h>/#include <string.h>\n#include <limits>/g' third_party/ijar/common.h
+sed -i 's/<limits.h>/<limits>/g' src/main/cpp/util/numbers.cc
 
 %build
 ln -s %{_bindir}/python3 %{_bindir}/python

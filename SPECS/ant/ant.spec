@@ -14,8 +14,10 @@
 # published by the Open Source Initiative.
 #
 
-%global debug_package %{nil}
-%global ant_home %{_datadir}/ant
+%global debug_package   %{nil}
+%global ant_home        %{_datadir}/ant
+%global _mavenpomdir    /usr/share/maven-poms
+
 Summary:        Apache Ant
 Name:           ant
 Version:        1.10.11
@@ -121,9 +123,7 @@ sh -x ./build.sh --noconfig jars
 mkdir -p %{buildroot}%{ant_home}/{lib,etc}
 # jars
 install -d -m 755 %{buildroot}%{_javadir}/ant
-# %{_mavenpomdir} — /usr/share/maven-poms
-#install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -d -m 755 %{buildroot}/usr/share/maven-poms
+install -d -m 755 %{buildroot}%{_mavenpomdir}
 
 rm build/lib/ant-junit*.jar
 
@@ -162,8 +162,7 @@ do
   if [ "$jarname" != ant-bootstrap ]; then
     %pom_remove_parent src/etc/poms/${jarname}/pom.xml
   fi
-  #install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/%{_mavenpomdir}/${pomname}
-  install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/usr/share/maven-poms/${pomname}
+  install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/%{_mavenpomdir}/${pomname}
   if [ "$jarname" = ant-launcher ]; then
     %add_maven_depmap ${pomname} ${destname}${jarname}.jar -a ant:ant-launcher
   elif [ "$jarname" = ant-jmf ]; then

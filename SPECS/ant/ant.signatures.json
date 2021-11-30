@@ -2,6 +2,6 @@
  "Signatures": {
   "ant-bootstrap.pom.in": "85d35aedfb5ccc60ba1642b4c7624d092f34b253662d3c6c8f2bc1982dcad580",
   "ant.conf": "8a0bace4a527bd0ff35ad0b0a31c1f7bf30fa186e98cd9dc5142a97098f36ddf",
-  "apache-ant-1.10.9-src.tar.xz": "4b2008cc60fefd424b05567e9d43a071302865d5fd8b01a807e15e381b557ec2"
+  "apache-ant-1.10.11-src.tar.gz": "c44d71e07e240eaab638d1da96f2038f84dcc1f245656f03e040a69603ca5b39"
  }
 }

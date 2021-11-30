@@ -35,6 +35,7 @@ BuildRequires:  libffi-devel
 BuildRequires:  openjdk8
 #BuildRequires:  openjre8
 BuildRequires:  openjdk-11-hotspot
+BuildRequires:  javapackages-tools
 #Requires:       openjre8
 Requires:       openjdk-11-hotspot
 
