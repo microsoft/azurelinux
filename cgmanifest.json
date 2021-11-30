@@ -5,8 +5,8 @@
         "type": "other",
         "other": {
           "name": "acl",
-          "version": "2.2.53",
-          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/acl/acl-2.2.53.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.3.1.tar.gz"
         }
       }
     },
@@ -165,8 +165,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.4.48",
-          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/attr/attr-2.4.48.tar.gz"
+          "version": "2.5.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.1.tar.gz"
         }
       }
     },
@@ -2749,8 +2749,8 @@
         "type": "other",
         "other": {
           "name": "keyutils",
-          "version": "1.5.10",
-          "downloadUrl": "https://people.redhat.com/~dhowells/keyutils/keyutils-1.5.10.tar.bz2"
+          "version": "1.6.1",
+          "downloadUrl": "https://people.redhat.com/~dhowells/keyutils/keyutils-1.6.1.tar.bz2"
         }
       }
     },
