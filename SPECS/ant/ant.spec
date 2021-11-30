@@ -18,14 +18,14 @@
 %global ant_home %{_datadir}/ant
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.9
-Release:        7%{?dist}
+Version:        1.10.11
+Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
-Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
+Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
@@ -113,7 +113,7 @@ mv LICENSE.utf8 LICENSE
 export OPT_JAR_LIST=:
 
 export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
-export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk-11-hotspot*")
 sh -x ./build.sh --noconfig jars
 
 %install
@@ -121,7 +121,9 @@ sh -x ./build.sh --noconfig jars
 mkdir -p %{buildroot}%{ant_home}/{lib,etc}
 # jars
 install -d -m 755 %{buildroot}%{_javadir}/ant
-install -d -m 755 %{buildroot}%{_mavenpomdir}
+# %{_mavenpomdir} — /usr/share/maven-poms
+#install -d -m 755 %{buildroot}%{_mavenpomdir}
+install -d -m 755 %{buildroot}/usr/share/maven-poms
 
 rm build/lib/ant-junit*.jar
 
@@ -160,7 +162,8 @@ do
   if [ "$jarname" != ant-bootstrap ]; then
     %pom_remove_parent src/etc/poms/${jarname}/pom.xml
   fi
-  install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/%{_mavenpomdir}/${pomname}
+  #install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/%{_mavenpomdir}/${pomname}
+  install -m 644 src/etc/poms/${jarname}/pom.xml %{buildroot}/usr/share/maven-poms/${pomname}
   if [ "$jarname" = ant-launcher ]; then
     %add_maven_depmap ${pomname} ${destname}${jarname}.jar -a ant:ant-launcher
   elif [ "$jarname" = ant-jmf ]; then
