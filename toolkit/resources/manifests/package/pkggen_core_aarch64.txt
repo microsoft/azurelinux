@@ -61,7 +61,7 @@ findutils-4.8.0-1.cm2.aarch64.rpm
 findutils-lang-4.8.0-1.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
 gzip-1.11-1.cm2.aarch64.rpm
-make-4.2.1-6.cm2.aarch64.rpm
+make-4.3-1.cm2.aarch64.rpm
 mariner-release-2.0-1.cm2.noarch.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
 util-linux-2.37.2-1.cm2.aarch64.rpm

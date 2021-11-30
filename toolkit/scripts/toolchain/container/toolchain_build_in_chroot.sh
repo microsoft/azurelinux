@@ -885,19 +885,14 @@ popd
 rm -rf libpipeline-1.5.0
 touch /logs/status_libpipeline_complete
 
-echo Make-4.2.1
-tar xf make-4.2.1.tar.gz
-pushd make-4.2.1
-# fix errors caused by glibc 2.34
-# Note: upgrading to make 4.3 fixes the glob errors, but also caused the following errors: (possibly faccessat2 docker issue)
-# make[1]: /bin/sh: Operation not permitted
-sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
-sed -i '215 d; 223 d;' glob/glob.c
+echo Make-4.3
+tar xf make-4.3.tar.gz
+pushd make-4.3
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.2.1
+rm -rf make-4.3
 touch /logs/status_make_complete
 
 echo Patch-2.7.6
