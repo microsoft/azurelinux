@@ -3288,6 +3288,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libiscsi",
+          "version": "1.18.0",
+          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.18.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libisoburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libisoburn-1.4.8.tar.gz"

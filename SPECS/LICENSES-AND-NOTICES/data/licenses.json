@@ -92,6 +92,7 @@
                 "libglvnd",
                 "libICE",
                 "libinput",
+                "libiscsi",
                 "libisoburn",
                 "libisofs",
                 "libkcapi",
