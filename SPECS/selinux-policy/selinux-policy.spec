@@ -51,7 +51,6 @@ enforced by the kernel when running with SELinux enabled.
 %license COPYING
 %dir %{_usr}/share/selinux
 %dir %{_usr}/share/selinux/packages
-%dir %{_sysconfdir}/selinux
 %ghost %config(noreplace) %{_sysconfdir}/selinux/config
 %ghost %{_sysconfdir}/sysconfig/selinux
 %{_datadir}/selinux/%{policy_name}
