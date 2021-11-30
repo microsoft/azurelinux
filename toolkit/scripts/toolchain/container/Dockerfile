@@ -61,6 +61,7 @@ COPY [ "./toolchain-sha256sums", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./linker-script-readonly-keyword-support.patch", \
        "./toolchain-jdk8-wget.sh", \
+       "./0002-add-linux-syscall-license-info.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
@@ -70,7 +71,7 @@ COPY [ "./toolchain-sha256sums", \
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz -O kernel-5.10.74.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz -O kernel-5.10.78.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN /tools/toolchain-jdk8-wget.sh; exit 0
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
