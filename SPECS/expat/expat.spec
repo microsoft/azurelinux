@@ -1,7 +1,7 @@
 Summary:	An XML parser library
 Name:		expat
 Version:	2.2.6
-Release:    4%{?dist}
+Release:    5%{?dist}
 License:	MIT
 URL:		https://libexpat.github.io/
 Group:		System Environment/GeneralLibraries
@@ -9,6 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_2_2_6/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2018-20843.patch
+Patch1: CVE-2019-15903_c20b75.patch
+Patch2: CVE-2019-15903_4406ff.patch
+Patch3: CVE-2019-15903_438493.patch
 Requires:       expat-libs = %{version}-%{release}
 %description
 The Expat package contains a stream oriented C library for parsing XML.
@@ -28,6 +31,9 @@ This package contains minimal set of shared expat libraries.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 %build
 %configure \
 	CFLAGS="%{optflags}" \
@@ -66,6 +72,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libexpat.so.*
 
 %changelog
+*   Tue Nov 30 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.2.6-5
+-   Added patch file(s) CVE-2019-15903_c20b75.patch,
+-   CVE-2019-15903_4406ff.patch, CVE-2019-15903_438493.patch
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
 - Added %%license line automatically
 
