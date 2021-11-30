@@ -1,0 +1,102 @@
+From e5c84f0b7a2e2cef8d8630bd8c26a2f859e959ff Mon Sep 17 00:00:00 2001
+From: Pierre Joye <pierre.php@gmail.com>
+Date: Tue, 7 Sep 2021 22:03:21 +0700
+Subject: [PATCH 1/2] Partial fix for #750
+
+---
+ src/gd_bmp.c  | 14 +++++++++++---
+ src/gd_webp.c |  7 ++++++-
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/src/gd_bmp.c b/src/gd_bmp.c
+index e186ac951..29a05cee5 100644
+--- a/src/gd_bmp.c
++++ b/src/gd_bmp.c
+@@ -266,7 +266,11 @@ static int _gdImageBmpCtx(gdImagePtr im, gdIOCtxPtr out, int compression)
+ 				bitmap_size += compressed_size;
+ 
+ 
+-				gdPutBuf(uncompressed_row, compressed_size, out);
++				if (gdPutBuf(uncompressed_row, compressed_size, out) != compressed_size){
++					gd_error("gd-bmp write error\n");
++					error = 1;
++					break;
++				}
+ 				gdPutC(BMP_RLE_COMMAND, out);
+ 				gdPutC(BMP_RLE_ENDOFLINE, out);
+ 				bitmap_size += 2;
+@@ -322,10 +326,14 @@ static int _gdImageBmpCtx(gdImagePtr im, gdIOCtxPtr out, int compression)
+ 		}
+ 
+ 		while ((buffer_size = gdGetBuf(copy_buffer, 1024, out)) != EOF) {
++			int res;
+ 			if (buffer_size == 0) {
+ 				break;
+ 			}
+-			gdPutBuf(copy_buffer , buffer_size, out_original);
++			if (gdPutBuf(copy_buffer , buffer_size, out_original) != buffer_size) {
++				gd_error("gd-bmp write error\n");
++				error = 1;
++			}
+ 		}
+ 		gdFree(copy_buffer);
+ 
+@@ -335,7 +343,7 @@ static int _gdImageBmpCtx(gdImagePtr im, gdIOCtxPtr out, int compression)
+ 		out_original = NULL;
+ 	}
+ 
+-	ret = 0;
++	ret = error;
+ cleanup:
+ 	if (tmpfile_for_compression) {
+ #ifdef _WIN32
+diff --git a/src/gd_webp.c b/src/gd_webp.c
+index bf8908772..e9ad8023a 100644
+--- a/src/gd_webp.c
++++ b/src/gd_webp.c
+@@ -227,8 +227,13 @@ static int _gdImageWebpCtx (gdImagePtr im, gdIOCtx * outfile, int quality)
+         ret = 1;
+ 		goto freeargb;
+ 	}
+-	gdPutBuf(out, out_size, outfile);
++
++	int res = gdPutBuf(out, out_size, outfile);
+ 	free(out);
++	if (res != out_size) {
++		gd_error("gd-webp write error\n");
++		ret = 1;
++	}
+ 
+ freeargb:
+ 	gdFree(argb);
+
+From 75fecefe770a1672ff57064ca827d71e44244d66 Mon Sep 17 00:00:00 2001
+From: Pierre Joye <pierre.php@gmail.com>
+Date: Tue, 7 Sep 2021 22:10:26 +0700
+Subject: [PATCH 2/2]  <3 the CI, forgot header for gd_error and unused var,
+ strict mode for the win :)
+
+---
+ src/gd_bmp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gd_bmp.c b/src/gd_bmp.c
+index 29a05cee5..c67e45fdd 100644
+--- a/src/gd_bmp.c
++++ b/src/gd_bmp.c
+@@ -30,6 +30,7 @@
+ #include <stdlib.h>
+ #include "gd.h"
+ #include "gdhelpers.h"
++#include "gd_errors.h"
+ #include "bmp.h"
+ 
+ static int compress_row(unsigned char *uncompressed_row, int length);
+@@ -326,7 +327,6 @@ static int _gdImageBmpCtx(gdImagePtr im, gdIOCtxPtr out, int compression)
+ 		}
+ 
+ 		while ((buffer_size = gdGetBuf(copy_buffer, 1024, out)) != EOF) {
+-			int res;
+ 			if (buffer_size == 0) {
+ 				break;
+ 			}

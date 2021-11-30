@@ -20,7 +20,7 @@
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 Name:           gd
 Version:        2.3.0
-Release:        2.4%{?dist}
+Release:        3.4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ Patch1:         gd-fontpath.patch
 Patch2:         gd-format.patch
 # could be upstreamed
 Patch3:         gd-aliasing.patch
+Patch4: CVE-2021-40812.patch
 Provides:       gdlib = %{version}
 Obsoletes:      gdlib < %{version}
 %if %{with_check}
@@ -75,6 +76,7 @@ the formats accepted for inline images by most browsers.
 %patch1
 %patch2
 %patch3
+%patch4 -p1
 chmod 644 COPYING
 
 %build
@@ -145,6 +147,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+*   Tue Nov 30 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.3.0-3
+-   Added patch file(s) CVE-2021-40812.patch
 * Thu Oct 21 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.4
 - Build without fontconfig and freetype as fontconfig support is failing
 - Remove `annotate` binary
