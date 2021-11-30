@@ -31,9 +31,9 @@ BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
-BuildRequires:  python2
+BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 %endif
 
 Provides:       cargo = %{version}-%{release}
@@ -116,6 +116,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %changelog
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.56.1-1
 - Updating to version 1.56.1.
+- Switching to building with Python 3.
 
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-5
 - Add provides for 'cargo' from the base package
