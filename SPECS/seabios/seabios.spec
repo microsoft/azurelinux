@@ -81,12 +81,10 @@ BuildArch:      noarch
 SeaVGABIOS is an open-source VGABIOS implementation.
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1
 
 %build
 %define _lto_cflags %{nil}
-export CFLAGS="%{optflags}"
 
 # Need to discard ".note.gnu.property" section with "binutils" 2.36+ to avoid build breaks.
 # See https://sourceware.org/bugzilla/show_bug.cgi?id=27753 for details.
