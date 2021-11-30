@@ -1,41 +1,36 @@
+Summary:        Virgl Rendering library.
+Name:           virglrenderer
+Version:        0.9.1
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://gitlab.freedesktop.org/virgl/virglrenderer
+Source0:        %{url}/-/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz
 
-Name:		virglrenderer
-Version:	0.9.1
-Release:	1%{?dist}
-
-Summary:	Virgl Rendering library.
-License:	MIT
-
-URL: https://gitlab.freedesktop.org/virgl/virglrenderer
-Source0:	%{url}/-/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz
-
+BuildRequires:  libdrm-devel
+BuildRequires:  libepoxy-devel
+BuildRequires:  mesa-libEGL-devel
+BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
-BuildRequires:	xorg-x11-util-macros
-BuildRequires:	libepoxy-devel
-BuildRequires:	mesa-libgbm-devel
-BuildRequires:	mesa-libEGL-devel
-BuildRequires:	python3
-BuildRequires:	libdrm-devel
+BuildRequires:  python3
+BuildRequires:  xorg-x11-util-macros
 
 %description
 The virgil3d rendering library is a library used by
 qemu to implement 3D GPU support for the virtio GPU.
 
 %package devel
-Summary: Virgil3D renderer development files
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Virgil3D renderer development files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Virgil3D renderer development files, used by
 qemu to build against.
 
 %package test-server
-Summary: Virgil3D renderer testing server
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Virgil3D renderer testing server
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description test-server
 Virgil3D renderer testing server is a server
@@ -72,7 +67,7 @@ driver to test virgl rendering without GL.
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.1-1
 - Updating to version 0.9.1.
 - License verified.
-- Updated "Source0" URL.
+- Updated "Source0" URL, using official release sources.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
@@ -153,5 +148,3 @@ driver to test virgl rendering without GL.
 
 * Wed Apr 01 2015 Dave Airlie <airlied@redhat.com> 0.0.1-0.20150401gita9ba2c442
 - initial virglrenderer spec
-
-
