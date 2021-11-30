@@ -1,21 +1,14 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
-# A buildable grpc environment needs functioning submodules that do not work from the archive download
-# To recreate the tar.gz run the following
-#  git clone -b RELEASE_TAG_HERE --depth 1 https://github.com/grpc/grpc
-#  pushd grpc
-#  git submodule update --depth 1 --init
-#  popd
-#  sudo mv grpc grpc-%{version}
-#  sudo tar -cvf grpc-%{version}.tar.gz grpc-%{version}/
+
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -56,13 +49,19 @@ The grpc-plugins package contains the grpc plugins.
 %autosetup
 
 %build
+# Updating used C++ version to be compatible with the build dependencies.
+# Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
+# which generate a different set of APIs than the ones provided by the BR 'abseil-cpp'.
+CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
+
 mkdir -p cmake/build
 cd cmake/build
 cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
+   -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
-   -DgRPC_ABSL_PROVIDER:STRING='package'    \
+   -DgRPC_ABSL_PROVIDER:STRING='package'     \
    -DgRPC_CARES_PROVIDER:STRING='package'    \
    -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
    -DgRPC_RE2_PROVIDER:STRING='package'      \
@@ -103,6 +102,9 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Mon Nov 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-8
+- Building with CBL-Mariner's default C++ version.
+
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-7
 - Use pre-installed "re2" and "abseil-cpp" instead of building them.
 
