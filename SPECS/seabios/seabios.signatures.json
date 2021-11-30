@@ -1,0 +1,19 @@
+{
+ "Signatures": {
+  "config.coreboot": "562c285883d803b415fc5836367ae919ab34a6d09001a84970f464887a03fe2c",
+  "config.csm": "a046a73392f449f106de918a82c51c99225212d9d253b9011475d0eaa41e6180",
+  "config.seabios-128k": "330fadea9b230c9165f62c06fb2e01c4bb86dd4e05d341df8c8bc2ec6b98c4ed",
+  "config.seabios-256k": "ae24be1993d21b62683b9b274e9f219c705c0d0106816362ae5250cbc92e18b4",
+  "config.seabios-microvm": "f359c2ed0abea13c3bb517d4986ac1265fd50b5e58b83a704938adc91916e87c",
+  "config.vga-ati": "eb500b7fd1e13d8cec76be21a5dbf30e7cb98682e9f0fa87dad41d844c44e5ec",
+  "config.vga-bochs-display": "31a303efb67f0aa9d79ec8cad5a32b7c6b72d4fa8227110a0e85b37fc39a6804",
+  "config.vga-cirrus": "888ad874052d301981a8cc6fa4bc72b1edd14ba937e7de113f71ce3fd2f8c253",
+  "config.vga-isavga": "5826ec704d4e4bb57089e0cbb72e7e5ccd31b7192d81084665cd4faeecb60b04",
+  "config.vga-qxl": "26e43ea5e98615d11573b2619f3fb3c1933d5f810e6a2c44218d99465cc3ae77",
+  "config.vga-ramfb": "66bec6516e41c3601af1e86d1d78410574f1fb694de509a91b55050a80f7400a",
+  "config.vga-stdvga": "ca7367ae57665fa01e0ebb741ba5823d646f4b65a9a87657ea163cc9f362a8a8",
+  "config.vga-virtio": "afa7d59e1c18ed770cf0e83e3d5dc70866f75fdde83064fbea6e115f79504066",
+  "config.vga-vmware": "1bd31f16dd43fb25aa92f9816cbfaae4a19a8faf29ff52bd02429fbaafb78f57",
+  "seabios-1.14.0.tar.gz": "eb70cc62b29aa83e10a653233acebf4bb154d00d0c87dc2a2c6e2da75e5e81fd"
+ }
+}

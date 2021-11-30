@@ -1,0 +1,74 @@
+From 0c1e0d59ceb3c4c8909d7a7b6e62d19c7ad81bef Mon Sep 17 00:00:00 2001
+From: Radim Krcmar <rkrcmar@redhat.com>
+Date: Mon, 10 Mar 2014 15:14:27 +0100
+Subject: Workaround for a win8.1-32 S4 resume bug
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RH-Author: Radim Krcmar <rkrcmar@redhat.com>
+Message-id: <1394464467-23560-1-git-send-email-rkrcmar@redhat.com>
+Patchwork-id: 58069
+O-Subject: [RHEL7.0 seabios PATCH] Workaround for a win8.1-32 S4 resume bug
+Bugzilla: 1050775
+RH-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+RH-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+RH-Acked-by: Laszlo Ersek <lersek@redhat.com>
+
+bug:  https://bugzilla.redhat.com/show_bug.cgi?id=1050775
+brew: http://brewweb.devel.redhat.com/brew/taskinfo?taskID=7176174
+This patch has no upstream equivalent.
+
+When a 32 bit version of windows 8.1 resumes from suspend, it writes 1
+into 0x72 in the early boot because it didn't expect a NULL pointer.
+0x72 is lower offset byte of 0x1c interrupt entry, so we jump into a
+middle of other function if this interrupt is triggered.
+
+Because 0x1c is only triggered from our handle_08, we detect if our
+default value (function that does only iret) has its lower offset byte
+overwritten and skip it in that case.
+(Windows never sets own callback there, so we always detect this bug
+ correctly, as seabios doesn't use it either
+ Other sources shouldn't incorrectly overwrite it or use seabios code,
+ but it is quite ok even if the guest did this on purpose.)
+
+The reason Windows uses NULL pointer is still unknown, but this bug is
+blocking WHQL certification, so we have to work around it in 7.0.
+
+Signed-off-by: Radim Krčmář <rkrcmar@redhat.com>
+---
+(It is either a Windows bug that is going to be solved on their side,
+ or we will find a better solution after consulting what went wrong.
+ Happens on RHEL6 too.)
+
+ src/clock.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+(cherry picked from commit aa1c26538deecfd820b7da9b3be09ebc20b7fef9)
+---
+ src/clock.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/clock.c b/src/clock.c
+index e44e112..298a722 100644
+--- a/src/clock.c
++++ b/src/clock.c
+@@ -309,7 +309,13 @@ handle_08(void)
+     struct bregs br;
+     memset(&br, 0, sizeof(br));
+     br.flags = F_IF;
+-    call16_int(0x1c, &br);
++    struct segoff_s isr1c = GET_IVT(0x1c);
++    // hardcoded address of entry_iret_official with lower segment byte
++    // overwritten by 1
++    if (isr1c.seg == ((SEG_BIOS & ~0xff) | 0x1) && isr1c.offset == 0xff53)
++        dprintf(1, "Worked around win8.1-32 S4 resume bug\n");
++    else
++        call16_int(0x1c, &br);
+ 
+     pic_eoi1();
+ }
+-- 
+1.8.3.1
+
