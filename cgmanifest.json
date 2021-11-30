@@ -776,8 +776,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "19.1",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/19.1/+download/cloud-init-19.1.tar.gz"
+          "version": "21.3",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.3/+download/cloud-init-21.3.tar.gz"
         }
       }
     },

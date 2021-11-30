@@ -1,0 +1,42 @@
+From 6b917c9ecb9e8b1b30c32d5c5f83eebea2e1807d Mon Sep 17 00:00:00 2001
+From: Shreenidhi Shedi <sshedi@vmware.com>
+Date: Wed, 25 Aug 2021 23:52:42 +0530
+Subject: [PATCH] networkd: fix search path
+
+Signed-off-by: Shreenidhi Shedi <sshedi@vmware.com>
+---
+ cloudinit/net/networkd.py              | 2 +-
+ tests/unittests/test_net_activators.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/cloudinit/net/networkd.py b/cloudinit/net/networkd.py
+index a311572f..6dff154f 100644
+--- a/cloudinit/net/networkd.py
++++ b/cloudinit/net/networkd.py
+@@ -247,7 +247,7 @@ class Renderer(renderer.Renderer):
+ 
+ def available(target=None):
+     expected = ['ip', 'systemctl']
+-    search = ['/usr/bin', '/bin']
++    search = ['/usr/sbin', '/bin']
+     for p in expected:
+         if not subp.which(p, search=search, target=target):
+             return False
+diff --git a/tests/unittests/test_net_activators.py b/tests/unittests/test_net_activators.py
+index 38f2edf2..f63a8b74 100644
+--- a/tests/unittests/test_net_activators.py
++++ b/tests/unittests/test_net_activators.py
+@@ -118,8 +118,8 @@ NETWORK_MANAGER_AVAILABLE_CALLS = [
+ ]
+ 
+ NETWORKD_AVAILABLE_CALLS = [
+-    (('ip',), {'search': ['/usr/bin', '/bin'], 'target': None}),
+-    (('systemctl',), {'search': ['/usr/bin', '/bin'], 'target': None}),
++    (('ip',), {'search': ['/usr/sbin', '/bin'], 'target': None}),
++    (('systemctl',), {'search': ['/usr/sbin', '/bin'], 'target': None}),
+ ]
+ 
+ 
+-- 
+2.32.0
+
