@@ -9,7 +9,7 @@ Summary:	Virgl Rendering library.
 License:	MIT
 
 URL: https://gitlab.freedesktop.org/virgl/virglrenderer
-Source0:	https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.9.1/virglrenderer-virglrenderer-0.9.1.tar.gz
+Source0:	%{url}/-/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz
 
 BuildRequires:  meson
 BuildRequires:	xorg-x11-util-macros
@@ -43,7 +43,7 @@ that can be used along with the mesa virgl
 driver to test virgl rendering without GL.
 
 %prep
-%autosetup
+%autosetup -n %{name}-%{name}-%{version}
 
 %build
 %meson
@@ -56,6 +56,7 @@ driver to test virgl rendering without GL.
 
 %files
 %license COPYING
+%{_libdir}/lib*.so.1
 %{_libdir}/lib*.so.1.*
 
 %files devel
