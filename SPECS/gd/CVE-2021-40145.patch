@@ -1,0 +1,124 @@
+From e95059590fadaabd9aadc0c0489804d75a3c5d52 Mon Sep 17 00:00:00 2001
+From: maryam ebrahimzadeh <maryam.ebr@student.sharif.edu>
+Date: Mon, 19 Jul 2021 18:52:50 +0430
+Subject: [PATCH 1/3] gdImageGd2Ptr memory leak
+
+---
+ src/gd_gd2.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/src/gd_gd2.c b/src/gd_gd2.c
+index 760e85b9f..84ec53375 100644
+--- a/src/gd_gd2.c
++++ b/src/gd_gd2.c
+@@ -1,4 +1,4 @@
+-/*
++ /*
+    * gd_gd2.c
+    *
+    * Implements the I/O and support for the GD2 format.
+@@ -910,9 +910,11 @@ _gd2PutHeader (gdImagePtr im, gdIOCtx * out, int cs, int fmt, int cx, int cy)
+ 
+ }
+ 
+-static void
++/* returns 0 on success, 1 on failure */
++static int
+ _gdImageGd2 (gdImagePtr im, gdIOCtx * out, int cs, int fmt)
+ {
++	int ret = 0;
+ 	int ncx, ncy, cx, cy;
+ 	int x, y, ylo, yhi, xlo, xhi;
+ 	int chunkLen;
+@@ -974,10 +976,12 @@ _gdImageGd2 (gdImagePtr im, gdIOCtx * out, int cs, int fmt)
+ 		/* */
+ 		chunkData = gdCalloc (cs * bytesPerPixel * cs, 1);
+ 		if (!chunkData) {
++			ret = 1;
+ 			goto fail;
+ 		}
+ 		compData = gdCalloc (compMax, 1);
+ 		if (!compData) {
++			ret = 1;
+ 			goto fail;
+ 		}
+ 
+@@ -992,6 +996,7 @@ _gdImageGd2 (gdImagePtr im, gdIOCtx * out, int cs, int fmt)
+ 
+ 		chunkIdx = gdCalloc (idxSize * sizeof (t_chunk_info), 1);
+ 		if (!chunkIdx) {
++			ret = 1;
+ 			goto fail;
+ 		}
+ 	};
+@@ -1107,6 +1112,8 @@ _gdImageGd2 (gdImagePtr im, gdIOCtx * out, int cs, int fmt)
+ 	}
+ 	GD2_DBG (printf ("Done\n"));
+ 
++	return ret;
++
+ }
+ 
+ /*
+@@ -1128,8 +1135,11 @@ BGD_DECLARE(void *) gdImageGd2Ptr (gdImagePtr im, int cs, int fmt, int *size)
+ 	void *rv;
+ 	gdIOCtx *out = gdNewDynamicCtx (2048, NULL);
+ 	if (out == NULL) return NULL;
+-	_gdImageGd2 (im, out, cs, fmt);
+-	rv = gdDPExtractData (out, size);
++	if (_gdImageGd2(im, out, cs, fmt)) {
++		rv = NULL;
++	} else {
++		rv = gdDPExtractData(out, size);
++	}
+ 	out->gd_free (out);
+ 	return rv;
+ }
+
+From e8eeb8dde5bc4c9d4e7ae1ab43d9fd1780ceb792 Mon Sep 17 00:00:00 2001
+From: Maryam Ebrahimzadeh <61263086+me22bee@users.noreply.github.com>
+Date: Tue, 24 Aug 2021 11:46:07 +0430
+Subject: [PATCH 2/3] trigger the github actions
+
+---
+ src/gd_gd2.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gd_gd2.c b/src/gd_gd2.c
+index 84ec53375..097c93d0d 100644
+--- a/src/gd_gd2.c
++++ b/src/gd_gd2.c
+@@ -1135,11 +1135,13 @@ BGD_DECLARE(void *) gdImageGd2Ptr (gdImagePtr im, int cs, int fmt, int *size)
+ 	void *rv;
+ 	gdIOCtx *out = gdNewDynamicCtx (2048, NULL);
+ 	if (out == NULL) return NULL;
++	
+ 	if (_gdImageGd2(im, out, cs, fmt)) {
+ 		rv = NULL;
+ 	} else {
+ 		rv = gdDPExtractData(out, size);
+ 	}
++	
+ 	out->gd_free (out);
+ 	return rv;
+ }
+
+From a1d4caace613d31209b42d22d9f7ebe37c381f9a Mon Sep 17 00:00:00 2001
+From: Maryam Ebrahimzadeh <61263086+me22bee@users.noreply.github.com>
+Date: Tue, 24 Aug 2021 12:02:23 +0430
+Subject: [PATCH 3/3] remove non-printable bytes
+
+---
+ src/gd_gd2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gd_gd2.c b/src/gd_gd2.c
+index 097c93d0d..5c57d44a6 100644
+--- a/src/gd_gd2.c
++++ b/src/gd_gd2.c
+@@ -1,4 +1,4 @@
+- /*
++/*
+    * gd_gd2.c
+    *
+    * Implements the I/O and support for the GD2 format.
