@@ -215,6 +215,7 @@
                 "uclibc-ng",
                 "usbredir",
                 "uuid",
+                "virglrenderer",
                 "vitess",
                 "vulkan-headers",
                 "vulkan-loader",
