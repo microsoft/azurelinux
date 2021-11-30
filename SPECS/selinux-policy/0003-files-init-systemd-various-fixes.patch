@@ -1,0 +1,156 @@
+From dd0d61c8ec585ea655aff555d958a8910224ae46 Mon Sep 17 00:00:00 2001
+From: Kenton Groombridge <me@concord.sh>
+Date: Thu, 11 Mar 2021 23:03:10 -0500
+Subject: files, init, systemd: various fixes
+
+Signed-off-by: Kenton Groombridge <me@concord.sh>
+---
+ policy/modules/kernel/files.if   | 18 ++++++++++++++++++
+ policy/modules/system/init.te    | 11 ++++++++++-
+ policy/modules/system/systemd.if | 20 ++++++++++++++++++++
+ policy/modules/system/systemd.te |  3 +++
+ 4 files changed, 51 insertions(+), 1 deletion(-)
+
+MSFT_TAG: upstream cherry-pick
+
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index 467d8a26d..cd2bc59cf 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -4585,6 +4585,24 @@ interface(`files_manage_generic_tmp_dirs',`
+ 	manage_dirs_pattern($1, tmp_t, tmp_t)
+ ')
+
++########################################
++## <summary>
++##	Relabel temporary directories in /tmp.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`files_relabel_generic_tmp_dirs',`
++	gen_require(`
++		type tmp_t;
++	')
++
++	relabel_dirs_pattern($1, tmp_t, tmp_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Manage temporary files and directories in /tmp.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 62afc3ebe..d7ef16852 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -266,7 +266,7 @@ ifdef(`init_systemd',`
+
+ 	# setexec and setkeycreate for systemd --user
+ 	allow init_t self:process { getcap getsched setsched setpgid setfscreate setsockcreate setexec setkeycreate setcap setrlimit };
+-	allow init_t self:capability2 { audit_read block_suspend };
++	allow init_t self:capability2 { audit_read block_suspend bpf perfmon };
+ 	allow init_t self:netlink_kobject_uevent_socket create_socket_perms;
+ 	allow init_t self:unix_dgram_socket lock;
+
+@@ -293,6 +293,11 @@ ifdef(`init_systemd',`
+ 	# /memfd:systemd-state
+ 	fs_tmpfs_filetrans(init_t, init_runtime_t, file)
+
++	# mounton is required for systemd-timesyncd
++	allow init_t init_var_lib_t:dir { manage_dir_perms mounton };
++	allow init_t init_var_lib_t:file manage_file_perms;
++	allow init_t init_var_lib_t:lnk_file manage_lnk_file_perms;
++
+ 	manage_files_pattern(init_t, systemd_unit_t, systemdunit)
+
+ 	manage_dirs_pattern(init_t, systemd_unit_t, systemd_unit_t)
+@@ -306,6 +311,8 @@ ifdef(`init_systemd',`
+ 	kernel_read_fs_sysctls(init_t)
+ 	kernel_list_unlabeled(init_t)
+ 	kernel_load_module(init_t)
++	kernel_request_load_module(init_t)
++	kernel_rw_fs_sysctls(init_t)
+ 	kernel_rw_kernel_sysctl(init_t)
+ 	kernel_rw_net_sysctls(init_t)
+ 	kernel_read_all_sysctls(init_t)
+@@ -389,6 +396,8 @@ ifdef(`init_systemd',`
+ 	files_list_spool(init_t)
+ 	files_manage_all_runtime_dirs(init_t)
+ 	files_manage_generic_tmp_dirs(init_t)
++	files_relabel_generic_tmp_dirs(init_t)
++	files_mounton_tmp(init_t)
+ 	files_manage_urandom_seed(init_t)
+ 	files_read_boot_files(initrc_t)
+ 	files_relabel_all_lock_dirs(init_t)
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index 33c91052d..e4dc83636 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -164,6 +164,8 @@ template(`systemd_role_template',`
+ 	systemd_status_user_runtime_units($3)
+ 	systemd_stop_user_runtime_units($3)
+
++	systemd_watch_passwd_runtime_dirs($3)
++
+ 	optional_policy(`
+ 		xdg_config_filetrans($1_systemd_t, systemd_conf_home_t, dir, "systemd")
+ 		xdg_data_filetrans($1_systemd_t, systemd_data_home_t, dir, "systemd")
+@@ -1163,6 +1165,24 @@ interface(`systemd_manage_passwd_runtime_symlinks',`
+ 	allow $1 systemd_passwd_runtime_t:lnk_file manage_lnk_file_perms;
+ ')
+
++########################################
++## <summary>
++##   Allow a domain to watch systemd-passwd runtime dirs.
++## </summary>
++## <param name="domain">
++##   <summary>
++##     Domain allowed access.
++##   </summary>
++## </param>
++#
++interface(`systemd_watch_passwd_runtime_dirs',`
++	gen_require(`
++		type systemd_passwd_runtime_t;
++	')
++
++	allow $1 systemd_passwd_runtime_t:dir watch;
++')
++
+ ########################################
+ ## <summary>
+ ##      manage systemd unit dirs and the files in them  (Deprecated)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 6bdd0e3fb..624ca6eaf 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -420,6 +420,7 @@ allow systemd_generator_t self:fifo_file rw_fifo_file_perms;
+ allow systemd_generator_t self:capability dac_override;
+ allow systemd_generator_t self:process setfscreate;
+
++corecmd_exec_shell(systemd_generator_t)
+ corecmd_getattr_bin_files(systemd_generator_t)
+
+ dev_read_sysfs(systemd_generator_t)
+@@ -434,6 +435,7 @@ files_search_all_mountpoints(systemd_generator_t)
+ files_list_usr(systemd_generator_t)
+
+ fs_list_efivars(systemd_generator_t)
++fs_getattr_cgroup(systemd_generator_t)
+ fs_getattr_xattr_fs(systemd_generator_t)
+
+ init_create_runtime_files(systemd_generator_t)
+@@ -452,6 +454,7 @@ init_read_script_files(systemd_generator_t)
+ kernel_use_fds(systemd_generator_t)
+ kernel_read_system_state(systemd_generator_t)
+ kernel_read_kernel_sysctls(systemd_generator_t)
++kernel_dontaudit_getattr_proc(systemd_generator_t)
+
+ storage_raw_read_fixed_disk(systemd_generator_t)
+
+--
+2.17.1
+
