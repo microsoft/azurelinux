@@ -1,4 +1,5 @@
 %define cross 0
+
 # Seabios is noarch, but required on architectures which cannot build it.
 # Disable debuginfo because it is of no use to us.
 %global debug_package %{nil}
@@ -18,10 +19,10 @@ Summary:        Open-source legacy BIOS implementation
 Name:           seabios
 Version:        1.14.0
 Release:        7%{?dist}
-License:        GPLv3+ and LGPLv3+
+License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.coreboot.org/SeaBIOS
+URL:            https://www.seabios.org/SeaBIOS
 Source0:        https://www.seabios.org/downloads/%{name}-%{version}.tar.gz
 Source10:       config.vga-cirrus
 Source11:       config.vga-isavga
@@ -155,6 +156,7 @@ install -m 0644 binaries/vgabios*.bin %{buildroot}%{_datadir}/seavgabios
 %changelog
 * Thu Aug 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-7
 - License verified.
+- Updated project's URL.
 - Removing unused BR on "iasl".
 - Manually discarding ".note.gnu.property" section from "vgalayout.lds.S"
   to fix build issues with "binutils" 2.36+.
