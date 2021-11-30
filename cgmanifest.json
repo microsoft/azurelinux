@@ -8421,6 +8421,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "seabios",
+          "version": "1.14.0",
+          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "secilc",
           "version": "3.2",
           "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/secilc-3.2.tar.gz"

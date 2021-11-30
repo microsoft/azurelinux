@@ -203,6 +203,7 @@
                 "rdma-core",
                 "re2",
                 "sanlock",
+                "seabios",
                 "secilc",
                 "selinux-policy",
                 "setools",
