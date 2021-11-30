@@ -19,7 +19,9 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  java-devel
+#BuildRequires:  java-devel
+BuildRequires:  openjdk-11-hotspot
+
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -30,7 +32,8 @@ BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       java-1.8.0-openjdk-headless
+#Requires:       java-1.8.0-openjdk-headless
+Requires:       openjdk-11-hotspot
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}

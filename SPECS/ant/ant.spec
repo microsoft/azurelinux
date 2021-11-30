@@ -30,16 +30,16 @@ Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
-BuildRequires:  java-devel >= 1.8
+#BuildRequires:  java-devel >= 1.8
+BuildRequires:  openjdk-11-hotspot
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-Requires:       java-devel >= 1.8
+#Requires:       java-devel >= 1.8
+Requires:       openjdk-11-hotspot
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
-#BuildArch:      noarch
+BuildArch:      noarch
 
 
 %description
@@ -113,7 +113,7 @@ mv LICENSE.utf8 LICENSE
 export OPT_JAR_LIST=:
 
 export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk*")
 sh -x ./build.sh --noconfig jars
 
 %install

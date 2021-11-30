@@ -15,7 +15,8 @@ BuildRequires:  curl-devel
 BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
 BuildRequires:  make
-BuildRequires:  openjdk8
+#BuildRequires:  openjdk8
+BuildRequires:  openjdk-11-hotspot
 BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel
@@ -24,9 +25,6 @@ BuildRequires:  which
 BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
 
 %description
 R is a language and environment for statistical computing and graphics.

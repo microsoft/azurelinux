@@ -3,7 +3,7 @@
 %define __os_install_post %{_libdir}/rpm/brp-compress %{nil}
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
-Version:        4.1.0
+Version:        4.2.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -13,14 +13,13 @@ Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{versio
 Patch0:         fix-bazel-version-check.patch
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-BuildRequires:  openjdk8
+#BuildRequires:  openjdk8
+BuildRequires:  openjdk-11-hotspot
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
-Requires:       openjdk8
-
-# Temp: Do not build with 2.0 toolchain
-ExclusiveArch:  mips
+#Requires:       openjdk8
+Requires:       openjdk-11-hotspot
 
 %description
 A fast, scalable, multi-language and extensible build system.
@@ -47,6 +46,9 @@ rm -rf %{buildroot}
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Mon Nov 29 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-1
+- Update to version 4.2.1
+
 * Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 4.1.0-1
 - Upgrade to version 4.1.0
 - Remove jni-build-error patch
