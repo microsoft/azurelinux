@@ -42,7 +42,6 @@ generate_toolchain () {
 # Remove specific packages that are not needed in pkggen_core
 remove_packages_for_pkggen_core () {
     sed -i '/alsa-lib-/d' $TmpPkgGen
-    sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
@@ -296,6 +295,7 @@ generate_pkggen_core () {
         grep "^ca-certificates-shared-" $TmpPkgGen
         grep "^ca-certificates-tools-" $TmpPkgGen
         grep "^ca-certificates-base-" $TmpPkgGen
+        grep "^ca-certificates-[0-9]" $TmpPkgGen
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
