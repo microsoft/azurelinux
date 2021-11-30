@@ -491,7 +491,7 @@ echo Perl-5.32.0
 tar xf perl-5.32.0.tar.xz
 pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
-# Using locally-built version of 'make' to avoid mismatch between the build machine's version of make
+# Using locally-built version of 'make' to avoid mismatch between the build machine's version
 # and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
 # we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
 /tools/bin/make -j$(nproc)
