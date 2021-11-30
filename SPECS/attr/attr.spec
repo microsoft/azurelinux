@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://savannah.nongnu.org/projects/attr
-Source:         http://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
+Source:         https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
 BuildRequires:  flex-devel
 BuildRequires:  gettext

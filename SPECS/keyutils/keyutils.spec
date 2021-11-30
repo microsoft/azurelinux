@@ -8,9 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://people.redhat.com/~dhowells/keyutils/
 Source0:        https://people.redhat.com/~dhowells/keyutils/%{name}-%{version}.tar.bz2
-%if %{with_check}
 Patch0:         tests_endianness_check_fix.patch
-%endif
 
 %if %{with_check}
 BuildRequires: lsb-release
