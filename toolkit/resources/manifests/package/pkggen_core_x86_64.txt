@@ -172,7 +172,6 @@ openssl-static-1.1.1k-5.cm2.x86_64.rpm
 openssl-debuginfo-1.1.1k-5.cm2.x86_64.rpm
 libcap-2.26-2.cm2.x86_64.rpm
 libcap-devel-2.26-2.cm2.x86_64.rpm
-libcap-ng-0.7.9-4.cm2.x86_64.rpm
 libdb-5.3.28-5.cm2.x86_64.rpm
 libdb-devel-5.3.28-5.cm2.x86_64.rpm
 libdb-docs-5.3.28-5.cm2.x86_64.rpm
@@ -189,6 +188,7 @@ libsolv-0.7.19-1.cm2.x86_64.rpm
 libsolv-devel-0.7.19-1.cm2.x86_64.rpm
 libssh2-1.9.0-1.cm2.x86_64.rpm
 libssh2-devel-1.9.0-1.cm2.x86_64.rpm
+krb5-1.18-1.cm2.x86_64.rpm
 curl-7.76.0-5.cm2.x86_64.rpm
 curl-devel-7.76.0-5.cm2.x86_64.rpm
 curl-libs-7.76.0-5.cm2.x86_64.rpm
@@ -205,7 +205,6 @@ libltdl-2.4.6-7.cm2.x86_64.rpm
 libltdl-devel-2.4.6-7.cm2.x86_64.rpm
 pcre-8.44-3.cm2.x86_64.rpm
 pcre-libs-8.44-3.cm2.x86_64.rpm
-krb5-1.18-1.cm2.x86_64.rpm
 lua-5.3.5-11.cm2.x86_64.rpm
 lua-libs-5.3.5-11.cm2.x86_64.rpm
 mariner-rpm-macros-2.0-7.cm2.noarch.rpm
@@ -235,7 +234,6 @@ dwz-0.13-4.cm2.x86_64.rpm
 unzip-6.0-19.cm2.x86_64.rpm
 python3-3.7.10-3.cm2.x86_64.rpm
 python3-devel-3.7.10-3.cm2.x86_64.rpm
-python3-libcap-ng-0.7.9-4.cm2.x86_64.rpm
 python3-libs-3.7.10-3.cm2.x86_64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-xml-3.7.10-3.cm2.x86_64.rpm
