@@ -56,7 +56,7 @@ CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2
 
 mkdir -p cmake/build
 cd cmake/build
-cmake ../.. -DgRPC_INSTALL=ON               \
+cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
    -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
