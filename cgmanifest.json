@@ -4,6 +4,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "abseil-cpp",
+          "version": "20211102.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "acl",
           "version": "2.3.1",
           "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.3.1.tar.gz"
@@ -796,8 +806,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz"
+          "version": "3.21.4",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
         }
       }
     },
@@ -2149,8 +2159,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.41.1",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.41.1/grpc-1.41.1.tar.gz"
+          "version": "1.42.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
         }
       }
     },
@@ -2189,8 +2199,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
         }
       }
     },
