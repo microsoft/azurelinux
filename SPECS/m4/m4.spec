@@ -3,10 +3,10 @@ Name:           m4
 Version:        1.4.19
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/m4
+Distribution:   Mariner
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+URL:            http://www.gnu.org/software/m4
 Source0:        https://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
 
 %description
@@ -40,20 +40,28 @@ make  %{?_smp_mflags}  check
 * Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> 1.4.19-1
 - Update to version 1.4.19
 - Remove patches
+
 * Thu Oct 21 2021 Andrew Phelps <anphel@microsoft.com> 1.4.18-5
 - Add patches for glibc 2.34
 - License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.4.18-4
 - Added %%license line automatically
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.18-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Sun Sep 09 2018 Alexey Makhalov <amakhalov@vmware.com> 1.4.18-2
 - Fix compilation issue against glibc-2.28
+
 * Fri Mar 31 2017 Michelle Wang <michellew@vmware.com> 1.4.18-1
 - Update package version
+
 * Fri Oct 07 2016 ChangLee <changlee@vmware.com> 1.4.17-3
 - Modified %check
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.4.17-2
 - GA - Bump release of all rpms
+
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.4.17-1
 - Initial build. First version

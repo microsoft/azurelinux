@@ -43,7 +43,6 @@ These are the additional language files of krb5.
 %build
 cd src
 sed -e 's@\^u}@^u cols 300}@' -i tests/dejagnu/config/default.exp
-#autoupdate
 CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" autoconf
 ./configure \
     --prefix=%{_prefix} \

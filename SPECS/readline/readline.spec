@@ -3,10 +3,10 @@ Name:           readline
 Version:        8.1
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            https://tiswww.case.edu/php/chet/readline/rltop.html
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://tiswww.case.edu/php/chet/readline/rltop.html
 Source0:        https://ftp.gnu.org/gnu/readline/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 Requires:       ncurses-libs
