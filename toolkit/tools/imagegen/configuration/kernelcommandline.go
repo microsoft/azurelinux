@@ -18,6 +18,7 @@ import (
 //   end of the kernel command line
 type KernelCommandLine struct {
 	ImaPolicy        []ImaPolicy `json:"ImaPolicy"`
+	SELinux          SELinux     `json:"SELinux"`
 	ExtraCommandLine string      `json:"ExtraCommandLine"`
 }
 
