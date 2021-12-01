@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
-Version:        1.3.1
-Release:        7%{?dist}
+Version:        1.3.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.5-1
+- New version
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
 - Add provides for scanner subpackage from base package
 - Remove openscap-python python2 subpackage
