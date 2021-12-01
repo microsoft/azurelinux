@@ -21,7 +21,7 @@ by Greg Hudson at MIT.
 Summary:        Development files for c-ares
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkg-config
+Requires:       pkgconfig
 
 %description devel
 This package contains the header files and libraries needed to
@@ -44,8 +44,9 @@ rm -f %{buildroot}/%{_libdir}/libcares.la
 %check
 make %{?_smp_mflags} check
 
-%clean
+%{clean}
 rm -rf %{buildroot}
+
 
 
 %post -p /sbin/ldconfig
@@ -72,6 +73,7 @@ rm -rf %{buildroot}
 %changelog
 * Sun Nov 28 2021 Muhammad Falak <mwani@microsoft.com> - 1.18.1-1
 - Bump version to fix CVE-2021-3672
+- License verified
 
 * Mon Mar 15 2021 Nick Samson <nisamson@microsoft.com> - 1.17.1-1
 - Removed %%sha line. Upgraded to 1.17.1 to address CVE-2020-8277.
@@ -95,8 +97,8 @@ rm -rf %{buildroot}
 * Wed Oct 05 2016 Xiaolin Li <xiaolinl@vmware.com> 1.10.0-3
 - Apply patch for CVE-2016-5180.
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.10.0-2
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.10.0-2
+- GA - Bump release of all rpms
 
-*   Wed Feb 03 2016 Anish Swaminathan <anishs@vmware.com> - 1.10.0-1
--   Initial version
+* Wed Feb 03 2016 Anish Swaminathan <anishs@vmware.com> - 1.10.0-1
+- Initial version
