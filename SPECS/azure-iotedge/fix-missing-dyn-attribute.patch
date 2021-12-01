@@ -1,0 +1,492 @@
+diff --git a/edgelet-docker/src/error.rs b/edgelet-docker/src/error.rs
+index 9c2d41a..5b635b8 100644
+--- a/edgelet-docker/src/error.rs
++++ b/edgelet-docker/src/error.rs
+@@ -148,7 +148,7 @@ impl From<Context<ErrorKind>> for Error {
+ 
+ impl<'a> From<&'a Error> for ModuleRuntimeErrorReason {
+     fn from(err: &'a Error) -> Self {
+-        match Fail::find_root_cause(err).downcast_ref::<ErrorKind>() {
++        match <dyn Fail>::find_root_cause(err).downcast_ref::<ErrorKind>() {
+             Some(ErrorKind::NotFound(_)) => ModuleRuntimeErrorReason::NotFound,
+             _ => ModuleRuntimeErrorReason::Other,
+         }
+diff --git a/edgelet-docker/src/runtime.rs b/edgelet-docker/src/runtime.rs
+index 14e5593..6e2f9d5 100644
+--- a/edgelet-docker/src/runtime.rs
++++ b/edgelet-docker/src/runtime.rs
+@@ -931,7 +931,7 @@ impl ModuleRuntime for DockerModuleRuntime {
+                     wait_before_kill,
+                 )
+                 .or_else(|err| {
+-                    match Fail::find_root_cause(&err).downcast_ref::<ErrorKind>() {
++                    match <dyn Fail>::find_root_cause(&err).downcast_ref::<ErrorKind>() {
+                         Some(ErrorKind::NotFound(_)) | Some(ErrorKind::NotModified) => Ok(()),
+                         _ => Err(err),
+                     }
+@@ -1298,7 +1298,7 @@ mod tests {
+         )
+         .wait()
+         .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("URL does not have a recognized scheme")));
+     }
+@@ -1322,7 +1322,7 @@ mod tests {
+         )
+         .wait()
+         .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("Socket file could not be found")));
+     }
+ 
+diff --git a/edgelet-docker/tests/runtime.rs b/edgelet-docker/tests/runtime.rs
+index 73b4c2b..3ccf297 100644
+--- a/edgelet-docker/tests/runtime.rs
++++ b/edgelet-docker/tests/runtime.rs
+@@ -274,7 +274,7 @@ fn image_pull_with_invalid_image_name_fails() {
+         .block_on(task)
+         .expect_err("Expected runtime pull method to fail due to invalid image name.");
+ 
+-    match (err.kind(), err.cause().and_then(Fail::downcast_ref)) {
++    match (err.kind(), err.cause().and_then(<dyn Fail>::downcast_ref)) {
+         (
+             edgelet_docker::ErrorKind::RegistryOperation(
+                 edgelet_core::RegistryOperation::PullImage(name),
+@@ -382,7 +382,7 @@ fn image_pull_with_invalid_image_host_fails() {
+         .block_on(task)
+         .expect_err("Expected runtime pull method to fail due to invalid image host.");
+ 
+-    match (err.kind(), err.cause().and_then(Fail::downcast_ref)) {
++    match (err.kind(), err.cause().and_then(<dyn Fail>::downcast_ref)) {
+         (
+             edgelet_docker::ErrorKind::RegistryOperation(
+                 edgelet_core::RegistryOperation::PullImage(name),
+@@ -504,7 +504,7 @@ fn image_pull_with_invalid_creds_fails() {
+         .block_on(task)
+         .expect_err("Expected runtime pull method to fail due to unauthentication.");
+ 
+-    match (err.kind(), err.cause().and_then(Fail::downcast_ref)) {
++    match (err.kind(), err.cause().and_then(<dyn Fail>::downcast_ref)) {
+         (
+             edgelet_docker::ErrorKind::RegistryOperation(
+                 edgelet_core::RegistryOperation::PullImage(name),
+diff --git a/edgelet-http-mgmt/src/error.rs b/edgelet-http-mgmt/src/error.rs
+index ddcadeb..4f35a50 100644
+--- a/edgelet-http-mgmt/src/error.rs
++++ b/edgelet-http-mgmt/src/error.rs
+@@ -122,13 +122,13 @@ impl From<Context<ErrorKind>> for Error {
+ impl IntoResponse for Error {
+     fn into_response(self) -> Response<Body> {
+         let mut message = self.to_string();
+-        for cause in Fail::iter_causes(&self) {
++        for cause in <dyn Fail>::iter_causes(&self) {
+             message.push_str(&format!("\n\tcaused by: {}", cause));
+         }
+ 
+         // Specialize status code based on the underlying docker runtime error, if any
+         let status_code =
+-            if let Some(cause) = Fail::find_root_cause(&self).downcast_ref::<DockerErrorKind>() {
++            if let Some(cause) = <dyn Fail>::find_root_cause(&self).downcast_ref::<DockerErrorKind>() {
+                 match cause {
+                     DockerErrorKind::NotFound(_) => StatusCode::NOT_FOUND,
+                     DockerErrorKind::Conflict => StatusCode::CONFLICT,
+diff --git a/edgelet-http/src/util/connector.rs b/edgelet-http/src/util/connector.rs
+index 5662f87..b39a4f1 100644
+--- a/edgelet-http/src/util/connector.rs
++++ b/edgelet-http/src/util/connector.rs
+@@ -175,7 +175,7 @@ mod tests {
+     #[test]
+     fn invalid_url_scheme() {
+         let err = UrlConnector::new(&Url::parse("foo:///this/is/not/valid").unwrap()).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("URL does not have a recognized scheme")));
+     }
+diff --git a/edgelet-iothub/src/lib.rs b/edgelet-iothub/src/lib.rs
+index 926daef..cabc521 100644
+--- a/edgelet-iothub/src/lib.rs
++++ b/edgelet-iothub/src/lib.rs
+@@ -462,7 +462,7 @@ mod tests {
+ 
+         let identity_manager = HubIdentityManager::new(key_store, device_client);
+         let err = identity_manager.get_key_pair("m1", "g1").unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("KeyStore could not fetch keys for module")));
+     }
+@@ -489,7 +489,7 @@ mod tests {
+ 
+         let identity_manager = HubIdentityManager::new(key_store, device_client);
+         let err = identity_manager.get_key_pair("m1", "g1").unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("KeyStore could not fetch keys for module")));
+     }
+@@ -516,7 +516,7 @@ mod tests {
+ 
+         let identity_manager = HubIdentityManager::new(key_store, device_client);
+         let err = identity_manager.get_key_pair("m1", "g1").unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("KeyStore could not fetch keys for module")));
+     }
+diff --git a/edgelet-kube/src/error.rs b/edgelet-kube/src/error.rs
+index 83fe009..8c62aca 100644
+--- a/edgelet-kube/src/error.rs
++++ b/edgelet-kube/src/error.rs
+@@ -146,7 +146,7 @@ impl From<Context<ErrorKind>> for Error {
+ 
+ impl<'a> From<&'a Error> for ModuleRuntimeErrorReason {
+     fn from(err: &'a Error) -> Self {
+-        match Fail::find_root_cause(err).downcast_ref::<ErrorKind>() {
++        match <dyn Fail>::find_root_cause(err).downcast_ref::<ErrorKind>() {
+             Some(ErrorKind::NotFound(_)) => ModuleRuntimeErrorReason::NotFound,
+             _ => ModuleRuntimeErrorReason::Other,
+         }
+diff --git a/edgelet-kube/src/module/trust_bundle.rs b/edgelet-kube/src/module/trust_bundle.rs
+index 3a45352..7338ad8 100644
+--- a/edgelet-kube/src/module/trust_bundle.rs
++++ b/edgelet-kube/src/module/trust_bundle.rs
+@@ -135,7 +135,7 @@ mod tests {
+ 
+         assert_eq!(err.kind(), &ErrorKind::Initialization);
+ 
+-        let cause = Fail::iter_causes(&err)
++        let cause = <dyn Fail>::iter_causes(&err)
+             .next()
+             .and_then(|cause| cause.downcast_ref::<Error>())
+             .map(Error::kind);
+@@ -160,7 +160,7 @@ mod tests {
+ 
+         assert_eq!(err.kind(), &ErrorKind::Initialization);
+ 
+-        let cause = Fail::iter_causes(&err)
++        let cause = <dyn Fail>::iter_causes(&err)
+             .next()
+             .and_then(|cause| cause.downcast_ref::<Error>())
+             .map(Error::kind);
+@@ -185,7 +185,7 @@ mod tests {
+ 
+         assert_eq!(err.kind(), &ErrorKind::Initialization);
+ 
+-        let cause = Fail::iter_causes(&err)
++        let cause = <dyn Fail>::iter_causes(&err)
+             .next()
+             .and_then(|cause| cause.downcast_ref::<Error>())
+             .map(Error::kind);
+diff --git a/hsm-rs/src/crypto.rs b/hsm-rs/src/crypto.rs
+index 2828bbd..a290bb2 100644
+--- a/hsm-rs/src/crypto.rs
++++ b/hsm-rs/src/crypto.rs
+@@ -1083,7 +1083,7 @@ mod tests {
+         let hsm_crypto = fake_no_if_hsm_crypto();
+         let mut test_array = [0_u8; 4];
+         let err = hsm_crypto.get_random_bytes(&mut test_array).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1091,7 +1091,7 @@ mod tests {
+     fn no_create_master_key_api_fail() {
+         let hsm_crypto = fake_no_if_hsm_crypto();
+         let err = hsm_crypto.create_master_encryption_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1099,7 +1099,7 @@ mod tests {
+     fn no_destroy_master_key_api_fail() {
+         let hsm_crypto = fake_no_if_hsm_crypto();
+         let err = hsm_crypto.destroy_master_encryption_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1108,7 +1108,7 @@ mod tests {
+         let props = CertificateProperties::default();
+         let hsm_crypto = fake_no_if_hsm_crypto();
+         let err = hsm_crypto.create_certificate(&props).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1116,7 +1116,7 @@ mod tests {
+     fn no_trust_bundle_api_fail() {
+         let hsm_crypto = fake_no_if_hsm_crypto();
+         let err = hsm_crypto.get_trust_bundle().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1129,7 +1129,7 @@ mod tests {
+         let err = hsm_crypto
+             .encrypt(client_id, plaintext, initialization_vector)
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1142,7 +1142,7 @@ mod tests {
+         let err = hsm_crypto
+             .encrypt(client_id, ciphertext, initialization_vector)
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -1172,7 +1172,7 @@ mod tests {
+         let hsm_crypto = fake_bad_hsm_crypto();
+         let mut test_array = [0_u8; 4];
+         let err = hsm_crypto.get_random_bytes(&mut test_array).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -1180,7 +1180,7 @@ mod tests {
+     fn hsm_create_master_encryption_key_errors() {
+         let hsm_crypto = fake_bad_hsm_crypto();
+         let err = hsm_crypto.create_master_encryption_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -1188,7 +1188,7 @@ mod tests {
+     fn hsm_destroy_master_encryption_key_errors() {
+         let hsm_crypto = fake_bad_hsm_crypto();
+         let err = hsm_crypto.destroy_master_encryption_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -1197,7 +1197,7 @@ mod tests {
+         let hsm_crypto = fake_bad_hsm_crypto();
+         let props = CertificateProperties::default();
+         let err = hsm_crypto.create_certificate(&props).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API returned an invalid null response")));
+     }
+@@ -1206,7 +1206,7 @@ mod tests {
+     fn hsm_get_trust_bundle_errors() {
+         let hsm_crypto = fake_bad_hsm_crypto();
+         let err = hsm_crypto.get_trust_bundle().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API returned an invalid null response")));
+     }
+@@ -1217,7 +1217,7 @@ mod tests {
+         let err = hsm_crypto
+             .encrypt(b"client_id", b"plaintext", b"init_vector")
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+     #[test]
+@@ -1226,7 +1226,7 @@ mod tests {
+         let err = hsm_crypto
+             .decrypt(b"client_id", b"ciphertext", b"init_vector")
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+diff --git a/hsm-rs/src/tpm.rs b/hsm-rs/src/tpm.rs
+index 06db52d..146338b 100644
+--- a/hsm-rs/src/tpm.rs
++++ b/hsm-rs/src/tpm.rs
+@@ -389,7 +389,7 @@ mod tests {
+         let hsm_tpm = fake_no_if_tpm_hsm();
+         let key = b"key data";
+         let err = hsm_tpm.activate_identity_key(key).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -397,7 +397,7 @@ mod tests {
+     fn tpm_no_getek_function_fail() {
+         let hsm_tpm = fake_no_if_tpm_hsm();
+         let err = hsm_tpm.get_ek().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -405,7 +405,7 @@ mod tests {
+     fn tpm_no_getsrk_function_fail() {
+         let hsm_tpm = fake_no_if_tpm_hsm();
+         let err = hsm_tpm.get_srk().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -414,7 +414,7 @@ mod tests {
+         let hsm_tpm = fake_no_if_tpm_hsm();
+         let key = b"key data";
+         let err = hsm_tpm.sign_with_identity(key).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -426,7 +426,7 @@ mod tests {
+         let err = hsm_tpm
+             .derive_and_sign_with_identity(key, identity)
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -494,7 +494,7 @@ mod tests {
+         let hsm_tpm = fake_bad_tpm_hsm();
+         let k1 = b"A fake key";
+         let err = hsm_tpm.activate_identity_key(k1).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -502,7 +502,7 @@ mod tests {
+     fn tpm_getek_errors() {
+         let hsm_tpm = fake_bad_tpm_hsm();
+         let err = hsm_tpm.get_ek().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -510,7 +510,7 @@ mod tests {
+     fn tpm_getsrk_errors() {
+         let hsm_tpm = fake_bad_tpm_hsm();
+         let err = hsm_tpm.get_srk().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -519,7 +519,7 @@ mod tests {
+         let hsm_tpm = fake_bad_tpm_hsm();
+         let k1 = b"A fake buffer";
+         let err = hsm_tpm.sign_with_identity(k1).unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ 
+@@ -531,7 +531,7 @@ mod tests {
+         let err = hsm_tpm
+             .derive_and_sign_with_identity(k1, identity)
+             .unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API failure occurred")));
+     }
+ }
+diff --git a/hsm-rs/src/x509.rs b/hsm-rs/src/x509.rs
+index 8d5e536..ee471d9 100644
+--- a/hsm-rs/src/x509.rs
++++ b/hsm-rs/src/x509.rs
+@@ -409,7 +409,7 @@ mod tests {
+     fn x509_no_getcert_function_fail() {
+         let hsm_x509 = fake_no_if_x509_hsm();
+         let err = hsm_x509.get_cert().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -417,7 +417,7 @@ mod tests {
+     fn x509_no_getkey_function_fail() {
+         let hsm_x509 = fake_no_if_x509_hsm();
+         let err = hsm_x509.get_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -425,7 +425,7 @@ mod tests {
+     fn x509_no_getname_function_fail() {
+         let hsm_x509 = fake_no_if_x509_hsm();
+         let err = hsm_x509.get_common_name().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -433,7 +433,7 @@ mod tests {
+     fn x509_no_sign_with_private_key_function_fail() {
+         let hsm_x509 = fake_no_if_x509_hsm();
+         let err = hsm_x509.sign_with_private_key(b"aabb").unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM API Not Implemented")));
+     }
+ 
+@@ -520,7 +520,7 @@ mod tests {
+     fn get_cert_null() {
+         let hsm_x509 = fake_bad_x509_hsm();
+         let err = hsm_x509.get_cert().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API returned an invalid null response")));
+     }
+@@ -529,7 +529,7 @@ mod tests {
+     fn get_key_null() {
+         let hsm_x509 = fake_bad_x509_hsm();
+         let err = hsm_x509.get_key().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API returned an invalid null response")));
+     }
+@@ -538,7 +538,7 @@ mod tests {
+     fn common_name_error() {
+         let hsm_x509 = fake_bad_x509_hsm();
+         let err = hsm_x509.get_common_name().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API returned an invalid null response")));
+     }
+@@ -547,7 +547,7 @@ mod tests {
+     fn sign_with_private_key_error() {
+         let hsm_x509 = fake_bad_x509_hsm();
+         let err = hsm_x509.sign_with_private_key(b"aabbcc").unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err).any(|err| err
++        assert!(failure::<dyn Fail>::iter_chain(&err).any(|err| err
+             .to_string()
+             .contains("HSM API sign with private key failed")));
+     }
+@@ -556,7 +556,7 @@ mod tests {
+     fn get_certificate_info_error() {
+         let hsm_x509 = fake_bad_x509_hsm();
+         let err = hsm_x509.get_certificate_info().unwrap_err();
+-        assert!(failure::Fail::iter_chain(&err)
++        assert!(failure::<dyn Fail>::iter_chain(&err)
+             .any(|err| err.to_string().contains("HSM certificate info get failed")));
+     }
+ }
