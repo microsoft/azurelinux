@@ -13,6 +13,7 @@ BuildRequires:  apr-devel
 BuildRequires:  apr-util-devel
 BuildRequires:  libdb-devel
 BuildRequires:  scons
+BuildRequires:  libdb
 BuildRequires:  openssl-devel
 BuildRequires:  openldap
 Requires:       libdb
