@@ -1,39 +1,41 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
+# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
+# Look for "date:" and "rustc:".
+%define release_date 2021-09-09
+%define stage0_version 1.55.0
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.47.0
-Release:        5%{?dist}
+Version:        1.56.1
+Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
-Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
+Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.gz
+# Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-aarch64-unknown-linux-gnu.tar.gz
-Patch0:         CVE-2020-36317.patch
-Patch1:         CVE-2021-28875.patch
-Patch2:         CVE-2021-28877.patch
-Patch3:         CVE-2021-28876.patch
-Patch4:         CVE-2021-28879.patch
-Patch5:         CVE-2021-28878.patch
-Patch6:         CVE-2020-36323.patch
+Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
-BuildRequires:  python2
+BuildRequires:  ninja-build
+BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 %endif
+
 Provides:       cargo = %{version}-%{release}
 
 %description
@@ -43,7 +45,7 @@ Rust Programming Language
 # Setup .cargo directory
 mkdir -p $HOME
 pushd $HOME
-tar xf %{SOURCE1} --no-same-owner
+tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
@@ -53,17 +55,17 @@ popd
 sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
 
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/2020-08-27/
-mkdir -pv %{BUILD_CACHE_DIR}
+BUILD_CACHE_DIR="build/cache/%{release_date}"
+mkdir -pv "$BUILD_CACHE_DIR"
 %ifarch x86_64
-mv %{SOURCE2} %{BUILD_CACHE_DIR}
-mv %{SOURCE3} %{BUILD_CACHE_DIR}
-mv %{SOURCE4} %{BUILD_CACHE_DIR}
+mv %{SOURCE2} "$BUILD_CACHE_DIR"
+mv %{SOURCE3} "$BUILD_CACHE_DIR"
+mv %{SOURCE4} "$BUILD_CACHE_DIR"
 %endif
 %ifarch aarch64
-mv %{SOURCE5} %{BUILD_CACHE_DIR}
-mv %{SOURCE6} %{BUILD_CACHE_DIR}
-mv %{SOURCE7} %{BUILD_CACHE_DIR}
+mv %{SOURCE5} "$BUILD_CACHE_DIR"
+mv %{SOURCE6} "$BUILD_CACHE_DIR"
+mv %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
 %build
@@ -72,24 +74,19 @@ export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
-# Exporting SUDO_USER=root bypasses a check in the python bootstrap that
+# SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
-export USER=root
-export SUDO_USER=root
-make %{?_smp_mflags}
+USER=root SUDO_USER=root %make_build
 
 %check
-make check
+%make_build check
 
 %install
-export USER=root
-export SUDO_USER=root
-make DESTDIR=%{buildroot} install
+USER=root SUDO_USER=root %make_install
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE-MIT
@@ -100,6 +97,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
+%{_libexecdir}/cargo-credential-1password
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
 %doc %{_docdir}/%{name}/html/*
@@ -116,6 +114,10 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.56.1-1
+- Updating to version 1.56.1.
+- Switching to building with Python 3.
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-5
 - Add provides for 'cargo' from the base package
 

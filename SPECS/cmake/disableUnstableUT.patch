@@ -1,21 +1,24 @@
-diff -ru cmake-3.12.1/Source/kwsys/CMakeLists.txt cmake-3.12.1-new/Source/kwsys/CMakeLists.txt
---- cmake-3.12.1/Source/kwsys/CMakeLists.txt	2018-08-09 17:44:08.000000000 +0530
-+++ cmake-3.12.1-new/Source/kwsys/CMakeLists.txt	2018-09-21 09:11:46.011100539 +0530
-@@ -1078,7 +1078,6 @@
-     ENDIF()
-     SET(KWSYS_CXX_TESTS ${KWSYS_CXX_TESTS}
+diff --git a/Source/kwsys/CMakeLists.txt b/Source/kwsys/CMakeLists.txt
+index 7da59712..a2983833 100644
+--- a/Source/kwsys/CMakeLists.txt
++++ b/Source/kwsys/CMakeLists.txt
+@@ -979,7 +979,6 @@ if(KWSYS_STANDALONE OR CMake_SOURCE_DIR)
+     set(KWSYS_CXX_TESTS ${KWSYS_CXX_TESTS}
        testConfigure.cxx
+       testStatus.cxx
 -      testSystemTools.cxx
        testCommandLineArguments.cxx
        testCommandLineArguments1.cxx
        testDirectory.cxx
-diff -ruN a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
---- a/Tests/CMakeLists.txt	2020-06-23 15:56:37.066386295 -0700
-+++ b/Tests/CMakeLists.txt	2020-06-23 15:58:16.918966343 -0700
-@@ -2668,20 +2668,6 @@
+diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
+index 341aba63..af124b0b 100644
+--- a/Tests/CMakeLists.txt
++++ b/Tests/CMakeLists.txt
+@@ -2779,17 +2779,6 @@ if(BUILD_TESTING)
+       PASS_REGULAR_EXPRESSION "Upload\\.xml")
    endif()
  
-   configure_file(
+-  configure_file(
 -    "${CMake_SOURCE_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake.in"
 -    "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake"
 -    @ONLY ESCAPE_QUOTES)
@@ -24,19 +27,16 @@ diff -ruN a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
 -    -S "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/test.cmake" -VV
 -    --output-log "${CMake_BINARY_DIR}/Tests/CTestCoverageCollectGCOV/testOut.log"
 -    )
--  set_tests_properties(CTestCoverageCollectGCOV PROPERTIES
--    PASS_REGULAR_EXPRESSION
--    "PASSED with correct output.*Testing/CoverageInfo/main.cpp.gcov")
 -  set_property(TEST CTestCoverageCollectGCOV PROPERTY ENVIRONMENT CTEST_PARALLEL_LEVEL=)
 -
--  configure_file(
+   configure_file(
      "${CMake_SOURCE_DIR}/Tests/CTestTestEmptyBinaryDirectory/test.cmake.in"
      "${CMake_BINARY_DIR}/Tests/CTestTestEmptyBinaryDirectory/test.cmake"
-     @ONLY ESCAPE_QUOTES)
-@@ -3050,18 +3036,6 @@
+@@ -3151,18 +3140,6 @@ if(BUILD_TESTING)
+   set_tests_properties(CTestTestStopTime PROPERTIES
      PASS_REGULAR_EXPRESSION "The stop time has been passed")
  
-   configure_file(
+-  configure_file(
 -    "${CMake_SOURCE_DIR}/Tests/CTestTestSubdir/test.cmake.in"
 -    "${CMake_BINARY_DIR}/Tests/CTestTestSubdir/test.cmake"
 -    @ONLY ESCAPE_QUOTES)
@@ -48,7 +48,8 @@ diff -ruN a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
 -  set_tests_properties(CTestTestSubdir PROPERTIES
 -    PASS_REGULAR_EXPRESSION "0 tests failed out of 3")
 -
--  configure_file(
+   configure_file(
      "${CMake_SOURCE_DIR}/Tests/CTestTestTimeout/test.cmake.in"
      "${CMake_BINARY_DIR}/Tests/CTestTestTimeout/test.cmake"
-     @ONLY ESCAPE_QUOTES)
+-- 
+2.17.1
