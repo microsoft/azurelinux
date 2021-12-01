@@ -3,10 +3,10 @@ Name:           m4
 Version:        1.4.19
 Release:        1%{?dist}
 License:        GPLv3+
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-Vendor:         Microsoft Corporation
-URL:            http://www.gnu.org/software/m4
+URL:            https://www.gnu.org/software/m4
 Source0:        https://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
 
 %description
