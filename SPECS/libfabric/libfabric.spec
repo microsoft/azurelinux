@@ -1,33 +1,29 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global __remake_config 0
 
+Summary:        Open Fabric Interfaces
 Name:           libfabric
 Version:        1.12.0
-%global         __rc  rc1
-Release:        1%{?dist}
-Summary:        Open Fabric Interfaces
-
-License:        BSD or GPLv2
+Release:        2%{?dist}
+License:        BSD OR GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ofiwg/libfabric
-Source0:        https://github.com/ofiwg/%{name}/releases/download/v%{version}%{__rc}/%{name}-%{version}%{__rc}.tar.bz2
+Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 
-%if %{__remake_config}
-BuildRequires:  automake
-BuildRequires:  autoconf
-BuildRequires:  libtool
-%endif
-BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:  libnl3-devel
+BuildRequires:  make
+
+%if %{__remake_config}
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+%endif
+
 # RDMA not available on 32-bit ARM: #1484155
 %ifnarch %{arm}
 BuildRequires:  libibverbs-devel
 BuildRequires:  librdmacm-devel
-%endif
-%ifarch x86_64
-BuildRequires:  infinipath-psm-devel
-BuildRequires:  libpsm2-devel
 %endif
 
 %description
@@ -42,7 +38,6 @@ exports the user-space API of OFI, and is typically the only software that
 applications deal with directly.  It works in conjunction with provider
 libraries, which are often integrated directly into libfabric.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -51,9 +46,8 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
-%setup -q -n %{name}-%{version}%{__rc}
+%setup -q
 
 %build
 %if %{__remake_config}
@@ -65,7 +59,7 @@ developing applications that use %{name}.
 
 %install
 %make_install
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 
 %ldconfig_scriptlets
@@ -90,8 +84,12 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man3/*.3*
 %{_mandir}/man7/*.7*
 
-
 %changelog
+* Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-2
+- Removing BR on "infinipath-psm-devel" and "libpsm2-devel".
+- Using the 1.12.0 final release version of the sources instead of the release candidate.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

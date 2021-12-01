@@ -3158,6 +3158,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libfabric",
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0/libfabric-1.12.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libfastjson",
           "version": "0.99.8",
           "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.8.tar.gz"
