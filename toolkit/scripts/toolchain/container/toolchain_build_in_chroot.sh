@@ -1179,7 +1179,7 @@ popd
 rm -rf "$RPM_FOLDER"
 
 # Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python:' pythondistdeps.py
+sed -i '1 s:.*:#!/usr/bin/python3:' pythondistdeps.py
 install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
 install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
 install -p python.attr /usr/lib/rpm/fileattrs/python.attr

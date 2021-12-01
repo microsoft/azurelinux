@@ -141,7 +141,7 @@ popd
 sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 # Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python:' %{SOURCE5}
+sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
 
 %check
 %make_build_check
