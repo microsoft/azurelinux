@@ -39,6 +39,7 @@ BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
 BuildRequires:  expat-devel
+BuildRequires:  libdb
 BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
