@@ -319,25 +319,26 @@ chroot_and_install_rpms freetype
 build_rpm_in_chroot_no_install fontconfig
 chroot_and_install_rpms fontconfig
 
-
-# Build OpenJDK and OpenJRE
-echo Java bootstrap version:
+# Download JDK rpms
+echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-212-b04-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-debuginfo-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-doc-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-sample-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-src-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjre8-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8_aarch64
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-debuginfo-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-doc-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-sample-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-src-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjre8-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
-
-# Install OpenJDK and OpenJRE
-chroot_and_install_rpms openjdk8
-# Copy OpenJRE
-cp -v $CHROOT_RPMS_DIR_ARCH/openjre8* $FINISHED_RPM_DIR
-chroot_and_install_rpms openjre8
 
 # PCRE needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
