@@ -5,7 +5,9 @@
 set -e
 
 temp_dir=$(mktemp -d)
+echo "Working in temporary directory '$temp_dir'."
 function clean-up {
+    echo "Cleaning up temporary directory '$temp_dir'."
     rm -rf "$temp_dir"
 }
 trap clean-up EXIT
@@ -32,7 +34,11 @@ then
     cp "$tarball_name" "$temp_dir"
 else
     echo "Tarball '$tarball_name' doesn't exist. Will attempt to download from blobstorage."
-    wget -q "https://cblmarinerstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$temp_dir/$tarball_name"
+    if ! wget -q "https://cblmarinerstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$temp_dir/$tarball_name"
+    then
+        echo "ERROR: failed to download the source tarball."
+        exit 1
+    fi
     echo "Download successful."
 fi
 
