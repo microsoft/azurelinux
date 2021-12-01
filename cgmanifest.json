@@ -5120,6 +5120,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nvml",
+          "version": "1.8",
+          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/1.8/pmdk-1.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "oath-toolkit",
           "version": "2.6.2",
           "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.2.tar.gz"

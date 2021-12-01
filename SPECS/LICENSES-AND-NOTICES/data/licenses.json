@@ -139,6 +139,7 @@
                 "mokutil",
                 "mtdev",
                 "nftables",
+                "nvml",
                 "oath-toolkit",
                 "opa",
                 "open-vm-tools",
