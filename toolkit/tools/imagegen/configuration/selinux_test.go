@@ -15,6 +15,7 @@ var (
 	validSELinuxOptions = []SELinux{
 		SELinux("permissive"),
 		SELinux("enforcing"),
+		SELinux("force_enforcing"),
 		SELinux(""),
 	}
 	invalidSELinux     = SELinux("bad_selinux")

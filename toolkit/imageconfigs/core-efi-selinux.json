@@ -54,7 +54,7 @@
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "SELinux": "enforcing"
+                "SELinux": "force_enforcing"
             },
             "Hostname": "cbl-mariner"
         }

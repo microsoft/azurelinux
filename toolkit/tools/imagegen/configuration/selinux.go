@@ -20,6 +20,8 @@ const (
 	SELinuxEnforcing SELinux = "enforcing"
 	// SELinuxPermissive sets SELinux to permissive
 	SELinuxPermissive SELinux = "permissive"
+	// SELinuxForceEnforcing both sets SELinux to enforcing, and forces it via the kernel command line
+	SELinuxForceEnforcing SELinux = "force_enforcing"
 )
 
 func (s SELinux) String() string {
@@ -32,6 +34,7 @@ func (s *SELinux) GetValidSELinux() (types []SELinux) {
 	return []SELinux{
 		SELinuxOff,
 		SELinuxEnforcing,
+		SELinuxForceEnforcing,
 		SELinuxPermissive,
 	}
 }
