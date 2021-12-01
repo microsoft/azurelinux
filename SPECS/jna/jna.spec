@@ -32,12 +32,12 @@ BuildRequires:  dos2unix
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libffi
 BuildRequires:  libffi-devel
-BuildRequires:  openjdk8
-BuildRequires:  openjre8
-Requires:       openjre8
+#BuildRequires:  openjdk8
+#BuildRequires:  openjre8
+#Requires:       openjre8
 
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
+# Temp: Do not build
+ExclusiveArch:  mips
 
 %description
 JNA provides Java programs easy access to native shared libraries

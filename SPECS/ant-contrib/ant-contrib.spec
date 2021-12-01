@@ -29,14 +29,14 @@ Source1:        http://mirrors.ibiblio.org/pub/mirrors/maven2/%{name}/%{name}/1.
 Source2:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Patch0:         ant-contrib-pom.patch
 BuildRequires:  ant
-BuildRequires:  java-devel
+#BuildRequires:  java-devel
 BuildRequires:  javapackages-local-bootstrap
 Requires:       ant
-Requires:       java-headless
-BuildArch:      noarch
+#Requires:       java-headless
+#BuildArch:      noarch
 
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
+# Temp: Do not build
+ExclusiveArch:  mips
 
 %description
 The Ant-Contrib project is a collection of tasks (and at one point

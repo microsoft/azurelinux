@@ -13,13 +13,13 @@ Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{versio
 Patch0:         fix-bazel-version-check.patch
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-BuildRequires:  openjdk8
+#BuildRequires:  openjdk8
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
-Requires:       openjdk8
+#Requires:       openjdk8
 
-# Temp: Do not build with 2.0 toolchain
+# Temp: Do not build
 ExclusiveArch:  mips
 
 %description
