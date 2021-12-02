@@ -351,7 +351,7 @@ fi
 
 %changelog
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.4.46-10
-- Fixes
+- Add explicit requires for libdb.
 
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-9
 - Added missing BR on "systemd-rpm-macros".

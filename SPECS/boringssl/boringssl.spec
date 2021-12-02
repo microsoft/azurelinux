@@ -138,7 +138,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 
 %changelog
 
-* Tue Oct 12 2021 Mateusz Malisz <mamalisz@microsoft.com> - 20200921-3
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 20200921-3
 - Unify macro syntax used in the spec.
 
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200921-2

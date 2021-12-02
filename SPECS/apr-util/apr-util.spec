@@ -186,7 +186,7 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
-* Tue Aug 24 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-6
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-6
 - Add libdb dependencies to berkleydb subpackage.
 
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-5

@@ -113,7 +113,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.5-1
-- New version
+- Update to version 1.3.5
 
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
 - Add provides for scanner subpackage from base package

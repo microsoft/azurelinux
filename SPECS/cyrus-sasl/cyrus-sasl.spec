@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -310,6 +310,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.1.27-10
+- Add libdb as an explicit dependency.
+
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.27-9
 - Introduced following subpackages using Fedora 32 (license: MIT) specs as guidance:
   - cyrus-sasl-gs2,

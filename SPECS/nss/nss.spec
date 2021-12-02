@@ -166,7 +166,7 @@ popd
 %changelog
 
 * Tue Nov 16 2021 Mateusz Malisz <mamalisz@microsoft.com> - 3.44-10
-- Fixes
+- Remove libdb from toolchain. Add workaround for the shlibsign script to work.
 
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 3.44-9
 - Fix for gcc 11.2.0
