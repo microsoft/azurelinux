@@ -19,8 +19,8 @@
 %define lname libgd3
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 Name:           gd
-Version:        2.3.0
-Release:        2.4%{?dist}
+Version:        2.3.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -145,6 +145,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Thu Dec 02 2021 Nick Samson <nick.samson@microsoft.com> - 2.3.3-1
+- Upgrade to 2.3.3 to fix CVEs CVE-2021-38115, CVE-2021-40145, CVE-2021-40812
+
 * Thu Oct 21 2021 Bala <balakumaran.kannan@microsoft.com> - 2.3.0-2.4
 - Build without fontconfig and freetype as fontconfig support is failing
 - Remove `annotate` binary
