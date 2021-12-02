@@ -1,5 +1,5 @@
---- PAMmodule.c.python3	2014-06-24 11:29:10.958299393 +0200
-+++ PAMmodule.c	2014-06-24 15:20:02.728118493 +0200
+--- a/PAMmodule.c.python3	2014-06-24 11:29:10.958299393 +0200
++++ b/PAMmodule.c	2014-06-24 15:20:02.728118493 +0200
 @@ -15,6 +15,14 @@
  #include <stdio.h>
  #include <dlfcn.h>
@@ -167,8 +167,8 @@
 +    return m;
 +#endif
  }
---- setup.py.python3	2014-06-24 15:58:07.792172439 +0200
-+++ setup.py	2014-06-24 15:58:13.714909021 +0200
+--- a/setup.py.python3	2014-06-24 15:58:07.792172439 +0200
++++ b/setup.py	2014-06-24 15:58:13.714909021 +0200
 @@ -12,7 +12,7 @@
      license='LGPL',
      ext_modules=[
@@ -178,8 +178,8 @@
              ['PAMmodule.c'],
              libraries=['pam', 'pam_misc'],
              extra_compile_args = ['-std=c99'],
---- tests/PamTest.py.python3	2014-06-24 16:54:28.902998249 +0200
-+++ tests/PamTest.py	2014-06-24 17:07:11.392094775 +0200
+--- a/tests/PamTest.py.python3	2014-06-24 16:54:28.902998249 +0200
++++ b/tests/PamTest.py	2014-06-24 17:07:11.392094775 +0200
 @@ -41,13 +41,13 @@
      def test_userdata_default(self):
          """The default value for userdata is None."""

@@ -114,14 +114,16 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.74.1 API Headers
-tar xf kernel-5.10.74.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+echo Linux-5.10.78.1 API Headers
+tar xf kernel-5.10.78.1.tar.gz
+cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+patch -p1 -i 0002-add-linux-syscall-license-info.patch
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -300,55 +302,6 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
-echo Tcl-8.6.9
-tar xf tcl8.6.9-src.tar.gz
-pushd tcl8.6.9
-cd unix
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-chmod -v u+w /tools/lib/libtcl8.6.so
-make install-private-headers
-ln -sv tclsh8.6 /tools/bin/tclsh
-popd
-rm -rf tcl8.6.9
-
-touch $LFS/logs/temptoolchain/status_tcl_complete
-
-echo Expect-5.45.4
-tar -zxf expect5.45.4.tar.gz
-pushd expect5.45.4
-cp -v configure{,.orig}
-sed 's:/usr/local/bin:/bin:' configure.orig > configure
-case $(uname -m) in
-    x86_64)
-      ./configure --prefix=/tools \
-        --with-tcl=/tools/lib \
-        --with-tclinclude=/tools/include
-    ;;
-    aarch64)
-      ./configure --prefix=/tools \
-        --with-tcl=/tools/lib \
-        --with-tclinclude=/tools/include \
-        --build=aarch64-unknown-linux-gnu
-    ;;
-esac
-make -j$(nproc)
-make SCRIPTS="" install
-popd
-rm -rf expect5.45.4
-touch $LFS/logs/temptoolchain/status_expect_complete
-
-echo DejaGNU-1.6.2
-tar xf dejagnu-1.6.2.tar.gz
-pushd dejagnu-1.6.2
-./configure --prefix=/tools
-make install
-popd
-rm -rf dejagnu-1.6.2
-
-touch $LFS/logs/temptoolchain/status_dejagnu_complete
-
 echo M4-1.4.18
 tar xf m4-1.4.18.tar.xz
 pushd m4-1.4.18
@@ -381,15 +334,15 @@ rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
 ./configure --prefix=/tools --without-bash-malloc
 make -j$(nproc)
 make install
 ln -sv bash /tools/bin/sh
 popd
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
@@ -514,16 +467,14 @@ rm -rf gzip-1.11
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
-echo Make-4.2.1
-tar xf make-4.2.1.tar.gz
-pushd make-4.2.1
-sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
-sed -i '215 d; 223 d;' glob/glob.c
+echo Make-4.3
+tar xf make-4.3.tar.gz
+pushd make-4.3
 ./configure --prefix=/tools --without-guile
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.2.1
+rm -rf make-4.3
 
 touch $LFS/logs/temptoolchain/status_make_complete
 
@@ -542,7 +493,10 @@ echo Perl-5.32.0
 tar xf perl-5.32.0.tar.xz
 pushd perl-5.32.0
 sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
-make -j$(nproc)
+# Using locally-built version of 'make' to avoid mismatch between the build machine's version
+# and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
+# we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
+/tools/bin/make -j$(nproc)
 cp -v perl cpan/podlators/scripts/pod2man /tools/bin
 mkdir -pv /tools/lib/perl5/5.32.0
 cp -Rv lib/* /tools/lib/perl5/5.32.0

@@ -1,11 +1,10 @@
 http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz
-http://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.xz
+http://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz
 https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz
 https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz
 http://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.2.tar.gz
 https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz
 https://sourceware.org/ftp/elfutils/0.185/elfutils-0.185.tar.bz2
-https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz
 https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz
 https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
 https://ftp.gnu.org/gnu/gdbm/gdbm-1.21.tar.gz
@@ -14,7 +13,7 @@ http://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz
 https://gcc.gnu.org/pub/libffi/libffi-3.2.1.tar.gz
 http://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz
 http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz
-https://ftp.gnu.org/gnu/make/make-4.2.1.tar.gz
+https://ftp.gnu.org/gnu/make/make-4.3.tar.gz
 https://www.kernel.org/pub/linux/docs/man-pages/Archive/man-pages-5.02.tar.xz
 https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
 http://www.mpfr.org/mpfr-4.1.0/mpfr-4.1.0.tar.xz
@@ -23,7 +22,6 @@ http://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz
 https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.15.tar.xz
 https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tar.xz
-https://downloads.sourceforge.net/tcl/tcl8.6.9-src.tar.gz
 https://tukaani.org/xz/xz-5.2.5.tar.xz
 https://zlib.net/zlib-1.2.11.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
@@ -43,13 +41,13 @@ http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
 https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
 http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
 https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz
-http://ftp.gnu.org/gnu/bash/bash-4.4.18.tar.gz
+https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz
 https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz
 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
 https://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz
 http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.32-i18n-1.patch
 https://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz
-https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2
+https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2
 http://ftp.astron.com/pub/file/file-5.40.tar.gz
 https://ftp.gnu.org/gnu/gawk/gawk-5.1.0.tar.xz
 http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz

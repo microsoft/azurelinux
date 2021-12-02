@@ -67,14 +67,16 @@ set -e
 #
 cd /sources
 
-echo Linux-5.10.74.1 API Headers
-tar xf kernel-5.10.74.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+echo Linux-5.10.78.1 API Headers
+tar xf kernel-5.10.78.1.tar.gz
+cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+patch -p1 -i 0002-add-linux-syscall-license-info.patch
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -543,17 +545,17 @@ popd
 rm -rf grep-3.7
 touch /logs/status_grep_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
-./configure --prefix=/usr                    \
-            --docdir=/usr/share/doc/bash-4.4.18 \
-            --without-bash-malloc            \
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
+./configure --prefix=/usr                      \
+            --docdir=/usr/share/doc/bash-5.1.8 \
+            --without-bash-malloc              \
             --with-installed-readline
 make -j$(nproc)
 make install
 cd /sources
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 touch /logs/status_bash_complete
 
 echo Libtool-2.4.6
@@ -588,17 +590,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.2.6
-tar xf expat-2.2.6.tar.bz2
-pushd expat-2.2.6
+echo Expat-2.4.1
+tar xf expat-2.4.1.tar.bz2
+pushd expat-2.4.1
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.2.6
+            --docdir=/usr/share/doc/expat-2.4.1
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.2.6
+rm -rf expat-2.4.1
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0
@@ -632,14 +634,14 @@ popd
 rm -rf autoconf-2.69
 touch /logs/status_autoconf_complete
 
-echo Automake-1.16.1
-tar xf automake-1.16.1.tar.xz
-pushd automake-1.16.1
-./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.1
+echo Automake-1.16.5
+tar xf automake-1.16.5.tar.gz
+pushd automake-1.16.5
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
 make -j$(nproc)
 make install
 popd
-rm -rf automake-1.16.1
+rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
 echo Xz-5.2.5
@@ -883,19 +885,14 @@ popd
 rm -rf libpipeline-1.5.0
 touch /logs/status_libpipeline_complete
 
-echo Make-4.2.1
-tar xf make-4.2.1.tar.gz
-pushd make-4.2.1
-# fix errors caused by glibc 2.34
-# Note: upgrading to make 4.3 fixes the glob errors, but also caused the following errors: (possibly faccessat2 docker issue)
-# make[1]: /bin/sh: Operation not permitted
-sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
-sed -i '215 d; 223 d;' glob/glob.c
+echo Make-4.3
+tar xf make-4.3.tar.gz
+pushd make-4.3
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.2.1
+rm -rf make-4.3
 touch /logs/status_make_complete
 
 echo Patch-2.7.6
