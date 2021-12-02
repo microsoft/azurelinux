@@ -82,6 +82,7 @@
                 "libatasmart",
                 "libbpf",
                 "libburn",
+                "libcacard",
                 "libcgroup",
                 "libcomps",
                 "libdnf",

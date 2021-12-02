@@ -2988,6 +2988,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcacard",
+          "version": "2.7.0",
+          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libcgroup",
           "version": "0.41",
           "downloadUrl": "https://downloads.sourceforge.net/libcg/libcgroup-0.41.tar.bz2"
