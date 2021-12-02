@@ -1155,6 +1155,9 @@ tar xf "$RPM_WITH_VERSION"-release.tar.gz
 mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
 pushd "$RPM_FOLDER"
 
+# Still not in the upstream
+patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am
 sed -iE '/Always build/,+16 d' Makefile.am

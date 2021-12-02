@@ -36,6 +36,7 @@ Requires:       rpm-libs = %{version}-%{release}
 Requires:       rpm-build = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
+Patch1: rpm-define-RPM-LD-FLAGS.patch
 
 %description
 RPM package manager

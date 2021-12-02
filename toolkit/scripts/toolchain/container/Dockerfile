@@ -58,6 +58,7 @@ RUN apt-get update -y -qq && \
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
+       "./rpm-define-RPM-LD-FLAGS.patch", \
        "./linker-script-readonly-keyword-support.patch", \
        "./toolchain-jdk8-wget.sh", \
        "./0002-add-linux-syscall-license-info.patch", \
@@ -105,6 +106,7 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./Awt_build_headless_only.patch", \
        "./check-system-ca-certs.patch", \
        "./go14_bootstrap_aarch64.patch", \
+       "./rpm-define-RPM-LD-FLAGS.patch", \
        "./cpio_extern_nocommon.patch", \
        "$LFS/tools/" ]
 
