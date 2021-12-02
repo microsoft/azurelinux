@@ -1,14 +1,13 @@
 Summary:	An XML parser library
 Name:		expat
-Version:	2.2.6
-Release:    4%{?dist}
+Version:	2.2.10
+Release:        1%{?dist}
 License:	MIT
 URL:		https://libexpat.github.io/
 Group:		System Environment/GeneralLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/libexpat/libexpat/releases/download/R_2_2_6/%{name}-%{version}.tar.bz2
-Patch0:         CVE-2018-20843.patch
+Source0:        https://github.com/libexpat/libexpat/releases/download/R_2_2_10/%{name}-%{version}.tar.bz2
 Requires:       expat-libs = %{version}-%{release}
 %description
 The Expat package contains a stream oriented C library for parsing XML.
@@ -27,14 +26,13 @@ This package contains minimal set of shared expat libraries.
 
 %prep
 %setup -q
-%patch0 -p1
 %build
 %configure \
 	CFLAGS="%{optflags}" \
 	CXXFLAGS="%{optflags}" \
 	--bindir=%{_bindir} \
 	--libdir=%{_libdir} \
-	--disable-static
+	--disable-static 
 make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
@@ -55,7 +53,6 @@ rm -rf %{buildroot}/*
 %license COPYING
 %doc AUTHORS Changes
 %{_bindir}/*
-%{_mandir}/man1/*
 
 %files devel
 %{_includedir}/*
