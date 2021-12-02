@@ -1,7 +1,7 @@
 Summary:        FUSE adapter - Azure Storage Blobs
 Name:           blobfuse
 Version:        1.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,10 @@ FUSE adapter - Azure Storage Blobs
 %autosetup -n azure-storage-fuse-blobfuse-%{version}
 
 %build
+CFLAGS="`echo " %{build_cflags} -Wno-error=type-limits "`"
+CXXFLAGS="`echo " %{build_cflags} -Wno-error=type-limits "`"
+export CFLAGS
+export CXXFLAGS
 ./build.sh
 
 %install
@@ -42,6 +46,9 @@ install -p -m 755 build/blobfuse %{buildroot}%{_bindir}/
 %{_bindir}/blobfuse
 
 %changelog
+* Wed Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.2-2
+- Add back in gcc11 compilation error mitigation
+
 * Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.2-1
 - Upgrade to latest upstream version
 - Remove %%clean section
