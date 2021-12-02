@@ -1,14 +1,16 @@
 Summary:        A Rust-VMM based cloud hypervisor from Intel
 Name:           cloud-hypervisor
-Version:        0.6.0
-Release:        7%{?dist}
+Version:        19.0
+Release:        1%{?dist}
 License:        ASL 2.0 or BSD
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       %{url}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Note: the cloud-hypervisor-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh cloud-hypervisor-%%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 ExclusiveArch:  x86_64
 
@@ -36,20 +38,17 @@ cargo build --release
 install -d %{buildroot}%{_bindir}
 install -D -m755 target/release/ch-remote %{buildroot}%{_bindir}
 install -D -m755 target/release/cloud-hypervisor %{buildroot}%{_bindir}
-install -d %{buildroot}%{_libdir}
-install -d %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_blk %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_fs %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_net %{buildroot}%{_libdir}/cloud-hypervisor
 
 %files
 %defattr(-,root,root)
 %license LICENSE-APACHE
 %{_bindir}/*
-%{_libdir}/cloud-hypervisor
 %exclude %{_libdir}/debug
 
 %changelog
+* Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 19.0-1
+- Updating to version 19.0 to use existing dependencies and build with the 1.56.1 version of 'rust'.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
 - Bump release to rebuild with rust 1.47.0-3 (security update)
 

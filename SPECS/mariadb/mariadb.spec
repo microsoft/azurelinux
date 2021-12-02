@@ -1,13 +1,15 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.3.28
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
+Patch0:         cmake_3.21.4_fix.patch
+
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -17,6 +19,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+
 Conflicts:      mysql
 
 %description
@@ -53,7 +56,7 @@ Summary:        errmsg for mariadb
 errmsg for maridb
 
 %prep
-%setup -q
+%autosetup -p1
 # Remove PerconaFT from here because of AGPL licence
 rm -rf storage/tokudb/PerconaFT
 # Disable "embedded" directory which only contains "test-connect" test
@@ -367,6 +370,9 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-2
+- Adding a fix to work with newer version of cmake.
+
 * Fri Apr 02 2021 Nicolas Ontiveros <niontive@microsoft.com> - 10.3.28-1
 - Upgrade to version 10.3.28, which resolves CVE-2021-27928
 

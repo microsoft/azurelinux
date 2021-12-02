@@ -4,9 +4,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "abseil-cpp",
+          "version": "20211102.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "acl",
-          "version": "2.2.53",
-          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/acl/acl-2.2.53.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.3.1.tar.gz"
         }
       }
     },
@@ -165,8 +175,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.4.48",
-          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/attr/attr-2.4.48.tar.gz"
+          "version": "2.5.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.1.tar.gz"
         }
       }
     },
@@ -436,8 +446,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse",
-          "version": "1.3.6",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.3.6.tar.gz"
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.2.tar.gz"
         }
       }
     },
@@ -576,8 +586,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.17.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
+          "version": "1.18.1",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.18.1.tar.gz"
         }
       }
     },
@@ -756,8 +766,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "0.6.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v0.6.0.tar.gz"
+          "version": "19.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v19.0.tar.gz"
         }
       }
     },
@@ -796,8 +806,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz"
+          "version": "3.21.4",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
         }
       }
     },
@@ -1547,8 +1557,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2"
+          "version": "2.4.1",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2"
         }
       }
     },
@@ -1999,8 +2009,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.2.20",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.2.20.tar.bz2"
+          "version": "2.3.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.3.tar.bz2"
         }
       }
     },
@@ -2109,8 +2119,8 @@
         "type": "other",
         "other": {
           "name": "gpgme",
-          "version": "1.13.1",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.13.1.tar.bz2"
+          "version": "1.16.0",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.16.0.tar.bz2"
         }
       }
     },
@@ -2149,8 +2159,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.41.1",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.41.1/grpc-1.41.1.tar.gz"
+          "version": "1.42.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
         }
       }
     },
@@ -2189,8 +2199,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.8.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
         }
       }
     },
@@ -2349,8 +2359,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.74.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
+          "version": "5.10.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
         }
       }
     },
@@ -2459,8 +2469,8 @@
         "type": "other",
         "other": {
           "name": "iproute",
-          "version": "4.18.0",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-4.18.0.tar.xz"
+          "version": "5.15.0",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-5.15.0.tar.xz"
         }
       }
     },
@@ -2709,8 +2719,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.74.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
+          "version": "5.10.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
         }
       }
     },
@@ -2719,8 +2729,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.74.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
+          "version": "5.10.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
         }
       }
     },
@@ -2729,8 +2739,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.74.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.74.1.tar.gz"
+          "version": "5.10.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
         }
       }
     },
@@ -2749,8 +2759,8 @@
         "type": "other",
         "other": {
           "name": "keyutils",
-          "version": "1.5.10",
-          "downloadUrl": "https://people.redhat.com/~dhowells/keyutils/keyutils-1.5.10.tar.bz2"
+          "version": "1.6.1",
+          "downloadUrl": "https://people.redhat.com/~dhowells/keyutils/keyutils-1.6.1.tar.bz2"
         }
       }
     },
@@ -2909,8 +2919,8 @@
         "type": "other",
         "other": {
           "name": "libassuan",
-          "version": "2.5.1",
-          "downloadUrl": "ftp://ftp.gnupg.org/gcrypt/libassuan/libassuan-2.5.1.tar.bz2"
+          "version": "2.5.5",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.5.tar.bz2"
         }
       }
     },
@@ -3189,8 +3199,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.8.7",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
+          "version": "1.9.4",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
         }
       }
     },
@@ -3319,8 +3329,8 @@
         "type": "other",
         "other": {
           "name": "libksba",
-          "version": "1.3.5",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.3.5.tar.bz2"
+          "version": "1.6.0",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.6.0.tar.bz2"
         }
       }
     },
@@ -3599,8 +3609,8 @@
         "type": "other",
         "other": {
           "name": "librelp",
-          "version": "1.2.17",
-          "downloadUrl": "https://github.com/rsyslog/librelp/archive/v1.2.17.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://download.rsyslog.com/librelp/librelp-1.10.0.tar.gz"
         }
       }
     },
@@ -4489,8 +4499,8 @@
         "type": "other",
         "other": {
           "name": "make",
-          "version": "4.2.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.2.1.tar.gz"
+          "version": "4.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.3.tar.gz"
         }
       }
     },
@@ -4952,7 +4962,7 @@
         "other": {
           "name": "npth",
           "version": "1.6",
-          "downloadUrl": "https://github.com/gpg/npth/archive/npth-1.6.tar.gz"
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
         }
       }
     },
@@ -5802,8 +5812,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.11.0",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.11.0/pgbouncer-1.11.0.tar.gz"
+          "version": "1.16.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.16.1/pgbouncer-1.16.1.tar.gz"
         }
       }
     },
@@ -5832,8 +5842,8 @@
         "type": "other",
         "other": {
           "name": "pinentry",
-          "version": "1.1.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.1.0.tar.bz2"
+          "version": "1.2.0",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
         }
       }
     },
@@ -6121,16 +6131,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-backports-ssl_match_hostname",
-          "version": "3.5.0.1",
-          "downloadUrl": "https://pypi.python.org/packages/76/21/2dc61178a2038a5cb35d14b61467c6ac632791ed05131dda72c20e7b9e23/backports.ssl_match_hostname-3.5.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-bcrypt",
           "version": "3.1.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/ce/3a/3d540b9f5ee8d92ce757eebacf167b9deedb8e30aedec69a2a072b2399bb/bcrypt-3.1.6.tar.gz"
@@ -6351,16 +6351,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-enum34",
-          "version": "1.1.6",
-          "downloadUrl": "https://pypi.python.org/packages/bf/3e/31d502c25302814a7c2f1d3959d2a3b3f78e509002ba91aea64993936876/enum34-1.1.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-execnet",
           "version": "1.7.1",
           "downloadUrl": "https://pypi.io/packages/source/e/execnet/execnet-1.7.1.tar.gz"
@@ -6394,16 +6384,6 @@
           "name": "python-frozendict",
           "version": "1.2",
           "downloadUrl": "https://pypi.python.org/packages/source/f/frozendict/frozendict-1.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-futures",
-          "version": "3.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/1f/9e/7b2ff7e965fc654592269f2906ade1c7d705f1bf25b7d469fa153f7d19eb/futures-3.2.0.tar.gz"
         }
       }
     },
@@ -6504,16 +6484,6 @@
           "name": "python-ipaddr",
           "version": "2.2.0",
           "downloadUrl": "https://pypi.python.org/packages/source/i/ipaddr/ipaddr-2.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-ipaddress",
-          "version": "1.0.22",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/ipaddress/ipaddress-1.0.22.tar.gz"
         }
       }
     },
@@ -7224,16 +7194,6 @@
           "name": "python-twisted",
           "version": "19.2.1",
           "downloadUrl": "https://pypi.python.org/packages/source/T/Twisted/Twisted-19.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-typing",
-          "version": "3.6.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/bf/9b/2bf84e841575b633d8d91ad923e198a415e3901f228715524689495b4317/typing-3.6.6.tar.gz"
         }
       }
     },
@@ -8422,8 +8382,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.47.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.xz"
+          "version": "1.56.1",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.56.1-src.tar.gz"
         }
       }
     },

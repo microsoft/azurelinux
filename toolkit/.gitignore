@@ -2,8 +2,13 @@ out/
 
 # Temporary toolchain build files that are left behind after a failed build.
 scripts/toolchain/container/.bashrc
+scripts/toolchain/container/04-fix-sigstksz.patch
 scripts/toolchain/container/Awt_build_headless_only.patch
 scripts/toolchain/container/check-system-ca-certs.patch
+scripts/toolchain/container/coreutils-fix-get-sys_getdents-aarch64.patch
+scripts/toolchain/container/cpio_extern_nocommon.patch
+scripts/toolchain/container/linker-script-readonly-keyword-support.patch
+scripts/toolchain/container/m4-1.4.18-glibc-change-work-around.patch
+scripts/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 scripts/toolchain/container/texinfo-perl-fix.patch
 scripts/toolchain/container/toolchain-local-wget-list
-scripts/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
