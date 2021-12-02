@@ -1,10 +1,10 @@
 Summary:    A GNU tool for automatically configuring source code
 Name:       autoconf213
 Version:    2.13
-Release:    47%{?dist}
+Release:    48%{?dist}
 License:    GPLv2+
 URL:        http://www.gnu.org/software/autoconf/
-Source:     ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-%{version}.tar.gz
+Source:     https://ftp.gnu.org/pub/gnu/autoconf/autoconf-%{version}.tar.gz
 Patch0:     autoconf-2.13-versioning.patch
 Patch1:     autoconf213-destdir.patch
 Patch2:     autoconf213-info.patch
@@ -82,6 +82,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_datadir}/autoconf-%{version}/
  
 %changelog
+*   Thu Dec 02 2021 Jamie Magee <jamagee@microsoft.com> 2.13-48
+-   Updated source URL to HTTPS
 *   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 2.13-47
 -   Fix check tests.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-46
