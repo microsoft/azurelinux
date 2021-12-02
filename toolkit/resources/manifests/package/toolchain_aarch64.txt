@@ -153,9 +153,6 @@ libassuan-devel-2.5.5-1.cm2.aarch64.rpm
 libcap-2.26-2.cm2.aarch64.rpm
 libcap-debuginfo-2.26-2.cm2.aarch64.rpm
 libcap-devel-2.26-2.cm2.aarch64.rpm
-libcap-ng-0.7.9-4.cm2.aarch64.rpm
-libcap-ng-debuginfo-0.7.9-4.cm2.aarch64.rpm
-libcap-ng-devel-0.7.9-4.cm2.aarch64.rpm
 libffi-3.2.1-12.cm2.aarch64.rpm
 libffi-debuginfo-3.2.1-12.cm2.aarch64.rpm
 libffi-devel-3.2.1-12.cm2.aarch64.rpm
@@ -507,7 +504,6 @@ python3-libs-3.7.10-3.cm2.aarch64.rpm
 python3-libxml2-2.9.12-2.cm2.aarch64.rpm
 python3-magic-5.40-1.cm2.noarch.rpm
 python3-pip-3.7.10-3.cm2.noarch.rpm
-python3-pwquality-1.4.2-6.cm2.aarch64.rpm
 python3-rpm-4.17.0-1.cm2.aarch64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-test-3.7.10-3.cm2.aarch64.rpm

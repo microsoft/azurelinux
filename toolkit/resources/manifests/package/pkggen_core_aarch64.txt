@@ -168,11 +168,9 @@ openssl-devel-1.1.1k-5.cm2.aarch64.rpm
 openssl-libs-1.1.1k-5.cm2.aarch64.rpm
 openssl-perl-1.1.1k-5.cm2.aarch64.rpm
 openssl-static-1.1.1k-5.cm2.aarch64.rpm
-openssl-debuginfo-1.1.1k-5.cm2.aarch64.rpm
 libcap-2.26-2.cm2.aarch64.rpm
 libcap-devel-2.26-2.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
-debugedit-debuginfo-5.0-1.cm2.aarch64.rpm
 rpm-4.17.0-1.cm2.aarch64.rpm
 rpm-build-4.17.0-1.cm2.aarch64.rpm
 rpm-build-libs-4.17.0-1.cm2.aarch64.rpm
@@ -207,7 +205,8 @@ lua-5.3.5-11.cm2.aarch64.rpm
 lua-libs-5.3.5-11.cm2.aarch64.rpm
 mariner-rpm-macros-2.0-8.cm2.noarch.rpm
 mariner-check-macros-2.0-8.cm2.noarch.rpm
-libassuan-2.5.1-5.cm2.aarch64.rpm
+libassuan-2.5.5-1.cm2.aarch64.rpm
+libassuan-devel-2.5.5-1.cm2.aarch64.rpm
 libgpg-error-1.43-1.cm2.aarch64.rpm
 libgcrypt-1.9.4-1.cm2.aarch64.rpm
 libksba-1.6.0-1.cm2.aarch64.rpm
