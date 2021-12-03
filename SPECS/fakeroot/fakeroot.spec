@@ -1,51 +1,50 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %bcond_with po4a
 
-Summary: Gives a fake root environment
-Name: fakeroot
-Version: 1.25.3
-Release: 1%{?dist}
+Summary:        Gives a fake root environment
+Name:           fakeroot
+Version:        1.25.3
+Release:        1%{?dist}
 # setenv.c: LGPLv2+
 # the rest: GPLv3+
-License: GPLv3+ and LGPLv2+
-URL: https://tracker.debian.org/pkg/fakeroot
-Source0: https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
-
+License:        GPLv3+ AND LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://tracker.debian.org/pkg/fakeroot
+Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
 # Debian package patches, from debian.tar.xz
-Patch0: debian_eglibc-fts-without-LFS.patch
-Patch2: debian_fix-shell-in-fakeroot.patch
+Patch0:         debian_eglibc-fts-without-LFS.patch
+Patch2:         debian_fix-shell-in-fakeroot.patch
 # Address some POSIX-types related problems.
-Patch4: fakeroot-inttypes.patch
+Patch4:         fakeroot-inttypes.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
-Patch5: fakeroot-multilib.patch
+Patch5:         fakeroot-multilib.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1889862
-Patch6: glibc_2.33_fix.patch
-Patch7: relax_tartest.patch
+Patch6:         glibc_2.33_fix.patch
+Patch7:         relax_tartest.patch
 
+BuildRequires:  %{_bindir}/getopt
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  gcc
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=887001
+BuildRequires:  libacl-devel
+BuildRequires:  libcap-devel
+
 BuildRequires:  libtool
 %if %{with po4a}
 BuildRequires:  po4a
 %endif
-BuildRequires: /usr/bin/getopt
-BuildRequires: gcc
-# https://bugzilla.redhat.com/show_bug.cgi?id=887001
-BuildRequires: libacl-devel
-BuildRequires: libcap-devel
-
 %if %{with_check}
 # uudecode used by tests/tartest
-BuildRequires: sharutils
+BuildRequires:  sharutils
 %endif
 
-Requires: /usr/bin/getopt
-Requires: fakeroot-libs = %{version}-%{release}
-Requires(post): /usr/sbin/alternatives
-Requires(post): /usr/bin/readlink
-Requires(preun): /usr/sbin/alternatives
-
+Requires:       %{_bindir}/getopt
+Requires:       fakeroot-libs = %{version}-%{release}
+Requires(post): %{_bindir}/readlink
+Requires(post): %{_sbindir}/alternatives
+Requires(preun): %{_sbindir}/alternatives
 
 %description
 fakeroot runs a command in an environment wherein it appears to have
@@ -55,7 +54,7 @@ that simulate the effect the real library functions would have had,
 had the user really been root.
 
 %package libs
-Summary: Gives a fake root environment (libraries)
+Summary:        Gives a fake root environment (libraries)
 
 %description libs
 This package contains the libraries required by %{name}.
@@ -131,9 +130,9 @@ for type in sysv tcp; do
 done
 
 %post
-link=$(readlink -e "/usr/bin/fakeroot")
-if [ "$link" = "/usr/bin/fakeroot" ]; then
-  rm -f /usr/bin/fakeroot
+link=$(readlink -e "%{_bindir}/fakeroot")
+if [ "$link" = "%{_bindir}/fakeroot" ]; then
+  rm -f %{_bindir}/fakeroot
 fi
 link=$(readlink -e "%{_bindir}/faked")
 if [ "$link" = "%{_bindir}/faked" ]; then
@@ -144,20 +143,19 @@ if [ "$link" = "%{_libdir}/libfakeroot/libfakeroot-0.so" ]; then
   rm -f "%{_libdir}/libfakeroot/libfakeroot-0.so"
 fi
 
-/usr/sbin/alternatives --install "%{_bindir}/fakeroot" fakeroot \
+%{_sbindir}/alternatives --install "%{_bindir}/fakeroot" fakeroot \
   "%{_bindir}/fakeroot-tcp" 50 \
   --slave %{_bindir}/faked faked %{_bindir}/faked-tcp \
   --slave %{_libdir}/libfakeroot/libfakeroot-0.so libfakeroot.so %{_libdir}/libfakeroot/libfakeroot-tcp.so \
 
-/usr/sbin/alternatives --install "%{_bindir}/fakeroot" fakeroot \
+%{_sbindir}/alternatives --install "%{_bindir}/fakeroot" fakeroot \
   "%{_bindir}/fakeroot-sysv" 40 \
   --slave %{_bindir}/faked faked %{_bindir}/faked-sysv \
   --slave %{_libdir}/libfakeroot/libfakeroot-0.so libfakeroot.so %{_libdir}/libfakeroot/libfakeroot-sysv.so \
-
 %preun
 if [ $1 = 0 ]; then
-  /usr/sbin/alternatives --remove fakeroot "%{_bindir}/fakeroot-tcp"
-  /usr/sbin/alternatives --remove fakeroot "%{_bindir}/fakeroot-sysv"
+  %{_sbindir}/alternatives --remove fakeroot "%{_bindir}/fakeroot-tcp"
+  %{_sbindir}/alternatives --remove fakeroot "%{_bindir}/fakeroot-sysv"
 fi
 
 %if %{with po4a}
@@ -171,6 +169,7 @@ fi
 %ghost %{_bindir}/faked
 %{_bindir}/fakeroot-*
 %ghost %{_bindir}/fakeroot
+
 %if %{with po4a}
 %{_mandir}/man1/faked.1*
 %{_mandir}/man1/fakeroot.1*
