@@ -502,7 +502,6 @@ python3-libs-3.7.10-3.cm2.x86_64.rpm
 python3-libxml2-2.9.12-2.cm2.x86_64.rpm
 python3-magic-5.40-1.cm2.noarch.rpm
 python3-pip-3.7.10-3.cm2.noarch.rpm
-python3-pwquality-1.4.2-6.cm2.x86_64.rpm
 python3-rpm-4.17.0-1.cm2.x86_64.rpm
 python3-setuptools-3.7.10-3.cm2.noarch.rpm
 python3-test-3.7.10-3.cm2.x86_64.rpm
