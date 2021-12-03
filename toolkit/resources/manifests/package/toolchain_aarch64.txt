@@ -335,7 +335,6 @@ perl-File-Fetch-0.56-464.cm2.noarch.rpm
 perl-File-Find-1.37-464.cm2.noarch.rpm
 perl-File-Path-2.16-464.cm2.noarch.rpm
 perl-File-Temp-0.230.900-464.cm2.noarch.rpm
-perl-File-Which-1.22-6.cm2.noarch.rpm
 perl-File-stat-1.09-464.cm2.noarch.rpm
 perl-FileCache-1.10-464.cm2.noarch.rpm
 perl-FileHandle-2.03-464.cm2.noarch.rpm
