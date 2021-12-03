@@ -323,6 +323,7 @@ chroot_and_install_rpms fontconfig
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
+        wget -nv --timeout=30 https://packages.microsoft.com/centos/8/prod/msopenjdk-11-11.0.11%2B9-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
         wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
         wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-debuginfo-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
         wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjdk8-doc-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH

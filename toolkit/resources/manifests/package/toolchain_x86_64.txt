@@ -235,6 +235,7 @@ mariner-repos-ui-2.0-1.cm2.noarch.rpm
 mariner-repos-ui-preview-2.0-1.cm2.noarch.rpm
 mariner-rpm-macros-2.0-7.cm2.noarch.rpm
 meson-0.57.1-2.cm2.noarch.rpm
+msopenjdk-11-11.0.11+9-1.x86_64.rpm
 mpfr-4.1.0-1.cm2.x86_64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.x86_64.rpm
 mpfr-devel-4.1.0-1.cm2.x86_64.rpm
