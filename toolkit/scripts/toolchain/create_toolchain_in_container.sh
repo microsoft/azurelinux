@@ -30,6 +30,8 @@ cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
 cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
 # Binutils readonly patch
 cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
+# RPM LD_FLAGS patch
+cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
 
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
