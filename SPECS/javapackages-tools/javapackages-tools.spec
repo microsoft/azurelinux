@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,9 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
+- Update to build with JDK 11
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
