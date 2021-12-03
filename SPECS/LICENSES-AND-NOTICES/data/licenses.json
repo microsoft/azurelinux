@@ -47,6 +47,7 @@
                 "dwz",
                 "ebtables",
                 "extra-cmake-modules",
+                "fakeroot",
                 "fdupes",
                 "firewalld",
                 "fmt",
