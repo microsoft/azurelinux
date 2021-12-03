@@ -78,6 +78,7 @@ rm -rf %{buildroot}
 
 
 %build
+export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk*")
 build-jar-repository -s -p lib ant
 ant \
     jar \
