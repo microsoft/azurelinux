@@ -118,6 +118,8 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.0-2
+- Build with JDK 11
 * Wed Jun 16 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.1.0-1
 - Add R spec.
 - License verified

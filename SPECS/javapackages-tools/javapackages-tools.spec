@@ -21,7 +21,6 @@ BuildRequires:  asciidoc
 BuildRequires:  coreutils
 #BuildRequires:  java-devel
 BuildRequires:  openjdk-11-hotspot
-
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -32,9 +31,9 @@ BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-#Requires:       java-1.8.0-openjdk-headless
 Requires:       openjdk-11-hotspot
-Requires:       javapackages-filesystem = %{version}-%{release}
+#Requires:       java-1.8.0-openjdk-headless
+#Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
 # These could be generated automatically, but then we would need to
@@ -77,7 +76,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       java-1.8.0-openjdk-devel
+#Requires:       java-1.8.0-openjdk-devel
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 

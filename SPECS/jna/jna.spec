@@ -19,7 +19,7 @@
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,7 @@ BuildRequires:  dos2unix
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libffi
 BuildRequires:  libffi-devel
-BuildRequires:  openjdk8
+#BuildRequires:  openjdk8
 #BuildRequires:  openjre8
 BuildRequires:  openjdk-11-hotspot
 BuildRequires:  javapackages-tools
@@ -138,6 +138,9 @@ ant
 %license LICENSE
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.5.0-3
+- Modify to build with JDK 11
+
 * Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-2
 - License verified.
 
