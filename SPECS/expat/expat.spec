@@ -63,9 +63,13 @@ rm -rf %{buildroot}/*
 %{_libdir}/libexpat.so.*
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
-- Added %%license line automatically
-
+*   Thu Dec 02 2021 Nick Samson <nisamson@microsoft.com> - 2.2.10-1
+-   Upgraded to 2.2.10 to fix CVE-2019-15903
+-   Removed files no longer produced by build from spec.
+-   Removed patch no longer required to fix CVE.
+-   Updated source URL.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.6-4
+-   Added %%license line automatically
 *   Wed Apr 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.2.6-3
 -   Fix CVE-2018-20843.
 -   Remove sha1 macro.
