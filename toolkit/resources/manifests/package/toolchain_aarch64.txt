@@ -333,7 +333,6 @@ perl-File-Copy-2.34-464.cm2.noarch.rpm
 perl-File-DosGlob-1.12-464.cm2.aarch64.rpm
 perl-File-Fetch-0.56-464.cm2.noarch.rpm
 perl-File-Find-1.37-464.cm2.noarch.rpm
-perl-File-HomeDir-1.004-6.cm2.noarch.rpm
 perl-File-Path-2.16-464.cm2.noarch.rpm
 perl-File-Temp-0.230.900-464.cm2.noarch.rpm
 perl-File-Which-1.22-6.cm2.noarch.rpm
