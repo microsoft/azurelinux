@@ -1,7 +1,7 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        2.10.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-markupsafe
+Provides:       python3dist(jinja2) = %{version}-%{release}
+Provides:       python3.7dist(jinja2) = %{version}-%{release}
 
 %description -n python3-jinja2
 Jinja2 is a template engine written in pure Python.  It provides a Django
@@ -48,6 +50,9 @@ sed -i 's/\r$//' LICENSE # Fix wrong EOL encoding
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Sat Dec 04 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.10.1-4
+- Explicitly provide python3dist(jinja2) because built in toolchain.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.1-3
 - Remove python2 package and re-enable fatal python byte compilation errors
 - Fix build instruction ordering

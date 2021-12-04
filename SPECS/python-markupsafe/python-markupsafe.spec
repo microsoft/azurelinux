@@ -2,7 +2,7 @@
 Summary:        A XML/HTML/XHTML Markup safe string for Python.
 Name:           python-markupsafe
 Version:        1.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
+Provides:       python3dist(markupsafe) = %{version}-%{release}
+Provides:       python3.7dist(markupsafe) = %{version}-%{release}
 
 %description -n python3-markupsafe
 MarkupSafe implements a XML/HTML/XHTML Markup safe string for Python.
@@ -42,6 +44,9 @@ easy_install py
 %{python3_sitelib}/*
 
 %changelog
+* Sat Dec 04 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.1.1-3
+- Explicitly provide python3dist(markupsafe) because built in toolchain.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-2
 - Add license to python3 package
 - Remove python2 package
