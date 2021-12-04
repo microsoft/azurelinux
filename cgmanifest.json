@@ -256,7 +256,7 @@
         "other": {
           "name": "autogen",
           "version": "5.18.16",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/autogen/rel5.18.16/autogen-5.18.16.tar.xz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/autogen/rel5.18.16/autogen-5.18.16.tar.xz"
         }
       }
     },
@@ -1188,7 +1188,7 @@
         "other": {
           "name": "dhcp",
           "version": "4.4.2",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
+          "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
         }
       }
     },
@@ -1198,7 +1198,7 @@
         "other": {
           "name": "dialog",
           "version": "1.3",
-          "downloadUrl": "ftp://ftp.invisible-island.net/dialog/dialog-1.3-20180621.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/dialog/dialog-1.3-20180621.tgz"
         }
       }
     },
@@ -1628,7 +1628,7 @@
         "other": {
           "name": "file",
           "version": "5.40",
-          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
+          "downloadUrl": "https://astron.com/pub/file/file-5.40.tar.gz"
         }
       }
     },
@@ -2070,7 +2070,7 @@
         "other": {
           "name": "gnutls",
           "version": "3.6.14",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
         }
       }
     },
@@ -2270,7 +2270,7 @@
         "other": {
           "name": "guile",
           "version": "2.0.14",
-          "downloadUrl": "ftp://ftp.gnu.org/pub/gnu/guile/guile-2.0.14.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/pub/gnu/guile/guile-2.0.14.tar.gz"
         }
       }
     },
@@ -2560,7 +2560,7 @@
         "other": {
           "name": "ipv6calc",
           "version": "2.2.0",
-          "downloadUrl": "ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/ipv6calc-2.2.0.tar.gz"
+          "downloadUrl": "https://www.deepspace6.net/ftp/pub/ds6/sources/ipv6calc/ipv6calc-2.2.0.tar.gz"
         }
       }
     },
@@ -4170,7 +4170,7 @@
         "other": {
           "name": "libxml2",
           "version": "2.9.12",
-          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz"
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.12/libxml2-v2.9.12.tar.gz"
         }
       }
     },
@@ -4530,7 +4530,7 @@
         "other": {
           "name": "lvm2",
           "version": "2.03.05",
-          "downloadUrl": "ftp://sourceware.org/pub/lvm2/releases/LVM2.2.03.05.tgz"
+          "downloadUrl": "https://mirrors.kernel.org/sourceware/lvm2/LVM2.2.03.05.tgz"
         }
       }
     },
@@ -5283,7 +5283,7 @@
         "other": {
           "name": "openldap",
           "version": "2.4.57",
-          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+          "downloadUrl": "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.4.57.tgz"
         }
       }
     },
@@ -5993,7 +5993,7 @@
         "other": {
           "name": "popt",
           "version": "1.16",
-          "downloadUrl": "ftp://anduin.linuxfromscratch.org/BLFS/svn/p/popt-1.16.tar.gz"
+          "downloadUrl": "https://ftp.osuosl.org/pub/rpm/popt/releases/historical/popt-1.16.tar.gz"
         }
       }
     },
@@ -8614,7 +8614,7 @@
         "other": {
           "name": "sgml-common",
           "version": "0.6.3",
-          "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
+          "downloadUrl": "https://www.sourceware.org/pub/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
         }
       }
     },
@@ -9104,7 +9104,7 @@
         "other": {
           "name": "unixODBC",
           "version": "2.3.7",
-          "downloadUrl": "ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.7.tar.gz"
+          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.7.tar.gz"
         }
       }
     },

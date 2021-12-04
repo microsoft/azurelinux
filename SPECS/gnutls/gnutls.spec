@@ -1,13 +1,13 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
-Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
+Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/v3.6/%{name}-%{version}.tar.xz
 Patch0:         CVE-2020-24659.patch
 Patch1:         CVE-2021-20231.patch
 Patch2:         CVE-2021-20232.patch
@@ -97,6 +97,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 3.6.14-7
+- Use HTTPS source URL
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.14-6
 - Provide compatibility provides for c++ subpackage from base package
 - Lint spec

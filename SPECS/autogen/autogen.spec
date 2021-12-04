@@ -1,10 +1,10 @@
 Summary:	The Automated Text and Program Generation Tool
 Name:		autogen
 Version:    5.18.16
-Release:    7%{?dist}
+Release:    8%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/autogen/
-Source0:        ftp://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/rel%{version}/%{name}-%{version}.tar.xz
 Group:		System Environment/Tools
 Vendor:         Microsoft Corporation
 BuildRequires:	guile-devel
@@ -80,6 +80,9 @@ make %{?_smp_mflags} check
 %exclude /usr/share/info/
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 5.18.16-8
+- Use HTTPS source URL
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.18.16-7
 - Remove libtool archive files from final packaging
 

@@ -1,13 +1,13 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/General Libraries
 URL:            http://www.xmlsoft.org/
-Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
+Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildRequires:  python3-devel
 Provides:       %{name}-tools = %{version}-%{release}
 Provides:       libxml-tools = %{version}-%{release}
@@ -77,6 +77,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 2.9.12-3
+- Use HTTPS source URL
+
 * Tue Aug 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.12-2
 - Revert re-addition of python2 dependency from bad merge
 - Remove recompilation with python support during install step

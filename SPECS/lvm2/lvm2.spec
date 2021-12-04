@@ -3,13 +3,13 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2, BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceware.org/lvm2/
-Source0:        ftp://sourceware.org/pub/lvm2/releases/LVM2.%{version}.tgz
+Source0:        https://mirrors.kernel.org/sourceware/%{name}/LVM2.%{version}.tgz
 Source1:        lvm2-activate.service
 Patch0:         lvm2-set-default-preferred_names.patch
 BuildRequires:  libaio-devel
@@ -340,6 +340,9 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> 2.03.05-9
+- Use HTTPS source URL
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.03.05-8
 - Adding the 'lvm2-dbusd' package using Fedora 32 (license: MIT) specs as guidance.
 

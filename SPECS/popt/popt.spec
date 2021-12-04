@@ -1,13 +1,13 @@
 Summary:	Programs to parse command-line options
 Name:		popt
 Version:	1.16
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:	MIT
 URL:		http://rpm5.org/files/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	ftp://anduin.linuxfromscratch.org/BLFS/svn/p/%{name}-%{version}.tar.gz
+Source0:	https://ftp.osuosl.org/pub/rpm/%{name}/releases/historical/%{name}-%{version}.tar.gz
 %define sha1 popt=cfe94a15a2404db85858a81ff8de27c8ff3e235e
 %description
 The popt package contains the popt libraries which are used by
@@ -60,6 +60,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 1.16-8
+- Use HTTPS source URL
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16-7
 - Added %%license line automatically
 

@@ -1,13 +1,13 @@
 Summary:    ODBC driver manager
 Name:       unixODBC
 Version:    2.3.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:    GPLv2+ and LGPLv2+
 URL:        http://www.unixodbc.org/
 Group:      System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    ftp://ftp.unixodbc.org/pub/unixODBC/%{name}-%{version}.tar.gz
+Source0:    http://www.unixodbc.org/%{name}-%{version}.tar.gz
 %define sha1 unixODBC=a066c4f3fcb19befbaf5a5801b830ec41b7318df
 
 BuildRequires: automake autoconf libtool
@@ -71,6 +71,9 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %{_libdir}/pkgconfig
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 2.3.7-4
+- Use HTTP source URL
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.7-3
 - Added %%license line automatically
 

@@ -2,14 +2,13 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.57
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openldap.org/
-# Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%{name}-%{version}.tgz
-Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/%{name}-%{version}.tgz
+Source0:        https://www.openldap.org/software/download/OpenLDAP/openldap-release/%{name}-%{version}.tgz
 Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
@@ -70,6 +69,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 2.4.57-6
+- Use HTTPS source URL
+
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.57-5
 - Removing dependency on "cyrus-sasl".
 

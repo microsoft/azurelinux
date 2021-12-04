@@ -1,13 +1,13 @@
 Summary:        GNU Ubiquitous Intelligent Language for Extensions
 Name:           guile
 Version:        2.0.14
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://www.gnu.org/software/guile/
-Source0:        ftp://ftp.gnu.org/pub/gnu/guile/%{name}-%{version}.tar.gz
+Source0:        https://ftp.gnu.org/pub/gnu/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  gc-devel
 BuildRequires:  libffi-devel
 BuildRequires:  libltdl-devel
@@ -78,6 +78,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 2.0.14-5
+- Use HTTPS source URL
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.14-4
 - Remove libtool archive files from final packaging
 

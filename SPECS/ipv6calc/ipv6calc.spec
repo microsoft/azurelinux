@@ -29,12 +29,12 @@
 Summary:        IPv6 address format change and calculation utility
 Name:           ipv6calc
 Version:        2.2.0
-Release:        41%{?dist}
+Release:        42%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.deepspace6.net/projects/%{name}.html
-Source0:        ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/%{name}-%{version}.tar.gz
+Source0:        https://www.deepspace6.net/ftp/pub/ds6/sources/%{name}/%{name}-%{version}.tar.gz
 Patch0:         ipv6calc-2.2.0-patch-8c7eea58.diff
 BuildRequires:  gcc
 BuildRequires:  openssl-devel
@@ -249,6 +249,9 @@ rm -rf %{buildroot}
 %{_sbindir}/ldconfig
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 2.2.0-42
+- Use HTTPS source URL
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.2.0-41
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

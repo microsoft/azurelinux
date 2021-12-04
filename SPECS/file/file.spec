@@ -1,13 +1,13 @@
 Summary:        Contains a utility for determining file types
 Name:           file
 Version:        5.40
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.darwinsys.com/file
-Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
+Source0:        https://astron.com/pub/%{name}/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -90,6 +90,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Wed Dec 08 2021 Jamie Magee <jamagee@microsoft.com> - 5.40-2
+- Use HTTPS source URL
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.40-1
 - Update to latest upstream version
 - Move license to libs subpackage
