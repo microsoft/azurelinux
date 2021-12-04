@@ -332,12 +332,12 @@ case $(uname -m) in
         wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/x86_64/rpms/openjre8-1.8.0.292-2.cm1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-debuginfo-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-doc-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-sample-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-src-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjre8-1.8.0.292-2.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-debuginfo-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-doc-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-sample-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjdk8-src-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/1.0/prod/update/aarch64/rpms/openjre8-1.8.0.292-1.cm1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
