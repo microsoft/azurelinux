@@ -33,11 +33,13 @@ Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
 #BuildRequires:  java-devel >= 1.8
-BuildRequires:  openjdk-11-hotspot
+#BuildRequires:  openjdk-11-hotspot
+BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
 #Requires:       java-devel >= 1.8
-Requires:       openjdk-11-hotspot
+#Requires:       openjdk-11-hotspot
+Requires:       msopenjdk-11
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
@@ -115,7 +117,7 @@ mv LICENSE.utf8 LICENSE
 export OPT_JAR_LIST=:
 
 export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
-export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk-11-hotspot*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 sh -x ./build.sh --noconfig jars
 
 %install

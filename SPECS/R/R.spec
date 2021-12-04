@@ -16,7 +16,8 @@ BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
 BuildRequires:  make
 #BuildRequires:  openjdk8
-BuildRequires:  openjdk-11-hotspot
+#BuildRequires:  openjdk-11-hotspot
+BuildRequires:  msopenjdk-11
 BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel

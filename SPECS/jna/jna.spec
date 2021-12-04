@@ -34,10 +34,12 @@ BuildRequires:  libffi
 BuildRequires:  libffi-devel
 #BuildRequires:  openjdk8
 #BuildRequires:  openjre8
-BuildRequires:  openjdk-11-hotspot
+#BuildRequires:  openjdk-11-hotspot
+BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-tools
 #Requires:       openjre8
-Requires:       openjdk-11-hotspot
+#Requires:       openjdk-11-hotspot
+Requires:       msopenjdk-11
 
 %description
 JNA provides Java programs easy access to native shared libraries
@@ -78,7 +80,7 @@ rm -rf %{buildroot}
 
 
 %build
-export JAVA_HOME=$(find %{_libdir}/jvm -name "openjdk*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 build-jar-repository -s -p lib ant
 ant \
     jar \

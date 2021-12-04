@@ -20,7 +20,8 @@ Patch0:         remove-epoch-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 #BuildRequires:  java-devel
-BuildRequires:  openjdk-11-hotspot
+#BuildRequires:  openjdk-11-hotspot
+BuildRequires:  msopenjdk-11
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -31,9 +32,10 @@ BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       openjdk-11-hotspot
+#Requires:       openjdk-11-hotspot
+Requires:       msopenjdk-11
 #Requires:       java-1.8.0-openjdk-headless
-#Requires:       javapackages-filesystem = %{version}-%{release}
+Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
 # These could be generated automatically, but then we would need to
@@ -89,7 +91,7 @@ It is a lightweight version with minimal runtime requirements.
 %patch0 -p1
 
 %build
-%define jdk_home $(find %{_libdir}/jvm -name "OpenJDK*")
+%define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
 %define jre_home %{jdk_home}/jre
 
 %configure --pyinterpreter=%{python_interpreter} \
