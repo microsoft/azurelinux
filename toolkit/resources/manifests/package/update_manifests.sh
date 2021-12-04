@@ -74,11 +74,9 @@ remove_packages_for_pkggen_core () {
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/libnsl2-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsepol-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libsolv-tools/d' $TmpPkgGen
-    sed -i '/libtirpc-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
@@ -253,8 +251,6 @@ generate_pkggen_core () {
         grep "^expat-" $TmpPkgGen
         grep "^libpipeline-" $TmpPkgGen
         grep "^gdbm-" $TmpPkgGen
-        grep "^libnsl2-" $TmpPkgGen
-        grep "^libtirpc-" $TmpPkgGen
         grep "^perl-" $TmpPkgGen
         grep "^texinfo-" $TmpPkgGen
         grep "^autoconf-" $TmpPkgGen
