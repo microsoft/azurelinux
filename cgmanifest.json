@@ -1737,6 +1737,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fontpackages",
+          "version": "",
+          "downloadUrl": "https://github.com/pnemade/fontpackages/archive/refs/tags/1.44.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fontsproto",
           "version": "2.1.3",
           "downloadUrl": "https://www.x.org/pub/individual/proto/fontsproto-2.1.3.tar.bz2"
