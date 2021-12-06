@@ -1,14 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global fontname lato
 %global fontconf 61-%{fontname}.conf
 
+Summary:        A sanserif typeface family
 Name:           %{fontname}-fonts
 Version:        2.015
 Release:        11%{?dist}
-Summary:        A sanserif typeface family
-
 License:        OFL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.latofonts.com/
 # Fonts retrieved 2015-08-07.
 Source0:        https://www.latofonts.com/download/Lato2OFL.zip#/%{name}-%{version}.zip
@@ -16,10 +15,13 @@ Source1:        %{name}-fontconfig.conf
 Source2:        %{fontname}.metainfo.xml
 
 BuildArch:      noarch
+
 BuildRequires:  fontpackages-devel
+
 Requires:       fontpackages-filesystem
-Provides:       google-lato-fonts = %{version}-%{release}
+
 Obsoletes:      google-lato-fonts < 1.014-1
+Provides:       google-lato-fonts = %{version}-%{release}
 
 %description
 Lato is a sanserif typeface family designed in the Summer 2010 by Warsaw-based
@@ -44,7 +46,6 @@ beautiful hairline style. It covers 2300+ glyphs per style and supports 100+
 Latin-based languages, 50+ Cyrillic-based languages as well as Greek and IPA
 phonetics.
 
-
 %prep
 %setup -q -c
 
@@ -59,19 +60,19 @@ chmod 0644 Lato2OFL/{OFL.txt,README.txt}
 %build
 
 %install
-install -m 0755 -d $RPM_BUILD_ROOT%{_fontdir}
-install -m 0644 -p Lato2OFL/*.ttf $RPM_BUILD_ROOT%{_fontdir}
+install -m 0755 -d %{buildroot}%{_fontdir}
+install -m 0644 -p Lato2OFL/*.ttf %{buildroot}%{_fontdir}
 
-install -m 0755 -d $RPM_BUILD_ROOT%{_fontconfig_templatedir} $RPM_BUILD_ROOT%{_fontconfig_confdir}
+install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} %{buildroot}%{_fontconfig_confdir}
 
-install -m 0644 -p %{SOURCE1} $RPM_BUILD_ROOT%{_fontconfig_templatedir}/%{fontconf}
-ln -s %{_fontconfig_templatedir}/%{fontconf} $RPM_BUILD_ROOT%{_fontconfig_confdir}/%{fontconf}
+install -m 0644 -p %{SOURCE1} %{buildroot}%{_fontconfig_templatedir}/%{fontconf}
+ln -s %{_fontconfig_templatedir}/%{fontconf} %{buildroot}%{_fontconfig_confdir}/%{fontconf}
 
 # Add AppStream metadata
 install -Dm 0644 -p %{SOURCE2} \
         %{buildroot}%{_datadir}/appdata/%{fontname}.metainfo.xml
 
-%_font_pkg -f %{fontconf} *.ttf
+%{_font_pkg} -f %{fontconf} *.ttf
 %doc Lato2OFL/README.txt
 %license Lato2OFL/OFL.txt
 %{_datadir}/appdata/%{fontname}.metainfo.xml
