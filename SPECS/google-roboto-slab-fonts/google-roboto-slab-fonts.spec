@@ -9,7 +9,8 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.google.com/fonts/specimen/Roboto+Slab
-Source0:        https://fonts.google.com/download?family=Roboto%{20}Slab#/%{name}-%{version}.zip
+# Fonts archive retrieved on 2021-12-06.
+Source0:        https://fonts.google.com/download?family=Roboto%20Slab#/%{name}-%{version}.zip
 Source5:        %{fontname}-fontconfig.conf
 Source6:        %{fontname}.metainfo.xml
 
