@@ -218,6 +218,7 @@
                 "secilc",
                 "selinux-policy",
                 "setools",
+                "sharutils",
                 "sgml-common",
                 "sos",
                 "squashfs-tools",
