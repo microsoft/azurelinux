@@ -8,10 +8,6 @@ glibc-lang-2.34-2.cm2.x86_64.rpm
 glibc-nscd-2.34-2.cm2.x86_64.rpm
 glibc-tools-2.34-2.cm2.x86_64.rpm
 zlib-1.2.11-5.cm2.x86_64.rpm
-libpkgconf-1.7.0-3.cm2.x86_64.rpm
-pkgconf-1.7.0-3.cm2.x86_64.rpm
-pkgconf-m4-1.7.0-3.cm2.noarch.rpm
-pkgconf-pkg-config-1.7.0-3.cm2.x86_64.rpm
 zlib-devel-1.2.11-5.cm2.x86_64.rpm
 file-5.40-1.cm2.x86_64.rpm
 file-devel-5.40-1.cm2.x86_64.rpm
