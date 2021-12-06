@@ -1,22 +1,22 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global fontconf 64-%{fontname}
 %global fontname google-roboto-slab
 
-Name:          google-roboto-slab-fonts
-Version:       1.100263
-Release:       2%{?dist}
-Summary:       Google Roboto Slab fonts
+Summary:        Google Roboto Slab fonts
+Name:           google-roboto-slab-fonts
+Version:        1.100263
+Release:        2%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.google.com/fonts/specimen/Roboto+Slab
+Source0:        https://fonts.google.com/download?family=Roboto%{20}Slab#/%{name}-%{version}.zip
+Source5:        %{fontname}-fontconfig.conf
+Source6:        %{fontname}.metainfo.xml
 
-License:       ASL 2.0
-URL:           https://www.google.com/fonts/specimen/Roboto+Slab
-Source0:       https://fonts.google.com/download?family=Roboto%20Slab#/%{name}-%{version}.zip
-Source5:       %{fontname}-fontconfig.conf
-Source6:       %{fontname}.metainfo.xml
-BuildArch:     noarch
+BuildArch:      noarch
 
-BuildRequires: fontpackages-devel
-BuildRequires: unzip
+BuildRequires:  fontpackages-devel
+BuildRequires:  unzip
 
 %description
 Roboto has a dual nature. It has a mechanical skeleton and the forms are
@@ -44,12 +44,12 @@ install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
 install -m 0644 -p %{SOURCE5} \
          %{buildroot}%{_fontconfig_templatedir}/%{fontconf}-fontconfig.conf
 ln -s %{_fontconfig_templatedir}/%{fontconf}-fontconfig.conf \
-      %{buildroot}%{_fontconfig_confdir}/%{fontconf}-fontconfig.conf 
+      %{buildroot}%{_fontconfig_confdir}/%{fontconf}-fontconfig.conf
 
 install -m 0755 -d %{buildroot}%{_datadir}/appdata
 install -m 0644 -p %{SOURCE6} %{buildroot}%{_datadir}/appdata
 
-%_font_pkg -f %{fontconf}-fontconfig.conf RobotoSlab-*.ttf
+%{_font_pkg} -f %{fontconf}-fontconfig.conf RobotoSlab-*.ttf
 %{_datadir}/appdata/%{fontname}.metainfo.xml
 %license LICENSE.txt
 
