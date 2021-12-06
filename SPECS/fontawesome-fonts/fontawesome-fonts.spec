@@ -65,7 +65,7 @@ mkdir -p %{buildroot}%{_datadir}/font-awesome-web/
 cp -a css less scss %{buildroot}%{_datadir}/font-awesome-web/
 
 # files:
-%{_font_pkg} -f %{fontconf} *.ttf *.otf
+%_font_pkg -f %{fontconf} *.ttf *.otf
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2

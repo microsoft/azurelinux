@@ -72,7 +72,7 @@ ln -s %{_fontconfig_templatedir}/%{fontconf} %{buildroot}%{_fontconfig_confdir}/
 install -Dm 0644 -p %{SOURCE2} \
         %{buildroot}%{_datadir}/appdata/%{fontname}.metainfo.xml
 
-%{_font_pkg} -f %{fontconf} *.ttf
+%_font_pkg -f %{fontconf} *.ttf
 %doc Lato2OFL/README.txt
 %license Lato2OFL/OFL.txt
 %{_datadir}/appdata/%{fontname}.metainfo.xml

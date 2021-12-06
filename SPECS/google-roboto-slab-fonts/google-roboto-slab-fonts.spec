@@ -50,7 +50,7 @@ ln -s %{_fontconfig_templatedir}/%{fontconf}-fontconfig.conf \
 install -m 0755 -d %{buildroot}%{_datadir}/appdata
 install -m 0644 -p %{SOURCE6} %{buildroot}%{_datadir}/appdata
 
-%{_font_pkg} -f %{fontconf}-fontconfig.conf RobotoSlab-*.ttf
+%_font_pkg -f %{fontconf}-fontconfig.conf RobotoSlab-*.ttf
 %{_datadir}/appdata/%{fontname}.metainfo.xml
 %license LICENSE.txt
 
