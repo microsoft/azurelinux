@@ -2128,6 +2128,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "google-roboto-slab-fonts",
+          "version": "1.100263",
+          "downloadUrl": "https://fonts.google.com/download?family=Roboto%20Slab"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gperf",
           "version": "3.1",
           "downloadUrl": "http://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz"
