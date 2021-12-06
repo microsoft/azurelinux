@@ -1,7 +1,7 @@
 Summary:        Microsoft Bond Library
 Name:           bond
 Version:        8.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ Development files for %{name}
 
 %prep
 %setup -q
+chmod u+x %{SOURCE1} %{SOURCE2}
 
 %build
 CMAKE_OPTS="\
@@ -50,11 +51,11 @@ CMAKE_OPTS="\
 mkdir -v build
 cd build
 cmake $CMAKE_OPTS ..
-make %{?_smp_mflags}
+%make_build
 
 %install
 cd build
-make DESTDIR=%{buildroot} install
+%make_install
 chmod 0755 %{buildroot}%{_bindir}/gbc
 
 %files
@@ -67,16 +68,19 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 %{_libdir}/%{name}/*
 
 %changelog
+* Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
+- Updating package build steps.
+
 * Tue Oct 27 2020 Joe Schmitt <joschmit@microsoft.com> - 8.0.1-4
 - Include all sources regardless of architecture.
 
-*   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.0.1-3
--   License verified.
--   Added source URL.
--   Added 'Vendor' and 'Distribution' tags.
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-3
+- License verified.
+- Added source URL.
+- Added 'Vendor' and 'Distribution' tags.
 
-*   Tue May 19 2020 Jonathan Chiu <jochi@microsoft.com> 8.0.1-2
--   Add aarch64 support
+* Tue May 19 2020 Jonathan Chiu <jochi@microsoft.com> - 8.0.1-2
+- Add aarch64 support
 
-*   Mon Apr 06 2020 Jonathan Chiu <jochi@microsoft.com> 8.0.1-1
--   Original version for CBL-Mariner.
+* Mon Apr 06 2020 Jonathan Chiu <jochi@microsoft.com> - 8.0.1-1
+- Original version for CBL-Mariner.
