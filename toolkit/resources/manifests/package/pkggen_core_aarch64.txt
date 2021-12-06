@@ -150,6 +150,7 @@ perl-interpreter-5.32.0-464.cm2.aarch64.rpm
 perl-libs-5.32.0-464.cm2.aarch64.rpm
 perl-locale-1.09-464.cm2.noarch.rpm
 perl-macros-5.32.0-464.cm2.noarch.rpm
+perl-mro-1.23-464.cm2.noarch.rpm
 perl-overload-1.31-464.cm2.noarch.rpm
 perl-overloading-0.02-464.cm2.noarch.rpm
 perl-parent-0.238-464.cm2.noarch.rpm
@@ -158,6 +159,7 @@ perl-subs-1.03-464.cm2.noarch.rpm
 perl-threads-2.25-464.cm2.aarch64.rpm
 perl-threads-shared-1.61-464.cm2.aarch64.rpm
 perl-vars-1.05-464.cm2.noarch.rpm
+perl-5.32.0-464.cm2.aarch64.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
 autoconf-2.69-11.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
@@ -169,6 +171,8 @@ openssl-static-1.1.1k-5.cm2.aarch64.rpm
 libcap-2.26-2.cm2.aarch64.rpm
 libcap-devel-2.26-2.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
+libarchive-3.4.2-3.cm2.aarch64.rpm
+libarchive-devel-3.4.2-3.cm2.aarch64.rpm
 rpm-4.17.0-1.cm2.aarch64.rpm
 rpm-build-4.17.0-1.cm2.aarch64.rpm
 rpm-build-libs-4.17.0-1.cm2.aarch64.rpm
@@ -178,8 +182,8 @@ rpm-libs-4.17.0-1.cm2.aarch64.rpm
 cpio-2.13-3.cm2.aarch64.rpm
 cpio-lang-2.13-3.cm2.aarch64.rpm
 e2fsprogs-libs-1.45.6-1.cm2.aarch64.rpm
-libsolv-0.7.19-1.cm2.aarch64.rpm
-libsolv-devel-0.7.19-1.cm2.aarch64.rpm
+libsolv-0.7.19-2.cm2.aarch64.rpm
+libsolv-devel-0.7.19-2.cm2.aarch64.rpm
 libssh2-1.9.0-1.cm2.aarch64.rpm
 libssh2-devel-1.9.0-1.cm2.aarch64.rpm
 krb5-1.18-1.cm2.aarch64.rpm
