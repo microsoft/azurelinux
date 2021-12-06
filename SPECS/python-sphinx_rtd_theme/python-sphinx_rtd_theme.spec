@@ -10,7 +10,7 @@ URL:            https://github.com/rtfd/%{srcname}
 Source0:        https://github.com/rtfd/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The koji builders do not have network access, and this file is not included
 # in any Fedora package, so we retrieve it for offline use.
-Source1:        https://docs.readthedocs.io/en/latest/objects.inv
+Source1:        https://docs.readthedocs.io/en/latest/objects.inv#/%{name}-objects.inv
 # Remove deprecated use of script_files.  See:
 # - https://github.com/readthedocs/sphinx_rtd_theme/pull/728
 # - https://github.com/readthedocs/sphinx_rtd_theme/commit/a49a812c8821123091166fae1897d702cdc2d627

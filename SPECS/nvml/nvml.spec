@@ -116,7 +116,7 @@ to pmem is provided.
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n libpmemblk-devel
 Summary:        Development files for the Persistent Memory Resident Array of Blocks library
@@ -155,7 +155,7 @@ failure or program interruption (no torn blocks).
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n libpmemlog
 Summary:        Persistent Memory Resident Log File library
@@ -190,7 +190,7 @@ level libraries like libpmemobj to be more generally useful.
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n libpmemobj
 Summary:        Persistent Memory Transactional Object Store library
@@ -225,7 +225,7 @@ probably want to start with this library.
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n libpmempool
 Summary:        Persistent Memory pool management library
@@ -258,7 +258,7 @@ pools created by libpmemlog, libpmemblk and libpmemobj libraries.
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n pmempool
 Summary:        Utilities for Persistent Memory
@@ -311,7 +311,7 @@ to replicate persistent memory regions over RDMA protocol.
 This sub-package contains debug variant of the library, providing
 run-time assertions and trace points. The typical way to access the
 debug version is to set the environment variable LD_LIBRARY_PATH to
-%{_lib64dir}/pmdk_debug.
+%{_libdir}/pmdk_debug.
 
 %package -n rpmemd
 Summary:        Target node process executed by librpmem
