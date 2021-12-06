@@ -1,7 +1,7 @@
-Summary:    The GNU shar utilities for packaging and unpackaging shell archives
-Name:       sharutils
-Version:    4.15.2
-Release:    19%{?dist}
+Summary:        The GNU shar utilities for packaging and unpackaging shell archives
+Name:           sharutils
+Version:        4.15.2
+Release:        19%{?dist}
 # The main code:                GPLv3+
 # intl/dngettext.c:             LGPLv2+
 # lib (gnulib):                 GPLv3+
@@ -16,38 +16,42 @@ Release:    19%{?dist}
 # config.rpath:                 FSFULLR
 # INSTALL:                      FSFAPP
 # install-sh:                   MIT
-License:    GPLv3+ and (GPLv3+ and BSD) and (LGPLv3+ or BSD) and LGPLv2+ and Public Domain and GFDL
-Source:     https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+License:        GPLv3+ AND (GPLv3+ AND BSD) AND (LGPLv3+ OR BSD) AND LGPLv2+ AND Public Domain AND GFDL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.gnu.org/software/%{name}/
+Source:         https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # Pass compilation with -Werror=format-security, bug #1037323
-Patch0:     %{name}-4.14.2-Pass-compilation-with-Werror-format-security.patch
+Patch0:         %{name}-4.14.2-Pass-compilation-with-Werror-format-security.patch
 # Fix CVE-2018-1000097 (a heap buffer overflow in find_archive()),
 # bug #1548019,
 # <http://lists.gnu.org/archive/html/bug-gnu-utils/2018-02/msg00004.html>
-Patch1:     %{name}-4.15.2-Fix-a-heap-buffer-overflow-in-find_archive.patch
+Patch1:         %{name}-4.15.2-Fix-a-heap-buffer-overflow-in-find_archive.patch
 # Adapt bundled gnulib to glibc-2.28
-Patch2:     %{name}-4.15.2-fflush-adjust-to-glibc-2.28-libio.h-removal.patch
+Patch2:         %{name}-4.15.2-fflush-adjust-to-glibc-2.28-libio.h-removal.patch
 # Fix building with GCC 10,
 # <https://lists.gnu.org/archive/html/bug-gnu-utils/2020-01/msg00001.html>
-Patch3:     %{name}-4.15.2-Fix-building-with-GCC-10.patch
+Patch3:         %{name}-4.15.2-Fix-building-with-GCC-10.patch
 # Fix building with GCC 10,
 # <https://lists.gnu.org/archive/html/bug-gnu-utils/2020-01/msg00001.html>
-Patch4:     %{name}-4.15.2-Do-not-include-lib-md5.c-into-src-shar.c.patch
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:        http://www.gnu.org/software/%{name}/
-BuildRequires:      binutils
-BuildRequires:      coreutils
-BuildRequires:      gcc
-BuildRequires:      gettext
+Patch4:         %{name}-4.15.2-Do-not-include-lib-md5.c-into-src-shar.c.patch
+
+BuildRequires:  binutils
+BuildRequires:  coreutils
+BuildRequires:  gcc
+BuildRequires:  gettext
 # glibc-common for iconv
-BuildRequires:      glibc-common
-BuildRequires:      make
-BuildRequires:      sed
-# Tests:
-BuildRequires:      diffutils
-Provides:           bundled(gnulib)
+BuildRequires:  glibc-common
+BuildRequires:  make
+BuildRequires:  sed
+
+%if %{with_check}
+BuildRequires:  diffutils
+%endif
+
+Provides:       bundled(gnulib)
 # See libopts/autoopts/options.h for OPTIONS_DOTTED_VERSION
-Provides:           bundled(libopts) = 41.1
+Provides:       bundled(libopts) = 41.1
 
 %description
 The sharutils package contains the GNU shar utilities, a set of tools for
@@ -77,16 +81,16 @@ done
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=${RPM_BUILD_ROOT} install
-rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+%make_install
+rm -f %{buildroot}%{_infodir}/dir
 chmod 644 AUTHORS ChangeLog COPYING NEWS README THANKS TODO
 %find_lang %{name}
 
 %check
-make check
+%make_build check
 
 %files -f %{name}.lang
 %license COPYING
@@ -400,4 +404,3 @@ make check
 
 * Fri Jul 18 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-
