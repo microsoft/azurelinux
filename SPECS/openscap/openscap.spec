@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
-Version:        1.3.1
-Release:        7%{?dist}
+Version:        1.3.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  libxmlsec1-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  pcre-devel
 BuildRequires:  perl-XML-Parser
@@ -25,6 +26,7 @@ BuildRequires:  rpm-devel
 BuildRequires:  swig
 BuildRequires:  util-linux-devel
 Requires:       curl
+Requires:       libxmlsec1
 Requires:       popt
 Provides:       %{name}-engine-sce = %{version}-%{release}
 Provides:       %{name}-scanner = %{version}-%{release}
@@ -112,6 +114,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.5-1
+- Update to version 1.3.5
+- License verified
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
 - Add provides for scanner subpackage from base package
 - Remove openscap-python python2 subpackage
