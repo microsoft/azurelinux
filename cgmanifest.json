@@ -1748,7 +1748,7 @@
         "type": "other",
         "other": {
           "name": "fontpackages",
-          "version": "",
+          "version": "1.44",
           "downloadUrl": "https://github.com/pnemade/fontpackages/archive/refs/tags/1.44.tar.gz"
         }
       }
