@@ -14,11 +14,10 @@ Remove embedding limitations from TrueType fonts, by setting the fsType field
 in the OS/2 table to zero. That's it; this program is a one-trick pony.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-export CFLAGS="$CFLAGS %{optflags}"
-make %{?_smp_mflags}
+CFLAGS="$CFLAGS %{optflags}" %make_build
 
 %install
 install -d %{buildroot}%{_bindir}
