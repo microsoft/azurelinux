@@ -1,30 +1,29 @@
 %global spectool_version 1.0.10
 
+Summary:        RPM Development Tools
 Name:           rpmdevtools
 Version:        8.10
-Release:        12%{?dist}
-Summary:        RPM Development Tools
-
+Release:        13%{?dist}
 # rpmdev-setuptree is GPLv2, everything else GPLv2+
-License:        GPLv2+ and GPLv2
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/rpmdevtools
 Source0:        https://releases.pagure.org/rpmdevtools/%{name}-%{version}.tar.xz
-
 # Backports from upstream
 Patch0001:      0001-bumpspec-checksig-Avoid-python-3.6-regex-related-dep.patch
 Patch0002:      0001-Limit-newVersion-s-re.sub-to-a-single-replacement.patch
 
 BuildArch:      noarch
+
 # help2man, pod2man, *python for creating man pages
-BuildRequires:  help2man
 BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  bash-completion
+BuildRequires:  help2man
 BuildRequires:  perl-generators
 BuildRequires:  python3
 BuildRequires:  python3-rpm
-BuildRequires:  bash-completion
-Provides:       spectool = %{spectool_version}
+
 Requires:       curl
 Requires:       diffutils
 Requires:       fakeroot
@@ -32,9 +31,10 @@ Requires:       file
 Requires:       findutils
 Requires:       gawk
 Requires:       grep
-Requires:       rpm-build >= 4.4.2.3
 Requires:       python3-rpm
+Requires:       rpm-build >= 4.4.2.3
 Requires:       sed
+Provides:       spectool = %{spectool_version}
 
 %description
 This package contains scripts and to aid in
@@ -53,7 +53,6 @@ rpmdev-extract      Extract various archives, "tar xvf" style
 rpmdev-bumpspec     Bump revision in specfile
 ...and many more.
 
-
 %prep
 %autosetup -p1
 grep -lF "%{_bindir}/python " * \
@@ -61,17 +60,14 @@ grep -lF "%{_bindir}/python " * \
 
 
 %build
-%configure --libdir=%{_prefix}/lib
+%configure --libdir=%{_libdir}
 %make_build
 
-
 %install
-rm -rf $RPM_BUILD_ROOT
-
 %make_install
 
 echo %%{_datadir}/bash-completion > %{name}.files
-[ -d $RPM_BUILD_ROOT%{_sysconfdir}/bash_completion.d ] && \
+[ -d %{buildroot}%{_sysconfdir}/bash_completion.d ] && \
 echo %%{_sysconfdir}/bash_completion.d > %{name}.files
 
 
@@ -83,8 +79,10 @@ echo %%{_sysconfdir}/bash_completion.d > %{name}.files
 %{_bindir}/*
 %{_mandir}/man[18]/*.[18]*
 
-
 %changelog
+* Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.10-13
+- License verified.
+
 * Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.10-12
 - Removing option to build with Python 2.
 - Replacing dependency on 'rpm-python3' with 'python3-rpm'.
