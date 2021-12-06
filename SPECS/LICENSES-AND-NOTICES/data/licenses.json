@@ -199,6 +199,7 @@
                 "python-responses",
                 "python-ruamel-yaml",
                 "python-ruamel-yaml-clib",
+                "python-sphinx_rtd_theme",
                 "python-sphinx-theme-py3doc-enhanced",
                 "python-toolz",
                 "python-tqdm",

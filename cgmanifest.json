@@ -7221,6 +7221,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sphinx_rtd_theme",
+          "version": "0.4.3",
+          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/0.4.3/sphinx_rtd_theme-0.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinx-theme-alabaster",
           "version": "0.7.11",
           "downloadUrl": "https://files.pythonhosted.org/packages/3f/46/9346ea429931d80244ab7f11c4fce83671df0b7ae5a60247a2b588592c46/alabaster-0.7.11.tar.gz"
