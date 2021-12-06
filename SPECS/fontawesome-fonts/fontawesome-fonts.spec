@@ -1,23 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global fontname fontawesome
 %global fontconf 60-%{fontname}.conf
 
-Name:		%{fontname}-fonts
-Version:	4.7.0
-Release:	11%{?dist}
+Summary:        Iconic font set
+Name:           %{fontname}-fonts
+Version:        4.7.0
+Release:        11%{?dist}
+License:        OFL AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://fontawesome.com
+Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-fontconfig.conf
+Source2:        README-Trademarks.txt
 
-Summary:	Iconic font set
-License:	OFL AND MIT
-URL:		https://fontawesome.com
-Source0:	https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:	%{name}-fontconfig.conf
-Source2:	README-Trademarks.txt
-BuildArch:	noarch
-BuildRequires:	fontpackages-devel
-BuildRequires:	ttembed
-Requires:	fontpackages-filesystem
+BuildArch:      noarch
 
+BuildRequires:  fontpackages-devel
+BuildRequires:  ttembed
+
+Requires:       fontpackages-filesystem
 
 %description
 Font Awesome gives you scalable vector icons that can instantly be
@@ -28,8 +29,8 @@ This package contains OpenType and TrueType font files which are typically used
 locally.
 
 %package web
-Requires:	%{fontname}-fonts = %{version}-%{release}
-Summary:	Iconic font set, web files
+Summary:        Iconic font set, web files
+Requires:       %{fontname}-fonts = %{version}-%{release}
 
 %description web
 Font Awesome gives you scalable vector icons that can instantly be
@@ -42,7 +43,7 @@ typically used on the web.
 
 %prep
 %setup -q -n Font-Awesome-%{version}
-cp -p %SOURCE2 .
+cp -p %{SOURCE2} .
 
 %build
 ttembed fonts/*.ttf fonts/*.otf
@@ -64,7 +65,7 @@ mkdir -p %{buildroot}%{_datadir}/font-awesome-web/
 cp -a css less scss %{buildroot}%{_datadir}/font-awesome-web/
 
 # files:
-%_font_pkg -f %{fontconf} *.ttf *.otf
+%{_font_pkg} -f %{fontconf} *.ttf *.otf
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
 %exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2
