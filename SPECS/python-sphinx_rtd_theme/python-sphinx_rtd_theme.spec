@@ -1,13 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global srcname sphinx_rtd_theme
-
+Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
 Version:        0.4.3
-Summary:        Sphinx theme for readthedocs.org
 Release:        12%{?dist}
-
 License:        MIT AND OFL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/rtfd/%{srcname}
 Source0:        https://github.com/rtfd/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The koji builders do not have network access, and this file is not included
@@ -35,11 +33,10 @@ of that site.
 
 %package -n python3-%{srcname}
 Summary:        Sphinx theme for readthedocs.org
-Requires:       fontawesome-fonts-web
 Requires:       font(fontawesome)
 Requires:       font(lato)
 Requires:       font(robotoslab)
-
+Requires:       fontawesome-fonts-web
 %{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
