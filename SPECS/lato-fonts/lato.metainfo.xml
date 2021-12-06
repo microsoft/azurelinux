@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Richard Hughes <richard@hughsie.com> -->
+<component type="font">
+  <id>lato</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Lato</name>
+  <summary>A classical sans-serif font family</summary>
+  <description>
+    <p>
+      The semi-rounded details of the letters give Lato a feeling of warmth,
+      while the strong structure provides stability and seriousness.
+    </p>
+  </description>
+  <updatecontact>richard_at_hughsie_dot_com</updatecontact>
+  <url type="homepage">http://www.latofonts.com/</url>
+</component>
