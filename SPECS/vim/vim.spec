@@ -27,7 +27,7 @@ Conflicts:      toybox
 The vim extra package contains a extra files for powerful text editor.
 
 %prep
-%autosetup
+%autosetup -p1
 echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 
 %build
