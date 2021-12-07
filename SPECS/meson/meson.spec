@@ -1,8 +1,8 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Extremely fast and user friendly build system
 Name:           meson
-Version:        0.57.1
-Release:        2%{?dist}
+Version:        0.59.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Fri Dec 03 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.59.2-1
+- Updating to 0.59.2.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.57.1-2
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 0.56.0-1: Removing 'python3-xml' from '*Requires'.
