@@ -10,9 +10,8 @@ URL:            https://www.keepalived.org/
 #Note.          We currently use alternate source location.  Preferred original is here:  https://www.keepalived.org/software/keepalived-%{version}.tar.gz
 #Source0:       https://github.com/acassen/keepalived/archive/v%{version}.zip
 Source0:        %{name}-%{version}.zip
-Patch0: CVE-2021-44225.patch
 Source1:        %{name}.service
-
+Patch0:         CVE-2021-44225.patch
 BuildRequires:  ipset-devel
 BuildRequires:  iptables-devel
 BuildRequires:  libmnl-devel
@@ -22,7 +21,6 @@ BuildRequires:  net-snmp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  systemd
 BuildRequires:  unzip
-
 Requires:       libnl3-devel
 Requires:       net-snmp
 Requires:       systemd
@@ -91,8 +89,9 @@ fi
 %{_mandir}/man8/%{name}.8*
 
 %changelog
-*   Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.0.10-7
--   Added patch file(s) CVE-2021-44225.patch
+* Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 2.0.10-7
+- Added patch file(s) CVE-2021-44225.patch
+
 * Thu Apr 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.10-6
 - Adding an explicit run-time dependency on 'net-snmp'.
 - Bumping up release number to link against newer version of 'net-snmp' libraries.
