@@ -951,13 +951,13 @@ popd
 rm -rf texinfo-6.8
 touch /logs/status_texinfo_complete
 
-echo Procps-ng-3.3.15
-tar xf procps-ng-3.3.15.tar.xz
-pushd procps-ng-3.3.15
+echo Procps-ng-3.3.17
+tar xf procps-ng-3.3.17.tar.xz
+pushd procps-3.3.17
 ./configure --prefix=/usr                            \
             --exec-prefix=                           \
             --libdir=/usr/lib                        \
-            --docdir=/usr/share/doc/procps-ng-3.3.15 \
+            --docdir=/usr/share/doc/procps-ng-3.3.17 \
             --disable-static                         \
             --disable-kill
 make -j$(nproc)
@@ -965,7 +965,7 @@ make install
 #mv -v /usr/lib/libprocps.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libprocps.so) /usr/lib/libprocps.so
 popd
-rm -rf procps-ng-3.3.15
+rm -rf procps-ng-3.3.17
 touch /logs/status_procpsng_complete
 
 echo util-linux-2.37.2
