@@ -40,7 +40,7 @@ failover. So in short keepalived is a userspace daemon for LVS cluster nodes
 healthchecks and LVS directors failover.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 autoreconf -f -i
