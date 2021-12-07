@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.3668
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
-Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-4019.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -19,15 +20,14 @@ Summary:        Extra files for Vim text editor
 Group:          Applications/Editors
 Requires:       %{name} = %{version}-%{release}
 Requires:       tcsh
-
 Conflicts:      toybox
 
 %description extra
 The vim extra package contains a extra files for powerful text editor.
 
 %prep
-%autosetup
-echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+%autosetup -p1
+echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
 
 %build
 %configure --enable-multibyte
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.2.3668-2
+- Added patch file(s) CVE-2021-4019.patch
+
 * Thu Nov 25 2021 Muhammad Falak <mwani@microsoft.com> - 8.2.3668-1
 - Bump version to 8.2.3668 to fix CVE-2021-3968,CVE-2021-3973,CVE-2021-3974
 
