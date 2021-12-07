@@ -43,7 +43,7 @@ for rpmpackage in $pkgs; do
     for sofile in $package_provides; do
         # Query local metadata for provides
         sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
-        if [[ $sos_found -eq 0 ]] ; then
+        if [[ "$sos_found" -eq 0 ]] ; then
             # SO file not found, meaning this might be a new .SO
             # or a new version of a preexisting .SO.
             # Check if the previous version exists in the database.
@@ -67,7 +67,7 @@ done
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-rm "$sodiff_out_dir"/sodiff-summary.txt
+rm -f "$sodiff_out_dir"/sodiff-summary.txt
 
 # Remove packages that have been dash-rolled already.
 echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
