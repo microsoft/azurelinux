@@ -1,16 +1,14 @@
+%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
-Version:        8.6.8
-%define majorver 8.6
-Release:        3%{?dist}
-URL:            http://tcl.sourceforge.net/
-License:        LGPLv2+
-Group:          System Environment/Libraries
+Version:        8.6.12
+Release:        1%{?dist}
+License:        TCL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
-%define sha1    tcl-core=e13199c76a7d1eae02f35cc9a20fabded6f815f5
-
 BuildRequires:  cmake
 
 %description
@@ -22,9 +20,9 @@ Tcl can also be used for a variety of web-related tasks and for creating
 powerful command languages for applications.
 
 %package devel
-Summary: Headers and development libraries for tcl
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Summary:        Headers and development libraries for tcl
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Headers and development libraries for tcl
@@ -97,18 +95,24 @@ make test
 %{_mandir}/mann/*
 %{_mandir}/man3/*
 
-
 %changelog
+* Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 8.6.12-1
+- Update to 8.6.12
+- Fix lint
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.8-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.6.8-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 8.6.8-1
--   Update version to 8.6.8.
-*   Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com>  8.6.6-2
--   Package more files (private headers, etc). Took install section from
-    Fedora: http://pkgs.fedoraproject.org/cgit/rpms/tcl.git/tree/tcl.spec
--   Move init.tcl and other *.tck files to the main package
-*   Wed Apr 12 2017 Xiaolin Li <xiaolinl@vmware.com>  8.6.6-1
--   Initial build.  First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 8.6.8-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> - 8.6.8-1
+- Update version to 8.6.8.
+
+* Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 8.6.6-2
+- Package more files (private headers, etc). Took install section fromFedora: http://pkgs.fedoraproject.org/cgit/rpms/tcl.git/tree/tcl.spec
+- Move init.tcl and other *.tck files to the main package
+
+* Wed Apr 12 2017 Xiaolin Li <xiaolinl@vmware.com> - 8.6.6-1
+- Initial build.  First version

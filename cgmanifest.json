@@ -6062,8 +6062,8 @@
         "type": "other",
         "other": {
           "name": "psmisc",
-          "version": "23.2",
-          "downloadUrl": "http://prdownloads.sourceforge.net/psmisc/psmisc-23.2.tar.xz"
+          "version": "23.4",
+          "downloadUrl": "http://prdownloads.sourceforge.net/psmisc/psmisc-23.4.tar.xz"
         }
       }
     },
@@ -8873,8 +8873,8 @@
         "type": "other",
         "other": {
           "name": "tcl",
-          "version": "8.6.8",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.8-src.tar.gz"
+          "version": "8.6.12",
+          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.12-src.tar.gz"
         }
       }
     },
