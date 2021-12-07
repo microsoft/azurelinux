@@ -18,6 +18,7 @@ BuildRequires:  libselinux-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  pcre-devel
+BuildRequires:  perl-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
@@ -99,6 +100,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files devel
 %defattr(-,root,root)
+%{_datadir}/perl5/vendor_perl/openscap_pm.so
 %{_includedir}/*
 %{_libdir}/libopenscap_sce.so
 %{_libdir}/libopenscap.so
@@ -107,7 +109,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files perl
 %defattr(-,root,root)
 %{_libdir}/perl5/*
-%{_datadir}/perl5/vendor_perl/openscap_pm.pm
 
 %files -n python3-%{name}
 %defattr(-,root,root)
@@ -116,6 +117,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Tue Dec 07 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.5-2
 - Using "xmlsec1" instead of "libxmlsec1" as dependency.
+- Fixing building Perl binding for new version.
 
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.5-1
 - Update to version 1.3.5
