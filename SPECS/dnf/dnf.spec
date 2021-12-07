@@ -3,8 +3,8 @@
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
 
 Name:           dnf
-Version:        4.2.18
-Release:        3%{?dist}
+Version:        4.10.0
+Release:        1%{?dist}
 Summary:        Python 3 version of the DNF package manager.
 License:        GPLv2+ or GPL
 URL:            https://github.com/rpm-software-management/dnf
@@ -149,6 +149,9 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Mon Dec 06 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.10.0-1
+- Update version to 4.10.0.
+
 * Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> 4.2.18-3
 - Edit dnf-automatic.conf and start dnf-automatic-notifyonly timer.
 

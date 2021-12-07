@@ -2,8 +2,8 @@
 
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
-Version:        2.5.0
-Release:        5%{?dist}
+Version:        2.13.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
@@ -40,18 +40,19 @@ It contains the libraries and header files.
 %patch1 -p1
 
 %build
-meson -Dprefix=%{_prefix} -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=false \
-       -Dwith_py3_overrides=true -Dwith_py2_overrides=false api1
-cd api1
+meson -Dprefix=%{_prefix} -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=true \
+      -Dwith_py3_overrides=true -Dwith_py2_overrides=false \
+      -Dwith_manpages=disabled -Dwith_docs=false build
+cd build
 ninja
 
 %check
 export LC_CTYPE=C.utf8
-cd api1
+cd build
 ninja test
 
 %install
-cd api1
+cd build
 DESTDIR=%{buildroot}/ ninja install
 
 %post -p /sbin/ldconfig
@@ -60,19 +61,21 @@ DESTDIR=%{buildroot}/ ninja install
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/modulemd-validator-v1
-%{_libdir}/girepository-1.0/Modulemd-1.0.typelib
+%{_bindir}/modulemd-validator
+%{_libdir}/girepository-1.0/Modulemd-2.0.typelib
 %{_libdir}/libmodulemd.so.*
-%{_datadir}/gir-1.0/Modulemd-1.0.gir
-%{_datadir}/gtk-doc/html/modulemd-1.0/*
+%{_datadir}/gir-1.0/Modulemd-2.0.gir
 %{python3_sitelib}/*
 
 %files  devel
 %{_libdir}/libmodulemd.so
-%{_libdir}/pkgconfig/modulemd.pc
-%{_includedir}/modulemd/*
+%{_libdir}/pkgconfig/*.pc
+%{_includedir}/modulemd-2.0/*.h
 
 %changelog
+*   Mon Dec 06 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.13.0-1
+-   Update version to 2.13.0.
+-   Update test_v1_import_headers_timeout.patch to sync with 2.13.0 sources
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 2.5.0-5
 -   Improve test reliability by increasing timeout.
 *   Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 2.5.0-4
