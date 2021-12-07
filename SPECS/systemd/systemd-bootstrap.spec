@@ -38,6 +38,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
+AutoReq:        no
 
 %description
 Systemd is an init replacement with better process control and security
@@ -45,6 +46,7 @@ Systemd is an init replacement with better process control and security
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
+AutoReq:        no
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -53,6 +55,7 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
+AutoReq:        no
 
 %description devel
 Development headers for developing applications linking to libsystemd
