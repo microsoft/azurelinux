@@ -234,7 +234,7 @@ mariner-repos-preview-2.0-1.cm2.noarch.rpm
 mariner-repos-ui-2.0-1.cm2.noarch.rpm
 mariner-repos-ui-preview-2.0-1.cm2.noarch.rpm
 mariner-rpm-macros-2.0-7.cm2.noarch.rpm
-meson-0.57.1-2.cm2.noarch.rpm
+meson-0.59.2-1.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.aarch64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.aarch64.rpm
 mpfr-devel-4.1.0-1.cm2.aarch64.rpm
@@ -244,8 +244,8 @@ ncurses-debuginfo-6.2-4.cm2.aarch64.rpm
 ncurses-devel-6.2-4.cm2.aarch64.rpm
 ncurses-libs-6.2-4.cm2.aarch64.rpm
 ncurses-term-6.2-4.cm2.aarch64.rpm
-ninja-build-1.8.2-3.cm2.aarch64.rpm
-ninja-build-debuginfo-1.8.2-3.cm2.aarch64.rpm
+ninja-build-1.10.2-1.cm2.aarch64.rpm
+ninja-build-debuginfo-1.10.2-1.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
 npth-debuginfo-1.6-4.cm2.aarch64.rpm
 npth-devel-1.6-4.cm2.aarch64.rpm

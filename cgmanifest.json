@@ -4589,8 +4589,8 @@
         "type": "other",
         "other": {
           "name": "meson",
-          "version": "0.57.1",
-          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/0.57.1/meson-0.57.1.tar.gz"
+          "version": "0.59.2",
+          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/0.59.2/meson-0.59.2.tar.gz"
         }
       }
     },
@@ -4911,8 +4911,8 @@
         "type": "other",
         "other": {
           "name": "ninja-build",
-          "version": "1.8.2",
-          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz"
+          "version": "1.10.2",
+          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.10.2.tar.gz"
         }
       }
     },
