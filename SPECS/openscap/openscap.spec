@@ -1,7 +1,7 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,6 @@ BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxml2-devel
-BuildRequires:  libxmlsec1-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  pcre-devel
 BuildRequires:  perl-XML-Parser
@@ -25,9 +24,10 @@ BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
 BuildRequires:  swig
 BuildRequires:  util-linux-devel
+BuildRequires:  xmlsec1-devel
 Requires:       curl
-Requires:       libxmlsec1
 Requires:       popt
+Requires:       xmlsec1
 Provides:       %{name}-engine-sce = %{version}-%{release}
 Provides:       %{name}-scanner = %{version}-%{release}
 Provides:       %{name}-utils = %{version}-%{release}
@@ -114,6 +114,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Tue Dec 07 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.5-2
+- Using "xmlsec1" instead of "libxmlsec1" as dependency.
+
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.5-1
 - Update to version 1.3.5
 - License verified
