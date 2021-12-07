@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Required binaries:
 # rpm and dnf on Mariner
@@ -43,7 +43,7 @@ for rpmpackage in $pkgs; do
     for sofile in $package_provides; do
         # Query local metadata for provides
         sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
-        if [[ "$sos_found" -eq 0 ]] ; then
+        if [ "$sos_found" -eq 0 ] ; then
             # SO file not found, meaning this might be a new .SO
             # or a new version of a preexisting .SO.
             # Check if the previous version exists in the database.
@@ -54,7 +54,7 @@ for rpmpackage in $pkgs; do
             # check for generic .so in the repo
             sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
 
-            if ! [[ $sos_found -eq 0 ]] ; then
+            if ! [ "$sos_found" -eq 0 ] ; then
                 # Generic version of SO was found.
                 # This means it's a new version of a preexisting SO.
                 # Log which packages depend on this functionality
