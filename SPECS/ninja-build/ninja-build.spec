@@ -1,12 +1,12 @@
 Name:           ninja-build
 Summary:        Small build system with focus on speed
-Version:        1.10.2
-Release:        1%{?dist}
+Version:        1.8.2
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://ninja-build.org
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/ninja-build/ninja/archive/v%%{version}.tar.gz
+#Source0:       https://github.com/ninja-build/ninja/archive/v%{version}.tar.gz
 Source0:        ninja-%{version}.tar.gz
 Source1:        macros.ninja
 
@@ -38,22 +38,17 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.ninja
 
 %files
 %license COPYING
-%doc README.md
+%doc HACKING.md README
 %{_bindir}/ninja
 %{_bindir}/ninja-build
 %{_datadir}/bash-completion/completions/ninja
 %{_libdir}/rpm/macros.d/macros.ninja
 
 %changelog
-*   Mon Dec 06 2021 Max Brodeur-Urbas <maxbr@microsoft.com> 1.10.2-1
--   Updated to version 1.10.2.
-
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.2-3
 -   License verified.
 -   Fixed 'Source0' tag.
-
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
-
 *   Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 1.8.2-1
 -   Initial packaging
