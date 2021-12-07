@@ -1,0 +1,44 @@
+From cd088ce3bc68a6986637c0cd77b94ebff729b89b Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 19 Apr 2016 11:27:50 +0200
+Subject: redhat: reserve more memory on fseg
+
+RH-Author: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: <1461065271-22039-2-git-send-email-kraxel@redhat.com>
+Patchwork-id: 70213
+O-Subject: [RHEL-7.1 seabios PATCH 1/2] redhat: reserve more memory on fseg
+Bugzilla: 1327060
+RH-Acked-by: Miroslav Rezanina <mrezanin@redhat.com>
+RH-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+RH-Acked-by: Laszlo Ersek <lersek@redhat.com>
+
+seabios 1.7.5 has about 8k free space in fseg.
+
+configure 1.9.1 to keep the same amout space in fseg, so the amout of
+disks we are able to handle stays roughly the same.  ahci + scsi are
+slightly below the 1.7.5 numbers but stay above the documented limits.
+virtio-block numbers are higher than the 1.7.5 numbers.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+(cherry picked from commit 0561b82b0470679505d62f49eec83adb01eec0ab)
+---
+ scripts/layoutrom.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/layoutrom.py b/scripts/layoutrom.py
+index 6616721..71841aa 100755
+--- a/scripts/layoutrom.py
++++ b/scripts/layoutrom.py
+@@ -66,7 +66,7 @@ BUILD_BIOS_SIZE = 0x10000
+ BUILD_ROM_START = 0xc0000
+ BUILD_LOWRAM_END = 0xa0000
+ # Space to reserve in f-segment for dynamic allocations
+-BUILD_MIN_BIOSTABLE = 2048
++BUILD_MIN_BIOSTABLE = 8192
+ 
+ # Layout the 16bit code.  This ensures sections with fixed offset
+ # requirements are placed in the correct location.  It also places the
+-- 
+1.8.3.1
+

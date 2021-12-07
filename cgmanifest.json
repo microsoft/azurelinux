@@ -1586,6 +1586,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fakeroot",
+          "version": "1.25.3",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.25.3.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fcgi",
           "version": "2.4.0",
           "downloadUrl": "https://src.fedoraproject.org/lookaside/extras/fcgi/fcgi-2.4.0.tar.gz/d15060a813b91383a9f3c66faf84867e/fcgi-2.4.0.tar.gz"
@@ -1717,9 +1727,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fontawesome-fonts",
+          "version": "4.7.0",
+          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fontconfig",
           "version": "2.13.91",
           "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.91.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fontpackages",
+          "version": "1.44",
+          "downloadUrl": "https://github.com/pnemade/fontpackages/archive/refs/tags/1.44.tar.gz"
         }
       }
     },
@@ -2091,6 +2121,16 @@
           "name": "golang-sys",
           "version": "b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d",
           "downloadUrl": "https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "google-roboto-slab-fonts",
+          "version": "1.100263",
+          "downloadUrl": "https://fonts.google.com/download?family=Roboto%20Slab"
         }
       }
     },
@@ -2868,6 +2908,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lato-fonts",
+          "version": "2.015",
+          "downloadUrl": "https://www.latofonts.com/download/Lato2OFL.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "less",
           "version": "530",
           "downloadUrl": "http://www.greenwoodsoftware.com/less/less-530.tar.gz"
@@ -2981,6 +3031,16 @@
           "name": "libcap-ng",
           "version": "0.7.9",
           "downloadUrl": "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.7.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcacard",
+          "version": "2.7.0",
+          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
         }
       }
     },
@@ -3158,6 +3218,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libfabric",
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0/libfabric-1.12.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libfastjson",
           "version": "0.99.8",
           "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.8.tar.gz"
@@ -3281,6 +3351,16 @@
           "name": "libiothsm-std",
           "version": "1.1.8",
           "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libiscsi",
+          "version": "1.18.0",
+          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.18.0.tar.gz"
         }
       }
     },
@@ -5093,6 +5173,16 @@
           "name": "nvme-cli",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nvml",
+          "version": "1.8",
+          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/1.8/pmdk-1.8.tar.gz"
         }
       }
     },
@@ -7131,6 +7221,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sphinx_rtd_theme",
+          "version": "0.4.3",
+          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/0.4.3/sphinx_rtd_theme-0.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinx-theme-alabaster",
           "version": "0.7.11",
           "downloadUrl": "https://files.pythonhosted.org/packages/3f/46/9346ea429931d80244ab7f11c4fce83671df0b7ae5a60247a2b588592c46/alabaster-0.7.11.tar.gz"
@@ -7564,6 +7664,16 @@
           "name": "rpm-ostree",
           "version": "2020.4",
           "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rpmdevtools",
+          "version": "8.10",
+          "downloadUrl": "https://releases.pagure.org/rpmdevtools/rpmdevtools-8.10.tar.xz"
         }
       }
     },
@@ -8421,6 +8531,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "seabios",
+          "version": "1.14.0",
+          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "secilc",
           "version": "3.2",
           "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/secilc-3.2.tar.gz"
@@ -8495,6 +8615,16 @@
           "name": "shadow-utils",
           "version": "4.9",
           "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/v4.9/shadow-4.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sharutils",
+          "version": "4.15.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/sharutils/sharutils-4.15.2.tar.xz"
         }
       }
     },
@@ -8852,6 +8982,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ttembed",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/hisdeedsaredust/ttembed/archive/v1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tpm2-abrmd",
           "version": "2.3.3",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
@@ -9075,6 +9215,16 @@
           "name": "vim",
           "version": "8.1.1667",
           "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virglrenderer",
+          "version": "0.9.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.9.1/virglrenderer-virglrenderer-0.9.1.tar.gz"
         }
       }
     },

@@ -1,0 +1,58 @@
+From 1067cdba6d08f2a765cb0ea371189a5b703eb4db Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 22 Feb 2018 16:39:43 +0100
+Subject: [PATCH] Fix a heap-buffer-overflow in find_archive()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+rw_buffer has allocated rw_base_size bytes. But subsequend fgets() in
+find_archive() reads up-to BUFSIZ bytes.
+
+On my system, BUFSIZ is 8192. rw_base_size is usually equaled to
+a memory page size, 4096 on my system. Thus find_archive() can write
+beyonded allocated memmory for rw_buffer array:
+
+$ valgrind -- ./unshar /tmp/id\:000000\,sig\:06\,src\:000005+000030\,op\:splice\,rep\:4
+==30582== Memcheck, a memory error detector
+==30582== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==30582== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==30582== Command: ./unshar /tmp/id:000000,sig:06,src:000005+000030,op:splice,rep:4
+==30582==
+==30582== Invalid write of size 1
+==30582==    at 0x4EAB480: _IO_getline_info (in /usr/lib64/libc-2.27.so)
+==30582==    by 0x4EB47C2: fgets_unlocked (in /usr/lib64/libc-2.27.so)
+==30582==    by 0x10BF60: fgets_unlocked (stdio2.h:320)
+==30582==    by 0x10BF60: find_archive (unshar.c:243)
+==30582==    by 0x10BF60: unshar_file (unshar.c:379)
+==30582==    by 0x10BCCC: validate_fname (unshar-opts.c:604)
+==30582==    by 0x10BCCC: main (unshar-opts.c:639)
+==30582==  Address 0x523a790 is 0 bytes after a block of size 4,096 alloc'd
+==30582==    at 0x4C2DBBB: malloc (vg_replace_malloc.c:299)
+==30582==    by 0x10C670: init_unshar (unshar.c:450)
+==30582==    by 0x10BC55: main (unshar-opts.c:630)
+
+This was reported in
+<http://lists.gnu.org/archive/html/bug-gnu-utils/2018-02/msg00004.html>.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/unshar.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/unshar.c b/src/unshar.c
+index 80bc3a9..0fc3773 100644
+--- a/src/unshar.c
++++ b/src/unshar.c
+@@ -240,7 +240,7 @@ find_archive (char const * name, FILE * file, off_t start)
+       off_t position = ftello (file);
+ 
+       /* Read next line, fail if no more and no previous process.  */
+-      if (!fgets (rw_buffer, BUFSIZ, file))
++      if (!fgets (rw_buffer, rw_base_size, file))
+ 	{
+ 	  if (!start)
+ 	    error (0, 0, _("Found no shell commands in %s"), name);
+-- 
+2.13.6
+

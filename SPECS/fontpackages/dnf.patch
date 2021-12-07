@@ -1,0 +1,79 @@
+diff -ur fontpackages-1.44.orig/bin/repo-font-audit fontpackages-1.44/bin/repo-font-audit
+--- fontpackages-1.44.orig/bin/repo-font-audit	2010-06-13 16:43:19.000000000 +0200
++++ fontpackages-1.44/bin/repo-font-audit	2015-06-16 13:51:53.739107822 +0200
+@@ -1,5 +1,5 @@
+ #!/bin/sh
+-# Quick and dirty script to audit font use in a yum package repository
++# Quick and dirty script to audit font use in a package repository
+ #
+ # It is slow, it is ugly, and it requires a good network connection
+ 
+@@ -332,7 +332,7 @@
+ 
+ echo "Looking for packages:"
+ echo "— with font metadata…"
+-repoquery --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
++$REPOQUERY --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
+           --qf "%{sourcerpm}|%{name}|%{epoch}:%{version}-%{release}|%{arch}|%{packagesize}|M" \
+           --whatprovides "font(*)" --quiet \
+           | sort | uniq \
+@@ -340,7 +340,7 @@
+           > "$FPL"
+ 
+ echo "— that include files with common font extensions…"
+-repoquery --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
++$REPOQUERY --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
+           --qf "%{sourcerpm}|%{name}|%{epoch}:%{version}-%{release}|%{arch}|%{packagesize}|E" \
+           -f '*.ttf' -f '*.otf' -f '*.ttc' \
+           -f '*.pfb' -f '*.pfa' \
+@@ -350,7 +350,7 @@
+           > "$PWFL"
+ 
+ echo "— that use the core X11 protocol…"
+-repoquery --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
++$REPOQUERY --repofrompath=$REPOID,$FREPOURL --repoid=$REPOID \
+           --qf "%{sourcerpm}|%{name}|%{epoch}:%{version}-%{release}|%{arch}|%{packagesize}|X" \
+           --whatrequires 'libX11.so*' \
+           | sort | uniq \
+@@ -386,7 +386,7 @@
+   echo -n "– $rpm ◔"
+   mkdir "$rpmd"
+   cd "$rpmd"
+-  rpm_loc=$(repoquery --repofrompath=$REPOID,$REPOURL --repoid=$REPOID \
++  rpm_loc=$($REPOQUERY --repofrompath=$REPOID,$REPOURL --repoid=$REPOID \
+                       --location "$rpm" 2>/dev/null \
+               | fix_url)
+   if $(echo "$rpm_loc" | grep -q -e '^[\./~]') ; then
+@@ -1018,12 +1018,12 @@
+    text library such as pango, pango-cairo, harfbuzz, or QT)
+ 
+ You can self-check your packages at any time by:
+-1. installing createrepo and fontpackages-tools:
+-# yum install createrepo fontpackages-tools
++1. installing $CREATEREPO and fontpackages-tools:
++# $YUM install $CREATEREPO fontpackages-tools
+ 2. putting your packages and any font package they depends on in a
+    test directory
+-3. indexing this directory with createrepo:
+-$ createrepo path-to-test-directory
++3. indexing this directory with $CREATEREPO:
++$ $CREATEREPO path-to-test-directory
+ 4. running repo-font-audit:
+ $ repo-font-audit test absolute-path-to-test-directory
+ 
+@@ -1163,6 +1163,15 @@
+ SRES="repo-font-audit-$ID-$TIMESTAMP-short"
+ SPAM="repo-font-audit-$ID-$TIMESTAMP-mail"
+ 
++if [ -x /usr/bin/dnf ] ; then
++    CREATEREPO='createrepo_c'
++    REPOQUERY='dnf repoquery'
++    YUM='dnf'
++else
++    CREATEREPO='createrepo'
++    REPOQUERY='repoquery'
++    YUM='yum'
++fi
+ TMPDIR=$(mktemp -d --tmpdir=/tmp $RES-XXXXXXXXXX)
+ cd $TMPDIR
+ 

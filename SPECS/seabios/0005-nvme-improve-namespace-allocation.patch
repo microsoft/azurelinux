@@ -1,0 +1,123 @@
+From f2522cde64a70ea215826052b4cabeda84f0cace Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 26 May 2021 09:32:10 +0200
+Subject: [PATCH] nvme: improve namespace allocation
+
+Instead of allocating a big array upfront go probe the namespaces and
+only allocate an nvme_namespace struct for those namespaces which are
+actually active.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 9bb1203b359dff5b36e8e6d0afcfc6fc2c1f8e78)
+---
+ src/hw/nvme-int.h |  1 -
+ src/hw/nvme.c     | 40 ++++++++++++++++------------------------
+ 2 files changed, 16 insertions(+), 25 deletions(-)
+
+diff --git a/src/hw/nvme-int.h b/src/hw/nvme-int.h
+index 674008a..7cade8c 100644
+--- a/src/hw/nvme-int.h
++++ b/src/hw/nvme-int.h
+@@ -101,7 +101,6 @@ struct nvme_ctrl {
+     struct nvme_cq admin_cq;
+ 
+     u32 ns_count;
+-    struct nvme_namespace *ns;
+ 
+     struct nvme_sq io_sq;
+     struct nvme_cq io_cq;
+diff --git a/src/hw/nvme.c b/src/hw/nvme.c
+index 5bc2586..7910b15 100644
+--- a/src/hw/nvme.c
++++ b/src/hw/nvme.c
+@@ -238,11 +238,9 @@ nvme_admin_identify_ns(struct nvme_ctrl *ctrl, u32 ns_id)
+ }
+ 
+ static void
+-nvme_probe_ns(struct nvme_ctrl *ctrl, struct nvme_namespace *ns, u32 ns_id,
+-              u8 mdts)
++nvme_probe_ns(struct nvme_ctrl *ctrl, u32 ns_idx, u8 mdts)
+ {
+-    ns->ctrl  = ctrl;
+-    ns->ns_id = ns_id;
++    u32 ns_id = ns_idx + 1;
+ 
+     struct nvme_identify_ns *id = nvme_admin_identify_ns(ctrl, ns_id);
+     if (!id) {
+@@ -258,12 +256,21 @@ nvme_probe_ns(struct nvme_ctrl *ctrl, struct nvme_namespace *ns, u32 ns_id,
+         goto free_buffer;
+     }
+ 
+-    ns->lba_count = id->nsze;
+-    if (!ns->lba_count) {
++    if (!id->nsze) {
+         dprintf(2, "NVMe NS %u is inactive.\n", ns_id);
+         goto free_buffer;
+     }
+ 
++    struct nvme_namespace *ns = malloc_fseg(sizeof(*ns));
++    if (!ns) {
++        warn_noalloc();
++        goto free_buffer;
++    }
++    memset(ns, 0, sizeof(*ns));
++    ns->ctrl  = ctrl;
++    ns->ns_id = ns_id;
++    ns->lba_count = id->nsze;
++
+     struct nvme_lba_format *fmt = &id->lbaf[current_lba_format];
+ 
+     ns->block_size    = 1U << fmt->lbads;
+@@ -273,10 +280,11 @@ nvme_probe_ns(struct nvme_ctrl *ctrl, struct nvme_namespace *ns, u32 ns_id,
+         /* If we see devices that trigger this path, we need to increase our
+            buffer size. */
+         warn_internalerror();
++        free(ns);
+         goto free_buffer;
+     }
+ 
+-    ns->drive.cntl_id   = ns - ctrl->ns;
++    ns->drive.cntl_id   = ns_idx;
+     ns->drive.removable = 0;
+     ns->drive.type      = DTYPE_NVME;
+     ns->drive.blksize   = ns->block_size;
+@@ -466,13 +474,6 @@ nvme_create_io_queues(struct nvme_ctrl *ctrl)
+     return -1;
+ }
+ 
+-static void
+-nvme_destroy_io_queues(struct nvme_ctrl *ctrl)
+-{
+-    nvme_destroy_sq(&ctrl->io_sq);
+-    nvme_destroy_cq(&ctrl->io_cq);
+-}
+-
+ /* Waits for CSTS.RDY to match rdy. Returns 0 on success. */
+ static int
+ nvme_wait_csts_rdy(struct nvme_ctrl *ctrl, unsigned rdy)
+@@ -566,24 +567,15 @@ nvme_controller_enable(struct nvme_ctrl *ctrl)
+         goto err_destroy_admin_sq;
+     }
+ 
+-    ctrl->ns = malloc_fseg(sizeof(*ctrl->ns) * ctrl->ns_count);
+-    if (!ctrl->ns) {
+-        warn_noalloc();
+-        goto err_destroy_ioq;
+-    }
+-    memset(ctrl->ns, 0, sizeof(*ctrl->ns) * ctrl->ns_count);
+-
+     /* Populate namespace IDs */
+     int ns_idx;
+     for (ns_idx = 0; ns_idx < ctrl->ns_count; ns_idx++) {
+-        nvme_probe_ns(ctrl, &ctrl->ns[ns_idx], ns_idx + 1, identify->mdts);
++        nvme_probe_ns(ctrl, ns_idx, identify->mdts);
+     }
+ 
+     dprintf(3, "NVMe initialization complete!\n");
+     return 0;
+ 
+- err_destroy_ioq:
+-    nvme_destroy_io_queues(ctrl);
+  err_destroy_admin_sq:
+     nvme_destroy_sq(&ctrl->admin_sq);
+  err_destroy_admin_cq:
