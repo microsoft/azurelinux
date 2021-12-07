@@ -2,12 +2,12 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 %global libdnf_major_version 0
-%global libdnf_minor_version 43
-%global libdnf_micro_version 1
+%global libdnf_minor_version 65
+%global libdnf_micro_version 0
 
 Name:           libdnf
 Version:        %{libdnf_major_version}.%{libdnf_minor_version}.%{libdnf_micro_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -15,12 +15,11 @@ Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Patch0:         CVE-2021-3445.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  glib-devel
-BuildRequires:  libsolv-devel
+BuildRequires:  libsolv-devel>=0.7.20
 BuildRequires:  librepo-devel
 BuildRequires:  check
 BuildRequires:  rpm-devel
@@ -33,7 +32,7 @@ BuildRequires:  gpgme-devel
 BuildRequires:  python-sphinx
 
 Requires:       libmodulemd
-Requires:       libsolv
+Requires:       libsolv >= 0.7.20
 Requires:       librepo
 
 %description
@@ -91,6 +90,11 @@ Python 3 bindings for the hawkey library.
 %build
 # Allows cmake to find libsolv.
 find %{_prefix} -name "FindLibSolv.cmake" -exec cp {} cmake/modules ';'
+
+CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
+CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
+export CFLAGS
+export CXXFLAGS
 
 mkdir build-py2
 pushd build-py2
@@ -177,6 +181,10 @@ popd
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Mon Dec 06 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.65.0-1
+- Update version to 0.65.0.
+- Remove patch CVE-2021-3445 not needed.
+
 * Tue Jul 06 2021 Henry Li <lihl@microsoft.com> 0.43.1-2
 - Patch CVE-2021-3445
 

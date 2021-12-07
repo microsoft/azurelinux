@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,7 @@ Patch6:         CVE-2020-15863.patch
 Patch7:         CVE-2020-10702.patch
 Patch8:         CVE-2020-10761.patch
 # CVE-2020-13253 backported to 4.2.0. Original version: https://github.com/qemu/qemu/commit/790762e5487114341cccc5bffcec4cb3c022c3cd
-Patch9:        CVE-2020-13253.patch
+Patch9:         CVE-2020-13253.patch
 Patch10:        CVE-2020-13754.patch
 Patch11:        CVE-2020-13800.patch
 Patch12:        CVE-2020-14364.patch
@@ -53,15 +53,17 @@ Patch35:        CVE-2021-3527.patch
 Patch36:        CVE-2021-3546.patch
 Patch37:        CVE-2021-3682.patch
 Patch38:        CVE-2021-3713.patch
-
+Patch39:        CVE-2021-3545.patch
 # Range 1001+ reserved for nopatch files
-Patch1001: CVE-2020-7039.nopatch
+Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
 # CONFIG_SM501 is selected by CONFIG_SAM460EX and CONFIG_R2D (from ppc-softmmu and sh4 targets respectively). We are not affected because we only build natively.
 # This is resolved in qemu >= 5.0
-Patch1002: CVE-2020-12829.nopatch
-Patch1003: CVE-2020-27661.nopatch
-
+Patch1002:      CVE-2020-12829.nopatch
+Patch1003:      CVE-2020-27661.nopatch
+# CVE 2020-35506 affects the SCSI ESP driver (esp.c), which is only compiled when CONFIG_ESP is set.
+# Our configuration does not enable CONFIG_ESP/compile esp.c, so Mariner is not vulnerable.
+Patch1004:      CVE-2020-35506.nopatch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -187,6 +189,10 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
+- Patched CVE-2021-3545
+- Marked CVE-2020-35506 as nopatch
+
 * Thu Sep 09 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.2.0-36
 - Patched CVE-2021-3713
 - Move nopatch files to 1001+ range.

@@ -155,7 +155,7 @@ json-c-debuginfo-0.14-3.cm1.aarch64.rpm
 json-c-devel-0.14-3.cm1.aarch64.rpm
 kbd-2.0.4-6.cm1.aarch64.rpm
 kbd-debuginfo-2.0.4-6.cm1.aarch64.rpm
-kernel-headers-5.10.78.1-1.cm1.noarch.rpm
+kernel-headers-5.10.78.1-2.cm1.noarch.rpm
 kmod-25-4.cm1.aarch64.rpm
 kmod-debuginfo-25-4.cm1.aarch64.rpm
 kmod-devel-25-4.cm1.aarch64.rpm
@@ -224,10 +224,10 @@ libsemanage-python3-2.9-4.cm1.aarch64.rpm
 libsepol-2.9-5.cm1.aarch64.rpm
 libsepol-debuginfo-2.9-5.cm1.aarch64.rpm
 libsepol-devel-2.9-5.cm1.aarch64.rpm
-libsolv-0.7.19-1.cm1.aarch64.rpm
-libsolv-debuginfo-0.7.19-1.cm1.aarch64.rpm
-libsolv-devel-0.7.19-1.cm1.aarch64.rpm
-libsolv-tools-0.7.19-1.cm1.aarch64.rpm
+libsolv-0.7.20-1.cm1.aarch64.rpm
+libsolv-debuginfo-0.7.20-1.cm1.aarch64.rpm
+libsolv-devel-0.7.20-1.cm1.aarch64.rpm
+libsolv-tools-0.7.20-1.cm1.aarch64.rpm
 libssh2-1.9.0-1.cm1.aarch64.rpm
 libssh2-debuginfo-1.9.0-1.cm1.aarch64.rpm
 libssh2-devel-1.9.0-1.cm1.aarch64.rpm
@@ -385,8 +385,8 @@ rpm-libs-4.14.2-13.cm1.aarch64.rpm
 sed-4.5-3.cm1.aarch64.rpm
 sed-debuginfo-4.5-3.cm1.aarch64.rpm
 sed-lang-4.5-3.cm1.aarch64.rpm
-shadow-utils-4.6-13.cm1.aarch64.rpm
-shadow-utils-debuginfo-4.6-13.cm1.aarch64.rpm
+shadow-utils-4.6-14.cm1.aarch64.rpm
+shadow-utils-debuginfo-4.6-14.cm1.aarch64.rpm
 sqlite-3.34.1-1.cm1.aarch64.rpm
 sqlite-debuginfo-3.34.1-1.cm1.aarch64.rpm
 sqlite-devel-3.34.1-1.cm1.aarch64.rpm

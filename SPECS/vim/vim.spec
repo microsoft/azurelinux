@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3582
+Version:        8.2.3668
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Nov 25 2021 Muhammad Falak <mwani@microsoft.com> - 8.2.3668-1
+- Bump version to 8.2.3668 to fix CVE-2021-3968,CVE-2021-3973,CVE-2021-3974
+
 * Wed Nov 10 2021 Nick Samson <nisamson@microsoft.com> - 8.2.3582-1
 - Upgrade to 8.2.3582 to fix CVE-2021-3927 and CVE-2021-3928
 

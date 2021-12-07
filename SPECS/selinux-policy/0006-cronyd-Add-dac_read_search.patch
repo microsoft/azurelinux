@@ -1,0 +1,28 @@
+From 83cb68e5c78713cd46943c27428dd08423f39e33 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Fri, 20 Aug 2021 18:11:23 +0000
+Subject: cronyd: Add dac_read_search.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/services/chronyd.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+MSFT_TAG: upstream cherry-pick
+
+diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
+index 96121be48..bb251cb68 100644
+--- a/policy/modules/services/chronyd.te
++++ b/policy/modules/services/chronyd.te
+@@ -46,7 +46,7 @@ logging_log_file(chronyd_var_log_t)
+ # chronyd local policy
+ #
+
+-allow chronyd_t self:capability { chown dac_override ipc_lock setgid setuid sys_resource sys_time };
++allow chronyd_t self:capability { chown dac_read_search dac_override ipc_lock setgid setuid sys_resource sys_time };
+ allow chronyd_t self:process { getcap setcap setrlimit signal };
+ allow chronyd_t self:shm create_shm_perms;
+ allow chronyd_t self:fifo_file rw_fifo_file_perms;
+--
+2.17.1
+
