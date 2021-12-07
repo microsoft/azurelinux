@@ -1,6 +1,6 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.19
+Version:        0.7.20
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -80,6 +80,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Mon Dec 06 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.7.20-1
+- Update version to 0.7.20.
+
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-1
 - Upgrade to fix CVE-2021-33928, CVE-2021-33929, CVE-2021-33930, CVE-2021-33938, CVE-2021-3200
 - Install files to %%{_libdir} instead of %%{_lib64dir}

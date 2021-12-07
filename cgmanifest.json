@@ -525,8 +525,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.17.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
+          "version": "1.18.1",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.18.1.tar.gz"
         }
       }
     },
@@ -1135,8 +1135,8 @@
         "type": "other",
         "other": {
           "name": "dnf",
-          "version": "4.2.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.2.18.tar.gz"
+          "version": "4.10.0",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.10.0.tar.gz"
         }
       }
     },
@@ -1635,8 +1635,8 @@
         "type": "other",
         "other": {
           "name": "gd",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.0/libgd-2.3.0.tar.xz"
+          "version": "2.3.3",
+          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.xz"
         }
       }
     },
@@ -2825,8 +2825,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.43.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
+          "version": "0.65.0",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.65.0.tar.gz"
         }
       }
     },
@@ -3075,8 +3075,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/libmodulemd-2.5.0/modulemd-2.5.0.tar.xz"
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
         }
       }
     },
@@ -3295,8 +3295,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.11.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
         }
       }
     },
@@ -3385,8 +3385,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.19",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.19/libsolv-0.7.19.tar.gz"
+          "version": "0.7.20",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.20/libsolv-0.7.20.tar.gz"
         }
       }
     },
@@ -5555,8 +5555,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.11.0",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.11.0/pgbouncer-1.11.0.tar.gz"
+          "version": "1.16.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.16.1/pgbouncer-1.16.1.tar.gz"
         }
       }
     },
@@ -7955,8 +7955,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20200818",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20200818/refpolicy-2.20200818.tar.bz2"
+          "version": "2.20210203",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20210203/refpolicy-2.20210203.tar.bz2"
         }
       }
     },
@@ -8605,8 +8605,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.3582",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3582.tar.gz"
+          "version": "8.2.3668",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3668.tar.gz"
         }
       }
     },
