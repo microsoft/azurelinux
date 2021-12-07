@@ -1,8 +1,8 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
-Version:        3.3.15
-Release:        5%{?dist}
-License:        GPLv2
+Version:        3.3.17
+Release:        1%{?dist}
+License:        GPLv2 and LGPLv2
 URL:            http://procps.sourceforge.net/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -102,6 +102,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 3.3.17-1
+- Update to 3.3.17
+- License verified
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.3.15-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
