@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.78.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -222,6 +222,8 @@ Patch1182:      CVE-2021-43267.nopatch
 Patch1183:      CVE-2021-42739.nopatch
 Patch1184:      CVE-2021-42327.nopatch
 Patch1185:      CVE-2021-43389.nopatch
+# CVE-2021-43057 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1186:      CVE-2021-43057.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -589,6 +591,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Dec 06 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-2
+- Address CVE-2021-4305
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389
