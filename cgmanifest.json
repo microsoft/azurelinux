@@ -1135,8 +1135,8 @@
         "type": "other",
         "other": {
           "name": "dnf",
-          "version": "4.2.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.2.18.tar.gz"
+          "version": "4.10.0",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.10.0.tar.gz"
         }
       }
     },
@@ -2825,8 +2825,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.43.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.43.1.tar.gz"
+          "version": "0.65.0",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.65.0.tar.gz"
         }
       }
     },
@@ -3075,8 +3075,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/libmodulemd-2.5.0/modulemd-2.5.0.tar.xz"
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
         }
       }
     },
@@ -3295,8 +3295,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.11.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
         }
       }
     },
@@ -3385,8 +3385,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.19",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.19/libsolv-0.7.19.tar.gz"
+          "version": "0.7.20",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.20/libsolv-0.7.20.tar.gz"
         }
       }
     },
