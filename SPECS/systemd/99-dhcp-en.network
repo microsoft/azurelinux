@@ -4,3 +4,6 @@ Name=e*
 [Network]
 DHCP=yes
 IPv6AcceptRA=no
+
+[DHCPv4]
+SendRelease=false
