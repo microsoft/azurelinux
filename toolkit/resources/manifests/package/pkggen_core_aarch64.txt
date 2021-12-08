@@ -28,10 +28,10 @@ libgomp-11.2.0-1.cm2.aarch64.rpm
 libgomp-devel-11.2.0-1.cm2.aarch64.rpm
 gcc-11.2.0-1.cm2.aarch64.rpm
 gcc-c++-11.2.0-1.cm2.aarch64.rpm
-libpkgconf-1.7.0-3.cm2.aarch64.rpm
-pkgconf-1.7.0-3.cm2.aarch64.rpm
-pkgconf-m4-1.7.0-3.cm2.noarch.rpm
-pkgconf-pkg-config-1.7.0-3.cm2.aarch64.rpm
+libpkgconf-1.8.0-1.cm2.aarch64.rpm
+pkgconf-1.8.0-1.cm2.aarch64.rpm
+pkgconf-m4-1.8.0-1.cm2.noarch.rpm
+pkgconf-pkg-config-1.8.0-1.cm2.aarch64.rpm
 ncurses-6.2-4.cm2.aarch64.rpm
 ncurses-compat-6.2-4.cm2.aarch64.rpm
 ncurses-devel-6.2-4.cm2.aarch64.rpm
