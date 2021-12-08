@@ -165,8 +165,8 @@
         "type": "other",
         "other": {
           "name": "atftp",
-          "version": "0.7.2",
-          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
+          "version": "0.7.5",
+          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.5.tar.gz"
         }
       }
     },
@@ -9213,8 +9213,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.1667",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
+          "version": "8.2.3582",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3582.tar.gz"
         }
       }
     },
