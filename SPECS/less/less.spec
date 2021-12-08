@@ -1,14 +1,13 @@
 Summary:        Text file viewer
 Name:           less
-Version:        530
-Release:        2%{?dist}
+Version:        590
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.greenwoodsoftware.com/less
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
-%define sha1 %{name}=d8ba1f43e88b706ef701f978cd3262b5b44dffd6
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
@@ -16,16 +15,14 @@ Requires:       ncurses
 The Less package contains a text file viewer
 
 %prep
-%setup -q
+%autosetup
 
 %build
-./configure \
-        --prefix=%{_prefix} \
-        --sysconfdir=%{_sysconfdir}
-make %{?_smp_mflags}
+%configure
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 %files
 %defattr(-,root,root)
@@ -34,9 +31,11 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/*/*
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 530-2
+* Wed Dec 12 2021 Mateusz Malisz <mamalisz@microsoft.com> - 590-1
+- Update to version 590
+- Fix changelog versions and formatting
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 530-3
 - Added %%license line automatically
-
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 530-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Mon Sep 17 2018 Ankit Jain <ankitja@vmware.com> 530-1
