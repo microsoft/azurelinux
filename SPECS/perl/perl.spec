@@ -24,7 +24,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        463%{?dist}
+Release:        464%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -158,7 +158,6 @@ Requires:  gdbm-devel
 
 # glibc-common for iconv
 Requires:  glibc-common
-Requires:  libdb-devel
 Requires:  make
 %if !%{defined perl_bootstrap}
 Requires:  perl-interpreter
@@ -6702,6 +6701,8 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Tue Oct 26 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 4:5.32.0-464
+- Removing unused dependency on 'libdb-devel'.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 4:5.32.0-463
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)

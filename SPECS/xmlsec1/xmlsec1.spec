@@ -1,7 +1,7 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
 Version:        1.2.26
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,9 @@ BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  nss-devel
 Requires:       libltdl
+Requires:       nss
 Requires:       libxml2
 Provides:       %{name}-gcrypt = %{release}-%{version}
 Provides:       %{name}-gnutls = %{release}-%{version}
@@ -32,6 +34,7 @@ Requires:       gnutls-devel
 Requires:       libgcrypt-devel
 Requires:       libltdl-devel
 Requires:       libxml2-devel
+Requires:       nss-devel
 Provides:       %{name}-gcrypt-devel = %{release}-%{version}
 Provides:       %{name}-gnutls-devel = %{release}-%{version}
 Provides:       %{name}-openssl-devel = %{release}-%{version}
@@ -99,6 +102,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man1/xmlsec1-config.1.gz
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.26-8
+- Add nss as an explicit requirement.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.26-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
