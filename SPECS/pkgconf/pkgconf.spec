@@ -12,8 +12,8 @@
 %global pkgconf_libdirs %{_libdir}/pkgconfig:%{_datadir}/pkgconfig
 
 Name:           pkgconf
-Version:        1.7.0
-Release:        3%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 Summary:        Package compiler and linker metadata toolkit
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -184,6 +184,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 1.8.0-1
+- Update to 1.8.0
+
 * Thu Oct 08 2020 Joe Schmitt <joschmit@microsoft.com> - 1.7.0-3
 - License verified.
 
