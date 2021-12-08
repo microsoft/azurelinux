@@ -16,7 +16,7 @@
 
 %global debug_package   %{nil}
 %global ant_home        %{_datadir}/ant
-%global _mavenpomdir    /usr/share/maven-poms
+%global _mavenpomdir    %{_datadir}/maven-poms
 
 Summary:        Apache Ant
 Name:           ant
@@ -261,6 +261,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Wed Dec 08 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.11-1
+- Update to build with jdk11
+
 * Fri Nov 19 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.9-7
 - Disable debuginfo package
 
