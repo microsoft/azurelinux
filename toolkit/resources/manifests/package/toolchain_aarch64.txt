@@ -420,8 +420,8 @@ perl-Unicode-Collate-1.27-464.cm2.aarch64.rpm
 perl-Unicode-Normalize-1.27-464.cm2.aarch64.rpm
 perl-Unicode-UCD-0.75-464.cm2.noarch.rpm
 perl-User-pwent-1.03-464.cm2.noarch.rpm
-perl-XML-Parser-2.44-11.cm2.aarch64.rpm
-perl-XML-Parser-debuginfo-2.44-11.cm2.aarch64.rpm
+perl-XML-Parser-2.46-1.cm2.aarch64.rpm
+perl-XML-Parser-debuginfo-2.46-1.cm2.aarch64.rpm
 perl-autodie-2.32-464.cm2.noarch.rpm
 perl-autouse-1.11-464.cm2.noarch.rpm
 perl-base-2.27-464.cm2.noarch.rpm
