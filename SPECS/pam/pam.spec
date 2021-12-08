@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -44,7 +44,8 @@ for developing applications that use pam.
     --sysconfdir=/etc   \
     --enable-securedir=/usr/lib/security \
     --enable-selinux \
-    --docdir=%{_docdir}/%{name}-%{version}
+    --docdir=%{_docdir}/%{name}-%{version} \
+    --disable-db
 %make_build
 
 %install
@@ -95,6 +96,9 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.5.1-2
+- Remove libdb dependency
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-1
 - Upgrade to latest upstream version
 

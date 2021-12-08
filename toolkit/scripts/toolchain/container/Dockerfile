@@ -87,6 +87,7 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
        "./mount_chroot_start_build.sh", \
        "./unmount_chroot.sh", \
+       "./go14_bootstrap_aarch64.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./cpio_extern_nocommon.patch", \
        "$LFS/tools/" ]

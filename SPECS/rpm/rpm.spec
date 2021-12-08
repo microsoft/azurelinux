@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.14.2.1
-Release:        4%{?dist}
+Version:        4.17.0
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,30 +10,33 @@ URL:            https://rpm.org
 Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
-Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
-Patch1:         python-dist-deps-version-parse.patch
-Patch2:         define-RPM_LD_FLAGS.patch
-Patch3:         CVE-2021-20271.patch
-# CVE-2021-20271 patch also patches CVE-2021-3421
-Patch4:         CVE-2021-3421.nopatch
+# The license for the files below is the same as for RPM as they have originally came from rpm.
+# The git repo is hosted by centos. The version below is centos 8 stable.
+Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
+Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
+Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
+BuildRequires:  openssl-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
-BuildRequires:  libdb-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
-BuildRequires:  nss-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 Requires:       bash
+Requires:       debugedit
 Requires:       libarchive
-Requires:       libdb
 Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
+Requires:       rpm-build = %{version}-%{release}
+
+Patch0: remove-docs-from-makefile.patch
+Patch1: define-RPM_LD_FLAGS.patch
 
 %description
 RPM package manager
@@ -53,7 +56,6 @@ Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
 Requires:       mariner-rpm-macros
-Requires:       nss-libs
 Requires:       popt
 Requires:       xz-libs
 Requires:       zlib
@@ -107,36 +109,46 @@ Python3 rpm.
 %autosetup -n rpm-%{name}-%{version}-release -p1
 
 %build
-sed -i '/define _GNU_SOURCE/a #include "../config.h"' tools/sepdebugcrcfix.c
 # pass -L opts to gcc as well to prioritize it over standard libs
 sed -i 's/-Wl,-L//g' python/setup.py.in
 sed -i '/library_dirs/d' python/setup.py.in
 sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 
 ./autogen.sh --noconfigure
+
 %configure \
-    CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
-        --program-prefix= \
-        --disable-dependency-tracking \
-        --disable-static \
-        --with-vendor=mariner \
-        --enable-python \
-        --with-cap \
-        --with-lua \
-        --disable-silent-rules \
-        --with-external-db \
-        --with-selinux
-make %{?_smp_mflags}
+    CPPFLAGS='-DLUA_COMPAT_APIINTCASTS' \
+    --program-prefix= \
+    --with-crypto=openssl \
+    --enable-ndb \
+    --disable-dependency-tracking \
+    --disable-static \
+    --with-vendor=mariner \
+    --enable-python \
+    --with-cap \
+    --disable-silent-rules \
+    --with-selinux
+
+# Remove manpages translations
+rm -r docs/man/{fr,ja,ko,pl,ru,sk}
+
+%make_build
 
 pushd python
-python3 setup.py build
+%py3_build
 popd
 
+# Set provided python versions
+sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
+
+# Fix the interpreter path for python replacing the first line
+sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
+
 %check
-make check
+%make_build_check
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name 'perl*' -delete
@@ -146,6 +158,10 @@ find %{buildroot} -name 'perl*' -delete
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
 install -vm755 %{SOURCE1} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
+install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
+install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
+install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
+
 
 pushd python
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
@@ -178,22 +194,16 @@ popd
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
 %{_libdir}/rpm-plugins/*
-%{_libdir}/rpm/python-macro-helper
 %{_libdir}/rpm/pythondistdeps.py
-%{_mandir}/man8/rpm.8.gz
-%{_mandir}/man8/rpm2cpio.8.gz
-%{_mandir}/man8/rpmdb.8.gz
-%{_mandir}/man8/rpmgraph.8.gz
-%{_mandir}/man8/rpmkeys.8.gz
-%{_mandir}/man8/rpm-misc.8.gz
-%{_mandir}/man8/rpm-plugin-systemd-inhibit.8.gz
-%exclude %{_mandir}/fr/man8/*.gz
-%exclude %{_mandir}/ja/man8/*.gz
-%exclude %{_mandir}/ko/man8/*.gz
-%exclude %{_mandir}/pl/man1/*.gz
-%exclude %{_mandir}/pl/man8/*.gz
-%exclude %{_mandir}/ru/man8/*.gz
-%exclude %{_mandir}/sk/man8/*.gz
+%{_fileattrsdir}/python.attr
+# Because of no doxygen dependency, we do not produce manpages that require it.
+# %{_mandir}/man8/rpm.8.gz
+# %{_mandir}/man8/rpm2cpio.8.gz
+# %{_mandir}/man8/rpmdb.8.gz
+# %{_mandir}/man8/rpmgraph.8.gz
+# %{_mandir}/man8/rpmkeys.8.gz
+# %{_mandir}/man8/rpm-misc.8.gz
+# %{_mandir}/man8/rpm-plugin-systemd-inhibit.8.gz
 
 %files libs
 %defattr(-,root,root)
@@ -211,15 +221,10 @@ popd
 %{_bindir}/rpmsign
 %{_bindir}/rpmspec
 %{_libdir}/rpm/macros.*
-%{_libdir}/rpm/find-debuginfo.sh
 %{_libdir}/rpm/find-lang.sh
 %{_libdir}/rpm/find-provides
 %{_libdir}/rpm/find-requires
 %{_libdir}/rpm/brp-*
-%{_libdir}/rpm/mono-find-provides
-%{_libdir}/rpm/mono-find-requires
-%{_libdir}/rpm/ocaml-find-provides.sh
-%{_libdir}/rpm/ocaml-find-requires.sh
 %{_libdir}/rpm/fileattrs/*
 %{_libdir}/rpm/script.req
 %{_libdir}/rpm/check-buildroot
@@ -227,24 +232,20 @@ popd
 %{_libdir}/rpm/check-prereqs
 %{_libdir}/rpm/check-rpaths
 %{_libdir}/rpm/check-rpaths-worker
-%{_libdir}/rpm/config.guess
-%{_libdir}/rpm/config.sub
-%{_libdir}/rpm/debugedit
 %{_libdir}/rpm/elfdeps
-%{_libdir}/rpm/libtooldeps.sh
 %{_libdir}/rpm/mkinstalldirs
 %{_libdir}/rpm/pkgconfigdeps.sh
 %{_libdir}/rpm/*.prov
-%{_libdir}/rpm/sepdebugcrcfix
 
 %{_libdir}/rpm/pythondeps.sh
+%{_libdir}/rpm/ocamldeps.sh
 %{_libdir}/rpm/rpmdeps
-
-%{_mandir}/man1/gendiff.1*
-%{_mandir}/man8/rpmbuild.8*
-%{_mandir}/man8/rpmdeps.8*
-%{_mandir}/man8/rpmspec.8*
-%{_mandir}/man8/rpmsign.8.gz
+# Because of no doxygen dependency, we do not produce manpages that require it.
+# %{_mandir}/man1/gendiff.1*
+# %{_mandir}/man8/rpmbuild.8*
+# %{_mandir}/man8/rpmdeps.8*
+# %{_mandir}/man8/rpmspec.8*
+# %{_mandir}/man8/rpmsign.8.gz
 
 %files devel
 %defattr(-,root,root)
@@ -263,6 +264,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+
+* Wed Sep 15 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.17.0-1
+- Upgrade to version 4.17.0.  Remove libdb dependency.
+
 * Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-4
 - Add patch to define "$RPM_LD_FLAGS" during spec %%build phases
 - Remove %%python3_sitelib redefinition

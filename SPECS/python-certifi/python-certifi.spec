@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
 BuildRequires:  python3-pytest
-BuildRequiers:  python3-xml
+BuildRequires:  python3-xml
 %endif
 
 %description -n python3-certifi
@@ -38,7 +38,7 @@ SSL certificates while verifying the identity of TLS hosts
 %py3_install
 
 %check
-%python3 setup.py test
+%{python3} setup.py test
 
 %files -n python3-certifi
 %defattr(-,root,root,-)
