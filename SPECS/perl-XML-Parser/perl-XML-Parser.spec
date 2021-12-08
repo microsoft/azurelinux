@@ -1,7 +1,7 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
-Version:        2.44
-Release:        11%{?dist}
+Version:        2.46
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/pod/XML::Parser
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{version}.tar.gz
@@ -44,6 +44,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 2.46-1
+- Update to 2.46
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.44-11
 -   Use new perl package names.
 -   Use pure_install instead of install.
