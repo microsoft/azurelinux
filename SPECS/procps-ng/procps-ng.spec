@@ -29,7 +29,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of procps-ng
 
 %prep
-%setup -q
+%setup -q -n procps-%{version}
 %build
 ./configure \
     --prefix=%{_prefix} \
