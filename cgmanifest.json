@@ -1347,8 +1347,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "049",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-049.tar.xz"
+          "version": "055",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-055.tar.xz"
         }
       }
     },
@@ -8833,8 +8833,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "239",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v239.tar.gz"
+          "version": "249.7",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
         }
       }
     },
@@ -8843,8 +8843,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootstrap",
-          "version": "239",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v239.tar.gz"
+          "version": "249.7",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
         }
       }
     },

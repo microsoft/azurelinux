@@ -486,7 +486,15 @@ build_rpm_in_chroot_no_install rpm
 # rebuild pam with selinux support
 build_rpm_in_chroot_no_install pam
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool
+# python-jinja2 needs python3-markupsafe
+# python3-setuptools, python3-xml are also needed but already installed
+build_rpm_in_chroot_no_install python-markupsafe
+copy_rpm_subpackage python3-markupsafe
+chroot_and_install_rpms python3-markupsafe
+build_rpm_in_chroot_no_install python-jinja2
+copy_rpm_subpackage python3-jinja2
+
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
@@ -496,6 +504,7 @@ chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
 chroot_and_install_rpms meson
 chroot_and_install_rpms intltool
+chroot_and_install_rpms python3-jinja2
 build_rpm_in_chroot_no_install systemd-bootstrap
 
 # Removed 'lvm2', might not need: ncurses

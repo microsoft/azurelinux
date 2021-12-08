@@ -4,8 +4,8 @@
 %define _unitdir %{_libdir}/systemd/system
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        049
-Release:        8%{?dist}
+Version:        055
+Release:        1%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -15,6 +15,7 @@ Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
 Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-%{version}.tar.xz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
+Source2:        mkinitrd
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
 BuildRequires:  asciidoc
@@ -60,10 +61,8 @@ Requires:       %{name} = %{version}-%{release}
 This package contains tools to assemble the local initrd and host configuration.
 
 %prep
-%setup -q
+%autosetup -p1
 cp %{SOURCE1} .
-%patch0 -p1
-%patch1 -p1
 
 %build
 %configure --systemdsystemunitdir=%{_unitdir} --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
@@ -103,6 +102,8 @@ rm -f %{buildroot}%{_mandir}/man?/*suse*
 install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
 
+install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
+
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
 ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
@@ -130,6 +131,7 @@ rm -rf -- %{buildroot}
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
 %{_libdir}/dracut/dracut-init.sh
+%{_libdir}/dracut/dracut-util
 %{_datadir}/pkgconfig/dracut.pc
 %{dracutlibdir}/dracut-functions.sh
 %{dracutlibdir}/dracut-functions
@@ -177,6 +179,9 @@ rm -rf -- %{buildroot}
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Wed Dec 01 2021 Henry Beberman <henry.beberman@microsoft.com> - 055-1
+- Update to version 055. Port mkinitrd forward for compatibility.
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 049-8
 - Added missing BR on "systemd-rpm-macros".
 
