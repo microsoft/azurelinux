@@ -2,34 +2,39 @@ Summary:        Programs for monitoring processes
 Name:           procps-ng
 Version:        3.3.17
 Release:        1%{?dist}
-License:        GPLv2 and LGPLv2
-URL:            http://procps.sourceforge.net/
-Group:          Applications/System
+License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            http://procps.sourceforge.net/
 Source0:        http://sourceforge.net/projects/procps-ng/files/Production/%{name}-%{version}.tar.xz
 BuildRequires:  ncurses-devel
-Provides:       /bin/ps
-Provides:       procps = %{version}-%{release}
 Requires:       ncurses
 Conflicts:      toybox
+Provides:       /bin/ps
+Provides:       procps = %{version}-%{release}
+
 %description
 The Procps package contains programs for monitoring processes.
+
 %package    devel
-Summary:    Header and development files for procps-ng
-Requires:   %{name} = %{version}
+Summary:        Header and development files for procps-ng
+Requires:       %{name} = %{version}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %package lang
-Summary: Additional language files for procps-ng
-Group:   Applications/Databases
-Requires: %{name} = %{version}-%{release}
+Summary:        Additional language files for procps-ng
+Group:          Applications/Databases
+Requires:       %{name} = %{version}-%{release}
+
 %description lang
 These are the additional language files of procps-ng
 
 %prep
 %setup -q -n procps-%{version}
+
 %build
 ./configure \
     --prefix=%{_prefix} \
@@ -40,6 +45,7 @@ These are the additional language files of procps-ng
     --disable-kill \
     --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
@@ -47,7 +53,7 @@ install -vdm 755 %{buildroot}/%{_libdir}
 ln -sfv ../..%{_libdir}/$(readlink %{buildroot}/%{_libdir}/libprocps.so) %{buildroot}/%{_libdir}/libprocps.so
 install -vdm 755 %{buildroot}/%{_sbindir}
 ln -s %{_bindir}/pidof %{buildroot}%{_sbindir}/pidof
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name} --all-name --with-man
 
 %check
@@ -55,6 +61,7 @@ make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -74,13 +81,14 @@ make %{?_smp_mflags} check
 /bin/watch
 /bin/pkill
 %{_sbindir}/pidof
-%_datadir/locale/*
+%{_datadir}/locale/*
 %{_docdir}/procps-ng-*/*
 %{_mandir}/man8/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_libdir}/libprocps.so.*
 /sbin/sysctl
+
 %files devel
 %{_includedir}/proc/sig.h
 %{_includedir}/proc/wchan.h
