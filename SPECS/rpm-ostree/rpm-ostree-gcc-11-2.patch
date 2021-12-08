@@ -1,0 +1,24 @@
+diff -ru rpm-ostree-2020.4-orig/libdnf/tests/hawkey/test_query.cpp rpm-ostree-2020.4/libdnf/tests/hawkey/test_query.cpp
+--- rpm-ostree-2020.4-orig/libdnf/tests/hawkey/test_query.cpp	2020-07-24 03:29:34.000000000 -0700
++++ rpm-ostree-2020.4/libdnf/tests/hawkey/test_query.cpp	2021-11-29 17:21:02.648380257 -0800
+@@ -306,7 +306,7 @@
+     hy_query_filter(q, HY_PKG_NAME, HY_EQ, "jay");
+     pset = hy_query_run_set(q);
+     hy_query_free(q);
+-    fail_unless(dnf_packageset_count(pset), 2);
++    fail_unless(dnf_packageset_count(pset) == 2);
+ 
+     // use hy_query_filter_package_in():
+     q = hy_query_create(test_globals.sack);
+diff -ru rpm-ostree-2020.4-orig/libdnf/tests/hawkey/test_sack.cpp rpm-ostree-2020.4/libdnf/tests/hawkey/test_sack.cpp
+--- rpm-ostree-2020.4-orig/libdnf/tests/hawkey/test_sack.cpp	2020-07-24 03:29:34.000000000 -0700
++++ rpm-ostree-2020.4/libdnf/tests/hawkey/test_sack.cpp	2021-11-29 17:48:37.769337883 -0800
+@@ -83,7 +83,7 @@
+     const char ** arches = dnf_sack_list_arches(sack);
+ 
+     /* noarch, x86_64, athlon, i686, i586, i486, i386 */
+-    fail_unless(g_strv_length((gchar**)arches), 7);
++    fail_unless(g_strv_length((gchar**)arches) == 7);
+ 
+     if (strcmp(arches[2], "athlon") == 0) {
+         // Fedora, Mageia
