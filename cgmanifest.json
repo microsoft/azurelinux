@@ -2189,8 +2189,8 @@
         "type": "other",
         "other": {
           "name": "groff",
-          "version": "1.22.3",
-          "downloadUrl": "http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz"
+          "version": "1.22.4",
+          "downloadUrl": "http://ftp.gnu.org/gnu/groff/groff-1.22.4.tar.gz"
         }
       }
     },
