@@ -32,13 +32,8 @@ BuildRequires:  dos2unix
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libffi
 BuildRequires:  libffi-devel
-#BuildRequires:  openjdk8
-#BuildRequires:  openjre8
-#BuildRequires:  openjdk-11-hotspot
 BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-tools
-#Requires:       openjre8
-#Requires:       openjdk-11-hotspot
 Requires:       msopenjdk-11
 
 %description

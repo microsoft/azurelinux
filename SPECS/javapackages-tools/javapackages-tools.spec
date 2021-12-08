@@ -19,8 +19,6 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-#BuildRequires:  java-devel
-#BuildRequires:  openjdk-11-hotspot
 BuildRequires:  msopenjdk-11
 BuildRequires:  make
 BuildRequires:  python3-devel
@@ -32,9 +30,7 @@ BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-#Requires:       openjdk-11-hotspot
 Requires:       msopenjdk-11
-#Requires:       java-1.8.0-openjdk-headless
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
@@ -78,7 +74,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-#Requires:       java-1.8.0-openjdk-devel
+Requires:       msopenjdk-11
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 

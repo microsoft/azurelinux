@@ -13,14 +13,10 @@ Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{versio
 Patch0:         fix-bazel-version-check.patch
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-#BuildRequires:  openjdk8
-#BuildRequires:  openjdk-11-hotspot
 BuildRequires:  msopenjdk-11
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
-#Requires:       openjdk8
-#Requires:       openjdk-11-hotspot
 Requires:       msopenjdk-11
 
 %description

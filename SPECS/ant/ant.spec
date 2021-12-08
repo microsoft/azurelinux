@@ -32,13 +32,9 @@ Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
-#BuildRequires:  java-devel >= 1.8
-#BuildRequires:  openjdk-11-hotspot
 BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-#Requires:       java-devel >= 1.8
-#Requires:       openjdk-11-hotspot
 Requires:       msopenjdk-11
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
