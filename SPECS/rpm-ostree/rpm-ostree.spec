@@ -1,18 +1,15 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2019.3
-Release:        9%{?dist}
+Version:        2020.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/projectatomic/rpm-ostree
+URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Source1:        libglnx-470af87.tar.gz
-Source2:        libdnf-d8e481b.tar.gz
-
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
-
+Patch2:         rpm-ostree-gcc-11-2.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -22,11 +19,11 @@ BuildRequires:  check
 BuildRequires:  cmake
 BuildRequires:  cppunit-devel
 BuildRequires:  createrepo_c
-BuildRequires:  dbus
+BuildRequires:  dbus-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gobject-introspection-python
+BuildRequires:  python3-gobject-introspection
 BuildRequires:  gperf
 BuildRequires:  gpgme-devel
 BuildRequires:  gtk-doc
@@ -48,8 +45,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
-BuildRequires:  python2
-BuildRequires:  python2-libs
+BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
@@ -73,7 +69,6 @@ Requires:       ostree
 Requires:       ostree-grub2
 Requires:       ostree-libs
 Requires:       polkit
-
 ExclusiveArch:  x86_64
 
 %description
@@ -105,11 +100,7 @@ Requires:       %{name} = %{version}-%{release}
 Includes the scripts for rpm-ostree repo creation to act as server
 
 %prep
-%setup -q
-tar xf %{SOURCE1} --no-same-owner
-tar xf %{SOURCE2} --no-same-owner
-%patch0
-%patch1
+%autosetup -p1
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -140,7 +131,7 @@ make check
 %{_libdir}/%{name}/
 %{_libdir}/*.so.1*
 %{_libdir}/girepository-1.0/*.typelib
-%{_sysconfdir}/dbus-1/system.d/*
+%{_datadir}/dbus-1/system.d/*
 %{_prefix}%{_unitdir}/*.service
 %{_libexecdir}/*
 %{_datadir}/dbus-1/system-services/*
@@ -161,8 +152,13 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2019-3.9
-- Bump release to rebuild with rust 1.47.0-3 (security update)
+* Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-1
+- Upgrade version and rebase patches
+- License verified
+
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
+- Merge the following releases from dev to 1.0 spec
+- v-ruyche@microsoft.com, 2019.3-7: Systemd supports merged /usr. Update unit file directory macro.
 
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-8
 - Bump release to rebuild with rust 1.47.0-2 (security update)
