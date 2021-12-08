@@ -48,7 +48,7 @@ ln -sfv ../..%{_libdir}/$(readlink %{buildroot}/%{_libdir}/libprocps.so) %{build
 install -vdm 755 %{buildroot}/%{_sbindir}
 ln -s %{_bindir}/pidof %{buildroot}%{_sbindir}/pidof
 find %{buildroot} -name '*.la' -delete
-%find_lang %{name}
+%find_lang %{name} --all-name --with-man
 
 %check
 make %{?_smp_mflags} check
@@ -58,6 +58,7 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
+/bin/pwait
 /bin/ps
 /bin/pidof
 /bin/free
