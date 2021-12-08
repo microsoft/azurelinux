@@ -219,8 +219,8 @@ gnupg2-2.3.3-1.cm2.x86_64.rpm
 gpgme-1.16.0-1.cm2.x86_64.rpm
 mariner-repos-2.0-2.cm2.noarch.rpm
 mariner-repos-preview-2.0-2.cm2.noarch.rpm
-libffi-3.2.1-12.cm2.x86_64.rpm
-libffi-devel-3.2.1-12.cm2.x86_64.rpm
+libffi-3.4.2-1.cm2.x86_64.rpm
+libffi-devel-3.4.2-1.cm2.x86_64.rpm
 libtasn1-4.14-3.cm2.x86_64.rpm
 p11-kit-0.23.22-3.cm2.x86_64.rpm
 p11-kit-trust-0.23.22-3.cm2.x86_64.rpm
