@@ -395,16 +395,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bigreqsproto",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/bigreqsproto-1.1.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "bind",
           "version": "9.16.15",
           "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
@@ -875,16 +865,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "compositeproto",
-          "version": "0.4.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/compositeproto-0.4.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "conda",
           "version": "4.10.1",
           "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
@@ -1055,16 +1035,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cups",
-          "version": "2.2.4",
-          "downloadUrl": "https://github.com/apple/cups/releases/download/v2.2.4/cups-2.2.4-source.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "curl",
           "version": "7.76.0",
           "downloadUrl": "https://curl.haxx.se/download/curl-7.76.0.tar.gz"
@@ -1088,16 +1058,6 @@
           "name": "Cython",
           "version": "0.28.5",
           "downloadUrl": "https://github.com/cython/cython/archive/0.28.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "damageproto",
-          "version": "1.2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/damageproto-1.2.1.tar.bz2"
         }
       }
     },
@@ -1246,16 +1206,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dmxproto",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dmxproto-2.3.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dnf",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
@@ -1359,26 +1309,6 @@
           "name": "dracut",
           "version": "049",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-049.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dri2proto",
-          "version": "2.8",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dri2proto-2.8.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dri3proto",
-          "version": "1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dri3proto-1.0.tar.bz2"
         }
       }
     },
@@ -1666,16 +1596,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fixesproto",
-          "version": "5.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/fixesproto-5.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "flannel",
           "version": "0.14.0",
           "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
@@ -1730,16 +1650,6 @@
           "name": "fontconfig",
           "version": "2.13.91",
           "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.91.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "fontsproto",
-          "version": "2.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/fontsproto-2.1.3.tar.bz2"
         }
       }
     },
@@ -1951,16 +1861,6 @@
           "name": "glibmm24",
           "version": "2.56.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.56/glibmm-2.56.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "glproto",
-          "version": "1.4.17",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/glproto-1.4.17.tar.bz2"
         }
       }
     },
@@ -2428,16 +2328,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "inputproto",
-          "version": "2.3.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/inputproto-2.3.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
@@ -2681,16 +2571,6 @@
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kbproto",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/kbproto-1.0.7.tar.bz2"
         }
       }
     },
@@ -3068,16 +2948,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libdmx",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libdmx-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libdnet",
           "version": "1.12",
           "downloadUrl": "https://github.com/dugsong/libdnet/archive/libdnet-1.12.tar.gz"
@@ -3188,26 +3058,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libfontenc",
-          "version": "1.1.3",
-          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libFS",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libFS-1.0.7.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libgcrypt",
           "version": "1.9.4",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
@@ -3261,16 +3111,6 @@
           "name": "libgudev",
           "version": "232",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libICE",
-          "version": "1.0.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
         }
       }
     },
@@ -3548,16 +3388,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libpciaccess",
-          "version": "0.16",
-          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libpipeline",
           "version": "1.5.0",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz"
@@ -3711,16 +3541,6 @@
           "name": "libslirp",
           "version": "4.6.1",
           "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libSM",
-          "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
         }
       }
     },
@@ -3918,69 +3738,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libX11",
-          "version": "1.6.12",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.6.12.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXau",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.9.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXaw",
-          "version": "1.0.13",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXaw-1.0.13.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxcb",
-          "version": "1.13.1",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libxcrypt",
           "version": "4.4.17",
           "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXcursor",
-          "version": "1.2.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXdamage",
-          "version": "1.1.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.5.tar.bz2"
         }
       }
     },
@@ -3998,79 +3758,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libXext",
-          "version": "1.3.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXfixes",
-          "version": "5.0.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXfont2",
-          "version": "2.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXft",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXi",
-          "version": "1.7.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.10.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXinerama",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXinerama-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libxkbcommon",
           "version": "1.0.1",
           "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.0.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxkbfile",
-          "version": "1.1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
         }
       }
     },
@@ -4098,139 +3788,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libXmu",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXpm",
-          "version": "3.5.13",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.13.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXrandr",
-          "version": "1.5.2",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXrender",
-          "version": "0.9.10",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.10.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXres",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXres-1.0.7.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXScrnSaver",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libxshmfence",
-          "version": "1.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libxslt",
           "version": "1.1.34",
           "downloadUrl": "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXt",
-          "version": "1.2.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXt-1.2.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXtst",
-          "version": "1.2.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXv",
-          "version": "1.0.11",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXv-1.0.11.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXvMC",
-          "version": "1.0.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXvMC-1.0.10.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXxf86dga",
-          "version": "1.1.4",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXxf86dga-1.1.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXxf86vm",
-          "version": "1.1.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.4.tar.bz2"
         }
       }
     },
@@ -5171,26 +4731,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openjdk8",
-          "version": "1.8.0.302",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u302-b04.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "openjdk8_aarch64",
-          "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "openldap",
           "version": "2.4.57",
           "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
@@ -5924,16 +5464,6 @@
           "name": "powershell",
           "version": "7.0.2",
           "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.0.2/powershell-7.0.2-linux-x64.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "presentproto",
-          "version": "1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/presentproto-1.1.tar.bz2"
         }
       }
     },
@@ -7421,16 +6951,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "randrproto",
-          "version": "1.5.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/randrproto-1.5.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rapidjson",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
@@ -7484,26 +7004,6 @@
           "name": "redis",
           "version": "5.0.5",
           "downloadUrl": "http://download.redis.io/releases/redis-5.0.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "renderproto",
-          "version": "0.11.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/renderproto-0.11.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "resourceproto",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/resourceproto-1.2.0.tar.bz2"
         }
       }
     },
@@ -8421,16 +7921,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "scrnsaverproto",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/scrnsaverproto-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "secilc",
           "version": "3.2",
           "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/secilc-3.2.tar.gz"
@@ -9072,16 +8562,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "videoproto",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/videoproto-2.3.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "vim",
           "version": "8.1.1667",
           "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
@@ -9316,61 +8796,11 @@
     {
       "component": {
         "type": "other",
-        "other": {
-          "name": "xextproto",
-          "version": "7.3.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xextproto-7.3.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xeyes",
           "version": "1.1.2",
           "downloadUrl": "https://www.x.org/pub/individual/app/xeyes-1.1.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86bigfontproto",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86bigfontproto-1.2.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86dgaproto",
-          "version": "2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86dgaproto-2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86driproto",
-          "version": "2.1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86driproto-2.1.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86vidmodeproto",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86vidmodeproto-2.3.1.tar.bz2"
         }
       }
     },
@@ -9403,16 +8833,6 @@
           "name": "xfsprogs",
           "version": "5.0.0",
           "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.0.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xineramaproto",
-          "version": "1.2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xineramaproto-1.2.1.tar.bz2"
         }
       }
     },
