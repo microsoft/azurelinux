@@ -1,13 +1,16 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
 Version:        1.0.0~rc95+azure
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 URL:            https://runc.io/
 
 # See generate-sources.sh for creating runc source tarball
 #Source0:       https://github.com/opencontainers/runc/releases/download/v1.0.0-rc95/runc.tar.xz
 Source0:        runc-v1.0.0-rc95.tar.gz
+Patch0: CVE-2021-43784_9c4440.patch
+Patch1: CVE-2021-43784_d72d05.patch
+Patch2: CVE-2021-43784_f50369.patch
 #Source1:       https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
@@ -59,7 +62,7 @@ runC is a CLI tool for spawning and running containers according to the OCI spec
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
+%autosetup -n %{name}-%{version} -c
 mkdir -p %{OUR_GOPATH}/src/github.com/opencontainers
 ln -svfT %{_topdir}/BUILD/%{name}-%{version}/runc %{OUR_GOPATH}/src/github.com/opencontainers/runc
 
@@ -114,6 +117,9 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+*   Wed Dec 08 2021 Mariner Autopatcher <cblmargh@microsoft.com> 1.0.0~rc95+azure-5
+-   Added patch file(s) CVE-2021-43784_9c4440.patch,
+-   CVE-2021-43784_d72d05.patch, CVE-2021-43784_f50369.patch
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0~rc95+azure-4
 - Increment release for force republishing using golang 1.16.9
 

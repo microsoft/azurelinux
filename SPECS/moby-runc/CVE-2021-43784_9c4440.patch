@@ -1,0 +1,845 @@
+From 9c444070ec7bb83995dbc0185da68284da71c554 Mon Sep 17 00:00:00 2001
+From: Alban Crequy <alban@kinvolk.io>
+Date: Thu, 3 Sep 2020 14:41:05 +0200
+Subject: [PATCH] Open bind mount sources from the host userns
+
+The source of the bind mount might not be accessible in a different user
+namespace because a component of the source path might not be traversed
+under the users and groups mapped inside the user namespace. This caused
+errors such as the following:
+
+  # time="2020-06-22T13:48:26Z" level=error msg="container_linux.go:367:
+  starting container process caused: process_linux.go:459:
+  container init caused: rootfs_linux.go:58:
+  mounting \"/tmp/busyboxtest/source-inaccessible/dir\"
+  to rootfs at \"/tmp/inaccessible\" caused:
+  stat /tmp/busyboxtest/source-inaccessible/dir: permission denied"
+
+To solve this problem, this patch performs the following:
+
+1. in nsexec.c, it opens the source path in the host userns (so we have
+   the right permissions to open it) but in the container mntns (so the
+   kernel cross mntns mount check let us mount it later:
+   https://github.com/torvalds/linux/blob/v5.8/fs/namespace.c#L2312).
+
+2. in nsexec.c, it passes the file descriptors of the source to the
+   child process with SCM_RIGHTS.
+
+3. In runc-init in Golang, it finishes the mounts while inside the
+   userns even without access to the some components of the source
+   paths.
+
+Passing the fds with SCM_RIGHTS is necessary because once the child
+process is in the container mntns, it is already in the container userns
+so it cannot temporarily join the host mntns.
+
+This patch uses the existing mechanism with _LIBCONTAINER_* environment
+variables to pass the file descriptors from runc to runc init.
+
+This patch uses the existing mechanism with the Netlink-style bootstrap
+to pass information about the list of source mounts to nsexec.c.
+
+Rootless containers don't use this bind mount sources fdpassing
+mechanism because we can't setns() to the target mntns in a rootless
+container (we don't have the privileges when we are in the host userns).
+
+This patch takes care of using O_CLOEXEC on mount fds, and close them
+early.
+
+Fixes: #2484.
+
+Signed-off-by: Alban Crequy <alban@kinvolk.io>
+Signed-off-by: Rodrigo Campos <rodrigo@kinvolk.io>
+Co-authored-by: Rodrigo Campos <rodrigo@kinvolk.io>
+---
+ libcontainer/configs/mount.go       |   6 +
+ libcontainer/container_linux.go     |  83 +++++++++-
+ libcontainer/factory_linux.go       |  23 ++-
+ libcontainer/init_linux.go          |   8 +-
+ libcontainer/message_linux.go       |   1 +
+ libcontainer/nsenter/nsexec.c       | 231 ++++++++++++++++++++++++++++
+ libcontainer/rootfs_linux.go        |  68 +++++---
+ libcontainer/standard_init_linux.go |  17 +-
+ 8 files changed, 412 insertions(+), 25 deletions(-)
+
+diff --git a/libcontainer/configs/mount.go b/libcontainer/configs/mount.go
+index a75ff10ec9..3f315f7186 100644
+--- a/libcontainer/configs/mount.go
++++ b/libcontainer/configs/mount.go
+@@ -1,5 +1,7 @@
+ package configs
+ 
++import "golang.org/x/sys/unix"
++
+ const (
+ 	// EXT_COPYUP is a directive to copy up the contents of a directory when
+ 	// a tmpfs is mounted over it.
+@@ -37,3 +39,7 @@ type Mount struct {
+ 	// Optional Command to be run after Source is mounted.
+ 	PostmountCmds []Command `json:"postmount_cmds"`
+ }
++
++func (m *Mount) IsBind() bool {
++	return m.Flags&unix.MS_BIND != 0
++}
+diff --git a/libcontainer/container_linux.go b/libcontainer/container_linux.go
+index df78a950f0..9ceb7869d9 100644
+--- a/libcontainer/container_linux.go
++++ b/libcontainer/container_linux.go
+@@ -521,6 +521,33 @@ func (c *linuxContainer) commandTemplate(p *Process, childInitPipe *os.File, chi
+ 	return cmd
+ }
+ 
++// shouldSendMountSources says whether the child process must setup bind mounts with
++// the source pre-opened (O_PATH) in the host user namespace.
++// See https://github.com/opencontainers/runc/issues/2484
++func (c *linuxContainer) shouldSendMountSources() bool {
++	// Passing the mount sources via SCM_RIGHTS is only necessary when
++	// both userns and mntns are active.
++	if !c.config.Namespaces.Contains(configs.NEWUSER) ||
++		!c.config.Namespaces.Contains(configs.NEWNS) {
++		return false
++	}
++
++	// nsexec.c send_mountsources() requires setns(mntns) capabilities
++	// CAP_SYS_CHROOT and CAP_SYS_ADMIN.
++	if c.config.RootlessEUID {
++		return false
++	}
++
++	// We need to send sources if there are bind-mounts.
++	for _, m := range c.config.Mounts {
++		if m.IsBind() {
++			return true
++		}
++	}
++
++	return false
++}
++
+ func (c *linuxContainer) newInitProcess(p *Process, cmd *exec.Cmd, messageSockPair, logFilePair filePair) (*initProcess, error) {
+ 	cmd.Env = append(cmd.Env, "_LIBCONTAINER_INITTYPE="+string(initStandard))
+ 	nsMaps := make(map[configs.NamespaceType]string)
+@@ -530,10 +557,40 @@ func (c *linuxContainer) newInitProcess(p *Process, cmd *exec.Cmd, messageSockPa
+ 		}
+ 	}
+ 	_, sharePidns := nsMaps[configs.NEWPID]
+-	data, err := c.bootstrapData(c.config.Namespaces.CloneFlags(), nsMaps)
++	data, err := c.bootstrapData(c.config.Namespaces.CloneFlags(), nsMaps, initStandard)
+ 	if err != nil {
+ 		return nil, err
+ 	}
++
++	if c.shouldSendMountSources() {
++		// Elements on this slice will be paired with mounts (see StartInitialization() and
++		// prepareRootfs()). This slice MUST have the same size as c.config.Mounts.
++		mountFds := make([]int, len(c.config.Mounts))
++		for i, m := range c.config.Mounts {
++			if !m.IsBind() {
++				// Non bind-mounts do not use an fd.
++				mountFds[i] = -1
++				continue
++			}
++
++			// The fd passed here will not be used: nsexec.c will overwrite it with dup3(). We just need
++			// to allocate a fd so that we know the number to pass in the environment variable. The fd
++			// must not be closed before cmd.Start(), so we reuse messageSockPair.child because the
++			// lifecycle of that fd is already taken care of.
++			cmd.ExtraFiles = append(cmd.ExtraFiles, messageSockPair.child)
++			mountFds[i] = stdioFdCount + len(cmd.ExtraFiles) - 1
++		}
++
++		mountFdsJson, err := json.Marshal(mountFds)
++		if err != nil {
++			return nil, fmt.Errorf("Error creating _LIBCONTAINER_MOUNT_FDS: %w", err)
++		}
++
++		cmd.Env = append(cmd.Env,
++			"_LIBCONTAINER_MOUNT_FDS="+string(mountFdsJson),
++		)
++	}
++
+ 	init := &initProcess{
+ 		cmd:             cmd,
+ 		messageSockPair: messageSockPair,
+@@ -558,7 +615,7 @@ func (c *linuxContainer) newSetnsProcess(p *Process, cmd *exec.Cmd, messageSockP
+ 	}
+ 	// for setns process, we don't have to set cloneflags as the process namespaces
+ 	// will only be set via setns syscall
+-	data, err := c.bootstrapData(0, state.NamespacePaths)
++	data, err := c.bootstrapData(0, state.NamespacePaths, initSetns)
+ 	if err != nil {
+ 		return nil, err
+ 	}
+@@ -1213,7 +1270,9 @@ func (c *linuxContainer) makeCriuRestoreMountpoints(m *configs.Mount) error {
+ 	case "bind":
+ 		// The prepareBindMount() function checks if source
+ 		// exists. So it cannot be used for other filesystem types.
+-		if err := prepareBindMount(m, c.config.Rootfs); err != nil {
++		// TODO: pass something else than nil? Not sure if criu is
++		// impacted by issue #2484
++		if err := prepareBindMount(m, c.config.Rootfs, nil); err != nil {
+ 			return err
+ 		}
+ 	default:
+@@ -2050,7 +2109,7 @@ func encodeIDMapping(idMap []configs.IDMap) ([]byte, error) {
+ // such as one that uses nsenter package to bootstrap the container's
+ // init process correctly, i.e. with correct namespaces, uid/gid
+ // mapping etc.
+-func (c *linuxContainer) bootstrapData(cloneFlags uintptr, nsMaps map[configs.NamespaceType]string) (io.Reader, error) {
++func (c *linuxContainer) bootstrapData(cloneFlags uintptr, nsMaps map[configs.NamespaceType]string, it initType) (io.Reader, error) {
+ 	// create the netlink message
+ 	r := nl.NewNetlinkRequest(int(InitMsg), 0)
+ 
+@@ -2132,6 +2191,22 @@ func (c *linuxContainer) bootstrapData(cloneFlags uintptr, nsMaps map[configs.Na
+ 		Value: c.config.RootlessEUID,
+ 	})
+ 
++	// Bind mount source to open.
++	if it == initStandard && c.shouldSendMountSources() {
++		var mounts []byte
++		for _, m := range c.config.Mounts {
++			if m.IsBind() {
++				mounts = append(mounts, []byte(m.Source)...)
++			}
++			mounts = append(mounts, byte(0))
++		}
++
++		r.AddData(&Bytemsg{
++			Type:  MountSourcesAttr,
++			Value: mounts,
++		})
++	}
++
+ 	return bytes.NewReader(r.Serialize()), nil
+ }
+ 
+diff --git a/libcontainer/factory_linux.go b/libcontainer/factory_linux.go
+index 4c5bf67bee..6c4a65c739 100644
+--- a/libcontainer/factory_linux.go
++++ b/libcontainer/factory_linux.go
+@@ -295,6 +295,12 @@ func (l *LinuxFactory) StartInitialization() (err error) {
+ 		return fmt.Errorf("unable to convert _LIBCONTAINER_LOGPIPE: %w", err)
+ 	}
+ 
++	// Get mount files (O_PATH).
++	mountFds, err := parseMountFds()
++	if err != nil {
++		return err
++	}
++
+ 	// clear the current process's environment to clean any libcontainer
+ 	// specific env vars.
+ 	os.Clearenv()
+@@ -305,7 +311,7 @@ func (l *LinuxFactory) StartInitialization() (err error) {
+ 		}
+ 	}()
+ 
+-	i, err := newContainerInit(it, pipe, consoleSocket, fifofd, logPipeFd)
++	i, err := newContainerInit(it, pipe, consoleSocket, fifofd, logPipeFd, mountFds)
+ 	if err != nil {
+ 		return err
+ 	}
+@@ -359,3 +365,18 @@ func NewgidmapPath(newgidmapPath string) func(*LinuxFactory) error {
+ 		return nil
+ 	}
+ }
++
++func parseMountFds() ([]int, error) {
++	fdsJson := os.Getenv("_LIBCONTAINER_MOUNT_FDS")
++	if fdsJson == "" {
++		// Always return the nil slice if no fd is present.
++		return nil, nil
++	}
++
++	var mountFds []int
++	if err := json.Unmarshal([]byte(fdsJson), &mountFds); err != nil {
++		return nil, fmt.Errorf("Error unmarshalling _LIBCONTAINER_MOUNT_FDS: %w", err)
++	}
++
++	return mountFds, nil
++}
+diff --git a/libcontainer/init_linux.go b/libcontainer/init_linux.go
+index 9f7dc75f2e..1eb4ca0bf4 100644
+--- a/libcontainer/init_linux.go
++++ b/libcontainer/init_linux.go
+@@ -76,7 +76,7 @@ type initer interface {
+ 	Init() error
+ }
+ 
+-func newContainerInit(t initType, pipe *os.File, consoleSocket *os.File, fifoFd, logFd int) (initer, error) {
++func newContainerInit(t initType, pipe *os.File, consoleSocket *os.File, fifoFd, logFd int, mountFds []int) (initer, error) {
+ 	var config *initConfig
+ 	if err := json.NewDecoder(pipe).Decode(&config); err != nil {
+ 		return nil, err
+@@ -86,6 +86,11 @@ func newContainerInit(t initType, pipe *os.File, consoleSocket *os.File, fifoFd,
+ 	}
+ 	switch t {
+ 	case initSetns:
++		// mountFds must be nil in this case. We don't mount while doing runc exec.
++		if mountFds != nil {
++			return nil, errors.New("mountFds must be nil. Can't mount while doing runc exec.")
++		}
++
+ 		return &linuxSetnsInit{
+ 			pipe:          pipe,
+ 			consoleSocket: consoleSocket,
+@@ -100,6 +105,7 @@ func newContainerInit(t initType, pipe *os.File, consoleSocket *os.File, fifoFd,
+ 			config:        config,
+ 			fifoFd:        fifoFd,
+ 			logFd:         logFd,
++			mountFds:      mountFds,
+ 		}, nil
+ 	}
+ 	return nil, fmt.Errorf("unknown init type %q", t)
+diff --git a/libcontainer/message_linux.go b/libcontainer/message_linux.go
+index f10efa3663..7d0b629508 100644
+--- a/libcontainer/message_linux.go
++++ b/libcontainer/message_linux.go
+@@ -18,6 +18,7 @@ const (
+ 	RootlessEUIDAttr uint16 = 27287
+ 	UidmapPathAttr   uint16 = 27288
+ 	GidmapPathAttr   uint16 = 27289
++	MountSourcesAttr uint16 = 27290
+ )
+ 
+ type Int32msg struct {
+diff --git a/libcontainer/nsenter/nsexec.c b/libcontainer/nsenter/nsexec.c
+index 7e79ca0eb2..c53fb3d792 100644
+--- a/libcontainer/nsenter/nsexec.c
++++ b/libcontainer/nsenter/nsexec.c
+@@ -4,6 +4,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <grp.h>
++#include <limits.h>
+ #include <sched.h>
+ #include <setjmp.h>
+ #include <signal.h>
+@@ -39,6 +40,8 @@ enum sync_t {
+ 	SYNC_RECVPID_ACK = 0x43,	/* PID was correctly received by parent. */
+ 	SYNC_GRANDCHILD = 0x44,	/* The grandchild is ready to run. */
+ 	SYNC_CHILD_FINISH = 0x45,	/* The child or grandchild has finished. */
++	SYNC_MOUNTSOURCES_PLS = 0x46,	/* Tell parent to send mount sources by SCM_RIGHTS. */
++	SYNC_MOUNTSOURCES_ACK = 0x47,	/* All mount sources have been sent. */
+ };
+ 
+ #define STAGE_SETUP  -1
+@@ -87,6 +90,10 @@ struct nlconfig_t {
+ 	size_t uidmappath_len;
+ 	char *gidmappath;
+ 	size_t gidmappath_len;
++
++	/* Mount sources opened outside the container userns. */
++	char *mountsources;
++	size_t mountsources_len;
+ };
+ 
+ /*
+@@ -119,6 +126,7 @@ static int loglevel = DEBUG;
+ #define ROOTLESS_EUID_ATTR	27287
+ #define UIDMAPPATH_ATTR		27288
+ #define GIDMAPPATH_ATTR		27289
++#define MOUNT_SOURCES_ATTR	27290
+ 
+ /*
+  * Use the raw syscall for versions of glibc which don't include a function for
+@@ -542,6 +550,10 @@ static void nl_parse(int fd, struct nlconfig_t *config)
+ 		case SETGROUP_ATTR:
+ 			config->is_setgroup = readint8(current);
+ 			break;
++		case MOUNT_SOURCES_ATTR:
++			config->mountsources = current;
++			config->mountsources_len = payload_len;
++			break;
+ 		default:
+ 			bail("unknown netlink message type %d", nlattr->nla_type);
+ 		}
+@@ -633,6 +645,193 @@ static inline int sane_kill(pid_t pid, int signum)
+ 		return 0;
+ }
+ 
++void receive_fd(int sockfd, int new_fd)
++{
++	int bytes_read;
++	struct msghdr msg = { };
++	struct cmsghdr *cmsg;
++	struct iovec iov = { };
++	char null_byte = '\0';
++	int ret;
++	int fd_count;
++	int *fd_payload;
++
++	iov.iov_base = &null_byte;
++	iov.iov_len = 1;
++
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++
++	msg.msg_controllen = CMSG_SPACE(sizeof(int));
++	msg.msg_control = malloc(msg.msg_controllen);
++	if (msg.msg_control == NULL) {
++		bail("Can't allocate memory to receive fd.");
++	}
++
++	memset(msg.msg_control, 0, msg.msg_controllen);
++
++	bytes_read = recvmsg(sockfd, &msg, 0);
++	if (bytes_read != 1)
++		bail("failed to receive fd from unix socket %d", sockfd);
++	if (msg.msg_flags & MSG_CTRUNC)
++		bail("received truncated control message from unix socket %d", sockfd);
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	if (!cmsg)
++		bail("received message from unix socket %d without control message", sockfd);
++
++	if (cmsg->cmsg_level != SOL_SOCKET)
++		bail("received unknown control message from unix socket %d: cmsg_level=%d", sockfd, cmsg->cmsg_level);
++
++	if (cmsg->cmsg_type != SCM_RIGHTS)
++		bail("received unknown control message from unix socket %d: cmsg_type=%d", sockfd, cmsg->cmsg_type);
++
++	fd_count = (cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
++	if (fd_count != 1)
++		bail("received control message from unix socket %d with too many fds: %d", sockfd, fd_count);
++
++	fd_payload = (int *)CMSG_DATA(cmsg);
++	ret = dup3(*fd_payload, new_fd, O_CLOEXEC);
++	if (ret < 0)
++		bail("cannot dup3 fd %d to %d", *fd_payload, new_fd);
++
++	free(msg.msg_control);
++
++	ret = close(*fd_payload);
++	if (ret < 0)
++		bail("cannot close fd %d", *fd_payload);
++}
++
++void send_fd(int sockfd, int fd)
++{
++	int bytes_written;
++	struct msghdr msg = { };
++	struct cmsghdr *cmsg;
++	struct iovec iov[1] = { };
++	char null_byte = '\0';
++
++	iov[0].iov_base = &null_byte;
++	iov[0].iov_len = 1;
++
++	msg.msg_iov = iov;
++	msg.msg_iovlen = 1;
++
++	/* We send only one fd as specified by cmsg->cmsg_len below, even
++	 * though msg.msg_controllen might have more space due to alignment. */
++	msg.msg_controllen = CMSG_SPACE(sizeof(int));
++	msg.msg_control = malloc(msg.msg_controllen);
++	if (msg.msg_control == NULL) {
++		bail("Can't allocate memory to send fd.");
++	}
++
++	memset(msg.msg_control, 0, msg.msg_controllen);
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(int));
++	memcpy(CMSG_DATA(cmsg), &fd, sizeof(int));
++
++	bytes_written = sendmsg(sockfd, &msg, 0);
++
++	free(msg.msg_control);
++
++	if (bytes_written != 1)
++		bail("failed to send fd %d via unix socket %d", fd, sockfd);
++}
++
++void receive_mountsources(int sockfd)
++{
++	char *mount_fds, *endp;
++	long new_fd;
++
++	// This env var must be a json array of ints.
++	mount_fds = getenv("_LIBCONTAINER_MOUNT_FDS");
++
++	if (mount_fds[0] != '[') {
++		bail("malformed _LIBCONTAINER_MOUNT_FDS env var: missing '['");
++	}
++	mount_fds++;
++
++	for (endp = mount_fds; *endp != ']'; mount_fds = endp + 1) {
++		new_fd = strtol(mount_fds, &endp, 10);
++		if (endp == mount_fds) {
++			bail("malformed _LIBCONTAINER_MOUNT_FDS env var: not a number");
++		}
++		if (*endp == '\0') {
++			bail("malformed _LIBCONTAINER_MOUNT_FDS env var: missing ]");
++		}
++		// The list contains -1 when no fd is needed. Ignore them.
++		if (new_fd == -1) {
++			continue;
++		}
++
++		if (new_fd == LONG_MAX || new_fd < 0 || new_fd > INT_MAX) {
++			bail("malformed _LIBCONTAINER_MOUNT_FDS env var: fds out of range");
++		}
++
++		receive_fd(sockfd, new_fd);
++	}
++}
++
++void send_mountsources(int sockfd, pid_t child, char *mountsources, size_t mountsources_len)
++{
++	char proc_path[PATH_MAX];
++	int host_mntns_fd;
++	int container_mntns_fd;
++	int fd;
++	int ret;
++
++	// container_linux.go shouldSendMountSources() decides if mount sources
++	// should be pre-opened (O_PATH) and passed via SCM_RIGHTS
++	if (mountsources == NULL)
++		return;
++
++	host_mntns_fd = open("/proc/self/ns/mnt", O_RDONLY | O_CLOEXEC);
++	if (host_mntns_fd == -1)
++		bail("failed to get current mount namespace");
++
++	if (snprintf(proc_path, PATH_MAX, "/proc/%d/ns/mnt", child) < 0)
++		bail("failed to get mount namespace path");
++
++	container_mntns_fd = open(proc_path, O_RDONLY | O_CLOEXEC);
++	if (container_mntns_fd == -1)
++		bail("failed to get container mount namespace");
++
++	if (setns(container_mntns_fd, CLONE_NEWNS) < 0)
++		bail("failed to setns to container mntns");
++
++	char *mountsources_end = mountsources + mountsources_len;
++	while (mountsources < mountsources_end) {
++		if (mountsources[0] == '\0') {
++			mountsources++;
++			continue;
++		}
++
++		fd = open(mountsources, O_PATH | O_CLOEXEC);
++		if (fd < 0)
++			bail("failed to open mount source %s", mountsources);
++
++		send_fd(sockfd, fd);
++
++		ret = close(fd);
++		if (ret != 0)
++			bail("failed to close mount source fd %d", fd);
++
++		mountsources += strlen(mountsources) + 1;
++	}
++
++	if (setns(host_mntns_fd, CLONE_NEWNS) < 0)
++		bail("failed to setns to host mntns");
++
++	ret = close(host_mntns_fd);
++	if (ret != 0)
++		bail("failed to close host mount namespace fd %d", host_mntns_fd);
++	ret = close(container_mntns_fd);
++	if (ret != 0)
++		bail("failed to close container mount namespace fd %d", container_mntns_fd);
++}
++
+ void nsexec(void)
+ {
+ 	int pipenum;
+@@ -865,6 +1064,16 @@ void nsexec(void)
+ 						bail("failed to sync with runc: write(pid-JSON)");
+ 					}
+ 					break;
++				case SYNC_MOUNTSOURCES_PLS:
++					send_mountsources(syncfd, stage1_pid, config.mountsources,
++							  config.mountsources_len);
++
++					s = SYNC_MOUNTSOURCES_ACK;
++					if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
++						kill(stage1_pid, SIGKILL);
++						bail("failed to sync with child: write(SYNC_MOUNTSOURCES_ACK)");
++					}
++					break;
+ 				case SYNC_CHILD_FINISH:
+ 					write_log(DEBUG, "stage-1 complete");
+ 					stage1_complete = true;
+@@ -1019,6 +1228,28 @@ void nsexec(void)
+ 			if (unshare(config.cloneflags & ~CLONE_NEWCGROUP) < 0)
+ 				bail("failed to unshare remaining namespaces (except cgroupns)");
+ 
++			/* Ask our parent to send the mount sources fds. */
++			if (config.mountsources) {
++				s = SYNC_MOUNTSOURCES_PLS;
++				if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
++					kill(stage2_pid, SIGKILL);
++					bail("failed to sync with parent: write(SYNC_MOUNTSOURCES_PLS)");
++				}
++
++				/* Receive and install all mount sources fds. */
++				receive_mountsources(syncfd);
++
++				/* Parent finished to send the mount sources fds. */
++				if (read(syncfd, &s, sizeof(s)) != sizeof(s)) {
++					kill(stage2_pid, SIGKILL);
++					bail("failed to sync with parent: read(SYNC_MOUNTSOURCES_ACK)");
++				}
++				if (s != SYNC_MOUNTSOURCES_ACK) {
++					kill(stage2_pid, SIGKILL);
++					bail("failed to sync with parent: SYNC_MOUNTSOURCES_ACK: got %u", s);
++				}
++			}
++
+ 			/*
+ 			 * TODO: What about non-namespace clone flags that we're dropping here?
+ 			 *
+diff --git a/libcontainer/rootfs_linux.go b/libcontainer/rootfs_linux.go
+index 19bc96d55d..781fe92471 100644
+--- a/libcontainer/rootfs_linux.go
++++ b/libcontainer/rootfs_linux.go
+@@ -36,6 +36,7 @@ type mountConfig struct {
+ 	cgroup2Path     string
+ 	rootlessCgroups bool
+ 	cgroupns        bool
++	fd              *int
+ }
+ 
+ // needsSetupDev returns true if /dev needs to be set up.
+@@ -51,12 +52,16 @@ func needsSetupDev(config *configs.Config) bool {
+ // prepareRootfs sets up the devices, mount points, and filesystems for use
+ // inside a new mount namespace. It doesn't set anything as ro. You must call
+ // finalizeRootfs after this function to finish setting up the rootfs.
+-func prepareRootfs(pipe io.ReadWriter, iConfig *initConfig) (err error) {
++func prepareRootfs(pipe io.ReadWriter, iConfig *initConfig, mountFds []int) (err error) {
+ 	config := iConfig.Config
+ 	if err := prepareRoot(config); err != nil {
+ 		return fmt.Errorf("error preparing rootfs: %w", err)
+ 	}
+ 
++	if mountFds != nil && len(mountFds) != len(config.Mounts) {
++		return fmt.Errorf("malformed mountFds slice. Expected size: %v, got: %v. Slice: %v", len(config.Mounts), len(mountFds), mountFds)
++	}
++
+ 	mountConfig := &mountConfig{
+ 		root:            config.Rootfs,
+ 		label:           config.MountLabel,
+@@ -65,12 +70,19 @@ func prepareRootfs(pipe io.ReadWriter, iConfig *initConfig) (err error) {
+ 		cgroupns:        config.Namespaces.Contains(configs.NEWCGROUP),
+ 	}
+ 	setupDev := needsSetupDev(config)
+-	for _, m := range config.Mounts {
++	for i, m := range config.Mounts {
+ 		for _, precmd := range m.PremountCmds {
+ 			if err := mountCmd(precmd); err != nil {
+ 				return fmt.Errorf("error running premount command: %w", err)
+ 			}
+ 		}
++
++		// Just before the loop we checked that if not empty, len(mountFds) == len(config.Mounts).
++		// Therefore, we can access mountFds[i] without any concerns.
++		if mountFds != nil && mountFds[i] != -1 {
++			mountConfig.fd = &mountFds[i]
++		}
++
+ 		if err := mountToRootfs(m, mountConfig); err != nil {
+ 			return fmt.Errorf("error mounting %q to rootfs at %q: %w", m.Source, m.Destination, err)
+ 		}
+@@ -210,8 +222,13 @@ func mountCmd(cmd configs.Command) error {
+ 	return nil
+ }
+ 
+-func prepareBindMount(m *configs.Mount, rootfs string) error {
+-	stat, err := os.Stat(m.Source)
++func prepareBindMount(m *configs.Mount, rootfs string, mountFd *int) error {
++	source := m.Source
++	if mountFd != nil {
++		source = "/proc/self/fd/" + strconv.Itoa(*mountFd)
++	}
++
++	stat, err := os.Stat(source)
+ 	if err != nil {
+ 		// error out if the source of a bind mount does not exist as we will be
+ 		// unable to bind anything to it.
+@@ -225,7 +242,7 @@ func prepareBindMount(m *configs.Mount, rootfs string) error {
+ 	if dest, err = securejoin.SecureJoin(rootfs, m.Destination); err != nil {
+ 		return err
+ 	}
+-	if err := checkProcMount(rootfs, dest, m.Source); err != nil {
++	if err := checkProcMount(rootfs, dest, source); err != nil {
+ 		return err
+ 	}
+ 	if err := createIfNotExists(dest, stat.IsDir()); err != nil {
+@@ -255,9 +272,11 @@ func mountCgroupV1(m *configs.Mount, c *mountConfig) error {
+ 		Data:             "mode=755",
+ 		PropagationFlags: m.PropagationFlags,
+ 	}
++
+ 	if err := mountToRootfs(tmpfs, c); err != nil {
+ 		return err
+ 	}
++
+ 	for _, b := range binds {
+ 		if c.cgroupns {
+ 			subsystemPath := filepath.Join(c.root, b.Destination)
+@@ -347,7 +366,7 @@ func doTmpfsCopyUp(m *configs.Mount, rootfs, mountLabel string) (Err error) {
+ 	// m.Destination since we are going to mount *on the host*.
+ 	oldDest := m.Destination
+ 	m.Destination = tmpDir
+-	err = mountPropagate(m, "/", mountLabel)
++	err = mountPropagate(m, "/", mountLabel, nil)
+ 	m.Destination = oldDest
+ 	if err != nil {
+ 		return err
+@@ -378,6 +397,7 @@ func doTmpfsCopyUp(m *configs.Mount, rootfs, mountLabel string) (Err error) {
+ func mountToRootfs(m *configs.Mount, c *mountConfig) error {
+ 	rootfs := c.root
+ 	mountLabel := c.label
++	mountFd := c.fd
+ 	dest, err := securejoin.SecureJoin(rootfs, m.Destination)
+ 	if err != nil {
+ 		return err
+@@ -401,12 +421,12 @@ func mountToRootfs(m *configs.Mount, c *mountConfig) error {
+ 			return err
+ 		}
+ 		// Selinux kernels do not support labeling of /proc or /sys
+-		return mountPropagate(m, rootfs, "")
++		return mountPropagate(m, rootfs, "", nil)
+ 	case "mqueue":
+ 		if err := os.MkdirAll(dest, 0o755); err != nil {
+ 			return err
+ 		}
+-		if err := mountPropagate(m, rootfs, ""); err != nil {
++		if err := mountPropagate(m, rootfs, "", nil); err != nil {
+ 			return err
+ 		}
+ 		return label.SetFileLabel(dest, mountLabel)
+@@ -421,11 +441,13 @@ func mountToRootfs(m *configs.Mount, c *mountConfig) error {
+ 		if m.Extensions&configs.EXT_COPYUP == configs.EXT_COPYUP {
+ 			err = doTmpfsCopyUp(m, rootfs, mountLabel)
+ 		} else {
+-			err = mountPropagate(m, rootfs, mountLabel)
++			err = mountPropagate(m, rootfs, mountLabel, nil)
+ 		}
++
+ 		if err != nil {
+ 			return err
+ 		}
++
+ 		if stat != nil {
+ 			if err = os.Chmod(dest, stat.Mode()); err != nil {
+ 				return err
+@@ -433,23 +455,23 @@ func mountToRootfs(m *configs.Mount, c *mountConfig) error {
+ 		}
+ 		// Initially mounted rw in mountPropagate, remount to ro if flag set.
+ 		if m.Flags&unix.MS_RDONLY != 0 {
+-			if err := remount(m, rootfs); err != nil {
++			if err := remount(m, rootfs, mountFd); err != nil {
+ 				return err
+ 			}
+ 		}
+ 		return nil
+ 	case "bind":
+-		if err := prepareBindMount(m, rootfs); err != nil {
++		if err := prepareBindMount(m, rootfs, mountFd); err != nil {
+ 			return err
+ 		}
+-		if err := mountPropagate(m, rootfs, mountLabel); err != nil {
++		if err := mountPropagate(m, rootfs, mountLabel, mountFd); err != nil {
+ 			return err
+ 		}
+ 		// bind mount won't change mount options, we need remount to make mount options effective.
+ 		// first check that we have non-default options required before attempting a remount
+ 		if m.Flags&^(unix.MS_REC|unix.MS_REMOUNT|unix.MS_BIND) != 0 {
+ 			// only remount if unique mount options are set
+-			if err := remount(m, rootfs); err != nil {
++			if err := remount(m, rootfs, mountFd); err != nil {
+ 				return err
+ 			}
+ 		}
+@@ -475,7 +497,7 @@ func mountToRootfs(m *configs.Mount, c *mountConfig) error {
+ 		if err := os.MkdirAll(dest, 0o755); err != nil {
+ 			return err
+ 		}
+-		return mountPropagate(m, rootfs, mountLabel)
++		return mountPropagate(m, rootfs, mountLabel, mountFd)
+ 	}
+ 	return nil
+ }
+@@ -1037,15 +1059,20 @@ func writeSystemProperty(key, value string) error {
+ 	return ioutil.WriteFile(path.Join("/proc/sys", keyPath), []byte(value), 0o644)
+ }
+ 
+-func remount(m *configs.Mount, rootfs string) error {
++func remount(m *configs.Mount, rootfs string, mountFd *int) error {
++	source := m.Source
++	if mountFd != nil {
++		source = "/proc/self/fd/" + strconv.Itoa(*mountFd)
++	}
++
+ 	return utils.WithProcfd(rootfs, m.Destination, func(procfd string) error {
+-		return mount(m.Source, m.Destination, procfd, m.Device, uintptr(m.Flags|unix.MS_REMOUNT), "")
++		return mount(source, m.Destination, procfd, m.Device, uintptr(m.Flags|unix.MS_REMOUNT), "")
+ 	})
+ }
+ 
+ // Do the mount operation followed by additional mounts required to take care
+ // of propagation flags. This will always be scoped inside the container rootfs.
+-func mountPropagate(m *configs.Mount, rootfs string, mountLabel string) error {
++func mountPropagate(m *configs.Mount, rootfs string, mountLabel string, mountFd *int) error {
+ 	var (
+ 		data  = label.FormatMountLabel(m.Data, mountLabel)
+ 		flags = m.Flags
+@@ -1062,8 +1089,13 @@ func mountPropagate(m *configs.Mount, rootfs string, mountLabel string) error {
+ 	// mutating underneath us, we verify that we are actually going to mount
+ 	// inside the container with WithProcfd() -- mounting through a procfd
+ 	// mounts on the target.
++	source := m.Source
++	if mountFd != nil {
++		source = "/proc/self/fd/" + strconv.Itoa(*mountFd)
++	}
++
+ 	if err := utils.WithProcfd(rootfs, m.Destination, func(procfd string) error {
+-		return mount(m.Source, m.Destination, procfd, m.Device, uintptr(flags), data)
++		return mount(source, m.Destination, procfd, m.Device, uintptr(flags), data)
+ 	}); err != nil {
+ 		return err
+ 	}
+diff --git a/libcontainer/standard_init_linux.go b/libcontainer/standard_init_linux.go
+index cd722c7e77..f59d8fa21a 100644
+--- a/libcontainer/standard_init_linux.go
++++ b/libcontainer/standard_init_linux.go
+@@ -26,6 +26,7 @@ type linuxStandardInit struct {
+ 	parentPid     int
+ 	fifoFd        int
+ 	logFd         int
++	mountFds      []int
+ 	config        *initConfig
+ }
+ 
+@@ -87,9 +88,23 @@ func (l *linuxStandardInit) Init() error {
+ 
+ 	// initialises the labeling system
+ 	selinux.GetEnabled()
+-	if err := prepareRootfs(l.pipe, l.config); err != nil {
++
++	// We don't need the mountFds after prepareRootfs() nor if it fails.
++	err := prepareRootfs(l.pipe, l.config, l.mountFds)
++	for _, m := range l.mountFds {
++		if m == -1 {
++			continue
++		}
++
++		if err := unix.Close(m); err != nil {
++			return fmt.Errorf("Unable to close mountFds fds: %w", err)
++		}
++	}
++
++	if err != nil {
+ 		return err
+ 	}
++
+ 	// Set up the console. This has to be done *before* we finalize the rootfs,
+ 	// but *after* we've given the user the chance to set up all of the mounts
+ 	// they wanted.
