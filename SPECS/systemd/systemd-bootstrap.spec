@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        249.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -229,6 +229,10 @@ rm -rf %{buildroot}/*
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Wed Dec 08 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-2
+- Update systemd boot args to force cgroups V1 with systemd.unified_cgroup_hierarchy=0
+- Update 99-dhcp-en.network with SendRelease=false so DHCP leases arent released on reboot
+
 * Wed Dec 01 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-1
 - Update to systemd-stable version 249.7 by bootstrapifying the systemd 249.7 spec
 
