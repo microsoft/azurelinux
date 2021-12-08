@@ -121,6 +121,7 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %changelog
 * Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
 - Update to build with JDK 11
+- License verified
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
 - Replace incorrect %%{_lib} usage with %%{_libdir}
