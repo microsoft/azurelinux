@@ -51,6 +51,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 
 %files
 %defattr(-,root,root)
+%license COPYING
 %doc AUTHORS Changes
 %{_bindir}/*
 
