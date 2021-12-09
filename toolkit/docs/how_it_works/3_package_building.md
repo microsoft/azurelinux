@@ -163,7 +163,15 @@ The `grapher` tool automatically adds an "ALL" goal node to the graph which link
 ### Stage 2: Graphpkgfetcher
 The `graphpkgfetcher` tool's job is to resolve unresolved remote nodes. Unresolved nodes occur when a local package has `Requires` or `BuildRequires` which are not available from another local package.
 
-The tool uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) to locate packages. The worker will search in six locations: 1) the local chroot environment, 2) already build RPMs in `./../out/RPMS/`, 3) the upstream base repository 4) the upstream update repository if `$(USE_UPDATE_REPO)` is set to `y` 5) the upstream preview repository if `$(USE_PREVIEW_REPO)` is set to `y` 6) any remote repo listed in `REPO_LIST ?=`. If `$(DISABLE_UPSTREAM_REPOS)` is set to `y`, any repo that is accessed through the network is disabled.
+The tool uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) to locate packages. The worker will search in five locations:
+
+1. the local chroot environment,
+2. already built RPMs in `./../out/RPMS/`,
+3. the upstream base repository,
+4. the upstream preview repository if `$(USE_PREVIEW_REPO)` is set to `y`, and
+5. any remote repo listed in `REPO_LIST ?=`.
+
+If `$(DISABLE_UPSTREAM_REPOS)` is set to `y`, any repo that is accessed through the network is disabled.
 
 The worker will run the `tdnf` command to search for each missing package. `tdnf` will prioritize local packages over pulling them from a remote location.
 

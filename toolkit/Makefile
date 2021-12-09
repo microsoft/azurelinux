@@ -26,7 +26,6 @@ DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
-USE_UPDATE_REPO                 ?= y
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
@@ -95,16 +94,11 @@ endif
 # External source server
 SOURCE_URL         ?=
 
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
-ifeq ($(USE_UPDATE_REPO),y)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/$(build_arch)/rpms
-SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/update/srpms
-endif
-
 ifeq ($(USE_PREVIEW_REPO),y)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/update/$(build_arch)/rpms
+PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/update/$(build_arch)
 SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/update/srpms
 endif
 

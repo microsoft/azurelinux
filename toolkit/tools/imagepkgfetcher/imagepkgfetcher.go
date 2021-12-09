@@ -31,7 +31,6 @@ var (
 
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
-	useUpdateRepo        = app.Flag("use-update-repo", "Pull packages from the upstream update repo").Bool()
 	usePreviewRepo       = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
 	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
 
@@ -58,7 +57,7 @@ func main() {
 	}
 
 	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *useUpdateRepo, *usePreviewRepo, *repoFiles)
+	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}
