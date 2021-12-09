@@ -6,8 +6,8 @@ License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
-URL:            http://www.greenwoodsoftware.com/less
-Source0:        http://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
+URL:            https://www.greenwoodsoftware.com/less
+Source0:        https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
