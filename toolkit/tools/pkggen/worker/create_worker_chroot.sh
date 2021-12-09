@@ -54,6 +54,26 @@ while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
 
+TEMP_DB_PATH=/temp_db
+echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'."  | tee -a "$chroot_log"
+chroot "$chroot_builder_folder" mkdir -p "$TEMP_DB_PATH"
+chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
+
+# Popularing the SQLite database with package info.
+while read -r package || [ -n "$package" ]; do
+    full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
+    cp $full_rpm_path $chroot_builder_folder/$package
+
+    echo "Adding RPM DB entry to worker chroot: $package."  | tee -a "$chroot_log"
+
+    chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
+    chroot "$chroot_builder_folder" rm $package
+done < "$packages"
+
+echo "Overwriting old RPM database with the results of the conversion."  | tee -a "$chroot_log"
+chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
+chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
+
 HOME=$ORIGINAL_HOME
 
 # In case of Docker based build do not add the below folders into chroot tarball 

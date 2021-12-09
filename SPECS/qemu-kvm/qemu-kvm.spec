@@ -1,3 +1,5 @@
+# Temporarily disable stripping - strip is trying to strip .img files.
+%global __strip /bin/true
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0

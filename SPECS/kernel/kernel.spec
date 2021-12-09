@@ -561,7 +561,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
-%exclude %{_libdir}/debug
 %ifarch x86_64
 %{_lib64dir}/traceevent
 %endif

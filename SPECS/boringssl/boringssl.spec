@@ -22,7 +22,7 @@
 Summary:        An SSL/TLS protocol implementation
 Name:           boringssl
 Version:        20200921
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,7 +108,7 @@ find %{buildroot}%{src_install_dir} -type f \( -name "*.a" -o -name "*.lib" -o -
 find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec chmod +x "{}" +
 # Fix env-script-interpreter error.
 find %{buildroot}%{src_install_dir} -type f -name "*.pl" -exec sed -i 's|#!.*/usr/bin/env perl|#!%{_bindir}/perl|' "{}" +
-find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*/usr/bin/env python.*|#!%[_bindir]/python3|' "{}" +
+find %{buildroot}%{src_install_dir} -type f -name "*.py" -exec sed -i 's|#!.*/usr/bin/env python.*|#!%{_bindir}/python3|' "{}" +
 find %{buildroot}%{src_install_dir} -type f -name "*.sh" -exec sed -i 's|#!.*/usr/bin/env bash|#!/bin/bash|' "{}" +
 
 # To avoid conflicts with openssl development files, change all includes from
@@ -137,6 +137,10 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 %{src_install_dir}
 
 %changelog
+
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 20200921-3
+- Unify macro syntax used in the spec.
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200921-2
 - Switching to using a single digit for the 'Release' tag.
 
@@ -146,7 +150,7 @@ find src/include/openssl -type f -execdir install -D -m0644 "{}" "%{buildroot}%{
 - Fix Source URL
 - Change build requirement from ninja to ninja-build
 - Modify location of shared library files
-- Add _binaries_in_noarch_packages_terminate_build definition to resolve arch dependent binary error 
+- Add _binaries_in_noarch_packages_terminate_build definition to resolve arch dependent binary error
 - Remove unsupported architectures in CBL-Mariner from ExclusiveArch list
 
 * Mon May 17 2021 mrostecki@suse.com
