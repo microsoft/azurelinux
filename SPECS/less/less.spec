@@ -2,7 +2,7 @@ Summary:        Text file viewer
 Name:           less
 Version:        590
 Release:        1%{?dist}
-License:        GPLv3+
+License:        GPLv3+ or BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
@@ -26,7 +26,7 @@ The Less package contains a text file viewer
 
 %files
 %defattr(-,root,root)
-%license LICENSE
+%license LICENSE COPYING
 %{_bindir}/*
 %{_mandir}/*/*
 
