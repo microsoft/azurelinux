@@ -32,7 +32,7 @@ install_one_toolchain_rpm () {
     fi
 
     echo "Found full path for package $1 in $rpm_path: ($full_rpm_path)" >> "$chroot_log"
-    rpm -i -v --nodeps --noorder --force --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
+    rpm -i -v --nodeps --noorder --force --noscripts --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
 
     if [ ! $? -eq 0 ]
     then
