@@ -20,15 +20,16 @@ Source9:        mariner-microsoft-preview.repo
 Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 
-Requires(post):  gpgme
-Requires(post):  rpm
+Requires(post): gpgme
+Requires(post): rpm
+
 Requires(preun): gpgme
 Requires(preun): rpm
-BuildArch:       noarch
+
+BuildArch:      noarch
 
 %description
 CBL-Mariner repo files and gpg keys
-
 
 %package debuginfo
 Summary:        CBL-Mariner Debuginfo repo file.
@@ -121,9 +122,6 @@ export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
-
-%clean
-rm -rf %{buildroot}
 
 %posttrans
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
