@@ -3,7 +3,7 @@
 Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,7 +25,9 @@ The Apache Portable Runtime Utility Library.
 
 %package bdb
 Summary:        APR utility library Berkeley DB driver
+BuildRequires:  libdb-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       libdb
 
 %description bdb
 This package provides the Berkeley DB driver for the apr-util
@@ -184,6 +186,9 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-6
+- Add libdb dependencies to berkleydb subpackage.
+
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-5
 - Added support for more databases: BDB, ODBC, MySQL.
 - Split out the "*-openssl" subpackage.

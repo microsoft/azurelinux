@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.46
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
 BuildRequires:  expat-devel
+BuildRequires:  libdb-devel
 BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
@@ -47,6 +48,7 @@ BuildRequires:  pcre-devel
 BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
+Requires:       libdb
 Requires:       lua
 Requires:       openldap
 Requires:       openssl
@@ -348,6 +350,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.4.46-10
+- Add explicit requires for libdb.
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.46-9
 - Added missing BR on "systemd-rpm-macros".
 
