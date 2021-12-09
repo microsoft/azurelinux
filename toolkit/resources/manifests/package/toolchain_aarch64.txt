@@ -81,12 +81,6 @@ findutils-lang-4.8.0-1.cm2.aarch64.rpm
 flex-2.6.4-7.cm2.aarch64.rpm
 flex-debuginfo-2.6.4-7.cm2.aarch64.rpm
 flex-devel-2.6.4-7.cm2.aarch64.rpm
-fontconfig-2.13.91-1.cm2.aarch64.rpm
-fontconfig-debuginfo-2.13.91-1.cm2.aarch64.rpm
-fontconfig-devel-2.13.91-1.cm2.aarch64.rpm
-freetype-2.9.1-5.cm2.aarch64.rpm
-freetype-debuginfo-2.9.1-5.cm2.aarch64.rpm
-freetype-devel-2.9.1-5.cm2.aarch64.rpm
 gawk-5.1.0-1.cm2.aarch64.rpm
 gawk-debuginfo-5.1.0-1.cm2.aarch64.rpm
 gcc-11.2.0-1.cm2.aarch64.rpm

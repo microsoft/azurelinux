@@ -295,7 +295,6 @@ chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
 build_rpm_in_chroot_no_install wget
-build_rpm_in_chroot_no_install freetype
 
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre
@@ -315,16 +314,6 @@ chroot_and_install_rpms gperf
 build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3
-
-
-# openjdk needs fontconfig to build, which needs libxml
-build_rpm_in_chroot_no_install libxml2
-copy_rpm_subpackage python3-libxml2
-chroot_and_install_rpms libxml2
-chroot_and_install_rpms expat
-chroot_and_install_rpms freetype
-build_rpm_in_chroot_no_install fontconfig
-chroot_and_install_rpms fontconfig
 
 # Download JDK rpms
 echo Download JDK rpms
@@ -403,6 +392,8 @@ build_rpm_in_chroot_no_install libsolv
 chroot_and_install_rpms perl-XML-Parser
 
 # itstool needs python3-libxml2
+build_rpm_in_chroot_no_install libxml2
+copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
