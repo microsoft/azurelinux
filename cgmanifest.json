@@ -3058,6 +3058,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libfontenc",
+          "version": "1.1.3",
+          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgcrypt",
           "version": "1.9.4",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
@@ -3111,6 +3121,16 @@
           "name": "libgudev",
           "version": "232",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libICE",
+          "version": "1.0.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
         }
       }
     },
@@ -3548,6 +3568,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libSM",
+          "version": "1.2.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libsndfile",
           "version": "1.0.31",
           "downloadUrl": "https://github.com/libsndfile/libsndfile/archive/1.0.31.tar.gz"
@@ -3738,9 +3768,69 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libX11",
+          "version": "1.6.12",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.6.12.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXau",
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXaw",
+          "version": "1.0.13",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXaw-1.0.13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxcb",
+          "version": "1.13.1",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxcrypt",
           "version": "4.4.17",
           "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXcursor",
+          "version": "1.2.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXdamage",
+          "version": "1.1.5",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.5.tar.bz2"
         }
       }
     },
@@ -3758,9 +3848,69 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libXext",
+          "version": "1.3.4",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXfixes",
+          "version": "5.0.3",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXfont2",
+          "version": "2.0.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXft",
+          "version": "2.3.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXi",
+          "version": "1.7.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.10.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxkbcommon",
           "version": "1.0.1",
           "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.0.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxkbfile",
+          "version": "1.1.0",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
         }
       }
     },
@@ -3788,9 +3938,89 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libXmu",
+          "version": "1.1.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXpm",
+          "version": "3.5.13",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXpm-3.5.13.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXrandr",
+          "version": "1.5.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXrender",
+          "version": "0.9.10",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.10.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxshmfence",
+          "version": "1.3",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxslt",
           "version": "1.1.34",
           "downloadUrl": "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXt",
+          "version": "1.2.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXt-1.2.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXtst",
+          "version": "1.2.3",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libXxf86vm",
+          "version": "1.1.4",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.4.tar.bz2"
         }
       }
     },
