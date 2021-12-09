@@ -37,8 +37,8 @@ ncurses-compat-6.2-4.cm2.aarch64.rpm
 ncurses-devel-6.2-4.cm2.aarch64.rpm
 ncurses-libs-6.2-4.cm2.aarch64.rpm
 ncurses-term-6.2-4.cm2.aarch64.rpm
-readline-7.0-5.cm2.aarch64.rpm
-readline-devel-7.0-5.cm2.aarch64.rpm
+readline-8.1-1.cm2.aarch64.rpm
+readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-1.cm2.aarch64.rpm
 coreutils-lang-8.32-1.cm2.aarch64.rpm
 bash-5.1.8-1.cm2.aarch64.rpm
@@ -52,7 +52,7 @@ sed-lang-4.8-1.cm2.aarch64.rpm
 procps-ng-3.3.15-5.cm2.aarch64.rpm
 procps-ng-devel-3.3.15-5.cm2.aarch64.rpm
 procps-ng-lang-3.3.15-5.cm2.aarch64.rpm
-m4-1.4.18-5.cm2.aarch64.rpm
+m4-1.4.19-1.cm2.aarch64.rpm
 grep-3.7-1.cm2.aarch64.rpm
 grep-lang-3.7-1.cm2.aarch64.rpm
 diffutils-3.8-1.cm2.aarch64.rpm
@@ -162,7 +162,7 @@ perl-threads-2.25-463.cm2.aarch64.rpm
 perl-threads-shared-1.61-463.cm2.aarch64.rpm
 perl-vars-1.05-463.cm2.noarch.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
-autoconf-2.69-11.cm2.noarch.rpm
+autoconf-2.71-1.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
 openssl-1.1.1k-5.cm2.aarch64.rpm
 openssl-devel-1.1.1k-5.cm2.aarch64.rpm
@@ -188,7 +188,7 @@ libsolv-0.7.19-1.cm2.aarch64.rpm
 libsolv-devel-0.7.19-1.cm2.aarch64.rpm
 libssh2-1.9.0-1.cm2.aarch64.rpm
 libssh2-devel-1.9.0-1.cm2.aarch64.rpm
-krb5-1.18-1.cm2.aarch64.rpm
+krb5-1.19.2-1.cm2.aarch64.rpm
 curl-7.76.0-5.cm2.aarch64.rpm
 curl-devel-7.76.0-5.cm2.aarch64.rpm
 curl-libs-7.76.0-5.cm2.aarch64.rpm

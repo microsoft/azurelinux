@@ -1,6 +1,6 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.18
+Version:        1.19.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -41,11 +41,9 @@ These are the additional language files of krb5.
 %setup -q
 
 %build
-cd src &&
-sed -e 's@\^u}@^u cols 300}@' \
-    -i tests/dejagnu/config/default.exp &&
-CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" \
-autoconf &&
+cd src
+sed -e 's@\^u}@^u cols 300}@' -i tests/dejagnu/config/default.exp
+CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" autoconf
 ./configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
@@ -95,6 +93,7 @@ make check
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-,root,root)
 %license doc/copyright.rst
@@ -122,6 +121,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.19.2-1
+- Update to version 1.19.2
+
 * Mon Aug 16 2021 Muhammad Falak <mwani@microsoft.com> - 1.18-1
 - Bump version to 1.18
 

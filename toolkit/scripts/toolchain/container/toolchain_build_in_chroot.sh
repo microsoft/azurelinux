@@ -219,31 +219,29 @@ popd
 rm -rf file-5.40
 touch /logs/status_file_complete
 
-echo Readline-7.0
-tar xf readline-7.0.tar.gz
-pushd readline-7.0
+echo Readline-8.1
+tar xf readline-8.1.tar.gz
+pushd readline-8.1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/readline-7.0
+            --with-curses    \
+            --docdir=/usr/share/doc/readline-8.1
 make SHLIB_LIBS="-L/tools/lib -lncursesw"
-make SHLIB_LIBS="-L/tools/lib -lncurses" install
+make SHLIB_LIBS="-L/tools/lib -lncursesw" install
 popd
-rm -rf readline-7.0
+rm -rf readline-8.1
 touch /logs/status_readline_complete
 
-echo M4-1.4.18
-tar xf m4-1.4.18.tar.xz
-pushd m4-1.4.18
-# patch issues building with glibc 2.34
-patch -Np1 -i /tools/04-fix-sigstksz.patch
-patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
+echo M4-1.4.19
+tar xf m4-1.4.19.tar.gz
+pushd m4-1.4.19
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf m4-1.4.18
+rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
 echo Binutils-2.37
@@ -623,15 +621,14 @@ popd
 rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.5
