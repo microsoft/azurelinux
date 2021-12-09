@@ -2,7 +2,7 @@ Summary:        Text file viewer
 Name:           less
 Version:        590
 Release:        1%{?dist}
-License:        GPLv3+ or BSD
+License:        GPLv3+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
