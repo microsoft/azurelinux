@@ -2,14 +2,15 @@
  "Signatures": {
   "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
-  "mariner-extras.repo": "fb4830c8c7d658e7721ae8049eff5d1d8d47433e6e8fa3e9f5f6169855df29ce",
-  "mariner-extras-preview.repo": "f2ec9ac247d75de3d8a21089a25855e47d081aed265ff906d052f41df9496530",
-  "mariner-official-base.repo": "af485f85c5c856536c6ec2f73f0afd1d9c424396fce1c9ae6f40745a5f41503d",
-  "mariner-official-update.repo": "d80ed87ba6cf1e535131a9a68499b832dc87fc9add29cbae0f6cc76ebc36fbf3",
-  "mariner-preview.repo": "7b5731bce3d0c81647144822a886a01912e325db10f7519e105b5224a25f1568",
-  "mariner-ui.repo": "3e434c6418de638ff919f373f666866d0e075b8f26deeec4b96fb47e1d62d9b3",
-  "mariner-ui-preview.repo": "77a094a136cab2a927cffe92753e853f44b28607010cf48af7a2781edb7aded0",
-  "mariner-microsoft.repo": "135b5d5b925fd351cdd3db9063895dc79eb6d6c49d891d6507a5acd8a0c6effc",
-  "mariner-microsoft-preview.repo": "92e7b972026de175bf744525a8a2e40cff94b1cd5d6489a12d024ec57da02de3"
+  "mariner-debuginfo-preview.repo": "d7459bbc24f2c8d431d26b9eded48fdc88d5ca055082ac956dae601fc0068cea",
+  "mariner-debuginfo.repo": "dd411da6a92cec9f380375c8bf4ad480d19148090901af72f620aa9d21db1e3a",
+  "mariner-extended-preview.repo": "b7d5d89bb5ce1b1deade6c34aae8c9c9e62890eb235ac4a8557e5444a57b5ec9",
+  "mariner-extended.repo": "fda0174a7e397ad730f73c27732b71ae1c5e8e44b7e15e5493545bf501a4e3c4",
+  "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
+  "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
+  "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
+  "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
+  "mariner-official-base.repo": "1022cf71d875a2d5df7d54145898a64912cee14c2ce47ed505032840e97054da",
+  "mariner-official-preview.repo": "a13a35cd29232dcb067e5a8824ca18a8307141426c28169524dd596264bdf50d"
  }
 }

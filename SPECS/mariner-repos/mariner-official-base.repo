@@ -1,6 +1,6 @@
 [mariner-official-base]
 name=CBL-Mariner Official Base $releasever $basearch
-baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch/rpms
+baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
