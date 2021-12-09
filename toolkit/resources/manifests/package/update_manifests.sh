@@ -297,6 +297,7 @@ generate_pkggen_core () {
         grep "^python3-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
+        grep "^msopenjdk-" $TmpPkgGen
     } > "$1"
 }
 
