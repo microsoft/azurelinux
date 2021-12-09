@@ -315,6 +315,11 @@ build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3
 
+# libxml2 is required for at least: libxslt, createrepo_c
+build_rpm_in_chroot_no_install libxml2
+copy_rpm_subpackage python3-libxml2
+chroot_and_install_rpms libxml2
+
 # Download JDK rpms
 echo Download JDK rpms
 case $(uname -m) in
@@ -392,8 +397,6 @@ build_rpm_in_chroot_no_install libsolv
 chroot_and_install_rpms perl-XML-Parser
 
 # itstool needs python3-libxml2
-build_rpm_in_chroot_no_install libxml2
-copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
