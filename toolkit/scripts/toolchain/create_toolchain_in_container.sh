@@ -72,8 +72,6 @@ popd
 rm -vf ./container/Awt_build_headless_only.patch
 rm -vf ./container/check-system-ca-certs.patch
 rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch
-rm -vf ./container/04-fix-sigstksz.patch
-rm -vf ./container/m4-1.4.18-glibc-change-work-around.patch
 rm -vf ./container/coreutils-fix-get-sys_getdents-aarch64.patch
 rm -vf ./container/cpio_extern_nocommon.patch
 rm -vf ./container/linker-script-readonly-keyword-support.patch
