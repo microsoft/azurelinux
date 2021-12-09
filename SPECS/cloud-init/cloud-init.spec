@@ -155,7 +155,7 @@ make check %{?_smp_mflags}
 %changelog
 * Tue Nov 30 2021 Henry Beberman <henry.beberman@microsoft.com> - 21.3-4
 - Update files to explicitly reference /lib/udev/rules.d
-- License verified
+- License verified.
 
 * Mon Oct 18 2021 Henry Beberman <henry.beberman@microsoft.com> - 21.3-3
 - Add azure-kvp subpackage.
