@@ -82,10 +82,6 @@ ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 imagepkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
-ifeq ($(USE_UPDATE_REPO),y)
-imagepkgfetcher_extra_flags += --use-update-repo
-endif
-
 ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif
