@@ -166,7 +166,7 @@ The `graphpkgfetcher` tool's job is to resolve unresolved remote nodes. Unresolv
 The tool uses the `worker_chroot` (see [Chroot Worker](1_initial_prep.md#chroot_worker)) to locate packages. The worker will search in five locations:
 
 1. the local chroot environment,
-2. already build RPMs in `./../out/RPMS/`,
+2. already built RPMs in `./../out/RPMS/`,
 3. the upstream base repository,
 4. the upstream preview repository if `$(USE_PREVIEW_REPO)` is set to `y`, and
 5. any remote repo listed in `REPO_LIST ?=`.
