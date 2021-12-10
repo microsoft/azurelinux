@@ -16,7 +16,7 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, ignoredPackages []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -36,7 +36,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: []*pkggraph.PkgNode{node},
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, ignoredPackages, buildState)
 
 		requests = append(requests, req)
 	}
@@ -50,7 +50,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: nodes,
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, ignoredPackages, buildState)
 
 		requests = append(requests, req)
 	}
@@ -60,14 +60,29 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 
 // canUseCacheForNode checks if the cache can be used for a given node.
 // - It will check if the node corresponds to an entry in packagesToRebuild.
-// - It will check if all dependencies of the node were also cached.
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState) (canUseCache bool) {
+// - It will check if all dependencies of the node were also cached. Exceptions:
+//		- "TypePreBuilt" nodes must use the cache and have not dependencies to check.
+//		- Nodes on the ignore list may use the cache regardless of the state of their dependencies.
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild, ignoredPackages []string, buildState *GraphBuildState) (canUseCache bool) {
 	const specSuffix = ".spec"
 
-	// Check if the node corresponds to an entry in packagesToRebuild
+	// The "TypePreBuilt" nodes always use the cache.
+	if node.Type == pkggraph.TypePreBuilt {
+		canUseCache = true
+		return
+	}
+
 	specName := strings.TrimSuffix(filepath.Base(node.SpecPath), specSuffix)
-	canUseCache = (node.Type == pkggraph.TypePreBuilt) ||
-		(sliceutils.Find(packagesToRebuild, specName, sliceutils.StringMatch) == -1)
+
+	// Check if the node belongs to an ignored package.
+	if sliceutils.Find(ignoredPackages, specName, sliceutils.StringMatch) != sliceutils.NotFound {
+		logger.Log.Warnf("Will skip building (%s) if all of its RPMs are already present.", specName)
+		canUseCache = true
+		return
+	}
+
+	// Check if the node corresponds to an entry in packagesToRebuild
+	canUseCache = (sliceutils.Find(packagesToRebuild, specName, sliceutils.StringMatch) == sliceutils.NotFound)
 	if !canUseCache {
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
 		return

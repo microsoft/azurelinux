@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"sync"
 
+	"github.com/juliangruber/go-intersect"
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/internal/exe"
@@ -68,6 +69,8 @@ var (
 	buildAgentProgram    = app.Flag("build-agent-program", "Path to the build agent that will be invoked to build packages.").String()
 	workers              = app.Flag("workers", "Number of concurrent build agents to spawn. If set to 0, will automatically set to the logical CPU count.").Default(defaultWorkerCount).Int()
 
+	ignoredPackages = app.Flag("ignored-packages", "Space separated list of specs ignoring rebuilds if their dependencies have been updated. Will still build if all of the spec's RPMs have not been built.").String()
+
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
@@ -90,10 +93,17 @@ func main() {
 		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d", *buildAttempts)
 	}
 
+	ignoredPackages := exe.ParseListArgument(*ignoredPackages)
+
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
 	packagesNamesToBuild := exe.ParseListArgument(*pkgsToBuild)
 	packagesNamesToRebuild := exe.ParseListArgument(*pkgsToRebuild)
+
+	ignoredAndRebuiltPackage := intersect.Hash(ignoredPackages, packagesNamesToRebuild)
+	if len(ignoredAndRebuiltPackage) != 0 {
+		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackage)
+	}
 
 	packageVersToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild, *imageConfig, *baseDirPath)
 	if err != nil {
@@ -140,7 +150,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
@@ -168,7 +178,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild []string) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages []string) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -184,7 +194,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, ignoredPackages, pkgGraph, &graphMutex, goalNode, channels)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -233,7 +243,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNamesToRebuild, ignoredPackages []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -253,7 +263,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, buildState, canUseCache)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, ignoredPackages, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			channels.Requests <- req
