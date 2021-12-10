@@ -57,7 +57,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-[0-9]/d' $TmpPkgGen
     sed -i '/e2fsprogs-devel/d' $TmpPkgGen
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
-    sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
