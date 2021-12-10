@@ -100,9 +100,9 @@ func main() {
 	packagesNamesToBuild := exe.ParseListArgument(*pkgsToBuild)
 	packagesNamesToRebuild := exe.ParseListArgument(*pkgsToRebuild)
 
-	ignoredAndRebuiltPackage := intersect.Hash(ignoredPackages, packagesNamesToRebuild)
-	if len(ignoredAndRebuiltPackage) != 0 {
-		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackage)
+	ignoredAndRebuiltPackages := intersect.Hash(ignoredPackages, packagesNamesToRebuild)
+	if len(ignoredAndRebuiltPackages) != 0 {
+		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
 	}
 
 	packageVersToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild, *imageConfig, *baseDirPath)
