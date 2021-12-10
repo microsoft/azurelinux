@@ -305,8 +305,13 @@ func findSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 				return
 			}
 			if len(specFile) != 1 {
-				err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
-				return
+				if( specName == "msopenjdk-11" ) {
+					logger.Log.Infof("Ignoring missing match for (%s)", specName)
+					continue
+				} else {
+					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
+					return
+				}
 			}
 
 			specFiles = append(specFiles, specFile[0])
