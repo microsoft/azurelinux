@@ -678,18 +678,13 @@ func (n *PkgNode) FriendlyName() string {
 }
 
 // SpecName returns the name of the spec associated with this node.
+// Returns "." if the node doesn't have a spec file path or URL.
 func (n *PkgNode) SpecName() string {
-	const specSuffix = ".spec"
-
-	switch n.Type {
-	case TypeBuild, TypePreBuilt, TypeRun:
-		return strings.TrimSuffix(filepath.Base(n.SpecPath), specSuffix)
-	default:
-		return fmt.Sprintf("No spec name for node type '%s'", n.Type.String())
-	}
+	return strings.TrimSuffix(filepath.Base(n.SpecPath), ".spec")
 }
 
 // SRPMFileName returns the name of the SRPM file associated with this node.
+// Returns "." if the node doesn't have an SRPM file path or URL.
 func (n *PkgNode) SRPMFileName() string {
 	return filepath.Base(n.SrpmPath)
 }

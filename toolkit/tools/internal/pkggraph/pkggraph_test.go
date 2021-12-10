@@ -1026,3 +1026,46 @@ func TestShouldSucceedMakeDAGWithoutGoalNode(t *testing.T) {
 
 	assert.NoError(t, gOut.MakeDAG())
 }
+
+func TestShouldGetSpecNameFromFilePath(t *testing.T) {
+	const specFileName = "A"
+	node := &PkgNode{
+		SpecPath: "/file/path/" + specFileName + ".spec",
+	}
+
+	assert.Equal(t, specFileName, node.SpecName())
+}
+
+func TestShouldGetSpecNameFromURL(t *testing.T) {
+	const specFileName = "A.spec"
+	node := &PkgNode{
+		SpecPath: "protocol://file/path/" + specFileName + ".spec",
+	}
+
+	assert.Equal(t, specFileName, node.SpecName())
+}
+
+func TestShouldGetSpecNameFromEmptySpecPath(t *testing.T) {
+	node := &PkgNode{
+		SpecPath: "",
+	}
+
+	assert.Equal(t, ".", node.SpecName())
+}
+
+func TestShouldGetSRPMFileNameFromFilePath(t *testing.T) {
+	const srpmFileName = "A.src.rpm"
+	node := &PkgNode{
+		SrpmPath: "/file/path/" + srpmFileName,
+	}
+
+	assert.Equal(t, srpmFileName, node.SRPMFileName())
+}
+
+func TestShouldGetSRPMNameFromEmptySRPMPath(t *testing.T) {
+	node := &PkgNode{
+		SrpmPath: "",
+	}
+
+	assert.Equal(t, ".", node.SRPMFileName())
+}
