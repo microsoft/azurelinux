@@ -24,6 +24,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "adwaita-icon-theme",
+          "version": "3.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "alsa-lib",
           "version": "1.2.2",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"

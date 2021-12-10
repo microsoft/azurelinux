@@ -11,6 +11,7 @@
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
                 "abseil-cpp",
+                "adwaita-icon-theme",
                 "archivemount",
                 "at",
                 "atf",
