@@ -309,6 +309,7 @@
                 "libiothsm-std",
                 "libmaxminddb",
                 "libuv",
+                "libXcomposite",
                 "libxml++",
                 "lsb-release",
                 "lttng-consume",
