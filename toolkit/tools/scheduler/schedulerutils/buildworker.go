@@ -35,12 +35,13 @@ type BuildRequest struct {
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
+	AncillaryNodes []*pkggraph.PkgNode
+	BuiltFiles     []string
 	Err            error
 	LogFile        string
 	Node           *pkggraph.PkgNode
-	AncillaryNodes []*pkggraph.PkgNode
+	Skipped        bool
 	UsedCache      bool
-	BuiltFiles     []string
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
@@ -60,7 +61,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			res.UsedCache, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
+			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -84,12 +85,13 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
 	baseSrpmName := node.SRPMFileName()
 	usedCache, builtFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
+	skipped = sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch)
 
-	if sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch) {
-		logger.Log.Warnf("Skipping build for '%s' per user request.", baseSrpmName)
+	if skipped {
+		logger.Log.Debugf("%s explicitly marked to be skipped.", baseSrpmName)
 		return
 	}
 

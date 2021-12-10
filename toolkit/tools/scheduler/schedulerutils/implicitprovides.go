@@ -23,7 +23,11 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 
 		provides, err = rpm.QueryRPMProvides(rpmFile)
 		if err != nil {
-			err = fmt.Errorf("failed to query (%s) for provides, error: %s", rpmFile, err)
+			if res.Skipped {
+				err = fmt.Errorf("failed to query (%s) for provides. NOTE: source spec '%s' was marked to be skipped - please check if the queried RPM is present. Error: %s", rpmFile, res.Node.SpecName(), err)
+			} else {
+				err = fmt.Errorf("failed to query (%s) for provides. Error: %s", rpmFile, err)
+			}
 			return
 		}
 
