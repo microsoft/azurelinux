@@ -156,6 +156,7 @@
                 "patchelf",
                 "perl-App-cpanminus",
                 "perl-Bit-Vector",
+                "perl-Carp-Clan",
                 "perl-CPAN-DistnameInfo",
                 "perl-CPAN-Meta-Check",
                 "perl-Fedora-VSP",
