@@ -278,7 +278,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		} else {
 			args = append([]string{"download-nodeps"}, args...)
 		}
-		}
 
 		err = r.chroot.Run(func() (err error) {
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.

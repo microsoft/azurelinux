@@ -36,9 +36,9 @@ write_rpms_from_toolchain () {
     specs=$(cat $TOOLCHAIN_SPEC_LIST_FILE)
     for specName in $specs
     do
-        if [[ $specName == *"msopenjdk"* ]]; then
+        if [[ "$specName" =~ ".*msopenjdk.*" ]]; then
             # special case to add msopenjdk-11 which is downloaded and does not have a SPEC
-            jdkfilename=$(cat "$MANIFESTS_DIR/toolchain_$ARCH.txt" | grep $specName)
+            jdkfilename=$(grep $specName "$MANIFESTS_DIR/toolchain_$ARCH.txt" )
             echo "adding special case for: $jdkfilename"
             echo "$jdkfilename" >> $1
         else
