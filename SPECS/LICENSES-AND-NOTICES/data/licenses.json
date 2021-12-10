@@ -239,6 +239,7 @@
                 "xcb-proto",
                 "xkeyboard-config",
                 "xmlstarlet",
+                "xmltoman",
                 "xorg-x11-apps",
                 "xorg-x11-drv-libinput",
                 "xorg-x11-font-utils",

@@ -9398,6 +9398,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xmltoman",
+          "version": "0.4",
+          "downloadUrl": "https://downloads.sourceforge.net/xmltoman/xmltoman-0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-drv-libinput",
           "version": "0.30.0",
           "downloadUrl": "ftp://ftp.x.org/pub/individual/driver/xf86-input-libinput-0.30.0.tar.bz2"
