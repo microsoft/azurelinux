@@ -9,13 +9,14 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/refpolicy
 Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_${refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
+Source2:        booleans_targeted.conf
 Patch0:         0001-various-systemd-user-fixes-and-additional-support.patch
 Patch1:         0002-Allow-use-of-systemd-UNIX-sockets-created-at-initrd-.patch
 Patch2:         0003-files-init-systemd-various-fixes.patch
@@ -38,6 +39,7 @@ BuildRequires:  m4
 BuildRequires:  policycoreutils-devel >= %{POLICYCOREUTILSVER}
 BuildRequires:  python3
 BuildRequires:  python3-xml
+Provides:       selinux-policy-targeted
 Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
 BuildArch:      noarch
@@ -107,7 +109,7 @@ enforced by the kernel when running with SELinux enabled.
 %ghost %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
 %ghost %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
-%ghost %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
+%verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
 
 %package devel
 Summary:        SELinux policy devel
@@ -146,14 +148,15 @@ SELinux policy documentation package
 %doc %{_usr}/share/doc/%{name}
 
 %define makeCmds() \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 bare \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 conf
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 bare \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 conf \
+install -m0644 %{_sourcedir}/booleans_%{1}.conf policy/booleans.conf
 %define installCmds() \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 base.pp \
-%make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} MLS_CATS=1024 MCS_CATS=1024 modules \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 install-appconfig \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} MLS_CATS=1024 MCS_CATS=1024 SEMODULE="semodule -p %{buildroot} -X 100 " load \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 base.pp \
+%make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 modules \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 install \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 install-appconfig \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 SEMODULE="semodule -p %{buildroot} -X 100 " load \
 mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
 touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
 install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
@@ -200,7 +203,7 @@ else \
 fi;
 
 %prep
-%setup -q -n refpolicy
+%autosetup -p1 -n refpolicy
 
 %install
 # Build policy
@@ -277,6 +280,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Dec 14 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-2
+- Fix setup process to apply patches.
+- Correct files listing to include the module store files.
+- Create a booleans.conf for the build process, to override upstream Boolean
+  values.
+- Fix build to include systemd rules.
+
 * Tue Sep 07 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-1
 - Update to newest refpolicy release.  Add policy changes to boot the system
   in enforcing.  Change policy name to targeted.  Remove unrelated changelog

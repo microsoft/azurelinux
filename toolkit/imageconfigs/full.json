@@ -7,8 +7,12 @@
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image.json",
                 "packagelists/hyperv-packages.json",
-                "packagelists/ssh-server.json"
+                "packagelists/ssh-server.json",
+                "packagelists/selinux-full.json"
             ],
+            "KernelCommandLine": {
+                "SELinux": "permissive"
+            },
             "KernelOptions": {
                 "default": "kernel"
             }
@@ -17,8 +21,12 @@
             "Name": "CBL-Mariner Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/selinux.json"
             ],
+            "KernelCommandLine": {
+                "SELinux": "permissive"
+            },
             "KernelOptions": {
                 "default": "kernel"
             }
