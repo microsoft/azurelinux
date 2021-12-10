@@ -139,7 +139,7 @@ index 4b8434d..31cf454 100644
 +
 +        fprintf(
 +            stdout,
-+            "%s-%s.%s.%s\n",
++            "%s-%s-%s.%s\n",
 +            rpmteN(pElement),
 +            rpmteV(pElement),
 +            rpmteR(pElement),
@@ -208,31 +208,3 @@ index 0f1498c..8be8ff5 100644
      pArgs->nIPv4          = pOptionArgs->nIPv4;
 -- 
 2.17.1
-
-
-From 73552c5227ab7a063c8e09fe8e43e3ba5be27b62 Mon Sep 17 00:00:00 2001
-From: Joe Schmitt <joschmit@microsoft.com>
-Date: Thu, 21 Nov 2019 23:59:37 +0000
-Subject: [PATCH 2/2] Merged PR 245: Fix tdnf showorder package name output
-
-`showorder` incorrectly formatted package names, using a `.` in between version and release instead of a `-`.
----
- client/rpmtrans.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/client/rpmtrans.c b/client/rpmtrans.c
-index 31cf454..82c203b 100644
---- a/client/rpmtrans.c
-+++ b/client/rpmtrans.c
-@@ -393,7 +393,7 @@ TDNFPrintTransactionOrder(
- 
-         fprintf(
-             stdout,
--            "%s-%s.%s.%s\n",
-+            "%s-%s-%s.%s\n",
-             rpmteN(pElement),
-             rpmteV(pElement),
-             rpmteR(pElement),
--- 
-2.17.1
-

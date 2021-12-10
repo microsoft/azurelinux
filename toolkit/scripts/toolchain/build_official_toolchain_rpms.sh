@@ -337,7 +337,7 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
-# Build tdnf-2.1.0
+# Build tdnf-3.3.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -451,11 +451,12 @@ build_rpm_in_chroot_no_install gnupg2
 chroot_and_install_rpms gnupg2
 build_rpm_in_chroot_no_install gpgme
 
-# tdnf needs python3, gpgme, curl and libsolv
+# tdnf needs python3, gpgme, curl, libmetalink and libsolv
+build_rpm_in_chroot_no_install libmetalink
 chroot_and_install_rpms libsolv
 chroot_and_install_rpms curl
-
 chroot_and_install_rpms gpgme
+chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf

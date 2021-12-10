@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
-Version:        2.1.0
-Release:        8%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,21 +14,20 @@ Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
 
-Patch0:         tdnf-fix-distroverpkg-search.patch
-Patch1:         tdnf-ssl-support.patch
-Patch2:         tdnf-add-download-command.patch
-Patch3:         tdnf-add-showorder-argument.patch
-Patch4:         tdnf-add-mariner-release.patch
-Patch5:         tdnf-support-multiple-gpgkeys.patch
-Patch6:         tdnf-add-download-no-deps-command.patch
-Patch7:         tdnf-use-custom-keyring-for-gpg-checks.patch
 Patch8:         tdnf-mandatory-space-list-output.patch
 
+#Cmake requires binutils
+BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
+#Cmake requires gcc,glibc-devel
+BuildRequires:  gcc
+BuildRequires:  glibc-devel
 #plugin repogpgcheck
 BuildRequires:  gpgme-devel
 BuildRequires:  libsolv-devel
+BuildRequires:  libmetalink-devel
+BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
@@ -93,11 +92,18 @@ Requires:       python3
 %description python
 python bindings for tdnf
 
+%package        autoupdate
+Summary:        systemd services for periodic automatic update
+Requires:       %{name} = %{version}-%{release}
+
+%description autoupdate
+systemd services for periodic automatic update
+
 %prep
 %autosetup -p1
 
-# Enable plugins in tdnf.conf
-echo plugins=1 >> resources/tdnf.conf
+# Enable plugins in the default tdnf.conf
+echo "plugins=1" >> etc/tdnf/tdnf.conf
 
 %build
 mkdir build && cd build
@@ -113,7 +119,7 @@ pip3 install pytest
 cd build && make %{?_smp_mflags} check
 
 %install
-cd build && make DESTDIR=%{buildroot} install
+cd build && %make_install
 find %{buildroot} -name '*.a' -delete
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
@@ -129,35 +135,11 @@ mv %{buildroot}/%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so %{buildroot}/%{_tdnfpl
 pushd python
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 popd
+
 find %{buildroot} -name '*.pyc' -delete
 
-# Pre-install
-%pre
-
-    # First argument is 1 => New Installation
-    # First argument is 2 => Upgrade
-
-# Post-install
-%post
-
-    # First argument is 1 => New Installation
-    # First argument is 2 => Upgrade
-
-    /sbin/ldconfig
-
-# Pre-uninstall
-%preun
-
-    # First argument is 0 => Uninstall
-    # First argument is 1 => Upgrade
-
-# Post-uninstall
-%postun
-
-    /sbin/ldconfig
-
-    # First argument is 0 => Uninstall
-    # First argument is 1 => Upgrade
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %license COPYING
@@ -166,10 +148,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tyum
 %{_bindir}/yum
 %{_bindir}/tdnf-cache-updateinfo
-%{_libdir}/libtdnf.so.*
+%{_libdir}/libtdnf.so.3
+%{_libdir}/libtdnf.so.3.*
 %config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
-%config %{_libdir}/systemd/system/tdnf-cache-updateinfo.service
-%config(noreplace) %{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
 %dir %{_var}/cache/tdnf
 %{_datadir}/bash-completion/completions/tdnf
 
@@ -184,7 +165,8 @@ find %{buildroot} -name '*.pyc' -delete
 
 %files cli-libs
 %defattr(-,root,root)
-%{_libdir}/libtdnfcli.so.*
+%{_libdir}/libtdnfcli.so.3
+%{_libdir}/libtdnfcli.so.3.*
 
 %files plugin-repogpgcheck
 %defattr(-,root,root)
@@ -196,7 +178,20 @@ find %{buildroot} -name '*.pyc' -delete
 %defattr(-,root,root)
 %{python3_sitelib}/*
 
+%files autoupdate
+%{_sysconfdir}/motdgen.d/02-tdnf-updateinfo.sh
+%{_sysconfdir}/tdnf/automatic.conf
+/%{_lib}/systemd/system/tdnf*
+%{_libdir}/systemd/system/tdnf-cache-updateinfo*
+%{_bindir}/tdnf-automatic
+
 %changelog
+* Wed Jan 12 2022 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.2-1
+- Update to 3.2.2 version
+- Remove upstreamed patches
+- Clean up the spec.
+- Add libmetalink as a dependency
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-8
 - Replace easy_install usage with pip in %%check sections
 
