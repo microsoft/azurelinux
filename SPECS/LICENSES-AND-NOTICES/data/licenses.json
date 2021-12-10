@@ -159,6 +159,7 @@
                 "perl-Carp-Clan",
                 "perl-CPAN-DistnameInfo",
                 "perl-CPAN-Meta-Check",
+                "perl-Date-Calc",
                 "perl-Fedora-VSP",
                 "perl-File-pushd",
                 "perl-generators",

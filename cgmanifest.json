@@ -5391,6 +5391,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Date-Calc",
+          "version": "6.4",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Date-Calc-6.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-DBD-SQLite",
           "version": "1.62",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.62.tar.gz"
