@@ -100,6 +100,8 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
+	usedCache = false
+
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Building %s", baseSrpmName)
