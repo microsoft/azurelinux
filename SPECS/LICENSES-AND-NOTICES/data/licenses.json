@@ -155,6 +155,7 @@
                 "p7zip",
                 "patchelf",
                 "perl-App-cpanminus",
+                "perl-Bit-Vector",
                 "perl-CPAN-DistnameInfo",
                 "perl-CPAN-Meta-Check",
                 "perl-Fedora-VSP",

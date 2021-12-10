@@ -5301,6 +5301,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Bit-Vector",
+          "version": "7.4",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-7.4.tar.gz#/perl-Bit-Vector-7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2012",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2012.tar.gz"
