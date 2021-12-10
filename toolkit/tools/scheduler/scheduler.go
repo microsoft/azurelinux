@@ -190,11 +190,11 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
 
-	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex)
+	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex, ignoredPackages)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, ignoredPackages, pkgGraph, &graphMutex, goalNode, channels)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -211,7 +211,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 // startWorkerPool starts the worker pool and returns the communication channels between the workers and the scheduler.
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
-func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex) (channels *schedulerChannels) {
+func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
 		Requests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
 		Results:  make(chan *schedulerutils.BuildResult, channelBufferSize),
@@ -228,7 +228,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 	// Start the workers now so they begin working as soon as a new job is queued.
 	for i := 0; i < workers; i++ {
 		logger.Log.Debugf("Starting worker #%d", i)
-		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts)
+		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, ignoredPackages)
 	}
 
 	return
@@ -243,7 +243,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNamesToRebuild, ignoredPackages []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNamesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -263,7 +263,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, ignoredPackages, buildState, canUseCache)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			channels.Requests <- req
