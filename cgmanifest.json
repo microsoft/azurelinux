@@ -2208,6 +2208,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gtk-update-icon-cache",
+          "version": "3.24.26",
+          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.26/gtk-update-icon-cache-3.24.26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "guile",
           "version": "2.0.14",
           "downloadUrl": "ftp://ftp.gnu.org/pub/gnu/guile/guile-2.0.14.tar.gz"
