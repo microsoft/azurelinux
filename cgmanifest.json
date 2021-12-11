@@ -4048,6 +4048,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libXinerama",
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXinerama-1.1.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxkbcommon",
           "version": "1.0.1",
           "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.0.1.tar.xz"

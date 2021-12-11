@@ -133,6 +133,7 @@
                 "libXfont2",
                 "libXft",
                 "libXi",
+                "libXinerama",
                 "libxkbcommon",
                 "libxkbfile",
                 "libXmu",
