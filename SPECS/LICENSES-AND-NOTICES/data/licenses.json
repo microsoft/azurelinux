@@ -226,6 +226,7 @@
                 "ragel",
                 "rdma-core",
                 "re2",
+                "rest",
                 "rpmdevtools",
                 "sanlock",
                 "seabios",
