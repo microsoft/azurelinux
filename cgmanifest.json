@@ -875,6 +875,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "colord",
+          "version": "1.4.4",
+          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "conda",
           "version": "4.10.1",
           "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
