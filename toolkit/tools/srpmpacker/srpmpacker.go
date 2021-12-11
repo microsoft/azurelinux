@@ -305,8 +305,8 @@ func findSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 				return
 			}
 			if len(specFile) != 1 {
-				if specName == "msopenjdk-11" {
-					logger.Log.Infof("Ignoring missing match for (%s)", specName)
+				if strings.HasPrefix(specName, "msopenjdk-11") {
+					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
 					continue
 				} else {
 					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
