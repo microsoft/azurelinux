@@ -3738,6 +3738,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libpq",
+          "version": "12.2",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libpsl",
           "version": "0.20.2",
           "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.20.2/libpsl-0.20.2.tar.gz"

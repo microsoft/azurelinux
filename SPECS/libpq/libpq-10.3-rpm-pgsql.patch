@@ -1,0 +1,72 @@
+For the RPMs, we want the custom installation directories to end in
+/pgsql not /postgresql.  This is historical but not worth changing.
+
+Notice that this patch also makes the appending of /pgsql unconditional.
+This is to avoid unexpected behavior if the RPM is built in a working
+directory whose path happens to include "postgres" or "pgsql" already.
+However, datadir and sysconfdir are already set up in the specfile's
+configure call, so we do not have to append anything to them.
+
+
+diff -Naur postgresql-9.0.1.orig/src/Makefile.global.in postgresql-9.0.1/src/Makefile.global.in
+--- postgresql-9.0.1.orig/src/Makefile.global.in	2010-10-01 10:25:44.000000000 -0400
++++ postgresql-9.0.1/src/Makefile.global.in	2010-10-11 11:52:05.224975308 -0400
+@@ -55,8 +55,7 @@
+ # Installation directories
+ #
+ # These are set by the equivalent --xxxdir configure options.  We
+-# append "postgresql" to some of them, if the string does not already
+-# contain "pgsql" or "postgres", in order to avoid directory clutter.
++# append "pgsql" to some of them, in order to avoid directory clutter.
+ #
+ # In a PGXS build, we cannot use the values inserted into Makefile.global
+ # by configure, since the installation tree may have been relocated.
+@@ -74,45 +73,23 @@
+ bindir := @bindir@
+ 
+ datadir := @datadir@
+-ifeq "$(findstring pgsql, $(datadir))" ""
+-ifeq "$(findstring postgres, $(datadir))" ""
+-override datadir := $(datadir)/postgresql
+-endif
+-endif
+ 
+ sysconfdir := @sysconfdir@
+-ifeq "$(findstring pgsql, $(sysconfdir))" ""
+-ifeq "$(findstring postgres, $(sysconfdir))" ""
+-override sysconfdir := $(sysconfdir)/postgresql
+-endif
+-endif
+ 
+ libdir := @libdir@
+ 
+ pkglibdir = $(libdir)
+-ifeq "$(findstring pgsql, $(pkglibdir))" ""
+-ifeq "$(findstring postgres, $(pkglibdir))" ""
+-override pkglibdir := $(pkglibdir)/postgresql
+-endif
+-endif
++override pkglibdir := $(pkglibdir)/pgsql
+ 
+ includedir := @includedir@
+ 
+ pkgincludedir = $(includedir)
+-ifeq "$(findstring pgsql, $(pkgincludedir))" ""
+-ifeq "$(findstring postgres, $(pkgincludedir))" ""
+-override pkgincludedir := $(pkgincludedir)/postgresql
+-endif
+-endif
++override pkgincludedir := $(pkgincludedir)/pgsql
+ 
+ mandir := @mandir@
+ 
+ docdir := @docdir@
+-ifeq "$(findstring pgsql, $(docdir))" ""
+-ifeq "$(findstring postgres, $(docdir))" ""
+-override docdir := $(docdir)/postgresql
+-endif
+-endif
++override docdir := $(docdir)/pgsql
+ 
+ htmldir := @htmldir@
+ 
