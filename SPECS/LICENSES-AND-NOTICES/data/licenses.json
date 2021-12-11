@@ -103,6 +103,7 @@
                 "libfontenc",
                 "libglvnd",
                 "libgusb",
+                "libgxim",
                 "libICE",
                 "libinput",
                 "libiscsi",

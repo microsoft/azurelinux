@@ -3268,6 +3268,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgxim",
+          "version": "0.5.0",
+          "downloadUrl": "https://bitbucket.org/tagoh/libgxim/downloads/libgxim-0.5.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libICE",
           "version": "1.0.10",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
