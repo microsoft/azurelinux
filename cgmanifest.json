@@ -4588,6 +4588,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mariadb-connector-c",
+          "version": "3.1.10",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mc",
           "version": "4.8.21",
           "downloadUrl": "https://ftp.midnight-commander.org/mc-4.8.21.tar.xz"

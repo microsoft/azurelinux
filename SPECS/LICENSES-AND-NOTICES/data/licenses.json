@@ -154,6 +154,7 @@
                 "libXxf86vm",
                 "libzip",
                 "mailcap",
+                "mariadb-connector-c",
                 "mcpp",
                 "mcstrans",
                 "mesa",
