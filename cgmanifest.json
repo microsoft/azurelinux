@@ -3528,6 +3528,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnotify",
+          "version": "0.7.9",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libnotify/0.7/libnotify-0.7.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnsl2",
           "version": "1.2.0",
           "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz"

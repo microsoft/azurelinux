@@ -111,6 +111,7 @@
                 "libkcapi",
                 "liblognorm",
                 "libnfs",
+                "libnotify",
                 "libpciaccess",
                 "libpwquality",
                 "libsemanage",
