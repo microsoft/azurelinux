@@ -31,8 +31,15 @@ install_one_toolchain_rpm () {
         exit 1
     fi
 
+    if [[ "$1" == *"msopenjdk"* ]]; then
+        echo "Will install msopenjdk with --noscripts option: $1"
+        SCRIPTS_OPTION="--noscripts"
+    else
+        SCRIPTS_OPTION=""
+    fi
+
     echo "Found full path for package $1 in $rpm_path: ($full_rpm_path)" >> "$chroot_log"
-    rpm -i -v --nodeps --noorder --force --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
+    rpm -i -v --nodeps --noorder --force $SCRIPTS_OPTION --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
 
     if [ ! $? -eq 0 ]
     then
@@ -66,7 +73,14 @@ while read -r package || [ -n "$package" ]; do
 
     echo "Adding RPM DB entry to worker chroot: $package."  | tee -a "$chroot_log"
 
-    chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
+    if [[ "$package" == *"msopenjdk"* ]]; then
+        echo "Will install msopenjdk with --noscripts option: $package"
+        SCRIPTS_OPTION="--noscripts"
+    else
+        SCRIPTS_OPTION=""
+    fi
+
+    chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force $SCRIPTS_OPTION --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
     chroot "$chroot_builder_folder" rm $package
 done < "$packages"
 
