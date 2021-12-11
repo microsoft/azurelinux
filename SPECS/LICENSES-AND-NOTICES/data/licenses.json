@@ -72,6 +72,7 @@
                 "hwdata",
                 "hyperscan",
                 "hyperv-daemons",
+                "imsettings",
                 "ipmitool",
                 "ipv6calc",
                 "iscsi-initiator-utils",
