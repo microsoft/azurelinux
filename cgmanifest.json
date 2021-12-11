@@ -3108,6 +3108,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdaemon",
+          "version": "0.14",
+          "downloadUrl": "https://0pointer.de/lennart/projects/libdaemon/libdaemon-0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdb",
           "version": "5.3.28",
           "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"
