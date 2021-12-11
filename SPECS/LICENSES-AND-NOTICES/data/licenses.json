@@ -280,6 +280,7 @@
                 "xorg-x11-font-utils",
                 "xorg-x11-proto-devel",
                 "xorg-x11-server",
+                "xorg-x11-server-utils",
                 "xorg-x11-util-macros",
                 "xorg-x11-xauth",
                 "xorg-x11-xbitmaps",
