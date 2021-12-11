@@ -4588,6 +4588,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mcpp",
+          "version": "2.7.2",
+          "downloadUrl": "https://downloads.sourceforge.net/mcpp/mcpp-2.7.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mcstrans",
           "version": "3.2",
           "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/mcstrans-3.2.tar.gz"

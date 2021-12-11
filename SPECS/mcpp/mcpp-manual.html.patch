@@ -1,0 +1,17 @@
+*** doc-jp/mcpp-manual.html	2007-04-02 00:20:16.000000000 +0900
+--- doc-jp/mcpp-manual.html.utf8	2007-04-24 18:12:39.000000000 +0900
+***************
+*** 1,6 ****
+  <html>
+  <head>
+!   <meta http-equiv="Content-Type" content="text/html; charset=EUC-JP">
+    <style> pre {color: navy} tt {color: maroon} </style>
+    <style> table {border-collapse: separate; border-spacing: 0px; empty-cells: show; background-color: #f0f0ff} </style>
+    <style> th, td {text-align: left; padding-left: 15px; padding-right: 15px} </style>
+--- 1,6 ----
+  <html>
+  <head>
+!   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style> pre {color: navy} tt {color: maroon} </style>
+    <style> table {border-collapse: separate; border-spacing: 0px; empty-cells: show; background-color: #f0f0ff} </style>
+    <style> th, td {text-align: left; padding-left: 15px; padding-right: 15px} </style>

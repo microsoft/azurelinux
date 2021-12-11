@@ -153,6 +153,7 @@
                 "libXxf86vm",
                 "libzip",
                 "mailcap",
+                "mcpp",
                 "mcstrans",
                 "mesa",
                 "mokutil",
