@@ -33,6 +33,7 @@ sed -i 's/<limits.h>/<limits>\n#include <climits>/g' src/main/cpp/util/numbers.c
 sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/include/c++/11.2.0/array
 
 %build
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
 EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" ./compile.sh

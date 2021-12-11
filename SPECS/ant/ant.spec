@@ -17,6 +17,8 @@
 %global debug_package   %{nil}
 %global ant_home        %{_datadir}/ant
 %global _mavenpomdir    %{_datadir}/maven-poms
+# Don't generate requires on java-headless
+%global __requires_exclude_from %{_datadir}/maven-metadata
 
 Summary:        Apache Ant
 Name:           ant

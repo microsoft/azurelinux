@@ -14,8 +14,11 @@
 # published by the Open Source Initiative.
 #
 
-#need to disable debuginfo till we bring in x11 deps
+# need to disable debuginfo till we bring in x11 deps
 %define debug_package %{nil}
+# Don't generate requires on java-headless
+%global __requires_exclude_from %{_datadir}/maven-metadata
+
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
