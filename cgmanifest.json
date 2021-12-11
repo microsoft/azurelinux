@@ -9588,6 +9588,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-xbitmaps",
+          "version": "1.1.1",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xbitmaps-1.1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-xinit",
           "version": "1.4.0",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.0.tar.bz2"
