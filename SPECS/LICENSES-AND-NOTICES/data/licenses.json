@@ -30,6 +30,7 @@
                 "chrony",
                 "collectd",
                 "colm",
+                "color-filesystem",
                 "conda",
                 "conmon",
                 "conntrack-tools",
