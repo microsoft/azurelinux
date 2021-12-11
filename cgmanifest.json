@@ -4498,6 +4498,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lynx",
+          "version": "2.9.0~dev.9",
+          "downloadUrl": "https://invisible-mirror.net/archives/lynx/tarballs/lynx2.9.0dev.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lz4",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.2/lz4-1.9.2.tar.gz"

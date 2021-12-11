@@ -409,6 +409,7 @@
                 "jna",
                 "kured",
                 "libcontainers-common",
+                "lynx",
                 "patterns-ceph-containers",
                 "rook",
                 "xcursor-themes"
