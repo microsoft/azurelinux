@@ -102,6 +102,7 @@
                 "libfabric",
                 "libfontenc",
                 "libglvnd",
+                "libgusb",
                 "libICE",
                 "libinput",
                 "libiscsi",

@@ -3258,6 +3258,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgusb",
+          "version": "0.3.5",
+          "downloadUrl": "https://people.freedesktop.org/~hughsient/releases/libgusb-0.3.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libICE",
           "version": "1.0.10",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
