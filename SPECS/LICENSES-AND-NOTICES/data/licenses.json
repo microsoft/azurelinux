@@ -96,6 +96,7 @@
                 "libcacard",
                 "libcgroup",
                 "libcomps",
+                "libcroco",
                 "libdnf",
                 "libdrm",
                 "libepoxy",

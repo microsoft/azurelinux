@@ -3068,6 +3068,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcroco",
+          "version": "0.6.13",
+          "downloadUrl": "https://gitlab.gnome.org/Archive/libcroco/-/archive/0.6.13/libcroco-0.6.13.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdb",
           "version": "5.3.28",
           "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"

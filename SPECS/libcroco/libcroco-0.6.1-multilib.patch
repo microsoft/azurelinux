@@ -1,0 +1,41 @@
+--- libcroco-0.6.1/croco-config.in.multilib	2006-03-05 16:57:01.000000000 -0500
++++ libcroco-0.6.1/croco-config.in	2006-05-23 13:54:34.000000000 -0400
+@@ -1,10 +1,11 @@
+ #! /bin/sh
+ 
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
++name=libcroco-0.6
++prefix=`pkg-config --variable prefix $name`
++exec_prefix=`pkg-config --variable exec_prefix $name`
+ exec_prefix_set=no
+-includedir=@includedir@
+-libdir=@libdir@
++includedir=`pkg-config --variable includedir $name`
++libdir=`pkg-config --variable libdir $name`
+ 
+ usage()
+ {
+@@ -59,7 +60,7 @@
+ 	;;
+ 
+     --version)
+-	echo @VERSION@
++	pkg-config --modversion $name
+ 	exit 0
+ 	;;
+ 
+@@ -68,11 +69,11 @@
+ 	;;
+ 
+     --cflags)
+-	echo @CROCO_CFLAGS@ @GLIB2_CFLAGS@ @LIBXML2_CFLAGS@
++	pkg-config --cflags $name
+        	;;
+ 
+     --libs)
+-	echo @CROCO_LIBS@ @GLIB2_LIBS@ @LIBXML2_LIBS@
++	pkg-config --libs $name
+        	;;
+ 
+     *)
