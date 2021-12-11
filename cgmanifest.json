@@ -164,6 +164,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "at-spi2-core",
+          "version": "2.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/at-spi2-core/2.36/at-spi2-core-2.36.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atf",
           "version": "0.20",
           "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
