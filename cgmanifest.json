@@ -4098,6 +4098,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxfce4util",
+          "version": "4.14.0",
+          "downloadUrl": "https://archive.xfce.org/src/xfce/libxfce4util/4.14/libxfce4util-4.14.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXfixes",
           "version": "5.0.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"

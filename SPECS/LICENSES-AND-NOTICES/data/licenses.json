@@ -140,6 +140,7 @@
                 "libXext",
                 "libXfixes",
                 "libXfont2",
+                "libxfce4util",
                 "libXft",
                 "libXi",
                 "libXinerama",
