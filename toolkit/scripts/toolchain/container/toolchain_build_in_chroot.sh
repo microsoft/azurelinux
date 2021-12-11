@@ -1192,7 +1192,4 @@ rm -rf /tmp/*
 echo sanity check - raw toolchain - after build complete - gcc -v
 gcc -v
 
-echo Building OpenJDK raw dependencies
-sh /tools/jdk8-build-raw.sh 2>&1 | tee /logs/openjdk8_dependency_build.log
-
 touch /logs/status_building_in_chroot_complete

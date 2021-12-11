@@ -3,8 +3,6 @@ out/
 # Temporary toolchain build files that are left behind after a failed build.
 scripts/toolchain/container/.bashrc
 scripts/toolchain/container/04-fix-sigstksz.patch
-scripts/toolchain/container/Awt_build_headless_only.patch
-scripts/toolchain/container/check-system-ca-certs.patch
 scripts/toolchain/container/coreutils-fix-get-sys_getdents-aarch64.patch
 scripts/toolchain/container/cpio_extern_nocommon.patch
 scripts/toolchain/container/linker-script-readonly-keyword-support.patch
