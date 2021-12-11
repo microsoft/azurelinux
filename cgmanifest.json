@@ -7583,9 +7583,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qemu-kvm",
-          "version": "4.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-4.2.0.tar.xz"
+          "name": "qemu",
+          "version": "6.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-6.1.0.tar.xz"
         }
       }
     },
