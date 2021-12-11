@@ -8492,6 +8492,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "shared-mime-info",
+          "version": "1.15",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/b27eb88e4155d8fccb8bb3cd12025d5b/shared-mime-info-1.15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sharutils",
           "version": "4.15.2",
           "downloadUrl": "https://ftp.gnu.org/gnu/sharutils/sharutils-4.15.2.tar.xz"

@@ -228,6 +228,7 @@
                 "selinux-policy",
                 "setools",
                 "sgml-common",
+                "shared-mime-info",
                 "sharutils",
                 "sos",
                 "squashfs-tools",
