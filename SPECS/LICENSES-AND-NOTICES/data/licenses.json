@@ -61,6 +61,7 @@
                 "fuse-zip",
                 "fuse3",
                 "gcovr",
+                "gdk-pixbuf2",
                 "glusterfs",
                 "gnu-efi",
                 "google-roboto-slab-fonts",

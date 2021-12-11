@@ -1868,6 +1868,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gdk-pixbuf2",
+          "version": "2.40.0",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.40.0/gdk-pixbuf-2.40.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gettext",
           "version": "0.21",
           "downloadUrl": "http://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
