@@ -8872,6 +8872,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tinycdb",
+          "version": "0.78",
+          "downloadUrl": "https://www.corpit.ru/mjt/tinycdb/tinycdb-0.78.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tinyxml2",
           "version": "7.1.0",
           "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
