@@ -71,6 +71,8 @@
                 "gnu-efi",
                 "google-roboto-slab-fonts",
                 "gsm",
+                "gtk2",
+                "gtk3",
                 "hardening-check",
                 "heimdal",
                 "help2man",

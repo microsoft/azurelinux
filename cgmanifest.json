@@ -2278,6 +2278,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gtk2",
+          "version": "2.24.32",
+          "downloadUrl": "http://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.32.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gtk3",
+          "version": "3.24.28",
+          "downloadUrl": "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.28.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "guile",
           "version": "2.0.14",
           "downloadUrl": "ftp://ftp.gnu.org/pub/gnu/guile/guile-2.0.14.tar.gz"
