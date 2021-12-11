@@ -31,7 +31,7 @@ install_one_toolchain_rpm () {
         exit 1
     fi
 
-    if [[ "$1" =~ ".*msopenjdk.*" ]]; then
+    if [[ "$1" == *"msopenjdk"* ]]; then
         echo "Will install msopenjdk with --noscripts option: $1"
         SCRIPTS_OPTION="--noscripts"
     else
@@ -73,7 +73,7 @@ while read -r package || [ -n "$package" ]; do
 
     echo "Adding RPM DB entry to worker chroot: $package."  | tee -a "$chroot_log"
 
-    if [[ "$package" =~ ".*msopenjdk.*" ]]; then
+    if [[ "$package" == *"msopenjdk"* ]]; then
         echo "Will install msopenjdk with --noscripts option: $package"
         SCRIPTS_OPTION="--noscripts"
     else
