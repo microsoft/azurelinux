@@ -40,6 +40,7 @@
                 "CUnit",
                 "Cython",
                 "dbus-python",
+                "dconf",
                 "desktop-file-utils",
                 "ding-libs",
                 "dnf",

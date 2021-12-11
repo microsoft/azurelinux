@@ -1115,6 +1115,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dconf",
+          "version": "0.36.0",
+          "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "debugedit",
           "version": "5.0",
           "downloadUrl": "https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz"
