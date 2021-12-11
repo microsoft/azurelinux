@@ -164,6 +164,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "at-spi2-atk",
+          "version": "2.34.2",
+          "downloadUrl": "https://download.gnome.org/sources/at-spi2-atk/2.34/at-spi2-atk-2.34.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "at-spi2-core",
           "version": "2.36.1",
           "downloadUrl": "https://download.gnome.org/sources/at-spi2-core/2.36/at-spi2-core-2.36.tar.xz"
