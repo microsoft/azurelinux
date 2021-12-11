@@ -91,6 +91,7 @@
                 "kpmcore",
                 "kyua",
                 "lato-fonts",
+                "lcms2",
                 "leveldb",
                 "libatasmart",
                 "libbpf",

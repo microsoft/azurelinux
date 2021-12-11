@@ -2898,6 +2898,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lcms2",
+          "version": "2.9",
+          "downloadUrl": "https://www.littlecms.com/lcms2-2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "less",
           "version": "590",
           "downloadUrl": "http://www.greenwoodsoftware.com/less/less-590.tar.gz"
