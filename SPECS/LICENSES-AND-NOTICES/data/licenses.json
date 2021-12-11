@@ -161,6 +161,7 @@
                 "mesa",
                 "mokutil",
                 "mtdev",
+                "multilib-rpm-config",
                 "nftables",
                 "nvml",
                 "oath-toolkit",
