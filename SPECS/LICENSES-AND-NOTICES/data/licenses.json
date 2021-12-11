@@ -86,6 +86,7 @@
                 "ipv6calc",
                 "iscsi-initiator-utils",
                 "isns-utils",
+                "jasper",
                 "javapackages-tools",
                 "jemalloc",
                 "kde-settings",
