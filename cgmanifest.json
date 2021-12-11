@@ -9192,6 +9192,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vte291",
+          "version": "0.60.3",
+          "downloadUrl": "https://download.gnome.org/sources/vte/0.60/vte-0.60.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vulkan-headers",
           "version": "1.2.148.0",
           "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-1.2.148.0.tar.gz"

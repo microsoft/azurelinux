@@ -246,6 +246,7 @@
                 "uuid",
                 "virglrenderer",
                 "vitess",
+                "vte291",
                 "vulkan-headers",
                 "vulkan-loader",
                 "wayland",
