@@ -17,6 +17,7 @@
                 "at-spi2-atk",
                 "at-spi2-core",
                 "atf",
+                "atk",
                 "attr",
                 "augeas",
                 "autoconf213",
