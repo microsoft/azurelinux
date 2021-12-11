@@ -21,6 +21,7 @@
                 "attr",
                 "augeas",
                 "autoconf213",
+                "avahi",
                 "babeltrace2",
                 "bmake",
                 "brotli",

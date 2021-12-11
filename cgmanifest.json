@@ -314,6 +314,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "avahi",
+          "version": "0.7",
+          "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.7/avahi-0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-iot-sdk-c",
           "version": "2020.02.04.1",
           "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_02_2020_Ref01.tar.gz"
