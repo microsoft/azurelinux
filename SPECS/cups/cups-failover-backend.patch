@@ -1,0 +1,876 @@
+diff -up cups-2.3.3/backend/failover.c.failover cups-2.3.3/backend/failover.c
+--- cups-2.3.3/backend/failover.c.failover	2020-06-11 08:49:20.515264358 +0200
++++ cups-2.3.3/backend/failover.c	2020-06-11 08:49:20.515264358 +0200
+@@ -0,0 +1,837 @@
++/*
++ * Failover Backend for the Common UNIX Printing System (CUPS).
++ *
++ * Copyright (c) 2014, Red Hat, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * * Redistributions of source code must retain the above copyright
++ *   notice, this list of conditions and the following disclaimer.
++ * * Redistributions in binary form must reproduce the above copyright
++ *   notice, this list of conditions and the following disclaimer in the
++ *   documentation and/or other materials provided with the distribution.
++ * * Neither the name of Red Hat, Inc. nor the names of its contributors
++ *   may be used to endorse or promote products derived from this software
++ *   without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL RED HAT,
++ * INC.  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
++ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
++ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
++ * DAMAGE.
++ *
++ * Original version by Clark Hale, Red Hat, Inc.
++ *
++ * This backend presents a fake printer that will choose the first
++ * available printer from a list of IPP URIs.
++ *
++ * Option failover contains a comma separated list of IPP URIs.  The
++ * URIs are attempted in-order.
++ *
++ * Option failover-retries contains an integer that indicates how many
++ * times to iterate through the failover list before completely
++ * failing.
++ *
++ * Contents:
++ *   main()                   - Checks each printer in a failover list, and
++ *                              sends job data to the first available printer
++ *   move_job()               - Sends and IPP Move-Job request
++ *   check_printer()          - Checks a printer's attributes to see
++ *                              if it's enabled and accepting jobs
++ *   read_config()            - Read the backends configuration from
++ *                              options
++ *   get_printer_attributes() - Sends an IPP Get-Attributes request to
++ *                              a URI
++ *   sigterm_handler()        - Handle SIGTERM that cancels the job
++ *   password_cb()            - Password call back used to disable password
++ *                              prompt
++ */
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/wait.h>
++#include <cups/http-private.h>
++#include <cups/http.h>
++#include "backend-private.h"
++
++/*
++ * Return Values
++ */
++typedef enum fo_state_e
++{
++  FO_PRINTER_GOOD = 0,
++  FO_PRINTER_BAD,
++  FO_PRINTER_BUSY,
++  FO_AUTH_REQUIRED
++} fo_state_t;
++
++/*
++ * Constants
++ */
++#define FAILOVER_DEFAULT_RETRIES        (3)
++#define FAILOVER_PASSWORD_RETRIES_MAX   (3)
++
++/*
++ * Local Functions
++ */
++static       int   check_printer(const char *device_uri);
++static       int   read_config(cups_array_t *printer_array, int *retries,
++                               const char *options);
++static       int   get_printer_attributes(const char *device_uri,
++                                          ipp_t **attributes);
++static       int   move_job(int jobid, const char *dest);
++static       void  sigterm_handler(int sig);
++static const char *password_cb(const char *);
++
++/*
++ * Global Variables
++ */
++static int         job_canceled = 0;     /* Job canceled */
++static char       *password = NULL;      /* password for device */
++static int         password_retries = 0;
++static const char *auth_info_required = "none";
++
++/*
++ * 'main()' - Checks each printer in a failover list, and
++ *            sends job data to the first available printer
++ * Usage:
++ *    printer-uri job-id user title copies options [file]
++ *
++ *    The printer-uri option is not used, but it still required to fit
++ *    to the backend(7) standards.
++ */
++int
++main(int argc, char *argv[])
++{
++  const char   *selected_uri = NULL;      /* URI of selected printer     */
++  const char   *tmp_device_uri;           /* Device URI to check         */
++  cups_array_t *printer_array;            /* Array of available printers */
++  int           printer_count = 0;        /* current printer array index */
++  int           retry_max = 1;            /* maximum retries before exit */
++  int           retry_count = 0;          /* current retry number        */
++  int           auth_failed_count = 0;    /* auth failures per loop      */
++  int           rc = CUPS_BACKEND_OK;
++#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
++  struct        sigaction action;       /* Actions for POSIX signals */
++#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
++
++ /*
++  * Check args
++  */
++  if (argc == 1)
++  {
++   /*
++    * print out discovery data
++    */
++    char *backendName;
++
++    if ((backendName = strrchr(argv[0], '/')) != NULL)
++      backendName++;
++    else
++      backendName = argv[0];
++
++    _cupsLangPrintf(stderr,"network %s \"Unknown\" \"%s (%s)\"\n",
++                    backendName,
++                    _cupsLangString(cupsLangDefault(), _("Failover Printer")),
++                    backendName);
++
++    return (CUPS_BACKEND_OK);
++  }
++  else if (argc < 6)
++  {
++    _cupsLangPrintf(stderr,
++                    _("Usage: %s job-id user title copies options [file]"),
++                    argv[0]);
++    return (CUPS_BACKEND_STOP);
++  }
++
++  fprintf(stderr, "DEBUG: Failover backend starting up.\n");
++
++ /*
++  * Don't buffer status messages
++  */
++  setbuf(stderr, NULL);
++
++ /*
++  * Ignore SIGPIPE and catch SIGTERM signals...
++  */
++#ifdef HAVE_SIGSET
++  sigset(SIGPIPE, SIG_IGN);
++  sigset(SIGTERM, sigterm_handler);
++#elif defined(HAVE_SIGACTION)
++  memset(&action, 0, sizeof(action));
++  action.sa_handler = SIG_IGN;
++  sigaction(SIGPIPE, &action, NULL);
++
++  sigemptyset(&action.sa_mask);
++  sigaddset(&action.sa_mask, SIGTERM);
++  action.sa_handler = sigterm_handler;
++  sigaction(SIGTERM, &action, NULL);
++#else
++  signal(SIGPIPE, SIG_IGN);
++  signal(SIGTERM, sigterm_handler);
++#endif /* HAVE_SIGSET */
++
++  printer_array = cupsArrayNew(NULL, NULL);
++
++ /*
++  * Read Configuration
++  */
++  if ((rc = read_config(printer_array, &retry_max,
++                        argv[5])) != CUPS_BACKEND_OK)
++  {
++    fprintf(stderr, "ERROR: Failed to read configuration options!\n");
++    goto cleanup;
++  }
++
++ /*
++  * Main Retry Loop
++  */
++  for (retry_count = 0; retry_count < retry_max; retry_count++)
++  {
++    fprintf(stderr, "DEBUG: Retry loop #%d\n", retry_count + 1);
++
++   /*
++    * Reset Counters
++    */
++    printer_count = 0;
++    auth_failed_count = 0;
++
++    tmp_device_uri = (char *)cupsArrayFirst(printer_array);
++
++    do
++    {
++      if (job_canceled)
++      {
++        fprintf(stderr, "DEBUG: Job Canceled\n");
++        goto cleanup;
++      }
++
++      fprintf(stderr,"DEBUG: Checking printer #%d: %s\n",
++              printer_count+1, tmp_device_uri);
++
++      rc = check_printer(tmp_device_uri);
++
++      // Printer is available and not busy.
++      if ( rc == FO_PRINTER_GOOD )
++      {
++        selected_uri = tmp_device_uri;
++        break;
++      }
++      // Printer is busy
++      else if (rc == FO_PRINTER_BUSY)
++      {
++        fprintf(stderr, "DEBUG: Waiting for job to complete.\n");
++        sleep(2);
++        continue;
++      }
++      // Authorization is required to access the printer.
++      else if (rc == FO_AUTH_REQUIRED)
++      {
++        auth_failed_count++;
++        fprintf(stderr, "DEBUG: auth_failed_count = %d\n", auth_failed_count);
++      }
++      // Printer is stopped or not accepting jobs
++      else
++      {
++        if (!printer_count)
++          fprintf(stderr, "INFO: Primary Printer, %s, not available.  "
++                  "Attempting Failovers...\n",
++                  tmp_device_uri);
++        else
++          fprintf(stderr, "INFO: Failover Printer, %s, not available.  "
++                  "Attempting Failovers..\n",
++                  tmp_device_uri);
++        printer_count++;
++        tmp_device_uri = (char *)cupsArrayNext(printer_array);
++      }
++    } while (tmp_device_uri != NULL);
++
++    if (selected_uri && !printer_count)
++      fprintf(stderr, "STATE: -primary-printer-failed\n");
++    else
++      fprintf(stderr, "STATE: +primary-printer-failed\n");
++
++    if (job_canceled)
++    {
++      fprintf(stderr, "DEBUG: Job Canceled\n");
++      goto cleanup;
++    }
++
++    if (!selected_uri && auth_failed_count == printer_count)
++    {
++      fprintf(stderr, "ERROR:  All failover printers failed with "
++              "authorization issues.\n");
++      rc = CUPS_BACKEND_AUTH_REQUIRED;
++      fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
++      goto cleanup;
++    }
++    else if (!selected_uri && retry_count + 1 < retry_max)
++    {
++      fprintf(stderr, "INFO: No suitable printer found...retrying...\n");
++      sleep(2);
++      continue;
++    }
++    else if (selected_uri)
++    {
++      fprintf(stderr, "DEBUG: Using printer, %s.\n", selected_uri);
++      break;
++    }
++  }
++
++  if (!selected_uri)
++  {
++    fprintf(stderr, "ERROR: No suitable printer found.  Aborting print\n");
++    rc = CUPS_BACKEND_FAILED;
++    goto cleanup;
++  }
++
++  rc = move_job(atoi(argv[1]), selected_uri);
++
++  if (job_canceled)
++    rc = CUPS_BACKEND_OK;
++
++cleanup :
++  if (job_canceled)
++    rc = CUPS_BACKEND_OK;
++
++  tmp_device_uri = (char *)cupsArrayFirst(printer_array);
++  do
++  {
++    free((void *)tmp_device_uri);
++  } while ((tmp_device_uri = (char *)cupsArrayNext(printer_array)) != NULL);
++
++  cupsArrayDelete(printer_array);
++  sleep(2);
++  return (rc);
++}
++
++/*
++ * 'check_printer()' - Checks the status of a remote printer and returns
++ *                     back a good/bad/busy status.
++ */
++int
++check_printer(const char *device_uri)
++{
++  ipp_t           *attributes = NULL;     /* attributes for device_uri */
++  ipp_attribute_t *tmp_attribute;         /* for examining attribs     */
++  int              rc = FO_PRINTER_GOOD;  /* return code               */
++  char            *reason;                /* printer state reason */
++  int              i;
++
++  fprintf(stderr, "DEBUG: Checking printer %s\n",device_uri);
++
++  rc = get_printer_attributes(device_uri, &attributes);
++  if ( rc != CUPS_BACKEND_OK )
++  {
++    fprintf(stderr, "DEBUG: Failed to get attributes from printer: %s\n",
++            device_uri);
++    if ( rc == CUPS_BACKEND_AUTH_REQUIRED )
++      return (FO_AUTH_REQUIRED);
++    else
++      return (FO_PRINTER_BAD);
++  }
++
++ /*
++  * Check if printer is accepting jobs
++  */
++  if ((tmp_attribute = ippFindAttribute(attributes,
++                                        "printer-is-accepting-jobs",
++                                        IPP_TAG_BOOLEAN)) != NULL &&
++      !tmp_attribute->values[0].boolean)
++  {
++    fprintf(stderr,
++            "DEBUG: Printer, %s, is not accepting jobs.\n",
++            device_uri);
++
++    rc = FO_PRINTER_BAD;
++  }
++
++ /*
++  * Check if printer is stopped or busy processing
++  */
++  if ((tmp_attribute = ippFindAttribute(attributes,
++                                        "printer-state",
++                                        IPP_TAG_ENUM)) != NULL)
++  {
++    // Printer Stopped
++    if ( tmp_attribute->values[0].integer == IPP_PRINTER_STOPPED )
++    {
++      fprintf(stderr, "DEBUG: Printer, %s, stopped.\n", device_uri);
++      rc = FO_PRINTER_BAD;
++    }
++    // Printer Busy
++    else if ( tmp_attribute->values[0].integer == IPP_PRINTER_PROCESSING )
++    {
++      fprintf(stderr, "DEBUG: Printer %s is busy.\n", device_uri);
++      rc = FO_PRINTER_BUSY;
++    }
++  }
++
++  /*
++   * Parse through the printer-state-reasons
++   */
++  if ((tmp_attribute = ippFindAttribute(attributes, "printer-state-reasons",
++                                        IPP_TAG_KEYWORD)) != NULL)
++  {
++    for (i = 0; i < tmp_attribute->num_values; i++)
++    {
++      reason = tmp_attribute->values[i].string.text;
++      int len = strlen(reason);
++
++      if (len > 8 && !strcmp(reason + len - 8, "-warning"))
++      {
++        fprintf(stderr, "DEBUG: Printer Supply Warning, %s\n", reason);
++        rc = FO_PRINTER_BAD;
++      }
++      else if (len > 6 && !strcmp(reason + len - 6, "-error"))
++      {
++        fprintf(stderr, "DEBUG: Printer Supply Error, %s\n", reason);
++        rc = FO_PRINTER_BAD;
++      }
++    }
++  }
++
++  return (rc);
++}
++
++/*
++ * 'read_config()' - Parses the failover and failover-retries options
++ *
++ */
++static int
++read_config(cups_array_t *printer_array, int *retries, const char *options)
++{
++
++  const char    *tmp;                   /* temporary ptr                     */
++  char          *tok_tmp;               /* temporary ptr for option  parsing */
++  int            jobopts_count = 0;     /* number of options                 */
++  cups_option_t *jobopts = NULL;        /* job options                       */
++
++
++  fprintf(stderr, "DEBUG: Reading Configuration.\n");
++  jobopts_count = cupsParseOptions(options, 0, &jobopts);
++
++  if (!jobopts_count)
++  {
++    fprintf(stderr,
++            "ERROR: No job options!  Cannot find failover options!\n");
++    return (CUPS_BACKEND_STOP);
++  }
++
++ /*
++  * Get attributes from the primary printer
++  */
++  fprintf(stderr, "DEBUG: Searching for failover option.\n");
++
++  if ((tmp = cupsGetOption("failover", jobopts_count, jobopts)) != NULL)
++  {
++    fprintf(stderr, "DEBUG: Failover option contents: %s.\n", tmp);
++
++    tok_tmp = strdup(tmp);
++
++    tmp = strtok(tok_tmp, ",");
++    do
++    {
++      cupsArrayAdd(printer_array, strdup(tmp));
++    } while ((tmp = strtok(NULL,",")) != NULL);
++
++    free(tok_tmp);
++  }
++  else
++  {
++   /*
++    * The queue is misconfigured, so return back CUPS_BACKEND_STOP
++    */
++    fprintf(stderr, "ERROR: failover option not specified!\n");
++    return (CUPS_BACKEND_STOP);
++  }
++
++ /*
++  * Get the failover-retries value, if it exists.
++  */
++  fprintf(stderr, "DEBUG: Searching for failover-retries option.\n");
++
++  if ((tmp = cupsGetOption("failover-retries",
++                           jobopts_count, jobopts)) != NULL)
++  {
++    fprintf(stderr, "DEBUG: failover-retries option contents: %s.\n", tmp);
++    *retries = atoi(tmp);
++  }
++  else
++  {
++    *retries = FAILOVER_DEFAULT_RETRIES;
++    fprintf(stderr, "DEBUG: Failed to get failover-retries option\n");
++    fprintf(stderr, "DEBUG: Defaulted to %d retries\n", *retries);
++  }
++
++  return (CUPS_BACKEND_OK);
++}
++
++/*
++ * 'get_printer_attributes()' - Sends an IPP Get-Attributes request to
++ *                              a URI
++ */
++int
++get_printer_attributes(const char *device_uri, ipp_t **attributes)
++{
++  char               uri[HTTP_MAX_URI];         /* Updated URI without login */
++  int                version;                   /* IPP version */
++  char               scheme[256];               /* Scheme in URI */
++  ipp_status_t       ipp_status;                /* Status of IPP request */
++  char               hostname[1024];            /* Hostname */
++  char               resource[1024];            /* Resource infoo */
++  char               addrname[256];             /* Address name */
++  int                port;                      /* IPP Port number */
++  char               portname[255];             /* Port as string */
++  http_t            *http;                      /* HTTP connection */
++  ipp_t             *request;                   /* IPP request */
++  int                rc = CUPS_BACKEND_OK;      /* Return Code */
++  char               username[256];             /* Username for device URI */
++  char              *option_ptr;                /* for parsing resource opts */
++  const char * const pattrs[] =                 /* Printer attributes wanted */
++    {
++      "printer-is-accepting-jobs",
++      "printer-state",
++      "printer-state-reasons"
++    };
++
++  if (job_canceled)
++    return (CUPS_BACKEND_OK);
++
++  fprintf(stderr, "DEBUG: Getting Printer Attributes.\n");
++  fprintf(stderr, "DEBUG: Device URL %s.\n", device_uri);
++
++ /*
++  * Parse device_uri
++  */
++  if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
++                     username, sizeof(username), hostname, sizeof(hostname),
++                     &port, resource, sizeof(resource)) != HTTP_URI_OK)
++  {
++    fprintf(stderr, "ERROR: Problem parsing device_uri, %s\n", device_uri);
++    return (CUPS_BACKEND_STOP);
++  }
++
++  if (!port)
++    port = IPP_PORT;
++
++  sprintf(portname, "%d", port);
++
++  fprintf(stderr, "DEBUG: Getting Printer Attributes.\n");
++
++ /*
++  * Configure password
++  */
++  cupsSetPasswordCB(password_cb);
++
++ /*
++  * reset, in case a previous attempt for
++  * another printer left residue
++  */
++  cupsSetUser(NULL);
++  password = NULL;
++  password_retries = 0;
++
++  if (*username)
++  {
++    if ((password = strchr(username, ':')) != NULL)
++    {
++      *password = '\0';
++      password++;
++    }
++
++    cupsSetUser(username);
++  }
++  else if (!getuid())
++  {
++    const char *username_env;
++
++    if ((username_env = getenv("AUTH_USERNAME")) != NULL)
++    {
++      cupsSetUser(username_env);
++      password = getenv("AUTH_PASSWORD");
++    }
++  }
++
++ /*
++  * Try connecting to the remote server...
++  */
++  fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
++  _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
++
++  http = httpConnectEncrypt(hostname, port, cupsEncryption());
++
++ /*
++  * Deal the socket not being open.
++  */
++  if (!http)
++  {
++    int error = errno;          /* Connection error */
++
++    switch (error)
++    {
++    case EHOSTDOWN :
++      _cupsLangPuts(stderr, _("WARNING: "
++                              "The printer may not exist or "
++                              "is unavailable at this time.\n"));
++      break;
++    case EHOSTUNREACH :
++      _cupsLangPuts(stderr, _("WARNING: "
++                              "The printer is unreachable at this "
++                              "time.\n"));
++      break;
++    case ECONNREFUSED :
++      _cupsLangPuts(stderr, _("WARNING: "
++                              "Connection Refused.\n"));
++      break;
++    default :
++      fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
++      break;
++    }
++
++    rc = CUPS_BACKEND_FAILED;
++    sleep(5);
++    goto prt_available_cleanup;
++  }
++
++
++#ifdef AF_INET6
++  if (http->hostaddr->addr.sa_family == AF_INET6)
++    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n",
++            httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
++            ntohs(http->hostaddr->ipv6.sin6_port));
++  else
++#endif /* AF_INET6 */
++  if (http->hostaddr->addr.sa_family == AF_INET)
++    fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
++            httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
++            ntohs(http->hostaddr->ipv4.sin_port));
++
++ /*
++  * Search the resource string for options.
++  * We only care about version, for the moment.
++  */
++  version = 11;
++
++  if ((option_ptr = strchr(resource, '?')) != NULL)
++  {
++    *option_ptr++ = '\0';
++
++    if ((option_ptr = strstr(option_ptr, "version="))!=NULL)
++    {
++      int   minor;       /* minor version from URI */
++      int   major;       /* major version from URI */
++      char *version_str; /* ipp version */
++
++      option_ptr += 8;
++      version_str = option_ptr;
++
++      while (*option_ptr && *option_ptr != '&' && *option_ptr != '+')
++        option_ptr++;
++
++      if (*option_ptr)
++        *option_ptr = '\0';
++
++      sscanf(version_str, "%d.%d", &major, &minor);
++
++      version = (major * 10) + minor;
++
++      switch(version)
++      {
++      case 10 :
++      case 11 :
++      case 20 :
++      case 21 :
++        fprintf(stderr,
++                "DEBUG: Set version to %d from URI\n",
++                version);
++        break;
++      default :
++        _cupsLangPrintf(stderr,
++                        _("DEBUG: Invalid version, %d, from URI.  "
++                          "Using default of 1.1 \n"),
++                        version);
++        version = 11;
++      }
++    }
++  }
++
++
++ /*
++  * Build a URI for the printer.  We can't use the URI in argv[0]
++  * because it might contain username:password information...
++  */
++  if (httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
++                      hostname, port, resource) != HTTP_URI_OK)
++  {
++    fprintf(stderr, "ERROR: Problem assembling printer URI from host %s, "
++            "port %d, resource %s\n", hostname, port, resource);
++    return (CUPS_BACKEND_STOP);
++  }
++
++ /*
++  * Build the IPP request...
++  */
++  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
++  request->request.op.version[0] = version / 10;
++  request->request.op.version[1] = version % 10;
++
++  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
++               NULL, uri);
++
++  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
++                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
++                NULL, pattrs);
++
++ /*
++  * Do the request...
++  */
++  fputs("DEBUG: Getting supported attributes...\n", stderr);
++
++  fprintf(stderr, "DEBUG: IPP Request Structure Built.\n");
++
++  *attributes = cupsDoRequest(http, request, resource);
++  ipp_status = cupsLastError();
++
++  fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
++          ippErrorString(ipp_status), cupsLastErrorString());
++
++  if (ipp_status > IPP_OK_CONFLICT)
++  {
++    fprintf(stderr, "DEBUG: Get-Printer-Attributes returned %s.\n",
++            ippErrorString(ipp_status));
++    switch(ipp_status)
++    {
++    case IPP_FORBIDDEN :
++    case IPP_NOT_AUTHORIZED :
++      _cupsLangPuts(stderr, _("ERROR: Not Authorized.\n"));
++      rc = CUPS_BACKEND_AUTH_REQUIRED;
++      break;
++    case IPP_PRINTER_BUSY :
++    case IPP_SERVICE_UNAVAILABLE :
++      _cupsLangPuts(stderr, _("ERROR: "
++                              "The printer is not responding.\n"));
++      rc = CUPS_BACKEND_FAILED;
++      break;
++    case IPP_BAD_REQUEST :
++    case IPP_VERSION_NOT_SUPPORTED :
++      fprintf(stderr, "ERROR: Destination does not support IPP version %d\n",
++              version);
++    case IPP_NOT_FOUND :
++      _cupsLangPuts(stderr, _("ERROR: "
++                              "The printer configuration is incorrect or the "
++                              "printer no longer exists.\n"));
++      rc = CUPS_BACKEND_STOP;
++      break;
++    default :
++      rc = CUPS_BACKEND_FAILED;
++    }
++    goto prt_available_cleanup;
++  }
++
++prt_available_cleanup :
++  httpClose(http);
++  return (rc);
++}
++
++static int
++move_job(int        jobid,              /* Job ID */
++         const char *dest)              /* Destination ipp address */
++{
++  ipp_t *request;                       /* IPP Request */
++  char  job_uri[HTTP_MAX_URI];          /* job-uri */
++
++  http_t* http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
++
++  if (!http)
++  {
++    _cupsLangPrintf(stderr,
++                    _("failover: Unable to connect to server: %s\n"),
++                    strerror(errno));
++    return (CUPS_BACKEND_FAILED);
++  }
++
++ /*
++  * Build a CUPS_MOVE_JOB request, which requires the following
++  * attributes:
++  *
++  *    job-uri/printer-uri
++  *    job-printer-uri
++  *    requesting-user-name
++  */
++
++  request = ippNewRequest(CUPS_MOVE_JOB);
++
++  snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", jobid);
++  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
++               job_uri);
++
++  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
++               "requesting-user-name",
++               NULL, cupsUser());
++
++  ippAddString(request, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri",
++               NULL, dest);
++
++ /*
++  * Do the request and get back a response...
++  */
++
++  ippDelete(cupsDoRequest(http, request, "/jobs"));
++
++  httpClose(http);
++
++  if (cupsLastError() > IPP_OK_CONFLICT)
++  {
++    _cupsLangPrintf(stderr, "failover: %s\n", cupsLastErrorString());
++    return (CUPS_BACKEND_FAILED);
++  }
++  else
++    return (CUPS_BACKEND_OK);
++}
++
++/*
++ * 'sigterm_handler()' - handles a sigterm, i.e. job canceled
++ */
++static void
++sigterm_handler(int sig)
++{
++  if (!job_canceled)
++  {
++    write(2, "DEBUG: Got SIGTERM.\n", 20);
++    job_canceled = 1;
++  }
++  else
++  {
++   /*
++    * Job has already been canceled, so just exit
++    */
++    exit(1);
++  }
++}
++
++/*
++ * 'password_cb()' - Disable the password prompt for cupsDoFileRequest().
++ */
++static const char *                     /* O - Password  */
++password_cb(const char *prompt)         /* I - Prompt (not used) */
++{
++  auth_info_required = "username,password";
++  password_retries++;
++
++  if(password_retries < FAILOVER_PASSWORD_RETRIES_MAX)
++    return (password);
++  else
++    return (NULL);
++}
+diff -up cups-2.3.3/backend/Makefile.failover cups-2.3.3/backend/Makefile
+--- cups-2.3.3/backend/Makefile.failover	2020-04-27 20:04:29.000000000 +0200
++++ cups-2.3.3/backend/Makefile	2020-06-11 08:52:31.212642019 +0200
+@@ -22,6 +22,7 @@ include ../Makedefs
+ RBACKENDS =	\
+ 		ipp \
+ 		lpd \
++		failover \
+ 		$(DNSSD_BACKEND)
+ UBACKENDS =	\
+ 		snmp \
+@@ -45,6 +46,7 @@ LIBOBJS	=	\
+ OBJS	=	\
+ 		ipp.o \
+ 		lpd.o \
++		failover.o \
+ 		dnssd.o \
+ 		snmp.o \
+ 		socket.o \
+@@ -276,6 +278,15 @@ lpd:	lpd.o ../cups/$(LIBCUPS) libbackend
+ 
+ 
+ #
++# failover
++#
++
++failover:	failover.o ../cups/$(LIBCUPS) libbackend.a
++	echo Linking $@...
++	$(LD_CC) $(ALL_LDFLAGS) -o failover failover.o libbackend.a $(LINKCUPS)
++
++
++#
+ # snmp
+ #
+ 

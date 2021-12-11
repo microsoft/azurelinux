@@ -1055,6 +1055,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cups",
+          "version": "2.3.3op2",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.3.3op2/cups-2.3.3op2-source.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "curl",
           "version": "7.76.0",
           "downloadUrl": "https://curl.haxx.se/download/curl-7.76.0.tar.gz"

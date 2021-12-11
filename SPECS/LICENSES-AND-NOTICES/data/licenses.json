@@ -38,6 +38,7 @@
                 "cpprest",
                 "cryptsetup",
                 "CUnit",
+                "cups",
                 "Cython",
                 "dbus-python",
                 "dconf",
