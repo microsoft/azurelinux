@@ -126,6 +126,7 @@
                 "libnotify",
                 "libpciaccess",
                 "libpwquality",
+                "librsvg2",
                 "libsemanage",
                 "libslirp",
                 "libSM",

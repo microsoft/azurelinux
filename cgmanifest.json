@@ -3768,6 +3768,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "librsvg2",
+          "version": "2.48.9",
+          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.48/librsvg-2.48.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "librsync",
           "version": "2.0.2",
           "downloadUrl": "https://github.com/librsync/librsync/archive/v2.0.2.tar.gz"
