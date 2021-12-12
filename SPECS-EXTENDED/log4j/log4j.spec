@@ -1,18 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %bcond_without  jp_minimal
 
 Name:           log4j
-Version:        2.13.0
-Release:        4%{?dist}
+Version:        2.15.0
+Release:        2%{?dist}
 Summary:        Java logging package
 BuildArch:      noarch
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://logging.apache.org/%{name}
+Source0:        https://www.apache.org/dist/logging/%{name}/%{version}/apache-%{name}-%{version}-src.tar.gz
 
-URL:            http://logging.apache.org/%{name}
-Source0:        http://www.apache.org/dist/logging/%{name}/%{version}/apache-%{name}-%{version}-src.tar.gz
-
-Patch1:         logging-log4j-LOG4J2-2745-LOG4J2-2744-slf4j.patch
 Patch2:         logging-log4j-Remove-unsupported-EventDataConverter.patch
 
 BuildRequires:  maven-local
@@ -20,17 +18,20 @@ BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations)
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-core)
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-databind)
 BuildRequires:  mvn(com.lmax:disruptor)
+BuildRequires:  mvn(com.sun.activation:jakarta.activation)
 BuildRequires:  mvn(com.sun.mail:javax.mail)
 BuildRequires:  mvn(commons-logging:commons-logging)
 BuildRequires:  mvn(org.apache.commons:commons-compress)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
 BuildRequires:  mvn(org.apache:apache:pom:)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-assembly-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-dependency-plugin)
 BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
 BuildRequires:  mvn(org.fusesource.jansi:jansi)
 BuildRequires:  mvn(org.jctools:jctools-core)
 BuildRequires:  mvn(org.osgi:osgi.core)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
-BuildRequires:  mvn(org.slf4j:slf4j-ext)
+BuildRequires:  mvn(jakarta.servlet:jakarta.servlet-api)
 
 %if %{without jp_minimal}
 BuildRequires:  mvn(com.datastax.cassandra:cassandra-driver-core)
@@ -49,7 +50,7 @@ BuildRequires:  mvn(org.apache.tomcat:tomcat-catalina)
 BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
 BuildRequires:  mvn(org.eclipse.jetty:jetty-util)
 BuildRequires:  mvn(org.eclipse.persistence:javax.persistence)
-BuildRequires:  mvn(org.fusesource.jansi:jansi)
+BuildRequires:  mvn(org.fusesource.jansi:jansi:1)
 BuildRequires:  mvn(org.jboss.spec.javax.jms:jboss-jms-api_1.1_spec)
 BuildRequires:  mvn(org.jctools:jctools-core)
 BuildRequires:  mvn(org.lightcouch:lightcouch)
@@ -160,12 +161,8 @@ rm -rf docs/api
 # artifact for upstream testing of log4j itself, shouldn't be distributed
 %pom_disable_module %{name}-perf
 
-# needs java 9 to build
-%pom_disable_module %{name}-api-java9
-%pom_disable_module %{name}-core-java9
-%pom_remove_dep -r :%{name}-api-java9
-%pom_remove_dep -r :%{name}-core-java9
-%pom_remove_plugin -r :maven-dependency-plugin
+# add dependency for javax.activation package (no longer part of OpenJDK)
+%pom_add_dep com.sun.activation:jakarta.activation
 
 # unavailable com.conversantmedia:disruptor
 rm log4j-core/src/main/java/org/apache/logging/log4j/core/async/DisruptorBlockingQueueFactory.java
@@ -184,9 +181,9 @@ rm -r log4j-core/src/main/java/org/apache/logging/log4j/core/appender/mom/kafka
 # we don't have commons-dbcp2
 %pom_disable_module %{name}-jdbc-dbcp2
 
-# We have mongodb 4
-%pom_disable_module %{name}-mongodb2
+# We don't have mmongo-java
 %pom_disable_module %{name}-mongodb3
+%pom_disable_module %{name}-mongodb4
 
 # System scoped dep provided by JDK
 %pom_remove_dep :jconsole %{name}-jmx-gui
@@ -201,6 +198,10 @@ rm -r log4j-core/src/main/java/org/apache/logging/log4j/core/appender/mom/kafka
 # tests are disabled
 %pom_remove_plugin :maven-failsafe-plugin
 
+# Remove deps on slf4j-ext, it is no longer available in Fedora 35
+%pom_remove_dep -r :slf4j-ext
+%pom_remove_parent
+
 %if %{with jp_minimal}
 %pom_disable_module %{name}-taglib
 %pom_disable_module %{name}-jmx-gui
@@ -214,7 +215,9 @@ rm -r log4j-core/src/main/java/org/apache/logging/log4j/core/appender/mom/kafka
 %pom_disable_module %{name}-cassandra
 %pom_disable_module %{name}-appserver
 %pom_disable_module %{name}-spring-cloud-config
+%pom_disable_module %{name}-spring-boot
 %pom_disable_module %{name}-kubernetes
+%pom_disable_module %{name}-layout-template-json
 
 %pom_remove_dep -r :jackson-dataformat-yaml
 %pom_remove_dep -r :jackson-dataformat-xml
@@ -253,7 +256,7 @@ rm -r log4j-1.2-api/src/main/java/org/apache/log4j/or/jms
 
 %build
 # missing test deps (mockejb)
-%mvn_build -f --skip-tests
+%mvn_build -f -j --skip-tests
 
 %install
 %mvn_install
@@ -280,14 +283,49 @@ mvn test
 %{_bindir}/%{name}-jmx
 %endif
 
-%files javadoc -f .mfiles-javadoc
-%doc LICENSE.txt NOTICE.txt
+#%%files javadoc -f .mfiles-javadoc
+#%%doc LICENSE.txt NOTICE.txt
 
 
 %changelog
-* Wed Aug 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13.0-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Moving tests to the '%%check' section.
+* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.15.0-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
+* Sun Dec 12 2021 Sérgio Basto <sergio@serjux.com> - 2.15.0-1
+- Update log4j to 2.15.0 (#2030907)
+- Security fix for CVE-2021-44228 (#2030945)
+
+* Sun Aug 01 2021 Sérgio Basto <sergio@serjux.com> - 2.14.1-1
+- Update to 2.14.1
+- Disable javadoc (#1988896)
+- Build with jansi-2
+- Remove deps on slf4j-ext (no longer available in Fedora 35)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 14 2020 Jerry James <loganjerry@gmail.com> - 2.13.3-2
+- Update jansi dep to jansi1
+
+* Thu Aug 20 2020 Fabio Valentini <decathorpe@gmail.com> - 2.13.3-1
+- Update to version 2.13.3.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 20 2020 Fabio Valentini <decathorpe@gmail.com> - 2.13.1-3
+- Add missing javax.activation dependency.
+
+* Sat Jul 11 2020 Jiri Vanek <jvanek@redhat.com> - 2.13.1-2
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Mon Mar 02 2020 Fabio Valentini <decathorpe@gmail.com> - 2.13.1-1
+- Update to version 2.13.1.
+- Drop upstream patch that's included in the new release.
+- Rebase patch for removing the unsupported SLF4J EventDataConverter.
 
 * Thu Jan 30 2020 Fabio Valentini <decathorpe@gmail.com> - 2.13.0-3
 - Add upstream patch for compatibility with the latest slf4j versions.
